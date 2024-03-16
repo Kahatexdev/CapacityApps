@@ -35,4 +35,15 @@ class CapacityController extends BaseController
         ];
         return view('Capacity/index', $data);
     }
+    public function booking(){
+        $data = [
+            'title' => 'Capacity System',
+            'active1' => '',
+            'active2' => 'active',
+            'active3' => '',
+            'active4' => '',
+
+        ];
+        return view('Capacity/Booking/booking', $data);
+    }
 }

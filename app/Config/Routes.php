@@ -14,6 +14,7 @@ $routes->post('authverify', 'AuthController::login');
 
 $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('', 'CapacityController::index');
+    $routes->get('databooking', 'CapacityController::booking');
 });
 
 
