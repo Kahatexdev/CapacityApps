@@ -16,6 +16,8 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('', 'CapacityController::index');
     $routes->get('databooking', 'CapacityController::booking');
     $routes->get('databooking/detail144', 'CapacityController::jarum144');
+    $routes->get('dataorder', 'CapacityController::order');
+    $routes->get('dataproduksi', 'CapacityController::produksi');
 });
 
 
