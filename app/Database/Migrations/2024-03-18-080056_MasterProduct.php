@@ -4,7 +4,7 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class MasterProductType extends Migration
+class MasterProduct extends Migration
 {
     public function up()
     {
