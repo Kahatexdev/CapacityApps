@@ -26,98 +26,36 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-            <button class="btn ">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
 
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-capitalize font-weight-bold">Jarum 144</p>
-                                    <h5 class="font-weight-bolder mb-0">
+        <?php foreach ($Jarum as $jr) : ?>
+            <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+                <a href="<?= base_url('capacity/databooking/') ?>">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row">
 
-                                    </h5>
+                                <div class="col-8">
+                                    <div class="numbers">
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold"><?= $jr ?></p>
+                                        <h5 class="font-weight-bolder mb-0">
+
+                                        </h5>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                    <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+                                <div class="col-4 text-end">
+                                    <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                        <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+                                    </div>
                                 </div>
-                            </div>
 
-                        </div>
-                    </div>
-                </div>
-            </button>
-        </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Order Jalan</p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    175
-                                </h5>
-                            </div>
-                        </div>
-                        <div class="col-4 text-end">
-                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-single-02 text-lg opacity-10" aria-hidden="true"></i>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
-        </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Mesin Jalan</p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    1420
-                                </h5>
-                            </div>
-                        </div>
-                        <div class="col-4 text-end">
-                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-atom text-lg opacity-10" aria-hidden="true"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-sm-6">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Order Selesai</p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    8
-                                    <span class="text-success text-sm font-weight-bolder">Bulan Ini</span>
-                                </h5>
-                            </div>
-                        </div>
-                        <div class="col-4 text-end">
-                            <div class="icon icon-shape bg-gradient-success shadow text-center border-radius-md">
-                                <i class="ni ni-check-bold text-lg opacity-10" aria-hidden="true"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <?php endforeach ?>
+
     </div>
-
-</div>
 
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>

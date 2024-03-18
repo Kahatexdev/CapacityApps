@@ -20,7 +20,7 @@ class DataBooking extends Migration
             ],
             'kd_buyer_booking' => [
                 'type' => 'VARCHAR',
-                'constraint' => 100,
+                'constraint' => 30,
             ],
             'id_product_type' => [
                 'type' => 'INT',
@@ -28,15 +28,19 @@ class DataBooking extends Migration
             ],
             'no_order' => [
                 'type' => 'VARCHAR',
-                'constraint' => 100,
+                'constraint' => 30,
             ],
             'no_booking' => [
+                'type' => 'VARCHAR',
+                'constraint' => 30,
+            ],
+            'desc' => [
                 'type' => 'VARCHAR',
                 'constraint' => 100,
             ],
             'opd' => [
                 'type' => 'VARCHAR',
-                'constraint' => 100,
+                'constraint' => 30,
             ],
             'delivery' => [
                 'type' => 'DATE',
@@ -51,11 +55,11 @@ class DataBooking extends Migration
             ],
             'needle' => [
                 'type' => 'VARCHAR',
-                'constraint' => 100,
+                'constraint' => 30,
             ],
             'seam' => [
                 'type' => 'VARCHAR',
-                'constraint' => 100,
+                'constraint' => 30,
             ],
         ]);
         $this->forge->addKey('id_booking', true);

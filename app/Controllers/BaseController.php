@@ -9,6 +9,10 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
+use App\Models\DataMesinModel;
+
+
+
 /**
  * Class BaseController
  *
@@ -21,6 +25,12 @@ use Psr\Log\LoggerInterface;
  */
 abstract class BaseController extends Controller
 {
+    protected $jarumModel;
+
+    public function __construct()
+    {
+        $this->jarumModel = new DataMesinModel();
+    }
     /**
      * Instance of the main Request object.
      *
