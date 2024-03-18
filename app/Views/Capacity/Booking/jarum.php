@@ -50,7 +50,11 @@
                                     <input type="text" name="no_pdk" id="" class="form-control">
                                 </div>
                                 <div class="form-group">
-                                    <label for="desc" class="col-form-label">Description:</label>
+                                    <label for="productType" class="col-form-label">Description:</label>
+                                    <input type="text" name="productType" id="" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="desc" class="col-form-label">Product Type:</label>
                                     <input type="text" name="desc" id="" class="form-control">
                                 </div>
                                 <div class="form-group">
