@@ -36,9 +36,9 @@
 
                                 <div class="col-8">
                                     <div class="numbers">
-                                        <p class="text-sm mb-0 text-capitalize font-weight-bold"><?= $jr ?></p>
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold"><?= $jr['jarum'] ?></p>
                                         <h5 class="font-weight-bolder mb-0">
-
+                                            Total Mesin : <?= $jr['totalMesin'] ?>
                                         </h5>
                                     </div>
                                 </div>

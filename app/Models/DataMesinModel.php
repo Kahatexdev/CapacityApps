@@ -43,12 +43,8 @@ class DataMesinModel extends Model
 
     public function getJarum()
     {
-        // Mengambil nilai unik dari kolom 'jarum'
-        $query = $this->distinct()->select('')->orderBy('jarum', 'ASC')->findAll();
-
-        // Mengubah hasil query menjadi array dengan nilai 'jarum' saja
+        $query = $this->distinct()->select('jarum')->orderBy('jarum', 'ASC')->findAll();
         $uniqueJarums = array_column($query, 'jarum');
-
         return $uniqueJarums;
     }
     public function getTotalMesinByJarum()

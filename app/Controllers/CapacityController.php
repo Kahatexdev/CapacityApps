@@ -44,14 +44,17 @@ class CapacityController extends BaseController
     {
         $dataJarum = $this->jarumModel->getJarum();
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
-        dd($totalMesin);
+        $jarumData = [
+            'jarum' => $dataJarum,
+            'totalMesin' => $totalMesin
+        ];
         $data = [
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
             'active3' => '',
             'active4' => '',
-            'Jarum' => $dataJarum,
+            'Jarum' => $jarumData,
 
         ];
         return view('Capacity/Booking/booking', $data);
