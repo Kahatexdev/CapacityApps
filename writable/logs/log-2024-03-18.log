@@ -332,3 +332,136 @@ INFO - 2024-03-18 03:54:59 --> Session: Class initialized using 'CodeIgniter\Ses
 INFO - 2024-03-18 03:56:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2024-03-18 03:56:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2024-03-18 04:00:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:04:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:04:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:05:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:06:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:07:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:10:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:10:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:12:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:12:42 --> TypeError: Cannot access offset of type string on string
+in APPPATH\Views\Capacity\Booking\booking.php on line 39.
+ 1 SYSTEMPATH\View\View.php(228): include()
+ 2 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 3 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 4 APPPATH\Controllers\CapacityController.php(56): view('Capacity/Booking/booking', [...])
+ 5 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
+ 6 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
+ 7 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('D:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:13:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:13:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:13:42 --> ErrorException: Undefined variable $jarumWithTotalMesin
+in APPPATH\Views\Capacity\Booking\booking.php on line 30.
+ 1 APPPATH\Views\Capacity\Booking\booking.php(30): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $jarumWithTotalMesin', 'D:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php', 30)
+ 2 SYSTEMPATH\View\View.php(228): include('D:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php')
+ 3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 5 APPPATH\Controllers\CapacityController.php(56): view('Capacity/Booking/booking', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
+ 7 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('D:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:14:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:14:20 --> ErrorException: Undefined variable $jarumWithTotalMesin
+in APPPATH\Views\Capacity\Booking\booking.php on line 30.
+ 1 APPPATH\Views\Capacity\Booking\booking.php(30): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $jarumWithTotalMesin', 'D:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php', 30)
+ 2 SYSTEMPATH\View\View.php(228): include('D:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php')
+ 3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 5 APPPATH\Controllers\CapacityController.php(56): view('Capacity/Booking/booking', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
+ 7 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('D:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:14:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:14:26 --> ErrorException: Undefined variable $jarumWithTotalMesin
+in APPPATH\Views\Capacity\Booking\booking.php on line 30.
+ 1 APPPATH\Views\Capacity\Booking\booking.php(30): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $jarumWithTotalMesin', 'D:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php', 30)
+ 2 SYSTEMPATH\View\View.php(228): include('D:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php')
+ 3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 5 APPPATH\Controllers\CapacityController.php(56): view('Capacity/Booking/booking', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
+ 7 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('D:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:15:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:15:18 --> ErrorException: Undefined variable $TotalMesin
+in APPPATH\Views\Capacity\Booking\booking.php on line 30.
+ 1 APPPATH\Views\Capacity\Booking\booking.php(30): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $TotalMesin', 'D:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php', 30)
+ 2 SYSTEMPATH\View\View.php(228): include('D:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php')
+ 3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 5 APPPATH\Controllers\CapacityController.php(56): view('Capacity/Booking/booking', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
+ 7 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('D:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:16:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:16:05 --> ErrorException: Array to string conversion
+in APPPATH\Views\Capacity\Booking\booking.php on line 39.
+ 1 APPPATH\Views\Capacity\Booking\booking.php(39): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Array to string conversion', 'D:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php', 39)
+ 2 SYSTEMPATH\View\View.php(228): include('D:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php')
+ 3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 5 APPPATH\Controllers\CapacityController.php(57): view('Capacity/Booking/booking', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
+ 7 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('D:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:16:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:16:15 --> ErrorException: Undefined array key "jarum"
+in APPPATH\Views\Capacity\Booking\booking.php on line 39.
+ 1 APPPATH\Views\Capacity\Booking\booking.php(39): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "jarum"', 'D:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php', 39)
+ 2 SYSTEMPATH\View\View.php(228): include('D:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php')
+ 3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 5 APPPATH\Controllers\CapacityController.php(57): view('Capacity/Booking/booking', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
+ 7 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('D:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:17:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:17:44 --> ErrorException: Undefined array key "jarum"
+in APPPATH\Views\Capacity\Booking\booking.php on line 39.
+ 1 APPPATH\Views\Capacity\Booking\booking.php(39): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "jarum"', 'D:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php', 39)
+ 2 SYSTEMPATH\View\View.php(228): include('D:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php')
+ 3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 5 APPPATH\Controllers\CapacityController.php(57): view('Capacity/Booking/booking', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
+ 7 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('D:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:18:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:18:19 --> ErrorException: Undefined array key "jarum"
+in APPPATH\Views\Capacity\Booking\booking.php on line 39.
+ 1 APPPATH\Views\Capacity\Booking\booking.php(39): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "jarum"', 'D:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php', 39)
+ 2 SYSTEMPATH\View\View.php(228): include('D:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php')
+ 3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 5 APPPATH\Controllers\CapacityController.php(57): view('Capacity/Booking/booking', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
+ 7 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('D:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:19:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:19:24 --> ErrorException: Cannot redeclare App\Models\DataMesinModel::getTotalMesinByJarum()
+in APPPATH\Models\DataMesinModel.php on line 60.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+INFO - 2024-03-18 04:19:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:20:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:20:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:21:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:21:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
