@@ -44,22 +44,18 @@ class CapacityController extends BaseController
     {
         $dataJarum = $this->jarumModel->getJarum();
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
-        $jarumData = [
-            'jarum' => $dataJarum,
-            'totalMesin' => $totalMesin
-        ];
         $data = [
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
             'active3' => '',
             'active4' => '',
-            'Jarum' => $jarumData,
-
+            'Jarum' => $dataJarum,
+            'TotalMesin' => $totalMesin,
         ];
         return view('Capacity/Booking/booking', $data);
     }
-    public function jarum144()
+    public function bookingPerJarum($jarum)
     {
 
         $data = [
@@ -68,8 +64,31 @@ class CapacityController extends BaseController
             'active2' => 'active',
             'active3' => '',
             'active4' => '',
+            'jarum' => $jarum
 
         ];
-        return view('Capacity/Booking/jarum144', $data);
+        return view('Capacity/Booking/jarum', $data);
+    }
+    public function inputbooking()
+    {
+        $tglbk = $this->request->getPost("tgl_booking");
+        $no_order = $this->request->getPost("no_order");
+        $no_pdk = $this->request->getPost("no_pdk");
+        $desc = $this->request->getPost("desc");
+        $seam = $this->request->getPost("seam");
+        $opd = $this->request->getPost("opd");
+        $shipment = $this->request->getPost("shipment");
+        $qty = $this->request->getPost("qty");
+
+        $validate = [
+            'no_order' => $no_order,
+            'no_pdk' => $no_pdk
+        ];
+
+
+        $input = [
+            'tgl_booking' => $tglbk,
+
+        ];
     }
 }

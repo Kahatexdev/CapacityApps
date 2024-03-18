@@ -4,20 +4,20 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class DataMesinModel extends Model
+class BookingModel extends Model
 {
-    protected $table            = 'data_mesin';
-    protected $primaryKey       = 'id_data_mesin';
+    protected $table            = 'data_booking';
+    protected $primaryKey       = 'id_booking';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_data_mesin', 'area', 'jarum', 'total_mc', 'brand', 'mesin_jalan'];
+    protected $allowedFields    = ['id_booking', 'tgl_terima_booking', 'kd_buyer', 'id_product_type', 'no_order', 'no_booking', 'desc', 'opd', 'delivery', 'qty_booking', 'sisa_booking', 'needle', 'seam'];
 
     protected bool $allowEmptyInserts = false;
 
     // Dates
-    protected $useTimestamps = true;
+    protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -39,20 +39,4 @@ class DataMesinModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
-
-
-    public function getJarum()
-    {
-        // Mengambil nilai unik dari kolom 'jarum'
-        $query = $this->distinct()->select('jarum')->orderBy('jarum', 'ASC')->findAll();
-
-        // Mengubah hasil query menjadi array dengan nilai 'jarum' saja
-        $uniqueJarums = array_column($query, 'jarum');
-        return $uniqueJarums;
-    }
-    public function getTotalMesinByJarum()
-    {
-        $query = $this->select('jarum, SUM(total_mc) as total')->groupBy('jarum')->findAll();
-        return $query;
-    }
 }
