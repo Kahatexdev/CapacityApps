@@ -332,6 +332,16 @@ INFO - 2024-03-18 03:54:59 --> Session: Class initialized using 'CodeIgniter\Ses
 INFO - 2024-03-18 03:56:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2024-03-18 03:56:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2024-03-18 04:00:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+<<<<<<< HEAD
+INFO - 2024-03-18 04:06:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:06:52 --> ErrorException: Array to string conversion
+in APPPATH\Views\Capacity\Booking\booking.php on line 39.
+ 1 APPPATH\Views\Capacity\Booking\booking.php(39): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Array to string conversion', 'C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php', 39)
+ 2 SYSTEMPATH\View\View.php(228): include('C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php')
+ 3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 5 APPPATH\Controllers\CapacityController.php(60): view('Capacity/Booking/booking', [...])
+=======
 INFO - 2024-03-18 04:04:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2024-03-18 04:04:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2024-03-18 04:05:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
@@ -360,10 +370,22 @@ in APPPATH\Views\Capacity\Booking\booking.php on line 30.
  3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
  4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
  5 APPPATH\Controllers\CapacityController.php(56): view('Capacity/Booking/booking', [...])
+>>>>>>> 2c921b7b3213ec14bd01c30939e78122a6bc56ff
  6 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
  7 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
  8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
  9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+<<<<<<< HEAD
+10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('C:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:07:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:07:25 --> ErrorException: Undefined array key "jarum"
+in APPPATH\Views\Capacity\Booking\booking.php on line 39.
+ 1 APPPATH\Views\Capacity\Booking\booking.php(39): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "jarum"', 'C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php', 39)
+ 2 SYSTEMPATH\View\View.php(228): include('C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php')
+ 3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 5 APPPATH\Controllers\CapacityController.php(60): view('Capacity/Booking/booking', [...])
+=======
 10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('D:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
 INFO - 2024-03-18 04:14:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 CRITICAL - 2024-03-18 04:14:20 --> ErrorException: Undefined variable $jarumWithTotalMesin
@@ -373,10 +395,41 @@ in APPPATH\Views\Capacity\Booking\booking.php on line 30.
  3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
  4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
  5 APPPATH\Controllers\CapacityController.php(56): view('Capacity/Booking/booking', [...])
+>>>>>>> 2c921b7b3213ec14bd01c30939e78122a6bc56ff
  6 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
  7 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
  8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
  9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+<<<<<<< HEAD
+10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('C:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:08:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:09:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:09:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:09:41 --> TypeError: Cannot access offset of type string on string
+in APPPATH\Views\Capacity\Booking\booking.php on line 39.
+ 1 SYSTEMPATH\View\View.php(228): include()
+ 2 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 3 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 4 APPPATH\Controllers\CapacityController.php(60): view('Capacity/Booking/booking', [...])
+ 5 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
+ 6 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
+ 7 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('C:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:09:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:10:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:10:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:10:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:11:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:14:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:14:12 --> ErrorException: Array to string conversion
+in APPPATH\Views\Capacity\Booking\booking.php on line 39.
+ 1 APPPATH\Views\Capacity\Booking\booking.php(39): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Array to string conversion', 'C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php', 39)
+ 2 SYSTEMPATH\View\View.php(228): include('C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php')
+ 3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 5 APPPATH\Controllers\CapacityController.php(61): view('Capacity/Booking/booking', [...])
+=======
 10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('D:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
 INFO - 2024-03-18 04:14:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 CRITICAL - 2024-03-18 04:14:26 --> ErrorException: Undefined variable $jarumWithTotalMesin
@@ -386,10 +439,23 @@ in APPPATH\Views\Capacity\Booking\booking.php on line 30.
  3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
  4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
  5 APPPATH\Controllers\CapacityController.php(56): view('Capacity/Booking/booking', [...])
+>>>>>>> 2c921b7b3213ec14bd01c30939e78122a6bc56ff
  6 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
  7 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
  8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
  9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+<<<<<<< HEAD
+10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('C:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:14:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:16:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:17:00 --> ErrorException: Array to string conversion
+in APPPATH\Views\Capacity\Booking\booking.php on line 39.
+ 1 APPPATH\Views\Capacity\Booking\booking.php(39): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Array to string conversion', 'C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php', 39)
+ 2 SYSTEMPATH\View\View.php(228): include('C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php')
+ 3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 5 APPPATH\Controllers\CapacityController.php(60): view('Capacity/Booking/booking', [...])
+=======
 10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('D:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
 INFO - 2024-03-18 04:15:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 CRITICAL - 2024-03-18 04:15:18 --> ErrorException: Undefined variable $TotalMesin
@@ -399,10 +465,26 @@ in APPPATH\Views\Capacity\Booking\booking.php on line 30.
  3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
  4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
  5 APPPATH\Controllers\CapacityController.php(56): view('Capacity/Booking/booking', [...])
+>>>>>>> 2c921b7b3213ec14bd01c30939e78122a6bc56ff
  6 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
  7 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
  8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
  9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+<<<<<<< HEAD
+10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('C:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:17:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:17:16 --> ErrorException: Cannot use [] for reading
+in APPPATH\Views\Capacity\Booking\booking.php on line 39.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+INFO - 2024-03-18 04:17:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:17:22 --> ErrorException: Undefined array key "jarum"
+in APPPATH\Views\Capacity\Booking\booking.php on line 39.
+ 1 APPPATH\Views\Capacity\Booking\booking.php(39): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "jarum"', 'C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php', 39)
+ 2 SYSTEMPATH\View\View.php(228): include('C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php')
+ 3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 5 APPPATH\Controllers\CapacityController.php(60): view('Capacity/Booking/booking', [...])
+=======
 10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('D:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
 INFO - 2024-03-18 04:16:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 CRITICAL - 2024-03-18 04:16:05 --> ErrorException: Array to string conversion
@@ -412,10 +494,22 @@ in APPPATH\Views\Capacity\Booking\booking.php on line 39.
  3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
  4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
  5 APPPATH\Controllers\CapacityController.php(57): view('Capacity/Booking/booking', [...])
+>>>>>>> 2c921b7b3213ec14bd01c30939e78122a6bc56ff
  6 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
  7 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
  8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
  9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+<<<<<<< HEAD
+10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('C:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:17:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:17:52 --> ErrorException: Array to string conversion
+in APPPATH\Views\Capacity\Booking\booking.php on line 39.
+ 1 APPPATH\Views\Capacity\Booking\booking.php(39): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Array to string conversion', 'C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php', 39)
+ 2 SYSTEMPATH\View\View.php(228): include('C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php')
+ 3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 5 APPPATH\Controllers\CapacityController.php(60): view('Capacity/Booking/booking', [...])
+=======
 10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('D:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
 INFO - 2024-03-18 04:16:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 CRITICAL - 2024-03-18 04:16:15 --> ErrorException: Undefined array key "jarum"
@@ -425,10 +519,22 @@ in APPPATH\Views\Capacity\Booking\booking.php on line 39.
  3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
  4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
  5 APPPATH\Controllers\CapacityController.php(57): view('Capacity/Booking/booking', [...])
+>>>>>>> 2c921b7b3213ec14bd01c30939e78122a6bc56ff
  6 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
  7 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
  8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
  9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+<<<<<<< HEAD
+10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('C:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:18:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:18:02 --> ErrorException: Undefined array key 0
+in APPPATH\Views\Capacity\Booking\booking.php on line 39.
+ 1 APPPATH\Views\Capacity\Booking\booking.php(39): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key 0', 'C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php', 39)
+ 2 SYSTEMPATH\View\View.php(228): include('C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php')
+ 3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 5 APPPATH\Controllers\CapacityController.php(60): view('Capacity/Booking/booking', [...])
+=======
 10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('D:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
 INFO - 2024-03-18 04:17:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 CRITICAL - 2024-03-18 04:17:44 --> ErrorException: Undefined array key "jarum"
@@ -438,10 +544,34 @@ in APPPATH\Views\Capacity\Booking\booking.php on line 39.
  3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
  4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
  5 APPPATH\Controllers\CapacityController.php(57): view('Capacity/Booking/booking', [...])
+>>>>>>> 2c921b7b3213ec14bd01c30939e78122a6bc56ff
  6 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
  7 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
  8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
  9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+<<<<<<< HEAD
+10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('C:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:18:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:18:12 --> TypeError: Illegal offset type
+in APPPATH\Views\Capacity\Booking\booking.php on line 39.
+ 1 SYSTEMPATH\View\View.php(228): include()
+ 2 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 3 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 4 APPPATH\Controllers\CapacityController.php(60): view('Capacity/Booking/booking', [...])
+ 5 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
+ 6 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
+ 7 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('C:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:18:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:18:29 --> ErrorException: Undefined array key "jarum"
+in APPPATH\Views\Capacity\Booking\booking.php on line 39.
+ 1 APPPATH\Views\Capacity\Booking\booking.php(39): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "jarum"', 'C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php', 39)
+ 2 SYSTEMPATH\View\View.php(228): include('C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php')
+ 3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 5 APPPATH\Controllers\CapacityController.php(60): view('Capacity/Booking/booking', [...])
+=======
 10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('D:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
 INFO - 2024-03-18 04:18:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 CRITICAL - 2024-03-18 04:18:19 --> ErrorException: Undefined array key "jarum"
@@ -451,10 +581,14 @@ in APPPATH\Views\Capacity\Booking\booking.php on line 39.
  3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
  4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
  5 APPPATH\Controllers\CapacityController.php(57): view('Capacity/Booking/booking', [...])
+>>>>>>> 2c921b7b3213ec14bd01c30939e78122a6bc56ff
  6 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
  7 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
  8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
  9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+<<<<<<< HEAD
+10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('C:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+=======
 10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('D:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
 INFO - 2024-03-18 04:19:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 CRITICAL - 2024-03-18 04:19:24 --> ErrorException: Cannot redeclare App\Models\DataMesinModel::getTotalMesinByJarum()
@@ -465,6 +599,7 @@ INFO - 2024-03-18 04:20:10 --> Session: Class initialized using 'CodeIgniter\Ses
 INFO - 2024-03-18 04:20:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2024-03-18 04:21:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2024-03-18 04:21:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+<<<<<<< HEAD
 INFO - 2024-03-18 04:24:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2024-03-18 04:24:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2024-03-18 04:25:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
@@ -646,3 +781,319 @@ INFO - 2024-03-18 07:19:58 --> Session: Class initialized using 'CodeIgniter\Ses
 INFO - 2024-03-18 09:02:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2024-03-18 09:02:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2024-03-18 09:02:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+=======
+>>>>>>> 2c921b7b3213ec14bd01c30939e78122a6bc56ff
+INFO - 2024-03-18 04:25:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:25:15 --> ErrorException: Undefined array key "totalMesin"
+in APPPATH\Views\Capacity\Booking\booking.php on line 42.
+ 1 APPPATH\Views\Capacity\Booking\booking.php(42): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "totalMesin"', 'C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php', 42)
+ 2 SYSTEMPATH\View\View.php(228): include('C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php')
+ 3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 5 APPPATH\Controllers\CapacityController.php(56): view('Capacity/Booking/booking', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
+ 7 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('C:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:25:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:25:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 04:25:53 --> ErrorException: Undefined array key "totalMesin"
+in APPPATH\Views\Capacity\Booking\booking.php on line 42.
+ 1 APPPATH\Views\Capacity\Booking\booking.php(42): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "totalMesin"', 'C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php', 42)
+ 2 SYSTEMPATH\View\View.php(228): include('C:\\xampp\\htdocs\\CapacityApps\\app\\Views\\Capacity\\Booking\\booking.php')
+ 3 SYSTEMPATH\View\View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/booking', [], true)
+ 5 APPPATH\Controllers\CapacityController.php(56): view('Capacity/Booking/booking', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->booking()
+ 7 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('C:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 04:25:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:26:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:26:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:27:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:28:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:29:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:29:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:31:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:32:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:33:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:36:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:36:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:36:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:36:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:39:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:40:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:40:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 04:40:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:14:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:25:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:28:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:28:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:29:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:30:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:31:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:31:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:31:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:31:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:31:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:32:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:33:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:33:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:33:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:34:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:36:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:36:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:37:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:37:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:38:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:53:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:53:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:55:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:55:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:57:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 06:57:18 --> ParseError: syntax error, unexpected token ";", expecting identifier or variable or "{" or "$"
+in APPPATH\Controllers\CapacityController.php on line 87.
+ 1 SYSTEMPATH\Autoloader\Autoloader.php(290): CodeIgniter\Autoloader\Autoloader->includeFile('C:\\xampp\\htdocs\\CapacityApps\\app\\Controllers\\CapacityController.php')
+ 2 SYSTEMPATH\Autoloader\Autoloader.php(266): CodeIgniter\Autoloader\Autoloader->loadInNamespace('App\\Controllers\\CapacityController')
+ 3 [internal function]: CodeIgniter\Autoloader\Autoloader->loadClass('App\\Controllers\\CapacityController')
+ 4 SYSTEMPATH\CodeIgniter.php(899): class_exists('\\App\\Controllers\\CapacityController', true)
+ 5 SYSTEMPATH\CodeIgniter.php(489): CodeIgniter\CodeIgniter->startController()
+ 6 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('C:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 06:57:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-03-18 06:57:21 --> ParseError: syntax error, unexpected token ";", expecting identifier or variable or "{" or "$"
+in APPPATH\Controllers\CapacityController.php on line 87.
+ 1 SYSTEMPATH\Autoloader\Autoloader.php(290): CodeIgniter\Autoloader\Autoloader->includeFile('C:\\xampp\\htdocs\\CapacityApps\\app\\Controllers\\CapacityController.php')
+ 2 SYSTEMPATH\Autoloader\Autoloader.php(266): CodeIgniter\Autoloader\Autoloader->loadInNamespace('App\\Controllers\\CapacityController')
+ 3 [internal function]: CodeIgniter\Autoloader\Autoloader->loadClass('App\\Controllers\\CapacityController')
+ 4 SYSTEMPATH\CodeIgniter.php(899): class_exists('\\App\\Controllers\\CapacityController', true)
+ 5 SYSTEMPATH\CodeIgniter.php(489): CodeIgniter\CodeIgniter->startController()
+ 6 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('C:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
+INFO - 2024-03-18 06:57:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 06:57:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-03-18 07:02:20 --> mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ') NOT NULL,
+	`product_type` VARCHAR(10) NOT NULL,
+	CONSTRAINT `pk_master_prod...' at line 3 in C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `m...', 0)
+#1 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `m...')
+#2 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `m...')
+#3 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `m...')
+#4 C:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-18-065811_MasterProductType.php(29): CodeIgniter\Database\Forge->createTable('master_product_...')
+#5 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\MasterProductType->up()
+#6 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 07:05:55 --> mysqli_sql_exception: Can't create table `capacity_system`.`data_booking` (errno: 150 "Foreign key constraint is incorrectly formed") in C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 C:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-14-034140_DataBooking.php(68): CodeIgniter\Database\Forge->createTable('data_booking')
+#5 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\DataBooking->up()
+#6 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 07:06:43 --> mysqli_sql_exception: Can't create table `capacity_system`.`data_booking` (errno: 150 "Foreign key constraint is incorrectly formed") in C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 C:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-14-034140_DataBooking.php(68): CodeIgniter\Database\Forge->createTable('data_booking')
+#5 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\DataBooking->up()
+#6 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 07:09:36 --> mysqli_sql_exception: Can't create table `capacity_system`.`data_booking` (errno: 150 "Foreign key constraint is incorrectly formed") in C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 C:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-14-034140_DataBooking.php(68): CodeIgniter\Database\Forge->createTable('data_booking')
+#5 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\DataBooking->up()
+#6 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 07:12:23 --> mysqli_sql_exception: Can't create table `capacity_system`.`data_booking` (errno: 150 "Foreign key constraint is incorrectly formed") in C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 C:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-14-034140_DataBooking.php(68): CodeIgniter\Database\Forge->createTable('data_booking')
+#5 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\DataBooking->up()
+#6 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 07:15:16 --> mysqli_sql_exception: Can't create table `capacity_system`.`data_booking` (errno: 150 "Foreign key constraint is incorrectly formed") in C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 C:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-14-034140_DataBooking.php(68): CodeIgniter\Database\Forge->createTable('data_booking')
+#5 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\DataBooking->up()
+#6 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 07:16:19 --> mysqli_sql_exception: Can't create table `capacity_system`.`data_booking` (errno: 150 "Foreign key constraint is incorrectly formed") in C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 C:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-14-034140_DataBooking.php(68): CodeIgniter\Database\Forge->createTable('data_booking')
+#5 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\DataBooking->up()
+#6 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 07:18:59 --> mysqli_sql_exception: Can't create table `capacity_system`.`data_booking` (errno: 150 "Foreign key constraint is incorrectly formed") in C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 C:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-14-034140_DataBooking.php(68): CodeIgniter\Database\Forge->createTable('data_booking')
+#5 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\DataBooking->up()
+#6 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 07:19:47 --> mysqli_sql_exception: Can't create table `capacity_system`.`data_booking` (errno: 150 "Foreign key constraint is incorrectly formed") in C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 C:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-14-034140_DataBooking.php(67): CodeIgniter\Database\Forge->createTable('data_booking')
+#5 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\DataBooking->up()
+#6 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 07:21:39 --> mysqli_sql_exception: Can't create table `capacity_system`.`data_booking` (errno: 150 "Foreign key constraint is incorrectly formed") in C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 C:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-14-034140_DataBooking.php(68): CodeIgniter\Database\Forge->createTable('data_booking')
+#5 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\DataBooking->up()
+#6 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 07:23:15 --> mysqli_sql_exception: Can't create table `capacity_system`.`data_booking` (errno: 150 "Foreign key constraint is incorrectly formed") in C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 C:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-14-034140_DataBooking.php(68): CodeIgniter\Database\Forge->createTable('data_booking')
+#5 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\DataBooking->up()
+#6 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 07:24:37 --> mysqli_sql_exception: Can't create table `capacity_system`.`data_booking` (errno: 150 "Foreign key constraint is incorrectly formed") in C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 C:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-14-034140_DataBooking.php(68): CodeIgniter\Database\Forge->createTable('data_booking')
+#5 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\DataBooking->up()
+#6 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 07:27:55 --> mysqli_sql_exception: Can't create table `capacity_system`.`data_booking` (errno: 150 "Foreign key constraint is incorrectly formed") in C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 C:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-14-034140_DataBooking.php(68): CodeIgniter\Database\Forge->createTable('data_booking')
+#5 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\DataBooking->up()
+#6 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 07:29:10 --> mysqli_sql_exception: Can't create table `capacity_system`.`data_booking` (errno: 150 "Foreign key constraint is incorrectly formed") in C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 C:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-14-034140_DataBooking.php(68): CodeIgniter\Database\Forge->createTable('data_booking')
+#5 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\DataBooking->up()
+#6 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 07:31:44 --> mysqli_sql_exception: Can't create table `capacity_system`.`data_booking` (errno: 150 "Foreign key constraint is incorrectly formed") in C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 C:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-14-034140_DataBooking.php(68): CodeIgniter\Database\Forge->createTable('data_booking')
+#5 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\DataBooking->up()
+#6 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+INFO - 2024-03-18 08:47:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 08:47:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 08:47:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 08:47:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 09:10:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 09:10:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 09:11:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+>>>>>>> c3a375ff6d0928633019c0c91b7771011a85983a
