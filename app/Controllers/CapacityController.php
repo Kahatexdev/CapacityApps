@@ -75,7 +75,9 @@ class CapacityController extends BaseController
             'active2' => 'active',
             'active3' => '',
             'active4' => '',
-            'jarum' => $jarum
+            'jarum' => $jarum,
+            'product' => $product,
+            'booking' => $booking
 
         ];
         return view('Capacity/Booking/jarum', $data);
@@ -83,7 +85,8 @@ class CapacityController extends BaseController
     public function OrderPerJarum($jarum)
     {
         $tampilperjarum = $this->orderModel->findAll();
-        $data = [
+        $product = $this->productModel->findAll();
+        $booking = $$data = [
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -91,6 +94,7 @@ class CapacityController extends BaseController
             'active4' => '',
             'jarum' => $jarum,
             'tampildata' => $tampilperjarum,
+            'product' => $product,
 
         ];
         return view('Capacity/Order/jarum', $data);
