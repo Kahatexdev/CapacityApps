@@ -11,10 +11,12 @@ class CapacityController extends BaseController
 {
     protected $filters;
     protected $jarumModel;
+    protected $orderModel;
 
     public function __construct()
     {
         $this->jarumModel = new DataMesinModel();
+        $this->orderModel = new OrderModel();
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -70,6 +72,21 @@ class CapacityController extends BaseController
         ];
         return view('Capacity/Booking/jarum', $data);
     }
+    public function OrderPerJarum($jarum)
+    {
+        $tampilperjarum = $this->orderModel->findAll();
+        $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'jarum' => $jarum,
+            'tampildata' => $tampilperjarum,
+
+        ];
+        return view('Capacity/Order/jarum', $data);
+    }
     public function inputbooking()
     {
         $tglbk = $this->request->getPost("tgl_booking");
@@ -92,14 +109,34 @@ class CapacityController extends BaseController
 
         ];
     }
+    public function inputOrder()
+    {
+        $tgl_turun = $this->request->getPost("tgl_turun");
+        $no_model = $this->request->getPost("no_model");
+        $jarum = $this->request->getPost("jarum");
+        $validate = [
+            'tgl_turun' => $tgl_turun,
+            'no_model' => $no_model,
+        ];
+
+        $input = [
+            'tgl_terima_order' => $tgl_turun,
+            'no_model' => $no_model,
+        ];
+        $this->orderModel->insert($input);
+        return redirect()->to(base_url('capacity/dataorder/'.$jarum))->withInput()->with('success','Data Berhasil Diinput');
+
+    }
     public function order()
     {
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $data = [
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
             'active3' => 'active',
             'active4' => '',
+            'TotalMesin' => $totalMesin,
         ];
         return view('Capacity/Order/order', $data);
     }

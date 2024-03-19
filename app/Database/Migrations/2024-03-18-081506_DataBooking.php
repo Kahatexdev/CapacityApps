@@ -48,11 +48,11 @@ class DataBooking extends Migration
             ],
             'qty_booking' => [
                 'type' => 'INT',
-                'constraint' => 11,
+                'constraint' => 100,
             ],
             'sisa_booking' => [
                 'type' => 'INT',
-                'constraint' => 11,
+                'constraint' => 100,
             ],
             'needle' => [
                 'type' => 'VARCHAR',
