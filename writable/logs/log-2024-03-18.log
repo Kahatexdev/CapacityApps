@@ -1097,3 +1097,258 @@ INFO - 2024-03-18 09:10:45 --> Session: Class initialized using 'CodeIgniter\Ses
 INFO - 2024-03-18 09:10:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2024-03-18 09:11:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 >>>>>>> c3a375ff6d0928633019c0c91b7771011a85983a
+INFO - 2024-03-18 09:17:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 09:17:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 09:17:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-03-18 09:18:09 --> mysqli_sql_exception: Table 'user' already exists in D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `u...', 0)
+#1 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `u...')
+#2 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `u...')
+#3 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `u...')
+#4 D:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-18-081403_User.php(33): CodeIgniter\Database\Forge->createTable('user')
+#5 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\User->up()
+#6 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 D:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 09:30:30 --> mysqli_sql_exception: Table 'user' already exists in D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `u...', 0)
+#1 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `u...')
+#2 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `u...')
+#3 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `u...')
+#4 D:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-18-081403_User.php(33): CodeIgniter\Database\Forge->createTable('user')
+#5 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\User->up()
+#6 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 D:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 09:31:02 --> mysqli_sql_exception: Table 'user' already exists in D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `u...', 0)
+#1 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `u...')
+#2 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `u...')
+#3 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `u...')
+#4 D:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-18-081403_User.php(33): CodeIgniter\Database\Forge->createTable('user')
+#5 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\User->up()
+#6 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 D:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+INFO - 2024-03-18 09:33:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 09:33:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 09:34:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 09:34:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 09:34:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 09:34:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 09:34:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 09:35:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 09:35:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-03-18 09:35:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-03-18 09:40:22 --> mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'NOT NULL,
+	`smv` INT NOT NULL,
+	CONSTRAINT `pk_detail_order` PRIMARY KEY(`id_...' at line 11 in D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 D:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-18-093714_DataDetailOrder.php(57): CodeIgniter\Database\Forge->createTable('detail_order')
+#5 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\CreateDetailOrderTable->up()
+#6 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 D:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 09:42:40 --> mysqli_sql_exception: Table 'master_product_type' already exists in D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `m...', 0)
+#1 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `m...')
+#2 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `m...')
+#3 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `m...')
+#4 D:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-18-080056_MasterProduct.php(28): CodeIgniter\Database\Forge->createTable('master_product_...')
+#5 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\MasterProduct->up()
+#6 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 D:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 09:42:56 --> mysqli_sql_exception: Table 'capacity_system.data_mesin' doesn't exist in D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('INSERT INTO `da...', 0)
+#1 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `da...')
+#2 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `da...')
+#3 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1803): CodeIgniter\Database\BaseConnection->query('INSERT INTO `da...', NULL, false)
+#4 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(2192): CodeIgniter\Database\BaseBuilder->batchExecute('_insertBatch', 100)
+#5 D:\xampp\htdocs\CapacityApps\app\Database\Seeds\DataMesin.php(118): CodeIgniter\Database\BaseBuilder->insertBatch(Array)
+#6 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Seeder.php(145): App\Database\Seeds\DataMesin->run()
+#7 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Seed.php(77): CodeIgniter\Database\Seeder->call('App\\Database\\Se...')
+#8 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Seed->run(Array)
+#9 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('db:seed', Array)
+#10 D:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 09:43:11 --> mysqli_sql_exception: Table 'capacity_system.user' doesn't exist in D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('INSERT INTO `us...', 0)
+#1 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `us...')
+#2 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `us...')
+#3 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1803): CodeIgniter\Database\BaseConnection->query('INSERT INTO `us...', NULL, false)
+#4 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(2192): CodeIgniter\Database\BaseBuilder->batchExecute('_insertBatch', 100)
+#5 D:\xampp\htdocs\CapacityApps\app\Database\Seeds\UserSeed.php(28): CodeIgniter\Database\BaseBuilder->insertBatch(Array)
+#6 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Seeder.php(145): App\Database\Seeds\UserSeed->run()
+#7 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Seed.php(77): CodeIgniter\Database\Seeder->call('App\\Database\\Se...')
+#8 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Seed->run(Array)
+#9 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('db:seed', Array)
+#10 D:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 09:43:55 --> mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'NOT NULL,
+	`smv` INT NOT NULL,
+	CONSTRAINT `pk_detail_order` PRIMARY KEY(`id_...' at line 11 in D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 D:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-18-093714_DataDetailOrder.php(57): CodeIgniter\Database\Forge->createTable('detail_order')
+#5 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\CreateDetailOrderTable->up()
+#6 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 D:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 09:45:41 --> mysqli_sql_exception: Can't create table `capacity_system`.`detail_order` (errno: 150 "Foreign key constraint is incorrectly formed") in D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 D:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-18-093714_DataDetailOrder.php(61): CodeIgniter\Database\Forge->createTable('detail_order')
+#5 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\CreateDetailOrderTable->up()
+#6 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 D:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 09:46:12 --> mysqli_sql_exception: Can't create table `capacity_system`.`detail_order` (errno: 150 "Foreign key constraint is incorrectly formed") in D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 D:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-18-093714_DataDetailOrder.php(60): CodeIgniter\Database\Forge->createTable('detail_order')
+#5 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\CreateDetailOrderTable->up()
+#6 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 D:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 09:48:07 --> mysqli_sql_exception: Can't create table `capacity_system`.`detail_order` (errno: 150 "Foreign key constraint is incorrectly formed") in D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 D:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-18-093714_DataDetailOrder.php(61): CodeIgniter\Database\Forge->createTable('detail_order')
+#5 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\CreateDetailOrderTable->up()
+#6 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 D:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 09:49:25 --> mysqli_sql_exception: Can't create table `capacity_system`.`detail_order` (errno: 150 "Foreign key constraint is incorrectly formed") in D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 D:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-18-093714_DataDetailOrder.php(61): CodeIgniter\Database\Forge->createTable('detail_order')
+#5 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\CreateDetailOrderTable->up()
+#6 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 D:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 09:52:52 --> mysqli_sql_exception: Can't create table `capacity_system`.`detail_order` (errno: 150 "Foreign key constraint is incorrectly formed") in D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 D:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-18-093714_DataDetailOrder.php(61): CodeIgniter\Database\Forge->createTable('detail_order')
+#5 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\CreateDetailOrderTable->up()
+#6 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 D:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 09:53:36 --> mysqli_sql_exception: Can't create table `capacity_system`.`detail_order` (errno: 150 "Foreign key constraint is incorrectly formed") in D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 D:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-18-093714_DataDetailOrder.php(61): CodeIgniter\Database\Forge->createTable('detail_order')
+#5 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\CreateDetailOrderTable->up()
+#6 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 D:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 09:55:39 --> mysqli_sql_exception: Can't create table `capacity_system`.`detail_order` (errno: 150 "Foreign key constraint is incorrectly formed") in D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 D:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-18-093714_DataDetailOrder.php(61): CodeIgniter\Database\Forge->createTable('detail_order')
+#5 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\CreateDetailOrderTable->up()
+#6 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 D:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 09:56:36 --> mysqli_sql_exception: Can't create table `capacity_system`.`detail_order` (errno: 150 "Foreign key constraint is incorrectly formed") in D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 D:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-18-093714_DataDetailOrder.php(61): CodeIgniter\Database\Forge->createTable('detail_order')
+#5 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\CreateDetailOrderTable->up()
+#6 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 D:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
+ERROR - 2024-03-18 09:57:16 --> mysqli_sql_exception: Can't create table `capacity_system`.`detail_order` (errno: 150 "Foreign key constraint is incorrectly formed") in D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(306): mysqli->query('CREATE TABLE `d...', 0)
+#1 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `d...')
+#2 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `d...')
+#3 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\Forge.php(555): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `d...')
+#4 D:\xampp\htdocs\CapacityApps\app\Database\Migrations\2024-03-18-093714_DataDetailOrder.php(61): CodeIgniter\Database\Forge->createTable('detail_order')
+#5 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(865): App\Database\Migrations\CreateDetailOrderTable->up()
+#6 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Database\MigrationRunner.php(181): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\Commands\Database\Migrate.php(84): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 D:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
+#11 {main}
