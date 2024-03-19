@@ -1,5 +1,6 @@
 <?php $this->extend('Capacity/layout'); ?>
 <?php $this->section('content'); ?>
+
 <div class="container-fluid py-4">
     <div class="row my-4">
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
@@ -25,6 +26,29 @@
                     </div>
                 </div>
             </div>
+            <?php if (session()->getFlashdata('success')) : ?>
+                <script>
+                    $(document).ready(function() {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: '<?= session()->getFlashdata('success') ?>',
+                        });
+                    });
+                </script>
+            <?php endif; ?>
+
+            <?php if (session()->getFlashdata('error')) : ?>
+                <script>
+                    $(document).ready(function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: '<?= session()->getFlashdata('error') ?>',
+                        });
+                    });
+                </script>
+            <?php endif; ?>
 
             <div class="modal fade  bd-example-modal-lg" id="exampleModalMessage" tabindex="-1" role="dialog" aria-labelledby="exampleModalMessageTitle" aria-hidden="true">
                 <div class="modal-dialog  modal-dialog-centered" role="document">
@@ -38,8 +62,13 @@
                         <div class="modal-body">
                             <form action="<?= base_url('capacity/inputbooking') ?>" method="post">
                                 <div class="form-group">
+                                    <input type="text" class="form-control" name="jarum" hidden value="<?= $jarum ?>">
                                     <label for="tgl-bk-form-label">Tanggal Booking</label>
                                     <input type="date" class="form-control" name="tgl_booking">
+                                </div>
+                                <div class="form-group">
+                                    <label for="buyer" class="col-form-label">Kode Buyer:</label>
+                                    <input type="text" name="buyer" id="" class="form-control">
                                 </div>
                                 <div class="form-group">
                                     <label for="no_order" class="col-form-label">No Order:</label>
@@ -50,12 +79,17 @@
                                     <input type="text" name="no_pdk" id="" class="form-control">
                                 </div>
                                 <div class="form-group">
-                                    <label for="productType" class="col-form-label">Description:</label>
-                                    <input type="text" name="productType" id="" class="form-control">
+                                    <label for="desc" class="col-form-label">Description:</label>
+                                    <input type="text" name="desc" id="" class="form-control">
                                 </div>
                                 <div class="form-group">
-                                    <label for="desc" class="col-form-label">Product Type:</label>
-                                    <input type="text" name="desc" id="" class="form-control">
+                                    <label for="productType">Product Type</label>
+                                    <select class="form-control" id="productType" name="productType">
+                                        <option>Choose</option>
+                                        <?php foreach ($product as $pr) : ?>
+                                            <option><?= $pr['product_type'] ?></option>
+                                        <?php endforeach ?>
+                                    </select>
                                 </div>
                                 <div class="form-group">
                                     <label for="seam" class="col-form-label">Seam:</label>
@@ -73,12 +107,12 @@
                                     <label for="qty" class="col-form-label">QTY Booking (pcs):</label>
                                     <input type="number" name="qty" id="" class="form-control">
                                 </div>
-                            </form>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn bg-gradient-primary">Simpan</button>
+                            <button type="submit" class="btn bg-gradient-info">Simpan</button>
                         </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -93,25 +127,38 @@
                 <table class="table align-items-center mb-0">
                     <thead>
                         <tr>
-                            <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7">Tgl Booking</th>
-                            <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">Buyer</th>
-                            <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">No Order</th>
-                            <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">No PDK</th>
-                            <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">Desc</th>
-                            <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">Seam</th>
-                            <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">OPD</th>
-                            <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">Shipment</th>
-                            <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">Qty Booking</th>
-                            <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">Sisa Booking</th>
-                            <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">Action</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Tgl Booking</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Buyer</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Order</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No PDK</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Desc</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Seam</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">OPD</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Ship</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty BK</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa BK</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
 
                             <th class="text-dark opacity-7"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td> </td>
-                        </tr>
+                        <?php foreach ($booking as $bk) : ?>
+                            <tr>
+                                <td class="text-sm"><?= $bk['tgl_terima_booking'] ?></td>
+                                <td class="text-sm"><?= $bk['kd_buyer_booking'] ?></td>
+                                <td class="text-sm"><?= $bk['no_order'] ?></td>
+                                <td class="text-sm"><?= $bk['no_booking'] ?></td>
+                                <td class="text-sm"><?= $bk['product_type'] ?></td>
+                                <td class="text-sm"><?= $bk['desc'] ?></td>
+                                <td class="text-sm"><?= $bk['seam'] ?></td>
+                                <td class="text-sm"><?= $bk['opd'] ?></td>
+                                <td class="text-sm"><?= $bk['delivery'] ?></td>
+                                <td class="text-sm"><?= $bk['qty_booking'] ?></td>
+                                <td class="text-sm"><?= $bk['sisa_booking'] ?></td>
+                            </tr>
+                        <?php endforeach ?>
                     </tbody>
                 </table>
             </div>
@@ -121,5 +168,10 @@
 </div>
 
 </div>
+<script>
+    $(document).ready(function() {
+        $('.js-example-basic-single').select2();
+    });
+</script>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <?php $this->endSection(); ?>

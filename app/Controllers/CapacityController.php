@@ -11,11 +11,14 @@ class CapacityController extends BaseController
 {
     protected $filters;
     protected $jarumModel;
-    protected $orderModel;
+    protected $productModel;
+    protected $bookingModel;    protected $orderModel;
 
     public function __construct()
     {
         $this->jarumModel = new DataMesinModel();
+        $this->bookingModel = new BookingModel();
+        $this->productModel = new ProductTypeModel();
         $this->orderModel = new OrderModel();
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -102,12 +105,30 @@ class CapacityController extends BaseController
             'no_order' => $no_order,
             'no_pdk' => $no_pdk
         ];
-
-
-        $input = [
-            'tgl_booking' => $tglbk,
-
-        ];
+        $check = $this->bookingModel->checkExist($validate);
+        if (!$check) {
+            $input = [
+                'tgl_terima_booking' => $tglbk,
+                'kd_buyer_booking' => $buyer,
+                'id_product_type' => $idProduct,
+                'no_order' => $no_order,
+                'no_booking' => $no_pdk,
+                'desc' => $desc,
+                'opd' => $opd,
+                'delivery' => $shipment,
+                'qty_booking' => $qty,
+                'needle' => $jarum,
+                'seam' => $seam
+            ];
+            $insert =   $this->bookingModel->insert($input);
+            if ($insert) {
+                return redirect()->to(base_url('/capacity/databooking/' . $jarum))->withInput()->with('success', 'Data Berhasil Di Input');
+            } else {
+                return redirect()->to(base_url('/capacity/databooking/' . $jarum))->withInput()->with('error', 'Data Gagal Di Input');
+            }
+        } else {
+            return redirect()->to(base_url('/capacity/databooking/' . $jarum))->withInput()->with('error', 'Data Sudah Ada, Silahkan Cek Ulang Kembali Inputanya');
+        }
     }
     public function inputOrder()
     {

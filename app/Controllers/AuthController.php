@@ -36,7 +36,7 @@ class AuthController extends BaseController
                 break;
 
             default:
-                return redirect()->to(base_url('/login'));
+                return redirect()->to(base_url('/login'))->withInput()->with('error', 'Invalid username or password');
                 break;
         }
     }
