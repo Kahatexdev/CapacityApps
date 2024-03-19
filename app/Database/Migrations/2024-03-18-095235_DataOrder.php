@@ -39,14 +39,11 @@ class DataOrder extends Migration
                 'type' => 'INT',
                 'constraint' => 11,
             ],
-            'id_hari' => [
-                'type' => 'INT',
-                'constraint' => 11,
+            'description' => [
+                'type' => 'VARCHAR',
+                'constraint' => 100,
             ],
-            'id_plan' => [
-                'type' => 'INT',
-                'constraint' => 11,
-            ],
+
         ]);
         $this->forge->addKey('id_order', true);
         // Tambahkan kunci asing ke sisa tabel referensi di sini

@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\DataMesinModel;
+use App\Models\OrderModel;
 
 class CapacityController extends BaseController
 {
@@ -90,5 +91,27 @@ class CapacityController extends BaseController
             'tgl_booking' => $tglbk,
 
         ];
+    }
+    public function order()
+    {
+        $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+        ];
+        return view('Capacity/Order/order', $data);
+    }
+    public function produksi()
+    {
+        $data = [
+            'title' => 'Data Produksi',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => 'active',
+        ];
+        return view('Capacity/Produksi/produksi', $data);
     }
 }
