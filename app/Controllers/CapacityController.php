@@ -6,13 +6,16 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\DataMesinModel;
 use App\Models\OrderModel;
+use App\Models\BookingModel;
+use App\Models\ProductTypeModel;
 
 class CapacityController extends BaseController
 {
     protected $filters;
     protected $jarumModel;
     protected $productModel;
-    protected $bookingModel;    protected $orderModel;
+    protected $bookingModel;    
+    protected $orderModel;
 
     public function __construct()
     {
