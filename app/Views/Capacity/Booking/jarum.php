@@ -97,11 +97,15 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="opd" class="col-form-label">OPD:</label>
-                                    <input type="date" name="opd" id="" class="form-control">
+                                    <input type="date" name="opd" id="opd" class="form-control" onchange="hitungJumlahHari()">
                                 </div>
-                                <div class="form-group">
+                                <div class=" form-group">
                                     <label for="shipment" class="col-form-label">Shipment:</label>
-                                    <input type="date" name="shipment" id="" class="form-control">
+                                    <input type="date" name="shipment" id="shipment" class="form-control" onchange="hitungJumlahHari()">
+                                </div>
+                                <div class=" form-group">
+                                    <label for="Lead" class="col-form-label">LeadTime</label>
+                                    <input type="number" name="leadTime" id="lead" class="form-control">
                                 </div>
                                 <div class="form-group">
                                     <label for="qty" class="col-form-label">QTY Booking (pcs):</label>
@@ -161,6 +165,21 @@
 </div>
 
 </div>
+<script>
+    function hitungJumlahHari() {
+        var opdString = document.getElementById("opd").value
+        var shipmentString = document.getElementById("shipment").value
+
+        var opd = new Date(opdString)
+        var shipment = new Date(shipmentString)
+
+        var timeDiff = shipment.getTime() - opd.getTime()
+        var leanTime = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
+
+        document.getElementById("lead").value = leanTime
+    }
+</script>
+
 <script>
     $(document).ready(function() {
         $('.js-example-basic-single').select2();

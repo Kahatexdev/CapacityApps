@@ -54,6 +54,10 @@ class DataBooking extends Migration
                 'type' => 'INT',
                 'constraint' => 100,
             ],
+            'lead_time' => [
+                'type' => 'INT',
+                'constraint' => 100,
+            ],
             'needle' => [
                 'type' => 'VARCHAR',
                 'constraint' => 30,
@@ -66,7 +70,6 @@ class DataBooking extends Migration
                 'type' => 'ENUM',
                 'constraint' => ['Booking Baru', 'Aktif', 'Cancel Booking', 'Habis'],
                 'default' => 'Booking Baru'
-
             ],
         ]);
         $this->forge->addKey('id_booking', true);

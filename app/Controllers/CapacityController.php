@@ -113,6 +113,7 @@ class CapacityController extends BaseController
         $product = $this->request->getPost("productType");
         $idProduct = $this->productModel->getId($product);
         $buyer = $this->request->getPost("buyer");
+        $leadTime = $this->request->getPost("lead");
 
         $validate = [
             'no_order' => $no_order,
@@ -132,7 +133,8 @@ class CapacityController extends BaseController
                 'qty_booking' => $qty,
                 'sisa_booking' => $qty,
                 'needle' => $jarum,
-                'seam' => $seam
+                'seam' => $seam,
+                'lead_time' => $leadTime
             ];
             $insert =   $this->bookingModel->insert($input);
             if ($insert) {

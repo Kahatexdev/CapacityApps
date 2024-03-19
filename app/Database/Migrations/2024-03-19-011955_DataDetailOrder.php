@@ -53,11 +53,11 @@ class CreateDetailOrderTable extends Migration
             ],
             'smv' => [
                 'type' => 'INT',
-                'constraint'=> 10,
+                'constraint' => 10,
             ],
         ]);
         $this->forge->addKey('id_detail_order', true);
-        $this->forge->addForeignKey('id_order', 'data_order', 'id_order');
+        //$this->forge->addForeignKey('id_order', 'data_order', 'id_order');
         $this->forge->createTable('detail_order');
     }
 
