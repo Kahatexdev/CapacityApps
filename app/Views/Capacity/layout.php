@@ -26,6 +26,8 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <link href="https://cdn.datatables.net/2.0.0/css/dataTables.dataTables.min.css" rel="stylesheet">
     <script src="https://cdn.datatables.net/2.0.0/js/dataTables.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
 </head>
 
 <body class="g-sidenav-show  bg-gray-100">
@@ -276,6 +278,7 @@
         </footer>
         </div>
     </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script src="<?= base_url('assets/js/core/popper.min.js') ?>"></script>
     <script src="<?= base_url('assets/js/core/bootstrap.min.js') ?>"></script>
     <script src="<?= base_url('assets/js/plugins/perfect-scrollbar.min.js') ?>"></script>

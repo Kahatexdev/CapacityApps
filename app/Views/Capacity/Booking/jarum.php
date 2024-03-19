@@ -1,5 +1,6 @@
 <?php $this->extend('Capacity/layout'); ?>
 <?php $this->section('content'); ?>
+
 <div class="container-fluid py-4">
     <div class="row my-4">
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
@@ -55,7 +56,11 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="desc" class="col-form-label">Product Type:</label>
-                                    <input type="text" name="desc" id="" class="form-control">
+                                    <select class="js-example-basic-single" name="state">
+                                        <option value="AL">Alabama</option>
+                                        <option value="WY">Wyoming</option>
+                                        <!-- Tambahkan opsi dropdown lainnya di sini -->
+                                    </select>
                                 </div>
                                 <div class="form-group">
                                     <label for="seam" class="col-form-label">Seam:</label>
@@ -97,12 +102,13 @@
                             <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">Buyer</th>
                             <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">No Order</th>
                             <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">No PDK</th>
+                            <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">Product Type</th>
                             <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">Desc</th>
                             <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">Seam</th>
                             <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">OPD</th>
-                            <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">Shipment</th>
-                            <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">Qty Booking</th>
-                            <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">Sisa Booking</th>
+                            <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">Ship</th>
+                            <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">Qty BK</th>
+                            <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">Sisa BK</th>
                             <th class="text-uppercase text-dark text-sm font-weight-bolder opacity-7 ps-2">Action</th>
 
                             <th class="text-dark opacity-7"></th>
@@ -121,5 +127,10 @@
 </div>
 
 </div>
+<script>
+    $(document).ready(function() {
+        $('.js-example-basic-single').select2();
+    });
+</script>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <?php $this->endSection(); ?>
