@@ -91,9 +91,8 @@
                 <div class="card-footer">
                     <div class="row">
                         <div class="col-lg-6">
-
                             <a href="" class="btn btn-info">Booking to Booking</a>
-                            <a href="" class="btn btn-info">Booking to Order</a>
+                            <a href="#" class="btn btn-info order-btn" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">Booking to Order</a>
                             <a href="" class="btn btn-success">Edit Booking</a>
                         </div>
                         <div class="col-lg-4">
@@ -103,11 +102,60 @@
 
                     </div>
                 </div>
+                
+                <div class="modal fade  bd-example-modal-lg" id="exampleModalMessage" tabindex="-1" role="dialog" aria-labelledby="exampleModalMessageTitle" aria-hidden="true">
+                <div class="modal-dialog  modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Ambil Booking Jadi Order</h5>
+                            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="" method="post">
+                            <input type="text" name="jarum" value="" hidden>
+                                <div class="form-group">
+                                    <label for="col-lg-6 col-sm-12">Tanggal Turun Order</label>
+                                    <input type="date" class="form-control" name="tgl_turun">
+                                </div>
+                                <div class="form-group">
+                                    <label for="col-lg-6 col-sm-12">No Booking</label>
+                                    <input type="text" class="form-control" name="no_booking" value="<?= $booking['no_booking']; ?>">
+                                </div>
+                                <div class="form-group">
+                                    <label for="col-lg-6 col-sm-12">Deskripsi</label>
+                                    <input type="text" class="form-control" name="deskripsi">
+                                </div>
+                                <div class="form-group">
+                                    <label for="col-lg-6 col-sm-12">No Model</label>
+                                    <input type="text" name="no_model" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="col-lg-6 col-sm-12">Sisa Booking Awal</label>
+                                    <input type="text" name="sisa_booking" class="form-control" value="<?= $booking['sisa_booking']; ?>">
+                                </div>
+                                <div class="form-group">
+                                    <label for="col-lg-6 col-sm-12">Turun Order</label>
+                                    <input type="text" name="turun_order" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="col-lg-6 col-sm-12">Sisa Booking Akhir</label>
+                                    <input type="text" name="sisa_booking_akhir" class="form-control">
+                                </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn bg-gradient-primary">Simpan</button>
+                                </div>
+                            </form>
+                    </div>
+                </div>
+            </div>
 
             </div>
 
-        </div>
-
     </div>
+
     <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
     <?php $this->endSection(); ?>
