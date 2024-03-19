@@ -52,4 +52,18 @@ class BookingModel extends Model
             ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
             ->findAll();
     }
+    public function getDataById($idBooking)
+    {
+        return $this->select('data_booking.*, master_product_type.product_type')
+            ->where('id_booking', $idBooking)
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->first();
+    }
+    public function getDataPerjarum($jarum)
+    {
+        return $this->select('data_booking.*, master_product_type.product_type')
+            ->where('needle', $jarum)
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->findAll();
+    }
 }

@@ -62,6 +62,12 @@ class DataBooking extends Migration
                 'type' => 'VARCHAR',
                 'constraint' => 30,
             ],
+            'status' => [
+                'type' => 'ENUM',
+                'constraint' => ['Booking Baru', 'Aktif', 'Cancel Booking', 'Habis'],
+                'default' => 'Booking Baru'
+
+            ],
         ]);
         $this->forge->addKey('id_booking', true);
         $this->forge->addForeignKey('id_product_type', 'master_product_type', 'id_product_type', 'CASCADE', 'CASCADE');

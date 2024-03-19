@@ -63,7 +63,7 @@ class CapacityController extends BaseController
     public function bookingPerJarum($jarum)
     {
         $product = $this->productModel->findAll();
-        $booking = $this->bookingModel->getAllData();
+        $booking = $this->bookingModel->getDataPerjarum($jarum);
 
         $data = [
             'title' => 'Data Booking',
@@ -109,6 +109,7 @@ class CapacityController extends BaseController
                 'opd' => $opd,
                 'delivery' => $shipment,
                 'qty_booking' => $qty,
+                'sisa_booking' => $qty,
                 'needle' => $jarum,
                 'seam' => $seam
             ];
@@ -121,6 +122,20 @@ class CapacityController extends BaseController
         } else {
             return redirect()->to(base_url('/capacity/databooking/' . $jarum))->withInput()->with('error', 'Data Sudah Ada, Silahkan Cek Ulang Kembali Inputanya');
         }
+    }
+    public function detailbooking($idBooking)
+    {
+        $booking = $this->bookingModel->getDataById($idBooking);
+        $data = [
+            'title' => 'Data Booking',
+            'active1' => '',
+            'active2' => 'active',
+            'active3' => '',
+            'active4' => '',
+            'booking' => $booking,
+
+        ];
+        return view('Capacity/Booking/detail', $data);
     }
     public function order()
     {

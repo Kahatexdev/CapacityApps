@@ -16,10 +16,10 @@
                             </div>
                         </div>
                         <div>
-                            <button type="button" class="btn btn-success bg-gradient-success shadow text-center border-radius-md">
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-success shadow text-center border-radius-md">
                                 Import Data Booking
                             </button>
-                            <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-success bg-gradient-info shadow text-center border-radius-md">
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md">
                                 Input Data Booking
                             </button>
                         </div>
@@ -134,13 +134,8 @@
                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Desc</th>
                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Seam</th>
-                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">OPD</th>
-                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Ship</th>
-                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty BK</th>
-                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa BK</th>
                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
 
-                            <th class="text-dark opacity-7"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -153,10 +148,8 @@
                                 <td class="text-sm"><?= $bk['product_type'] ?></td>
                                 <td class="text-sm"><?= $bk['desc'] ?></td>
                                 <td class="text-sm"><?= $bk['seam'] ?></td>
-                                <td class="text-sm"><?= $bk['opd'] ?></td>
-                                <td class="text-sm"><?= $bk['delivery'] ?></td>
-                                <td class="text-sm"><?= $bk['qty_booking'] ?></td>
                                 <td class="text-sm"><?= $bk['sisa_booking'] ?></td>
+                                <td class="text-sm"> <a href="<?= base_url('capacity/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm">detail</a> </td>
                             </tr>
                         <?php endforeach ?>
                     </tbody>
