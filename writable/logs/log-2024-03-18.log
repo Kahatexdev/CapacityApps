@@ -1096,81 +1096,6 @@ INFO - 2024-03-18 08:47:34 --> Session: Class initialized using 'CodeIgniter\Ses
 INFO - 2024-03-18 09:10:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2024-03-18 09:10:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2024-03-18 09:11:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-<<<<<<< HEAD
-INFO - 2024-03-18 09:17:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:26:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:26:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:26:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:27:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:27:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:27:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:27:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:27:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:27:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:28:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:28:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:30:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:33:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:36:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:36:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:36:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:39:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:40:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:40:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:40:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:40:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:40:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:41:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-INFO - 2024-03-18 09:46:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-CRITICAL - 2024-03-18 09:46:05 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "../Capacity.php"
-in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
- 1 SYSTEMPATH\View\View.php(216): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('../Capacity.php')
- 2 SYSTEMPATH\View\View.php(244): CodeIgniter\View\View->render('../Capacity', [], true)
- 3 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/jarum', [], true)
- 4 APPPATH\Controllers\CapacityController.php(70): view('Capacity/Booking/jarum', [...])
- 5 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->bookingPerJarum('JC120')
- 6 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
- 7 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
- 8 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
- 9 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('C:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
-INFO - 2024-03-18 09:46:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-CRITICAL - 2024-03-18 09:46:13 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "../Capacity/layout.php"
-in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
- 1 SYSTEMPATH\View\View.php(216): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('../Capacity/layout.php')
- 2 SYSTEMPATH\View\View.php(244): CodeIgniter\View\View->render('../Capacity/layout', [], true)
- 3 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/jarum', [], true)
- 4 APPPATH\Controllers\CapacityController.php(70): view('Capacity/Booking/jarum', [...])
- 5 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->bookingPerJarum('JC120')
- 6 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
- 7 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
- 8 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
- 9 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('C:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
-INFO - 2024-03-18 09:46:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-CRITICAL - 2024-03-18 09:46:29 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "../../layout.php"
-in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
- 1 SYSTEMPATH\View\View.php(216): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('../../layout.php')
- 2 SYSTEMPATH\View\View.php(244): CodeIgniter\View\View->render('../../layout', [], true)
- 3 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/jarum', [], true)
- 4 APPPATH\Controllers\CapacityController.php(70): view('Capacity/Booking/jarum', [...])
- 5 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->bookingPerJarum('JC120')
- 6 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
- 7 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
- 8 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
- 9 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('C:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
-INFO - 2024-03-18 09:46:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-CRITICAL - 2024-03-18 09:46:36 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "../layout.php"
-in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
- 1 SYSTEMPATH\View\View.php(216): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('../layout.php')
- 2 SYSTEMPATH\View\View.php(244): CodeIgniter\View\View->render('../layout', [], true)
- 3 SYSTEMPATH\Common.php(1178): CodeIgniter\View\View->render('Capacity/Booking/jarum', [], true)
- 4 APPPATH\Controllers\CapacityController.php(70): view('Capacity/Booking/jarum', [...])
- 5 SYSTEMPATH\CodeIgniter.php(941): App\Controllers\CapacityController->bookingPerJarum('JC120')
- 6 SYSTEMPATH\CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\CapacityController))
- 7 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
- 8 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
- 9 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('C:\\xampp\\htdocs\\CapacityApps\\public\\index.php')
-INFO - 2024-03-18 09:46:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
-=======
 >>>>>>> c3a375ff6d0928633019c0c91b7771011a85983a
 INFO - 2024-03-18 09:17:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2024-03-18 09:17:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
@@ -1427,4 +1352,3 @@ Stack trace:
 #9 D:\xampp\htdocs\CapacityApps\vendor\codeigniter4\framework\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
 #10 D:\xampp\htdocs\CapacityApps\spark(102): CodeIgniter\CLI\Console->run()
 #11 {main}
->>>>>>> ea2994135dc1f1186252900243442d59f8a4cd5f

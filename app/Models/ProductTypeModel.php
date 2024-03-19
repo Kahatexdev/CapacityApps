@@ -4,15 +4,15 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class BookingModel extends Model
+class ProductTypeModel extends Model
 {
-    protected $table            = 'data_booking';
-    protected $primaryKey       = 'id_booking';
+    protected $table            = 'master_product_type';
+    protected $primaryKey       = 'id_product_type';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_booking', 'tgl_terima_booking', 'kd_buyer_booking', 'id_product_type', 'no_order', 'no_booking', 'desc', 'opd', 'delivery', 'qty_booking', 'sisa_booking', 'needle', 'seam'];
+    protected $allowedFields    = ['id_product_type', 'konversi', 'product_type'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -40,16 +40,9 @@ class BookingModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function checkExist($validate)
+    public function getId($product)
     {
-        $query = $this->where('no_order', $validate['no_order'])
-            ->where('no_booking ', $validate['no_pdk'])->first();
+        $query = $this->select('id_product_type')->where('product_type', $product)->first();
         return $query;
-    }
-    public function getAllData()
-    {
-        return $this->select('data_booking.*, master_product_type.product_type')
-            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
-            ->findAll();
     }
 }

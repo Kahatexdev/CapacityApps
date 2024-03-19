@@ -5,16 +5,20 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\DataMesinModel;
-use App\Models\OrderModel;
+use App\Models\ProductTypeModel;
+use App\Models\BookingModel;
 
 class CapacityController extends BaseController
 {
     protected $filters;
     protected $jarumModel;
-
+    protected $productModel;
+    protected $bookingModel;
     public function __construct()
     {
         $this->jarumModel = new DataMesinModel();
+        $this->bookingModel = new BookingModel();
+        $this->productModel = new ProductTypeModel();
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -58,6 +62,8 @@ class CapacityController extends BaseController
     }
     public function bookingPerJarum($jarum)
     {
+        $product = $this->productModel->findAll();
+        $booking = $this->bookingModel->getAllData();
 
         $data = [
             'title' => 'Data Booking',
@@ -65,13 +71,16 @@ class CapacityController extends BaseController
             'active2' => 'active',
             'active3' => '',
             'active4' => '',
-            'jarum' => $jarum
+            'jarum' => $jarum,
+            'product' => $product,
+            'booking' => $booking,
 
         ];
         return view('Capacity/Booking/jarum', $data);
     }
     public function inputbooking()
     {
+        $jarum = $this->request->getPost(("jarum"));
         $tglbk = $this->request->getPost("tgl_booking");
         $no_order = $this->request->getPost("no_order");
         $no_pdk = $this->request->getPost("no_pdk");
@@ -80,17 +89,38 @@ class CapacityController extends BaseController
         $opd = $this->request->getPost("opd");
         $shipment = $this->request->getPost("shipment");
         $qty = $this->request->getPost("qty");
+        $buyer = $this->request->getPost("buyer");
+        $product = $this->request->getPost("productType");
+        $idProduct = $this->productModel->getId($product);
 
         $validate = [
             'no_order' => $no_order,
             'no_pdk' => $no_pdk
         ];
-
-
-        $input = [
-            'tgl_booking' => $tglbk,
-
-        ];
+        $check = $this->bookingModel->checkExist($validate);
+        if (!$check) {
+            $input = [
+                'tgl_terima_booking' => $tglbk,
+                'kd_buyer_booking' => $buyer,
+                'id_product_type' => $idProduct,
+                'no_order' => $no_order,
+                'no_booking' => $no_pdk,
+                'desc' => $desc,
+                'opd' => $opd,
+                'delivery' => $shipment,
+                'qty_booking' => $qty,
+                'needle' => $jarum,
+                'seam' => $seam
+            ];
+            $insert =   $this->bookingModel->insert($input);
+            if ($insert) {
+                return redirect()->to(base_url('/capacity/databooking/' . $jarum))->withInput()->with('success', 'Data Berhasil Di Input');
+            } else {
+                return redirect()->to(base_url('/capacity/databooking/' . $jarum))->withInput()->with('error', 'Data Gagal Di Input');
+            }
+        } else {
+            return redirect()->to(base_url('/capacity/databooking/' . $jarum))->withInput()->with('error', 'Data Sudah Ada, Silahkan Cek Ulang Kembali Inputanya');
+        }
     }
     public function order()
     {
