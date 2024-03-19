@@ -75,7 +75,7 @@ class CapacityController extends BaseController
             'active2' => 'active',
             'active3' => '',
             'active4' => '',
-            'jarum' => $jarum
+            'jarum' => $jarum,
 
         ];
         return view('Capacity/Booking/jarum', $data);
