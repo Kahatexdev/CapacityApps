@@ -5,8 +5,9 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\DataMesinModel;
-use App\Models\ProductTypeModel;
+use App\Models\OrderModel;
 use App\Models\BookingModel;
+use App\Models\ProductTypeModel;
 
 class CapacityController extends BaseController
 {
@@ -14,11 +15,14 @@ class CapacityController extends BaseController
     protected $jarumModel;
     protected $productModel;
     protected $bookingModel;
+    protected $orderModel;
+
     public function __construct()
     {
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
+        $this->orderModel = new OrderModel();
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -71,16 +75,29 @@ class CapacityController extends BaseController
             'active2' => 'active',
             'active3' => '',
             'active4' => '',
-            'jarum' => $jarum,
-            'product' => $product,
-            'booking' => $booking,
+            'jarum' => $jarum
 
         ];
         return view('Capacity/Booking/jarum', $data);
     }
+    public function OrderPerJarum($jarum)
+    {
+        $tampilperjarum = $this->orderModel->findAll();
+        $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'jarum' => $jarum,
+            'tampildata' => $tampilperjarum,
+
+        ];
+        return view('Capacity/Order/jarum', $data);
+    }
     public function inputbooking()
     {
-        $jarum = $this->request->getPost(("jarum"));
+        $jarum = $this->request->getPost("jarum");
         $tglbk = $this->request->getPost("tgl_booking");
         $no_order = $this->request->getPost("no_order");
         $no_pdk = $this->request->getPost("no_pdk");
@@ -89,9 +106,9 @@ class CapacityController extends BaseController
         $opd = $this->request->getPost("opd");
         $shipment = $this->request->getPost("shipment");
         $qty = $this->request->getPost("qty");
-        $buyer = $this->request->getPost("buyer");
         $product = $this->request->getPost("productType");
         $idProduct = $this->productModel->getId($product);
+        $buyer = $this->request->getPost("buyer");
 
         $validate = [
             'no_order' => $no_order,
@@ -137,14 +154,33 @@ class CapacityController extends BaseController
         ];
         return view('Capacity/Booking/detail', $data);
     }
+    public function inputOrder()
+    {
+        $tgl_turun = $this->request->getPost("tgl_turun");
+        $no_model = $this->request->getPost("no_model");
+        $jarum = $this->request->getPost("jarum");
+        $validate = [
+            'tgl_turun' => $tgl_turun,
+            'no_model' => $no_model,
+        ];
+
+        $input = [
+            'tgl_terima_order' => $tgl_turun,
+            'no_model' => $no_model,
+        ];
+        $this->orderModel->insert($input);
+        return redirect()->to(base_url('capacity/dataorder/' . $jarum))->withInput()->with('success', 'Data Berhasil Diinput');
+    }
     public function order()
     {
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $data = [
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
             'active3' => 'active',
             'active4' => '',
+            'TotalMesin' => $totalMesin,
         ];
         return view('Capacity/Order/order', $data);
     }

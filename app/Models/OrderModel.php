@@ -4,7 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class DataOrder extends Model
+class OrderModel extends Model
 {
     protected $table            = 'data_order';
     protected $primaryKey       = 'id_order';
@@ -12,7 +12,7 @@ class DataOrder extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_order', 'id_booking', 'tgl_terima_order', 'kd_buyer_order', 'id_product_type', 'qty_order', 'sisa_order', 'id_hari', 'id_plan'];
+    protected $allowedFields    = ['id_order', 'id_booking', 'tgl_terima_order', 'kd_buyer_order', 'id_product_type', 'id_hari', 'id_plan','no_model'];
 
     protected bool $allowEmptyInserts = false;
 
