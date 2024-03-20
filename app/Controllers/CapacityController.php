@@ -150,7 +150,7 @@ class CapacityController extends BaseController
     public function detailbooking($idBooking)
     {
         $needle = $this->bookingModel->getNeedle($idBooking);
-
+        $product = $this->productModel->findAll();
         $booking = $this->bookingModel->getDataById($idBooking);
         $data = [
             'title' => 'Data Booking',
@@ -159,7 +159,8 @@ class CapacityController extends BaseController
             'active3' => '',
             'active4' => '',
             'booking' => $booking,
-            'jarum' => $needle
+            'jarum' => $needle,
+            'product' => $product
 
         ];
         return view('Capacity/Booking/detail', $data);
@@ -190,9 +191,11 @@ class CapacityController extends BaseController
                 return redirect()->to(base_url('capacity/detailbooking/' . $id_booking))->withInput()->with('error', 'Gagal Ambil Order');
             } else {
                 $id = $id_booking;
-                $field = 'sisa_booking';
-                $value = $sisa_booking;
-                $this->bookingModel->update($id, [$field => $value]);
+                $data = [
+                    'sisa_booking' => $sisa_booking,
+                    'status' => 'Aktif'
+                ];
+                $this->bookingModel->update($id, $data);
                 return redirect()->to(base_url('capacity/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
             }
         }
@@ -220,5 +223,49 @@ class CapacityController extends BaseController
             'active4' => 'active',
         ];
         return view('Capacity/Produksi/produksi', $data);
+    }
+    public function updatebooking($idBooking)
+    {
+
+        $data = [
+            'no_booking' =>  $this->request->getPost("no_booking"),
+            'desc' => $this->request->getPost("desc"),
+            'opd' =>  $this->request->getPost("opd"),
+            'delivery' => $this->request->getPost("delivery"),
+            'lead_time' => $this->request->getPost("lead"),
+            'qty_booking' => $this->request->getPost("qty"),
+            'sisa_booking' => $this->request->getPost("sisa")
+        ];
+        $id = $idBooking;
+        $update = $this->bookingModel->update($id, $data);
+        if ($update) {
+            return redirect()->to(base_url('capacity/detailbooking/' . $idBooking))->withInput()->with('success', 'Data Berhasil Di Update');
+        } else {
+            return redirect()->to(base_url('capacity/detailbooking/' . $idBooking))->withInput()->with('error', 'Gagal Update Data');
+        }
+    }
+    public function deletebooking($idBooking)
+    {
+
+        $jarum = $this->request->getPost("jarum");
+        $id = $idBooking;
+        $delete = $this->bookingModel->delete($id);
+        if ($delete) {
+            return redirect()->to(base_url('capacity/databooking/' . $jarum))->withInput()->with('success', 'Data Berhasil Di Hapus');
+        } else {
+            return redirect()->to(base_url('capacity/databooking/' . $jarum))->withInput()->with('error', 'Gagal Hapus Data');
+        }
+    }
+    public function cancelbooking($idBooking)
+    {
+
+        $jarum = $this->request->getPost("jarum");
+        $id = $idBooking;
+        $cancel = $this->bookingModel->update($id, ['status' => 'Cancel Booking']);
+        if ($cancel) {
+            return redirect()->to(base_url('capacity/databooking/' . $jarum))->withInput()->with('success', 'Bookingan Berhasil Di Cancel');
+        } else {
+            return redirect()->to(base_url('capacity/databooking/' . $jarum))->withInput()->with('error', 'Gagal Cancek Booking');
+        }
     }
 }

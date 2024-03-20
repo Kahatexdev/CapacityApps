@@ -109,7 +109,7 @@
                                         </div>
                                         <div class=" form-group">
                                             <label for="Lead" class="col-form-label">LeadTime</label>
-                                            <input type="number" name="lead" id="lead" class="form-control">
+                                            <input type="text" readonly name="lead" id="lead" class="form-control">
                                         </div>
                                         <div class="form-group">
                                             <label for="qty" class="col-form-label">QTY Booking (pcs):</label>
@@ -145,8 +145,8 @@
                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No PDK</th>
                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Desc</th>
-                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Seam</th>
                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Booking</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
 
                         </tr>
@@ -160,8 +160,8 @@
                                 <td class="text-sm"><?= $bk['no_booking'] ?></td>
                                 <td class="text-sm"><?= $bk['product_type'] ?></td>
                                 <td class="text-sm"><?= $bk['desc'] ?></td>
-                                <td class="text-sm"><?= $bk['seam'] ?></td>
                                 <td class="text-sm"><?= $bk['sisa_booking'] ?></td>
+                                <td class="text-sm"><?= $bk['status'] ?></td>
                                 <td class="text-sm"> <a href="<?= base_url('capacity/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm">detail</a> </td>
                             </tr>
                         <?php endforeach ?>
@@ -184,8 +184,18 @@
 
         var timeDiff = shipment.getTime() - opd.getTime()
         var leanTime = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
+        var leadTime = leanTime - 7;
 
-        document.getElementById("lead").value = leanTime
+        if (leadTime <= 14) {
+            document.getElementById("lead").value = "Invalid Lead Time"
+            document.getElementById("lead").classList.add("is-invalid")
+            document.getElementById("lead").classList.add("text-danger")
+        } else {
+            document.getElementById("lead").value = leadTime
+            document.getElementById("lead").classList.remove("is-invalid")
+            document.getElementById("lead").classList.remove("text-danger")
+        }
+
     }
 </script>
 

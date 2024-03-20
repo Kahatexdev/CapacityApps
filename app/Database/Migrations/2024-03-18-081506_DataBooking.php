@@ -71,6 +71,11 @@ class DataBooking extends Migration
                 'constraint' => ['Booking Baru', 'Aktif', 'Cancel Booking', 'Habis'],
                 'default' => 'Booking Baru'
             ],
+            'ref_id' => [
+                'type' => 'INT',
+                'constraint' => 11,
+                'default' => 0
+            ],
         ]);
         $this->forge->addKey('id_booking', true);
         $this->forge->addForeignKey('id_product_type', 'master_product_type', 'id_product_type', 'CASCADE', 'CASCADE');

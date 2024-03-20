@@ -1,6 +1,29 @@
 <?php $this->extend('Capacity/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
+    <?php if (session()->getFlashdata('success')) : ?>
+        <script>
+            $(document).ready(function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '<?= session()->getFlashdata('success') ?>',
+                });
+            });
+        </script>
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('error')) : ?>
+        <script>
+            $(document).ready(function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: '<?= session()->getFlashdata('error') ?>',
+                });
+            });
+        </script>
+    <?php endif; ?>
     <div class="row">
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
 
@@ -101,39 +124,15 @@
                 <div class="card-footer">
                     <div class="row">
                         <div class="col-lg-12">
-                            <a href="" class="btn btn-info">Booking to Booking</a>
+                            <a href="" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#ModalBooking">Booking to Booking</a>
                             <a href="#" class="btn btn-info order-btn" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">Booking to Order</a>
-                            <a href="" class="btn btn-success">Edit Booking</a>
-                            <a href="" class="btn btn-warning">Cancel Booking</a>
-                            <a href="" class="btn btn-danger">Delete Booking</a>
+                            <a href="" class="btn btn-success" Data-bs-toggle="modal" data-bs-target="#ModalEdit">Edit Booking</a>
+                            <a href="" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#ModalCancel">Cancel Booking</a>
+                            <a href="" class="btn btn-danger" Data-bs-toggle="modal" data-bs-target="#ModalDelete">Delete Booking</a>
                         </div>
 
                     </div>
                 </div>
-                <?php if (session()->getFlashdata('success')) : ?>
-                    <script>
-                        $(document).ready(function() {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success!',
-                                text: '<?= session()->getFlashdata('success') ?>',
-                            });
-                        });
-                    </script>
-                <?php endif; ?>
-
-                <?php if (session()->getFlashdata('error')) : ?>
-                    <script>
-                        $(document).ready(function() {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error!',
-                                text: '<?= session()->getFlashdata('error') ?>',
-                            });
-                        });
-                    </script>
-                <?php endif; ?>
-
                 <div class="modal fade  bd-example-modal-lg" id="exampleModalMessage" tabindex="-1" role="dialog" aria-labelledby="exampleModalMessageTitle" aria-hidden="true">
                     <div class="modal-dialog  modal-dialog-centered" role="document">
                         <div class="modal-content">
@@ -192,10 +191,235 @@
                         </div>
                     </div>
                 </div>
+                <!-- modal edit -->
+                <div class="modal fade  bd-example-modal-lg" id="ModalEdit" tabindex="-1" role="dialog" aria-labelledby="modalEdit" aria-hidden="true">
+                    <div class="modal-dialog  modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Edit Data Booking</h5>
+                                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="<?= base_url('capacity/updatebooking/' . $booking['id_booking']) ?>" method="post">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-sm-12">
+                                            <div class="form-group">
+                                                <label for="tgl-bk" class="col-form-label">Tanggal Booking</label>
+                                                <input type="date" class="form-control" name="tgl_booking" value="<?= $booking['tgl_terima_booking'] ?>" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="buyer" class="col-form-label">Kode Buyer:</label>
+                                                <input type="text" name="buyer" id="" class="form-control" value="<?= $booking['kd_buyer_booking']; ?>" disabled>
+                                            </div>
+                                            <div class=" form-group">
+                                                <label for="no_order" class="col-form-label">No Order:</label>
+                                                <input type="text" name="no_order" id="" class="form-control" value="<?= $booking['no_order']; ?>" disabled>
+                                            </div>
+                                            <div class=" form-group">
+                                                <label for="productType" class="col-form-label">Product Type</label>
+                                                <input type="text" name="desc" id="" class="form-control" value="<?= $booking['product_type']; ?>" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="no_pdk" class="col-form-label">No Booking:</label>
+                                                <input type="text" name="no_booking" id="" class="form-control" value="<?= $booking['no_booking']; ?>">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="desc" class="col-form-label">Description:</label>
+                                                <input type="text" name="desc" id="" class="form-control" value="<?= $booking['desc']; ?>">
+                                            </div>
 
+                                        </div>
+                                        <div class="col-lg-6 col-sm-12">
+                                            <div class="form-group">
+                                                <label for="seam" class="col-form-label">Seam:</label>
+                                                <input type="text" name="seam" id="" class="form-control" value="<?= $booking['seam']; ?>">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="opd" class="col-form-label">OPD:</label>
+                                                <input type="date" name="opd" id="opd" class="form-control" value="<?= $booking['opd']; ?>" onchange="hitungJumlahHari()">
+                                            </div>
+                                            <div class=" form-group">
+                                                <label for="shipment" class="col-form-label">Shipment:</label>
+                                                <input type="date" name="delivery" id="shipment" value="<?= $booking['delivery']; ?>" class="form-control" onchange="hitungJumlahHari()">
+                                            </div>
+                                            <div class=" form-group">
+                                                <label for="Lead" class="col-form-label">LeadTime</label>
+                                                <input type="text" readonly name="lead" id="lead" value="<?= $booking['lead_time']; ?>" class=" form-control">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="qty" class="col-form-label">QTY Booking (pcs):</label>
+                                                <input type="number" name="qty" id="" class="form-control" value="<?= $booking['qty_booking']; ?>">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="qty" class="col-form-label">Sisa Booking (pcs):</label>
+                                                <input type="number" name="sisa" id="" class="form-control" value="<?= $booking['sisa_booking']; ?>">
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn bg-gradient-info">Ubah</button>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- modal delete -->
+                <div class="modal fade  bd-example-modal-lg" id="ModalDelete" tabindex="-1" role="dialog" aria-labelledby="modaldelete" aria-hidden="true">
+                    <div class="modal-dialog  modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Hapus Data Booking</h5>
+                                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="<?= base_url('capacity/deletebooking/' . $booking['id_booking']) ?>" method="post">
+                                    <input type="text" name="jarum" id="" hidden value="<?= $booking['needle'] ?>">
+                                    Apakah anda yakin ingin menghapus Data Booking?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn bg-gradient-danger">Hapus</button>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade  bd-example-modal-lg" id="ModalCancel" tabindex="-1" role="dialog" aria-labelledby="modalCancel" aria-hidden="true">
+                    <div class="modal-dialog  modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Cancel Booking</h5>
+                                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="<?= base_url('capacity/cancelbooking/' . $booking['id_booking']) ?>" method="post">
+                                    <input type="text" name="jarum" id="" hidden value="<?= $booking['needle'] ?>">
+                                    Apakah anda yakin ingin Cancel Booking?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn bg-gradient-danger">Cancel</button>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-        </div>
+            <!-- Modal Booking -->
+            <div class="modal fade  bd-example-modal-lg" id="ModalBooking" tabindex="-1" role="dialog" aria-labelledby="modalbooking" aria-hidden="true">
+                <div class="modal-dialog  modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Pecah Booking</h5>
+                            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="<?= base_url('capacity/updatebooking/' . $booking['id_booking']) ?>" method="post">
+                                <div class="row">
+                                    <div class="col-lg-6 col-sm-12">
+                                        <div class="form-group">
+                                            <label for="tgl-bk" class="col-form-label">Tanggal Booking</label>
+                                            <input type="date" class="form-control" name="tgl_booking">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="buyer" class="col-form-label">Kode Buyer:</label>
+                                            <input type="text" name="buyer" id="" class="form-control">
+                                        </div>
+                                        <div class=" form-group">
+                                            <label for="no_order" class="col-form-label">No Order:</label>
+                                            <input type="text" name="no_order" id="" class="form-control">
+                                        </div>
+                                        <div class=" form-group">
+                                            <label for="productType" class="col-form-label">Product Type</label>
+                                            <input type="text" name="desc" id="" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="no_pdk" class="col-form-label">No Booking:</label>
+                                            <input type="text" name="no_booking" id="" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="desc" class="col-form-label">Description:</label>
+                                            <input type="text" name="desc" id="" class="form-control">
+                                        </div>
 
+                                    </div>
+                                    <div class="col-lg-6 col-sm-12">
+                                        <div class="form-group">
+                                            <label for="seam" class="col-form-label">Seam:</label>
+                                            <input type="text" name="seam" id="" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="opd" class="col-form-label">OPD:</label>
+                                            <input type="date" name="opd" id="opd" class="form-control onchange=" hitungJumlahHari()">
+                                        </div>
+                                        <div class=" form-group">
+                                            <label for="shipment" class="col-form-label">Shipment:</label>
+                                            <input type="date" name="delivery" id="shipment" class="form-control" onchange="hitungJumlahHari()">
+                                        </div>
+                                        <div class=" form-group">
+                                            <label for="Lead" class="col-form-label">LeadTime</label>
+                                            <input type="text" readonly name="lead" id="lead" class=" form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="qty" class="col-form-label">QTY Booking (pcs):</label>
+                                            <input type="number" name="qty" id="" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="qty" class="col-form-label">Sisa Booking (pcs):</label>
+                                            <input type="number" name="sisa" id="" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-info">Ubah</button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <script>
+            function hitungJumlahHari() {
+                var opdString = document.getElementById("opd").value
+                var shipmentString = document.getElementById("shipment").value
+
+                var opd = new Date(opdString)
+                var shipment = new Date(shipmentString)
+
+                var timeDiff = shipment.getTime() - opd.getTime()
+                var leanTime = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
+                var leadTime = leanTime - 7;
+
+                if (leadTime <= 14) {
+                    document.getElementById("lead").value = "invalid Lead Time"
+                } else {
+                    document.getElementById("lead").value = leadTime
+
+                }
+
+            }
+        </script>
         <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
         <?php $this->endSection(); ?>
