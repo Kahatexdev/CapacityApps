@@ -45,13 +45,6 @@ class Apsperstyle extends Migration
             'type' => 'varchar',
             'constraint' => 100,
         ],
-        'created_at' => [
-            'type' => 'Date',
-        ],
-        'updated_at' => [
-            'type' => 'Date',
-        ],
-
     ]);
     $this->forge->addKey('idapsperstyle', true);
     // Tambahkan kunci asing ke sisa tabel referensi di sini

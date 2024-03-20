@@ -26,10 +26,6 @@ class APSOrderReport extends Migration
             'type' => 'int',
             'constraint' => 50,
         ],
-        'sisa' => [
-            'type' => 'INT',
-            'constraint' => 50,
-        ],
         'color' => [
             'type' => 'VARCHAR',
             'constraint' => 150,
@@ -52,6 +48,10 @@ class APSOrderReport extends Migration
         'processroute' => [
             'type' => 'VARCHAR',
             'constraint' => 100,
+        ],  
+        'no_model' => [
+            'type' => 'VARCHAR',
+            'constraint' => 30,
         ],        
         'lcoDate' => [
             'type' => 'date',
