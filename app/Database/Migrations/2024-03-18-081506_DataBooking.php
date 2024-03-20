@@ -68,7 +68,7 @@ class DataBooking extends Migration
             ],
             'status' => [
                 'type' => 'ENUM',
-                'constraint' => ['Booking Baru', 'Aktif', 'Cancel Booking', 'Habis'],
+                'constraint' => ['Booking Baru', 'Aktif', 'Cancel Booking', 'Habis', 'Pecah', 'Pecahan'],
                 'default' => 'Booking Baru'
             ],
             'ref_id' => [

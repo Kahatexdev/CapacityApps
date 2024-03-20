@@ -330,7 +330,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form action="<?= base_url('capacity/updatebooking/' . $booking['id_booking']) ?>" method="post">
+                            <form action="<?= base_url('capacity/pecahbooking/' . $booking['id_booking']) ?>" method="post">
                                 <div class="row">
                                     <div class="col-lg-6 col-sm-12">
                                         <div class="form-group">
@@ -341,14 +341,29 @@
                                             <label for="buyer" class="col-form-label">Kode Buyer:</label>
                                             <input type="text" name="buyer" id="" class="form-control">
                                         </div>
+                                        <div class="form-group">
+                                            <label for="jarum" class="col-form-label">Needle :</label>
+                                            <select class="form-control" id="jarum" name="jarum">
+                                                <option>Choose</option>
+                                                <?php foreach ($jenisJarum as $jj) : ?>
+                                                    <option><?= $jj['jarum'] ?></option>
+                                                <?php endforeach ?>
+                                            </select>
+                                        </div>
+                                        <div class=" form-group">
+                                            <label for="productType" class="col-form-label">Product Type</label>
+                                            <select class="form-control" id="productType" name="productType">
+                                                <option>Choose</option>
+                                                <?php foreach ($product as $pr) : ?>
+                                                    <option><?= $pr['product_type'] ?></option>
+                                                <?php endforeach ?>
+                                            </select>
+                                        </div>
                                         <div class=" form-group">
                                             <label for="no_order" class="col-form-label">No Order:</label>
                                             <input type="text" name="no_order" id="" class="form-control">
                                         </div>
-                                        <div class=" form-group">
-                                            <label for="productType" class="col-form-label">Product Type</label>
-                                            <input type="text" name="desc" id="" class="form-control">
-                                        </div>
+
                                         <div class="form-group">
                                             <label for="no_pdk" class="col-form-label">No Booking:</label>
                                             <input type="text" name="no_booking" id="" class="form-control">
@@ -366,15 +381,15 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="opd" class="col-form-label">OPD:</label>
-                                            <input type="date" name="opd" id="opd" class="form-control onchange=" hitungJumlahHari()">
+                                            <input type="date" name="opd" id="opd1" class="form-control" onchange="hitungJumlahHari()">
                                         </div>
                                         <div class=" form-group">
                                             <label for="shipment" class="col-form-label">Shipment:</label>
-                                            <input type="date" name="delivery" id="shipment" class="form-control" onchange="hitungJumlahHari()">
+                                            <input type="date" name="delivery" id="shipment1" class="form-control" onchange="hitungJumlahHari()">
                                         </div>
                                         <div class=" form-group">
                                             <label for="Lead" class="col-form-label">LeadTime</label>
-                                            <input type="text" readonly name="lead" id="lead" class=" form-control">
+                                            <input type="text" readonly name="lead" id="lead1" class=" form-control">
                                         </div>
                                         <div class="form-group">
                                             <label for="qty" class="col-form-label">QTY Booking (pcs):</label>
@@ -404,18 +419,31 @@
             function hitungJumlahHari() {
                 var opdString = document.getElementById("opd").value
                 var shipmentString = document.getElementById("shipment").value
+                var opdString1 = document.getElementById("opd1").value
+                var shipmentString1 = document.getElementById("shipment1").value
 
                 var opd = new Date(opdString)
                 var shipment = new Date(shipmentString)
+                var opd1 = new Date(opdString1)
+                var shipment1 = new Date(shipmentString1)
 
                 var timeDiff = shipment.getTime() - opd.getTime()
+                var timeDiff1 = shipment1.getTime() - opd1.getTime()
                 var leanTime = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
+                var leanTime1 = Math.floor(timeDiff1 / (1000 * 60 * 60 * 24))
                 var leadTime = leanTime - 7;
+                var leadTime1 = leanTime1 - 7;
 
                 if (leadTime <= 14) {
                     document.getElementById("lead").value = "invalid Lead Time"
                 } else {
                     document.getElementById("lead").value = leadTime
+
+                }
+                if (leadTime1 <= 14) {
+                    document.getElementById("lead1").value = "invalid Lead Time"
+                } else {
+                    document.getElementById("lead1").value = leadTime1
 
                 }
 

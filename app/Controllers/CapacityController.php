@@ -9,6 +9,8 @@ use App\Models\OrderModel;
 use App\Models\BookingModel;
 use App\Models\ProductTypeModel;
 
+use PhpOffice\PhpSpreadsheet\IOFactory;
+
 class CapacityController extends BaseController
 {
     protected $filters;
@@ -152,6 +154,7 @@ class CapacityController extends BaseController
         $needle = $this->bookingModel->getNeedle($idBooking);
         $product = $this->productModel->findAll();
         $booking = $this->bookingModel->getDataById($idBooking);
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $data = [
             'title' => 'Data Booking',
             'active1' => '',
@@ -160,7 +163,8 @@ class CapacityController extends BaseController
             'active4' => '',
             'booking' => $booking,
             'jarum' => $needle,
-            'product' => $product
+            'product' => $product,
+            'jenisJarum' => $totalMesin
 
         ];
         return view('Capacity/Booking/detail', $data);
@@ -197,6 +201,82 @@ class CapacityController extends BaseController
                 ];
                 $this->bookingModel->update($id, $data);
                 return redirect()->to(base_url('capacity/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
+            }
+        }
+    }
+    public function pecahbooking($id_booking)
+    {
+
+        $jarum = $this->request->getPost("jarum");
+        $tglbk = $this->request->getPost("tgl_booking");
+        $no_order = $this->request->getPost("no_order");
+        $no_pdk = $this->request->getPost("no_booking");
+        $desc = $this->request->getPost("desc");
+        $seam = $this->request->getPost("seam");
+        $opd = $this->request->getPost("opd");
+        $shipment = $this->request->getPost("delivery");
+        $qty = $this->request->getPost("qty");
+        $product = $this->request->getPost("productType");
+        $idProduct = $this->productModel->getId($product);
+        $buyer = $this->request->getPost("buyer");
+        $leadTime = $this->request->getPost("lead");
+        $refId = $id_booking;
+
+
+
+        $validate = [
+            'no_order' => $no_order,
+            'no_pdk' => $no_pdk
+        ];
+        $check = $this->bookingModel->checkExist($validate);
+        if (!$check) {
+            $input = [
+                'tgl_terima_booking' => $tglbk,
+                'kd_buyer_booking' => $buyer,
+                'id_product_type' => $idProduct,
+                'no_order' => $no_order,
+                'no_booking' => $no_pdk,
+                'desc' => $desc,
+                'opd' => $opd,
+                'delivery' => $shipment,
+                'qty_booking' => $qty,
+                'sisa_booking' => $qty,
+                'needle' => $jarum,
+                'seam' => $seam,
+                'lead_time' => $leadTime,
+                'status' => 'Pecahan',
+                'ref_id' => $refId
+            ];
+            $insert =   $this->bookingModel->insert($input);
+
+            if ($insert) {
+                $this->bookingModel->update($id_booking, ['sisa_booking' => $this->request->getPost("sisa")]);
+                return redirect()->to(base_url('/capacity/databooking/' . $jarum))->withInput()->with('success', 'Data Berhasil Di Input');
+            } else {
+                return redirect()->to(base_url('/capacity/databooking/' . $jarum))->withInput()->with('error', 'Data Gagal Di Input');
+            }
+        } else {
+            return redirect()->to(base_url('/capacity/databooking/' . $jarum))->withInput()->with('error', 'Data Sudah Ada, Silahkan Cek Ulang Kembali Inputanya');
+        }
+    }
+    public function importBooking()
+    {
+        $file = $this->request->getFile('excel_file');
+        if ($file->isValid() && !$file->hasMoved()) {
+            $spreadsheet = IOFactory::load($file);
+            $data = $spreadsheet->getActiveSheet();
+            $startRow = 18; // Ganti dengan nomor baris mulai
+            foreach ($spreadsheet->getActiveSheet()->getRowIterator($startRow) as $row) {
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+                $data = [];
+                foreach ($cellIterator as $cell) {
+                    $data[] = $cell->getValue();
+                }
+                if (!empty($data)) {
+                } else {
+                    return redirect()->to(base_url('/capacity/databooking'))->withInput()->with('error', 'Excel kosong mba  ');
+                }
             }
         }
     }

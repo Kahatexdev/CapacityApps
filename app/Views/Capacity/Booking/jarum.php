@@ -16,9 +16,7 @@
                             </div>
                         </div>
                         <div>
-                            <button type="button" class="btn btn-sm btn-success bg-gradient-success shadow text-center border-radius-md">
-                                Import Data Booking
-                            </button>
+
                             <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md">
                                 Input Data Booking
                             </button>
