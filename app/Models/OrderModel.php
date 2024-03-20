@@ -12,7 +12,7 @@ class OrderModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_model', 'id_booking', 'no_model', 'kd_buyer_order', 'id_product_type', 'seam', 'leadtime','description','created at','updated_at'];
+    protected $allowedFields    = ['id_model', 'id_booking', 'no_model', 'kd_buyer_order', 'id_product_type', 'seam', 'leadtime', 'description', 'created at', 'updated_at'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -46,11 +46,15 @@ class OrderModel extends Model
     {
         return $this->findAll(); // Mengembalikan seluruh data
     }
+    public function checkExist($no_model)
+    {
+        return $this->where('no_model', $no_model)->first();
+    }
 
     // // Fungsi untuk mendapatkan data berdasarkan kondisi
     // public function getDataByCondition($condition)
     // {
     //     return $this->where($condition)->findAll(); // Mengembalikan data berdasarkan kondisi
     // }
-    
+
 }

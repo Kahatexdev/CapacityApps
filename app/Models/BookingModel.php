@@ -66,4 +66,9 @@ class BookingModel extends Model
             ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
             ->findAll();
     }
+    public function getNeedle($idBooking)
+    {
+        $query = $this->select('needle')->where('id_booking', $idBooking)->first();
+        return $query;
+    }
 }

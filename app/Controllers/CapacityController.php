@@ -149,6 +149,8 @@ class CapacityController extends BaseController
     }
     public function detailbooking($idBooking)
     {
+        $needle = $this->bookingModel->getNeedle($idBooking);
+
         $booking = $this->bookingModel->getDataById($idBooking);
         $data = [
             'title' => 'Data Booking',
@@ -157,6 +159,7 @@ class CapacityController extends BaseController
             'active3' => '',
             'active4' => '',
             'booking' => $booking,
+            'jarum' => $needle
 
         ];
         return view('Capacity/Booking/detail', $data);
@@ -167,29 +170,32 @@ class CapacityController extends BaseController
         $no_model = $this->request->getPost("no_model");
         $no_booking = $this->request->getPost("no_booking");
         $deskripsi = $this->request->getPost("deskripsi");
-        $sisa_booking = $this->request->getPost("sisa_booking");
+        $sisa_booking = $this->request->getPost("sisa_booking_akhir");
         $id_booking = $this->request->getPost("id_booking");
         $jarum = $this->request->getPost("jarum");
-        $validate = [
-            'tgl_turun' => $tgl_turun,
-            'no_model' => $no_model,
-            'deskripsi' => $deskripsi,
-            'id_booking' => $id_booking,
-            'sisa_booking' => $sisa_booking,
-        ];
 
-        $inputModel = [
-            'tgl_terima_order' => $tgl_turun,
-            'no_model' => $no_model,
-            'deskripsi' => $deskripsi,
-            'id_booking' => $id_booking,
-        ];
-        $id = $id_booking;
-        $field = "sisa_booking";
-        $value = $sisa_booking;
-        $this->orderModel->insert($inputModel);
-        $this->bookingModel->update($id,[$field=>$value]);
-        return redirect()->to(base_url('capacity/databooking/'.$id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
+        $check = $this->orderModel->checkExist($no_model);
+        if ($check) {
+            return redirect()->to(base_url('/capacity/detailbooking/' . $id_booking))->withInput()->with('error', 'No Model Sudah ada');
+        } else {
+
+            $inputModel = [
+                'tgl_terima_order' => $tgl_turun,
+                'no_model' => $no_model,
+                'deskripsi' => $deskripsi,
+                'id_booking' => $id_booking,
+            ];
+            $input = $this->orderModel->insert($inputModel);
+            if (!$input) {
+                return redirect()->to(base_url('capacity/detailbooking/' . $id_booking))->withInput()->with('error', 'Gagal Ambil Order');
+            } else {
+                $id = $id_booking;
+                $field = 'sisa_booking';
+                $value = $sisa_booking;
+                $this->bookingModel->update($id, [$field => $value]);
+                return redirect()->to(base_url('capacity/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
+            }
+        }
     }
     public function order()
     {

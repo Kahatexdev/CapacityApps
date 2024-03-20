@@ -61,56 +61,64 @@
                         </div>
                         <div class="modal-body">
                             <form action="<?= base_url('capacity/inputbooking') ?>" method="post">
-                                <div class="form-group">
-                                    <input type="text" class="form-control" name="jarum" hidden value="<?= $jarum ?>">
-                                    <label for="tgl-bk-form-label">Tanggal Booking</label>
-                                    <input type="date" class="form-control" name="tgl_booking">
+                                <div class="row">
+                                    <div class="col-lg-6 col-sm-12">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="jarum" hidden value="<?= $jarum ?>">
+                                            <label for="tgl-bk" class="col-form-label">Tanggal Booking</label>
+                                            <input type="date" class="form-control" name="tgl_booking">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="buyer" class="col-form-label">Kode Buyer:</label>
+                                            <input type="text" name="buyer" id="" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="no_order" class="col-form-label">No Order:</label>
+                                            <input type="text" name="no_order" id="" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="no_pdk" class="col-form-label">No PDK:</label>
+                                            <input type="text" name="no_pdk" id="" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="desc" class="col-form-label">Description:</label>
+                                            <input type="text" name="desc" id="" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="productType" class="col-form-label">Product Type</label>
+                                            <select class="form-control" id="productType" name="productType">
+                                                <option>Choose</option>
+                                                <?php foreach ($product as $pr) : ?>
+                                                    <option><?= $pr['product_type'] ?></option>
+                                                <?php endforeach ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-sm-12">
+                                        <div class="form-group">
+                                            <label for="seam" class="col-form-label">Seam:</label>
+                                            <input type="text" name="seam" id="" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="opd" class="col-form-label">OPD:</label>
+                                            <input type="date" name="opd" id="opd" class="form-control" onchange="hitungJumlahHari()">
+                                        </div>
+                                        <div class=" form-group">
+                                            <label for="shipment" class="col-form-label">Shipment:</label>
+                                            <input type="date" name="shipment" id="shipment" class="form-control" onchange="hitungJumlahHari()">
+                                        </div>
+                                        <div class=" form-group">
+                                            <label for="Lead" class="col-form-label">LeadTime</label>
+                                            <input type="number" name="lead" id="lead" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="qty" class="col-form-label">QTY Booking (pcs):</label>
+                                            <input type="number" name="qty" id="" class="form-control">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="buyer" class="col-form-label">Kode Buyer:</label>
-                                    <input type="text" name="buyer" id="" class="form-control">
-                                </div>
-                                <div class="form-group">
-                                    <label for="no_order" class="col-form-label">No Order:</label>
-                                    <input type="text" name="no_order" id="" class="form-control">
-                                </div>
-                                <div class="form-group">
-                                    <label for="no_pdk" class="col-form-label">No PDK:</label>
-                                    <input type="text" name="no_pdk" id="" class="form-control">
-                                </div>
-                                <div class="form-group">
-                                    <label for="desc" class="col-form-label">Description:</label>
-                                    <input type="text" name="desc" id="" class="form-control">
-                                </div>
-                                <div class="form-group">
-                                    <label for="productType">Product Type</label>
-                                    <select class="form-control" id="productType" name="productType">
-                                        <option>Choose</option>
-                                        <?php foreach ($product as $pr) : ?>
-                                            <option><?= $pr['product_type'] ?></option>
-                                        <?php endforeach ?>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="seam" class="col-form-label">Seam:</label>
-                                    <input type="text" name="seam" id="" class="form-control">
-                                </div>
-                                <div class="form-group">
-                                    <label for="opd" class="col-form-label">OPD:</label>
-                                    <input type="date" name="opd" id="opd" class="form-control" onchange="hitungJumlahHari()">
-                                </div>
-                                <div class=" form-group">
-                                    <label for="shipment" class="col-form-label">Shipment:</label>
-                                    <input type="date" name="shipment" id="shipment" class="form-control" onchange="hitungJumlahHari()">
-                                </div>
-                                <div class=" form-group">
-                                    <label for="Lead" class="col-form-label">LeadTime</label>
-                                    <input type="number" name="lead" id="lead" class="form-control">
-                                </div>
-                                <div class="form-group">
-                                    <label for="qty" class="col-form-label">QTY Booking (pcs):</label>
-                                    <input type="number" name="qty" id="" class="form-control">
-                                </div>
+
+
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>

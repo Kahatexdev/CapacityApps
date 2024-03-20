@@ -6,9 +6,13 @@
 
             <div class="card">
                 <div class="card-header">
-                    <h5>
-                        Detail Booking
-                    </h5>
+                    <div class="d-flex justify-content-between">
+                        <h5>
+                            Detail Booking
+                        </h5>
+                        <a href="<?= base_url('capacity/databooking/' . $jarum['needle']) ?>" class="btn bg-gradient-info"> Kembali</a>
+                    </div>
+
                 </div>
                 <div class="card-body p-3">
                     <div class="row">
@@ -106,6 +110,29 @@
 
                     </div>
                 </div>
+                <?php if (session()->getFlashdata('success')) : ?>
+                    <script>
+                        $(document).ready(function() {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: '<?= session()->getFlashdata('success') ?>',
+                            });
+                        });
+                    </script>
+                <?php endif; ?>
+
+                <?php if (session()->getFlashdata('error')) : ?>
+                    <script>
+                        $(document).ready(function() {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: '<?= session()->getFlashdata('error') ?>',
+                            });
+                        });
+                    </script>
+                <?php endif; ?>
 
                 <div class="modal fade  bd-example-modal-lg" id="exampleModalMessage" tabindex="-1" role="dialog" aria-labelledby="exampleModalMessageTitle" aria-hidden="true">
                     <div class="modal-dialog  modal-dialog-centered" role="document">
@@ -120,34 +147,42 @@
                                 <form action="<?= base_url("capacity/inputOrder"); ?>" method="post">
                                     <input type="text" name="id_booking" value="<?= $booking['id_booking']; ?>" hidden>
                                     <input type="text" name="jarum" value="<?= $booking['needle']; ?>" hidden>
-                                    <div class="form-group">
-                                        <label for="col-lg-6 col-sm-12">Tanggal Turun Order</label>
-                                        <input type="date" class="form-control" name="tgl_turun">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-sm-12">
+                                            <div class="form-group">
+                                                <label for="col-lg-6 col-sm-12">Tanggal Turun Order</label>
+                                                <input type="date" class="form-control" name="tgl_turun">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="col-lg-6 col-sm-12">No Booking</label>
+                                                <input type="text" class="form-control" name="no_booking" value="<?= $booking['no_booking']; ?>">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="col-lg-6 col-sm-12">Deskripsi</label>
+                                                <input type="text" class="form-control" name="deskripsi">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="col-lg-6 col-sm-12">No Model</label>
+                                                <input type="text" name="no_model" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-sm-12">
+                                            <div class="form-group">
+                                                <label for="col-lg-6 col-sm-12">Sisa Booking Awal</label>
+                                                <input type="text" name="sisa_booking" class="form-control" value="<?= $booking['sisa_booking']; ?>">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="col-lg-6 col-sm-12">Turun Order</label>
+                                                <input type="text" name="turun_order" class="form-control">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="col-lg-6 col-sm-12">Sisa Booking Akhir</label>
+                                                <input type="text" name="sisa_booking_akhir" class="form-control">
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="col-lg-6 col-sm-12">No Booking</label>
-                                        <input type="text" class="form-control" name="no_booking" value="<?= $booking['no_booking']; ?>">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="col-lg-6 col-sm-12">Deskripsi</label>
-                                        <input type="text" class="form-control" name="deskripsi">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="col-lg-6 col-sm-12">No Model</label>
-                                        <input type="text" name="no_model" class="form-control">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="col-lg-6 col-sm-12">Sisa Booking Awal</label>
-                                        <input type="text" name="sisa_booking" class="form-control" value="<?= $booking['sisa_booking']; ?>">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="col-lg-6 col-sm-12">Turun Order</label>
-                                        <input type="text" name="turun_order" class="form-control">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="col-lg-6 col-sm-12">Sisa Booking Akhir</label>
-                                        <input type="text" name="sisa_booking_akhir" class="form-control">
-                                    </div>
+
+
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
