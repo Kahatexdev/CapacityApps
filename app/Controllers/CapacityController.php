@@ -164,18 +164,31 @@ class CapacityController extends BaseController
     {
         $tgl_turun = $this->request->getPost("tgl_turun");
         $no_model = $this->request->getPost("no_model");
+        $no_booking = $this->request->getPost("no_booking");
+        $deskripsi = $this->request->getPost("deskripsi");
+        $sisa_booking = $this->request->getPost("sisa_booking");
+        $id_booking = $this->request->getPost("id_booking");
         $jarum = $this->request->getPost("jarum");
         $validate = [
             'tgl_turun' => $tgl_turun,
             'no_model' => $no_model,
+            'deskripsi' => $deskripsi,
+            'id_booking' => $id_booking,
+            'sisa_booking' => $sisa_booking,
         ];
 
-        $input = [
+        $inputModel = [
             'tgl_terima_order' => $tgl_turun,
             'no_model' => $no_model,
+            'deskripsi' => $deskripsi,
+            'id_booking' => $id_booking,
         ];
-        $this->orderModel->insert($input);
-        return redirect()->to(base_url('capacity/dataorder/' . $jarum))->withInput()->with('success', 'Data Berhasil Diinput');
+        $id = $id_booking;
+        $field = "sisa_booking";
+        $value = $sisa_booking;
+        $this->orderModel->insert($inputModel);
+        $this->bookingModel->update($id,[$field=>$value]);
+        return redirect()->to(base_url('capacity/databooking/'.$id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
     }
     public function order()
     {

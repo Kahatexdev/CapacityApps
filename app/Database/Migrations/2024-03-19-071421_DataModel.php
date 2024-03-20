@@ -62,6 +62,6 @@ class DataModel extends Migration
 
     public function down()
     {
-        $this->forge->dropTable('data_order');
+        $this->forge->dropTable('data_model');
     }
 }

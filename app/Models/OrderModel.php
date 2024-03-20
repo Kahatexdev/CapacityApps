@@ -6,13 +6,13 @@ use CodeIgniter\Model;
 
 class OrderModel extends Model
 {
-    protected $table            = 'data_order';
-    protected $primaryKey       = 'id_order';
+    protected $table            = 'data_model';
+    protected $primaryKey       = 'id_model';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_order', 'id_booking', 'tgl_terima_order', 'kd_buyer_order', 'id_product_type', 'id_hari', 'id_plan','no_model'];
+    protected $allowedFields    = ['id_model', 'id_booking', 'no_model', 'kd_buyer_order', 'id_product_type', 'seam', 'leadtime','description','created at','updated_at'];
 
     protected bool $allowEmptyInserts = false;
 
