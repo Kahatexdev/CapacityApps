@@ -28,5 +28,6 @@ class UserSeed extends Seeder
         $this->db->table('user')->insertBatch($data);
         $this->call('DataMesin');
         $this->call('ProductType');
+        $this->call('DataBooking');
     }
 }

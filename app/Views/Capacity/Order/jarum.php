@@ -69,6 +69,7 @@
                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Desc</th>
                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Seam</th>
+                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Leadtime</th>
                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Shipment</th>
                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Order</th>
                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Order</th>
@@ -79,12 +80,13 @@
                 <tbody>
                 <?php foreach ($tampildata as $order) : ?>
                         <tr>
-                            <td><?= $order['tgl_terima_order'] ?></td>
+                            <td><?= $order['created_at'] ?></td>
                             <td><?= $order['kd_buyer_order'] ?></td>
                             <td><?= $order['no_model'] ?></td>
                             <td><?= $order['id_product_type'] ?></td>
                             <td><?= $order['description'] ?></td>
-                            <td></td>
+                            <td><?= $order['seam'] ?></td>
+                            <td><?= $order['leadtime'] ?></td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -109,22 +111,27 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="<?= base_url('import-data') ?>" method="post" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="importFile">Choose file:</label>
-                        <div class="input-group">
-                            <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="importFile" name="importFile">
-                                <label class="custom-file-label" for="importFile">Choose file</label>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-info" id="importDataBtn">Import</button>
-            </div>
+            <?php foreach ($tampildata as $order) : ?>
+            <form action="<?= base_url('capacity/importModel') ?>" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>ID Model</label>
+                    <input type="text" class="form-control" name="id_model" value="<?=  $order['id_model'] ?>">
+                </div>
+                <div class="form-group">
+                    <label>No Model</label>
+                    <input type="text" class="form-control" name="no_model" value="<?= $order['no_model'] ?>">
+                </div>
+                <div class="">File Browser</div>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" name="fileexcel" id="file" required accept=".xls, .xlsx">
+                    <label class="custom-file-label" for="file">Pilih APS Order Report</label>
+                </div> 
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-info" id="importDataBtn">Import</button>
+               </div>
+            </form> 
+            <?php endforeach; ?>
         </div>
     </div>
 </div>
