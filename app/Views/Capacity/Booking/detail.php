@@ -117,8 +117,9 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <form action="" method="post">
-                                    <input type="text" name="jarum" value="" hidden>
+                                <form action="<?= base_url("capacity/inputOrder"); ?>" method="post">
+                                    <input type="text" name="id_booking" value="<?= $booking['id_booking']; ?>" hidden>
+                                    <input type="text" name="jarum" value="<?= $booking['needle']; ?>" hidden>
                                     <div class="form-group">
                                         <label for="col-lg-6 col-sm-12">Tanggal Turun Order</label>
                                         <input type="date" class="form-control" name="tgl_turun">

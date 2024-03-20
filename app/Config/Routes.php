@@ -20,6 +20,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('databooking/(:any)', 'CapacityController::bookingPerJarum/$1');
     $routes->get('detailbooking/(:any)', 'CapacityController::detailbooking/$1');
     $routes->post('inputbooking', 'CapacityController::inputbooking');
+    $routes->post('inputOrder', 'CapacityController::inputOrder');
 });
 
 
