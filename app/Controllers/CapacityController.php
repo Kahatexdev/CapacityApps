@@ -115,6 +115,7 @@ class CapacityController extends BaseController
         $buyer = $this->request->getPost("buyer");
         $leadTime = $this->request->getPost("lead");
 
+
         $validate = [
             'no_order' => $no_order,
             'no_pdk' => $no_pdk

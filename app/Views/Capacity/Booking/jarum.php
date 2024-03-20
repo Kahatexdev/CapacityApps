@@ -105,7 +105,7 @@
                                 </div>
                                 <div class=" form-group">
                                     <label for="Lead" class="col-form-label">LeadTime</label>
-                                    <input type="number" name="leadTime" id="lead" class="form-control">
+                                    <input type="number" name="lead" id="lead" class="form-control">
                                 </div>
                                 <div class="form-group">
                                     <label for="qty" class="col-form-label">QTY Booking (pcs):</label>
@@ -138,6 +138,7 @@
                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Desc</th>
                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Seam</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Booking</th>
                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
 
                         </tr>
