@@ -53,7 +53,7 @@ class OrderModel extends Model
     public function tampilPerdelivery(){
         $builder = $this->db->table('data_model');
         
-        $builder->select('data_model.*, mastermodel, machinetypeid, ROUND(SUM(QTy)/24, 0) AS qty, ROUND(SUM(QTy)/24, 0) AS sisa, factory, delivery, product_type');
+        $builder->select('data_model.*, mastermodel, machinetypeid, ROUND(SUM(QTy)/24, 0) AS qty, ROUND(SUM(sisa)/24, 0) AS sisa, factory, delivery, product_type');
         $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
         $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
         $builder->groupBy('delivery');
