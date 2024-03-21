@@ -80,17 +80,22 @@
                 <tbody>
                 <?php foreach ($tampildata as $order) : ?>
                         <tr>
-                            <td><?= $order['created_at'] ?></td>
-                            <td><?= $order['kd_buyer_order'] ?></td>
-                            <td><?= $order['no_model'] ?></td>
-                            <td><?= $order['id_product_type'] ?></td>
-                            <td><?= $order['description'] ?></td>
-                            <td><?= $order['seam'] ?></td>
-                            <td><?= $order['leadtime'] ?></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td><button type="button" class="btn btn-success btn-sm import-btn" data-toggle="modal" data-target="#importModal">Import</button></td>
+                            <td><?= $order->created_at; ?></td>
+                            <td><?= $order->kd_buyer_order; ?></td>
+                            <td><?= $order->no_model; ?></td>
+                            <td><?= $order->product_type; ?></td>
+                            <td><?= $order->description; ?></td>
+                            <td><?= $order->seam; ?></td>
+                            <td><?= $order->leadtime; ?></td>
+                            <td><?= $order->delivery; ?></td>
+                            <td><?= $order->qty; ?></td>
+                            <td><?= $order->sisa; ?></td>
+                            <td><button type="button" class="btn btn-success btn-sm import-btn" data-toggle="modal" data-target="#importModal" 
+                                    data-id="<?= $order->id_model; ?>"
+                                    data-no-model="<?= $order->no_model; ?>"
+                                >
+                                    Import
+                                </button></td>
                             <td></td>
                         </tr>
                     <?php endforeach; ?>
@@ -111,15 +116,14 @@
                 </button>
             </div>
             <div class="modal-body">
-            <?php foreach ($tampildata as $order) : ?>
             <form action="<?= base_url('capacity/importModel') ?>" method="post" enctype="multipart/form-data">
                 <div class="form-group">
                     <label>ID Model</label>
-                    <input type="text" class="form-control" name="id_model" value="<?=  $order['id_model'] ?>">
+                    <input type="text" class="form-control" name="id_model" value="<?=  $order->id_model; ?>">
                 </div>
                 <div class="form-group">
                     <label>No Model</label>
-                    <input type="text" class="form-control" name="no_model" value="<?= $order['no_model'] ?>">
+                    <input type="text" class="form-control" name="no_model" value="<?= $order->no_model; ?>">
                 </div>
                 <div class="">File Browser</div>
                 <div class="custom-file">
@@ -131,7 +135,6 @@
                     <button type="submit" class="btn btn-info" id="importDataBtn">Import</button>
                </div>
             </form> 
-            <?php endforeach; ?>
         </div>
     </div>
 </div>
@@ -145,7 +148,13 @@
 
         // Trigger import modal when import button is clicked
         $('.import-btn').click(function() {
-            $('#importModal').modal('show');
+            var idModel = $(this).data('id');
+            var noModel = $(this).data('no-model');
+            
+            $('#importModal').find('input[name="id_model"]').val(idModel);
+            $('#importModal').find('input[name="no_model"]').val(noModel);
+            
+            $('#importModal').modal('show'); // Show the modal
         });
     });
 </script>

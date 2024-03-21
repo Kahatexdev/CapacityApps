@@ -50,6 +50,16 @@ class OrderModel extends Model
     {
         return $this->where('no_model', $no_model)->first();
     }
+    public function tampilPerdelivery(){
+        $builder = $this->db->table('data_model');
+        
+        $builder->select('data_model.*, mastermodel, machinetypeid, ROUND(SUM(QTy)/24, 0) AS qty, ROUND(SUM(QTy)/24, 0) AS sisa, factory, delivery, product_type');
+        $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
+        $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
+        $builder->groupBy('delivery');
+        
+        return $builder->get()->getResult();
+    }
 
     // // Fungsi untuk mendapatkan data berdasarkan kondisi
     // public function getDataByCondition($condition)

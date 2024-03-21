@@ -9,6 +9,7 @@ use App\Models\OrderModel;
 use App\Models\BookingModel;
 use App\Models\ProductTypeModel;
 
+
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class CapacityController extends BaseController
@@ -87,6 +88,7 @@ class CapacityController extends BaseController
     public function OrderPerJarum($jarum)
     {
         $tampilperjarum = $this->orderModel->findAll();
+        $tampilperdelivery = $this->orderModel->tampilPerdelivery();
         $product = $this->productModel->findAll();
         $booking = $data = [
             'title' => 'Data Order',
@@ -95,7 +97,7 @@ class CapacityController extends BaseController
             'active3' => 'active',
             'active4' => '',
             'jarum' => $jarum,
-            'tampildata' => $tampilperjarum,
+            'tampildata' => $tampilperdelivery,
             'product' => $product,
 
         ];
@@ -281,114 +283,110 @@ class CapacityController extends BaseController
         }
     }
 
-    // public function importModel()
-    // {
-    //     $request = \Config\Services::request();
-    //     helper(['form', 'url']);
-    //     $nomodel = $this->request->getVar('no_model');
-    //     $file_excel = $this->request->getFile('fileexcel');
-    //     $ext = $file_excel->getClientExtension();
-    //     if ($ext == 'xls') {
-    //         $render = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
-    //     } else {
-    //         $render = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
-    //     }
-    //     $spreadsheet = $render->load($file_excel);
+    public function importModel()
+    {
+        $request = \Config\Services::request();
+        helper(['form', 'url']);
+        $nomodel = $this->request->getVar('no_model');
+        $file_excel = $this->request->getFile('fileexcel');
+        $ext = $file_excel->getClientExtension();
+        if ($ext == 'xls') {
+            $render = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
+        } else {
+            $render = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+        }
+        $spreadsheet = $render->load($file_excel);
 
-    //     $data = $spreadsheet->getActiveSheet()->toArray();
-    //     $db = \Config\Database::connect();
+        $data = $spreadsheet->getActiveSheet()->toArray();
+        $db = \Config\Database::connect();
 
-    //     foreach ($data as $x => $row) {
-    //         if ($x == 0) {
-    //             continue;
-    //         }
+        foreach ($data as $x => $row) {
+            if ($x == 0) {
+                continue;
+            }
 
-    //         $recordID = $row[0];
-    //         $delFlag = $row[1];
-    //         $articleNo = $row[2];
-    //         $merchandiser = $row[3];
-    //         $priority = $row[4];
-    //         $producttype = $row[5];
-    //         $factorycd = $row[6];
-    //         $custCode = $row[7];
-    //         $customerStyle = $row[8];
-    //         $style = $row[9];
-    //         $description = $row[10];
-    //         $delivery = $row[11];
-    //         $rdelivery = str_replace('/', '-', (substr($delivery, -10)));
-    //         $delivery2 = date('Y-m-d', strtotime($rdelivery));
-    //         $qty = $row[12];
-    //         $qtyset = $row[13];
-    //         $isfirmorder = $row[14];
-    //         $remarks = $row[15];
-    //         $shipMode = $row[16];
-    //         $country = $row[17];
-    //         $color = $row[18];
-    //         $size = $row[19];
-    //         $sam = $row[20];
-    //         $unitprice = $row[21];
-    //         $machinetypeid = $row[22];
-    //         $seam = $row[23];
-    //         $leadtime = $row[24];
-    //         $processRoute = $row[25];
-    //         $lcoDate = $row[26];
-    //         $rlcoDate = str_replace('/', '-', (substr($lcoDate, -10)));
-    //         $lcoDate2 = date('Y-m-d', strtotime($rlcoDate));
-    //         $no_model = $row[27];
-    //         $area = $row[28];
-    //         $orderNo = $row[29];
-    //         $custOrder = $row[30];
+            $recordID = $row[0];
+            $delFlag = $row[1];
+            $articleNo = $row[2];
+            $merchandiser = $row[3];
+            $priority = $row[4];
+            $producttype = $row[5];
+            $idProduct = $this->productModel->getId($producttype);
+            $factorycd = $row[6];
+            $custCode = $row[7];
+            $customerStyle = $row[8];
+            $style = $row[9];
+            $description = $row[10];
+            $delivery = $row[11];
+            $rdelivery = str_replace('/', '-', (substr($delivery, -10)));
+            $delivery2 = date('Y-m-d', strtotime($rdelivery));
+            $qty = $row[12];
+            $qtyset = $row[13];
+            $isfirmorder = $row[14];
+            $remarks = $row[15];
+            $shipMode = $row[16];
+            $country = $row[17];
+            $color = $row[18];
+            $size = $row[19];
+            $sam = $row[20];
+            $unitprice = $row[21];
+            $machinetypeid = $row[22];
+            $seam = $row[23];
+            $leadtime = $row[24];
+            $processRoute = $row[25];
+            $lcoDate = $row[26];
+            $rlcoDate = str_replace('/', '-', (substr($lcoDate, -10)));
+            $lcoDate2 = date('Y-m-d', strtotime($rlcoDate));
+            $no_model = $row[27];
+            $area = $row[28];
+            $orderNo = $row[29];
+            $custOrder = $row[30];
 
 
-    //         $simpandata = [
-    //             'recordID' => $recordID,
-    //             'articleNo' => $articleNo,
-    //             'delivery' => $delivery2,
-    //             'qty' => $qty,
-    //             'country' => $country,
-    //             'color' => $color,
-    //             'size' => $size,
-    //             'smv' => $sam,
-    //             'machinetypeid' => $machinetypeid,
-    //             'processRoute' => $processRoute,
-    //             'lcoDate' => $lcoDate2,
-    //             'no_model' => $nomodel,
-    //         ];
-    //         $db->table('aps_order_report')->insert($simpandata);
-    //     }
-    //     $updateData = [
-    //         'seam' => $processRoute,
-    //         'id_product_type' => $producttype,
-    //         'kd_buyer_order' => $custCode,
-    //         'leadtime' => $leadtime,
-    //         'description' => $description
-    //     ];
+            $simpandata = [
+                'recordID' => $recordID,
+                'articleNo' => $articleNo,
+                'delivery' => $delivery2,
+                'qty' => $qty,
+                'country' => $country,
+                'color' => $color,
+                'size' => $size,
+                'smv' => $sam,
+                'machinetypeid' => $machinetypeid,
+                'processRoute' => $processRoute,
+                'lcoDate' => $lcoDate2,
+                'no_model' => $nomodel,
+            ];
+            $db->table('aps_order_report')->insert($simpandata);
+        }
+        $updateData = [
+            'seam' => $processRoute,
+            'id_product_type' => $idProduct,
+            'kd_buyer_order' => $custCode,
+            'leadtime' => $leadtime,
+            'description' => $description
+        ];
 
-    //     $db->table('data_model')
-    //         ->where('no_model', $nomodel)
-    //         ->update($updateData);
+        $db->table('data_model')
+            ->where('no_model', $nomodel)
+            ->update($updateData);
 
-    //     // Delete query for aps_order_report table
-    //     $db->table('aps_order_report')
-    //         ->where('qty IS NULL')
-    //         ->delete();
+        $query = $db->query("INSERT INTO apsperstyle
+		SELECT DISTINCT '',aps_order_report.machinetypeid,aps_order_report.no_model,aps_order_report.size,aps_order_report.delivery,SUM(aps_order_report.qty) AS qty,SUM(aps_order_report.qty) AS sisa,data_model.seam,'BELUM ADA AREAL'
+		from aps_order_report JOIN data_model
+		ON aps_order_report.no_model=data_model.no_model
+		WHERE aps_order_report.no_model = '$nomodel'
+		GROUP BY delivery,size,no_model");
 
-    //     $query = $db->table('aps_order_report')
-    //         ->distinct()
-    //         ->select('"" AS column1, aps_order_report.machinetypeid, aps_order_report.no_model, aps_order_report.size, aps_order_report.delivery')
-    //         ->select('SUM(aps_order_report.qty) AS qty, SUM(aps_order_report.qty) AS sisa')
-    //         ->select('data_model.seam AS seam, "BELUM ADA AREAL" AS column2')
-    //         ->join('data_model', 'aps_order_report.no_model = data_model.no_model', 'inner')
-    //         ->where('aps_order_report.no_model', $nomodel)
-    //         ->groupBy('aps_order_report.delivery, aps_order_report.size, aps_order_report.no_model');
+        $db->table('aps_order_report')
+        ->where('no_model', $nomodel)
+        ->delete();
 
-    //     $results = $query->get()->getResult();
-
-    //     if ($results) {
-    //         return redirect()->to(base_url('capacity'))->withInput()->with('success', 'Data Berhasil Diinput');
-    //     } else {
-    //     }
-    // }
+        if ($query) {
+            return redirect()->to(base_url('capacity'))->withInput()->with('success', 'Data Berhasil Diinput');
+        } else {
+        }
+    }
     public function order()
     {
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();

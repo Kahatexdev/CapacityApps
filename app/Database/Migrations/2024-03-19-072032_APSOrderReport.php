@@ -56,13 +56,6 @@ class APSOrderReport extends Migration
         'lcoDate' => [
             'type' => 'date',
         ],
-        'created_at' => [
-            'type' => 'Date',
-        ],
-        'updated_at' => [
-            'type' => 'Date',
-        ],
-
     ]);
     $this->forge->addKey('recordid', true);
     // Tambahkan kunci asing ke sisa tabel referensi di sini
