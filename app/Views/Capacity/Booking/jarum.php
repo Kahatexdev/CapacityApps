@@ -134,7 +134,6 @@
     <div class="row mt-3">
         <div class="card">
             <div class="card-body">
-
                 <div class="table-responsive">
                     <table id="example" class="display compact " style="width:100%">
                         <thead>

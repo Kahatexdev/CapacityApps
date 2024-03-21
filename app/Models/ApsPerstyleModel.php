@@ -7,12 +7,12 @@ use CodeIgniter\Model;
 class ApsPerstyleModel extends Model
 {
     protected $table            = 'apsperstyle';
-    protected $primaryKey       = 'id_model';
+    protected $primaryKey       = 'idapsperstyle';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_apsperstyle', 'machinetypeid', 'mastermodel', 'size', 'delivery', 'qty', 'sisa', 'seam', 'factory'];
+    protected $allowedFields    = ['idapsperstyle', 'machinetypeid', 'mastermodel', 'size', 'delivery', 'qty', 'sisa', 'seam', 'factory'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -50,11 +50,20 @@ class ApsPerstyleModel extends Model
     {
         return $this->where('no_model', $no_model)->first();
     }
+    public function checkAps($validate)
+    {
+        $result = $this->select('*')
+            ->where('size', $validate['size'])
+            ->where('delivery', $validate['delivery'])
+            ->get()
+            ->getRow();
+        return $result;
+    }
     public function detailModel($noModel, $delivery)
     {
         return $this->where('mastermodel', $noModel)
-                    ->where('delivery', $delivery)
-                    ->findAll();
+            ->where('delivery', $delivery)
+            ->findAll();
     }
 
     // // Fungsi untuk mendapatkan data berdasarkan kondisi

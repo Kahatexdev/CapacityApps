@@ -117,6 +117,7 @@ class CapacityController extends BaseController
             'tampildata' => $tampilperdelivery,
             'product' => $product,
 
+
         ];
         return view('Capacity/Order/semuaorder', $data);
     }
@@ -344,108 +345,90 @@ class CapacityController extends BaseController
 
     public function importModel()
     {
-        $request = \Config\Services::request();
-        helper(['form', 'url']);
-        $nomodel = $this->request->getVar('no_model');
-        $file_excel = $this->request->getFile('fileexcel');
-        $ext = $file_excel->getClientExtension();
-        if ($ext == 'xls') {
-            $render = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
-        } else {
-            $render = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
-        }
-        $spreadsheet = $render->load($file_excel);
+        $file = $this->request->getFile('excel_file');
+        if ($file->isValid() && !$file->hasMoved()) {
+            $spreadsheet = IOFactory::load($file);
+            $row = $spreadsheet->getActiveSheet();
+            $nomodel = $this->request->getVar('no_model');
+            $startRow = 2; // Ganti dengan nomor baris mulai
+            foreach ($spreadsheet->getActiveSheet()->getRowIterator($startRow) as $row) {
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+                $row = [];
+                foreach ($cellIterator as $cell) {
+                    $row[] = $cell->getValue();
+                }
+                if (!empty($row)) {
+                    $no_models = $row[29];
+                    $firstSpacePosition = strpos($no_models, ' '); // Cari posisi spasi pertama
+                    $no_model = substr($no_models, 0, $firstSpacePosition);
+                    if ($no_model != $nomodel) {
+                        return redirect()->to(base_url('/capacity/semuaOrder'))->with('error', 'Nomor Model Tidak Sama. Silahkan periksa kembali');
+                    } else {
+                        $recordID = $row[0];
+                        $articleNo = $row[2];
+                        $producttype = $row[5];
+                        $idProduct = $this->productModel->getId($producttype);
+                        $custCode = $row[7];
+                        $description = $row[10];
+                        $delivery = $row[11];
+                        $rdelivery = str_replace('/', '-', (substr($delivery, -10)));
+                        $delivery2 = date('Y-m-d', strtotime($rdelivery));
+                        $qty = $row[12];
+                        $country = $row[17];
+                        $color = $row[18];
+                        $size = $row[19];
+                        $sam = $row[20];
+                        $machinetypeid = $row[22];
+                        $leadtime = $row[24];
+                        $processRoute = $row[25];
+                        $lcoDate = $row[26];
+                        $rlcoDate = str_replace('/', '-', (substr($lcoDate, -10)));
+                        $lcoDate2 = date('Y-m-d', strtotime($rlcoDate));
 
-        $data = $spreadsheet->getActiveSheet()->toArray();
-        $db = \Config\Database::connect();
+                        $simpandata = [
+                            'machinetypeid' => $machinetypeid,
+                            'size' => $size,
+                            'mastermodel' => $nomodel,
+                            'delivery' => $delivery2,
+                            'qty' => $qty,
+                            'sisa' => $qty,
+                            'country' => $country,
+                            'color' => $color,
+                            'seam' => $processRoute,
+                            'factory' => 'Belum Ada Area'
+                        ];
+                        $updateData = [
+                            'seam' => $processRoute,
+                            'id_product_type' => $idProduct,
+                            'kd_buyer_order' => $custCode,
+                            'leadtime' => $leadtime,
+                            'description' => $description
+                        ];
+                        $validate = [
+                            'size' => $size,
+                            'delivery' => $delivery2
+                        ];
 
-        foreach ($data as $x => $row) {
-            if ($x == 0) {
-                continue;
+                        $existingAps = $this->ApsPerstyleModel->checkAps($validate);
+                        if (!$existingAps) {
+                            $this->ApsPerstyleModel->insert($simpandata);
+                        } else {
+                            $sumqty = $existingAps->qty + $qty;
+                            $sumsisa = $existingAps->sisa + $qty;
+                            $idAps = $existingAps->idapsperstyle;
+                            $this->ApsPerstyleModel->update($idAps, ['qty' => $sumqty, 'sisa' => $sumsisa]);
+                        }
+                        $this->orderModel->update($no_model, $updateData);
+                    }
+                }
             }
-
-            $recordID = $row[0];
-            $delFlag = $row[1];
-            $articleNo = $row[2];
-            $merchandiser = $row[3];
-            $priority = $row[4];
-            $producttype = $row[5];
-            $idProduct = $this->productModel->getId($producttype);
-            $factorycd = $row[6];
-            $custCode = $row[7];
-            $customerStyle = $row[8];
-            $style = $row[9];
-            $description = $row[10];
-            $delivery = $row[11];
-            $rdelivery = str_replace('/', '-', (substr($delivery, -10)));
-            $delivery2 = date('Y-m-d', strtotime($rdelivery));
-            $qty = $row[12];
-            $qtyset = $row[13];
-            $isfirmorder = $row[14];
-            $remarks = $row[15];
-            $shipMode = $row[16];
-            $country = $row[17];
-            $color = $row[18];
-            $size = $row[19];
-            $sam = $row[20];
-            $unitprice = $row[21];
-            $machinetypeid = $row[22];
-            $seam = $row[23];
-            $leadtime = $row[24];
-            $processRoute = $row[25];
-            $lcoDate = $row[26];
-            $rlcoDate = str_replace('/', '-', (substr($lcoDate, -10)));
-            $lcoDate2 = date('Y-m-d', strtotime($rlcoDate));
-            $no_model = $row[27];
-            $area = $row[28];
-            $orderNo = $row[29];
-            $custOrder = $row[30];
-
-
-            $simpandata = [
-                'recordID' => $recordID,
-                'articleNo' => $articleNo,
-                'delivery' => $delivery2,
-                'qty' => $qty,
-                'country' => $country,
-                'color' => $color,
-                'size' => $size,
-                'smv' => $sam,
-                'machinetypeid' => $machinetypeid,
-                'processRoute' => $processRoute,
-                'lcoDate' => $lcoDate2,
-                'no_model' => $nomodel,
-            ];
-            $db->table('aps_order_report')->insert($simpandata);
-        }
-        $updateData = [
-            'seam' => $processRoute,
-            'id_product_type' => $idProduct,
-            'kd_buyer_order' => $custCode,
-            'leadtime' => $leadtime,
-            'description' => $description
-        ];
-
-        $db->table('data_model')
-            ->where('no_model', $nomodel)
-            ->update($updateData);
-
-        $query = $db->query("INSERT INTO apsperstyle
-		SELECT DISTINCT '',aps_order_report.machinetypeid,aps_order_report.no_model,aps_order_report.size,aps_order_report.delivery,SUM(aps_order_report.qty) AS qty,SUM(aps_order_report.qty) AS sisa,data_model.seam,'BELUM ADA AREAL'
-		from aps_order_report JOIN data_model
-		ON aps_order_report.no_model=data_model.no_model
-		WHERE aps_order_report.no_model = '$nomodel'
-		GROUP BY delivery,size,no_model");
-
-        $db->table('aps_order_report')
-        ->where('no_model', $nomodel)
-        ->delete();
-
-        if ($query) {
-            return redirect()->to(base_url('capacity'))->withInput()->with('success', 'Data Berhasil Diinput');
+            return redirect()->to(base_url('/capacity/semuaOrder'))->withInput()->with('success', 'Data Berhasil di Import');
         } else {
+            return redirect()->to(base_url('/capacity/semuaOrder'))->with('error', 'No data found in the Excel file');
         }
     }
+
     public function detailmodel($noModel, $delivery)
     {
         $apsPerstyleModel = new ApsPerstyleModel(); // Create an instance of the model
@@ -459,7 +442,7 @@ class CapacityController extends BaseController
             'active4' => '',
             'dataAps' => $dataApsPerstyle,
             'noModel' => $noModel,
-            'delivery' => $delivery, 
+            'delivery' => $delivery,
         ];
 
         return view('Capacity/Order/detailOrder', $data);
@@ -476,7 +459,7 @@ class CapacityController extends BaseController
             'active4' => '',
             'TotalMesin' => $totalMesin,
         ];
-        return view('Capacity/Order/ordermaster',$data);
+        return view('Capacity/Order/ordermaster', $data);
     }
     public function produksi()
     {
