@@ -437,8 +437,8 @@ class CapacityController extends BaseController
         $data = [
             'title' => 'Data Booking',
             'active1' => '',
-            'active2' => 'active',
-            'active3' => '',
+            'active2' => '',
+            'active3' => 'active',
             'active4' => '',
             'dataAps' => $dataApsPerstyle,
             'noModel' => $noModel,
