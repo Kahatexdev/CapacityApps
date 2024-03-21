@@ -94,7 +94,6 @@
                 <div class="card-footer">
                     <div class="row">
                         <div class="col-lg-12">
-                            <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">Arahkan Ke Areal</a>
                             <a href="#" class="btn btn-danger btn-delete-all" Data-bs-toggle="modal" data-bs-target="ModalDeleteAll">Delete All</a>
                         </div>
                     </div>
@@ -195,7 +194,7 @@
                             <div class="modal-body">
                                 <form action="" method="post">
                                     <input type="text" name="idapsperstyle" id="" hidden value="">
-                                    Apakah anda yakin ingin menghapus Semua Data Style?
+                                    Apakah anda yakin menghapus semua style di Model <?= $noModel ?>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
@@ -235,14 +234,14 @@
         });
         $('.delete-btn').click(function() {
             var apsperstyle = $(this).data('id');
-            $('#ModalDelete').find('form').attr('action', '<?= base_url('capacity/deletedetailorder/') ?>' + apsperstyle);
+            $('#ModalDelete').find('form').attr('action', '<?= base_url('capacity/deletedetailstyle/') ?>' + apsperstyle);
             $('#ModalDelete').find('input[name="idapsperstyle"]').val(apsperstyle);
             $('#ModalDelete').modal('show'); // Show the modal
         });
         $('.btn-delete-all').click(function() {
-            var apsperstyle = $(this).data('id');
-            $('#ModalDeleteAll').find('form').attr('action', '<?= base_url('capacity/deletedetailorder/') ?>' + apsperstyle);
-            $('#ModalDeleteAll').find('input[name="idapsperstyle"]').val(apsperstyle);
+            var noModel = $(this).data('no-model');
+            $('#ModalDeleteAll').find('form').attr('action', '<?= base_url('capacity/deletedetailorder/') ?>' + noModel);
+            $('#ModalDeleteAll').find('input[name="idapsperstyle"]').val(noModel);
             $('#ModalDeleteAll').modal('show'); // Show the modal
         });
         });
