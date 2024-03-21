@@ -63,7 +63,7 @@ class OrderModel extends Model
     }
     public function getId($nomodel)
     {
-        return $this->select('id_model')->where('no_model', $nomodel);
+        return $this->select('id_model')->where('no_model', $nomodel)->first();
     }
 
     // // Fungsi untuk mendapatkan data berdasarkan kondisi

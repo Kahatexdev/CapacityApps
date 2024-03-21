@@ -400,9 +400,9 @@ class CapacityController extends BaseController
                             'factory' => 'Belum Ada Area'
                         ];
                         $updateData = [
-                            'seam' => $processRoute,
-                            'id_product_type' => $idProduct,
                             'kd_buyer_order' => $custCode,
+                            'id_product_type' => $idProduct,
+                            'seam' => $processRoute,
                             'leadtime' => $leadtime,
                             'description' => $description
                         ];
