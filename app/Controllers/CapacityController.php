@@ -350,6 +350,7 @@ class CapacityController extends BaseController
             $spreadsheet = IOFactory::load($file);
             $row = $spreadsheet->getActiveSheet();
             $nomodel = $this->request->getVar('no_model');
+            $idModel = $this->orderModel->getId($nomodel);
             $startRow = 2; // Ganti dengan nomor baris mulai
             foreach ($spreadsheet->getActiveSheet()->getRowIterator($startRow) as $row) {
                 $cellIterator = $row->getCellIterator();
@@ -399,9 +400,9 @@ class CapacityController extends BaseController
                             'factory' => 'Belum Ada Area'
                         ];
                         $updateData = [
-                            'seam' => $processRoute,
-                            'id_product_type' => $idProduct,
                             'kd_buyer_order' => $custCode,
+                            'id_product_type' => $idProduct,
+                            'seam' => $processRoute,
                             'leadtime' => $leadtime,
                             'description' => $description
                         ];
@@ -413,13 +414,13 @@ class CapacityController extends BaseController
                         $existingAps = $this->ApsPerstyleModel->checkAps($validate);
                         if (!$existingAps) {
                             $this->ApsPerstyleModel->insert($simpandata);
+                            $this->orderModel->update($idModel, $updateData);
                         } else {
                             $sumqty = $existingAps->qty + $qty;
                             $sumsisa = $existingAps->sisa + $qty;
                             $idAps = $existingAps->idapsperstyle;
                             $this->ApsPerstyleModel->update($idAps, ['qty' => $sumqty, 'sisa' => $sumsisa]);
                         }
-                        $this->orderModel->update($no_model, $updateData);
                     }
                 }
             }
