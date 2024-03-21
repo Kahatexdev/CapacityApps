@@ -133,39 +133,41 @@
 
     <div class="row mt-3">
         <div class="card">
-            <div class="table-responsive">
-                <table class="table align-items-center mb-0">
-                    <thead>
-                        <tr>
-                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Tgl Booking</th>
-                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Buyer</th>
-                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Order</th>
-                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No PDK</th>
-                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
-                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Desc</th>
-                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Booking</th>
-                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
-                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
+            <div class="card-body">
 
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($booking as $bk) : ?>
+                <div class="table-responsive">
+                    <table id="example" class="display compact " style="width:100%">
+                        <thead>
                             <tr>
-                                <td class="text-sm"><?= $bk['tgl_terima_booking'] ?></td>
-                                <td class="text-sm"><?= $bk['kd_buyer_booking'] ?></td>
-                                <td class="text-sm"><?= $bk['no_order'] ?></td>
-                                <td class="text-sm"><?= $bk['no_booking'] ?></td>
-                                <td class="text-sm"><?= $bk['product_type'] ?></td>
-                                <td class="text-sm"><?= $bk['desc'] ?></td>
-                                <td class="text-sm"><?= $bk['sisa_booking'] ?></td>
-                                <td class="text-sm"><?= $bk['status'] ?></td>
-                                <td class="text-sm"> <a href="<?= base_url('capacity/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm">detail</a> </td>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Tgl Booking</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Buyer</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Order</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No PDK</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Booking</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
+
                             </tr>
-                        <?php endforeach ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($booking as $bk) : ?>
+                                <tr>
+                                    <td class="text-xs"><?= $bk['tgl_terima_booking'] ?></td>
+                                    <td class="text-xs"><?= $bk['kd_buyer_booking'] ?></td>
+                                    <td class="text-xs"><?= $bk['no_order'] ?></td>
+                                    <td class="text-xs"><?= $bk['no_booking'] ?></td>
+                                    <td class="text-xs"><?= $bk['product_type'] ?></td>
+                                    <td class="text-xs"><?= $bk['sisa_booking'] ?></td>
+                                    <td class="text-xs"><?= $bk['status'] ?></td>
+                                    <td class="text-xs"> <a href="<?= base_url('capacity/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm text-xxs">detail</a> </td>
+                                </tr>
+                            <?php endforeach ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
         </div>
     </div>
 
@@ -200,6 +202,16 @@
 <script>
     $(document).ready(function() {
         $('.js-example-basic-single').select2();
+    });
+</script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#example').DataTable();
+
+        // Trigger import modal when import button is clicked
+        $('.import-btn').click(function() {
+            $('#importModal').modal('show');
+        });
     });
 </script>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>

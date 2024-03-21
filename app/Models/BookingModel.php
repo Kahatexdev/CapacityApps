@@ -71,4 +71,8 @@ class BookingModel extends Model
         $query = $this->select('needle')->where('id_booking', $idBooking)->first();
         return $query;
     }
+    public function existingOrder($no_order)
+    {
+        return $this->where('no_order', $no_order)->first();
+    }
 }
