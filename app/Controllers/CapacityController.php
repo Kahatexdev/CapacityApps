@@ -8,8 +8,7 @@ use App\Models\DataMesinModel;
 use App\Models\OrderModel;
 use App\Models\BookingModel;
 use App\Models\ProductTypeModel;
-
-
+use App\Models\ApsPerstyleModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class CapacityController extends BaseController
@@ -19,6 +18,7 @@ class CapacityController extends BaseController
     protected $productModel;
     protected $bookingModel;
     protected $orderModel;
+    protected $ApsPerstyleModel;
 
     public function __construct()
     {
@@ -26,6 +26,7 @@ class CapacityController extends BaseController
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
         $this->orderModel = new OrderModel();
+        $this->ApsPerstyleModel = new ApsPerstyleModel();
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -102,6 +103,22 @@ class CapacityController extends BaseController
 
         ];
         return view('Capacity/Order/jarum', $data);
+    }
+    public function semuaOrder()
+    {
+        $tampilperdelivery = $this->orderModel->tampilPerdelivery();
+        $product = $this->productModel->findAll();
+        $booking = $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'tampildata' => $tampilperdelivery,
+            'product' => $product,
+
+        ];
+        return view('Capacity/Order/semuaorder', $data);
     }
     public function inputbooking()
     {
@@ -387,6 +404,25 @@ class CapacityController extends BaseController
         } else {
         }
     }
+    public function detailmodel($noModel, $delivery)
+    {
+        $apsPerstyleModel = new ApsPerstyleModel(); // Create an instance of the model
+        $dataApsPerstyle = $apsPerstyleModel->detailModel($noModel, $delivery); // Call the model method
+
+        $data = [
+            'title' => 'Data Booking',
+            'active1' => '',
+            'active2' => 'active',
+            'active3' => '',
+            'active4' => '',
+            'dataAps' => $dataApsPerstyle,
+            'noModel' => $noModel,
+            'delivery' => $delivery, 
+        ];
+
+        return view('Capacity/Order/detailOrder', $data);
+    }
+
     public function order()
     {
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
@@ -398,7 +434,7 @@ class CapacityController extends BaseController
             'active4' => '',
             'TotalMesin' => $totalMesin,
         ];
-        return view('Capacity/Order/order', $data);
+        return view('Capacity/Order/ordermaster',$data);
     }
     public function produksi()
     {
