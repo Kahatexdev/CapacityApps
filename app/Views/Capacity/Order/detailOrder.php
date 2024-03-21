@@ -95,7 +95,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">Arahkan Ke Areal</a>
-                            <a href="#" class="btn btn-danger" Data-bs-toggle="modal" data-bs-target="#">Delete All</a>
+                            <a href="#" class="btn btn-danger btn-delete-all" Data-bs-toggle="modal" data-bs-target="ModalDeleteAll">Delete All</a>
                         </div>
                     </div>
                 </div>
@@ -165,15 +165,37 @@
                     <div class="modal-dialog  modal-dialog-centered" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Hapus Data Booking</h5>
+                                <h5 class="modal-title" id="exampleModalLabel">Hapus Data Style</h5>
                                 <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">×</span>
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <form action="<?= base_url('capacity/deletebooking/' . $booking['id_booking']) ?>" method="post">
-                                    <input type="text" name="jarum" id="" hidden value="<?= $booking['needle'] ?>">
-                                    Apakah anda yakin ingin menghapus Data Booking?
+                                <form action="" method="post">
+                                    <input type="text" name="idapsperstyle" id="" hidden value="">
+                                    Apakah anda yakin ingin menghapus Data Style?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn bg-gradient-danger">Hapus</button>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade  bd-example-modal-lg" id="ModalDeleteAll" tabindex="-1" role="dialog" aria-labelledby="modaldeleteall" aria-hidden="true">
+                    <div class="modal-dialog  modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Hapus Semua Style ?</h5>
+                                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="" method="post">
+                                    <input type="text" name="idapsperstyle" id="" hidden value="">
+                                    Apakah anda yakin ingin menghapus Semua Data Style?
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
@@ -200,7 +222,7 @@
 
             var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
             
-            $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/updateorder/') ?>' + apsperstyle);
+            $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/updatedetailorder/') ?>' + apsperstyle);
             $('#ModalEdit').find('input[name="style"]').val(style);
             $('#ModalEdit').find('input[name="no_model"]').val(noModel);
             $('#ModalEdit').find('input[name="delivery"]').val(formattedDelivery);
@@ -210,6 +232,18 @@
             $('#ModalEdit').find('input[name="factory"]').val(factory);
             
             $('#ModalEdit').modal('show'); // Show the modal
+        });
+        $('.delete-btn').click(function() {
+            var apsperstyle = $(this).data('id');
+            $('#ModalDelete').find('form').attr('action', '<?= base_url('capacity/deletedetailorder/') ?>' + apsperstyle);
+            $('#ModalDelete').find('input[name="idapsperstyle"]').val(apsperstyle);
+            $('#ModalDelete').modal('show'); // Show the modal
+        });
+        $('.btn-delete-all').click(function() {
+            var apsperstyle = $(this).data('id');
+            $('#ModalDeleteAll').find('form').attr('action', '<?= base_url('capacity/deletedetailorder/') ?>' + apsperstyle);
+            $('#ModalDeleteAll').find('input[name="idapsperstyle"]').val(apsperstyle);
+            $('#ModalDeleteAll').modal('show'); // Show the modal
         });
         });
         </script>
