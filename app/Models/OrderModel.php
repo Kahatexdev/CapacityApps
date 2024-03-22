@@ -70,7 +70,7 @@ class OrderModel extends Model
         $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
         $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
         $builder->where('machinetypeid', $jarum);
-        $builder->groupBy('delivery');        
+        $builder->groupBy('delivery');
         $builder->groupBy('data_model.no_model');
         $builder->groupBy('machinetypeid');
 
@@ -80,6 +80,7 @@ class OrderModel extends Model
     {
         return $this->select('id_model')->where('no_model', $nomodel)->first();
     }
+
 
     // // Fungsi untuk mendapatkan data berdasarkan kondisi
     // public function getDataByCondition($condition)
