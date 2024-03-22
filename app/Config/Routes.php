@@ -44,8 +44,12 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     // produksi
     $routes->get('dataproduksi', 'CapacityController::produksi');
 
-     // produksi
-     $routes->get('datamesin', 'CapacityController::datamesin');
+    // mesin
+    $routes->get('datamesin', 'CapacityController::datamesin');
+    $routes->get('mesinPerJarum', 'CapacityController::mesinPerJarum');
+    $routes->get('mesinperarea', 'CapacityController::mesinperarea');
+    $routes->get('datamesinperjarum/(:any)', 'CapacityController::DetailMesinPerJarum/$1');
+
 });
 
 
