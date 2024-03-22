@@ -90,11 +90,11 @@
                             <td><?= $order->delivery; ?></td>
                             <td><?= $order->qty; ?></td>
                             <td><?= $order->sisa; ?></td>
-                            <td><button type="button" class="btn btn-success btn-sm import-btn" data-toggle="modal" data-target="#importModal" 
+                            <td><button type="button" class="btn btn-info btn-sm import-btn" data-toggle="modal" data-target="#importModal" 
                                     data-id="<?= $order->id_model; ?>"
                                     data-no-model="<?= $order->no_model; ?>"
                                 >
-                                    Import
+                                    Detail
                                 </button></td>
                             <td></td>
                         </tr>
@@ -119,11 +119,11 @@
             <form action="<?= base_url('capacity/importModel') ?>" method="post" enctype="multipart/form-data">
                 <div class="form-group">
                     <label>ID Model</label>
-                    <input type="text" class="form-control" name="id_model" value="<?=  $order->id_model; ?>">
+                    <input type="text" class="form-control" name="id_model" value="">
                 </div>
                 <div class="form-group">
                     <label>No Model</label>
-                    <input type="text" class="form-control" name="no_model" value="<?= $order->no_model; ?>">
+                    <input type="text" class="form-control" name="no_model" value="">
                 </div>
                 <div class="">File Browser</div>
                 <div class="custom-file">

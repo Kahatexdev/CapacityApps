@@ -86,10 +86,9 @@ class CapacityController extends BaseController
         ];
         return view('Capacity/Booking/jarum', $data);
     }
-    public function OrderPerJarum($jarum)
+    public function DetailOrderPerJarum($jarum)
     {
-        $tampilperjarum = $this->orderModel->findAll();
-        $tampilperdelivery = $this->orderModel->tampilPerdelivery();
+        $tampilperdelivery = $this->orderModel->tampilPerjarum($jarum);
         $product = $this->productModel->findAll();
         $booking = $data = [
             'title' => 'Data Order',
@@ -102,7 +101,7 @@ class CapacityController extends BaseController
             'product' => $product,
 
         ];
-        return view('Capacity/Order/jarum', $data);
+        return view('Capacity/Order/semuaorderjarum', $data);
     }
     public function semuaOrder()
     {
@@ -364,6 +363,29 @@ class CapacityController extends BaseController
             return redirect()->to(base_url('capacity/detailmodel/'.$modl.'/'.$del))->withInput()->with('error', 'Gagal Update Data');
         }
     }
+    public function updateorderjarum($idOrder)
+    {
+
+        $data = [
+            'mastermodel' => $this->request->getPost("no_model"),
+            'size' =>  $this->request->getPost("style"),
+            'delivery' => $this->request->getPost("delivery"),
+            'qty' => $this->request->getPost("qty"),
+            'sisa' => $this->request->getPost("sisa"),
+            'seam' => $this->request->getPost("seam"),
+            'factory' => $this->request->getPost("factory"),
+        ];
+        $id = $idOrder;
+        $update = $this->ApsPerstyleModel->update($id, $data);
+        $modl = $this->request->getPost("no_model");
+        $del = $this->request->getPost("delivery");
+        $jrm = $this->request->getPost("jarum");
+        if ($update) {
+            return redirect()->to(base_url('capacity/detailmodeljarum/'.$modl.'/'.$del.'/'.$jrm))->withInput()->with('success', 'Data Berhasil Di Update');
+        } else {
+            return redirect()->to(base_url('capacity/detailmodeljarum/'.$modl.'/'.$del.'/'.$jrm))->withInput()->with('error', 'Gagal Update Data');
+        }
+    }
     public function deletedetailstyle($idOrder)
     {
 
@@ -376,6 +398,22 @@ class CapacityController extends BaseController
             return redirect()->to(base_url('capacity/detailmodel/'.$modl.'/'.$del))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
             return redirect()->to(base_url('capacity/detailmodel/'.$modl.'/'.$del))->withInput()->with('error', 'Gagal Hapus Data');
+        }
+    }
+
+    public function deletedetailmodeljarum($idOrder)
+    {
+
+        $idOrder = $this->request->getPost("idapsperstyle");
+        $id = $idOrder;
+        $delete = $this->ApsPerstyleModel->delete($id);
+        $modl = $this->request->getPost("no_model");
+        $del = $this->request->getPost("delivery");
+        $jrm = $this->request->getPost("jarum");
+        if ($delete) {
+            return redirect()->to(base_url('capacity/detailmodeljarum/'.$modl.'/'.$del.'/'.$jrm))->withInput()->with('success', 'Data Berhasil Di Hapus');
+        } else {
+            return redirect()->to(base_url('capacity/detailmodeljarum/'.$modl.'/'.$del.'/'.$jrm))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
     
@@ -498,6 +536,25 @@ class CapacityController extends BaseController
         return view('Capacity/Order/detailOrder', $data);
     }
 
+    public function detailmodeljarum($noModel, $delivery, $jarum)
+    {
+        $apsPerstyleModel = new ApsPerstyleModel(); // Create an instance of the model
+        $dataApsPerstyle = $apsPerstyleModel->detailModelJarum($noModel, $delivery, $jarum); // Call the model method
+
+        $data = [
+            'title' => 'Data Booking',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'dataAps' => $dataApsPerstyle,
+            'noModel' => $noModel,
+            'delivery' => $delivery,
+        ];
+
+        return view('Capacity/Order/detailModelJarum', $data);
+    }
+
     public function order()
     {
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
@@ -510,6 +567,20 @@ class CapacityController extends BaseController
             'TotalMesin' => $totalMesin,
         ];
         return view('Capacity/Order/ordermaster', $data);
+    }
+
+    public function orderPerJarum()
+    {
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+        $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'TotalMesin' => $totalMesin,
+        ];
+        return view('Capacity/Order/orderjarum', $data);
     }
     public function produksi()
     {

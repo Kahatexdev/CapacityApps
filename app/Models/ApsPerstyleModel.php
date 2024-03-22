@@ -65,6 +65,13 @@ class ApsPerstyleModel extends Model
             ->where('delivery', $delivery)
             ->findAll();
     }
+    public function detailModelJarum($noModel, $delivery, $jarum)
+    {
+        return $this->where('mastermodel', $noModel)
+            ->where('delivery', $delivery)
+            ->where('machinetypeid', $jarum)
+            ->findAll();
+    }
 
     // // Fungsi untuk mendapatkan data berdasarkan kondisi
     // public function getDataByCondition($condition)

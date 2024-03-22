@@ -29,11 +29,15 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     // order
     $routes->get('dataorder', 'CapacityController::order');    
     $routes->get('detailmodel/(:any)/(:any)', 'CapacityController::detailmodel/$1/$2');  
+    $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'CapacityController::detailmodeljarum/$1/$2/$3');  
     $routes->get('semuaOrder', 'CapacityController::semuaOrder');
-    $routes->get('dataorder/(:any)', 'CapacityController::OrderPerJarum/$1');
+    $routes->get('orderPerjarum', 'CapacityController::OrderPerJarum');
+    $routes->get('dataorderperjarum/(:any)', 'CapacityController::DetailOrderPerJarum/$1');
     $routes->post('updatedetailorder/(:any)', 'CapacityController::updateorder/$1');
+    $routes->post('updatedetailjarum/(:any)', 'CapacityController::updateorderjarum/$1');
     $routes->post('deletedetailstyle/(:any)', 'CapacityController::deletedetailstyle/$1');
     $routes->post('deletedetailorder/(:any)', 'CapacityController::deletedetailorder/$1');
+    $routes->post('deletedetailjarum/(:any)', 'CapacityController::deletedetailmodeljarum/$1');
     $routes->post('inputOrder', 'CapacityController::inputOrder');
     $routes->post('importModel', 'CapacityController::importModel');
 

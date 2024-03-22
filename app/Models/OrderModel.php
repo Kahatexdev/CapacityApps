@@ -62,6 +62,20 @@ class OrderModel extends Model
 
         return $builder->get()->getResult();
     }
+    public function tampilPerjarum($jarum)
+    {
+        $builder = $this->db->table('data_model');
+
+        $builder->select('data_model.*, mastermodel, machinetypeid, ROUND(SUM(QTy), 0) AS qty, ROUND(SUM(sisa), 0) AS sisa, factory, delivery, product_type');
+        $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
+        $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
+        $builder->where('machinetypeid', $jarum);
+        $builder->groupBy('delivery');        
+        $builder->groupBy('data_model.no_model');
+        $builder->groupBy('machinetypeid');
+
+        return $builder->get()->getResult();
+    }
     public function getId($nomodel)
     {
         return $this->select('id_model')->where('no_model', $nomodel)->first();

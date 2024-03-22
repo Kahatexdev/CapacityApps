@@ -10,7 +10,7 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    Data Booking Berdasarkan Jarum
+                                    Data Order Berdasarkan Jarum
                                 </h5>
                             </div>
                         </div>
@@ -29,7 +29,7 @@
 
         <?php foreach ($TotalMesin as $jr) : ?>
             <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-                <a href="<?= base_url('capacity/dataorder/' . $jr['jarum']) ?>">
+                <a href="<?= base_url('capacity/dataorderperjarum/' . $jr['jarum']) ?>">
                     <div class="card">
                         <div class="card-body p-3">
                             <div class="row">
