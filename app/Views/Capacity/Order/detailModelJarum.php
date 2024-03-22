@@ -68,7 +68,7 @@
                                                 </button>
                                             </td>
                                             <td>
-                                                <button type="button" class="btn btn-danger btn-sm delete-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $order['idapsperstyle']; ?>"data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>" data-jarum="<?= $order['machinetypeid']; ?>">
+                                                <button type="button" class="btn btn-danger btn-sm delete-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $order['idapsperstyle']; ?>" data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>" data-jarum="<?= $order['machinetypeid']; ?>">
                                                     Delete
                                                 </button>
                                             </td>
@@ -80,21 +80,21 @@
                         </div>
                     </div>
 
-                <div class="card-footer">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <a href="#" class="btn btn-danger btn-delete-all" Data-bs-toggle="modal" data-bs-target="ModalDeleteAll">Delete All</a>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <a href="#" class="btn btn-danger btn-delete-all" Data-bs-toggle="modal" data-bs-target="ModalDeleteAll">Delete All</a>
+                            </div>
                         </div>
                     </div>
+
                 </div>
-                
-            </div>
 
 
             </div>
         </div>
-        <div class="modal fade  bd-example-modal-lg" id="ModalEdit" tabindex="-1" role="dialog" aria-labelledby="modalEdit" aria-hidden="true">
-            <div class="modal-dialog  modal-dialog-centered" role="document">
+        <div class="modal fade" id="ModalEdit" tabindex="-1" role="dialog" aria-labelledby="modalEdit" aria-hidden="true">
+            <div class="modal-dialog   role=" document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Edit Data Booking</h5>
@@ -105,11 +105,11 @@
                     <div class="modal-body">
                         <form action="" method="post">
                             <div class="row">
-                                <div class="col-lg-12 col-sm-12">
+                                <div class="col-lg-6 col-sm-6">
                                     <div class="form-group">
                                         <label for="tgl-bk" class="col-form-label">No Model</label>
                                         <input type="text" class="form-control" name="no_model" readonly>
-                                        <input type="hiddem" class="form-control" name="jarum" readonly>
+                                        <input type="hiddem" class="form-control" name="jarum" readonly hidden>
                                     </div>
                                     <div class="form-group">
                                         <label for="tgl-bk" class="col-form-label">Style</label>
@@ -119,22 +119,25 @@
                                         <label for="buyer" class="col-form-label">Delivery</label>
                                         <input type="date" name="delivery" id="" class="form-control">
                                     </div>
+
+
+
+                                </div>
+                                <div class="col-lg-6 col-sm-12">
+
                                     <div class=" form-group">
                                         <label for="no_order" class="col-form-label">Quantity</label>
-                                        <input type="number" name="qty" id="" class="form-control">
+                                        <input type="number" name="qty" id="qty" class="form-control" readonly>
                                     </div>
                                     <div class=" form-group">
                                         <label for="productType" class="col-form-label">Sisa</label>
-                                        <input type="text" name="sisa" id="" class="form-control">
+                                        <input type="number" name="sisa" id="sisa" class="form-control">
                                     </div>
                                     <div class="form-group">
                                         <label for="no_pdk" class="col-form-label">Seam</label>
                                         <input type="text" name="seam" id="" class="form-control">
                                     </div>
-                                    <div class="form-group">
-                                        <label for="desc" class="col-form-label">Areal</label>
-                                        <input type="text" name="factory" id="" class="form-control">
-                                    </div>
+
 
                                 </div>
                             </div>
@@ -150,53 +153,64 @@
             </div>
         </div>
 
-                <div class="modal fade  bd-example-modal-lg" id="ModalDelete" tabindex="-1" role="dialog" aria-labelledby="modaldelete" aria-hidden="true">
-                    <div class="modal-dialog  modal-dialog-centered" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Hapus Data Style</h5>
-                                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">×</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <form action="" method="post">
-                                    <input type="hidden" class="form-control" name="no_model">
-                                    <input type="hidden" class="form-control" name="delivery">
-                                    <input type="hidden" class="form-control" name="jarum">
-                                    <input type="text" name="idapsperstyle" id="" hidden value="">
-                                    Apakah anda yakin ingin menghapus Data Style?
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn bg-gradient-danger">Hapus</button>
-                            </div>
-                            </form>
-                        </div>
+        <div class="modal fade  bd-example-modal-lg" id="ModalDelete" tabindex="-1" role="dialog" aria-labelledby="modaldelete" aria-hidden="true">
+            <div class="modal-dialog  modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Hapus Data Style</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
                     </div>
-                </div>
-                <div class="modal fade  bd-example-modal-lg" id="ModalDeleteAll" tabindex="-1" role="dialog" aria-labelledby="modaldeleteall" aria-hidden="true">
-                    <div class="modal-dialog  modal-dialog-centered" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Hapus Semua Style ?</h5>
-                                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">×</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <form action="" method="post">
-                                    <input type="text" name="no_model" id="" hidden value="<?= $noModel ?>">
-                                    Apakah anda yakin menghapus semua style di Model <?= $noModel ?>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn bg-gradient-danger">Hapus</button>
-                            </div>
-                            </form>
-                        </div>
+                    <div class="modal-body">
+                        <form action="" method="post">
+                            <input type="hidden" class="form-control" name="no_model">
+                            <input type="hidden" class="form-control" name="delivery">
+                            <input type="hidden" class="form-control" name="jarum">
+                            <input type="text" name="idapsperstyle" id="" hidden value="">
+                            Apakah anda yakin ingin menghapus Data Style?
                     </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-danger">Hapus</button>
+                    </div>
+                    </form>
                 </div>
+            </div>
+        </div>
+        <div class="modal fade  bd-example-modal-lg" id="ModalDeleteAll" tabindex="-1" role="dialog" aria-labelledby="modaldeleteall" aria-hidden="true">
+            <div class="modal-dialog  modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Hapus Semua Style ?</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="" method="post">
+                            <input type="text" name="no_model" id="" hidden value="<?= $noModel ?>">
+                            Apakah anda yakin menghapus semua style di Model <?= $noModel ?>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-danger">Hapus</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- <script>
+            function valildasi() {
+                let qty = parseInt(document.getElementById("qty").value);
+                let sisa = parseInt(document.getElementById("sisa").value);
+
+                if (sisa > qty) {
+                    alert("Qty tidak boleh melebihi sisa!");
+                    document.getElementById("sisa").value = qty; // Reset nilai qty menjadi nilai sisa
+                }
+            }
+        </script> -->
         <script>
             $(document).ready(function() {
                 $('#dataTable').DataTable();
@@ -212,40 +226,40 @@
                     var seam = $(this).data('seam');
                     var factory = $(this).data('factory');
 
-            var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
-            
-            $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/updatedetailjarum/') ?>' + apsperstyle);
-            $('#ModalEdit').find('input[name="style"]').val(style);
-            $('#ModalEdit').find('input[name="no_model"]').val(noModel);
-            $('#ModalEdit').find('input[name="jarum"]').val(jarum);
-            $('#ModalEdit').find('input[name="delivery"]').val(formattedDelivery);
-            $('#ModalEdit').find('input[name="qty"]').val(qty);
-            $('#ModalEdit').find('input[name="sisa"]').val(sisa);
-            $('#ModalEdit').find('input[name="seam"]').val(seam);
-            $('#ModalEdit').find('input[name="factory"]').val(factory);
-            
-            $('#ModalEdit').modal('show'); // Show the modal
-        });
-            $('.delete-btn').click(function() {
-            var noModel = $(this).data('no-model');
-            var delivery = $(this).data('delivery');
-            var jarum = $(this).data('jarum');
-            var apsperstyle = $(this).data('id');
-            var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
-            $('#ModalDelete').find('form').attr('action', '<?= base_url('capacity/deletedetailjarum/') ?>' + apsperstyle);
-            $('#ModalDelete').find('input[name="idapsperstyle"]').val(apsperstyle);
-            $('#ModalDelete').find('input[name="no_model"]').val(noModel);
-            $('#ModalDelete').find('input[name="delivery"]').val(formattedDelivery);
-            $('#ModalDelete').find('input[name="jarum"]').val(jarum);
-            $('#ModalDelete').modal('show'); // Show the modal
-        });
-        $('.btn-delete-all').click(function() {
-            var noModel = $(this).data('no-model');
-            $('#ModalDeleteAll').find('form').attr('action', '<?= base_url('capacity/deletedetailorder/') ?>' + noModel);
-            $('#ModalDeleteAll').find('input[name="idapsperstyle"]').val(noModel);
-            $('#ModalDeleteAll').modal('show'); // Show the modal
-        });
-        });
+                    var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
+
+                    $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/updatedetailjarum/') ?>' + apsperstyle);
+                    $('#ModalEdit').find('input[name="style"]').val(style);
+                    $('#ModalEdit').find('input[name="no_model"]').val(noModel);
+                    $('#ModalEdit').find('input[name="jarum"]').val(jarum);
+                    $('#ModalEdit').find('input[name="delivery"]').val(formattedDelivery);
+                    $('#ModalEdit').find('input[name="qty"]').val(qty);
+                    $('#ModalEdit').find('input[name="sisa"]').val(sisa);
+                    $('#ModalEdit').find('input[name="seam"]').val(seam);
+                    $('#ModalEdit').find('input[name="factory"]').val(factory);
+
+                    $('#ModalEdit').modal('show'); // Show the modal
+                });
+                $('.delete-btn').click(function() {
+                    var noModel = $(this).data('no-model');
+                    var delivery = $(this).data('delivery');
+                    var jarum = $(this).data('jarum');
+                    var apsperstyle = $(this).data('id');
+                    var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
+                    $('#ModalDelete').find('form').attr('action', '<?= base_url('capacity/deletedetailjarum/') ?>' + apsperstyle);
+                    $('#ModalDelete').find('input[name="idapsperstyle"]').val(apsperstyle);
+                    $('#ModalDelete').find('input[name="no_model"]').val(noModel);
+                    $('#ModalDelete').find('input[name="delivery"]').val(formattedDelivery);
+                    $('#ModalDelete').find('input[name="jarum"]').val(jarum);
+                    $('#ModalDelete').modal('show'); // Show the modal
+                });
+                $('.btn-delete-all').click(function() {
+                    var noModel = $(this).data('no-model');
+                    $('#ModalDeleteAll').find('form').attr('action', '<?= base_url('capacity/deletedetailorder/') ?>' + noModel);
+                    $('#ModalDeleteAll').find('input[name="idapsperstyle"]').val(noModel);
+                    $('#ModalDeleteAll').modal('show'); // Show the modal
+                });
+            });
         </script>
         <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
         <?php $this->endSection(); ?>

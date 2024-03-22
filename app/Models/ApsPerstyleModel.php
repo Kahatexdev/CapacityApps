@@ -72,6 +72,15 @@ class ApsPerstyleModel extends Model
             ->where('machinetypeid', $jarum)
             ->findAll();
     }
+    public function getTurunOrder($bulan)
+    {
+        return $this->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
+            ->select('data_model.created_at, SUM(apsperstyle.qty) as total_produksi')
+            ->where('MONTH(data_model.created_at)', $bulan)
+            ->groupBy('data_model.created_at')
+            ->orderBy('data_model.created_at')
+            ->findAll();
+    }
 
     // // Fungsi untuk mendapatkan data berdasarkan kondisi
     // public function getDataByCondition($condition)

@@ -44,6 +44,7 @@ class CapacityController extends BaseController
         $terimaBooking = $this->bookingModel->getBookingMasuk();
         $mcJalan = $this->jarumModel->mcJalan();
         $totalMc = $this->jarumModel->totalMc();
+        $bulan = date('m');
 
         $data = [
             'title' => 'Capacity System',
@@ -55,7 +56,9 @@ class CapacityController extends BaseController
             'jalan' => $orderJalan,
             'TerimaBooking' => $terimaBooking,
             'mcJalan' => $mcJalan,
-            'totalMc' => $totalMc
+            'totalMc' => $totalMc,
+            'order' => $this->ApsPerstyleModel->getTurunOrder($bulan)
+
 
         ];
         return view('Capacity/index', $data);
@@ -391,9 +394,9 @@ class CapacityController extends BaseController
         $modl = $this->request->getPost("no_model");
         $del = $this->request->getPost("delivery");
         if ($update) {
-            return redirect()->to(base_url('capacity/detailmodel/'.$modl.'/'.$del))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->to(base_url('capacity/detailmodel/' . $modl . '/' . $del))->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url('capacity/detailmodel/'.$modl.'/'.$del))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->to(base_url('capacity/detailmodel/' . $modl . '/' . $del))->withInput()->with('error', 'Gagal Update Data');
         }
     }
     public function updateorderjarum($idOrder)
@@ -414,9 +417,9 @@ class CapacityController extends BaseController
         $del = $this->request->getPost("delivery");
         $jrm = $this->request->getPost("jarum");
         if ($update) {
-            return redirect()->to(base_url('capacity/detailmodeljarum/'.$modl.'/'.$del.'/'.$jrm))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->to(base_url('capacity/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url('capacity/detailmodeljarum/'.$modl.'/'.$del.'/'.$jrm))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->to(base_url('capacity/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('error', 'Gagal Update Data');
         }
     }
     public function deletedetailstyle($idOrder)
@@ -428,9 +431,9 @@ class CapacityController extends BaseController
         $modl = $this->request->getPost("no_model");
         $del = $this->request->getPost("delivery");
         if ($delete) {
-            return redirect()->to(base_url('capacity/detailmodel/'.$modl.'/'.$del))->withInput()->with('success', 'Data Berhasil Di Hapus');
+            return redirect()->to(base_url('capacity/detailmodel/' . $modl . '/' . $del))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
-            return redirect()->to(base_url('capacity/detailmodel/'.$modl.'/'.$del))->withInput()->with('error', 'Gagal Hapus Data');
+            return redirect()->to(base_url('capacity/detailmodel/' . $modl . '/' . $del))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
 
@@ -444,18 +447,18 @@ class CapacityController extends BaseController
         $del = $this->request->getPost("delivery");
         $jrm = $this->request->getPost("jarum");
         if ($delete) {
-            return redirect()->to(base_url('capacity/detailmodeljarum/'.$modl.'/'.$del.'/'.$jrm))->withInput()->with('success', 'Data Berhasil Di Hapus');
+            return redirect()->to(base_url('capacity/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
-            return redirect()->to(base_url('capacity/detailmodeljarum/'.$modl.'/'.$del.'/'.$jrm))->withInput()->with('error', 'Gagal Hapus Data');
+            return redirect()->to(base_url('capacity/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
-    
+
     public function deletedetailorder($idModel)
     {
 
         $idModel = $this->request->getPost("no_model");
         $id = $idModel;
-        $delete = $this->ApsPerstyleModel->where('Mastermodel',$id)->delete();
+        $delete = $this->ApsPerstyleModel->where('Mastermodel', $id)->delete();
         if ($delete) {
             return redirect()->to(base_url('capacity/semuaOrder/'))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
