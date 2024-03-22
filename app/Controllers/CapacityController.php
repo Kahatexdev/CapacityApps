@@ -51,6 +51,7 @@ class CapacityController extends BaseController
             'active2' => '',
             'active3' => '',
             'active4' => '',
+            'active5' => '',
             'jalan' => $orderJalan,
             'TerimaBooking' => $terimaBooking,
             'mcJalan' => $mcJalan,
@@ -71,6 +72,7 @@ class CapacityController extends BaseController
             'active2' => 'active',
             'active3' => '',
             'active4' => '',
+            'active5' => '',
             'Jarum' => $dataJarum,
             'TotalMesin' => $totalMesin,
         ];
@@ -87,6 +89,7 @@ class CapacityController extends BaseController
             'active2' => 'active',
             'active3' => '',
             'active4' => '',
+            'active5' => '',
             'jarum' => $jarum,
             'product' => $product,
             'booking' => $booking
@@ -104,6 +107,7 @@ class CapacityController extends BaseController
             'active2' => '',
             'active3' => 'active',
             'active4' => '',
+            'active5' => '',
             'jarum' => $jarum,
             'tampildata' => $tampilperdelivery,
             'product' => $product,
@@ -121,6 +125,7 @@ class CapacityController extends BaseController
             'active2' => '',
             'active3' => 'active',
             'active4' => '',
+            'active5' => '',
             'tampildata' => $tampilperdelivery,
             'product' => $product,
 
@@ -188,6 +193,7 @@ class CapacityController extends BaseController
             'active2' => 'active',
             'active3' => '',
             'active4' => '',
+            'active5' => '',
             'booking' => $booking,
             'jarum' => $needle,
             'product' => $product,
@@ -536,6 +542,7 @@ class CapacityController extends BaseController
             'active2' => '',
             'active3' => 'active',
             'active4' => '',
+            'active5' => '',
             'dataAps' => $dataApsPerstyle,
             'noModel' => $noModel,
             'delivery' => $delivery,
@@ -555,6 +562,7 @@ class CapacityController extends BaseController
             'active2' => '',
             'active3' => 'active',
             'active4' => '',
+            'active5' => '',
             'dataAps' => $dataApsPerstyle,
             'noModel' => $noModel,
             'delivery' => $delivery,
@@ -572,6 +580,7 @@ class CapacityController extends BaseController
             'active2' => '',
             'active3' => 'active',
             'active4' => '',
+            'active5' => '',
             'TotalMesin' => $totalMesin,
         ];
         return view('Capacity/Order/ordermaster', $data);
@@ -586,6 +595,7 @@ class CapacityController extends BaseController
             'active2' => '',
             'active3' => 'active',
             'active4' => '',
+            'active5' => '',
             'TotalMesin' => $totalMesin,
         ];
         return view('Capacity/Order/orderjarum', $data);
@@ -598,8 +608,22 @@ class CapacityController extends BaseController
             'active2' => '',
             'active3' => '',
             'active4' => 'active',
+            'active5' => '',
         ];
         return view('Capacity/Produksi/produksi', $data);
+    }
+    
+    public function datamesin()
+    {
+        $data = [
+            'title' => 'Data Mesin',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => 'active',
+        ];
+        return view('Capacity/Mesin/Mastermesin', $data);
     }
     public function updatebooking($idBooking)
     {
