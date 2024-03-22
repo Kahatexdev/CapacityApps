@@ -342,6 +342,55 @@ class CapacityController extends BaseController
             return redirect()->to(base_url('/capacity/databooking'))->with('error', 'No data found in the Excel file');
         }
     }
+    public function updateorder($idOrder)
+    {
+
+        $data = [
+            'mastermodel' => $this->request->getPost("no_model"),
+            'size' =>  $this->request->getPost("style"),
+            'delivery' => $this->request->getPost("delivery"),
+            'qty' => $this->request->getPost("qty"),
+            'sisa' => $this->request->getPost("sisa"),
+            'seam' => $this->request->getPost("seam"),
+            'factory' => $this->request->getPost("factory"),
+        ];
+        $id = $idOrder;
+        $update = $this->ApsPerstyleModel->update($id, $data);
+        $modl = $this->request->getPost("no_model");
+        $del = $this->request->getPost("delivery");
+        if ($update) {
+            return redirect()->to(base_url('capacity/detailmodel/'.$modl.'/'.$del))->withInput()->with('success', 'Data Berhasil Di Update');
+        } else {
+            return redirect()->to(base_url('capacity/detailmodel/'.$modl.'/'.$del))->withInput()->with('error', 'Gagal Update Data');
+        }
+    }
+    public function deletedetailstyle($idOrder)
+    {
+
+        $idOrder = $this->request->getPost("idapsperstyle");
+        $id = $idOrder;
+        $delete = $this->ApsPerstyleModel->delete($id);
+        $modl = $this->request->getPost("no_model");
+        $del = $this->request->getPost("delivery");
+        if ($delete) {
+            return redirect()->to(base_url('capacity/detailmodel/'.$modl.'/'.$del))->withInput()->with('success', 'Data Berhasil Di Hapus');
+        } else {
+            return redirect()->to(base_url('capacity/detailmodel/'.$modl.'/'.$del))->withInput()->with('error', 'Gagal Hapus Data');
+        }
+    }
+    
+    public function deletedetailorder($idModel)
+    {
+
+        $idModel = $this->request->getPost("no_model");
+        $id = $idModel;
+        $delete = $this->ApsPerstyleModel->where('Mastermodel',$id)->delete();
+        if ($delete) {
+            return redirect()->to(base_url('capacity/semuaOrder/'))->withInput()->with('success', 'Data Berhasil Di Hapus');
+        } else {
+            return redirect()->to(base_url('capacity/semuaOrder/'))->withInput()->with('error', 'Gagal Hapus Data');
+        }
+    }
 
     public function importModel()
     {

@@ -58,6 +58,7 @@ class OrderModel extends Model
         $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
         $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
         $builder->groupBy('delivery');
+        $builder->groupBy('data_model.no_model');
 
         return $builder->get()->getResult();
     }

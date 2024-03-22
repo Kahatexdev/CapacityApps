@@ -182,7 +182,11 @@
     <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
     <script type="text/javascript">
         $(document).ready(function() {
-            $('#example').DataTable();
+            $('#example').DataTable({
+                "order": [
+                    [0, 'desc'] // Kolom pertama (indeks 0) diurutkan secara descending
+                ]
+            });
 
             // Trigger import modal when import button is clicked
             $('.import-btn').click(function() {

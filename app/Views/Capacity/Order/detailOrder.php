@@ -68,7 +68,7 @@
                                                 </button>
                                             </td>
                                             <td>
-                                                <button type="button" class="btn btn-danger btn-sm delete-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $order['idapsperstyle']; ?>">
+                                                <button type="button" class="btn btn-danger btn-sm delete-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $order['idapsperstyle']; ?>"data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>">
                                                     Delete
                                                 </button>
                                             </td>
@@ -108,7 +108,7 @@
                                 <div class="col-lg-12 col-sm-12">
                                     <div class="form-group">
                                         <label for="tgl-bk" class="col-form-label">No Model</label>
-                                        <input type="text" class="form-control" name="no_model" disabled>
+                                        <input type="text" class="form-control" name="no_model" readonly>
                                     </div>
                                     <div class="form-group">
                                         <label for="tgl-bk" class="col-form-label">Style</label>
@@ -160,6 +160,8 @@
                             </div>
                             <div class="modal-body">
                                 <form action="" method="post">
+                                    <input type="hidden" class="form-control" name="no_model">
+                                    <input type="hidden" class="form-control" name="delivery">
                                     <input type="text" name="idapsperstyle" id="" hidden value="">
                                     Apakah anda yakin ingin menghapus Data Style?
                             </div>
@@ -182,7 +184,7 @@
                             </div>
                             <div class="modal-body">
                                 <form action="" method="post">
-                                    <input type="text" name="idapsperstyle" id="" hidden value="">
+                                    <input type="text" name="no_model" id="" hidden value="<?= $noModel ?>">
                                     Apakah anda yakin menghapus semua style di Model <?= $noModel ?>
                             </div>
                             <div class="modal-footer">
@@ -221,10 +223,15 @@
             
             $('#ModalEdit').modal('show'); // Show the modal
         });
-        $('.delete-btn').click(function() {
+            $('.delete-btn').click(function() {
+            var noModel = $(this).data('no-model');
+            var delivery = $(this).data('delivery');
             var apsperstyle = $(this).data('id');
+            var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
             $('#ModalDelete').find('form').attr('action', '<?= base_url('capacity/deletedetailstyle/') ?>' + apsperstyle);
             $('#ModalDelete').find('input[name="idapsperstyle"]').val(apsperstyle);
+            $('#ModalDelete').find('input[name="no_model"]').val(noModel);
+            $('#ModalDelete').find('input[name="delivery"]').val(formattedDelivery);
             $('#ModalDelete').modal('show'); // Show the modal
         });
         $('.btn-delete-all').click(function() {
