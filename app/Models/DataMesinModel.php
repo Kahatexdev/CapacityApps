@@ -50,6 +50,15 @@ class DataMesinModel extends Model
         $uniqueJarums = array_column($query, 'jarum');
         return $uniqueJarums;
     }
+    public function getArea()
+    {
+        // Mengambil nilai unik dari kolom 'jarum'
+        $query = $this->distinct()->select('area')->orderBy('id_data_mesin', 'ASC')->findAll();
+
+        // Mengubah hasil query menjadi array dengan nilai 'jarum' saja
+        $uniqueArea = array_column($query, 'area');
+        return $uniqueArea;
+    }
     public function getTotalMesinByJarum()
     {
         $query = $this->select('jarum, SUM(total_mc) as total')->groupBy('jarum')->findAll();

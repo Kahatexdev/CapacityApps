@@ -115,6 +115,25 @@ class CapacityController extends BaseController
         ];
         return view('Capacity/Order/semuaorderjarum', $data);
     }
+
+    public function mesinperarea()
+    {
+        $tampilperarea = $this->jarumModel->getArea();
+        $product = $this->productModel->findAll();
+        $booking = $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => 'active',
+            'tampildata' => $tampilperarea,
+            'product' => $product,
+
+        ];
+        return view('Capacity/Mesin/mesinarea', $data);
+    }
+
     public function semuaOrder()
     {
         $tampilperdelivery = $this->orderModel->tampilPerdelivery();
@@ -584,6 +603,21 @@ class CapacityController extends BaseController
             'TotalMesin' => $totalMesin,
         ];
         return view('Capacity/Order/ordermaster', $data);
+    }
+
+    public function mesinPerJarum()
+    {
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+        $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => 'active',
+            'TotalMesin' => $totalMesin,
+        ];
+        return view('Capacity/Mesin/mesinjarum', $data);
     }
 
     public function orderPerJarum()
