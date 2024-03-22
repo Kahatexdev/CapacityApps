@@ -158,11 +158,11 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="col-lg-6 col-sm-12">Deskripsi</label>
-                                                <input type="text" class="form-control" name="deskripsi">
+                                                <input type="text" class="form-control" name="deskripsi" oninput="this.value = this.value.toUpperCase()">
                                             </div>
                                             <div class="form-group">
                                                 <label for="col-lg-6 col-sm-12">No Model</label>
-                                                <input type="text" name="no_model" class="form-control">
+                                                <input type="text" name="no_model" class="form-control" oninput="this.value = this.value.toUpperCase()">
                                             </div>
                                         </div>
                                         <div class="col-lg-6 col-sm-12">
@@ -227,14 +227,14 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="desc" class="col-form-label">Description:</label>
-                                                <input type="text" name="desc" id="" class="form-control" value="<?= $booking['desc']; ?>">
+                                                <input type="text" name="desc" id="" class="form-control" value="<?= $booking['desc']; ?>" oninput="this.value = this.value.toUpperCase()">
                                             </div>
 
                                         </div>
                                         <div class="col-lg-6 col-sm-12">
                                             <div class="form-group">
                                                 <label for="seam" class="col-form-label">Seam:</label>
-                                                <input type="text" name="seam" id="" class="form-control" value="<?= $booking['seam']; ?>">
+                                                <input type="text" name="seam" id="" class="form-control" value="<?= $booking['seam']; ?>" oninput="this.value = this.value.toUpperCase()">
                                             </div>
                                             <div class="form-group">
                                                 <label for="opd" class="col-form-label">OPD:</label>
@@ -339,7 +339,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="buyer" class="col-form-label">Kode Buyer:</label>
-                                            <input type="text" name="buyer" id="" class="form-control">
+                                            <input type="text" name="buyer" id="" class="form-control" oninput="this.value = this.value.toUpperCase()">
                                         </div>
                                         <div class="form-group">
                                             <label for="jarum" class="col-form-label">Needle :</label>
@@ -361,23 +361,23 @@
                                         </div>
                                         <div class=" form-group">
                                             <label for="no_order" class="col-form-label">No Order:</label>
-                                            <input type="text" name="no_order" id="" class="form-control">
+                                            <input type="text" name="no_order" id="" class="form-control" oninput="this.value = this.value.toUpperCase()">
                                         </div>
 
                                         <div class="form-group">
                                             <label for="no_pdk" class="col-form-label">No Booking:</label>
-                                            <input type="text" name="no_booking" id="" class="form-control">
+                                            <input type="text" name="no_booking" id="" class="form-control" oninput="this.value = this.value.toUpperCase()">
                                         </div>
                                         <div class="form-group">
                                             <label for="desc" class="col-form-label">Description:</label>
-                                            <input type="text" name="desc" id="" class="form-control">
+                                            <input type="text" name="desc" id="" class="form-control" oninput="this.value = this.value.toUpperCase()">
                                         </div>
 
                                     </div>
                                     <div class="col-lg-6 col-sm-12">
                                         <div class="form-group">
                                             <label for="seam" class="col-form-label">Seam:</label>
-                                            <input type="text" name="seam" id="" class="form-control">
+                                            <input type="text" name="seam" id="" class="form-control" oninput="this.value = this.value.toUpperCase()">
                                         </div>
                                         <div class="form-group">
                                             <label for="opd" class="col-form-label">OPD:</label>

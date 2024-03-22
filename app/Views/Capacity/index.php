@@ -32,9 +32,11 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Order Masuk</p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Booking Masuk </p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    432
+                                    <span class=" text-sm font-weight-bolder">Bulan Ini</span>
+                                    <?= $TerimaBooking ?>
+
                                 </h5>
                             </div>
                         </div>
@@ -53,9 +55,9 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Order Jalan</p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Order aktif </p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    175
+                                    <?= $jalan ?>
                                 </h5>
                             </div>
                         </div>
@@ -76,7 +78,9 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Mesin Jalan</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    1420
+                                    <?= $mcJalan ?>
+                                    <span class=" text-sm font-weight-bolder">/ <?= $totalMc ?> mesin</span>
+
                                 </h5>
                             </div>
                         </div>

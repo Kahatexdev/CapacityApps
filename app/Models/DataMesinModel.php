@@ -55,4 +55,12 @@ class DataMesinModel extends Model
         $query = $this->select('jarum, SUM(total_mc) as total')->groupBy('jarum')->findAll();
         return $query;
     }
+    public function mcJalan()
+    {
+        return $this->selectSum('mesin_jalan')->get()->getRow()->mesin_jalan;
+    }
+    public function totalMc()
+    {
+        return $this->selectSum('total_mc')->get()->getRow()->total_mc;
+    }
 }

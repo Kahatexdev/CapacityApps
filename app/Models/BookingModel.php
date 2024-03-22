@@ -75,4 +75,14 @@ class BookingModel extends Model
     {
         return $this->where('no_order', $no_order)->first();
     }
+    public function getOrderJalan()
+    {
+        return $this->where('status', 'Aktif')->countAllResults();
+    }
+    public function getBookingMasuk()
+    {
+        $bulan = date('m');
+
+        return $this->where('status', 'Booking Baru')->where("MONTH(tgl_terima_booking) =", $bulan)->countAllResults();
+    }
 }

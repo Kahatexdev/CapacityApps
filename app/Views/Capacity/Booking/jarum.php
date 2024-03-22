@@ -68,19 +68,19 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="buyer" class="col-form-label">Kode Buyer:</label>
-                                            <input type="text" name="buyer" id="" class="form-control">
+                                            <input type="text" name="buyer" id="" class="form-control" oninput="this.value = this.value.toUpperCase()">
                                         </div>
                                         <div class="form-group">
                                             <label for="no_order" class="col-form-label">No Order:</label>
-                                            <input type="text" name="no_order" id="" class="form-control">
+                                            <input type="text" name="no_order" id="" class="form-control" oninput="this.value = this.value.toUpperCase()">
                                         </div>
                                         <div class="form-group">
                                             <label for="no_pdk" class="col-form-label">No PDK:</label>
-                                            <input type="text" name="no_pdk" id="" class="form-control">
+                                            <input type="text" name="no_pdk" id="" class="form-control" oninput="this.value = this.value.toUpperCase()">
                                         </div>
                                         <div class="form-group">
                                             <label for="desc" class="col-form-label">Description:</label>
-                                            <input type="text" name="desc" id="" class="form-control">
+                                            <input type="text" name="desc" id="" class="form-control" oninput="this.value = this.value.toUpperCase()">
                                         </div>
                                         <div class="form-group">
                                             <label for="productType" class="col-form-label">Product Type</label>
@@ -95,7 +95,7 @@
                                     <div class="col-lg-6 col-sm-12">
                                         <div class="form-group">
                                             <label for="seam" class="col-form-label">Seam:</label>
-                                            <input type="text" name="seam" id="" class="form-control">
+                                            <input type="text" name="seam" id="" class="form-control" oninput="this.value = this.value.toUpperCase()">
                                         </div>
                                         <div class="form-group">
                                             <label for="opd" class="col-form-label">OPD:</label>
@@ -159,7 +159,19 @@
                                     <td class="text-xs"><?= $bk['product_type'] ?></td>
                                     <td class="text-xs"><?= $bk['sisa_booking'] ?></td>
                                     <td class="text-xs"><?= $bk['status'] ?></td>
-                                    <td class="text-xs"> <a href="<?= base_url('capacity/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm text-xxs">detail</a> </td>
+
+                                    <td class="text-xs">
+                                        <?php if ($bk['status'] == 'Cancel Booking') : ?>
+                                            <!-- If qty is null, set action to Import -->
+                                            <button type="button" class="btn bg-gradient-secondary btn-sm text-xxs" disabled>
+                                                Detail
+                                            </button>
+                                        <?php else : ?>
+                                            <!-- If qty is not null, set action to Details -->
+                                            <a href="<?= base_url('capacity/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm text-xxs">detail</a>
+                                        <?php endif; ?>
+
+                                    </td>
                                 </tr>
                             <?php endforeach ?>
                         </tbody>
