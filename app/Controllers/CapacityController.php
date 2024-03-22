@@ -40,6 +40,10 @@ class CapacityController extends BaseController
     }
     public function index()
     {
+        $orderJalan = $this->bookingModel->getOrderJalan();
+        $terimaBooking = $this->bookingModel->getBookingMasuk();
+        $mcJalan = $this->jarumModel->mcJalan();
+        $totalMc = $this->jarumModel->totalMc();
 
         $data = [
             'title' => 'Capacity System',
@@ -47,6 +51,10 @@ class CapacityController extends BaseController
             'active2' => '',
             'active3' => '',
             'active4' => '',
+            'jalan' => $orderJalan,
+            'TerimaBooking' => $terimaBooking,
+            'mcJalan' => $mcJalan,
+            'totalMc' => $totalMc
 
         ];
         return view('Capacity/index', $data);
@@ -510,7 +518,7 @@ class CapacityController extends BaseController
 
         $jarum = $this->request->getPost("jarum");
         $id = $idBooking;
-        $cancel = $this->bookingModel->update($id, ['status' => 'Cancel Booking']);
+        $cancel = $this->bookingModel->update($id, ['status' => 'Cancel Booking', 'qty_booking' => 0, 'sisa_booking' => 0]);
         if ($cancel) {
             return redirect()->to(base_url('capacity/databooking/' . $jarum))->withInput()->with('success', 'Bookingan Berhasil Di Cancel');
         } else {
