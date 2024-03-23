@@ -17,7 +17,7 @@
 
     <!-- Font Awesome Icons -->
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
-    <link href="<?= base_url('assets/css/nucleo-svg.css"') ?> rel=" stylesheet" />
+    <link href="<?= base_url('assets/css/nucleo-svg.css"') ?>" rel=" stylesheet" />
     <!-- CSS Files -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link id="pagestyle" href="<?= base_url('assets/css/soft-ui-dashboard.css?v=1.0.7') ?>" rel="stylesheet" />
@@ -37,8 +37,10 @@
         <div class="sidenav-header">
             <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
             <a class="navbar-brand m-0" href="<?= base_url('/capacity') ?> " target="_blank">
-                <img src="<?= base_url('assets/img/logo-ct-dark.png') ?>" class="navbar-brand-img h-100" alt="main_logo">
-                <span class="ms-1 font-weight-bold">Capacity Apps</span>
+            <div class="icon icon-shape bg-dark shadow text-center border-radius-lg" style="font-size: 17px;">
+                                <i class="fab fa-cuttlefish text-lg opacity-10" aria-hidden="true"></i>
+                            </div>
+                <span class="ms-1 font-weight-bold" style="font-size: 20px;">Capacity Apps</span>
             </a>
         </div>
         <hr class="horizontal dark mt-0">
@@ -312,9 +314,9 @@
                             <script>
                                 document.write(new Date().getFullYear())
                             </script>,
-                            made with <i class="fa fa-heart"></i> by
-                            <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Creative Tim</a>
-                            for a better web.
+                            made with <i class="fas fa-laptop-code"></i> by
+                            <a href="https://woz-u.com/wp-content/uploads/2020/04/how-stressful-is-software-development-woz-u-1280x720.jpg" class="font-weight-bold" target="_blank">RnD Team</a>
+                           BP System
                         </div>
                     </div>
 

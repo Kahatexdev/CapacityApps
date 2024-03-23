@@ -16,7 +16,7 @@
                         </div>
                         <div class="col-4 text-end">
                             <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">
-                                Import Data
+                            <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Import Data  
                             </button>
                         </div>
                     </div>
@@ -106,7 +106,7 @@
                                 </div>
                                 <div class="col-4 text-end">
                                     <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                        <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+                                        <i class="fas fa-pen-fancy text-lg opacity-10" aria-hidden="true"></i>
                                     </div>
                                 </div>
 

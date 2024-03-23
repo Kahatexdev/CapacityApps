@@ -250,9 +250,15 @@ class CapacityController extends BaseController
                 return redirect()->to(base_url('capacity/detailbooking/' . $id_booking))->withInput()->with('error', 'Gagal Ambil Order');
             } else {
                 $id = $id_booking;
+                $status ="";
+                if($sisa_booking=="0"){
+                    $status="Habis";
+                }else{
+                    $status = "Aktif";
+                }
                 $data = [
                     'sisa_booking' => $sisa_booking,
-                    'status' => 'Aktif'
+                    'status' => $status
                 ];
                 $this->bookingModel->update($id, $data);
                 return redirect()->to(base_url('capacity/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');

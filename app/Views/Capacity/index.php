@@ -42,7 +42,7 @@
                         </div>
                         <div class="col-4 text-end">
                             <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+                                <i class="fas fa-book text-lg opacity-10" aria-hidden="true"></i>
                             </div>
                         </div>
                     </div>
@@ -63,7 +63,7 @@
                         </div>
                         <div class="col-4 text-end">
                             <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-single-02 text-lg opacity-10" aria-hidden="true"></i>
+                                <i class="fas fa-tasks text-lg opacity-10" aria-hidden="true"></i>
                             </div>
                         </div>
                     </div>
@@ -79,14 +79,14 @@
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Mesin Jalan</p>
                                 <h5 class="font-weight-bolder mb-0">
                                     <?= $mcJalan ?>
-                                    <span class=" text-sm font-weight-bolder">/ <?= $totalMc ?> mesin</span>
+                                    <span class=" text-sm font-weight-bolder">/ <?= $totalMc ?> </span>
 
                                 </h5>
                             </div>
                         </div>
                         <div class="col-4 text-end">
                             <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-atom text-lg opacity-10" aria-hidden="true"></i>
+                                <i class="ni ni-settings text-lg opacity-10" aria-hidden="true"></i>
                             </div>
                         </div>
                     </div>
@@ -102,12 +102,12 @@
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Order Selesai</p>
                                 <h5 class="font-weight-bolder mb-0">
                                     8
-                                    <span class="text-success text-sm font-weight-bolder">Bulan Ini</span>
+                                    <span class=" text-sm font-weight-bolder">Bulan Ini</span>
                                 </h5>
                             </div>
                         </div>
                         <div class="col-4 text-end">
-                            <div class="icon icon-shape bg-gradient-success shadow text-center border-radius-md">
+                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
                                 <i class="ni ni-check-bold text-lg opacity-10" aria-hidden="true"></i>
                             </div>
                         </div>

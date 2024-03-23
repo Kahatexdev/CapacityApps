@@ -42,7 +42,7 @@
                                 </div>
                                 <div class="col-4 text-end">
                                     <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                        <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+                                        <i class="ni ni-settings text-lg opacity-10" aria-hidden="true"></i>
                                     </div>
                                 </div>
 
@@ -68,7 +68,7 @@
                                 </div>
                                 <div class="col-4 text-end">
                                     <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                        <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+                                        <i class="ni ni-settings text-lg opacity-10" aria-hidden="true"></i>
                                     </div>
                                 </div>
 
