@@ -84,6 +84,6 @@ class BookingModel extends Model
     {
         $bulan = date('m');
 
-        return $this->where('status', 'Booking Baru')->where("MONTH(tgl_terima_booking) =", $bulan)->countAllResults();
+        return $this->where("MONTH(tgl_terima_booking) =", $bulan)->countAllResults();
     }
 }

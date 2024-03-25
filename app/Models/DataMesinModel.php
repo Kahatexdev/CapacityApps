@@ -17,7 +17,7 @@ class DataMesinModel extends Model
     protected bool $allowEmptyInserts = false;
 
     // Dates
-    protected $useTimestamps = true;
+    protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -60,6 +60,14 @@ class DataMesinModel extends Model
         $uniqueArea = array_column($query, 'area');
         return $uniqueArea;
     }
+
+    public function getJarumArea($area)
+    {
+    $query = $this->select('*')->where('area',$area)->findAll();
+
+    return $query;
+    }
+
     public function getTotalMesinByJarum()
     {
         $query = $this->select('jarum, SUM(total_mc) as total')->groupBy('jarum')->findAll();
@@ -73,4 +81,5 @@ class DataMesinModel extends Model
     {
         return $this->selectSum('total_mc')->get()->getRow()->total_mc;
     }
+    
 }
