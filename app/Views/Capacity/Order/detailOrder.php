@@ -83,7 +83,7 @@
                 <div class="card-footer">
                     <div class="row">
                         <div class="col-lg-12">
-                            <a href="#" class="btn btn-danger btn-delete-all" Data-bs-toggle="modal" data-bs-target="ModalDeleteAll">Delete All</a>
+                            <a href="#" class="btn btn-danger btn-delete-all" Data-bs-toggle="modal" data-bs-target="ModalDeleteAll" data-no-model="<?= $noModel ?>">Delete All</a>
                         </div>
                     </div>
                 </div>

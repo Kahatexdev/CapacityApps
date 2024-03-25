@@ -34,7 +34,7 @@
                             Detail Data Mesin <?= $area ?>
                         </h5>
                         <div>
-                        <a href="<?= base_url('capacity/datamesin') ?>" class="btn bg-gradient-info"> Kembali</a>
+                        <a href="<?= base_url('capacity/mesinperarea') ?>" class="btn bg-gradient-info"> Kembali</a>
                         <button type="button" class="btn btn-add bg-gradient-success" data-toggle="modal" data-target="#modalTambah">Input Data Mesin</button>
                         </div>
                     </div>

@@ -355,4 +355,16 @@ class OrderController extends BaseController
             return redirect()->to(base_url('/capacity/semuaOrder'))->with('error', 'No data found in the Excel file');
         }
     }
+    public function deletedetailorder($idModel)
+    {
+
+        $idModel = $this->request->getPost("no_model");
+        $id = $idModel;
+        $delete = $this->ApsPerstyleModel->where('Mastermodel', $id)->delete();
+        if ($delete) {
+            return redirect()->to(base_url('capacity/semuaOrder/'))->withInput()->with('success', 'Data Berhasil Di Hapus');
+        } else {
+            return redirect()->to(base_url('capacity/semuaOrder/'))->withInput()->with('error', 'Gagal Hapus Data');
+        }
+    }
 }

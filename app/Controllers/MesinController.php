@@ -57,7 +57,7 @@ class MesinController extends BaseController
     {
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $data = [
-            'title' => 'Data Order',
+            'title' => 'Data Mesin',
             'active1' => '',
             'active2' => '',
             'active3' => '',
@@ -72,7 +72,7 @@ class MesinController extends BaseController
         $tampilperarea = $this->jarumModel->getArea();
         $product = $this->productModel->findAll();
         $data = [
-            'title' => 'Data Order',
+            'title' => 'Data Mesin',
             'active1' => '',
             'active2' => '',
             'active3' => '',
@@ -88,7 +88,7 @@ class MesinController extends BaseController
     {
         $tampilperarea = $this->jarumModel->getJarumArea($area);
         $data = [
-            'title' => 'Data Order',
+            'title' => 'Data Mesin',
             'active1' => '',
             'active2' => '',
             'active3' => '',

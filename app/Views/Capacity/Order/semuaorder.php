@@ -183,13 +183,11 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $('#example').DataTable({
-                "order": [
-                    [0, 'desc'] // Kolom pertama (indeks 0) diurutkan secara descending
-                ]
             });
 
             // Trigger import modal when import button is clicked
             $('.import-btn').click(function() {
+                console.log("a");
                 var idModel = $(this).data('id');
                 var noModel = $(this).data('no-model');
 
