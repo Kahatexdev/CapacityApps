@@ -16,30 +16,30 @@ $routes->post('authverify', 'AuthController::login');
 $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('', 'CapacityController::index');
     // booking
-    $routes->get('databooking', 'CapacityController::booking');
-    $routes->get('databooking/(:any)', 'CapacityController::bookingPerJarum/$1');
-    $routes->get('detailbooking/(:any)', 'CapacityController::detailbooking/$1');
-    $routes->post('inputbooking', 'CapacityController::inputbooking');
-    $routes->post('updatebooking/(:any)', 'CapacityController::updatebooking/$1');
-    $routes->post('deletebooking/(:any)', 'CapacityController::deletebooking/$1');
-    $routes->post('cancelbooking/(:any)', 'CapacityController::cancelbooking/$1');
-    $routes->post('pecahbooking/(:any)', 'CapacityController::pecahbooking/$1');
-    $routes->post('importbooking', 'CapacityController::importbooking');
+    $routes->get('databooking', 'BookingController::booking');
+    $routes->get('databooking/(:any)', 'BookingController::bookingPerJarum/$1');
+    $routes->get('detailbooking/(:any)', 'BookingController::detailbooking/$1');
+    $routes->post('inputbooking', 'BookingController::inputbooking');
+    $routes->post('updatebooking/(:any)', 'BookingController::updatebooking/$1');
+    $routes->post('deletebooking/(:any)', 'BookingController::deletebooking/$1');
+    $routes->post('cancelbooking/(:any)', 'BookingController::cancelbooking/$1');
+    $routes->post('pecahbooking/(:any)', 'BookingController::pecahbooking/$1');
+    $routes->post('importbooking', 'BookingController::importbooking');
 
     // order
-    $routes->get('dataorder', 'CapacityController::order');
-    $routes->get('detailmodel/(:any)/(:any)', 'CapacityController::detailmodel/$1/$2');
-    $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'CapacityController::detailmodeljarum/$1/$2/$3');
-    $routes->get('semuaOrder', 'CapacityController::semuaOrder');
-    $routes->get('orderPerjarum', 'CapacityController::OrderPerJarum');
-    $routes->get('dataorderperjarum/(:any)', 'CapacityController::DetailOrderPerJarum/$1');
-    $routes->post('updatedetailorder/(:any)', 'CapacityController::updateorder/$1');
-    $routes->post('updatedetailjarum/(:any)', 'CapacityController::updateorderjarum/$1');
-    $routes->post('deletedetailstyle/(:any)', 'CapacityController::deletedetailstyle/$1');
-    $routes->post('deletedetailorder/(:any)', 'CapacityController::deletedetailorder/$1');
-    $routes->post('deletedetailjarum/(:any)', 'CapacityController::deletedetailmodeljarum/$1');
-    $routes->post('inputOrder', 'CapacityController::inputOrder');
-    $routes->post('importModel', 'CapacityController::importModel');
+    $routes->get('dataorder', 'OrderController::order');
+    $routes->get('detailmodel/(:any)/(:any)', 'OrderController::detailmodel/$1/$2');
+    $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'OrderController::detailmodeljarum/$1/$2/$3');
+    $routes->get('semuaOrder', 'OrderController::semuaOrder');
+    $routes->get('orderPerjarum', 'OrderController::OrderPerJarum');
+    $routes->get('dataorderperjarum/(:any)', 'OrderController::DetailOrderPerJarum/$1');
+    $routes->post('updatedetailorder/(:any)', 'OrderController::updateorder/$1');
+    $routes->post('updatedetailjarum/(:any)', 'OrderController::updateorderjarum/$1');
+    $routes->post('deletedetailstyle/(:any)', 'OrderController::deletedetailstyle/$1');
+    $routes->post('deletedetailorder/(:any)', 'OrderController::deletedetailorder/$1');
+    $routes->post('deletedetailjarum/(:any)', 'OrderController::deletedetailmodeljarum/$1');
+    $routes->post('inputOrder', 'OrderController::inputOrder');
+    $routes->post('importModel', 'OrderController::importModel');
 
     // produksi
     $routes->get('dataproduksi', 'CapacityController::produksi');
