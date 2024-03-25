@@ -42,8 +42,8 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('importModel', 'OrderController::importModel');
 
     // produksi
-    $routes->get('dataproduksi', 'CapacityController::produksi');
-    $routes->get('dataproduksi/(:any)', 'CapacityController::produksiPerArea/$1');
+    $routes->get('dataproduksi', 'ProduksiController::produksi');
+    $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
 
     // mesin
     $routes->get('datamesin', 'MesinController::index');
