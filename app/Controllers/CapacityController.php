@@ -119,11 +119,28 @@ class CapacityController extends BaseController
         return view('Capacity/Order/semuaorderjarum', $data);
     }
 
+    public function DetailMesinPerJarum($area)
+    {
+        $tampilperarea = $this->jarumModel->getJarumArea($area);
+        $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => 'active',
+            'area' => $area,
+            'tampildata' => $tampilperarea,
+
+        ];
+        return view('Capacity/Mesin/detailMesinJarum', $data);
+    }
+
     public function mesinperarea()
     {
         $tampilperarea = $this->jarumModel->getArea();
         $product = $this->productModel->findAll();
-        $booking = $data = [
+        $data = [
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -141,7 +158,7 @@ class CapacityController extends BaseController
     {
         $tampilperdelivery = $this->orderModel->tampilPerdelivery();
         $product = $this->productModel->findAll();
-        $booking = $data = [
+        $data = [
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -203,6 +220,31 @@ class CapacityController extends BaseController
             return redirect()->to(base_url('/capacity/databooking/' . $jarum))->withInput()->with('error', 'Data Sudah Ada, Silahkan Cek Ulang Kembali Inputanya');
         }
     }
+
+    public function inputmesinperarea()
+    {
+        $area = $this->request->getPost("area");
+        $jarum = $this->request->getPost("jarum");
+        $total_mc = $this->request->getPost("total_mc");
+        $brand = $this->request->getPost("brand");
+        $mesin_jalan = $this->request->getPost("mesin_jalan");
+
+        $input = [
+            'area' => $area,
+            'jarum' => $jarum,
+            'total_mc' => $total_mc,
+            'brand' => $brand,
+            'mesin_jalan' => $mesin_jalan,
+        ];
+
+        $insert =   $this->jarumModel->insert($input);
+        if ($insert) {
+            return redirect()->to(base_url('/capacity/datamesinperjarum/' . $area))->withInput()->with('success', 'Data Berhasil Di Input');
+        } else {
+            return redirect()->to(base_url('/capacity/datamesinperjarum/' . $area))->withInput()->with('error', 'Data Gagal Di Input');
+        }
+    }
+
     public function detailbooking($idBooking)
     {
         $needle = $this->bookingModel->getNeedle($idBooking);
@@ -428,6 +470,25 @@ class CapacityController extends BaseController
             return redirect()->to(base_url('capacity/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('error', 'Gagal Update Data');
         }
     }
+
+    public function updatemesinperjarum($idDataMesin)
+    {
+
+        $data = [
+            'total_mesin' => $this->request->getPost("total_mc"),
+            'brand' => $this->request->getPost("brand"),
+            'mesin_jalan' => $this->request->getPost("mesin_jalan"),
+        ];
+        $id = $idDataMesin;
+        $update = $this->jarumModel->update($id, $data);
+        $area = $this->request->getPost("area");
+        if ($update) {
+            return redirect()->to(base_url('capacity/datamesinperjarum/' . $area))->withInput()->with('success', 'Data Berhasil Di Update');
+        } else {
+            return redirect()->to(base_url('capacity/datamesinperjarum/' . $area))->withInput()->with('error', 'Gagal Update Data');
+        }
+    }
+
     public function deletedetailstyle($idOrder)
     {
 
@@ -456,6 +517,16 @@ class CapacityController extends BaseController
             return redirect()->to(base_url('capacity/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
             return redirect()->to(base_url('capacity/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('error', 'Gagal Hapus Data');
+        }
+    }
+
+    public function deletemesinareal($idDataMesin)
+    {
+        $delete = $this->jarumModel->delete($idDataMesin);
+        if ($delete) {
+            return redirect()->to(base_url('capacity/datamesin'))->withInput()->with('success', 'Data Berhasil Di Hapus');
+        } else {
+            return redirect()->to(base_url('capacity/datamesin'))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
 

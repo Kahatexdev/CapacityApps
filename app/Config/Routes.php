@@ -49,6 +49,9 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('mesinPerJarum', 'CapacityController::mesinPerJarum');
     $routes->get('mesinperarea', 'CapacityController::mesinperarea');
     $routes->get('datamesinperjarum/(:any)', 'CapacityController::DetailMesinPerJarum/$1');
+    $routes->post('deletemesinareal/(:any)', 'CapacityController::deletemesinareal/$1');
+    $routes->post('updatemesinperjarum/(:any)', 'CapacityController::updatemesinperjarum/$1');
+    $routes->post('tambahmesinperarea', 'CapacityController::inputmesinperarea');
 
 });
 
