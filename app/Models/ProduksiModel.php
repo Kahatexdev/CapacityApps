@@ -45,4 +45,8 @@ class ProduksiModel extends Model
         return $this->join('apsperstyle', 'apsperstyle.idapsperstyle= data_produksi.idapsperstyle')
             ->select('*')->where('apsperstyle.factory', $area)->orderBy('data_produksi.tgl_produksi')->findAll();
     }
+    public function existingData($insert)
+    {
+        return $this->where('idapsperstyle', $insert['idapsperstyle'])->where('tgl_produksi', $insert['tgl_produksi'])->where('qty_produksi', $insert['qty_produksi'])->first();
+    }
 }
