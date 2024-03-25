@@ -85,6 +85,10 @@ class ApsPerstyleModel extends Model
     {
         return $this->where('factory', $area)->findAll();
     }
+    public function getId($validate)
+    {
+        return $this->select('idapsperstyle')->where('mastermodel', $validate['no_model'])->where('delivery', $validate['delivery'])->where('size', $validate['style'])->first();
+    }
 
     // // Fungsi untuk mendapatkan data berdasarkan kondisi
     // public function getDataByCondition($condition)
