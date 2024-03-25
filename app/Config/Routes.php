@@ -27,9 +27,9 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('importbooking', 'CapacityController::importbooking');
 
     // order
-    $routes->get('dataorder', 'CapacityController::order');    
-    $routes->get('detailmodel/(:any)/(:any)', 'CapacityController::detailmodel/$1/$2');  
-    $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'CapacityController::detailmodeljarum/$1/$2/$3');  
+    $routes->get('dataorder', 'CapacityController::order');
+    $routes->get('detailmodel/(:any)/(:any)', 'CapacityController::detailmodel/$1/$2');
+    $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'CapacityController::detailmodeljarum/$1/$2/$3');
     $routes->get('semuaOrder', 'CapacityController::semuaOrder');
     $routes->get('orderPerjarum', 'CapacityController::OrderPerJarum');
     $routes->get('dataorderperjarum/(:any)', 'CapacityController::DetailOrderPerJarum/$1');
@@ -43,13 +43,13 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
     // produksi
     $routes->get('dataproduksi', 'CapacityController::produksi');
+    $routes->get('dataproduksi/(:any)', 'CapacityController::produksiPerArea/$1');
 
     // mesin
     $routes->get('datamesin', 'CapacityController::datamesin');
     $routes->get('mesinPerJarum', 'CapacityController::mesinPerJarum');
     $routes->get('mesinperarea', 'CapacityController::mesinperarea');
     $routes->get('datamesinperjarum/(:any)', 'CapacityController::DetailMesinPerJarum/$1');
-
 });
 
 

@@ -50,6 +50,7 @@ class DataMesinModel extends Model
         $uniqueJarums = array_column($query, 'jarum');
         return $uniqueJarums;
     }
+
     public function getArea()
     {
         // Mengambil nilai unik dari kolom 'jarum'

@@ -81,6 +81,10 @@ class ApsPerstyleModel extends Model
             ->orderBy('data_model.created_at')
             ->findAll();
     }
+    public function getPerArea($area)
+    {
+        return $this->where('factory', $area)->findAll();
+    }
 
     // // Fungsi untuk mendapatkan data berdasarkan kondisi
     // public function getDataByCondition($condition)

@@ -9,6 +9,7 @@ use App\Models\OrderModel;
 use App\Models\BookingModel;
 use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
+use App\Models\ProduksiModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class CapacityController extends BaseController
@@ -16,6 +17,7 @@ class CapacityController extends BaseController
     protected $filters;
     protected $jarumModel;
     protected $productModel;
+    protected $produksiModel;
     protected $bookingModel;
     protected $orderModel;
     protected $ApsPerstyleModel;
@@ -25,6 +27,7 @@ class CapacityController extends BaseController
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
+        $this->produksiModel = new ProduksiModel();
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
@@ -250,10 +253,10 @@ class CapacityController extends BaseController
                 return redirect()->to(base_url('capacity/detailbooking/' . $id_booking))->withInput()->with('error', 'Gagal Ambil Order');
             } else {
                 $id = $id_booking;
-                $status ="";
-                if($sisa_booking=="0"){
-                    $status="Habis";
-                }else{
+                $status = "";
+                if ($sisa_booking == "0") {
+                    $status = "Habis";
+                } else {
                     $status = "Aktif";
                 }
                 $data = [
@@ -645,6 +648,7 @@ class CapacityController extends BaseController
     }
     public function produksi()
     {
+        $totalMesin = $this->jarumModel->getArea();
         $data = [
             'title' => 'Data Produksi',
             'active1' => '',
@@ -652,10 +656,27 @@ class CapacityController extends BaseController
             'active3' => '',
             'active4' => 'active',
             'active5' => '',
+            'Area' => $totalMesin
         ];
         return view('Capacity/Produksi/produksi', $data);
     }
-    
+    public function produksiPerArea($area)
+    {
+        $produksi = $this->produksiModel->getProduksi($area);
+        dd($produksi);
+        $data = [
+            'title' => 'Data Produksi',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => 'active',
+            'active5' => '',
+            'produksi' => $produksi,
+            'area' => $area
+        ];
+        return view('Capacity/Produksi/detail', $data);
+    }
+
     public function datamesin()
     {
         $data = [
