@@ -139,7 +139,6 @@
                 <div class="card-body">
                     <h2><?= date('F', mktime(0, 0, 0, $month, 1)) ?></h2>
                     <p>Jumlah Hari: <?= $calendar_data['days_in_month'] ?></p>
-                    <p>Total Libur: <?= $calendar_data['holidays_in_month'] ?></p>
 
                     <table class="table">
                         <thead>
