@@ -71,61 +71,108 @@ class CapacityController extends BaseController
         ];
         return view('Capacity/index', $data);
     }
+   
+
     private function generateYearlyCalendar($year)
     {
-        // Menginisialisasi kalender tahunan
+        // Inisialisasi array untuk kalender tahunan
         $yearly_calendar = [];
 
         // Loop untuk setiap bulan dalam tahun
         for ($month = 1; $month <= 12; $month++) {
-            // Mendapatkan daftar hari libur dari database untuk bulan tertentu
-            $holidayModel = new LiburModel();
-            $holidays = $holidayModel->where('YEAR(tanggal)', $year)
-                                     ->where('MONTH(tanggal)', $month)
-                                     ->findAll();
+            // Mendapatkan data kalender bulanan
+            $monthly_calendar = $this->generateMonthlyCalendar($year, $month);
 
-            // Mendapatkan jumlah hari dalam bulan
-            $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month, $year);
-
-            // Menginisialisasi kalender bulanan
-            $monthly_calendar = [];
-
-            // Menghitung hari libur dalam bulan
-            $holidays_in_month = count($holidays);
-
-            // Menyusun tanggal per minggu
-            for ($week = 1; $week <= 5; $week++) { // Maksimum 5 minggu dalam sebulan
-                $week_start = ($week - 1) * 7 + 1;
-                $week_end = min($week_start + 6, $days_in_month);
-                $week_days = $week_end - $week_start + 1; // Jumlah hari dalam seminggu
-
-                // Mengurangi hari libur dari jumlah hari dalam minggu
-                foreach ($holidays as $holiday) {
-                    $holiday_day = date('j', strtotime($holiday['tanggal']));
-                    if ($holiday_day >= $week_start && $holiday_day <= $week_end) {
-                        $week_days--;
-                    }
-                }
-
-                // Menambahkan minggu ke kalender bulanan
-                $monthly_calendar[] = [
-                    'week_start' => $week_start,
-                    'week_end' => $week_end,
-                    'week_days' => $week_days
-                ];
-            }
-
-            // Menambahkan kalender bulanan ke kalender tahunan
-            $yearly_calendar[$month] = [
-                'days_in_month' => $days_in_month,
-                'holidays_in_month' => $holidays_in_month,
-                'monthly_calendar' => $monthly_calendar
-            ];
+            // Menambahkan data kalender bulanan ke kalender tahunan
+            $yearly_calendar[$month] = $monthly_calendar;
         }
 
         return $yearly_calendar;
     }
 
+    private function generateMonthlyCalendar($year, $month)
+    {
+        // Mendapatkan daftar hari libur dari database untuk bulan dan tahun tertentu
+        $holidayModel = new LiburModel();
+        $holidays = $holidayModel->where('YEAR(tanggal)', $year)
+                                 ->where('MONTH(tanggal)', $month)
+                                 ->findAll();
 
-    // 
+        // Mendapatkan jumlah hari dalam bulan
+        $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+
+        // Inisialisasi array untuk kalender bulanan
+        $monthly_calendar = [
+            'days_in_month' => $days_in_month,
+            'holidays_in_month' => count($holidays),
+            'monthly_calendar' => []
+        ];
+
+        // Menentukan tanggal awal bulan dan tanggal akhir bulan
+        $first_day_of_month = date('Y-m-d', strtotime("{$year}-{$month}-01"));
+        $last_day_of_month = date('Y-m-d', strtotime("last day of {$year}-{$month}"));
+
+        // Menentukan tanggal akhir minggu terakhir dalam bulan
+        $last_week_end = date('Y-m-d', strtotime("last sunday", strtotime($last_day_of_month)));
+
+        // Menyusun tanggal per minggu
+        $week_start = $first_day_of_month;
+        $week = 1;
+        $current_date = $first_day_of_month;
+        while (strtotime($current_date) <= strtotime($last_week_end)) {
+            // Tentukan tanggal akhir minggu
+            $week_end = date('Y-m-d', strtotime("next sunday", strtotime($current_date)));
+            if (strtotime($week_end) > strtotime($last_day_of_month)) {
+                $week_end = $last_day_of_month; // Sesuaikan tanggal akhir minggu terakhir dengan tanggal akhir bulan
+            }
+            // Hitung jumlah hari dalam minggu
+            $week_days = $this->countWeekDays($week_start, $week_end, $holidays);
+
+            // Hitung jumlah hari libur dalam minggu
+            $holidays_in_week = $this->countHolidaysInWeek($week_start, $week_end, $holidays);
+
+            // Menambahkan minggu ke kalender bulanan
+            $monthly_calendar['monthly_calendar'][$week] = [
+                'week_start' => $week_start,
+                'week_end' => $week_end,
+                'week_days' => $week_days,
+                'holidays_in_week' => $holidays_in_week
+            ];
+
+            // Persiapkan untuk minggu berikutnya
+            $week++;
+            $week_start = date('Y-m-d', strtotime("next monday", strtotime($week_end)));
+            $current_date = $week_start;
+        }
+
+        return $monthly_calendar;
+    }
+
+    private function countWeekDays($start_date, $end_date, $holidays)
+    {
+        $week_days = 0;
+        $current_date = $start_date;
+        while (strtotime($current_date) <= strtotime($end_date)) {
+            $day_of_week = date('N', strtotime($current_date));
+            if ($day_of_week >= 1 && $day_of_week <= 5) {
+                $week_days++;
+            }
+            $current_date = date('Y-m-d', strtotime("+1 day", strtotime($current_date)));
+        }
+
+        return $week_days;
+    }
+
+    private function countHolidaysInWeek($start_date, $end_date, $holidays)
+    {
+        $holidays_in_week = 0;
+        foreach ($holidays as $holiday) {
+            $holiday_date = date('Y-m-d', strtotime($holiday['tanggal']));
+            if (strtotime($holiday_date) >= strtotime($start_date) && strtotime($holiday_date) <= strtotime($end_date)) {
+                $holidays_in_week++;
+            }
+        }
+
+        return $holidays_in_week;
+    }
 }
