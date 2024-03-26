@@ -4,12 +4,15 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
+use App\Helpers\DateHelper;
+
 
 class Checkdate extends BaseController
 {
     protected $dateHelper;
     public function __construct()
     {
+        $db = db_connect();
         $this->dateHelper = new DateHelper(db_connect());
     }
 

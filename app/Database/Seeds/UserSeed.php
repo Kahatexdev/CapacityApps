@@ -29,5 +29,7 @@ class UserSeed extends Seeder
         $this->call('DataMesin');
         $this->call('ProductType');
         $this->call('DataBooking');
+        $this->call('DataModel');
+        $this->call('DataOrder');
     }
 }
