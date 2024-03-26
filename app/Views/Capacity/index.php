@@ -131,46 +131,32 @@
             </div>
         </div>
     </div>
-    <div class="row">
-    <div class="col-lg-12">
-        <h1>Kalender Tahunan</h1>
-        <?php foreach ($Capacity as $month => $calendar_data): ?>
-            <div class="card z-index-2 mt-3">
-                <div class="card-body">
-                    <h2><?= date('F', mktime(0, 0, 0, $month, 1)) ?></h2>
-                    <p>Jumlah Hari: <?= $calendar_data['days_in_month'] ?></p>
+   
+    <h1>Weekly Ranges</h1>
 
-                    <table class="table">
-                        <thead>
-                            <tr class="text-center">
-                                <?php foreach ($calendar_data['monthly_calendar'] as $week_num => $week_data): ?>
-                                    <th>Week <?= $week_num ?></th>
-                                <?php endforeach; ?>
-                            </tr>
-                            <tr class="text-center">
-                                <?php foreach ($calendar_data['monthly_calendar'] as $week_num => $week_data): ?>
-                                    <td><?= $week_data['week_start'] ?> - <?= $week_data['week_end'] ?></td>
-                                <?php endforeach; ?>
-                            </tr>
-                            <tr class="text-center">
-                                <?php foreach ($calendar_data['monthly_calendar'] as $week_num => $week_data): ?>
-                                    <td><?= $week_data['week_days'] ?></td>
-                                <?php endforeach; ?>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <!-- Isi tambahan jika diperlukan -->
-                            </tr>
-                        </tbody>
-                    </table>
-                    <hr>
-                </div>
-            </div>
-        <?php endforeach; ?>
-    </div>
-</div>
-</div>
+<?php foreach ($weeklyRanges as $month => $ranges): ?>
+    <h2><?= $month ?></h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Week</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Jumlah Hari</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($ranges as $index => $range): ?>
+                <tr>
+                    <td><?= $index + 1 ?></td>
+                    <td><?= $range['start_date'] ?></td>
+                    <td><?= $range['end_date'] ?></td>
+                    <td><?= $range['number_of_days'] ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php endforeach; ?>
 </div>
 
    

@@ -11,6 +11,7 @@ use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use App\Models\LiburModel;
+use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Week;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class CapacityController extends BaseController
@@ -44,33 +45,84 @@ class CapacityController extends BaseController
     }
     public function index()
     {
-        $orderJalan = $this->bookingModel->getOrderJalan();
-        $terimaBooking = $this->bookingModel->getBookingMasuk();
-        $mcJalan = $this->jarumModel->mcJalan();
-        $totalMc = $this->jarumModel->totalMc();
-        $bulan = date('m');
+            $orderJalan = $this->bookingModel->getOrderJalan();
+            $terimaBooking = $this->bookingModel->getBookingMasuk();
+            $mcJalan = $this->jarumModel->mcJalan();
+            $totalMc = $this->jarumModel->totalMc();
+            $bulan = date('m');
 
-        // Mendapatkan kalender tahunan
-        $data = [
-            'title' => 'Capacity System',
-            'active1' => 'active',
-            'active2' => '',
-            'active3' => '',
-            'active4' => '',
-            'active5' => '',
-            'active6' => '',
-            'jalan' => $orderJalan,
-            'TerimaBooking' => $terimaBooking,
-            'mcJalan' => $mcJalan,
-            'totalMc' => $totalMc,
-            'order' => $this->ApsPerstyleModel->getTurunOrder($bulan),
+             // Specify the start date
+    $startDate = new \DateTime('first day of this month');
 
+    // Load the HolidayModel
+    $liburModel = new LiburModel();
 
+    // Get all holidays from the database
+    $holidays = $liburModel->findAll();
+
+    // Initialize variable to keep track of the current month
+    $currentMonth = null;
+
+    // Initialize array to store weekly ranges
+    $weeklyRanges = [];
+
+    // Loop for 52 weeks to generate weekly ranges
+    for ($i = 0; $i < 52; $i++) {
+        // Calculate the start of the week
+        $startOfWeek = clone $startDate;
+        $startOfWeek->modify("+$i week");
+        $startOfWeek->modify('Monday this week');
+
+        // Calculate the end of the week
+        $endOfWeek = clone $startOfWeek;
+        $endOfWeek->modify('Sunday this week');
+
+        // Calculate the number of days in the week
+        $numberOfDays = $startOfWeek->diff($endOfWeek)->days + 1;
+
+        // Check if any holidays fall within this week
+        foreach ($holidays as $holiday) {
+            $holidayDate = new \DateTime($holiday['tanggal']);
+            if ($holidayDate >= $startOfWeek && $holidayDate <= $endOfWeek) {
+                // Subtract the holiday from the total number of days
+                $numberOfDays--;
+            }
+        }
+
+        // Get the month of the current week
+        $currentMonthOfYear = $startOfWeek->format('F');
+
+        // Format dates to the desired format
+        $startOfWeekFormatted = $startOfWeek->format('Y-m-d');
+        $endOfWeekFormatted = $endOfWeek->format('Y-m-d');
+
+        // Append the weekly range to the array
+        $weeklyRanges[$currentMonthOfYear][] = [
+            'start_date' => $startOfWeekFormatted,
+            'end_date' => $endOfWeekFormatted,
+            'number_of_days' => $numberOfDays,
         ];
-        return view('Capacity/index', $data);
     }
-   
 
+            $data = [
+                'title' => 'Capacity System',
+                'active1' => 'active',
+                'active2' => '',
+                'active3' => '',
+                'active4' => '',
+                'active5' => '',
+                'active6' => '',
+                'jalan' => $orderJalan,
+                'TerimaBooking' => $terimaBooking,
+                'mcJalan' => $mcJalan,
+                'totalMc' => $totalMc,
+                'order' => $this->ApsPerstyleModel->getTurunOrder($bulan),
+                'weeklyRanges'=>$weeklyRanges
+
+
+            ];
+            return view('Capacity/index', $data);
+     }
   
-   
 }
+
