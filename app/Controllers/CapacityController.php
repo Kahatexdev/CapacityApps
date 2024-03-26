@@ -51,59 +51,68 @@ class CapacityController extends BaseController
             $totalMc = $this->jarumModel->totalMc();
             $bulan = date('m');
 
-             // Specify the start date
-    $startDate = new \DateTime('first day of this month');
+      // Set the start date to the first day of the current month
+      $startDate = new \DateTime('first day of this month');
 
-    // Load the HolidayModel
-    $liburModel = new LiburModel();
-
-    // Get all holidays from the database
-    $holidays = $liburModel->findAll();
-
-    // Initialize variable to keep track of the current month
-    $currentMonth = null;
-
-    // Initialize array to store weekly ranges
-    $weeklyRanges = [];
-
-    // Loop for 52 weeks to generate weekly ranges
-    for ($i = 0; $i < 52; $i++) {
-        // Calculate the start of the week
-        $startOfWeek = clone $startDate;
-        $startOfWeek->modify("+$i week");
-        $startOfWeek->modify('Monday this week');
-
-        // Calculate the end of the week
-        $endOfWeek = clone $startOfWeek;
-        $endOfWeek->modify('Sunday this week');
-
-        // Calculate the number of days in the week
-        $numberOfDays = $startOfWeek->diff($endOfWeek)->days + 1;
-
-        // Check if any holidays fall within this week
-        foreach ($holidays as $holiday) {
-            $holidayDate = new \DateTime($holiday['tanggal']);
-            if ($holidayDate >= $startOfWeek && $holidayDate <= $endOfWeek) {
-                // Subtract the holiday from the total number of days
-                $numberOfDays--;
-            }
-        }
-
-        // Get the month of the current week
-        $currentMonthOfYear = $startOfWeek->format('F');
-
-        // Format dates to the desired format
-        $startOfWeekFormatted = $startOfWeek->format('Y-m-d');
-        $endOfWeekFormatted = $endOfWeek->format('Y-m-d');
-
-        // Append the weekly range to the array
-        $weeklyRanges[$currentMonthOfYear][] = [
-            'start_date' => $startOfWeekFormatted,
-            'end_date' => $endOfWeekFormatted,
-            'number_of_days' => $numberOfDays,
-        ];
-    }
-
+      // Load the HolidayModel
+      $LiburModel = new LiburModel();
+  
+      // Get all holidays from the database
+      $holidays = $LiburModel->findAll();
+  
+      // Initialize variables to keep track of the current month and week count
+      $currentMonth = $startDate->format('F');
+      $weekCount = 1; // Initialize week count for the first week of the month
+  
+      // Initialize array to store weekly ranges
+      $weeklyRanges = [];
+  
+      // Loop for 26 weeks (1 year)
+      for ($i = 0; $i < 26; $i++) {
+          // Calculate the start of the week
+          $startOfWeek = clone $startDate;
+          $startOfWeek->modify("+$i week");
+          $startOfWeek->modify('Monday this week');
+  
+          // Calculate the end of the week
+          $endOfWeek = clone $startOfWeek;
+          $endOfWeek->modify('Sunday this week');
+  
+          // Calculate the number of days in the week
+          $numberOfDays = $startOfWeek->diff($endOfWeek)->days + 1;
+  
+          // Check if any holidays fall within this week
+          foreach ($holidays as $holiday) {
+              $holidayDate = new \DateTime($holiday['tanggal']);
+              if ($holidayDate >= $startOfWeek && $holidayDate <= $endOfWeek) {
+                  // Subtract the holiday from the total number of days
+                  $numberOfDays--;
+              }
+          }
+  
+          // Get the month of the current week
+          $currentMonthOfYear = $startOfWeek->format('F');
+  
+          // Reset the week count and update the current month if it's a new month
+          if ($currentMonth !== $currentMonthOfYear) {
+              $currentMonth = $currentMonthOfYear;
+              $weekCount = 1; // Reset week count
+          }
+  
+          // Format dates to the desired format
+          $startOfWeekFormatted = $startOfWeek->format('Y-m-d');
+          $endOfWeekFormatted = $endOfWeek->format('Y-m-d');
+  
+          // Append the weekly range to the array
+          $weeklyRanges[$currentMonth][] = [
+              'week' => $weekCount,
+              'start_date' => $startOfWeekFormatted,
+              'end_date' => $endOfWeekFormatted,
+              'number_of_days' => $numberOfDays,
+          ];
+  
+          $weekCount++;
+      }
             $data = [
                 'title' => 'Capacity System',
                 'active1' => 'active',

@@ -132,30 +132,45 @@
         </div>
     </div>
    
-    <h1>Weekly Ranges</h1>
+    <h3>Kalender Mingguan</h3>
 
 <?php foreach ($weeklyRanges as $month => $ranges): ?>
-    <h2><?= $month ?></h2>
-    <table>
+    <div class="row mt-3">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                <h2><?= $month ?></h2>
+                <table class="table">
         <thead>
             <tr>
-                <th>Week</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Jumlah Hari</th>
+                <th>Week </th>
+                <?php foreach ($ranges as $index => $range): ?>
+                <th>Week <?= $index + 1 ?></th>
+                <?php endforeach; ?>
             </tr>
+                <tr>
+                    <td>Tanggal </td>
+                <?php foreach ($ranges as $index => $range): ?>
+                    <td><?= $range['start_date'] ?> - <?= $range['end_date'] ?> </td>
+                    <?php endforeach; ?>
+                </tr>
+                <tr>
+                    <td>Jumlah Hari</td>
+                <?php foreach ($ranges as $index => $range): ?>
+                    <td><?= $range['number_of_days'] ?></td>
+                    <?php endforeach; ?>
+                </tr>
         </thead>
         <tbody>
-            <?php foreach ($ranges as $index => $range): ?>
-                <tr>
-                    <td><?= $index + 1 ?></td>
-                    <td><?= $range['start_date'] ?></td>
-                    <td><?= $range['end_date'] ?></td>
-                    <td><?= $range['number_of_days'] ?></td>
-                </tr>
-            <?php endforeach; ?>
+          
         </tbody>
     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
 <?php endforeach; ?>
 </div>
 
