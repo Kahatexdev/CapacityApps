@@ -131,8 +131,46 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <h1>Kalender Tahunan</h1>
+                <?php foreach ($Capacity as $month => $calendar_data): ?>
+                 <div class="card z-index-2 mt-3">
+                    <div class="card-body">
+                    <h2><?= date('F', mktime(0, 0, 0, $month, 1)) ?></h2>
+                    <p>Jumlah Hari: <?= $calendar_data['days_in_month'] ?></p>
+                    <p>Total Libur: <?= $calendar_data['holidays_in_month'] ?></p>
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Week</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Days in Week</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($calendar_data['monthly_calendar'] as $week_num => $week_data): ?>
+                                    <tr>
+                                        <td><?= $week_num ?></td>
+                                        <td><?= $week_data['week_start'] ?></td>
+                                        <td><?= $week_data['week_end'] ?></td>
+                                        <td><?= $week_data['week_days'] ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+        <hr>
+                    </div>
+    
+                </div>
+                <?php endforeach; ?>
+</div>
+</div>
 </div>
 
+   
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script>
