@@ -13,7 +13,7 @@ class CalendarController extends BaseController
         // Mendapatkan bulan dan tahun saat ini
         $year = date('Y');
         $month = date('n');
-
+ 
         // Mendapatkan kalender per minggu
         $weekly_calendar = $this->generateWeeklyCalendar($year, $month);
 

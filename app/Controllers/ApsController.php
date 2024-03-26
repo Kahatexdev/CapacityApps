@@ -31,6 +31,8 @@ class ApsController extends BaseController
             'active2' => '',
             'active3' => '',
             'active4' => '',
+            'active5' => '',
+            'active6' => '',
 
         ];
         return view('Aps/index', $data);

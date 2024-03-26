@@ -50,6 +50,7 @@ class MesinController extends BaseController
             'active3' => '',
             'active4' => '',
             'active5' => 'active',
+            'active6' => 'active',
         ];
         return view('Capacity/Mesin/Mastermesin', $data);
     }
@@ -63,6 +64,7 @@ class MesinController extends BaseController
             'active3' => '',
             'active4' => '',
             'active5' => 'active',
+            'active6' => 'active',
             'TotalMesin' => $totalMesin,
         ];
         return view('Capacity/Mesin/mesinjarum', $data);
@@ -78,6 +80,7 @@ class MesinController extends BaseController
             'active3' => '',
             'active4' => '',
             'active5' => 'active',
+            'active6' => 'active',
             'tampildata' => $tampilperarea,
             'product' => $product,
 
@@ -94,6 +97,7 @@ class MesinController extends BaseController
             'active3' => '',
             'active4' => '',
             'active5' => 'active',
+            'active6' => 'active',
             'area' => $area,
             'tampildata' => $tampilperarea,
 

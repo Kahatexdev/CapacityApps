@@ -57,7 +57,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('tambahmesinperarea', 'MesinController::inputmesinperarea');
 
     //calendar
-    $routes->get('checkdate', 'Checkdate::index');
+    $routes->get('checkdate', 'Checkdate::generateWeeklyRanges');
 
 });
 
