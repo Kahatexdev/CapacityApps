@@ -60,6 +60,7 @@ class CapacityController extends BaseController
             'active3' => '',
             'active4' => '',
             'active5' => '',
+            'active6' => '',
             'jalan' => $orderJalan,
             'TerimaBooking' => $terimaBooking,
             'mcJalan' => $mcJalan,

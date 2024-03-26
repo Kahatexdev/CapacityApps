@@ -48,6 +48,7 @@ class ProduksiController extends BaseController
             'active3' => '',
             'active4' => 'active',
             'active5' => '',
+            'active6' => '',
             'Area' => $totalMesin
         ];
         return view('Capacity/Produksi/produksi', $data);
@@ -62,6 +63,7 @@ class ProduksiController extends BaseController
             'active3' => '',
             'active4' => 'active',
             'active5' => '',
+            'active6' => '',
             'produksi' => $produksi,
             'area' => $area
         ];
