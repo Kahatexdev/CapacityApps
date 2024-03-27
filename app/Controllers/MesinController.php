@@ -12,7 +12,7 @@ use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-class MesinController extends BaseController
+class MesinController extends BaseController 
 {
     protected $filters;
     protected $jarumModel;
@@ -50,7 +50,7 @@ class MesinController extends BaseController
             'active3' => '',
             'active4' => '',
             'active5' => 'active',
-            'active6' => 'active',
+            'active6' => '',
         ];
         return view('Capacity/Mesin/Mastermesin', $data);
     }
@@ -64,7 +64,7 @@ class MesinController extends BaseController
             'active3' => '',
             'active4' => '',
             'active5' => 'active',
-            'active6' => 'active',
+            'active6' => '',
             'TotalMesin' => $totalMesin,
         ];
         return view('Capacity/Mesin/mesinjarum', $data);
@@ -80,7 +80,7 @@ class MesinController extends BaseController
             'active3' => '',
             'active4' => '',
             'active5' => 'active',
-            'active6' => 'active',
+            'active6' => '',
             'tampildata' => $tampilperarea,
             'product' => $product,
 
@@ -97,7 +97,7 @@ class MesinController extends BaseController
             'active3' => '',
             'active4' => '',
             'active5' => 'active',
-            'active6' => 'active',
+            'active6' => '',
             'area' => $area,
             'tampildata' => $tampilperarea,
 

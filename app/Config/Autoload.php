@@ -47,7 +47,7 @@ class Autoload extends AutoloadConfig
         APP_NAMESPACE => APPPATH, // For custom app namespace
         'Config'      => APPPATH . 'Config',
     ];
-
+    
     /**
      * -------------------------------------------------------------------
      * Class Map
@@ -95,5 +95,8 @@ class Autoload extends AutoloadConfig
      *
      * @var list<string>
      */
-    public $helpers = [];
+    public $helpers = [
+        'url',
+        'calendar',
+    ];
 }
