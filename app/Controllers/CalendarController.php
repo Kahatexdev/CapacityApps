@@ -13,7 +13,7 @@ class CalendarController extends BaseController
         // Mendapatkan bulan dan tahun saat ini
         $year = date('Y');
         $month = date('n');
- 
+
         // Mendapatkan kalender per minggu
         $weekly_calendar = $this->generateWeeklyCalendar($year, $month);
 
@@ -26,8 +26,8 @@ class CalendarController extends BaseController
         // Mendapatkan daftar hari libur dari database
         $holidayModel = new LiburModel();
         $holidays = $holidayModel->where('YEAR(date)', $year)
-                                 ->where('MONTH(date)', $month)
-                                 ->findAll();
+            ->where('MONTH(date)', $month)
+            ->findAll();
 
         // Mendapatkan jumlah hari dalam bulan
         $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month, $year);

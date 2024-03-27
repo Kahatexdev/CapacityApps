@@ -182,8 +182,7 @@
     <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
     <script type="text/javascript">
         $(document).ready(function() {
-            $('#example').DataTable({
-            });
+            $('#example').DataTable({});
 
             // Trigger import modal when import button is clicked
             $('.import-btn').click(function() {

@@ -131,50 +131,50 @@
             </div>
         </div>
     </div>
-   
+
     <h3>Kalender Mingguan</h3>
 
-<?php foreach ($weeklyRanges as $month => $ranges): ?>
-    <div class="row mt-3">
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="card-body">
-                <h2><?= $month ?></h2>
-                <table class="table">
-        <thead>
-            <tr>
-                <th>Week </th>
-                <?php foreach ($ranges as $index => $range): ?>
-                <th>Week <?= $index + 1 ?></th>
-                <?php endforeach; ?>
-            </tr>
-                <tr>
-                    <td>Tanggal </td>
-                <?php foreach ($ranges as $index => $range): ?>
-                    <td><?= $range['start_date'] ?> - <?= $range['end_date'] ?> </td>
-                    <?php endforeach; ?>
-                </tr>
-                <tr>
-                    <td>Jumlah Hari</td>
-                <?php foreach ($ranges as $index => $range): ?>
-                    <td><?= $range['number_of_days'] ?></td>
-                    <?php endforeach; ?>
-                </tr>
-        </thead>
-        <tbody>
-          
-        </tbody>
-    </table>
+    <?php foreach ($weeklyRanges as $month => $ranges) : ?>
+        <div class="row mt-3">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h2><?= $month ?></h2>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Week </th>
+                                    <?php foreach ($ranges as $index => $range) : ?>
+                                        <th>Week <?= $index + 1 ?></th>
+                                    <?php endforeach; ?>
+                                </tr>
+                                <tr>
+                                    <td>Tanggal </td>
+                                    <?php foreach ($ranges as $index => $range) : ?>
+                                        <td><?= $range['start_date'] ?> - <?= $range['end_date'] ?> </td>
+                                    <?php endforeach; ?>
+                                </tr>
+                                <tr>
+                                    <td>Jumlah Hari</td>
+                                    <?php foreach ($ranges as $index => $range) : ?>
+                                        <td><?= $range['number_of_days'] ?></td>
+                                    <?php endforeach; ?>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    
-<?php endforeach; ?>
+
+
+    <?php endforeach; ?>
 </div>
 
-   
+
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script>
