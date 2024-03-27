@@ -58,8 +58,8 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
     //calendar
     $routes->get('Calendar', 'CalendarController::index');
-    $routes->get('checkdate', 'Checkdate::generateWeeklyRanges');
-    $routes->post('inputLibur', 'CalendarController::inputLibur');
+    $routes->get('checkdate', 'Checkdate::index');
+    $routes->post('inputLibur', 'CapacityController::inputLibur');
 });
 
 
