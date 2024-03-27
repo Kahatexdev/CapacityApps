@@ -58,6 +58,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
     //calendar
     $routes->get('checkdate', 'Checkdate::generateWeeklyRanges');
+    // $routes->get('Calendar', 'CalendarController::index');
 
 });
 

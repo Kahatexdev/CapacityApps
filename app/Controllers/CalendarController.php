@@ -2,67 +2,141 @@
 
 namespace App\Controllers;
 
+
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\LiburModel;
+use App\Models\DataMesinModel;
+use App\Models\OrderModel;
+use App\Models\BookingModel;
+use App\Models\ProductTypeModel;
+use App\Models\ApsPerstyleModel;
+use App\Models\ProduksiModel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class CalendarController extends BaseController
 {
+    protected $filters;
+    protected $jarumModel;
+    protected $productModel;
+    protected $produksiModel;
+    protected $bookingModel;
+    protected $orderModel;
+    protected $ApsPerstyleModel;
+
+    public function __construct()
+    {
+        $this->jarumModel = new DataMesinModel();
+        $this->bookingModel = new BookingModel();
+        $this->productModel = new ProductTypeModel();
+        $this->produksiModel = new ProduksiModel();
+        $this->orderModel = new OrderModel();
+        $this->ApsPerstyleModel = new ApsPerstyleModel();
+        if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
+            return redirect()->to(base_url('/login'));
+        }
+        $this->isLogedin();
+    }
+    protected function isLogedin()
+    {
+        if (!session()->get('id_user')) {
+            return redirect()->to(base_url('/login'));
+        }
+    }
+
+public function generateCalendar($year, $month)
+{
+    // Get the current day, month, and year
+    $currentDay = date('j');
+    $currentMonth = date('n');
+    $currentYear = date('Y');
+    
+    $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+    $first_day = mktime(0, 0, 0, $month, 1, $year);
+    $first_day_of_week = date('N', $first_day); // 1 (Monday) to 7 (Sunday)
+
+    $calendar = '<table>';
+    $calendar .= '<tr>';
+    $calendar .= '<th>Sen</th>';
+    $calendar .= '<th>Sel</th>';
+    $calendar .= '<th>Rab</th>';
+    $calendar .= '<th>Kam</th>';
+    $calendar .= '<th>Jum</th>';
+    $calendar .= '<th>Sam</th>';
+    $calendar .= '<th>Min</th>';
+    $calendar .= '</tr>';
+    $calendar .= '<tr>';
+
+    // Fill in blank cells until the first day of the week
+    for ($i = 1; $i < $first_day_of_week; $i++) {
+        $calendar .= '<td></td>';
+    }
+
+    // Fill in the days of the month
+    for ($day = 1; $day <= $days_in_month; $day++) {
+        $class = ($day == $currentDay && $month == $currentMonth && $year == $currentYear) ? 'highlight' : '';
+        $calendar .= '<td class="' . $class . '">' . $day . '</td>';
+
+        // Start a new row if it's the end of the week
+        if (date('N', mktime(0, 0, 0, $month, $day, $year)) == 7) {
+            $calendar .= '</tr>';
+            // If it's not the last day of the month, start a new row
+            if ($day != $days_in_month) {
+                $calendar .= '<tr>';
+            }
+        }
+    }
+
+    // Fill in remaining empty cells until the end of the week
+    while (date('N', mktime(0, 0, 0, $month, $day, $year)) != 1) {
+        $calendar .= '<td></td>';
+        $day++;
+    }
+
+    $calendar .= '</tr>';
+    $calendar .= '</table>';
+
+    return $calendar;
+    }
+
+    public function generateYearCalendar($year)
+    {
+        $calendar = '<h2>' . $year . '</h2>';
+        
+        $calendar .= '<div class="row">';
+        for ($month = 1; $month <= 12; $month++) {
+            $calendar .= '<div class="col">';
+            $calendar .= '<h3>' . date('F', mktime(0, 0, 0, $month, 1, $year)) . '</h3>';
+            $calendar .= $this->generateCalendar($year, $month);
+            $calendar .= '</div>';
+            // Add a new row after every 4 months
+            if ($month % 4 == 0 && $month != 12) {
+                $calendar .= '</div><div class="row">';
+            }
+        }
+        $calendar .= '</div>';
+    
+        return $calendar;
+    }
+    
+
+
     public function index()
     {
-        // Mendapatkan bulan dan tahun saat ini
+        helper('calendar');
         $year = date('Y');
-        $month = date('n');
- 
-        // Mendapatkan kalender per minggu
-        $weekly_calendar = $this->generateWeeklyCalendar($year, $month);
-
-        // Menampilkan halaman dengan data kalender
-        return view('calendar_view', ['weekly_calendar' => $weekly_calendar]);
-    }
-
-    private function generateWeeklyCalendar($year, $month)
-    {
-        // Mendapatkan daftar hari libur dari database
-        $holidayModel = new LiburModel();
-        $holidays = $holidayModel->where('YEAR(date)', $year)
-                                 ->where('MONTH(date)', $month)
-                                 ->findAll();
-
-        // Mendapatkan jumlah hari dalam bulan
-        $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month, $year);
-
-        // Mendapatkan tanggal pertama dan terakhir dari bulan
-        $first_day = date("N", strtotime("$year-$month-01"));
-        $last_day = date("N", strtotime("$year-$month-$days_in_month"));
-
-        // Mendapatkan jumlah minggu dalam bulan
-        $num_weeks = ($first_day == 7) ? ceil(($days_in_month + $first_day - 1) / 7) : ceil(($days_in_month + $first_day - 1) / 7) + 1;
-
-        // Menginisialisasi kalender per minggu
-        $weekly_calendar = [];
-
-        // Menyusun tanggal per minggu
-        for ($i = 0; $i < $num_weeks; $i++) {
-            $week_start = $i * 7 - $first_day + 2;
-            $week_end = min($week_start + 6, $days_in_month);
-            $week_days = 7; // Jumlah hari dalam seminggu
-            foreach ($holidays as $holiday) {
-                $holiday_date = date("j", strtotime($holiday['date']));
-                if ($holiday_date >= $week_start && $holiday_date <= $week_end) {
-                    $week_days--;
-                }
-            }
-            $weekly_calendar[] = [
-                'start' => $week_start,
-                'end' => $week_end,
-                'days_in_week' => $week_days
-            ];
-        }
-
-        return [
-            'weekly_calendar' => $weekly_calendar,
-            'days_in_month' => $days_in_month,
+        $month = date('m');
+        $calendar = $this->generateYearCalendar($year);
+        $data = [
+            'title' => 'Data Libur Calendar',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => 'active',
+            'calendar' => $calendar,
         ];
+        return view('Capacity/Calendar/MasterCalendar', $data);
     }
+
 }
