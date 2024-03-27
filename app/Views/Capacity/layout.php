@@ -37,9 +37,9 @@
         <div class="sidenav-header">
             <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
             <a class="navbar-brand m-0" href="<?= base_url('/capacity') ?> " target="_blank">
-            <div class="icon icon-shape bg-dark shadow text-center border-radius-lg" style="font-size: 17px;">
-                                <i class="fab fa-cuttlefish text-lg opacity-10" aria-hidden="true"></i>
-                            </div>
+                <div class="icon icon-shape bg-dark shadow text-center border-radius-lg" style="font-size: 17px;">
+                    <i class="fab fa-cuttlefish text-lg opacity-10" aria-hidden="true"></i>
+                </div>
                 <span class="ms-1 font-weight-bold" style="font-size: 20px;">Capacity Apps</span>
             </a>
         </div>
@@ -338,7 +338,7 @@
                             </script>,
                             made with <i class="fas fa-laptop-code"></i> by
                             <a href="https://woz-u.com/wp-content/uploads/2020/04/how-stressful-is-software-development-woz-u-1280x720.jpg" class="font-weight-bold" target="_blank">RnD Team</a>
-                           BP System
+                            BP System
                         </div>
                     </div>
 

@@ -131,50 +131,74 @@
             </div>
         </div>
     </div>
-   
+
     <h3>Kalender Mingguan</h3>
 
-<?php foreach ($weeklyRanges as $month => $ranges): ?>
-    <div class="row mt-3">
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="card-body">
-                <h2><?= $month ?></h2>
-                <table class="table">
-        <thead>
-            <tr>
-                <th>Week </th>
-                <?php foreach ($ranges as $index => $range): ?>
-                <th>Week <?= $index + 1 ?></th>
-                <?php endforeach; ?>
-            </tr>
-                <tr>
-                    <td>Tanggal </td>
-                <?php foreach ($ranges as $index => $range): ?>
-                    <td><?= $range['start_date'] ?> - <?= $range['end_date'] ?> </td>
-                    <?php endforeach; ?>
-                </tr>
-                <tr>
-                    <td>Jumlah Hari</td>
-                <?php foreach ($ranges as $index => $range): ?>
-                    <td><?= $range['number_of_days'] ?></td>
-                    <?php endforeach; ?>
-                </tr>
-        </thead>
-        <tbody>
-          
-        </tbody>
-    </table>
+    <?php foreach ($weeklyRanges as $month => $ranges) : ?>
+        <div class="row mt-3">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h2><?= $month ?></h2>
+                            <div class="holiday">
+                                <div class="week-holiday d-flex justify-content-between">
+                                    <?php foreach ($ranges as $index => $range) : ?>
+                                        <?php if (isset($range['holidays']) && !empty($range['holidays'])) : ?>
+                                            <div class="week ">
+                                                <h5>Week <?= $index + 1 ?> :</h5>
+                                                <ul class="text-danger">
+                                                    <?php foreach ($range['holidays'] as $holiday) : ?>
+                                                        <li><?= $holiday['nama'] ?> (<?= $holiday['tanggal'] ?>)</li>
+                                                    <?php endforeach; ?>
+                                                </ul>
+                                            </div>
+
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Week </th>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td>Week <?= $index + 1 ?></td>
+
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <th>Tanggal </th>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['start_date'] ?> - <?= $range['end_date'] ?> </td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <th>Jumlah Hari</th>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['number_of_days'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    
-<?php endforeach; ?>
+
+
+    <?php endforeach; ?>
 </div>
 
-   
+
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script>
