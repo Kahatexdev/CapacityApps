@@ -11,6 +11,7 @@ use App\Models\BookingModel;
 use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
+use App\Models\LiburModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class CalendarController extends BaseController
@@ -32,8 +33,8 @@ class CalendarController extends BaseController
     {
         // Mendapatkan daftar hari libur dari database
         $holidayModel = new LiburModel();
-        $holidays = $holidayModel->where('YEAR(date)', $year)
-            ->where('MONTH(date)', $month)
+        $holidays = $holidayModel->where('YEAR(tanggal)', $year)
+            ->where('MONTH(tanggal)', $month)
             ->findAll();
 
         // Mendapatkan jumlah hari dalam bulan
@@ -55,7 +56,7 @@ class CalendarController extends BaseController
             $week_end = min($week_start + 6, $days_in_month);
             $week_days = 7; // Jumlah hari dalam seminggu
             foreach ($holidays as $holiday) {
-                $holiday_date = date("j", strtotime($holiday['date']));
+                $holiday_date = date("j", strtotime($holiday['tanggal']));
                 if ($holiday_date >= $week_start && $holiday_date <= $week_end) {
                     $week_days--;
                 }
