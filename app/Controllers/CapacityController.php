@@ -23,6 +23,7 @@ class CapacityController extends BaseController
     protected $bookingModel;
     protected $orderModel;
     protected $ApsPerstyleModel;
+    protected $liburModel;
 
     public function __construct()
     {
@@ -32,6 +33,7 @@ class CapacityController extends BaseController
         $this->produksiModel = new ProduksiModel();
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
+        $this->liburModel = new LiburModel();
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -51,37 +53,22 @@ class CapacityController extends BaseController
         $totalMc = $this->jarumModel->totalMc();
         $bulan = date('m');
 
-        // Set the start date to the first day of the current month
         $startDate = new \DateTime('first day of this month');
-
-        // Load the HolidayModel
         $LiburModel = new LiburModel();
-
-        // Get all holidays from the database
         $holidays = $LiburModel->findAll();
-
-        // Initialize variables to keep track of the current month and week count
         $currentMonth = $startDate->format('F');
         $weekCount = 1; // Initialize week count for the first week of the month
-
-        // Initialize array to store weekly ranges and holidays
         $monthlyData = [];
 
-        // Loop for 26 weeks (1 year)
         for ($i = 0; $i < 26; $i++) {
-            // Calculate the start of the week
             $startOfWeek = clone $startDate;
             $startOfWeek->modify("+$i week");
             $startOfWeek->modify('Monday this week');
 
-            // Calculate the end of the week
             $endOfWeek = clone $startOfWeek;
             $endOfWeek->modify('Sunday this week');
-
-            // Calculate the number of days in the week
             $numberOfDays = $startOfWeek->diff($endOfWeek)->days + 1;
 
-            // Check if any holidays fall within this week
             $weekHolidays = [];
             foreach ($holidays as $holiday) {
                 $holidayDate = new \DateTime($holiday['tanggal']);
@@ -93,15 +80,10 @@ class CapacityController extends BaseController
                     $numberOfDays--;
                 }
             }
-
-            // Get the month of the current week
             $currentMonthOfYear = $startOfWeek->format('F');
-
-            // Reset the week count and update the current month if it's a new month
             if ($currentMonth !== $currentMonthOfYear) {
                 $currentMonth = $currentMonthOfYear;
                 $weekCount = 1; // Reset week count
-                // Initialize array to store data for this month
                 $monthlyData[$currentMonth] = [];
             }
 
@@ -131,10 +113,26 @@ class CapacityController extends BaseController
             'mcJalan' => $mcJalan,
             'totalMc' => $totalMc,
             'order' => $this->ApsPerstyleModel->getTurunOrder($bulan),
-            'weeklyRanges' => $monthlyData
+            'weeklyRanges' => $monthlyData,
+            'DaftarLibur' => $holidays
 
 
         ];
         return view('Capacity/index', $data);
+    }
+    public function inputLibur()
+    {
+        $tanggal = $this->request->getPost('tgl_libur');
+        $nama = $this->request->getPost('nama');
+        $data = [
+            'tanggal' => $tanggal,
+            'nama' => $nama
+        ];
+        $insert = $this->liburModel->insert($data);
+        if ($insert) {
+            return redirect()->to(base_url('/capacity'))->withInput()->with('success', 'Tanggal Berhasil Di Input');
+        } else {
+            return redirect()->to(base_url('/capacity'))->withInput()->with('error', 'Gagal Input Tanggal');
+        }
     }
 }

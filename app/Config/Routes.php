@@ -58,7 +58,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
     //calendar
     $routes->get('checkdate', 'Checkdate::generateWeeklyRanges');
-
+    $routes->post('inputLibur', 'CapacityController::inputLibur');
 });
 
 
