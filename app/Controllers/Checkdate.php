@@ -2,77 +2,95 @@
 
 namespace App\Controllers;
 
+use App\Models\TestModel;
 use App\Controllers\BaseController;
-use App\Models\LiburModel; // Import the HolidayModel
 
 class Checkdate extends BaseController
 {
-    public function generateWeeklyRanges()
+    public function index()
     {
-        // Set the start date to the first day of the current month
-        $startDate = new \DateTime('first day of this month');
-
-        // Load the HolidayModel
-        $LiburModel = new LiburModel();
-
-        // Get all holidays from the database
-        $holidays = $LiburModel->findAll();
-
-        // Initialize variable to keep track of the current month
-        $currentMonth = null;
-
-        // Initialize variable to keep track of the current month
-        $currentMonth = null;
-
+        helper('form');
         
-        // Loop for 10 years (520 weeks)
-        for ($year = 0; $year < 10; $year++) {
-            // Loop for 52 weeks (1 year)
-            for ($i = 0; $i < 52; $i++) {
-                // Calculate the start of the week
-                $startOfWeek = clone $startDate;
-                $startOfWeek->modify("$year year"); // Increment the year dynamically
-                $startOfWeek->modify("+$i week");
-                $startOfWeek->modify('Monday this week');
+        // Buat instance model
+        $testModel = new TestModel();
 
-                // Calculate the end of the week
-                $endOfWeek = clone $startOfWeek;
-                $endOfWeek->modify('Sunday this week');
+        // Ambil data dari database
+        $optionsData = $testModel->findAll();
 
-                // Calculate the number of days in the week
-                $numberOfDays = $startOfWeek->diff($endOfWeek)->days + 1;
+        // Array untuk menyimpan opsi-opsi
+        $options = [];
 
-                // Check if any holidays fall within this week
-                foreach ($holidays as $holiday) {
-                    $holidayDate = new \DateTime($holiday['tanggal']);
-                    if ($holidayDate >= $startOfWeek && $holidayDate <= $endOfWeek) {
-                        // Subtract the holiday from the total number of days
-                        $numberOfDays--;
-                    }
-                }
+        // Loop untuk membuat opsi-opsi dan menghitung kumulatif
+        $qtyTotal = 0;
+        $hariTotal = 0;
+        foreach ($optionsData as $key => $option) {
+            $qty1 = $option['qty'];
+            $hari1 = $option['hari'];
 
-                // Get the month of the current week
-                $currentMonthOfYear = $startOfWeek->format('F');
+            // Akumulasi nilai-nilai
+            $qtyTotal += $qty1;
+            $hariTotal += $hari1;
 
-                // Output the month header if it's a new month
-                if ($currentMonth !== $currentMonthOfYear) {
-                    echo "<h2>$currentMonthOfYear</h2>";
-                    $currentMonth = $currentMonthOfYear;
-                }
+            $options["OPT " . chr(65 + $key)] = [
+                'Qty1' => $qty1,
+                'Jumlah Hari1' => $hari1,
+                'QtyTotal' => $qtyTotal,
+                'Jumlah HariTotal' => $hariTotal,
+            ];
+        }
 
-                // Format dates to the desired format
-                $startOfWeekFormatted = $startOfWeek->format('Y-m-d');
-                $endOfWeekFormatted = $endOfWeek->format('Y-m-d');
-                $HolidayDays = 7 - $numberOfDays;
+        // Bandingkan nilai kumulatif dengan masing-masing opsi
+        $this->compareOptions($options);
+    }
 
-                // Output the range along with the number of days
-                echo "Week " . (($year * 52) + $i + 1) . ": $startOfWeekFormatted to $endOfWeekFormatted ($numberOfDays Hari Kerja)
-                ";
-                if($HolidayDays != 0){
-                    echo "($HolidayDays Hari Libur)";
-                }
-                echo "<br>";
+    // Method untuk membandingkan kumulatif nilai dengan masing-masing opsi
+    private function compareOptions($options)
+    {
+        // Total nilai untuk setiap kategori
+        $totalQty = 0;
+        $totalHari = 0;
+        // Inisialisasi variabel untuk nilai maksimum perbedaan Qty
+        $maxQtyDiff = 0;
+        $maxQtyDiffOption = null; // Tambahkan inisialisasi di sini
+
+        // Iterasi melalui setiap opsi
+        foreach ($options as $opt => $data) {
+            // Tampilkan total sampai opsi saat ini
+            echo "Total sampai $opt: <br>";
+            echo "Qty Total: " . $data['QtyTotal'] . "<br>";
+            echo "Jumlah Hari Total: " . $data['Jumlah HariTotal'] . "<br>";
+
+            // Perbedaan antara kumulatif dan nilai opsi saat ini
+            $qtyDiff = $totalQty - $data['QtyTotal'];
+            $hariDiff = $totalHari - $data['Jumlah HariTotal'];
+
+            // Tampilkan hasil perbandingan
+            echo "Perbedaan Qty: " . abs($qtyDiff) . "<br>";
+            echo "Perbedaan Jumlah Hari: " . abs($hariDiff) . "<br><br>";
+
+            // Update total untuk kategori berikutnya
+            $totalQty = $data['QtyTotal'];
+            $totalHari = $data['Jumlah HariTotal'];
+
+            // Hitung nilai maksimum perbedaan Qty
+            if (abs($qtyDiff) > $maxQtyDiff) {
+                $maxQtyDiff = abs($qtyDiff);
+                $maxQtyDiffOption = $opt;
             }
+        }
+
+        // Tampilkan nilai terbesar dari perbedaan Qty
+        echo "Nilai terbesar dari perbedaan Qty: " . $maxQtyDiff . "<br>";
+
+        // Opsi dengan perbedaan qty terbesar
+        echo "Opsi dengan perbedaan qty terbesar: ";
+        echo $maxQtyDiffOption !== null ? $maxQtyDiffOption : "Tidak ada opsi";
+
+        // Tampilkan qty total dan jumlah hari total sesuai dengan opsi terpilih
+        if ($maxQtyDiffOption !== null) {
+            echo "<br>Qty Total untuk opsi terpilih: " . $options[$maxQtyDiffOption]['QtyTotal'] . "<br>";
+            echo "Jumlah Hari Total untuk opsi terpilih: " . $options[$maxQtyDiffOption]['Jumlah HariTotal'] . "<br>";
+            echo "Kebutuhan Mesin: " . ceil($options[$maxQtyDiffOption]['QtyTotal']/($options[$maxQtyDiffOption]['Jumlah HariTotal']-3)/16);
         }
     }
 }

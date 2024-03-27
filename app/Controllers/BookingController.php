@@ -14,8 +14,17 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class BookingController extends BaseController
 {
+    protected $filters;
+    protected $jarumModel;
+    protected $productModel;
+    protected $produksiModel;
+    protected $bookingModel;
+    protected $orderModel;
+    protected $ApsPerstyleModel;
+    protected $liburModel;
     public function __construct()
     {
+
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
