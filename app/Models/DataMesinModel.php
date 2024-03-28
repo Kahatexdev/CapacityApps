@@ -81,5 +81,14 @@ class DataMesinModel extends Model
     {
         return $this->selectSum('total_mc')->get()->getRow()->total_mc;
     }
+    public function getAreaModel($noModel)
+    {
+    return $this->select('data_mesin.*')
+                ->join('apsperstyle', 'data_mesin.jarum = apsperstyle.machinetypeid','left')
+                ->where('apsperstyle.mastermodel', $noModel)
+                ->get()
+                ->getResult();
+    }
+
     
 }

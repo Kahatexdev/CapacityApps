@@ -14,6 +14,15 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class OrderController extends BaseController
 {
+    protected $filters;
+    protected $jarumModel;
+    protected $productModel;
+    protected $produksiModel;
+    protected $bookingModel;
+    protected $orderModel;
+    protected $ApsPerstyleModel;
+    protected $liburModel;
+
     public function __construct()
     {
         $this->jarumModel = new DataMesinModel();
@@ -48,11 +57,10 @@ class OrderController extends BaseController
         ];
         return view('Capacity/Order/ordermaster', $data);
     }
-    public function detailmodel($noModel, $delivery)
-    {
-        $apsPerstyleModel = new ApsPerstyleModel(); // Create an instance of the model
-        $dataApsPerstyle = $apsPerstyleModel->detailModel($noModel, $delivery); // Call the model method
 
+    public function detailModelCapacity($noModel, $delivery)
+    {
+        $dataApsPerstyle = $this->$apsPerstyleModel->detailModel($noModel, $delivery); // Call the model method
         $data = [
             'title' => 'Data Booking',
             'active1' => '',
@@ -65,9 +73,30 @@ class OrderController extends BaseController
             'noModel' => $noModel,
             'delivery' => $delivery,
         ];
-
         return view('Capacity/Order/detailOrder', $data);
     }
+
+    public function detailModelPlanning($noModel, $delivery)
+    {
+        $dataApsPerstyle = $this->ApsPerstyleModel->detailModel($noModel, $delivery); 
+        $dataMc = $this->jarumModel->getAreaModel($noModel);
+        $data = [
+            'title' => 'Data Booking',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'dataAps' => $dataApsPerstyle,
+            'noModel' => $noModel,
+            'delivery' => $delivery,
+            'dataMc' => $dataMc,
+        ];
+        return view('Planning/Order/detailOrder', $data);
+    }
+
+    
     public function detailmodeljarum($noModel, $delivery, $jarum)
     {
         $apsPerstyleModel = new ApsPerstyleModel(); // Create an instance of the model
@@ -105,6 +134,24 @@ class OrderController extends BaseController
 
         ];
         return view('Capacity/Order/semuaorder', $data);
+    }
+    public function orderBlmAdaAreal()
+    {
+        $tampilperdelivery = $this->orderModel->tampilPerModelBlmAdaArea();
+        $product = $this->productModel->findAll();
+        $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'tampildata' => $tampilperdelivery,
+            'product' => $product,
+
+        ];
+        return view('Planning/Order/orderblmAdaArea', $data);
     }
     public function orderPerJarum()
     {
