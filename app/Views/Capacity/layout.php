@@ -178,7 +178,7 @@
                                 </g>
                             </svg>
                         </div>
-                        <span class="nav-link-text ms-1">Data Libur</span>
+                        <span class="nav-link-text ms-1">Planning</span>
                     </a>
                 </li>
 

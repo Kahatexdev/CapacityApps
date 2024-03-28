@@ -89,6 +89,34 @@ class ApsPerstyleModel extends Model
     {
         return $this->select('idapsperstyle')->where('mastermodel', $validate['no_model'])->where('delivery', $validate['delivery'])->where('size', $validate['style'])->first();
     }
+    public function getPlanJarum($cek)
+    {
+        $results = $this->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
+            ->join('master_product_type', 'master_product_type.id_product_type = data_model.id_product_type')
+            ->groupBy('apsperstyle.delivery, master_product_type.keterangan')
+            ->select('apsperstyle.delivery,apsperstyle.mastermodel, master_product_type.keterangan, SUM(apsperstyle.qty) AS total_qty')
+            ->where('apsperstyle.machinetypeid', $cek['jarum'])
+            ->where('apsperstyle.machinetypeid', $cek['jarum'])
+            ->where('apsperstyle.delivery >=', $cek['start'])
+            ->where('apsperstyle.delivery <=', $cek['end'])
+            ->get()
+            ->getResultArray();
+
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $groupedResults = [];
+
+        // Mengelompokkan hasil berdasarkan keterangan
+        foreach ($results as $result) {
+            $keterangan = $result['keterangan'];
+            $groupedResults[$keterangan] = [
+                'keterangan' => $result['keterangan'],
+                'delivery' => $result['delivery'],
+                'total_qty' => $result['total_qty'],
+            ];
+        }
+
+        return $groupedResults;
+    }
 
     // // Fungsi untuk mendapatkan data berdasarkan kondisi
     // public function getDataByCondition($condition)

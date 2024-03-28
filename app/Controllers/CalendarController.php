@@ -47,6 +47,23 @@ class CalendarController extends BaseController
     }
     public function index()
     {
+        $dataJarum = $this->jarumModel->getJarum();
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+        $data = [
+            'title' => 'Data Booking',
+            'active1' => '',
+            'active2' => 'active',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => 'active',
+            'Jarum' => $dataJarum,
+            'TotalMesin' => $totalMesin,
+        ];
+        return view('Capacity/Calendar/index', $data);
+    }
+    public function calendar($jarum)
+    {
 
         $startDate = new \DateTime('first day of this month');
         $LiburModel = new LiburModel();
@@ -54,8 +71,8 @@ class CalendarController extends BaseController
         $currentMonth = $startDate->format('F');
         $weekCount = 1; // Initialize week count for the first week of the month
         $monthlyData = [];
-
-        for ($i = 0; $i < 52; $i++) {
+        $jarum = 'TJ144';
+        for ($i = 0; $i < 26; $i++) {
             $startOfWeek = clone $startDate;
             $startOfWeek->modify("+$i week");
             $startOfWeek->modify('Monday this week');
@@ -82,8 +99,17 @@ class CalendarController extends BaseController
                 $monthlyData[$currentMonth] = [];
             }
 
-            $startOfWeekFormatted = $startOfWeek->format('d/m');
-            $endOfWeekFormatted = $endOfWeek->format('d/m');
+            $startOfWeekFormatted = $startOfWeek->format('d-m');
+            $endOfWeekFormatted = $endOfWeek->format('d-m');
+            $start = $startOfWeek->format('Y-m-d');
+            $end = $endOfWeek->format('Y-m-d');
+            $cek = [
+                'jarum' => $jarum,
+                'start' => $start,
+                'end' => $end
+            ];
+            $dt = $this->ApsPerstyleModel->getPlanJarum($cek);
+
 
             $monthlyData[$currentMonth][] = [
                 'week' => $weekCount,
@@ -91,6 +117,7 @@ class CalendarController extends BaseController
                 'end_date' => $endOfWeekFormatted,
                 'number_of_days' => $numberOfDays,
                 'holidays' => $weekHolidays,
+                'data' => $dt
             ];
 
             $weekCount++;

@@ -166,35 +166,43 @@
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th rowspan="4" colspan="2" class="text-center">Needle</th>
+                                        <th rowspan="4" class="text-center">Product Style</th>
                                         <td>
                                     <tr>
-                                        <th>Week </th>
                                         <?php foreach ($ranges as $index => $range) : ?>
                                             <td>Week <?= $index + 1 ?></td>
 
                                         <?php endforeach; ?>
                                     </tr>
                                     <tr>
-                                        <th>Tanggal </th>
                                         <?php foreach ($ranges as $index => $range) : ?>
                                             <td><small><?= $range['start_date'] ?> - <?= $range['end_date'] ?> </small></td>
                                         <?php endforeach; ?>
                                     </tr>
                                     <tr>
-                                        <th>Hari Kerja</th>
                                         <?php foreach ($ranges as $index => $range) : ?>
-                                            <td><?= $range['number_of_days'] ?></td>
+                                            <td class="text-xs">Hari Kerja : <?= $range['number_of_days'] ?></td>
                                         <?php endforeach; ?>
                                     </tr>
                                     </td>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td><?= $kt[''] ?></td>
-                                    </tr>
+                                    <?php foreach ($ranges as $index => $range) : ?>
+
+                                        <tr>
+                                            <td> tes</td>
+                                            <?php foreach ($range['data'] as $data) : ?>
+
+                                                <td> <?= $data['total_qty'] ?></td>
+                                            <?php endforeach ?>
+
+                                        </tr>
+
+                                    <?php endforeach ?>
+
                                 </tbody>
+
                             </table>
                         </div>
 
