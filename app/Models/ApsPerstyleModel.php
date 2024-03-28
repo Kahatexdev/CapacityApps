@@ -109,8 +109,7 @@ class ApsPerstyleModel extends Model
         foreach ($results as $result) {
             $keterangan = $result['keterangan'];
             $groupedResults[$keterangan] = [
-                'keterangan' => $result['keterangan'],
-                'delivery' => $result['delivery'],
+
                 'total_qty' => $result['total_qty'],
             ];
         }

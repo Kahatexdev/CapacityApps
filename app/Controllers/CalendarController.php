@@ -122,6 +122,7 @@ class CalendarController extends BaseController
 
             $weekCount++;
         }
+
         $kategori = $this->productModel->getKategori();
         $data = [
             'title' => 'Capacity System',
