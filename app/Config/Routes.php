@@ -28,7 +28,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
     // order
     $routes->get('dataorder', 'OrderController::order');
-    $routes->get('detailmodel/(:any)/(:any)', 'OrderController::detailmodel/$1/$2');
+    $routes->get('detailModelCapacity/(:any)/(:any)', 'OrderController::detailModelCapacity/$1/$2');
     $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'OrderController::detailmodeljarum/$1/$2/$3');
     $routes->get('semuaOrder', 'OrderController::semuaOrder');
     $routes->get('orderPerjarum', 'OrderController::OrderPerJarum');
@@ -64,6 +64,20 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
 //planning manager
 $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
+    $routes->get('', 'PlanningController::index');
+    $routes->get('dataorder', 'PlanningController::order');
+    $routes->get('blmAdaArea', 'OrderController::orderBlmAdaAreal');
+    $routes->get('orderPerjarum', 'OrderController::OrderPerJarum');
+    $routes->get('detailModelPlanning/(:any)/(:any)', 'OrderController::detailModelPlanning/$1/$2');
+    $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'OrderController::detailmodeljarum/$1/$2/$3');
+    $routes->get('semuaOrder', 'OrderController::semuaOrder');
+    $routes->get('orderPerjarum', 'OrderController::OrderPerJarum');
+    $routes->get('dataorderperjarum/(:any)', 'OrderController::DetailOrderPerJarum/$1');
+    $routes->post('updatedetailorder/(:any)', 'OrderController::updateorder/$1');
+    $routes->post('updatedetailjarum/(:any)', 'OrderController::updateorderjarum/$1');
+    $routes->post('deletedetailstyle/(:any)', 'OrderController::deletedetailstyle/$1');
+    $routes->post('deletedetailorder/(:any)', 'OrderController::deletedetailorder/$1');
+    $routes->post('deletedetailjarum/(:any)', 'OrderController::deletedetailmodeljarum/$1');
 });
 
 

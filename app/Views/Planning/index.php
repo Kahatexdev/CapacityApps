@@ -1,4 +1,4 @@
-<?php $this->extend('Planing/layout'); ?>
+<?php $this->extend('Planning/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
