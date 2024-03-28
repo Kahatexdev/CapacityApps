@@ -60,7 +60,7 @@ class CapacityController extends BaseController
         $weekCount = 1; // Initialize week count for the first week of the month
         $monthlyData = [];
 
-        for ($i = 0; $i < 26; $i++) {
+        for ($i = 0; $i < 52; $i++) {
             $startOfWeek = clone $startDate;
             $startOfWeek->modify("+$i week");
             $startOfWeek->modify('Monday this week');
@@ -87,8 +87,8 @@ class CapacityController extends BaseController
                 $monthlyData[$currentMonth] = [];
             }
 
-            $startOfWeekFormatted = $startOfWeek->format('d-F');
-            $endOfWeekFormatted = $endOfWeek->format('d-F');
+            $startOfWeekFormatted = $startOfWeek->format('d/m');
+            $endOfWeekFormatted = $endOfWeek->format('d/m');
 
             $monthlyData[$currentMonth][] = [
                 'week' => $weekCount,

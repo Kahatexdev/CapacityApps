@@ -89,32 +89,35 @@
                 </div>
             </div>
         </div>
-        <?php foreach ($Area as $ar) : ?>
-            <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-                <a href="<?= base_url('capacity/dataproduksi/' . $ar) ?>">
-                    <div class="card">
-                        <div class="card-body p-3">
-                            <div class="row">
+        <div class="row">
+            <?php foreach ($Area as $ar) : ?>
 
-                                <div class="col-8">
-                                    <div class="numbers">
-                                        <p class="text-sm mb-0 text-capitalize font-weight-bold"><?= $ar ?></p>
-                                        <h5 class="font-weight-bolder mb-0">
-                                        </h5>
-                                    </div>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                        <i class="fas fa-pen-fancy text-lg opacity-10" aria-hidden="true"></i>
-                                    </div>
-                                </div>
+                <div class="col-xl-2 col-sm-3 mb-xl-0 mb-4 mt-2">
+                    <a href="<?= base_url('capacity/dataproduksi/' . $ar) ?>">
+                        <div class="card">
+                            <div class="card-body p-3">
+                                <div class="row">
 
+                                    <div class="col-8">
+                                        <div class="numbers">
+                                            <p class="text-sm mb-0 text-capitalize font-weight-bold"><?= $ar ?></p>
+                                            <h5 class="font-weight-bolder mb-0">
+                                            </h5>
+                                        </div>
+                                    </div>
+                                    <div class="col-4 text-end">
+
+                                        <i class="fas fa-pen-fancy text-sm opacity-10 text-dark" aria-hidden="true"></i>
+
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </a>
-            </div>
-        <?php endforeach ?>
+                    </a>
+                </div>
+            <?php endforeach ?>
+        </div>
 
     </div>
 

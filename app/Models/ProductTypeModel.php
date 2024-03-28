@@ -45,4 +45,8 @@ class ProductTypeModel extends Model
         $query = $this->select('id_product_type')->where('product_type', $product)->first();
         return $query;
     }
+    public function getKategori()
+    {
+        return $this->distinct()->select('keterangan')->findAll();
+    }
 }
