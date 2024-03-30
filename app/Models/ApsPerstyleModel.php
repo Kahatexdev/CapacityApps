@@ -116,7 +116,15 @@ class ApsPerstyleModel extends Model
 
         return $groupedResults;
     }
+    public function asignareal($data)
+    {
+        $this->set('factory', $data['area'])
+            ->where('mastermodel', $data['mastermodel'])
+            ->where('machinetypeid', $data['jarum'])
+            ->update();
 
+        return $this->affectedRows();
+    }
     // // Fungsi untuk mendapatkan data berdasarkan kondisi
     // public function getDataByCondition($condition)
     // {

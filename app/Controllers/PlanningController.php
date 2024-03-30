@@ -36,7 +36,7 @@ class PlanningController extends BaseController
         $this->liburModel = new LiburModel();
         if ($this->filters   = ['role' => ['planning']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
-        } 
+        }
         $this->isLogedin();
     }
     protected function isLogedin()
@@ -75,5 +75,19 @@ class PlanningController extends BaseController
         ];
         return view('Planning/Order/ordermaster', $data);
     }
-    
+
+    public function assignareal()
+    {
+        $data = [
+            'mastermodel' => $this->request->getPost("no_model"),
+            'jarum' => $this->request->getPost("jarum"),
+            'area' => $this->request->getPost("area"),
+        ];
+        $assign = $this->ApsPerstyleModel->asignAreal($data);
+        if ($assign) {
+            return redirect()->to(base_url('planning/dataorder/'))->withInput()->with('success', 'Berhasil Assign Area');
+        } else {
+            return redirect()->to(base_url('planning/dataorder/'))->withInput()->with('error', 'Gagal Assign Area');
+        }
+    }
 }

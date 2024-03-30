@@ -1,5 +1,6 @@
-<?php ini_set('display_errors', 1); error_reporting(E_ALL); ?>
-<?php $this->extend('Capacity/layout'); ?>
+<?php ini_set('display_errors', 1);
+error_reporting(E_ALL); ?>
+<?php $this->extend('Planning/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -33,7 +34,7 @@
                     <div class="d-flex justify-content-between">
                         <h5>
                             Detail Data Model <?= $noModel ?> Delivery <?= date('d-M-Y', strtotime($delivery)) ?>
-                        </h5>                       
+                        </h5>
                     </div>
                     <div>
                         <a href="<?= base_url('planning/semuaOrder/') ?>" class="btn bg-gradient-info"> Kembali</a>
@@ -88,7 +89,7 @@
                         <div>
                             <br>
                             <div class="col-md-3">
-                                <button type="button" class="btn btn-success btn-sm btn-assign" data-toggle="modal" data-target="#ModalAssign" data-id="<?= $order['idapsperstyle']; ?>"data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>">
+                                <button type="button" class="btn btn-success btn-sm btn-assign" data-toggle="modal" data-target="#ModalAssign" data-id="<?= $order['idapsperstyle']; ?>" data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>">
                                     Arahkan Seluruh Model ke
                                 </button>
                             </div>
@@ -96,8 +97,8 @@
                     </div>
 
 
-                
-            </div>
+
+                </div>
 
 
             </div>
@@ -168,16 +169,14 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form action="" method="post">
+                        <form action="<?= base_url('planning/assignareal') ?>" method="post">
                             <input type="text" name="no_model" id="" hidden value="<?= $noModel ?>">
                             <div id="confirmationMessage"></div>
                             <div class="form-group">
                                 <label for="selectMachineType">Pilih Tipe Mesin:</label>
-                                <select class="form-control" id="selectMachineType" name="selectedMachineType">
+                                <select class="form-control" id="selectMachineType" name="jarum">
                                     <?php
-                                    // Ambil nilai yang unik dari $dataAps
                                     $uniqueMachineTypeIds = array_unique(array_column($dataAps, 'machinetypeid'));
-                                    // Loop untuk menambahkan opsi ke dalam tag <select>
                                     foreach ($uniqueMachineTypeIds as $machinetypeid) :
                                     ?>
                                         <option value="<?= $machinetypeid; ?>"><?= $machinetypeid; ?></option>
@@ -186,22 +185,20 @@
                             </div>
                             <div class="form-group">
                                 <label for="selectArea">Pilih Area:</label>
-                                <select class="form-control" id="selectArea" name="selectedArea">
+                                <select class="form-control" id="selectArea" name="area">
                                     <?php
-                                    // Ambil nilai yang unik dari $dataMc
                                     $uniqueAreas = array_unique(array_column($dataMc, 'area'));
-                                    // Loop untuk menambahkan opsi ke dalam tag <select>
                                     foreach ($uniqueAreas as $area) :
                                     ?>
                                         <option value="<?= $area; ?>"><?= $area; ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                        </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn bg-gradient-danger">Ya</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -223,38 +220,38 @@
                     var seam = $(this).data('seam');
                     var factory = $(this).data('factory');
 
-            var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
-            
-            $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/updatedetailorder/') ?>' + apsperstyle);
-            $('#ModalEdit').find('input[name="style"]').val(style);
-            $('#ModalEdit').find('input[name="no_model"]').val(noModel);
-            $('#ModalEdit').find('input[name="delivery"]').val(formattedDelivery);
-            $('#ModalEdit').find('input[name="qty"]').val(qty);
-            $('#ModalEdit').find('input[name="sisa"]').val(sisa);
-            $('#ModalEdit').find('input[name="seam"]').val(seam);
-            $('#ModalEdit').find('input[name="factory"]').val(factory);
-            
-            $('#ModalEdit').modal('show'); // Show the modal
-        });
-            $('.delete-btn').click(function() {
-            var noModel = $(this).data('no-model');
-            var delivery = $(this).data('delivery');
-            var apsperstyle = $(this).data('id');
-            var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
-            $('#ModalDelete').find('form').attr('action', '<?= base_url('capacity/deletedetailstyle/') ?>' + apsperstyle);
-            $('#ModalDelete').find('input[name="idapsperstyle"]').val(apsperstyle);
-            $('#ModalDelete').find('input[name="no_model"]').val(noModel);
-            $('#ModalDelete').find('input[name="delivery"]').val(formattedDelivery);
-            $('#ModalDelete').modal('show'); // Show the modal
-        });
-        $('.btn-assign').click(function() {
-            var noModel = $(this).data('no-model');
-            $('#ModalAssign').modal('show'); // Show the modal
-            var selectedMachineTypeId = document.getElementById("machinetypeid").value;
-            var selectedArea = document.getElementById("area").value;
-            document.getElementById('confirmationMessage').innerHTML = "Apakah anda yakin mengarahkan PDK " + noModel + " dengan jarum " + selectedMachineTypeId + " ke " + selectedArea;
-        });
-        });
+                    var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
+
+                    $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/updatedetailorder/') ?>' + apsperstyle);
+                    $('#ModalEdit').find('input[name="style"]').val(style);
+                    $('#ModalEdit').find('input[name="no_model"]').val(noModel);
+                    $('#ModalEdit').find('input[name="delivery"]').val(formattedDelivery);
+                    $('#ModalEdit').find('input[name="qty"]').val(qty);
+                    $('#ModalEdit').find('input[name="sisa"]').val(sisa);
+                    $('#ModalEdit').find('input[name="seam"]').val(seam);
+                    $('#ModalEdit').find('input[name="factory"]').val(factory);
+
+                    $('#ModalEdit').modal('show'); // Show the modal
+                });
+                $('.delete-btn').click(function() {
+                    var noModel = $(this).data('no-model');
+                    var delivery = $(this).data('delivery');
+                    var apsperstyle = $(this).data('id');
+                    var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
+                    $('#ModalDelete').find('form').attr('action', '<?= base_url('capacity/deletedetailstyle/') ?>' + apsperstyle);
+                    $('#ModalDelete').find('input[name="idapsperstyle"]').val(apsperstyle);
+                    $('#ModalDelete').find('input[name="no_model"]').val(noModel);
+                    $('#ModalDelete').find('input[name="delivery"]').val(formattedDelivery);
+                    $('#ModalDelete').modal('show'); // Show the modal
+                });
+                $('.btn-assign').click(function() {
+                    var noModel = $(this).data('no-model');
+                    $('#ModalAssign').modal('show'); // Show the modal
+                    var selectedMachineTypeId = document.getElementById("machinetypeid").value;
+                    var selectedArea = document.getElementById("area").value;
+                    document.getElementById('confirmationMessage').innerHTML = "Apakah anda yakin mengarahkan PDK " + noModel + " dengan jarum " + selectedMachineTypeId + " ke " + selectedArea;
+                });
+            });
         </script>
         <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
         <?php $this->endSection(); ?>
