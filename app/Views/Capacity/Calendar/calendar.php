@@ -191,10 +191,9 @@
                                     <?php foreach ($ranges as $index => $range) : ?>
 
                                         <tr>
-                                            <td> tes</td>
                                             <?php foreach ($range['data'] as $data) : ?>
-
-                                                <td> <?= $data['total_qty'] ?></td>
+                                                <td> <?= $data['keterangan'] ?></td>
+                                                
                                             <?php endforeach ?>
 
                                         </tr>
