@@ -151,6 +151,44 @@ class OrderController extends BaseController
         ];
         return view('Capacity/Order/semuaorderjarum', $data);
     }
+    public function DetailOrderPerJarumPlan($jarum)
+    {
+        $tampilperdelivery = $this->orderModel->tampilPerjarum($jarum);
+        $product = $this->productModel->findAll();
+        $booking = $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'jarum' => $jarum,
+            'tampildata' => $tampilperdelivery,
+            'product' => $product,
+
+        ];
+        return view('Planning/Order/semuaorderjarum', $data);
+    }
+    public function DetailOrderPerAreaPlan($area)
+    {
+        $tampilperdelivery = $this->orderModel->tampilPerarea($area);
+        $product = $this->productModel->findAll();
+        $booking = $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'area' => $area,
+            'tampildata' => $tampilperdelivery,
+            'product' => $product,
+
+        ];
+        return view('Planning/Order/semuaorderarea', $data);
+    }
     public function updateorder($idOrder)
     {
 
@@ -457,5 +495,20 @@ class OrderController extends BaseController
             'TotalMesin' => $totalMesin,
         ];
         return view('Planning/Order/orderjarum', $data);
+    }
+    public function orderPerAreaPlan()
+    {
+        $totalMesin = $this->jarumModel->getArea();
+        $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'TotalMesin' => $totalMesin,
+        ];
+        return view('Planning/Order/orderarea', $data);
     }
 }

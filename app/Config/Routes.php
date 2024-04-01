@@ -71,16 +71,19 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('dataorder', 'PlanningController::order');
     $routes->get('blmAdaArea', 'OrderController::orderBlmAdaAreal');
     $routes->get('orderPerjarum', 'OrderController::OrderPerJarumPlan');
+    $routes->get('orderPerArea', 'OrderController::orderPerAreaPlan');
     $routes->get('detailModelPlanning/(:any)/(:any)', 'OrderController::detailModelPlanning/$1/$2');
     $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'OrderController::detailmodeljarum/$1/$2/$3');
     $routes->get('semuaOrder', 'OrderController::semuaOrderPlan');
-    $routes->get('dataorderperjarum/(:any)', 'OrderController::DetailOrderPerJarum/$1');
+    $routes->get('dataorderperjarum/(:any)', 'OrderController::DetailOrderPerJarumPlan/$1');
+    $routes->get('dataorderperarea/(:any)', 'OrderController::DetailOrderPerAreaPlan/$1');
     $routes->post('updatedetailorder/(:any)', 'OrderController::updateorder/$1');
     $routes->post('updatedetailjarum/(:any)', 'OrderController::updateorderjarum/$1');
     $routes->post('deletedetailstyle/(:any)', 'OrderController::deletedetailstyle/$1');
     $routes->post('deletedetailorder/(:any)', 'OrderController::deletedetailorder/$1');
     $routes->post('deletedetailjarum/(:any)', 'OrderController::deletedetailmodeljarum/$1');
     $routes->post('assignareal', 'PlanningController::assignareal');
+    $routes->post('assignarealall', 'PlanningController::assignarealall');
 });
 
 

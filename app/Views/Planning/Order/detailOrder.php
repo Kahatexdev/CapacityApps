@@ -89,7 +89,7 @@ error_reporting(E_ALL); ?>
                         <div>
                             <br>
                             <div class="col-md-3">
-                                <button type="button" class="btn btn-success btn-sm btn-assign" data-toggle="modal" data-target="#ModalAssign" data-id="<?= $order['idapsperstyle']; ?>" data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>">
+                                <button type="button" class="btn btn-success btn-sm btn-assignall" data-toggle="modal" data-target="#ModalAssignAll" data-id="<?= $order['idapsperstyle']; ?>" data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>">
                                     Arahkan Seluruh Model ke
                                 </button>
                             </div>
@@ -101,61 +101,6 @@ error_reporting(E_ALL); ?>
                 </div>
 
 
-            </div>
-        </div>
-        <div class="modal fade  bd-example-modal-lg" id="ModalEdit" tabindex="-1" role="dialog" aria-labelledby="modalEdit" aria-hidden="true">
-            <div class="modal-dialog  modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Edit Data Booking</h5>
-                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="" method="post">
-                            <div class="row">
-                                <div class="col-lg-12 col-sm-12">
-                                    <div class="form-group">
-                                        <label for="tgl-bk" class="col-form-label">No Model</label>
-                                        <input type="text" class="form-control" name="no_model" readonly>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="tgl-bk" class="col-form-label">Style</label>
-                                        <input type="text" class="form-control" name="style">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Delivery</label>
-                                        <input type="date" name="delivery" id="" class="form-control">
-                                    </div>
-                                    <div class=" form-group">
-                                        <label for="no_order" class="col-form-label">Quantity</label>
-                                        <input type="number" name="qty" id="" class="form-control">
-                                    </div>
-                                    <div class=" form-group">
-                                        <label for="productType" class="col-form-label">Sisa</label>
-                                        <input type="text" name="sisa" id="" class="form-control">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="no_pdk" class="col-form-label">Seam</label>
-                                        <input type="text" name="seam" id="" class="form-control">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="desc" class="col-form-label">Areal</label>
-                                        <input type="text" name="factory" id="" class="form-control">
-                                    </div>
-
-                                </div>
-                            </div>
-
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn bg-gradient-info">Ubah</button>
-                    </div>
-                    </form>
-                </div>
             </div>
         </div>
 
@@ -204,49 +149,56 @@ error_reporting(E_ALL); ?>
             </div>
         </div>
 
+        <div class="modal fade bd-example-modal-lg" id="ModalAssignAll" tabindex="-1" role="dialog" aria-labelledby="ModalAssignAll" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Arahkan Model <?= $noModel ?> dan seluruh Delivery ke Areal</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="<?= base_url('planning/assignarealall') ?>" method="post">
+                            <input type="text" name="no_model" id="" hidden value="<?= $noModel ?>">
+                            <div id="confirmationMessage"></div>
+                            <div class="form-group">
+                            </div>
+                            <div class="form-group">
+                                <label for="selectArea">Pilih Area:</label>
+                                <select class="form-control" id="selectArea" name="area">
+                                    <?php
+                                    $uniqueAreas = array_unique(array_column($dataMc, 'area'));
+                                    foreach ($uniqueAreas as $area) :
+                                    ?>
+                                        <option value="<?= $area; ?>"><?= $area; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-danger">Ya</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <script>
             $(document).ready(function() {
                 $('#dataTable').DataTable();
-
-                $('.import-btn').click(function() {
-                    var apsperstyle = $(this).data('id');
-                    var noModel = $(this).data('no-model');
-                    var delivery = $(this).data('delivery');
-                    var jarum = $(this).data('jarum');
-                    var style = $(this).data('style');
-                    var qty = $(this).data('qty');
-                    var sisa = $(this).data('sisa');
-                    var seam = $(this).data('seam');
-                    var factory = $(this).data('factory');
-
-                    var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
-
-                    $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/updatedetailorder/') ?>' + apsperstyle);
-                    $('#ModalEdit').find('input[name="style"]').val(style);
-                    $('#ModalEdit').find('input[name="no_model"]').val(noModel);
-                    $('#ModalEdit').find('input[name="delivery"]').val(formattedDelivery);
-                    $('#ModalEdit').find('input[name="qty"]').val(qty);
-                    $('#ModalEdit').find('input[name="sisa"]').val(sisa);
-                    $('#ModalEdit').find('input[name="seam"]').val(seam);
-                    $('#ModalEdit').find('input[name="factory"]').val(factory);
-
-                    $('#ModalEdit').modal('show'); // Show the modal
-                });
-                $('.delete-btn').click(function() {
-                    var noModel = $(this).data('no-model');
-                    var delivery = $(this).data('delivery');
-                    var apsperstyle = $(this).data('id');
-                    var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
-                    $('#ModalDelete').find('form').attr('action', '<?= base_url('capacity/deletedetailstyle/') ?>' + apsperstyle);
-                    $('#ModalDelete').find('input[name="idapsperstyle"]').val(apsperstyle);
-                    $('#ModalDelete').find('input[name="no_model"]').val(noModel);
-                    $('#ModalDelete').find('input[name="delivery"]').val(formattedDelivery);
-                    $('#ModalDelete').modal('show'); // Show the modal
-                });
                 $('.btn-assign').click(function() {
                     var noModel = $(this).data('no-model');
                     $('#ModalAssign').modal('show'); // Show the modal
+                    var selectedMachineTypeId = document.getElementById("machinetypeid").value;
+                    var selectedArea = document.getElementById("area").value;
+                    document.getElementById('confirmationMessage').innerHTML = "Apakah anda yakin mengarahkan PDK " + noModel + " dengan jarum " + selectedMachineTypeId + " ke " + selectedArea;
+                });
+                $('.btn-assignall').click(function() {
+                    var noModel = $(this).data('no-model');
+                    $('#ModalAssignAll').modal('show'); // Show the modal
                     var selectedMachineTypeId = document.getElementById("machinetypeid").value;
                     var selectedArea = document.getElementById("area").value;
                     document.getElementById('confirmationMessage').innerHTML = "Apakah anda yakin mengarahkan PDK " + noModel + " dengan jarum " + selectedMachineTypeId + " ke " + selectedArea;

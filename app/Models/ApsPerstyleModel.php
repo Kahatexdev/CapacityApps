@@ -116,7 +116,7 @@ class ApsPerstyleModel extends Model
 
         return $groupedResults;
     }
-    public function getPlanJarumNs($cek)
+public function getPlanJarumNs($cek)
     {
         $results = $this->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
             ->join('master_product_type', 'master_product_type.id_product_type = data_model.id_product_type')
@@ -226,6 +226,14 @@ class ApsPerstyleModel extends Model
         $this->set('factory', $data['area'])
             ->where('mastermodel', $data['mastermodel'])
             ->where('machinetypeid', $data['jarum'])
+            ->update();
+
+        return $this->affectedRows();
+    }
+    public function asignarealall($data)
+    {
+        $this->set('factory', $data['area'])
+            ->where('mastermodel', $data['mastermodel'])
             ->update();
 
         return $this->affectedRows();
