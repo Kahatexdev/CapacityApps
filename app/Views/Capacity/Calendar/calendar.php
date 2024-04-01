@@ -213,6 +213,7 @@
                                             <td><?= $range['tight'] ?></td>
                                         <?php endforeach; ?>
                                     </tr>
+                                    >>>>>>> 0087cbd9dc4581af451fe1e9b7e615eb4be8a29e
                                 </tbody>
                             </table>
                         </div>
