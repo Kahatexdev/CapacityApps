@@ -48,6 +48,7 @@ class CalendarController extends BaseController
     }
     public function index()
     {
+        $holidays = $this->liburModel->findAll();
         $dataJarum = $this->jarumModel->getJarum();
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $data = [
@@ -60,6 +61,7 @@ class CalendarController extends BaseController
             'active6' => 'active',
             'Jarum' => $dataJarum,
             'TotalMesin' => $totalMesin,
+            'DaftarLibur' => $holidays,
         ];
         return view('Capacity/Calendar/index', $data);
     }
@@ -72,8 +74,8 @@ class CalendarController extends BaseController
         $currentMonth = $startDate->format('F');
         $weekCount = 1; // Initialize week count for the first week of the month
         $monthlyData = [];
-        $jarum = 'TJ144';
-        for ($i = 0; $i < 52; $i++) {
+        $range = 12;
+        for ($i = 0; $i < $range; $i++) {
             $startOfWeek = clone $startDate;
             $startOfWeek->modify("+$i week");
             $startOfWeek->modify('Monday this week');
@@ -171,5 +173,101 @@ class CalendarController extends BaseController
         } else {
             return redirect()->to(base_url('/capacity/calendar'))->withInput()->with('error', 'Gagal Input Tanggal');
         }
+    }
+
+    public function generatePlanning()
+    {
+        $tgl_awal = $this->request->getPost("tgl_awal");
+        $tgl_akhir = $this->request->getPost("tgl_akhir");
+
+
+        $dataJarum = $this->jarumModel->getJarum();
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+
+        $startDate = new \DateTime('first day of this month');
+        $LiburModel = new LiburModel();
+        $holidays = $LiburModel->findAll();
+        $currentMonth = $startDate->format('F');
+        $weekCount = 1; // Initialize week count for the first week of the month
+        $monthlyData = [];
+        $range = 12;
+        for ($i = 0; $i < $range; $i++) {
+            $startOfWeek = clone $startDate;
+            $startOfWeek->modify("+$i week");
+            $startOfWeek->modify('Monday this week');
+
+            $endOfWeek = clone $startOfWeek;
+            $endOfWeek->modify('Sunday this week');
+            $numberOfDays = $startOfWeek->diff($endOfWeek)->days + 1;
+
+            $weekHolidays = [];
+            foreach ($holidays as $holiday) {
+                $holidayDate = new \DateTime($holiday['tanggal']);
+                if ($holidayDate >= $startOfWeek && $holidayDate <= $endOfWeek) {
+                    $weekHolidays[] = [
+                        'nama' => $holiday['nama'],
+                        'tanggal' => $holidayDate->format('d-F'),
+                    ];
+                    $numberOfDays--;
+                }
+            }
+            $currentMonthOfYear = $startOfWeek->format('F');
+            if ($currentMonth !== $currentMonthOfYear) {
+                $currentMonth = $currentMonthOfYear;
+                $weekCount = 1; // Reset week count
+                $monthlyData[$currentMonth] = [];
+            }
+
+            $startOfWeekFormatted = $startOfWeek->format('d-m');
+            $endOfWeekFormatted = $endOfWeek->format('d-m');
+            $start = $startOfWeek->format('Y-m-d');
+            $end = $endOfWeek->format('Y-m-d');
+            $cek = [
+                'start' => $start,
+                'end' => $end,
+            ];
+            // $dt = $this->ApsPerstyleModel->getPlanJarum($cek);
+            // $normalSock = $this->ApsPerstyleModel->getPlanJarumNs($cek);
+            // $sneaker = $this->ApsPerstyleModel->getPlanJarumSs($cek);
+            // $knee = $this->ApsPerstyleModel->getPlanJarumKh($cek);
+            // $footies = $this->ApsPerstyleModel->getPlanJarumFs($cek);
+            // $tight = $this->ApsPerstyleModel->getPlanJarumT($cek);
+            $normalTotalQty = $normalSock ?? 0;
+            $sneakerTotalQty = $sneaker ?? 0;
+            $kneeTotalQty = $knee ?? 0;
+            $footiesTotalQty = $footies ?? 0;
+            $tightTotalQty = $tight ?? 0;
+
+            $monthlyData[$currentMonth][] = [
+                'week' => $weekCount,
+                'start_date' => $startOfWeekFormatted,
+                'end_date' => $endOfWeekFormatted,
+                'number_of_days' => $numberOfDays,
+                'holidays' => $weekHolidays,
+                'normal' => $normalTotalQty,
+                'sneaker' => $sneakerTotalQty,
+                'knee' => $kneeTotalQty,
+                'footies' => $footiesTotalQty,
+                'tight' => $tightTotalQty,
+            ];
+
+            $weekCount++;
+        }
+        $data = [
+            'title' => 'Data Booking',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => 'active',
+            'Jarum' => $dataJarum,
+            'TotalMesin' => $totalMesin,
+            'DaftarLibur' => $holidays,
+            'weeklyRanges' => $monthlyData,
+            'DaftarLibur' => $holidays,
+
+        ];
+        return view('Capacity/Calendar/generate', $data);
     }
 }

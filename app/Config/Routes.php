@@ -62,6 +62,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('calendar/(:any)', 'CalendarController::calendar/$1');
     $routes->get('checkdate', 'Checkdate::index');
     $routes->post('inputLibur', 'CapacityController::inputLibur');
+    $routes->post('generate', 'CalendarController::generatePlanning');
 });
 
 
