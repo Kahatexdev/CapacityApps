@@ -60,7 +60,7 @@ class OrderController extends BaseController
 
     public function detailModelCapacity($noModel, $delivery)
     {
-        $dataApsPerstyle = $this->$apsPerstyleModel->detailModel($noModel, $delivery); // Call the model method
+        $dataApsPerstyle = $this->ApsPerstyleModel->detailModel($noModel, $delivery); // Call the model method
         $data = [
             'title' => 'Data Booking',
             'active1' => '',
@@ -74,47 +74,6 @@ class OrderController extends BaseController
             'delivery' => $delivery,
         ];
         return view('Capacity/Order/detailOrder', $data);
-    }
-
-    public function detailModelPlanning($noModel, $delivery)
-    {
-        $dataApsPerstyle = $this->ApsPerstyleModel->detailModel($noModel, $delivery); 
-        $dataMc = $this->jarumModel->getAreaModel($noModel);
-        $data = [
-            'title' => 'Data Booking',
-            'active1' => '',
-            'active2' => '',
-            'active3' => 'active',
-            'active4' => '',
-            'active5' => '',
-            'active6' => '',
-            'dataAps' => $dataApsPerstyle,
-            'noModel' => $noModel,
-            'delivery' => $delivery,
-            'dataMc' => $dataMc,
-        ];
-        return view('Planning/Order/detailOrder', $data);
-    }
-
-    
-    public function detailmodeljarum($noModel, $delivery, $jarum)
-    {
-        $apsPerstyleModel = new ApsPerstyleModel(); // Create an instance of the model
-        $dataApsPerstyle = $apsPerstyleModel->detailModelJarum($noModel, $delivery, $jarum); // Call the model method
-        $data = [
-            'title' => 'Data Booking',
-            'active1' => '',
-            'active2' => '',
-            'active3' => 'active',
-            'active4' => '',
-            'active5' => '',
-            'active6' => '',
-            'dataAps' => $dataApsPerstyle,
-            'noModel' => $noModel,
-            'delivery' => $delivery,
-        ];
-
-        return view('Capacity/Order/detailModelJarum', $data);
     }
     public function semuaOrder()
     {
@@ -135,24 +94,6 @@ class OrderController extends BaseController
         ];
         return view('Capacity/Order/semuaorder', $data);
     }
-    public function orderBlmAdaAreal()
-    {
-        $tampilperdelivery = $this->orderModel->tampilPerModelBlmAdaArea();
-        $product = $this->productModel->findAll();
-        $data = [
-            'title' => 'Data Order',
-            'active1' => '',
-            'active2' => '',
-            'active3' => 'active',
-            'active4' => '',
-            'active5' => '',
-            'active6' => '',
-            'tampildata' => $tampilperdelivery,
-            'product' => $product,
-
-        ];
-        return view('Planning/Order/orderblmAdaArea', $data);
-    }
     public function orderPerJarum()
     {
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
@@ -168,6 +109,29 @@ class OrderController extends BaseController
         ];
         return view('Capacity/Order/orderjarum', $data);
     }
+
+    public function detailmodeljarum($noModel, $delivery, $jarum)
+    {
+        $apsPerstyleModel = new ApsPerstyleModel(); // Create an instance of the model
+        $dataApsPerstyle = $apsPerstyleModel->detailModelJarum($noModel, $delivery, $jarum); // Call the model method
+        $data = [
+            'title' => 'Data Booking',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'dataAps' => $dataApsPerstyle,
+            'noModel' => $noModel,
+            'delivery' => $delivery,
+        ];
+
+        return view('Capacity/Order/detailModelJarum', $data);
+    }
+
+
+
     public function DetailOrderPerJarum($jarum)
     {
         $tampilperdelivery = $this->orderModel->tampilPerjarum($jarum);
@@ -419,5 +383,79 @@ class OrderController extends BaseController
         } else {
             return redirect()->to(base_url('capacity/semuaOrder/'))->withInput()->with('error', 'Gagal Hapus Data');
         }
+    }
+
+    // Planning
+    public function detailModelPlanning($noModel, $delivery)
+    {
+        $dataApsPerstyle = $this->ApsPerstyleModel->detailModel($noModel, $delivery);
+        $dataMc = $this->jarumModel->getAreaModel($noModel);
+        $data = [
+            'title' => 'Data Booking',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'dataAps' => $dataApsPerstyle,
+            'noModel' => $noModel,
+            'delivery' => $delivery,
+            'dataMc' => $dataMc,
+        ];
+        return view('Planning/Order/detailOrder', $data);
+    }
+
+    public function orderBlmAdaAreal()
+    {
+        $tampilperdelivery = $this->orderModel->tampilPerModelBlmAdaArea();
+        $product = $this->productModel->findAll();
+        $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'tampildata' => $tampilperdelivery,
+            'product' => $product,
+
+        ];
+        return view('Planning/Order/orderblmAdaArea', $data);
+    }
+    public function semuaOrderPlan()
+    {
+        $tampilperdelivery = $this->orderModel->tampilPerdelivery();
+        $product = $this->productModel->findAll();
+        $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'tampildata' => $tampilperdelivery,
+            'product' => $product,
+
+
+        ];
+        return view('Planning/Order/semuaorder', $data);
+    }
+    public function orderPerJarumPlan()
+    {
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+        $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'TotalMesin' => $totalMesin,
+        ];
+        return view('Planning/Order/orderjarum', $data);
     }
 }

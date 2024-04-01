@@ -109,15 +109,22 @@ class ApsPerstyleModel extends Model
         foreach ($results as $result) {
             $keterangan = $result['keterangan'];
             $groupedResults[$keterangan] = [
-                'keterangan' => $result['keterangan'],
-                'delivery' => $result['delivery'],
+
                 'total_qty' => $result['total_qty'],
             ];
         }
 
         return $groupedResults;
     }
+    public function asignareal($data)
+    {
+        $this->set('factory', $data['area'])
+            ->where('mastermodel', $data['mastermodel'])
+            ->where('machinetypeid', $data['jarum'])
+            ->update();
 
+        return $this->affectedRows();
+    }
     // // Fungsi untuk mendapatkan data berdasarkan kondisi
     // public function getDataByCondition($condition)
     // {

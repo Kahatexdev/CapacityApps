@@ -153,41 +153,34 @@
                                                         </li>
                                                     <?php endforeach; ?>
                                                 </ul>
-
                                             </div>
-
                                         <?php endif; ?>
                                     <?php endforeach; ?>
                                 </div>
                             </div>
                         </div>
                         <div class="table-responsive">
-
                             <table class="table">
                                 <thead>
                                     <tr>
                                         <th rowspan="4" class="text-center">Product Style</th>
-                                        <td>
-                                    <tr>
                                         <?php foreach ($ranges as $index => $range) : ?>
-                                            <td>Week <?= $index + 1 ?></td>
-
+                                            <th class="text-center">Week <?= $range['week'] ?></th>
                                         <?php endforeach; ?>
                                     </tr>
                                     <tr>
                                         <?php foreach ($ranges as $index => $range) : ?>
-                                            <td><small><?= $range['start_date'] ?> - <?= $range['end_date'] ?> </small></td>
+                                            <th><?= $range['start_date'] ?> - <?= $range['end_date'] ?></th>
                                         <?php endforeach; ?>
                                     </tr>
                                     <tr>
                                         <?php foreach ($ranges as $index => $range) : ?>
-                                            <td class="text-xs">Hari Kerja : <?= $range['number_of_days'] ?></td>
+                                            <th>Hari Kerja : <?= $range['number_of_days'] ?></th>
                                         <?php endforeach; ?>
-                                    </tr>
-                                    </td>
                                     </tr>
                                 </thead>
                                 <tbody>
+<<<<<<< HEAD
                                     <?php foreach ($ranges as $index => $range) : ?>
 
                                         <tr>
@@ -200,17 +193,23 @@
 
                                     <?php endforeach ?>
 
+=======
+                                    <tr>
+                                        <td>Keterangan</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <?php foreach ($range['data'] as $data) : ?>
+                                                <td><?= $data['total_qty'] ?></td>
+                                            <?php endforeach; ?>
+                                        <?php endforeach; ?>
+                                    </tr>
+>>>>>>> 0087cbd9dc4581af451fe1e9b7e615eb4be8a29e
                                 </tbody>
-
                             </table>
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
-
-
     <?php endforeach; ?>
 </div>
 

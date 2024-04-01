@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend('Planning/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
@@ -77,7 +77,7 @@
 
                 </div>
             </a>
-            
+
         </div>
 
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
@@ -104,7 +104,7 @@
 
                 </div>
             </a>
-            
+
         </div>
 
     </div>
