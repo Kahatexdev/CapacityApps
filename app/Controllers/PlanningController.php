@@ -90,4 +90,17 @@ class PlanningController extends BaseController
             return redirect()->to(base_url('planning/dataorder/'))->withInput()->with('error', 'Gagal Assign Area');
         }
     }
+    public function assignarealall()
+    {
+        $data = [
+            'mastermodel' => $this->request->getPost("no_model"),
+            'area' => $this->request->getPost("area"),
+        ];
+        $assign = $this->ApsPerstyleModel->asignArealall($data);
+        if ($assign) {
+            return redirect()->to(base_url('planning/dataorder/'))->withInput()->with('success', 'Berhasil Assign Area');
+        } else {
+            return redirect()->to(base_url('planning/dataorder/'))->withInput()->with('error', 'Gagal Assign Area');
+        }
+    }
 }
