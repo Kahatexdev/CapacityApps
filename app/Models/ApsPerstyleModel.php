@@ -116,6 +116,111 @@ class ApsPerstyleModel extends Model
 
         return $groupedResults;
     }
+    public function getPlanJarumNs($cek)
+    {
+        $results = $this->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
+            ->join('master_product_type', 'master_product_type.id_product_type = data_model.id_product_type')
+            ->groupBy('apsperstyle.delivery, master_product_type.keterangan')
+            ->select('apsperstyle.delivery,apsperstyle.mastermodel, master_product_type.keterangan, SUM(apsperstyle.sisa) AS total_qty')
+            ->where('apsperstyle.machinetypeid', $cek['jarum'])
+            ->where('apsperstyle.delivery >=', $cek['start'])
+            ->where('apsperstyle.delivery <=', $cek['end'])
+            ->where('master_product_type.keterangan', "Normal Sock")
+            ->get()
+            ->getResultArray();
+
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+
+
+        return $total_qty;
+    }
+
+    public function getPlanJarumSs($cek)
+    {
+        $results = $this->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
+            ->join('master_product_type', 'master_product_type.id_product_type = data_model.id_product_type')
+            ->groupBy('apsperstyle.delivery, master_product_type.keterangan')
+            ->select('apsperstyle.delivery,apsperstyle.mastermodel, master_product_type.keterangan, SUM(apsperstyle.sisa) AS total_qty')
+            ->where('apsperstyle.machinetypeid', $cek['jarum'])
+            ->where('apsperstyle.delivery >=', $cek['start'])
+            ->where('apsperstyle.delivery <=', $cek['end'])
+            ->where('master_product_type.keterangan', "Sneaker")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    public function getPlanJarumKh($cek)
+    {
+        $results = $this->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
+            ->join('master_product_type', 'master_product_type.id_product_type = data_model.id_product_type')
+            ->groupBy('apsperstyle.delivery, master_product_type.keterangan')
+            ->select('apsperstyle.delivery,apsperstyle.mastermodel, master_product_type.keterangan, SUM(apsperstyle.sisa) AS total_qty')
+            ->where('apsperstyle.machinetypeid', $cek['jarum'])
+            ->where('apsperstyle.delivery >=', $cek['start'])
+            ->where('apsperstyle.delivery <=', $cek['end'])
+            ->where('master_product_type.keterangan', "Knee High")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    public function getPlanJarumFs($cek)
+    {
+        $results = $this->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
+            ->join('master_product_type', 'master_product_type.id_product_type = data_model.id_product_type')
+            ->groupBy('apsperstyle.delivery, master_product_type.keterangan')
+            ->select('apsperstyle.delivery,apsperstyle.mastermodel, master_product_type.keterangan, SUM(apsperstyle.sisa) AS total_qty')
+            ->where('apsperstyle.machinetypeid', $cek['jarum'])
+            ->where('apsperstyle.delivery >=', $cek['start'])
+            ->where('apsperstyle.delivery <=', $cek['end'])
+            ->where('master_product_type.keterangan', "Footies")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    public function getPlanJarumT($cek)
+    {
+        $results = $this->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
+            ->join('master_product_type', 'master_product_type.id_product_type = data_model.id_product_type')
+            ->groupBy('apsperstyle.delivery, master_product_type.keterangan')
+            ->select('apsperstyle.delivery,apsperstyle.mastermodel, master_product_type.keterangan, SUM(apsperstyle.sisa) AS total_qty')
+            ->where('apsperstyle.machinetypeid', $cek['jarum'])
+            ->where('apsperstyle.delivery >=', $cek['start'])
+            ->where('apsperstyle.delivery <=', $cek['end'])
+            ->where('master_product_type.keterangan', "Tight")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
     public function asignareal($data)
     {
         $this->set('factory', $data['area'])

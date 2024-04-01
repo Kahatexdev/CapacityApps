@@ -12,6 +12,7 @@ use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\LiburModel;
 use App\Models\ProduksiModel;
+use CodeIgniter\Format\JSONFormatter;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class CalendarController extends BaseController
@@ -52,7 +53,7 @@ class CalendarController extends BaseController
         $data = [
             'title' => 'Data Booking',
             'active1' => '',
-            'active2' => 'active',
+            'active2' => '',
             'active3' => '',
             'active4' => '',
             'active5' => '',
@@ -72,7 +73,7 @@ class CalendarController extends BaseController
         $weekCount = 1; // Initialize week count for the first week of the month
         $monthlyData = [];
         $jarum = 'TJ144';
-        for ($i = 0; $i < 26; $i++) {
+        for ($i = 0; $i < 52; $i++) {
             $startOfWeek = clone $startDate;
             $startOfWeek->modify("+$i week");
             $startOfWeek->modify('Monday this week');
@@ -106,10 +107,19 @@ class CalendarController extends BaseController
             $cek = [
                 'jarum' => $jarum,
                 'start' => $start,
-                'end' => $end
+                'end' => $end,
             ];
             $dt = $this->ApsPerstyleModel->getPlanJarum($cek);
-
+            $normalSock = $this->ApsPerstyleModel->getPlanJarumNs($cek);
+            $sneaker = $this->ApsPerstyleModel->getPlanJarumSs($cek);
+            $knee = $this->ApsPerstyleModel->getPlanJarumKh($cek);
+            $footies = $this->ApsPerstyleModel->getPlanJarumFs($cek);
+            $tight = $this->ApsPerstyleModel->getPlanJarumT($cek);
+            $normalTotalQty = $normalSock ?? 0;
+            $sneakerTotalQty = $sneaker ?? 0;
+            $kneeTotalQty = $knee ?? 0;
+            $footiesTotalQty = $footies ?? 0;
+            $tightTotalQty = $tight ?? 0;
 
             $monthlyData[$currentMonth][] = [
                 'week' => $weekCount,
@@ -117,12 +127,15 @@ class CalendarController extends BaseController
                 'end_date' => $endOfWeekFormatted,
                 'number_of_days' => $numberOfDays,
                 'holidays' => $weekHolidays,
-                'data' => $dt
+                'normal' => $normalTotalQty,
+                'sneaker' => $sneakerTotalQty,
+                'knee' => $kneeTotalQty,
+                'footies' => $footiesTotalQty,
+                'tight' => $tightTotalQty,
             ];
 
             $weekCount++;
         }
-
         $kategori = $this->productModel->getKategori();
         $data = [
             'title' => 'Capacity System',

@@ -32,10 +32,11 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <h3 class="font-weight-bolder mb-0">
-                                <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                    <i class="ni ni-chart-bar-32 text-lg opacity-10" aria-hidden="true"></i>
-                                </div>
-                                Capasity Calendar
+                                <a href="" # class="btn bg-gradient-info">
+
+                                    <i class="fas fa-calendar-alt text-lg opacity-10" aria-hidden="true"></i>
+                                </a>
+                                Capacity Calendar
                             </h3>
                         </div>
                         <div>
@@ -46,6 +47,8 @@
                                 </button>
                                 <div> &nbsp;</div>
                                 <button class="btn bg-gradient-success ml-2" data-bs-toggle="modal" data-bs-target="#addLibur">
+                                    <i class="fas fa-calendar-plus text-lg opacity-10" aria-hidden="true"></i>
+
                                     Tambah Libur
                                 </button>
                             </div>
@@ -160,7 +163,7 @@
                             </div>
                         </div>
                         <div class="table-responsive">
-                            <table class="table">
+                            <table class="table ">
                                 <thead>
                                     <tr>
                                         <th rowspan="4" class="text-center">Product Style</th>
@@ -170,22 +173,44 @@
                                     </tr>
                                     <tr>
                                         <?php foreach ($ranges as $index => $range) : ?>
-                                            <th><?= $range['start_date'] ?> - <?= $range['end_date'] ?></th>
+                                            <th class="text-xs"> <span><?= $range['start_date'] ?> - <?= $range['end_date'] ?> </span></th>
                                         <?php endforeach; ?>
                                     </tr>
                                     <tr>
                                         <?php foreach ($ranges as $index => $range) : ?>
-                                            <th>Hari Kerja : <?= $range['number_of_days'] ?></th>
+                                            <th class="text-xs "> <span class="badge bg-success"> Hari Kerja : <?= $range['number_of_days'] ?> </span></th>
                                         <?php endforeach; ?>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="text-center">
                                     <tr>
-                                        <td>Keterangan</td>
+                                        <td>Normal Sock</td>
                                         <?php foreach ($ranges as $index => $range) : ?>
-                                            <?php foreach ($range['data'] as $data) : ?>
-                                                <td><?= $data['total_qty'] ?></td>
-                                            <?php endforeach; ?>
+                                            <td><?= $range['normal'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <td>Sneakers</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['sneaker'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <td>Footies</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['footies'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <td>Knee High</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['knee'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <td>Tight</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['tight'] ?></td>
                                         <?php endforeach; ?>
                                     </tr>
                                 </tbody>
