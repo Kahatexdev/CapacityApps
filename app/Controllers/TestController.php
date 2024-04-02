@@ -49,8 +49,9 @@ class TestController extends BaseController
 
     public function test()
     {
-        $tgl_awal = $this->request->getPost("tgl_awal");
-        $tgl_akhir = $this->request->getPost("tgl_akhir");
+        $tgl_awal = strtotime("2024-04-01");
+        $tgl_akhir = strtotime("2024-05-01");
+        $jumlahHari = ($tgl_akhir - $tgl_awal) / (60 * 60 * 24);
 
         $startDate = new \DateTime('first day of this month');
         $LiburModel = new LiburModel();
@@ -58,7 +59,7 @@ class TestController extends BaseController
         $currentMonth = $startDate->format('F');
         $weekCount = 1; // Initialize week count for the first week of the month
         $monthlyData = [];
-        $range = 12;
+        $range = $jumlahHari / 7;
         for ($i = 0; $i < $range; $i++) {
             $startOfWeek = clone $startDate;
             $startOfWeek->modify("+$i week");
@@ -118,7 +119,34 @@ class TestController extends BaseController
 
             $weekCount++;
         }
-        dd($monthlyData);
+        $normalTotal = 0;
+        $sneakerTotal = 0;
+        $hariTotal = 0;
+        $value = [];
+        foreach ($monthlyData as $data) {
+            $normal = $data['normal'];
+            $sneaker = $data['sneaker'];
+            $hari = $data['number_of_days'];
+
+            $normalTotal += $normal;
+            $sneakerTotal += $sneaker;
+            $hariTotal += $hari;
+            $value[] = [
+                'normal' => $normal,
+                'sneaker' => $sneaker,
+                'Jumlah Hari1' => $hari,
+                'totalNormal' => ceil($normalTotal / 14 / $hariTotal),
+                'totalsneaker' => ceil($sneakerTotal / 16 / $hariTotal),
+                'Jumlah HariTotal' => $hariTotal,
+            ];
+        }
+        $maxTotalNormal = max(array_column($value, 'totalNormal'));
+        $maxTotalSneaker = max(array_column($value, 'totalsneaker'));
+        $kebutuhanMc = [
+            'Normal Socks' => $maxTotalNormal,
+            'Sneakers' => $maxTotalSneaker
+        ];
+        dd($kebutuhanMc);
         $data = [
             'title' => 'Data Booking',
             'active1' => '',
