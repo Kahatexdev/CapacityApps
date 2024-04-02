@@ -226,12 +226,12 @@ class CalendarController extends BaseController
                 'start' => $start,
                 'end' => $end,
             ];
-            // $dt = $this->ApsPerstyleModel->getPlanJarum($cek);
-            // $normalSock = $this->ApsPerstyleModel->getPlanJarumNs($cek);
-            // $sneaker = $this->ApsPerstyleModel->getPlanJarumSs($cek);
-            // $knee = $this->ApsPerstyleModel->getPlanJarumKh($cek);
-            // $footies = $this->ApsPerstyleModel->getPlanJarumFs($cek);
-            // $tight = $this->ApsPerstyleModel->getPlanJarumT($cek);
+            $dt = $this->ApsPerstyleModel->getPlanJarum($cek);
+            $normalSock = $this->ApsPerstyleModel->getPlanJarumNs($cek);
+            $sneaker = $this->ApsPerstyleModel->getPlanJarumSs($cek);
+            $knee = $this->ApsPerstyleModel->getPlanJarumKh($cek);
+            $footies = $this->ApsPerstyleModel->getPlanJarumFs($cek);
+            $tight = $this->ApsPerstyleModel->getPlanJarumT($cek);
             $normalTotalQty = $normalSock ?? 0;
             $sneakerTotalQty = $sneaker ?? 0;
             $kneeTotalQty = $knee ?? 0;
