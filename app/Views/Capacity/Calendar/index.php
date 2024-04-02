@@ -68,34 +68,7 @@
             </div>
         </div>
     </div>
-    <div class="modal fade  bd-example-modal-lg" id="generate" tabindex="-1" role="dialog" aria-labelledby="generate" aria-hidden="true">
-        <div class="modal-dialog  modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Generate Planning</h5>
-                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form action="<?= base_url('capacity/generate') ?>" method="post">
-                        <div class="form-group">
-                            <label for="tgl-bk-form-label">Dari</label>
-                            <input type="date" class="form-control" name="tgl_awal">
-                        </div>
-                        <div class="form-group">
-                            <label for="No Model" class="col-form-label">Sampai</label>
-                            <input type="date" name="tgl_akhir" class="form-control">
-                        </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn bg-gradient-info">Generate</button>
-                </div>
-                </form>
-            </div>
-        </div>
-    </div>
+
     <div class="modal fade  bd-example-modal-lg" id="lihatLibur" tabindex="-1" role="dialog" aria-labelledby="lihatLibur" aria-hidden="true">
         <div class="modal-dialog  modal-dialog" role="document">
             <div class="modal-content">
@@ -172,7 +145,7 @@
 
         <?php foreach ($TotalMesin as $jr) : ?>
             <div class="col-xl-2 col-sm-3 mb-xl-0 mb-4 mt-2">
-                <a href="<?= base_url('capacity/calendar/' . $jr['jarum']) ?>">
+                <button class="btn" data-bs-toggle="modal" data-bs-target="#generate" href="<?= base_url('capacity/calendar/' . $jr['jarum']) ?>">
                     <div class="card">
                         <div class="card-body p-3">
                             <div class="row">
@@ -193,7 +166,35 @@
                             </div>
                         </div>
                     </div>
-                </a>
+                </button>
+            </div>
+            <div class="modal fade  bd-example-modal-lg" id="generate" tabindex="-1" role="dialog" aria-labelledby="generate" aria-hidden="true">
+                <div class="modal-dialog  modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Generate Planning</h5>
+                            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="<?= base_url('capacity/calendar/' . $jr['jarum']); ?>" method="POST">
+                                <div class="form-group">
+                                    <label for="awal">Dari</label>
+                                    <input type="date" class="form-control" name="awal">
+                                </div>
+                                <div class="form-group">
+                                    <label for="akhir" class="col-form-label">Sampai</label>
+                                    <input type="date" name="akhir" class="form-control">
+                                </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-info">Generate</button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         <?php endforeach ?>
 

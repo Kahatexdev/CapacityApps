@@ -116,7 +116,7 @@ class ApsPerstyleModel extends Model
 
         return $groupedResults;
     }
-public function getPlanJarumNs($cek)
+    public function getPlanJarumNs($cek)
     {
         $results = $this->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
             ->join('master_product_type', 'master_product_type.id_product_type = data_model.id_product_type')
@@ -238,10 +238,4 @@ public function getPlanJarumNs($cek)
 
         return $this->affectedRows();
     }
-    // // Fungsi untuk mendapatkan data berdasarkan kondisi
-    // public function getDataByCondition($condition)
-    // {
-    //     return $this->where($condition)->findAll(); // Mengembalikan data berdasarkan kondisi
-    // }
-
 }
