@@ -50,8 +50,8 @@ class Checkdate extends BaseController
         $totalQty = 0;
         $totalHari = 0;
         // Inisialisasi variabel untuk nilai maksimum perbedaan Qty
-        $maxQtyDiff = 0;
-        $maxQtyDiffOption = null; // Tambahkan inisialisasi di sini
+        $maxValue = 0;
+        $maxValueOption = null;
 
         // Iterasi melalui setiap opsi
         foreach ($options as $opt => $data) {
@@ -59,6 +59,10 @@ class Checkdate extends BaseController
             echo "Total sampai $opt: <br>";
             echo "Qty Total: " . $data['QtyTotal'] . "<br>";
             echo "Jumlah Hari Total: " . $data['Jumlah HariTotal'] . "<br>";
+            $expressionValue = $data['QtyTotal'] / $data['Jumlah HariTotal'] / 14; //14 ini adalah targetnya
+
+            // Output the value for the current option
+            echo "Kebutuhan Mesin Sampai $opt: " . ceil($expressionValue) . "<br>";
 
             // Perbedaan antara kumulatif dan nilai opsi saat ini
             $qtyDiff = $totalQty - $data['QtyTotal'];
@@ -71,26 +75,14 @@ class Checkdate extends BaseController
             // Update total untuk kategori berikutnya
             $totalQty = $data['QtyTotal'];
             $totalHari = $data['Jumlah HariTotal'];
+            
 
-            // Hitung nilai maksimum perbedaan Qty
-            if (abs($qtyDiff) > $maxQtyDiff) {
-                $maxQtyDiff = abs($qtyDiff);
-                $maxQtyDiffOption = $opt;
+            if ($expressionValue > $maxValue) {
+                $maxValue = $expressionValue;
+                $maxValueOption = $opt;
             }
         }
 
-        // Tampilkan nilai terbesar dari perbedaan Qty
-        echo "Nilai terbesar dari perbedaan Qty: " . $maxQtyDiff . "<br>";
-
-        // Opsi dengan perbedaan qty terbesar
-        echo "Opsi dengan perbedaan qty terbesar: ";
-        echo $maxQtyDiffOption !== null ? $maxQtyDiffOption : "Tidak ada opsi";
-
-        // Tampilkan qty total dan jumlah hari total sesuai dengan opsi terpilih
-        if ($maxQtyDiffOption !== null) {
-            echo "<br>Qty Total untuk opsi terpilih: " . $options[$maxQtyDiffOption]['QtyTotal'] . "<br>";
-            echo "Jumlah Hari Total untuk opsi terpilih: " . $options[$maxQtyDiffOption]['Jumlah HariTotal'] . "<br>";
-            echo "Kebutuhan Mesin: " . ceil($options[$maxQtyDiffOption]['QtyTotal']/($options[$maxQtyDiffOption]['Jumlah HariTotal']-3)/16);
+            echo "Kebutuhan Mesin: " . ceil($maxValue) . "<br>";
         }
     }
-}
