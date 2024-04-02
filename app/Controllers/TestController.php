@@ -91,7 +91,6 @@ class TestController extends BaseController
                 'start' => $start,
                 'end' => $end,
             ];
-            $hari = 18;
             $dt = $this->ApsPerstyleModel->getPlanJarum($cek);
             $normalSock = $this->ApsPerstyleModel->getPlanJarumNs($cek);
             $sneaker = $this->ApsPerstyleModel->getPlanJarumSs($cek);

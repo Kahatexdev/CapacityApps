@@ -65,16 +65,22 @@ class CalendarController extends BaseController
         ];
         return view('Capacity/Calendar/index', $data);
     }
-    public function calendar($jarum)
+    public function calendar()
     {
+        $jarum = $this->request->getPost("jarum");
+        $awal = $this->request->getPost("awal");
 
+
+        dd($awal);
+
+        $jumlahHari = (40 - 50) / (60 * 60 * 24);
         $startDate = new \DateTime('first day of this month');
         $LiburModel = new LiburModel();
         $holidays = $LiburModel->findAll();
         $currentMonth = $startDate->format('F');
         $weekCount = 1; // Initialize week count for the first week of the month
         $monthlyData = [];
-        $range = 12;
+        $range = $jumlahHari / 7;
         for ($i = 0; $i < $range; $i++) {
             $startOfWeek = clone $startDate;
             $startOfWeek->modify("+$i week");
@@ -98,7 +104,6 @@ class CalendarController extends BaseController
             $currentMonthOfYear = $startOfWeek->format('F');
             if ($currentMonth !== $currentMonthOfYear) {
                 $currentMonth = $currentMonthOfYear;
-                $weekCount = 1; // Reset week count
                 $monthlyData[$currentMonth] = [];
             }
 
@@ -223,6 +228,7 @@ class CalendarController extends BaseController
             $start = $startOfWeek->format('Y-m-d');
             $end = $endOfWeek->format('Y-m-d');
             $cek = [
+                'jarum' => 'TJ144',
                 'start' => $start,
                 'end' => $end,
             ];
