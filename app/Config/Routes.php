@@ -60,6 +60,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('Calendar', 'CalendarController::index');
     $routes->get('test', 'CalendarController::test');
     $routes->get('calendar/(:any)', 'CalendarController::calendar/$1');
+    $routes->get('hapusLibur/(:any)', 'CalendarController::hapuslibur/$1');
     $routes->get('checkdate', 'Checkdate::index');
     $routes->post('inputLibur', 'CapacityController::inputLibur');
     $routes->post('generate', 'CalendarController::generatePlanning');
