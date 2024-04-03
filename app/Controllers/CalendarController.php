@@ -14,6 +14,7 @@ use App\Models\LiburModel;
 use App\Models\ProduksiModel;
 use CodeIgniter\Format\JSONFormatter;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpParser\Node\Expr\Cast\String_;
 
 class CalendarController extends BaseController
 {
@@ -65,15 +66,15 @@ class CalendarController extends BaseController
         ];
         return view('Capacity/Calendar/index', $data);
     }
-    public function calendar()
+    public function calendar($jarum)
     {
-        $jarum = $this->request->getPost("jarum");
-        $awal = $this->request->getPost("awal");
+        $awal = strval($this->request->getPost("awal"));
+        $akhir = strval($this->request->getPost("akhir"));
 
+        $tgl_awal = strtotime($awal);
+        $tgl_akhir = strtotime($akhir);
 
-        dd($awal);
-
-        $jumlahHari = (40 - 50) / (60 * 60 * 24);
+        $jumlahHari = ($tgl_akhir - $tgl_awal) / (60 * 60 * 24);
         $startDate = new \DateTime('first day of this month');
         $LiburModel = new LiburModel();
         $holidays = $LiburModel->findAll();
@@ -81,6 +82,8 @@ class CalendarController extends BaseController
         $weekCount = 1; // Initialize week count for the first week of the month
         $monthlyData = [];
         $range = $jumlahHari / 7;
+        $value = []; // Initialize $value array
+
         for ($i = 0; $i < $range; $i++) {
             $startOfWeek = clone $startDate;
             $startOfWeek->modify("+$i week");
@@ -104,6 +107,7 @@ class CalendarController extends BaseController
             $currentMonthOfYear = $startOfWeek->format('F');
             if ($currentMonth !== $currentMonthOfYear) {
                 $currentMonth = $currentMonthOfYear;
+                $weekCount = 1;
                 $monthlyData[$currentMonth] = [];
             }
 
@@ -128,7 +132,7 @@ class CalendarController extends BaseController
             $footiesTotalQty = $footies ?? 0;
             $tightTotalQty = $tight ?? 0;
 
-            $monthlyData[$currentMonth][] = [
+            $monthlyData[] = [
                 'week' => $weekCount,
                 'start_date' => $startOfWeekFormatted,
                 'end_date' => $endOfWeekFormatted,
@@ -143,7 +147,108 @@ class CalendarController extends BaseController
 
             $weekCount++;
         }
+
+        $normalTotal = 0;
+        $sneakerTotal = 0;
+        $kneeTotal = 0;
+        $footiesTotal = 0;
+        $tightTotal = 0;
+        $hariTotal = 0;
+        $tNormal = 0;
+        $tSneaker = 0;
+        $tFooties = 0;
+        $tKnee = 0;
+        $tTight = 0;
+        foreach ($monthlyData as $data) {
+            if (isset($data['normal'])) {
+                $normal = $data['normal'];
+            } else {
+                $normal = 0;
+            }
+            if (isset($data['sneaker'])) {
+                $sneaker = $data['sneaker'];
+            } else {
+                $sneaker = 0;
+            }
+            if (isset($data['knee'])) {
+                $knee = $data['knee'];
+            } else {
+                $knee = 0;
+            }
+            if (isset($data['tight'])) {
+                $tight = $data['tight'];
+            } else {
+                $tight = 0;
+            }
+            if (isset($data['footies'])) {
+                $footies = $data['footies'];
+            } else {
+                $footies = 0;
+            }
+            if (isset($data['number_of_days'])) {
+                $hari = $data['number_of_days'];
+            } else {
+                $hari = 0;
+            }
+            $normalTotal += $normal;
+            $sneakerTotal += $sneaker;
+            $hariTotal += $hari;
+
+            switch ($jarum) {
+                case 'JC120':
+                    $tNormal = 17;
+                    $tSneaker = 20.4;
+                    $tFooties = 21.3;
+                    $tKnee = 11.3;
+                    $tTight = 8.2;
+                    break;
+                case 'JC168':
+                    $tNormal = 12;
+                    $tSneaker = 15.6;
+                    $tFooties = 16.9;
+                    $tKnee = 8.7;
+                    $tTight = 4.3;
+                    break;
+                default:
+                    $tNormal = 1;
+                    $tSneaker = 1;
+                    $tFooties = 1;
+                    $tKnee = 1;
+                    $tTight = 1;
+                    break;
+            }
+        }
+
+        $value[] = [
+            'Jumlah Hari1' => $hari,
+            'totalNormal' => ceil($normalTotal / $tNormal / $hariTotal),
+            'totalsneaker' => ceil($sneakerTotal / $tSneaker / $hariTotal),
+            'totalFooties' => ceil($footiesTotal / $tFooties / $hariTotal),
+            'totalKnee' => ceil($kneeTotal / $tKnee / $hariTotal),
+            'totalTight' => ceil($tightTotal / $tTight / $hariTotal),
+            'Jumlah HariTotal' => $hariTotal,
+        ];
+
+        $maxTotalNormal = max(array_column($value, 'totalNormal'));
+        $maxTotalSneaker = max(array_column($value, 'totalsneaker'));
+        $maxTotalFooties = max(array_column($value, 'totalFooties'));
+        $maxTotalKnee = max(array_column($value, 'totalKnee'));
+        $maxTotalTight = max(array_column($value, 'totalTight'));
+
+        $TotalKebutuhanMesin = $maxTotalNormal + $maxTotalSneaker + $maxTotalFooties + $maxTotalKnee + $maxTotalTight;
+        $kebutuhanMc = [
+            'Normal Socks' => $maxTotalNormal,
+            'Sneakers' => $maxTotalSneaker,
+            'Footies' => $maxTotalFooties,
+            'Knee' => $maxTotalKnee,
+            'Tight' => $maxTotalTight,
+            'Total Kebutuhan Mesin' => $TotalKebutuhanMesin,
+            'Hari' => $hariTotal
+        ];
+
+        // Di sini Anda mungkin perlu memanggil model lain untuk mendapatkan data lain yang diperlukan
         $kategori = $this->productModel->getKategori();
+
         $data = [
             'title' => 'Capacity System',
             'active1' => '',
@@ -152,13 +257,12 @@ class CalendarController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => 'active',
-
+            'kebutuhanMc' => $kebutuhanMc,
             'weeklyRanges' => $monthlyData,
             'DaftarLibur' => $holidays,
             'kategoriProduk' => $kategori
-
-
         ];
+
         return view('Capacity/Calendar/calendar', $data);
     }
 
