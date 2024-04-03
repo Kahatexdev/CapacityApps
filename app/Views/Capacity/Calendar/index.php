@@ -145,7 +145,7 @@
 
         <?php foreach ($TotalMesin as $jr) : ?>
             <div class="col-xl-2 col-sm-3 mb-xl-0 mb-4 mt-2">
-                <button class="btn" data-bs-toggle="modal" data-bs-target="#generate" href="<?= base_url('capacity/calendar/' . $jr['jarum']) ?>">
+                <button class="btn pilih-jarum" data-bs-toggle="modal" data-bs-target="#generate" data-id="<?= $jr['jarum'] ?>">
                     <div class="card">
                         <div class="card-body p-3">
                             <div class="row">
@@ -178,7 +178,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form action="<?= base_url('capacity/calendar/' . $jr['jarum']); ?>" method="POST">
+                            <form action="<?= base_url('capacity/calendar/'); ?>" method="POST">
                                 <div class="form-group">
                                     <label for="awal">Dari</label>
                                     <input type="date" class="form-control" name="awal">
@@ -203,4 +203,10 @@
 
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+<script>
+    $('.pilih-jarum').click(function() {
+        var jarum = $(this).data('id');
+        $('#generate').find('form').attr('action', '<?= base_url('capacity/calendar/') ?>' + jarum);
+    })
+</script>
 <?php $this->endSection(); ?>
