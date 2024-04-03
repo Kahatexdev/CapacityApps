@@ -107,7 +107,6 @@ class CalendarController extends BaseController
             $currentMonthOfYear = $startOfWeek->format('F');
             if ($currentMonth !== $currentMonthOfYear) {
                 $currentMonth = $currentMonthOfYear;
-                $weekCount = 1;
                 $monthlyData[$currentMonth] = [];
             }
 
@@ -132,7 +131,7 @@ class CalendarController extends BaseController
             $footiesTotalQty = $footies ?? 0;
             $tightTotalQty = $tight ?? 0;
 
-            $monthlyData[] = [
+            $monthlyData[$currentMonth][] = [
                 'week' => $weekCount,
                 'start_date' => $startOfWeekFormatted,
                 'end_date' => $endOfWeekFormatted,
@@ -153,12 +152,12 @@ class CalendarController extends BaseController
         $kneeTotal = 0;
         $footiesTotal = 0;
         $tightTotal = 0;
-        $hariTotal = 0;
-        $tNormal = 0;
-        $tSneaker = 0;
-        $tFooties = 0;
-        $tKnee = 0;
-        $tTight = 0;
+        $hariTotal = 1;
+        $tNormal = 1;
+        $tSneaker = 1;
+        $tFooties = 1;
+        $tKnee = 1;
+        $tTight = 1;
         foreach ($monthlyData as $data) {
             if (isset($data['normal'])) {
                 $normal = $data['normal'];
@@ -192,6 +191,9 @@ class CalendarController extends BaseController
             }
             $normalTotal += $normal;
             $sneakerTotal += $sneaker;
+            $kneeTotal += $knee;
+            $footiesTotal += $footies;
+            $tightTotal += $tight;
             $hariTotal += $hari;
 
             switch ($jarum) {
@@ -218,7 +220,6 @@ class CalendarController extends BaseController
                     break;
             }
         }
-
         $value[] = [
             'Jumlah Hari1' => $hari,
             'totalNormal' => ceil($normalTotal / $tNormal / $hariTotal),
@@ -245,7 +246,6 @@ class CalendarController extends BaseController
             'Total Kebutuhan Mesin' => $TotalKebutuhanMesin,
             'Hari' => $hariTotal
         ];
-
         // Di sini Anda mungkin perlu memanggil model lain untuk mendapatkan data lain yang diperlukan
         $kategori = $this->productModel->getKategori();
 
@@ -257,11 +257,13 @@ class CalendarController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => 'active',
-            'kebutuhanMc' => $kebutuhanMc,
+
             'weeklyRanges' => $monthlyData,
             'DaftarLibur' => $holidays,
             'kategoriProduk' => $kategori
         ];
+
+        dd($data);
 
         return view('Capacity/Calendar/calendar', $data);
     }
