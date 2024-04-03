@@ -66,6 +66,15 @@ class BookingModel extends Model
             ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
             ->findAll();
     }
+    public function getDataPerjarumbulan($bulan,$tahun,$jarum)
+    {
+        return $this->select('data_booking.*, master_product_type.product_type')
+            ->where('needle', $jarum)
+            ->where('monthname(delivery)', $bulan)
+            ->where('year(delivery)', $tahun)
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->findAll();
+    }
     public function getNeedle($idBooking)
     {
         $query = $this->select('needle')->where('id_booking', $idBooking)->first();
@@ -85,5 +94,12 @@ class BookingModel extends Model
         $bulan = date('m');
 
         return $this->where("MONTH(tgl_terima_booking) =", $bulan)->countAllResults();
+    }
+    public function getBulan($jarum)
+    {
+        return $this->select("MONTHNAME(delivery) as bulan, YEAR(delivery) as tahun")
+        ->where('needle', $jarum)
+        ->groupBy('MONTHNAME(delivery), YEAR(delivery)')
+        ->findAll();
     }
 }

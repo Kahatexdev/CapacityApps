@@ -75,6 +75,18 @@
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th id="totalQty" class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2"></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
                             </table>
 
                         </div>
@@ -213,7 +225,8 @@
         </script> -->
         <script>
             $(document).ready(function() {
-                $('#dataTable').DataTable();
+                $('#dataTable').DataTable({
+                });
 
                 $('.import-btn').click(function() {
                     var apsperstyle = $(this).data('id');

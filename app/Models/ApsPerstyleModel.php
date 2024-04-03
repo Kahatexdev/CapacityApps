@@ -238,4 +238,10 @@ class ApsPerstyleModel extends Model
 
         return $this->affectedRows();
     }
+    public function getBulan($jarum){
+        return $this->select("MONTHNAME(delivery) as bulan, YEAR(delivery) as tahun")
+        ->where('machinetypeid', $jarum)
+        ->groupBy('MONTH(delivery), YEAR(delivery)')
+        ->findAll();
+    }
 }

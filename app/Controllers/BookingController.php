@@ -51,6 +51,7 @@ class BookingController extends BaseController
     {
         $dataJarum = $this->jarumModel->getJarum();
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+       
         $data = [
             'title' => 'Data Booking',
             'active1' => '',
@@ -84,6 +85,45 @@ class BookingController extends BaseController
         ];
         return view('Capacity/Booking/jarum', $data);
     }
+
+    public function bookingPerBulanJarum($jarum)
+    {
+        $bulan = $this->bookingModel->getbulan($jarum);
+        $data = [
+            'title' => 'Data Booking',
+            'active1' => '',
+            'active2' => 'active',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'bulan' => $bulan,
+            'jarum' => $jarum,
+        ];
+        return view('Capacity/Booking/bookingbulan', $data);
+    }
+
+    public function bookingPerBulanJarumTampil($bulan,$tahun,$jarum)
+    {
+        $booking = $this->bookingModel->getDataPerjarumbulan($bulan,$tahun,$jarum);
+        $product = $this->productModel->findAll();
+        $data = [
+            'title' => 'Data Booking',
+            'active1' => '',
+            'active2' => 'active',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'booking' => $booking,
+            'product' => $product,
+            'bulan' => $bulan,
+            'tahun' => $tahun,
+            'jarum' => $jarum,
+        ];
+        return view('Capacity/Booking/jarumbulan', $data);
+    }
+
     public function inputbooking()
     {
         $jarum = $this->request->getPost("jarum");

@@ -18,6 +18,8 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     // booking
     $routes->get('databooking', 'BookingController::booking');
     $routes->get('databooking/(:any)', 'BookingController::bookingPerJarum/$1');
+    $routes->get('databookingbulan/(:any)', 'BookingController::bookingPerBulanJarum/$1');
+    $routes->get('databookingbulantampil/(:any)/(:any)/(:any)', 'BookingController::bookingPerBulanJarumTampil/$1/$2/$3');
     $routes->get('detailbooking/(:any)', 'BookingController::detailbooking/$1');
     $routes->post('inputbooking', 'BookingController::inputbooking');
     $routes->post('updatebooking/(:any)', 'BookingController::updatebooking/$1');
@@ -32,7 +34,10 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'OrderController::detailmodeljarum/$1/$2/$3');
     $routes->get('semuaOrder', 'OrderController::semuaOrder');
     $routes->get('orderPerjarum', 'OrderController::OrderPerJarum');
+    $routes->get('orderPerjarumBln', 'OrderController::orderPerJarumBln');
     $routes->get('dataorderperjarum/(:any)', 'OrderController::DetailOrderPerJarum/$1');
+    $routes->get('dataorderperjarumbln/(:any)', 'OrderController::DetailOrderPerJarumBln/$1');
+    $routes->get('dataorderperjarumblndetail/(:any)/(:any)/(:any)', 'OrderController::DetailOrderPerJarumBlnDetail/$1/$2/$3');
     $routes->post('updatedetailorder/(:any)', 'OrderController::updateorder/$1');
     $routes->post('updatedetailjarum/(:any)', 'OrderController::updateorderjarum/$1');
     $routes->post('deletedetailstyle/(:any)', 'OrderController::deletedetailstyle/$1');

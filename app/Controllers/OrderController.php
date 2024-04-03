@@ -109,6 +109,21 @@ class OrderController extends BaseController
         ];
         return view('Capacity/Order/orderjarum', $data);
     }
+    public function orderPerJarumBln()
+    {
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+        $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'TotalMesin' => $totalMesin,
+        ];
+        return view('Capacity/Order/orderjarumbln', $data);
+    }
 
     public function detailmodeljarum($noModel, $delivery, $jarum)
     {
@@ -150,6 +165,46 @@ class OrderController extends BaseController
 
         ];
         return view('Capacity/Order/semuaorderjarum', $data);
+    }
+
+    public function DetailOrderPerJarumBlnDetail($bulan,$tahun,$jarum)
+    {
+        $tampilperdelivery = $this->orderModel->tampilPerjarumBulan($bulan,$tahun,$jarum);
+        $product = $this->productModel->findAll();
+        $booking = $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'jarum' => $jarum,
+            'tampildata' => $tampilperdelivery,
+            'product' => $product,
+
+        ];
+        return view('Capacity/Order/semuaorderjarum', $data);
+    }
+    
+    public function DetailOrderPerJarumBln($jarum)
+    {
+        $bulan = $this->ApsPerstyleModel->getBulan($jarum);
+        $product = $this->productModel->findAll();
+        $booking = $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'jarum' => $jarum,
+            'bulan' => $bulan,
+            'product' => $product,
+
+        ];
+        return view('Capacity/Order/orderjarumblngroup', $data);
     }
     public function DetailOrderPerJarumPlan($jarum)
     {

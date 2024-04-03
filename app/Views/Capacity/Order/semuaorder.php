@@ -15,39 +15,8 @@
                             </div>
                         </div>
                         <div>
-                            <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-success bg-gradient-info shadow text-center border-radius-md">
-                                Input Data Order
-                            </button>
+                            
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal fade  bd-example-modal-lg" id="exampleModalMessage" tabindex="-1" role="dialog" aria-labelledby="exampleModalMessageTitle" aria-hidden="true">
-                <div class="modal-dialog  modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Input Data Order</h5>
-                            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form action="<?= base_url('capacity/inputOrder') ?>" method="post">
-                                <div class="form-group">
-                                    <label for="tgl-bk-form-label">Tanggal Turun Order</label>
-                                    <input type="date" class="form-control" name="tgl_turun">
-                                </div>
-                                <div class="form-group">
-                                    <label for="No Model" class="col-form-label">No Model</label>
-                                    <input type="text" name="no_model" class="form-control">
-                                </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn bg-gradient-primary">Simpan</button>
-                        </div>
-                        </form>
                     </div>
                 </div>
             </div>

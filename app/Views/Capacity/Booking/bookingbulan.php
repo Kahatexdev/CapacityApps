@@ -89,17 +89,16 @@
                 </div>
             </div>
         </div>
-        <?php foreach ($TotalMesin as $jr) : ?>
+        <?php foreach ($bulan as $jr) : ?>
             <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-                <a href="<?= base_url('capacity/databookingbulan/' . $jr['jarum']) ?>">
+                <a href="<?= base_url('capacity/databookingbulantampil/' . $jr['bulan'] . '/' . $jr['tahun']) . '/' . $jarum?>">
                     <div class="card">
                         <div class="card-body p-3">
                             <div class="row">
 
                                 <div class="col-8">
                                     <div class="numbers">
-                                        <p class="text-sm mb-0 text-capitalize font-weight-bold"><?= $jr['jarum'] ?></p>
-                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Mesin : <?= $jr['total'] ?></p>
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold"><?= $jr['bulan'] ?>  <?= $jr['tahun'] ?></p>
                                         <h5 class="font-weight-bolder mb-0">
                                         </h5>
                                     </div>
