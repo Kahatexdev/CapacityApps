@@ -28,10 +28,7 @@
                                     Tambah
                                 </button>
                                 <div> &nbsp;</div>
-                                <button class="btn bg-gradient-info ml-2" data-bs-toggle="modal" data-bs-target="#generate">
-                                    <i class="fas fa-calendar-plus text-lg opacity-10" aria-hidden="true"></i>
-                                    Generate Planning
-                                </button>
+
                             </div>
                         </div>
                     </div>
@@ -146,7 +143,7 @@
         <?php foreach ($TotalMesin as $jr) : ?>
             <div class="col-xl-2 col-sm-3 mb-xl-0 mb-4 mt-2">
                 <div class="card bg-dark">
-                        <button class="btn pilih-jarum bg-white" data-bs-toggle="modal" data-bs-target="#generate" data-id="<?= $jr['jarum'] ?>">
+                    <button class="btn pilih-jarum bg-white" data-bs-toggle="modal" data-bs-target="#generate" data-id="<?= $jr['jarum'] ?>">
                         <div class="card-body p-3">
                             <div class="row">
 
@@ -166,7 +163,7 @@
                             </div>
                         </div>
                     </button>
-                    </div>
+                </div>
             </div>
             <div class="modal fade  bd-example-modal-lg" id="generate" tabindex="-1" role="dialog" aria-labelledby="generate" aria-hidden="true">
                 <div class="modal-dialog  modal-dialog" role="document">
@@ -199,11 +196,64 @@
         <?php endforeach ?>
 
     </div>
+    <div class="row mt-5">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        Tabel Planning Order
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table  w-100" id="table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Judul
+                                    </th>
+                                    <th>
+                                        Kebutuhan Mesin
+                                    </th>
+                                    <th>
+                                        Jumlah Hari
+                                    </th>
+                                    <th>
+                                        Aksi
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($kebutuhanMc as $mc) : ?>
+                                    <tr>
+                                        <td><?= $mc['judul'] ?></td>
+                                        <td><?= $mc['total'] ?> Mesin</td>
+                                        <td><?= $mc['jumlah_hari'] ?> Hari</td>
+                                        <td> <button class="btn bg-gradient-info"> Details </button></td>
+
+                                    </tr>
+                                <?php endforeach ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <?= $this->renderSection('generate'); ?>
 
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
-<script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#table').DataTable({
+            "order": [
+                [0, 'desc'] // Kolom pertama (indeks 0) diurutkan secara descending
+            ]
+        });
+    });
+</script>
+<script script>
     $('.pilih-jarum').click(function() {
         var jarum = $(this).data('id');
         $('#generate').find('form').attr('action', '<?= base_url('capacity/calendar/') ?>' + jarum);

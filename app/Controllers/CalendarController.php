@@ -11,6 +11,7 @@ use App\Models\BookingModel;
 use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\LiburModel;
+use App\Models\KebutuhanMesinModel;
 use App\Models\ProduksiModel;
 use CodeIgniter\Format\JSONFormatter;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -26,9 +27,11 @@ class CalendarController extends BaseController
     protected $orderModel;
     protected $ApsPerstyleModel;
     protected $liburModel;
+    protected $kebMc;
 
     public function __construct()
     {
+        $this->kebMc = new KebutuhanMesinModel();
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
@@ -52,6 +55,7 @@ class CalendarController extends BaseController
         $holidays = $this->liburModel->findAll();
         $dataJarum = $this->jarumModel->getJarum();
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+        $kebutuhanMC = $this->kebMc->getJudul();
         $data = [
             'title' => 'Data Booking',
             'active1' => '',
@@ -63,6 +67,7 @@ class CalendarController extends BaseController
             'Jarum' => $dataJarum,
             'TotalMesin' => $totalMesin,
             'DaftarLibur' => $holidays,
+            'kebutuhanMc' => $kebutuhanMC
         ];
         return view('Capacity/Calendar/index', $data);
     }
@@ -622,9 +627,9 @@ class CalendarController extends BaseController
         ];
         $insert = $this->liburModel->insert($data);
         if ($insert) {
-            return redirect()->to(base_url('/capacity/calendar'))->withInput()->with('success', 'Tanggal Berhasil Di Input');
+            return redirect()->to(base_url('/capacity/Calendar'))->withInput()->with('success', 'Tanggal Berhasil Di Input');
         } else {
-            return redirect()->to(base_url('/capacity/calendar'))->withInput()->with('error', 'Gagal Input Tanggal');
+            return redirect()->to(base_url('/capacity/Calendar'))->withInput()->with('error', 'Gagal Input Tanggal');
         }
     }
 }

@@ -70,6 +70,8 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('inputLibur', 'CapacityController::inputLibur');
     $routes->post('generate', 'CalendarController::generatePlanning');
     $routes->get('cek', 'TestController::test');
+
+    $routes->post('kebutuhanMesinOrder', 'KebutuhanMesin::inputMesinOrder');
 });
 
 

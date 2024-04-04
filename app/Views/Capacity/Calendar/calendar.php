@@ -34,11 +34,10 @@
                     <div class="d-flex justify-content-between">
 
                         <h4>Capacity Mesin dari <mark><small><?= $start ?> </mark> </small> sampai <mark><small><?= $end ?> </mark> </small> </h4>
-                        <a href="" class="btn bg-gradient-success">Export Excel</a>
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action="">
+                    <form action="<?= base_url('capacity/kebutuhanMesinOrder') ?>" method="POST">
                         <div class="row">
                             <div class="col-lg-6">
 
@@ -52,7 +51,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="jarum" class="form-control-label">Jumlah Hari</label>
-                                    <input class="form-control" type="text" value="<?= $jmlHari ?>" id="jarum" name="jarum" readonly>
+                                    <input class="form-control" type="text" value="<?= $jmlHari ?>" id="jarum" name="hari" readonly>
                                 </div>
                                 <div class="form-group">
                                     <label for="jarum" class="form-control-label">Total Kebutuhan Mesin</label>
@@ -70,21 +69,7 @@
                                     </div>
                                     <div class="col-lg-6 col-md-6">
                                         <div class="form-group">
-                                            <label for="example-text-input" class="form-control-label">Stop MC</label>
-                                            <input class="form-control" type="text" value="<?= $mesinNormal ?> Mesin" id="example-text-input" readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-6 col-md-6">
-                                        <div class="form-group">
                                             <label for="example-text-input" class="form-control-label">Sneaker</label>
-                                            <input class="form-control" type="text" value="<?= $mesinSneaker ?> Mesin" id="example-text-input" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 col-md-6">
-                                        <div class="form-group">
-                                            <label for="example-text-input" class="form-control-label">Stop MC</label>
                                             <input class="form-control" type="text" value="<?= $mesinSneaker ?> Mesin" id="example-text-input" readonly>
                                         </div>
                                     </div>
@@ -98,21 +83,7 @@
                                     </div>
                                     <div class="col-lg-6 col-md-6">
                                         <div class="form-group">
-                                            <label for="example-text-input" class="form-control-label">Stop MC</label>
-                                            <input class="form-control" type="text" value="<?= $mesinKnee ?> Mesin" id="example-text-input" readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-6 col-md-6">
-                                        <div class="form-group">
                                             <label for="example-text-input" class="form-control-label">Footies</label>
-                                            <input class="form-control" type="text" value="<?= $mesinFooties ?> Mesin" id="example-text-input" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 col-md-6">
-                                        <div class="form-group">
-                                            <label for="example-text-input" class="form-control-label">Stop MC</label>
                                             <input class="form-control" type="text" value="<?= $mesinFooties ?> Mesin" id="example-text-input" readonly>
                                         </div>
                                     </div>
@@ -126,25 +97,19 @@
                                     </div>
                                     <div class="col-lg-6 col-md-6">
                                         <div class="form-group">
-                                            <label for="example-text-input" class="form-control-label">Stop MC</label>
-                                            <input class="form-control" type="text" value="<?= $mesinShaftless ?> Mesin" id="example-text-input" readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-6 col-md-6">
-                                        <div class="form-group">
                                             <label for="example-text-input" class="form-control-label">Tight</label>
                                             <input class="form-control" type="text" value="<?= $mesinTight ?> Mesin" id="example-text-input" readonly>
                                         </div>
                                     </div>
-                                    <div class="col-lg-6 col-md-6">
-                                        <div class="form-group">
-                                            <label for="example-text-input" class="form-control-label">Stop MC</label>
-                                            <input class="form-control" type="text" value="<?= $mesinTight ?> Mesin" id="example-text-input" readonly>
-                                        </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <button type="submit" class="btn bg-gradient-info w-100">
+                                            Save
+                                        </button>
                                     </div>
                                 </div>
+
 
                             </div>
                         </div>
