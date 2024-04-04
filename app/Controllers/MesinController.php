@@ -67,6 +67,7 @@ class MesinController extends BaseController
             'active6' => '',
             'TotalMesin' => $totalMesin,
         ];
+        dd($totalMesin);
         return view('Capacity/Mesin/mesinjarum', $data);
     }
     public function mesinperarea()

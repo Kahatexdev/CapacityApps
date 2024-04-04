@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class TestModel extends Model
 {
-    protected $table            = 'test';
+    protected $table            = 'apsperstyle';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
@@ -39,4 +39,20 @@ class TestModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getDeliveryData()
+    {
+        $builder = $this->db->table($this->table);
+        $builder->select('delivery, SUM(sisa) AS sisa, 
+            DATEDIFF(delivery, CURDATE()) - 
+            (SELECT COUNT(tanggal) FROM data_libur WHERE tanggal BETWEEN CURDATE() AND apsperstyle.delivery)-3 AS totalhari, 
+            master_product_type.keterangan');
+        $builder->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'left');
+        $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
+        $builder->where('apsperstyle.machinetypeid', 'tj144');
+        $builder->where('apsperstyle.delivery >', date('Y-m-d'));
+        $builder->groupBy('apsperstyle.delivery, master_product_type.keterangan');
+
+        return $builder->get()->getResultArray();
+    }
 }
