@@ -82,7 +82,8 @@ class Checkdate extends BaseController
                 $maxValueOption = $opt;
             }
         }
-
+            $maxValueTotalHari = $options[$maxValueOption]['Jumlah HariTotal'];
+            echo "Total Hari for Option with Max Value: $maxValueTotalHari <br>";
             echo "Kebutuhan Mesin: " . ceil($maxValue) . "<br>";
         }
     }

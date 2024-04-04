@@ -145,19 +145,19 @@
 
         <?php foreach ($TotalMesin as $jr) : ?>
             <div class="col-xl-2 col-sm-3 mb-xl-0 mb-4 mt-2">
-                <button class="btn pilih-jarum" data-bs-toggle="modal" data-bs-target="#generate" data-id="<?= $jr['jarum'] ?>">
-                    <div class="card">
+                <div class="card bg-dark">
+                        <button class="btn pilih-jarum bg-white" data-bs-toggle="modal" data-bs-target="#generate" data-id="<?= $jr['jarum'] ?>">
                         <div class="card-body p-3">
                             <div class="row">
 
-                                <div class="col-8">
+                                <div class="col-9">
                                     <div class="numbers">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold"><?= $jr['jarum'] ?></p>
                                         <h5 class="font-weight-bolder mb-0">
                                         </h5>
                                     </div>
                                 </div>
-                                <div class="col-4 text-end">
+                                <div class="col-3 text-end">
 
                                     <i class="fas fa-pen-fancy text-sm opacity-10 text-dark" aria-hidden="true"></i>
 
@@ -165,8 +165,8 @@
 
                             </div>
                         </div>
+                    </button>
                     </div>
-                </button>
             </div>
             <div class="modal fade  bd-example-modal-lg" id="generate" tabindex="-1" role="dialog" aria-labelledby="generate" aria-hidden="true">
                 <div class="modal-dialog  modal-dialog" role="document">

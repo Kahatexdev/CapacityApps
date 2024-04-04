@@ -75,6 +75,7 @@ class CalendarController extends BaseController
         $tgl_akhir = strtotime($akhir);
 
         $jumlahHari = ($tgl_akhir - $tgl_awal) / (60 * 60 * 24);
+        
         $startDate = new \DateTime('first day of this month');
         $LiburModel = new LiburModel();
         $holidays = $LiburModel->findAll();
@@ -131,7 +132,7 @@ class CalendarController extends BaseController
             $footiesTotalQty = $footies ?? 0;
             $tightTotalQty = $tight ?? 0;
 
-            $monthlyData[$currentMonth][] = [
+            $monthlyData[] = [
                 'week' => $weekCount,
                 'start_date' => $startOfWeekFormatted,
                 'end_date' => $endOfWeekFormatted,
@@ -152,43 +153,16 @@ class CalendarController extends BaseController
         $kneeTotal = 0;
         $footiesTotal = 0;
         $tightTotal = 0;
-        $hariTotal = 1;
+        $hariTotal = 0;
         $tNormal = 1;
         $tSneaker = 1;
         $tFooties = 1;
         $tKnee = 1;
         $tTight = 1;
         foreach ($monthlyData as $data) {
-            if (isset($data['normal'])) {
-                $normal = $data['normal'];
-            } else {
-                $normal = 0;
-            }
-            if (isset($data['sneaker'])) {
-                $sneaker = $data['sneaker'];
-            } else {
-                $sneaker = 0;
-            }
-            if (isset($data['knee'])) {
-                $knee = $data['knee'];
-            } else {
-                $knee = 0;
-            }
-            if (isset($data['tight'])) {
-                $tight = $data['tight'];
-            } else {
-                $tight = 0;
-            }
-            if (isset($data['footies'])) {
-                $footies = $data['footies'];
-            } else {
-                $footies = 0;
-            }
-            if (isset($data['number_of_days'])) {
-                $hari = $data['number_of_days'];
-            } else {
-                $hari = 0;
-            }
+          
+           $normal = $data['normal'];
+           $hari = $data['number_of_days'];
             $normalTotal += $normal;
             $sneakerTotal += $sneaker;
             $kneeTotal += $knee;
@@ -221,7 +195,7 @@ class CalendarController extends BaseController
             }
         }
         $value[] = [
-            'Jumlah Hari1' => $hari,
+            'Jumlah Hari1' => $hariTotal,
             'totalNormal' => ceil($normalTotal / $tNormal / $hariTotal),
             'totalsneaker' => ceil($sneakerTotal / $tSneaker / $hariTotal),
             'totalFooties' => ceil($footiesTotal / $tFooties / $hariTotal),
@@ -235,6 +209,7 @@ class CalendarController extends BaseController
         $maxTotalFooties = max(array_column($value, 'totalFooties'));
         $maxTotalKnee = max(array_column($value, 'totalKnee'));
         $maxTotalTight = max(array_column($value, 'totalTight'));
+        $maxHariTotal = max(array_column($value, 'Jumlah Hari1'));
 
         $TotalKebutuhanMesin = $maxTotalNormal + $maxTotalSneaker + $maxTotalFooties + $maxTotalKnee + $maxTotalTight;
         $kebutuhanMc = [
@@ -257,12 +232,11 @@ class CalendarController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => 'active',
-
+            'KebutuhanMC'=>$kebutuhanMc,
             'weeklyRanges' => $monthlyData,
             'DaftarLibur' => $holidays,
             'kategoriProduk' => $kategori
         ];
-
         dd($data);
 
         return view('Capacity/Calendar/calendar', $data);
