@@ -74,8 +74,9 @@ class CalendarController extends BaseController
         $tgl_awal = strtotime($awal);
         $tgl_akhir = strtotime($akhir);
 
+
         $jumlahHari = ($tgl_akhir - $tgl_awal) / (60 * 60 * 24);
-        
+
         $startDate = new \DateTime('first day of this month');
         $LiburModel = new LiburModel();
         $holidays = $LiburModel->findAll();
@@ -120,198 +121,8 @@ class CalendarController extends BaseController
                 'start' => $start,
                 'end' => $end,
             ];
-            $dt = $this->ApsPerstyleModel->getPlanJarum($cek);
-            $normalSock = $this->ApsPerstyleModel->getPlanJarumNs($cek);
-            $sneaker = $this->ApsPerstyleModel->getPlanJarumSs($cek);
-            $knee = $this->ApsPerstyleModel->getPlanJarumKh($cek);
-            $footies = $this->ApsPerstyleModel->getPlanJarumFs($cek);
-            $tight = $this->ApsPerstyleModel->getPlanJarumT($cek);
-            $normalTotalQty = $normalSock ?? 0;
-            $sneakerTotalQty = $sneaker ?? 0;
-            $kneeTotalQty = $knee ?? 0;
-            $footiesTotalQty = $footies ?? 0;
-            $tightTotalQty = $tight ?? 0;
-
-            $monthlyData[] = [
-                'week' => $weekCount,
-                'start_date' => $startOfWeekFormatted,
-                'end_date' => $endOfWeekFormatted,
-                'number_of_days' => $numberOfDays,
-                'holidays' => $weekHolidays,
-                'normal' => $normalTotalQty,
-                'sneaker' => $sneakerTotalQty,
-                'knee' => $kneeTotalQty,
-                'footies' => $footiesTotalQty,
-                'tight' => $tightTotalQty,
-            ];
-
-            $weekCount++;
-        }
-
-        $normalTotal = 0;
-        $sneakerTotal = 0;
-        $kneeTotal = 0;
-        $footiesTotal = 0;
-        $tightTotal = 0;
-        $hariTotal = 0;
-        $tNormal = 1;
-        $tSneaker = 1;
-        $tFooties = 1;
-        $tKnee = 1;
-        $tTight = 1;
-        foreach ($monthlyData as $data) {
-          
-           $normal = $data['normal'];
-           $hari = $data['number_of_days'];
-            $normalTotal += $normal;
-            $sneakerTotal += $sneaker;
-            $kneeTotal += $knee;
-            $footiesTotal += $footies;
-            $tightTotal += $tight;
-            $hariTotal += $hari;
-
-            switch ($jarum) {
-                case 'JC120':
-                    $tNormal = 17;
-                    $tSneaker = 20.4;
-                    $tFooties = 21.3;
-                    $tKnee = 11.3;
-                    $tTight = 8.2;
-                    break;
-                case 'JC168':
-                    $tNormal = 12;
-                    $tSneaker = 15.6;
-                    $tFooties = 16.9;
-                    $tKnee = 8.7;
-                    $tTight = 4.3;
-                    break;
-                default:
-                    $tNormal = 1;
-                    $tSneaker = 1;
-                    $tFooties = 1;
-                    $tKnee = 1;
-                    $tTight = 1;
-                    break;
-            }
-        }
-        $value[] = [
-            'Jumlah Hari1' => $hariTotal,
-            'totalNormal' => ceil($normalTotal / $tNormal / $hariTotal),
-            'totalsneaker' => ceil($sneakerTotal / $tSneaker / $hariTotal),
-            'totalFooties' => ceil($footiesTotal / $tFooties / $hariTotal),
-            'totalKnee' => ceil($kneeTotal / $tKnee / $hariTotal),
-            'totalTight' => ceil($tightTotal / $tTight / $hariTotal),
-            'Jumlah HariTotal' => $hariTotal,
-        ];
-
-        $maxTotalNormal = max(array_column($value, 'totalNormal'));
-        $maxTotalSneaker = max(array_column($value, 'totalsneaker'));
-        $maxTotalFooties = max(array_column($value, 'totalFooties'));
-        $maxTotalKnee = max(array_column($value, 'totalKnee'));
-        $maxTotalTight = max(array_column($value, 'totalTight'));
-        $maxHariTotal = max(array_column($value, 'Jumlah Hari1'));
-
-        $TotalKebutuhanMesin = $maxTotalNormal + $maxTotalSneaker + $maxTotalFooties + $maxTotalKnee + $maxTotalTight;
-        $kebutuhanMc = [
-            'Normal Socks' => $maxTotalNormal,
-            'Sneakers' => $maxTotalSneaker,
-            'Footies' => $maxTotalFooties,
-            'Knee' => $maxTotalKnee,
-            'Tight' => $maxTotalTight,
-            'Total Kebutuhan Mesin' => $TotalKebutuhanMesin,
-            'Hari' => $hariTotal
-        ];
-        // Di sini Anda mungkin perlu memanggil model lain untuk mendapatkan data lain yang diperlukan
-        $kategori = $this->productModel->getKategori();
-
-        $data = [
-            'title' => 'Capacity System',
-            'active1' => '',
-            'active2' => '',
-            'active3' => '',
-            'active4' => '',
-            'active5' => '',
-            'active6' => 'active',
-            'KebutuhanMC'=>$kebutuhanMc,
-            'weeklyRanges' => $monthlyData,
-            'DaftarLibur' => $holidays,
-            'kategoriProduk' => $kategori
-        ];
-        dd($data);
-
-        return view('Capacity/Calendar/calendar', $data);
-    }
 
 
-
-    public function inputLibur()
-    {
-        $tanggal = $this->request->getPost('tgl_libur');
-        $nama = $this->request->getPost('nama');
-        $data = [
-            'tanggal' => $tanggal,
-            'nama' => $nama
-        ];
-        $insert = $this->liburModel->insert($data);
-        if ($insert) {
-            return redirect()->to(base_url('/capacity/calendar'))->withInput()->with('success', 'Tanggal Berhasil Di Input');
-        } else {
-            return redirect()->to(base_url('/capacity/calendar'))->withInput()->with('error', 'Gagal Input Tanggal');
-        }
-    }
-
-    public function generatePlanning()
-    {
-        $tgl_awal = $this->request->getPost("tgl_awal");
-        $tgl_akhir = $this->request->getPost("tgl_akhir");
-
-
-        $dataJarum = $this->jarumModel->getJarum();
-        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
-
-        $startDate = new \DateTime('first day of this month');
-        $LiburModel = new LiburModel();
-        $holidays = $LiburModel->findAll();
-        $currentMonth = $startDate->format('F');
-        $weekCount = 1; // Initialize week count for the first week of the month
-        $monthlyData = [];
-        $range = 12;
-        for ($i = 0; $i < $range; $i++) {
-            $startOfWeek = clone $startDate;
-            $startOfWeek->modify("+$i week");
-            $startOfWeek->modify('Monday this week');
-
-            $endOfWeek = clone $startOfWeek;
-            $endOfWeek->modify('Sunday this week');
-            $numberOfDays = $startOfWeek->diff($endOfWeek)->days + 1;
-
-            $weekHolidays = [];
-            foreach ($holidays as $holiday) {
-                $holidayDate = new \DateTime($holiday['tanggal']);
-                if ($holidayDate >= $startOfWeek && $holidayDate <= $endOfWeek) {
-                    $weekHolidays[] = [
-                        'nama' => $holiday['nama'],
-                        'tanggal' => $holidayDate->format('d-F'),
-                    ];
-                    $numberOfDays--;
-                }
-            }
-            $currentMonthOfYear = $startOfWeek->format('F');
-            if ($currentMonth !== $currentMonthOfYear) {
-                $currentMonth = $currentMonthOfYear;
-                $weekCount = 1; // Reset week count
-                $monthlyData[$currentMonth] = [];
-            }
-
-            $startOfWeekFormatted = $startOfWeek->format('d-m');
-            $endOfWeekFormatted = $endOfWeek->format('d-m');
-            $start = $startOfWeek->format('Y-m-d');
-            $end = $endOfWeek->format('Y-m-d');
-            $cek = [
-                'jarum' => 'TJ144',
-                'start' => $start,
-                'end' => $end,
-            ];
             $dt = $this->ApsPerstyleModel->getPlanJarum($cek);
             $normalSock = $this->ApsPerstyleModel->getPlanJarumNs($cek);
             $sneaker = $this->ApsPerstyleModel->getPlanJarumSs($cek);
@@ -339,21 +150,481 @@ class CalendarController extends BaseController
 
             $weekCount++;
         }
+        $get = [
+            'jarum' => $jarum,
+            'start' => $awal,
+            'end' => $akhir,
+        ];
+
+        $normalMC = $this->normalCalc($get);
+        $sneakerMC = $this->sneakerCalc($get);
+        $kneeMc = $this->kneeCalc($get);
+        $footiesMc = $this->footiesCalc($get);
+        $shaftlessMc = $this->shaftlessCalc($get);
+        $tightMc = $this->tightCalc($get);
+        $totalKebutuhan = $normalMC + $sneakerMC + $kneeMc + $footiesMc + $shaftlessMc + $tightMc;
+
+        // Di sini Anda mungkin perlu memanggil model lain untuk mendapatkan data lain yang diperlukan
+        $kategori = $this->productModel->getKategori();
+
         $data = [
-            'title' => 'Data Booking',
+            'title' => 'Capacity System',
             'active1' => '',
             'active2' => '',
             'active3' => '',
             'active4' => '',
             'active5' => '',
             'active6' => 'active',
-            'Jarum' => $dataJarum,
-            'TotalMesin' => $totalMesin,
-            'DaftarLibur' => $holidays,
             'weeklyRanges' => $monthlyData,
             'DaftarLibur' => $holidays,
-
+            'kategoriProduk' => $kategori,
+            'mesinNormal' => $normalMC,
+            'mesinSneaker' => $sneakerMC,
+            'mesinKnee' => $kneeMc,
+            'mesinFooties' => $footiesMc,
+            'mesinShaftless' => $shaftlessMc,
+            'mesinTight' => $tightMc,
+            'totalKebutuhan' => $totalKebutuhan,
+            'start' => $awal,
+            'end' => $akhir,
+            'jarum' => $jarum,
+            'jmlHari' => $jumlahHari
         ];
-        return view('Capacity/Calendar/generate', $data);
+
+        return view('Capacity/Calendar/calendar', $data);
+    }
+
+    private function normalCalc($cek)
+    {
+        $query = $this->ApsPerstyleModel->normalCalc($cek);
+        if (!$query) {
+            $result = 0;
+            return $result;
+        } else {
+            $qtyTotal = 0;
+            $jarum = $cek['jarum'];
+            $target = 0;
+            switch ($jarum) {
+                case 'JC84':
+                    $target = 25 * 24;
+                    break;
+                case 'JC96':
+                    $target = 19 * 24;
+                    break;
+                case 'JC108':
+                    $target = 18 * 24;
+                    break;
+                case 'JC120':
+                    $target = 17 * 24;
+                    break;
+                case 'JC144':
+                    $target = 14 * 24;
+                    break;
+                case 'JC168':
+                    $target = 13 * 24;
+                    break;
+                case 'JC200':
+                    $target = 11 * 24;
+                    break;
+                case 'TJ96':
+                    $target = 16 * 24;
+                    break;
+                case 'TJ108':
+                    $target = 14 * 24;
+                    break;
+                case 'TJ120':
+                    $target = 12 * 24;
+                    break;
+                case 'TJ144':
+                    $target = 11 * 24;
+                    break;
+                case 'TJ168':
+                    $target = 9 * 24;
+                    break;
+
+                default:
+                    $target = 1;
+            }
+            $value = [];
+            foreach ($query as $key => $data) {
+                $qty1 = $data['sisa'];
+                $hari1 = $data['totalhari'];
+                $deliv = $data['delivery'];
+                $qtyTotal += $qty1;
+
+                $value[] = [
+                    'kebutuhanMc' => ceil($qtyTotal / $target / $hari1),
+                    'JumlahHari' => $hari1,
+                    'delivery' => $deliv
+                ];
+            }
+            $kebutuhanMc = max(array_column($value, 'kebutuhanMc'));
+            $result = $kebutuhanMc;
+            return $result;
+        }
+    }
+    private function sneakerCalc($cek)
+    {
+        $query = $this->ApsPerstyleModel->sneakerCalc($cek);
+        if (!$query) {
+            $result = 0;
+            return $result;
+        } else {
+            $qtyTotal = 0;
+            $jarum = $cek['jarum'];
+            $target = 0;
+            switch ($jarum) {
+                case 'JC84':
+                    $target = 30 * 24;
+                    break;
+                case 'JC96':
+                    $target = 22.8 * 24;
+                    break;
+                case 'JC108':
+                    $target = 21.6 * 24;
+                    break;
+                case 'JC120':
+                    $target = 20.4 * 24;
+                    break;
+                case 'JC144':
+                    $target = 16.8 * 24;
+                    break;
+                case 'JC168':
+                    $target = 15.6 * 24;
+                    break;
+                case 'JC200':
+                    $target = 13.2 * 24;
+                    break;
+                case 'TJ96':
+                    $target = 19.2 * 24;
+                    break;
+                case 'TJ108':
+                    $target = 16.8 * 24;
+                    break;
+                case 'TJ120':
+                    $target = 14.4 * 24;
+                    break;
+                case 'TJ144':
+                    $target = 13.2 * 24;
+                    break;
+                case 'TJ168':
+                    $target = 10.8 * 24;
+                    break;
+
+                default:
+                    $target = 1;
+            }
+            $value = [];
+            foreach ($query as $key => $data) {
+                $qty1 = $data['sisa'];
+                $hari1 = $data['totalhari'];
+                $deliv = $data['delivery'];
+                $qtyTotal += $qty1;
+
+                $value[] = [
+                    'kebutuhanMc' => ceil($qtyTotal / $target / $hari1),
+                    'JumlahHari' => $hari1,
+                    'delivery' => $deliv
+                ];
+            }
+            $kebutuhanMc = max(array_column($value, 'kebutuhanMc'));
+
+            $result = $kebutuhanMc;
+            return $result;
+        }
+    }
+    private function kneeCalc($cek)
+    {
+        $query = $this->ApsPerstyleModel->kneeCalc($cek);
+        if (!$query) {
+            $result = 0;
+            return $result;
+        } else {
+            $qtyTotal = 0;
+            $jarum = $cek['jarum'];
+            $target = 0;
+            switch ($jarum) {
+                case 'JC84':
+                    $target = 16.6 * 24;
+                    break;
+                case 'JC96':
+                    $target = 12.8 * 24;
+                    break;
+                case 'JC108':
+                    $target = 12 * 24;
+                    break;
+                case 'JC120':
+                    $target = 11.3 * 24;
+                    break;
+                case 'JC144':
+                    $target = 9.3 * 24;
+                    break;
+                case 'JC168':
+                    $target = 8.6 * 24;
+                    break;
+                case 'JC200':
+                    $target = 7.3 * 24;
+                    break;
+                case 'TJ96':
+                    $target = 10.6 * 24;
+                    break;
+                case 'TJ108':
+                    $target = 9.3 * 24;
+                    break;
+                case 'TJ120':
+                    $target = 8 * 24;
+                    break;
+                case 'TJ144':
+                    $target = 7.3 * 24;
+                    break;
+                case 'TJ168':
+                    $target = 6 * 24;
+                    break;
+                default:
+                    $target = 1;
+            }
+            $value = [];
+            foreach ($query as $key => $data) {
+                $qty1 = $data['sisa'];
+                $hari1 = $data['totalhari'];
+                $deliv = $data['delivery'];
+                $qtyTotal += $qty1;
+
+                $value[] = [
+                    'kebutuhanMc' => ceil($qtyTotal / $target / $hari1),
+                    'JumlahHari' => $hari1,
+                    'delivery' => $deliv
+                ];
+            }
+            $kebutuhanMc = max(array_column($value, 'kebutuhanMc'));
+
+            $result = $kebutuhanMc;
+            return $result;
+        }
+    }
+    private function footiesCalc($cek)
+    {
+        $query = $this->ApsPerstyleModel->footiesCalc($cek);
+        if (!$query) {
+            $result = 0;
+            return $result;
+        } else {
+            $qtyTotal = 0;
+            $jarum = $cek['jarum'];
+            $target = 0;
+            switch ($jarum) {
+                case 'JC84':
+                    $target = 32.5 * 24;
+                    break;
+                case 'JC96':
+                    $target = 24.7 * 24;
+                    break;
+                case 'JC108':
+                    $target = 23.4 * 24;
+                    break;
+                case 'JC120':
+                    $target = 22.1 * 24;
+                    break;
+                case 'JC144':
+                    $target = 18.2 * 24;
+                    break;
+                case 'JC168':
+                    $target = 16.9 * 24;
+                    break;
+                case 'JC200':
+                    $target = 14.3 * 24;
+                    break;
+                case 'TJ96':
+                    $target = 20.8 * 24;
+                    break;
+                case 'TJ108':
+                    $target = 18.2 * 24;
+                    break;
+                case 'TJ120':
+                    $target = 15.6 * 24;
+                    break;
+                case 'TJ144':
+                    $target = 14.3 * 24;
+                    break;
+                case 'TJ168':
+                    $target = 11.7 * 24;
+                    break;
+                default:
+                    $target = 1;
+            }
+            $value = [];
+            foreach ($query as $key => $data) {
+                $qty1 = $data['sisa'];
+                $hari1 = $data['totalhari'];
+                $deliv = $data['delivery'];
+                $qtyTotal += $qty1;
+
+                $value[] = [
+                    'kebutuhanMc' => ceil($qtyTotal / $target / $hari1),
+                    'JumlahHari' => $hari1,
+                    'delivery' => $deliv
+                ];
+            }
+            $kebutuhanMc = max(array_column($value, 'kebutuhanMc'));
+
+            $result = $kebutuhanMc;
+            return $result;
+        }
+    }
+    private function shaftlessCalc($cek)
+    {
+        $query = $this->ApsPerstyleModel->shaftlessCalc($cek);
+        if (!$query) {
+            $result = 0;
+            return $result;
+        } else {
+            $qtyTotal = 0;
+            $jarum = $cek['jarum'];
+            $target = 0;
+            switch ($jarum) {
+                case 'JC84':
+                    $target = 32.5 * 24;
+                    break;
+                case 'JC96':
+                    $target = 24.7 * 24;
+                    break;
+                case 'JC108':
+                    $target = 23.4 * 24;
+                    break;
+                case 'JC120':
+                    $target = 22.1 * 24;
+                    break;
+                case 'JC144':
+                    $target = 18.2 * 24;
+                    break;
+                case 'JC168':
+                    $target = 16.9 * 24;
+                    break;
+                case 'JC200':
+                    $target = 14.3 * 24;
+                    break;
+                case 'TJ96':
+                    $target = 20.8 * 24;
+                    break;
+                case 'TJ108':
+                    $target = 18.2 * 24;
+                    break;
+                case 'TJ120':
+                    $target = 15.6 * 24;
+                    break;
+                case 'TJ144':
+                    $target = 14.3 * 24;
+                    break;
+                case 'TJ168':
+                    $target = 11.7 * 24;
+                    break;
+                default:
+                    $target = 1;
+            }
+            $value = [];
+            foreach ($query as $key => $data) {
+                $qty1 = $data['sisa'];
+                $hari1 = $data['totalhari'];
+                $deliv = $data['delivery'];
+                $qtyTotal += $qty1;
+
+                $value[] = [
+                    'kebutuhanMc' => ceil($qtyTotal / $target / $hari1),
+                    'JumlahHari' => $hari1,
+                    'delivery' => $deliv
+                ];
+            }
+            $kebutuhanMc = max(array_column($value, 'kebutuhanMc'));
+
+            $result = $kebutuhanMc;
+            return $result;
+        }
+    }
+    private function tightCalc($cek)
+    {
+        $query = $this->ApsPerstyleModel->tightCalc($cek);
+        if (!$query) {
+            $result = 0;
+            return $result;
+        } else {
+            $qtyTotal = 0;
+            $jarum = $cek['jarum'];
+            $target = 0;
+            switch ($jarum) {
+                case 'JC84':
+                    $target = 16 * 24;
+                    break;
+                case 'JC96':
+                    $target = 7.6 * 24;
+                    break;
+                case 'JC108':
+                    $target = 7.2 * 24;
+                    break;
+                case 'JC120':
+                    $target = 6.8 * 24;
+                    break;
+                case 'JC144':
+                    $target = 5.6 * 24;
+                    break;
+                case 'JC168':
+                    $target = 5.2 * 24;
+                    break;
+                case 'JC200':
+                    $target = 4.4 * 24;
+                    break;
+                case 'TJ96':
+                    $target = 6.4 * 24;
+                    break;
+                case 'TJ108':
+                    $target = 5.6 * 24;
+                    break;
+                case 'TJ120':
+                    $target = 4.8 * 24;
+                    break;
+                case 'TJ144':
+                    $target = 4.4 * 24;
+                    break;
+                case 'TJ168':
+                    $target = 3.6 * 24;
+                    break;
+                default:
+                    $target = 1;
+            }
+            $value = [];
+            foreach ($query as $key => $data) {
+                $qty1 = $data['sisa'];
+                $hari1 = $data['totalhari'];
+                $deliv = $data['delivery'];
+                $qtyTotal += $qty1;
+
+                $value[] = [
+                    'kebutuhanMc' => ceil($qtyTotal / $target / $hari1),
+                    'JumlahHari' => $hari1,
+                    'delivery' => $deliv
+                ];
+            }
+            $kebutuhanMc = max(array_column($value, 'kebutuhanMc'));
+
+            $result = $kebutuhanMc;
+            return $result;
+        }
+    }
+
+
+
+    public function inputLibur()
+    {
+        $tanggal = $this->request->getPost('tgl_libur');
+        $nama = $this->request->getPost('nama');
+        $data = [
+            'tanggal' => $tanggal,
+            'nama' => $nama
+        ];
+        $insert = $this->liburModel->insert($data);
+        if ($insert) {
+            return redirect()->to(base_url('/capacity/calendar'))->withInput()->with('success', 'Tanggal Berhasil Di Input');
+        } else {
+            return redirect()->to(base_url('/capacity/calendar'))->withInput()->with('error', 'Gagal Input Tanggal');
+        }
     }
 }

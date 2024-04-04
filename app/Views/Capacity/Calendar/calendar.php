@@ -25,29 +25,135 @@
         </script>
     <?php endif; ?>
 
-    <div class="row mb-2 mt-4">
-        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+
+    <div class="row mt-3">
+        <div class="col-xl-12">
+
             <div class="card">
-                <div class="card-body p-3">
+                <div class="card-header">
                     <div class="d-flex justify-content-between">
-                        <div>
-                            <h3 class="font-weight-bolder mb-0">
-                                <a href="" # class="btn bg-gradient-info">
 
-                                    <i class="fas fa-calendar-alt text-lg opacity-10" aria-hidden="true"></i>
-                                </a>
-                                Capacity Calendar
-                            </h3>
-                        </div>
-                        <div>
-
-                        </div>
+                        <h4>Capacity Mesin dari <mark><small><?= $start ?> </mark> </small> sampai <mark><small><?= $end ?> </mark> </small> </h4>
+                        <a href="" class="btn bg-gradient-success">Export Excel</a>
                     </div>
                 </div>
-            </div>
+                <div class="card-body">
+                    <form action="">
+                        <div class="row">
+                            <div class="col-lg-6">
 
+                                <div class="form-group">
+                                    <label for="jarum" class="form-control-label">Judul</label>
+                                    <input class="form-control" type="text" value="" placeholder="Masukan Judul" required id="judul" name="judul">
+                                </div>
+                                <div class="form-group">
+                                    <label for="jarum" class="form-control-label">Jarum</label>
+                                    <input class="form-control" type="text" value="<?= $jarum ?>" id="jarum" name="jarum" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label for="jarum" class="form-control-label">Jumlah Hari</label>
+                                    <input class="form-control" type="text" value="<?= $jmlHari ?>" id="jarum" name="jarum" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label for="jarum" class="form-control-label">Total Kebutuhan Mesin</label>
+                                    <input class="form-control" type="text" value="<?= $totalKebutuhan ?>" id="totalMc" name="totalMc" readonly>
+                                </div>
+
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="form-group">
+                                            <label for="example-text-input" class="form-control-label">Normal Sock</label>
+                                            <input class="form-control" type="text" value="<?= $mesinNormal ?> Mesin" id="example-text-input" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="form-group">
+                                            <label for="example-text-input" class="form-control-label">Stop MC</label>
+                                            <input class="form-control" type="text" value="<?= $mesinNormal ?> Mesin" id="example-text-input" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="form-group">
+                                            <label for="example-text-input" class="form-control-label">Sneaker</label>
+                                            <input class="form-control" type="text" value="<?= $mesinSneaker ?> Mesin" id="example-text-input" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="form-group">
+                                            <label for="example-text-input" class="form-control-label">Stop MC</label>
+                                            <input class="form-control" type="text" value="<?= $mesinSneaker ?> Mesin" id="example-text-input" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="form-group">
+                                            <label for="example-text-input" class="form-control-label">Knee High</label>
+                                            <input class="form-control" type="text" value="<?= $mesinKnee ?> Mesin" id="example-text-input" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="form-group">
+                                            <label for="example-text-input" class="form-control-label">Stop MC</label>
+                                            <input class="form-control" type="text" value="<?= $mesinKnee ?> Mesin" id="example-text-input" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="form-group">
+                                            <label for="example-text-input" class="form-control-label">Footies</label>
+                                            <input class="form-control" type="text" value="<?= $mesinFooties ?> Mesin" id="example-text-input" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="form-group">
+                                            <label for="example-text-input" class="form-control-label">Stop MC</label>
+                                            <input class="form-control" type="text" value="<?= $mesinFooties ?> Mesin" id="example-text-input" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="form-group">
+                                            <label for="example-text-input" class="form-control-label">Shaftless</label>
+                                            <input class="form-control" type="text" value="<?= $mesinShaftless ?> Mesin" id="example-text-input" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="form-group">
+                                            <label for="example-text-input" class="form-control-label">Stop MC</label>
+                                            <input class="form-control" type="text" value="<?= $mesinShaftless ?> Mesin" id="example-text-input" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="form-group">
+                                            <label for="example-text-input" class="form-control-label">Tight</label>
+                                            <input class="form-control" type="text" value="<?= $mesinTight ?> Mesin" id="example-text-input" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="form-group">
+                                            <label for="example-text-input" class="form-control-label">Stop MC</label>
+                                            <input class="form-control" type="text" value="<?= $mesinTight ?> Mesin" id="example-text-input" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
+
 
 
     <!-- kalender -->
