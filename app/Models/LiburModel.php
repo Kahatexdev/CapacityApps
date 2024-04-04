@@ -39,4 +39,17 @@ class LiburModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getTotalLiburBetweenDates($startDate, $endDate)
+{
+    $query = $this->select('COUNT(*) as total_libur')
+                    ->where('tanggal >=', $startDate)
+                    ->where('tanggal <=', $endDate)
+                    ->get();
+
+    $row = $query->getRow();
+
+    return $row->total_libur;
+}
+
 }

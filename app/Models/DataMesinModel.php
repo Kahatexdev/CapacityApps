@@ -70,9 +70,31 @@ class DataMesinModel extends Model
 
     public function getTotalMesinByJarum()
     {
-        $query = $this->select('jarum, SUM(total_mc) as total')->groupBy('jarum')->findAll();
-        return $query;
+    $customOrder = [
+        'JC120' => 3,
+        'JC144' => 2,
+        'JC168' => 1
+    ];
+
+    // Get the keys of the custom order
+    $customOrderKeys = array_keys($customOrder);
+
+    // Generate the CASE statement for custom ordering
+    $caseStatement = "CASE jarum ";
+    foreach ($customOrderKeys as $index => $jarum) {
+        $caseStatement .= "WHEN '$jarum' THEN $index ";
     }
+    $caseStatement .= "END";
+
+    $query = $this->select('jarum, SUM(total_mc) as total')
+                  ->groupBy('jarum')
+                  ->orderBy("FIELD(jarum, 'JC120', 'JC144', 'JC168') DESC, jarum");
+
+    $result = $query->findAll();
+
+    return $result;
+    }
+
     public function mcJalan()
     {
         return $this->selectSum('mesin_jalan')->get()->getRow()->mesin_jalan;

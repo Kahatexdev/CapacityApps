@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\TestModel;
+use App\Models\LiburModel;
 use App\Controllers\BaseController;
 
 class Checkdate extends BaseController
@@ -15,7 +16,7 @@ class Checkdate extends BaseController
         $testModel = new TestModel();
 
         // Ambil data dari database
-        $optionsData = $testModel->findAll();
+        $optionsData = $testModel->getDeliveryData();
 
         // Array untuk menyimpan opsi-opsi
         $options = [];
@@ -24,18 +25,20 @@ class Checkdate extends BaseController
         $qtyTotal = 0;
         $hariTotal = 0;
         foreach ($optionsData as $key => $option) {
-            $qty1 = $option['qty'];
-            $hari1 = $option['hari'];
+            $delivery = $option['delivery'];
+            $qty1 = $option['sisa'];            
+            $hari1 = $option['totalhari'];
+            $keterangan = $option['keterangan'];
 
             // Akumulasi nilai-nilai
             $qtyTotal += $qty1;
             $hariTotal += $hari1;
 
             $options["OPT " . chr(65 + $key)] = [
-                'Qty1' => $qty1,
-                'Jumlah Hari1' => $hari1,
+                'Delivery' => $delivery,
+                'Qty Di Delivery' => $qty1,
                 'QtyTotal' => $qtyTotal,
-                'Jumlah HariTotal' => $hariTotal,
+                'Jumlah HariTotal' => $hari1,
             ];
         }
 
@@ -57,9 +60,11 @@ class Checkdate extends BaseController
         foreach ($options as $opt => $data) {
             // Tampilkan total sampai opsi saat ini
             echo "Total sampai $opt: <br>";
+            echo "Delivery : ".date('d-M-Y', strtotime($data['Delivery']))."<br>";
+            echo "Qty di Delivery : " . $data['Qty Di Delivery'] . "<br>";
             echo "Qty Total: " . $data['QtyTotal'] . "<br>";
             echo "Jumlah Hari Total: " . $data['Jumlah HariTotal'] . "<br>";
-            $expressionValue = $data['QtyTotal'] / $data['Jumlah HariTotal'] / 14; //14 ini adalah targetnya
+            $expressionValue = $data['QtyTotal'] / $data['Jumlah HariTotal'] / 14 / 12; //14 ini adalah targetnya
 
             // Output the value for the current option
             echo "Kebutuhan Mesin Sampai $opt: " . ceil($expressionValue) . "<br>";
@@ -70,7 +75,7 @@ class Checkdate extends BaseController
 
             // Tampilkan hasil perbandingan
             echo "Perbedaan Qty: " . abs($qtyDiff) . "<br>";
-            echo "Perbedaan Jumlah Hari: " . abs($hariDiff) . "<br><br>";
+            echo "<br><br>";
 
             // Update total untuk kategori berikutnya
             $totalQty = $data['QtyTotal'];
@@ -83,7 +88,19 @@ class Checkdate extends BaseController
             }
         }
             $maxValueTotalHari = $options[$maxValueOption]['Jumlah HariTotal'];
-            echo "Total Hari for Option with Max Value: $maxValueTotalHari <br>";
-            echo "Kebutuhan Mesin: " . ceil($maxValue) . "<br>";
+            $maxValueTotalQty = $options[$maxValueOption]['QtyTotal'];
+            echo "Total Hari Yang dibutuhkan : $maxValueTotalHari  Hari <br>";
+            echo "Kebutuhan Mesin: " . ceil($maxValue) . " Mesin<br>";
+            echo "Jalan mesin selama ".$kebutuhanhari = ceil($totalQty/$maxValue/12/14);
+            echo " Hari<br>";
+            $dateStopMesin = date('Y-m-d', strtotime('+' . $kebutuhanhari . ' days'));
+            echo "<br>";
+        
+            $liburModel = new LiburModel();
+            $startDate = date('Y-m-d'); // Tanggal hari ini
+            $endDate = date('Y-m-d',strtotime($dateStopMesin)); // Tanggal stop mesin
+            $totalLibur = $liburModel->getTotalLiburBetweenDates($startDate, $endDate);           
+            $estimatedStopDate = date('Y-m-d', strtotime("+$totalLibur days", strtotime($dateStopMesin)));
+            echo "Estimasi stop mesin: " . date('d-M-Y',strtotime($estimatedStopDate)) ." Sudah Termasuk Libur $totalLibur Hari";
         }
     }
