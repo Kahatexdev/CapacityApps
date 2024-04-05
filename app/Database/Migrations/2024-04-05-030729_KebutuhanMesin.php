@@ -31,6 +31,14 @@ class KebutuhanMesin extends Migration
                 'type' => 'INT',
                 'constraint' => 30,
             ],
+            'tanggal_awal' => [
+                'type' => 'date',
+
+            ],
+            'tanggal_akhir' => [
+                'type' => 'date',
+
+            ],
             'created_at' => [
                 'type' => 'date',
 

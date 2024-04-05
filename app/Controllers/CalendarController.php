@@ -632,4 +632,50 @@ class CalendarController extends BaseController
             return redirect()->to(base_url('/capacity/Calendar'))->withInput()->with('error', 'Gagal Input Tanggal');
         }
     }
+
+    public function detailPlanning($judul)
+    {
+        $holidays = $this->liburModel->findAll();
+        $dataJarum = $this->jarumModel->getJarum();
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+        $kebutuhanMC = $this->kebMc->getJudul();
+
+        $planning = $this->kebMc->getData($judul);
+        $tgl_plan = $this->kebMc->tglPlan($judul);
+
+        $range = $this->kebMc->range($judul);
+        $groupedData = [];
+        $jumlahMc = 0;
+        foreach ($planning as $val) {
+            $judul = $val['judul'];
+            if (!array_key_exists($judul, $groupedData)) {
+                $groupedData[$judul] = [];
+            }
+            $groupedData[$judul][] = [
+                'jarum' => $val['jarum'],
+                'mesin' => $val['mesin']
+            ];
+            $jumlahMc += (int)$val['mesin'];
+        }
+        $data = [
+            'planning' => $groupedData,
+            'jumlahMc' => $jumlahMc,
+            'judul' => $judul,
+            'range' => $range,
+            'tglplan' => $tgl_plan,
+            'title' => 'Data Booking',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => 'active',
+            'Jarum' => $dataJarum,
+            'TotalMesin' => $totalMesin,
+            'DaftarLibur' => $holidays,
+            'kebutuhanMc' => $kebutuhanMC,
+            'chartstat' => $planning
+        ];
+        return view('Capacity/Calendar/detail', $data);
+    }
 }

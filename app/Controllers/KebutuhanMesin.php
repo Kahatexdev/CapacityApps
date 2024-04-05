@@ -22,7 +22,9 @@ class KebutuhanMesin extends BaseController
             'judul' => $this->request->getPost("judul"),
             'jarum' => $this->request->getPost("jarum"),
             'mesin' => $this->request->getPost("totalMc"),
-            'jumlah_hari' => $this->request->getPost("hari")
+            'jumlah_hari' => $this->request->getPost("hari"),
+            'tanggal_awal' => $this->request->getPost("tgl_awal"),
+            'tanggal_akhir' => $this->request->getPost("tgl_akhir"),
         ];
         $insert = $this->kebMC->insert($data);
 

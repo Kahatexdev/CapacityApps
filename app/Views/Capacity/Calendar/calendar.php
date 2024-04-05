@@ -57,6 +57,8 @@
                                     <label for="jarum" class="form-control-label">Total Kebutuhan Mesin</label>
                                     <input class="form-control" type="text" value="<?= $totalKebutuhan ?>" id="totalMc" name="totalMc" readonly>
                                 </div>
+                                <input type="date" value="<?= $start ?>" hidden name="tgl_awal">
+                                <input type="date" value="<?= $end ?>" hidden name="tgl_akhir">
 
                             </div>
                             <div class="col-lg-6">
