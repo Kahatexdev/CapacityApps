@@ -120,6 +120,142 @@
         </div>
 
     </div>
+    <div class="row my-3">
+        <div class="col-lg-12">
+            <div class="card z-index-2">
+                <div class="card-header pb-0">
+                    <h6 class="card-title">Data Produksi Harian bulan <?= $bulan ?></h6>
+
+                </div>
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12">
+                            <div class="chart">
+                                <canvas id="mixed-chart" class="chart-canvas" height="300"></canvas>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+    <script>
+        let data = <?php echo json_encode($Produksi); ?>;
+        console.log(data)
+        // Ekstraksi tanggal dan jumlah produksi dari data
+        let labels = data.map(item => item.tgl_produksi);
+        console.log(labels)
+        let values = data.map(item => item.qty_produksi);
+        console.log(values)
+
+
+
+        var ctx2 = document.getElementById("mixed-chart").getContext("2d");
+
+        var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
+
+        gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
+        gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
+        gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)'); //purple colors
+
+        var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
+
+        gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
+        gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
+        gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)'); //purple colors
+
+        new Chart(ctx2, {
+
+            data: {
+                labels: labels,
+                datasets: [{
+                        type: "bar",
+                        label: "Jumlah Produksi",
+                        borderWidth: 0,
+                        pointRadius: 30,
+
+                        backgroundColor: "#3A416F",
+                        fill: true,
+                        data: values,
+                        maxBarThickness: 20
+
+                    }, {
+                        type: "line",
+
+                        tension: 0.1,
+                        borderWidth: 0,
+                        pointRadius: 0,
+                        borderColor: "#3A416F",
+                        borderWidth: 2,
+                        backgroundColor: gradientStroke1,
+                        fill: true,
+                        data: values,
+                    },
+
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            drawBorder: false,
+                            display: true,
+                            drawOnChartArea: true,
+                            drawTicks: false,
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            display: true,
+                            padding: 10,
+                            color: '#b2b9bf',
+                            font: {
+                                size: 11,
+                                family: "Open Sans",
+                                style: 'normal',
+                                lineHeight: 2
+                            },
+                        }
+                    },
+                    x: {
+                        grid: {
+                            drawBorder: false,
+                            display: false,
+                            drawOnChartArea: false,
+                            drawTicks: false,
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            display: true,
+                            color: '#b2b9bf',
+                            padding: 20,
+                            font: {
+                                size: 11,
+                                family: "Open Sans",
+                                style: 'normal',
+                                lineHeight: 2
+                            },
+                        }
+                    },
+                },
+            },
+        });
+    </script>
 
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>

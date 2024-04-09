@@ -50,7 +50,10 @@ class ProduksiController extends BaseController
     }
     public function produksi()
     {
+        $bulan = date('m');
+        $month = date('F');
         $totalMesin = $this->jarumModel->getArea();
+        $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
         $data = [
             'title' => 'Data Produksi',
             'active1' => '',
@@ -59,7 +62,9 @@ class ProduksiController extends BaseController
             'active4' => 'active',
             'active5' => '',
             'active6' => '',
-            'Area' => $totalMesin
+            'Area' => $totalMesin,
+            'Produksi' => $dataProduksi,
+            'bulan' => $month
         ];
         return view('Capacity/Produksi/produksi', $data);
     }
