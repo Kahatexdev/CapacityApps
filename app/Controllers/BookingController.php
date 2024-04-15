@@ -51,7 +51,7 @@ class BookingController extends BaseController
     {
         $dataJarum = $this->jarumModel->getJarum();
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
-       
+
         $data = [
             'title' => 'Data Booking',
             'active1' => '',
@@ -60,6 +60,7 @@ class BookingController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'Jarum' => $dataJarum,
             'TotalMesin' => $totalMesin,
         ];
@@ -78,6 +79,7 @@ class BookingController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'jarum' => $jarum,
             'product' => $product,
             'booking' => $booking
@@ -97,15 +99,16 @@ class BookingController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'bulan' => $bulan,
             'jarum' => $jarum,
         ];
         return view('Capacity/Booking/bookingbulan', $data);
     }
 
-    public function bookingPerBulanJarumTampil($bulan,$tahun,$jarum)
+    public function bookingPerBulanJarumTampil($bulan, $tahun, $jarum)
     {
-        $booking = $this->bookingModel->getDataPerjarumbulan($bulan,$tahun,$jarum);
+        $booking = $this->bookingModel->getDataPerjarumbulan($bulan, $tahun, $jarum);
         $product = $this->productModel->findAll();
         $data = [
             'title' => 'Data Booking',
@@ -115,6 +118,7 @@ class BookingController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'booking' => $booking,
             'product' => $product,
             'bulan' => $bulan,
@@ -186,6 +190,7 @@ class BookingController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'booking' => $booking,
             'jarum' => $needle,
             'product' => $product,

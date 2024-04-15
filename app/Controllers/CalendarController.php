@@ -50,20 +50,21 @@ class CalendarController extends BaseController
             return redirect()->to(base_url('/login'));
         }
     }
-    public function index()
+    public function planningorder()
     {
         $holidays = $this->liburModel->findAll();
         $dataJarum = $this->jarumModel->getJarum();
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
-        $kebutuhanMC = $this->kebMc->getJudul();
+        $kebutuhanMC = $this->kebMc->getOrder();
         $data = [
-            'title' => 'Data Booking',
+            'title' => 'Planning Order',
             'active1' => '',
             'active2' => '',
             'active3' => '',
             'active4' => '',
             'active5' => '',
             'active6' => 'active',
+            'active7' => '',
             'Jarum' => $dataJarum,
             'TotalMesin' => $totalMesin,
             'DaftarLibur' => $holidays,
@@ -71,7 +72,29 @@ class CalendarController extends BaseController
         ];
         return view('Capacity/Calendar/index', $data);
     }
-    public function calendar($jarum)
+    public function planningBooking()
+    {
+        $holidays   = $this->liburModel->findAll();
+        $dataJarum  = $this->jarumModel->getJarum();
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+        $kebutuhanMC = $this->kebMc->getBooking();
+        $data = [
+            'title' => 'Planning Booking',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => 'active',
+            'Jarum' => $dataJarum,
+            'TotalMesin' => $totalMesin,
+            'DaftarLibur' => $holidays,
+            'kebutuhanMc' => $kebutuhanMC
+        ];
+        return view('Capacity/Calendar/booking', $data);
+    }
+    public function planOrder($jarum)
     {
         $awal = strval($this->request->getPost("awal"));
         $akhir = strval($this->request->getPost("akhir"));
@@ -180,6 +203,137 @@ class CalendarController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => 'active',
+            'active7' => '',
+            'weeklyRanges' => $monthlyData,
+            'DaftarLibur' => $holidays,
+            'kategoriProduk' => $kategori,
+            'mesinNormal' => $normalMC,
+            'mesinSneaker' => $sneakerMC,
+            'mesinKnee' => $kneeMc,
+            'mesinFooties' => $footiesMc,
+            'mesinShaftless' => $shaftlessMc,
+            'mesinTight' => $tightMc,
+            'totalKebutuhan' => $totalKebutuhan,
+            'start' => $awal,
+            'end' => $akhir,
+            'jarum' => $jarum,
+            'jmlHari' => $jumlahHari,
+            'title' => 'Planning Order'
+        ];
+
+        return view('Capacity/Calendar/calendar', $data);
+    }
+    public function planBooking($jarum)
+    {
+        $awal = strval($this->request->getPost("awal"));
+        $akhir = strval($this->request->getPost("akhir"));
+
+        $tgl_awal = strtotime($awal);
+        $tgl_akhir = strtotime($akhir);
+
+
+        $jumlahHari = ($tgl_akhir - $tgl_awal) / (60 * 60 * 24);
+
+        $startDate = new \DateTime('first day of this month');
+        $LiburModel = new LiburModel();
+        $holidays = $LiburModel->findAll();
+        $currentMonth = $startDate->format('F');
+        $weekCount = 1; // Initialize week count for the first week of the month
+        $monthlyData = [];
+        $range = $jumlahHari / 7;
+        $value = []; // Initialize $value array
+
+        for ($i = 0; $i < $range; $i++) {
+            $startOfWeek = clone $startDate;
+            $startOfWeek->modify("+$i week");
+            $startOfWeek->modify('Monday this week');
+
+            $endOfWeek = clone $startOfWeek;
+            $endOfWeek->modify('Sunday this week');
+            $numberOfDays = $startOfWeek->diff($endOfWeek)->days + 1;
+
+            $weekHolidays = [];
+            foreach ($holidays as $holiday) {
+                $holidayDate = new \DateTime($holiday['tanggal']);
+                if ($holidayDate >= $startOfWeek && $holidayDate <= $endOfWeek) {
+                    $weekHolidays[] = [
+                        'nama' => $holiday['nama'],
+                        'tanggal' => $holidayDate->format('d-F'),
+                    ];
+                    $numberOfDays--;
+                }
+            }
+            $currentMonthOfYear = $startOfWeek->format('F');
+            if ($currentMonth !== $currentMonthOfYear) {
+                $currentMonth = $currentMonthOfYear;
+                $monthlyData[$currentMonth] = [];
+            }
+
+            $startOfWeekFormatted = $startOfWeek->format('d-m');
+            $endOfWeekFormatted = $endOfWeek->format('d-m');
+            $start = $startOfWeek->format('Y-m-d');
+            $end = $endOfWeek->format('Y-m-d');
+            $cek = [
+                'jarum' => $jarum,
+                'start' => $start,
+                'end' => $end,
+            ];
+
+
+            $normalSock = $this->bookingModel->getPlanJarumNs($cek);
+            $sneaker = $this->bookingModel->getPlanJarumSs($cek);
+            $knee = $this->bookingModel->getPlanJarumKh($cek);
+            $footies = $this->bookingModel->getPlanJarumFs($cek);
+            $tight = $this->bookingModel->getPlanJarumT($cek);
+            $normalTotalQty = $normalSock ?? 0;
+            $sneakerTotalQty = $sneaker ?? 0;
+            $kneeTotalQty = $knee ?? 0;
+            $footiesTotalQty = $footies ?? 0;
+            $tightTotalQty = $tight ?? 0;
+
+            $monthlyData[$currentMonth][] = [
+                'week' => $weekCount,
+                'start_date' => $startOfWeekFormatted,
+                'end_date' => $endOfWeekFormatted,
+                'number_of_days' => $numberOfDays,
+                'holidays' => $weekHolidays,
+                'normal' => $normalTotalQty,
+                'sneaker' => $sneakerTotalQty,
+                'knee' => $kneeTotalQty,
+                'footies' => $footiesTotalQty,
+                'tight' => $tightTotalQty,
+            ];
+
+            $weekCount++;
+        }
+
+        $get = [
+            'jarum' => $jarum,
+            'start' => $awal,
+            'end' => $akhir,
+        ];
+
+
+        $normalMC = $this->normalCalc($get);
+        $sneakerMC = $this->sneakerCalc($get);
+        $kneeMc = $this->kneeCalc($get);
+        $footiesMc = $this->footiesCalc($get);
+        $shaftlessMc = $this->shaftlessCalc($get);
+        $tightMc = $this->tightCalc($get);
+        $totalKebutuhan = $normalMC + $sneakerMC + $kneeMc + $footiesMc + $shaftlessMc + $tightMc;
+
+        // Di sini Anda mungkin perlu memanggil model lain untuk mendapatkan data lain yang diperlukan
+        $kategori = $this->productModel->getKategori();
+
+        $data = [
+            'title' => 'Capacity System',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => 'active',
+            'active7' => '',
             'weeklyRanges' => $monthlyData,
             'DaftarLibur' => $holidays,
             'kategoriProduk' => $kategori,
@@ -638,7 +792,7 @@ class CalendarController extends BaseController
         $holidays = $this->liburModel->findAll();
         $dataJarum = $this->jarumModel->getJarum();
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
-        $kebutuhanMC = $this->kebMc->getJudul();
+        $kebutuhanMC = $this->kebMc->getOrder();
 
         $planning = $this->kebMc->getData($judul);
         $tgl_plan = $this->kebMc->tglPlan($judul);
@@ -663,13 +817,14 @@ class CalendarController extends BaseController
             'judul' => $judul,
             'range' => $range,
             'tglplan' => $tgl_plan,
-            'title' => 'Data Booking',
+            'title' => 'Plan Order',
             'active1' => '',
             'active2' => '',
             'active3' => '',
             'active4' => '',
             'active5' => '',
             'active6' => 'active',
+            'active7' => '',
             'Jarum' => $dataJarum,
             'TotalMesin' => $totalMesin,
             'DaftarLibur' => $holidays,

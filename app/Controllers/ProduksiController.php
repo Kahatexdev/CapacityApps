@@ -62,6 +62,8 @@ class ProduksiController extends BaseController
             'active4' => 'active',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
+
             'Area' => $totalMesin,
             'Produksi' => $dataProduksi,
             'bulan' => $month
@@ -79,6 +81,8 @@ class ProduksiController extends BaseController
             'active4' => 'active',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
+
             'produksi' => $produksi,
             'area' => $area
         ];

@@ -25,13 +25,14 @@ class KebutuhanMesin extends BaseController
             'jumlah_hari' => $this->request->getPost("hari"),
             'tanggal_awal' => $this->request->getPost("tgl_awal"),
             'tanggal_akhir' => $this->request->getPost("tgl_akhir"),
+            'deskripsi' => 'ORDER'
         ];
         $insert = $this->kebMC->insert($data);
 
         if ($insert) {
-            return redirect()->to(base_url('/capacity/Calendar'))->withInput()->with('success', 'Data Berhasil Di input');
+            return redirect()->to(base_url('/capacity/planningorder'))->withInput()->with('success', 'Data Berhasil Di input');
         } else {
-            return redirect()->to(base_url('/capacity/Calendar'))->withInput()->with('error', 'Data Gagal Di input');
+            return redirect()->to(base_url('/capacity/planningorder'))->withInput()->with('error', 'Data Gagal Di input');
         }
     }
 }

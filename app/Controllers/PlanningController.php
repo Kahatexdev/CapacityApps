@@ -56,6 +56,7 @@ class PlanningController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => 'active',
+            'acive7' => '',
 
         ];
         return view('Planning/index', $data);
@@ -71,6 +72,8 @@ class PlanningController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => 'active',
+            'acive7' => '',
+
             'TotalMesin' => $totalMesin,
         ];
         return view('Planning/Order/ordermaster', $data);

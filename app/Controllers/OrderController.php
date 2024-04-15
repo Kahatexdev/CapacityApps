@@ -53,6 +53,7 @@ class OrderController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'TotalMesin' => $totalMesin,
         ];
         return view('Capacity/Order/ordermaster', $data);
@@ -69,6 +70,7 @@ class OrderController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'dataAps' => $dataApsPerstyle,
             'noModel' => $noModel,
             'delivery' => $delivery,
@@ -87,6 +89,7 @@ class OrderController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'tampildata' => $tampilperdelivery,
             'product' => $product,
 
@@ -105,6 +108,7 @@ class OrderController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'TotalMesin' => $totalMesin,
         ];
         return view('Capacity/Order/orderjarum', $data);
@@ -120,6 +124,7 @@ class OrderController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'TotalMesin' => $totalMesin,
         ];
         return view('Capacity/Order/orderjarumbln', $data);
@@ -137,6 +142,7 @@ class OrderController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'dataAps' => $dataApsPerstyle,
             'noModel' => $noModel,
             'delivery' => $delivery,
@@ -159,6 +165,7 @@ class OrderController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'jarum' => $jarum,
             'tampildata' => $tampilperdelivery,
             'product' => $product,
@@ -167,9 +174,9 @@ class OrderController extends BaseController
         return view('Capacity/Order/semuaorderjarum', $data);
     }
 
-    public function DetailOrderPerJarumBlnDetail($bulan,$tahun,$jarum)
+    public function DetailOrderPerJarumBlnDetail($bulan, $tahun, $jarum)
     {
-        $tampilperdelivery = $this->orderModel->tampilPerjarumBulan($bulan,$tahun,$jarum);
+        $tampilperdelivery = $this->orderModel->tampilPerjarumBulan($bulan, $tahun, $jarum);
         $product = $this->productModel->findAll();
         $booking = $data = [
             'title' => 'Data Order',
@@ -179,6 +186,7 @@ class OrderController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'jarum' => $jarum,
             'tampildata' => $tampilperdelivery,
             'product' => $product,
@@ -186,7 +194,7 @@ class OrderController extends BaseController
         ];
         return view('Capacity/Order/semuaorderjarum', $data);
     }
-    
+
     public function DetailOrderPerJarumBln($jarum)
     {
         $bulan = $this->ApsPerstyleModel->getBulan($jarum);
@@ -199,6 +207,7 @@ class OrderController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'jarum' => $jarum,
             'bulan' => $bulan,
             'product' => $product,
@@ -218,6 +227,7 @@ class OrderController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'jarum' => $jarum,
             'tampildata' => $tampilperdelivery,
             'product' => $product,
@@ -237,6 +247,7 @@ class OrderController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'area' => $area,
             'tampildata' => $tampilperdelivery,
             'product' => $product,
@@ -491,6 +502,7 @@ class OrderController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'dataAps' => $dataApsPerstyle,
             'noModel' => $noModel,
             'delivery' => $delivery,
@@ -511,6 +523,7 @@ class OrderController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'tampildata' => $tampilperdelivery,
             'product' => $product,
 
@@ -529,6 +542,7 @@ class OrderController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'tampildata' => $tampilperdelivery,
             'product' => $product,
 
@@ -547,6 +561,7 @@ class OrderController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'TotalMesin' => $totalMesin,
         ];
         return view('Planning/Order/orderjarum', $data);
@@ -562,6 +577,7 @@ class OrderController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
             'TotalMesin' => $totalMesin,
         ];
         return view('Planning/Order/orderarea', $data);

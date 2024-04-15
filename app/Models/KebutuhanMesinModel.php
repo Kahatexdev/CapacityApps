@@ -13,7 +13,7 @@ class KebutuhanMesinModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'judul', 'jarum', 'mesin', 'jumlah_hari', 'tanggal_awal', 'tanggal_akhir', 'created_at', 'updated_at'];
+    protected $allowedFields    = ['id', 'judul', 'jarum', 'mesin', 'jumlah_hari', 'tanggal_awal', 'tanggal_akhir', 'created_at', 'updated_at', 'deskripsi'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -41,9 +41,14 @@ class KebutuhanMesinModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getJudul()
+    public function getOrder()
     {
-        $result = $this->select('*, SUM(mesin) as total')->groupBy('judul')->get()->getResultArray();
+        $result = $this->select('*, SUM(mesin) as total')->where('deskripsi', 'ORDER')->groupBy('judul')->get()->getResultArray();
+        return $result;
+    }
+    public function getBooking()
+    {
+        $result = $this->select('*, SUM(mesin) as total')->where('deskripsi', 'BOOKING')->groupBy('judul')->get()->getResultArray();
         return $result;
     }
 

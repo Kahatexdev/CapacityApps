@@ -12,7 +12,7 @@ use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-class MesinController extends BaseController 
+class MesinController extends BaseController
 {
     protected $filters;
     protected $jarumModel;
@@ -51,6 +51,7 @@ class MesinController extends BaseController
             'active4' => '',
             'active5' => 'active',
             'active6' => '',
+            'active7' => '',
         ];
         return view('Capacity/Mesin/Mastermesin', $data);
     }
@@ -65,6 +66,7 @@ class MesinController extends BaseController
             'active4' => '',
             'active5' => 'active',
             'active6' => '',
+            'active7' => '',
             'TotalMesin' => $totalMesin,
         ];
         return view('Capacity/Mesin/mesinjarum', $data);
@@ -81,6 +83,7 @@ class MesinController extends BaseController
             'active4' => '',
             'active5' => 'active',
             'active6' => '',
+            'active7' => '',
             'tampildata' => $tampilperarea,
             'product' => $product,
 
@@ -98,6 +101,7 @@ class MesinController extends BaseController
             'active4' => '',
             'active5' => 'active',
             'active6' => '',
+            'active7' => '',
             'area' => $area,
             'tampildata' => $tampilperarea,
 
@@ -153,6 +157,4 @@ class MesinController extends BaseController
             return redirect()->to(base_url('capacity/datamesin'))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
-    
-
 }
