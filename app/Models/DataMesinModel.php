@@ -63,36 +63,41 @@ class DataMesinModel extends Model
 
     public function getJarumArea($area)
     {
-    $query = $this->select('*')->where('area',$area)->findAll();
+        $query = $this->select('*')->where('area', $area)->findAll();
 
-    return $query;
+        return $query;
+    }
+    public function getMesinPerJarum($jarum)
+    {
+        $query = $this->select('*')->where('jarum', $jarum)->findAll();
+        return $query;
     }
 
     public function getTotalMesinByJarum()
     {
-    $customOrder = [
-        'JC120' => 3,
-        'JC144' => 2,
-        'JC168' => 1
-    ];
+        $customOrder = [
+            'JC120' => 3,
+            'JC144' => 2,
+            'JC168' => 1
+        ];
 
-    // Get the keys of the custom order
-    $customOrderKeys = array_keys($customOrder);
+        // Get the keys of the custom order
+        $customOrderKeys = array_keys($customOrder);
 
-    // Generate the CASE statement for custom ordering
-    $caseStatement = "CASE jarum ";
-    foreach ($customOrderKeys as $index => $jarum) {
-        $caseStatement .= "WHEN '$jarum' THEN $index ";
-    }
-    $caseStatement .= "END";
+        // Generate the CASE statement for custom ordering
+        $caseStatement = "CASE jarum ";
+        foreach ($customOrderKeys as $index => $jarum) {
+            $caseStatement .= "WHEN '$jarum' THEN $index ";
+        }
+        $caseStatement .= "END";
 
-    $query = $this->select('jarum, SUM(total_mc) as total')
-                  ->groupBy('jarum')
-                  ->orderBy("FIELD(jarum, 'JC120', 'JC144', 'JC168') DESC, jarum");
+        $query = $this->select('jarum, SUM(total_mc) as total')
+            ->groupBy('jarum')
+            ->orderBy("FIELD(jarum, 'JC120', 'JC144', 'JC168') DESC, jarum");
 
-    $result = $query->findAll();
+        $result = $query->findAll();
 
-    return $result;
+        return $result;
     }
 
     public function mcJalan()
@@ -105,12 +110,10 @@ class DataMesinModel extends Model
     }
     public function getAreaModel($noModel)
     {
-    return $this->select('data_mesin.*')
-                ->join('apsperstyle', 'data_mesin.jarum = apsperstyle.machinetypeid','left')
-                ->where('apsperstyle.mastermodel', $noModel)
-                ->get()
-                ->getResult();
+        return $this->select('data_mesin.*')
+            ->join('apsperstyle', 'data_mesin.jarum = apsperstyle.machinetypeid', 'left')
+            ->where('apsperstyle.mastermodel', $noModel)
+            ->get()
+            ->getResult();
     }
-
-    
 }

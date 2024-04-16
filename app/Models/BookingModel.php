@@ -12,12 +12,12 @@ class BookingModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_booking', 'tgl_terima_booking', 'kd_buyer_booking', 'id_product_type', 'no_order', 'no_booking', 'desc', 'opd', 'delivery', 'qty_booking', 'sisa_booking', 'needle', 'seam', 'status', 'lead_time', 'ref_id'];
+    protected $allowedFields    = ['id_booking', 'tgl_terima_booking', 'kd_buyer_booking', 'id_product_type', 'no_order', 'no_booking', 'desc', 'opd', 'delivery', 'qty_booking', 'sisa_booking', 'needle', 'seam', 'status', 'lead_time', 'ref_id', 'created_at', 'updated_at'];
 
     protected bool $allowEmptyInserts = false;
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -208,5 +208,62 @@ class BookingModel extends Model
             $total_qty += $result['total_qty'] ?? 0;
         }
         return $total_qty;
+    }
+
+    public function getCancelBooking()
+    {
+        $allResults = $this
+            ->select('*')
+            ->where('status', 'Cancel Booking')
+            ->orderBy('updated_at', 'ASC')
+            ->findAll();
+
+        $results = [];
+        $totalPerBulan = [];
+
+        foreach ($allResults as $result) {
+            $month = date('F', strtotime($result['updated_at']));
+            // Menambahkan detail pembatalan ke dalam array berdasarkan bulan
+            if (!isset($results[$month])) {
+                $results[$month] = [];
+                $totalPerBulan[$month] = 0;
+            }
+            $results[$month][] = $result;
+            // Menghitung total pembatalan per bulan
+            $totalPerBulan[$month]++;
+        }
+
+        return [
+            'details' => $results,
+            'totals' => $totalPerBulan
+        ];
+    }
+    public function getTurunOrder()
+    {
+        $allResults = $this
+            ->select('*')
+            ->where('status', 'Aktif')
+            ->orderBy('updated_at', 'ASC')
+            ->findAll();
+
+        $results = [];
+        $totalPerBulan = [];
+
+        foreach ($allResults as $result) {
+            $month = date('F', strtotime($result['updated_at']));
+            // Menambahkan detail pembatalan ke dalam array berdasarkan bulan
+            if (!isset($results[$month])) {
+                $results[$month] = [];
+                $totalPerBulan[$month] = 0;
+            }
+            $results[$month][] = $result;
+            // Menghitung total pembatalan per bulan
+            $totalPerBulan[$month]++;
+        }
+
+        return [
+            'details' => $results,
+            'totals' => $totalPerBulan
+        ];
     }
 }

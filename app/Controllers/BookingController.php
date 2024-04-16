@@ -402,4 +402,31 @@ class BookingController extends BaseController
             return redirect()->to(base_url('capacity/databooking/' . $jarum))->withInput()->with('error', 'Gagal Cancek Booking');
         }
     }
+    public function getCancelBooking()
+    {
+
+        $resultCancelBooking = $this->bookingModel->getCancelBooking();
+        $bulan = array_keys($resultCancelBooking['totals']);
+        $jumlahPembatalan = array_values($resultCancelBooking['totals']);
+        $data = [
+            'title' => 'Summary Cancel Booking',
+            'active1' => '',
+            'active2' => 'active',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'details' => $resultCancelBooking['details'],
+            'totals' => $resultCancelBooking['totals'],
+            'bulan' => $bulan,
+            'jumlahPembatalan' => $jumlahPembatalan
+        ];
+        return view('Capacity/Booking/cancelbooking', $data);
+    }
+    public function getTurunOrder()
+    {
+        $turunOrder = $this->ApsPerstyleModel->getTurunOrderPerbulan();
+        dd($turunOrder);
+    }
 }

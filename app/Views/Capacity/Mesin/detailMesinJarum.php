@@ -31,11 +31,11 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <h5>
-                            Detail Data Mesin <?= $area ?>
+                            Detail Data Mesin
                         </h5>
                         <div>
-                        <a href="<?= base_url('capacity/mesinperarea') ?>" class="btn bg-gradient-info"> Kembali</a>
-                        <button type="button" class="btn btn-add bg-gradient-success" data-toggle="modal" data-target="#modalTambah">Input Data Mesin</button>
+                            <a href="<?= base_url('capacity/mesinperarea') ?>" class="btn bg-gradient-info"> Kembali</a>
+                            <button type="button" class="btn btn-add bg-gradient-success" data-toggle="modal" data-target="#modalTambah">Input Data Mesin</button>
                         </div>
                     </div>
                 </div>
@@ -62,9 +62,9 @@
                                             <td class="text-sm"><?= $order['total_mc']; ?></td>
                                             <td class="text-sm"><?= $order['brand']; ?></td>
                                             <td class="text-sm"><?= $order['mesin_jalan']; ?></td>
-                                            <td class="text-sm"><?= $order['total_mc']-$order['mesin_jalan']; ?></td>
+                                            <td class="text-sm"><?= $order['total_mc'] - $order['mesin_jalan']; ?></td>
                                             <td class="text-sm">
-                                                <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['id_data_mesin']; ?>" data-area="<?= $order['area']; ?>" data-total="<?= $order['total_mc']; ?>" data-jarum="<?= $order['jarum']; ?>" data-mc-jalan="<?= $order['mesin_jalan']; ?>" data-brand="<?= $order['brand'];?>">
+                                                <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['id_data_mesin']; ?>" data-area="<?= $order['area']; ?>" data-total="<?= $order['total_mc']; ?>" data-jarum="<?= $order['jarum']; ?>" data-mc-jalan="<?= $order['mesin_jalan']; ?>" data-brand="<?= $order['brand']; ?>">
                                                     Edit
                                                 </button>
                                             </td>
@@ -82,7 +82,7 @@
                     </div>
 
                     <div class="card-footer">
-                        
+
                     </div>
 
                 </div>
@@ -111,12 +111,12 @@
                                     <div class="form-group">
                                         <label for="tgl-bk" class="col-form-label">Jarum</label>
                                         <input type="text" class="form-control" name="jarum">
-                                    </div>                                    
+                                    </div>
                                     <div class="form-group">
                                         <label for="buyer" class="col-form-label">Brand</label>
                                         <input type="text" name="brand" class="form-control">
                                     </div>
-                                    
+
                                 </div>
                                 <div class="col-lg-6 col-sm-12">
 
@@ -147,7 +147,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="modal fade" id="modalTambah" tabindex="-1" role="dialog" aria-labelledby="modalTambah" aria-hidden="true">
             <div class="modal-dialog   role=" document">
                 <div class="modal-content">
@@ -163,18 +163,18 @@
                                 <div class="col-lg-6 col-sm-6">
                                     <div class="form-group">
                                         <label for="tgl-bk" class="col-form-label">Area</label>
-                                        <input type="text" class="form-control" name="area" value=<?= $area ?>>
+
                                         <input type="hidden" name="id">
                                     </div>
                                     <div class="form-group">
                                         <label for="tgl-bk" class="col-form-label">Jarum</label>
                                         <input type="text" class="form-control" name="jarum">
-                                    </div>                                    
+                                    </div>
                                     <div class="form-group">
                                         <label for="buyer" class="col-form-label">Brand</label>
                                         <input type="text" name="brand" class="form-control">
                                     </div>
-                                    
+
                                 </div>
                                 <div class="col-lg-6 col-sm-12">
 
@@ -204,13 +204,13 @@
                     </form>
                 </div>
             </div>
-        </div>  
+        </div>
 
         <div class="modal fade  bd-example-modal-lg" id="ModalDelete" tabindex="-1" role="dialog" aria-labelledby="modaldelete" aria-hidden="true">
             <div class="modal-dialog  modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Hapus Data Mesin di Areal <?= $area ?></h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Hapus Data Mesin di Areal </h5>
                         <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
@@ -228,7 +228,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- <script>
             function valildasi() {
                 let qty = parseInt(document.getElementById("qty").value);
@@ -246,7 +246,7 @@
 
                 $('.btn-add').click(function() {
                     $('#modalTambah').find('form').attr('action', '<?= base_url('capacity/tambahmesinperarea/') ?>');
-                    
+
                     $('#modalTambah').modal('show'); // Show the modal
                 });
 
@@ -257,7 +257,7 @@
                     var total_mc = $(this).data('total');
                     var brand = $(this).data('brand');
                     var mesin_jalan = $(this).data('mc-jalan');
-                    var mesin_mati = total_mc-mesin_jalan;
+                    var mesin_mati = total_mc - mesin_jalan;
 
                     $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/updatemesinperjarum/') ?>' + id_data_mesin);
                     $('#ModalEdit').find('input[name="id"]').val(id_data_mesin);
@@ -276,7 +276,7 @@
                     $('#ModalDelete').find('input[name="id_data_mesin"]').val(id);
                     $('#ModalDelete').modal('show'); // Show the modal
                 });
-                
+
             });
         </script>
         <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>

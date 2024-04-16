@@ -81,6 +81,25 @@ class ApsPerstyleModel extends Model
             ->orderBy('data_model.created_at')
             ->findAll();
     }
+    public function getTurunOrderPerbulan()
+    {
+        $hasil = $this->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
+            ->select('data_model.created_at, apsperstyle.qty')
+            ->orderBy('data_model.created_at')
+            ->findAll();
+
+        $dataPerBulan = [];
+        foreach ($hasil as $row) {
+            $bulanTahun = date('Y-m', strtotime($row['created_at']));
+            if (!isset($dataPerBulan[$bulanTahun])) {
+                $dataPerBulan[$bulanTahun] = ['total_qty' => 0, 'details' => []];
+            }
+            $dataPerBulan[$bulanTahun]['total_qty'] += $row['qty'];
+            array_push($dataPerBulan[$bulanTahun]['details'], $row);
+        }
+
+        return $dataPerBulan;
+    }
     public function getPerArea($area)
     {
         return $this->where('factory', $area)->findAll();
