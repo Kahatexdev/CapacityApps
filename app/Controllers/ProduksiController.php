@@ -114,25 +114,28 @@ class ProduksiController extends BaseController
                         'style' => $style
                     ];
                     $idAps = $this->ApsPerstyleModel->getId($validate);
-                    $id = $idAps['idapsperstyle'];
-
-                    if ($data[0] == null) {
-                        break;
+                    if (!$idAps) {
+                        return redirect()->to(base_url('/capacity/dataproduksi'))->with('error', 'Data Order Tidak Ditemukan');
                     } else {
-                        $tglprod = $data[23];
-                        $unixProd = ($tglprod - 25569) * 86400;
-                        $tgl_produksi = date('Y-m-d', $unixProd);
-                        $qtyProd = $data[15];
-                        $sisaQty = $data[12];
-                        $insert = [
-                            'idapsperstyle' => $id,
-                            'tgl_produksi' => $tgl_produksi,
-                            'qty_produksi' => $qtyProd
-                        ];
-                        $existingProduction = $this->produksiModel->existingData($insert);
-                        if (!$existingProduction) {
-                            $this->produksiModel->insert($insert);
-                            $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
+                        $id = $idAps['idapsperstyle'];
+                        if ($data[0] == null) {
+                            break;
+                        } else {
+                            $tglprod = $data[23];
+                            $unixProd = ($tglprod - 25569) * 86400;
+                            $tgl_produksi = date('Y-m-d', $unixProd);
+                            $qtyProd = $data[15];
+                            $sisaQty = $data[12];
+                            $insert = [
+                                'idapsperstyle' => $id,
+                                'tgl_produksi' => $tgl_produksi,
+                                'qty_produksi' => $qtyProd
+                            ];
+                            $existingProduction = $this->produksiModel->existingData($insert);
+                            if (!$existingProduction) {
+                                $this->produksiModel->insert($insert);
+                                $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
+                            }
                         }
                     }
                 }
