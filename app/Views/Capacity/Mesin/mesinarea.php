@@ -29,7 +29,7 @@
 
         <?php foreach ($tampildata as $area) : ?>
             <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-                <a href="<?= base_url('capacity/datamesinperjarum/'.$area) ?>">
+                <a href="<?= base_url('capacity/datamesinperarea/'.$area) ?>">
                     <div class="card">
                         <div class="card-body p-3">
                             <div class="row">

@@ -61,9 +61,9 @@ class DataMesinModel extends Model
         return $uniqueArea;
     }
 
-    public function getJarumArea($jarum)
+    public function getJarumArea($area)
     {
-    $query = $this->select('*')->where('jarum',$jarum)->findAll();
+    $query = $this->select('*')->where('area',$area)->findAll();
 
         return $query;
     }
