@@ -114,7 +114,7 @@ class CalendarController extends BaseController
         $range = $jumlahHari / 7;
         $value = []; // Initialize $value array
 
-        for ($i = 0; $i < $range; $i++) {
+        for ($i = 0; $i < 52; $i++) {
             $startOfWeek = clone $startDate;
             $startOfWeek->modify("+$i week");
             $startOfWeek->modify('Monday this week');

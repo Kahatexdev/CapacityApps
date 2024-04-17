@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Sum;
 
 class OrderModel extends Model
 {
@@ -57,7 +58,7 @@ class OrderModel extends Model
         $builder->select('data_model.*, mastermodel, machinetypeid, ROUND(SUM(QTy), 0) AS qty, ROUND(SUM(sisa), 0) AS sisa, factory, delivery, product_type');
         $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
         $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
-        $builder->orderby('created_at', 'desc');        
+        $builder->orderby('created_at', 'desc');
         $builder->orderby('no_model', 'asc');
         $builder->orderby('delivery', 'asc');
         $builder->groupBy('delivery');
@@ -73,7 +74,7 @@ class OrderModel extends Model
         $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
         $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
         $builder->where('factory', "Belum Ada Area");
-        $builder->orderby('created_at', 'desc');        
+        $builder->orderby('created_at', 'desc');
         $builder->orderby('no_model', 'asc');
         $builder->orderby('delivery', 'asc');
         $builder->groupBy('delivery');
@@ -89,7 +90,7 @@ class OrderModel extends Model
         $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
         $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
         $builder->where('machinetypeid', $jarum);
-        $builder->orderby('created_at', 'desc');        
+        $builder->orderby('created_at', 'desc');
         $builder->orderby('no_model', 'asc');
         $builder->orderby('delivery', 'asc');
         $builder->groupBy('delivery');
@@ -98,7 +99,7 @@ class OrderModel extends Model
 
         return $builder->get()->getResult();
     }
-    public function tampilPerjarumBulan($bulan,$tahun,$jarum)
+    public function tampilPerjarumBulan($bulan, $tahun, $jarum)
     {
         $builder = $this->db->table('data_model');
 
@@ -108,7 +109,7 @@ class OrderModel extends Model
         $builder->where('machinetypeid', $jarum);
         $builder->where('monthname(delivery)', $bulan);
         $builder->where('year(delivery)', $tahun);
-        $builder->orderby('created_at', 'desc');        
+        $builder->orderby('created_at', 'desc');
         $builder->orderby('no_model', 'asc');
         $builder->orderby('delivery', 'asc');
         $builder->groupBy('delivery');
@@ -125,7 +126,7 @@ class OrderModel extends Model
         $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
         $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
         $builder->where('factory', $area);
-        $builder->orderby('created_at', 'desc');        
+        $builder->orderby('created_at', 'desc');
         $builder->orderby('no_model', 'asc');
         $builder->orderby('delivery', 'asc');
         $builder->groupBy('delivery');
@@ -139,6 +140,14 @@ class OrderModel extends Model
         return $this->select('id_model')->where('no_model', $nomodel)->first();
     }
 
+    public function getChild($idBooking)
+    {
+        return  $this->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left')
+            ->select('no_model, created_at, kd_buyer_order, SUM(qty) AS qtyOrder')
+            ->groupBy('no_model')
+            ->where('id_booking', $idBooking)
+            ->findAll();
+    }
 
     // // Fungsi untuk mendapatkan data berdasarkan kondisi
     // public function getDataByCondition($condition)

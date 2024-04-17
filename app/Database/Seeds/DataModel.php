@@ -10,7 +10,7 @@ class DataModel extends Seeder
     {
         $data = [
             [
-                'id_booking' => 1,
+                'id_booking' => 259,
                 'no_model' => 'SI2600',
                 'kd_buyer_order' => 'H&M',
                 'id_product_type' => 1,
@@ -21,7 +21,7 @@ class DataModel extends Seeder
                 'updated_at' => date('Y-m-d H:i:s')
             ],
             [
-                'id_booking' => 1,
+                'id_booking' => 259,
                 'no_model' => 'SI2609',
                 'kd_buyer_order' => 'H&M',
                 'id_product_type' => 1,
@@ -32,7 +32,7 @@ class DataModel extends Seeder
                 'updated_at' => date('Y-m-d H:i:s')
             ],
             [
-                'id_booking' => 1,
+                'id_booking' => 259,
                 'no_model' => 'ER1025',
                 'kd_buyer_order' => 'AUCHAN',
                 'id_product_type' => 1,
@@ -43,7 +43,7 @@ class DataModel extends Seeder
                 'updated_at' => date('Y-m-d H:i:s')
             ],
             [
-                'id_booking' => 1,
+                'id_booking' => 259,
                 'no_model' => 'RZ2407',
                 'kd_buyer_order' => 'ADIDAS',
                 'id_product_type' => 3,
@@ -54,7 +54,7 @@ class DataModel extends Seeder
                 'updated_at' => date('Y-m-d H:i:s')
             ],
             [
-                'id_booking' => 1,
+                'id_booking' => 259,
                 'no_model' => 'RZ2416',
                 'kd_buyer_order' => 'ADIDAS',
                 'id_product_type' => 6,

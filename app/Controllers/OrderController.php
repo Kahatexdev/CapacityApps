@@ -398,7 +398,7 @@ class OrderController extends BaseController
             $row = $spreadsheet->getActiveSheet();
             $nomodel = $this->request->getVar('no_model');
             $idModel = $this->orderModel->getId($nomodel);
-            $startRow = 2; // Ganti dengan nomor baris mulai
+            $startRow = 4; // Ganti dengan nomor baris mulai
             foreach ($spreadsheet->getActiveSheet()->getRowIterator($startRow) as $row) {
                 $cellIterator = $row->getCellIterator();
                 $cellIterator->setIterateOnlyExistingCells(false);
@@ -433,40 +433,43 @@ class OrderController extends BaseController
                         $lcoDate = $row[26];
                         $rlcoDate = str_replace('/', '-', (substr($lcoDate, -10)));
                         $lcoDate2 = date('Y-m-d', strtotime($rlcoDate));
-
-                        $simpandata = [
-                            'machinetypeid' => $machinetypeid,
-                            'size' => $size,
-                            'mastermodel' => $nomodel,
-                            'delivery' => $delivery2,
-                            'qty' => $qty,
-                            'sisa' => $qty,
-                            'country' => $country,
-                            'color' => $color,
-                            'seam' => $processRoute,
-                            'factory' => 'Belum Ada Area'
-                        ];
-                        $updateData = [
-                            'kd_buyer_order' => $custCode,
-                            'id_product_type' => $idProduct,
-                            'seam' => $processRoute,
-                            'leadtime' => $leadtime,
-                            'description' => $description
-                        ];
-                        $validate = [
-                            'size' => $size,
-                            'delivery' => $delivery2
-                        ];
-
-                        $existingAps = $this->ApsPerstyleModel->checkAps($validate);
-                        if (!$existingAps) {
-                            $this->ApsPerstyleModel->insert($simpandata);
-                            $this->orderModel->update($idModel, $updateData);
+                        if ($row[2] == null) {
+                            break;
                         } else {
-                            $sumqty = $existingAps->qty + $qty;
-                            $sumsisa = $existingAps->sisa + $qty;
-                            $idAps = $existingAps->idapsperstyle;
-                            $this->ApsPerstyleModel->update($idAps, ['qty' => $sumqty, 'sisa' => $sumsisa]);
+                            $simpandata = [
+                                'machinetypeid' => $machinetypeid,
+                                'size' => $size,
+                                'mastermodel' => $nomodel,
+                                'delivery' => $delivery2,
+                                'qty' => $qty,
+                                'sisa' => $qty,
+                                'country' => $country,
+                                'color' => $color,
+                                'seam' => $processRoute,
+                                'factory' => 'Belum Ada Area'
+                            ];
+                            $updateData = [
+                                'kd_buyer_order' => $custCode,
+                                'id_product_type' => $idProduct,
+                                'seam' => $processRoute,
+                                'leadtime' => $leadtime,
+                                'description' => $description
+                            ];
+                            $validate = [
+                                'size' => $size,
+                                'delivery' => $delivery2
+                            ];
+
+                            $existingAps = $this->ApsPerstyleModel->checkAps($validate);
+                            if (!$existingAps) {
+                                $this->ApsPerstyleModel->insert($simpandata);
+                                $this->orderModel->update($idModel, $updateData);
+                            } else {
+                                $sumqty = $existingAps->qty + $qty;
+                                $sumsisa = $existingAps->sisa + $qty;
+                                $idAps = $existingAps->idapsperstyle;
+                                $this->ApsPerstyleModel->update($idAps, ['qty' => $sumqty, 'sisa' => $sumsisa]);
+                            }
                         }
                     }
                 }
