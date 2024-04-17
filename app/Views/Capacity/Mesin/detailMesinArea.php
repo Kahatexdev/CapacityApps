@@ -94,7 +94,7 @@
             <div class="modal-dialog   role=" document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Edit Data Mesin</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Edit Data Machine</h5>
                         <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
@@ -109,7 +109,7 @@
                                         <input type="hidden" name="id">
                                     </div>
                                     <div class="form-group">
-                                        <label for="tgl-bk" class="col-form-label">Jarum</label>
+                                        <label for="tgl-bk" class="col-form-label">Needle</label>
                                         <input type="text" class="form-control" name="jarum">
                                     </div>
                                     <div class="form-group">
@@ -121,15 +121,15 @@
                                 <div class="col-lg-6 col-sm-12">
 
                                     <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Total Mesin</label>
+                                        <label for="buyer" class="col-form-label">Total Machine</label>
                                         <input type="text" name="total_mc" class="form-control">
                                     </div>
                                     <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Mesin Jalan</label>
+                                        <label for="buyer" class="col-form-label">Mesin Runnig</label>
                                         <input type="text" name="mesin_jalan" class="form-control">
                                     </div>
                                     <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Mesin Mati</label>
+                                        <label for="buyer" class="col-form-label">Mesin Not Running</label>
                                         <input type="text" name="mesin_mati" class="form-control">
                                     </div>
 
@@ -141,7 +141,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn bg-gradient-info">Ubah</button>
+                        <button type="submit" class="btn bg-gradient-info">Edit</button>
                     </div>
                     </form>
                 </div>
@@ -152,7 +152,7 @@
             <div class="modal-dialog   role=" document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Tambah Data Mesin</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Add Data Mesin</h5>
                         <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
@@ -162,12 +162,12 @@
                             <div class="row">
                                 <div class="col-lg-6 col-sm-6">
                                     <div class="form-group">
-                                        <label for="tgl-bk" class="col-form-label">Jarum</label>
+                                        <label for="tgl-bk" class="col-form-label">Area</label>
                                         <input type="text" class="form-control" name="area" value=<?= $area ?>>
                                         <input type="hidden" name="id">
                                     </div>
                                     <div class="form-group">
-                                        <label for="tgl-bk" class="col-form-label">Jarum</label>
+                                        <label for="tgl-bk" class="col-form-label">Needle</label>
                                         <input type="text" class="form-control" name="jarum">
                                     </div>
                                     <div class="form-group">
@@ -179,15 +179,15 @@
                                 <div class="col-lg-6 col-sm-12">
 
                                     <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Total Mesin</label>
+                                        <label for="buyer" class="col-form-label">Total Machine</label>
                                         <input type="text" name="total_mc" class="form-control">
                                     </div>
                                     <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Mesin Jalan</label>
+                                        <label for="buyer" class="col-form-label">Machine Running</label>
                                         <input type="text" name="mesin_jalan" class="form-control">
                                     </div>
                                     <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Mesin Mati</label>
+                                        <label for="buyer" class="col-form-label">Machine Not Running</label>
                                         <input type="text" name="mesin_mati" class="form-control">
                                     </div>
 
@@ -199,7 +199,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn bg-gradient-info">Tambah Data</button>
+                        <button type="submit" class="btn bg-gradient-info">Add Data</button>
                     </div>
                     </form>
                 </div>
@@ -210,7 +210,7 @@
             <div class="modal-dialog  modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Hapus Data Mesin di Jarum <?= $area ?></h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Delete Machine in Area <?= $area ?></h5>
                         <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
@@ -218,11 +218,11 @@
                     <div class="modal-body">
                         <form action="" method="post">
                             <input type="text" name="id_data_mesin" id="" hidden value="">
-                            Apakah anda yakin ingin menghapus Data Style?
+                            Are you sure you want to delete ?
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn bg-gradient-danger">Hapus</button>
+                        <button type="submit" class="btn bg-gradient-danger">Delete</button>
                     </div>
                     </form>
                 </div>

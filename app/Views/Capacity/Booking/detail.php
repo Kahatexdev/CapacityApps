@@ -41,13 +41,13 @@
                     <div class="row">
                         <div class="col-lg-6 col-sm-12">
                             <div class="form-group">
-                                <label for="" class="form-control-label">Tanggal Terima Booking</label>
+                                <label for="" class="form-control-label">Booking Receipt Date</label>
                                 <input class="form-control" type="text" value="<?= $booking['tgl_terima_booking'] ?>" readonly id="">
                             </div>
                         </div>
                         <div class="col-lg-6 col-sm-12">
                             <div class="form-group">
-                                <label for="" class="form-control-label">Kode Buyer</label>
+                                <label for="" class="form-control-label">Buyer Code</label>
                                 <input class="form-control" type="text" value="<?= $booking['kd_buyer_booking'] ?>" readonly id="">
                             </div>
                         </div>
@@ -59,19 +59,19 @@
                         </div>
                         <div class="col-lg-6 col-sm-12">
                             <div class="form-group">
-                                <label for="" class="form-control-label">No Order</label>
+                                <label for="" class="form-control-label">Order Number</label>
                                 <input class="form-control" type="text" value="<?= $booking['no_order'] ?>" readonly id="">
                             </div>
                         </div>
                         <div class="col-lg-6 col-sm-12">
                             <div class="form-group">
-                                <label for="" class="form-control-label">No Booking</label>
+                                <label for="" class="form-control-label">Booking Number</label>
                                 <input class="form-control" type="text" value="<?= $booking['no_booking'] ?>" readonly id="">
                             </div>
                         </div>
                         <div class="col-lg-6 col-sm-12">
                             <div class="form-group">
-                                <label for="" class="form-control-label">Deskripsi</label>
+                                <label for="" class="form-control-label">Description</label>
                                 <input class="form-control" type="text" value="<?= $booking['desc'] ?>" readonly id="">
                             </div>
                         </div>
@@ -89,13 +89,13 @@
                         </div>
                         <div class="col-lg-6 col-sm-12">
                             <div class="form-group">
-                                <label for="" class="form-control-label">Qty Booking</label>
+                                <label for="" class="form-control-label">Booking Qty</label>
                                 <input class="form-control" type="text" value="<?= $booking['qty_booking'] ?>" readonly id="">
                             </div>
                         </div>
                         <div class="col-lg-6 col-sm-12">
                             <div class="form-group">
-                                <label for="" class="form-control-label">Sisa Booking</label>
+                                <label for="" class="form-control-label">Booking Left</label>
                                 <input class="form-control" type="text" value="<?= $booking['sisa_booking'] ?>" readonly id="">
                             </div>
                         </div>
@@ -152,7 +152,7 @@
                                 <th>
                                     No Model
                                 </th>
-                                <th> Buyer Order</th>
+                                <th>Buyer Order</th>
                                 <th>Order Placement Date</th>
                                 <th>Qty Order</th>
                             </thead>
@@ -186,9 +186,9 @@
                             <thead>
 
                                 <th>
-                                    Tgl Turun Booking
+                                    Booking Receipt Date
                                 </th>
-                                <th> Buyer Booking</th>
+                                <th>Buyer Booking</th>
                                 <th>No Booking</th>
                                 <th>Qty Booking</th>
                                 <th>Desc</th>
@@ -218,7 +218,7 @@
         <div class="modal-dialog  modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ambil Booking Jadi Order</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Convert Booking into Order</h5>
                     <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -230,7 +230,7 @@
                         <div class="row">
                             <div class="col-lg-6 col-sm-12">
                                 <div class="form-group">
-                                    <label for="col-lg-6 col-sm-12">Tanggal Turun Order</label>
+                                    <label for="col-lg-6 col-sm-12">Order Receipt Date</label>
                                     <input type="date" class="form-control" name="tgl_turun">
                                 </div>
                                 <div class="form-group">
@@ -238,7 +238,7 @@
                                     <input type="text" class="form-control" name="no_booking" value="<?= $booking['no_booking']; ?>">
                                 </div>
                                 <div class="form-group">
-                                    <label for="col-lg-6 col-sm-12">Deskripsi</label>
+                                    <label for="col-lg-6 col-sm-12">Description</label>
                                     <input type="text" class="form-control" name="deskripsi" oninput="this.value = this.value.toUpperCase()">
                                 </div>
                                 <div class="form-group">
@@ -248,15 +248,15 @@
                             </div>
                             <div class="col-lg-6 col-sm-12">
                                 <div class="form-group">
-                                    <label for="col-lg-6 col-sm-12">Sisa Booking Awal</label>
+                                    <label for="col-lg-6 col-sm-12">Beginning Remaining Booking</label>
                                     <input type="text" name="sisa_booking" class="form-control" value="<?= $booking['sisa_booking']; ?>">
                                 </div>
                                 <div class="form-group">
-                                    <label for="col-lg-6 col-sm-12">Turun Order</label>
+                                    <label for="col-lg-6 col-sm-12">Qty Order Place</label>
                                     <input type="text" name="turun_order" class="form-control">
                                 </div>
                                 <div class="form-group">
-                                    <label for="col-lg-6 col-sm-12">Sisa Booking Akhir</label>
+                                    <label for="col-lg-6 col-sm-12">Ending Remaining Booking</label>
                                     <input type="text" name="sisa_booking_akhir" class="form-control">
                                 </div>
                             </div>
@@ -266,7 +266,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn bg-gradient-primary">Simpan</button>
+                    <button type="submit" class="btn bg-gradient-primary">Save</button>
                 </div>
                 </form>
             </div>
@@ -287,15 +287,15 @@
                         <div class="row">
                             <div class="col-lg-6 col-sm-12">
                                 <div class="form-group">
-                                    <label for="tgl-bk" class="col-form-label">Tanggal Booking</label>
+                                    <label for="tgl-bk" class="col-form-label">Order Receipt Date</label>
                                     <input type="date" class="form-control" name="tgl_booking" value="<?= $booking['tgl_terima_booking'] ?>" disabled>
                                 </div>
                                 <div class="form-group">
-                                    <label for="buyer" class="col-form-label">Kode Buyer:</label>
+                                    <label for="buyer" class="col-form-label">Buyer Code </label>
                                     <input type="text" name="buyer" id="" class="form-control" value="<?= $booking['kd_buyer_booking']; ?>" disabled>
                                 </div>
                                 <div class=" form-group">
-                                    <label for="no_order" class="col-form-label">No Order:</label>
+                                    <label for="no_order" class="col-form-label">Order Number</label>
                                     <input type="text" name="no_order" id="" class="form-control" value="<?= $booking['no_order']; ?>" disabled>
                                 </div>
                                 <div class=" form-group">
@@ -303,26 +303,26 @@
                                     <input type="text" name="desc" id="" class="form-control" value="<?= $booking['product_type']; ?>" disabled>
                                 </div>
                                 <div class="form-group">
-                                    <label for="no_pdk" class="col-form-label">No Booking:</label>
+                                    <label for="no_pdk" class="col-form-label">Booking Number</label>
                                     <input type="text" name="no_booking" id="" class="form-control" value="<?= $booking['no_booking']; ?>">
                                 </div>
                                 <div class="form-group">
-                                    <label for="desc" class="col-form-label">Description:</label>
+                                    <label for="desc" class="col-form-label">Description</label>
                                     <input type="text" name="desc" id="" class="form-control" value="<?= $booking['desc']; ?>" oninput="this.value = this.value.toUpperCase()">
                                 </div>
 
                             </div>
                             <div class="col-lg-6 col-sm-12">
                                 <div class="form-group">
-                                    <label for="seam" class="col-form-label">Seam:</label>
+                                    <label for="seam" class="col-form-label">Seam</label>
                                     <input type="text" name="seam" id="" class="form-control" value="<?= $booking['seam']; ?>" oninput="this.value = this.value.toUpperCase()">
                                 </div>
                                 <div class="form-group">
-                                    <label for="opd" class="col-form-label">OPD:</label>
+                                    <label for="opd" class="col-form-label">OPD</label>
                                     <input type="date" name="opd" id="opd" class="form-control" value="<?= $booking['opd']; ?>" onchange="hitungJumlahHari()">
                                 </div>
                                 <div class=" form-group">
-                                    <label for="shipment" class="col-form-label">Shipment:</label>
+                                    <label for="shipment" class="col-form-label">Shipment</label>
                                     <input type="date" name="delivery" id="shipment" value="<?= $booking['delivery']; ?>" class="form-control" onchange="hitungJumlahHari()">
                                 </div>
                                 <div class=" form-group">
@@ -330,11 +330,11 @@
                                     <input type="text" readonly name="lead" id="lead" value="<?= $booking['lead_time']; ?>" class=" form-control">
                                 </div>
                                 <div class="form-group">
-                                    <label for="qty" class="col-form-label">QTY Booking (pcs):</label>
+                                    <label for="qty" class="col-form-label">QTY Booking (pcs)</label>
                                     <input type="number" name="qty" id="" class="form-control" value="<?= $booking['qty_booking']; ?>">
                                 </div>
                                 <div class="form-group">
-                                    <label for="qty" class="col-form-label">Sisa Booking (pcs):</label>
+                                    <label for="qty" class="col-form-label">Sisa Booking (pcs)</label>
                                     <input type="number" name="sisa" id="" class="form-control" value="<?= $booking['sisa_booking']; ?>">
                                 </div>
                             </div>
@@ -344,7 +344,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn bg-gradient-info">Ubah</button>
+                    <button type="submit" class="btn bg-gradient-info">Edit</button>
                 </div>
                 </form>
             </div>
@@ -357,7 +357,7 @@
         <div class="modal-dialog  modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Hapus Data Booking</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Delete Data Booking</h5>
                     <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -365,11 +365,11 @@
                 <div class="modal-body">
                     <form action="<?= base_url('capacity/deletebooking/' . $booking['id_booking']) ?>" method="post">
                         <input type="text" name="jarum" id="" hidden value="<?= $booking['needle'] ?>">
-                        Apakah anda yakin ingin menghapus Data Booking?
+                        Are you sure to Delete Data Booking?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn bg-gradient-danger">Hapus</button>
+                    <button type="submit" class="btn bg-gradient-danger">Delete</button>
                 </div>
                 </form>
             </div>
@@ -388,7 +388,7 @@
                 <div class="modal-body">
                     <form action="<?= base_url('capacity/cancelbooking/' . $booking['id_booking']) ?>" method="post">
                         <input type="text" name="jarum" id="" hidden value="<?= $booking['needle'] ?>">
-                        Apakah anda yakin ingin Cancel Booking?
+                        Are You Sure Want to Cancel Booking?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
@@ -405,7 +405,7 @@
     <div class="modal-dialog  modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Pecah Booking</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Split Booking</h5>
                 <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
@@ -415,15 +415,15 @@
                     <div class="row">
                         <div class="col-lg-6 col-sm-12">
                             <div class="form-group">
-                                <label for="tgl-bk" class="col-form-label">Tanggal Booking</label>
+                                <label for="tgl-bk" class="col-form-label">Booking Date</label>
                                 <input type="date" class="form-control" name="tgl_booking">
                             </div>
                             <div class="form-group">
-                                <label for="buyer" class="col-form-label">Kode Buyer:</label>
+                                <label for="buyer" class="col-form-label">Buyer Code</label>
                                 <input type="text" name="buyer" id="" class="form-control" oninput="this.value = this.value.toUpperCase()">
                             </div>
                             <div class="form-group">
-                                <label for="jarum" class="col-form-label">Needle :</label>
+                                <label for="jarum" class="col-form-label">Needle</label>
                                 <select class="form-control" id="jarum" name="jarum">
                                     <option>Choose</option>
                                     <?php foreach ($jenisJarum as $jj) : ?>
@@ -477,7 +477,7 @@
                                 <input type="number" name="qty" id="" class="form-control">
                             </div>
                             <div class="form-group">
-                                <label for="qty" class="col-form-label">Sisa Booking (pcs):</label>
+                                <label for="qty" class="col-form-label">Booking Left (pcs):</label>
                                 <input type="number" name="sisa" id="" class="form-control">
                             </div>
                         </div>
@@ -487,7 +487,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn bg-gradient-info">Ubah</button>
+                <button type="submit" class="btn bg-gradient-info">Edit</button>
             </div>
             </form>
         </div>

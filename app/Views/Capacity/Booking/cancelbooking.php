@@ -5,9 +5,9 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header pb-0 d-flex justify-content-between">
-                    <h6>Grafik Cancel Booking Per Bulan</h6>
+                    <h6>Monthly Booking Cancellation Chart</h6>
                     <div>
-                        <a href="<?= base_url('capacity/databooking') ?>" class="btn btn-info">Kembali</a>
+                        <a href="<?= base_url('capacity/databooking') ?>" class="btn btn-info">Back</a>
                     </div>
                 </div>
                 <div class="card-body p-3">
@@ -33,10 +33,10 @@
                             <table class="table align-items-center mb-0">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tanggal Cancel</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cancel Date</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Buyer</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No Booking</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Deskripsi</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Description</th>
                                     </tr>
                                 </thead>
                                 <tbody>

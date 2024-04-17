@@ -114,7 +114,7 @@
                                 </g>
                             </svg>
                         </div>
-                        <span class="nav-link-text ms-1">Data order</span>
+                        <span class="nav-link-text ms-1">Data Order</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -135,7 +135,7 @@
                                 </g>
                             </svg>
                         </div>
-                        <span class="nav-link-text ms-1">Data Produksi</span>
+                        <span class="nav-link-text ms-1">Data Production</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -156,7 +156,7 @@
                                 </g>
                             </svg>
                         </div>
-                        <span class="nav-link-text ms-1">Data Mesin Per Area</span>
+                        <span class="nav-link-text ms-1">Data Machine</span>
                     </a>
                 </li>
 

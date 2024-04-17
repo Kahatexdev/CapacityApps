@@ -54,7 +54,7 @@
             <div class="modal-dialog " role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Input Data Booking</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Input Booking Data</h5>
                         <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
@@ -79,7 +79,7 @@
                                     <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control ">
                             </div>
                             <div class="col-3 pl-0">
-                                <button type="submit" class="btn btn-info btn-block"> Simpan</button>
+                                <button type="submit" class="btn btn-info btn-block"> Save </button>
                                 </form>
                             </div>
                         </div>
