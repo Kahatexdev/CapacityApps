@@ -91,7 +91,6 @@ class MesinController extends BaseController
         return view('Capacity/Mesin/mesinarea', $data);
     }
     public function DetailMesinPerJarum($jarum)
-    public function DetailMesinPerJarum($jarum)
     {
         $tampilperarea = $this->jarumModel->getJarumArea($jarum);
         $data = [
