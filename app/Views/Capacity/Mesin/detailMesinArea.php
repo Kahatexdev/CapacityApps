@@ -31,7 +31,7 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <h5>
-                            Detail Data Jarum <?= $jarum ?>
+                            Detail Data Area <?= $area ?>
                         </h5>
                         <div>
                             <a href="<?= base_url('capacity/mesinperarea') ?>" class="btn bg-gradient-info"> Kembali</a>
@@ -163,7 +163,7 @@
                                 <div class="col-lg-6 col-sm-6">
                                     <div class="form-group">
                                         <label for="tgl-bk" class="col-form-label">Jarum</label>
-                                        <input type="text" class="form-control" name="area" value=<?= $jarum ?>>
+                                        <input type="text" class="form-control" name="area" value=<?= $area ?>>
                                         <input type="hidden" name="id">
                                     </div>
                                     <div class="form-group">
@@ -210,7 +210,7 @@
             <div class="modal-dialog  modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Hapus Data Mesin di Jarum <?= $jarum ?></h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Hapus Data Mesin di Jarum <?= $area ?></h5>
                         <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
