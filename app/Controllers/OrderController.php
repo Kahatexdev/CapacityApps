@@ -413,29 +413,30 @@ class OrderController extends BaseController
                     if ($no_model != $nomodel) {
                         return redirect()->to(base_url('/capacity/semuaOrder'))->with('error', 'Nomor Model Tidak Sama. Silahkan periksa kembali');
                     } else {
-                        $recordID = $row[0];
-                        $articleNo = $row[2];
-                        $producttype = $row[5];
-                        $idProduct = $this->productModel->getId($producttype);
-                        $custCode = $row[7];
-                        $description = $row[10];
-                        $delivery = $row[11];
-                        $rdelivery = str_replace('/', '-', (substr($delivery, -10)));
-                        $delivery2 = date('Y-m-d', strtotime($rdelivery));
-                        $qty = $row[12];
-                        $country = $row[17];
-                        $color = $row[18];
-                        $size = $row[19];
-                        $sam = $row[20];
-                        $machinetypeid = $row[22];
-                        $leadtime = $row[24];
-                        $processRoute = $row[25];
-                        $lcoDate = $row[26];
-                        $rlcoDate = str_replace('/', '-', (substr($lcoDate, -10)));
-                        $lcoDate2 = date('Y-m-d', strtotime($rlcoDate));
-                        if ($row[2] == null) {
+                        if ($row[5] == null) {
                             break;
                         } else {
+                            $recordID = $row[0];
+                            $articleNo = $row[2];
+                            $producttype = $row[5];
+                            $idProduct = $this->productModel->getId($producttype);
+                            $custCode = $row[7];
+                            $description = $row[10];
+                            $delivery = $row[11];
+                            $rdelivery = str_replace('/', '-', (substr($delivery, -10)));
+                            $delivery2 = date('Y-m-d', strtotime($rdelivery));
+                            $qty = $row[12];
+                            $country = $row[17];
+                            $color = $row[18];
+                            $size = $row[19];
+                            $sam = $row[20];
+                            $machinetypeid = $row[22];
+                            $leadtime = $row[24];
+                            $processRoute = $row[25];
+                            $lcoDate = $row[26];
+                            $rlcoDate = str_replace('/', '-', (substr($lcoDate, -10)));
+                            $lcoDate2 = date('Y-m-d', strtotime($rlcoDate));
+
                             $simpandata = [
                                 'machinetypeid' => $machinetypeid,
                                 'size' => $size,

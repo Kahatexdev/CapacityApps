@@ -33,7 +33,7 @@
                         <h5>
                             Detail Data Model <?= $noModel ?> Delivery <?= date('d-M-Y', strtotime($delivery)) ?>
                         </h5>
-                        <a href="<?= base_url('capacity/semuaOrder/') ?>" class="btn bg-gradient-info"> Kembali</a>
+                        <a href="<?= base_url('capacity/semuaOrder/') ?>" class="btn bg-gradient-info"> Back</a>
                     </div>
                 </div>
                 <div class="card-body p-3">
@@ -42,7 +42,7 @@
                             <table id="dataTable" class="display compact striped" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jarum</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Needle</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Style</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Delivery</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty</th>
@@ -225,8 +225,7 @@
         </script> -->
         <script>
             $(document).ready(function() {
-                $('#dataTable').DataTable({
-                });
+                $('#dataTable').DataTable({});
 
                 $('.import-btn').click(function() {
                     var apsperstyle = $(this).data('id');
