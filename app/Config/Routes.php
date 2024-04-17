@@ -27,6 +27,8 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('cancelbooking/(:any)', 'BookingController::cancelbooking/$1');
     $routes->post('pecahbooking/(:any)', 'BookingController::pecahbooking/$1');
     $routes->post('importbooking', 'BookingController::importbooking');
+    $routes->get('cancelBooking', 'BookingController::getCancelBooking');
+    $routes->get('turunOrder', 'BookingController::getTurunOrder');
 
     // order
     $routes->get('dataorder', 'OrderController::order');
@@ -48,7 +50,6 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::produksi');
-    $routes->get('dataproduksi', 'ProduksiController::produksi');
     $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
 
@@ -62,14 +63,18 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('tambahmesinperarea', 'MesinController::inputmesinperarea');
 
     //calendar
-    $routes->get('Calendar', 'CalendarController::index');
+    $routes->get('planningorder', 'CalendarController::planningorder');
+    $routes->get('planningbooking', 'CalendarController::planningbooking');
     $routes->get('test', 'CalendarController::test');
-    $routes->post('calendar/(:any)', 'CalendarController::calendar/$1');
+    $routes->post('calendar/(:any)', 'CalendarController::planOrder/$1');
+    $routes->post('planningbooking/(:any)', 'CalendarController::planBooking/$1');
     $routes->get('hapusLibur/(:any)', 'CalendarController::hapuslibur/$1');
     $routes->get('checkdate', 'Checkdate::index');
     $routes->post('inputLibur', 'CapacityController::inputLibur');
-    $routes->post('generate', 'CalendarController::generatePlanning');
+    $routes->get('detailplan/(:any)', 'CalendarController::detailPlanning/$1');
     $routes->get('cek', 'TestController::test');
+
+    $routes->post('kebutuhanMesinOrder', 'KebutuhanMesin::inputMesinOrder');
 });
 
 

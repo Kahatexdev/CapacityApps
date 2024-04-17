@@ -6,7 +6,7 @@
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
-                        <div class="col-8">
+                        <div class="col-6">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
@@ -14,9 +14,16 @@
                                 </h5>
                             </div>
                         </div>
-                        <div class="col-4 text-end">
+                        <div class="col-6 text-end">
+
+                            <a href="<?= base_url('capacity/cancelBooking') ?>" class="btn btn-sm btn-warning bg-gradient-warning shadow text-center border-radius-md">
+                                Summary Cancel Booking
+                            </a>
+                            <a href="<?= base_url('capacity/turunOrder') ?>" class="btn btn-sm btn-success bg-gradient-success shadow text-center border-radius-md">
+                                Summary Turun Order
+                            </a>
                             <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">
-                            <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Import Data  
+                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Import Data
                             </button>
                         </div>
                     </div>

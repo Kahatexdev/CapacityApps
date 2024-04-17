@@ -203,7 +203,7 @@
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">
-                        Tabel Planning Order
+                        Tabel Planning Booking
                     </h4>
                 </div>
                 <div class="card-body">
@@ -258,7 +258,7 @@
 <script script>
     $('.pilih-jarum').click(function() {
         var jarum = $(this).data('id');
-        $('#generate').find('form').attr('action', '<?= base_url('capacity/calendar/') ?>' + jarum);
+        $('#generate').find('form').attr('action', '<?= base_url('capacity/planningbooking/') ?>' + jarum);
     })
 </script>
 <?php $this->endSection(); ?>

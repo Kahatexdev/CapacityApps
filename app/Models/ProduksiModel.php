@@ -49,4 +49,8 @@ class ProduksiModel extends Model
     {
         return $this->where('idapsperstyle', $insert['idapsperstyle'])->where('tgl_produksi', $insert['tgl_produksi'])->where('qty_produksi', $insert['qty_produksi'])->first();
     }
+    public function getProduksiPerhari($bulan)
+    {
+        return $this->select('*')->where('MONTH(tgl_produksi)', $bulan)->orderBy('tgl_produksi')->findAll();
+    }
 }

@@ -15,8 +15,18 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ProduksiController extends BaseController
 {
+    protected $filters;
+    protected $jarumModel;
+    protected $productModel;
+    protected $produksiModel;
+    protected $bookingModel;
+    protected $orderModel;
+    protected $ApsPerstyleModel;
+    protected $liburModel;
     public function __construct()
     {
+
+
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
@@ -40,7 +50,10 @@ class ProduksiController extends BaseController
     }
     public function produksi()
     {
+        $bulan = date('m');
+        $month = date('F');
         $totalMesin = $this->jarumModel->getArea();
+        $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
         $data = [
             'title' => 'Data Produksi',
             'active1' => '',
@@ -49,7 +62,11 @@ class ProduksiController extends BaseController
             'active4' => 'active',
             'active5' => '',
             'active6' => '',
-            'Area' => $totalMesin
+            'active7' => '',
+
+            'Area' => $totalMesin,
+            'Produksi' => $dataProduksi,
+            'bulan' => $month
         ];
         return view('Capacity/Produksi/produksi', $data);
     }
@@ -64,6 +81,8 @@ class ProduksiController extends BaseController
             'active4' => 'active',
             'active5' => '',
             'active6' => '',
+            'active7' => '',
+
             'produksi' => $produksi,
             'area' => $area
         ];
@@ -95,25 +114,28 @@ class ProduksiController extends BaseController
                         'style' => $style
                     ];
                     $idAps = $this->ApsPerstyleModel->getId($validate);
-                    $id = $idAps['idapsperstyle'];
-
-                    if ($data[0] == null) {
-                        break;
+                    if (!$idAps) {
+                        return redirect()->to(base_url('/capacity/dataproduksi'))->with('error', 'Data Order Tidak Ditemukan');
                     } else {
-                        $tglprod = $data[23];
-                        $unixProd = ($tglprod - 25569) * 86400;
-                        $tgl_produksi = date('Y-m-d', $unixProd);
-                        $qtyProd = $data[15];
-                        $sisaQty = $data[12];
-                        $insert = [
-                            'idapsperstyle' => $id,
-                            'tgl_produksi' => $tgl_produksi,
-                            'qty_produksi' => $qtyProd
-                        ];
-                        $existingProduction = $this->produksiModel->existingData($insert);
-                        if (!$existingProduction) {
-                            $this->produksiModel->insert($insert);
-                            $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
+                        $id = $idAps['idapsperstyle'];
+                        if ($data[0] == null) {
+                            break;
+                        } else {
+                            $tglprod = $data[23];
+                            $unixProd = ($tglprod - 25569) * 86400;
+                            $tgl_produksi = date('Y-m-d', $unixProd);
+                            $qtyProd = $data[15];
+                            $sisaQty = $data[12];
+                            $insert = [
+                                'idapsperstyle' => $id,
+                                'tgl_produksi' => $tgl_produksi,
+                                'qty_produksi' => $qtyProd
+                            ];
+                            $existingProduction = $this->produksiModel->existingData($insert);
+                            if (!$existingProduction) {
+                                $this->produksiModel->insert($insert);
+                                $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
+                            }
                         }
                     }
                 }

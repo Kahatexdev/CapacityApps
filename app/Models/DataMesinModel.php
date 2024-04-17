@@ -65,7 +65,12 @@ class DataMesinModel extends Model
     {
     $query = $this->select('*')->where('jarum',$jarum)->findAll();
 
-    return $query;
+        return $query;
+    }
+    public function getMesinPerJarum($jarum)
+    {
+        $query = $this->select('*')->where('jarum', $jarum)->findAll();
+        return $query;
     }
 
     public function getTotalMesinByJarum()
@@ -109,12 +114,10 @@ class DataMesinModel extends Model
     }
     public function getAreaModel($noModel)
     {
-    return $this->select('data_mesin.*')
-                ->join('apsperstyle', 'data_mesin.jarum = apsperstyle.machinetypeid','left')
-                ->where('apsperstyle.mastermodel', $noModel)
-                ->get()
-                ->getResult();
+        return $this->select('data_mesin.*')
+            ->join('apsperstyle', 'data_mesin.jarum = apsperstyle.machinetypeid', 'left')
+            ->where('apsperstyle.mastermodel', $noModel)
+            ->get()
+            ->getResult();
     }
-
-    
 }
