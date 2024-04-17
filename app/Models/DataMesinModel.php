@@ -61,9 +61,9 @@ class DataMesinModel extends Model
         return $uniqueArea;
     }
 
-    public function getJarumArea($area)
+    public function getJarumArea($jarum)
     {
-    $query = $this->select('*')->where('area',$area)->findAll();
+    $query = $this->select('*')->where('jarum',$jarum)->findAll();
 
     return $query;
     }
@@ -71,29 +71,33 @@ class DataMesinModel extends Model
     public function getTotalMesinByJarum()
     {
     $customOrder = [
-        'JC120' => 3,
-        'JC144' => 2,
-        'JC168' => 1
+        'JC120' => 1,
+        'TJ120' => 2,
+        'JC144' => 3,
+        'TJ144' => 4,
+        'JC168' => 5,
+        'TJ168' => 6
     ];
 
-    // Get the keys of the custom order
-    $customOrderKeys = array_keys($customOrder);
-
     // Generate the CASE statement for custom ordering
-    $caseStatement = "CASE jarum ";
-    foreach ($customOrderKeys as $index => $jarum) {
-        $caseStatement .= "WHEN '$jarum' THEN $index ";
+    $caseStatement = "CASE ";
+    foreach ($customOrder as $jarum => $index) {
+        $caseStatement .= "WHEN jarum = '$jarum' THEN $index ";
     }
-    $caseStatement .= "END";
+    // For '10G', '13G', '240N', and 'POM-POM' entries, set the index to a very large number to move them to the end
+    $caseStatement .= "WHEN jarum LIKE '10G%' THEN 1000 ";
+    $caseStatement .= "WHEN jarum = '13G' THEN 1001 ";
+    $caseStatement .= "WHEN jarum = '240N' THEN 1002 ";
+    $caseStatement .= "WHEN jarum = 'POM-POM' THEN 1003 ";
+    $caseStatement .= "ELSE " . (count($customOrder) + 1) . " END";
 
-    $query = $this->select('jarum, SUM(total_mc) as total')
-                  ->groupBy('jarum')
-                  ->orderBy("FIELD(jarum, 'JC120', 'JC144', 'JC168') DESC, jarum");
-
-    $result = $query->findAll();
-
-    return $result;
+    return $this->select('jarum, SUM(total_mc) as total')
+                ->groupBy('jarum')
+                ->orderBy($caseStatement . ', jarum')
+                ->findAll();
     }
+
+
 
     public function mcJalan()
     {
