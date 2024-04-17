@@ -182,6 +182,8 @@ class BookingController extends BaseController
         $product = $this->productModel->findAll();
         $booking = $this->bookingModel->getDataById($idBooking);
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+        $childOrder = $this->orderModel->getChild($idBooking);
+        $childBooking = $this->bookingModel->getChild($idBooking);
         $data = [
             'title' => 'Data Booking',
             'active1' => '',
@@ -194,7 +196,9 @@ class BookingController extends BaseController
             'booking' => $booking,
             'jarum' => $needle,
             'product' => $product,
-            'jenisJarum' => $totalMesin
+            'jenisJarum' => $totalMesin,
+            'childOrder' => $childOrder,
+            'childBooking' => $childBooking
 
         ];
         return view('Capacity/Booking/detail', $data);
@@ -245,6 +249,7 @@ class BookingController extends BaseController
 
         $jarum = $this->request->getPost("jarum");
         $tglbk = $this->request->getPost("tgl_booking");
+
         $no_order = $this->request->getPost("no_order");
         $no_pdk = $this->request->getPost("no_booking");
         $desc = $this->request->getPost("desc");
@@ -319,13 +324,13 @@ class BookingController extends BaseController
                     $unixTime = ($shipment - 25569) * 86400;
                     $delivery = date('Y-m-d', $unixTime);
                     $qty = $data[7];
-                    $opd = $data[9];
+                    $opd = $data[11];
                     $unixOpd = ($opd - 25569) * 86400;
                     $opd1 = date('Y-m-d', $unixOpd);
-                    $jarum = $data[14];
-                    $lead_time = $data[16];
+                    $jarum = $data[16];
+                    $lead_time = $data[18];
                     $seam = $data[17];
-                    $no_order = $data[18];
+                    $no_order = $data[20];
                     $tgl_booking = date('Y-m-d');
 
                     if ($data[0] == null) {
