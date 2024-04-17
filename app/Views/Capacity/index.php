@@ -55,9 +55,9 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Booking Masuk </p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Booking </p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    <span class=" text-sm font-weight-bolder">Bulan Ini</span>
+                                    <span class=" text-sm font-weight-bolder">This Month</span>
                                     <?= $TerimaBooking ?>
 
                                 </h5>
@@ -78,7 +78,7 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Order aktif </p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Active Order </p>
                                 <h5 class="font-weight-bolder mb-0">
                                     <?= $jalan ?>
                                 </h5>
@@ -99,7 +99,7 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Mesin Jalan</p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Machine Running</p>
                                 <h5 class="font-weight-bolder mb-0">
                                     <?= $mcJalan ?>
                                     <span class=" text-sm font-weight-bolder">/ <?= $totalMc ?> </span>
@@ -122,10 +122,10 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Order Selesai</p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Order Finished</p>
                                 <h5 class="font-weight-bolder mb-0">
                                     8
-                                    <span class=" text-sm font-weight-bolder">Bulan Ini</span>
+                                    <span class=" text-sm font-weight-bolder">This Month</span>
                                 </h5>
                             </div>
                         </div>
@@ -143,7 +143,7 @@
         <div class="col-lg-12">
             <div class="card z-index-2">
                 <div class="card-header pb-0">
-                    <h6>Statistik Data Turun Order Perhari</h6>
+                    <h6>Daily Placed Order</h6>
 
                 </div>
                 <div class="card-body p-3">
