@@ -31,10 +31,10 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <h5>
-                            Detail Data Jarum <?= $jarum ?>
+                            Detail Data Needle <?= $jarum ?>
                         </h5>
                         <div>
-                            <a href="<?= base_url('capacity/mesinperarea') ?>" class="btn bg-gradient-info"> Kembali</a>
+                            <a href="<?= base_url('capacity/mesinperarea') ?>" class="btn bg-gradient-info"> Back</a>
                             <button type="button" class="btn btn-add bg-gradient-success" data-toggle="modal" data-target="#modalTambah">Input Data Mesin</button>
                         </div>
                     </div>
@@ -46,11 +46,11 @@
                                 <thead>
                                     <tr>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Area</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jarum</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Total Mesin</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Needle</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Machine Total</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Brand</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Mesin Jalan</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Mesin Mati</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Machine Running</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Machine Not Running</th>
                                         <th colspan=2 class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
                                     </tr>
                                 </thead>

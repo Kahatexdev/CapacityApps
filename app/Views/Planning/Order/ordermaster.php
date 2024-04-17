@@ -10,7 +10,7 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    Data Booking Berdasarkan Jarum
+                                    Booking Data Based on Needles
                                 </h5>
                             </div>
                         </div>
@@ -35,7 +35,7 @@
 
                             <div class="col-8">
                                 <div class="numbers">
-                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Order Belum Diplanning</p>
+                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Order Not Yet Planned</p>
                                     <h5 class="font-weight-bolder mb-0">
                                     </h5>
                                 </div>
@@ -61,7 +61,7 @@
 
                             <div class="col-8">
                                 <div class="numbers">
-                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Data Order Per Jarum</p>
+                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Order Data Per Needle</p>
                                     <h5 class="font-weight-bolder mb-0">
                                     </h5>
                                 </div>
@@ -88,7 +88,7 @@
 
                             <div class="col-8">
                                 <div class="numbers">
-                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Data Order Per Area</p>
+                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Order Data Per Area</p>
                                     <h5 class="font-weight-bolder mb-0">
                                     </h5>
                                 </div>

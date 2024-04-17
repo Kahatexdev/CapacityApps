@@ -10,7 +10,7 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    Data Mesin Berdasarkan Area
+                                    Machine Data
                                 </h5>
                             </div>
                         </div>
@@ -35,7 +35,7 @@
 
                                 <div class="col-8">
                                     <div class="numbers">
-                                        <p class="text-md mb-0 text-capitalize font-weight-bold">Data Mesin Per Area</p>
+                                        <p class="text-md mb-0 text-capitalize font-weight-bold">Machine Data by Area</p>
                                         <h5 class="font-weight-bolder mb-0">
                                         </h5>
                                     </div>
@@ -61,7 +61,7 @@
 
                                 <div class="col-8">
                                     <div class="numbers">
-                                        <p class="text-md mb-0 text-capitalize font-weight-bold">Data Mesin Per Jarum</p>
+                                        <p class="text-md mb-0 text-capitalize font-weight-bold">Machine Data by Needle</p>
                                         <h5 class="font-weight-bolder mb-0">
                                         </h5>
                                     </div>
