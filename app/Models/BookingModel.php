@@ -108,16 +108,16 @@ class BookingModel extends Model
     }
 
 
-    public function getPlanJarumNs($cek)
+    public function getPlanJarumNSMP($cek)
     {
         $results = $this
             ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
-            ->groupBy('data_booking.delivery, master_product_type.keterangan')
-            ->select('data_booking.delivery, master_product_type.keterangan, SUM(data_booking.sisa_booking) AS total_qty')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
             ->where('data_booking.needle', $cek['jarum'])
             ->where('data_booking.delivery >=', $cek['start'])
             ->where('data_booking.delivery <=', $cek['end'])
-            ->where('master_product_type.keterangan', "Normal Sock")
+            ->where('master_product_type.product_type', "NS-MP")
             ->get()
             ->getResultArray();
 

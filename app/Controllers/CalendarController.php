@@ -279,8 +279,8 @@ class CalendarController extends BaseController
                 'end' => $end,
             ];
 
-            
-            $normalSock = $this->bookingModel->getPlanJarumNs($cek);
+
+            $normalSock = $this->bookingModel->getPlanJarumNSMP($cek);
             $sneaker = $this->bookingModel->getPlanJarumSs($cek);
             $knee = $this->bookingModel->getPlanJarumKh($cek);
             $footies = $this->bookingModel->getPlanJarumFs($cek);
@@ -306,8 +306,7 @@ class CalendarController extends BaseController
 
             $weekCount++;
         }
-        
-
+        dd($monthlyData);
         $get = [
             'jarum' => $jarum,
             'start' => $awal,

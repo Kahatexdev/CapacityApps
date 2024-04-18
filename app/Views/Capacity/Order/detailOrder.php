@@ -33,7 +33,7 @@
                         <h5>
                             Detail Data Model <?= $noModel ?> Delivery <?= date('d-M-Y', strtotime($delivery)) ?>
                         </h5>
-                        <a href="<?= base_url('capacity/semuaOrder/') ?>" class="btn bg-gradient-info"> Kembali</a>
+                        <a href="<?= base_url('capacity/semuaOrder/') ?>" class="btn bg-gradient-info"> Back</a>
                     </div>
                 </div>
                 <div class="card-body p-3">
@@ -68,7 +68,7 @@
                                                 </button>
                                             </td>
                                             <td>
-                                                <button type="button" class="btn btn-danger btn-sm delete-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $order['idapsperstyle']; ?>"data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>">
+                                                <button type="button" class="btn btn-danger btn-sm delete-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $order['idapsperstyle']; ?>" data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>">
                                                     Delete
                                                 </button>
                                             </td>
@@ -80,15 +80,15 @@
                         </div>
                     </div>
 
-                <div class="card-footer">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <a href="#" class="btn btn-danger btn-delete-all" Data-bs-toggle="modal" data-bs-target="ModalDeleteAll" data-no-model="<?= $noModel ?>">Delete All</a>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <a href="#" class="btn btn-danger btn-delete-all" Data-bs-toggle="modal" data-bs-target="ModalDeleteAll" data-no-model="<?= $noModel ?>">Delete All</a>
+                            </div>
                         </div>
                     </div>
+
                 </div>
-                
-            </div>
 
 
             </div>
@@ -149,52 +149,52 @@
             </div>
         </div>
 
-                <div class="modal fade  bd-example-modal-lg" id="ModalDelete" tabindex="-1" role="dialog" aria-labelledby="modaldelete" aria-hidden="true">
-                    <div class="modal-dialog  modal-dialog-centered" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Hapus Data Style</h5>
-                                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">×</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <form action="" method="post">
-                                    <input type="hidden" class="form-control" name="no_model">
-                                    <input type="hidden" class="form-control" name="delivery">
-                                    <input type="text" name="idapsperstyle" id="" hidden value="">
-                                    Apakah anda yakin ingin menghapus Data Style?
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn bg-gradient-danger">Hapus</button>
-                            </div>
-                            </form>
-                        </div>
+        <div class="modal fade  bd-example-modal-lg" id="ModalDelete" tabindex="-1" role="dialog" aria-labelledby="modaldelete" aria-hidden="true">
+            <div class="modal-dialog  modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Hapus Data Style</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
                     </div>
-                </div>
-                <div class="modal fade  bd-example-modal-lg" id="ModalDeleteAll" tabindex="-1" role="dialog" aria-labelledby="modaldeleteall" aria-hidden="true">
-                    <div class="modal-dialog  modal-dialog-centered" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Hapus Semua Style ?</h5>
-                                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">×</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <form action="" method="post">
-                                    <input type="text" name="no_model" id="" hidden value="<?= $noModel ?>">
-                                    Apakah anda yakin menghapus semua style di Model <?= $noModel ?>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn bg-gradient-danger">Hapus</button>
-                            </div>
-                            </form>
-                        </div>
+                    <div class="modal-body">
+                        <form action="" method="post">
+                            <input type="hidden" class="form-control" name="no_model">
+                            <input type="hidden" class="form-control" name="delivery">
+                            <input type="text" name="idapsperstyle" id="" hidden value="">
+                            Apakah anda yakin ingin menghapus Data Style?
                     </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-danger">Hapus</button>
+                    </div>
+                    </form>
                 </div>
+            </div>
+        </div>
+        <div class="modal fade  bd-example-modal-lg" id="ModalDeleteAll" tabindex="-1" role="dialog" aria-labelledby="modaldeleteall" aria-hidden="true">
+            <div class="modal-dialog  modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Hapus Semua Style ?</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="" method="post">
+                            <input type="text" name="no_model" id="" hidden value="<?= $noModel ?>">
+                            Apakah anda yakin menghapus semua style di Model <?= $noModel ?>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-danger">Hapus</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
         <script>
             $(document).ready(function() {
                 $('#dataTable').DataTable();
@@ -210,37 +210,37 @@
                     var seam = $(this).data('seam');
                     var factory = $(this).data('factory');
 
-            var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
-            
-            $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/updatedetailorder/') ?>' + apsperstyle);
-            $('#ModalEdit').find('input[name="style"]').val(style);
-            $('#ModalEdit').find('input[name="no_model"]').val(noModel);
-            $('#ModalEdit').find('input[name="delivery"]').val(formattedDelivery);
-            $('#ModalEdit').find('input[name="qty"]').val(qty);
-            $('#ModalEdit').find('input[name="sisa"]').val(sisa);
-            $('#ModalEdit').find('input[name="seam"]').val(seam);
-            $('#ModalEdit').find('input[name="factory"]').val(factory);
-            
-            $('#ModalEdit').modal('show'); // Show the modal
-        });
-            $('.delete-btn').click(function() {
-            var noModel = $(this).data('no-model');
-            var delivery = $(this).data('delivery');
-            var apsperstyle = $(this).data('id');
-            var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
-            $('#ModalDelete').find('form').attr('action', '<?= base_url('capacity/deletedetailstyle/') ?>' + apsperstyle);
-            $('#ModalDelete').find('input[name="idapsperstyle"]').val(apsperstyle);
-            $('#ModalDelete').find('input[name="no_model"]').val(noModel);
-            $('#ModalDelete').find('input[name="delivery"]').val(formattedDelivery);
-            $('#ModalDelete').modal('show'); // Show the modal
-        });
-        $('.btn-delete-all').click(function() {
-            var noModel = $(this).data('no-model');
-            $('#ModalDeleteAll').find('form').attr('action', '<?= base_url('capacity/deletedetailorder/') ?>' + noModel);
-            $('#ModalDeleteAll').find('input[name="idapsperstyle"]').val(noModel);
-            $('#ModalDeleteAll').modal('show'); // Show the modal
-        });
-        });
+                    var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
+
+                    $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/updatedetailorder/') ?>' + apsperstyle);
+                    $('#ModalEdit').find('input[name="style"]').val(style);
+                    $('#ModalEdit').find('input[name="no_model"]').val(noModel);
+                    $('#ModalEdit').find('input[name="delivery"]').val(formattedDelivery);
+                    $('#ModalEdit').find('input[name="qty"]').val(qty);
+                    $('#ModalEdit').find('input[name="sisa"]').val(sisa);
+                    $('#ModalEdit').find('input[name="seam"]').val(seam);
+                    $('#ModalEdit').find('input[name="factory"]').val(factory);
+
+                    $('#ModalEdit').modal('show'); // Show the modal
+                });
+                $('.delete-btn').click(function() {
+                    var noModel = $(this).data('no-model');
+                    var delivery = $(this).data('delivery');
+                    var apsperstyle = $(this).data('id');
+                    var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
+                    $('#ModalDelete').find('form').attr('action', '<?= base_url('capacity/deletedetailstyle/') ?>' + apsperstyle);
+                    $('#ModalDelete').find('input[name="idapsperstyle"]').val(apsperstyle);
+                    $('#ModalDelete').find('input[name="no_model"]').val(noModel);
+                    $('#ModalDelete').find('input[name="delivery"]').val(formattedDelivery);
+                    $('#ModalDelete').modal('show'); // Show the modal
+                });
+                $('.btn-delete-all').click(function() {
+                    var noModel = $(this).data('no-model');
+                    $('#ModalDeleteAll').find('form').attr('action', '<?= base_url('capacity/deletedetailorder/') ?>' + noModel);
+                    $('#ModalDeleteAll').find('input[name="idapsperstyle"]').val(noModel);
+                    $('#ModalDeleteAll').modal('show'); // Show the modal
+                });
+            });
         </script>
         <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
         <?php $this->endSection(); ?>
