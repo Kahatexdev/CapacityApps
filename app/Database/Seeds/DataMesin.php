@@ -120,7 +120,7 @@ class DataMesin extends Seeder
                 'total_mc' => 68,
                 'brand' => 'DAKONG',
                 'mesin_jalan' => 53,
-            ],[
+            ], [
                 'area' => 'KK2A',
                 'jarum' => 'JC144',
                 'total_mc' => 223,
@@ -511,9 +511,7 @@ class DataMesin extends Seeder
                 'total_mc' => 1,
                 'brand' => 'GLOVES',
                 'mesin_jalan' => 1,
-            ],
-
-
+            ]
         ];
         $this->db->table('data_mesin')->insertBatch($data);
     }
