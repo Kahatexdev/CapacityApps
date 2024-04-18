@@ -16,7 +16,7 @@ class ProductType extends Seeder
             ],
             [
                 'konversi' => 0,
-                'product_type' => 'NS-FS',                
+                'product_type' => 'NS-FP',                
                 'keterangan' => 'Normal Sock',
             ],
             [
@@ -31,7 +31,7 @@ class ProductType extends Seeder
             ],
             [
                 'konversi' => 0,
-                'product_type' => 'S-FS',
+                'product_type' => 'S-FP',
                 'keterangan' => 'Sneaker',
             ],
             [
@@ -46,7 +46,7 @@ class ProductType extends Seeder
             ],
             [
                 'konversi' => 0,
-                'product_type' => 'F-FS',
+                'product_type' => 'F-FP',
                 'keterangan' => 'Footies',
             ],
             [
@@ -61,7 +61,7 @@ class ProductType extends Seeder
             ],
             [
                 'konversi' => 0,
-                'product_type' => 'KH-FS',
+                'product_type' => 'KH-FP',
                 'keterangan' => 'Knee High',
             ],
             [
@@ -76,7 +76,7 @@ class ProductType extends Seeder
             ],
             [
                 'konversi' => 0,
-                'product_type' => 'TG-FS',
+                'product_type' => 'TG-FP',
                 'keterangan' => 'Tight',
             ],
             [
@@ -91,7 +91,7 @@ class ProductType extends Seeder
             ],
             [
                 'konversi' => 0,
-                'product_type' => 'SS-FS',
+                'product_type' => 'SS-FP',
                 'keterangan' => 'Short Shaft',
             ],
             [
@@ -101,9 +101,35 @@ class ProductType extends Seeder
             ],
             [
                 'konversi' => 0,
-                'product_type' => 'GL-PS',
-                'keterangan' => 'Gloves',
+                'product_type' => 'GL-PL',
+                'keterangan' => 'Gloves Plain',
             ],
+            [
+                'konversi' => 0,
+                'product_type' => 'GL-ST',
+                'keterangan' => 'Gloves Stripe',
+            ],
+            [
+                'konversi' => 0,
+                'product_type' => 'GL-FL',
+                'keterangan' => 'Gloves Fingerless',
+            ],
+            [
+                'konversi' => 0,
+                'product_type' => 'GL-MT',
+                'keterangan' => 'Gloves Mitten',
+            ],
+            [
+                'konversi' => 0,
+                'product_type' => 'HT-PL',
+                'keterangan' => 'Hat Plain',
+            ],
+            [
+                'konversi' => 0,
+                'product_type' => 'HT-ST',
+                'keterangan' => 'Hat Stripe',
+            ],
+
         ];
         $this->db->table('master_product_type')->insertBatch($data);
     }
