@@ -173,35 +173,156 @@
                                 </thead>
                                 <tbody class="text-center">
                                     <tr>
-                                        <td>Normal Sock</td>
+                                        <td>F-PS</td>
                                         <?php foreach ($ranges as $index => $range) : ?>
-                                            <td><?= $range['normal'] ?></td>
+                                            <td><?= $range['fps'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+
+                                    <tr>
+                                        <td>F-MP</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['fmp'] ?></td>
                                         <?php endforeach; ?>
                                     </tr>
                                     <tr>
-                                        <td>Sneakers</td>
+                                        <td>F-FP</td>
                                         <?php foreach ($ranges as $index => $range) : ?>
-                                            <td><?= $range['sneaker'] ?></td>
+                                            <td><?= $range['ffp'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+
+                                    <tr>
+                                        <td>S-PS</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['sps'] ?></td>
                                         <?php endforeach; ?>
                                     </tr>
                                     <tr>
-                                        <td>Footies</td>
+                                        <td>S-MP</td>
                                         <?php foreach ($ranges as $index => $range) : ?>
-                                            <td><?= $range['footies'] ?></td>
+                                            <td><?= $range['smp'] ?></td>
                                         <?php endforeach; ?>
                                     </tr>
                                     <tr>
-                                        <td>Knee High</td>
+                                        <td>S-FP</td>
                                         <?php foreach ($ranges as $index => $range) : ?>
-                                            <td><?= $range['knee'] ?></td>
+                                            <td><?= $range['sfp'] ?></td>
+                                        <?php endforeach; ?>
+                                    <tr>
+                                    <tr>
+                                        <td>SS-PS</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['ssps'] ?></td>
                                         <?php endforeach; ?>
                                     </tr>
                                     <tr>
-                                        <td>Tight</td>
+                                        <td>SS-MP</td>
                                         <?php foreach ($ranges as $index => $range) : ?>
-                                            <td><?= $range['tight'] ?></td>
+                                            <td><?= $range['ssmp'] ?></td>
                                         <?php endforeach; ?>
                                     </tr>
+                                    <tr>
+                                        <td>SS-FP</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['ssfp'] ?></td>
+                                        <?php endforeach; ?>
+                                    <tr>
+                                        <td>NS-PS</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['nsps'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <td>NS-MP</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['nsmp'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <td>NS-FP</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['nsfp'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+
+
+                                    </tr>
+
+                                    <tr>
+                                        <td>KH-PS</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['khps'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <td>KH-MP</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['khmp'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <td>KH-FP</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['khfp'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <td>TG-PS</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['tgps'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <td>TG-MP</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['tgmp'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <td>TG-FP</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['tgfp'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <td>GL-FL</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['glfl'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <td>GL-MT</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['glmt'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <td>GL-PT</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['glpt'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <td>GL-ST</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['glst'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <td>HT-ST</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['htst'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <td>HT-PL</td>
+                                        <?php foreach ($ranges as $index => $range) : ?>
+                                            <td><?= $range['htpl'] ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+
+
                                 </tbody>
                             </table>
                         </div>

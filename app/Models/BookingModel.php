@@ -107,7 +107,7 @@ class BookingModel extends Model
             ->findAll();
     }
 
-
+    // Plan Jarum NORMAL
     public function getPlanJarumNSMP($cek)
     {
         $results = $this
@@ -132,17 +132,66 @@ class BookingModel extends Model
 
         return $total_qty;
     }
+    public function getPlanJarumNSPS($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "NS-PS")
+            ->get()
+            ->getResultArray();
 
-    public function getPlanJarumSs($cek)
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+
+
+        return $total_qty;
+    }
+    public function getPlanJarumNSFP($cek)
     {
         $results = $this
             ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
-            ->groupBy('data_booking.delivery, master_product_type.keterangan')
-            ->select('data_booking.delivery, master_product_type.keterangan, SUM(data_booking.sisa_booking) AS total_qty')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
             ->where('data_booking.needle', $cek['jarum'])
             ->where('data_booking.delivery >=', $cek['start'])
             ->where('data_booking.delivery <=', $cek['end'])
-            ->where('master_product_type.keterangan', "Sneaker")
+            ->where('master_product_type.product_type', "NS-FP")
+            ->get()
+            ->getResultArray();
+
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+
+
+        return $total_qty;
+    }
+
+    // SNEAKER SOCK
+    public function getPlanJarumSPS($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "S-PS")
             ->get()
             ->getResultArray();
         // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
@@ -153,16 +202,16 @@ class BookingModel extends Model
         }
         return $total_qty;
     }
-    public function getPlanJarumKh($cek)
+    public function getPlanJarumSMP($cek)
     {
         $results = $this
             ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
-            ->groupBy('data_booking.delivery, master_product_type.keterangan')
-            ->select('data_booking.delivery, master_product_type.keterangan, SUM(data_booking.sisa_booking) AS total_qty')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
             ->where('data_booking.needle', $cek['jarum'])
             ->where('data_booking.delivery >=', $cek['start'])
             ->where('data_booking.delivery <=', $cek['end'])
-            ->where('master_product_type.keterangan', "Knee High")
+            ->where('master_product_type.product_type', "S-MP")
             ->get()
             ->getResultArray();
         // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
@@ -173,16 +222,16 @@ class BookingModel extends Model
         }
         return $total_qty;
     }
-    public function getPlanJarumFs($cek)
+    public function getPlanJarumSSFP($cek)
     {
         $results = $this
             ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
-            ->groupBy('data_booking.delivery, master_product_type.keterangan')
-            ->select('data_booking.delivery, master_product_type.keterangan, SUM(data_booking.sisa_booking) AS total_qty')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
             ->where('data_booking.needle', $cek['jarum'])
             ->where('data_booking.delivery >=', $cek['start'])
             ->where('data_booking.delivery <=', $cek['end'])
-            ->where('master_product_type.keterangan', "Footies")
+            ->where('master_product_type.product_type', "SS-FP")
             ->get()
             ->getResultArray();
         // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
@@ -193,16 +242,16 @@ class BookingModel extends Model
         }
         return $total_qty;
     }
-    public function getPlanJarumT($cek)
+    public function getPlanJarumSSPS($cek)
     {
         $results = $this
             ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
-            ->groupBy('data_booking.delivery, master_product_type.keterangan')
-            ->select('data_booking.delivery, master_product_type.keterangan, SUM(data_booking.sisa_booking) AS total_qty')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
             ->where('data_booking.needle', $cek['jarum'])
             ->where('data_booking.delivery >=', $cek['start'])
             ->where('data_booking.delivery <=', $cek['end'])
-            ->where('master_product_type.keterangan', "Tight")
+            ->where('master_product_type.product_type', "SS-PS")
             ->get()
             ->getResultArray();
         // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
@@ -213,6 +262,348 @@ class BookingModel extends Model
         }
         return $total_qty;
     }
+    public function getPlanJarumSSMP($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "SS-MP")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    public function getPlanJarumSFP($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "S-FP")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    // KNEE HIGH
+    public function getPlanJarumKHPS($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "KH-PS")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    public function getPlanJarumKHMP($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "KH-MP")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    public function getPlanJarumKHFP($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "KH-FP")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    public function getPlanJarumFPS($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "F-PS")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    public function getPlanJarumFMP($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "F-MP")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    public function getPlanJarumFFP($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "F-FP")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    public function getPlanJarumTGPS($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "TG-PS")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    public function getPlanJarumTGFP($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "TG-FP")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    public function getPlanJarumTGMP($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "TG-MP")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    public function getPlanJarumGLFL($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "GL-FL")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    public function getPlanJarumGLMT($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "GL-MT")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    public function getPlanJarumGLPT($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "GL-PT")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    public function getPlanJarumGLST($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "GL-ST")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    public function getPlanJarumHTST($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "HT-ST")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+    public function getPlanJarumHTPL($cek)
+    {
+        $results = $this
+            ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('data_booking.delivery, master_product_type.product_type')
+            ->select('data_booking.delivery, master_product_type.product_type, SUM(data_booking.sisa_booking) AS total_qty')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->where('master_product_type.product_type', "HT-PL")
+            ->get()
+            ->getResultArray();
+        // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
+        $total_qty = 0;
+        // Menghitung total_qty dari hasil query
+        foreach ($results as $result) {
+            $total_qty += $result['total_qty'] ?? 0;
+        }
+        return $total_qty;
+    }
+
 
     public function getCancelBooking()
     {

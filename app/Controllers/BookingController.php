@@ -315,8 +315,7 @@ class BookingController extends BaseController
                     $data[] = $cell->getValue();
                 }
                 if (!empty($data)) {
-                    $product_type = $data[2];
-                    $idprod = $this->productModel->getId($product_type);
+
                     $no_booking = $data[0];
                     $buyer = $data[3];
                     $desc = $data[5];
@@ -332,7 +331,9 @@ class BookingController extends BaseController
                     $seam = $data[17];
                     $no_order = $data[20];
                     $tgl_booking = date('Y-m-d');
-
+                    $product_type = $data[2];
+                    $getIdProd = ['prodtype' => $product_type, 'jarum' => $jarum];
+                    $idprod = $this->productModel->getId($getIdProd);
                     if ($data[0] == null) {
                         break;
                     } else {

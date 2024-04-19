@@ -40,9 +40,12 @@ class ProductTypeModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getId($product)
+    public function getId($getIdProd)
     {
-        $query = $this->select('id_product_type')->where('product_type', $product)->first();
+        $query = $this->select('id_product_type')
+            ->where('product_type', $getIdProd['prodtype'])
+            ->where('jarum', $getIdProd['jarum'])
+            ->first();
         return $query;
     }
     public function getKategori()

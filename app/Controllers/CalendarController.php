@@ -280,16 +280,54 @@ class CalendarController extends BaseController
             ];
 
 
-            $normalSock = $this->bookingModel->getPlanJarumNSMP($cek);
-            $sneaker = $this->bookingModel->getPlanJarumSs($cek);
-            $knee = $this->bookingModel->getPlanJarumKh($cek);
-            $footies = $this->bookingModel->getPlanJarumFs($cek);
-            $tight = $this->bookingModel->getPlanJarumT($cek);
-            $normalTotalQty = $normalSock ?? 0;
-            $sneakerTotalQty = $sneaker ?? 0;
-            $kneeTotalQty = $knee ?? 0;
-            $footiesTotalQty = $footies ?? 0;
-            $tightTotalQty = $tight ?? 0;
+            $nsmp = $this->bookingModel->getPlanJarumNSMP($cek);
+            $nsps = $this->bookingModel->getPlanJarumNSPS($cek);
+            $nsfp = $this->bookingModel->getPlanJarumNSFP($cek);
+            $sps = $this->bookingModel->getPlanJarumSPS($cek);
+            $smp = $this->bookingModel->getPlanJarumSMP($cek);
+            $sfp = $this->bookingModel->getPlanJarumSFP($cek);
+            $ssps = $this->bookingModel->getPlanJarumSSPS($cek);
+            $ssmp = $this->bookingModel->getPlanJarumSSMP($cek);
+            $ssfp = $this->bookingModel->getPlanJarumSSFP($cek);
+            $khps = $this->bookingModel->getPlanJarumKHPS($cek);
+            $khmp = $this->bookingModel->getPlanJarumKHMP($cek);
+            $khfp = $this->bookingModel->getPlanJarumKHFP($cek);
+            $fps = $this->bookingModel->getPlanJarumFPS($cek);
+            $fmp = $this->bookingModel->getPlanJarumFMP($cek);
+            $ffp = $this->bookingModel->getPlanJarumFFP($cek);
+            $tgps = $this->bookingModel->getPlanJarumTGPS($cek);
+            $tgfp = $this->bookingModel->getPlanJarumTGFP($cek);
+            $tgmp = $this->bookingModel->getPlanJarumTGMP($cek);
+            $glfl = $this->bookingModel->getPlanJarumGLFL($cek);
+            $glmt = $this->bookingModel->getPlanJarumGLMT($cek);
+            $glpt = $this->bookingModel->getPlanJarumGLPT($cek);
+            $glst = $this->bookingModel->getPlanJarumGLST($cek);
+            $htst = $this->bookingModel->getPlanJarumHTST($cek);
+            $htpl = $this->bookingModel->getPlanJarumHTPL($cek);
+            $nsmpQty = $nsmp ?? 0;
+            $nspsQty = $nsps ?? 0;
+            $nsfpQty = $nsfp ?? 0;
+            $spsQty = $sps ?? 0;
+            $smpQty = $smp ?? 0;
+            $sfpQty = $sfp ?? 0;
+            $sspsQty = $ssps ?? 0;
+            $ssmpQty = $ssmp ?? 0;
+            $ssfpQty = $ssfp ?? 0;
+            $khpsQty = $khps ?? 0;
+            $khmpQty = $khmp ?? 0;
+            $khfpQty = $khfp ?? 0;
+            $ffpQty = $ffp ?? 0;
+            $fpsQty = $fps ?? 0;
+            $fmpQty = $fmp ?? 0;
+            $tgpsQty = $tgps ?? 0;
+            $tgmpQty = $tgmp ?? 0;
+            $tgfpQty = $tgfp ?? 0;
+            $glflQty = $glfl ?? 0;
+            $glmtQty = $glmt ?? 0;
+            $glptQty = $glpt ?? 0;
+            $glstQty = $glst ?? 0;
+            $htstQty = $htst ?? 0;
+            $htplQty = $htpl ?? 0;
 
             $monthlyData[$currentMonth][] = [
                 'week' => $weekCount,
@@ -297,16 +335,34 @@ class CalendarController extends BaseController
                 'end_date' => $endOfWeekFormatted,
                 'number_of_days' => $numberOfDays,
                 'holidays' => $weekHolidays,
-                'normal' => $normalTotalQty,
-                'sneaker' => $sneakerTotalQty,
-                'knee' => $kneeTotalQty,
-                'footies' => $footiesTotalQty,
-                'tight' => $tightTotalQty,
+                'nsps' => $nspsQty,
+                'nsmp' => $nsmpQty,
+                'nsfp' => $nsfpQty,
+                'sps' => $spsQty,
+                'smp' => $smpQty,
+                'sfp' => $ssfpQty,
+                'ssps' => $sspsQty,
+                'ssmp' => $ssmpQty,
+                'ssfp' => $sfpQty,
+                'khps' => $khpsQty,
+                'khmp' => $khmpQty,
+                'khfp' => $khfpQty,
+                'ffp' => $ffpQty,
+                'fmp' => $fmpQty,
+                'fps' => $fpsQty,
+                'tgps' => $tgpsQty,
+                'tgmp' => $tgmpQty,
+                'tgfp' => $tgfpQty,
+                'glfl' => $glflQty,
+                'glmt' => $glmtQty,
+                'glpt' => $glptQty,
+                'glst' => $glstQty,
+                'htst' => $htstQty,
+                'htpl' => $htplQty,
             ];
 
             $weekCount++;
         }
-        dd($monthlyData);
         $get = [
             'jarum' => $jarum,
             'start' => $awal,
@@ -315,6 +371,7 @@ class CalendarController extends BaseController
 
 
         $normalMC = $this->normalCalc($get);
+        dd($normalMC);
         $sneakerMC = $this->sneakerCalc($get);
         $kneeMc = $this->kneeCalc($get);
         $footiesMc = $this->footiesCalc($get);
