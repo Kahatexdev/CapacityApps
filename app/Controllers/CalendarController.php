@@ -17,6 +17,8 @@ use CodeIgniter\Format\JSONFormatter;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpParser\Node\Expr\Cast\String_;
 
+use function PHPUnit\Framework\returnSelf;
+
 class CalendarController extends BaseController
 {
     protected $filters;
@@ -184,13 +186,13 @@ class CalendarController extends BaseController
             'end' => $akhir,
         ];
 
-        $normalMC = $this->normalCalc($get);
-        $sneakerMC = $this->sneakerCalc($get);
-        $kneeMc = $this->kneeCalc($get);
-        $footiesMc = $this->footiesCalc($get);
-        $shaftlessMc = $this->shaftlessCalc($get);
-        $tightMc = $this->tightCalc($get);
-        $totalKebutuhan = $normalMC + $sneakerMC + $kneeMc + $footiesMc + $shaftlessMc + $tightMc;
+        // $normalMC = $this->normalCalc($get);
+        // $sneakerMC = $this->sneakerCalc($get);
+        // $kneeMc = $this->kneeCalc($get);
+        // $footiesMc = $this->footiesCalc($get);
+        // $shaftlessMc = $this->shaftlessCalc($get);
+        // $tightMc = $this->tightCalc($get);
+        // $totalKebutuhan = $normalMC + $sneakerMC + $kneeMc + $footiesMc + $shaftlessMc + $tightMc;
 
         // Di sini Anda mungkin perlu memanggil model lain untuk mendapatkan data lain yang diperlukan
         $kategori = $this->productModel->getKategori();
@@ -206,14 +208,14 @@ class CalendarController extends BaseController
             'active7' => '',
             'weeklyRanges' => $monthlyData,
             'DaftarLibur' => $holidays,
-            'kategoriProduk' => $kategori,
-            'mesinNormal' => $normalMC,
-            'mesinSneaker' => $sneakerMC,
-            'mesinKnee' => $kneeMc,
-            'mesinFooties' => $footiesMc,
-            'mesinShaftless' => $shaftlessMc,
-            'mesinTight' => $tightMc,
-            'totalKebutuhan' => $totalKebutuhan,
+            // 'kategoriProduk' => $kategori,
+            // 'mesinNormal' => $normalMC,
+            // 'mesinSneaker' => $sneakerMC,
+            // 'mesinKnee' => $kneeMc,
+            // 'mesinFooties' => $footiesMc,
+            // 'mesinShaftless' => $shaftlessMc,
+            // 'mesinTight' => $tightMc,
+            // 'totalKebutuhan' => $totalKebutuhan,
             'start' => $awal,
             'end' => $akhir,
             'jarum' => $jarum,
@@ -278,56 +280,30 @@ class CalendarController extends BaseController
                 'start' => $start,
                 'end' => $end,
             ];
-
-
-            $nsmp = $this->bookingModel->getPlanJarumNSMP($cek);
-            $nsps = $this->bookingModel->getPlanJarumNSPS($cek);
-            $nsfp = $this->bookingModel->getPlanJarumNSFP($cek);
-            $sps = $this->bookingModel->getPlanJarumSPS($cek);
-            $smp = $this->bookingModel->getPlanJarumSMP($cek);
-            $sfp = $this->bookingModel->getPlanJarumSFP($cek);
-            $ssps = $this->bookingModel->getPlanJarumSSPS($cek);
-            $ssmp = $this->bookingModel->getPlanJarumSSMP($cek);
-            $ssfp = $this->bookingModel->getPlanJarumSSFP($cek);
-            $khps = $this->bookingModel->getPlanJarumKHPS($cek);
-            $khmp = $this->bookingModel->getPlanJarumKHMP($cek);
-            $khfp = $this->bookingModel->getPlanJarumKHFP($cek);
-            $fps = $this->bookingModel->getPlanJarumFPS($cek);
-            $fmp = $this->bookingModel->getPlanJarumFMP($cek);
-            $ffp = $this->bookingModel->getPlanJarumFFP($cek);
-            $tgps = $this->bookingModel->getPlanJarumTGPS($cek);
-            $tgfp = $this->bookingModel->getPlanJarumTGFP($cek);
-            $tgmp = $this->bookingModel->getPlanJarumTGMP($cek);
-            $glfl = $this->bookingModel->getPlanJarumGLFL($cek);
-            $glmt = $this->bookingModel->getPlanJarumGLMT($cek);
-            $glpt = $this->bookingModel->getPlanJarumGLPT($cek);
-            $glst = $this->bookingModel->getPlanJarumGLST($cek);
-            $htst = $this->bookingModel->getPlanJarumHTST($cek);
-            $htpl = $this->bookingModel->getPlanJarumHTPL($cek);
-            $nsmpQty = $nsmp ?? 0;
-            $nspsQty = $nsps ?? 0;
-            $nsfpQty = $nsfp ?? 0;
-            $spsQty = $sps ?? 0;
-            $smpQty = $smp ?? 0;
-            $sfpQty = $sfp ?? 0;
-            $sspsQty = $ssps ?? 0;
-            $ssmpQty = $ssmp ?? 0;
-            $ssfpQty = $ssfp ?? 0;
-            $khpsQty = $khps ?? 0;
-            $khmpQty = $khmp ?? 0;
-            $khfpQty = $khfp ?? 0;
-            $ffpQty = $ffp ?? 0;
-            $fpsQty = $fps ?? 0;
-            $fmpQty = $fmp ?? 0;
-            $tgpsQty = $tgps ?? 0;
-            $tgmpQty = $tgmp ?? 0;
-            $tgfpQty = $tgfp ?? 0;
-            $glflQty = $glfl ?? 0;
-            $glmtQty = $glmt ?? 0;
-            $glptQty = $glpt ?? 0;
-            $glstQty = $glst ?? 0;
-            $htstQty = $htst ?? 0;
-            $htplQty = $htpl ?? 0;
+            $nsps = $this->bookingModel->getPlanJarum($cek, 'NS-PS');
+            $nsmp = $this->bookingModel->getPlanJarum($cek, 'NS-MP');
+            $nsfp = $this->bookingModel->getPlanJarum($cek, 'NS-FP');
+            $sps = $this->bookingModel->getPlanJarum($cek, 'S-PS');
+            $smp = $this->bookingModel->getPlanJarum($cek, 'S-MP');
+            $sfp = $this->bookingModel->getPlanJarum($cek, 'S-FP');
+            $ssps = $this->bookingModel->getPlanJarum($cek, 'SS-PS');
+            $ssmp = $this->bookingModel->getPlanJarum($cek, 'SS-MP');
+            $ssfp = $this->bookingModel->getPlanJarum($cek, 'SS-FP');
+            $khps = $this->bookingModel->getPlanJarum($cek, 'KH-PS');
+            $khmp = $this->bookingModel->getPlanJarum($cek, 'KH-MP');
+            $khfp = $this->bookingModel->getPlanJarum($cek, 'KH-FP');
+            $fps = $this->bookingModel->getPlanJarum($cek, 'F-PS');
+            $fmp = $this->bookingModel->getPlanJarum($cek, 'F-MP');
+            $ffp = $this->bookingModel->getPlanJarum($cek, 'F-FP');
+            $tgps = $this->bookingModel->getPlanJarum($cek, 'TG-PS');
+            $tgfp = $this->bookingModel->getPlanJarum($cek, 'TG-MP');
+            $tgmp = $this->bookingModel->getPlanJarum($cek, 'TG-FP');
+            $glfl = $this->bookingModel->getPlanJarum($cek, 'GL-FL');
+            $glmt = $this->bookingModel->getPlanJarum($cek, 'GL-MT');
+            $glpt = $this->bookingModel->getPlanJarum($cek, 'GL-PT');
+            $glst = $this->bookingModel->getPlanJarum($cek, 'GL-ST');
+            $htst = $this->bookingModel->getPlanJarum($cek, 'HT-ST');
+            $htpl = $this->bookingModel->getPlanJarum($cek, 'HT-PL');
 
             $monthlyData[$currentMonth][] = [
                 'week' => $weekCount,
@@ -335,30 +311,30 @@ class CalendarController extends BaseController
                 'end_date' => $endOfWeekFormatted,
                 'number_of_days' => $numberOfDays,
                 'holidays' => $weekHolidays,
-                'nsps' => $nspsQty,
-                'nsmp' => $nsmpQty,
-                'nsfp' => $nsfpQty,
-                'sps' => $spsQty,
-                'smp' => $smpQty,
-                'sfp' => $ssfpQty,
-                'ssps' => $sspsQty,
-                'ssmp' => $ssmpQty,
-                'ssfp' => $sfpQty,
-                'khps' => $khpsQty,
-                'khmp' => $khmpQty,
-                'khfp' => $khfpQty,
-                'ffp' => $ffpQty,
-                'fmp' => $fmpQty,
-                'fps' => $fpsQty,
-                'tgps' => $tgpsQty,
-                'tgmp' => $tgmpQty,
-                'tgfp' => $tgfpQty,
-                'glfl' => $glflQty,
-                'glmt' => $glmtQty,
-                'glpt' => $glptQty,
-                'glst' => $glstQty,
-                'htst' => $htstQty,
-                'htpl' => $htplQty,
+                'nsps' => $nsps ?? 0,
+                'nsmp' => $nsmp ?? 0,
+                'nsfp' => $nsfp ?? 0,
+                'sps' => $sps ?? 0,
+                'smp' => $smp ?? 0,
+                'sfp' => $ssfp ?? 0,
+                'ssps' => $ssps ?? 0,
+                'ssmp' => $ssmp ?? 0,
+                'ssfp' => $sfp ?? 0,
+                'khps' => $khps ?? 0,
+                'khmp' => $khmp ?? 0,
+                'khfp' => $khfp ?? 0,
+                'ffp' => $ffp ?? 0,
+                'fmp' => $fmp ?? 0,
+                'fps' => $fps ?? 0,
+                'tgps' => $tgps ?? 0,
+                'tgmp' => $tgmp ?? 0,
+                'tgfp' => $tgfp ?? 0,
+                'glfl' => $glfl ?? 0,
+                'glmt' => $glmt ?? 0,
+                'glpt' => $glpt ?? 0,
+                'glst' => $glst ?? 0,
+                'htst' => $htst ?? 0,
+                'htpl' => $htpl ?? 0,
             ];
 
             $weekCount++;
@@ -369,16 +345,37 @@ class CalendarController extends BaseController
             'end' => $akhir,
         ];
 
-
-        $normalMC = $this->normalCalc($get);
-        dd($normalMC);
-        $sneakerMC = $this->sneakerCalc($get);
-        $kneeMc = $this->kneeCalc($get);
-        $footiesMc = $this->footiesCalc($get);
-        $shaftlessMc = $this->shaftlessCalc($get);
-        $tightMc = $this->tightCalc($get);
-        $totalKebutuhan = $normalMC + $sneakerMC + $kneeMc + $footiesMc + $shaftlessMc + $tightMc;
-
+        $KebMesin = [
+            'fps' =>  $this->hitungKebutuhanMC($get, 'F-PS'),
+            'fmp' =>  $this->hitungKebutuhanMC($get, 'F-MP'),
+            'ffp' =>  $this->hitungKebutuhanMC($get, 'F-FP'),
+            'sps' =>  $this->hitungKebutuhanMC($get, 'S-PS'),
+            'smp' =>  $this->hitungKebutuhanMC($get, 'S-MP'),
+            'sfp' =>  $this->hitungKebutuhanMC($get, 'S-FP'),
+            'ssps' => $this->hitungKebutuhanMC($get, 'SS-PS'),
+            'ssmp' => $this->hitungKebutuhanMC($get, 'SS-MP'),
+            'ssfp' => $this->hitungKebutuhanMC($get, 'SS-FP'),
+            'nsps' => $this->hitungKebutuhanMC($get, 'NS-PS'),
+            'nsmp' => $this->hitungKebutuhanMC($get, 'NS-MP'),
+            'nsfp' => $this->hitungKebutuhanMC($get, 'NS-FP'),
+            'khps' => $this->hitungKebutuhanMC($get, 'KH-PS'),
+            'khmp' => $this->hitungKebutuhanMC($get, 'KH-MP'),
+            'khfp' => $this->hitungKebutuhanMC($get, 'KH-FP'),
+            'tgps' => $this->hitungKebutuhanMC($get, 'TG-PS'),
+            'tgmp' => $this->hitungKebutuhanMC($get, 'TG-MP'),
+            'tgfp' => $this->hitungKebutuhanMC($get, 'TG-FP'),
+            'glfl' => $this->hitungKebutuhanMC($get, 'GL-FL'),
+            'glmt' => $this->hitungKebutuhanMC($get, 'GL-MT'),
+            'glpt' => $this->hitungKebutuhanMC($get, 'GL-PT'),
+            'glst' => $this->hitungKebutuhanMC($get, 'GL-ST'),
+            'htst' => $this->hitungKebutuhanMC($get, 'HT-ST'),
+            'htpl' => $this->hitungKebutuhanMC($get, 'HT-PL'),
+        ];
+        $maxHari = max(array_column($KebMesin, 'JumlahHari'));
+        $totalKebutuhanMC = 0;
+        foreach ($KebMesin as $kebutuhanMesin) {
+            $totalKebutuhanMC += $kebutuhanMesin['kebutuhanMc']; // Adjust this line based on the structure of your data
+        }
         // Di sini Anda mungkin perlu memanggil model lain untuk mendapatkan data lain yang diperlukan
         $kategori = $this->productModel->getKategori();
 
@@ -394,437 +391,50 @@ class CalendarController extends BaseController
             'weeklyRanges' => $monthlyData,
             'DaftarLibur' => $holidays,
             'kategoriProduk' => $kategori,
-            'mesinNormal' => $normalMC,
-            'mesinSneaker' => $sneakerMC,
-            'mesinKnee' => $kneeMc,
-            'mesinFooties' => $footiesMc,
-            'mesinShaftless' => $shaftlessMc,
-            'mesinTight' => $tightMc,
-            'totalKebutuhan' => $totalKebutuhan,
+            'kebMesin' => $KebMesin,
             'start' => $awal,
             'end' => $akhir,
             'jarum' => $jarum,
-            'jmlHari' => $jumlahHari
+            'jmlHari' => $maxHari,
+            'totalKebutuhan' => $totalKebutuhanMC,
         ];
-
         return view('Capacity/Calendar/calendar', $data);
     }
 
-    private function normalCalc($cek)
+    private function hitungKebutuhanMC($get, $type)
     {
-        $query = $this->ApsPerstyleModel->normalCalc($cek);
-        if (!$query) {
-            $result = 0;
-            return $result;
+        $query = $this->bookingModel->hitungKebutuhanMC($get, $type);
+        $value = [];
+        $qtyTotal = 0;
+        foreach ($query as $key => $data) {
+            $qty1 = $data['sisa_booking'];
+            $hari1 = $data['totalhari'];
+            $deliv = $data['delivery'];
+            $target = $data['konversi'];
+            $type = $data['product_type'];
+            $qtyTotal += $qty1;
+
+            $value[] = [
+                'kebutuhanMc' => ceil($qtyTotal / $target / $hari1 / 24),
+                'JumlahHari' => $hari1,
+                'delivery' => $deliv,
+                'type' => $type
+            ];
+        }
+        if (!$value) {
+            $value =  ['kebutuhanMc' => 0, 'JumlahHari' => 0, 'delivery' => 0, 'type' => $type];
+            return $value;
         } else {
-            $qtyTotal = 0;
-            $jarum = $cek['jarum'];
-            $target = 0;
-            switch ($jarum) {
-                case 'JC84':
-                    $target = 25 * 24;
-                    break;
-                case 'JC96':
-                    $target = 19 * 24;
-                    break;
-                case 'JC108':
-                    $target = 18 * 24;
-                    break;
-                case 'JC120':
-                    $target = 17 * 24;
-                    break;
-                case 'JC144':
-                    $target = 14 * 24;
-                    break;
-                case 'JC168':
-                    $target = 13 * 24;
-                    break;
-                case 'JC200':
-                    $target = 11 * 24;
-                    break;
-                case 'TJ96':
-                    $target = 16 * 24;
-                    break;
-                case 'TJ108':
-                    $target = 14 * 24;
-                    break;
-                case 'TJ120':
-                    $target = 12 * 24;
-                    break;
-                case 'TJ144':
-                    $target = 11 * 24;
-                    break;
-                case 'TJ168':
-                    $target = 9 * 24;
-                    break;
-
-                default:
-                    $target = 1;
-            }
-            $value = [];
-            foreach ($query as $key => $data) {
-                $qty1 = $data['sisa'];
-                $hari1 = $data['totalhari'];
-                $deliv = $data['delivery'];
-                $qtyTotal += $qty1;
-
-                $value[] = [
-                    'kebutuhanMc' => ceil($qtyTotal / $target / $hari1),
-                    'JumlahHari' => $hari1,
-                    'delivery' => $deliv
-                ];
-            }
             $kebutuhanMc = max(array_column($value, 'kebutuhanMc'));
-            $result = $kebutuhanMc;
-            return $result;
+            $result = array_filter($value, function ($val) use ($kebutuhanMc) {
+                return $val['kebutuhanMc'] == $kebutuhanMc;
+            });
+            $hasil = reset($result);
+            return $hasil;
         }
     }
-    private function sneakerCalc($cek)
-    {
-        $query = $this->ApsPerstyleModel->sneakerCalc($cek);
-        if (!$query) {
-            $result = 0;
-            return $result;
-        } else {
-            $qtyTotal = 0;
-            $jarum = $cek['jarum'];
-            $target = 0;
-            switch ($jarum) {
-                case 'JC84':
-                    $target = 30 * 24;
-                    break;
-                case 'JC96':
-                    $target = 22.8 * 24;
-                    break;
-                case 'JC108':
-                    $target = 21.6 * 24;
-                    break;
-                case 'JC120':
-                    $target = 20.4 * 24;
-                    break;
-                case 'JC144':
-                    $target = 16.8 * 24;
-                    break;
-                case 'JC168':
-                    $target = 15.6 * 24;
-                    break;
-                case 'JC200':
-                    $target = 13.2 * 24;
-                    break;
-                case 'TJ96':
-                    $target = 19.2 * 24;
-                    break;
-                case 'TJ108':
-                    $target = 16.8 * 24;
-                    break;
-                case 'TJ120':
-                    $target = 14.4 * 24;
-                    break;
-                case 'TJ144':
-                    $target = 13.2 * 24;
-                    break;
-                case 'TJ168':
-                    $target = 10.8 * 24;
-                    break;
 
-                default:
-                    $target = 1;
-            }
-            $value = [];
-            foreach ($query as $key => $data) {
-                $qty1 = $data['sisa'];
-                $hari1 = $data['totalhari'];
-                $deliv = $data['delivery'];
-                $qtyTotal += $qty1;
 
-                $value[] = [
-                    'kebutuhanMc' => ceil($qtyTotal / $target / $hari1),
-                    'JumlahHari' => $hari1,
-                    'delivery' => $deliv
-                ];
-            }
-            $kebutuhanMc = max(array_column($value, 'kebutuhanMc'));
-
-            $result = $kebutuhanMc;
-            return $result;
-        }
-    }
-    private function kneeCalc($cek)
-    {
-        $query = $this->ApsPerstyleModel->kneeCalc($cek);
-        if (!$query) {
-            $result = 0;
-            return $result;
-        } else {
-            $qtyTotal = 0;
-            $jarum = $cek['jarum'];
-            $target = 0;
-            switch ($jarum) {
-                case 'JC84':
-                    $target = 16.6 * 24;
-                    break;
-                case 'JC96':
-                    $target = 12.8 * 24;
-                    break;
-                case 'JC108':
-                    $target = 12 * 24;
-                    break;
-                case 'JC120':
-                    $target = 11.3 * 24;
-                    break;
-                case 'JC144':
-                    $target = 9.3 * 24;
-                    break;
-                case 'JC168':
-                    $target = 8.6 * 24;
-                    break;
-                case 'JC200':
-                    $target = 7.3 * 24;
-                    break;
-                case 'TJ96':
-                    $target = 10.6 * 24;
-                    break;
-                case 'TJ108':
-                    $target = 9.3 * 24;
-                    break;
-                case 'TJ120':
-                    $target = 8 * 24;
-                    break;
-                case 'TJ144':
-                    $target = 7.3 * 24;
-                    break;
-                case 'TJ168':
-                    $target = 6 * 24;
-                    break;
-                default:
-                    $target = 1;
-            }
-            $value = [];
-            foreach ($query as $key => $data) {
-                $qty1 = $data['sisa'];
-                $hari1 = $data['totalhari'];
-                $deliv = $data['delivery'];
-                $qtyTotal += $qty1;
-
-                $value[] = [
-                    'kebutuhanMc' => ceil($qtyTotal / $target / $hari1),
-                    'JumlahHari' => $hari1,
-                    'delivery' => $deliv
-                ];
-            }
-            $kebutuhanMc = max(array_column($value, 'kebutuhanMc'));
-
-            $result = $kebutuhanMc;
-            return $result;
-        }
-    }
-    private function footiesCalc($cek)
-    {
-        $query = $this->ApsPerstyleModel->footiesCalc($cek);
-        if (!$query) {
-            $result = 0;
-            return $result;
-        } else {
-            $qtyTotal = 0;
-            $jarum = $cek['jarum'];
-            $target = 0;
-            switch ($jarum) {
-                case 'JC84':
-                    $target = 32.5 * 24;
-                    break;
-                case 'JC96':
-                    $target = 24.7 * 24;
-                    break;
-                case 'JC108':
-                    $target = 23.4 * 24;
-                    break;
-                case 'JC120':
-                    $target = 22.1 * 24;
-                    break;
-                case 'JC144':
-                    $target = 18.2 * 24;
-                    break;
-                case 'JC168':
-                    $target = 16.9 * 24;
-                    break;
-                case 'JC200':
-                    $target = 14.3 * 24;
-                    break;
-                case 'TJ96':
-                    $target = 20.8 * 24;
-                    break;
-                case 'TJ108':
-                    $target = 18.2 * 24;
-                    break;
-                case 'TJ120':
-                    $target = 15.6 * 24;
-                    break;
-                case 'TJ144':
-                    $target = 14.3 * 24;
-                    break;
-                case 'TJ168':
-                    $target = 11.7 * 24;
-                    break;
-                default:
-                    $target = 1;
-            }
-            $value = [];
-            foreach ($query as $key => $data) {
-                $qty1 = $data['sisa'];
-                $hari1 = $data['totalhari'];
-                $deliv = $data['delivery'];
-                $qtyTotal += $qty1;
-
-                $value[] = [
-                    'kebutuhanMc' => ceil($qtyTotal / $target / $hari1),
-                    'JumlahHari' => $hari1,
-                    'delivery' => $deliv
-                ];
-            }
-            $kebutuhanMc = max(array_column($value, 'kebutuhanMc'));
-
-            $result = $kebutuhanMc;
-            return $result;
-        }
-    }
-    private function shaftlessCalc($cek)
-    {
-        $query = $this->ApsPerstyleModel->shaftlessCalc($cek);
-        if (!$query) {
-            $result = 0;
-            return $result;
-        } else {
-            $qtyTotal = 0;
-            $jarum = $cek['jarum'];
-            $target = 0;
-            switch ($jarum) {
-                case 'JC84':
-                    $target = 32.5 * 24;
-                    break;
-                case 'JC96':
-                    $target = 24.7 * 24;
-                    break;
-                case 'JC108':
-                    $target = 23.4 * 24;
-                    break;
-                case 'JC120':
-                    $target = 22.1 * 24;
-                    break;
-                case 'JC144':
-                    $target = 18.2 * 24;
-                    break;
-                case 'JC168':
-                    $target = 16.9 * 24;
-                    break;
-                case 'JC200':
-                    $target = 14.3 * 24;
-                    break;
-                case 'TJ96':
-                    $target = 20.8 * 24;
-                    break;
-                case 'TJ108':
-                    $target = 18.2 * 24;
-                    break;
-                case 'TJ120':
-                    $target = 15.6 * 24;
-                    break;
-                case 'TJ144':
-                    $target = 14.3 * 24;
-                    break;
-                case 'TJ168':
-                    $target = 11.7 * 24;
-                    break;
-                default:
-                    $target = 1;
-            }
-            $value = [];
-            foreach ($query as $key => $data) {
-                $qty1 = $data['sisa'];
-                $hari1 = $data['totalhari'];
-                $deliv = $data['delivery'];
-                $qtyTotal += $qty1;
-
-                $value[] = [
-                    'kebutuhanMc' => ceil($qtyTotal / $target / $hari1),
-                    'JumlahHari' => $hari1,
-                    'delivery' => $deliv
-                ];
-            }
-            $kebutuhanMc = max(array_column($value, 'kebutuhanMc'));
-
-            $result = $kebutuhanMc;
-            return $result;
-        }
-    }
-    private function tightCalc($cek)
-    {
-        $query = $this->ApsPerstyleModel->tightCalc($cek);
-        if (!$query) {
-            $result = 0;
-            return $result;
-        } else {
-            $qtyTotal = 0;
-            $jarum = $cek['jarum'];
-            $target = 0;
-            switch ($jarum) {
-                case 'JC84':
-                    $target = 16 * 24;
-                    break;
-                case 'JC96':
-                    $target = 7.6 * 24;
-                    break;
-                case 'JC108':
-                    $target = 7.2 * 24;
-                    break;
-                case 'JC120':
-                    $target = 6.8 * 24;
-                    break;
-                case 'JC144':
-                    $target = 5.6 * 24;
-                    break;
-                case 'JC168':
-                    $target = 5.2 * 24;
-                    break;
-                case 'JC200':
-                    $target = 4.4 * 24;
-                    break;
-                case 'TJ96':
-                    $target = 6.4 * 24;
-                    break;
-                case 'TJ108':
-                    $target = 5.6 * 24;
-                    break;
-                case 'TJ120':
-                    $target = 4.8 * 24;
-                    break;
-                case 'TJ144':
-                    $target = 4.4 * 24;
-                    break;
-                case 'TJ168':
-                    $target = 3.6 * 24;
-                    break;
-                default:
-                    $target = 1;
-            }
-            $value = [];
-            foreach ($query as $key => $data) {
-                $qty1 = $data['sisa'];
-                $hari1 = $data['totalhari'];
-                $deliv = $data['delivery'];
-                $qtyTotal += $qty1;
-
-                $value[] = [
-                    'kebutuhanMc' => ceil($qtyTotal / $target / $hari1),
-                    'JumlahHari' => $hari1,
-                    'delivery' => $deliv
-                ];
-            }
-            $kebutuhanMc = max(array_column($value, 'kebutuhanMc'));
-
-            $result = $kebutuhanMc;
-            return $result;
-        }
-    }
 
 
 
@@ -889,5 +499,49 @@ class CalendarController extends BaseController
             'chartstat' => $planning
         ];
         return view('Capacity/Calendar/detail', $data);
+    }
+    public function detailPlanningbook($judul)
+    {
+        $holidays = $this->liburModel->findAll();
+        $dataJarum = $this->jarumModel->getJarum();
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+        $kebutuhanMC = $this->kebMc->getBooking();
+        $planning = $this->kebMc->getData($judul);
+        $tgl_plan = $this->kebMc->tglPlan($judul);
+        $range = $this->kebMc->range($judul);
+        $groupedData = [];
+        $jumlahMc = 0;
+        foreach ($planning as $val) {
+            $judul = $val['judul'];
+            if (!array_key_exists($judul, $groupedData)) {
+                $groupedData[$judul] = [];
+            }
+            $groupedData[$judul][] = [
+                'jarum' => $val['jarum'],
+                'mesin' => $val['mesin']
+            ];
+            $jumlahMc += (int)$val['mesin'];
+        }
+        $data = [
+            'planning' => $groupedData,
+            'jumlahMc' => $jumlahMc,
+            'judul' => $judul,
+            'range' => $range,
+            'tglplan' => $tgl_plan,
+            'title' => 'Plan Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => 'active',
+            'Jarum' => $dataJarum,
+            'TotalMesin' => $totalMesin,
+            'DaftarLibur' => $holidays,
+            'kebutuhanMc' => $kebutuhanMC,
+            'chartstat' => $planning
+        ];
+        return view('Capacity/Calendar/detailbook', $data);
     }
 }

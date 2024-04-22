@@ -75,9 +75,10 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('checkdate', 'Checkdate::index');
     $routes->post('inputLibur', 'CapacityController::inputLibur');
     $routes->get('detailplan/(:any)', 'CalendarController::detailPlanning/$1');
+    $routes->get('detailbook/(:any)', 'CalendarController::detailPlanningbook/$1');
     $routes->get('cek', 'TestController::test');
 
-    $routes->post('kebutuhanMesinOrder', 'KebutuhanMesin::inputMesinOrder');
+    $routes->post('kebutuhanMesinBooking', 'KebutuhanMesin::inputMesinBooking');
 });
 
 

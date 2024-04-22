@@ -231,7 +231,7 @@
                                         <td><?= $mc['judul'] ?></td>
                                         <td><?= $mc['total'] ?> Mesin</td>
                                         <td><?= $mc['jumlah_hari'] ?> Hari</td>
-                                        <td> <a class="btn bg-gradient-info" href="<?= base_url('capacity/detailplan/' . $mc['judul']) ?>"> Details </a></td>
+                                        <td> <a class="btn bg-gradient-info" href="<?= base_url('capacity/detailbook/' . $mc['judul']) ?>"> Detail Booking </a></td>
 
                                     </tr>
                                 <?php endforeach ?>
@@ -242,7 +242,7 @@
             </div>
         </div>
     </div>
-    <?= $this->renderSection('generate'); ?>
+    <?= $this->renderSection('generatebook'); ?>
 
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
