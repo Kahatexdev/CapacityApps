@@ -37,9 +37,9 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action="<?= base_url('capacity/kebutuhanMesinOrder') ?>" method="POST">
+                    <form action="<?= base_url('capacity/kebutuhanMesinBooking') ?>" method="POST">
                         <div class="row">
-                            <div class="col-lg-6">
+                            <div class="col-lg-12 col-md-12">
 
                                 <div class="form-group">
                                     <label for="jarum" class="form-control-label">Judul</label>
@@ -61,61 +61,28 @@
                                 <input type="date" value="<?= $end ?>" hidden name="tgl_akhir">
 
                             </div>
-                            <div class="col-lg-6">
-                                <div class="row">
-                                    <div class="col-lg-6 col-md-6">
-                                        <div class="form-group">
-                                            <label for="example-text-input" class="form-control-label">Normal Sock</label>
-                                            <input class="form-control" type="text" value="<?= $mesinNormal ?> Mesin" id="example-text-input" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 col-md-6">
-                                        <div class="form-group">
-                                            <label for="example-text-input" class="form-control-label">Sneaker</label>
-                                            <input class="form-control" type="text" value="<?= $mesinSneaker ?> Mesin" id="example-text-input" readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-6 col-md-6">
-                                        <div class="form-group">
-                                            <label for="example-text-input" class="form-control-label">Knee High</label>
-                                            <input class="form-control" type="text" value="<?= $mesinKnee ?> Mesin" id="example-text-input" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 col-md-6">
-                                        <div class="form-group">
-                                            <label for="example-text-input" class="form-control-label">Footies</label>
-                                            <input class="form-control" type="text" value="<?= $mesinFooties ?> Mesin" id="example-text-input" readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-6 col-md-6">
-                                        <div class="form-group">
-                                            <label for="example-text-input" class="form-control-label">Shaftless</label>
-                                            <input class="form-control" type="text" value="<?= $mesinShaftless ?> Mesin" id="example-text-input" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 col-md-6">
-                                        <div class="form-group">
-                                            <label for="example-text-input" class="form-control-label">Tight</label>
-                                            <input class="form-control" type="text" value="<?= $mesinTight ?> Mesin" id="example-text-input" readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-12">
-                                        <button type="submit" class="btn bg-gradient-info w-100">
-                                            Save
-                                        </button>
-                                    </div>
-                                </div>
 
-
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <?php foreach ($kebMesin as $type => $value) : ?>
+                                <div class="col-lg-3 col-md-3">
+                                    <div class="form-group">
+                                        <label for="jarum" class="form-control-label"><?= $value['type'] ?></label>
+                                        <input class="form-control <?= $value['kebutuhanMc'] != 0 ? 'border-info text-bold' : '' ?>" type="text" value="<?= $value['kebutuhanMc'] ?> Mesin <?= $value['JumlahHari'] ?> Hari" id="text-input" readonly>
+                                    </div>
+                                </div>
+                            <?php endforeach ?>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <button type="submit" class="btn bg-gradient-info w-100">
+                                    Save
+                                </button>
                             </div>
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>

@@ -5,13 +5,13 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 
-use App\Models\Usermodel;
+use App\Models\UserModel;
 
 class AuthController extends BaseController
 {
     public function index()
     {
-        return view('auth/index');
+        return view('Auth/index');
     }
     public function login()
     {
