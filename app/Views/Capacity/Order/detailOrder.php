@@ -42,28 +42,32 @@
                             <table id="dataTable" class="display compact striped" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jarum</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Style</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Id</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Needle</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Style Size</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Delivery</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty (Dz)</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Remaining Qty (Dz)</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Seam</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Factory</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">PU</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Area</th>
                                         <th colspan=2 class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php foreach ($dataAps as $order) : ?>
                                         <tr>
+                                            <td class="text-sm"><?= $order['idapsperstyle']; ?></td>
                                             <td class="text-sm"><?= $order['machinetypeid']; ?></td>
                                             <td class="text-sm"><?= $order['size']; ?></td>
                                             <td class="text-sm"><?= $order['delivery']; ?></td>
-                                            <td class="text-sm"><?= $order['qty']; ?></td>
-                                            <td class="text-sm"><?= $order['sisa']; ?></td>
+                                            <td class="text-sm"><?= round($order['qty'] / 24, 0); ?></td>
+                                            <td class="text-sm"><?= round($order['sisa'] / 24, 0); ?></td>
                                             <td class="text-sm"><?= $order['seam']; ?></td>
+                                            <td class="text-sm"><?= $order['production_unit']; ?></td>
                                             <td class="text-sm"><?= $order['factory']; ?></td>
                                             <td class="text-sm">
-                                                <button type="button" class="btn btn-success btn-sm import-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['idapsperstyle']; ?>" data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>" data-jarum="<?= $order['machinetypeid']; ?>" data-style="<?= $order['size']; ?>" data-qty="<?= $order['qty']; ?>" data-sisa="<?= $order['sisa']; ?>" data-seam="<?= $order['seam']; ?>" data-factory="<?= $order['factory']; ?>">
+                                                <button type="button" class="btn btn-success btn-sm import-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['idapsperstyle']; ?>" data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>" data-jarum="<?= $order['machinetypeid']; ?>" data-style="<?= $order['size']; ?>" data-qty="<?= $order['qty']; ?>" data-sisa="<?= $order['sisa']; ?>" data-seam="<?= $order['seam']; ?>" data-factory="<?= $order['factory']; ?>" data-production_unit="<?= $order['production_unit']; ?>">
                                                     Edit
                                                 </button>
                                             </td>
@@ -75,6 +79,17 @@
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="4">Total</th>
+                                        <th></th> <!-- This will hold the total for Qty (Dz) -->
+                                        <th></th> <!-- Optionally, any total for Remaining Qty -->
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th colspan="2"></th> <!-- Empty cells for the action columns -->
+                                    </tr>
+                                </tfoot>
                             </table>
 
                         </div>
@@ -107,6 +122,10 @@
                             <div class="row">
                                 <div class="col-lg-12 col-sm-12">
                                     <div class="form-group">
+                                        <label for="tgl-bk" class="col-form-label">ID</label>
+                                        <input type="text" class="form-control" name="idapsperstyle" readonly>
+                                    </div>
+                                    <div class="form-group">
                                         <label for="tgl-bk" class="col-form-label">No Model</label>
                                         <input type="text" class="form-control" name="no_model" readonly>
                                     </div>
@@ -129,6 +148,10 @@
                                     <div class="form-group">
                                         <label for="no_pdk" class="col-form-label">Seam</label>
                                         <input type="text" name="seam" id="" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="desc" class="col-form-label">Production Unit</label>
+                                        <input type="text" name="production_unit" id="" class="form-control">
                                     </div>
                                     <div class="form-group">
                                         <label for="desc" class="col-form-label">Areal</label>
@@ -197,7 +220,29 @@
         </div>
         <script>
             $(document).ready(function() {
-                $('#dataTable').DataTable();
+                    $('#dataTable').DataTable({
+                    "pageLength": 20,
+                    "footerCallback": function(row, data, start, end, display) {
+                        var api = this.api();
+
+                        // Calculate the total of the 4th column (Qty in dozens) - index 3
+                        var totalQty = api.column(4, { page: 'current' }).data().reduce(function(a, b) {
+                            return parseInt(a) + parseInt(b);
+                        }, 0);
+
+                        // Calculate the total of the 5th column (Remaining Qty in dozens) - index 4
+                        var totalRemainingQty = api.column(5, { page: 'current' }).data().reduce(function(a, b) {
+                            return parseInt(a) + parseInt(b);
+                        }, 0);
+
+                        // Update the footer cell for the total Qty
+                        $(api.column(4).footer()).html(totalQty);
+
+                        // Update the footer cell for the total Remaining Qty
+                        $(api.column(5).footer()).html(totalRemainingQty);
+                    }
+                });
+
 
                 $('.import-btn').click(function() {
                     var apsperstyle = $(this).data('id');
@@ -208,17 +253,20 @@
                     var qty = $(this).data('qty');
                     var sisa = $(this).data('sisa');
                     var seam = $(this).data('seam');
+                    var production_unit = $(this).data('production_unit');
                     var factory = $(this).data('factory');
 
                     var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
 
                     $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/updatedetailorder/') ?>' + apsperstyle);
+                    $('#ModalEdit').find('input[name="idapsperstyle"]').val(apsperstyle);
                     $('#ModalEdit').find('input[name="style"]').val(style);
                     $('#ModalEdit').find('input[name="no_model"]').val(noModel);
                     $('#ModalEdit').find('input[name="delivery"]').val(formattedDelivery);
                     $('#ModalEdit').find('input[name="qty"]').val(qty);
                     $('#ModalEdit').find('input[name="sisa"]').val(sisa);
                     $('#ModalEdit').find('input[name="seam"]').val(seam);
+                    $('#ModalEdit').find('input[name="production_unit"]').val(production_unit);
                     $('#ModalEdit').find('input[name="factory"]').val(factory);
 
                     $('#ModalEdit').modal('show'); // Show the modal

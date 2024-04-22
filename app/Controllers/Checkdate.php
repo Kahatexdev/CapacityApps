@@ -102,5 +102,5 @@ class Checkdate extends BaseController
             $totalLibur = $liburModel->getTotalLiburBetweenDates($startDate, $endDate);           
             $estimatedStopDate = date('Y-m-d', strtotime("+$totalLibur days", strtotime($dateStopMesin)));
             echo "Estimasi stop mesin: " . date('d-M-Y',strtotime($estimatedStopDate)) ." Sudah Termasuk Libur $totalLibur Hari";
-        }
-    }
+        } // Penutup kurung kurawal yang seharusnya ada di sini
+}

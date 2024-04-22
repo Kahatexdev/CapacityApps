@@ -63,7 +63,7 @@ class OrderController extends BaseController
     {
         $dataApsPerstyle = $this->ApsPerstyleModel->detailModel($noModel, $delivery); // Call the model method
         $data = [
-            'title' => 'Data Booking',
+            'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
             'active3' => 'active',
@@ -135,7 +135,7 @@ class OrderController extends BaseController
         $apsPerstyleModel = new ApsPerstyleModel(); // Create an instance of the model
         $dataApsPerstyle = $apsPerstyleModel->detailModelJarum($noModel, $delivery, $jarum); // Call the model method
         $data = [
-            'title' => 'Data Booking',
+            'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
             'active3' => 'active',
@@ -437,6 +437,7 @@ class OrderController extends BaseController
                             $rlcoDate = str_replace('/', '-', (substr($lcoDate, -10)));
                             $lcoDate2 = date('Y-m-d', strtotime($rlcoDate));
 
+
                             $simpandata = [
                                 'machinetypeid' => $machinetypeid,
                                 'size' => $size,
@@ -447,6 +448,8 @@ class OrderController extends BaseController
                                 'country' => $country,
                                 'color' => $color,
                                 'seam' => $processRoute,
+                                'smv' => $sam,
+                                'production_unit' => 'PU Belum Dipilih',
                                 'factory' => 'Belum Ada Area'
                             ];
                             $updateData = [
@@ -499,7 +502,7 @@ class OrderController extends BaseController
         $dataApsPerstyle = $this->ApsPerstyleModel->detailModel($noModel, $delivery);
         $dataMc = $this->jarumModel->getAreaModel($noModel);
         $data = [
-            'title' => 'Data Booking',
+            'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
             'active3' => 'active',

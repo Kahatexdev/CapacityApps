@@ -10,6 +10,7 @@ use App\Models\BookingModel;
 use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
+use App\Models\CylinderModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class MesinController extends BaseController
@@ -29,6 +30,7 @@ class MesinController extends BaseController
         $this->productModel = new ProductTypeModel();
         $this->produksiModel = new ProduksiModel();
         $this->orderModel = new OrderModel();
+        $this->cylinderModel = new cylinderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -70,6 +72,22 @@ class MesinController extends BaseController
             'TotalMesin' => $totalMesin,
         ];
         return view('Capacity/Mesin/mesinjarum', $data);
+    }
+    public function stockcylinder()
+    {
+        $totalCylinder = $this->cylinderModel->findAll();
+        $data = [
+            'title' => 'Data Cylinder',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => 'active',
+            'active6' => '',
+            'active7' => '',
+            'tampildata' => $totalCylinder,
+        ];
+        return view('Capacity/Mesin/dataCylinder', $data);
     }
     public function mesinperarea()
     {
@@ -147,6 +165,29 @@ class MesinController extends BaseController
             return redirect()->to(base_url('/capacity/datamesinperjarum/' . $area))->withInput()->with('success', 'Data Berhasil Di Input');
         } else {
             return redirect()->to(base_url('/capacity/datamesinperjarum/' . $area))->withInput()->with('error', 'Data Gagal Di Input');
+        }
+    }
+    public function inputcylinder()
+    {
+        $area = $this->request->getPost("needle");
+        $jarum = $this->request->getPost("production_unit");
+        $total_mc = $this->request->getPost("type_machine");
+        $brand = $this->request->getPost("qty");
+        $mesin_jalan = $this->request->getPost("needle_detail");
+
+        $input = [
+            'needle' => $area,
+            'production_unit' => $jarum,
+            'type_machine' => $total_mc,
+            'qty' => $brand,
+            'needle_detail' => $mesin_jalan,
+        ];
+
+        $insert =   $this->cylinderModel->insert($input);
+        if ($insert) {
+            return redirect()->to(base_url('/capacity/stockcylinder/'))->withInput()->with('success', 'Data Berhasil Di Input');
+        } else {
+            return redirect()->to(base_url('/capacity/stockcylinder/'))->withInput()->with('error', 'Data Gagal Di Input');
         }
     }
     public function updatemesinperjarum($idDataMesin)
