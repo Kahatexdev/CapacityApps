@@ -122,39 +122,43 @@
                             <div class="row">
                                 <div class="col-lg-12 col-sm-12">
                                     <div class="form-group">
-                                        <label for="tgl-bk" class="col-form-label">ID</label>
+                                        <label for="" class="col-form-label">ID</label>
                                         <input type="text" class="form-control" name="idapsperstyle" readonly>
                                     </div>
                                     <div class="form-group">
-                                        <label for="tgl-bk" class="col-form-label">No Model</label>
+                                        <label for="" class="col-form-label">No Model</label>
                                         <input type="text" class="form-control" name="no_model" readonly>
                                     </div>
                                     <div class="form-group">
-                                        <label for="tgl-bk" class="col-form-label">Style</label>
+                                        <label for="" class="col-form-label">Style</label>
                                         <input type="text" class="form-control" name="style">
                                     </div>
                                     <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Delivery</label>
+                                        <label for="" class="col-form-label">Delivery</label>
                                         <input type="date" name="delivery" id="" class="form-control">
                                     </div>
                                     <div class=" form-group">
-                                        <label for="no_order" class="col-form-label">Quantity</label>
+                                        <label for="" class="col-form-label">Quantity</label>
                                         <input type="number" name="qty" id="" class="form-control">
                                     </div>
                                     <div class=" form-group">
-                                        <label for="productType" class="col-form-label">Sisa</label>
+                                        <label for="" class="col-form-label">Sisa</label>
                                         <input type="text" name="sisa" id="" class="form-control">
                                     </div>
                                     <div class="form-group">
-                                        <label for="no_pdk" class="col-form-label">Seam</label>
+                                        <label for="" class="col-form-label">Seam</label>
                                         <input type="text" name="seam" id="" class="form-control">
                                     </div>
                                     <div class="form-group">
-                                        <label for="desc" class="col-form-label">Production Unit</label>
+                                        <label for="" class="col-form-label">SMV</label>
+                                        <input type="text" name="smv" id="" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-form-label">Production Unit</label>
                                         <input type="text" name="production_unit" id="" class="form-control">
                                     </div>
                                     <div class="form-group">
-                                        <label for="desc" class="col-form-label">Areal</label>
+                                        <label for="" class="col-form-label">Areal</label>
                                         <input type="text" name="factory" id="" class="form-control">
                                     </div>
 
@@ -220,18 +224,22 @@
         </div>
         <script>
             $(document).ready(function() {
-                    $('#dataTable').DataTable({
+                $('#dataTable').DataTable({
                     "pageLength": 20,
                     "footerCallback": function(row, data, start, end, display) {
                         var api = this.api();
 
                         // Calculate the total of the 4th column (Qty in dozens) - index 3
-                        var totalQty = api.column(4, { page: 'current' }).data().reduce(function(a, b) {
+                        var totalQty = api.column(4, {
+                            page: 'current'
+                        }).data().reduce(function(a, b) {
                             return parseInt(a) + parseInt(b);
                         }, 0);
 
                         // Calculate the total of the 5th column (Remaining Qty in dozens) - index 4
-                        var totalRemainingQty = api.column(5, { page: 'current' }).data().reduce(function(a, b) {
+                        var totalRemainingQty = api.column(5, {
+                            page: 'current'
+                        }).data().reduce(function(a, b) {
                             return parseInt(a) + parseInt(b);
                         }, 0);
 
@@ -253,6 +261,7 @@
                     var qty = $(this).data('qty');
                     var sisa = $(this).data('sisa');
                     var seam = $(this).data('seam');
+                    var smv = $(this).data('smv');
                     var production_unit = $(this).data('production_unit');
                     var factory = $(this).data('factory');
 
@@ -266,6 +275,7 @@
                     $('#ModalEdit').find('input[name="qty"]').val(qty);
                     $('#ModalEdit').find('input[name="sisa"]').val(sisa);
                     $('#ModalEdit').find('input[name="seam"]').val(seam);
+                    $('#ModalEdit').find('input[name="smv"]').val(smv);
                     $('#ModalEdit').find('input[name="production_unit"]').val(production_unit);
                     $('#ModalEdit').find('input[name="factory"]').val(factory);
 

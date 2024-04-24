@@ -152,30 +152,37 @@ class CalendarController extends BaseController
                 'end' => $end,
             ];
 
-
-            $dt = $this->ApsPerstyleModel->getPlanJarum($cek);
-            $normalSock = $this->ApsPerstyleModel->getPlanJarumNs($cek);
-            $sneaker = $this->ApsPerstyleModel->getPlanJarumSs($cek);
-            $knee = $this->ApsPerstyleModel->getPlanJarumKh($cek);
-            $footies = $this->ApsPerstyleModel->getPlanJarumFs($cek);
-            $tight = $this->ApsPerstyleModel->getPlanJarumT($cek);
-            $normalTotalQty = $normalSock ?? 0;
-            $sneakerTotalQty = $sneaker ?? 0;
-            $kneeTotalQty = $knee ?? 0;
-            $footiesTotalQty = $footies ?? 0;
-            $tightTotalQty = $tight ?? 0;
-
             $monthlyData[$currentMonth][] = [
                 'week' => $weekCount,
                 'start_date' => $startOfWeekFormatted,
                 'end_date' => $endOfWeekFormatted,
                 'number_of_days' => $numberOfDays,
                 'holidays' => $weekHolidays,
-                'normal' => $normalTotalQty,
-                'sneaker' => $sneakerTotalQty,
-                'knee' => $kneeTotalQty,
-                'footies' => $footiesTotalQty,
-                'tight' => $tightTotalQty,
+                'nsmp' => $this->ApsPerstyleModel->getPlanJarum($cek, "NS-MP") ?? 0,
+                'nsfp' => $this->ApsPerstyleModel->getPlanJarum($cek, "NS-FP") ?? 0,
+                'nsps' => $this->ApsPerstyleModel->getPlanJarum($cek, "NS-PS") ?? 0,
+                'smp' => $this->ApsPerstyleModel->getPlanJarum($cek, "S-MP") ?? 0,
+                'sfp' => $this->ApsPerstyleModel->getPlanJarum($cek, "S-FP") ?? 0,
+                'sps' => $this->ApsPerstyleModel->getPlanJarum($cek, "S-PS") ?? 0,
+                'ssmp' => $this->ApsPerstyleModel->getPlanJarum($cek, "SS-MP") ?? 0,
+                'ssfp' => $this->ApsPerstyleModel->getPlanJarum($cek, "SS-FP") ?? 0,
+                'ssps' => $this->ApsPerstyleModel->getPlanJarum($cek, "SS-PS") ?? 0,
+                'fmp' => $this->ApsPerstyleModel->getPlanJarum($cek, "F-MP") ?? 0,
+                'ffp' => $this->ApsPerstyleModel->getPlanJarum($cek, "F-FP") ?? 0,
+                'fps' => $this->ApsPerstyleModel->getPlanJarum($cek, "F-PS") ?? 0,
+                'khmp' => $this->ApsPerstyleModel->getPlanJarum($cek, "KH-MP") ?? 0,
+                'khfp' => $this->ApsPerstyleModel->getPlanJarum($cek, "KH-FP") ?? 0,
+                'khps' => $this->ApsPerstyleModel->getPlanJarum($cek, "KH-PS") ?? 0,
+                'tgmp' => $this->ApsPerstyleModel->getPlanJarum($cek, "TG-MP") ?? 0,
+                'tgfp' => $this->ApsPerstyleModel->getPlanJarum($cek, "TG-FP") ?? 0,
+                'tgps' => $this->ApsPerstyleModel->getPlanJarum($cek, "TG-PS") ?? 0,
+                'glfl' => $this->ApsPerstyleModel->getPlanJarum($cek, "GL-FL") ?? 0,
+                'glmt' => $this->ApsPerstyleModel->getPlanJarum($cek, "GL-MT") ?? 0,
+                'glpt' => $this->ApsPerstyleModel->getPlanJarum($cek, "GL-PT") ?? 0,
+                'glst' => $this->ApsPerstyleModel->getPlanJarum($cek, "GL-ST") ?? 0,
+                'htst' => $this->ApsPerstyleModel->getPlanJarum($cek, "HT-ST") ?? 0,
+                'htpl' => $this->ApsPerstyleModel->getPlanJarum($cek, "HT-pl") ?? 0,
+
             ];
 
             $weekCount++;
@@ -186,17 +193,38 @@ class CalendarController extends BaseController
             'end' => $akhir,
         ];
 
-        // $normalMC = $this->normalCalc($get);
-        // $sneakerMC = $this->sneakerCalc($get);
-        // $kneeMc = $this->kneeCalc($get);
-        // $footiesMc = $this->footiesCalc($get);
-        // $shaftlessMc = $this->shaftlessCalc($get);
-        // $tightMc = $this->tightCalc($get);
-        // $totalKebutuhan = $normalMC + $sneakerMC + $kneeMc + $footiesMc + $shaftlessMc + $tightMc;
-
-        // Di sini Anda mungkin perlu memanggil model lain untuk mendapatkan data lain yang diperlukan
+        $KebMesin = [
+            'fps' =>  $this->hitungMcOrder($get, 'F-PS'),
+            'fmp' =>  $this->hitungMcOrder($get, 'F-MP'),
+            'ffp' =>  $this->hitungMcOrder($get, 'F-FP'),
+            'sps' =>  $this->hitungMcOrder($get, 'S-PS'),
+            'smp' =>  $this->hitungMcOrder($get, 'S-MP'),
+            'sfp' =>  $this->hitungMcOrder($get, 'S-FP'),
+            'ssps' => $this->hitungMcOrder($get, 'SS-PS'),
+            'ssmp' => $this->hitungMcOrder($get, 'SS-MP'),
+            'ssfp' => $this->hitungMcOrder($get, 'SS-FP'),
+            'nsps' => $this->hitungMcOrder($get, 'NS-PS'),
+            'nsmp' => $this->hitungMcOrder($get, 'NS-MP'),
+            'nsfp' => $this->hitungMcOrder($get, 'NS-FP'),
+            'khps' => $this->hitungMcOrder($get, 'KH-PS'),
+            'khmp' => $this->hitungMcOrder($get, 'KH-MP'),
+            'khfp' => $this->hitungMcOrder($get, 'KH-FP'),
+            'tgps' => $this->hitungMcOrder($get, 'TG-PS'),
+            'tgmp' => $this->hitungMcOrder($get, 'TG-MP'),
+            'tgfp' => $this->hitungMcOrder($get, 'TG-FP'),
+            'glfl' => $this->hitungMcOrder($get, 'GL-FL'),
+            'glmt' => $this->hitungMcOrder($get, 'GL-MT'),
+            'glpt' => $this->hitungMcOrder($get, 'GL-PT'),
+            'glst' => $this->hitungMcOrder($get, 'GL-ST'),
+            'htst' => $this->hitungMcOrder($get, 'HT-ST'),
+            'htpl' => $this->hitungMcOrder($get, 'HT-PL'),
+        ];
         $kategori = $this->productModel->getKategori();
-
+        $maxHari = max(array_column($KebMesin, 'JumlahHari'));
+        $totalKebutuhanMC = 0;
+        foreach ($KebMesin as $kebutuhanMesin) {
+            $totalKebutuhanMC += $kebutuhanMesin['kebutuhanMc']; // Adjust this line based on the structure of your data
+        }
         $data = [
             'title' => 'Capacity System',
             'active1' => '',
@@ -208,18 +236,12 @@ class CalendarController extends BaseController
             'active7' => '',
             'weeklyRanges' => $monthlyData,
             'DaftarLibur' => $holidays,
-            // 'kategoriProduk' => $kategori,
-            // 'mesinNormal' => $normalMC,
-            // 'mesinSneaker' => $sneakerMC,
-            // 'mesinKnee' => $kneeMc,
-            // 'mesinFooties' => $footiesMc,
-            // 'mesinShaftless' => $shaftlessMc,
-            // 'mesinTight' => $tightMc,
-            // 'totalKebutuhan' => $totalKebutuhan,
+            'kebMesin' => $KebMesin,
+            'totalKebutuhan' => $totalKebutuhanMC,
             'start' => $awal,
             'end' => $akhir,
             'jarum' => $jarum,
-            'jmlHari' => $jumlahHari,
+            'jmlHari' => $maxHari,
             'title' => 'Planning Order'
         ];
 
@@ -433,9 +455,38 @@ class CalendarController extends BaseController
             return $hasil;
         }
     }
+    public function hitungMcOrder($get, $type)
+    {
+        $query = $this->ApsPerstyleModel->hitungMesin($get, $type);
+        $value = [];
+        $qtyTotal = 0;
+        foreach ($query as $key => $data) {
+            $qty1 = $data['sisa'];
+            $hari1 = $data['totalhari'];
+            $deliv = $data['delivery'];
+            $target = $data['smv'];
+            $type = $data['product_type'];
+            $qtyTotal += $qty1;
 
-
-
+            $value[] = [
+                'kebutuhanMc' => ceil($qtyTotal / $target / $hari1 / 24),
+                'JumlahHari' => $hari1,
+                'delivery' => $deliv,
+                'type' => $type
+            ];
+        }
+        if (!$value) {
+            $value =  ['kebutuhanMc' => 0, 'JumlahHari' => 0, 'delivery' => 0, 'type' => $type];
+            return $value;
+        } else {
+            $kebutuhanMc = max(array_column($value, 'kebutuhanMc'));
+            $result = array_filter($value, function ($val) use ($kebutuhanMc) {
+                return $val['kebutuhanMc'] == $kebutuhanMc;
+            });
+            $hasil = reset($result);
+            return $hasil;
+        }
+    }
 
 
     public function inputLibur()

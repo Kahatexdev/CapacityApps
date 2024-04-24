@@ -265,6 +265,7 @@ class OrderController extends BaseController
             'qty' => $this->request->getPost("qty"),
             'sisa' => $this->request->getPost("sisa"),
             'seam' => $this->request->getPost("seam"),
+            'smv' => $this->request->getPost("smv"),
             'factory' => $this->request->getPost("factory"),
         ];
         $id = $idOrder;
@@ -361,7 +362,19 @@ class OrderController extends BaseController
 
         $check = $this->orderModel->checkExist($no_model);
         if ($check) {
-            return redirect()->to(base_url('/capacity/detailbooking/' . $id_booking))->withInput()->with('error', 'No Model Sudah ada');
+            $id = $id_booking;
+            $status = "";
+            if ($sisa_booking == "0") {
+                $status = "Habis";
+            } else {
+                $status = "Aktif";
+            }
+            $data = [
+                'sisa_booking' => $sisa_booking,
+                'status' => $status
+            ];
+            $this->bookingModel->update($id, $data);
+            return redirect()->to(base_url('capacity/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
         } else {
 
             $inputModel = [
@@ -419,7 +432,6 @@ class OrderController extends BaseController
                             $recordID = $row[0];
                             $articleNo = $row[2];
                             $producttype = $row[5];
-                            $idProduct = $this->productModel->getId($producttype);
                             $custCode = $row[7];
                             $description = $row[10];
                             $delivery = $row[11];
@@ -431,6 +443,12 @@ class OrderController extends BaseController
                             $size = $row[19];
                             $sam = $row[20];
                             $machinetypeid = $row[22];
+                            $prodtype = [
+                                'jarum' => $machinetypeid,
+                                'prodtype' => $producttype
+                            ];
+                            $idProduct = $this->productModel->getId($prodtype);
+
                             $leadtime = $row[24];
                             $processRoute = $row[25];
                             $lcoDate = $row[26];
@@ -452,6 +470,7 @@ class OrderController extends BaseController
                                 'production_unit' => 'PU Belum Dipilih',
                                 'factory' => 'Belum Ada Area'
                             ];
+
                             $updateData = [
                                 'kd_buyer_order' => $custCode,
                                 'id_product_type' => $idProduct,
@@ -467,6 +486,7 @@ class OrderController extends BaseController
                             $existingAps = $this->ApsPerstyleModel->checkAps($validate);
                             if (!$existingAps) {
                                 $this->ApsPerstyleModel->insert($simpandata);
+
                                 $this->orderModel->update($idModel, $updateData);
                             } else {
                                 $sumqty = $existingAps->qty + $qty;

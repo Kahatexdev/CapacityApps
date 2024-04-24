@@ -215,7 +215,8 @@ class BookingController extends BaseController
 
         $check = $this->orderModel->checkExist($no_model);
         if ($check) {
-            return redirect()->to(base_url('/capacity/detailbooking/' . $id_booking))->withInput()->with('error', 'No Model Sudah ada');
+            $this->bookingModel->update($id_booking, ['sisa_booking' => $sisa_booking]);
+            return redirect()->to(base_url('capacity/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
         } else {
 
             $inputModel = [
@@ -323,13 +324,13 @@ class BookingController extends BaseController
                     $unixTime = ($shipment - 25569) * 86400;
                     $delivery = date('Y-m-d', $unixTime);
                     $qty = $data[7];
-                    $opd = $data[11];
+                    $opd = $data[9];
                     $unixOpd = ($opd - 25569) * 86400;
                     $opd1 = date('Y-m-d', $unixOpd);
-                    $jarum = $data[16];
-                    $lead_time = $data[18];
-                    $seam = $data[17];
-                    $no_order = $data[20];
+                    $jarum = $data[14];
+                    $lead_time = $data[16];
+                    $seam = $data[15];
+                    $no_order = $data[18];
                     $tgl_booking = date('Y-m-d');
                     $product_type = $data[2];
                     $getIdProd = ['prodtype' => $product_type, 'jarum' => $jarum];
