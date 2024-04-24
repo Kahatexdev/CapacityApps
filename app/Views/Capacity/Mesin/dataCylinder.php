@@ -89,7 +89,7 @@
             </div>
         </div>
         <div class="modal fade" id="ModalEdit" tabindex="-1" role="dialog" aria-labelledby="modalEdit" aria-hidden="true">
-            <div class="modal-dialog   role=" document">
+            <div class="modal-dialog"   role=" document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Edit Data Cylinder</h5>
@@ -147,7 +147,7 @@
         </div>
 
         <div class="modal fade" id="modalTambah" tabindex="-1" role="dialog" aria-labelledby="modalTambah" aria-hidden="true">
-            <div class="modal-dialog   role=" document">
+            <div class="modal-dialog"   role=" document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Tambah Data Mesin</h5>
@@ -156,7 +156,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form action="" method="post">
+                        <form action="<?=base_url('capacity/addcylinder')?>" method="post">
                             <div class="row">
                                 <div class="col-lg-6 col-sm-6">
                                     <div class="form-group">
@@ -250,11 +250,10 @@
                 $('#dataTable').DataTable();
 
                 $('.btn-add').click(function() {
-                    $('#modalTambah').find('form').attr('action', '<?= base_url('capacity/tambahdatacylinder/') ?>');
-
-                    $('#modalTambah').modal('show'); // Show the modal
-                });
-
+    var form = $('#modalTambah').find('form');
+   
+    $('#modalTambah').modal('show'); // Show the modal
+});
                 $('.edit-btn').click(function() {
                     var id = $(this).data('id');
                     var area = $(this).data('area');
