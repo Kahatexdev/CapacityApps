@@ -16,17 +16,19 @@
     <link href="<?= base_url('assets/css/nucleo-svg.css') ?>" rel=" stylesheet" />
 
     <!-- Font Awesome Icons -->
-    <script src="<?= base_url('assets/js/42d5adcbca.js') ?>"></script>
+    <script src="<?= base_url('assets/fa/js/fontawesome.min`.js') ?>"></script>
+    <link href="<?= base_url('assets/fa/css/all.min.css') ?>" rel=" stylesheet" />
+
     <link href="<?= base_url('assets/css/nucleo-svg.css') ?>" rel=" stylesheet" />
     <!-- CSS Files -->
-    <link rel="stylesheet" href="<?= base_url('assets/css/bootstrap.min.css')?>">
+    <link rel="stylesheet" href="<?= base_url('assets/css/bootstrap.min.css') ?>">
     <link id="pagestyle" href="<?= base_url('assets/css/soft-ui-dashboard.css?v=1.0.7') ?>" rel="stylesheet" />
     <!-- Nepcha Analytics (nepcha.com) -->
     <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
-    <script src="<?= base_url('assets/js/jquery/jquery-3.7.1.min.js')?>" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-    <link href="<?= base_url('assets/css/dataTables.dataTables.css')?>" rel="stylesheet">
-    <script src="<?= base_url('assets/js/dataTables.min.js')?>"></script>
-    <link href="<?= base_url('assets/css/select2.min.css')?>" rel="stylesheet" />
+    <script src="<?= base_url('assets/js/jquery/jquery-3.7.1.min.js') ?>" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <link href="<?= base_url('assets/css/dataTables.dataTables.css') ?>" rel="stylesheet">
+    <script src="<?= base_url('assets/js/dataTables.min.js') ?>"></script>
+    <link href="<?= base_url('assets/css/select2.min.css') ?>" rel="stylesheet" />
     <link href="<?= base_url('assets/node_modules/sweetalert2/dist/sweetalert2.min.css') ?>" rel="stylesheet">
 
 
@@ -388,7 +390,7 @@
         </footer>
         </div>
     </main>
-    <script src="<?= base_url('assets/js/select2.min.js')?>"></script>
+    <script src="<?= base_url('assets/js/select2.min.js') ?>"></script>
     <script src="<?= base_url('assets/js/core/popper.min.js') ?>"></script>
     <script src="<?= base_url('assets/js/core/bootstrap.min.js') ?>"></script>
     <script src="<?= base_url('assets/js/plugins/perfect-scrollbar.min.js') ?>"></script>
@@ -575,7 +577,7 @@
         }
     </script>
     <!-- Github buttons -->
-    <script async defer src="<?= base_url('assets/js/buttons.js')?>"></script>
+    <script async defer src="<?= base_url('assets/js/buttons.js') ?>"></script>
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="<?= base_url('assets/js/soft-ui-dashboard.min.js?v=1.0.7') ?>"></script>
 </body>
