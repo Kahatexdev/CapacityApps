@@ -26,13 +26,14 @@ class DataBooking extends Migration
                 'type' => 'INT',
                 'constraint' => 11,
                 'unsigned' => true,
+                'null' => true,
             ],
             'no_order' => [
-                'type' => 'VARCHAR',
+                'type' => 'TEXT',
                 'constraint' => 30,
             ],
             'no_booking' => [
-                'type' => 'VARCHAR',
+                'type' => 'TEXT',
                 'constraint' => 30,
             ],
             'desc' => [

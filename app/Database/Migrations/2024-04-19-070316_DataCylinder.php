@@ -42,6 +42,6 @@ class DataCylinder extends Migration
 
     public function down()
     {
-        $this->forge->dropTable('data_cylinder'); // Drops the table
+        $this->forge->dropTable('data_booking');
     }
 }
