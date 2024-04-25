@@ -79,6 +79,9 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('cek', 'TestController::test');
 
     $routes->post('kebutuhanMesinBooking', 'KebutuhanMesin::inputMesinBooking');
+
+    $routes->get('sales', 'ExportController::index');
+    $routes->get('export', 'ExportController::export');
 });
 
 
