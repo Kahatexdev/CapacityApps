@@ -10,7 +10,7 @@ use App\Models\BookingModel;
 use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
-use App\Models\cancelModel;
+use App\Models\CancelModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class BookingController extends BaseController
