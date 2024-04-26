@@ -81,7 +81,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('kebutuhanMesinBooking', 'KebutuhanMesin::inputMesinBooking');
 
     $routes->get('sales', 'ExportController::index');
-    $routes->get('export', 'ExportController::export');
+    $routes->get('exportsales', 'ExportController::export');
 });
 
 
