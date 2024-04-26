@@ -10,6 +10,7 @@ use App\Models\BookingModel;
 use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
+use App\Models\cancelModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class BookingController extends BaseController
@@ -21,6 +22,7 @@ class BookingController extends BaseController
     protected $bookingModel;
     protected $orderModel;
     protected $ApsPerstyleModel;
+    protected $cancelModel;
     protected $liburModel;
     public function __construct()
     {
@@ -31,6 +33,7 @@ class BookingController extends BaseController
         $this->produksiModel = new ProduksiModel();
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
+        $this->cancelModel = new cancelModel();
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -353,10 +356,10 @@ class BookingController extends BaseController
                             'lead_time' => $lead_time,
                             'tgl_terima_booking' => $tgl_booking
                         ];
-                        $existOrder = $this->bookingModel->existingOrder($no_order);
-                        if (!$existOrder) {
-                            $this->bookingModel->insert($insert);
-                        }
+                        // $existOrder = $this->bookingModel->existingOrder($no_order);
+                        // if (!$existOrder) {
+                        $this->bookingModel->insert($insert);
+                        // }
                     }
                 }
             }
@@ -399,11 +402,15 @@ class BookingController extends BaseController
     }
     public function cancelbooking($idBooking)
     {
-
         $jarum = $this->request->getPost("jarum");
+        $insert = [
+            "id_booking" => $idBooking,
+            "qty_cancel" =>intval($this->request->getPost("sisa")),
+        ];
         $id = $idBooking;
-        $cancel = $this->bookingModel->update($id, ['status' => 'Cancel Booking', 'qty_booking' => 0, 'sisa_booking' => 0]);
-        if ($cancel) {
+        $this->bookingModel->update($id, ['status' => 'Cancel Booking', 'qty_booking' => 0, 'sisa_booking' => 0]);
+        $input = $this->cancelModel->insert($insert);
+        if ($input) {
             return redirect()->to(base_url('capacity/databooking/' . $jarum))->withInput()->with('success', 'Bookingan Berhasil Di Cancel');
         } else {
             return redirect()->to(base_url('capacity/databooking/' . $jarum))->withInput()->with('error', 'Gagal Cancek Booking');
@@ -413,8 +420,9 @@ class BookingController extends BaseController
     {
 
         $resultCancelBooking = $this->bookingModel->getCancelBooking();
-        $bulan = array_keys($resultCancelBooking['totals']);
-        $jumlahPembatalan = array_values($resultCancelBooking['totals']);
+        $totals = array_keys($resultCancelBooking[0],['qty']);
+        // $jumlahPembatalan = array_values($resultCancelBooking['totals']);
+        // dd($resultCancelBooking);
         $data = [
             'title' => 'Summary Cancel Booking',
             'active1' => '',
@@ -424,10 +432,10 @@ class BookingController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-            'details' => $resultCancelBooking['details'],
-            'totals' => $resultCancelBooking['totals'],
-            'bulan' => $bulan,
-            'jumlahPembatalan' => $jumlahPembatalan
+            'details' => $resultCancelBooking,
+            'totals' => $totals,
+            // 'bulan' => $bulan,
+            // 'jumlahPembatalan' => $jumlahPembatalan
         ];
         return view('Capacity/Booking/cancelbooking', $data);
     }

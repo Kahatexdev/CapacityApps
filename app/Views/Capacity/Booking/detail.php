@@ -388,6 +388,7 @@
                 <div class="modal-body">
                     <form action="<?= base_url('capacity/cancelbooking/' . $booking['id_booking']) ?>" method="post">
                         <input type="text" name="jarum" id="" hidden value="<?= $booking['needle'] ?>">
+                        <input type="text" name="sisa" id="" hidden value="<?= $booking['sisa_booking'] ?>">
                         Are You Sure Want to Cancel Booking?
                 </div>
                 <div class="modal-footer">

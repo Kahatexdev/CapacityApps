@@ -18,41 +18,63 @@
             </div>
         </div>
     </div>
-    <?php foreach ($details as $bulan => $dataBulan) : ?>
         <div class="row mt-2">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header pb-0 d-flex justify-content-between">
-                        <h6>Cancel Booking <?= $bulan ?></h6>
-                        <div>
-                            <span class="badge bg-warning">Total : <?= count($dataBulan) ?></span>
-                        </div>
+                        <h6>Cancel Booking</h6>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table align-items-center mb-0">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cancel Date</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cancel Weekdate</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Buyer</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No Booking</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Description</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Qty Cancel</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($dataBulan as $detail) : ?>
+                                    <?php foreach ($details as $detail) : ?>
                                         <tr>
                                             <td>
-                                                <p class="text-xs font-weight-bold mb-0"><?= date('d-m-Y', strtotime($detail['updated_at'])) ?></p>
+                                                <p class="text-xs font-weight-bold mb-0">
+                                                    <?php
+                                                    // Assuming $detail['week_number'] contains the week number in the format 'YYYYWW'
+                                                    $year = substr($detail['week_number'], 0, 4); // Extract year from week number
+                                                    $week = substr($detail['week_number'], 4, 2); // Extract week from week number
+
+                                                    // Calculate the date of the first day of the week
+                                                    $first_day_of_week = date('Y-m-d', strtotime($year . 'W' . $week)); 
+
+                                                    // Calculate the month of the week
+                                                    $month_of_week = date('F', strtotime($first_day_of_week)); 
+
+                                                    // Get the week number relative to the month
+                                                    $week_of_month = ceil(date('d', strtotime($first_day_of_week)) / 7); 
+
+                                                    // Get the ordinal suffix for the week number (e.g., 1st, 2nd, 3rd)
+                                                    if ($week_of_month % 10 == 1 && $week_of_month != 11) {
+                                                        $suffix = 'st';
+                                                    } elseif ($week_of_month % 10 == 2 && $week_of_month != 12) {
+                                                        $suffix = 'nd';
+                                                    } elseif ($week_of_month % 10 == 3 && $week_of_month != 13) {
+                                                        $suffix = 'rd';
+                                                    } else {
+                                                        $suffix = 'th';
+                                                    }
+
+                                                    // Output the formatted date with month, year, week number, and suffix
+                                                    echo $month_of_week . ' ' . $year . ' ' . $week_of_month . $suffix . ' Week';
+                                                    ?>
+                                                </p>
                                             </td>
+
                                             <td>
                                                 <p class="text-xs font-weight-bold mb-0"><?= $detail['kd_buyer_booking'] ?></p>
                                             </td>
                                             <td>
-                                                <p class="text-xs font-weight-bold mb-0"><?= $detail['no_booking'] ?></p>
-                                            </td>
-                                            <td>
-                                                <p class="text-xs font-weight-bold mb-0"><?= $detail['desc'] ?></p>
+                                                <p class="text-xs font-weight-bold mb-0"><?= $detail['qty'] ?></p>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -63,8 +85,6 @@
                 </div>
             </div>
         </div>
-
-    <?php endforeach; ?>
 
 
 </div>
