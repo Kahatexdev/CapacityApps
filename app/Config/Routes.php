@@ -63,7 +63,9 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('deletemesinareal/(:any)', 'MesinController::deletemesinareal/$1');
     $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarum/$1');
     $routes->post('tambahmesinperarea', 'MesinController::inputmesinperarea');
-    $routes->post('tambahdatacylinder', 'MesinController::inputcylinder');
+    $routes->post('addcylinder', 'MesinController::inputcylinder');
+    $routes->post('editcylinder/(:any)', 'MesinController::editcylinder/$1');
+    $routes->post('deletecylinder/(:any)', 'MesinController::deletecylinder/$1');
 
     //calendar
     $routes->get('planningorder', 'CalendarController::planningorder');

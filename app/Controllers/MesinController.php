@@ -190,6 +190,24 @@ class MesinController extends BaseController
             return redirect()->to(base_url('/capacity/stockcylinder/'))->withInput()->with('error', 'Data Gagal Di Input');
         }
     }
+    public function editcylinder($idDataCylinder)
+    {
+
+        $data = [
+            'needle' => $this->request->getPost("needle"),
+            'production_unit' => $this->request->getPost("production_unit"),
+            'type_machine' => $this->request->getPost("type_machine"),
+            'qty' => $this->request->getPost("qty"),
+            'needle_detail' => $this->request->getPost("needle_detail"),
+        ];
+        $id = $idDataCylinder;
+        $update = $this->cylinderModel->update($id, $data);
+        if ($update) {
+            return redirect()->to(base_url('capacity/stockcylinder/'))->withInput()->with('success', 'Data Berhasil Di Update');
+        } else {
+            return redirect()->to(base_url('capacity/stockcylinder/'))->withInput()->with('error', 'Gagal Update Data');
+        }
+    }
     public function updatemesinperjarum($idDataMesin)
     {
 
@@ -214,6 +232,15 @@ class MesinController extends BaseController
             return redirect()->to(base_url('capacity/datamesin'))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
             return redirect()->to(base_url('capacity/datamesin'))->withInput()->with('error', 'Gagal Hapus Data');
+        }
+    }
+    public function deletecylinder($idDataCylinder)
+    {
+        $delete = $this->cylinderModel->delete($idDataCylinder);
+        if ($delete) {
+            return redirect()->to(base_url('capacity/stockcylinder'))->withInput()->with('success', 'Data Berhasil Di Hapus');
+        } else {
+            return redirect()->to(base_url('capacity/stockcylinder'))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
 }
