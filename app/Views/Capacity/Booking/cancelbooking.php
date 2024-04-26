@@ -18,73 +18,146 @@
             </div>
         </div>
     </div>
-        <div class="row mt-2">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header pb-0 d-flex justify-content-between">
-                        <h6>Cancel Booking</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table align-items-center mb-0">
-                                <thead>
-                                    <tr>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cancel Weekdate</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Buyer</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Qty Cancel</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($details as $detail) : ?>
-                                        <tr>
-                                            <td>
-                                                <p class="text-xs font-weight-bold mb-0">
-                                                    <?php
-                                                    // Assuming $detail['week_number'] contains the week number in the format 'YYYYWW'
-                                                    $year = substr($detail['week_number'], 0, 4); // Extract year from week number
-                                                    $week = substr($detail['week_number'], 4, 2); // Extract week from week number
+    <div class="row mt-2">
+    
+    <?php
+        $currentWeek = null; // Initialize a variable to keep track of the current week
+        $subtotal = 0; // Initialize a variable to store the subtotal
 
-                                                    // Calculate the date of the first day of the week
-                                                    $first_day_of_week = date('Y-m-d', strtotime($year . 'W' . $week)); 
+        // Loop through each detail
+        foreach ($details as $index => $detail) {
+            // If the week number changes, close the previous card and start a new one for the current week
+            if ($detail['week_number'] != $currentWeek) {
+                // If it's not the first week, close the previous card and output the subtotal
+                if ($currentWeek !== null) {
+                    echo '</tbody>';
+                    echo '<tfoot>';
+                    echo '<tr>';
+                    echo '<td colspan="2"><strong>Total:</strong></td>';
+                    echo '<td><strong>' . number_format(round($subtotal), 0, ',', '.') . ' Dz</strong></td>'; // Add "Dz" here
+                    echo '</tr>';
+                    echo '</tfoot>';
+                    echo '</table></div></div></div>'; // Closing tags for previous card
+                    echo '<hr>'; // Add separation between cards
+                }
+                
+                // Start a new card for the current week
+                $currentWeek = $detail['week_number'];
+                $subtotal = 0; // Reset the subtotal for the new week
+        ?>
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header pb-0 d-flex justify-content-between">
+                    <h6>Cancel Booking Week <?php
+                        // Assuming $detail['week_number'] contains the week number in the format 'YYYYWW'
+                        $year = substr($detail['week_number'], 0, 4); // Extract year from week number
+                        $week = substr($detail['week_number'], 4, 2); // Extract week from week number
 
-                                                    // Calculate the month of the week
-                                                    $month_of_week = date('F', strtotime($first_day_of_week)); 
+                        // Calculate the date of the first day of the week
+                        $first_day_of_week = date('Y-m-d', strtotime($year . 'W' . $week)); 
 
-                                                    // Get the week number relative to the month
-                                                    $week_of_month = ceil(date('d', strtotime($first_day_of_week)) / 7); 
+                        // Calculate the month of the week
+                        $month_of_week = date('F', strtotime($first_day_of_week)); 
 
-                                                    // Get the ordinal suffix for the week number (e.g., 1st, 2nd, 3rd)
-                                                    if ($week_of_month % 10 == 1 && $week_of_month != 11) {
-                                                        $suffix = 'st';
-                                                    } elseif ($week_of_month % 10 == 2 && $week_of_month != 12) {
-                                                        $suffix = 'nd';
-                                                    } elseif ($week_of_month % 10 == 3 && $week_of_month != 13) {
-                                                        $suffix = 'rd';
-                                                    } else {
-                                                        $suffix = 'th';
-                                                    }
+                        // Get the week number relative to the month
+                        $week_of_month = ceil(date('d', strtotime($first_day_of_week)) / 7); 
 
-                                                    // Output the formatted date with month, year, week number, and suffix
-                                                    echo $month_of_week . ' ' . $year . ' ' . $week_of_month . $suffix . ' Week';
-                                                    ?>
-                                                </p>
-                                            </td>
+                        // Get the ordinal suffix for the week number (e.g., 1st, 2nd, 3rd)
+                        if ($week_of_month % 10 == 1 && $week_of_month != 11) {
+                            $suffix = 'st';
+                        } elseif ($week_of_month % 10 == 2 && $week_of_month != 12) {
+                            $suffix = 'nd';
+                        } elseif ($week_of_month % 10 == 3 && $week_of_month != 13) {
+                            $suffix = 'rd';
+                        } else {
+                            $suffix = 'th';
+                        }
 
-                                            <td>
-                                                <p class="text-xs font-weight-bold mb-0"><?= $detail['kd_buyer_booking'] ?></p>
-                                            </td>
-                                            <td>
-                                                <p class="text-xs font-weight-bold mb-0"><?= $detail['qty'] ?></p>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                        // Output the formatted date with month, year, week number, and suffix
+                        echo $month_of_week . ' ' . $year . ' ' . $week_of_month . $suffix . ' Week';
+                    ?>
+                    </h6>
                 </div>
-            </div>
-        </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cancel Weekdate</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Buyer</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Qty Cancel</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th> <!-- Add Actions column header -->
+                                </tr>
+                            </thead>
+                            <tbody>
+        <?php
+            }
+        ?>
+                                <tr>
+                                    <td>
+                                        <p class="text-xs font-weight-bold mb-0">
+                                            <?php
+                                                // Assuming $detail['week_number'] contains the week number in the format 'YYYYWW'
+                                                $year = substr($detail['week_number'], 0, 4); // Extract year from week number
+                                                $week = substr($detail['week_number'], 4, 2); // Extract week from week number
+
+                                                // Calculate the date of the first day of the week
+                                                $first_day_of_week = date('Y-m-d', strtotime($year . 'W' . $week)); 
+
+                                                // Calculate the month of the week
+                                                $month_of_week = date('F', strtotime($first_day_of_week)); 
+
+                                                // Get the week number relative to the month
+                                                $week_of_month = ceil(date('d', strtotime($first_day_of_week)) / 7); 
+
+                                                // Get the ordinal suffix for the week number (e.g., 1st, 2nd, 3rd)
+                                                if ($week_of_month % 10 == 1 && $week_of_month != 11) {
+                                                    $suffix = 'st';
+                                                } elseif ($week_of_month % 10 == 2 && $week_of_month != 12) {
+                                                    $suffix = 'nd';
+                                                } elseif ($week_of_month % 10 == 3 && $week_of_month != 13) {
+                                                    $suffix = 'rd';
+                                                } else {
+                                                    $suffix = 'th';
+                                                }
+
+                                                // Output the formatted date with month, year, week number, and suffix
+                                                echo $month_of_week . ' ' . $year . ' ' . $week_of_month . $suffix . ' Week';
+                                            ?>
+                                        </p>
+                                    </td>
+                                    <td>
+                                        <p class="text-xs font-weight-bold mb-0"><?= $detail['kd_buyer_booking'] ?></p>
+                                    </td>
+                                    <td>
+                                        <p class="text-xs font-weight-bold mb-0"><?= number_format(round($detail['qty'] / 24), 0, ',', '.') ?> Dz</p>
+                                    </td>
+                                    <td> <!-- Actions column -->
+                                    <a href="<?= base_url() ?>/BookingController/detailcancelbooking/<?= $detail['week_number'] ?>/<?= $detail['kd_buyer_booking'] ?>" class="btn btn-success">Detail</a>
+                                    </td>
+                                </tr>
+        <?php
+            // Add the current quantity to the subtotal
+            $subtotal += $detail['qty'] / 24;
+
+            // If it's the last detail, close the last card and output the final subtotal
+            if ($index === count($details) - 1) {
+                echo '</tbody>';
+                echo '<tfoot>';
+                echo '<tr>';
+                echo '<td colspan="2"><strong>Total:</strong></td>';
+                echo '<td><strong>' . number_format(round($subtotal), 0, ',', '.') . ' Dz</strong></td>'; // Add "Dz" here
+                echo '<td></td>'; // Add an empty column for consistency
+                echo '</tr>';
+                echo '</tfoot>';
+                echo '</table></div></div></div>'; // Closing tags for last card
+            }
+        }
+        ?>
+
+
+    </div>
+</div>
 
 
 </div>
