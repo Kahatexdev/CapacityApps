@@ -12,6 +12,7 @@ use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use App\Models\LiburModel;
+use LengthException;
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Week;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -72,14 +73,18 @@ class ExportController extends BaseController
 
 
         $rangeReport = "";
+        $jarumDc = $this->jarumModel->getDC();
+        $doublecyn = [];
+        foreach ($jarumDc as $dc) {
+            $jarum = $dc['jarum'];
+            $doublecyn[$jarum] = [
+                'dakong' => $this->jarumModel->getBrand($jarum, 'dakong') ?? 0,
+                'mekanik' => $this->jarumModel->getBrand($jarum, 'MECHANIC') ?? 0,
+                'rosso' => $this->jarumModel->getBrand($jarum, 'ROSSO') ?? 0,
+                'lonati' => $this->jarumModel->getBrand($jarum, 'lonati') ?? 0,
 
-        $doublecyn = [
-            'jarum' => $this->jarumModel->getDC(),
-            'dakong' => $this->jarumModel->getBrand("DAKONG") ?? 0,
-            'Rosso' => $this->jarumModel->getBrand("ROSSO") ?? 0,
-            'Lonati' => $this->jarumModel->getBrand("Lonati") ?? 0,
-        ];
-        dd($doublecyn);
+            ];
+        }
 
         function setCellStyle($sheet, $cellRange, $value, $borderStyle = Border::BORDER_THIN)
         {
@@ -312,16 +317,54 @@ class ExportController extends BaseController
 
         // data body
         $rowjarum = 7;
-        foreach ($doublecyn as $item) {
-            $sheet->setCellValue('A' . $rowjarum, $item['jarum'])
-                ->setCellValue('F' . $rowjarum, $item['jarum'])
-                ->getStyle('A' . $rowjarum)
-                ->applyFromArray([
+        $totalDCRow = count($doublecyn) + $rowjarum;
+        $totalDakong = 0;
+        $totalRosso = 0;
+        $totalThs = 0;
+        $totalLon = 0;
+        $totalDc = 0;
+        foreach ($doublecyn as $jarum => $item) {
+
+            $total = $item['dakong'] + $item['rosso'] + $item['mekanik'] + $item['lonati'];
+            $totalDakong  += $item['dakong'];
+            $totalThs  += $item['mekanik'];
+            $totalRosso  += $item['rosso'];
+            $totalLon  += $item['lonati'];
+            $totalDc  += $total;
+
+
+            $sheet->setCellValue('A' . $rowjarum, $jarum)
+                ->setCellValue('C' . $rowjarum, $item['dakong'])
+                ->setCellValue('D' . $rowjarum, $item['rosso'])
+                ->setCellValue('E' . $rowjarum, $item['mekanik'])
+                ->setCellValue('F' . $rowjarum, $item['lonati'])
+                ->setCellValue('B' . $rowjarum, "0")
+                ->setCellValue('G' . $rowjarum, $total);
+            $cellCoordinates = ['A' . $rowjarum, 'C' . $rowjarum, 'D' . $rowjarum, 'F' . $rowjarum, 'G' . $rowjarum, 'B' . $rowjarum, 'E' . $rowjarum,];
+            // Mengatur gaya sel dengan border untuk setiap kolom dalam baris saat ini
+            foreach ($cellCoordinates as $cellCoordinate) {
+                $sheet->getStyle($cellCoordinate)->applyFromArray([
                     'borders' => [
                         'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
                     ],
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
                 ]);
+            }
+            $sheet->setCellValue('A' . $totalDCRow, 'TOTAL DOUBLE CYLINDER')
+                ->setCellValue('C' . $totalDCRow, $totalDakong)
+                ->setCellValue('D' . $totalDCRow, $totalRosso)
+                ->setCellValue('E' . $totalDCRow, $totalThs)
+                ->setCellValue('G' . $totalDCRow, $totalDc)
+                ->setCellValue('F' . $totalDCRow, $totalLon);
+            $boldStyle = ['A' . $totalDCRow, 'C' . $totalDCRow, 'B' . $totalDCRow, 'D' . $totalDCRow, 'E' . $totalDCRow, 'F' . $totalDCRow, 'G' . $totalDCRow,];
+            foreach ($boldStyle as $bs) {
+                $sheet->getStyle($bs)->applyFromArray([
+                    'borders' => [
+                        'outline' => ['borderStyle' => Border::BORDER_THICK, 'color' => ['rgb' => '000000']],
+                    ],
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+                ]);
+            }
             $rowjarum++;
         }
         // download Data

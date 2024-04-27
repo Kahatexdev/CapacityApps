@@ -124,8 +124,11 @@ class DataMesinModel extends Model
     {
         return $this->select('jarum')->like('jarum', 'DC')->findAll();
     }
-    public function getBrand($brand)
+    public function getBrand($jarum, $brand)
     {
-        return $this->select('total_mc')->like('jarum', 'DC')->like('brand', $brand)->findAll();
+        $result = $this->selectSum('total_mc')->where('jarum', $jarum)->like('brand', $brand)->get()->getRow();
+
+        // Periksa apakah hasilnya ada sebelum mengembalikannya
+        return $result ? $result->total_mc : 0; // Mengembalikan total_mc jika ada, jika tidak, kembalikan 0 atau nilai default lainnya
     }
 }
