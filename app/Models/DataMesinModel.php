@@ -131,4 +131,12 @@ class DataMesinModel extends Model
         // Periksa apakah hasilnya ada sebelum mengembalikannya
         return $result ? $result->total_mc : 0; // Mengembalikan total_mc jika ada, jika tidak, kembalikan 0 atau nilai default lainnya
     }
+    public function getRunningMc($jarum, $brand)
+    {
+        $result = $this->selectSum('mesin_jalan')->where('jarum', $jarum)->like('brand', $brand)->get()->getRow();
+
+        // Periksa apakah hasilnya ada sebelum mengembalikannya
+        return $result ? $result->mesin_jalan : 0; // Mengembalikan total_mc jika ada, jika tidak, kembalikan 0 atau nilai default lainnya
+
+    }
 }

@@ -82,9 +82,14 @@ class ExportController extends BaseController
                 'mekanik' => $this->jarumModel->getBrand($jarum, 'MECHANIC') ?? 0,
                 'rosso' => $this->jarumModel->getBrand($jarum, 'ROSSO') ?? 0,
                 'lonati' => $this->jarumModel->getBrand($jarum, 'lonati') ?? 0,
+                'dakongRun' => $this->jarumModel->getRunningMc($jarum, 'dakong') ?? 0,
+                'mekanikRun' => $this->jarumModel->getRunningMc($jarum, 'MECHANIC') ?? 0,
+                'rossoRun' => $this->jarumModel->getRunningMc($jarum, 'ROSSO') ?? 0,
+                'lonatiRun' => $this->jarumModel->getRunningMc($jarum, 'lonati') ?? 0,
 
             ];
         }
+
 
         function setCellStyle($sheet, $cellRange, $value, $borderStyle = Border::BORDER_THIN)
         {
@@ -315,7 +320,7 @@ class ExportController extends BaseController
 
 
 
-        // data body
+        // data body machine
         $rowjarum = 7;
         $totalDCRow = count($doublecyn) + $rowjarum;
         $totalDakong = 0;
@@ -323,14 +328,27 @@ class ExportController extends BaseController
         $totalThs = 0;
         $totalLon = 0;
         $totalDc = 0;
+        $totalDakongRun = 0;
+        $totalRossoRun = 0;
+        $totalThsRun = 0;
+        $totalLonRun = 0;
+        $totalDcRun = 0;
         foreach ($doublecyn as $jarum => $item) {
 
-            $total = $item['dakong'] + $item['rosso'] + $item['mekanik'] + $item['lonati'];
+            $totalMc = $item['dakong'] + $item['rosso'] + $item['mekanik'] + $item['lonati'];
             $totalDakong  += $item['dakong'];
             $totalThs  += $item['mekanik'];
             $totalRosso  += $item['rosso'];
             $totalLon  += $item['lonati'];
-            $totalDc  += $total;
+            $totalDc  += $totalMc;
+
+            $totalMcDcRun = $item['dakongRun'] + $item['rossoRun'] + $item['mekanikRun'] + $item['lonatiRun'];
+            $totalDakongRun  += $item['dakongRun'];
+            $totalThsRun  += $item['mekanikRun'];
+            $totalRossoRun  += $item['rossoRun'];
+            $totalLonRun  += $item['lonatiRun'];
+            $totalDcRun += $totalMcDcRun;
+
 
 
             $sheet->setCellValue('A' . $rowjarum, $jarum)
@@ -339,9 +357,8 @@ class ExportController extends BaseController
                 ->setCellValue('E' . $rowjarum, $item['mekanik'])
                 ->setCellValue('F' . $rowjarum, $item['lonati'])
                 ->setCellValue('B' . $rowjarum, "0")
-                ->setCellValue('G' . $rowjarum, $total);
+                ->setCellValue('G' . $rowjarum, $totalMc);
             $cellCoordinates = ['A' . $rowjarum, 'C' . $rowjarum, 'D' . $rowjarum, 'F' . $rowjarum, 'G' . $rowjarum, 'B' . $rowjarum, 'E' . $rowjarum,];
-            // Mengatur gaya sel dengan border untuk setiap kolom dalam baris saat ini
             foreach ($cellCoordinates as $cellCoordinate) {
                 $sheet->getStyle($cellCoordinate)->applyFromArray([
                     'borders' => [
@@ -350,17 +367,39 @@ class ExportController extends BaseController
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
                 ]);
             }
+            // total mesin DC
             $sheet->setCellValue('A' . $totalDCRow, 'TOTAL DOUBLE CYLINDER')
                 ->setCellValue('C' . $totalDCRow, $totalDakong)
                 ->setCellValue('D' . $totalDCRow, $totalRosso)
                 ->setCellValue('E' . $totalDCRow, $totalThs)
                 ->setCellValue('G' . $totalDCRow, $totalDc)
-                ->setCellValue('F' . $totalDCRow, $totalLon);
-            $boldStyle = ['A' . $totalDCRow, 'C' . $totalDCRow, 'B' . $totalDCRow, 'D' . $totalDCRow, 'E' . $totalDCRow, 'F' . $totalDCRow, 'G' . $totalDCRow,];
+                ->setCellValue('F' . $totalDCRow, $totalLon)
+                ->setCellValue('H' . $totalDCRow, $totalDakongRun)
+                ->setCellValue('I' . $totalDCRow, $totalRossoRun)
+                ->setCellValue('J' . $totalDCRow, $totalThsRun)
+                ->setCellValue('K' . $totalDCRow, $totalLonRun)
+                ->setCellValue('M' . $totalDCRow, $totalDcRun);
+            $boldStyle = ['A' . $totalDCRow, 'C' . $totalDCRow, 'B' . $totalDCRow, 'D' . $totalDCRow, 'E' . $totalDCRow, 'F' . $totalDCRow, 'G' . $totalDCRow, 'H' . $totalDCRow, 'I' . $totalDCRow, 'J' . $totalDCRow, 'K' . $totalDCRow, 'M' . $totalDCRow,];
             foreach ($boldStyle as $bs) {
                 $sheet->getStyle($bs)->applyFromArray([
                     'borders' => [
                         'outline' => ['borderStyle' => Border::BORDER_THICK, 'color' => ['rgb' => '000000']],
+                    ],
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+                ]);
+            }
+            // totalRunningMc
+            $sheet
+                ->setCellValue('H' . $rowjarum, $item['dakongRun'])
+                ->setCellValue('I' . $rowjarum, $item['rossoRun'])
+                ->setCellValue('J' . $rowjarum, $item['mekanikRun'])
+                ->setCellValue('K' . $rowjarum, $item['lonatiRun'])
+                ->setCellValue('M' . $rowjarum, $totalMcDcRun);
+            $cellCoordinates = ['H' . $rowjarum, 'I' . $rowjarum, 'J' . $rowjarum, 'K' . $rowjarum, 'M' . $rowjarum,];
+            foreach ($cellCoordinates as $cellCoordinate) {
+                $sheet->getStyle($cellCoordinate)->applyFromArray([
+                    'borders' => [
+                        'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
                     ],
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
                 ]);
