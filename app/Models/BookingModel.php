@@ -148,6 +148,34 @@ class BookingModel extends Model
 
         return $allResults;
     }
+    public function chartCancel()
+    {
+        $allResults = $this
+            ->select('*')
+            ->where('status', 'Cancel Booking')
+            ->orderBy('updated_at', 'ASC')
+            ->findAll();
+
+        $results = [];
+        $totalPerBulan = [];
+
+        foreach ($allResults as $result) {
+            $month = date('F', strtotime($result['updated_at']));
+            // Menambahkan detail pembatalan ke dalam array berdasarkan bulan
+            if (!isset($results[$month])) {
+                $results[$month] = [];
+                $totalPerBulan[$month] = 0;
+            }
+            $results[$month][] = $result;
+            // Menghitung total pembatalan per bulan
+            $totalPerBulan[$month]++;
+        }
+
+        return [
+            'details' => $results,
+            'totals' => $totalPerBulan
+        ];
+    }
     public function getTurunOrder()
     {
         $allResults = $this
@@ -184,8 +212,8 @@ class BookingModel extends Model
             ->where('data_booking.delivery >=', $get['start'])
             ->where('data_booking.delivery <=', $get['end'])
             ->select('delivery,master_product_type.konversi,master_product_type.product_type, data_booking.sisa_booking,   DATEDIFF(delivery, CURDATE()) - 
-            (SELECT COUNT(tanggal) FROM data_libur WHERE tanggal BETWEEN CURDATE() AND data_booking.delivery)-3 AS totalhari');
+            (SELECT COUNT(tanggal) FROM data_libur WHERE tanggal BETWEEN CURDATE() AND data_booking.delivery)-3 AS totalhari')->get()->getResultArray();
 
-        return $result->get()->getResultArray();
+        return $result ?? "tidak Ada Data";
     }
 }

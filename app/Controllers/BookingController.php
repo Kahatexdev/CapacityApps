@@ -347,7 +347,7 @@ class BookingController extends BaseController
                             'kd_buyer_booking' => $buyer,
                             'desc' => $desc,
                             'delivery' => $delivery,
-                            'opd' => $opd1,                            
+                            'opd' => $opd1,
                             'sisa_booking' => $qty,
                             'qty_booking' => $qty,
                             'needle' => $jarum,
@@ -405,7 +405,7 @@ class BookingController extends BaseController
         $jarum = $this->request->getPost("jarum");
         $insert = [
             "id_booking" => $idBooking,
-            "qty_cancel" =>intval($this->request->getPost("sisa")),
+            "qty_cancel" => intval($this->request->getPost("sisa")),
         ];
         $id = $idBooking;
         $this->bookingModel->update($id, ['status' => 'Cancel Booking', 'qty_booking' => 0, 'sisa_booking' => 0]);
@@ -420,9 +420,10 @@ class BookingController extends BaseController
     {
 
         $resultCancelBooking = $this->bookingModel->getCancelBooking();
-        $totals = array_keys($resultCancelBooking[0],['qty']);
-        // $jumlahPembatalan = array_values($resultCancelBooking['totals']);
-        // dd($resultCancelBooking);
+        $totals = array_keys($resultCancelBooking[0], ['qty']);
+        $charts = $this->bookingModel->chartCancel();
+        $bulan = array_keys($charts['totals']);
+        $jumlahPembatalan = array_values($charts['totals']);
         $data = [
             'title' => 'Summary Cancel Booking',
             'active1' => '',
@@ -434,14 +435,14 @@ class BookingController extends BaseController
             'active7' => '',
             'details' => $resultCancelBooking,
             'totals' => $totals,
-            // 'bulan' => $bulan,
-            // 'jumlahPembatalan' => $jumlahPembatalan
+            'bulan' => $bulan,
+            'jumlahPembatalan' => $jumlahPembatalan,
+            'totalChart' => $charts['totals']
         ];
         return view('Capacity/Booking/cancelbooking', $data);
     }
     public function getTurunOrder()
     {
         $turunOrder = $this->ApsPerstyleModel->getTurunOrderPerbulan();
-        dd($turunOrder);
     }
 }
