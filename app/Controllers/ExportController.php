@@ -77,6 +77,7 @@ class ExportController extends BaseController
         $doublecyn = [];
         foreach ($jarumDc as $dc) {
             $jarum = $dc['aliasjarum'];
+            $needle = $dc['jarum'];
             $doublecyn[$jarum] = [
                 'dakong' => $this->jarumModel->getBrand($jarum, 'dakong') ?? 0,
                 'mekanik' => $this->jarumModel->getBrand($jarum, 'MECHANIC') ?? 0,
@@ -86,11 +87,11 @@ class ExportController extends BaseController
                 'mekanikRun' => $this->jarumModel->getRunningMc($jarum, 'MECHANIC') ?? 0,
                 'rossoRun' => $this->jarumModel->getRunningMc($jarum, 'ROSSO') ?? 0,
                 'lonatiRun' => $this->jarumModel->getRunningMc($jarum, 'lonati') ?? 0,
-
+                'stockCylDk' => $this->jarumModel->getStockSylDc($needle, "3") ?? 0,
+                'stockCylThs' => $this->jarumModel->getStockSylDc($needle, "THS") ?? 0,
+                'stockCylRosso' => $this->jarumModel->getStockSylDc($needle, "Rosso") ?? 0,
             ];
         }
-
-
         function setCellStyle($sheet, $cellRange, $value, $borderStyle = Border::BORDER_THIN)
         {
             $sheet->mergeCells($cellRange)->setCellValue($cellRange, $value);

@@ -12,7 +12,7 @@ class DataMesinModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_data_mesin', 'area', 'jarum', 'total_mc', 'brand', 'mesin_jalan', 'aliasjarum'];
+    protected $allowedFields    = ['id_data_mesin', 'area', 'jarum', 'total_mc', 'brand', 'mesin_jalan', 'aliasjarum`'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -122,21 +122,31 @@ class DataMesinModel extends Model
     }
     public function getDC()
     {
-        return $this->select('aliasjarum')->like('jarum', 'DC')->findAll();
+        return $this->select('aliasjarum, jarum')->like('jarum', 'DC')->findAll();
     }
     public function getBrand($jarum, $brand)
     {
-        $result = $this->selectSum('total_mc')->where('jarum', $jarum)->like('brand', $brand)->get()->getRow();
+        $result = $this->selectSum('total_mc')->where('aliasjarum', $jarum)->like('brand', $brand)->get()->getRow();
 
         // Periksa apakah hasilnya ada sebelum mengembalikannya
         return $result ? $result->total_mc : 0; // Mengembalikan total_mc jika ada, jika tidak, kembalikan 0 atau nilai default lainnya
     }
     public function getRunningMc($jarum, $brand)
     {
-        $result = $this->selectSum('mesin_jalan')->where('jarum', $jarum)->like('brand', $brand)->get()->getRow();
+        $result = $this->selectSum('mesin_jalan')->where('aliasjarum', $jarum)->like('brand', $brand)->get()->getRow();
 
         // Periksa apakah hasilnya ada sebelum mengembalikannya
         return $result ? $result->mesin_jalan : 0; // Mengembalikan total_mc jika ada, jika tidak, kembalikan 0 atau nilai default lainnya
 
+    }
+    public function getStockSylDc($needle, $brand)
+    {
+        $qry = $this->join('data_cylinder', 'data_mesin.jarum = data_cylinder.needle')
+            ->select('data_cylinder.qty')
+            ->like('data_cylinder.type_machine',  $brand)
+            ->where('data_cylinder.needle', $needle)
+            ->get()->getRow();
+
+        return $qry->qty ?? 0;
     }
 }
