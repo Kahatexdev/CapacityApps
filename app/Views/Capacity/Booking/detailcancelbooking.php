@@ -71,8 +71,8 @@
                                     <td class="text-xs"><?= $bk['kd_buyer_booking'] ?></td>
                                     <td class="text-xs"><?= $bk['no_order'] ?></td>
                                     <td class="text-xs"><?= $bk['no_booking'] ?></td>
-                                    <td class="text-xs"><?= $bk['qty_booking'] ?></td>
-                                    <td class="text-xs"><?= $bk['sisa_booking'] ?></td>
+                                    <td class="text-xs"><?= round($bk['qty_booking']/24) ?> Dz</td>
+                                    <td class="text-xs"><?= round($bk['sisa_booking']/24) ?> Dz</td>
                                     <td class="text-xs"><?= $bk['status'] ?></td>
                                     <td class="text-xs"><?= round($bk['qty_cancel'] / 24)?> Dz</td>
                                     <td class="text-xs"><?= $bk['alasan'] ?></td>

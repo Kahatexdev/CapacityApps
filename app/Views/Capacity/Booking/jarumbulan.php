@@ -11,7 +11,7 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    Data Booking Jarum <?= $jarum ?> di bulan <?= $bulan ?> tahun <?= $tahun ?>
+                                    Data Booking Needle <?= $jarum ?> In Month <?= $bulan ?> Year <?= $tahun ?>
                                 </h5>
                             </div>
                         </div>
@@ -138,12 +138,14 @@
                     <table id="example" class="display compact " style="width:100%">
                         <thead>
                             <tr>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Tgl Booking</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Booking Date</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Buyer</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Order</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No PDK</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Booking</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Booking Qty</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Booking Remaining Pcs</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Booking Remaining Dz</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Delivery</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
@@ -153,21 +155,21 @@
                         <tbody>
                             <?php foreach ($booking as $bk) : ?>
                                 <tr>
-                                    <td class="text-xs"><?= $bk['tgl_terima_booking'] ?></td>
+                                    <td class="text-xs"><?= date('d-M-Y',strtotime($bk['tgl_terima_booking'])) ?></td>
                                     <td class="text-xs"><?= $bk['kd_buyer_booking'] ?></td>
                                     <td class="text-xs"><?= $bk['no_order'] ?></td>
                                     <td class="text-xs"><?= $bk['no_booking'] ?></td>
                                     <td class="text-xs"><?= $bk['product_type'] ?></td>
-                                    <td class="text-xs"><?= $bk['sisa_booking'] ?></td>
+                                    <td class="text-xs"><?= number_format($bk['qty_booking'], 0, '.', '.') ?> Pcs</td>
+                                    <td class="text-xs"><?= number_format($bk['sisa_booking'], 0, '.', '.') ?> Pcs</td>
+                                    <td class="text-xs"><?= number_format(round($bk['sisa_booking']/24), 0, '.', '.') ?> Dz</td>
                                     <td class="text-xs"><?= date('d-M-Y', strtotime($bk['delivery'])) ?></td>
                                     <td class="text-xs"><?= $bk['status'] ?></td>
 
                                     <td class="text-xs">
                                         <?php if ($bk['status'] == 'Cancel Booking') : ?>
                                             <!-- If qty is null, set action to Import -->
-                                            <button type="button" class="btn bg-gradient-secondary btn-sm text-xxs" disabled>
-                                                Detail
-                                            </button>
+                                            <a href="<?= base_url('capacity/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-secondary btn-sm text-xxs">detail</a>
                                         <?php else : ?>
                                             <!-- If qty is not null, set action to Details -->
                                             <a href="<?= base_url('capacity/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm text-xxs">detail</a>

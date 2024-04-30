@@ -143,7 +143,7 @@ class BookingModel extends Model
             ->join('data_cancel', 'data_booking.id_booking = data_cancel.id_booking')
             ->where('status', 'Cancel Booking')
             ->groupBy('data_booking.kd_buyer_booking, week_number')
-            ->orderBy('week_number', 'ASC')
+            ->orderBy('week_number', 'Desc')
             ->findAll();
 
         return $allResults;
@@ -156,7 +156,7 @@ class BookingModel extends Model
         ->where("CONCAT(YEAR(data_booking.updated_at), LPAD(WEEK(data_booking.updated_at), 2, '0'))", $week)
         ->where('data_booking.kd_buyer_booking', $buyer)
         ->findAll();
-        
+
         return $query;
     }
 
