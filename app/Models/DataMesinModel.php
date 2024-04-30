@@ -12,7 +12,7 @@ class DataMesinModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_data_mesin', 'area', 'jarum', 'total_mc', 'brand', 'mesin_jalan'];
+    protected $allowedFields    = ['id_data_mesin', 'area', 'jarum', 'total_mc', 'brand', 'mesin_jalan', 'aliasjarum'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -122,7 +122,7 @@ class DataMesinModel extends Model
     }
     public function getDC()
     {
-        return $this->select('jarum')->like('jarum', 'DC')->findAll();
+        return $this->select('aliasjarum')->like('jarum', 'DC')->findAll();
     }
     public function getBrand($jarum, $brand)
     {

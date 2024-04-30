@@ -408,7 +408,7 @@ class BookingController extends BaseController
             "qty_cancel" => intval($this->request->getPost("sisa")),
         ];
         $id = $idBooking;
-        $this->bookingModel->update($id, ['status' => 'Cancel Booking', 'qty_booking' => 0, 'sisa_booking' => 0]);
+        $this->bookingModel->update($id, ['status' => 'Cancel Booking', 'sisa_booking' => 0]);
         $input = $this->cancelModel->insert($insert);
         if ($input) {
             return redirect()->to(base_url('capacity/databooking/' . $jarum))->withInput()->with('success', 'Bookingan Berhasil Di Cancel');

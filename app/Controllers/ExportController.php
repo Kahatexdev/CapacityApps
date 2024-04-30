@@ -76,7 +76,7 @@ class ExportController extends BaseController
         $jarumDc = $this->jarumModel->getDC();
         $doublecyn = [];
         foreach ($jarumDc as $dc) {
-            $jarum = $dc['jarum'];
+            $jarum = $dc['aliasjarum'];
             $doublecyn[$jarum] = [
                 'dakong' => $this->jarumModel->getBrand($jarum, 'dakong') ?? 0,
                 'mekanik' => $this->jarumModel->getBrand($jarum, 'MECHANIC') ?? 0,
