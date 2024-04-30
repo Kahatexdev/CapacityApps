@@ -262,7 +262,11 @@ class BookingController extends BaseController
         $shipment = $this->request->getPost("delivery");
         $qty = $this->request->getPost("qty");
         $product = $this->request->getPost("productType");
-        $idProduct = $this->productModel->getId($product);
+        $getid = [
+            'prodtype' => $product,
+            'jarum' => $jarum
+        ];
+        $idProduct = $this->productModel->getId($getid);
         $buyer = $this->request->getPost("buyer");
         $leadTime = $this->request->getPost("lead");
         $refId = $id_booking;
@@ -442,10 +446,10 @@ class BookingController extends BaseController
         return view('Capacity/Booking/cancelbooking', $data);
     }
 
-    public function detailcancelbooking($week,$buyer)
+    public function detailcancelbooking($week, $buyer)
     {
 
-        $resultCancelBooking = $this->bookingModel->getDetailCancelBooking($week,$buyer);
+        $resultCancelBooking = $this->bookingModel->getDetailCancelBooking($week, $buyer);
         $data = [
             'title' => 'Detail Cancel Booking',
             'active1' => '',

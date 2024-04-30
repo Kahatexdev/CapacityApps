@@ -403,7 +403,24 @@ class ExportController extends BaseController
                         'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
                     ],
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
                 ]);
+                // stockCylinderDc
+                $sheet
+                    ->setCellValue('P' . $rowjarum, $item['stockCylDk'])
+                    ->setCellValue('Q' . $rowjarum, $item['stockCylThs'])
+                    ->setCellValue('R' . $rowjarum, $item['stockCylRosso']);
+
+                $cellCoordinates = ['P' . $rowjarum, 'Q' . $rowjarum, 'J' . $rowjarum, 'R' . $rowjarum,];
+                foreach ($cellCoordinates as $cellCoordinate) {
+                    $sheet->getStyle($cellCoordinate)->applyFromArray([
+                        'borders' => [
+                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+                        ],
+                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+                    ]);
+                }
             }
             $rowjarum++;
         }
