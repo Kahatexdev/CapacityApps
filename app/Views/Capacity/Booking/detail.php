@@ -89,13 +89,13 @@
                         </div>
                         <div class="col-lg-6 col-sm-12">
                             <div class="form-group">
-                                <label for="" class="form-control-label">Booking Qty</label>
+                                <label for="" class="form-control-label">Booking Qty (Pcs) </label>
                                 <input class="form-control" type="text" value="<?= $booking['qty_booking'] ?>" readonly id="">
                             </div>
                         </div>
                         <div class="col-lg-6 col-sm-12">
                             <div class="form-group">
-                                <label for="" class="form-control-label">Booking Left</label>
+                                <label for="" class="form-control-label">Booking Remaining (Pcs) </label>
                                 <input class="form-control" type="text" value="<?= $booking['sisa_booking'] ?>" readonly id="">
                             </div>
                         </div>
@@ -124,15 +124,16 @@
                 <div class="card-footer">
                     <div class="row">
                         <div class="col-lg-12">
-                            <a href="" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#ModalBooking">Booking to Booking</a>
-                            <a href="#" class="btn btn-info order-btn" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">Booking to Order</a>
-                            <a href="" class="btn btn-success" Data-bs-toggle="modal" data-bs-target="#ModalEdit">Edit Booking</a>
-                            <a href="" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#ModalCancel">Cancel Booking</a>
-                            <a href="" class="btn btn-danger" Data-bs-toggle="modal" data-bs-target="#ModalDelete">Delete Booking</a>
+                            <?php if ($booking['status'] !== 'Cancel Booking'): ?>
+                                <a href="" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#ModalBooking">Booking to Booking</a>
+                                <a href="#" class="btn btn-info order-btn" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">Booking to Order</a>
+                                <a href="" class="btn btn-success" Data-bs-toggle="modal" data-bs-target="#ModalEdit">Edit Booking</a>
+                                <a href="" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#ModalCancel">Cancel Booking</a>
+                            <?php endif; ?>
                         </div>
-
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -334,7 +335,7 @@
                                     <input type="number" name="qty" id="" class="form-control" value="<?= $booking['qty_booking']; ?>">
                                 </div>
                                 <div class="form-group">
-                                    <label for="qty" class="col-form-label">Sisa Booking (pcs)</label>
+                                    <label for="qty" class="col-form-label">Booking Remaining (pcs)</label>
                                     <input type="number" name="sisa" id="" class="form-control" value="<?= $booking['sisa_booking']; ?>">
                                 </div>
                             </div>
@@ -352,7 +353,7 @@
     </div>
 
 
-    <!-- modal delete -->
+    <!-- modal delete
     <div class="modal fade  bd-example-modal-lg" id="ModalDelete" tabindex="-1" role="dialog" aria-labelledby="modaldelete" aria-hidden="true">
         <div class="modal-dialog  modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -374,7 +375,7 @@
                 </form>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <div class="modal fade  bd-example-modal-lg" id="ModalCancel" tabindex="-1" role="dialog" aria-labelledby="modalCancel" aria-hidden="true">
         <div class="modal-dialog  modal-dialog-centered" role="document">
@@ -389,7 +390,9 @@
                     <form action="<?= base_url('capacity/cancelbooking/' . $booking['id_booking']) ?>" method="post">
                         <input type="text" name="jarum" id="" hidden value="<?= $booking['needle'] ?>">
                         <input type="text" name="sisa" id="" hidden value="<?= $booking['sisa_booking'] ?>">
-                        Are You Sure Want to Cancel Booking?
+                        <p>Are you sure you want to cancel the booking?</p>
+                        <label for="alasan">Reason:</label>
+                        <input type="text" name="alasan" id="alasan" class="form-control" required>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
@@ -478,7 +481,7 @@
                                 <input type="number" name="qty" id="" class="form-control">
                             </div>
                             <div class="form-group">
-                                <label for="qty" class="col-form-label">Booking Left (pcs):</label>
+                                <label for="qty" class="col-form-label">Booking Remaining (pcs):</label>
                                 <input type="number" name="sisa" id="" class="form-control">
                             </div>
                         </div>
@@ -488,7 +491,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn bg-gradient-info">Edit</button>
+                <button type="submit" class="btn bg-gradient-info">Split</button>
             </div>
             </form>
         </div>

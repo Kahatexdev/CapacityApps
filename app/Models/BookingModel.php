@@ -143,11 +143,24 @@ class BookingModel extends Model
             ->join('data_cancel', 'data_booking.id_booking = data_cancel.id_booking')
             ->where('status', 'Cancel Booking')
             ->groupBy('data_booking.kd_buyer_booking, week_number')
-            ->orderBy('week_number', 'ASC')
+            ->orderBy('week_number', 'Desc')
             ->findAll();
 
         return $allResults;
     }
+
+    public function getDetailCancelBooking($week,$buyer)
+    {
+        $query = $this->select('data_booking.*, data_cancel.qty_cancel, data_cancel.alasan')
+        ->join('data_cancel', 'data_booking.id_booking = data_cancel.id_booking')
+        ->where("CONCAT(YEAR(data_booking.updated_at), LPAD(WEEK(data_booking.updated_at), 2, '0'))", $week)
+        ->where('data_booking.kd_buyer_booking', $buyer)
+        ->findAll();
+
+        return $query;
+    }
+
+
     public function chartCancel()
     {
         $allResults = $this

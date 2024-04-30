@@ -34,11 +34,9 @@ class DataBooking extends Migration
             ],
             'no_booking' => [
                 'type' => 'TEXT',
-                'constraint' => 30,
             ],
             'desc' => [
-                'type' => 'VARCHAR',
-                'constraint' => 100,
+                'type' => 'TEXT',
             ],
             'opd' => [
                 'type' => 'VARCHAR',
