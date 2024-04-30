@@ -441,6 +441,25 @@ class BookingController extends BaseController
         ];
         return view('Capacity/Booking/cancelbooking', $data);
     }
+
+    public function detailcancelbooking($week,$buyer)
+    {
+
+        $resultCancelBooking = $this->bookingModel->getDetailCancelBooking($week,$buyer);
+        $data = [
+            'title' => 'Detail Cancel Booking',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => 'active',
+            'active7' => '',
+            'data' => $resultCancelBooking,
+        ];
+        return view('Capacity/Booking/detailcancelbooking', $data);
+    }
+
     public function getTurunOrder()
     {
         $turunOrder = $this->ApsPerstyleModel->getTurunOrderPerbulan();

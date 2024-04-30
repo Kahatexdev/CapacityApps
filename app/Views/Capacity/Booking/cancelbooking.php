@@ -133,7 +133,9 @@
                                             <p class="text-xs font-weight-bold mb-0"><?= number_format(round($detail['qty'] / 24), 0, ',', '.') ?> Dz</p>
                                         </td>
                                         <td> <!-- Actions column -->
-                                            <a href="<?= base_url() ?>/BookingController/detailcancelbooking/<?= $detail['week_number'] ?>/<?= $detail['kd_buyer_booking'] ?>" class="btn btn-success">Detail</a>
+                                            <form id="detailForm" action="<?= base_url() ?>capacity/detailcancelbooking/<?= $detail['week_number'] ?>/<?= $detail['kd_buyer_booking'] ?>" method="POST">
+                                                <button type="submit" class="btn btn-success">Detail</button>
+                                            </form>
                                         </td>
                                     </tr>
                                 <?php
