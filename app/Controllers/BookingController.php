@@ -342,6 +342,7 @@ class BookingController extends BaseController
                     $product_type = $data[2];
                     $getIdProd = ['prodtype' => $product_type, 'jarum' => $jarum];
                     $idprod = $this->productModel->getId($getIdProd);
+
                     if ($data[0] == null) {
                         break;
                     } else {
