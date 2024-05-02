@@ -137,6 +137,7 @@ class MesinController extends BaseController
             'active5' => 'active',
             'active6' => '',
             'active7' => '',
+            'pu' => $pu,
             'jarum' => $jarum,
             'tampildata' => $tampilperarea,
         ];
@@ -146,6 +147,7 @@ class MesinController extends BaseController
     public function DetailMesinPerArea($area)
     {
         $tampilperarea = $this->jarumModel->getJarumArea($area);
+        $getPU = $this->jarumModel->getpu($area);
         $data = [
             'title' => 'Data Mesin',
             'active1' => '',
@@ -156,6 +158,7 @@ class MesinController extends BaseController
             'active6' => '',
             'active7' => '',
             'area' => $area,
+            'pu' => $getPU,
             'tampildata' => $tampilperarea,
         ];
 

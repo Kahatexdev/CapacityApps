@@ -33,7 +33,11 @@
                         <h5>
                             Detail Data Model <?= $noModel ?> Delivery <?= date('d-M-Y', strtotime($delivery)) ?>
                         </h5>
-                        <a href="<?= base_url('capacity/semuaOrder/') ?>" class="btn bg-gradient-info"> Back</a>
+                        <a href="<?= base_url('capacity/semuaOrder/') ?>" class="btn bg-gradient-dark d-inline-flex align-items-center">
+                            <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i> 
+                        Back
+                        </a>
+
                     </div>
                 </div>
                 <div class="card-body p-3">

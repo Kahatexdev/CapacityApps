@@ -85,6 +85,13 @@ class DataMesinModel extends Model
 
         return $query;
     }
+
+    public function getpu($area) {
+        $query = $this->select('pu')->where('area', $area)->get()->getRow();
+        return $query ? $query->pu : ''; // Return the value of 'pu' if a row is found, otherwise return an empty string
+    }
+    
+
     public function getMesinPerJarum($jarum, $pu)
     {
         $query = $this->select('*')

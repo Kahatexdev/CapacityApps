@@ -33,7 +33,11 @@
                         <h5>
                             Detail Data Model <?= $noModel ?> Delivery <?= date('d-M-Y', strtotime($delivery)) ?>
                         </h5>
-                        <a href="<?= base_url('capacity/semuaOrder/') ?>" class="btn bg-gradient-info"> Back</a>
+                        <a href="<?= base_url('capacity/dataorderperjarumblndetail/'.date('F/Y', strtotime($delivery)).'/'.$jarum) ?>" class="btn bg-gradient-dark d-inline-flex align-items-center">
+                            <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i> 
+                            Back
+                        </a>
+
                     </div>
                 </div>
                 <div class="card-body p-3">
@@ -58,8 +62,8 @@
                                             <td class="text-sm"><?= $order['machinetypeid']; ?></td>
                                             <td class="text-sm"><?= $order['size']; ?></td>
                                             <td class="text-sm"><?= date('d-M-y', strtotime($order['delivery'])); ?></td>
-                                            <td class="text-xs"><?= number_format(round($order->qty / 24), 0, '.', ','); ?></td>
-                                            <td class="text-xs"><?= number_format(round($order->sisa / 24), 0, '.', ','); ?></td>
+                                            <td class="text-xs"><?= number_format(round($order['qty'] / 24), 0, '.', ','); ?> Dz</td>
+                                            <td class="text-xs"><?= number_format(round($order['sisa'] / 24), 0, '.', ','); ?> Dz</td>
                                             <td class="text-sm"><?= $order['seam']; ?></td>
                                             <td class="text-sm"><?= $order['factory']; ?></td>
                                             <td class="text-sm">

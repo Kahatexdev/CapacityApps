@@ -33,9 +33,15 @@
                         <h5>
                             Detail Data Area <?= $area ?>
                         </h5>
-                        <div>
-                            <a href="<?= base_url('capacity/mesinperarea') ?>" class="btn bg-gradient-info"> Kembali</a>
-                            <button type="button" class="btn btn-add bg-gradient-success" data-toggle="modal" data-target="#modalTambah">Input Data Mesin</button>
+                        <div>                            
+                            <button type="button" class="btn btn-add bg-gradient-info d-inline-flex align-items-center" data-toggle="modal" data-target="#modalTambah">
+                                <i class="fas fa-plus-circle me-2 text-lg opacity-10"></i>
+                                Input Data Machine
+                            </button>
+
+                            <a href="<?= base_url('capacity/mesinperarea/'.$pu) ?>" class="btn bg-gradient-dark">
+                                <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i> 
+                            Back</a>
                         </div>
                     </div>
                 </div>
@@ -46,11 +52,11 @@
                                 <thead>
                                     <tr>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Area</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jarum</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Total Mesin</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Needle</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Total Machine</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Brand</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Mesin Jalan</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Mesin Mati</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Machine Running</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Machine Not Running</th>
                                         <th colspan=2 class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
                                     </tr>
                                 </thead>
@@ -59,10 +65,10 @@
                                         <tr>
                                             <td class="text-sm"><?= $order['area']; ?></td>
                                             <td class="text-sm"><?= $order['jarum']; ?></td>
-                                            <td class="text-sm"><?= $order['total_mc']; ?></td>
+                                            <td class="text-sm"><?= $order['total_mc']; ?> Mc</td>
                                             <td class="text-sm"><?= $order['brand']; ?></td>
-                                            <td class="text-sm"><?= $order['mesin_jalan']; ?></td>
-                                            <td class="text-sm"><?= $order['total_mc'] - $order['mesin_jalan']; ?></td>
+                                            <td class="text-sm"><?= $order['mesin_jalan']; ?> Mc</td>
+                                            <td class="text-sm"><?= $order['total_mc'] - $order['mesin_jalan']; ?> Mc</td>
                                             <td class="text-sm">
                                                 <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['id_data_mesin']; ?>" data-area="<?= $order['area']; ?>" data-total="<?= $order['total_mc']; ?>" data-jarum="<?= $order['jarum']; ?>" data-mc-jalan="<?= $order['mesin_jalan']; ?>" data-brand="<?= $order['brand']; ?>" data-pu="<?= $order['pu']; ?>">
                                                     Edit
@@ -76,6 +82,16 @@
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
+                                <tfoot>
+                                    <th></th>
+                                    <th>Total :</th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                </tfoot>
                             </table>
 
                         </div>
@@ -261,7 +277,44 @@
         </script> -->
         <script>
             $(document).ready(function() {
-                $('#dataTable').DataTable();
+                $('#dataTable').DataTable({
+                    "footerCallback": function (row, data, start, end, display) {
+                        var api = this.api();
+
+                        var totalMesin = api.column(2, {
+                            page: 'current'
+                        }).data().reduce(function(a, b) {
+                            return parseInt(a) + parseInt(b);
+                        }, 0);
+
+                        // Calculate the total of the 5th column (Remaining Qty in dozens) - index 4
+                        var mesinJalan = api.column(4, {
+                            page: 'current'
+                        }).data().reduce(function(a, b) {
+                            return parseInt(a) + parseInt(b);
+                        }, 0);
+                        
+                        var mesinMati = totalMesin - mesinJalan;
+
+                        // Format totalMesin and mesinJalan with " Mc" suffix and dots for thousands
+                        var totalMesinFormatted = numberWithDots(totalMesin) + " Mc";
+                        var mesinJalanFormatted = numberWithDots(mesinJalan) + " Mc";
+                        var mesinMatiFormatted = numberWithDots(mesinMati) + " Mc";
+
+                        // Update the footer cell for the total Qty
+                        $(api.column(2).footer()).html(totalMesinFormatted);
+
+                        // Update the footer cell for the total Mesin Jalan
+                        $(api.column(4).footer()).html(mesinJalanFormatted);
+
+                        // Update the footer cell for the percentage
+                        $(api.column(5).footer()).html(mesinMatiFormatted);                        
+                    },
+                });
+
+                function numberWithDots(x) {
+                    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                }
 
                 $('.btn-add').click(function() {
                     $('#modalTambah').find('form').attr('action', '<?= base_url('capacity/tambahmesinperarea/') ?>');

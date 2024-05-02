@@ -33,7 +33,9 @@
                         <h5>
                             Detail Booking
                         </h5>
-                        <a href="<?= base_url('capacity/databooking/' . $jarum['needle']) ?>" class="btn bg-gradient-info"> Kembali</a>
+                        <a href="<?= base_url('capacity/databookingbulantampil/'.date('F/Y',strtotime($booking['delivery'])) .'/'. $jarum['needle']) ?>" class="btn bg-gradient-dark">
+                            <i class="fas fa-arrow-circle-left text-lg opacity-10" aria-hidden="true" style="margin-right: 0.5rem;"></i> Back
+                        </a>
                     </div>
 
                 </div>

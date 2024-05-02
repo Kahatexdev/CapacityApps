@@ -167,6 +167,7 @@ class OrderController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
+            'jarum' => $jarum,
             'dataAps' => $dataApsPerstyle,
             'noModel' => $noModel,
             'delivery' => $delivery,

@@ -10,14 +10,15 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    Data Semua Order <?= $jarum ?>
+                                    Data Order <?= $jarum ?>
                                 </h5>
                             </div>
                         </div>
                         <div>
-                            <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-success bg-gradient-info shadow text-center border-radius-md">
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-success bg-gradient-success shadow text-center border-radius-md">
                                 Input Data Order
                             </button>
+                            <!-- <a href="<?= base_url('capacity/orderPerjarum/')?>" class="btn bg-gradient-info"> Back</a> -->
                         </div>
                     </div>
                 </div>
