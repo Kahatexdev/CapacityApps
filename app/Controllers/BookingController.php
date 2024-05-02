@@ -424,21 +424,20 @@ class BookingController extends BaseController
     {
 
         $resultCancelBooking = $this->bookingModel->getCancelBooking();
-        $totals = array_keys($resultCancelBooking[0], ['qty']);
         $charts = $this->bookingModel->chartCancel();
         $bulan = array_keys($charts['details']);
         $jumlahPembatalan = array_values($charts['totals']);
         $data = [
             'title' => 'Summary Cancel Booking',
             'active1' => '',
-            'active2' => 'active',
+            'active2' => '',
             'active3' => '',
             'active4' => '',
             'active5' => '',
             'active6' => '',
             'active7' => '',
+            'active8' => 'active',
             'details' => $resultCancelBooking,
-            'totals' => $totals,
             'bulan' => $bulan,
             'jumlahPembatalan' => $jumlahPembatalan,
             'totalChart' => $charts['totals']

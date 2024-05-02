@@ -104,6 +104,7 @@ class BookingModel extends Model
         return $this->select("MONTHNAME(delivery) as bulan, YEAR(delivery) as tahun")
             ->where('needle', $jarum)
             ->groupBy('MONTHNAME(delivery), YEAR(delivery)')
+            ->orderBy('bulan','ASC')
             ->findAll();
     }
 
