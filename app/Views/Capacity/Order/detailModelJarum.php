@@ -57,9 +57,9 @@
                                         <tr>
                                             <td class="text-sm"><?= $order['machinetypeid']; ?></td>
                                             <td class="text-sm"><?= $order['size']; ?></td>
-                                            <td class="text-sm"><?= $order['delivery']; ?></td>
-                                            <td class="text-sm"><?= $order['qty']; ?></td>
-                                            <td class="text-sm"><?= $order['sisa']; ?></td>
+                                            <td class="text-sm"><?= date('d-M-y', strtotime($order['delivery'])); ?></td>
+                                            <td class="text-xs"><?= number_format(round($order->qty / 24), 0, '.', ','); ?></td>
+                                            <td class="text-xs"><?= number_format(round($order->sisa / 24), 0, '.', ','); ?></td>
                                             <td class="text-sm"><?= $order['seam']; ?></td>
                                             <td class="text-sm"><?= $order['factory']; ?></td>
                                             <td class="text-sm">
@@ -77,10 +77,10 @@
                                 </tbody>
                                 <tfoot>
                                     <tr>
+                                        <th colspan=2></th>
+                                        <th>Total </th>
                                         <th></th>
                                         <th></th>
-                                        <th></th>
-                                        <th id="totalQty" class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2"></th>
                                         <th></th>
                                         <th></th>
                                         <th></th>
@@ -225,7 +225,39 @@
         </script> -->
         <script>
             $(document).ready(function() {
-                $('#dataTable').DataTable({});
+                $('#dataTable').DataTable({
+                    "footerCallback": function (row, data, start, end, display) {
+                        var api = this.api();
+
+                        var qty = api.column(3, {
+                            page: 'current'
+                        }).data().reduce(function(a, b) {
+                            return parseInt(a) + parseInt(b);
+                        }, 0);
+
+                        // Calculate the total of the 5th column (Remaining Qty in dozens) - index 4
+                        var sisa = api.column(4, {
+                            page: 'current'
+                        }).data().reduce(function(a, b) {
+                            return parseInt(a) + parseInt(b);
+                        }, 0);
+
+                        // Format totalqty and totalsisa with " Dz" suffix and dots for thousands
+                        var totalqty = numberWithDots(qty) + " Dz";
+                        var totalsisa = numberWithDots(sisa) + " Dz";
+
+                        // Update the footer cell for the total Qty
+                        $(api.column(3).footer()).html(totalqty);
+
+                        // Update the footer cell for the total Sisa
+                        $(api.column(4).footer()).html(totalsisa);
+                      
+                    }
+                });
+
+                function numberWithDots(x) {
+                    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                }
 
                 $('.import-btn').click(function() {
                     var apsperstyle = $(this).data('id');

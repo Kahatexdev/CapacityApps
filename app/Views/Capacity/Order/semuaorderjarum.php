@@ -80,17 +80,17 @@
                         <tbody>
                             <?php foreach ($tampildata as $order) : ?>
                                 <tr>
-                                    <td class="text-xs"><?= $order->created_at; ?></td>
+                                <td class="text-xs"><?= date('d-M-y', strtotime($order->created_at)); ?></td>
                                     <td class="text-xs"><?= $order->kd_buyer_order; ?></td>
                                     <td class="text-xs"><?= $order->no_model; ?></td>
                                     <td class="text-xs"><?= $order->machinetypeid; ?></td>
                                     <td class="text-xs"><?= $order->product_type; ?></td>
                                     <td class="text-xs"><?= $order->description; ?></td>
                                     <td class="text-xs"><?= $order->seam; ?></td>
-                                    <td class="text-xs"><?= $order->leadtime; ?></td>
-                                    <td class="text-xs"><?= $order->delivery; ?></td>
-                                    <td class="text-xs"><?= $order->qty; ?></td>
-                                    <td class="text-xs"><?= $order->sisa; ?></td>
+                                    <td class="text-xs"><?= $order->leadtime; ?>  Days</td>
+                                    <td class="text-xs"><?= date('d-M-y', strtotime($order->delivery)); ?></td>
+                                    <td class="text-xs"><?= number_format(round($order->qty / 24), 0, ',', '.'); ?> Dz</td>
+                                    <td class="text-xs"><?= number_format(round($order->sisa / 24), 0, ',', '.'); ?> Dz</td>
                                     <td class="text-xs">
                                         <?php if ($order->qty === null) : ?>
                                             <!-- If qty is null, set action to Import -->
@@ -108,6 +108,13 @@
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
+                        <tfoot>
+                            <th colspan = 8></th>
+                            <th> Total : </th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -185,10 +192,40 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $('#example').DataTable({
-                "order": [
-                    [0, 'desc'] // Kolom pertama (indeks 0) diurutkan secara descending
-                ]
+                "order": [],
+                "footerCallback": function (row, data, start, end, display) {
+                        var api = this.api();
+
+                        var qty = api.column(9, {
+                            page: 'current'
+                        }).data().reduce(function(a, b) {
+                            return parseInt(a) + parseInt(b);
+                        }, 0);
+
+                        // Calculate the total of the 5th column (Remaining Qty in dozens) - index 4
+                        var sisa = api.column(10, {
+                            page: 'current'
+                        }).data().reduce(function(a, b) {
+                            return parseInt(a) + parseInt(b);
+                        }, 0);
+
+                        // Format totalqty and totalsisa with " Dz" suffix and dots for thousands
+                        var totalqty = numberWithDots(qty) + " Dz";
+                        var totalsisa = numberWithDots(sisa) + " Dz";
+
+                        // Update the footer cell for the total Qty
+                        $(api.column(9).footer()).html(totalqty);
+
+                        // Update the footer cell for the total Sisa
+                        $(api.column(10).footer()).html(totalsisa);
+                      
+                    }
             });
+            
+            // Function to add dots for thousands
+            function numberWithDots(x) {
+                return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            }
 
             // Trigger import modal when import button is clicked
             $('.import-btn').click(function() {

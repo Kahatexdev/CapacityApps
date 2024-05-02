@@ -39,6 +39,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('semuaOrder', 'OrderController::semuaOrder');
     $routes->get('orderPerjarum', 'OrderController::OrderPerJarum');
     $routes->get('orderPerjarumBln', 'OrderController::orderPerJarumBln');
+    $routes->get('belumImport', 'OrderController::belumImport');
     $routes->get('dataorderperjarum/(:any)', 'OrderController::DetailOrderPerJarum/$1');
     $routes->get('dataorderperjarumbln/(:any)', 'OrderController::DetailOrderPerJarumBln/$1');
     $routes->get('dataorderperjarumblndetail/(:any)/(:any)/(:any)', 'OrderController::DetailOrderPerJarumBlnDetail/$1/$2/$3');

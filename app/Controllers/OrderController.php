@@ -58,6 +58,7 @@ class OrderController extends BaseController
         ];
         return view('Capacity/Order/ordermaster', $data);
     }
+    
 
     public function detailModelCapacity($noModel, $delivery)
     {
@@ -77,6 +78,7 @@ class OrderController extends BaseController
         ];
         return view('Capacity/Order/detailOrder', $data);
     }
+
     public function semuaOrder()
     {
         $tampilperdelivery = $this->orderModel->tampilPerdelivery();
@@ -97,6 +99,28 @@ class OrderController extends BaseController
         ];
         return view('Capacity/Order/semuaorder', $data);
     }
+
+    public function belumImport()
+    {
+        $tampilperdelivery = $this->orderModel->tampilbelumImport();
+        $product = $this->productModel->findAll();
+        $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'tampildata' => $tampilperdelivery,
+            'product' => $product,
+
+
+        ];
+        return view('Capacity/Order/semuaorder', $data);
+    }
+
     public function orderPerJarum()
     {
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
