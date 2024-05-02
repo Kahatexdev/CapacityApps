@@ -106,7 +106,7 @@
                                 <div class="col-8">
                                     <div class="numbers">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold"><?= $jr['jarum'] ?></p>
-                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Machine : <?= $jr['total'] ?></p>
+                                        <!-- <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Machine : //$jr['total'] </p> -->
                                         <h5 class="font-weight-bolder mb-0">
                                         </h5>
                                     </div>

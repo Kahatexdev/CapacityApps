@@ -57,10 +57,10 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
     // mesin
     $routes->get('datamesin', 'MesinController::index');
-    $routes->get('mesinPerJarum', 'MesinController::mesinPerJarum');
-    $routes->get('mesinperarea', 'MesinController::mesinperarea');
+    $routes->get('mesinPerJarum/(:any)', 'MesinController::mesinPerJarum/$1');
+    $routes->get('mesinperarea/(:any)', 'MesinController::mesinperarea/$1');
     $routes->get('stockcylinder', 'MesinController::stockcylinder');
-    $routes->get('datamesinperjarum/(:any)', 'MesinController::DetailMesinPerJarum/$1');
+    $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarum/$1/$2');
     $routes->get('datamesinperarea/(:any)', 'MesinController::DetailMesinPerArea/$1');
     $routes->post('deletemesinareal/(:any)', 'MesinController::deletemesinareal/$1');
     $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarum/$1');
@@ -68,6 +68,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('addcylinder', 'MesinController::inputcylinder');
     $routes->post('editcylinder/(:any)', 'MesinController::editcylinder/$1');
     $routes->post('deletecylinder/(:any)', 'MesinController::deletecylinder/$1');
+    $routes->get('allmachine', 'MesinController::allmachine');
 
     //calendar
     $routes->get('planningorder', 'CalendarController::planningorder');

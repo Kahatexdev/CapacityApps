@@ -225,7 +225,7 @@
         <script>
             $(document).ready(function() {
                 $('#dataTable').DataTable({
-                    "pageLength": 20,
+                    "pageLength": 35,
                     "footerCallback": function(row, data, start, end, display) {
                         var api = this.api();
 

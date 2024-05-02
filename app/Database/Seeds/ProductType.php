@@ -2667,6 +2667,48 @@ class ProductType extends Seeder
                 'product_type' => 'HT-ST',
                 'keterangan' => 'Hat Stripe',
                 'jarum' => '240N'
+            ],
+            [
+                'konversi' => 1,
+                'product_type' => 'GL-PS',
+                'keterangan' => 'Gloves Plain Stripe',
+                'jarum' => '10G84N'
+            ],
+            [
+                'konversi' => 1,
+                'product_type' => 'GL-PS',
+                'keterangan' => 'Gloves Plain Stripe',
+                'jarum' => '10G92N'
+            ],
+            [
+                'konversi' => 1,
+                'product_type' => 'GL-PS',
+                'keterangan' => 'Gloves Plain Stripe',
+                'jarum' => '10G106N'
+            ],
+            [
+                'konversi' => 1,
+                'product_type' => 'GL-PS',
+                'keterangan' => 'Gloves Plain Stripe',
+                'jarum' => '10G116N'
+            ],
+            [
+                'konversi' => 1,
+                'product_type' => 'GL-PS',
+                'keterangan' => 'Gloves Plain Stripe',
+                'jarum' => '10G126N'
+            ],
+            [
+                'konversi' => 1,
+                'product_type' => 'GL-PS',
+                'keterangan' => 'Gloves Plain Stripe',
+                'jarum' => '13G'
+            ],
+            [
+                'konversi' => 1,
+                'product_type' => 'HT-PS',
+                'keterangan' => 'Hat Plain Stripe',
+                'jarum' => '240'
             ]
         ];
         $this->db->table('master_product_type')->insertBatch($data);

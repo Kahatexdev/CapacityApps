@@ -64,7 +64,7 @@
                                             <td class="text-sm"><?= $order['mesin_jalan']; ?></td>
                                             <td class="text-sm"><?= $order['total_mc'] - $order['mesin_jalan']; ?></td>
                                             <td class="text-sm">
-                                                <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['id_data_mesin']; ?>" data-area="<?= $order['area']; ?>" data-total="<?= $order['total_mc']; ?>" data-jarum="<?= $order['jarum']; ?>" data-mc-jalan="<?= $order['mesin_jalan']; ?>" data-brand="<?= $order['brand']; ?>">
+                                                <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['id_data_mesin']; ?>" data-area="<?= $order['area']; ?>" data-total="<?= $order['total_mc']; ?>" data-jarum="<?= $order['jarum']; ?>" data-mc-jalan="<?= $order['mesin_jalan']; ?>" data-brand="<?= $order['brand']; ?>" data-pu="<?= $order['pu']; ?>">
                                                     Edit
                                                 </button>
                                             </td>
@@ -132,7 +132,17 @@
                                         <label for="buyer" class="col-form-label">Mesin Not Running</label>
                                         <input type="text" name="mesin_mati" class="form-control">
                                     </div>
-
+                                    <div class="form-group">
+                                        <label class="col-form-label">Production Unit</label><br>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="production_unit" id="cj_radio" value="CJ">
+                                            <label class="form-check-label" for="cj_radio">CJ</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="production_unit" id="mj_radio" value="MJ">
+                                            <label class="form-check-label" for="mj_radio">MJ</label>
+                                        </div>
+                                    </div>
 
                                 </div>
                             </div>
@@ -190,8 +200,17 @@
                                         <label for="buyer" class="col-form-label">Machine Not Running</label>
                                         <input type="text" name="mesin_mati" class="form-control">
                                     </div>
-
-
+                                    <div class="form-group">
+                                        <label class="col-form-label">Production Unit</label><br>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="production_unit" id="cj_radio" value="CJ">
+                                            <label class="form-check-label" for="cj_radio">CJ</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="production_unit" id="mj_radio" value="MJ">
+                                            <label class="form-check-label" for="mj_radio">MJ</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -257,6 +276,7 @@
                     var total_mc = $(this).data('total');
                     var brand = $(this).data('brand');
                     var mesin_jalan = $(this).data('mc-jalan');
+                    var pu = $(this).data('pu');
                     var mesin_mati = total_mc - mesin_jalan;
 
                     $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/updatemesinperjarum/') ?>' + id_data_mesin);
@@ -267,6 +287,11 @@
                     $('#ModalEdit').find('input[name="brand"]').val(brand);
                     $('#ModalEdit').find('input[name="mesin_jalan"]').val(mesin_jalan);
                     $('#ModalEdit').find('input[name="mesin_mati"]').val(mesin_mati);
+                    if (pu === "CJ") {
+                        $('#cj_radio').prop('checked', true);
+                    } else if (pu === "MJ") {
+                        $('#mj_radio').prop('checked', true);
+                    }
 
                     $('#ModalEdit').modal('show'); // Show the modal
                 });
