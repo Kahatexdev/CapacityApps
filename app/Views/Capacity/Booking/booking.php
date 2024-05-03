@@ -118,7 +118,7 @@
                                     <?php elseif (stripos($jr['jarum'], '240N') !== false): ?>
                                         <i class="fab fa-redhat text-lg opacity-10" aria-hidden="true"></i>
                                     <?php elseif (stripos($jr['jarum'], 'POM') !== false): ?>
-                                        <i class="fab fa-hornbill text-lg opacity-10" aria-hidden="true"></i>
+                                        <i class="fas fa-atom text-lg opacity-10" aria-hidden="true"></i>
                                     <?php else: ?>
                                         <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i>
                                     <?php endif; ?>

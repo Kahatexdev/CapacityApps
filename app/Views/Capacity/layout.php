@@ -16,7 +16,7 @@
     <link href="<?= base_url('assets/css/nucleo-svg.css') ?>" rel=" stylesheet" />
 
     <!-- Font Awesome Icons -->
-    <script src="<?= base_url('assets/fa/js/fontawesome.min`.js') ?>"></script>
+    <script src="<?= base_url('assets/fa/js/fontawesome.min.js') ?>"></script>
     <link href="<?= base_url('assets/fa/css/all.min.css') ?>" rel=" stylesheet" />
 
     <link href="<?= base_url('assets/css/nucleo-svg.css') ?>" rel=" stylesheet" />

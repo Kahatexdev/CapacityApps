@@ -10,13 +10,13 @@
         Capacity Apps
     </title>
     <!--     Fonts and icons     -->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <link href="<?= base_url('/assets/css/open_sans_family.css') ?>" rel="stylesheet" />
     <!-- Nucleo Icons -->
     <link href="<?= base_url('/assets/css/nucleo-icons.css') ?>" rel="stylesheet" />
     <link href="<?= base_url('/assets/css/nucleo-svg.css') ?>" rel="stylesheet" />
     <!-- Font Awesome Icons -->
-    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
-    <link href="<?= base_url('/assets/css/nucleo-svg.css') ?>" rel="stylesheet" />
+    <script src="<?= base_url('assets/fa/js/fontawesome.min.js') ?>"></script>
+    <link href="<?= base_url('assets/fa/css/all.min.css') ?>" rel=" stylesheet" />
     <!-- CSS Files -->
     <link id="pagestyle" href="<?= base_url('/assets/css/soft-ui-dashboard.css') ?>" rel="stylesheet" />
     <!-- Nepcha Analytics (nepcha.com) -->
@@ -121,7 +121,7 @@
         }
     </script>
     <!-- Github buttons -->
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <script async defer src="<?= base_url('/assets/js/buttons.js') ?>"></script>
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="<?= base_url('/assets/js/soft-ui-dashboard.min.js?v=1.0.7') ?>"></script>
 </body>
