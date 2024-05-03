@@ -28,8 +28,6 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('pecahbooking/(:any)', 'BookingController::pecahbooking/$1');
     $routes->post('importbooking', 'BookingController::importbooking');
     $routes->get('cancelBooking', 'BookingController::getCancelBooking');
-    $routes->get('turunOrder', 'BookingController::getTurunOrder');
-    $routes->get('turunOrder', 'BookingController::getTurunOrder');
     $routes->post('detailcancelbooking/(:any)/(:any)', 'BookingController::detailcancelbooking/$1/$2');
 
     // order
@@ -50,6 +48,8 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('deletedetailjarum/(:any)', 'OrderController::deletedetailmodeljarum/$1');
     $routes->post('inputOrder', 'OrderController::inputOrder');
     $routes->post('importModel', 'OrderController::importModel');
+    $routes->get('turunOrder', 'OrderController::getTurunOrder');
+    $routes->post('detailturunorder/(:any)/(:any)', 'OrderController::detailturunorder/$1/$2');
 
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::produksi');

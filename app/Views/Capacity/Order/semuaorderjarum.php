@@ -67,6 +67,7 @@
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Turun PDK</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Buyer</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Model</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Order</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jarum</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Desc</th>
@@ -83,7 +84,8 @@
                                 <tr>
                                 <td class="text-xs"><?= date('d-M-y', strtotime($order->created_at)); ?></td>
                                     <td class="text-xs"><?= $order->kd_buyer_order; ?></td>
-                                    <td class="text-xs"><?= $order->no_model; ?></td>
+                                    <td class="text-xs"><?= $order->model_machine; ?></td>
+                                    <td class="text-xs"><?= $order->no_order; ?></td>
                                     <td class="text-xs"><?= $order->machinetypeid; ?></td>
                                     <td class="text-xs"><?= $order->product_type; ?></td>
                                     <td class="text-xs"><?= $order->description; ?></td>
@@ -110,7 +112,7 @@
                             <?php endforeach; ?>
                         </tbody>
                         <tfoot>
-                            <th colspan = 8></th>
+                            <th colspan = 9></th>
                             <th> Total : </th>
                             <th></th>
                             <th></th>
@@ -197,14 +199,14 @@
                 "footerCallback": function (row, data, start, end, display) {
                         var api = this.api();
 
-                        var qty = api.column(9, {
+                        var qty = api.column(10, {
                             page: 'current'
                         }).data().reduce(function(a, b) {
                             return parseInt(a) + parseInt(b);
                         }, 0);
 
                         // Calculate the total of the 5th column (Remaining Qty in dozens) - index 4
-                        var sisa = api.column(10, {
+                        var sisa = api.column(11, {
                             page: 'current'
                         }).data().reduce(function(a, b) {
                             return parseInt(a) + parseInt(b);
@@ -215,10 +217,10 @@
                         var totalsisa = numberWithDots(sisa) + " Dz";
 
                         // Update the footer cell for the total Qty
-                        $(api.column(9).footer()).html(totalqty);
+                        $(api.column(10).footer()).html(totalqty);
 
                         // Update the footer cell for the total Sisa
-                        $(api.column(10).footer()).html(totalsisa);
+                        $(api.column(11).footer()).html(totalsisa);
                       
                     }
             });

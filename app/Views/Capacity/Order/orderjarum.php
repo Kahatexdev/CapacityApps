@@ -43,7 +43,15 @@
                                 </div>
                                 <div class="col-4 text-end">
                                     <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                        <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+                                    <?php if (stripos($jr['jarum'], '10g') !== false || stripos($jr['jarum'], '13G') !== false): ?>
+                                        <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i>
+                                    <?php elseif (stripos($jr['jarum'], '240N') !== false): ?>
+                                        <i class="fab fa-redhat text-lg opacity-10" aria-hidden="true"></i>
+                                    <?php elseif (stripos($jr['jarum'], 'POM') !== false): ?>
+                                        <i class="fab fa-hornbill text-lg opacity-10" aria-hidden="true"></i>
+                                    <?php else: ?>
+                                        <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i>
+                                    <?php endif; ?>
                                     </div>
                                 </div>
 

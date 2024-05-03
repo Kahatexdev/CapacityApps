@@ -455,7 +455,7 @@ class OrderController extends BaseController
                             break;
                         } else {
                             $recordID = $row[0];
-                            $articleNo = $row[2];
+                            $articleNo = $row[30];
                             $producttype = $row[5];
                             $custCode = $row[7];
                             $description = $row[10];
@@ -485,6 +485,7 @@ class OrderController extends BaseController
                                 'machinetypeid' => $machinetypeid,
                                 'size' => $size,
                                 'mastermodel' => $nomodel,
+                                'no_order' => $articleNo,
                                 'delivery' => $delivery2,
                                 'qty' => $qty,
                                 'sisa' => $qty,
@@ -633,5 +634,45 @@ class OrderController extends BaseController
             'TotalMesin' => $totalMesin,
         ];
         return view('Planning/Order/orderarea', $data);
+    }
+    public function getTurunOrder()
+    {
+        $resultTurunOrder = $this->orderModel->getTurunOrder();
+        $charts = $this->orderModel->chartTurun();
+        $bulan = array_keys($charts['details']);
+        $jumlahTurun = array_values($charts['totals']);
+        $data = [
+            'title' => 'Summary Turun Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'active8' => '',
+            'details' => $resultTurunOrder,
+            'bulan' => $bulan,
+            'jumlahPembatalan' => $jumlahTurun,
+            'totalChart' => $charts['totals']
+        ];
+        return view('Capacity/Order/turunOrder', $data);
+    }
+
+    public function detailturunorder($week, $buyer)
+    {
+        $resultTurun = $this->orderModel->getDetailTurunOrder($week, $buyer);
+        $data = [
+            'title' => 'Detail Confirm Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => 'active',
+            'active7' => '',
+            'data' => $resultTurun,
+        ];
+        return view('Capacity/Order/detailturunorder', $data);
     }
 }

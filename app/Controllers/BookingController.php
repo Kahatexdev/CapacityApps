@@ -423,7 +423,6 @@ class BookingController extends BaseController
     }
     public function getCancelBooking()
     {
-
         $resultCancelBooking = $this->bookingModel->getCancelBooking();
         $charts = $this->bookingModel->chartCancel();
         $bulan = array_keys($charts['details']);
