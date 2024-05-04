@@ -581,7 +581,7 @@ class OrderController extends BaseController
             'product' => $product,
 
         ];
-        return view('Planning/Order/orderblmAdaArea', $data);
+        return view('Planning/Order/orderBlmAdaArea', $data);
     }
     public function semuaOrderPlan()
     {
