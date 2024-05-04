@@ -17,7 +17,7 @@ use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Week;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\{Border, Alignment};
+use PhpOffice\PhpSpreadsheet\Style\{Border, Alignment, Fill};
 
 
 class ExportController extends BaseController
@@ -87,11 +87,15 @@ class ExportController extends BaseController
                 'mekanikRun' => $this->jarumModel->getRunningMc($jarum, 'MECHANIC') ?? 0,
                 'rossoRun' => $this->jarumModel->getRunningMc($jarum, 'ROSSO') ?? 0,
                 'lonatiRun' => $this->jarumModel->getRunningMc($jarum, 'lonati') ?? 0,
+                'cjRun'  => $this->jarumModel->getRunningMcPU($jarum, 'CJ') ?? 0,
+                'mjRun'  => $this->jarumModel->getRunningMcPU($jarum, 'MJ') ?? 0,
                 'stockCylDk' => $this->jarumModel->getStockSylDc($needle, "3") ?? 0,
                 'stockCylThs' => $this->jarumModel->getStockSylDc($needle, "THS") ?? 0,
                 'stockCylRosso' => $this->jarumModel->getStockSylDc($needle, "Rosso") ?? 0,
             ];
         }
+        $jarumBabyComp = $this->jarumModel->getBabyComp();
+
         function setCellStyle($sheet, $cellRange, $value, $borderStyle = Border::BORDER_THIN)
         {
             $sheet->mergeCells($cellRange)->setCellValue($cellRange, $value);
@@ -324,6 +328,8 @@ class ExportController extends BaseController
         // data body machine
         $rowjarum = 7;
         $totalDCRow = count($doublecyn) + $rowjarum;
+        $rowBabyComp = $totalDCRow + 1;
+        dd($rowBabyComp);
         $totalDakong = 0;
         $totalRosso = 0;
         $totalThs = 0;
@@ -334,6 +340,12 @@ class ExportController extends BaseController
         $totalThsRun = 0;
         $totalLonRun = 0;
         $totalDcRun = 0;
+        $totalStockCylDk = 0;
+        $totalStockCylThs = 0;
+        $totalStockCylRosso = 0;
+        $totalCjRun = 0;
+        $totalMjRun = 0;
+        $totalMcDcRunperPU = 0;
         foreach ($doublecyn as $jarum => $item) {
 
             $totalMc = $item['dakong'] + $item['rosso'] + $item['mekanik'] + $item['lonati'];
@@ -350,6 +362,14 @@ class ExportController extends BaseController
             $totalLonRun  += $item['lonatiRun'];
             $totalDcRun += $totalMcDcRun;
 
+            $totalStockCylDk += $item['stockCylDk'];
+            $totalStockCylThs += $item['stockCylThs'];
+            $totalStockCylRosso += $item['stockCylRosso'];
+
+            $totalCjRun += $item['cjRun'];
+            $totalMjRun +=  $item['mjRun'];
+            $ttlMcDcRunperPU = $item['cjRun'] + $item['mjRun'];
+            $totalMcDcRunperPU +=  $ttlMcDcRunperPU;
 
 
             $sheet->setCellValue('A' . $rowjarum, $jarum)
@@ -380,7 +400,7 @@ class ExportController extends BaseController
                 ->setCellValue('J' . $totalDCRow, $totalThsRun)
                 ->setCellValue('K' . $totalDCRow, $totalLonRun)
                 ->setCellValue('M' . $totalDCRow, $totalDcRun);
-            $boldStyle = ['A' . $totalDCRow, 'C' . $totalDCRow, 'B' . $totalDCRow, 'D' . $totalDCRow, 'E' . $totalDCRow, 'F' . $totalDCRow, 'G' . $totalDCRow, 'H' . $totalDCRow, 'I' . $totalDCRow, 'J' . $totalDCRow, 'K' . $totalDCRow, 'M' . $totalDCRow,];
+            $boldStyle = ['A' . $totalDCRow, 'C' . $totalDCRow, 'B' . $totalDCRow, 'D' . $totalDCRow, 'E' . $totalDCRow, 'F' . $totalDCRow,  'H' . $totalDCRow, 'I' . $totalDCRow, 'J' . $totalDCRow, 'K' . $totalDCRow, 'M' . $totalDCRow, 'L' . $totalDCRow, 'N' . $totalDCRow, 'O' . $totalDCRow, 'P' . $totalDCRow, 'Q' . $totalDCRow,  'R' . $totalDCRow, 'S' . $totalDCRow, 'T' . $totalDCRow,];
             foreach ($boldStyle as $bs) {
                 $sheet->getStyle($bs)->applyFromArray([
                     'borders' => [
@@ -396,7 +416,7 @@ class ExportController extends BaseController
                 ->setCellValue('J' . $rowjarum, $item['mekanikRun'])
                 ->setCellValue('K' . $rowjarum, $item['lonatiRun'])
                 ->setCellValue('M' . $rowjarum, $totalMcDcRun);
-            $cellCoordinates = ['H' . $rowjarum, 'I' . $rowjarum, 'J' . $rowjarum, 'K' . $rowjarum, 'M' . $rowjarum,];
+            $cellCoordinates = ['H' . $rowjarum, 'I' . $rowjarum, 'J' . $rowjarum, 'K' . $rowjarum,  'N' . $rowjarum, 'L' . $rowjarum,  'O' . $rowjarum,  'P' . $rowjarum,  'Q' . $rowjarum,];
             foreach ($cellCoordinates as $cellCoordinate) {
                 $sheet->getStyle($cellCoordinate)->applyFromArray([
                     'borders' => [
@@ -409,7 +429,10 @@ class ExportController extends BaseController
                 $sheet
                     ->setCellValue('P' . $rowjarum, $item['stockCylDk'])
                     ->setCellValue('Q' . $rowjarum, $item['stockCylThs'])
-                    ->setCellValue('R' . $rowjarum, $item['stockCylRosso']);
+                    ->setCellValue('R' . $rowjarum, $item['stockCylRosso'])
+                    ->setCellValue('P' . $totalDCRow, $totalStockCylDk)
+                    ->setCellValue('Q' . $totalDCRow, $totalStockCylThs)
+                    ->setCellValue('R' . $totalDCRow, $totalStockCylRosso);
 
                 $cellCoordinates = ['P' . $rowjarum, 'Q' . $rowjarum, 'J' . $rowjarum, 'R' . $rowjarum,];
                 foreach ($cellCoordinates as $cellCoordinate) {
@@ -421,9 +444,44 @@ class ExportController extends BaseController
 
                     ]);
                 }
+                // totalRunningMc PU &stockCYl
+                $sheet
+                    ->setCellValue('S' . $totalDCRow, $totalCjRun)
+                    ->setCellValue('T' . $totalDCRow, $totalMjRun)
+                    ->setCellValue('U' . $totalDCRow, $totalMcDcRunperPU)
+                    ->setCellValue('S' . $rowjarum, $item['cjRun'])
+                    ->setCellValue('T' . $rowjarum, $item['mjRun'])
+                    ->setCellValue('U' . $rowjarum, $ttlMcDcRunperPU);
+                $cellCoordinates = ['S' . $rowjarum, 'T' . $rowjarum, 'U' . $rowjarum,];
+                foreach ($cellCoordinates as $cellCoordinate) {
+                    $sheet->getStyle($cellCoordinate)->applyFromArray([
+                        'borders' => [
+                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+                        ],
+                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+                    ]);
+                }
+
+                $totalStyle = ['U' . $rowjarum, 'M' . $rowjarum, 'G' . $rowjarum, 'G' . $totalDCRow, 'M' . $totalDCRow, 'U' . $totalDCRow,];
+                foreach ($totalStyle  as $styleTotal) {
+                    $sheet->getStyle($styleTotal)->applyFromArray([
+                        'borders' => [
+                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+                        ],
+                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+                        'fill' => [
+                            'fillType' => Fill::FILL_SOLID,
+                            'startColor' => ['rgb' => 'FFA500'], // Orange color
+                        ],
+                    ]);
+                }
             }
+
             $rowjarum++;
         }
+
+
         // download Data
         $writer = new Xlsx($spreadsheet);
         $file_path = WRITEPATH . 'uploads/data.xlsx'; // Lokasi penyimpanan file Excel

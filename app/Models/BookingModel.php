@@ -163,29 +163,26 @@ class BookingModel extends Model
 
     public function chartCancel()
     {
+
         $allResults = $this
-            ->select('*')
+            ->select('SUM(data_cancel.qty_cancel) AS qty')
+            ->select("DATE_FORMAT(data_booking.updated_at, '%M-%Y') AS month_year", false)
+            ->join('data_cancel', 'data_booking.id_booking = data_cancel.id_booking')
             ->where('status', 'Cancel Booking')
-            ->orderBy('updated_at', 'ASC')
+            ->groupBy('data_booking.kd_buyer_booking, month_year')
+            ->orderBy('month_year', 'ASC')
             ->findAll();
 
-        $results = [];
         $totalPerBulan = [];
 
         foreach ($allResults as $result) {
-            $month = date('F', strtotime($result['updated_at']));
-            // Menambahkan detail pembatalan ke dalam array berdasarkan bulan
-            if (!isset($results[$month])) {
-                $results[$month] = [];
-                $totalPerBulan[$month] = 0;
-            }
-            $results[$month][] = $result;
-            // Menghitung total pembatalan per bulan
-            $totalPerBulan[$month]++;
+            // Adding cancellation details to the array based on month
+            $monthYear = $result['month_year'];
+            $totalPerBulan[$monthYear] = $result['qty'] / 24;
         }
 
         return [
-            'details' => $results,
+            'details' => $result,
             'totals' => $totalPerBulan
         ];
     }

@@ -124,6 +124,10 @@ class DataMesinModel extends Model
     {
         return $this->select('aliasjarum, jarum')->like('jarum', 'DC')->findAll();
     }
+    public function getBabyComp()
+    {
+        return $this->select('aliasjarum, jarum')->like('aliasjarum', 'Baby Comp')->groupBy('aliasjarum')->findAll();
+    }
     public function getBrand($jarum, $brand)
     {
         $result = $this->selectSum('total_mc')->where('aliasjarum', $jarum)->like('brand', $brand)->get()->getRow();
@@ -134,6 +138,14 @@ class DataMesinModel extends Model
     public function getRunningMc($jarum, $brand)
     {
         $result = $this->selectSum('mesin_jalan')->where('aliasjarum', $jarum)->like('brand', $brand)->get()->getRow();
+
+        // Periksa apakah hasilnya ada sebelum mengembalikannya
+        return $result ? $result->mesin_jalan : 0; // Mengembalikan total_mc jika ada, jika tidak, kembalikan 0 atau nilai default lainnya
+
+    }
+    public function getRunningMcPU($jarum, $pu)
+    {
+        $result = $this->selectSum('mesin_jalan')->where('aliasjarum', $jarum)->like('pu', $pu)->get()->getRow();
 
         // Periksa apakah hasilnya ada sebelum mengembalikannya
         return $result ? $result->mesin_jalan : 0; // Mengembalikan total_mc jika ada, jika tidak, kembalikan 0 atau nilai default lainnya
