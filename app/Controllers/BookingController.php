@@ -467,4 +467,112 @@ class BookingController extends BaseController
     {
         $turunOrder = $this->ApsPerstyleModel->getTurunOrderPerbulan();
     }
+
+    // planning
+
+    public function bookingPlan()
+    {
+        $dataJarum = $this->jarumModel->getJarum();
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+
+        $data = [
+            'title' => 'Data Booking',
+            'active1' => '',
+            'active2' => 'active',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+
+            'Jarum' => $dataJarum,
+            'TotalMesin' => $totalMesin,
+        ];
+        return view('Planning/Booking/booking', $data);
+    }
+
+    public function bookingPerBulanJarumPLan($jarum)
+    {
+        $bulan = $this->bookingModel->getbulan($jarum);
+        $data = [
+            'title' => 'Data Booking',
+            'active1' => '',
+            'active2' => 'active',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'bulan' => $bulan,
+            'jarum' => $jarum,
+        ];
+        return view('Planning/Booking/bookingbulan', $data);
+    }
+    public function bookingPerBulanJarumTampilPlan($bulan, $tahun, $jarum)
+    {
+        $booking = $this->bookingModel->getDataPerjarumbulan($bulan, $tahun, $jarum);
+        $product = $this->productModel->findAll();
+        $data = [
+            'title' => 'Data Booking',
+            'active1' => '',
+            'active2' => 'active',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'booking' => $booking,
+            'product' => $product,
+            'bulan' => $bulan,
+            'tahun' => $tahun,
+            'jarum' => $jarum,
+        ];
+        return view('Planning/Booking/jarumbulan', $data);
+    }
+    public function bookingPerJarumPLan($jarum)
+    {
+        $product = $this->productModel->findAll();
+        $booking = $this->bookingModel->getDataPerjarum($jarum);
+
+        $data = [
+            'title' => 'Data Booking',
+            'active1' => '',
+            'active2' => 'active',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'jarum' => $jarum,
+            'product' => $product,
+            'booking' => $booking
+
+        ];
+        return view('Planning/Booking/jarum', $data);
+    }
+    public function detailbookingPlan($idBooking)
+    {
+        $needle = $this->bookingModel->getNeedle($idBooking);
+        $product = $this->productModel->findAll();
+        $booking = $this->bookingModel->getDataById($idBooking);
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+        $childOrder = $this->orderModel->getChild($idBooking);
+        $childBooking = $this->bookingModel->getChild($idBooking);
+        $data = [
+            'title' => 'Data Booking',
+            'active1' => '',
+            'active2' => 'active',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'booking' => $booking,
+            'jarum' => $needle,
+            'product' => $product,
+            'jenisJarum' => $totalMesin,
+            'childOrder' => $childOrder,
+            'childBooking' => $childBooking
+
+        ];
+        return view('Planning/Booking/detail', $data);
+    }
 }
