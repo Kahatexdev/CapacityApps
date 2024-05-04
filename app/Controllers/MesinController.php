@@ -22,6 +22,7 @@ class MesinController extends BaseController
     protected $bookingModel;
     protected $orderModel;
     protected $ApsPerstyleModel;
+    protected $cylinderModel;
 
     public function __construct()
     {
@@ -125,9 +126,9 @@ class MesinController extends BaseController
         ];
         return view('Capacity/Mesin/allmesin', $data);
     }
-    public function DetailMesinPerJarum($jarum,$pu)
+    public function DetailMesinPerJarum($jarum, $pu)
     {
-        $tampilperarea = $this->jarumModel->getMesinPerJarum($jarum,$pu);
+        $tampilperarea = $this->jarumModel->getMesinPerJarum($jarum, $pu);
         $data = [
             'title' => 'Data Mesin',
             'active1' => '',
@@ -262,5 +263,128 @@ class MesinController extends BaseController
         } else {
             return redirect()->to(base_url('capacity/stockcylinder'))->withInput()->with('error', 'Gagal Hapus Data');
         }
+    }
+
+    // planning
+    public function indexPlan()
+    {
+        $data = [
+            'title' => 'Data Mesin',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => 'active',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+        ];
+        return view('Planning/Mesin/index', $data);
+    }
+    public function mesinperareaPlan($pu)
+    {
+        $tampilperarea = $this->jarumModel->getArea2($pu);
+        $product = $this->productModel->findAll();
+        $data = [
+            'title' => 'Data Mesin',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => 'active',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'tampildata' => $tampilperarea,
+            'product' => $product,
+
+        ];
+        return view('Planning/Mesin/mesinarea', $data);
+    }
+    public function DetailMesinPerAreaPlan($area)
+    {
+        $tampilperarea = $this->jarumModel->getJarumArea($area);
+        $getPU = $this->jarumModel->getpu($area);
+        $data = [
+            'title' => 'Data Mesin',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => 'active',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'area' => $area,
+            'pu' => $getPU,
+            'tampildata' => $tampilperarea,
+        ];
+
+        return view('Planning/Mesin/detailMesinArea', $data);
+    }
+    public function updatemesinperjarumPlan($idDataMesin)
+    {
+
+        $data = [
+            'total_mesin' => $this->request->getPost("total_mc"),
+            'brand' => $this->request->getPost("brand"),
+            'mesin_jalan' => $this->request->getPost("mesin_jalan"),
+        ];
+        $id = $idDataMesin;
+        $update = $this->jarumModel->update($id, $data);
+        $area = $this->request->getPost("area");
+        if ($update) {
+            return redirect()->to(base_url('planning/datamesinperjarum/' . $area))->withInput()->with('success', 'Data Berhasil Di Update');
+        } else {
+            return redirect()->to(base_url('planning/datamesinperjarum/' . $area))->withInput()->with('error', 'Gagal Update Data');
+        }
+    }
+    public function deletemesinarealPlan($idDataMesin)
+    {
+        $delete = $this->jarumModel->delete($idDataMesin);
+        if ($delete) {
+            return redirect()->to(base_url('planning/datamesinPlan'))->withInput()->with('success', 'Data Berhasil Di Hapus');
+        } else {
+            return redirect()->to(base_url('planning/datamesinPlan'))->withInput()->with('error', 'Gagal Hapus Data');
+        }
+    }
+    public function inputmesinperareaPlan()
+    {
+        $area = $this->request->getPost("area");
+        $jarum = $this->request->getPost("jarum");
+        $total_mc = $this->request->getPost("total_mc");
+        $brand = $this->request->getPost("brand");
+        $mesin_jalan = $this->request->getPost("mesin_jalan");
+
+        $input = [
+            'area' => $area,
+            'jarum' => $jarum,
+            'total_mc' => $total_mc,
+            'brand' => $brand,
+            'mesin_jalan' => $mesin_jalan,
+        ];
+
+        $insert =   $this->jarumModel->insert($input);
+        if ($insert) {
+            return redirect()->to(base_url('/planning/datamesinperjarum/' . $area))->withInput()->with('success', 'Data Berhasil Di Input');
+        } else {
+            return redirect()->to(base_url('/planning/datamesinperjarum/' . $area))->withInput()->with('error', 'Data Gagal Di Input');
+        }
+    }
+    public function DetailMesinPerJarumPlan($jarum, $pu)
+    {
+        $tampilperarea = $this->jarumModel->getMesinPerJarum($jarum, $pu);
+        $data = [
+            'title' => 'Data Mesin',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => 'active',
+            'active6' => '',
+            'active7' => '',
+            'pu' => $pu,
+            'jarum' => $jarum,
+            'tampildata' => $tampilperarea,
+        ];
+
+        return view('Planning/Mesin/detailMesinJarum', $data);
     }
 }
