@@ -57,9 +57,9 @@ class MesinController extends BaseController
         ];
         return view('Capacity/Mesin/Mastermesin', $data);
     }
-    public function mesinPerJarum()
+    public function mesinPerJarum($pu)
     {
-        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum2($pu);
         $data = [
             'title' => 'Data Mesin',
             'active1' => '',
@@ -69,6 +69,7 @@ class MesinController extends BaseController
             'active5' => 'active',
             'active6' => '',
             'active7' => '',
+            'pu' => $pu,
             'TotalMesin' => $totalMesin,
         ];
         return view('Capacity/Mesin/mesinjarum', $data);
@@ -89,9 +90,9 @@ class MesinController extends BaseController
         ];
         return view('Capacity/Mesin/dataCylinder', $data);
     }
-    public function mesinperarea()
+    public function mesinperarea($pu)
     {
-        $tampilperarea = $this->jarumModel->getArea();
+        $tampilperarea = $this->jarumModel->getArea2($pu);
         $product = $this->productModel->findAll();
         $data = [
             'title' => 'Data Mesin',
@@ -108,9 +109,9 @@ class MesinController extends BaseController
         ];
         return view('Capacity/Mesin/mesinarea', $data);
     }
-    public function DetailMesinPerJarum($jarum)
+    public function allmachine()
     {
-        $tampilperarea = $this->jarumModel->getMesinPerJarum($jarum);
+        $tampilperarea = $this->jarumModel->getAllMachine();
         $data = [
             'title' => 'Data Mesin',
             'active1' => '',
@@ -120,6 +121,23 @@ class MesinController extends BaseController
             'active5' => 'active',
             'active6' => '',
             'active7' => '',
+            'tampildata' => $tampilperarea,
+        ];
+        return view('Capacity/Mesin/allmesin', $data);
+    }
+    public function DetailMesinPerJarum($jarum,$pu)
+    {
+        $tampilperarea = $this->jarumModel->getMesinPerJarum($jarum,$pu);
+        $data = [
+            'title' => 'Data Mesin',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => 'active',
+            'active6' => '',
+            'active7' => '',
+            'pu' => $pu,
             'jarum' => $jarum,
             'tampildata' => $tampilperarea,
         ];
@@ -129,6 +147,7 @@ class MesinController extends BaseController
     public function DetailMesinPerArea($area)
     {
         $tampilperarea = $this->jarumModel->getJarumArea($area);
+        $getPU = $this->jarumModel->getpu($area);
         $data = [
             'title' => 'Data Mesin',
             'active1' => '',
@@ -139,6 +158,7 @@ class MesinController extends BaseController
             'active6' => '',
             'active7' => '',
             'area' => $area,
+            'pu' => $getPU,
             'tampildata' => $tampilperarea,
         ];
 

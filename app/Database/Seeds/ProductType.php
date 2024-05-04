@@ -97,7 +97,7 @@ class ProductType extends Seeder
                 'konversi' => 1,
                 'product_type' => 'NS-PS',
                 'keterangan' => 'Normal Sock',
-                'jarum' => 'DC144 LSFO'
+                'jarum' => 'DC144 LSF'
             ],
             [
                 'konversi' => 1,
@@ -236,7 +236,7 @@ class ProductType extends Seeder
                 'konversi' => 1,
                 'product_type' => 'NS-FP',
                 'keterangan' => 'Normal Sock',
-                'jarum' => 'DC144 LSFO'
+                'jarum' => 'DC144 '
             ],
             [
                 'konversi' => 1,
@@ -375,7 +375,7 @@ class ProductType extends Seeder
                 'konversi' => 1,
                 'product_type' => 'NS-MP',
                 'keterangan' => 'Normal Sock',
-                'jarum' => 'DC144 LSFO'
+                'jarum' => 'DC144 '
             ],
             [
                 'konversi' => 1,
@@ -514,7 +514,7 @@ class ProductType extends Seeder
                 'konversi' => 1,
                 'product_type' => 'S-PS',
                 'keterangan' => 'Sneaker',
-                'jarum' => 'DC144 LSFO'
+                'jarum' => 'DC144 '
             ],
             [
                 'konversi' => 1,
@@ -653,7 +653,7 @@ class ProductType extends Seeder
                 'konversi' => 1,
                 'product_type' => 'S-FP',
                 'keterangan' => 'Sneaker',
-                'jarum' => 'DC144 LSFO'
+                'jarum' => 'DC144 '
             ],
             [
                 'konversi' => 1,
@@ -792,7 +792,7 @@ class ProductType extends Seeder
                 'konversi' => 1,
                 'product_type' => 'S-MP',
                 'keterangan' => 'Sneaker',
-                'jarum' => 'DC144 LSFO'
+                'jarum' => 'DC144 '
             ],
             [
                 'konversi' => 1,
@@ -931,7 +931,7 @@ class ProductType extends Seeder
                 'konversi' => 1,
                 'product_type' => 'F-PS',
                 'keterangan' => 'Footies',
-                'jarum' => 'DC144 LSFO'
+                'jarum' => 'DC144 '
             ],
             [
                 'konversi' => 1,
@@ -1070,7 +1070,7 @@ class ProductType extends Seeder
                 'konversi' => 1,
                 'product_type' => 'F-FP',
                 'keterangan' => 'Footies',
-                'jarum' => 'DC144 LSFO'
+                'jarum' => 'DC144 '
             ],
             [
                 'konversi' => 1,
@@ -1209,7 +1209,7 @@ class ProductType extends Seeder
                 'konversi' => 1,
                 'product_type' => 'F-MP',
                 'keterangan' => 'Footies',
-                'jarum' => 'DC144 LSFO'
+                'jarum' => 'DC144 '
             ],
             [
                 'konversi' => 1,
@@ -1348,7 +1348,7 @@ class ProductType extends Seeder
                 'konversi' => 1,
                 'product_type' => 'KH-PS',
                 'keterangan' => 'Knee High',
-                'jarum' => 'DC144 LSFO'
+                'jarum' => 'DC144 '
             ],
             [
                 'konversi' => 1,
@@ -1487,7 +1487,7 @@ class ProductType extends Seeder
                 'konversi' => 1,
                 'product_type' => 'KH-FP',
                 'keterangan' => 'Knee High',
-                'jarum' => 'DC144 LSFO'
+                'jarum' => 'DC144 '
             ],
             [
                 'konversi' => 1,
@@ -1626,7 +1626,7 @@ class ProductType extends Seeder
                 'konversi' => 1,
                 'product_type' => 'KH-MP',
                 'keterangan' => 'Knee High',
-                'jarum' => 'DC144 LSFO'
+                'jarum' => 'DC144 '
             ],
             [
                 'konversi' => 1,
@@ -1765,7 +1765,7 @@ class ProductType extends Seeder
                 'konversi' => 1,
                 'product_type' => 'TG-PS',
                 'keterangan' => 'Tight',
-                'jarum' => 'DC144 LSFO'
+                'jarum' => 'DC144 '
             ],
             [
                 'konversi' => 1,
@@ -1904,7 +1904,7 @@ class ProductType extends Seeder
                 'konversi' => 1,
                 'product_type' => 'TG-FP',
                 'keterangan' => 'Tight',
-                'jarum' => 'DC144 LSFO'
+                'jarum' => 'DC144 '
             ],
             [
                 'konversi' => 1,
@@ -2042,7 +2042,7 @@ class ProductType extends Seeder
                 'konversi' => 1,
                 'product_type' => 'TG-MP',
                 'keterangan' => 'Tight',
-                'jarum' => 'DC144 LSFO'
+                'jarum' => 'DC144 '
             ],
             [
                 'konversi' => 1,
@@ -2181,7 +2181,7 @@ class ProductType extends Seeder
                 'konversi' => 1,
                 'product_type' => 'SS-PS',
                 'keterangan' => 'Short Shaft',
-                'jarum' => 'DC144 LSFO'
+                'jarum' => 'DC144 '
             ],
             [
                 'konversi' => 1,
@@ -2320,7 +2320,7 @@ class ProductType extends Seeder
                 'konversi' => 1,
                 'product_type' => 'SS-FP',
                 'keterangan' => 'Short Shaft',
-                'jarum' => 'DC144 LSFO'
+                'jarum' => 'DC144 '
             ],
             [
                 'konversi' => 1,
@@ -2459,7 +2459,7 @@ class ProductType extends Seeder
                 'konversi' => 1,
                 'product_type' => 'SS-MP',
                 'keterangan' => 'Short Shaft',
-                'jarum' => 'DC144 LSFO'
+                'jarum' => 'DC144 '
             ],
             [
                 'konversi' => 1,
@@ -2667,6 +2667,48 @@ class ProductType extends Seeder
                 'product_type' => 'HT-ST',
                 'keterangan' => 'Hat Stripe',
                 'jarum' => '240N'
+            ],
+            [
+                'konversi' => 1,
+                'product_type' => 'GL-PS',
+                'keterangan' => 'Gloves Plain Stripe',
+                'jarum' => '10G84N'
+            ],
+            [
+                'konversi' => 1,
+                'product_type' => 'GL-PS',
+                'keterangan' => 'Gloves Plain Stripe',
+                'jarum' => '10G92N'
+            ],
+            [
+                'konversi' => 1,
+                'product_type' => 'GL-PS',
+                'keterangan' => 'Gloves Plain Stripe',
+                'jarum' => '10G106N'
+            ],
+            [
+                'konversi' => 1,
+                'product_type' => 'GL-PS',
+                'keterangan' => 'Gloves Plain Stripe',
+                'jarum' => '10G116N'
+            ],
+            [
+                'konversi' => 1,
+                'product_type' => 'GL-PS',
+                'keterangan' => 'Gloves Plain Stripe',
+                'jarum' => '10G126N'
+            ],
+            [
+                'konversi' => 1,
+                'product_type' => 'GL-PS',
+                'keterangan' => 'Gloves Plain Stripe',
+                'jarum' => '13G'
+            ],
+            [
+                'konversi' => 1,
+                'product_type' => 'HT-PS',
+                'keterangan' => 'Hat Plain Stripe',
+                'jarum' => '240'
             ]
         ];
         $this->db->table('master_product_type')->insertBatch($data);

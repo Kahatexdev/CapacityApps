@@ -17,9 +17,12 @@
                         </div>
                         <div>
 
-                            <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md">
-                                Input Data Booking
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md d-inline-flex align-items-center">
+                                <i class="fas fa-plus-circle me-2 text-lg opacity-10" style="margin-right: 0.5rem;"></i> <span class="ms-1">Input Data Booking</span>
                             </button>
+                            <a href="<?= base_url('capacity/databookingbulan/'.$jarum) ?>" class="btn btn-sm bg-gradient-dark">
+                                <i class="fas fa-arrow-circle-left text-lg opacity-10" aria-hidden="true" style="margin-right: 0.5rem;"></i>Back
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -120,7 +123,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn bg-gradient-info">Simpan</button>
+                            <button type="submit" class="btn bg-gradient-info">Save</button>
                         </div>
                         </form>
                     </div>

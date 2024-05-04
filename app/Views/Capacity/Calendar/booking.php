@@ -158,7 +158,15 @@
                                 </div>
                                 <div class="col-4 text-end">
 
-                                    <i class="fas fa-pen-fancy text-sm opacity-10 text-dark" aria-hidden="true"></i>
+                                    <?php if (stripos($jr['jarum'], '10g') !== false || stripos($jr['jarum'], '13G') !== false): ?>
+                                        <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i>
+                                    <?php elseif (stripos($jr['jarum'], '240N') !== false): ?>
+                                        <i class="fab fa-redhat text-lg opacity-10" aria-hidden="true"></i>
+                                    <?php elseif (stripos($jr['jarum'], 'POM') !== false): ?>
+                                        <i class="fas fa-atom text-lg opacity-10" aria-hidden="true"></i>
+                                    <?php else: ?>
+                                        <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i>
+                                    <?php endif; ?>
 
                                 </div>
 

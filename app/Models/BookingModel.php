@@ -102,9 +102,11 @@ class BookingModel extends Model
     public function getBulan($jarum)
     {
         return $this->select("MONTHNAME(delivery) as bulan, YEAR(delivery) as tahun")
-            ->where('needle', $jarum)
-            ->groupBy('MONTHNAME(delivery), YEAR(delivery)')
-            ->findAll();
+        ->where('needle', $jarum)
+        ->groupBy('MONTHNAME(delivery), YEAR(delivery)')
+        ->orderBy('tahun', 'ASC')
+        ->orderBy('delivery', 'ASC')
+        ->findAll();
     }
 
     // Plan Jarum NORMAL

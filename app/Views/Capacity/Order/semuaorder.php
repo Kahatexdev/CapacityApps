@@ -35,6 +35,7 @@
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Turun PDK</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Buyer</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Model</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Order</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Desc</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Seam</th>
@@ -48,16 +49,18 @@
                         <tbody>
                             <?php foreach ($tampildata as $order) : ?>
                                 <tr>
-                                    <td class="text-xs"><?= $order->created_at; ?></td>
+                                    <td class="text-xs"><?= date('d-M-y', strtotime($order->created_at)); ?></td>
                                     <td class="text-xs"><?= $order->kd_buyer_order; ?></td>
+                                    <td class="text-xs"><?= $order->no_order; ?></td>
                                     <td class="text-xs"><?= $order->no_model; ?></td>
                                     <td class="text-xs"><?= $order->product_type; ?></td>
                                     <td class="text-xs"><?= $order->description; ?></td>
                                     <td class="text-xs"><?= $order->seam; ?></td>
-                                    <td class="text-xs"><?= $order->leadtime; ?></td>
-                                    <td class="text-xs"><?= $order->delivery; ?></td>
-                                    <td class="text-xs"><?= $order->qty; ?></td>
-                                    <td class="text-xs"><?= $order->sisa; ?></td>
+                                    <td class="text-xs"><?= $order->leadtime; ?> Days</td>
+                                    <td class="text-xs"><?= date('d-M-y', strtotime($order->delivery)); ?></td>
+                                    <td class="text-xs"><?= number_format(round($order->qty / 24), 0, ',', '.'); ?> Dz</td>
+                                    <td class="text-xs"><?= number_format(round($order->sisa / 24), 0, ',', '.'); ?> Dz</td>
+
                                     <td class="text-xs">
                                         <?php if ($order->qty === null) : ?>
                                             <!-- If qty is null, set action to Import -->
@@ -163,7 +166,9 @@
                 $('#importModal').modal('show'); // Show the modal
             });
             
-            $('#example').DataTable({});
+            $('#example').DataTable({
+                "order": []
+            });
         });
     </script>
     <?php $this->endSection(); ?>

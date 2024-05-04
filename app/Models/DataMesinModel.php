@@ -53,13 +53,31 @@ class DataMesinModel extends Model
 
     public function getArea()
     {
-        // Mengambil nilai unik dari kolom 'jarum'
-        $query = $this->distinct()->select('area')->orderBy('id_data_mesin', 'ASC')->findAll();
+        // Mengambil nilai unik dari kolom 'area' where pu = $pu
+        $query = $this->distinct()
+                    ->select('area')
+                    ->orderBy('id_data_mesin', 'ASC')
+                    ->findAll();
 
-        // Mengubah hasil query menjadi array dengan nilai 'jarum' saja
+        // Mengubah hasil query menjadi array dengan nilai 'area' saja
         $uniqueArea = array_column($query, 'area');
         return $uniqueArea;
     }
+
+    public function getArea2($pu)
+    {
+        // Mengambil nilai unik dari kolom 'area' where pu = $pu
+        $query = $this->distinct()
+                    ->select('area')
+                    ->where('pu', $pu) // Add where clause for field 'pu' equals $pu
+                    ->orderBy('id_data_mesin', 'ASC')
+                    ->findAll();
+
+        // Mengubah hasil query menjadi array dengan nilai 'area' saja
+        $uniqueArea = array_column($query, 'area');
+        return $uniqueArea;
+    }
+
 
     public function getJarumArea($area)
     {
@@ -67,10 +85,52 @@ class DataMesinModel extends Model
 
         return $query;
     }
-    public function getMesinPerJarum($jarum)
+
+    public function getpu($area) {
+        $query = $this->select('pu')->where('area', $area)->get()->getRow();
+        return $query ? $query->pu : ''; // Return the value of 'pu' if a row is found, otherwise return an empty string
+    }
+    
+
+    public function getMesinPerJarum($jarum, $pu)
     {
-        $query = $this->select('*')->where('jarum', $jarum)->findAll();
+        $query = $this->select('*')
+                    ->where('jarum', $jarum)
+                    ->where('pu', $pu) // Add where clause for field 'pu' equals $pu
+                    ->findAll();
+
         return $query;
+    }
+
+
+    public function getTotalMesinByJarum2($pu)
+    {
+        $customOrder = [
+            'JC120' => 1,
+            'TJ120' => 2,
+            'JC144' => 3,
+            'TJ144' => 4,
+            'JC168' => 5,
+            'TJ168' => 6
+        ];
+
+        // Generate the CASE statement for custom ordering
+        $caseStatement = "CASE ";
+        foreach ($customOrder as $jarum => $index) {
+            $caseStatement .= "WHEN jarum = '$jarum' THEN $index ";
+        }
+        // For '10G', '13G', '240N', and 'POM-POM' entries, set the index to a very large number to move them to the end
+        $caseStatement .= "WHEN jarum LIKE '10G%' THEN 1000 ";
+        $caseStatement .= "WHEN jarum = '13G' THEN 1001 ";
+        $caseStatement .= "WHEN jarum = '240N' THEN 1002 ";
+        $caseStatement .= "WHEN jarum = 'POM-POM' THEN 1003 ";
+        $caseStatement .= "ELSE " . (count($customOrder) + 1) . " END";
+
+        return $this->select('jarum, SUM(total_mc) as total')
+                    ->where('pu', $pu) // Add where clause for field 'pu' equals $pu
+                    ->groupBy('jarum')
+                    ->orderBy($caseStatement . ', jarum')
+                    ->findAll();
     }
 
     public function getTotalMesinByJarum()
@@ -97,11 +157,10 @@ class DataMesinModel extends Model
         $caseStatement .= "ELSE " . (count($customOrder) + 1) . " END";
 
         return $this->select('jarum, SUM(total_mc) as total')
-            ->groupBy('jarum')
-            ->orderBy($caseStatement . ', jarum')
-            ->findAll();
+                    ->groupBy('jarum')
+                    ->orderBy($caseStatement . ', jarum')
+                    ->findAll();
     }
-
 
 
     public function mcJalan()
@@ -161,4 +220,17 @@ class DataMesinModel extends Model
 
         return $qry->qty ?? 0;
     }
+
+    public function getAllMachine()
+    {
+        $query = $this->select('area, jarum, SUM(total_mc) AS total_mc, brand, SUM(mesin_jalan) AS mesin_jalan,SUM(total_mc)-SUM(mesin_jalan) as mesin_mati, pu')
+                      ->groupBy('pu, brand, area , jarum')
+                      ->having('SUM(total_mc) !=', 0)
+                      ->orderBy('pu ASC, SUBSTRING(AREA, 3) + 0 ASC, AREA ASC') // Sorting by 'pu' first, then by KK number, then by Area
+                      ->findAll();
+    
+        return $query;
+    }
+    
+    
 }

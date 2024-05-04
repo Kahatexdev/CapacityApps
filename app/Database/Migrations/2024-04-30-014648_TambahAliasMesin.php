@@ -14,6 +14,11 @@ class TambahAliasMesin extends Migration
                 'constraint' => 100,
                 'null' => true,
             ],
+            'pu' => [
+                'type' => 'VARCHAR',
+                'constraint' => 100,
+                'Default' => 'CJ',
+            ],
         ]);
     }
 

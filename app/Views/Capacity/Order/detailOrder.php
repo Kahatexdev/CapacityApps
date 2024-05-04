@@ -33,7 +33,11 @@
                         <h5>
                             Detail Data Model <?= $noModel ?> Delivery <?= date('d-M-Y', strtotime($delivery)) ?>
                         </h5>
-                        <a href="<?= base_url('capacity/semuaOrder/') ?>" class="btn bg-gradient-info"> Back</a>
+                        <a href="<?= base_url('capacity/semuaOrder/') ?>" class="btn bg-gradient-dark d-inline-flex align-items-center">
+                            <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i> 
+                        Back
+                        </a>
+
                     </div>
                 </div>
                 <div class="card-body p-3">
@@ -42,7 +46,6 @@
                             <table id="dataTable" class="display compact striped" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Id</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Needle</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Style Size</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Delivery</th>
@@ -57,12 +60,11 @@
                                 <tbody>
                                     <?php foreach ($dataAps as $order) : ?>
                                         <tr>
-                                            <td class="text-sm"><?= $order['idapsperstyle']; ?></td>
                                             <td class="text-sm"><?= $order['machinetypeid']; ?></td>
                                             <td class="text-sm"><?= $order['size']; ?></td>
-                                            <td class="text-sm"><?= $order['delivery']; ?></td>
-                                            <td class="text-sm"><?= round($order['qty'] / 24, 0); ?></td>
-                                            <td class="text-sm"><?= round($order['sisa'] / 24, 0); ?></td>
+                                            <td class="text-sm"><?= date('d-M-y', strtotime($order['delivery'])); ?></td>
+                                            <td class="text-sm"><?= round($order['qty'] / 24, 0); ?> Dz</td>
+                                            <td class="text-sm"><?= round($order['sisa'] / 24, 0); ?> Dz</td>
                                             <td class="text-sm"><?= $order['seam']; ?></td>
                                             <td class="text-sm"><?= $order['production_unit']; ?></td>
                                             <td class="text-sm"><?= $order['factory']; ?></td>
@@ -81,7 +83,7 @@
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <th colspan="4">Total</th>
+                                        <th colspan="3">Total</th>
                                         <th></th> <!-- This will hold the total for Qty (Dz) -->
                                         <th></th> <!-- Optionally, any total for Remaining Qty -->
                                         <th></th>
@@ -225,31 +227,38 @@
         <script>
             $(document).ready(function() {
                 $('#dataTable').DataTable({
-                    "pageLength": 20,
+                    "pageLength": 35,
                     "footerCallback": function(row, data, start, end, display) {
                         var api = this.api();
 
                         // Calculate the total of the 4th column (Qty in dozens) - index 3
-                        var totalQty = api.column(4, {
+                        var totalQty = api.column(3, {
                             page: 'current'
                         }).data().reduce(function(a, b) {
                             return parseInt(a) + parseInt(b);
                         }, 0);
 
                         // Calculate the total of the 5th column (Remaining Qty in dozens) - index 4
-                        var totalRemainingQty = api.column(5, {
+                        var totalRemainingQty = api.column(4, {
                             page: 'current'
                         }).data().reduce(function(a, b) {
                             return parseInt(a) + parseInt(b);
                         }, 0);
 
+                        var totalqty = numberWithDots(totalQty) + " Dz";
+                        var totalsisa = numberWithDots(totalRemainingQty) + " Dz";
+
                         // Update the footer cell for the total Qty
-                        $(api.column(4).footer()).html(totalQty);
+                        $(api.column(3).footer()).html(totalqty);
 
                         // Update the footer cell for the total Remaining Qty
-                        $(api.column(5).footer()).html(totalRemainingQty);
+                        $(api.column(4).footer()).html(totalsisa);
                     }
                 });
+
+                function numberWithDots(x) {
+                    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                }
 
 
                 $('.import-btn').click(function() {

@@ -35,7 +35,7 @@
 
                             <div class="col-8">
                                 <div class="numbers">
-                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Semua Data Order</p>
+                                    <p class="text-md mb-0 text-capitalize font-weight-bold">All Data Order</p>
                                     <h5 class="font-weight-bolder mb-0">
                                     </h5>
                                 </div>
@@ -52,6 +52,7 @@
                 </div>
             </a>
         </div>
+        
 
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
             <a href="<?= base_url('capacity/orderPerjarum/') ?>">
@@ -61,7 +62,7 @@
 
                             <div class="col-8">
                                 <div class="numbers">
-                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Data Order Per Jarum</p>
+                                    <p class="text-md mb-0 text-capitalize font-weight-bold">All Data Order by Needles</p>
                                     <h5 class="font-weight-bolder mb-0">
                                     </h5>
                                 </div>
@@ -87,7 +88,33 @@
 
                             <div class="col-8">
                                 <div class="numbers">
-                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Data Order Per Jarum Per Bulan</p>
+                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Data Order By Needle and Month</p>
+                                    <h5 class="font-weight-bolder mb-0">
+                                    </h5>
+                                </div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                    <i class="ni ni-archive-2 text-lg opacity-10" aria-hidden="true"></i>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </a>
+        </div>
+
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
+            <a href="<?= base_url('capacity/belumImport/') ?>">
+                <div class="card">
+                    <div class="card-body p-3">
+                        <div class="row">
+
+                            <div class="col-8">
+                                <div class="numbers">
+                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Order Not Yet Import</p>
                                     <h5 class="font-weight-bolder mb-0">
                                     </h5>
                                 </div>

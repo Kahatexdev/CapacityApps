@@ -100,15 +100,21 @@
 
                                     <div class="col-8">
                                         <div class="numbers">
-                                            <p class="text-sm mb-0 text-capitalize font-weight-bold"><?= $ar ?></p>
+                                            <?php if(stripos($ar,"Gedung") !== false):?>
+                                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Majalaya <?= $ar ?></p>
+                                            <?php else:?>
+                                                <p class="text-sm mb-0 text-capitalize font-weight-bold"><?= $ar ?></p>
+                                            <?php endif; ?>
                                             <h5 class="font-weight-bolder mb-0">
                                             </h5>
                                         </div>
                                     </div>
                                     <div class="col-4 text-end">
-
-                                        <i class="fas fa-pen-fancy text-sm opacity-10 text-dark" aria-hidden="true"></i>
-
+                                            <?php if (stripos($ar, 'KK8J') !== false || stripos($ar, '13G') !== false): ?>
+                                                <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i>
+                                            <?php else: ?>
+                                                <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i>
+                                            <?php endif; ?>
                                     </div>
 
                                 </div>

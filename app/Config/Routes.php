@@ -28,8 +28,6 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('pecahbooking/(:any)', 'BookingController::pecahbooking/$1');
     $routes->post('importbooking', 'BookingController::importbooking');
     $routes->get('cancelBooking', 'BookingController::getCancelBooking');
-    $routes->get('turunOrder', 'BookingController::getTurunOrder');
-    $routes->get('turunOrder', 'BookingController::getTurunOrder');
     $routes->post('detailcancelbooking/(:any)/(:any)', 'BookingController::detailcancelbooking/$1/$2');
 
     // order
@@ -39,6 +37,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('semuaOrder', 'OrderController::semuaOrder');
     $routes->get('orderPerjarum', 'OrderController::OrderPerJarum');
     $routes->get('orderPerjarumBln', 'OrderController::orderPerJarumBln');
+    $routes->get('belumImport', 'OrderController::belumImport');
     $routes->get('dataorderperjarum/(:any)', 'OrderController::DetailOrderPerJarum/$1');
     $routes->get('dataorderperjarumbln/(:any)', 'OrderController::DetailOrderPerJarumBln/$1');
     $routes->get('dataorderperjarumblndetail/(:any)/(:any)/(:any)', 'OrderController::DetailOrderPerJarumBlnDetail/$1/$2/$3');
@@ -49,6 +48,8 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('deletedetailjarum/(:any)', 'OrderController::deletedetailmodeljarum/$1');
     $routes->post('inputOrder', 'OrderController::inputOrder');
     $routes->post('importModel', 'OrderController::importModel');
+    $routes->get('turunOrder', 'OrderController::getTurunOrder');
+    $routes->post('detailturunorder/(:any)/(:any)', 'OrderController::detailturunorder/$1/$2');
 
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::produksi');
@@ -57,10 +58,10 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
     // mesin
     $routes->get('datamesin', 'MesinController::index');
-    $routes->get('mesinPerJarum', 'MesinController::mesinPerJarum');
-    $routes->get('mesinperarea', 'MesinController::mesinperarea');
+    $routes->get('mesinPerJarum/(:any)', 'MesinController::mesinPerJarum/$1');
+    $routes->get('mesinperarea/(:any)', 'MesinController::mesinperarea/$1');
     $routes->get('stockcylinder', 'MesinController::stockcylinder');
-    $routes->get('datamesinperjarum/(:any)', 'MesinController::DetailMesinPerJarum/$1');
+    $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarum/$1/$2');
     $routes->get('datamesinperarea/(:any)', 'MesinController::DetailMesinPerArea/$1');
     $routes->post('deletemesinareal/(:any)', 'MesinController::deletemesinareal/$1');
     $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarum/$1');
@@ -68,6 +69,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('addcylinder', 'MesinController::inputcylinder');
     $routes->post('editcylinder/(:any)', 'MesinController::editcylinder/$1');
     $routes->post('deletecylinder/(:any)', 'MesinController::deletecylinder/$1');
+    $routes->get('allmachine', 'MesinController::allmachine');
 
     //calendar
     $routes->get('planningorder', 'CalendarController::planningorder');

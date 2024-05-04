@@ -106,14 +106,22 @@
                                 <div class="col-8">
                                     <div class="numbers">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold"><?= $jr['jarum'] ?></p>
-                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Machine : <?= $jr['total'] ?></p>
+                                        <!-- <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Machine : //$jr['total'] </p> -->
                                         <h5 class="font-weight-bolder mb-0">
                                         </h5>
                                     </div>
                                 </div>
                                 <div class="col-4 text-end">
                                     <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                        <i class="fas fa-pen-fancy text-lg opacity-10" aria-hidden="true"></i>
+                                    <?php if (stripos($jr['jarum'], '10g') !== false || stripos($jr['jarum'], '13G') !== false): ?>
+                                        <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i>
+                                    <?php elseif (stripos($jr['jarum'], '240N') !== false): ?>
+                                        <i class="fab fa-redhat text-lg opacity-10" aria-hidden="true"></i>
+                                    <?php elseif (stripos($jr['jarum'], 'POM') !== false): ?>
+                                        <i class="fas fa-atom text-lg opacity-10" aria-hidden="true"></i>
+                                    <?php else: ?>
+                                        <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i>
+                                    <?php endif; ?>
                                     </div>
                                 </div>
 

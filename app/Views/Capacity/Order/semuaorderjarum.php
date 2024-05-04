@@ -10,14 +10,15 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    Data Semua Order <?= $jarum ?>
+                                    Data Order <?= $jarum ?>
                                 </h5>
                             </div>
                         </div>
                         <div>
-                            <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-success bg-gradient-info shadow text-center border-radius-md">
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-success bg-gradient-success shadow text-center border-radius-md">
                                 Input Data Order
                             </button>
+                            <!-- <a href="<?= base_url('capacity/orderPerjarum/')?>" class="btn bg-gradient-info"> Back</a> -->
                         </div>
                     </div>
                 </div>
@@ -66,6 +67,7 @@
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Turun PDK</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Buyer</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Model</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Order</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jarum</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Desc</th>
@@ -80,17 +82,18 @@
                         <tbody>
                             <?php foreach ($tampildata as $order) : ?>
                                 <tr>
-                                    <td class="text-xs"><?= $order->created_at; ?></td>
+                                <td class="text-xs"><?= date('d-M-y', strtotime($order->created_at)); ?></td>
                                     <td class="text-xs"><?= $order->kd_buyer_order; ?></td>
-                                    <td class="text-xs"><?= $order->no_model; ?></td>
+                                    <td class="text-xs"><?= $order->model_machine; ?></td>
+                                    <td class="text-xs"><?= $order->no_order; ?></td>
                                     <td class="text-xs"><?= $order->machinetypeid; ?></td>
                                     <td class="text-xs"><?= $order->product_type; ?></td>
                                     <td class="text-xs"><?= $order->description; ?></td>
                                     <td class="text-xs"><?= $order->seam; ?></td>
-                                    <td class="text-xs"><?= $order->leadtime; ?></td>
-                                    <td class="text-xs"><?= $order->delivery; ?></td>
-                                    <td class="text-xs"><?= $order->qty; ?></td>
-                                    <td class="text-xs"><?= $order->sisa; ?></td>
+                                    <td class="text-xs"><?= $order->leadtime; ?>  Days</td>
+                                    <td class="text-xs"><?= date('d-M-y', strtotime($order->delivery)); ?></td>
+                                    <td class="text-xs"><?= number_format(round($order->qty / 24), 0, ',', '.'); ?> Dz</td>
+                                    <td class="text-xs"><?= number_format(round($order->sisa / 24), 0, ',', '.'); ?> Dz</td>
                                     <td class="text-xs">
                                         <?php if ($order->qty === null) : ?>
                                             <!-- If qty is null, set action to Import -->
@@ -108,6 +111,13 @@
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
+                        <tfoot>
+                            <th colspan = 9></th>
+                            <th> Total : </th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -185,10 +195,40 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $('#example').DataTable({
-                "order": [
-                    [0, 'desc'] // Kolom pertama (indeks 0) diurutkan secara descending
-                ]
+                "order": [],
+                "footerCallback": function (row, data, start, end, display) {
+                        var api = this.api();
+
+                        var qty = api.column(10, {
+                            page: 'current'
+                        }).data().reduce(function(a, b) {
+                            return parseInt(a) + parseInt(b);
+                        }, 0);
+
+                        // Calculate the total of the 5th column (Remaining Qty in dozens) - index 4
+                        var sisa = api.column(11, {
+                            page: 'current'
+                        }).data().reduce(function(a, b) {
+                            return parseInt(a) + parseInt(b);
+                        }, 0);
+
+                        // Format totalqty and totalsisa with " Dz" suffix and dots for thousands
+                        var totalqty = numberWithDots(qty) + " Dz";
+                        var totalsisa = numberWithDots(sisa) + " Dz";
+
+                        // Update the footer cell for the total Qty
+                        $(api.column(10).footer()).html(totalqty);
+
+                        // Update the footer cell for the total Sisa
+                        $(api.column(11).footer()).html(totalsisa);
+                      
+                    }
             });
+            
+            // Function to add dots for thousands
+            function numberWithDots(x) {
+                return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            }
 
             // Trigger import modal when import button is clicked
             $('.import-btn').click(function() {
