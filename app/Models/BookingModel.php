@@ -171,7 +171,7 @@ class BookingModel extends Model
             ->select("DATE_FORMAT(data_booking.updated_at, '%M-%Y') AS month_year", false)
             ->join('data_cancel', 'data_booking.id_booking = data_cancel.id_booking')
             ->where('status', 'Cancel Booking')
-            ->groupBy('data_booking.kd_buyer_booking, month_year')
+            ->groupBy('month_year')
             ->orderBy('month_year', 'ASC')
             ->findAll();
 
@@ -180,7 +180,7 @@ class BookingModel extends Model
         foreach ($allResults as $result) {
             // Adding cancellation details to the array based on month
             $monthYear = $result['month_year'];
-            $totalPerBulan[$monthYear] = $result['qty'] / 24;
+            $totalPerBulan[$monthYear] = round($result['qty'] / 24);
         }
 
         return [

@@ -184,7 +184,7 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Total Cancel',
+                    label: 'Total Cancel in Dz',
                     backgroundColor: 'rgba(0, 123, 255, 0.5)',
                     borderColor: 'rgba(0, 123, 255, 1)',
                     borderWidth: 1,

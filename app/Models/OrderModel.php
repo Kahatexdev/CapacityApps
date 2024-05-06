@@ -197,29 +197,23 @@ class OrderModel extends Model
 
     public function chartTurun()
     {
-        $allResults = $this
-            ->select('*')
-            ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel')
-            ->orderBy('updated_at', 'ASC')
-            ->findAll();
+        $allResults = $this->select('sum(apsperstyle.qty) as qty_turun')
+        ->select("DATE_FORMAT(data_model.created_at, '%M-%Y') AS month_year", false)
+        ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel')
+        ->groupBy('month_year')
+        ->orderBy('month_year', 'ASC')
+        ->findAll();
 
-        $results = [];
         $totalPerBulan = [];
 
         foreach ($allResults as $result) {
-            $month = date('F', strtotime($result['updated_at']));
-            // Menambahkan detail pembatalan ke dalam array berdasarkan bulan
-            if (!isset($results[$month])) {
-                $results[$month] = [];
-                $totalPerBulan[$month] = 0;
-            }
-            $results[$month][] = $result;
-            // Menghitung total pembatalan per bulan
-            $totalPerBulan[$month]++;
+            // Adding cancellation details to the array based on month
+            $monthYear = $result['month_year'];
+            $totalPerBulan[$monthYear] = round($result['qty_turun'] / 24);
         }
 
         return [
-            'details' => $results,
+            'details' => $result,
             'totals' => $totalPerBulan
         ];
     }
