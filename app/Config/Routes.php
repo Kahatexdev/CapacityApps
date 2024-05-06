@@ -134,6 +134,10 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('editcylinder/(:any)', 'MesinController::editcylinder/$1');
     $routes->post('deletecylinder/(:any)', 'MesinController::deletecylinder/$1');
     $routes->get('allmachine', 'MesinController::allmachine');
+
+    //planning
+    $routes->get('dataplanning','PlanningController::listplanning');
+    $routes->post('detaillistplanning/(:any)','PlanningController::detaillistplanning/$1');
 });
 
 

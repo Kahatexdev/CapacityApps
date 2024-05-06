@@ -84,4 +84,15 @@ class KebutuhanMesinModel extends Model
             return null;
         }
     }
+    public function listPlan(){
+        return $query = $this->select('created_at,judul,count(jarum) as jarum,sum(mesin) as mesin,max(jumlah_hari) as jumlah_hari')
+        ->groupBy('judul,jarum')
+        ->findAll();
+    }
+    public function jarumPlan($judul){
+        return $query = $this->select('created_at,id,jarum,mesin,jumlah_hari,tanggal_awal,tanggal_akhir')
+        ->where('judul',$judul)
+        ->groupBy('judul')
+        ->findAll();
+    }
 }

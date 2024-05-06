@@ -11,6 +11,7 @@ use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use App\Models\LiburModel;
+use App\Models\KebutuhanMesinModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 
@@ -24,6 +25,7 @@ class PlanningController extends BaseController
     protected $orderModel;
     protected $ApsPerstyleModel;
     protected $liburModel;
+    protected $KebutuhanMesinModel;
 
     public function __construct()
     {
@@ -34,6 +36,7 @@ class PlanningController extends BaseController
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         $this->liburModel = new LiburModel();
+        $this->KebutuhanMesinModel = new KebutuhanMesinModel();
         if ($this->filters   = ['role' => ['planning']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -166,5 +169,38 @@ class PlanningController extends BaseController
         } else {
             return redirect()->to(base_url('planning/dataorder/'))->withInput()->with('error', 'Gagal Assign Area');
         }
+    }
+    public function listplanning(){
+        $dataBooking = $this->KebutuhanMesinModel->listPlan();
+        $data = [
+            'title' => 'List Planning From Capacity',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => 'active',
+            'active6' => '',
+            'active7' => '',
+            'data' => $dataBooking
+        ];
+        return view('Planning/Planning/listPlanning', $data);
+    }
+
+    public function detaillistplanning($judul){
+        $dataplan = $this->KebutuhanMesinModel->jarumPlan($judul);
+        $data = [
+            'title' => 'List Planning From Capacity',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => 'active',
+            'active6' => '',
+            'active7' => '',
+            'data' => $dataplan,
+            'judul' => $judul,
+        ];
+        return view('Planning/Planning/detailPlanning', $data);
+
     }
 }
