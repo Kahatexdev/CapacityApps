@@ -13,6 +13,8 @@ use App\Models\ProduksiModel;
 use App\Models\LiburModel;
 use App\Models\KebutuhanMesinModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use CodeIgniter\HTTP\RequestInterface;
+
 
 
 class PlanningController extends BaseController
@@ -225,5 +227,11 @@ class PlanningController extends BaseController
         ];
         return view('Planning/Planning/pilihMesin',$data);
 
+    }
+
+    public function savemachine($id){
+        $request = service('request');
+        $dataToSave = json_decode($request->getPost('dataToSave'), true);
+        dd($dataToSave);
     }
 }
