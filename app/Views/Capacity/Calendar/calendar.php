@@ -57,6 +57,14 @@
                                     <label for="jarum" class="form-control-label">Total Kebutuhan Mesin</label>
                                     <input class="form-control" type="text" value="<?= $totalKebutuhan ?>" id="totalMc" name="totalMc" readonly>
                                 </div>
+                                <div class="form-group">
+                                    <label for="startmc" class="form-control-label">Start Mesin</label>
+                                    <input class="form-control" type="text" value="<?= $start ?>" id="startMc" name="startMc" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label for="stopMc" class="form-control-label">Stop Mesin</label>
+                                    <input class="form-control" type="text" value="<?= $stopmc ?>" id="stopMc" name="stopMc" readonly>
+                                </div>
                                 <input type="date" value="<?= $start ?>" hidden name="tgl_awal">
                                 <input type="date" value="<?= $end ?>" hidden name="tgl_akhir">
 

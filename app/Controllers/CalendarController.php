@@ -398,6 +398,7 @@ class CalendarController extends BaseController
         foreach ($KebMesin as $kebutuhanMesin) {
             $totalKebutuhanMC += $kebutuhanMesin['kebutuhanMc']; // Adjust this line based on the structure of your data
         }
+        $stopmc = max(array_column($KebMesin, 'smc'));
         // Di sini Anda mungkin perlu memanggil model lain untuk mendapatkan data lain yang diperlukan
         $kategori = $this->productModel->getKategori();
 
@@ -408,8 +409,8 @@ class CalendarController extends BaseController
             'active3' => '',
             'active4' => '',
             'active5' => '',
-            'active6' => 'active',
-            'active7' => '',
+            'active6' => '',
+            'active7' => 'active',
             'weeklyRanges' => $monthlyData,
             'DaftarLibur' => $holidays,
             'kategoriProduk' => $kategori,
@@ -419,6 +420,7 @@ class CalendarController extends BaseController
             'jarum' => $jarum,
             'jmlHari' => $maxHari,
             'totalKebutuhan' => $totalKebutuhanMC,
+            'stopmc' => $stopmc
         ];
         return view('Capacity/Calendar/calendar', $data);
     }
@@ -426,6 +428,7 @@ class CalendarController extends BaseController
     private function hitungKebutuhanMC($get, $type)
     {
         $query = $this->bookingModel->hitungKebutuhanMC($get, $type);
+
         $value = [];
         $qtyTotal = 0;
         foreach ($query as $key => $data) {
@@ -443,15 +446,20 @@ class CalendarController extends BaseController
                 'type' => $type
             ];
         }
+
         if (!$value) {
-            $value =  ['kebutuhanMc' => 0, 'JumlahHari' => 0, 'delivery' => 0, 'type' => $type];
+            $value =  ['kebutuhanMc' => 0, 'JumlahHari' => 0, 'delivery' => 0, 'type' => $type, 'stopmc' => 0];
             return $value;
         } else {
             $kebutuhanMc = max(array_column($value, 'kebutuhanMc'));
+            $smc = max(array_column($value, 'delivery'));
+
             $result = array_filter($value, function ($val) use ($kebutuhanMc) {
                 return $val['kebutuhanMc'] == $kebutuhanMc;
             });
+
             $hasil = reset($result);
+            $hasil['smc'] = $smc; // Menyimpan nilai $smc ke dalam $hasil
             return $hasil;
         }
     }
