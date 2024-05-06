@@ -36,8 +36,6 @@ error_reporting(E_ALL); ?>
                             List Data Planning by Needle, Title <?= $judul; ?>
                         </h5>
                     </div>
-                    
-                    
                 </div>
                 <div class="card-body p-3">
                     <div class="row">
@@ -67,6 +65,8 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm"><?= $order['deskripsi']; ?></td>
                                             <td class="text-sm">
                                                 <form method="POST" action="<?= base_url('planning/pickmachine/'.$order['id'].'/'.$order['jarum']); ?>">
+                                                    <input type="hidden" name="mesin" value="<?= $order['mesin']; ?>">
+                                                    <input type="hidden" name="deskripsi" value="<?= $order['deskripsi']; ?>">
                                                     <button type="submit" class="btn btn-info btn-sm">
                                                         Pick Machine
                                                     </button>

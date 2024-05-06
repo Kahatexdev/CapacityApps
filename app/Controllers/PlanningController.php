@@ -206,7 +206,8 @@ class PlanningController extends BaseController
 
     public function pickmachine($id,$jarum){
         $datamc = $this->KebutuhanMesinModel->listmachine($id,$jarum);
-        
+        $mesin = $this->request->getPost('mesin');
+        $status = $this->request->getPost('deskripsi');
         $data = [
             'title' => 'Pick Machine',
             'active1' => '',
@@ -217,6 +218,8 @@ class PlanningController extends BaseController
             'active6' => '',
             'active7' => '',
             'datamc' => $datamc,
+            'mesin' => $mesin,
+            'status' => $status,
             'id' => $id,
             'jarum' => $jarum,
         ];

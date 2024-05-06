@@ -33,8 +33,19 @@ error_reporting(E_ALL); ?>
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <h5>
-                            Pick Data for Planning by Needle, Title <?= $jarum; ?> 
+                            Pick Data for Planning by Needle  <strong style="color: orange;"><?= $jarum; ?></strong>
                         </h5>
+                    </div>
+                    
+                    <div>
+                        <h6>
+                            Machine Requirement is <strong style="color: orange;"><?= $mesin; ?> Machine </strong>
+                        </h6>
+                    </div>
+                    <div>
+                        <h6>
+                            Status : <?= $status; ?>
+                        </h6>
                     </div>
                     
                     
@@ -64,11 +75,18 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm"><?= $order['mesin_jalan']; ?> Mc</td>
                                             <td class="text-sm"><?= $order['pu']; ?></td>
                                             <td class="text-sm">
-                                                <input type="number" class="input-machine" value="<?= $order['mesin_jalan']; ?>" data-order-id="<?= $order['id']; ?>" min="0" style="width: 80px;">
+                                                <input type="number" class="input-machine" value="<?= $order['mesin_jalan']; ?>" data-order-id="<?= $order['id']; ?>" min="0" style="width: 80px;" inputmode="numeric"> Machine
                                             </td>
+
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="6" class="text-right">Subtotal:</th>
+                                        <th class="subtotal-column"></th>
+                                    </tr>
+                                </tfoot>
                             </table>
 
                         </div>
@@ -82,10 +100,22 @@ error_reporting(E_ALL); ?>
             var table = $('#dataTable').DataTable({
                 "order": []
             });
-            
+
+            // Calculate and display subtotal in footer
+            function calculateSubtotal() {
+                var subtotal = 0;
+                $('#dataTable tbody tr').each(function() {
+                    var machineTotal = parseInt($(this).find('td:eq(2)').text().replace(/\D/g, ''));
+                    var inputMachine = parseInt($(this).find('.input-machine').val().trim());
+                    subtotal += Math.min(machineTotal, inputMachine);
+                });
+                $('#dataTable tfoot .subtotal-column').text(subtotal);
+            }
+
+            // Event listener for input fields
             $('#dataTable tbody').on('input', '.input-machine', function() {
                 var row = table.row($(this).closest('tr'));
-                var machineTotal = parseInt(row.data()[2].replace(/\D/g, '')); // Extract numeric value from "Machine Total" column
+                var machineTotal = parseInt(row.data()[2].replace(/\D/g, ''));
                 var inputMachine = parseInt($(this).val().trim());
 
                 // Check if inputMachine exceeds machineTotal
@@ -94,14 +124,19 @@ error_reporting(E_ALL); ?>
                     Swal.fire({
                         icon: 'warning',
                         title: 'Input Machine exceeds Machine Total',
-                        text: 'Setting Input Machine to Machine Total.',
+                        text: 'Please set the running machines correctly.',
                     });
 
                     // Set input value to machineTotal
                     $(this).val(machineTotal);
                 }
+
+                // Recalculate and update subtotal
+                calculateSubtotal();
             });
 
+            // Initial calculation of subtotal
+            calculateSubtotal();
         });
         </script>
 
