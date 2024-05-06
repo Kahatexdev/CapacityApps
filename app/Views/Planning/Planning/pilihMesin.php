@@ -91,6 +91,17 @@ error_reporting(E_ALL); ?>
 
                         </div>
                     </div>
+                    <form id="saveForm" action="<?= base_url('planning/Savemesin/' . $id) ?>" method="POST">
+                        <div class="card-body p-3">
+                            <!-- Your table and other content here -->
+                            <input type="hidden" name="dataToSave" id="dataToSaveInput" value="">
+                            <div class="row mt-3">
+                                <div class="col text-start">
+                                    <button type="submit" class="btn btn-info">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>       
@@ -134,6 +145,53 @@ error_reporting(E_ALL); ?>
                 // Recalculate and update subtotal
                 calculateSubtotal();
             });
+
+            $('#saveForm').on('submit', function(e) {
+                // Here you can implement your save logic
+                // For example, you can iterate through DataTable rows and collect data
+                var dataToSave = [];
+                table.rows().every(function() {
+                    var inputMachine = parseInt($(this.node()).find('.input-machine').val().trim());
+                    if (inputMachine !== 0) { // Exclude rows with zero inputMachine values
+                        var rowData = this.data();
+                        dataToSave.push([
+                            rowData[0], // Column 0
+                            rowData[1], // Column 1
+                            rowData[3], // Column 3
+                            inputMachine, // Column 5
+                        ]);
+                    }
+                });
+
+                // Calculate the required subtotal based on the percentage
+                var requiredPercentage = 80; // 80% required
+                var machineRequirement = <?= $mesin; ?>; // Total machine requirement
+                var subtotal = parseInt($('#dataTable tfoot .subtotal-column').text());
+                var requiredSubtotal = (requiredPercentage / 100) * machineRequirement;
+
+                // Check if the subtotal meets the required percentage
+                if (subtotal < requiredSubtotal) {
+                    // Display error message with the minimum required machine value
+                    var minimumRequiredMachine = Math.ceil(machineRequirement*requiredPercentage/100);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validation Error!',
+                        html: 'Booking requires at least <strong>' + minimumRequiredMachine + ' Machines</strong>, which is 80% of the total machine requirement <strong>' + machineRequirement + ' Machines</strong>.',
+                    });
+                    e.preventDefault(); // Prevent form submission
+                } else if (isNaN(subtotal)) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Error!',
+                        text: 'There was an error calculating the minimum required machines. Please check the data.',
+                    });
+                    e.preventDefault(); // Prevent form submission
+                } else {
+                    // Serialize the dataToSave array and set it as the value of the hidden input field
+                    $('#dataToSaveInput').val(JSON.stringify(dataToSave));
+                }
+            });
+
 
             // Initial calculation of subtotal
             calculateSubtotal();
