@@ -203,4 +203,24 @@ class PlanningController extends BaseController
         return view('Planning/Planning/detailPlanning', $data);
 
     }
+
+    public function pickmachine($id,$jarum){
+        $datamc = $this->KebutuhanMesinModel->listmachine($id,$jarum);
+        
+        $data = [
+            'title' => 'Pick Machine',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => 'active',
+            'active6' => '',
+            'active7' => '',
+            'datamc' => $datamc,
+            'id' => $id,
+            'jarum' => $jarum,
+        ];
+        return view('Planning/Planning/pilihMesin',$data);
+
+    }
 }

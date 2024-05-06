@@ -138,6 +138,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     //planning
     $routes->get('dataplanning','PlanningController::listplanning');
     $routes->post('detaillistplanning/(:any)','PlanningController::detaillistplanning/$1');
+    $routes->post('pickmachine/(:any)/(:any)','PlanningController::pickmachine/$1/$2');
 });
 
 

@@ -90,9 +90,17 @@ class KebutuhanMesinModel extends Model
         ->findAll();
     }
     public function jarumPlan($judul){
-        return $query = $this->select('created_at,id,jarum,mesin,jumlah_hari,tanggal_awal,tanggal_akhir')
+        return $query = $this->select('created_at,id,jarum,mesin,jumlah_hari,tanggal_awal,tanggal_akhir,deskripsi')
         ->where('judul',$judul)
         ->groupBy('judul')
+        ->findAll();
+    }
+    public function listmachine($id,$jarum){
+        return $query = $this->select('data_mesin.area,data_mesin.jarum,sum(data_mesin.total_mc) as total_mc,data_mesin.brand,sum(data_mesin.mesin_jalan) as mesin_jalan,pu,kebutuhan_mesin.id,kebutuhan_mesin.mesin as keb_mc,kebutuhan_mesin.deskripsi')
+        ->from('data_mesin')
+        ->where('data_mesin.jarum',$jarum)
+        ->groupBy('data_mesin.brand,data_mesin.jarum,data_mesin.area,data_mesin.pu')
+        ->orderBy('total_mc','Desc')
         ->findAll();
     }
 }
