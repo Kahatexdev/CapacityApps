@@ -32,11 +32,16 @@ error_reporting(E_ALL); ?>
             <div class="card">
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
-                        <h5>
-                            List Data Booking from Capacity
-                        </h5>
+                    <h5>
+                        List Data Machine Choosen by Needle <strong style="color: orange;"><?= $jarum ?></strong>
+                    </h5>
+                    <h5>
+                        Title <strong style="color: orange;"><?= $judul ?></strong>
+                    </h5>
+                    <h5>
+                        Machine Requirement <strong style="color: orange;"><?= $mesin ?></strong>
+                    </h5>
                     </div>
-                    
                 </div>
                 <div class="card-body p-3">
                     <div class="row">
@@ -44,27 +49,19 @@ error_reporting(E_ALL); ?>
                             <table id="dataTable" class="display compact striped" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Planning Date Creation</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Title Planning</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Needle Total</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Machine Usage</th>
-                                        <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Area</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Needle</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Brand</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Machine On</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($data as $order) : ?>
+                                    <?php foreach ($datamc as $order) : ?>
                                         <tr>
-                                            <td class="text-sm"><?= date('d-M-y', strtotime($order['created_at'])); ?></td>
-                                            <td class="text-sm"><?= $order['judul']; ?></td>
-                                            <td class="text-sm"><?= $order['jarum']; ?> Needle</td>
-                                            <td class="text-sm"><?= $order['mesin']; ?> Mc</td>
-                                            <td class="text-sm">
-                                                <form method="GET" action="<?= base_url('planning/detaillistplanning/'.$order['judul']); ?>">
-                                                    <button type="submit" class="btn btn-info btn-sm">
-                                                        Detail
-                                                    </button>
-                                                </form>
-                                            </td>
+                                            <td class="text-sm"><?= $order['area']; ?></td>
+                                            <td class="text-sm"><?= $order['jarum']; ?></td>
+                                            <td class="text-sm"><?= $order['brand']; ?></td>
+                                            <td class="text-sm"><?= $order['mc_nyala']; ?> Mc</td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
