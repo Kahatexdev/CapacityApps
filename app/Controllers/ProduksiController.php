@@ -68,7 +68,7 @@ class ProduksiController extends BaseController
             'Produksi' => $dataProduksi,
             'bulan' => $month
         ];
-        return view('Capacity/Produksi/produksi', $data);
+        return view('User/produksi', $data);
     }
     public function produksiPerArea($area)
     {
@@ -94,7 +94,7 @@ class ProduksiController extends BaseController
         if ($file->isValid() && !$file->hasMoved()) {
             $spreadsheet = IOFactory::load($file);
             $data = $spreadsheet->getActiveSheet();
-            $startRow = 2; // Ganti dengan nomor baris mulai
+            $startRow = 18; // Ganti dengan nomor baris mulai
             foreach ($spreadsheet->getActiveSheet()->getRowIterator($startRow) as $row) {
                 $cellIterator = $row->getCellIterator();
                 $cellIterator->setIterateOnlyExistingCells(false);
@@ -103,14 +103,12 @@ class ProduksiController extends BaseController
                     $data[] = $cell->getValue();
                 }
                 if (!empty($data)) {
-                    $no_model = $data[1];
-                    $del = $data[5];
-                    $unixTime = ($del - 25569) * 86400;
-                    $delivery = date('Y-m-d', $unixTime);
+                    $no_model = $data[20];
                     $style = $data[7];
+                    $no_order = $data[19];
                     $validate = [
                         'no_model' =>  $no_model,
-                        'delivery' => $delivery,
+                        'no_order' => $no_order,
                         'style' => $style
                     ];
                     $idAps = $this->ApsPerstyleModel->getId($validate);

@@ -13,7 +13,7 @@ class KebutuhanMesinModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'judul', 'jarum', 'mesin', 'jumlah_hari', 'tanggal_awal', 'tanggal_akhir', 'created_at', 'updated_at', 'deskripsi'];
+    protected $allowedFields    = ['id', 'judul', 'jarum', 'mesin', 'jumlah_hari', 'tanggal_awal', 'tanggal_akhir', 'start_mesin', 'stop_mesin', 'created_at', 'updated_at', 'deskripsi'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -84,23 +84,26 @@ class KebutuhanMesinModel extends Model
             return null;
         }
     }
-    public function listPlan(){
+    public function listPlan()
+    {
         return $query = $this->select('created_at,judul,count(jarum) as jarum,sum(mesin) as mesin,max(jumlah_hari) as jumlah_hari')
-        ->groupBy('judul,jarum')
-        ->findAll();
+            ->groupBy('judul,jarum')
+            ->findAll();
     }
-    public function jarumPlan($judul){
+    public function jarumPlan($judul)
+    {
         return $query = $this->select('created_at,id,jarum,mesin,jumlah_hari,tanggal_awal,tanggal_akhir,deskripsi')
-        ->where('judul',$judul)
-        ->groupBy('judul')
-        ->findAll();
+            ->where('judul', $judul)
+            ->groupBy('judul')
+            ->findAll();
     }
-    public function listmachine($id,$jarum){
+    public function listmachine($id, $jarum)
+    {
         return $query = $this->select('data_mesin.area,data_mesin.jarum,sum(data_mesin.total_mc) as total_mc,data_mesin.brand,sum(data_mesin.mesin_jalan) as mesin_jalan,pu,kebutuhan_mesin.id,kebutuhan_mesin.mesin as keb_mc,kebutuhan_mesin.deskripsi')
-        ->from('data_mesin')
-        ->where('data_mesin.jarum',$jarum)
-        ->groupBy('data_mesin.brand,data_mesin.jarum,data_mesin.area,data_mesin.pu')
-        ->orderBy('total_mc','Desc')
-        ->findAll();
+            ->from('data_mesin')
+            ->where('data_mesin.jarum', $jarum)
+            ->groupBy('data_mesin.brand,data_mesin.jarum,data_mesin.area,data_mesin.pu')
+            ->orderBy('total_mc', 'Desc')
+            ->findAll();
     }
 }

@@ -136,13 +136,20 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('allmachine', 'MesinController::allmachine');
 
     //planning
-    $routes->get('dataplanning','PlanningController::listplanning');
-    $routes->post('detaillistplanning/(:any)','PlanningController::detaillistplanning/$1');
-    $routes->post('pickmachine/(:any)/(:any)','PlanningController::pickmachine/$1/$2');
-    $routes->post('Savemesin/(:any)','PlanningController::savemachine/$1');
+    $routes->get('dataplanning', 'PlanningController::listplanning');
+    $routes->post('detaillistplanning/(:any)', 'PlanningController::detaillistplanning/$1');
+    $routes->post('pickmachine/(:any)/(:any)', 'PlanningController::pickmachine/$1/$2');
+    $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
 });
 
 
 //aps
 $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
+});
+
+// user
+$routes->group('/user', ['filter' => 'user'], function ($routes) {
+    $routes->get('', 'UserController::index');
+    $routes->get('produksi', 'ProduksiController::produksi');
+    $routes->get('importProduksi', 'ProduksiController::importProduksi');
 });

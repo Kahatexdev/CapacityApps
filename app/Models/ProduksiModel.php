@@ -6,13 +6,13 @@ use CodeIgniter\Model;
 
 class ProduksiModel extends Model
 {
-    protected $table            = 'data_produksi';
+    protected $table            = 'produksi';
     protected $primaryKey       = 'id_produksi';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_produksi', 'idapsperstyle', 'tgl_produksi', 'qty_produksi'];
+    protected $allowedFields    = ['id_produksi', 'idapsperstyle', 'tgl_produksi', 'qty_produksi', 'tgl_erp', 'bagian', 'storage_awal', 'storage_akhir', 'bs_prod', 'katefori_bs', 'no_box', 'no_label', 'no_mesin', 'created_at', 'updated_at', 'admin', 'kode_shipment'];
 
     protected bool $allowEmptyInserts = false;
 
