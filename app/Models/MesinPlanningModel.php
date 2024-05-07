@@ -68,5 +68,10 @@ class MesinPlanningModel extends Model
             return false; // No data to insert
         }
     }
-
+    public function getDataPlanning($id){
+        return $this->select('mesin_planning.*, data_mesin.*')
+            ->join('data_mesin', 'mesin_planning.jarum = data_mesin.jarum AND mesin_planning.brand = data_mesin.brand AND mesin_planning.area = data_mesin.area')
+            ->where('mesin_planning.id_kebutuhan_mesin', $id)
+            ->findAll();
+    }
 }

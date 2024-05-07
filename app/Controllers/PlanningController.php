@@ -245,7 +245,7 @@ class PlanningController extends BaseController
 
     public function viewdetail($id){
 
-        $datamc = $this->MesinPlanningModel->where('id_kebutuhan_mesin', $id)->findAll();
+        $datamc = $this->MesinPlanningModel->getDataPlanning($id);
         $judulData = $this->KebutuhanMesinModel->find($id);
         $judul = $judulData ? $judulData['judul'] : null;
         $mesin = $judulData ? $judulData['mesin'] : null;

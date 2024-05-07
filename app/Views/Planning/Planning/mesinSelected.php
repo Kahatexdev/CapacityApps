@@ -1,3 +1,18 @@
+<?php
+// Initialize variables
+$total_mc_nyala = 0;
+$percentage = 0;
+$total_mc = 0;
+
+// Calculate total_mc_nyala and percentage
+foreach ($datamc as $order) {
+    $total_mc_nyala += $order['mc_nyala'];
+    $total_mc += $order['total_mc'];
+}
+if ($mesin != 0) { // Avoid division by zero error
+    $percentage = ($total_mc_nyala / $mesin) * 100;
+}
+?>
 <?php ini_set('display_errors', 1);
 error_reporting(E_ALL); ?>
 <?php $this->extend('Planning/layout'); ?>
@@ -42,6 +57,9 @@ error_reporting(E_ALL); ?>
                         Machine Requirement <strong style="color: orange;"><?= $mesin ?></strong>
                     </h5>
                     </div>
+                    <div>
+                        <h4 class="card-title">Machine Utilization: <?= number_format($percentage, 2); ?>%</h4>
+                    </div>
                 </div>
                 <div class="card-body p-3">
                     <div class="row">
@@ -52,7 +70,10 @@ error_reporting(E_ALL); ?>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Area</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Needle</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Brand</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Machine On</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Total Machine</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Current Running Machine</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Planning Machine</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Percentage Planning Machine</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -61,19 +82,31 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm"><?= $order['area']; ?></td>
                                             <td class="text-sm"><?= $order['jarum']; ?></td>
                                             <td class="text-sm"><?= $order['brand']; ?></td>
-                                            <td class="text-sm"><?= $order['mc_nyala']; ?> Mc</td>
+                                            <td class="text-sm"><?= $order['total_mc']; ?> Mc</td>
+                                            <td class="text-sm"><?= $order['mesin_jalan']; ?> Mc</td>
+                                            <td class="text-sm"><strong class="font-weight-bold" style="color: green;"><?= $order['mc_nyala']; ?> Mc</strong></td>
+                                            <?php 
+                                            $percentage = ($order['mc_nyala'] / $order['total_mc']) * 100; // Calculate percentage
+                                            ?>
+                                            <td class="text-sm"><strong class="font-weight-bold" style="color: green;"><?= number_format($percentage, 2); ?> %</strong></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" class="text-end font-weight-bold">Total:</td>
+                                        <td><?= $total_mc; ?> Mc</td>
+                                        <td></td>
+                                        <td><strong class="font-weight-bold" style="color: green;"><?= $total_mc_nyala; ?> Mc</strong></td>
+                                        <td><strong class="font-weight-bold" style="color: green;"><?= number_format(($total_mc_nyala / $total_mc) * 100, 2); ?> %</strong></td>
+                                    </tr>
+                                </tfoot>
                             </table>
-
                         </div>
                     </div>
                 </div>
             </div>
         </div>       
-
-
         <script>
             $(document).ready(function() {
                 $('#dataTable').DataTable();
