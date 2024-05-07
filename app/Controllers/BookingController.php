@@ -482,7 +482,7 @@ class BookingController extends BaseController
             'active3' => '',
             'active4' => '',
             'active5' => '',
-
+            'active6' => '',
             'Jarum' => $dataJarum,
             'TotalMesin' => $totalMesin,
         ];
