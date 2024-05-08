@@ -187,12 +187,15 @@ class OrderModel extends Model
             ->findAll();
     }
 
-    public function getTurunOrder(){
-        return $this->select('data_model.kd_buyer_order,YEARWEEK(data_model.created_at) as week_number, sum(apsperstyle.qty) as qty_turun')
-        ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel')
-        ->groupBy('week_number,kd_buyer_order')
-        ->orderBy('week_number','Desc')
-        ->findAll();
+    public function getTurunOrder()
+    {
+        $query = $this->select('data_model.kd_buyer_order, YEARWEEK(data_model.created_at, 3) as week_number, SUM(apsperstyle.qty) as qty_turun')
+            ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel')
+            ->groupBy(['week_number', 'kd_buyer_order'])
+            ->orderBy('week_number', 'DESC')
+            ->findAll();
+
+        return $query;
     }
 
     public function chartTurun()
