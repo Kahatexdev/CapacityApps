@@ -12,6 +12,7 @@ use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use App\Models\LiburModel;
 use App\Models\KebutuhanMesinModel;
+use App\Models\MesinPlanningModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
 
@@ -28,6 +29,7 @@ class PlanningController extends BaseController
     protected $ApsPerstyleModel;
     protected $liburModel;
     protected $KebutuhanMesinModel;
+    protected $MesinPlanningModel;
 
     public function __construct()
     {
@@ -39,6 +41,7 @@ class PlanningController extends BaseController
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         $this->liburModel = new LiburModel();
         $this->KebutuhanMesinModel = new KebutuhanMesinModel();
+        $this->MesinPlanningModel = new MesinPlanningModel();
         if ($this->filters   = ['role' => ['planning']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -230,8 +233,39 @@ class PlanningController extends BaseController
     }
 
     public function savemachine($id){
-        $request = service('request');
-        $dataToSave = json_decode($request->getPost('dataToSave'), true);
-        dd($dataToSave);
+        $data = $this->MesinPlanningModel->savemachine($id);
+        $judulData = $this->KebutuhanMesinModel->find($id);
+        $judul = $judulData ? $judulData['judul'] : null;
+        if ($data) {
+            return redirect()->to(base_url('planning/detaillistplanning/'.$judul.'/'.$id))->withInput()->with('success', 'Success Pick Machine Area');
+        } else {
+            return redirect()->to(base_url('planning/detaillistplanning/'.$judul.'/'.$id))->withInput()->with('error', 'Error Pick Machine Area');
+        }
+    }
+
+    public function viewdetail($id){
+
+        $datamc = $this->MesinPlanningModel->getDataPlanning($id);
+        $judulData = $this->KebutuhanMesinModel->find($id);
+        $judul = $judulData ? $judulData['judul'] : null;
+        $mesin = $judulData ? $judulData['mesin'] : null;
+        $jarum = $judulData ? $judulData['jarum'] : null;
+        $data = [
+            'title' => 'View Detail Machine Choosen',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => 'active',
+            'active6' => '',
+            'active7' => '',
+            'datamc' => $datamc,
+            'judul' => $judul,
+            'mesin' => $mesin,
+            'jarum' => $jarum,
+
+        ];
+        return view('Planning/Planning/mesinSelected',$data);
+
     }
 }

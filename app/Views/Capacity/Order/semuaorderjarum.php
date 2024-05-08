@@ -84,7 +84,7 @@
                                 <tr>
                                 <td class="text-xs"><?= date('d-M-y', strtotime($order->created_at)); ?></td>
                                     <td class="text-xs"><?= $order->kd_buyer_order; ?></td>
-                                    <td class="text-xs"><?= $order->model_machine; ?></td>
+                                    <td class="text-xs"><?= $order->no_model; ?></td>
                                     <td class="text-xs"><?= $order->no_order; ?></td>
                                     <td class="text-xs"><?= $order->machinetypeid; ?></td>
                                     <td class="text-xs"><?= $order->product_type; ?></td>

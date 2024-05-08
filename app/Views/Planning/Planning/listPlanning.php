@@ -59,7 +59,7 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm"><?= $order['jarum']; ?> Needle</td>
                                             <td class="text-sm"><?= $order['mesin']; ?> Mc</td>
                                             <td class="text-sm">
-                                                <form method="POST" action="<?= base_url('planning/detaillistplanning/'.$order['judul']); ?>">
+                                                <form method="GET" action="<?= base_url('planning/detaillistplanning/'.$order['judul']); ?>">
                                                     <button type="submit" class="btn btn-info btn-sm">
                                                         Detail
                                                     </button>

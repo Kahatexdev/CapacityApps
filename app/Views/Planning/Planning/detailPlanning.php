@@ -50,6 +50,7 @@ error_reporting(E_ALL); ?>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Stop</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Days</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Order Status</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Machine Plan</th>
                                         <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Choose Machine</th>
                                     </tr>
                                 </thead>
@@ -63,15 +64,26 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm"><?= date('d-M-y', strtotime($order['tanggal_akhir'])); ?></td>
                                             <td class="text-sm"><?= $order['jumlah_hari']; ?> Days</td>
                                             <td class="text-sm"><?= $order['deskripsi']; ?></td>
+                                            <td class="text-sm"><?= $order['mc_nyala'] !== null ? $order['mc_nyala'] . ' Mc' : 'Mc not choosen yet'; ?></td>
                                             <td class="text-sm">
-                                                <form method="POST" action="<?= base_url('planning/pickmachine/'.$order['id'].'/'.$order['jarum']); ?>">
-                                                    <input type="hidden" name="mesin" value="<?= $order['mesin']; ?>">
-                                                    <input type="hidden" name="deskripsi" value="<?= $order['deskripsi']; ?>">
-                                                    <button type="submit" class="btn btn-info btn-sm">
-                                                        Pick Machine
-                                                    </button>
-                                                </form>
+                                                <?php if ($order['mc_nyala'] === null): ?>
+                                                    <form method="POST" action="<?= base_url('planning/pickmachine/'.$order['id'].'/'.$order['jarum']); ?>">
+                                                        <input type="hidden" name="mesin" value="<?= $order['mesin']; ?>">
+                                                        <input type="hidden" name="deskripsi" value="<?= $order['deskripsi']; ?>">
+                                                        <button type="submit" class="btn btn-info btn-sm">
+                                                            Pick Machine
+                                                        </button>
+                                                    </form>
+                                                <?php else: ?>
+                                                    <form method="POST" action="<?= base_url('planning/viewdetail/'.$order['id']); ?>">
+                                                        <button type="submit" class="btn btn-primary btn-sm">
+                                                            View Machine Details
+                                                        </button>
+                                                    </form>
+                                                <?php endif; ?>
                                             </td>
+
+
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>

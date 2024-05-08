@@ -36,6 +36,7 @@
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Buyer</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Model</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Order</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Needle</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Desc</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Seam</th>
@@ -51,8 +52,9 @@
                                 <tr>
                                     <td class="text-xs"><?= date('d-M-y', strtotime($order->created_at)); ?></td>
                                     <td class="text-xs"><?= $order->kd_buyer_order; ?></td>
-                                    <td class="text-xs"><?= $order->no_order; ?></td>
                                     <td class="text-xs"><?= $order->no_model; ?></td>
+                                    <td class="text-xs"><?= $order->no_order; ?></td>
+                                    <td class="text-xs"><?= $order->machinetypeid; ?></td>
                                     <td class="text-xs"><?= $order->product_type; ?></td>
                                     <td class="text-xs"><?= $order->description; ?></td>
                                     <td class="text-xs"><?= $order->seam; ?></td>
