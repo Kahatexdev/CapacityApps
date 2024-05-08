@@ -18,6 +18,7 @@ class KebutuhanMesin extends BaseController
     }
     public function inputMesinBooking()
     {
+        $desk = $this->request->getPost("deskripsi");
         $data = [
             'judul' => $this->request->getPost("judul"),
             'jarum' => $this->request->getPost("jarum"),
@@ -27,14 +28,14 @@ class KebutuhanMesin extends BaseController
             'tanggal_akhir' => $this->request->getPost("tgl_akhir"),
             'start_mesin' => $this->request->getPost("startMc"),
             'stop_mesin' => $this->request->getPost("stopMc"),
-            'deskripsi' => 'BOOKING'
+            'deskripsi' => $this->request->getPost("deskripsi")
         ];
         $insert = $this->kebMC->insert($data);
 
         if ($insert) {
-            return redirect()->to(base_url('/capacity/planningbooking'))->withInput()->with('success', 'Data Berhasil Di input');
+            return redirect()->to(base_url('/capacity'))->withInput()->with('success', 'Data Berhasil Di input');
         } else {
-            return redirect()->to(base_url('/capacity/planningbooking'))->withInput()->with('error', 'Data Gagal Di input');
+            return redirect()->to(base_url('/capacity'))->withInput()->with('error', 'Data Gagal Di input');
         }
     }
 }

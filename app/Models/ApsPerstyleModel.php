@@ -12,7 +12,7 @@ class ApsPerstyleModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['idapsperstyle', 'machinetypeid', 'mastermodel', 'size', 'delivery', 'qty', 'sisa', 'seam', 'factory', 'production_unit', 'smv','no_order'];
+    protected $allowedFields    = ['idapsperstyle', 'machinetypeid', 'mastermodel', 'size', 'delivery', 'qty', 'sisa', 'seam', 'factory', 'production_unit', 'smv', 'no_order'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -128,7 +128,6 @@ class ApsPerstyleModel extends Model
         foreach ($results as $result) {
             $total_qty += $result['total_qty'] ?? 0;
         }
-
 
         return $total_qty;
     }

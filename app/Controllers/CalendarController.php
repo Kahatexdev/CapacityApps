@@ -186,7 +186,6 @@ class CalendarController extends BaseController
                 'htpl' => $this->ApsPerstyleModel->getPlanJarum($cek, "HT-pl") ?? 0,
 
             ];
-
             $weekCount++;
         }
         $get = [
@@ -227,7 +226,7 @@ class CalendarController extends BaseController
         foreach ($KebMesin as $kebutuhanMesin) {
             $totalKebutuhanMC += $kebutuhanMesin['kebutuhanMc']; // Adjust this line based on the structure of your data
         }
-        $stopMc = 0;
+        $stopmc = max(array_column($KebMesin, 'stopmc'));
         $data = [
             'active1' => '',
             'active2' => '',
@@ -245,9 +244,9 @@ class CalendarController extends BaseController
             'jarum' => $jarum,
             'jmlHari' => $maxHari,
             'title' => 'Planning Order',
-            'stopmc' => $stopMc,
+            'stopmc' => $stopmc,
+            'desk' => 'ORDER',
         ];
-
         return view('Capacity/Calendar/calendar', $data);
     }
     public function planBooking($jarum)
@@ -401,7 +400,7 @@ class CalendarController extends BaseController
         foreach ($KebMesin as $kebutuhanMesin) {
             $totalKebutuhanMC += $kebutuhanMesin['kebutuhanMc']; // Adjust this line based on the structure of your data
         }
-        $stopmc = max(array_column($KebMesin, 'smc'));
+        $stopmc = max(array_column($KebMesin, 'stopmc'));
         // Di sini Anda mungkin perlu memanggil model lain untuk mendapatkan data lain yang diperlukan
         $kategori = $this->productModel->getKategori();
 
@@ -423,7 +422,8 @@ class CalendarController extends BaseController
             'jarum' => $jarum,
             'jmlHari' => $maxHari,
             'totalKebutuhan' => $totalKebutuhanMC,
-            'stopmc' => $stopmc
+            'stopmc' => $stopmc,
+            'desk' => 'BOOKING',
         ];
         return view('Capacity/Calendar/calendar', $data);
     }
@@ -462,7 +462,7 @@ class CalendarController extends BaseController
             });
 
             $hasil = reset($result);
-            $hasil['smc'] = $smc; // Menyimpan nilai $smc ke dalam $hasil
+            $hasil['stopmc'] = $smc; // Menyimpan nilai $smc ke dalam $hasil
             return $hasil;
         }
     }
@@ -487,14 +487,17 @@ class CalendarController extends BaseController
             ];
         }
         if (!$value) {
-            $value =  ['kebutuhanMc' => 0, 'JumlahHari' => 0, 'delivery' => 0, 'type' => $type];
+            $value =  ['kebutuhanMc' => 0, 'JumlahHari' => 0, 'delivery' => 0, 'type' => $type, 'stopmc' => 0];
             return $value;
         } else {
             $kebutuhanMc = max(array_column($value, 'kebutuhanMc'));
+            $smc = max(array_column($value, 'delivery'));
             $result = array_filter($value, function ($val) use ($kebutuhanMc) {
+
                 return $val['kebutuhanMc'] == $kebutuhanMc;
             });
             $hasil = reset($result);
+            $hasil['stopmc'] = $smc;
             return $hasil;
         }
     }

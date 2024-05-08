@@ -67,6 +67,7 @@
                                 </div>
                                 <input type="date" value="<?= $start ?>" hidden name="tgl_awal">
                                 <input type="date" value="<?= $end ?>" hidden name="tgl_akhir">
+                                <input type="text" value="<?= $desk ?>" hidden name="deskripsi">
 
                             </div>
 
