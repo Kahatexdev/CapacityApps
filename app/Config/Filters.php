@@ -27,6 +27,7 @@ class Filters extends BaseConfig
         'capacity' => \App\Filters\CapacityAuth::class,
         'planning' => \App\Filters\PlanningAuth::class,
         'aps' => \App\Filters\ApsAuth::class,
+        'user' => \App\Filters\UserFilter::class,
 
     ];
 
@@ -78,6 +79,9 @@ class Filters extends BaseConfig
         ],
         'aps' => [
             'before' => ['aps/*'],
+        ],
+        'user' => [
+            'before' => ['user/*'],
         ],
     ];
 }

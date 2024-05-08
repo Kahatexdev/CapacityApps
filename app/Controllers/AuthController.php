@@ -34,6 +34,9 @@ class AuthController extends BaseController
             case 'aps':
                 return redirect()->to(base_url('/aps'));
                 break;
+            case 'user':
+                return redirect()->to(base_url('/user'));
+                break;
 
             default:
                 return redirect()->to(base_url('/login'))->withInput()->with('error', 'Invalid username or password');

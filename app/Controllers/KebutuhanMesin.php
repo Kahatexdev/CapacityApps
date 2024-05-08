@@ -25,6 +25,8 @@ class KebutuhanMesin extends BaseController
             'jumlah_hari' => $this->request->getPost("hari"),
             'tanggal_awal' => $this->request->getPost("tgl_awal"),
             'tanggal_akhir' => $this->request->getPost("tgl_akhir"),
+            'start_mesin' => $this->request->getPost("startMc"),
+            'stop_mesin' => $this->request->getPost("stopMc"),
             'deskripsi' => 'BOOKING'
         ];
         $insert = $this->kebMC->insert($data);
