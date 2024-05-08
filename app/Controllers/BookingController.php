@@ -340,10 +340,11 @@ class BookingController extends BaseController
                     $no_order = $data[18];
                     $tgl_booking = date('Y-m-d');
                     $product_type = $data[2];
+                    $sisa = $data[8];
                     $getIdProd = ['prodtype' => $product_type, 'jarum' => $jarum];
                     $idprod = $this->productModel->getId($getIdProd);
 
-                    if ($data[0] == null) {
+                    if ($data[5] == null) {
                         break;
                     } else {
                         $insert = [
