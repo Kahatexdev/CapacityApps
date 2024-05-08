@@ -12,7 +12,7 @@ class CancelModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id','id_booking','qty_cancel'];
+    protected $allowedFields    = ['id','id_booking','qty_cancel','alasan'];
 
     protected bool $allowEmptyInserts = false;
 

@@ -52,4 +52,10 @@ class ProductTypeModel extends Model
     {
         return $this->distinct()->select('keterangan')->findAll();
     }
+    public function getJarum($jarum)
+    {
+        return $this->select('product_type')
+        ->where('jarum',$jarum)
+        ->findAll();
+    }
 }

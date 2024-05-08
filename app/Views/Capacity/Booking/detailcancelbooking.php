@@ -59,7 +59,6 @@
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No PDK</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Booking</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Booking</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Cancel</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Reason</th>
                             </tr>
@@ -67,13 +66,12 @@
                         <tbody>
                             <?php foreach ($data as $bk) : ?>
                                 <tr>
-                                    <td class="text-xs"><?= $bk['tgl_terima_booking'] ?></td>
+                                    <td class="text-xs"><?= date('d-M-Y', strtotime($bk['tgl_terima_booking'])) ?></td>
                                     <td class="text-xs"><?= $bk['kd_buyer_booking'] ?></td>
                                     <td class="text-xs"><?= $bk['no_order'] ?></td>
                                     <td class="text-xs"><?= $bk['no_booking'] ?></td>
                                     <td class="text-xs"><?= round($bk['qty_booking']/24) ?> Dz</td>
                                     <td class="text-xs"><?= round($bk['sisa_booking']/24) ?> Dz</td>
-                                    <td class="text-xs"><?= $bk['status'] ?></td>
                                     <td class="text-xs"><?= round($bk['qty_cancel'] / 24)?> Dz</td>
                                     <td class="text-xs"><?= $bk['alasan'] ?></td>
                                 </tr>

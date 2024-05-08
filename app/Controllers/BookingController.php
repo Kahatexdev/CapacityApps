@@ -71,7 +71,7 @@ class BookingController extends BaseController
     }
     public function bookingPerJarum($jarum)
     {
-        $product = $this->productModel->findAll();
+        $product = $this->productModel->getJarum($jarum);
         $booking = $this->bookingModel->getDataPerjarum($jarum);
 
         $data = [
@@ -112,7 +112,7 @@ class BookingController extends BaseController
     public function bookingPerBulanJarumTampil($bulan, $tahun, $jarum)
     {
         $booking = $this->bookingModel->getDataPerjarumbulan($bulan, $tahun, $jarum);
-        $product = $this->productModel->findAll();
+        $product = $this->productModel->getJarum($jarum);
         $data = [
             'title' => 'Data Booking',
             'active1' => '',
@@ -143,7 +143,7 @@ class BookingController extends BaseController
         $shipment = $this->request->getPost("shipment");
         $qty = $this->request->getPost("qty");
         $product = $this->request->getPost("productType");
-        $idProduct = $this->productModel->getId($product);
+        $idProduct = $this->productModel->getId(['prodtype' => $product, 'jarum' => $jarum]);
         $buyer = $this->request->getPost("buyer");
         $leadTime = $this->request->getPost("lead");
 
@@ -409,19 +409,38 @@ class BookingController extends BaseController
     public function cancelbooking($idBooking)
     {
         $jarum = $this->request->getPost("jarum");
+        $sisa = $this->request->getPost("sisa_booking_remaining");
+        $qty_cancel = intval($this->request->getPost("qty_cancel"));
+        $alasan = $this->request->getPost("alasan");
+        
+        // Prepare data for insertion
         $insert = [
             "id_booking" => $idBooking,
-            "qty_cancel" => intval($this->request->getPost("sisa")),
+            "qty_cancel" => $qty_cancel,
+            "alasan" => $alasan,
         ];
-        $id = $idBooking;
-        $this->bookingModel->update($id, ['status' => 'Cancel Booking', 'sisa_booking' => 0]);
+
+        // Update booking status based on sisa quantity
+        if ($sisa == 0) {
+            // If sisa is 0, update status to 'Cancel Booking' and set sisa_booking to 0
+            $updateData = ['status' => 'Cancel Booking', 'sisa_booking' => 0];
+        } else {
+            // If sisa is not 0, update status to 'Active' and set sisa_booking to $sisa
+            $updateData = ['status' => 'Active', 'sisa_booking' => $sisa];
+        }
+
+        // Update booking status and insert cancellation data
+        $this->bookingModel->update($idBooking, $updateData);
         $input = $this->cancelModel->insert($insert);
+
+        // Redirect with success or error message
         if ($input) {
             return redirect()->to(base_url('capacity/databooking/' . $jarum))->withInput()->with('success', 'Bookingan Berhasil Di Cancel');
         } else {
-            return redirect()->to(base_url('capacity/databooking/' . $jarum))->withInput()->with('error', 'Gagal Cancek Booking');
+            return redirect()->to(base_url('capacity/databooking/' . $jarum))->withInput()->with('error', 'Gagal Cancel Booking');
         }
     }
+
     public function getCancelBooking()
     {
         $resultCancelBooking = $this->bookingModel->getCancelBooking();
@@ -510,7 +529,7 @@ class BookingController extends BaseController
     public function bookingPerBulanJarumTampilPlan($bulan, $tahun, $jarum)
     {
         $booking = $this->bookingModel->getDataPerjarumbulan($bulan, $tahun, $jarum);
-        $product = $this->productModel->findAll();
+        $product = $this->productModel->getJarum($jarum);
         $data = [
             'title' => 'Data Booking',
             'active1' => '',
@@ -530,9 +549,9 @@ class BookingController extends BaseController
     }
     public function bookingPerJarumPLan($jarum)
     {
-        $product = $this->productModel->findAll();
+        $product = $this->productModel->getJarum($jarum);
         $booking = $this->bookingModel->getDataPerjarum($jarum);
-
+        
         $data = [
             'title' => 'Data Booking',
             'active1' => '',

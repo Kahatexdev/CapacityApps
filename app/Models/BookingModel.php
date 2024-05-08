@@ -135,32 +135,29 @@ class BookingModel extends Model
         return $total_qty;
     }
 
-
-
     public function getCancelBooking()
     {
-        $allResults = $this
-            ->select('data_booking.*, SUM(data_cancel.qty_cancel) AS qty')
-            ->select('YEARWEEK(data_booking.updated_at) AS week_number')
+        $query = $this->select('data_booking.*, SUM(data_cancel.qty_cancel) AS qty')
+            ->select("CONCAT(YEAR(data_booking.updated_at), WEEK(data_booking.updated_at, 3)) AS week_number", false)
             ->join('data_cancel', 'data_booking.id_booking = data_cancel.id_booking')
-            ->where('status', 'Cancel Booking')
-            ->groupBy('data_booking.kd_buyer_booking, week_number')
-            ->orderBy('week_number', 'Desc')
+            ->groupBy(['data_booking.kd_buyer_booking', 'week_number'])
+            ->orderBy('week_number', 'DESC')
             ->findAll();
 
-        return $allResults;
+        return $query;
     }
 
     public function getDetailCancelBooking($week, $buyer)
     {
         $query = $this->select('data_booking.*, data_cancel.qty_cancel, data_cancel.alasan')
             ->join('data_cancel', 'data_booking.id_booking = data_cancel.id_booking')
-            ->where("CONCAT(YEAR(data_booking.updated_at), LPAD(WEEK(data_booking.updated_at), 2, '0'))", $week)
+            ->where("CONCAT(YEARWEEK(data_booking.updated_at, 3))", $week) // Use YEARWEEK() function
             ->where('data_booking.kd_buyer_booking', $buyer)
             ->findAll();
 
         return $query;
     }
+
 
 
     public function chartCancel()
@@ -170,7 +167,6 @@ class BookingModel extends Model
             ->select('SUM(data_cancel.qty_cancel) AS qty')
             ->select("DATE_FORMAT(data_booking.updated_at, '%M-%Y') AS month_year", false)
             ->join('data_cancel', 'data_booking.id_booking = data_cancel.id_booking')
-            ->where('status', 'Cancel Booking')
             ->groupBy('month_year')
             ->orderBy('month_year', 'ASC')
             ->findAll();

@@ -388,19 +388,28 @@
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <form action="<?= base_url('capacity/cancelbooking/' . $booking['id_booking']) ?>" method="post">
-                        <input type="text" name="jarum" id="" hidden value="<?= $booking['needle'] ?>">
-                        <input type="text" name="sisa" id="" hidden value="<?= $booking['sisa_booking'] ?>">
-                        <p>Are you sure you want to cancel the booking?</p>
+                <form action="<?= base_url('capacity/cancelbooking/' . $booking['id_booking']) ?>" method="post">
+                    <div class="modal-body">
+                        <label for="sisa_booking">Quantity Available:</label>
+                        <input type="text" name="sisa_booking" id="sisa_booking" class="form-control" value="<?= $booking['sisa_booking'] ?>" readonly>
+                        
+                        <label for="qty_cancel">Quantity to Cancel:</label>
+                        <input type="number" name="qty_cancel" id="qty_cancel" class="form-control" required min="1" oninput="calculateRemaining()">
+                        
+                        <label for="sisa_booking_remaining">Quantity Remaining:</label>
+                        <input type="text" name="sisa_booking_remaining" id="sisa_booking_remaining" class="form-control" value="<?= $booking['sisa_booking'] ?>" readonly>
+                        
                         <label for="alasan">Reason:</label>
-                        <input type="text" name="alasan" id="alasan" class="form-control" required>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn bg-gradient-danger">Cancel</button>
-                </div>
+                        <input type="text" name="alasan" id="alasan" class="form-control" style="margin-bottom: 10px;" required>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger">Cancel Booking</button>
+                    </div>
                 </form>
+
+
             </div>
         </div>
     </div>
@@ -493,7 +502,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn bg-gradient-info">Split</button>
+                <button type="button" class="btn btn-danger" id="cancelBookingBtn">Cancel Booking</button>
             </div>
             </form>
         </div>
@@ -507,8 +516,6 @@
         $('#dataTable').DataTable();
         $('#dataTable1').DataTable();
     });
-</script>
-<script>
     function hitungJumlahHari() {
         var opdString = document.getElementById("opd").value
         var shipmentString = document.getElementById("shipment").value
@@ -541,6 +548,45 @@
         }
 
     }
+    function calculateRemaining() {
+        var availableQuantity = parseInt(document.getElementById("sisa_booking").value);
+        var quantityToCancel = parseInt(document.getElementById("qty_cancel").value);
+        
+        // Check if quantity to cancel exceeds available quantity
+        if (quantityToCancel > availableQuantity) {
+            // Show SweetAlert error message
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Quantity to cancel cannot exceed available quantity.',
+            });
+            
+            // Reset quantity to cancel to available quantity
+            document.getElementById("qty_cancel").value = availableQuantity;
+            quantityToCancel = availableQuantity; // Reset quantity to cancel
+        }
+        
+        var remainingQuantity = availableQuantity - quantityToCancel;
+        document.getElementById("sisa_booking_remaining").value = remainingQuantity;
+    }
+    function cancelBooking() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You are about to cancel this booking.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, cancel it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // If confirmed, submit the form
+                document.querySelector('form').submit();
+            }
+        });
+    }
+
+    document.getElementById('cancelBookingBtn').addEventListener('click', cancelBooking);
 </script>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <?php $this->endSection(); ?>
