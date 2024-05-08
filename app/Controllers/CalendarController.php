@@ -58,6 +58,7 @@ class CalendarController extends BaseController
         $dataJarum = $this->jarumModel->getJarum();
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $kebutuhanMC = $this->kebMc->getOrder();
+        $stopMc = 0;
         $data = [
             'title' => 'Planning Order',
             'active1' => '',
@@ -70,7 +71,8 @@ class CalendarController extends BaseController
             'Jarum' => $dataJarum,
             'TotalMesin' => $totalMesin,
             'DaftarLibur' => $holidays,
-            'kebutuhanMc' => $kebutuhanMC
+            'kebutuhanMc' => $kebutuhanMC,
+            'stopMc' => $stopMc,
         ];
         return view('Capacity/Calendar/index', $data);
     }
@@ -225,8 +227,8 @@ class CalendarController extends BaseController
         foreach ($KebMesin as $kebutuhanMesin) {
             $totalKebutuhanMC += $kebutuhanMesin['kebutuhanMc']; // Adjust this line based on the structure of your data
         }
+        $stopMc = 0;
         $data = [
-            'title' => 'Capacity System',
             'active1' => '',
             'active2' => '',
             'active3' => '',
@@ -242,7 +244,8 @@ class CalendarController extends BaseController
             'end' => $akhir,
             'jarum' => $jarum,
             'jmlHari' => $maxHari,
-            'title' => 'Planning Order'
+            'title' => 'Planning Order',
+            'stopmc' => $stopMc,
         ];
 
         return view('Capacity/Calendar/calendar', $data);
