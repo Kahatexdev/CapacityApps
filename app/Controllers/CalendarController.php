@@ -539,7 +539,9 @@ class CalendarController extends BaseController
             }
             $groupedData[$judul][] = [
                 'jarum' => $val['jarum'],
-                'mesin' => $val['mesin']
+                'mesin' => $val['mesin'],
+                'startmc' => $val['start_mesin'],
+                'stopmc' => $val['stop_mesin']
             ];
             $jumlahMc += (int)$val['mesin'];
         }
@@ -583,7 +585,9 @@ class CalendarController extends BaseController
             }
             $groupedData[$judul][] = [
                 'jarum' => $val['jarum'],
-                'mesin' => $val['mesin']
+                'mesin' => $val['mesin'],
+                'startmc' => $val['start_mesin'],
+                'stopmc' => $val['stop_mesin']
             ];
             $jumlahMc += (int)$val['mesin'];
         }

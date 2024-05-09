@@ -63,6 +63,8 @@
                             <tr class="text-center text-white">
                                 <th class="text-white">Jarum</th>
                                 <th class="text-white">Kebutuhan Mesin</th>
+                                <th class="text-white">Start Mesin</th>
+                                <th class="text-white">Stop Mesin</th>
                             </tr>
 
                         </thead>
@@ -75,6 +77,12 @@
                                         </td>
                                         <td>
                                             <?= $key['mesin'] ?>
+                                        </td>
+                                        <td>
+                                            <?= $key['startmc'] ?>
+                                        </td>
+                                        <td>
+                                            <?= $key['stopmc'] ?>
                                         </td>
 
                                     </tr>
