@@ -33,7 +33,7 @@ class ProduksiController extends BaseController
         $this->produksiModel = new ProduksiModel();
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
-        if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
+        if ($this->filters   = ['role' => ['capacity'], 'role' => ['user']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
         $this->isLogedin();
@@ -142,5 +142,30 @@ class ProduksiController extends BaseController
         } else {
             return redirect()->to(base_url('/capacity/dataproduksi'))->with('error', 'No data found in the Excel file');
         }
+    }
+
+    public function viewProduksi()
+    {
+        $bulan = date('m');
+        $month = date('F');
+        $totalMesin = $this->jarumModel->getArea();
+        $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
+        $pdkProgress = $this->ApsPerstyleModel->getProgress();
+        $data = [
+            'title' => 'Data Produksi',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => 'active',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+
+            'Area' => $totalMesin,
+            'Produksi' => $dataProduksi,
+            'bulan' => $month,
+            'progress' => $pdkProgress
+        ];
+        return view('Capacity/Produksi/produksi', $data);
     }
 }

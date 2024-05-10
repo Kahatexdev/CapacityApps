@@ -174,89 +174,29 @@ class ApsPerstyleModel extends Model
 
         return $this->get()->getResultArray();
     }
-    public function sneakerCalc($cek)
-    {
-        $this->select('delivery, SUM(sisa) AS sisa, 
-       DATEDIFF(delivery, CURDATE()) - 
-       (SELECT COUNT(tanggal) FROM data_libur WHERE tanggal BETWEEN CURDATE() AND apsperstyle.delivery)-3 AS totalhari,
-       master_product_type.keterangan');
-        $this->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'left');
-        $this->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
-        $this->where('apsperstyle.machinetypeid', $cek['jarum'])
-            ->where('apsperstyle.delivery >=', $cek['start'])
-            ->where('apsperstyle.delivery <=', $cek['end'])
-            ->where('master_product_type.keterangan', 'Sneaker');
-        $this->where('apsperstyle.sisa >', 0);
-        $this->groupBy('apsperstyle.delivery, master_product_type.keterangan');
 
-        return $this->get()->getResultArray();
-    }
-    public function kneeCalc($cek)
+    public function getProgress()
     {
-        $this->select('delivery, SUM(sisa) AS sisa, 
-       DATEDIFF(delivery, CURDATE()) - 
-       (SELECT COUNT(tanggal) FROM data_libur WHERE tanggal BETWEEN CURDATE() AND apsperstyle.delivery)-3 AS totalhari,
-       master_product_type.keterangan');
-        $this->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'left');
-        $this->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
-        $this->where('apsperstyle.machinetypeid', $cek['jarum'])
-            ->where('apsperstyle.delivery >=', $cek['start'])
-            ->where('apsperstyle.delivery <=', $cek['end'])
-            ->where('master_product_type.keterangan', 'Knee High');
-        $this->where('apsperstyle.sisa >', 0);
-        $this->groupBy('apsperstyle.delivery, master_product_type.keterangan');
+        $res = $this->select('mastermodel, SUM(qty) as target, SUM(sisa) as remain')
+            ->groupBy('mastermodel')
+            ->get()
+            ->getResultArray();
 
-        return $this->get()->getResultArray();
-    }
-    public function footiesCalc($cek)
-    {
-        $this->select('delivery, SUM(sisa) AS sisa, 
-       DATEDIFF(delivery, CURDATE()) - 
-       (SELECT COUNT(tanggal) FROM data_libur WHERE tanggal BETWEEN CURDATE() AND apsperstyle.delivery)-3 AS totalhari,
-       master_product_type.keterangan');
-        $this->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'left');
-        $this->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
-        $this->where('apsperstyle.machinetypeid', $cek['jarum'])
-            ->where('apsperstyle.delivery >=', $cek['start'])
-            ->where('apsperstyle.delivery <=', $cek['end'])
-            ->where('master_product_type.keterangan', 'Footies');
-        $this->where('apsperstyle.sisa >', 0);
-        $this->groupBy('apsperstyle.delivery, master_product_type.keterangan');
+        $reset = [];
+        foreach ($res as $data) {
+            $produksi = ($data['target'] - $data['remain']) / 24;
+            $target = $data['target'] / 24;
 
-        return $this->get()->getResultArray();
-    }
-    public function shaftlessCalc($cek)
-    {
-        $this->select('delivery, SUM(sisa) AS sisa, 
-       DATEDIFF(delivery, CURDATE()) - 
-       (SELECT COUNT(tanggal) FROM data_libur WHERE tanggal BETWEEN CURDATE() AND apsperstyle.delivery)-3 AS totalhari,
-       master_product_type.keterangan');
-        $this->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'left');
-        $this->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
-        $this->where('apsperstyle.machinetypeid', $cek['jarum'])
-            ->where('apsperstyle.delivery >=', $cek['start'])
-            ->where('apsperstyle.delivery <=', $cek['end'])
-            ->where('master_product_type.keterangan', 'Shaftless');
-        $this->where('apsperstyle.sisa >', 0);
-        $this->groupBy('apsperstyle.delivery, master_product_type.keterangan');
-
-        return $this->get()->getResultArray();
-    }
-    public function tightCalc($cek)
-    {
-        $this->select('delivery, SUM(sisa) AS sisa, 
-       DATEDIFF(delivery, CURDATE()) - 
-       (SELECT COUNT(tanggal) FROM data_libur WHERE tanggal BETWEEN CURDATE() AND apsperstyle.delivery)-3 AS totalhari,
-       master_product_type.keterangan');
-        $this->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'left');
-        $this->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
-        $this->where('apsperstyle.machinetypeid', $cek['jarum'])
-            ->where('apsperstyle.delivery >=', $cek['start'])
-            ->where('apsperstyle.delivery <=', $cek['end'])
-            ->where('master_product_type.keterangan', 'Tight');
-        $this->where('apsperstyle.sisa >', 0);
-        $this->groupBy('apsperstyle.delivery, master_product_type.keterangan');
-
-        return $this->get()->getResultArray();
+            $persen = ($produksi / $target) * 100;
+            $formated = round($persen);
+            $data['persen'] = $formated;
+            $reset[] = [
+                'mastermodel' => $data['mastermodel'],
+                'target' => round($target),
+                'persen' => $formated,
+                'remain' => round($produksi)
+            ];
+        }
+        return $reset;
     }
 }

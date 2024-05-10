@@ -100,9 +100,9 @@
 
                                     <div class="col-8">
                                         <div class="numbers">
-                                            <?php if(stripos($ar,"Gedung") !== false):?>
+                                            <?php if (stripos($ar, "Gedung") !== false) : ?>
                                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Majalaya <?= $ar ?></p>
-                                            <?php else:?>
+                                            <?php else : ?>
                                                 <p class="text-sm mb-0 text-capitalize font-weight-bold"><?= $ar ?></p>
                                             <?php endif; ?>
                                             <h5 class="font-weight-bolder mb-0">
@@ -110,11 +110,11 @@
                                         </div>
                                     </div>
                                     <div class="col-4 text-end">
-                                            <?php if (stripos($ar, 'KK8J') !== false || stripos($ar, '13G') !== false): ?>
-                                                <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i>
-                                            <?php else: ?>
-                                                <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i>
-                                            <?php endif; ?>
+                                        <?php if (stripos($ar, 'KK8J') !== false || stripos($ar, '13G') !== false) : ?>
+                                            <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i>
+                                        <?php else : ?>
+                                            <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i>
+                                        <?php endif; ?>
                                     </div>
 
                                 </div>
@@ -148,6 +148,50 @@
         </div>
     </div>
 
+    <div class="row my-2">
+        <div class="col-lg-12">
+            <div class="card z-index-2">
+                <div class="card-header">
+
+                    <h6 class="card-title"> Progress chart active order</h6>
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-2">
+                            <h6 class="card-title">PDK</h6>
+                        </div>
+
+                        <div class="col-lg-10">
+                            <h6 class="card-title">Progress</h6>
+                        </div>
+                    </div>
+                    <?php foreach ($progress as $key) : ?>
+                        <div class="row">
+                            <div class="col-lg-2">
+                                <h6 class="card-title"><?= $key['mastermodel'] ?></h6>
+                            </div>
+
+                            <div class="col-lg-8">
+                                <div class="progress-wrapper">
+                                    <div class="progress-info">
+                                        <div class="progress-percentage">
+                                            <span class="text-sm font-weight-bold"><?= $key['persen'] ?>% (<?= $key['remain'] ?> dz /<?= $key['target'] ?> dz)</span>
+                                        </div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-info" role="progressbar" aria-valuenow="<?= $key['persen'] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $key['persen'] ?>%;"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    <?php endforeach ?>
+
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
     <script>

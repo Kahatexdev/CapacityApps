@@ -52,7 +52,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('detailturunorder/(:any)/(:any)', 'OrderController::detailturunorder/$1/$2');
 
     // produksi
-    $routes->get('dataproduksi', 'ProduksiController::produksi');
+    $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
     $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
 
