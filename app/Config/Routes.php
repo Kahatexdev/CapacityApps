@@ -53,6 +53,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
+    $routes->get('dataprogress', 'ProduksiController::progressData');
     $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
 

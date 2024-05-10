@@ -166,88 +166,114 @@
                             <h6 class="card-title">Progress</h6>
                         </div>
                     </div>
-                    <?php foreach ($progress as $key) : ?>
-                        <div class="row">
-                            <div class="col-lg-2">
-                                <h6 class="card-title"><?= $key['mastermodel'] ?></h6>
-                            </div>
 
-                            <div class="col-lg-8">
-                                <div class="progress-wrapper">
-                                    <div class="progress-info">
-                                        <div class="progress-percentage">
-                                            <span class="text-sm font-weight-bold"><?= $key['persen'] ?>% (<?= $key['remain'] ?> dz /<?= $key['target'] ?> dz)</span>
+                    <div id="progress-container">
+                        <?php foreach ($progress as $key) : ?>
+                            <div class="row">
+                                <div class="col-lg-2">
+                                    <h6 class="card-title"><?= $key['mastermodel'] ?></h6>
+                                </div>
+                                <div class="col-lg-8">
+                                    <div class="progress-wrapper">
+                                        <div class="progress-info">
+                                            <div class="progress-percentage">
+                                                <span class="text-sm font-weight-bold"><?= $key['persen'] ?>% (<?= $key['remain'] ?> dz / <?= $key['target'] ?> dz)</span>
+                                            </div>
+                                        </div>
+                                        <!-- Tambahkan ID ke elemen progress bar -->
+                                        <div class="progress">
+                                            <div id="<?= $key['mastermodel'] ?>-progress-bar" class="progress-bar bg-info" role="progressbar" aria-valuenow="<?= $key['persen'] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $key['persen'] ?>%; height: 10px;"></div>
                                         </div>
                                     </div>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-info" role="progressbar" aria-valuenow="<?= $key['persen'] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $key['persen'] ?>%;"></div>
-                                    </div>
                                 </div>
-
                             </div>
-                        </div>
-                    <?php endforeach ?>
+                        <?php endforeach ?>
+                    </div>
+
 
                 </div>
             </div>
+
         </div>
     </div>
 
+    <!-- Skrip JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
     <script>
-        let data = <?php echo json_encode($Produksi); ?>;
-        console.log(data)
-        // Ekstraksi tanggal dan jumlah produksi dari data
-        let labels = data.map(item => item.tgl_produksi);
-        console.log(labels)
-        let values = data.map(item => item.qty_produksi);
-        console.log(values)
+        $(document).ready(function() {
+            function fetchData() {
+                $.ajax({
+                    url: '<?= base_url('capacity/dataprogress') ?>',
+                    type: 'GET',
+                    success: function(responseData) {
 
+                        updateProgressBars(responseData);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            }
 
+            function updateProgressBars(progressData) {
+                console.log(progressData)
+                progressData.forEach(function(item) {
+                    var progressBarId = item.mastermodel + '-progress-bar';
+                    var progressBar = $('#' + progressBarId);
+                    if (progressBar.length > 0) {
+                        progressBar.css('width', item.persen + '%').attr('aria-valuenow', item.persen);
+                        progressBar.text(item.persen + '%'); // Tambahkan teks persentase pada progress bar
+                    } else {
+                        console.error('Progress bar element not found for ID:', progressBarId);
+                    }
+                });
+            }
+
+            setInterval(fetchData, 10000);
+            fetchData();
+        });
+    </script>
+    <script>
+        let productionData = <?php echo json_encode($Produksi); ?>;
+        let labels = productionData.map(item => item.tgl_produksi);
+        let values = productionData.map(item => item.qty_produksi);
 
         var ctx2 = document.getElementById("mixed-chart").getContext("2d");
 
         var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
-
         gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
         gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-        gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)'); //purple colors
+        gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)');
 
         var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
-
         gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
         gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-        gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)'); //purple colors
+        gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)');
 
         new Chart(ctx2, {
-
             data: {
                 labels: labels,
                 datasets: [{
-                        type: "bar",
-                        label: "Jumlah Produksi",
-                        borderWidth: 0,
-                        pointRadius: 30,
-
-                        backgroundColor: "#3A416F",
-                        fill: true,
-                        data: values,
-                        maxBarThickness: 20
-
-                    }, {
-                        type: "line",
-
-                        tension: 0.1,
-                        borderWidth: 0,
-                        pointRadius: 0,
-                        borderColor: "#3A416F",
-                        borderWidth: 2,
-                        backgroundColor: gradientStroke1,
-                        fill: true,
-                        data: values,
-                    },
-
-                ],
+                    type: "bar",
+                    label: "Jumlah Produksi",
+                    borderWidth: 0,
+                    pointRadius: 30,
+                    backgroundColor: "#3A416F",
+                    fill: true,
+                    data: values,
+                    maxBarThickness: 20
+                }, {
+                    type: "line",
+                    tension: 0.1,
+                    borderWidth: 0,
+                    pointRadius: 0,
+                    borderColor: "#3A416F",
+                    borderWidth: 2,
+                    backgroundColor: gradientStroke1,
+                    fill: true,
+                    data: values,
+                }, ],
             },
             options: {
                 responsive: true,

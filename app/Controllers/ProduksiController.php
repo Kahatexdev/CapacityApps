@@ -151,6 +151,7 @@ class ProduksiController extends BaseController
         $totalMesin = $this->jarumModel->getArea();
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
         $pdkProgress = $this->ApsPerstyleModel->getProgress();
+        dd($pdkProgress);
         $data = [
             'title' => 'Data Produksi',
             'active1' => '',
@@ -167,5 +168,10 @@ class ProduksiController extends BaseController
             'progress' => $pdkProgress
         ];
         return view('Capacity/Produksi/produksi', $data);
+    }
+    public function progressData()
+    {
+        $pdkProgress = $this->ApsPerstyleModel->getProgress();
+        return json_encode($pdkProgress);
     }
 }

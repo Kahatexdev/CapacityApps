@@ -467,6 +467,9 @@ class OrderController extends BaseController
                             $color = $row[18];
                             $size = $row[19];
                             $sam = $row[20];
+                            if ($sam == null) {
+                                $sam = 10;
+                            }
                             $machinetypeid = $row[22];
                             $prodtype = [
                                 'jarum' => $machinetypeid,
