@@ -199,4 +199,9 @@ class ApsPerstyleModel extends Model
         }
         return $reset;
     }
+    public function getIdProd($validate)
+    {
+        $result = $this->select('idapsperstyle, delivery')->where('mastermodel', $validate['no_model'])->where('size', $validate['style'])->first();
+        return $result;
+    }
 }

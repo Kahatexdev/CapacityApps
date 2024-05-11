@@ -153,5 +153,5 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
 $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('', 'UserController::index');
     $routes->get('produksi', 'ProduksiController::produksi');
-    $routes->get('importProduksi', 'ProduksiController::importProduksi');
+    $routes->post('importproduksi', 'ProduksiController::importProduksi');
 });

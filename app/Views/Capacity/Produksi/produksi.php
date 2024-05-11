@@ -177,7 +177,7 @@
                                     <div class="progress-wrapper">
                                         <div class="progress-info">
                                             <div class="progress-percentage">
-                                                <span class="text-sm font-weight-bold"><?= $key['persen'] ?>% (<?= $key['remain'] ?> dz / <?= $key['target'] ?> dz)</span>
+                                                <span class="text-sm font-weight-bold " id="<?= $key['mastermodel'] ?>-progressText"> <?= $key['persen'] ?>% (<?= $key['remain'] ?> dz / <?= $key['target'] ?> dz)</span>
                                             </div>
                                         </div>
                                         <!-- Tambahkan ID ke elemen progress bar -->
@@ -217,13 +217,17 @@
             }
 
             function updateProgressBars(progressData) {
-                console.log(progressData)
-                progressData.forEach(function(item) {
+                var tes = JSON.parse(progressData);
+                console.log(tes)
+                tes.forEach(function(item) {
                     var progressBarId = item.mastermodel + '-progress-bar';
                     var progressBar = $('#' + progressBarId);
+                    var progressTextId = item.mastermodel + '-progressText';
+                    var progressText = $('#' + progressTextId);
                     if (progressBar.length > 0) {
                         progressBar.css('width', item.persen + '%').attr('aria-valuenow', item.persen);
-                        progressBar.text(item.persen + '%'); // Tambahkan teks persentase pada progress bar
+                        progressBar.text(item.persen + '%');
+                        progressText.text(item.persen + '% (' + item.remain + ' dz / ' + item.target + ' dz)'); // Mengubah teks ke 'tes'
                     } else {
                         console.error('Progress bar element not found for ID:', progressBarId);
                     }

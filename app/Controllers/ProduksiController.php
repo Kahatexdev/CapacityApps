@@ -57,9 +57,9 @@ class ProduksiController extends BaseController
         $data = [
             'title' => 'Data Produksi',
             'active1' => '',
-            'active2' => '',
+            'active2' => 'active',
             'active3' => '',
-            'active4' => 'active',
+            'active4' => '',
             'active5' => '',
             'active6' => '',
             'active7' => '',
@@ -94,6 +94,7 @@ class ProduksiController extends BaseController
         if ($file->isValid() && !$file->hasMoved()) {
             $spreadsheet = IOFactory::load($file);
             $data = $spreadsheet->getActiveSheet();
+
             $startRow = 18; // Ganti dengan nomor baris mulai
             foreach ($spreadsheet->getActiveSheet()->getRowIterator($startRow) as $row) {
                 $cellIterator = $row->getCellIterator();
@@ -104,14 +105,14 @@ class ProduksiController extends BaseController
                 }
                 if (!empty($data)) {
                     $no_model = $data[20];
-                    $style = $data[7];
+                    $style = $data[4];
                     $no_order = $data[19];
                     $validate = [
                         'no_model' =>  $no_model,
-                        'no_order' => $no_order,
+
                         'style' => $style
                     ];
-                    $idAps = $this->ApsPerstyleModel->getId($validate);
+                    $idAps = $this->ApsPerstyleModel->getIdProd($validate);
                     if (!$idAps) {
                         return redirect()->to(base_url('/capacity/dataproduksi'))->with('error', 'Data Order Tidak Ditemukan');
                     } else {
@@ -119,19 +120,36 @@ class ProduksiController extends BaseController
                         if ($data[0] == null) {
                             break;
                         } else {
-                            $tglprod = $data[23];
-                            $unixProd = ($tglprod - 25569) * 86400;
-                            $tgl_produksi = date('Y-m-d', $unixProd);
-                            $qtyProd = $data[15];
-                            $sisaQty = $data[12];
-                            $insert = [
-                                'idapsperstyle' => $id,
-                                'tgl_produksi' => $tgl_produksi,
-                                'qty_produksi' => $qtyProd
+                            $tglprod = $data[1];
+                            $strReplace = str_replace('.', '-', $tglprod);
+                            $dateTime   = \DateTime::createFromFormat('d-m-Y', $strReplace);
+                            $tgl_produksi =  $dateTime->format('Y-m-d');
+                            $bagian     = $data[2];
+                            $storage1   = $data[2];
+                            $storage2   = $data[10];
+                            $qtyerp        = $data[12];
+                            $qty = str_replace('-', '', $qtyerp);
+
+                            $shift = $data[30];
+                            $no_box     = $data[23];
+                            $no_label   = $data[22];
+                            $admin      = session()->get('username');
+                            $dataInsert = [
+                                'tgl_produksi'              => $tgl_produksi,
+                                'idapsperstyle'         => $idAps['idpsperstyle'],
+                                'bagian'                => $bagian,
+                                'storage_awal'          => $storage1,
+                                'storage_akhir'         => $storage2,
+                                'qty_prod'              => $qty,
+                                'no_box'                => $no_box,
+                                'no_label'              => $no_label,
+                                'admin'                 => $admin,
+                                'shift'                 => $shift
                             ];
-                            $existingProduction = $this->produksiModel->existingData($insert);
+
+                            $existingProduction = $this->produksiModel->existingData($dataInsert);
                             if (!$existingProduction) {
-                                $this->produksiModel->insert($insert);
+                                $this->produksiModel->insert($dataInsert);
                                 $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
                             }
                         }
@@ -151,7 +169,6 @@ class ProduksiController extends BaseController
         $totalMesin = $this->jarumModel->getArea();
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
         $pdkProgress = $this->ApsPerstyleModel->getProgress();
-        dd($pdkProgress);
         $data = [
             'title' => 'Data Produksi',
             'active1' => '',
