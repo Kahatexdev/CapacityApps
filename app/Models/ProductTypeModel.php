@@ -12,7 +12,7 @@ class ProductTypeModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_product_type', 'konversi', 'product_type'];
+    protected $allowedFields    = ['id_product_type', 'konversi', 'product_type','keterangan'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -56,6 +56,11 @@ class ProductTypeModel extends Model
     {
         return $this->select('product_type')
         ->where('jarum',$jarum)
+        ->findAll();
+    }
+    public function getDataisi(){
+        return $this->select('*')
+        ->where('konversi',10)
         ->findAll();
     }
 }
