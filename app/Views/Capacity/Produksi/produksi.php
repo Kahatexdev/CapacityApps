@@ -148,6 +148,51 @@
         </div>
     </div>
 
+
+    <div class="row">
+        <?php foreach ($Area as $ar) : ?>
+
+            <div class="col-xl-4 col-sm-3 mb-xl-0 mb-4 mt-2">
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="numbers">
+                                    <?php if (stripos($ar, "Gedung") !== false) : ?>
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Majalaya <?= $ar ?></p>
+                                    <?php else : ?>
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold"><?= $ar ?></p>
+                                    <?php endif; ?>
+                                    <h5 class="font-weight-bolder mb-0">
+                                    </h5>
+                                </div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <?php if (stripos($ar, 'KK8J') !== false || stripos($ar, '13G') !== false) : ?>
+                                    <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i>
+                                <?php else : ?>
+                                    <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i>
+                                <?php endif; ?>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12">
+                                <div class="chart">
+                                    <canvas id="<?= $ar ?>-chart" class="chart-canvas" height="300"></canvas>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        <?php endforeach ?>
+    </div>
     <div class="row my-2">
         <div class="col-lg-12">
             <div class="card z-index-2">
@@ -196,7 +241,6 @@
 
         </div>
     </div>
-
     <!-- Skrip JavaScript -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
@@ -233,15 +277,14 @@
                 });
             }
 
-            setInterval(fetchData, 10000);
+            setInterval(fetchData, 10000000);
             fetchData();
         });
     </script>
     <script>
         let productionData = <?php echo json_encode($Produksi); ?>;
         let labels = productionData.map(item => item.tgl_produksi);
-        let values = productionData.map(item => item.qty_produksi);
-
+        let values = productionData.map(item => (item.qty_produksi / 24).toFixed(0));
         var ctx2 = document.getElementById("mixed-chart").getContext("2d");
 
         var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
@@ -276,6 +319,104 @@
                     backgroundColor: gradientStroke1,
                     fill: true,
                     data: values,
+                }, ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            drawBorder: false,
+                            display: true,
+                            drawOnChartArea: true,
+                            drawTicks: false,
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            display: true,
+                            padding: 10,
+                            color: '#b2b9bf',
+                            font: {
+                                size: 11,
+                                family: "Open Sans",
+                                style: 'normal',
+                                lineHeight: 2
+                            },
+                        }
+                    },
+                    x: {
+                        grid: {
+                            drawBorder: false,
+                            display: false,
+                            drawOnChartArea: false,
+                            drawTicks: false,
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            display: true,
+                            color: '#b2b9bf',
+                            padding: 20,
+                            font: {
+                                size: 11,
+                                family: "Open Sans",
+                                style: 'normal',
+                                lineHeight: 2
+                            },
+                        }
+                    },
+                },
+            },
+        });
+    </script>
+    <script>
+        let produksiArea = <?php echo json_encode($produksiArea); ?>;
+        console.log(produksiArea)
+
+
+        var ctx2 = document.getElementById(produksiArea.map(item => item.area + 'chart')).getContext("2d").textcontent('test');
+
+        var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
+        gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
+        gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
+        gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)');
+
+        var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
+        gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
+        gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
+        gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)');
+
+        new Chart(ctx2, {
+            data: {
+                labels: tanggal,
+                datasets: [{
+                    type: "bar",
+                    label: "Jumlah Produksi",
+                    borderWidth: 0,
+                    pointRadius: 30,
+                    backgroundColor: "#3A416F",
+                    fill: true,
+                    data: values,
+                    maxBarThickness: 20
+                }, {
+                    type: "line",
+                    tension: 0.1,
+                    borderWidth: 0,
+                    pointRadius: 0,
+                    borderColor: "#3A416F",
+                    borderWidth: 2,
+                    backgroundColor: gradientStroke1,
+                    fill: true,
+                    data: qty,
                 }, ],
             },
             options: {

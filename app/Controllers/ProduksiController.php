@@ -153,7 +153,7 @@ class ProduksiController extends BaseController
                                 'shift'                 => $shift,
                                 'no_mesin'              => $no_mesin,
                                 'delivery'              => $delivery,
-                                'area' => $area
+                                'area'                  => $area
                             ];
                             // $existingProduction = $this->produksiModel->existingData($dataInsert);
                             // if (!$existingProduction) {
@@ -177,6 +177,11 @@ class ProduksiController extends BaseController
         $totalMesin = $this->jarumModel->getArea();
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
         $pdkProgress = $this->ApsPerstyleModel->getProgress();
+        $produksiPerArea = [];
+        foreach ($totalMesin as $area) {
+            $produksiPerArea[$area] = $this->produksiModel->getProduksiPerArea($bulan, $area);
+        }
+        json_encode($produksiPerArea);
         $data = [
             'title' => 'Data Produksi',
             'active1' => '',
@@ -186,7 +191,7 @@ class ProduksiController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-
+            'produksiArea' => $produksiPerArea,
             'Area' => $totalMesin,
             'Produksi' => $dataProduksi,
             'bulan' => $month,

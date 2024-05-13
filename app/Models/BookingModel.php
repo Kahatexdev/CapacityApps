@@ -132,7 +132,7 @@ class BookingModel extends Model
         }
 
 
-        return $total_qty;
+        return $total_qty / 24;
     }
 
     public function getCancelBooking()
