@@ -12,7 +12,7 @@ class ProduksiModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_produksi', 'idapsperstyle', 'tgl_produksi', 'qty_produksi', 'bagian', 'storage_awal', 'storage_akhir', 'bs_prod', 'katefori_bs', 'no_box', 'no_label', 'no_mesin', 'created_at', 'updated_at', 'admin', 'kode_shipment', 'delivery', 'shift'];
+    protected $allowedFields    = ['id_produksi', 'idapsperstyle', 'tgl_produksi', 'qty_produksi', 'bagian', 'storage_awal', 'storage_akhir', 'bs_prod', 'katefori_bs', 'no_box', 'no_label', 'no_mesin', 'created_at', 'updated_at', 'admin', 'kode_shipment', 'delivery', 'shift', 'area'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -54,6 +54,29 @@ class ProduksiModel extends Model
     }
     public function getProduksiPerhari($bulan)
     {
-        return $this->select('*')->where('MONTH(tgl_produksi)', $bulan)->orderBy('tgl_produksi')->findAll();
+        return $this->select('DATE(tgl_produksi) as tgl_produksi, SUM(qty_produksi) as qty_produksi')
+            ->where('MONTH(tgl_produksi)', $bulan)
+            ->groupBy('DATE(tgl_produksi)')
+            ->orderBy('tgl_produksi')
+            ->findAll();
+    }
+    public function getProduksiPerArea($bulan, $area)
+    {
+        $result = $this->select('DATE(tgl_produksi) as tgl_produksi, SUM(qty_produksi) as qty_produksi,area')
+            ->where('MONTH(tgl_produksi)', $bulan)
+            ->where('area', $area)
+            ->groupBy('DATE(tgl_produksi)')
+            ->orderBy('tgl_produksi')
+            ->findAll();
+        if (!$result) {
+            $nul = [
+                'tgl_produksi' => 'Tidak ada Data',
+                'qty_produksi' => 'Tidak ada Data',
+                'area' => $area
+            ];
+            return $nul;
+        } else {
+            return $result;
+        }
     }
 }
