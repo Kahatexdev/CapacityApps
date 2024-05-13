@@ -123,18 +123,18 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
 
     // mesin
     $routes->get('datamesin', 'MesinController::indexPlan');
-    $routes->get('mesinPerJarum/(:any)', 'MesinController::mesinPerJarum/$1');
+    $routes->get('mesinPerJarum/(:any)', 'MesinController::mesinPerJarumPlan/$1');
     $routes->get('mesinperarea/(:any)', 'MesinController::mesinperareaPlan/$1');
-    $routes->get('stockcylinder', 'MesinController::stockcylinder');
+    $routes->get('stockcylinder', 'MesinController::stockcylinderPlan');
     $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarumPlan/$1/$2');
     $routes->get('datamesinperarea/(:any)', 'MesinController::DetailMesinPerAreaPlan/$1');
     $routes->post('deletemesinareal/(:any)', 'MesinController::deletemesinarealPlan/$1');
     $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarumPlan/$1');
     $routes->post('tambahmesinperarea', 'MesinController::inputmesinperareaPlan');
-    $routes->post('addcylinder', 'MesinController::inputcylinder');
-    $routes->post('editcylinder/(:any)', 'MesinController::editcylinder/$1');
-    $routes->post('deletecylinder/(:any)', 'MesinController::deletecylinder/$1');
-    $routes->get('allmachine', 'MesinController::allmachine');
+    $routes->post('addcylinder', 'MesinController::inputcylinderPlan');
+    $routes->post('editcylinder/(:any)', 'MesinController::editcylinderPlan/$1');
+    $routes->post('deletecylinder/(:any)', 'MesinController::deletecylinderPlan/$1');
+    $routes->get('allmachine', 'MesinController::allmachinePlan');
 
     //planning
     $routes->get('dataplanning', 'PlanningController::listplanning');

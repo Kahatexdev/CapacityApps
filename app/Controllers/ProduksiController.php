@@ -109,14 +109,15 @@ class ProduksiController extends BaseController
                     $no_order = $data[19];
                     $validate = [
                         'no_model' =>  $no_model,
-
                         'style' => $style
                     ];
                     $idAps = $this->ApsPerstyleModel->getIdProd($validate);
                     if (!$idAps) {
-                        return redirect()->to(base_url('/capacity/dataproduksi'))->with('error', 'Data Order Tidak Ditemukan');
+                        return redirect()->to(base_url('/user/produksi'))->with('error', 'Data Order Tidak Ditemukan');
                     } else {
                         $id = $idAps['idapsperstyle'];
+                        $sisaOrder = $idAps['sisa'];
+                        $delivery = $idAps['delivery'];
                         if ($data[0] == null) {
                             break;
                         } else {
@@ -126,39 +127,46 @@ class ProduksiController extends BaseController
                             $tgl_produksi =  $dateTime->format('Y-m-d');
                             $bagian     = $data[2];
                             $storage1   = $data[2];
-                            $storage2   = $data[10];
+                            $storage2   = $data[10] ?? '-';
                             $qtyerp        = $data[12];
                             $qty = str_replace('-', '', $qtyerp);
-
+                            $sisaQty = $sisaOrder - $qty;
+                            $kategoriBs = $data[29] ?? '-';
+                            $no_mesin = $data[25];
                             $shift = $data[30];
                             $no_box     = $data[23];
                             $no_label   = $data[22];
+                            $area = $data[26];
                             $admin      = session()->get('username');
                             $dataInsert = [
-                                'tgl_produksi'              => $tgl_produksi,
-                                'idapsperstyle'         => $idAps['idpsperstyle'],
+                                'tgl_produksi'            => $tgl_produksi,
+                                'idapsperstyle'         => $id,
                                 'bagian'                => $bagian,
                                 'storage_awal'          => $storage1,
                                 'storage_akhir'         => $storage2,
-                                'qty_prod'              => $qty,
+                                'qty_produksi'              => $qty,
+                                'bs_prod'               => 0,
+                                'kategori_bs'           => $kategoriBs,
                                 'no_box'                => $no_box,
                                 'no_label'              => $no_label,
                                 'admin'                 => $admin,
-                                'shift'                 => $shift
+                                'shift'                 => $shift,
+                                'no_mesin'              => $no_mesin,
+                                'delivery'              => $delivery,
+                                'area' => $area
                             ];
-
-                            $existingProduction = $this->produksiModel->existingData($dataInsert);
-                            if (!$existingProduction) {
-                                $this->produksiModel->insert($dataInsert);
-                                $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
-                            }
+                            // $existingProduction = $this->produksiModel->existingData($dataInsert);
+                            // if (!$existingProduction) {
+                            $this->produksiModel->insert($dataInsert);
+                            $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
+                            //}
                         }
                     }
                 }
             }
-            return redirect()->to(base_url('/capacity/dataproduksi'))->withInput()->with('success', 'Data Berhasil di Import');
+            return redirect()->to(base_url('/user/produksi'))->withInput()->with('success', 'Data Berhasil di Import');
         } else {
-            return redirect()->to(base_url('/capacity/dataproduksi'))->with('error', 'No data found in the Excel file');
+            return redirect()->to(base_url('/user/produksi'))->with('error', 'No data found in the Excel file');
         }
     }
 

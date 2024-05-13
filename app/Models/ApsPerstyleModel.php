@@ -201,7 +201,7 @@ class ApsPerstyleModel extends Model
     }
     public function getIdProd($validate)
     {
-        $result = $this->select('idapsperstyle, delivery')->where('mastermodel', $validate['no_model'])->where('size', $validate['style'])->first();
+        $result = $this->select('idapsperstyle, delivery,sisa')->where('mastermodel', $validate['no_model'])->where('size', $validate['style'])->first();
         return $result;
     }
 }

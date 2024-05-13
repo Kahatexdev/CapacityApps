@@ -218,7 +218,6 @@
 
             function updateProgressBars(progressData) {
                 var tes = JSON.parse(progressData);
-                console.log(tes)
                 tes.forEach(function(item) {
                     var progressBarId = item.mastermodel + '-progress-bar';
                     var progressBar = $('#' + progressBarId);

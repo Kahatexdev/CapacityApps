@@ -436,7 +436,7 @@ class OrderController extends BaseController
             $row = $spreadsheet->getActiveSheet();
             $nomodel = $this->request->getVar('no_model');
             $idModel = $this->orderModel->getId($nomodel);
-            $startRow = 2; // Ganti dengan nomor baris mulai
+            $startRow = 4; // Ganti dengan nomor baris mulai
             foreach ($spreadsheet->getActiveSheet()->getRowIterator($startRow) as $row) {
                 $cellIterator = $row->getCellIterator();
                 $cellIterator->setIterateOnlyExistingCells(false);

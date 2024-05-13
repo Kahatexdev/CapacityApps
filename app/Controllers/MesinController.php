@@ -75,6 +75,23 @@ class MesinController extends BaseController
         ];
         return view('Capacity/Mesin/mesinjarum', $data);
     }
+    public function mesinPerJarumPlan($pu)
+    {
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum2($pu);
+        $data = [
+            'title' => 'Data Mesin',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => 'active',
+            'active6' => '',
+            'active7' => '',
+            'pu' => $pu,
+            'TotalMesin' => $totalMesin,
+        ];
+        return view('Planning/Mesin/mesinjarum', $data);
+    }
     public function stockcylinder()
     {
         $totalCylinder = $this->cylinderModel->findAll();
@@ -90,6 +107,22 @@ class MesinController extends BaseController
             'tampildata' => $totalCylinder,
         ];
         return view('Capacity/Mesin/dataCylinder', $data);
+    }
+    public function stockcylinderPlan()
+    {
+        $totalCylinder = $this->cylinderModel->findAll();
+        $data = [
+            'title' => 'Data Cylinder',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => 'active',
+            'active6' => '',
+            'active7' => '',
+            'tampildata' => $totalCylinder,
+        ];
+        return view('Planning/Mesin/dataCylinder', $data);
     }
     public function mesinperarea($pu)
     {
@@ -125,6 +158,22 @@ class MesinController extends BaseController
             'tampildata' => $tampilperarea,
         ];
         return view('Capacity/Mesin/allmesin', $data);
+    }
+    public function allmachinePlan()
+    {
+        $tampilperarea = $this->jarumModel->getAllMachine();
+        $data = [
+            'title' => 'Data Mesin',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => 'active',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'tampildata' => $tampilperarea,
+        ];
+        return view('Planning/Mesin/allmesin', $data);
     }
     public function DetailMesinPerJarum($jarum, $pu)
     {
@@ -229,6 +278,47 @@ class MesinController extends BaseController
             return redirect()->to(base_url('capacity/stockcylinder/'))->withInput()->with('error', 'Gagal Update Data');
         }
     }
+    public function inputcylinderPlan()
+    {
+        $area = $this->request->getPost("needle");
+        $jarum = $this->request->getPost("production_unit");
+        $total_mc = $this->request->getPost("type_machine");
+        $brand = $this->request->getPost("qty");
+        $mesin_jalan = $this->request->getPost("needle_detail");
+
+        $input = [
+            'needle' => $area,
+            'production_unit' => $jarum,
+            'type_machine' => $total_mc,
+            'qty' => $brand,
+            'needle_detail' => $mesin_jalan,
+        ];
+
+        $insert =   $this->cylinderModel->insert($input);
+        if ($insert) {
+            return redirect()->to(base_url('/planning/stockcylinder/'))->withInput()->with('success', 'Data Berhasil Di Input');
+        } else {
+            return redirect()->to(base_url('/planning/stockcylinder/'))->withInput()->with('error', 'Data Gagal Di Input');
+        }
+    }
+    public function editcylinderPlan($idDataCylinder)
+    {
+
+        $data = [
+            'needle' => $this->request->getPost("needle"),
+            'production_unit' => $this->request->getPost("production_unit"),
+            'type_machine' => $this->request->getPost("type_machine"),
+            'qty' => $this->request->getPost("qty"),
+            'needle_detail' => $this->request->getPost("needle_detail"),
+        ];
+        $id = $idDataCylinder;
+        $update = $this->cylinderModel->update($id, $data);
+        if ($update) {
+            return redirect()->to(base_url('planning/stockcylinder/'))->withInput()->with('success', 'Data Berhasil Di Update');
+        } else {
+            return redirect()->to(base_url('planning/stockcylinder/'))->withInput()->with('error', 'Gagal Update Data');
+        }
+    }
     public function updatemesinperjarum($idDataMesin)
     {
 
@@ -262,6 +352,15 @@ class MesinController extends BaseController
             return redirect()->to(base_url('capacity/stockcylinder'))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
             return redirect()->to(base_url('capacity/stockcylinder'))->withInput()->with('error', 'Gagal Hapus Data');
+        }
+    }
+    public function deletecylinderPlan($idDataCylinder)
+    {
+        $delete = $this->cylinderModel->delete($idDataCylinder);
+        if ($delete) {
+            return redirect()->to(base_url('planning/stockcylinder'))->withInput()->with('success', 'Data Berhasil Di Hapus');
+        } else {
+            return redirect()->to(base_url('planning/stockcylinder'))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
 
