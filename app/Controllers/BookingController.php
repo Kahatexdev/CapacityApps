@@ -595,4 +595,54 @@ class BookingController extends BaseController
         ];
         return view('Planning/Booking/detail', $data);
     }
+    public function target(){
+        $Jarum = $this->jarumModel->getJarum();
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+        $data = [
+            'title' => 'Data Target',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => 'active',
+            'active7' => '',
+            'Jarum' => $Jarum,
+            'TotalMesin' => $totalMesin,
+        ];
+        return view('Capacity/Target/index', $data);
+    }
+    public function targetjarum($jarum){
+        $product = $this->productModel
+        ->where('jarum',$jarum)
+        ->orderBy('id_product_type','asc')
+        ->findAll();
+        $data = [
+            'title' => 'Data Target by Needle',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => 'active',
+            'active7' => '',
+            'product' => $product,
+            'jarum' => $jarum
+        ];
+        return view('Capacity/Target/target', $data);
+    }
+    public function edittarget(){
+        $id = $this->request->getPost("id");
+        $keterangan = $this->request->getPost("keterangan");
+        $jarum = $this->request->getPost("jarum");
+        $target = $this->request->getPost("target");
+
+        if ($id) {
+            $this->productModel->set('konversi', $target)
+            ->set('keterangan', $keterangan)
+            ->where('id_product_type',$id)
+            ->update();
+            return redirect()->to(base_url('capacity/datatargetjarum/' . $jarum))->withInput()->with('success', 'Data Berhasil Diinput');
+        }
+    }
 }

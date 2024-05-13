@@ -16,20 +16,30 @@
                             </h4>
                         </div>
                         <div>
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between">    
 
-                                <button class="btn bg-gradient-warning mr-2" data-bs-toggle="modal" data-bs-target="#lihatLibur">
-                                    Lihat Data Libur
-                                </button>
-                                <div> &nbsp;</div>
-                                <button class="btn bg-gradient-success ml-2" data-bs-toggle="modal" data-bs-target="#addLibur">
-                                    <i class="fas fa-calendar-plus text-lg opacity-10" aria-hidden="true"></i>
+                            <a href="<?php echo base_url().'capacity/datatarget'; ?>" class="btn bg-gradient-warning mr-2">
+                                <i class="fas fa-bullseye"></i>
+                                Data Target per Product/Needle
+                            </a>
 
-                                    Tambah
-                                </button>
-                                <div> &nbsp;</div>
+                            <div style="margin-right: 10px;">&nbsp;</div> <!-- Space between buttons -->
+
+                            <button class="btn bg-gradient-warning mr-2" data-bs-toggle="modal" data-bs-target="#lihatLibur">
+                                Holiday Date
+                            </button>
+
+                            <div style="margin-right: 10px;">&nbsp;</div> <!-- Space between buttons -->
+
+                            <button class="btn bg-gradient-success ml-2" data-bs-toggle="modal" data-bs-target="#addLibur">
+                                <i class="fas fa-calendar-plus text-lg opacity-10" aria-hidden="true"></i>
+                                Add Holidays
+                            </button>
+
+                            <div style="margin-left: 10px;">&nbsp;</div> <!-- Space between buttons -->
 
                             </div>
+
                         </div>
                     </div>
                 </div>

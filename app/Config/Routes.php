@@ -89,6 +89,11 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
     $routes->get('sales', 'ExportController::index');
     $routes->get('exportsales', 'ExportController::export');
+
+    //target
+    $routes->get('datatarget','BookingController::target');
+    $routes->get('datatargetjarum/(:any)','BookingController::targetjarum/$1');
+    $routes->post('edittarget','BookingController::edittarget');
 });
 
 
