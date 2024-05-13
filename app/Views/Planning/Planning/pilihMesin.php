@@ -166,30 +166,36 @@ error_reporting(E_ALL); ?>
                 // Calculate the required subtotal based on the percentage
                 var requiredPercentage = 80; // 80% required
                 var machineRequirement = <?= $mesin; ?>; // Total machine requirement
+                var status = <?= $status; ?>;
                 var subtotal = parseInt($('#dataTable tfoot .subtotal-column').text());
                 var requiredSubtotal = (requiredPercentage / 100) * machineRequirement;
 
                 // Check if the subtotal meets the required percentage
-                if (subtotal < requiredSubtotal) {
-                    // Display error message with the minimum required machine value
-                    var minimumRequiredMachine = Math.ceil(machineRequirement*requiredPercentage/100);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Validation Error!',
-                        html: 'Booking requires at least <strong>' + minimumRequiredMachine + ' Machines</strong>, which is 80% of the total machine requirement <strong>' + machineRequirement + ' Machines</strong>.',
-                    });
-                    e.preventDefault(); // Prevent form submission
-                } else if (isNaN(subtotal)) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Error!',
-                        text: 'There was an error calculating the minimum required machines. Please check the data.',
-                    });
-                    e.preventDefault(); // Prevent form submission
-                } else {
-                    // Serialize the dataToSave array and set it as the value of the hidden input field
-                    $('#dataToSaveInput').val(JSON.stringify(dataToSave));
-                }
+                // if (status=="BOOKING"){
+                    if (subtotal < requiredSubtotal) {
+                        // Display error message with the minimum required machine value
+                        var minimumRequiredMachine = Math.ceil(machineRequirement*requiredPercentage/100);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Validation Error!',
+                            html: 'Booking requires at least <strong>' + minimumRequiredMachine + ' Machines</strong>, which is 80% of the total machine requirement <strong>' + machineRequirement + ' Machines</strong>.',
+                        });
+                        e.preventDefault(); // Prevent form submission
+                    } else if (isNaN(subtotal)) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Error!',
+                            text: 'There was an error calculating the minimum required machines. Please check the data.',
+                        });
+                        e.preventDefault(); // Prevent form submission
+                    } else {
+                        // Serialize the dataToSave array and set it as the value of the hidden input field
+                        $('#dataToSaveInput').val(JSON.stringify(dataToSave));
+                    }
+                // }
+                // else if (status="Order"){
+                //     $('#dataToSaveInput').val(JSON.stringify(dataToSave));
+                // }
             });
 
 

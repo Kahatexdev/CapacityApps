@@ -87,7 +87,7 @@ class KebutuhanMesinModel extends Model
     public function listPlan()
     {
         return $this->select('created_at,judul,count(jarum) as jarum,sum(mesin) as mesin,max(jumlah_hari) as jumlah_hari')
-            ->groupBy('judul,jarum')
+            ->groupBy('judul')
             ->findAll();
     }
     public function jarumPlan($judul)
@@ -95,7 +95,7 @@ class KebutuhanMesinModel extends Model
         return $this->select('kebutuhan_mesin.created_at, kebutuhan_mesin.id, kebutuhan_mesin.jarum, kebutuhan_mesin.mesin, kebutuhan_mesin.jumlah_hari, kebutuhan_mesin.tanggal_awal, kebutuhan_mesin.tanggal_akhir, kebutuhan_mesin.deskripsi, sum(mesin_planning.mc_nyala) as mc_nyala')
             ->join('mesin_planning', 'kebutuhan_mesin.id = mesin_planning.id_kebutuhan_mesin', 'left')
             ->where('judul', $judul)
-            ->groupBy('judul')
+            ->groupBy('judul,jarum,status,deskripsi')
             ->findAll();
     }
 
