@@ -75,7 +75,7 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm"><?= $order['mesin_jalan']; ?> Mc</td>
                                             <td class="text-sm"><?= $order['pu']; ?></td>
                                             <td class="text-sm">
-                                                <input type="number" class="input-machine" value="<?= $order['mesin_jalan']; ?>" data-order-id="<?= $order['id']; ?>" min="0" style="width: 80px;" inputmode="numeric"> Machine
+                                                <input type="number" class="input-machine" value="<?= $order['mesin_jalan']; ?>" min="0" style="width: 80px;" inputmode="numeric"> Machine
                                             </td>
 
                                         </tr>
@@ -109,7 +109,8 @@ error_reporting(E_ALL); ?>
         <script>
         $(document).ready(function() {
             var table = $('#dataTable').DataTable({
-                "order": []
+                "order": [],
+                "pageLength": 50
             });
 
             // Calculate and display subtotal in footer
@@ -146,6 +147,9 @@ error_reporting(E_ALL); ?>
                 calculateSubtotal();
             });
 
+            // Access PHP variable in JavaScript
+            var status = '<?= $status; ?>';
+
             $('#saveForm').on('submit', function(e) {
                 // Here you can implement your save logic
                 // For example, you can iterate through DataTable rows and collect data
@@ -166,15 +170,14 @@ error_reporting(E_ALL); ?>
                 // Calculate the required subtotal based on the percentage
                 var requiredPercentage = 80; // 80% required
                 var machineRequirement = <?= $mesin; ?>; // Total machine requirement
-                var status = <?= $status; ?>;
                 var subtotal = parseInt($('#dataTable tfoot .subtotal-column').text());
                 var requiredSubtotal = (requiredPercentage / 100) * machineRequirement;
 
-                // Check if the subtotal meets the required percentage
-                // if (status=="BOOKING"){
+                // Use the status variable in the condition
+                if (status === 'BOOKING') {
                     if (subtotal < requiredSubtotal) {
                         // Display error message with the minimum required machine value
-                        var minimumRequiredMachine = Math.ceil(machineRequirement*requiredPercentage/100);
+                        var minimumRequiredMachine = Math.ceil(machineRequirement * requiredPercentage / 100);
                         Swal.fire({
                             icon: 'error',
                             title: 'Validation Error!',
@@ -192,19 +195,33 @@ error_reporting(E_ALL); ?>
                         // Serialize the dataToSave array and set it as the value of the hidden input field
                         $('#dataToSaveInput').val(JSON.stringify(dataToSave));
                     }
-                // }
-                // else if (status="Order"){
-                //     $('#dataToSaveInput').val(JSON.stringify(dataToSave));
-                // }
+                } else if (status === 'ORDER') {
+                    if (subtotal < requiredSubtotal) {
+                        // Display error message with the minimum required machine value
+                        var minimumRequiredMachine = Math.ceil(machineRequirement * 100 / 100);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Validation Error!',
+                            html: 'Order requires 100% of the total machine requirement which is <strong>' + machineRequirement + ' Machines</strong>.',
+                        });
+                        e.preventDefault(); // Prevent form submission
+                    } else if (isNaN(subtotal)) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Error!',
+                            text: 'There was an error calculating the minimum required machines. Please check the data.',
+                        });
+                        e.preventDefault(); // Prevent form submission
+                    } else {
+                        // Serialize the dataToSave array and set it as the value of the hidden input field
+                        $('#dataToSaveInput').val(JSON.stringify(dataToSave));
+                    }
+                }
             });
-
 
             // Initial calculation of subtotal
             calculateSubtotal();
         });
         </script>
-
-
-
 
         <?php $this->endSection(); ?>
