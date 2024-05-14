@@ -184,32 +184,32 @@ class CalendarController extends BaseController
                 'end_date' => $endOfWeekFormatted,
                 'number_of_days' => $numberOfDays,
                 'holidays' => $weekHolidays,
-                'nsps' => number_format($nsps, 0, ',', '.') ?? 0,
-                'nsmp' => number_format($nsmp, 0, ',', '.') ?? 0,
-                'nsfp' => number_format($nsfp, 0, ',', '.') ?? 0,
-                'sps' => number_format($sps, 0, ',', '.') ?? 0,
-                'smp' => number_format($smp, 0, ',', '.') ?? 0,
-                'sfp' => number_format($sfp, 0, ',', '.') ?? 0,
-                'ssps' => number_format($ssps, 0, ',', '.') ?? 0,
-                'ssmp' => number_format($ssmp, 0, ',', '.') ?? 0,
-                'ssfp' => number_format($ssfp, 0, ',', '.') ?? 0,
-                'khps' => number_format($khps, 0, ',', '.') ?? 0,
-                'khmp' => number_format($khmp, 0, ',', '.') ?? 0,
-                'khfp' => number_format($khfp, 0, ',', '.') ?? 0,
-                'ffp' => number_format($ffp, 0, ',', '.') ?? 0,
-                'fmp' => number_format($fmp, 0, ',', '.') ?? 0,
-                'fps' => number_format($fps, 0, ',', '.') ?? 0,
-                'tgps' => number_format($tgps, 0, ',', '.') ?? 0,
-                'tgmp' => number_format($tgmp, 0, ',', '.') ?? 0,
-                'tgfp' => number_format($tgfp, 0, ',', '.') ?? 0,
-                'glfl' => number_format($glfl, 0, ',', '.') ?? 0,
-                'glmt' => number_format($glmt, 0, ',', '.') ?? 0,
-                'glpt' => number_format($glpt, 0, ',', '.') ?? 0,
-                'glst' => number_format($glst, 0, ',', '.') ?? 0,
-                'htst' => number_format($htst, 0, ',', '.') ?? 0,
-                'htpl' => number_format($htpl, 0, ',', '.') ?? 0,
-
+                'nsps' => $nsps != 0 ? number_format($nsps, 0, ',', '.') : '-',
+                'nsmp' => $nsmp != 0 ? number_format($nsmp, 0, ',', '.') : '-',
+                'nsfp' => $nsfp != 0 ? number_format($nsfp, 0, ',', '.') : '-',
+                'sps' => $sps != 0 ? number_format($sps, 0, ',', '.') : '-',
+                'smp' => $smp != 0 ? number_format($smp, 0, ',', '.') : '-',
+                'sfp' => $sfp != 0 ? number_format($sfp, 0, ',', '.') : '-',
+                'ssps' => $ssps != 0 ? number_format($ssps, 0, ',', '.') : '-',
+                'ssmp' => $ssmp != 0 ? number_format($ssmp, 0, ',', '.') : '-',
+                'ssfp' => $ssfp != 0 ? number_format($ssfp, 0, ',', '.') : '-',
+                'khps' => $khps != 0 ? number_format($khps, 0, ',', '.') : '-',
+                'khmp' => $khmp != 0 ? number_format($khmp, 0, ',', '.') : '-',
+                'khfp' => $khfp != 0 ? number_format($khfp, 0, ',', '.') : '-',
+                'ffp' => $ffp != 0 ? number_format($ffp, 0, ',', '.') : '-',
+                'fmp' => $fmp != 0 ? number_format($fmp, 0, ',', '.') : '-',
+                'fps' => $fps != 0 ? number_format($fps, 0, ',', '.') : '-',
+                'tgps' => $tgps != 0 ? number_format($tgps, 0, ',', '.') : '-',
+                'tgmp' => $tgmp != 0 ? number_format($tgmp, 0, ',', '.') : '-',
+                'tgfp' => $tgfp != 0 ? number_format($tgfp, 0, ',', '.') : '-',
+                'glfl' => $glfl != 0 ? number_format($glfl, 0, ',', '.') : '-',
+                'glmt' => $glmt != 0 ? number_format($glmt, 0, ',', '.') : '-',
+                'glpt' => $glpt != 0 ? number_format($glpt, 0, ',', '.') : '-',
+                'glst' => $glst != 0 ? number_format($glst, 0, ',', '.') : '-',
+                'htst' => $htst != 0 ? number_format($htst, 0, ',', '.') : '-',
+                'htpl' => $htpl != 0 ? number_format($htpl, 0, ',', '.') : '-',
             ];
+            
             $weekCount++;
         }
         $get = [
@@ -281,10 +281,9 @@ class CalendarController extends BaseController
         $tgl_awal = strtotime($awal);
         $tgl_akhir = strtotime($akhir);
 
-
         $jumlahHari = ($tgl_akhir - $tgl_awal) / (60 * 60 * 24);
 
-        $startDate = new \DateTime('first day of this month');
+        $startDate = new \DateTime();
         $LiburModel = new LiburModel();
         $holidays = $LiburModel->findAll();
         $currentMonth = $startDate->format('F');
@@ -359,30 +358,30 @@ class CalendarController extends BaseController
                 'end_date' => $endOfWeekFormatted,
                 'number_of_days' => $numberOfDays,
                 'holidays' => $weekHolidays,
-                'nsps' => number_format($nsps, 0, ',', '.') ?? 0,
-                'nsmp' => number_format($nsmp, 0, ',', '.') ?? 0,
-                'nsfp' => number_format($nsfp, 0, ',', '.') ?? 0,
-                'sps' => number_format($sps, 0, ',', '.') ?? 0,
-                'smp' => number_format($smp, 0, ',', '.') ?? 0,
-                'sfp' => number_format($sfp, 0, ',', '.') ?? 0,
-                'ssps' => number_format($ssps, 0, ',', '.') ?? 0,
-                'ssmp' => number_format($ssmp, 0, ',', '.') ?? 0,
-                'ssfp' => number_format($ssfp, 0, ',', '.') ?? 0,
-                'khps' => number_format($khps, 0, ',', '.') ?? 0,
-                'khmp' => number_format($khmp, 0, ',', '.') ?? 0,
-                'khfp' => number_format($khfp, 0, ',', '.') ?? 0,
-                'ffp' => number_format($ffp, 0, ',', '.') ?? 0,
-                'fmp' => number_format($fmp, 0, ',', '.') ?? 0,
-                'fps' => number_format($fps, 0, ',', '.') ?? 0,
-                'tgps' => number_format($tgps, 0, ',', '.') ?? 0,
-                'tgmp' => number_format($tgmp, 0, ',', '.') ?? 0,
-                'tgfp' => number_format($tgfp, 0, ',', '.') ?? 0,
-                'glfl' => number_format($glfl, 0, ',', '.') ?? 0,
-                'glmt' => number_format($glmt, 0, ',', '.') ?? 0,
-                'glpt' => number_format($glpt, 0, ',', '.') ?? 0,
-                'glst' => number_format($glst, 0, ',', '.') ?? 0,
-                'htst' => number_format($htst, 0, ',', '.') ?? 0,
-                'htpl' => number_format($htpl, 0, ',', '.') ?? 0,
+                'nsps' => $nsps != 0 ? number_format($nsps, 0, ',', '.') : '-',
+                'nsmp' => $nsmp != 0 ? number_format($nsmp, 0, ',', '.') : '-',
+                'nsfp' => $nsfp != 0 ? number_format($nsfp, 0, ',', '.') : '-',
+                'sps' => $sps != 0 ? number_format($sps, 0, ',', '.') : '-',
+                'smp' => $smp != 0 ? number_format($smp, 0, ',', '.') : '-',
+                'sfp' => $sfp != 0 ? number_format($sfp, 0, ',', '.') : '-',
+                'ssps' => $ssps != 0 ? number_format($ssps, 0, ',', '.') : '-',
+                'ssmp' => $ssmp != 0 ? number_format($ssmp, 0, ',', '.') : '-',
+                'ssfp' => $ssfp != 0 ? number_format($ssfp, 0, ',', '.') : '-',
+                'khps' => $khps != 0 ? number_format($khps, 0, ',', '.') : '-',
+                'khmp' => $khmp != 0 ? number_format($khmp, 0, ',', '.') : '-',
+                'khfp' => $khfp != 0 ? number_format($khfp, 0, ',', '.') : '-',
+                'ffp' => $ffp != 0 ? number_format($ffp, 0, ',', '.') : '-',
+                'fmp' => $fmp != 0 ? number_format($fmp, 0, ',', '.') : '-',
+                'fps' => $fps != 0 ? number_format($fps, 0, ',', '.') : '-',
+                'tgps' => $tgps != 0 ? number_format($tgps, 0, ',', '.') : '-',
+                'tgmp' => $tgmp != 0 ? number_format($tgmp, 0, ',', '.') : '-',
+                'tgfp' => $tgfp != 0 ? number_format($tgfp, 0, ',', '.') : '-',
+                'glfl' => $glfl != 0 ? number_format($glfl, 0, ',', '.') : '-',
+                'glmt' => $glmt != 0 ? number_format($glmt, 0, ',', '.') : '-',
+                'glpt' => $glpt != 0 ? number_format($glpt, 0, ',', '.') : '-',
+                'glst' => $glst != 0 ? number_format($glst, 0, ',', '.') : '-',
+                'htst' => $htst != 0 ? number_format($htst, 0, ',', '.') : '-',
+                'htpl' => $htpl != 0 ? number_format($htpl, 0, ',', '.') : '-',
             ];
 
             $weekCount++;
@@ -455,7 +454,6 @@ class CalendarController extends BaseController
     private function hitungKebutuhanMC($get, $type)
     {
         $query = $this->bookingModel->hitungKebutuhanMC($get, $type);
-
         $value = [];
         $qtyTotal = 0;
         foreach ($query as $key => $data) {
@@ -465,7 +463,8 @@ class CalendarController extends BaseController
             $target = $data['konversi'];
             $type = $data['product_type'];
             $qtyTotal += $qty1;
-
+            
+            
             $value[] = [
                 'kebutuhanMc' => ceil($qtyTotal / $target / $hari1 / 24),
                 'JumlahHari' => $hari1,
