@@ -181,8 +181,11 @@
                     <div class="card-body p-3">
                         <div class="row">
                             <div class="col-lg-12 col-md-12">
+                                <p id="<?= $ar ?>-chart">
+                                    trs
+                                </p>
                                 <div class="chart">
-                                    <canvas id="<?= $ar ?>-chart" class="chart-canvas" height="300"></canvas>
+                                    <canvas class="chart-canvas" height="300"></canvas>
                                 </div>
                             </div>
 
@@ -374,9 +377,8 @@
                 $.ajax({
                     url: '<?= base_url('capacity/produksiareachart') ?>',
                     type: 'GET',
-                    success: function(responseData) {
-
-                        updateProgressBars(responseData);
+                    success: function(response) {
+                        updatechart(response)
                     },
                     error: function(xhr, status, error) {
                         console.error(xhr.responseText);
@@ -384,9 +386,32 @@
                 });
             }
 
-            function updateProgressBars(progressData) {
-                var tes = JSON.parse(progressData);
-                tes.forEach(function(item) {
+            function updatechart(response) {
+                var produksi = JSON.parse(response);
+                for (const key in produksi) {
+                    const value = produksi[key]
+                    if (Array.isArray(value)) {
+                        value.forEach(function(item) {
+                            var tanggal = item.tgl_produksi;
+                            var values = item.qty_produksi
+                            var canvasId = item.area + '-chart';
+                            console.log(canvasId)
+                            document.getElementById(canvasId).text('HALO');
+
+
+                        });
+
+                    } else {
+                        var tanggal = value.tgl_produksi
+                        var values = value.qty_produksi
+                        var canvasId = value.area + '-chart';
+                        console.log(canvasId)
+                        var ctx2 = document.getElementById(canvasId).value('HALO');
+
+                    }
+                }
+                produksi.forEach(function(item) {
+
                     var progressBarId = item.mastermodel + '-progress-bar';
                     var progressBar = $('#' + progressBarId);
                     var progressTextId = item.mastermodel + '-progressText';
@@ -401,7 +426,7 @@
                 });
             }
 
-            setInterval(fetchData, 10000000);
+            setInterval(fetchData, 1000);
             fetchData();
         });
 
