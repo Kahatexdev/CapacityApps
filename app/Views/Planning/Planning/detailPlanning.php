@@ -67,8 +67,9 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm"><?= $order['mc_nyala'] !== null ? $order['mc_nyala'] . ' Mc' : 'Mc not choosen yet'; ?></td>
                                             <td class="text-sm">
                                                 <?php if ($order['mc_nyala'] === null): ?>
-                                                    <form method="POST" action="<?= base_url('planning/pickmachine/'.$order['id'].'/'.$order['jarum']); ?>">
-                                                        <input type="hidden" name="mesin" value="<?= $order['mesin']; ?>">
+                                                    <form method="POST" action="<?= base_url('planning/pickmachine/'.$order['jarum']); ?>">
+                                                        <input type="hidden" name="id" value="<?= $order['mesin']; ?>">
+                                                        <input type="hidden" name="mesin" value="<?= $order['id']; ?>">
                                                         <input type="hidden" name="deskripsi" value="<?= $order['deskripsi']; ?>">
                                                         <button type="submit" class="btn btn-info btn-sm">
                                                             Pick Machine

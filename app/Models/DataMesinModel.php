@@ -231,6 +231,13 @@ class DataMesinModel extends Model
     
         return $query;
     }
-    
+    public function listmachine($jarum)
+    {
+        return $this->select('data_mesin.area,data_mesin.jarum,sum(data_mesin.total_mc) as total_mc,data_mesin.brand,sum(data_mesin.mesin_jalan) as mesin_jalan,pu')
+            ->where('data_mesin.jarum', $jarum)
+            ->groupBy('data_mesin.brand,data_mesin.jarum,data_mesin.area,data_mesin.pu')
+            ->orderBy('pu','total_mc', 'Desc')
+            ->findAll();
+    }
     
 }
