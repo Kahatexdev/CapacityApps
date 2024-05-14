@@ -113,7 +113,7 @@ class ProduksiController extends BaseController
                     ];
                     $idAps = $this->ApsPerstyleModel->getIdProd($validate);
                     if (!$idAps) {
-                        return redirect()->to(base_url('/user/produksi'))->with('error', 'Data Order Tidak Ditemukan');
+                        return redirect()->to(base_url('/user/produksi'))->with('succcess', 'Data berhasil diimport');
                     } else {
                         $id = $idAps['idapsperstyle'];
                         $sisaOrder = $idAps['sisa'];
