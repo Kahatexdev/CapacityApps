@@ -309,16 +309,6 @@
                     fill: true,
                     data: values,
                     maxBarThickness: 20
-                }, {
-                    type: "line",
-                    tension: 0.1,
-                    borderWidth: 0,
-                    pointRadius: 0,
-                    borderColor: "#3A416F",
-                    borderWidth: 2,
-                    backgroundColor: gradientStroke1,
-                    fill: true,
-                    data: values,
                 }, ],
             },
             options: {
@@ -379,9 +369,41 @@
         });
     </script>
     <script>
-        let produksiArea = <?php echo json_encode($produksiArea); ?>;
-        console.log(produksiArea)
+        $(document).ready(function() {
+            function fetchData() {
+                $.ajax({
+                    url: '<?= base_url('capacity/produksiareachart') ?>',
+                    type: 'GET',
+                    success: function(responseData) {
 
+                        updateProgressBars(responseData);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            }
+
+            function updateProgressBars(progressData) {
+                var tes = JSON.parse(progressData);
+                tes.forEach(function(item) {
+                    var progressBarId = item.mastermodel + '-progress-bar';
+                    var progressBar = $('#' + progressBarId);
+                    var progressTextId = item.mastermodel + '-progressText';
+                    var progressText = $('#' + progressTextId);
+                    if (progressBar.length > 0) {
+                        progressBar.css('width', item.persen + '%').attr('aria-valuenow', item.persen);
+                        progressBar.text(item.persen + '%');
+                        progressText.text(item.persen + '% (' + item.remain + ' dz / ' + item.target + ' dz)'); // Mengubah teks ke 'tes'
+                    } else {
+                        console.error('Progress bar element not found for ID:', progressBarId);
+                    }
+                });
+            }
+
+            setInterval(fetchData, 10000000);
+            fetchData();
+        });
 
         var ctx2 = document.getElementById(produksiArea.map(item => item.area + 'chart')).getContext("2d").textcontent('test');
 
@@ -407,16 +429,6 @@
                     fill: true,
                     data: values,
                     maxBarThickness: 20
-                }, {
-                    type: "line",
-                    tension: 0.1,
-                    borderWidth: 0,
-                    pointRadius: 0,
-                    borderColor: "#3A416F",
-                    borderWidth: 2,
-                    backgroundColor: gradientStroke1,
-                    fill: true,
-                    data: qty,
                 }, ],
             },
             options: {

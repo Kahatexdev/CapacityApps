@@ -181,7 +181,7 @@ class ProduksiController extends BaseController
         foreach ($totalMesin as $area) {
             $produksiPerArea[$area] = $this->produksiModel->getProduksiPerArea($bulan, $area);
         }
-        json_encode($produksiPerArea);
+
         $data = [
             'title' => 'Data Produksi',
             'active1' => '',
@@ -203,5 +203,16 @@ class ProduksiController extends BaseController
     {
         $pdkProgress = $this->ApsPerstyleModel->getProgress();
         return json_encode($pdkProgress);
+    }
+    public function produksiAreaChart()
+    {
+        $bulan = date('m');
+        $month = date('F');
+        $totalMesin = $this->jarumModel->getArea();
+        $produksiPerArea = [];
+        foreach ($totalMesin as $area) {
+            $produksiPerArea[$area] = $this->produksiModel->getProduksiPerArea($bulan, $area);
+        }
+        return json_encode($produksiPerArea);
     }
 }
