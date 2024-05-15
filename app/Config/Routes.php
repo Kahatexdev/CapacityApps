@@ -159,6 +159,60 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
 
 //aps
 $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
+    
+    // booking
+    $routes->get('databooking', 'ApsController::booking');
+    $routes->get('databooking/(:any)', 'ApsController::bookingPerJarum/$1');
+    $routes->get('databookingbulan/(:any)', 'ApsController::bookingPerBulanJarum/$1');
+    $routes->get('databookingbulantampil/(:any)/(:any)/(:any)', 'ApsController::bookingPerBulanJarumTampil/$1/$2/$3');
+    $routes->get('detailbooking/(:any)', 'ApsController::detailbooking/$1');
+
+    //order
+    $routes->get('', 'ApsController::index');
+    $routes->get('dataorder', 'ApsController::order');
+    $routes->get('blmAdaArea', 'OrderController::orderBlmAdaAreal');
+    $routes->get('orderPerjarum', 'OrderController::OrderPerJarumPlan');
+    $routes->get('orderPerArea', 'OrderController::orderPerAreaPlan');
+    $routes->get('detailModelPlanning/(:any)/(:any)', 'OrderController::detailModelPlanning/$1/$2');
+    $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'OrderController::detailmodeljarum/$1/$2/$3');
+    $routes->get('semuaOrder', 'OrderController::semuaOrderPlan');
+    $routes->get('dataorderperjarum/(:any)', 'OrderController::DetailOrderPerJarumPlan/$1');
+    $routes->get('dataorderperarea/(:any)', 'OrderController::DetailOrderPerAreaPlan/$1');
+    $routes->post('updatedetailorder/(:any)', 'OrderController::updateorder/$1');
+    $routes->post('updatedetailjarum/(:any)', 'OrderController::updateorderjarum/$1');
+    $routes->post('deletedetailstyle/(:any)', 'OrderController::deletedetailstyle/$1');
+    $routes->post('deletedetailorder/(:any)', 'OrderController::deletedetailorder/$1');
+    $routes->post('deletedetailjarum/(:any)', 'OrderController::deletedetailmodeljarum/$1');
+    $routes->post('assignareal', 'PlanningController::assignareal');
+    $routes->post('assignarealall', 'PlanningController::assignarealall');
+
+    // mesin
+    $routes->get('datamesin', 'MesinController::indexPlan');
+    $routes->get('mesinPerJarum/(:any)', 'MesinController::mesinPerJarumPlan/$1');
+    $routes->get('mesinperarea/(:any)', 'MesinController::mesinperareaPlan/$1');
+    $routes->get('stockcylinder', 'MesinController::stockcylinderPlan');
+    $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarumPlan/$1/$2');
+    $routes->get('datamesinperarea/(:any)', 'MesinController::DetailMesinPerAreaPlan/$1');
+    $routes->post('deletemesinareal/(:any)', 'MesinController::deletemesinarealPlan/$1');
+    $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarumPlan/$1');
+    $routes->post('tambahmesinperarea', 'MesinController::inputmesinperareaPlan');
+    $routes->post('addcylinder', 'MesinController::inputcylinderPlan');
+    $routes->post('editcylinder/(:any)', 'MesinController::editcylinderPlan/$1');
+    $routes->post('deletecylinder/(:any)', 'MesinController::deletecylinderPlan/$1');
+    $routes->get('allmachine', 'MesinController::allmachinePlan');
+
+    //planning
+    $routes->get('dataplanning', 'PlanningController::listplanning');
+    $routes->get('detaillistplanning/(:any)', 'PlanningController::detaillistplanning/$1');
+    $routes->post('pickmachine/(:any)', 'PlanningController::pickmachine/$1');
+    $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
+    $routes->post('viewdetail/(:any)', 'PlanningController::viewdetail/$1');
+
+    $routes->get('dataproduksi', 'ProduksiController::viewProduksiPlan');
+    $routes->get('dataprogress', 'ProduksiController::progressData');
+    $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
+    $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->post('importproduksi', 'ProduksiController::importproduksi');
 });
 
 // user

@@ -4,7 +4,7 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class KebutuhanMesin extends Migration
+class KebutuhanArea extends Migration
 {
     public function up()
     {
