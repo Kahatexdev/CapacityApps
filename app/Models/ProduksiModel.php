@@ -62,7 +62,7 @@ class ProduksiModel extends Model
     }
     public function getProduksiPerArea($bulan, $area)
     {
-        $result = $this->select('DATE(tgl_produksi) as tgl_produksi, SUM(qty_produksi) as qty_produksi,area')
+        $result = $this->select('DATE(tgl_produksi) as tgl_produksi, SUM(qty_produksi) as qty_produksi')
             ->where('MONTH(tgl_produksi)', $bulan)
             ->where('area', $area)
             ->groupBy('DATE(tgl_produksi)')
@@ -70,9 +70,9 @@ class ProduksiModel extends Model
             ->findAll();
         if (!$result) {
             $nul = [
-                'tgl_produksi' => 'Tidak ada Data',
-                'qty_produksi' => 'Tidak ada Data',
-                'area' => $area
+                'tgl_produksi' => 0,
+                'qty_produksi' => 0,
+
             ];
             return $nul;
         } else {

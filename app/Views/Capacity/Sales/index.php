@@ -9,22 +9,7 @@
                     <a href="<?= base_url('capacity/exportsales') ?>" class="btn btn-info"> Generate report</a>
                 </div>
                 <div class="card-body p-3 ">
-                    <div class="table-responsive">
-                        <table id="tabel" class="display compact " id="tabel" style="width:100%">
-                            <thead>
-                                <th>
-                                    tes
-                                </th>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        tes
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+
                 </div>
             </div>
         </div>

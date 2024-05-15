@@ -54,6 +54,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
     $routes->get('dataprogress', 'ProduksiController::progressData');
+    $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
     $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
 
@@ -91,9 +92,9 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('exportsales', 'ExportController::export');
 
     //target
-    $routes->get('datatarget','BookingController::target');
-    $routes->get('datatargetjarum/(:any)','BookingController::targetjarum/$1');
-    $routes->post('edittarget','BookingController::edittarget');
+    $routes->get('datatarget', 'BookingController::target');
+    $routes->get('datatargetjarum/(:any)', 'BookingController::targetjarum/$1');
+    $routes->post('edittarget', 'BookingController::edittarget');
 });
 
 

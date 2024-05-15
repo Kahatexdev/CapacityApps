@@ -329,7 +329,6 @@ class ExportController extends BaseController
         $rowjarum = 7;
         $totalDCRow = count($doublecyn) + $rowjarum;
         $rowBabyComp = $totalDCRow + 1;
-        dd($rowBabyComp);
         $totalDakong = 0;
         $totalRosso = 0;
         $totalThs = 0;
