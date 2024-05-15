@@ -137,10 +137,10 @@ class PlanningController extends BaseController
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
-            'active3' => '',
+            'active3' => 'active',
             'active4' => '',
             'active5' => '',
-            'active6' => 'active',
+            'active6' => '',
             'acive7' => '',
 
             'TotalMesin' => $totalMesin,
@@ -175,7 +175,8 @@ class PlanningController extends BaseController
             return redirect()->to(base_url('planning/dataorder/'))->withInput()->with('error', 'Gagal Assign Area');
         }
     }
-    public function listplanning(){
+    public function listplanning()
+    {
         $dataBooking = $this->KebutuhanMesinModel->listPlan();
         $data = [
             'title' => 'List Planning From Capacity',
@@ -191,7 +192,8 @@ class PlanningController extends BaseController
         return view('Planning/Planning/listPlanning', $data);
     }
 
-    public function detaillistplanning($judul){
+    public function detaillistplanning($judul)
+    {
         $dataplan = $this->KebutuhanMesinModel->jarumPlan($judul);
         $data = [
             'title' => 'List Planning From Capacity',
@@ -206,10 +208,10 @@ class PlanningController extends BaseController
             'judul' => $judul,
         ];
         return view('Planning/Planning/detailPlanning', $data);
-
     }
 
-    public function pickmachine($jarum){
+    public function pickmachine($jarum)
+    {
         $datamc = $this->jarumModel->listmachine($jarum);
         $mesin = $this->request->getPost('mesin');
         $status = $this->request->getPost('deskripsi');
@@ -229,22 +231,23 @@ class PlanningController extends BaseController
             'id' => $id,
             'jarum' => $jarum,
         ];
-        return view('Planning/Planning/pilihMesin',$data);
-
+        return view('Planning/Planning/pilihMesin', $data);
     }
 
-    public function savemachine($id){
+    public function savemachine($id)
+    {
         $data = $this->MesinPlanningModel->savemachine($id);
         $judulData = $this->KebutuhanMesinModel->find($id);
         $judul = $judulData ? $judulData['judul'] : null;
         if ($data) {
-            return redirect()->to(base_url('planning/detaillistplanning/'.$judul.'/'.$id))->withInput()->with('success', 'Success Pick Machine Area');
+            return redirect()->to(base_url('planning/detaillistplanning/' . $judul . '/' . $id))->withInput()->with('success', 'Success Pick Machine Area');
         } else {
-            return redirect()->to(base_url('planning/detaillistplanning/'.$judul.'/'.$id))->withInput()->with('error', 'Error Pick Machine Area');
+            return redirect()->to(base_url('planning/detaillistplanning/' . $judul . '/' . $id))->withInput()->with('error', 'Error Pick Machine Area');
         }
     }
 
-    public function viewdetail($id){
+    public function viewdetail($id)
+    {
 
         $datamc = $this->MesinPlanningModel->getDataPlanning($id);
         $judulData = $this->KebutuhanMesinModel->find($id);
@@ -266,7 +269,6 @@ class PlanningController extends BaseController
             'jarum' => $jarum,
 
         ];
-        return view('Planning/Planning/mesinSelected',$data);
-
+        return view('Planning/Planning/mesinSelected', $data);
     }
 }

@@ -33,7 +33,7 @@ class ProduksiController extends BaseController
         $this->produksiModel = new ProduksiModel();
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
-        if ($this->filters   = ['role' => ['capacity'], 'role' => ['user']] != session()->get('role')) {
+        if ($this->filters   = ['role' => ['capacity'], 'role' => ['user'], 'role' => ['planning']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
         $this->isLogedin();
@@ -214,5 +214,34 @@ class ProduksiController extends BaseController
             $produksiPerArea[$area] = $this->produksiModel->getProduksiPerArea($bulan, $area);
         }
         return json_encode($produksiPerArea);
+    }
+    public function viewProduksiPlan()
+    {
+        $bulan = date('m');
+        $month = date('F');
+        $totalMesin = $this->jarumModel->getArea();
+        $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
+        $pdkProgress = $this->ApsPerstyleModel->getProgress();
+        $produksiPerArea = [];
+        foreach ($totalMesin as $area) {
+            $produksiPerArea[$area] = $this->produksiModel->getProduksiPerArea($bulan, $area);
+        }
+
+        $data = [
+            'title' => 'Data Produksi',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => 'active',
+            'active7' => '',
+            'produksiArea' => $produksiPerArea,
+            'Area' => $totalMesin,
+            'Produksi' => $dataProduksi,
+            'bulan' => $month,
+            'progress' => $pdkProgress
+        ];
+        return view('Planning/Produksi/produksi', $data);
     }
 }
