@@ -223,7 +223,6 @@ class BookingModel extends Model
         ->where("data_booking.delivery > DATE_ADD(CURDATE(), INTERVAL 7 DAY)")
         ->where('data_booking.delivery >=', $get['start'])
         ->where('data_booking.delivery <=', $get['end'])
-        ->groupBy('data_booking.delivery')
         ->get()->getResultArray();
         return $result ?? "tidak Ada Data";
     }
