@@ -215,7 +215,7 @@ class BookingModel extends Model
     public function hitungKebutuhanMC($get, $type)
     {
         $result = $this->select('data_booking.delivery, master_product_type.konversi, master_product_type.product_type, sum(data_booking.sisa_booking) as sisa_booking')
-        ->select('DATEDIFF(data_booking.delivery, CURDATE()) - (SELECT COUNT(tanggal) FROM data_libur WHERE tanggal BETWEEN CURDATE() AND data_booking.delivery) - 3 AS totalhari')
+        ->select('DATEDIFF(data_booking.delivery, CURDATE()) - (SELECT COUNT(tanggal) FROM data_libur WHERE tanggal BETWEEN CURDATE() AND data_booking.delivery) AS totalhari')
         ->join('master_product_type', 'data_booking.id_product_type = master_product_type.id_product_type')
         ->where('master_product_type.product_type', $type)
         ->where('master_product_type.jarum', $get['jarum'])
