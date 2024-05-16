@@ -27,6 +27,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('cancelbooking/(:any)', 'BookingController::cancelbooking/$1');
     $routes->post('pecahbooking/(:any)', 'BookingController::pecahbooking/$1');
     $routes->post('importbooking', 'BookingController::importbooking');
+    $routes->post('importpecahbooking/(:any)', 'BookingController::importpecahbooking/$1');
     $routes->get('cancelBooking', 'BookingController::getCancelBooking');
     $routes->post('detailcancelbooking/(:any)/(:any)', 'BookingController::detailcancelbooking/$1/$2');
     $routes->post('uncancelbooking/(:any)', 'BookingController::uncancelbooking/$1');
@@ -51,7 +52,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('importModel', 'OrderController::importModel');
     $routes->get('turunOrder', 'OrderController::getTurunOrder');
     $routes->post('detailturunorder/(:any)/(:any)', 'OrderController::detailturunorder/$1/$2');
-   
+
 
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
@@ -213,7 +214,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
     $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
-    $routes->get('planningmesin','ApsController::planningmesin');
+    $routes->get('planningmesin', 'ApsController::planningmesin');
 });
 
 // user
