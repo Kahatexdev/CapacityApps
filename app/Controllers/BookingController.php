@@ -412,7 +412,7 @@ class BookingController extends BaseController
         $sisa = $this->request->getPost("sisa_booking_remaining");
         $qty_cancel = intval($this->request->getPost("qty_cancel"));
         $alasan = $this->request->getPost("alasan");
-        
+
         // Prepare data for insertion
         $insert = [
             "id_booking" => $idBooking,
@@ -551,7 +551,7 @@ class BookingController extends BaseController
     {
         $product = $this->productModel->getJarum($jarum);
         $booking = $this->bookingModel->getDataPerjarum($jarum);
-        
+
         $data = [
             'title' => 'Data Booking',
             'active1' => '',
@@ -595,7 +595,8 @@ class BookingController extends BaseController
         ];
         return view('Planning/Booking/detail', $data);
     }
-    public function target(){
+    public function target()
+    {
         $Jarum = $this->jarumModel->getJarum();
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $data = [
@@ -612,11 +613,12 @@ class BookingController extends BaseController
         ];
         return view('Capacity/Target/index', $data);
     }
-    public function targetjarum($jarum){
+    public function targetjarum($jarum)
+    {
         $product = $this->productModel
-        ->where('jarum',$jarum)
-        ->orderBy('id_product_type','asc')
-        ->findAll();
+            ->where('jarum', $jarum)
+            ->orderBy('id_product_type', 'asc')
+            ->findAll();
         $data = [
             'title' => 'Data Target by Needle',
             'active1' => '',
@@ -631,7 +633,8 @@ class BookingController extends BaseController
         ];
         return view('Capacity/Target/target', $data);
     }
-    public function edittarget(){
+    public function edittarget()
+    {
         $id = $this->request->getPost("id");
         $keterangan = $this->request->getPost("keterangan");
         $jarum = $this->request->getPost("jarum");
@@ -639,23 +642,35 @@ class BookingController extends BaseController
 
         if ($id) {
             $this->productModel->set('konversi', $target)
-            ->set('keterangan', $keterangan)
-            ->where('id_product_type',$id)
-            ->update();
+                ->set('keterangan', $keterangan)
+                ->where('id_product_type', $id)
+                ->update();
             return redirect()->to(base_url('capacity/datatargetjarum/' . $jarum))->withInput()->with('success', 'Data Berhasil Diinput');
         }
     }
-    public function uncancelbooking($id){
+    public function getTypebyJarum()
+    {
+        if ($this->request->isAJAX()) {
+            $jarum = $this->request->getPost('jarum');
+
+            $productTypes = $this->productModel->getProductTypesByJarum($jarum);
+            return $this->response->setJSON($productTypes);
+        } else {
+            // Jika bukan permintaan AJAX, kembalikan 404
+            throw new \CodeIgniter\Exceptions\PageNotFoundException();
+        }
+    }
+    public function uncancelbooking($id)
+    {
         $qty_cancel = $this->request->getPost('qty_cancel');
         if ($id) {
             $this->bookingModel->set('sisa_booking', 'sisa_booking + ' . $qty_cancel, false)
-            ->set('status', 'Aktif')
-            ->where('id_booking', $id)
-            ->update();
-            $this->cancelModel->where('id_booking',$id)
-            ->delete();
+                ->set('status', 'Aktif')
+                ->where('id_booking', $id)
+                ->update();
+            $this->cancelModel->where('id_booking', $id)
+                ->delete();
             return redirect()->to(base_url('capacity/cancelBooking/'))->withInput()->with('success', 'Data Uncancel Success');
         }
     }
-
 }

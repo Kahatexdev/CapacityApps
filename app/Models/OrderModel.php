@@ -68,19 +68,19 @@ class OrderModel extends Model
     }
     public function tampilBelumImport()
     {
-    $builder = $this->db->table('data_model');
+        $builder = $this->db->table('data_model');
 
-    $builder->select('data_model.*, mastermodel,no_order, machinetypeid, ROUND(SUM(QTy), 0) AS qty, ROUND(SUM(sisa), 0) AS sisa, factory, delivery, product_type');
-    $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
-    $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
-    $builder->where('qty IS NULL'); // Add this line to filter records where qty is null
-    $builder->orderby('created_at', 'desc');
-    $builder->orderby('no_model', 'asc');
-    $builder->orderby('delivery', 'asc');
-    $builder->groupBy('delivery');
-    $builder->groupBy('data_model.no_model');
+        $builder->select('data_model.*, mastermodel,no_order, machinetypeid, ROUND(SUM(QTy), 0) AS qty, ROUND(SUM(sisa), 0) AS sisa, factory, delivery, product_type');
+        $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
+        $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
+        $builder->where('qty IS NULL'); // Add this line to filter records where qty is null
+        $builder->orderby('created_at', 'desc');
+        $builder->orderby('no_model', 'asc');
+        $builder->orderby('delivery', 'asc');
+        $builder->groupBy('delivery');
+        $builder->groupBy('data_model.no_model');
 
-    return $builder->get()->getResult();
+        return $builder->get()->getResult();
     }
     public function tampilPerModelBlmAdaArea()
     {
@@ -112,9 +112,9 @@ class OrderModel extends Model
         $builder->orderby('delivery', 'asc');
 
         $results = $builder->groupBy('delivery')
-                        ->groupBy('data_model.no_model')
-                        ->groupBy('machinetypeid')
-                        ->get()->getResult();
+            ->groupBy('data_model.no_model')
+            ->groupBy('machinetypeid')
+            ->get()->getResult();
 
         $previous_model_machine = null;
         $counter = 1;
@@ -201,22 +201,24 @@ class OrderModel extends Model
     public function chartTurun()
     {
         $allResults = $this->select('sum(apsperstyle.qty) as qty_turun')
-        ->select("DATE_FORMAT(data_model.created_at, '%M-%Y') AS month_year", false)
-        ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel')
-        ->groupBy('month_year')
-        ->orderBy('month_year', 'ASC')
-        ->findAll();
+            ->select("CONCAT(
+                    'Minggu ke ', CEIL(DAY(data_model.created_at) / 7), ' bulan ', 
+                    MONTHNAME(data_model.created_at)
+                 ) AS week_month", false)
+            ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel')
+            ->groupBy('week_month')
+            ->orderBy('week_month', 'ASC')
+            ->findAll();
 
         $totalPerBulan = [];
 
         foreach ($allResults as $result) {
-            // Adding cancellation details to the array based on month
-            $monthYear = $result['month_year'];
-            $totalPerBulan[$monthYear] = round($result['qty_turun'] / 24);
+            $week = $result['week_month'];
+            $totalPerBulan[$week] = round($result['qty_turun'] / 24);
         }
 
         return [
-            'details' => $result,
+            'details' => $allResults,
             'totals' => $totalPerBulan
         ];
     }
