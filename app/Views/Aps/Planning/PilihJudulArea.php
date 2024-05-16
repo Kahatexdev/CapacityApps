@@ -76,6 +76,18 @@
         </div>
     </div>
 
+    <div class="row mt-3">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <h3><?= $month ?></h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 

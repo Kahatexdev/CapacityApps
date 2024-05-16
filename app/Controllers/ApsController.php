@@ -15,7 +15,7 @@ use App\Models\ProduksiModel;
 use App\Models\LiburModel;
 use App\Models\KebutuhanMesinModel;
 use App\Models\KebutuhanAreaModel;
-use App\Models\MesinPlanningModel;/*  */
+use App\Models\MesinPlanningModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
 
@@ -31,6 +31,7 @@ class ApsController extends BaseController
     protected $ApsPerstyleModel;
     protected $liburModel;
     protected $KebutuhanMesinModel;
+    protected $KebutuhanAreaModel;
     protected $MesinPlanningModel;
 
     public function __construct()
@@ -43,6 +44,7 @@ class ApsController extends BaseController
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         $this->liburModel = new LiburModel();
         $this->KebutuhanMesinModel = new KebutuhanMesinModel();
+        $this->KebutuhanAreaModel = new KebutuhanAreaModel();
         $this->MesinPlanningModel = new MesinPlanningModel();
         if ($this->filters   = ['role' => ['aps']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -357,6 +359,7 @@ class ApsController extends BaseController
         return view('Aps/Order/detailModelJarum', $data);
     }
     public function planningmesin(){
+        $planarea = $this->KebutuhanAreaModel->findAll();
         $data = [
             'title' => 'Data Planning Area',
             'active1' => '',
@@ -366,7 +369,9 @@ class ApsController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
+            'planarea' => $planarea,
         ];
+        dd($planarea);
         return view('Aps/Planning/PilihJudulArea',$data);
     }
 }
