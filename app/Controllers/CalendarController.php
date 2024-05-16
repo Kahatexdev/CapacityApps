@@ -209,7 +209,7 @@ class CalendarController extends BaseController
                 'htst' => $htst != 0 ? number_format($htst, 0, ',', '.') : '-',
                 'htpl' => $htpl != 0 ? number_format($htpl, 0, ',', '.') : '-',
             ];
-            
+
             $weekCount++;
         }
         $get = [
@@ -463,14 +463,17 @@ class CalendarController extends BaseController
             $target = $data['konversi'];
             $type = $data['product_type'];
             $qtyTotal += $qty1;
-            
-            
-            $value[] = [
-                'kebutuhanMc' => ceil($qtyTotal / $target / $hari1 / 24),
-                'JumlahHari' => $hari1,
-                'delivery' => $deliv,
-                'type' => $type
-            ];
+            if ($hari1 == null) {
+                $value =  ['kebutuhanMc' => 0, 'JumlahHari' => 0, 'delivery' => 0, 'type' => $type, 'stopmc' => 0];
+                return $value;
+            } else {
+                $value[] = [
+                    'kebutuhanMc' => ceil($qtyTotal / $target / $hari1 / 24),
+                    'JumlahHari' => $hari1,
+                    'delivery' => $deliv,
+                    'type' => $type
+                ];
+            }
         }
 
         if (!$value) {
