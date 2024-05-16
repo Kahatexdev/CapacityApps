@@ -378,6 +378,7 @@ class BookingController extends BaseController
     {
         $file = $this->request->getFile('excel_file');
         $refId = $this->request->getPost('refid');
+        $sisa = $this->request->getPost('sisa');
 
         if ($file->isValid() && !$file->hasMoved()) {
             $spreadsheet = IOFactory::load($file);
@@ -408,7 +409,7 @@ class BookingController extends BaseController
                     $no_order = $data[18];
                     $tgl_booking = date('Y-m-d');
                     $product_type = $data[2];
-                    $sisa = $data[8];
+
                     $getIdProd = ['prodtype' => $product_type, 'jarum' => $jarum];
                     $idprod = $this->productModel->getId($getIdProd);
 
@@ -430,7 +431,8 @@ class BookingController extends BaseController
                             'lead_time' => $lead_time,
                             'tgl_terima_booking' => $tgl_booking,
                             'status' => 'Pecahan',
-                            'refid' => $refId
+                            'ref_id' => $refId,
+                            'sisa_booking' => $sisa
                         ];
                         // $existOrder = $this->bookingModel->existingOrder($no_order);
                         // if (!$existOrder) {

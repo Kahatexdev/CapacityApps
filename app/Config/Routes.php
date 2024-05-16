@@ -27,7 +27,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('cancelbooking/(:any)', 'BookingController::cancelbooking/$1');
     $routes->post('pecahbooking/(:any)', 'BookingController::pecahbooking/$1');
     $routes->post('importbooking', 'BookingController::importbooking');
-    $routes->post('importpecahbooking', 'BookingController::importpecahbooking');
+    $routes->post('importpecahbooking/(:any)', 'BookingController::importpecahbooking/$1');
     $routes->get('cancelBooking', 'BookingController::getCancelBooking');
     $routes->post('detailcancelbooking/(:any)/(:any)', 'BookingController::detailcancelbooking/$1/$2');
     $routes->post('uncancelbooking/(:any)', 'BookingController::uncancelbooking/$1');

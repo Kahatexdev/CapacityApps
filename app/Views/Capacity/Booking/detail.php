@@ -440,8 +440,9 @@
                 <div class="row mt-2">
                     <div class="col-9 pl-0">
 
-                        <form action="<?= base_url('capacity/importpecahbooking' . $booking['id_booking']) ?>" id="modalForm" method="POST" enctype="multipart/form-data">
+                        <form action="<?= base_url('capacity/importpecahbooking/' . $booking['id_booking']) ?>" id="modalForm" method="POST" enctype="multipart/form-data">
                             <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control ">
+                            Sisa: <input type="number" id="sisa" name="sisa" class="form-control">
                             <div class="form-group">
                                 <input type="text" name="refid" id="" class="form-control" value=<?= $booking['id_booking'] ?> hidden>
                             </div>
