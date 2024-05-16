@@ -33,7 +33,7 @@
                         <h5>
                             Detail Booking
                         </h5>
-                        <a href="<?= base_url('capacity/databookingbulantampil/'.date('F/Y',strtotime($booking['delivery'])) .'/'. $jarum['needle']) ?>" class="btn bg-gradient-dark">
+                        <a href="<?= base_url('capacity/databookingbulantampil/' . date('F/Y', strtotime($booking['delivery'])) . '/' . $jarum['needle']) ?>" class="btn bg-gradient-dark">
                             <i class="fas fa-arrow-circle-left text-lg opacity-10" aria-hidden="true" style="margin-right: 0.5rem;"></i> Back
                         </a>
                     </div>
@@ -126,7 +126,7 @@
                 <div class="card-footer">
                     <div class="row">
                         <div class="col-lg-12">
-                            <?php if ($booking['status'] !== 'Cancel Booking'): ?>
+                            <?php if ($booking['status'] !== 'Cancel Booking') : ?>
                                 <a href="" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#ModalBooking">Booking to Booking</a>
                                 <a href="#" class="btn btn-info order-btn" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">Booking to Order</a>
                                 <a href="" class="btn btn-success" Data-bs-toggle="modal" data-bs-target="#ModalEdit">Edit Booking</a>
@@ -392,13 +392,13 @@
                     <div class="modal-body">
                         <label for="sisa_booking">Quantity Available:</label>
                         <input type="text" name="sisa_booking" id="sisa_booking" class="form-control" value="<?= $booking['sisa_booking'] ?>" readonly>
-                        
+
                         <label for="qty_cancel">Quantity to Cancel:</label>
                         <input type="number" name="qty_cancel" id="qty_cancel" class="form-control" required min="1" oninput="calculateRemaining()">
-                        
+
                         <label for="sisa_booking_remaining">Quantity Remaining:</label>
                         <input type="text" name="sisa_booking_remaining" id="sisa_booking_remaining" class="form-control" value="<?= $booking['sisa_booking'] ?>" readonly>
-                        
+
                         <label for="alasan">Reason:</label>
                         <input type="text" name="alasan" id="alasan" class="form-control" style="margin-bottom: 10px;" required>
                     </div>
@@ -440,21 +440,19 @@
                             <div class="form-group">
                                 <label for="jarum" class="col-form-label">Needle</label>
                                 <select class="form-control" id="jarum" name="jarum">
-                                    <option>Choose</option>
+                                    <option value="">Choose</option>
                                     <?php foreach ($jenisJarum as $jj) : ?>
-                                        <option><?= $jj['jarum'] ?></option>
+                                        <option value="<?= $jj['jarum'] ?>"><?= $jj['jarum'] ?></option>
                                     <?php endforeach ?>
                                 </select>
                             </div>
-                            <div class=" form-group">
+                            <div class="form-group">
                                 <label for="productType" class="col-form-label">Product Type</label>
                                 <select class="form-control" id="productType" name="productType">
-                                    <option>Choose</option>
-                                    <?php foreach ($product as $pr) : ?>
-                                        <option><?= $pr['product_type'] ?></option>
-                                    <?php endforeach ?>
+                                    <option value="">Choose</option>
                                 </select>
                             </div>
+
                             <div class=" form-group">
                                 <label for="no_order" class="col-form-label">No Order:</label>
                                 <input type="text" name="no_order" id="" class="form-control" oninput="this.value = this.value.toUpperCase()">
@@ -502,7 +500,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger" id="cancelBookingBtn">Cancel Booking</button>
+                <button type="submit" class="btn btn-info" id="">Split Booking</button>
             </div>
             </form>
         </div>
@@ -516,6 +514,7 @@
         $('#dataTable').DataTable();
         $('#dataTable1').DataTable();
     });
+
     function hitungJumlahHari() {
         var opdString = document.getElementById("opd").value
         var shipmentString = document.getElementById("shipment").value
@@ -548,10 +547,11 @@
         }
 
     }
+
     function calculateRemaining() {
         var availableQuantity = parseInt(document.getElementById("sisa_booking").value);
         var quantityToCancel = parseInt(document.getElementById("qty_cancel").value);
-        
+
         // Check if quantity to cancel exceeds available quantity
         if (quantityToCancel > availableQuantity) {
             // Show SweetAlert error message
@@ -560,15 +560,16 @@
                 title: 'Oops...',
                 text: 'Quantity to cancel cannot exceed available quantity.',
             });
-            
+
             // Reset quantity to cancel to available quantity
             document.getElementById("qty_cancel").value = availableQuantity;
             quantityToCancel = availableQuantity; // Reset quantity to cancel
         }
-        
+
         var remainingQuantity = availableQuantity - quantityToCancel;
         document.getElementById("sisa_booking_remaining").value = remainingQuantity;
     }
+
     function cancelBooking() {
         Swal.fire({
             title: 'Are you sure?',
@@ -587,6 +588,40 @@
     }
 
     document.getElementById('cancelBookingBtn').addEventListener('click', cancelBooking);
+</script>
+<script>
+    $(document).ready(function() {
+        $('#jarum').change(function() {
+            var selectedJarum = $(this).val();
+            if (selectedJarum) {
+                $.ajax({
+                    url: '<?= base_url('capacity/getTypebyJarum') ?>', // Ubah dengan URL controller Anda
+                    type: 'POST',
+                    data: {
+                        jarum: selectedJarum
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+
+                        var productTypeSelect = $('#productType');
+                        productTypeSelect.empty();
+                        productTypeSelect.append('<option value="">Choose</option>'); // Tambahkan opsi default
+
+                        // Iterasi melalui data yang diterima dan tambahkan ke select option
+                        $.each(response, function(index, productType) {
+                            productTypeSelect.append('<option value="' + productType + '">' + productType + '</option>');
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching data:', error);
+                    }
+                });
+            } else {
+                $('#productType').empty();
+                $('#productType').append('<option value="">Choose</option>');
+            }
+        });
+    });
 </script>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <?php $this->endSection(); ?>

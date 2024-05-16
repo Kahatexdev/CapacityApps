@@ -88,6 +88,8 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
     $routes->post('kebutuhanMesinBooking', 'KebutuhanMesin::inputMesinBooking');
 
+    $routes->post('getTypebyJarum', 'BookingController::getTypebyJarum');
+
     $routes->get('sales', 'ExportController::index');
     $routes->get('exportsales', 'ExportController::export');
 
