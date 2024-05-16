@@ -161,7 +161,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
 
 //aps
 $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
-    
+
     // booking
     $routes->get('databooking', 'ApsController::booking');
     $routes->get('databooking/(:any)', 'ApsController::bookingPerJarum/$1');
@@ -173,20 +173,16 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('', 'ApsController::index');
     $routes->get('dataorder', 'ApsController::order');
     $routes->get('blmAdaArea', 'OrderController::orderBlmAdaAreal');
-    $routes->get('orderPerjarum', 'OrderController::OrderPerJarumPlan');
-    $routes->get('orderPerArea', 'OrderController::orderPerAreaPlan');
-    $routes->get('detailModelPlanning/(:any)/(:any)', 'OrderController::detailModelPlanning/$1/$2');
-    $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'OrderController::detailmodeljarum/$1/$2/$3');
-    $routes->get('semuaOrder', 'OrderController::semuaOrderPlan');
-    $routes->get('dataorderperjarum/(:any)', 'OrderController::DetailOrderPerJarumPlan/$1');
+    $routes->get('orderPerjarum', 'ApsController::OrderPerJarum');
+    $routes->get('orderPerArea', 'OrderController::orderPerArea');
+    $routes->get('detailmodel/(:any)/(:any)', 'ApsController::detailModel/$1/$2');
+    $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'ApsController::detailmodeljarum/$1/$2/$3');
+    $routes->get('semuaOrder', 'ApsController::semuaOrder');
+    $routes->get('dataorderperjarum/(:any)', 'ApsController::DetailOrderPerJarum/$1');
     $routes->get('dataorderperarea/(:any)', 'OrderController::DetailOrderPerAreaPlan/$1');
     $routes->post('updatedetailorder/(:any)', 'OrderController::updateorder/$1');
     $routes->post('updatedetailjarum/(:any)', 'OrderController::updateorderjarum/$1');
-    $routes->post('deletedetailstyle/(:any)', 'OrderController::deletedetailstyle/$1');
-    $routes->post('deletedetailorder/(:any)', 'OrderController::deletedetailorder/$1');
-    $routes->post('deletedetailjarum/(:any)', 'OrderController::deletedetailmodeljarum/$1');
-    $routes->post('assignareal', 'PlanningController::assignareal');
-    $routes->post('assignarealall', 'PlanningController::assignarealall');
+
 
     // mesin
     $routes->get('datamesin', 'MesinController::indexPlan');
