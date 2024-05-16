@@ -660,4 +660,17 @@ class BookingController extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException();
         }
     }
+    public function uncancelbooking($id)
+    {
+        $qty_cancel = $this->request->getPost('qty_cancel');
+        if ($id) {
+            $this->bookingModel->set('sisa_booking', 'sisa_booking + ' . $qty_cancel, false)
+                ->set('status', 'Aktif')
+                ->where('id_booking', $id)
+                ->update();
+            $this->cancelModel->where('id_booking', $id)
+                ->delete();
+            return redirect()->to(base_url('capacity/cancelBooking/'))->withInput()->with('success', 'Data Uncancel Success');
+        }
+    }
 }

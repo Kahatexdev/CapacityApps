@@ -1,3 +1,4 @@
+.env
 */config/development
 */logs/log-*.php
 !*/logs/index.html
@@ -10,8 +11,8 @@ writable/*
 writable/log/*
 composer.lock
 composer.json
-.env
 
+.env
 user_guide_src/build/*
 user_guide_src/cilexer/build/*
 user_guide_src/cilexer/dist/*
