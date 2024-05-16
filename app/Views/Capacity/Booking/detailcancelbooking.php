@@ -50,7 +50,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table id="example" class="display compact " style="width:100%">
+                    <table id="example" class="display compact" style="width:100%">
                         <thead>
                             <tr>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Tgl Booking</th>
@@ -61,6 +61,7 @@
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Booking</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Cancel</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Reason</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -74,13 +75,18 @@
                                     <td class="text-xs"><?= round($bk['sisa_booking']/24) ?> Dz</td>
                                     <td class="text-xs"><?= round($bk['qty_cancel'] / 24)?> Dz</td>
                                     <td class="text-xs"><?= $bk['alasan'] ?></td>
+                                    <td class="text-xs">
+                                    <form action="<?= base_url() . 'capacity/uncancelbooking/'.$bk['id_booking']; ?>" method="post">
+                                            <input type="hidden" name="qty_cancel" value="<?= $bk['qty_cancel'] ?>">
+                                            <button type="submit" class="btn btn-primary btn-sm">Uncancel</button>
+                                        </form>
+                                    </td>
                                 </tr>
                             <?php endforeach ?>
                         </tbody>
                     </table>
                 </div>
             </div>
-
         </div>
     </div>
 
