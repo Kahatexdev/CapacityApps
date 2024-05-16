@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend('Aps/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -33,7 +33,7 @@
                         <h5>
                             Detail Booking
                         </h5>
-                        <a href="<?= base_url('capacity/databookingbulantampil/'.date('F/Y',strtotime($booking['delivery'])) .'/'. $jarum['needle']) ?>" class="btn bg-gradient-dark">
+                        <a href="<?= base_url('capacity/databookingbulantampil/' . date('F/Y', strtotime($booking['delivery'])) . '/' . $jarum['needle']) ?>" class="btn bg-gradient-dark">
                             <i class="fas fa-arrow-circle-left text-lg opacity-10" aria-hidden="true" style="margin-right: 0.5rem;"></i> Back
                         </a>
                     </div>
@@ -124,16 +124,7 @@
                 </div>
 
                 <div class="card-footer">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <?php if ($booking['status'] !== 'Cancel Booking'): ?>
-                                <a href="" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#ModalBooking">Booking to Booking</a>
-                                <a href="#" class="btn btn-info order-btn" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">Booking to Order</a>
-                                <a href="" class="btn btn-success" Data-bs-toggle="modal" data-bs-target="#ModalEdit">Edit Booking</a>
-                                <a href="" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#ModalCancel">Cancel Booking</a>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+
                 </div>
 
             </div>
@@ -217,297 +208,11 @@
             </div>
         </div>
     </div>
-    <div class="modal fade  bd-example-modal-lg" id="exampleModalMessage" tabindex="-1" role="dialog" aria-labelledby="exampleModalMessageTitle" aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Convert Booking into Order</h5>
-                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form action="<?= base_url("capacity/inputOrder"); ?>" method="post">
-                        <input type="text" name="id_booking" value="<?= $booking['id_booking']; ?>" hidden>
-                        <input type="text" name="jarum" value="<?= $booking['needle']; ?>" hidden>
-                        <div class="row">
-                            <div class="col-lg-6 col-sm-12">
-                                <div class="form-group">
-                                    <label for="col-lg-6 col-sm-12">Order Receipt Date</label>
-                                    <input type="date" class="form-control" name="tgl_turun">
-                                </div>
-                                <div class="form-group">
-                                    <label for="col-lg-6 col-sm-12">No Booking</label>
-                                    <input type="text" class="form-control" name="no_booking" value="<?= $booking['no_booking']; ?>">
-                                </div>
-                                <div class="form-group">
-                                    <label for="col-lg-6 col-sm-12">Description</label>
-                                    <input type="text" class="form-control" name="deskripsi" oninput="this.value = this.value.toUpperCase()">
-                                </div>
-                                <div class="form-group">
-                                    <label for="col-lg-6 col-sm-12">No Model</label>
-                                    <input type="text" name="no_model" class="form-control" oninput="this.value = this.value.toUpperCase()">
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-sm-12">
-                                <div class="form-group">
-                                    <label for="col-lg-6 col-sm-12">Beginning Remaining Booking</label>
-                                    <input type="text" name="sisa_booking" class="form-control" value="<?= $booking['sisa_booking']; ?>">
-                                </div>
-                                <div class="form-group">
-                                    <label for="col-lg-6 col-sm-12">Qty Order Place</label>
-                                    <input type="text" name="turun_order" class="form-control">
-                                </div>
-                                <div class="form-group">
-                                    <label for="col-lg-6 col-sm-12">Ending Remaining Booking</label>
-                                    <input type="text" name="sisa_booking_akhir" class="form-control">
-                                </div>
-                            </div>
-                        </div>
 
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn bg-gradient-primary">Save</button>
-                </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <!-- modal edit -->
-    <div class="modal fade  bd-example-modal-lg" id="ModalEdit" tabindex="-1" role="dialog" aria-labelledby="modalEdit" aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Edit Data Booking</h5>
-                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form action="<?= base_url('capacity/updatebooking/' . $booking['id_booking']) ?>" method="post">
-                        <div class="row">
-                            <div class="col-lg-6 col-sm-12">
-                                <div class="form-group">
-                                    <label for="tgl-bk" class="col-form-label">Order Receipt Date</label>
-                                    <input type="date" class="form-control" name="tgl_booking" value="<?= $booking['tgl_terima_booking'] ?>" disabled>
-                                </div>
-                                <div class="form-group">
-                                    <label for="buyer" class="col-form-label">Buyer Code </label>
-                                    <input type="text" name="buyer" id="" class="form-control" value="<?= $booking['kd_buyer_booking']; ?>" disabled>
-                                </div>
-                                <div class=" form-group">
-                                    <label for="no_order" class="col-form-label">Order Number</label>
-                                    <input type="text" name="no_order" id="" class="form-control" value="<?= $booking['no_order']; ?>" disabled>
-                                </div>
-                                <div class=" form-group">
-                                    <label for="productType" class="col-form-label">Product Type</label>
-                                    <input type="text" name="desc" id="" class="form-control" value="<?= $booking['product_type']; ?>" disabled>
-                                </div>
-                                <div class="form-group">
-                                    <label for="no_pdk" class="col-form-label">Booking Number</label>
-                                    <input type="text" name="no_booking" id="" class="form-control" value="<?= $booking['no_booking']; ?>">
-                                </div>
-                                <div class="form-group">
-                                    <label for="desc" class="col-form-label">Description</label>
-                                    <input type="text" name="desc" id="" class="form-control" value="<?= $booking['desc']; ?>" oninput="this.value = this.value.toUpperCase()">
-                                </div>
-
-                            </div>
-                            <div class="col-lg-6 col-sm-12">
-                                <div class="form-group">
-                                    <label for="seam" class="col-form-label">Seam</label>
-                                    <input type="text" name="seam" id="" class="form-control" value="<?= $booking['seam']; ?>" oninput="this.value = this.value.toUpperCase()">
-                                </div>
-                                <div class="form-group">
-                                    <label for="opd" class="col-form-label">OPD</label>
-                                    <input type="date" name="opd" id="opd" class="form-control" value="<?= $booking['opd']; ?>" onchange="hitungJumlahHari()">
-                                </div>
-                                <div class=" form-group">
-                                    <label for="shipment" class="col-form-label">Shipment</label>
-                                    <input type="date" name="delivery" id="shipment" value="<?= $booking['delivery']; ?>" class="form-control" onchange="hitungJumlahHari()">
-                                </div>
-                                <div class=" form-group">
-                                    <label for="Lead" class="col-form-label">LeadTime</label>
-                                    <input type="text" readonly name="lead" id="lead" value="<?= $booking['lead_time']; ?>" class=" form-control">
-                                </div>
-                                <div class="form-group">
-                                    <label for="qty" class="col-form-label">QTY Booking (pcs)</label>
-                                    <input type="number" name="qty" id="" class="form-control" value="<?= $booking['qty_booking']; ?>">
-                                </div>
-                                <div class="form-group">
-                                    <label for="qty" class="col-form-label">Booking Remaining (pcs)</label>
-                                    <input type="number" name="sisa" id="" class="form-control" value="<?= $booking['sisa_booking']; ?>">
-                                </div>
-                            </div>
-                        </div>
-
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn bg-gradient-info">Edit</button>
-                </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- modal delete
-    <div class="modal fade  bd-example-modal-lg" id="ModalDelete" tabindex="-1" role="dialog" aria-labelledby="modaldelete" aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Delete Data Booking</h5>
-                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form action="<?= base_url('capacity/deletebooking/' . $booking['id_booking']) ?>" method="post">
-                        <input type="text" name="jarum" id="" hidden value="<?= $booking['needle'] ?>">
-                        Are you sure to Delete Data Booking?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn bg-gradient-danger">Delete</button>
-                </div>
-                </form>
-            </div>
-        </div>
-    </div> -->
-
-    <div class="modal fade  bd-example-modal-lg" id="ModalCancel" tabindex="-1" role="dialog" aria-labelledby="modalCancel" aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Cancel Booking</h5>
-                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <form action="<?= base_url('capacity/cancelbooking/' . $booking['id_booking']) ?>" method="post">
-                    <div class="modal-body">
-                        <label for="sisa_booking">Quantity Available:</label>
-                        <input type="text" name="sisa_booking" id="sisa_booking" class="form-control" value="<?= $booking['sisa_booking'] ?>" readonly>
-                        
-                        <label for="qty_cancel">Quantity to Cancel:</label>
-                        <input type="number" name="qty_cancel" id="qty_cancel" class="form-control" required min="1" oninput="calculateRemaining()">
-                        
-                        <label for="sisa_booking_remaining">Quantity Remaining:</label>
-                        <input type="text" name="sisa_booking_remaining" id="sisa_booking_remaining" class="form-control" value="<?= $booking['sisa_booking'] ?>" readonly>
-                        
-                        <label for="alasan">Reason:</label>
-                        <input type="text" name="alasan" id="alasan" class="form-control" style="margin-bottom: 10px;" required>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-danger">Cancel Booking</button>
-                    </div>
-                </form>
-
-
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- Modal Booking -->
-<div class="modal fade  bd-example-modal-lg" id="ModalBooking" tabindex="-1" role="dialog" aria-labelledby="modalbooking" aria-hidden="true">
-    <div class="modal-dialog  modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Split Booking</h5>
-                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form action="<?= base_url('capacity/pecahbooking/' . $booking['id_booking']) ?>" method="post">
-                    <div class="row">
-                        <div class="col-lg-6 col-sm-12">
-                            <div class="form-group">
-                                <label for="tgl-bk" class="col-form-label">Booking Date</label>
-                                <input type="date" class="form-control" name="tgl_booking">
-                            </div>
-                            <div class="form-group">
-                                <label for="buyer" class="col-form-label">Buyer Code</label>
-                                <input type="text" name="buyer" id="" class="form-control" oninput="this.value = this.value.toUpperCase()">
-                            </div>
-                            <div class="form-group">
-                                <label for="jarum" class="col-form-label">Needle</label>
-                                <select class="form-control" id="jarum" name="jarum">
-                                    <option>Choose</option>
-                                    <?php foreach ($jenisJarum as $jj) : ?>
-                                        <option><?= $jj['jarum'] ?></option>
-                                    <?php endforeach ?>
-                                </select>
-                            </div>
-                            <div class=" form-group">
-                                <label for="productType" class="col-form-label">Product Type</label>
-                                <select class="form-control" id="productType" name="productType">
-                                    <option>Choose</option>
-                                    <?php foreach ($product as $pr) : ?>
-                                        <option><?= $pr['product_type'] ?></option>
-                                    <?php endforeach ?>
-                                </select>
-                            </div>
-                            <div class=" form-group">
-                                <label for="no_order" class="col-form-label">No Order:</label>
-                                <input type="text" name="no_order" id="" class="form-control" oninput="this.value = this.value.toUpperCase()">
-                            </div>
 
-                            <div class="form-group">
-                                <label for="no_pdk" class="col-form-label">No Booking:</label>
-                                <input type="text" name="no_booking" id="" class="form-control" oninput="this.value = this.value.toUpperCase()">
-                            </div>
-                            <div class="form-group">
-                                <label for="desc" class="col-form-label">Description:</label>
-                                <input type="text" name="desc" id="" class="form-control" oninput="this.value = this.value.toUpperCase()">
-                            </div>
-
-                        </div>
-                        <div class="col-lg-6 col-sm-12">
-                            <div class="form-group">
-                                <label for="seam" class="col-form-label">Seam:</label>
-                                <input type="text" name="seam" id="" class="form-control" oninput="this.value = this.value.toUpperCase()">
-                            </div>
-                            <div class="form-group">
-                                <label for="opd" class="col-form-label">OPD:</label>
-                                <input type="date" name="opd" id="opd1" class="form-control" onchange="hitungJumlahHari()">
-                            </div>
-                            <div class=" form-group">
-                                <label for="shipment" class="col-form-label">Shipment:</label>
-                                <input type="date" name="delivery" id="shipment1" class="form-control" onchange="hitungJumlahHari()">
-                            </div>
-                            <div class=" form-group">
-                                <label for="Lead" class="col-form-label">LeadTime</label>
-                                <input type="text" readonly name="lead" id="lead1" class=" form-control">
-                            </div>
-                            <div class="form-group">
-                                <label for="qty" class="col-form-label">QTY Booking (pcs):</label>
-                                <input type="number" name="qty" id="" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label for="qty" class="col-form-label">Booking Remaining (pcs):</label>
-                                <input type="number" name="sisa" id="" class="form-control">
-                            </div>
-                        </div>
-                    </div>
-
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger" id="cancelBookingBtn">Cancel Booking</button>
-            </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 
 </div>
@@ -516,6 +221,7 @@
         $('#dataTable').DataTable();
         $('#dataTable1').DataTable();
     });
+
     function hitungJumlahHari() {
         var opdString = document.getElementById("opd").value
         var shipmentString = document.getElementById("shipment").value
@@ -548,10 +254,11 @@
         }
 
     }
+
     function calculateRemaining() {
         var availableQuantity = parseInt(document.getElementById("sisa_booking").value);
         var quantityToCancel = parseInt(document.getElementById("qty_cancel").value);
-        
+
         // Check if quantity to cancel exceeds available quantity
         if (quantityToCancel > availableQuantity) {
             // Show SweetAlert error message
@@ -560,15 +267,16 @@
                 title: 'Oops...',
                 text: 'Quantity to cancel cannot exceed available quantity.',
             });
-            
+
             // Reset quantity to cancel to available quantity
             document.getElementById("qty_cancel").value = availableQuantity;
             quantityToCancel = availableQuantity; // Reset quantity to cancel
         }
-        
+
         var remainingQuantity = availableQuantity - quantityToCancel;
         document.getElementById("sisa_booking_remaining").value = remainingQuantity;
     }
+
     function cancelBooking() {
         Swal.fire({
             title: 'Are you sure?',

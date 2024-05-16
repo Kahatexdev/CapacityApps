@@ -1,4 +1,4 @@
-<?php $this->extend('Aps/layout'); ?>
+<?php $this->extend('Capacity/layout'); ?>
 <?php $this->section('content'); ?>
 
 <div class="container-fluid py-4">
@@ -11,11 +11,10 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    Data Booking Needle <?= $jarum ?> In Month <?= $bulan ?> Year <?= $tahun ?>
+                                    Detail Confirm Order
                                 </h5>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -54,44 +53,27 @@
                     <table id="example" class="display compact " style="width:100%">
                         <thead>
                             <tr>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Booking Date</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Buyer</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Order</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No PDK</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Booking Qty</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Booking Remaining Pcs</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Booking Remaining Dz</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Tgl Confirm</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Buyer</th>                                
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No PDK</th>                               
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Order</th>                               
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Delivery</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
-
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jarum</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Desctiprion</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($booking as $bk) : ?>
+                            <?php foreach ($data as $bk) : ?>
                                 <tr>
-                                    <td class="text-xs"><?= date('d-M-Y', strtotime($bk['tgl_terima_booking'])) ?></td>
-                                    <td class="text-xs"><?= $bk['kd_buyer_booking'] ?></td>
+                                    <td class="text-xs"><?= $bk['created_at'] ?></td>
+                                    <td class="text-xs"><?= $bk['kd_buyer_order'] ?></td>
+                                    <td class="text-xs"><?= $bk['no_model'] ?></td>
                                     <td class="text-xs"><?= $bk['no_order'] ?></td>
-                                    <td class="text-xs"><?= $bk['no_booking'] ?></td>
-                                    <td class="text-xs"><?= $bk['product_type'] ?></td>
-                                    <td class="text-xs"><?= number_format($bk['qty_booking'], 0, '.', '.') ?> Pcs</td>
-                                    <td class="text-xs"><?= number_format($bk['sisa_booking'], 0, '.', '.') ?> Pcs</td>
-                                    <td class="text-xs"><?= number_format(round($bk['sisa_booking'] / 24), 0, '.', '.') ?> Dz</td>
-                                    <td class="text-xs"><?= date('d-M-Y', strtotime($bk['delivery'])) ?></td>
-                                    <td class="text-xs"><?= $bk['status'] ?></td>
-
-                                    <td class="text-xs">
-                                        <?php if ($bk['status'] == 'Cancel Booking') : ?>
-                                            <!-- If qty is null, set action to Import -->
-                                            <a href="<?= base_url('aps/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-secondary btn-sm text-xxs">detail</a>
-                                        <?php else : ?>
-                                            <!-- If qty is not null, set action to Details -->
-                                            <a href="<?= base_url('aps/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm text-xxs">detail</a>
-                                        <?php endif; ?>
-
-                                    </td>
+                                    <td class="text-xs"><?= $bk['delivery'] ?></td>
+                                    <td class="text-xs"><?= $bk['machinetypeid'] ?></td>
+                                    <td class="text-xs"><?= round($bk['qty']/24) ?> Dz</td>
+                                    <td class="text-xs"><?= $bk['description'] ?></td>
                                 </tr>
                             <?php endforeach ?>
                         </tbody>
