@@ -374,6 +374,76 @@ class BookingController extends BaseController
             return redirect()->to(base_url('/capacity/databooking'))->with('error', 'No data found in the Excel file');
         }
     }
+    public function importpecahbooking()
+    {
+        $file = $this->request->getFile('excel_file');
+        $refId = $this->request->getPost('refid');
+
+        if ($file->isValid() && !$file->hasMoved()) {
+            $spreadsheet = IOFactory::load($file);
+            $data = $spreadsheet->getActiveSheet();
+            $startRow = 12; // Ganti dengan nomor baris mulai
+            foreach ($spreadsheet->getActiveSheet()->getRowIterator($startRow) as $row) {
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+                $data = [];
+                foreach ($cellIterator as $cell) {
+                    $data[] = $cell->getValue();
+                }
+                if (!empty($data)) {
+
+                    $no_booking = $data[0];
+                    $buyer = $data[3];
+                    $desc = $data[5];
+                    $shipment = $data[6];
+                    $unixTime = ($shipment - 25569) * 86400;
+                    $delivery = date('Y-m-d', $unixTime);
+                    $qty = $data[7];
+                    $opd = $data[9];
+                    $unixOpd = ($opd - 25569) * 86400;
+                    $opd1 = date('Y-m-d', $unixOpd);
+                    $jarum = $data[14];
+                    $lead_time = $data[16];
+                    $seam = $data[15];
+                    $no_order = $data[18];
+                    $tgl_booking = date('Y-m-d');
+                    $product_type = $data[2];
+                    $sisa = $data[8];
+                    $getIdProd = ['prodtype' => $product_type, 'jarum' => $jarum];
+                    $idprod = $this->productModel->getId($getIdProd);
+
+                    if ($data[5] == null) {
+                        break;
+                    } else {
+                        $insert = [
+                            'no_booking' => $no_booking,
+                            'id_product_type' => $idprod,
+                            'kd_buyer_booking' => $buyer,
+                            'desc' => $desc,
+                            'delivery' => $delivery,
+                            'opd' => $opd1,
+                            'sisa_booking' => $qty,
+                            'qty_booking' => $qty,
+                            'needle' => $jarum,
+                            'seam' => $seam,
+                            'no_order' => $no_order,
+                            'lead_time' => $lead_time,
+                            'tgl_terima_booking' => $tgl_booking,
+                            'status' => 'Pecahan',
+                            'refid' => $refId
+                        ];
+                        // $existOrder = $this->bookingModel->existingOrder($no_order);
+                        // if (!$existOrder) {
+                        $this->bookingModel->insert($insert);
+                        // }
+                    }
+                }
+            }
+            return redirect()->to(base_url('/capacity/detailbooking/' . $refId))->withInput()->with('success', 'Data Berhasil di Import');
+        } else {
+            return redirect()->to(base_url('/capacity/detailbooking/' . $refId))->with('error', 'No data found in the Excel file');
+        }
+    }
     public function updatebooking($idBooking)
     {
 

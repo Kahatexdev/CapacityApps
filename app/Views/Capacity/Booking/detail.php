@@ -127,6 +127,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <?php if ($booking['status'] !== 'Cancel Booking') : ?>
+                                <a href="" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#importPecahBooking">Import Booking to Booking</a>
                                 <a href="" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#ModalBooking">Booking to Booking</a>
                                 <a href="#" class="btn btn-info order-btn" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">Booking to Order</a>
                                 <a href="" class="btn btn-success" Data-bs-toggle="modal" data-bs-target="#ModalEdit">Edit Booking</a>
@@ -414,7 +415,48 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="importPecahBooking" tabindex="-1" role="dialog" aria-labelledby="importPecahBookingTitle" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Input Data Booking</h5>
+                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body align-items-center">
+                <div class="row align-items-center">
+                    <div id="drop-area" class="border rounded d-flex justify-content-center align-item-center mx-3" style="height:200px; width: 95%; cursor:pointer;">
+                        <div class="text-center mt-5">
+                            <i class="ni ni-cloud-upload-96" style="font-size: 48px;">
 
+                            </i>
+                            <p class="mt-3" style="font-size: 28px;">
+                                Upload file here
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-9 pl-0">
+
+                        <form action="<?= base_url('capacity/importpecahbooking' . $booking['id_booking']) ?>" id="modalForm" method="POST" enctype="multipart/form-data">
+                            <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control ">
+                            <div class="form-group">
+                                <input type="text" name="refid" id="" class="form-control" value=<?= $booking['id_booking'] ?> hidden>
+                            </div>
+                    </div>
+                    <div class="col-3 pl-0">
+                        <button type="submit" class="btn btn-info btn-block"> Simpan</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
 <!-- Modal Booking -->
 <div class="modal fade  bd-example-modal-lg" id="ModalBooking" tabindex="-1" role="dialog" aria-labelledby="modalbooking" aria-hidden="true">
     <div class="modal-dialog  modal-dialog-centered" role="document">
@@ -493,6 +535,7 @@
                                 <label for="qty" class="col-form-label">Booking Remaining (pcs):</label>
                                 <input type="number" name="sisa" id="" class="form-control">
                             </div>
+
                         </div>
                     </div>
 
