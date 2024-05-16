@@ -211,6 +211,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
     $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
+    $routes->get('planningmesin','ApsController::planningmesin');
 });
 
 // user

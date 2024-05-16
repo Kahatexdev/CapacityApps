@@ -14,7 +14,8 @@ use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use App\Models\LiburModel;
 use App\Models\KebutuhanMesinModel;
-use App\Models\MesinPlanningModel;
+use App\Models\KebutuhanAreaModel;
+use App\Models\MesinPlanningModel;/*  */
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
 
@@ -354,5 +355,18 @@ class ApsController extends BaseController
         ];
 
         return view('Aps/Order/detailModelJarum', $data);
+    }
+    public function planningmesin(){
+        $data = [
+            'title' => 'Data Planning Area',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+        ];
+        return view('Aps/Planning/PilihJudulArea',$data);
     }
 }
