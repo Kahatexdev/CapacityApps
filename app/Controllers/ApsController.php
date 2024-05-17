@@ -16,6 +16,7 @@ use App\Models\LiburModel;
 use App\Models\KebutuhanMesinModel;
 use App\Models\KebutuhanAreaModel;
 use App\Models\MesinPlanningModel;/*  */
+use App\Models\AksesModel;/*  */
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
 
@@ -32,6 +33,7 @@ class ApsController extends BaseController
     protected $liburModel;
     protected $KebutuhanMesinModel;
     protected $MesinPlanningModel;
+    protected $aksesModel;
 
     public function __construct()
     {
@@ -44,6 +46,7 @@ class ApsController extends BaseController
         $this->liburModel = new LiburModel();
         $this->KebutuhanMesinModel = new KebutuhanMesinModel();
         $this->MesinPlanningModel = new MesinPlanningModel();
+        $this->aksesModel = new AksesModel();
         if ($this->filters   = ['role' => ['aps']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -356,7 +359,8 @@ class ApsController extends BaseController
 
         return view('Aps/Order/detailModelJarum', $data);
     }
-    public function planningmesin(){
+    public function planningmesin()
+    {
         $data = [
             'title' => 'Data Planning Area',
             'active1' => '',
@@ -367,6 +371,79 @@ class ApsController extends BaseController
             'active6' => '',
             'active7' => '',
         ];
-        return view('Aps/Planning/PilihJudulArea',$data);
+        return view('Aps/Planning/PilihJudulArea', $data);
+    }
+    public function orderPerJarumBln()
+    {
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+        $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'TotalMesin' => $totalMesin,
+        ];
+        return view('Aps/Order/orderjarumbln', $data);
+    }
+    public function orderBlmAdaAreal()
+    {
+        $tampilperdelivery = $this->orderModel->tampilPerModelBlmAdaArea();
+        $product = $this->productModel->findAll();
+        $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'tampildata' => $tampilperdelivery,
+            'product' => $product,
+
+        ];
+        return view('Aps/Order/orderBlmAdaArea', $data);
+    }
+    public function orderPerArea()
+    {
+        $id = session()->get('id_user');
+        $area = $this->aksesModel->getArea($id);
+        $totalMesin = $this->jarumModel->getArea();
+        $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'TotalMesin' => $area,
+        ];
+        return view('Aps/Order/orderarea', $data);
+    }
+    public function DetailOrderPerArea($area)
+    {
+        $tampilperdelivery = $this->orderModel->tampilPerarea($area);
+        $product = $this->productModel->findAll();
+        $booking = $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'area' => $area,
+            'tampildata' => $tampilperdelivery,
+            'product' => $product,
+
+        ];
+        return view('Aps/Order/semuaorderarea', $data);
     }
 }

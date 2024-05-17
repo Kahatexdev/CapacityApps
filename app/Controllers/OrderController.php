@@ -31,7 +31,7 @@ class OrderController extends BaseController
         $this->produksiModel = new ProduksiModel();
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
-        if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
+        if ($this->filters   = ['role' => ['capacity', 'planning', 'aps', 'god']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
         $this->isLogedin();

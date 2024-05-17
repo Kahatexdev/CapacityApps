@@ -34,7 +34,7 @@ class BookingController extends BaseController
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         $this->cancelModel = new cancelModel();
-        if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
+        if ($this->filters   = ['role' => ['capacity', 'planning', 'god']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
         $this->isLogedin();
@@ -343,6 +343,7 @@ class BookingController extends BaseController
                     $sisa = $data[8];
                     $getIdProd = ['prodtype' => $product_type, 'jarum' => $jarum];
                     $idprod = $this->productModel->getId($getIdProd);
+                    dd($getIdProd);
 
                     if ($data[5] == null) {
                         break;
@@ -432,11 +433,11 @@ class BookingController extends BaseController
                             'tgl_terima_booking' => $tgl_booking,
                             'status' => 'Pecahan',
                             'ref_id' => $refId,
-                            'sisa_booking' => $sisa
                         ];
                         // $existOrder = $this->bookingModel->existingOrder($no_order);
                         // if (!$existOrder) {
                         $this->bookingModel->insert($insert);
+                        $this->bookingModel->update($refId, ['sisa_booking' => $sisa]);
                         // }
                     }
                 }

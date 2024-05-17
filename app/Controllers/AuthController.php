@@ -22,6 +22,7 @@ class AuthController extends BaseController
         if (!$userData) {
             return redirect()->to(base_url('/login'))->withInput()->with('error', 'Invalid username or password');
         }
+        session()->set('id_user', $userData['id']);
         session()->set('username', $userData['username']);
         session()->set('role', $userData['role']);
         switch ($userData['role']) {
@@ -36,6 +37,9 @@ class AuthController extends BaseController
                 break;
             case 'user':
                 return redirect()->to(base_url('/user'));
+                break;
+            case 'god':
+                return redirect()->to(base_url('/sudo'));
                 break;
 
             default:
