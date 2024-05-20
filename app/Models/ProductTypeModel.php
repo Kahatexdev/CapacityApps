@@ -46,7 +46,7 @@ class ProductTypeModel extends Model
             ->where('product_type', $getIdProd['prodtype'])
             ->where('jarum', $getIdProd['jarum'])
             ->first();
-        return $query;
+        return reset($query);
     }
     public function getKategori()
     {

@@ -343,7 +343,7 @@ class BookingController extends BaseController
                     $sisa = $data[8];
                     $getIdProd = ['prodtype' => $product_type, 'jarum' => $jarum];
                     $idprod = $this->productModel->getId($getIdProd);
-                    dd($getIdProd);
+                    
 
                     if ($data[5] == null) {
                         break;
@@ -363,6 +363,7 @@ class BookingController extends BaseController
                             'lead_time' => $lead_time,
                             'tgl_terima_booking' => $tgl_booking
                         ];
+                        
                         // $existOrder = $this->bookingModel->existingOrder($no_order);
                         // if (!$existOrder) {
                         $this->bookingModel->insert($insert);
