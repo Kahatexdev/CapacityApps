@@ -37,7 +37,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action="<?= base_url('capacity/kebutuhanMesinBooking') ?>" method="POST">
+                    <form action="<?= base_url('aps/SimpanJudul') ?>" method="POST">
                         <div class="row">
                             <div class="col-lg-12 col-md-12">
 
@@ -46,8 +46,15 @@
                                     <input class="form-control" type="text" value="" placeholder="Masukan Judul" required id="judul" name="judul">
                                 </div>                                
                                 <div class="form-group">
-                                    <label for="jarum" class="form-control-label">Area</label>
-                                    <input class="form-control" type="text" value="" id="area" name="area">
+                                    <label for="area" class="form-control-label">Area</label>
+                                    <select class="form-control" id="area" name="area">
+                                        <option value="">Pilih Area</option>
+                                        <?php
+                                        foreach ($area as $area) {
+                                            echo "<option value=\"$area\">$area</option>";
+                                        }
+                                        ?>
+                                    </select>
                                 </div>
                                 <div class="form-group">
                                     <label for="jarum" class="form-control-label">Jarum</label>
@@ -81,7 +88,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
-                        <h3><?= $month ?></h3>
+                        
                     </div>
                 </div>
             </div>
@@ -107,6 +114,25 @@
             $('#importModal').find('input[name="no_model"]').val(noModel);
 
             $('#importModal').modal('show'); // Show the modal
+        });
+        $('#area').change(function() {
+            var area = $(this).val();
+            if (area) {
+                $.ajax({
+                    type: 'POST',
+                    url: '<?= base_url('aps/fetch_jarum') ?>', // URL to the PHP script that fetches Jarum data
+                    data: {area: area},
+                    success: function(response) {
+                        var jarumOptions = JSON.parse(response);
+                        $('#jarum').empty().append('<option value="">Pilih Jarum</option>');
+                        $.each(jarumOptions, function(key, value) {
+                            $('#jarum').append('<option value="'+ value +'">'+ value +'</option>');
+                        });
+                    }
+                });
+            } else {
+                $('#jarum').empty().append('<option value="">Pilih Jarum</option>');
+            }
         });
     });
 </script>

@@ -360,6 +360,7 @@ class ApsController extends BaseController
     }
     public function planningmesin(){
         $planarea = $this->KebutuhanAreaModel->findAll();
+        $area = $this->jarumModel->getArea();
         $data = [
             'title' => 'Data Planning Area',
             'active1' => '',
@@ -370,8 +371,8 @@ class ApsController extends BaseController
             'active6' => '',
             'active7' => '',
             'planarea' => $planarea,
+            'area'=> $area,
         ];
-        dd($planarea);
         return view('Aps/Planning/PilihJudulArea',$data);
     }
 }
