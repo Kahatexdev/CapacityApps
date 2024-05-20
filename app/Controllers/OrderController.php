@@ -508,30 +508,27 @@ class OrderController extends BaseController
                                 'description' => $description
                             ];
                             $validate = [
-                                'mastermodel'=>$nomodel,
                                 'size' => $size,
                                 'delivery' => $delivery2,
-
+                                'mastermodel' => $nomodel
                             ];
 
                             $existingAps = $this->ApsPerstyleModel->checkAps($validate);
                             if (!$existingAps) {
                                 $this->ApsPerstyleModel->insert($simpandata);
-                              
+
                                 $this->orderModel->update($idModel, $updateData);
-                                return redirect()->to(base_url('/capacity/semuaOrder'))->withInput()->with('success', 'Data Berhasil di Import');
                             } else {
                                 $sumqty = $existingAps->qty + $qty;
                                 $sumsisa = $existingAps->sisa + $qty;
                                 $idAps = $existingAps->idapsperstyle;
                                 $this->ApsPerstyleModel->update($idAps, ['qty' => $sumqty, 'sisa' => $sumsisa]);
-                                return redirect()->to(base_url('/capacity/semuaOrder'))->withInput()->with('success', 'Data Berhasil di update');
                             }
                         }
                     }
                 }
             }
-            
+            return redirect()->to(base_url('/capacity/semuaOrder'))->withInput()->with('success', 'Data Berhasil di Import');
         } else {
             return redirect()->to(base_url('/capacity/semuaOrder'))->with('error', 'No data found in the Excel file');
         }
