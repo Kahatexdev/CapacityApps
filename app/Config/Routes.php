@@ -174,17 +174,19 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
 
     //order
     $routes->get('', 'ApsController::index');
-    $routes->get('dataorder', 'ApsController::order');
-    $routes->get('blmAdaArea', 'OrderController::orderBlmAdaAreal');
+    $routes->get('dataorder', 'ApsController::orderPerArea');
+    $routes->get('blmAdaArea', 'ApsController::orderBlmAdaAreal');
     $routes->get('orderPerjarum', 'ApsController::OrderPerJarum');
-    $routes->get('orderPerArea', 'OrderController::orderPerArea');
+    $routes->get('orderPerArea', 'ApsController::orderPerArea');
     $routes->get('detailmodel/(:any)/(:any)', 'ApsController::detailModel/$1/$2');
     $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'ApsController::detailmodeljarum/$1/$2/$3');
     $routes->get('semuaOrder', 'ApsController::semuaOrder');
     $routes->get('dataorderperjarum/(:any)', 'ApsController::DetailOrderPerJarum/$1');
-    $routes->get('dataorderperarea/(:any)', 'OrderController::DetailOrderPerAreaPlan/$1');
+    $routes->get('dataorderperarea/(:any)', 'ApsController::DetailOrderPerArea/$1');
     $routes->post('updatedetailorder/(:any)', 'OrderController::updateorder/$1');
     $routes->post('updatedetailjarum/(:any)', 'OrderController::updateorderjarum/$1');
+    $routes->get('orderPerjarumBln', 'ApsController::orderPerJarumBln');
+
 
 
     // mesin

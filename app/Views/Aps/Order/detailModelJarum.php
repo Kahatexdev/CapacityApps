@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend('Aps/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -33,8 +33,8 @@
                         <h5>
                             Detail Data Model <?= $noModel ?> Delivery <?= date('d-M-Y', strtotime($delivery)) ?>
                         </h5>
-                        <a href="<?= base_url('capacity/dataorderperjarumblndetail/'.date('F/Y', strtotime($delivery)).'/'.$jarum) ?>" class="btn bg-gradient-dark d-inline-flex align-items-center">
-                            <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i> 
+                        <a href="<?= base_url('aps/dataorderperjarum/'  .  $jarum) ?>" class="btn bg-gradient-dark d-inline-flex align-items-center">
+                            <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
                             Back
                         </a>
 
@@ -230,7 +230,7 @@
         <script>
             $(document).ready(function() {
                 $('#dataTable').DataTable({
-                    "footerCallback": function (row, data, start, end, display) {
+                    "footerCallback": function(row, data, start, end, display) {
                         var api = this.api();
 
                         var qty = api.column(3, {
@@ -255,7 +255,7 @@
 
                         // Update the footer cell for the total Sisa
                         $(api.column(4).footer()).html(totalsisa);
-                      
+
                     }
                 });
 
