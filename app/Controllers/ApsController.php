@@ -424,6 +424,13 @@ class ApsController extends BaseController
             return $this->response->setStatusCode(500)->setBody($e->getMessage());
         }
     }
+    public function detailplanmc($id){
+        // $this->detailPlanningModel->where('id_pln_mc',$id)->findAll();
+        $judul = $this->request->getPost('judul');
+        $area = $this->request->getPost('area');
+        $jarum = $this->request->getPost('jarum');
+        dd($jarum);
+    }
     public function orderPerJarumBln()
     {
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();

@@ -103,8 +103,13 @@
                                         <td><?= $order['judul'] ?></td>
                                         <td><?= $order['jarum'] ?></td>
                                         <td><?= $order['area'] ?></td>
-                                        <td><?= date_format((new DateTime($order['updated_at'])), 'd-F-Y H:i') ?></td>
-                                        <td></td>
+                                        <td><?= date('F j, Y \a\t g:i A', strtotime($order['updated_at'])) ?></td>
+                                        <td><form action="<?= base_url('aps/detailplnmc/'.$order['id_pln_mc']) ?>" method="POST">
+                                                <input type="hidden" name="judul" value="<?= $order['judul'] ?>">
+                                                <input type="hidden" name="area" value="<?= $order['area'] ?>">
+                                                <input type="hidden" name="jarum" value="<?= $order['jarum'] ?>">
+                                            <button type="submit">View Details</button>
+                                        </form></td>
                                     </tr>
                                 <?php endforeach ?>
                             </tbody>
@@ -174,9 +179,10 @@
                     // Update DataTable
                     table.clear().draw();
                     $.each(response.planarea, function(index, item) {
-                        // Format date to match PHP format
+                        // Format date to display month name
                         var date = new Date(item.updated_at);
-                        var formattedDate = ('0' + date.getDate()).slice(-2) + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear() + ' ' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2);
+                        var options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+                        var formattedDate = date.toLocaleDateString('en-US', options);
                         table.row.add([
                             item.judul,
                             item.area,

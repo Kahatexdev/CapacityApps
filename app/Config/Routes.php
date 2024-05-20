@@ -219,6 +219,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('planningmesin', 'ApsController::planningmesin');
     $routes->post('fetch_jarum', 'ApsController::fetch_jarum');
     $routes->post('SimpanJudul', 'ApsController::saveplanningmesin');
+    $routes->post('detailplnmc/(:any)', 'ApsController::detailplanmc/$1');
 });
 
 // user

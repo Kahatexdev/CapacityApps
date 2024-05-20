@@ -53,6 +53,7 @@ class ApsPerstyleModel extends Model
     public function checkAps($validate)
     {
         $result = $this->select('*')
+            ->where('mastermodel', $validate['mastermodel'])
             ->where('size', $validate['size'])
             ->where('delivery', $validate['delivery'])
             ->get()
