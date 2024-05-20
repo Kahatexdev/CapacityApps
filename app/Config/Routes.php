@@ -217,6 +217,8 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('dataproduksi/(:any)', 'GodController::produksiPerArea/$1');
     $routes->post('importproduksi', 'GodController::importproduksi');
     $routes->get('planningmesin', 'ApsController::planningmesin');
+    $routes->post('fetch_jarum', 'ApsController::fetch_jarum');
+    $routes->post('SimpanJudul', 'ApsController::saveplanningmesin');
 });
 
 // user

@@ -37,7 +37,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action="<?= base_url('aps/SimpanJudul') ?>" method="POST">
+                    <form id="planningForm" method="POST">
                         <div class="row">
                             <div class="col-lg-12 col-md-12">
 
@@ -58,8 +58,10 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="jarum" class="form-control-label">Jarum</label>
-                                    <input class="form-control" type="text" value="" id="jarum" name="jarum">
-                                </div>                               
+                                    <select class="form-control" id="jarum" name="jarum">
+                                        <option value="">Pilih Jarum</option>
+                                    </select>
+                                </div>                             
                             </div>
 
                         </div>
@@ -84,12 +86,29 @@
     </div>
 
     <div class="row mt-3">
-        <div class="col-lg-12">
+        <div class="col-xl-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        
-                    </div>
+                    <table id="dataTable" class="display">
+                            <thead>
+                                <th>Judul</th>
+                                <th>Area</th>
+                                <th>Jarum</th>
+                                <th>Last Update</th>
+                                <th>Details</th>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($planarea as $order) : ?>
+                                    <tr>
+                                        <td><?= $order['judul'] ?></td>
+                                        <td><?= $order['jarum'] ?></td>
+                                        <td><?= $order['area'] ?></td>
+                                        <td><?= date_format((new DateTime($order['updated_at'])), 'd-F-Y H:i') ?></td>
+                                        <td></td>
+                                    </tr>
+                                <?php endforeach ?>
+                            </tbody>
+                        </table>
                 </div>
             </div>
         </div>
@@ -102,39 +121,88 @@
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#example').DataTable({});
+    // Initialize DataTable
+    var table = $('#dataTable').DataTable({
+        "order": [[3, "desc"]] // Sort by the fourth column (index 3) in descending order (newer first)
+    });
 
-        // Trigger import modal when import button is clicked
-        $('.import-btn').click(function() {
-            console.log("a");
-            var idModel = $(this).data('id');
-            var noModel = $(this).data('no-model');
+    // Trigger import modal when import button is clicked
+    $('.import-btn').click(function() {
+        console.log("a");
+        var idModel = $(this).data('id');
+        var noModel = $(this).data('no-model');
 
-            $('#importModal').find('input[name="id_model"]').val(idModel);
-            $('#importModal').find('input[name="no_model"]').val(noModel);
+        $('#importModal').find('input[name="id_model"]').val(idModel);
+        $('#importModal').find('input[name="no_model"]').val(noModel);
 
-            $('#importModal').modal('show'); // Show the modal
-        });
-        $('#area').change(function() {
-            var area = $(this).val();
-            if (area) {
-                $.ajax({
-                    type: 'POST',
-                    url: '<?= base_url('aps/fetch_jarum') ?>', // URL to the PHP script that fetches Jarum data
-                    data: {area: area},
-                    success: function(response) {
-                        var jarumOptions = JSON.parse(response);
-                        $('#jarum').empty().append('<option value="">Pilih Jarum</option>');
-                        $.each(jarumOptions, function(key, value) {
-                            $('#jarum').append('<option value="'+ value +'">'+ value +'</option>');
-                        });
-                    }
+        $('#importModal').modal('show'); // Show the modal
+    });
+
+    $('#area').change(function() {
+        var area = $(this).val();
+        if (area) {
+            $.ajax({
+                type: 'POST',
+                url: '<?= base_url('aps/fetch_jarum') ?>',
+                data: {area: area},
+                success: function(response) {
+                    var jarumOptions = response;
+                    $('#jarum').empty().append('<option value="">Pilih Jarum</option>');
+                    $.each(jarumOptions, function(index, value) {
+                        $('#jarum').append('<option value="'+ value +'">'+ value +'</option>');
+                    });
+                }
+            });
+        } else {
+            $('#jarum').empty().append('<option value="">Pilih Jarum</option>');
+        }
+    });
+    $('#planningForm').submit(function(e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '<?= base_url('aps/SimpanJudul') ?>',
+            data: $(this).serialize(),
+            success: function(response) {
+                if (response.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: response.message
+                    });
+
+                    // Update DataTable
+                    table.clear().draw();
+                    $.each(response.planarea, function(index, item) {
+                        // Format date to match PHP format
+                        var date = new Date(item.updated_at);
+                        var formattedDate = ('0' + date.getDate()).slice(-2) + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear() + ' ' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2);
+                        table.row.add([
+                            item.judul,
+                            item.area,
+                            item.jarum,
+                            formattedDate,
+                            ''
+                        ]).draw(false);
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: response.message
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Something went wrong. Please try again later.'
                 });
-            } else {
-                $('#jarum').empty().append('<option value="">Pilih Jarum</option>');
             }
         });
     });
+});
 </script>
 
 <?php $this->endSection(); ?>
