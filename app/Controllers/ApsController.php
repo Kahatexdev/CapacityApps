@@ -374,9 +374,55 @@ class ApsController extends BaseController
             'active6' => '',
             'active7' => '',
             'planarea' => $planarea,
-            'area'=> $area,
+            'area'=> $area,        
         ];
         return view('Aps/Planning/PilihJudulArea', $data);
+    }
+
+    public function saveplanningmesin() {
+        $validation = $this->validate([
+            'judul' => 'required',
+            'area' => 'required',
+            'jarum' => 'required'
+        ]);
+    
+        if (!$validation) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'All fields are required.'
+            ]);
+        }
+    
+        $data = [
+            'judul' => $this->request->getPost('judul'),
+            'area' => $this->request->getPost('area'),
+            'jarum' => $this->request->getPost('jarum')
+        ];
+        $save = $this->KebutuhanAreaModel->save($data);
+        if ($save) {
+            $planarea = $this->KebutuhanAreaModel->findAll();
+            $dataplan= $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Data saved successfully.',
+                'planarea' => $planarea
+            ]);
+            return $dataplan;
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Failed to save data.'
+            ]);
+        }
+    }
+    public function fetch_jarum() {
+        try {
+            $area = $this->request->getPost('area');
+            $jarumData = $this->jarumModel->getJarumByArea($area);
+
+            return $this->response->setJSON($jarumData);
+        } catch (\Exception $e) {
+            return $this->response->setStatusCode(500)->setBody($e->getMessage());
+        }
     }
     public function orderPerJarumBln()
     {
