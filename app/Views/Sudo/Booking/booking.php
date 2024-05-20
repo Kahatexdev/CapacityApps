@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend('Sudo/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
@@ -16,10 +16,10 @@
                         </div>
                         <div class="col-6 text-end">
 
-                            <a href="<?= base_url('capacity/cancelBooking') ?>" class="btn btn-sm btn-warning bg-gradient-warning shadow text-center border-radius-md">
+                            <a href="<?= base_url('sudo/cancelBooking') ?>" class="btn btn-sm btn-warning bg-gradient-warning shadow text-center border-radius-md">
                                 Summary Cancel Booking
                             </a>
-                            <a href="<?= base_url('capacity/turunOrder') ?>" class="btn btn-sm btn-success bg-gradient-success shadow text-center border-radius-md">
+                            <a href="<?= base_url('sudo/turunOrder') ?>" class="btn btn-sm btn-success bg-gradient-success shadow text-center border-radius-md">
                                 Summary Placed Order
                             </a>
                             <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">
@@ -82,7 +82,7 @@
                         <div class="row mt-2">
                             <div class="col-9 pl-0">
 
-                                <form action="<?= base_url('capacity/importbooking') ?>" id="modalForm" method="POST" enctype="multipart/form-data">
+                                <form action="<?= base_url('sudo/importbooking') ?>" id="modalForm" method="POST" enctype="multipart/form-data">
                                     <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control ">
                             </div>
                             <div class="col-3 pl-0">
@@ -98,7 +98,7 @@
         </div>
         <?php foreach ($TotalMesin as $jr) : ?>
             <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-                <a href="<?= base_url('capacity/databookingbulan/' . $jr['jarum']) ?>">
+                <a href="<?= base_url('sudo/databookingbulan/' . $jr['jarum']) ?>">
                     <div class="card">
                         <div class="card-body p-3">
                             <div class="row">
@@ -113,15 +113,15 @@
                                 </div>
                                 <div class="col-4 text-end">
                                     <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                    <?php if (stripos($jr['jarum'], '10g') !== false || stripos($jr['jarum'], '13G') !== false): ?>
-                                        <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i>
-                                    <?php elseif (stripos($jr['jarum'], '240N') !== false): ?>
-                                        <i class="fab fa-redhat text-lg opacity-10" aria-hidden="true"></i>
-                                    <?php elseif (stripos($jr['jarum'], 'POM') !== false): ?>
-                                        <i class="fas fa-atom text-lg opacity-10" aria-hidden="true"></i>
-                                    <?php else: ?>
-                                        <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i>
-                                    <?php endif; ?>
+                                        <?php if (stripos($jr['jarum'], '10g') !== false || stripos($jr['jarum'], '13G') !== false) : ?>
+                                            <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i>
+                                        <?php elseif (stripos($jr['jarum'], '240N') !== false) : ?>
+                                            <i class="fab fa-redhat text-lg opacity-10" aria-hidden="true"></i>
+                                        <?php elseif (stripos($jr['jarum'], 'POM') !== false) : ?>
+                                            <i class="fas fa-atom text-lg opacity-10" aria-hidden="true"></i>
+                                        <?php else : ?>
+                                            <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
 

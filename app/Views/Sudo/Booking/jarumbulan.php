@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend('Sudo/layout'); ?>
 <?php $this->section('content'); ?>
 
 <div class="container-fluid py-4">
@@ -9,7 +9,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">sudo System</p>
                                 <h5 class="font-weight-bolder mb-0">
                                     Data Booking Needle <?= $jarum ?> In Month <?= $bulan ?> Year <?= $tahun ?>
                                 </h5>
@@ -20,7 +20,7 @@
                             <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md d-inline-flex align-items-center">
                                 <i class="fas fa-plus-circle me-2 text-lg opacity-10" style="margin-right: 0.5rem;"></i> <span class="ms-1">Input Data Booking</span>
                             </button>
-                            <a href="<?= base_url('capacity/databookingbulan/'.$jarum) ?>" class="btn btn-sm bg-gradient-dark">
+                            <a href="<?= base_url('sudo/databookingbulan/' . $jarum) ?>" class="btn btn-sm bg-gradient-dark">
                                 <i class="fas fa-arrow-circle-left text-lg opacity-10" aria-hidden="true" style="margin-right: 0.5rem;"></i>Back
                             </a>
                         </div>
@@ -61,7 +61,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form action="<?= base_url('capacity/inputbooking') ?>" method="post">
+                            <form action="<?= base_url('sudo/inputbooking') ?>" method="post">
                                 <div class="row">
                                     <div class="col-lg-6 col-sm-12">
                                         <div class="form-group">
@@ -158,24 +158,24 @@
                         <tbody>
                             <?php foreach ($booking as $bk) : ?>
                                 <tr>
-                                    <td class="text-xs"><?= date('d-M-Y',strtotime($bk['tgl_terima_booking'])) ?></td>
+                                    <td class="text-xs"><?= date('d-M-Y', strtotime($bk['tgl_terima_booking'])) ?></td>
                                     <td class="text-xs"><?= $bk['kd_buyer_booking'] ?></td>
                                     <td class="text-xs"><?= $bk['no_order'] ?></td>
                                     <td class="text-xs"><?= $bk['no_booking'] ?></td>
                                     <td class="text-xs"><?= $bk['product_type'] ?></td>
                                     <td class="text-xs"><?= number_format($bk['qty_booking'], 0, '.', '.') ?> Pcs</td>
                                     <td class="text-xs"><?= number_format($bk['sisa_booking'], 0, '.', '.') ?> Pcs</td>
-                                    <td class="text-xs"><?= number_format(round($bk['sisa_booking']/24), 0, '.', '.') ?> Dz</td>
+                                    <td class="text-xs"><?= number_format(round($bk['sisa_booking'] / 24), 0, '.', '.') ?> Dz</td>
                                     <td class="text-xs"><?= date('d-M-Y', strtotime($bk['delivery'])) ?></td>
                                     <td class="text-xs"><?= $bk['status'] ?></td>
 
                                     <td class="text-xs">
                                         <?php if ($bk['status'] == 'Cancel Booking') : ?>
                                             <!-- If qty is null, set action to Import -->
-                                            <a href="<?= base_url('capacity/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-secondary btn-sm text-xxs">detail</a>
+                                            <a href="<?= base_url('sudo/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-secondary btn-sm text-xxs">detail</a>
                                         <?php else : ?>
                                             <!-- If qty is not null, set action to Details -->
-                                            <a href="<?= base_url('capacity/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm text-xxs">detail</a>
+                                            <a href="<?= base_url('sudo/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm text-xxs">detail</a>
                                         <?php endif; ?>
 
                                     </td>

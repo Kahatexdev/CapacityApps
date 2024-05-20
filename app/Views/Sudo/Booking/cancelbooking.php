@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend('Sudo/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row mt-2 mb-4">
@@ -7,7 +7,7 @@
                 <div class="card-header pb-0 d-flex justify-content-between">
                     <h6>Grafik Cancel Booking Per Bulan</h6>
                     <div>
-                        <a href="<?= base_url('capacity/databooking') ?>" class="btn btn-info">Kembali</a>
+                        <a href="<?= base_url('sudo/databooking') ?>" class="btn btn-info">Kembali</a>
                     </div>
                 </div>
                 <div class="card-body p-3">
@@ -133,7 +133,7 @@
                                             <p class="text-xs font-weight-bold mb-0"><?= number_format(round($detail['qty'] / 24), 0, ',', '.') ?> Dz</p>
                                         </td>
                                         <td> <!-- Actions column -->
-                                            <form id="detailForm" action="<?= base_url() ?>capacity/detailcancelbooking/<?= $detail['week_number'] ?>/<?= $detail['kd_buyer_booking'] ?>" method="POST">
+                                            <form id="detailForm" action="<?= base_url() ?>sudo/detailcancelbooking/<?= $detail['week_number'] ?>/<?= $detail['kd_buyer_booking'] ?>" method="POST">
                                                 <button type="submit" class="btn btn-success">Detail</button>
                                             </form>
                                         </td>

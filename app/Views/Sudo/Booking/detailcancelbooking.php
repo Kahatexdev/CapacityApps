@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend('Sudo/layout'); ?>
 <?php $this->section('content'); ?>
 
 <div class="container-fluid py-4">
@@ -9,7 +9,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">sudo System</p>
                                 <h5 class="font-weight-bolder mb-0">
                                     Detail Cancel Booking
                                 </h5>
@@ -71,12 +71,12 @@
                                     <td class="text-xs"><?= $bk['kd_buyer_booking'] ?></td>
                                     <td class="text-xs"><?= $bk['no_order'] ?></td>
                                     <td class="text-xs"><?= $bk['no_booking'] ?></td>
-                                    <td class="text-xs"><?= round($bk['qty_booking']/24) ?> Dz</td>
-                                    <td class="text-xs"><?= round($bk['sisa_booking']/24) ?> Dz</td>
-                                    <td class="text-xs"><?= round($bk['qty_cancel'] / 24)?> Dz</td>
+                                    <td class="text-xs"><?= round($bk['qty_booking'] / 24) ?> Dz</td>
+                                    <td class="text-xs"><?= round($bk['sisa_booking'] / 24) ?> Dz</td>
+                                    <td class="text-xs"><?= round($bk['qty_cancel'] / 24) ?> Dz</td>
                                     <td class="text-xs"><?= $bk['alasan'] ?></td>
                                     <td class="text-xs">
-                                    <form action="<?= base_url() . 'capacity/uncancelbooking/'.$bk['id_booking']; ?>" method="post">
+                                        <form action="<?= base_url() . 'sudo/uncancelbooking/' . $bk['id_booking']; ?>" method="post">
                                             <input type="hidden" name="qty_cancel" value="<?= $bk['qty_cancel'] ?>">
                                             <button type="submit" class="btn btn-primary btn-sm">Uncancel</button>
                                         </form>

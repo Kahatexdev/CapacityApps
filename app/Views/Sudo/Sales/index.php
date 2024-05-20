@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend('sudo/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
@@ -6,7 +6,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <h3>Sales Position</h3>
-                    <a href="<?= base_url('capacity/exportsales') ?>" class="btn btn-info"> Generate report</a>
+                    <a href="<?= base_url('sudo/exportsales') ?>" class="btn btn-info"> Generate report</a>
                 </div>
                 <div class="card-body p-3 ">
 

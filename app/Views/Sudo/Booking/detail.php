@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend('Sudo/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -33,7 +33,7 @@
                         <h5>
                             Detail Booking
                         </h5>
-                        <a href="<?= base_url('capacity/databookingbulantampil/' . date('F/Y', strtotime($booking['delivery'])) . '/' . $jarum['needle']) ?>" class="btn bg-gradient-dark">
+                        <a href="<?= base_url('sudo/databookingbulantampil/' . date('F/Y', strtotime($booking['delivery'])) . '/' . $jarum['needle']) ?>" class="btn bg-gradient-dark">
                             <i class="fas fa-arrow-circle-left text-lg opacity-10" aria-hidden="true" style="margin-right: 0.5rem;"></i> Back
                         </a>
                     </div>
@@ -228,7 +228,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="<?= base_url("capacity/inputOrder"); ?>" method="post">
+                    <form action="<?= base_url("sudo/inputOrder"); ?>" method="post">
                         <input type="text" name="id_booking" value="<?= $booking['id_booking']; ?>" hidden>
                         <input type="text" name="jarum" value="<?= $booking['needle']; ?>" hidden>
                         <div class="row">
@@ -287,7 +287,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="<?= base_url('capacity/updatebooking/' . $booking['id_booking']) ?>" method="post">
+                    <form action="<?= base_url('sudo/updatebooking/' . $booking['id_booking']) ?>" method="post">
                         <div class="row">
                             <div class="col-lg-6 col-sm-12">
                                 <div class="form-group">
@@ -367,7 +367,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="<?= base_url('capacity/deletebooking/' . $booking['id_booking']) ?>" method="post">
+                    <form action="<?= base_url('sudo/deletebooking/' . $booking['id_booking']) ?>" method="post">
                         <input type="text" name="jarum" id="" hidden value="<?= $booking['needle'] ?>">
                         Are you sure to Delete Data Booking?
                 </div>
@@ -389,7 +389,7 @@
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <form action="<?= base_url('capacity/cancelbooking/' . $booking['id_booking']) ?>" method="post">
+                <form action="<?= base_url('sudo/cancelbooking/' . $booking['id_booking']) ?>" method="post">
                     <div class="modal-body">
                         <label for="sisa_booking">Quantity Available:</label>
                         <input type="text" name="sisa_booking" id="sisa_booking" class="form-control" value="<?= $booking['sisa_booking'] ?>" readonly>
@@ -440,7 +440,7 @@
                 <div class="row mt-2">
                     <div class="col-9 pl-0">
 
-                        <form action="<?= base_url('capacity/importpecahbooking/' . $booking['id_booking']) ?>" id="modalForm" method="POST" enctype="multipart/form-data">
+                        <form action="<?= base_url('sudo/importpecahbooking/' . $booking['id_booking']) ?>" id="modalForm" method="POST" enctype="multipart/form-data">
                             <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control ">
                             Sisa: <input type="number" id="sisa" name="sisa" class="form-control">
                             <div class="form-group">
@@ -469,7 +469,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="<?= base_url('capacity/pecahbooking/' . $booking['id_booking']) ?>" method="post">
+                <form action="<?= base_url('sudo/pecahbooking/' . $booking['id_booking']) ?>" method="post">
                     <div class="row">
                         <div class="col-lg-6 col-sm-12">
                             <div class="form-group">
@@ -639,7 +639,7 @@
             var selectedJarum = $(this).val();
             if (selectedJarum) {
                 $.ajax({
-                    url: '<?= base_url('capacity/getTypebyJarum') ?>', // Ubah dengan URL controller Anda
+                    url: '<?= base_url('sudo/getTypebyJarum') ?>', // Ubah dengan URL controller Anda
                     type: 'POST',
                     data: {
                         jarum: selectedJarum

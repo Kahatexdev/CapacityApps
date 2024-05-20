@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend('Sudo/layout'); ?>
 <?php $this->section('content'); ?>
 
 <div class="container-fluid py-4">
@@ -9,7 +9,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">sudo System</p>
                                 <h5 class="font-weight-bolder mb-0">
                                     Data Booking Jarum <?= $jarum ?>
                                 </h5>
@@ -58,7 +58,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form action="<?= base_url('capacity/inputbooking') ?>" method="post">
+                            <form action="<?= base_url('sudo/inputbooking') ?>" method="post">
                                 <div class="row">
                                     <div class="col-lg-6 col-sm-12">
                                         <div class="form-group">
@@ -163,10 +163,10 @@
                                     <td class="text-xs">
                                         <?php if ($bk['status'] == 'Cancel Booking') : ?>
                                             <!-- If qty is null, set action to Import -->
-                                            <a href="<?= base_url('capacity/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-secondary btn-sm text-xxs">detail</a>
+                                            <a href="<?= base_url('sudo/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-secondary btn-sm text-xxs">detail</a>
                                         <?php else : ?>
                                             <!-- If qty is not null, set action to Details -->
-                                            <a href="<?= base_url('capacity/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm text-xxs">detail</a>
+                                            <a href="<?= base_url('sudo/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm text-xxs">detail</a>
                                         <?php endif; ?>
 
                                     </td>
