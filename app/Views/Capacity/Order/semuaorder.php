@@ -142,7 +142,9 @@
                                 <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control ">
                         </div>
                         <div class="col-3 pl-0">
-                            <button type="submit" class="btn btn-info btn-block"> Simpan</button>
+                            <form>
+                                <!-- Other form inputs go here -->
+                                <button type="submit" class="btn btn-info btn-block" onclick="this.disabled=true; this.form.submit();">Simpan</button>
                             </form>
                         </div>
                     </div>

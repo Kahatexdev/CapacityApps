@@ -528,9 +528,9 @@ class OrderController extends BaseController
                     }
                 }
             }
-            return redirect()->to(base_url('/capacity/semuaOrder'))->withInput()->with('success', 'Data Berhasil di Import');
+            return redirect()->to(base_url('/capacity/belumImport'))->withInput()->with('success', 'Data Berhasil di Import');
         } else {
-            return redirect()->to(base_url('/capacity/semuaOrder'))->with('error', 'No data found in the Excel file');
+            return redirect()->to(base_url('/capacity/belumImport'))->with('error', 'No data found in the Excel file');
         }
     }
     public function deletedetailorder($idModel)
