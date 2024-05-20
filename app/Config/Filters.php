@@ -28,7 +28,7 @@ class Filters extends BaseConfig
         'planning' => \App\Filters\PlanningAuth::class,
         'aps' => \App\Filters\ApsAuth::class,
         'user' => \App\Filters\UserFilter::class,
-        'gos' => \App\Filters\God::class,
+        'god' => \App\Filters\God::class,
 
     ];
 

@@ -4,15 +4,15 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class UserModel extends Model
+class AreaModel extends Model
 {
-    protected $table            = 'user';
-    protected $primaryKey       = 'id_user';
+    protected $table            = 'areas';
+    protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_user', 'username', 'password', 'role'];
+    protected $allowedFields    = ['id', 'name', 'created_at', 'updated_at'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -39,34 +39,4 @@ class UserModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
-
-    public function login($username, $password)
-    {
-        $user = $this->where(['username' => $username, 'password' => $password])->first();
-
-        if (!$user) {
-            return null;
-        }
-
-        return [
-            'id' => $user['id_user'],
-            'role' => $user['role'],
-            'username' => $user['username']
-        ];
-    }
-    public function getData()
-    {
-        $sql = "
-            SELECT user.username, user.role, (
-                SELECT GROUP_CONCAT(areas.name SEPARATOR ', ') 
-                FROM areas
-                JOIN user_areas ON areas.id = user_areas.area_id
-                WHERE user_areas.user_id = user.id_user
-            ) as area_names 
-            FROM user
-        ";
-
-        $query = $this->db->query($sql);
-        return $query->getResultArray();
-    }
 }

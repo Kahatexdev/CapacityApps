@@ -55,11 +55,11 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
 
     // produksi
-    $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
-    $routes->get('dataprogress', 'ProduksiController::progressData');
-    $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
-    $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
-    $routes->post('importproduksi', 'ProduksiController::importproduksi');
+    $routes->get('dataproduksi', 'GodController::viewProduksi');
+    $routes->get('dataprogress', 'GodController::progressData');
+    $routes->get('produksiareachart', 'GodController::produksiAreaChart');
+    $routes->get('dataproduksi/(:any)', 'GodController::produksiPerArea/$1');
+    $routes->post('importproduksi', 'GodController::importproduksi');
 
     // mesin
     $routes->get('datamesin', 'MesinController::index');
@@ -154,11 +154,11 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetail/$1');
 
-    $routes->get('dataproduksi', 'ProduksiController::viewProduksiPlan');
-    $routes->get('dataprogress', 'ProduksiController::progressData');
-    $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
-    $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
-    $routes->post('importproduksi', 'ProduksiController::importproduksi');
+    $routes->get('dataproduksi', 'GodController::viewProduksiPlan');
+    $routes->get('dataprogress', 'GodController::progressData');
+    $routes->get('produksiareachart', 'GodController::produksiAreaChart');
+    $routes->get('dataproduksi/(:any)', 'GodController::produksiPerArea/$1');
+    $routes->post('importproduksi', 'GodController::importproduksi');
 });
 
 
@@ -211,11 +211,11 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetail/$1');
 
-    $routes->get('dataproduksi', 'ProduksiController::viewProduksiPlan');
-    $routes->get('dataprogress', 'ProduksiController::progressData');
-    $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
-    $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
-    $routes->post('importproduksi', 'ProduksiController::importproduksi');
+    $routes->get('dataproduksi', 'GodController::viewProduksiPlan');
+    $routes->get('dataprogress', 'GodController::progressData');
+    $routes->get('produksiareachart', 'GodController::produksiAreaChart');
+    $routes->get('dataproduksi/(:any)', 'GodController::produksiPerArea/$1');
+    $routes->post('importproduksi', 'GodController::importproduksi');
     $routes->get('planningmesin', 'ApsController::planningmesin');
     $routes->post('fetch_jarum', 'ApsController::fetch_jarum');
     $routes->post('SimpanJudul', 'ApsController::saveplanningmesin');
@@ -225,6 +225,90 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
 // user
 $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('', 'UserController::index');
-    $routes->get('produksi', 'ProduksiController::produksi');
-    $routes->post('importproduksi', 'ProduksiController::importProduksi');
+    $routes->get('produksi', 'GodController::produksi');
+    $routes->post('importproduksi', 'GodController::importProduksi');
+});
+
+// user
+
+$routes->group('/sudo', ['filter' => 'god'], function ($routes) {
+    $routes->get('', 'GodController::index');
+    // booking
+    $routes->get('databooking', 'GodController::booking');
+    $routes->get('databooking/(:any)', 'GodController::bookingPerJarum/$1');
+    $routes->get('databookingbulan/(:any)', 'GodController::bookingPerBulanJarum/$1');
+    $routes->get('databookingbulantampil/(:any)/(:any)/(:any)', 'GodController::bookingPerBulanJarumTampil/$1/$2/$3');
+    $routes->get('detailbooking/(:any)', 'GodController::detailbooking/$1');
+    $routes->post('inputbooking', 'GodController::inputbooking');
+    $routes->post('updatebooking/(:any)', 'GodController::updatebooking/$1');
+    $routes->post('deletebooking/(:any)', 'GodController::deletebooking/$1');
+    $routes->post('cancelbooking/(:any)', 'GodController::cancelbooking/$1');
+    $routes->post('pecahbooking/(:any)', 'GodController::pecahbooking/$1');
+    $routes->post('importbooking', 'GodController::importbooking');
+    $routes->post('importpecahbooking/(:any)', 'GodController::importpecahbooking/$1');
+    $routes->get('cancelBooking', 'GodController::getCancelBooking');
+    $routes->post('detailcancelbooking/(:any)/(:any)', 'GodController::detailcancelbooking/$1/$2');
+    $routes->post('uncancelbooking/(:any)', 'GodController::uncancelbooking/$1');
+
+    // order
+    $routes->get('dataorder', 'GodController::order');
+    $routes->get('detailmodel/(:any)/(:any)', 'GodController::detailModelCapacity/$1/$2');
+    $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'GodController::detailmodeljarum/$1/$2/$3');
+    $routes->get('semuaOrder', 'GodController::semuaOrder');
+    $routes->get('orderPerjarum', 'GodController::OrderPerJarum');
+    $routes->get('orderPerjarumBln', 'GodController::orderPerJarumBln');
+    $routes->get('belumImport', 'GodController::belumImport');
+    $routes->get('dataorderperjarum/(:any)', 'GodController::DetailOrderPerJarum/$1');
+    $routes->get('dataorderperjarumbln/(:any)', 'GodController::DetailOrderPerJarumBln/$1');
+    $routes->get('dataorderperjarumblndetail/(:any)/(:any)/(:any)', 'GodController::DetailOrderPerJarumBlnDetail/$1/$2/$3');
+    $routes->post('updatedetailorder/(:any)', 'GodController::updateorder/$1');
+    $routes->post('updatedetailjarum/(:any)', 'GodController::updateorderjarum/$1');
+    $routes->post('deletedetailstyle/(:any)', 'GodController::deletedetailstyle/$1');
+    $routes->post('deletedetailorder/(:any)', 'GodController::deletedetailorder/$1');
+    $routes->post('deletedetailjarum/(:any)', 'GodController::deletedetailmodeljarum/$1');
+    $routes->post('inputOrder', 'GodController::inputOrder');
+    $routes->post('importModel', 'GodController::importModel');
+    $routes->get('turunOrder', 'GodController::getTurunOrder');
+    $routes->post('detailturunorder/(:any)/(:any)', 'GodController::detailturunorder/$1/$2');
+
+
+    // produksi
+    $routes->get('dataproduksi', 'GodController::viewProduksi');
+    $routes->get('dataprogress', 'GodController::progressData');
+    $routes->get('produksiareachart', 'GodController::produksiAreaChart');
+    $routes->get('dataproduksi/(:any)', 'GodController::produksiPerArea/$1');
+    $routes->post('importproduksi', 'GodController::importproduksi');
+
+    // mesin
+    $routes->get('datamesin', 'GodController::index');
+    $routes->get('mesinPerJarum/(:any)', 'GodController::mesinPerJarum/$1');
+    $routes->get('mesinperarea/(:any)', 'GodController::mesinperarea/$1');
+    $routes->get('stockcylinder', 'GodController::stockcylinder');
+    $routes->get('datamesinperjarum/(:any)/(:any)', 'GodController::DetailMesinPerJarum/$1/$2');
+    $routes->get('datamesinperarea/(:any)', 'GodController::DetailMesinPerArea/$1');
+    $routes->post('deletemesinareal/(:any)', 'GodController::deletemesinareal/$1');
+    $routes->post('updatemesinperjarum/(:any)', 'GodController::updatemesinperjarum/$1');
+    $routes->post('tambahmesinperarea', 'GodController::inputmesinperarea');
+    $routes->post('addcylinder', 'GodController::inputcylinder');
+    $routes->post('editcylinder/(:any)', 'GodController::editcylinder/$1');
+    $routes->post('deletecylinder/(:any)', 'GodController::deletecylinder/$1');
+    $routes->get('allmachine', 'GodController::allmachine');
+
+    $routes->post('kebutuhanMesinBooking', 'KebutuhanMesin::inputMesinBooking');
+
+    $routes->post('getTypebyJarum', 'GodController::getTypebyJarum');
+
+    $routes->get('sales', 'ExportController::index');
+    $routes->get('exportsales', 'ExportController::export');
+
+    //target
+    $routes->get('datatarget', 'GodController::target');
+    $routes->get('datatargetjarum/(:any)', 'GodController::targetjarum/$1');
+    $routes->post('edittarget', 'GodController::edittarget');
+
+    // usermanageement
+    $routes->get('account', 'GodController::account');
+    $routes->post('addaccount', 'GodController::addaccount');
+    $routes->post('updateaccount/(:any)', 'GodController::updateaccount/$1');
+    $routes->post('deleeaccount/(:any)', 'GodController::deleteaccount/$1');
 });
