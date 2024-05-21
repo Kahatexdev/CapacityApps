@@ -315,7 +315,7 @@ $routes->group('/sudo', ['filter' => 'god'], function ($routes) {
     $routes->post('deleteaccount/(:any)', 'GodController::deleteaccount/$1');
 });
 
-// user
+// ie
 $routes->group('/ie', ['filter' => 'ie'], function ($routes) {
     $routes->get('', 'IeController::index');
     $routes->get('historysmv', 'IeController::historysmv');
