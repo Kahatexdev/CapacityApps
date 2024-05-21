@@ -519,10 +519,10 @@ class OrderController extends BaseController
 
                                 $this->orderModel->update($idModel, $updateData);
                             } else {
-                                $sumqty = $existingAps->qty + $qty;
-                                $sumsisa = $existingAps->sisa + $qty;
-                                $idAps = $existingAps->idapsperstyle;
-                                $this->ApsPerstyleModel->update($idAps, ['qty' => $sumqty, 'sisa' => $sumsisa]);
+                                // $sumqty = $existingAps->qty + $qty;
+                                // $sumsisa = $existingAps->sisa + $qty;
+                                // $idAps = $existingAps->idapsperstyle;
+                                // $this->ApsPerstyleModel->update($idAps, ['qty' => $sumqty, 'sisa' => $sumsisa]);
                             }
                         }
                     }

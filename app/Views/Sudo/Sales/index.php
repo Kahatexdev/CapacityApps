@@ -1,4 +1,4 @@
-<?php $this->extend('sudo/layout'); ?>
+<?php $this->extend('Sudo/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">

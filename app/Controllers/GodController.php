@@ -835,7 +835,6 @@ class GodController extends BaseController
     {
         $userdata = $this->userModel->getData();
         $areadata = $this->areaModel->findAll();
-
         $data = [
             'title' => 'Account management',
             'active1' => '',
@@ -863,6 +862,40 @@ class GodController extends BaseController
             return redirect()->to(base_url('sudo/account'))->with('success', 'User Berhasil di input');
         } else {
             return redirect()->to(base_url('sudo/account'))->with('error', 'User Gagal di input');
+        }
+    }
+    public function assignarea()
+    {
+        $userId = $this->request->getPost("iduser");
+        $areaList = $this->request->getPost("areaList");
+        if (!empty($areaList)) {
+            $db = \Config\Database::connect();
+            foreach ($areaList as $areaId) {
+                $exists = $this->aksesModel->where(['user_id' => $userId, 'area_id' => $areaId])->first();
+                if (!$exists) {
+                    $data = [
+                        'user_id' => $userId,
+                        'area_id' => $areaId,
+                    ];
+                    $query = "INSERT INTO user_areas (user_id, area_id) VALUES (?, ?)";
+                    $db->query($query, [$userId, $areaId]);
+                    if (!$db) {
+                        return redirect()->to(base_url('sudo/account'))->with('error', 'User Gagal di input');
+                    }
+                }
+            }
+            return redirect()->to(base_url('sudo/account'))->with('success', 'User Berhasil di input');
+        } else {
+            return redirect()->to(base_url('sudo/account'))->with('error', 'Tidak ada data');
+        }
+    }
+    public function deleteaccount($id)
+    {
+        $delete = $this->userModel->delete($id);
+        if ($delete) {
+            return redirect()->to(base_url('sudo/account'))->with('success', 'User Berhasil di hapus');
+        } else {
+            return redirect()->to(base_url('sudo/account'))->with('error', 'User Gagal di hapus');
         }
     }
 }

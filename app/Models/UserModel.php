@@ -57,7 +57,7 @@ class UserModel extends Model
     public function getData()
     {
         $sql = "
-            SELECT user.username, user.role, (
+            SELECT user.id_user, user.username, user.role,user.password (
                 SELECT GROUP_CONCAT(areas.name SEPARATOR ', ') 
                 FROM areas
                 JOIN user_areas ON areas.id = user_areas.area_id

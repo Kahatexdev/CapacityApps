@@ -13,7 +13,6 @@ class AksesModel extends Model
     protected $protectFields    = true;
     protected $allowedFields = ['user_id', 'area_id', 'created_at', 'updated_at'];
 
-    protected bool $allowEmptyInserts = false;
 
     // Dates
     protected $useTimestamps = true;

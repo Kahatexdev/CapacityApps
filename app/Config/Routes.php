@@ -310,6 +310,7 @@ $routes->group('/sudo', ['filter' => 'god'], function ($routes) {
     // usermanageement
     $routes->get('account', 'GodController::account');
     $routes->post('addaccount', 'GodController::addaccount');
+    $routes->post('assignarea', 'GodController::assignarea');
     $routes->post('updateaccount/(:any)', 'GodController::updateaccount/$1');
-    $routes->post('deleeaccount/(:any)', 'GodController::deleteaccount/$1');
+    $routes->post('deleteaccount/(:any)', 'GodController::deleteaccount/$1');
 });

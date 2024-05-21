@@ -124,7 +124,7 @@
                                     <td class="text-xs"><?= $user['area_names'] ?></td>
                                     <td class="text-xs"> <?php if ($user['role'] == 'aps') : ?>
                                             <!-- If qty is null, set action to Import -->
-                                            <button class="btn bg-gradient-info btn-sm text-xxs">Assign</button>
+                                            <button class="btn bg-gradient-info btn-sm text-xxs assign-button" data-bs-toggle="modal" data-bs-target="#assignArea" data-id="<?= $user['id_user'] ?>">Assign</button>
 
                                         <?php else : ?>
                                             <!-- If qty is not null, set action to Details -->
@@ -132,10 +132,10 @@
                                     </td>
 
 
-                                    <td class="text-xs">
+                                    <td class=" text-xs">
 
-                                        <button class="btn bg-gradient-success btn-sm text-xxs">Edit</button>
-                                        <button class="btn bg-gradient-danger btn-sm text-xxs">Delete</button>
+                                        <button class="btn bg-gradient-danger btn-sm text-xxs edit-btn" data-bs-toggle="modal" data-bs-target="#edit-btn" data-id="<?= $user['id_user'] ?> " data-usn="<?= $user['username'] ?>" data-pass="<?= $user['password'] ?>" data-area="<?= $user['area_names'] ?>">Edit</button>
+                                        <button class=" btn bg-gradient-danger btn-sm text-xxs delete-btn" data-bs-toggle="modal" data-bs-target="#delete-btn" data-id="<?= $user['id_user'] ?> ">Delete</button>
 
                                     </td>
                                 </tr>
@@ -147,6 +147,70 @@
 
         </div>
     </div>
+    <div class=" modal fade bd-example-modal-lg" id="assignArea" tabindex="-1" role="dialog" aria-labelledby="assignArea" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Assign Area</h5>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="<?= base_url('sudo/assignarea/') ?>" method="post">
+                        <input type="text" name="iduser" id="iduser" hidden value="">
+                        <div class="row">
+                            <div class="col-lg-12 col-sm-12">
+
+                                <div class="form-group">
+                                    <label for="area"> Area</label>
+                                </div>
+                                <?php foreach ($area as $ar) : ?>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="<?= $ar['id'] ?>" id="fcustomCheck1" name="areaList[]">
+                                        <label class="custom-control-label" for="customCheck1"><?= $ar['name'] ?></label>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-info">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade  bd-example-modal-lg" id="ModalDelete" tabindex="-1" role="dialog" aria-labelledby="modaldelete" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Hapus Account</h5>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="" method="post">
+                        <input type="hidden" class="form-control" name="no_model">
+                        <input type="hidden" class="form-control" name="delivery">
+                        <input type="hidden" class="form-control" name="jarum">
+                        <input type="text" name="idapsperstyle" id="" hidden value="">
+                        Apakah anda yakin ingin menghapus Account?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-gradient-danger">Hapus</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
 
 </div>
 
@@ -190,6 +254,31 @@
             $('#importModal').modal('show');
         });
     });
+
+    $('.assign-button').click(function() {
+        var id = $(this).data('id');
+
+        $('#assignArea').find('input[name="iduser"]').val(id);
+
+        $('#assignArea').modal('show'); // Show the modal
+    });
+
+    $('.delete-btn').click(function() {
+        var id = $(this).data('id');
+        $('#ModalDelete').find('form').attr('action', '<?= base_url('sudo/deleteaccount/') ?>' + id);
+
+        $('#ModalDelete').modal('show'); // Show the modal
+    });
+    $('.edit-btn').click(function() {
+        var id = $(this).data('id');
+        var username = $(this).data('usn');
+        var pass = $(this).data('pass');
+        var area = $(this).data('area');
+        $('#ModalEdit').find('form').attr('action', '<?= base_url('sudo/editaccount/') ?>' + id);
+
+        $('#ModalEdit').modal('show'); // Show the modal
+    });
 </script>
+
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <?php $this->endSection(); ?>
