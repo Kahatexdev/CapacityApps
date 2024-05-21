@@ -16,6 +16,7 @@ use App\Models\LiburModel;
 use App\Models\KebutuhanMesinModel;
 use App\Models\KebutuhanAreaModel;
 use App\Models\MesinPlanningModel;
+use App\Models\DetailPlanningModel;
 use App\Models\AksesModel;/*  */
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
@@ -35,6 +36,7 @@ class ApsController extends BaseController
     protected $KebutuhanAreaModel;
     protected $MesinPlanningModel;
     protected $aksesModel;
+    protected $DetailPlanningModel;
 
     public function __construct()
     {
@@ -49,6 +51,7 @@ class ApsController extends BaseController
         $this->KebutuhanAreaModel = new KebutuhanAreaModel();
         $this->MesinPlanningModel = new MesinPlanningModel();
         $this->aksesModel = new AksesModel();
+        $this->DetailPlanningModel = new DetailPlanningModel();
         if ($this->filters   = ['role' => ['aps']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -368,9 +371,9 @@ class ApsController extends BaseController
             'title' => 'Data Planning Area',
             'active1' => '',
             'active2' => '',
-            'active3' => 'active',
+            'active3' => '',
             'active4' => '',
-            'active5' => '',
+            'active5' => 'active',
             'active6' => '',
             'active7' => '',
             'planarea' => $planarea,
@@ -425,12 +428,31 @@ class ApsController extends BaseController
         }
     }
     public function detailplanmc($id){
-        // $this->detailPlanningModel->where('id_pln_mc',$id)->findAll();
+        $detailplan = $this->DetailPlanningModel->where('id_pln_mc',$id)->findAll();
         $judul = $this->request->getPost('judul');
         $area = $this->request->getPost('area');
         $jarum = $this->request->getPost('jarum');
-        dd($jarum);
+        $mesinarea = $this->jarumModel->getMesinByArea($area,$jarum); //mesin yang dipakai semua mesin tanpa melibatkan head planning
+        // $mesinplanning = $this->MesinPlanningModel->getMesinByArea($area,$jarum); //mesin yang dipilih oleh head planning di teruskan ke bagian aps
+        $data = [
+            'title' => 'Data Planning',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => 'active',
+            'active6' => '',
+            'active7' => '',
+            'detailplan' => $detailplan,
+            'judul' => $judul,
+            'area' => $area,
+            'jarum' => $jarum,
+            'mesin' => $mesinarea,
+            'id_pln_mc' => $id,
+        ];
+        return view('Aps/Planning/fetchDataArea', $data);
     }
+
     public function orderPerJarumBln()
     {
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
@@ -500,8 +522,18 @@ class ApsController extends BaseController
             'area' => $area,
             'tampildata' => $tampilperdelivery,
             'product' => $product,
-
         ];
         return view('Aps/Order/semuaorderarea', $data);
+    }
+    public function fetchdetailorderarea(){
+        $area = $this->request->getGet('area');
+        $jarum = $this->request->getGet('jarum');
+        $id_pln_mc = $this->request->getGet('id_pln_mc');
+
+        $data = $this->ApsPerstyleModel->getDetailPlanning($area,$jarum);
+        foreach ($data as $row) {
+            $row['id_pln_mc'] = $id_pln_mc;
+            $this->DetailPlanningModel->insert($row);
+        }
     }
 }

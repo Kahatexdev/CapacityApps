@@ -253,4 +253,13 @@ class DataMesinModel extends Model
             ->orderBy('pu', 'total_mc', 'Desc')
             ->findAll();
     }
+    public function getMesinByArea($area,$jarum){
+        $a = $this->select('sum(total_mc) as mesin')
+        ->where('area',$area)
+        ->where('jarum',$jarum)
+        ->first();
+
+        $mesin = reset($a);
+        return $mesin;
+    }
 }

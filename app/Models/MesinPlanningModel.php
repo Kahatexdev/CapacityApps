@@ -74,4 +74,13 @@ class MesinPlanningModel extends Model
             ->where('mesin_planning.id_kebutuhan_mesin', $id)
             ->findAll();
     }
+    public function getMesinByArea($area,$jarum){
+        $a = $this->select('sum(mc_nyala)')
+        ->where('area',$area)
+        ->where('jarum',$jarum)
+        ->first();
+
+        $mesin = reset($a);
+        return $mesin;
+    }
 }

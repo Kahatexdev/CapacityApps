@@ -9,7 +9,7 @@ class EditTabelUser extends Migration
     public function up()
     {
 
-        $this->forge->addColumn('user', [
+        $this->forge->modifyColumn('user', [
             'role' => [
                 'type' => 'ENUM',
                 'constraint' => ['capacity', 'planning', 'aps', 'user', 'god'],
