@@ -898,4 +898,51 @@ class GodController extends BaseController
             return redirect()->to(base_url('sudo/account'))->with('error', 'User Gagal di hapus');
         }
     }
+    public function updateaccount($id)
+    {
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        // Delete akses terkait user_id
+        $this->aksesModel->where('user_id', $id)->delete();
+
+        // Data update user
+        $field = [
+            'username' => $this->request->getPost('username'),
+            'password' => $this->request->getPost('password'),
+            'role' => $this->request->getPost('role'),
+        ];
+
+        // Update data user
+        $update = $this->userModel->update($id, $field);
+        if ($update) {
+            $areaList = $this->request->getPost("areaList");
+
+            if (!empty($areaList)) {
+                foreach ($areaList as $areaId) {
+
+                    $data = [
+                        'user_id' => $id,
+                        'area_id' => $areaId,
+                    ];
+                    $query = "INSERT INTO user_areas (user_id, area_id) VALUES (?, ?)";
+                    $db->query($query, [$id, $areaId]);
+                    if (!$db) {
+                        return redirect()->to(base_url('sudo/account'))->with('error', 'User Gagal di input');
+                    }
+                }
+            }
+
+            $db->transComplete();
+
+            if ($db->transStatus() === FALSE) {
+                return redirect()->to(base_url('sudo/account'))->with('error', 'User Gagal di Update');
+            } else {
+                return redirect()->to(base_url('sudo/account'))->with('success', 'User Berhasil di Update');
+            }
+        } else {
+            $db->transRollback();
+            return redirect()->to(base_url('sudo/account'))->with('error', 'User Gagal di Update');
+        }
+    }
 }

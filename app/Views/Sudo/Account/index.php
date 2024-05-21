@@ -76,9 +76,11 @@
                                             <label for="productType" class="col-form-label">Role</label>
                                             <select class="form-control" id="role" name="role">
                                                 <option>Choose</option>
-                                                <?php foreach ($userdata as $ar) : ?>
-                                                    <option><?= $ar['role'] ?></option>
-                                                <?php endforeach ?>
+                                                <option> Capacity</option>
+                                                <option> Planning</option>
+                                                <option> Aps</option>
+                                                <option> User</option>
+
                                             </select>
                                         </div>
                                     </div>
@@ -134,7 +136,7 @@
 
                                     <td class=" text-xs">
 
-                                        <button class="btn bg-gradient-danger btn-sm text-xxs edit-btn" data-bs-toggle="modal" data-bs-target="#edit-btn" data-id="<?= $user['id_user'] ?> " data-usn="<?= $user['username'] ?>" data-pass="<?= $user['password'] ?>" data-area="<?= $user['area_names'] ?>">Edit</button>
+                                        <button class="btn bg-gradient-success btn-sm text-xxs edit-btn" data-bs-toggle="modal" data-bs-target="#edit-btn" data-id="<?= $user['id_user'] ?> " data-usn="<?= $user['username'] ?>" data-pass="<?= $user['password'] ?>" data-area="<?= $user['area_names'] ?>">Edit</button>
                                         <button class=" btn bg-gradient-danger btn-sm text-xxs delete-btn" data-bs-toggle="modal" data-bs-target="#delete-btn" data-id="<?= $user['id_user'] ?> ">Delete</button>
 
                                     </td>
@@ -209,6 +211,65 @@
             </div>
         </div>
     </div>
+    <div class="modal fade  bd-example-modal-lg" id="ModalEdit" tabindex="-1" role="dialog" aria-ModalDelete="ModalEdit" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Edit Data User</h5>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="<?= base_url('sudo/addaccount') ?>" method="post">
+                        <div class="row">
+                            <div class="col-lg-12 col-sm-12">
+
+                                <div class="form-group">
+                                    <label for="buyer" class="col-form-label">Username:</label>
+                                    <input type="text" name="username" id="" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="no_order" class="col-form-label">Password:</label>
+                                    <input type="password" name="password" id="" class="form-control" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="productType" class="col-form-label">Role</label>
+                                    <select class="form-control" id="role" name="role">
+                                        <option>Choose</option>
+
+                                        <option> Capacity</option>
+                                        <option> Planning</option>
+                                        <option> Aps</option>
+                                        <option> User</option>
+
+                                    </select>
+                                </div>
+                                <?php foreach ($area as $ar) : ?>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="<?= $ar['id'] ?>" id="fcustomCheck1" name="areaList[]">
+                                        <label class="custom-control-label" for="customCheck1"><?= $ar['name'] ?></label>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+
+                        </div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-gradient-info">Save</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
 
 </div>
 
@@ -274,8 +335,9 @@
         var username = $(this).data('usn');
         var pass = $(this).data('pass');
         var area = $(this).data('area');
-        $('#ModalEdit').find('form').attr('action', '<?= base_url('sudo/editaccount/') ?>' + id);
-
+        $('#ModalEdit').find('form').attr('action', '<?= base_url('sudo/updateaccount/') ?>' + id);
+        $('#ModalEdit').find('input[name="username"]').val(username);
+        $('#ModalEdit').find('input[name="password"]').val(pass);
         $('#ModalEdit').modal('show'); // Show the modal
     });
 </script>
