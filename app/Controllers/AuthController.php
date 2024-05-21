@@ -41,6 +41,9 @@ class AuthController extends BaseController
             case 'god':
                 return redirect()->to(base_url('/sudo'));
                 break;
+            case 'ie':
+                return redirect()->to(base_url('/ie'));
+                break;
 
             default:
                 return redirect()->to(base_url('/login'))->withInput()->with('error', 'Invalid username or password');
