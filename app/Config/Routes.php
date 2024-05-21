@@ -314,3 +314,10 @@ $routes->group('/sudo', ['filter' => 'god'], function ($routes) {
     $routes->post('updateaccount/(:any)', 'GodController::updateaccount/$1');
     $routes->post('deleteaccount/(:any)', 'GodController::deleteaccount/$1');
 });
+
+// user
+$routes->group('/ie', ['filter' => 'ie'], function ($routes) {
+    $routes->get('', 'IeController::index');
+    $routes->get('historysmv', 'IeController::historysmv');
+    $routes->post('inputsmv', 'IeController::inputsmv');
+});

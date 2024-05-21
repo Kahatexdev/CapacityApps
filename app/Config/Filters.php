@@ -29,6 +29,7 @@ class Filters extends BaseConfig
         'aps' => \App\Filters\ApsAuth::class,
         'user' => \App\Filters\UserFilter::class,
         'god' => \App\Filters\God::class,
+        'ie' => \App\Filters\IEFilter::class,
 
     ];
 
@@ -86,6 +87,9 @@ class Filters extends BaseConfig
         ],
         'god' => [
             'before' => ['god/*'],
+        ],
+        'ie' => [
+            'before' => ['ie/*'],
         ],
     ];
 }
