@@ -428,7 +428,7 @@ class ApsController extends BaseController
         }
     }
     public function detailplanmc($id){
-        $detailplan = $this->DetailPlanningModel->where('id_pln_mc',$id)->orderBy('delivery','ASC')->findAll();
+        $detailplan = $this->DetailPlanningModel->getDataPlanning($id);
         $judul = $this->request->getPost('judul');
         $area = $this->request->getPost('area');
         $jarum = $this->request->getPost('jarum');

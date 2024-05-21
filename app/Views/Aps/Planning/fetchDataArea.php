@@ -59,6 +59,7 @@ error_reporting(E_ALL); ?>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Remaining Qty</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Planned</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Target 100%</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Start</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Stop</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Machine</th>
@@ -67,22 +68,32 @@ error_reporting(E_ALL); ?>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                        <?php foreach ($detailplan as $order) : ?>
-                                            <tr>
-                                                <td class="text-sm"><?= $order['model']; ?></td>
-                                                <td class="text-sm"><?= date('d-M-Y', strtotime($order['delivery'])); ?></td>
-                                                <td class="text-sm"><?= $order['qty']; ?></td>
-                                                <td class="text-sm"><?= $order['sisa']; ?></td>
-                                                <td class="text-sm"></td>
-                                                <td class="text-sm"></td>
-                                                <td class="text-sm"></td>
-                                                <td class="text-sm"></td>
-                                                <td class="text-sm">Days</td>
-                                                <td class="text-sm">
-                                                    Operate
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
+                                <?php foreach ($detailplan as $order) : ?>
+                                    <tr>
+                                        <td class="text-sm"><?= htmlspecialchars($order['model']); ?></td>
+                                        <td class="text-sm"><?= date('d-M-Y', strtotime($order['delivery'])); ?></td>
+                                        <td class="text-sm"><?= number_format($order['qty'], 0, '.', ','); ?> Dz</td>
+                                        <td class="text-sm"><?= number_format($order['sisa'], 0, '.', ','); ?> Dz</td>
+                                        <td class="text-sm"><?= number_format($order['est_qty'], 0, '.', ','); ?> Dz</td>
+                                        <td class="text-sm"><?= number_format(3600 / $order['smv'], 2, '.', ','); ?> Dz/Days</td>
+                                        <td class="text-sm">
+                                            <?= !empty($order['start_date']) ? date('d-M-Y', strtotime($order['start_date'])) : 'No Start Date'; ?>
+                                        </td>
+                                        <td class="text-sm">
+                                            <?= !empty($order['stop_date']) ? date('d-M-Y', strtotime($order['stop_date'])) : 'No Stop Date'; ?>
+                                        </td>
+                                        <td class="text-sm"><?= htmlspecialchars($order['mesin']); ?></td>
+                                        <td class="text-sm"><?= htmlspecialchars($order['hari']); ?> Days</td>
+                                        <td class="text-sm">
+                                            <?php if ($order['est_qty'] < $order['sisa']) : ?>
+                                                <a href="<?= base_url('aps/planning/' . $order['id_detail_pln']); ?>" class="btn btn-primary">Planning</a>
+                                            <?php else : ?>
+                                                <a href="<?= base_url('aps/detail/' . $order['id_detail_pln']); ?>" class="btn btn-secondary">Detail</a>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+
                                 </tbody>
                             </table>
                         </div>

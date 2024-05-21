@@ -206,7 +206,7 @@ class ApsPerstyleModel extends Model
         return $result;
     }
     public function getDetailPlanning($area,$jarum){
-    return $this->select('mastermodel AS model,delivery,SUM(qty) AS qty ,SUM(sisa) AS sisa, AVG(smv) AS smv')
+    return $this->select('mastermodel AS model,delivery,SUM(qty)/24 AS qty ,SUM(sisa)/24 AS sisa, AVG(smv) AS smv')
     ->where('factory',$area)
     ->where('machinetypeid',$jarum)
     ->groupby('delivery','mastermodel')
