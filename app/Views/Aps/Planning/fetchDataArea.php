@@ -33,13 +33,12 @@ error_reporting(E_ALL); ?>
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <h5>
-                            Pick Data for Planning for Area <strong style="color: orange;"><?= $area; ?></strong> by Needle <strong style="color: orange;"><?= $jarum; ?></strong>
+                            Pick Data for Planning for Area <strong style="color: green;"><?= $area; ?></strong> by Needle <strong style="color: orange;"><?= $jarum; ?></strong>
                         </h5>
-                    </div>
-                    
+                    </div>                    
                     <div>
                         <h6>
-                            Machine Available is <strong style="color: orange;"><?= $mesin; ?> Machine </strong>
+                            Machine Available is <strong style="color: green;"><?= $mesin; ?> Machine </strong>
                         </h6>
                     </div>
                     <div>
@@ -71,7 +70,7 @@ error_reporting(E_ALL); ?>
                                         <?php foreach ($detailplan as $order) : ?>
                                             <tr>
                                                 <td class="text-sm"><?= $order['model']; ?></td>
-                                                <td class="text-sm"><?= $order['delivery']; ?></td>
+                                                <td class="text-sm"><?= date('d-M-Y', strtotime($order['delivery'])); ?></td>
                                                 <td class="text-sm"><?= $order['qty']; ?></td>
                                                 <td class="text-sm"><?= $order['sisa']; ?></td>
                                                 <td class="text-sm"></td>
@@ -106,6 +105,7 @@ error_reporting(E_ALL); ?>
         $(document).ready(function() {
             $('#dataTable').DataTable({
                     "pageLength": 35,
+                    "order": []
             });
             $('#fetch-data-button').click(function() {
                 var area = '<?= $area; ?>';
