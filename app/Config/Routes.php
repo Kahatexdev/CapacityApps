@@ -220,6 +220,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('fetch_jarum', 'ApsController::fetch_jarum');
     $routes->post('SimpanJudul', 'ApsController::saveplanningmesin');
     $routes->post('detailplnmc/(:any)', 'ApsController::detailplanmc/$1');
+    $routes->get('fetchdetailorderarea', 'ApsController::fetchdetailorderarea');
 });
 
 // user

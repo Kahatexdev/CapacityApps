@@ -205,4 +205,11 @@ class ApsPerstyleModel extends Model
         $result = $this->select('idapsperstyle, delivery,sisa')->where('mastermodel', $validate['no_model'])->where('size', $validate['style'])->first();
         return $result;
     }
+    public function getDetailPlanning($area,$jarum){
+    return $this->select('mastermodel AS model,delivery,SUM(qty) AS qty ,SUM(sisa) AS sisa, AVG(smv) AS smv')
+    ->where('factory',$area)
+    ->where('machinetypeid',$jarum)
+    ->groupby('delivery','mastermodel')
+    ->findAll();
+    }
 }

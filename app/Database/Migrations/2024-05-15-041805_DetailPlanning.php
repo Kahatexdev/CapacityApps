@@ -34,7 +34,7 @@ class DetailPlanning extends Migration
                 'constraint' => 15,
                 'unsigned' => true,
             ],
-            'qty planned' => [
+            'qty_planned' => [
                 'type' => 'INT',
                 'constraint' => 15,
                 'unsigned' => true,
