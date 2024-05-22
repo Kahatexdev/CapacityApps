@@ -55,11 +55,11 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
 
     // produksi
-    $routes->get('dataproduksi', 'GodController::viewProduksi');
-    $routes->get('dataprogress', 'GodController::progressData');
-    $routes->get('produksiareachart', 'GodController::produksiAreaChart');
-    $routes->get('dataproduksi/(:any)', 'GodController::produksiPerArea/$1');
-    $routes->post('importproduksi', 'GodController::importproduksi');
+    $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
+    $routes->get('dataprogress', 'ProduksiController::progressData');
+    $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
+    $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->post('importproduksi', 'ProduksiController::importproduksi');
 
     // mesin
     $routes->get('datamesin', 'MesinController::index');
@@ -321,4 +321,5 @@ $routes->group('/ie', ['filter' => 'ie'], function ($routes) {
     $routes->get('', 'IeController::index');
     $routes->get('historysmv', 'IeController::historysmv');
     $routes->post('inputsmv', 'IeController::inputsmv');
+    $routes->post('gethistory', 'IeController::gethistory');
 });

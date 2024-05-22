@@ -39,4 +39,11 @@ class HistorySmvModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getDataSize($size)
+    {
+        return $this->select('smv_old,created_at')
+            ->where('style', $size)
+            ->findAll();
+    }
 }
