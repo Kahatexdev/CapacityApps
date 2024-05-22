@@ -541,7 +541,20 @@ class ApsController extends BaseController
         $jarum = $this->request->getGet('jarum');
         $mesin = $this->request->getGet('mesin');
         $detailplan = $this->DetailPlanningModel->getDetailPlanning($id);
-        dd($detailplan);
-        
+        $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => 'active',
+            'area' => $area,
+            'jarum' => $jarum,
+            'mesin' => $mesin,
+            'planning' => $detailplan,
+        ];
+        return view('Aps/Planning/operationPlanning', $data);
     }
 }
