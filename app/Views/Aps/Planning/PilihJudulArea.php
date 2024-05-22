@@ -104,7 +104,7 @@
                                         <td><?= $order['jarum'] ?></td>
                                         <td><?= $order['area'] ?></td>
                                         <td><?= date('F j, Y \a\t g:i A', strtotime($order['updated_at'])) ?></td>
-                                        <td><form action="<?= base_url('aps/detailplnmc/'.$order['id_pln_mc']) ?>" method="POST">
+                                        <td><form action="<?= base_url('aps/detailplnmc/'.$order['id_pln_mc']) ?>" method="get">
                                                 <input type="hidden" name="judul" value="<?= $order['judul'] ?>">
                                                 <input type="hidden" name="area" value="<?= $order['area'] ?>">
                                                 <input type="hidden" name="jarum" value="<?= $order['jarum'] ?>">
@@ -133,7 +133,6 @@
 
     // Trigger import modal when import button is clicked
     $('.import-btn').click(function() {
-        console.log("a");
         var idModel = $(this).data('id');
         var noModel = $(this).data('no-model');
 
