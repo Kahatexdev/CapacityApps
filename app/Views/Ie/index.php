@@ -48,11 +48,53 @@
                 </script>
             <?php endif; ?>
 
-            <div class="modal fade  bd-example-modal-lg" id="exampleModalMessage" tabindex="-1" role="dialog" aria-labelledby="exampleModalMessageTitle" aria-hidden="true">
+
+
+            <div class="row mt-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="example" class="display compact " style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Model</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Size</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">SMV</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Action</th>
+
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($order as $key) : ?>
+                                        <tr>
+                                            <td class="text-xs"><?= $key['mastermodel'] ?></td>
+                                            <td class="text-xs"><?= $key['size'] ?></td>
+                                            <td class="text-xs"><?= $key['smv'] ?> second</td>
+
+                                            <td class=" text-xs">
+
+                                                <button class="btn bg-gradient-success btn-sm text-xxs edit-btn" data-bs-toggle="modal" data-bs-target="#edit-btn" data-id="<?= $key['idapsperstyle'] ?> " data-model="<?= $key['mastermodel'] ?>" data-size="<?= $key['size'] ?>" data-smv="<?= $key['smv'] ?>">Edit</button>
+
+                                                <button class="btn bg-gradient-info btn-sm text-xxs history-btn" data-bs-toggle="modal" data-bs-target="#edit-btn" data-id="<?= $key['idapsperstyle'] ?> " data-model="<?= $key['mastermodel'] ?>" data-size="<?= $key['size'] ?>" data-smv="<?= $key['smv'] ?>">History</button>
+
+                                            </td>
+                                        </tr>
+                                    <?php endforeach ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="modal fade  bd-example-modal-lg" id="ModalEdit" tabindex="-1" role="dialog" aria-ModalDelete="ModalEdit" aria-hidden="true">
                 <div class="modal-dialog  modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Input Data User</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">Edit Data SMV</h5>
                             <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">×</span>
                             </button>
@@ -63,26 +105,21 @@
                                     <div class="col-lg-12 col-sm-12">
 
                                         <div class="form-group">
-                                            <label for="buyer" class="col-form-label">Username:</label>
-                                            <input type="text" name="username" id="" class="form-control" required>
+                                            <label for="buyer" class="col-form-label">Model:</label>
+                                            <input type="text" name="id" id="" class="form-control" hidden>
+                                            <input type="text" name="model" id="" class="form-control" readonly>
                                         </div>
                                         <div class="form-group">
-                                            <label for="no_order" class="col-form-label">Password:</label>
-                                            <input type="password" name="password" id="" class="form-control" required>
+                                            <label for="no_order" class="col-form-label">Size:</label>
+                                            <input type="text" name="size" id="" class="form-control" readonly>
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="productType" class="col-form-label">Role</label>
-                                            <select class="form-control" id="role" name="role">
-                                                <option>Choose</option>
-                                                <option> Capacity</option>
-                                                <option> Planning</option>
-                                                <option> Aps</option>
-                                                <option> User</option>
-                                                <option> IE</option>
-
-                                            </select>
+                                            <label for="no_order" class="col-form-label">SMV:</label>
+                                            <input type="text" name="smvold" id="" class="form-control" hidden>
+                                            <input type="text" name="smv" id="" class="form-control" required>
                                         </div>
+
                                     </div>
 
                                 </div>
@@ -100,111 +137,6 @@
         </div>
 
     </div>
-
-
-    <div class="row mt-3">
-        <div class="card">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table id="example" class="display compact " style="width:100%">
-                        <thead>
-                            <tr>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Username</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Role</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Area</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Assign</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Action</th>
-
-
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($userdata as $user) : ?>
-                                <tr>
-                                    <td class="text-xs"><?= $user['username'] ?></td>
-                                    <td class="text-xs"><?= $user['role'] ?></td>
-                                    <td class="text-xs"><?= $user['area_names'] ?></td>
-                                    <td class="text-xs"> <?php if ($user['role'] == 'aps') : ?>
-                                            <!-- If qty is null, set action to Import -->
-
-                                        <?php endif; ?>
-                                    </td>
-
-
-                                    <td class=" text-xs">
-
-                                        <button class="btn bg-gradient-success btn-sm text-xxs edit-btn" data-bs-toggle="modal" data-bs-target="#edit-btn" data-id="<?= $user['id_user'] ?> " data-usn="<?= $user['username'] ?>" data-pass="<?= $user['password'] ?>" data-area="<?= $user['area_names'] ?>">Edit</button>
-
-                                    </td>
-                                </tr>
-                            <?php endforeach ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-
-    <div class="modal fade  bd-example-modal-lg" id="ModalEdit" tabindex="-1" role="dialog" aria-ModalDelete="ModalEdit" aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Edit Data User</h5>
-                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form action="<?= base_url('sudo/addaccount') ?>" method="post">
-                        <div class="row">
-                            <div class="col-lg-12 col-sm-12">
-
-                                <div class="form-group">
-                                    <label for="buyer" class="col-form-label">Username:</label>
-                                    <input type="text" name="username" id="" class="form-control" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="no_order" class="col-form-label">Password:</label>
-                                    <input type="password" name="password" id="" class="form-control" required>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="productType" class="col-form-label">Role</label>
-                                    <select class="form-control" id="role" name="role">
-                                        <option>Choose</option>
-
-                                        <option> Capacity</option>
-                                        <option> Planning</option>
-                                        <option> Aps</option>
-                                        <option> User</option>
-
-                                    </select>
-                                </div>
-                                <?php foreach ($area as $ar) : ?>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="<?= $ar['id'] ?>" id="fcustomCheck1" name="areaList[]">
-                                        <label class="custom-control-label" for="customCheck1"><?= $ar['name'] ?></label>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-
-                        </div>
-
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn bg-gradient-info">Save</button>
-                </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-</div>
 
 
 </div>
@@ -252,28 +184,18 @@
         });
     });
 
-    $('.assign-button').click(function() {
-        var id = $(this).data('id');
 
-        $('#assignArea').find('input[name="iduser"]').val(id);
-
-        $('#assignArea').modal('show'); // Show the modal
-    });
-
-    $('.delete-btn').click(function() {
-        var id = $(this).data('id');
-        $('#ModalDelete').find('form').attr('action', '<?= base_url('sudo/deleteaccount/') ?>' + id);
-
-        $('#ModalDelete').modal('show'); // Show the modal
-    });
     $('.edit-btn').click(function() {
         var id = $(this).data('id');
-        var username = $(this).data('usn');
-        var pass = $(this).data('pass');
-        var area = $(this).data('area');
-        $('#ModalEdit').find('form').attr('action', '<?= base_url('sudo/updateaccount/') ?>' + id);
-        $('#ModalEdit').find('input[name="username"]').val(username);
-        $('#ModalEdit').find('input[name="password"]').val(pass);
+        var model = $(this).data('model');
+        var size = $(this).data('size');
+        var smv = $(this).data('smv');
+        $('#ModalEdit').find('form').attr('action', '<?= base_url('ie/inputsmv/') ?>');
+        $('#ModalEdit').find('input[name="id"]').val(id);
+        $('#ModalEdit').find('input[name="model"]').val(model);
+        $('#ModalEdit').find('input[name="size"]').val(size);
+        $('#ModalEdit').find('input[name="smv"]').val(smv);
+        $('#ModalEdit').find('input[name="smvold"]').val(smv);
         $('#ModalEdit').modal('show'); // Show the modal
     });
 </script>

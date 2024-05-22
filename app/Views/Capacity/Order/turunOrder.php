@@ -129,10 +129,9 @@
                                         <td>
                                             <p class="text-xs font-weight-bold mb-0"><?= number_format(round($detail['qty_turun'] / 24), 0, ',', '.') ?> Dz</p>
                                         </td>
-                                        <td> <!-- Actions column -->
-                                            <form id="detailForm" action="<?= base_url() ?>capacity/detailturunorder/<?= $detail['week_number'] ?>/<?= $detail['kd_buyer_order'] ?>" method="POST">
-                                                <button type="submit" class="btn btn-success">Detail</button>
-                                            </form>
+                                        <td>
+                                            <a href="<?= base_url() ?>capacity/detailturunorder/<?= $detail['week_number'] ?>/<?= $detail['kd_buyer_order'] ?>" class="btn btn-success">detail</a>
+
                                         </td>
                                     </tr>
                                 <?php
