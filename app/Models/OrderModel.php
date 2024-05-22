@@ -190,13 +190,11 @@ class OrderModel extends Model
 
     public function getTurunOrder()
     {
-        $query = $this->select('data_model.kd_buyer_order, YEARWEEK(data_model.created_at, 3) as week_number, SUM(apsperstyle.qty) as qty_turun')
+        return $this->select('data_model.kd_buyer_order, YEARWEEK(data_model.updated_at, 3) as week_number, SUM(apsperstyle.qty) as qty_turun')
             ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel')
             ->groupBy(['week_number', 'kd_buyer_order'])
             ->orderBy('week_number', 'DESC')
             ->findAll();
-
-        return $query;
     }
 
     public function chartTurun()
@@ -226,12 +224,11 @@ class OrderModel extends Model
 
     public function getDetailTurunOrder($week, $buyer)
     {
-        $query = $this->select('data_model.*, apsperstyle.machinetypeid, apsperstyle.mastermodel,apsperstyle.delivery, sum(apsperstyle.qty) as qty,apsperstyle.no_order')
+        return $this->select('data_model.*, apsperstyle.machinetypeid, apsperstyle.mastermodel,apsperstyle.delivery, sum(apsperstyle.qty) as qty,apsperstyle.no_order')
             ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel')
-            ->where("CONCAT(YEAR(data_model.updated_at), LPAD(WEEK(data_model.updated_at), 2, '0'))", $week)
+            ->where("YEARWEEK(data_model.updated_at, 3)", $week)
             ->where('data_model.kd_buyer_order', $buyer)
+            ->groupby('data_model.no_model')
             ->findAll();
-
-        return $query;
     }
 }
