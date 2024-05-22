@@ -81,4 +81,21 @@ class IeController extends BaseController
             return redirect()->to(base_url('ie/'))->with('error', 'Smv gagal di update');
         }
     }
+    public function gethistory()
+    {
+        $size = $this->request->getPost('size');
+        $data = $this->historysmv->getDataSize($size);
+
+        if (empty($data)) {
+            $empty = [
+                [
+                    'smv_old' => "tidak ada data",
+                    'created_at' => "tidak ada data"
+                ]
+            ];
+            return json_encode($empty);
+        }
+
+        return json_encode($data);
+    }
 }

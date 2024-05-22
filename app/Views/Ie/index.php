@@ -8,17 +8,15 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">sudo System</p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Industrial Engineering</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    Data User
+                                    Data SMV
                                 </h5>
                             </div>
                         </div>
                         <div>
 
-                            <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md d-inline-flex align-items-center">
-                                <i class="fas fa-plus-circle me-2 text-lg opacity-10" style="margin-right: 0.5rem;"></i> <span class="ms-1">Tambah User</span>
-                            </button>
+
 
                         </div>
                     </div>
@@ -134,12 +132,54 @@
                     </div>
                 </div>
             </div>
+            <div class="modal fade bd-example-modal-lg" id="ModalHistory" tabindex="-1" role="dialog" aria-labelledby="ModalHistoryLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">History Data SMV</h5>
+                            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-lg-12 col-sm-12">
+                                    <div class="form-group">
+                                        <label for="no_order" class="col-form-label">Size:</label>
+                                        <input type="text" name="size" id="" class="form-control" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="no_order" class="col-form-label">Current SMV:</label>
+                                        <input type="text" name="currentsmv" id="" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>SMV</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Data from AJAX will be appended here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-info">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
+
     </div>
-
-
-</div>
 
 </div>
 
@@ -187,8 +227,8 @@
 
     $('.edit-btn').click(function() {
         var id = $(this).data('id');
-        var model = $(this).data('model');
         var size = $(this).data('size');
+        var model = $(this).data('model');
         var smv = $(this).data('smv');
         $('#ModalEdit').find('form').attr('action', '<?= base_url('ie/inputsmv/') ?>');
         $('#ModalEdit').find('input[name="id"]').val(id);
@@ -197,6 +237,52 @@
         $('#ModalEdit').find('input[name="smv"]').val(smv);
         $('#ModalEdit').find('input[name="smvold"]').val(smv);
         $('#ModalEdit').modal('show'); // Show the modal
+    });
+    $('.history-btn').click(function() {
+        var id = $(this).data('id');
+        var size = $(this).data('size');
+        var smv = $(this).data('smv');
+
+        // Clear existing table data
+        $('#ModalHistory tbody').empty();
+
+        $.ajax({
+            type: 'post',
+            url: '<?= base_url('ie/gethistory') ?>',
+            data: {
+                size: size
+            },
+            success: function(response) {
+                var history = JSON.parse(response);
+
+                // Loop through history data and append to table
+                for (const item of history) {
+                    var tanggal = item.created_at;
+                    var smvold = item.smv_old;
+
+                    var row = `
+                    <tr>
+                        <td>${tanggal}</td>
+                        <td>${smvold}</td>
+                    </tr>
+                `;
+
+                    $('#ModalHistory tbody').append(row);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX error:", error);
+            }
+        });
+
+        // Set modal fields
+        $('#ModalHistory').find('form').attr('action', '<?= base_url('ie/inputsmv/') ?>');
+        $('#ModalHistory').find('input[name="id"]').val(id);
+        $('#ModalHistory').find('input[name="size"]').val(size);
+        $('#ModalHistory').find('input[name="currentsmv"]').val(smv);
+
+        // Show the modal
+        $('#ModalHistory').modal('show');
     });
 </script>
 
