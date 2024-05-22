@@ -230,7 +230,7 @@
         var size = $(this).data('size');
         var model = $(this).data('model');
         var smv = $(this).data('smv');
-        $('#ModalEdit').find('form').attr('action', '<?= base_url('ie/inputsmv/') ?>');
+        $('#ModalEdit').find('form').attr('action', '<?= base_url('ie/inputsmv') ?>');
         $('#ModalEdit').find('input[name="id"]').val(id);
         $('#ModalEdit').find('input[name="model"]').val(model);
         $('#ModalEdit').find('input[name="size"]').val(size);
@@ -276,7 +276,7 @@
         });
 
         // Set modal fields
-        $('#ModalHistory').find('form').attr('action', '<?= base_url('ie/inputsmv/') ?>');
+        $('#ModalHistory').find('form').attr('action', '<?= base_url('ie/inputsmv') ?>');
         $('#ModalHistory').find('input[name="id"]').val(id);
         $('#ModalHistory').find('input[name="size"]').val(size);
         $('#ModalHistory').find('input[name="currentsmv"]').val(smv);

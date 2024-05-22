@@ -160,7 +160,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="<?= base_url('sudo/assignarea/') ?>" method="post">
+                    <form action="<?= base_url('sudo/assignarea') ?>" method="POSTe">
                         <input type="text" name="iduser" id="iduser" hidden value="">
                         <div class="row">
                             <div class="col-lg-12 col-sm-12">
