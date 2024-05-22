@@ -119,7 +119,9 @@
 </script>
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#example').DataTable();
+        $('#example').DataTable({
+            "pageLength": 50
+        });
 
         // Trigger import modal when import button is clicked
         $('.import-btn').click(function() {
