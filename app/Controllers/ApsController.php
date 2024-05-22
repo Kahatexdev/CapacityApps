@@ -429,9 +429,9 @@ class ApsController extends BaseController
     }
     public function detailplanmc($id){
         $detailplan = $this->DetailPlanningModel->getDataPlanning($id);
-        $judul = $this->request->getPost('judul');
-        $area = $this->request->getPost('area');
-        $jarum = $this->request->getPost('jarum');
+        $judul = $this->request->getGet('judul');
+        $area = $this->request->getGet('area');
+        $jarum = $this->request->getGet('jarum');
         $mesinarea = $this->jarumModel->getMesinByArea($area,$jarum); //mesin yang dipakai semua mesin tanpa melibatkan head planning
         // $mesinplanning = $this->MesinPlanningModel->getMesinByArea($area,$jarum); //mesin yang dipilih oleh head planning di teruskan ke bagian aps
         $data = [
@@ -535,5 +535,13 @@ class ApsController extends BaseController
             $row['id_pln_mc'] = $id_pln_mc;
             $this->DetailPlanningModel->insert($row);
         }
+    }
+    public function planningpage($id){
+        $area = $this->request->getGet('area');
+        $jarum = $this->request->getGet('jarum');
+        $mesin = $this->request->getGet('mesin');
+        $detailplan = $this->DetailPlanningModel->getDetailPlanning($id);
+        dd($detailplan);
+        
     }
 }

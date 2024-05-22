@@ -85,9 +85,15 @@ error_reporting(E_ALL); ?>
                                         <td class="text-sm"><?= htmlspecialchars($order['mesin']); ?></td>
                                         <td class="text-sm"><?= htmlspecialchars($order['hari']); ?> Days</td>
                                         <td class="text-sm">
-                                            <?php if ($order['est_qty'] < $order['sisa']) : ?>
-                                                <a href="<?= base_url('aps/planning/' . $order['id_detail_pln']); ?>" class="btn btn-primary">Planning</a>
-                                            <?php else : ?>
+                                        <?php if ($order['est_qty'] < $order['sisa']) : ?>
+                                            <form action="<?= base_url('aps/planningpage/' . $order['id_detail_pln']); ?>" method="get">
+                                                <input type="hidden" name="mesin" value="<?= $mesin; ?>">
+                                                <input type="hidden" name="area" value="<?= $area; ?>">
+                                                <input type="hidden" name="jarum" value="<?= $jarum; ?>">
+
+                                                <button type="submit" class="btn btn-primary">Planning</button>
+                                            </form>
+                                        <?php else: ?>
                                                 <a href="<?= base_url('aps/detail/' . $order['id_detail_pln']); ?>" class="btn btn-secondary">Detail</a>
                                             <?php endif; ?>
                                         </td>
@@ -110,8 +116,7 @@ error_reporting(E_ALL); ?>
                     </div>
                 <?php endif; ?>
             </div>
-        </div>       
-
+        </div> 
         <script>
         $(document).ready(function() {
             $('#dataTable').DataTable({
@@ -126,21 +131,33 @@ error_reporting(E_ALL); ?>
                 $.ajax({
                     url: '<?= base_url('aps/fetchdetailorderarea'); ?>',
                     type: 'GET',
-                    data: { area: area, jarum: jarum , id_pln_mc: id_pln_mc},
-                success: function(response) {
-                    // Handle success response
-                    alert('Data inserted successfully!');
-                    // Optionally, perform any other actions you need
-                },
-                error: function(xhr, status, error) {
-                    // Handle error response
-                    alert('Error inserting data: ' + error);
-                }
+                    data: { area: area, jarum: jarum, id_pln_mc: id_pln_mc },
+                    success: function(response) {
+                        // Handle success response
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Data inserted successfully!',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle error response
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Error inserting data: ' + error,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
                 });
             });
 
         });
-
         </script>
 
 <?php $this->endSection(); ?>
