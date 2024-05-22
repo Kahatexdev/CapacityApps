@@ -12,7 +12,7 @@ class DetailPlanningModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_detail_planning','id_pln_mc','model','delivery','qty','sisa','qty_planned'];
+    protected $allowedFields    = ['id_detail_planning','id_pln_mc','model','delivery','qty','sisa','smv'];
 
     protected bool $allowEmptyInserts = false;
 
