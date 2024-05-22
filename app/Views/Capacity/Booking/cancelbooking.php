@@ -133,7 +133,7 @@
                                             <p class="text-xs font-weight-bold mb-0"><?= number_format(round($detail['qty'] / 24), 0, ',', '.') ?> Dz</p>
                                         </td>
                                         <td> <!-- Actions column -->
-                                            <a href="<?= base_url() ?>capacity/detailturunorder/<?= $detail['week_number'] ?>/<?= $detail['kd_buyer_order'] ?>" class="btn btn-success">detail</a>
+                                            <a href="<?= base_url() ?>capacity/detailcancelbooking/<?= $detail['week_number'] ?>/<?= $detail['kd_buyer_booking'] ?>" class="btn btn-success">detail</a>
                                         </td>
                                     </tr>
                                 <?php
