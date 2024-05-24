@@ -557,4 +557,14 @@ class ApsController extends BaseController
         ];
         return view('Aps/Planning/operationPlanning', $data);
     }
+    public function getDataLibur(){
+    $startDate = $this->request->getPost('startDate');
+    $endDate = $this->request->getPost('endDate');
+
+    // Fetch total number of holidays between the given dates from the model
+    $totalLibur = $this->liburModel->getTotalLiburBetweenDates($startDate, $endDate);
+
+    // Return the total number of holidays as a JSON response
+    return $this->response->setJSON(['status' => 'success', 'total_libur' => $totalLibur]);
+}
 }

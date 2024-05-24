@@ -95,7 +95,11 @@
                                 <div class="col-lg-6 col-sm-12">
                                     <label for="" class="form-control-label">Start</label>
                                     <div class="input-group">
-                                        <input class="form-control" type="text" name="start" readonly value="<?= date('d-M-Y') ?>">
+                                        <?php
+                                            // Get today's date
+                                            $todayDate = date('Y-m-d');
+                                        ?>
+                                        <input class="form-control" type="date" name="start_date" value="<?= $todayDate ?>" id="start-date-<?= $key ?>">
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-sm-12">
@@ -105,9 +109,40 @@
                                         $stopDate = date('Y-m-d', strtotime('-3 days', strtotime($item['delivery'])));
                                     ?>
                                     <div class="input-group">
-                                        <input class="form-control" type="date" name="stop" value="<?= $stopDate ?>">
+                                        <input class="form-control stop-date" type="date" name="stop_date" value="<?= $stopDate ?>" id="stop-date-<?= $key ?>">
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-12">
+                            <div class="form-group row">
+                                <div class="col-lg-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label for="" class="form-control-label">Days</label>
+                                        <input class="form-control days-count" type="number" name="days_count" readonly id="days-count-<?= $key ?>">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-sm-12">
+                                    <label for="" class="form-control-label">Holiday Count</label>
+                                    <div class="input-group">
+                                        <input class="form-control holiday-count" type="number" name="holiday_count" readonly id="holiday-count-<?= $key ?>">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-12">
+                            <div class="form-group">
+                                <label for="" class="form-control-label">
+                                    Machines Usages
+                                    <span id="machine_suggestion" class="ml-2">(Suggested: 0)</span>
+                                </label>
+                                <input class="form-control" type="number" id="machine_count" name="machine_count" oninput="calculateEstimatedQty()">
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-12">
+                            <div class="form-group">
+                                <label for="" class="form-control-label">Estimated Qty (Days x Machine Usage x Target)</label>
+                                <input class="form-control estimated-qty" type="number" value="" name="estimated_qty" id="estimated-qty-<?= $key ?>" readonly>
                             </div>
                         </div>
                     </div>
@@ -126,29 +161,29 @@
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
             <div class="card">
                 <div class="card-header">
+                <?php foreach($planning as $key => $items): ?>
                     <h5>
-                        Detail Booking To Order
-                    </h5>
+                        Detail Planning for Model <?= $items['model'] ?> & Delivery <?= $items['delivery'] ?>
+                <?php endforeach ?>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table id="dataTable" class="display">
                             <thead>
-
-                                <th>
-                                    No Model
-                                </th>
-                                <th>Buyer Order</th>
-                                <th>Order Placement Date</th>
-                                <th>Qty Order</th>
+                                <tr>
+                                    <th>No Model</th>
+                                    <th>Buyer Order</th>
+                                    <th>Order Placement Date</th>
+                                    <th>Qty Order</th>
+                                </tr>
                             </thead>
                             <tbody>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -156,12 +191,6 @@
             </div>
         </div>
     </div>
-
-</div>
-
-<!-- Modal Booking -->
-
-
 
 </div>
 <script>
@@ -172,8 +201,8 @@
     function calculateTarget(key) {
         var percentage = document.getElementById('percentage-' + key).value;
         var target100 = document.getElementById('target-100-' + key).value;
-        var calculatedTarget = (target100 * (percentage / 100)).toFixed(2) + " (" + percentage + "%)";
-        document.getElementById('calculated-target-' + key).value = calculatedTarget;
+        var calculatedTarget = (target100 * (percentage / 100)).toFixed(2);
+        document.getElementById('calculated-target-' + key).value = calculatedTarget + " (" + percentage + "%)";
     }
 
     function initCalculations() {
@@ -181,10 +210,96 @@
         keys.forEach(function(key) {
             calculateTarget(key);
         });
+        calculateDaysCount(); // Calculate days count on initial load
+        fillMachineSuggestion();
     }
 
-    window.onload = initCalculations;
-    document.getElementById('cancelBookingBtn').addEventListener('click', cancelBooking);
+    function calculateDaysCount(callback) {
+    var startDateString = document.querySelector('input[name="start_date"]').value;
+    var stopDateString = document.querySelector('.stop-date').value;
+    var startDate = new Date(startDateString);
+    var stopDate = new Date(stopDateString);
+    var isoStartDate = startDate.toISOString().split('T')[0];
+    var isoStopDate = stopDate.toISOString().split('T')[0];
+
+    $.ajax({
+        url: '<?php echo base_url("aps/getDataLibur") ?>',
+        type: 'POST',
+        dataType: 'json',
+        data: { startDate: isoStartDate, endDate: isoStopDate },
+        success: function(response) {
+            if (response.status == 'success') {
+                var totalHolidays = response.total_libur;
+                var totalDays = ((stopDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+                if (totalDays < 1) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid Dates',
+                        text: 'Stop date and start date are invalid.',
+                    }).then((result) => {
+                    // Reset the stop date
+                    var deliveryDate = new Date(document.getElementById('delivery-<?= $key ?>').value);
+                    var newStopDate = new Date(deliveryDate.getTime() - (3 * 24 * 60 * 60 * 1000)); // 3 days before delivery
+
+                    document.querySelector('.stop-date').value = newStopDate.toISOString().split('T')[0];
+                    calculateDaysCount(function() {
+                        fillMachineSuggestion(); // Call fillMachineSuggestion() after calculateDaysCount() finishes
+                    });
+                    });
+                }
+                var daysWithoutHolidays = totalDays - totalHolidays;
+
+                document.querySelector('.days-count').value = daysWithoutHolidays;
+                document.querySelector('.holiday-count').value = totalHolidays;
+
+                calculateEstimatedQty(); // Calculate estimated quantity after days count is updated
+
+                // Call the callback function if it's provided
+                if (typeof callback === 'function') {
+                    callback();
+                }
+                fillMachineSuggestion();
+            } else {
+                console.error('Error: ' + response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX Error: ' + error);
+        }
+    });
+}
+
+    function calculateEstimatedQty() {
+        var daysCount = parseFloat(document.querySelector('.days-count').value);
+        var machineCount = parseFloat(document.getElementById('machine_count').value);
+        var targetPercentageInput = document.querySelector('[id^="calculated-target-"]').value;
+        var targetPercentage = parseFloat(targetPercentageInput.split(' ')[0]);
+
+        if (!isNaN(daysCount) && !isNaN(machineCount) && !isNaN(targetPercentage)) {
+            var estimatedQty = daysCount * machineCount * targetPercentage;
+            document.querySelector('.estimated-qty').value = estimatedQty.toFixed(2);
+        }
+    }
+
+    function fillMachineSuggestion(){
+        var daysCount = parseFloat(document.querySelector('.days-count').value);
+        var targetPercentageInput = document.querySelector('[id^="calculated-target-"]').value;
+        var targetPercentage = parseFloat(targetPercentageInput.split(' ')[0]);
+        
+        var remainingQty = parseFloat(document.querySelector('[id^="remaining-qty-"]').value);
+        var machineSuggestion = remainingQty / daysCount / targetPercentage;
+        document.getElementById('machine_suggestion').innerText = "(Suggested: " + machineSuggestion.toFixed(2) + ")";
+    }
+    
+
+    document.querySelector('.stop-date').addEventListener('change', calculateDaysCount);
+    document.querySelector('input[name="start_date"]').addEventListener('change', calculateDaysCount);
+    window.onload = function() {
+    initCalculations(); // Assuming this function is synchronous and doesn't involve AJAX calls
+    calculateDaysCount(function() {
+        fillMachineSuggestion(); // Call fillMachineSuggestion() after calculateDaysCount() finishes
+    });
+};
 </script>
-<script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+
 <?php $this->endSection(); ?>

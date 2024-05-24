@@ -222,6 +222,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('detailplnmc/(:any)', 'ApsController::detailplanmc/$1');
     $routes->get('fetchdetailorderarea', 'ApsController::fetchdetailorderarea');
     $routes->get('planningpage/(:any)', 'ApsController::planningpage/$1');
+    $routes->post('getDataLibur','ApsController::getDataLibur');
 });
 
 // user
