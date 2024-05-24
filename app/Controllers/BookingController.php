@@ -452,6 +452,7 @@ class BookingController extends BaseController
     {
 
         $data = [
+            'no_order' => $this->request->getPost("no_order"),
             'no_booking' =>  $this->request->getPost("no_booking"),
             'desc' => $this->request->getPost("desc"),
             'opd' =>  $this->request->getPost("opd"),
