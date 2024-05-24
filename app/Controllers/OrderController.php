@@ -175,6 +175,27 @@ class OrderController extends BaseController
 
         return view('Capacity/Order/detailModelJarum', $data);
     }
+    public function detailmodeljarumPlan($noModel, $delivery, $jarum)
+    {
+        $apsPerstyleModel = new ApsPerstyleModel(); // Create an instance of the model
+        $dataApsPerstyle = $apsPerstyleModel->detailModelJarum($noModel, $delivery, $jarum); // Call the model method
+        $data = [
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'jarum' => $jarum,
+            'dataAps' => $dataApsPerstyle,
+            'noModel' => $noModel,
+            'delivery' => $delivery,
+        ];
+
+        return view('Planning/Order/detailModelJarum', $data);
+    }
 
 
 
@@ -452,7 +473,7 @@ class OrderController extends BaseController
                         return redirect()->to(base_url('/capacity/semuaOrder'))->with('error', 'Nomor Model Tidak Sama. Silahkan periksa kembali');
                     } else {
                         if ($row[5] == null) {
-                            break;
+                            return redirect()->to(base_url('/capacity/semuaOrder'))->with('error', 'GAGAL');
                         } else {
                             $recordID = $row[0];
                             $articleNo = $row[30];
@@ -510,7 +531,8 @@ class OrderController extends BaseController
                             $validate = [
                                 'size' => $size,
                                 'delivery' => $delivery2,
-                                'mastermodel' => $nomodel
+                                'mastermodel' => $nomodel,
+                                'country' => $country
                             ];
 
                             $existingAps = $this->ApsPerstyleModel->checkAps($validate);
