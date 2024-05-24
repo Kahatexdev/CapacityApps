@@ -12,7 +12,7 @@ class ApsPerstyleModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['idapsperstyle', 'machinetypeid', 'mastermodel', 'size', 'delivery', 'qty', 'sisa', 'seam', 'factory', 'production_unit', 'smv', 'no_order'];
+    protected $allowedFields    = ['idapsperstyle', 'machinetypeid', 'mastermodel', 'size', 'delivery', 'qty', 'sisa', 'seam', 'factory', 'production_unit', 'smv', 'no_order', 'country'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -55,6 +55,7 @@ class ApsPerstyleModel extends Model
         $result = $this->select('*')
             ->where('mastermodel', $validate['mastermodel'])
             ->where('size', $validate['size'])
+            ->where('country', $validate['country'])
             ->where('delivery', $validate['delivery'])
             ->get()
             ->getRow();

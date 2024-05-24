@@ -16,12 +16,7 @@
                         </div>
                         <div class="col-6 text-end">
 
-                            <a href="<?= base_url('capacity/cancelBooking') ?>" class="btn btn-sm btn-warning bg-gradient-warning shadow text-center border-radius-md">
-                                Summary Cancel Booking
-                            </a>
-                            <a href="<?= base_url('capacity/turunOrder') ?>" class="btn btn-sm btn-success bg-gradient-success shadow text-center border-radius-md">
-                                Summary Placed Order
-                            </a>
+
 
                         </div>
                     </div>

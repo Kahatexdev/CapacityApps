@@ -120,7 +120,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('orderPerjarum', 'OrderController::OrderPerJarumPlan');
     $routes->get('orderPerArea', 'OrderController::orderPerAreaPlan');
     $routes->get('detailModelPlanning/(:any)/(:any)', 'OrderController::detailModelPlanning/$1/$2');
-    $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'OrderController::detailmodeljarum/$1/$2/$3');
+    $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'OrderController::detailmodeljarumPlan/$1/$2/$3');
     $routes->get('semuaOrder', 'OrderController::semuaOrderPlan');
     $routes->get('dataorderperjarum/(:any)', 'OrderController::DetailOrderPerJarumPlan/$1');
     $routes->get('dataorderperarea/(:any)', 'OrderController::DetailOrderPerAreaPlan/$1');
