@@ -302,9 +302,20 @@
                                     <label for="no_order" class="col-form-label">Order Number</label>
                                     <textarea name="no_order" id="no_order" class="form-control" rows="5"><?= $booking['no_order']; ?></textarea>
                                 </div>
-                                <div class=" form-group">
+                                <div class="form-group">
+                                    <label for="jarum" class="col-form-label">Needle</label>
+                                    <select class="form-control" id="jarum" name="jarum">
+                                        <option value="">Choose</option>
+                                        <?php foreach ($jenisJarum as $jj) : ?>
+                                            <option value="<?= $jj['jarum'] ?>"><?= $jj['jarum'] ?></option>
+                                        <?php endforeach ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
                                     <label for="productType" class="col-form-label">Product Type</label>
-                                    <input type="text" name="prod_type" id="" class="form-control" value="<?= $booking['product_type']; ?>">
+                                    <select class="form-control" id="productType" name="productType">
+                                        <option value="">Choose</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
                                     <label for="no_pdk" class="col-form-label">Booking Number</label>

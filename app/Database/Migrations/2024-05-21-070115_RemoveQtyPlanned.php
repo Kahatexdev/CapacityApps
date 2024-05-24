@@ -8,7 +8,7 @@ class RemoveQtyPlanned extends Migration
 {
     public function up()
     {
-        $this->forge->dropColumn('detail_planning', 'qty planned');
+        $this->forge->dropColumn('detail_planning', 'qty_planned');
     }
 
     public function down()

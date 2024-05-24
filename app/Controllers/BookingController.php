@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Database\Seeds\ProductType;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\DataMesinModel;
 use App\Models\OrderModel;
@@ -343,7 +344,7 @@ class BookingController extends BaseController
                     $sisa = $data[8];
                     $getIdProd = ['prodtype' => $product_type, 'jarum' => $jarum];
                     $idprod = $this->productModel->getId($getIdProd);
-                    
+
 
                     if ($data[5] == null) {
                         break;
@@ -363,7 +364,7 @@ class BookingController extends BaseController
                             'lead_time' => $lead_time,
                             'tgl_terima_booking' => $tgl_booking
                         ];
-                        
+
                         // $existOrder = $this->bookingModel->existingOrder($no_order);
                         // if (!$existOrder) {
                         $this->bookingModel->insert($insert);
@@ -451,10 +452,20 @@ class BookingController extends BaseController
     public function updatebooking($idBooking)
     {
 
+        $needle = $this->request->getPost("jarum");
+        $productType = $this->request->getPost('productType');
+        $getId = [
+            'jarum' => $needle,
+            'prodtype' => $productType
+        ];
+        $idProdtype = $this->productModel->getId($getId);
+
         $data = [
             'no_order' => $this->request->getPost("no_order"),
             'no_booking' =>  $this->request->getPost("no_booking"),
             'desc' => $this->request->getPost("desc"),
+            'needle' => $needle,
+            'id_product_type' => $idProdtype,
             'opd' =>  $this->request->getPost("opd"),
             'delivery' => $this->request->getPost("delivery"),
             'lead_time' => $this->request->getPost("lead"),
