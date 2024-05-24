@@ -298,13 +298,13 @@
                                     <label for="buyer" class="col-form-label">Buyer Code </label>
                                     <input type="text" name="buyer" id="" class="form-control" value="<?= $booking['kd_buyer_booking']; ?>" disabled>
                                 </div>
-                                <div class=" form-group">
+                                <div class="form-group">
                                     <label for="no_order" class="col-form-label">Order Number</label>
-                                    <input type="text" name="no_order" id="" class="form-control" value="<?= $booking['no_order']; ?>" disabled>
+                                    <textarea name="no_order" id="no_order" class="form-control" rows="5"><?= $booking['no_order']; ?></textarea>
                                 </div>
                                 <div class=" form-group">
                                     <label for="productType" class="col-form-label">Product Type</label>
-                                    <input type="text" name="desc" id="" class="form-control" value="<?= $booking['product_type']; ?>" disabled>
+                                    <input type="text" name="prod_type" id="" class="form-control" value="<?= $booking['product_type']; ?>">
                                 </div>
                                 <div class="form-group">
                                     <label for="no_pdk" class="col-form-label">Booking Number</label>
