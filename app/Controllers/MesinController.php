@@ -430,9 +430,9 @@ class MesinController extends BaseController
         $update = $this->jarumModel->update($id, $data);
         $area = $this->request->getPost("area");
         if ($update) {
-            return redirect()->to(base_url('planning/datamesinperjarum/' . $area))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->to(base_url('planning/datamesinperarea/' . $area))->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url('planning/datamesinperjarum/' . $area))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->to(base_url('planning/datamesinperarea/' . $area))->withInput()->with('error', 'Gagal Update Data');
         }
     }
     public function deletemesinarealPlan($idDataMesin)

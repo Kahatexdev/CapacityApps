@@ -53,8 +53,7 @@
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Seam</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Factory</th>
-                                        <th colspan=2 class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
-                                    </tr>
+
                                 </thead>
                                 <tbody>
                                     <?php foreach ($dataAps as $order) : ?>
@@ -66,18 +65,8 @@
                                             <td class="text-xs"><?= number_format(round($order['sisa'] / 24), 0, '.', ','); ?> Dz</td>
                                             <td class="text-sm"><?= $order['seam']; ?></td>
                                             <td class="text-sm"><?= $order['factory']; ?></td>
-                                            <td class="text-sm">
-                                                <button type="button" class="btn btn-success btn-sm import-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['idapsperstyle']; ?>" data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>" data-jarum="<?= $order['machinetypeid']; ?>" data-style="<?= $order['size']; ?>" data-qty="<?= $order['qty']; ?>" data-sisa="<?= $order['sisa']; ?>" data-seam="<?= $order['seam']; ?>" data-factory="<?= $order['factory']; ?>">
-                                                    Edit
-                                                </button>
-                                            </td>
-                                            <td>
-                                                <button type="button" class="btn btn-danger btn-sm delete-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $order['idapsperstyle']; ?>" data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>" data-jarum="<?= $order['machinetypeid']; ?>">
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
+
+                                        <?php endforeach; ?>
                                 </tbody>
                                 <tfoot>
                                     <tr>
@@ -97,11 +86,7 @@
                     </div>
 
                     <div class="card-footer">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <a href="#" class="btn btn-danger btn-delete-all" Data-bs-toggle="modal" data-bs-target="ModalDeleteAll">Delete All</a>
-                            </div>
-                        </div>
+
                     </div>
 
                 </div>

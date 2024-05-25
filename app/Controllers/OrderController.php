@@ -9,6 +9,7 @@ use App\Models\OrderModel;
 use App\Models\BookingModel;
 use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
+use App\Models\AreaModel;
 use App\Models\ProduksiModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -179,6 +180,8 @@ class OrderController extends BaseController
     {
         $apsPerstyleModel = new ApsPerstyleModel(); // Create an instance of the model
         $dataApsPerstyle = $apsPerstyleModel->detailModelJarum($noModel, $delivery, $jarum); // Call the model method
+        $area = new AreaModel();
+        $dataArea = $area->findALl();
         $data = [
             'title' => 'Data Order',
             'active1' => '',
@@ -192,6 +195,7 @@ class OrderController extends BaseController
             'dataAps' => $dataApsPerstyle,
             'noModel' => $noModel,
             'delivery' => $delivery,
+            'area' => $dataArea
         ];
 
         return view('Planning/Order/detailModelJarum', $data);
@@ -347,6 +351,29 @@ class OrderController extends BaseController
             return redirect()->to(base_url('capacity/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('error', 'Gagal Update Data');
         }
     }
+    public function updateorderjarumplan($idOrder)
+    {
+
+        $data = [
+            'mastermodel' => $this->request->getPost("no_model"),
+            'size' =>  $this->request->getPost("style"),
+            'delivery' => $this->request->getPost("delivery"),
+            'qty' => $this->request->getPost("qty"),
+            'sisa' => $this->request->getPost("sisa"),
+            'seam' => $this->request->getPost("seam"),
+            'factory' => $this->request->getPost("factory"),
+        ];
+        $id = $idOrder;
+        $update = $this->ApsPerstyleModel->update($id, $data);
+        $modl = $this->request->getPost("no_model");
+        $del = $this->request->getPost("delivery");
+        $jrm = $this->request->getPost("jarum");
+        if ($update) {
+            return redirect()->to(base_url('planning/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Update');
+        } else {
+            return redirect()->to(base_url('planning/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('error', 'Gagal Update Data');
+        }
+    }
 
     public function updatemesinperjarum($idDataMesin)
     {
@@ -394,6 +421,21 @@ class OrderController extends BaseController
             return redirect()->to(base_url('capacity/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
             return redirect()->to(base_url('capacity/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('error', 'Gagal Hapus Data');
+        }
+    }
+    public function deletedetailmodeljarumplan($idOrder)
+    {
+
+        $idOrder = $this->request->getPost("idapsperstyle");
+        $id = $idOrder;
+        $delete = $this->ApsPerstyleModel->delete($id);
+        $modl = $this->request->getPost("no_model");
+        $del = $this->request->getPost("delivery");
+        $jrm = $this->request->getPost("jarum");
+        if ($delete) {
+            return redirect()->to(base_url('planning/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Hapus');
+        } else {
+            return redirect()->to(base_url('planning/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
     public function inputOrder()

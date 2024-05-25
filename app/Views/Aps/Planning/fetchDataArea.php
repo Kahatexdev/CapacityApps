@@ -1,6 +1,6 @@
 <?php ini_set('display_errors', 1);
 error_reporting(E_ALL); ?>
-<?php $this->extend('Planning/layout'); ?>
+<?php $this->extend('Aps/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -35,7 +35,7 @@ error_reporting(E_ALL); ?>
                         <h5>
                             Pick Data for Planning for Area <strong style="color: green;"><?= $area; ?></strong> by Needle <strong style="color: orange;"><?= $jarum; ?></strong>
                         </h5>
-                    </div>                    
+                    </div>
                     <div>
                         <h6>
                             Machine Available is <strong style="color: green;"><?= $mesin; ?> Machine </strong>
@@ -46,7 +46,7 @@ error_reporting(E_ALL); ?>
                             Judul : <?= $judul; ?>
                         </h6>
                     </div>
-                    
+
                 </div>
                 <div class="card-body p-3">
                     <div class="row">
@@ -68,37 +68,37 @@ error_reporting(E_ALL); ?>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                <?php foreach ($detailplan as $order) : ?>
-                                    <tr>
-                                        <td class="text-sm"><?= htmlspecialchars($order['model']); ?></td>
-                                        <td class="text-sm"><?= date('d-M-Y', strtotime($order['delivery'])); ?></td>
-                                        <td class="text-sm"><?= number_format($order['qty'], 0, '.', ','); ?> Dz</td>
-                                        <td class="text-sm"><?= number_format($order['sisa'], 0, '.', ','); ?> Dz</td>
-                                        <td class="text-sm"><?= number_format($order['est_qty'], 0, '.', ','); ?> Dz</td>
-                                        <td class="text-sm"><?= number_format(3600 / $order['smv'], 2, '.', ','); ?> Dz/Days</td>
-                                        <td class="text-sm">
-                                            <?= !empty($order['start_date']) ? date('d-M-Y', strtotime($order['start_date'])) : 'No Start Date'; ?>
-                                        </td>
-                                        <td class="text-sm">
-                                            <?= !empty($order['stop_date']) ? date('d-M-Y', strtotime($order['stop_date'])) : 'No Stop Date'; ?>
-                                        </td>
-                                        <td class="text-sm"><?= htmlspecialchars($order['mesin']); ?></td>
-                                        <td class="text-sm"><?= htmlspecialchars($order['hari']); ?> Days</td>
-                                        <td class="text-sm">
-                                        <?php if ($order['est_qty'] < $order['sisa']) : ?>
-                                            <form action="<?= base_url('aps/planningpage/' . $order['id_detail_pln']); ?>" method="get">
-                                                <input type="hidden" name="mesin" value="<?= $mesin; ?>">
-                                                <input type="hidden" name="area" value="<?= $area; ?>">
-                                                <input type="hidden" name="jarum" value="<?= $jarum; ?>">
+                                    <?php foreach ($detailplan as $order) : ?>
+                                        <tr>
+                                            <td class="text-sm"><?= htmlspecialchars($order['model']); ?></td>
+                                            <td class="text-sm"><?= date('d-M-Y', strtotime($order['delivery'])); ?></td>
+                                            <td class="text-sm"><?= number_format($order['qty'], 0, '.', ','); ?> Dz</td>
+                                            <td class="text-sm"><?= number_format($order['sisa'], 0, '.', ','); ?> Dz</td>
+                                            <td class="text-sm"><?= number_format($order['est_qty'], 0, '.', ','); ?> Dz</td>
+                                            <td class="text-sm"><?= number_format(3600 / $order['smv'], 2, '.', ','); ?> Dz/Days</td>
+                                            <td class="text-sm">
+                                                <?= !empty($order['start_date']) ? date('d-M-Y', strtotime($order['start_date'])) : 'No Start Date'; ?>
+                                            </td>
+                                            <td class="text-sm">
+                                                <?= !empty($order['stop_date']) ? date('d-M-Y', strtotime($order['stop_date'])) : 'No Stop Date'; ?>
+                                            </td>
+                                            <td class="text-sm"><?= htmlspecialchars($order['mesin']); ?></td>
+                                            <td class="text-sm"><?= htmlspecialchars($order['hari']); ?> Days</td>
+                                            <td class="text-sm">
+                                                <?php if ($order['est_qty'] < $order['sisa']) : ?>
+                                                    <form action="<?= base_url('aps/planningpage/' . $order['id_detail_pln']); ?>" method="get">
+                                                        <input type="hidden" name="mesin" value="<?= $mesin; ?>">
+                                                        <input type="hidden" name="area" value="<?= $area; ?>">
+                                                        <input type="hidden" name="jarum" value="<?= $jarum; ?>">
 
-                                                <button type="submit" class="btn btn-primary">Planning</button>
-                                            </form>
-                                        <?php else: ?>
-                                                <a href="<?= base_url('aps/detail/' . $order['id_detail_pln']); ?>" class="btn btn-secondary">Detail</a>
-                                            <?php endif; ?>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
+                                                        <button type="submit" class="btn btn-primary">Planning</button>
+                                                    </form>
+                                                <?php else : ?>
+                                                    <a href="<?= base_url('aps/detail/' . $order['id_detail_pln']); ?>" class="btn btn-secondary">Detail</a>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
 
                                 </tbody>
                             </table>
@@ -116,48 +116,52 @@ error_reporting(E_ALL); ?>
                     </div>
                 <?php endif; ?>
             </div>
-        </div> 
+        </div>
         <script>
-        $(document).ready(function() {
-            $('#dataTable').DataTable({
+            $(document).ready(function() {
+                $('#dataTable').DataTable({
                     "pageLength": 35,
                     "order": []
-            });
-            $('#fetch-data-button').click(function() {
-                var area = '<?= $area; ?>';
-                var jarum = '<?= $jarum; ?>';
-                var id_pln_mc = '<?= $id_pln_mc ?>'
-                
-                $.ajax({
-                    url: '<?= base_url('aps/fetchdetailorderarea'); ?>',
-                    type: 'GET',
-                    data: { area: area, jarum: jarum, id_pln_mc: id_pln_mc },
-                    success: function(response) {
-                        // Handle success response
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Data inserted successfully!',
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        // Handle error response
-                        Swal.fire({
-                            title: 'Error!',
-                            text: 'Error inserting data: ' + error,
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        });
-                    }
                 });
-            });
+                $('#fetch-data-button').click(function() {
+                    var area = '<?= $area; ?>';
+                    var jarum = '<?= $jarum; ?>';
+                    var id_pln_mc = '<?= $id_pln_mc ?>'
 
-        });
+                    $.ajax({
+                        url: '<?= base_url('aps/fetchdetailorderarea'); ?>',
+                        type: 'GET',
+                        data: {
+                            area: area,
+                            jarum: jarum,
+                            id_pln_mc: id_pln_mc
+                        },
+                        success: function(response) {
+                            // Handle success response
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Data inserted successfully!',
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    location.reload();
+                                }
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            // Handle error response
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'Error inserting data: ' + error,
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    });
+                });
+
+            });
         </script>
 
-<?php $this->endSection(); ?>
+        <?php $this->endSection(); ?>

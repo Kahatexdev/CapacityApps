@@ -125,10 +125,10 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('dataorderperjarum/(:any)', 'OrderController::DetailOrderPerJarumPlan/$1');
     $routes->get('dataorderperarea/(:any)', 'OrderController::DetailOrderPerAreaPlan/$1');
     $routes->post('updatedetailorder/(:any)', 'OrderController::updateorder/$1');
-    $routes->post('updatedetailjarum/(:any)', 'OrderController::updateorderjarum/$1');
+    $routes->post('updatedetailjarum/(:any)', 'OrderController::updateorderjarumplan/$1');
     $routes->post('deletedetailstyle/(:any)', 'OrderController::deletedetailstyle/$1');
     $routes->post('deletedetailorder/(:any)', 'OrderController::deletedetailorder/$1');
-    $routes->post('deletedetailjarum/(:any)', 'OrderController::deletedetailmodeljarum/$1');
+    $routes->post('deletedetailjarum/(:any)', 'OrderController::deletedetailmodeljarumplan/$1');
     $routes->post('assignareal', 'PlanningController::assignareal');
     $routes->post('assignarealall', 'PlanningController::assignarealall');
 
@@ -222,14 +222,14 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('detailplnmc/(:any)', 'ApsController::detailplanmc/$1');
     $routes->get('fetchdetailorderarea', 'ApsController::fetchdetailorderarea');
     $routes->get('planningpage/(:any)', 'ApsController::planningpage/$1');
-    $routes->post('getDataLibur','ApsController::getDataLibur');
+    $routes->post('getDataLibur', 'ApsController::getDataLibur');
 });
 
 // user
 $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('', 'UserController::index');
-    $routes->get('produksi', 'GodController::produksi');
-    $routes->post('importproduksi', 'GodController::importProduksi');
+    $routes->get('produksi', 'UserController::produksi');
+    $routes->post('importproduksi', 'ProduksiController::importproduksi');
 });
 
 // user
