@@ -82,7 +82,9 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm">
                                                 <?= !empty($order['stop_date']) ? date('d-M-Y', strtotime($order['stop_date'])) : 'No Stop Date'; ?>
                                             </td>
-                                            <td class="text-sm"><?= htmlspecialchars($order['mesin']); ?></td>
+                                            <td class="text-sm">
+                                                <?= htmlspecialchars($order['mesin']) ? htmlspecialchars($order['mesin']) . ' Mc' : ''; ?>
+                                            </td>
                                             <td class="text-sm"><?= htmlspecialchars($order['hari']); ?> Days</td>
                                             <td class="text-sm">
                                                 <?php if ($order['est_qty'] < $order['sisa']) : ?>
@@ -94,7 +96,13 @@ error_reporting(E_ALL); ?>
                                                         <button type="submit" class="btn btn-primary">Planning</button>
                                                     </form>
                                                 <?php else : ?>
-                                                    <a href="<?= base_url('aps/detail/' . $order['id_detail_pln']); ?>" class="btn btn-secondary">Detail</a>
+                                                    <form action="<?= base_url('aps/planningpage/' . $order['id_detail_pln']); ?>" method="get">
+                                                        <input type="hidden" name="mesin" value="<?= $mesin; ?>">
+                                                        <input type="hidden" name="area" value="<?= $area; ?>">
+                                                        <input type="hidden" name="jarum" value="<?= $jarum; ?>">
+
+                                                        <button type="submit" class="btn btn-secondary">Detail</button>
+                                                    </form>
                                                 <?php endif; ?>
                                             </td>
                                         </tr>

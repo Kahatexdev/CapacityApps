@@ -31,18 +31,19 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <h5>
-                            Planning Order for area <?= $area ?> needle <?= $jarum ?>  Total <?= $mesin ?> Machine
+                            Planning Order for area <?= $area ?> needle <?= $jarum ?>  Total <?= $mesin ?> Machine 
                         </h5>
                     </div>
 
                 </div>
                 <div class="card-body p-3">
+                <form action="<?= base_url('aps/saveplanning'); ?>" method="post">
                 <?php foreach($planning as $key => $item): ?>
                     <div class="row">
                         <div class="col-lg-6 col-sm-12">
                             <div class="form-group">
                                 <label for="" class="form-control-label">No Model</label>
-                                <input class="form-control" type="text" value="<?= $item['model'] ?>" readonly id="model-<?= $key ?>">
+                                <input class="form-control" type="text" name="model" value="<?= $item['model'] ?>" readonly id="model-<?= $key ?>">
                             </div>
                         </div>
                         <div class="col-lg-6 col-sm-12">
@@ -52,25 +53,25 @@
                                     // Format delivery date to Y-m-d for input value
                                     $deliveryDate = date('Y-m-d', strtotime($item['delivery']));
                                 ?>
-                                <input class="form-control" type="date" value="<?= $deliveryDate ?>" readonly id="delivery-<?= $key ?>">
+                                <input class="form-control" type="date" name="delivery" value="<?= $deliveryDate ?>" readonly id="delivery-<?= $key ?>">
                             </div>
                         </div>
                         <div class="col-lg-6 col-sm-12">
                             <div class="form-group">
                                 <label for="" class="form-control-label">Qty</label>
-                                <input class="form-control" type="text" value="<?= $item['qty'] ?>" readonly id="qty-<?= $key ?>">
+                                <input class="form-control" type="text" name="qty" value="<?= $item['qty'] ?>" readonly id="qty-<?= $key ?>">
                             </div>
                         </div>
                         <div class="col-lg-6 col-sm-12">
                             <div class="form-group">
                                 <label for="" class="form-control-label">Remaining Qty</label>
-                                <input class="form-control" type="text" value="<?= $item['sisa'] ?>" readonly id="remaining-qty-<?= $key ?>">
+                                <input class="form-control" type="text" name="sisa" value="<?= $item['sisa'] ?>" readonly id="remaining-qty-<?= $key ?>">
                             </div>
                         </div>
                         <div class="col-lg-6 col-sm-12">
                             <div class="form-group">
                                 <label for="" class="form-control-label">Target 100%</label>
-                                <input class="form-control" type="text" value="<?= round(3600/$item['smv'],2) ?>" readonly id="target-100-<?= $key ?>">
+                                <input class="form-control" type="text" name="targetawal" value="<?= round(3600/$item['smv'],2) ?>" readonly id="target-100-<?= $key ?>">
                             </div>
                         </div>
                         <div class="col-lg-6 col-sm-12">
@@ -78,7 +79,7 @@
                                 <div class="col-lg-6 col-sm-12">
                                     <label for="" class="form-control-label">Percentage</label>
                                     <div class="input-group">
-                                        <input class="form-control" type="number" value="80" min="0" max="100" id="percentage-<?= $key ?>" oninput="calculateTarget(<?= $key ?>)">
+                                        <input class="form-control" type="number" name="persen_target" value="80" min="0" max="100" id="percentage-<?= $key ?>" oninput="calculateTarget(<?= $key ?>)">
                                         <div class="input-group-append">
                                             <span class="input-group-text">%</span>
                                         </div>
@@ -86,7 +87,7 @@
                                 </div>
                                 <div class="col-lg-6 col-sm-12">
                                     <label for="" class="form-control-label">Target</label>
-                                    <input class="form-control" type="text" value="" readonly id="calculated-target-<?= $key ?>">
+                                    <input class="form-control" type="text" name="target_akhir" value="" readonly id="calculated-target-<?= $key ?>">
                                 </div>
                             </div>
                         </div>
@@ -136,7 +137,7 @@
                                     Machines Usages
                                     <span id="machine_suggestion" class="ml-2">(Suggested: 0)</span>
                                 </label>
-                                <input class="form-control" type="number" id="machine_count" name="machine_count" oninput="calculateEstimatedQty()">
+                                <input class="form-control" type="number" id="machine_count" name="machine_usage" oninput="calculateEstimatedQty()" required>
                             </div>
                         </div>
                         <div class="col-lg-6 col-sm-12">
@@ -153,11 +154,15 @@
                 <div class="card-footer">
                     <div class="row">
                         <div class="col-12">
-                            <!-- Button here -->
-                            <button class="btn btn-info btn-block" style="width: 100%;">Save Planning</button>
+                            <input type="hidden" name="id_pln" value=<?= $id_pln ?>>
+                            <input type="hidden" name="mesin" value=<?= $mesin ?>>
+                            <input type="hidden" name="area" value=<?= $area ?>>
+                            <input type="hidden" name="jarum" value=<?= $jarum ?>>
+                            <button type="submit" class="btn btn-info btn-block" style="width: 100%;">Save Planning</button>
                         </div>
                     </div>
                 </div>
+                </form>
 
             </div>
         </div>

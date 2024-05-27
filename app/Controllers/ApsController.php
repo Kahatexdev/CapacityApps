@@ -17,6 +17,8 @@ use App\Models\KebutuhanMesinModel;
 use App\Models\KebutuhanAreaModel;
 use App\Models\MesinPlanningModel;
 use App\Models\DetailPlanningModel;
+use App\Models\TanggalPlanningModel;
+use App\Models\EstimatedPlanningModel;
 use App\Models\AksesModel;/*  */
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
@@ -37,6 +39,8 @@ class ApsController extends BaseController
     protected $MesinPlanningModel;
     protected $aksesModel;
     protected $DetailPlanningModel;
+    protected $TanggalPlanningModel;
+    protected $EstimatedPlanningModel;
 
     public function __construct()
     {
@@ -52,6 +56,8 @@ class ApsController extends BaseController
         $this->MesinPlanningModel = new MesinPlanningModel();
         $this->aksesModel = new AksesModel();
         $this->DetailPlanningModel = new DetailPlanningModel();
+        $this->TanggalPlanningModel = new TanggalPlanningModel();
+        $this->EstimatedPlanningModel = new EstimatedPlanningModel();
         if ($this->filters   = ['role' => ['aps']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -429,6 +435,7 @@ class ApsController extends BaseController
     }
     public function detailplanmc($id){
         $detailplan = $this->DetailPlanningModel->getDataPlanning($id);
+        // dd($detailplan);
         $judul = $this->request->getGet('judul');
         $area = $this->request->getGet('area');
         $jarum = $this->request->getGet('jarum');
@@ -554,6 +561,7 @@ class ApsController extends BaseController
             'jarum' => $jarum,
             'mesin' => $mesin,
             'planning' => $detailplan,
+            'id_pln' => $id,
         ];
         return view('Aps/Planning/operationPlanning', $data);
     }
@@ -566,5 +574,66 @@ class ApsController extends BaseController
 
     // Return the total number of holidays as a JSON response
     return $this->response->setJSON(['status' => 'success', 'total_libur' => $totalLibur]);
-}
+    }
+    public function saveplanning(){
+        $model = $this->request->getPost('model');
+        $delivery = $this->request->getPost('delivery');
+        $qty = $this->request->getPost('qty');
+        $sisa = $this->request->getPost('sisa');
+        $target = $this->request->getPost('target_akhir');
+        preg_match('/^[\d\.]+/', $target, $matches);
+        $numericalTarget = $matches[0];
+        $persentarget = $this->request->getPost('persen_target');
+        $start = $this->request->getPost('start_date');
+        $stop = $this->request->getPost('stop_date');
+        $hari = $this->request->getPost('days_count');
+        $mesin = $this->request->getPost('machine_usage');
+        $est = round($this->request->getPost('estimated_qty'));
+        $id_pln = $this->request->getPost('id_pln');
+        $mc = $this->request->getPost('mesin');
+        $area = $this->request->getPost('area');
+        $jrm = $this->request->getPost('jarum');
+
+        $startDateTime = new \DateTime($start);
+        $stopDateTime = new \DateTime($stop);
+    
+        $interval = new \DateInterval('P1D'); // 1 day interval
+        $datePeriod = new \DatePeriod($startDateTime, $interval, $stopDateTime->modify('+1 day')); // +1 day to include the end date
+
+        $libur = $this->liburModel->findAll();
+        $holidayDates = array_column($libur, 'tanggal');
+
+        $dataestqty = [
+            'id_detail_pln' => $id_pln,
+            'Est_qty' => $est,
+            'hari' => $hari,
+            'target' => $numericalTarget,
+            'precentage_target' => $persentarget,
+        ];
+        $saveest = $this->EstimatedPlanningModel->insert($dataestqty);
+
+        foreach ($datePeriod as $date) {
+            $formattedDate = $date->format('Y-m-d');
+            if (in_array($formattedDate, $holidayDates)) {
+                continue; // Skip this date
+            }
+            $data = [
+                'id_detail_pln' => $id_pln,
+                'date' => $date->format('Y-m-d'), // Insert the current date in the range
+                'mesin' => $mesin,
+            ];    
+            $this->TanggalPlanningModel->insert($data);
+        }
+        
+       
+
+        if($saveest){
+            return redirect()->to(base_url('aps/planningpage/'.$id_pln.'?mesin='.$mc.'&area='.$area.'&jarum='.$jrm))->withInput()->with('success', 'Data Berhasil Disimpan');
+        }else{
+            return redirect()->to(base_url('aps/planningpage/'.$id_pln.'?mesin='.$mc.'&area='.$area.'&jarum='.$jrm))->withInput()->with('error', 'Data Gagal Disimpan');
+        }    
+
+
+        dd($dataestqty);
+    }
 }
