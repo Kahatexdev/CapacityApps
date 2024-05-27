@@ -27,6 +27,14 @@ class AddEstimatedPlanning extends Migration
                 'type' => 'INT',
                 'constraint' => 11,
             ],
+            'target' => [
+                'type' => 'Float',
+                'constraint' => 11,
+            ],
+            'precentage_target' => [
+                'type' => 'INT',
+                'constraint' => 11,
+            ],
         ]);
         $this->forge->addKey('id_est_qty', true);
         $this->forge->createTable('estimated_planning');
