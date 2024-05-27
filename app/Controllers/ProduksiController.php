@@ -90,84 +90,149 @@ class ProduksiController extends BaseController
     }
     public function importproduksi()
     {
+        // Set maximum execution time and memory limit
+        ini_set('memory_limit', '512M');
+        set_time_limit(180);
+
         $file = $this->request->getFile('excel_file');
         if ($file->isValid() && !$file->hasMoved()) {
             $spreadsheet = IOFactory::load($file);
-            $data = $spreadsheet->getActiveSheet();
+            $worksheet = $spreadsheet->getActiveSheet();
 
             $startRow = 18; // Ganti dengan nomor baris mulai
-            foreach ($spreadsheet->getActiveSheet()->getRowIterator($startRow) as $row) {
+            $batchSize = 100; // Ukuran batch
+            $batchData = [];
+            $failedRows = []; // Array untuk menyimpan informasi baris yang gagal
+            $db = \Config\Database::connect();
+
+            foreach ($worksheet->getRowIterator($startRow) as $rowIndex => $row) {
                 $cellIterator = $row->getCellIterator();
                 $cellIterator->setIterateOnlyExistingCells(false);
                 $data = [];
                 foreach ($cellIterator as $cell) {
                     $data[] = $cell->getValue();
                 }
+
                 if (!empty($data)) {
-                    $no_model = $data[20];
-                    $style = $data[4];
-                    $no_order = $data[19];
-                    $validate = [
-                        'no_model' =>  $no_model,
-                        'style' => $style
-                    ];
-                    $idAps = $this->ApsPerstyleModel->getIdProd($validate);
-                    if (!$idAps) {
-                        return redirect()->to(base_url('/user/produksi'))->with('succcess', 'Data berhasil diimport');
-                    } else {
-                        $id = $idAps['idapsperstyle'];
-                        $sisaOrder = $idAps['sisa'];
-                        $delivery = $idAps['delivery'];
-                        if ($data[0] == null) {
-                            break;
-                        } else {
-                            $tglprod = $data[1];
-                            $strReplace = str_replace('.', '-', $tglprod);
-                            $dateTime   = \DateTime::createFromFormat('d-m-Y', $strReplace);
-                            $tgl_produksi =  $dateTime->format('Y-m-d');
-                            $bagian     = $data[2];
-                            $storage1   = $data[2];
-                            $storage2   = $data[10] ?? '-';
-                            $qtyerp        = $data[12];
-                            $qty = str_replace('-', '', $qtyerp);
-                            $sisaQty = $sisaOrder - $qty;
-                            $kategoriBs = $data[29] ?? '-';
-                            $no_mesin = $data[25];
-                            $shift = $data[30];
-                            $no_box     = $data[23];
-                            $no_label   = $data[22];
-                            $area = $data[26];
-                            $admin      = session()->get('username');
-                            $dataInsert = [
-                                'tgl_produksi'            => $tgl_produksi,
-                                'idapsperstyle'         => $id,
-                                'bagian'                => $bagian,
-                                'storage_awal'          => $storage1,
-                                'storage_akhir'         => $storage2,
-                                'qty_produksi'              => $qty,
-                                'bs_prod'               => 0,
-                                'kategori_bs'           => $kategoriBs,
-                                'no_box'                => $no_box,
-                                'no_label'              => $no_label,
-                                'admin'                 => $admin,
-                                'shift'                 => $shift,
-                                'no_mesin'              => $no_mesin,
-                                'delivery'              => $delivery,
-                                'area'                  => $area
-                            ];
-                            // $existingProduction = $this->produksiModel->existingData($dataInsert);
-                            // if (!$existingProduction) {
-                            $this->produksiModel->insert($dataInsert);
-                            $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
-                            //}
-                        }
+                    $batchData[] = ['rowIndex' => $rowIndex, 'data' => $data];
+                    // Process batch
+                    if (count($batchData) >= $batchSize) {
+                        $this->processBatch($batchData, $db, $failedRows);
+                        $batchData = []; // Reset batch data
                     }
                 }
             }
+
+            // Process any remaining data
+            if (!empty($batchData)) {
+                $this->processBatch($batchData, $db, $failedRows);
+            }
+
+            // Prepare notification message for failed rows
+            if (!empty($failedRows)) {
+                $failedRowsStr = implode(', ', $failedRows);
+                $errorMessage = "Baris berikut gagal diimpor: $failedRowsStr";
+                return redirect()->to(base_url('/user/produksi'))->with('error', $errorMessage);
+            }
+
             return redirect()->to(base_url('/user/produksi'))->withInput()->with('success', 'Data Berhasil di Import');
         } else {
             return redirect()->to(base_url('/user/produksi'))->with('error', 'No data found in the Excel file');
         }
+    }
+
+    private function processBatch($batchData, $db, &$failedRows)
+    {
+        $db->transStart();
+        foreach ($batchData as $batchItem) {
+            $rowIndex = $batchItem['rowIndex'];
+            $data = $batchItem['data'];
+
+            try {
+                $no_model = $data[21];
+                $style = $data[4];
+                $validate = [
+                    'no_model' =>  $no_model,
+                    'style' => $style
+                ];
+                $idAps = $this->ApsPerstyleModel->getIdProd($validate);
+                if (!$idAps) {
+                    if ($data[0] == null) {
+                        break;
+                    } else {
+                        // Jika tidak ada data, lanjutkan
+                        $failedRows[] = $rowIndex;
+                        continue;
+                    }
+                } else {
+                    $id = $idAps['idapsperstyle'];
+                    $sisaOrder = $idAps['sisa'];
+                    $delivery = $idAps['delivery'];
+
+                    $tglprod = $data[1];
+                    $strReplace = str_replace('.', '-', $tglprod);
+                    $dateTime   = \DateTime::createFromFormat('d-m-Y', $strReplace);
+                    $tgl_produksi =  $dateTime->format('Y-m-d');
+                    $bagian     = $data[2];
+                    $storage1   = $data[2];
+                    $storage2   = $data[10] ?? '-';
+                    $qtyerp        = $data[12];
+                    $qty = str_replace('-', '', $qtyerp);
+                    $sisaQty = $sisaOrder - $qty;
+                    if ($sisaQty < 0) {
+                        $minus = $sisaQty;
+                        $second = [
+                            'no_model' =>  $no_model,
+                            'style' => $style,
+                            'sisa' => $qty
+                        ];
+                        $nextid = $this->ApsPerstyleModel->getIdBawahnya($second);
+                        if ($nextid) {
+                            $idnext = $nextid['idapsperstyle'];
+                            $qtysisa = $nextid['sisa'];
+                            $sisa = $qtysisa + $minus;
+                            $this->ApsPerstyleModel->update($idnext, ['sisa' => $sisa]);
+
+                            $sisaQty = 0;
+                        } else {
+                            $sisaQty = $minus;
+                        }
+                    }
+                    $kategoriBs = $data[29] ?? '-';
+                    $no_mesin = $data[25];
+                    $shift = $data[30];
+                    $no_box     = $data[23];
+                    $no_label   = $data[22];
+                    $area = $data[26];
+                    $admin      = session()->get('username');
+                    $dataInsert = [
+                        'tgl_produksi'            => $tgl_produksi,
+                        'idapsperstyle'         => $id,
+                        'bagian'                => $bagian,
+                        'storage_awal'          => $storage1,
+                        'storage_akhir'         => $storage2,
+                        'qty_produksi'              => $qty,
+                        'bs_prod'               => 0,
+                        'kategori_bs'           => $kategoriBs,
+                        'no_box'                => $no_box,
+                        'no_label'              => $no_label,
+                        'admin'                 => $admin,
+                        'shift'                 => $shift,
+                        'no_mesin'              => $no_mesin,
+                        'delivery'              => $delivery,
+                        'area'                  => $area
+                    ];
+                    $existingProduction = $this->produksiModel->existingData($dataInsert);
+                    if (!$existingProduction) {
+                        $this->produksiModel->insert($dataInsert);
+                        $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
+                    }
+                }
+            } catch (\Exception $e) {
+                $failedRows[] = $rowIndex;
+            }
+        }
+        $db->transComplete();
     }
 
     public function viewProduksi()
