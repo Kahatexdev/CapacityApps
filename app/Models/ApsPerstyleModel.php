@@ -203,7 +203,16 @@ class ApsPerstyleModel extends Model
     }
     public function getIdProd($validate)
     {
-        $result = $this->select('idapsperstyle, delivery,sisa')->where('mastermodel', $validate['no_model'])->where('size', $validate['style'])->first();
+        $result = $this->select('idapsperstyle, delivery,sisa')->where('mastermodel', $validate['no_model'])
+            ->where('sisa >', 0)
+            ->where('size', $validate['style'])->first();
+        return $result;
+    }
+    public function getIdBawahnya($validate)
+    {
+        $result = $this->select('idapsperstyle, delivery,sisa')->where('mastermodel', $validate['no_model'])
+            ->where('sisa >', $validate['sisa'])
+            ->where('size', $validate['style'])->first();
         return $result;
     }
     public function getDetailPlanning($area, $jarum)
