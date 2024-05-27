@@ -12,6 +12,10 @@
                                 <h5 class="font-weight-bolder mb-0">
                                     Data Target Jarum <?= $jarum ?>
                                 </h5>
+                                <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#ModalAdd">
+                                    <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Tambah Target
+                                </button>
+
                             </div>
                         </div>
                         <div>
@@ -36,7 +40,7 @@
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Keterangan</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jarum</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Target</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Edit</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" colspan="2" style="text-align: center;">Operation</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -50,6 +54,11 @@
                                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalEdit" data-id="<?= $order['id_product_type']; ?>" data-product="<?= $order['product_type']; ?>" data-keterangan="<?= $order['keterangan']; ?>" data-jarum="<?= $order['jarum']; ?>" data-target="<?= $order['konversi']; ?>">
                                         Edit
                                     </button>   
+                                </td>
+                                <td class="text-s">
+                                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#ModalDelete" data-id="<?= $order['id_product_type']; ?>" data-product="<?= $order['product_type']; ?>" data-jarum="<?= $order['jarum']; ?>">
+                                        Delete
+                                    </button>
                                 </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -102,7 +111,7 @@
 
                                     <div class="form-group">
                                         <label for="" class="col-form-label">Product Type</label>
-                                        <input type="text" class="form-control" name="producttype" readonly>
+                                        <input type="text" class="form-control" name="producttype">
                                     </div>
                                     <div class="form-group">
                                         <label for="" class="col-form-label">Keterangan</label>
@@ -110,7 +119,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="" class="col-form-label">Jarum</label>
-                                        <input type="text" class="form-control" name="jarum" readonly>
+                                        <input type="text" class="form-control" name="jarum">
                                     </div>
                                     <div class="form-group">
                                         <label for="" class="col-form-label">Target Dz</label>
@@ -126,6 +135,71 @@
                         <button type="submit" class="btn bg-gradient-info">Ubah</button>
                     </div>
                     </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade  bd-example-modal-lg" id="ModalAdd" tabindex="-1" role="dialog" aria-labelledby="modalAdd" aria-hidden="true">
+            <div class="modal-dialog  modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Add Data Target</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="<?= base_url('capacity/addtarget'); ?>" method="post">
+                            <div class="row">
+                                <div class="col-lg-12 col-sm-12">
+                                    <div class="form-group">
+                                        <label for="" class="col-form-label">Product Type</label>
+                                        <input type="text" class="form-control" name="producttype">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-form-label">Keterangan</label>
+                                        <input type="text" class="form-control" name="keterangan">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-form-label">Jarum</label>
+                                        <input type="text" class="form-control" name="jarum" value ="<?= $jarum ?>">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-form-label">Target Dz</label>
+                                        <input type="number" class="form-control" name="target" step="0.01" min="0" value="0.00">
+                                    </div>
+                                </div>
+                            </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-info">Add</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="ModalDelete" tabindex="-1" aria-labelledby="ModalDeleteLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ModalDeleteLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this item?
+                </div>
+                <form id="deleteForm" method="post" action="<?= site_url('capacity/deletetarget'); ?>">
+                    <input type="hidden" name="id" id="deleteId">
+                    <input type="hidden" name="jarum" id="jarumId">
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                </div>
                 </div>
             </div>
         </div>
@@ -154,6 +228,23 @@
         $('#example').DataTable({
             "order": [],
             "pageLength": 25
+        });
+
+        $('#ModalDelete').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var id = button.data('id'); // Extract info from data-* attributes
+        var product = button.data('product');
+        var jarum = button.data('jarum');
+
+        var modal = $(this);
+        modal.find('.modal-body').html('Are you sure you want to delete the item with ID ' + id + ', Product: ' + product + ', Jarum: ' + jarum + '?');
+        $('#deleteId').val(id);
+        $('#jarumId').val(jarum);
+        });
+
+        $('#confirmDeleteBtn').click(function() {
+        // Submit the delete form
+        $('#deleteForm').submit();
         });
     });
 

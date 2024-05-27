@@ -100,6 +100,8 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('datatarget', 'BookingController::target');
     $routes->get('datatargetjarum/(:any)', 'BookingController::targetjarum/$1');
     $routes->post('edittarget', 'BookingController::edittarget');
+    $routes->post('addtarget', 'BookingController::addtarget');
+    $routes->post('deletetarget', 'BookingController::deletetarget');
 });
 
 

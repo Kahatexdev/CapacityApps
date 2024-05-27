@@ -151,7 +151,12 @@
                 </div>
 
                 <div class="card-footer">
-
+                    <div class="row">
+                        <div class="col-12">
+                            <!-- Button here -->
+                            <button class="btn btn-info btn-block" style="width: 100%;">Save Planning</button>
+                        </div>
+                    </div>
                 </div>
 
             </div>

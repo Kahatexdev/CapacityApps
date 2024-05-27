@@ -12,7 +12,7 @@ class ProductTypeModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_product_type', 'konversi', 'product_type', 'keterangan'];
+    protected $allowedFields    = ['id_product_type', 'konversi', 'product_type', 'keterangan','jarum'];
 
     protected bool $allowEmptyInserts = false;
 

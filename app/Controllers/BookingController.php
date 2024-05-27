@@ -722,6 +722,7 @@ class BookingController extends BaseController
     public function edittarget()
     {
         $id = $this->request->getPost("id");
+        $product = $this->request->getPost("producttype");
         $keterangan = $this->request->getPost("keterangan");
         $jarum = $this->request->getPost("jarum");
         $target = $this->request->getPost("target");
@@ -729,10 +730,42 @@ class BookingController extends BaseController
         if ($id) {
             $this->productModel->set('konversi', $target)
                 ->set('keterangan', $keterangan)
+                ->set('product_type',$product)
                 ->where('id_product_type', $id)
                 ->update();
-            return redirect()->to(base_url('capacity/datatargetjarum/' . $jarum))->withInput()->with('success', 'Data Berhasil Diinput');
+            return redirect()->to(base_url('capacity/datatargetjarum/' . $jarum))->withInput()->with('success', 'Data Has Been Updated');
         }
+    }
+    public function addtarget()
+    {
+        $keterangan = $this->request->getPost("keterangan");
+        $jarum = $this->request->getPost("jarum");
+        $target = $this->request->getPost("target");
+        $product = $this->request->getPost("producttype");
+
+        $input = [
+            'konversi' => $target,
+            'product_type' => $product,
+            'keterangan' => $keterangan,
+            'jarum' => $jarum
+        ];
+        $insert =   $this->productModel->insert($input);
+        if($insert){
+            return redirect()->to(base_url('capacity/datatargetjarum/' . $jarum))->withInput()->with('success', 'Data Berhasil Diinput');
+        }else{
+            return redirect()->to(base_url('capacity/datatargetjarum/' . $jarum))->withInput()->with('error', 'Data Gagal Diinput');
+        }       
+        
+    }
+    public function deletetarget(){
+        $id = $this->request->getPost("id");
+        $jarum = $this->request->getPost("jarum");
+        $del = $this->productModel->delete($id);
+        if($del){
+            return redirect()->to(base_url('capacity/datatargetjarum/' . $jarum))->withInput()->with('success', 'Data Berhasil Dihapus');
+        }else{
+            return redirect()->to(base_url('capacity/datatargetjarum/' . $jarum))->withInput()->with('error', 'Data Gagal Dihapus');
+        }    
     }
     public function getTypebyJarum()
     {
