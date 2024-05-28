@@ -549,8 +549,9 @@ class ApsController extends BaseController
         $mesin = $this->request->getGet('mesin');
         $judul = $this->request->getGet('judul');
         $idutama = $this->request->getGet('id_utama');
-        $detailplan = $this->DetailPlanningModel->getDetailPlanning($id);
-        $listPlanning = $this->EstimatedPlanningModel->listPlanning($id);
+        $detailplan = $this->DetailPlanningModel->getDetailPlanning($id);//get data model with detail quantity,model etc.
+        $listPlanning = $this->EstimatedPlanningModel->listPlanning($id);//get data planning per page and fetch it into datatable at bottom datatables
+        $mesinpertgl = $this->TanggalPlanningModel->getMesinByDate($idutama);//get data machine per date and return into array
         $data = [
             'title' => 'Data Order',
             'active1' => '',
@@ -566,6 +567,7 @@ class ApsController extends BaseController
             'planning' => $detailplan,
             'listPlanning' => $listPlanning,
             'id_pln' => $idutama,
+            'id_save' => $id,
             'judul' => $judul
         ];
         return view('Aps/Planning/operationPlanning', $data);
@@ -579,6 +581,11 @@ class ApsController extends BaseController
 
     // Return the total number of holidays as a JSON response
     return $this->response->setJSON(['status' => 'success', 'total_libur' => $totalLibur]);
+    }
+    public function getMesinByDate($id){
+        $date = $this->request->getPost('date');
+        $machine = $this->TanggalPlanningModel->getMesinByDate($id,$date);
+        return $this->response->setJSON(['mesin' => $availableMachines]);
     }
     public function saveplanning(){
         $model = $this->request->getPost('model');
@@ -594,6 +601,7 @@ class ApsController extends BaseController
         $hari = $this->request->getPost('days_count');
         $mesin = $this->request->getPost('machine_usage');
         $est = round($this->request->getPost('estimated_qty'));
+        $id_save = $this->request->getPost('id_save');
         $id_pln = $this->request->getPost('id_pln');
         $mc = $this->request->getPost('mesin');
         $area = $this->request->getPost('area');
@@ -609,14 +617,14 @@ class ApsController extends BaseController
         $holidayDates = array_column($libur, 'tanggal');
 
         $dataestqty = [
-            'id_detail_pln' => $id_pln,
+            'id_detail_pln' => $id_save,
             'Est_qty' => $est,
             'hari' => $hari,
             'target' => $numericalTarget,
             'precentage_target' => $persentarget,
         ];
         $saveest = $this->EstimatedPlanningModel->insert($dataestqty);
-        $idOrder = $this->EstimatedPlanningModel->getId($id_pln);
+        $idOrder = $this->EstimatedPlanningModel->getId($id_save);
 
         foreach ($datePeriod as $date) {
             $formattedDate = $date->format('Y-m-d');
@@ -624,7 +632,7 @@ class ApsController extends BaseController
                 continue; // Skip this date
             }
             $data = [
-                'id_detail_pln' => $id_pln,
+                'id_detail_pln' => $id_save,
                 'id_est_qty' => $idOrder,
                 'date' => $date->format('Y-m-d'), // Insert the current date in the range
                 'mesin' => $mesin,
@@ -635,9 +643,9 @@ class ApsController extends BaseController
        
 
         if($saveest){
-            return redirect()->to(base_url('aps/planningpage/'.$id_pln.'?mesin='.$mc.'&area='.$area.'&jarum='.$jrm))->withInput()->with('success', 'Data Berhasil Disimpan');
+            return redirect()->to(base_url('aps/planningpage/'.$id_save.'?id_utama='.$id_pln.'?mesin='.$mc.'&area='.$area.'&jarum='.$jrm))->withInput()->with('success', 'Data Berhasil Disimpan');
         }else{
-            return redirect()->to(base_url('aps/planningpage/'.$id_pln.'?mesin='.$mc.'&area='.$area.'&jarum='.$jrm))->withInput()->with('error', 'Data Gagal Disimpan');
+            return redirect()->to(base_url('aps/planningpage/'.$id_save.'?id_utama='.$id_pln.'?mesin='.$mc.'&area='.$area.'&jarum='.$jrm))->withInput()->with('error', 'Data Gagal Disimpan');
         }    
 
 

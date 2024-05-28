@@ -87,7 +87,7 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-sm-12">
-                                    <label for="" class="form-control-label">Target</label>
+                                    <label for="" class="form-control-label"><span style="color: orange">Target</span></label>
                                     <input class="form-control" type="text" name="target_akhir" value="" readonly id="calculated-target-<?= $key ?>">
                                 </div>
                             </div>
@@ -95,7 +95,9 @@
                         <div class="col-lg-6 col-sm-12">
                             <div class="form-group row">
                                 <div class="col-lg-6 col-sm-12">
-                                    <label for="" class="form-control-label">Start</label>
+                                    <label for="" class="form-control-label">Start
+                                        <span id="available_machine" class="ml-2">(Available : 0)</span>
+                                    </label>
                                     <div class="input-group">
                                         <?php
                                             // Get today's date
@@ -120,7 +122,7 @@
                             <div class="form-group row">
                                 <div class="col-lg-6 col-sm-12">
                                     <div class="form-group">
-                                        <label for="" class="form-control-label">Days</label>
+                                        <label for="" class="form-control-label"><span style="color: orange">Days</span> (Exclude Holidays)</label>
                                         <input class="form-control days-count" type="number" name="days_count" readonly id="days-count-<?= $key ?>">
                                     </div>
                                 </div>
@@ -142,7 +144,7 @@
                                 </div>
                                 <div class="col-lg-6 col-sm-12">
                                     <label for="" class="form-control-label">
-                                        Machines Usages
+                                        <span style="color: orange">Machines Usages</span>
                                         <span id="machine_suggestion" class="ml-2">(Suggested: 0)</span>
                                     </label>
                                     <input class="form-control" type="number" id="machine_count" name="machine_usage" oninput="calculateEstimatedQty()" required>
@@ -151,7 +153,7 @@
                         </div>
                         <div class="col-lg-6 col-sm-12">
                             <div class="form-group">
-                                <label for="" class="form-control-label">Estimated Qty (Days x Machine Usage x Target)</label>
+                                <label for="" class="form-control-label">Estimated Qty <span style="color: orange">(Target x Days x Machine Usage)</span></label>
                                 <input class="form-control estimated-qty" type="number" value="" name="estimated_qty" id="estimated-qty-<?= $key ?>" readonly>
                             </div>
                         </div>
@@ -163,6 +165,7 @@
                 <div class="card-footer">
                     <div class="row">
                         <div class="col-12">
+                            <input type="hidden" name="id_save" value=<?= $id_save ?>>
                             <input type="hidden" name="id_pln" value=<?= $id_pln ?>>
                             <input type="hidden" name="mesin" value=<?= $mesin ?>>
                             <input type="hidden" name="area" value=<?= $area ?>>
@@ -371,7 +374,7 @@
         if (machineSuggestion < 0) {
             machineSuggestion = 0; // Set machineSuggestion to 0
         }
-        document.getElementById('machine_suggestion').innerText = "(Suggested: " + machineSuggestion.toFixed(2) + ")";
+        document.getElementById('machine_suggestion').innerText = "(Suggested: " + machineSuggestion.toFixed(2) + " Mc)";
     }
 
     function fillUnplannedQty() {
