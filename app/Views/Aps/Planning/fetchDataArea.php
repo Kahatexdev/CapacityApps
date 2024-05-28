@@ -30,24 +30,33 @@ error_reporting(E_ALL); ?>
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
 
             <div class="card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col">
                         <h5>
                             Pick Data for Planning for Area <strong style="color: green;"><?= $area; ?></strong> by Needle <strong style="color: orange;"><?= $jarum; ?></strong>
                         </h5>
                     </div>
-                    <div>
+                </div>
+                <div class="row">
+                    <div class="col">
                         <h6>
                             Machine Available is <strong style="color: green;"><?= $mesin; ?> Machine </strong>
                         </h6>
                     </div>
-                    <div>
+                </div>
+                <div class="row">
+                    <div class="col">
                         <h6>
                             Judul : <?= $judul; ?>
                         </h6>
                     </div>
-
+                    <div class="col-auto">
+                        <a href="<?= base_url('aps/planningmesin')?>" class="btn btn-secondary">Back</a>
+                    </div>
                 </div>
+            </div>
+
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="table-responsive">
@@ -88,17 +97,21 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm"><?= htmlspecialchars($order['hari']); ?> Days</td>
                                             <td class="text-sm">
                                                 <?php if ($order['est_qty'] < $order['sisa']) : ?>
-                                                    <form action="<?= base_url('aps/planningpage/' . $order['id_detail_pln']); ?>" method="get">
+                                                    <form action="<?= base_url('aps/planningpage/' . $order['id_detail_pln']); ?>" method="get">    
+                                                        <input type="hidden" name="id_utama" value="<?= $id_pln_mc; ?>">
                                                         <input type="hidden" name="mesin" value="<?= $mesin; ?>">
                                                         <input type="hidden" name="area" value="<?= $area; ?>">
                                                         <input type="hidden" name="jarum" value="<?= $jarum; ?>">
+                                                        <input type="hidden" name="judul" value="<?= $judul; ?>">
 
                                                         <button type="submit" class="btn btn-primary">Planning</button>
                                                     </form>
                                                 <?php else : ?>
                                                     <form action="<?= base_url('aps/planningpage/' . $order['id_detail_pln']); ?>" method="get">
+                                                        <input type="hidden" name="id_utama" value="<?= $id_pln_mc; ?>">
                                                         <input type="hidden" name="mesin" value="<?= $mesin; ?>">
                                                         <input type="hidden" name="area" value="<?= $area; ?>">
+                                                        <input type="hidden" name="judul" value="<?= $judul; ?>">
                                                         <input type="hidden" name="jarum" value="<?= $jarum; ?>">
 
                                                         <button type="submit" class="btn btn-secondary">Detail</button>

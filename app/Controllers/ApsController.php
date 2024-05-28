@@ -379,8 +379,8 @@ class ApsController extends BaseController
             'active2' => '',
             'active3' => '',
             'active4' => '',
-            'active5' => 'active',
-            'active6' => '',
+            'active5' => '',
+            'active6' => 'active',
             'active7' => '',
             'planarea' => $planarea,
             'area'=> $area,        
@@ -447,8 +447,8 @@ class ApsController extends BaseController
             'active2' => '',
             'active3' => '',
             'active4' => '',
-            'active5' => 'active',
-            'active6' => '',
+            'active5' => '',
+            'active6' => 'active',
             'active7' => '',
             'detailplan' => $detailplan,
             'judul' => $judul,
@@ -547,7 +547,10 @@ class ApsController extends BaseController
         $area = $this->request->getGet('area');
         $jarum = $this->request->getGet('jarum');
         $mesin = $this->request->getGet('mesin');
+        $judul = $this->request->getGet('judul');
+        $idutama = $this->request->getGet('id_utama');
         $detailplan = $this->DetailPlanningModel->getDetailPlanning($id);
+        $listPlanning = $this->EstimatedPlanningModel->listPlanning($id);
         $data = [
             'title' => 'Data Order',
             'active1' => '',
@@ -555,13 +558,15 @@ class ApsController extends BaseController
             'active3' => '',
             'active4' => '',
             'active5' => '',
-            'active6' => '',
-            'active7' => 'active',
+            'active6' => 'active',
+            'active7' => '',
             'area' => $area,
             'jarum' => $jarum,
             'mesin' => $mesin,
             'planning' => $detailplan,
-            'id_pln' => $id,
+            'listPlanning' => $listPlanning,
+            'id_pln' => $idutama,
+            'judul' => $judul
         ];
         return view('Aps/Planning/operationPlanning', $data);
     }
@@ -611,6 +616,7 @@ class ApsController extends BaseController
             'precentage_target' => $persentarget,
         ];
         $saveest = $this->EstimatedPlanningModel->insert($dataestqty);
+        $idOrder = $this->EstimatedPlanningModel->getId($id_pln);
 
         foreach ($datePeriod as $date) {
             $formattedDate = $date->format('Y-m-d');
@@ -619,6 +625,7 @@ class ApsController extends BaseController
             }
             $data = [
                 'id_detail_pln' => $id_pln,
+                'id_est_qty' => $idOrder,
                 'date' => $date->format('Y-m-d'), // Insert the current date in the range
                 'mesin' => $mesin,
             ];    

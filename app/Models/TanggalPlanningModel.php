@@ -12,7 +12,7 @@ class TanggalPlanningModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id','id_detail_pln','date','mesin'];
+    protected $allowedFields    = ['id','id_detail_pln','id_est_qty','date','mesin'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -39,4 +39,12 @@ class TanggalPlanningModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getMesinByDate($id){
+        return $this->select('tanggal_planning.DATE, SUM(tanggal_planning.mesin) AS mesin')
+        ->join('detail_planning', 'tanggal_planning.id_detail_pln = detail_planning.id_detail_pln', 'left')
+        ->where('detail_planning.id_pln_mc', 3)
+        ->groupBy('tanggal_planning.DATE')
+        ->get();
+    }
 }

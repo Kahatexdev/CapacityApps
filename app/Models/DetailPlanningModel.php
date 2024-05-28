@@ -56,4 +56,5 @@ class DetailPlanningModel extends Model
         ->groupby('delivery','model')
         ->findAll();
     }
+    
 }
