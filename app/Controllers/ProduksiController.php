@@ -96,7 +96,7 @@ class ProduksiController extends BaseController
 
         $file = $this->request->getFile('excel_file');
         if ($file->isValid() && !$file->hasMoved()) {
-            $spreadsheet = IOFactory::load($file);
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
             $worksheet = $spreadsheet->getActiveSheet();
 
             $startRow = 18; // Ganti dengan nomor baris mulai
@@ -105,7 +105,8 @@ class ProduksiController extends BaseController
             $failedRows = []; // Array untuk menyimpan informasi baris yang gagal
             $db = \Config\Database::connect();
 
-            foreach ($worksheet->getRowIterator($startRow) as $rowIndex => $row) {
+            foreach ($worksheet->getRowIterator($startRow) as $row) {
+                $rowIndex = $row->getRowIndex();
                 $cellIterator = $row->getCellIterator();
                 $cellIterator->setIterateOnlyExistingCells(false);
                 $data = [];
@@ -152,17 +153,63 @@ class ProduksiController extends BaseController
                 $no_model = $data[21];
                 $style = $data[4];
                 $validate = [
-                    'no_model' =>  $no_model,
+                    'no_model' => $no_model,
                     'style' => $style
                 ];
                 $idAps = $this->ApsPerstyleModel->getIdProd($validate);
                 if (!$idAps) {
                     if ($data[0] == null) {
-                        break;
+                        continue; // Skip empty rows
                     } else {
-                        // Jika tidak ada data, lanjutkan
-                        $failedRows[] = $rowIndex;
-                        continue;
+                        $idMinus = $this->ApsPerstyleModel->getIdMinus($validate);
+                        if ($idMinus) {
+                            $idnext = $idMinus['idapsperstyle'];
+                            $qtysisa = $idMinus['sisa'];
+                            $deliv = $idMinus['delivery'];
+                            $sisa = $qtysisa - $data[12];
+                            $this->ApsPerstyleModel->update($idnext, ['sisa' => $sisa]);
+
+                            $tglprod = $data[1];
+                            $strReplace = str_replace('.', '-', $tglprod);
+                            $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
+                            $tgl_produksi = $dateTime->format('Y-m-d');
+                            $bagian = $data[2];
+                            $storage1 = $data[2];
+                            $storage2 = $data[10] ?? '-';
+                            $qtyerp = $data[12];
+                            $qty = str_replace('-', '', $qtyerp);
+                            $kategoriBs = $data[29] ?? '-';
+                            $no_mesin = $data[25];
+                            $shift = $data[30];
+                            $no_box = $data[23];
+                            $no_label = $data[22];
+                            $area = $data[26];
+                            $admin = session()->get('username');
+                            $dataInsert = [
+                                'tgl_produksi' => $tgl_produksi,
+                                'idapsperstyle' => $idMinus['idapsperstyle'],
+                                'bagian' => $bagian,
+                                'storage_awal' => $storage1,
+                                'storage_akhir' => $storage2,
+                                'qty_produksi' => $qty,
+                                'bs_prod' => 0,
+                                'kategori_bs' => $kategoriBs,
+                                'no_box' => $no_box,
+                                'no_label' => $no_label,
+                                'admin' => $admin,
+                                'shift' => $shift,
+                                'no_mesin' => $no_mesin,
+                                'delivery' => $deliv,
+                                'area' => $area
+                            ];
+                            $existingProduction = $this->produksiModel->existingData($dataInsert);
+                            if (!$existingProduction) {
+                                $this->produksiModel->insert($dataInsert);
+                            }
+                        } else {
+                            $failedRows[] = $rowIndex;
+                            continue;
+                        }
                     }
                 } else {
                     $id = $idAps['idapsperstyle'];
@@ -171,20 +218,20 @@ class ProduksiController extends BaseController
 
                     $tglprod = $data[1];
                     $strReplace = str_replace('.', '-', $tglprod);
-                    $dateTime   = \DateTime::createFromFormat('d-m-Y', $strReplace);
-                    $tgl_produksi =  $dateTime->format('Y-m-d');
-                    $bagian     = $data[2];
-                    $storage1   = $data[2];
-                    $storage2   = $data[10] ?? '-';
-                    $qtyerp        = $data[12];
+                    $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
+                    $tgl_produksi = $dateTime->format('Y-m-d');
+                    $bagian = $data[2];
+                    $storage1 = $data[2];
+                    $storage2 = $data[10] ?? '-';
+                    $qtyerp = $data[12];
                     $qty = str_replace('-', '', $qtyerp);
                     $sisaQty = $sisaOrder - $qty;
                     if ($sisaQty < 0) {
                         $minus = $sisaQty;
                         $second = [
-                            'no_model' =>  $no_model,
+                            'no_model' => $no_model,
                             'style' => $style,
-                            'sisa' => $qty
+                            'sisa' => $sisaOrder
                         ];
                         $nextid = $this->ApsPerstyleModel->getIdBawahnya($second);
                         if ($nextid) {
@@ -201,26 +248,26 @@ class ProduksiController extends BaseController
                     $kategoriBs = $data[29] ?? '-';
                     $no_mesin = $data[25];
                     $shift = $data[30];
-                    $no_box     = $data[23];
-                    $no_label   = $data[22];
+                    $no_box = $data[23];
+                    $no_label = $data[22];
                     $area = $data[26];
-                    $admin      = session()->get('username');
+                    $admin = session()->get('username');
                     $dataInsert = [
-                        'tgl_produksi'            => $tgl_produksi,
-                        'idapsperstyle'         => $id,
-                        'bagian'                => $bagian,
-                        'storage_awal'          => $storage1,
-                        'storage_akhir'         => $storage2,
-                        'qty_produksi'              => $qty,
-                        'bs_prod'               => 0,
-                        'kategori_bs'           => $kategoriBs,
-                        'no_box'                => $no_box,
-                        'no_label'              => $no_label,
-                        'admin'                 => $admin,
-                        'shift'                 => $shift,
-                        'no_mesin'              => $no_mesin,
-                        'delivery'              => $delivery,
-                        'area'                  => $area
+                        'tgl_produksi' => $tgl_produksi,
+                        'idapsperstyle' => $id,
+                        'bagian' => $bagian,
+                        'storage_awal' => $storage1,
+                        'storage_akhir' => $storage2,
+                        'qty_produksi' => $qty,
+                        'bs_prod' => 0,
+                        'kategori_bs' => $kategoriBs,
+                        'no_box' => $no_box,
+                        'no_label' => $no_label,
+                        'admin' => $admin,
+                        'shift' => $shift,
+                        'no_mesin' => $no_mesin,
+                        'delivery' => $delivery,
+                        'area' => $area
                     ];
                     $existingProduction = $this->produksiModel->existingData($dataInsert);
                     if (!$existingProduction) {
@@ -241,7 +288,7 @@ class ProduksiController extends BaseController
         $month = date('F');
         $totalMesin = $this->jarumModel->getArea();
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
-        $pdkProgress = $this->ApsPerstyleModel->getProgress();
+
         $produksiPerArea = [];
         foreach ($totalMesin as $area) {
             $produksiPerArea[$area] = $this->produksiModel->getProduksiPerArea($bulan, $area);
@@ -260,13 +307,13 @@ class ProduksiController extends BaseController
             'Area' => $totalMesin,
             'Produksi' => $dataProduksi,
             'bulan' => $month,
-            'progress' => $pdkProgress
+
         ];
         return view('Capacity/Produksi/produksi', $data);
     }
-    public function progressData()
+    public function progressData($noModel)
     {
-        $pdkProgress = $this->ApsPerstyleModel->getProgress();
+        $pdkProgress = $this->ApsPerstyleModel->getProgress($noModel);
         return json_encode($pdkProgress);
     }
     public function produksiAreaChart()
@@ -286,7 +333,7 @@ class ProduksiController extends BaseController
         $month = date('F');
         $totalMesin = $this->jarumModel->getArea();
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
-        $pdkProgress = $this->ApsPerstyleModel->getProgress();
+        // $pdkProgress = $this->ApsPerstyleModel->getProgress($noModel);
         $produksiPerArea = [];
         foreach ($totalMesin as $area) {
             $produksiPerArea[$area] = $this->produksiModel->getProduksiPerArea($bulan, $area);
@@ -305,7 +352,7 @@ class ProduksiController extends BaseController
             'Area' => $totalMesin,
             'Produksi' => $dataProduksi,
             'bulan' => $month,
-            'progress' => $pdkProgress
+            // 'progress' => $pdkProgress
         ];
         return view('Planning/Produksi/produksi', $data);
     }
