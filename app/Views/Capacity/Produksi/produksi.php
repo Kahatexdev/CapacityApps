@@ -158,308 +158,262 @@
                 </div>
             <?php endforeach ?>
         </div>
-        <div class="row my-2">
-            <div class="col-lg-12">
-                <div class="card z-index-2">
-                    <div class="card-header">
 
-                        <h6 class="card-title"> Progress chart active order</h6>
-                    </div>
+    </div>
+    <!-- Skrip JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+    <script>
+        $(document).ready(function() {
+            function fetchData() {
+                $.ajax({
+                    url: '<?= base_url('capacity/dataprogress') ?>',
+                    type: 'GET',
+                    success: function(responseData) {
 
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-lg-2">
-                                <h6 class="card-title">PDK</h6>
-                            </div>
+                        updateProgressBars(responseData);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            }
 
-                            <div class="col-lg-10">
-                                <h6 class="card-title">Progress</h6>
-                            </div>
-                        </div>
+            function updateProgressBars(progressData) {
+                var tes = JSON.parse(progressData);
+                tes.forEach(function(item) {
+                    var progressBarId = item.mastermodel + '-progress-bar';
+                    var progressBar = $('#' + progressBarId);
+                    var progressTextId = item.mastermodel + '-progressText';
+                    var progressText = $('#' + progressTextId);
+                    if (progressBar.length > 0) {
+                        progressBar.css('width', item.persen + '%').attr('aria-valuenow', item.persen);
+                        progressBar.text(item.persen + '%');
+                        progressText.text(item.persen + '% (' + item.remain + ' dz / ' + item.target + ' dz)'); // Mengubah teks ke 'tes'
+                    } else {
+                        console.error('Progress bar element not found for ID:', progressBarId);
+                    }
+                });
+            }
 
-                        <div id="progress-container">
-                            <?php foreach ($progress as $key) : ?>
-                                <div class="row">
-                                    <div class="col-lg-2">
-                                        <h6 class="card-title"><?= $key['mastermodel'] ?></h6>
-                                    </div>
-                                    <div class="col-lg-8">
-                                        <div class="progress-wrapper">
-                                            <div class="progress-info">
-                                                <div class="progress-percentage">
-                                                    <span class="text-sm font-weight-bold " id="<?= $key['mastermodel'] ?>-progressText"> <?= $key['persen'] ?>% (<?= $key['remain'] ?> dz / <?= $key['target'] ?> dz)</span>
-                                                </div>
-                                            </div>
-                                            <!-- Tambahkan ID ke elemen progress bar -->
-                                            <div class="progress">
-                                                <div id="<?= $key['mastermodel'] ?>-progress-bar" class="progress-bar bg-info" role="progressbar" aria-valuenow="<?= $key['persen'] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $key['persen'] ?>%; height: 10px;"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php endforeach ?>
-                        </div>
+            setInterval(fetchData, 10000000);
+            fetchData();
+        });
+    </script>
+    <script>
+        let productionData = <?php echo json_encode($Produksi); ?>;
+        let labels = productionData.map(item => item.tgl_produksi);
+        let values = productionData.map(item => (item.qty_produksi / 24).toFixed(0));
+        var ctx2 = document.getElementById("mixed-chart").getContext("2d");
 
+        var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
+        gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
+        gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
+        gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)');
 
-                    </div>
-                </div>
+        var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
+        gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
+        gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
+        gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)');
 
-            </div>
-        </div>
-        <!-- Skrip JavaScript -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
-        <script>
-            $(document).ready(function() {
-                function fetchData() {
-                    $.ajax({
-                        url: '<?= base_url('capacity/dataprogress') ?>',
-                        type: 'GET',
-                        success: function(responseData) {
-
-                            updateProgressBars(responseData);
-                        },
-                        error: function(xhr, status, error) {
-                            console.error(xhr.responseText);
-                        }
-                    });
-                }
-
-                function updateProgressBars(progressData) {
-                    var tes = JSON.parse(progressData);
-                    tes.forEach(function(item) {
-                        var progressBarId = item.mastermodel + '-progress-bar';
-                        var progressBar = $('#' + progressBarId);
-                        var progressTextId = item.mastermodel + '-progressText';
-                        var progressText = $('#' + progressTextId);
-                        if (progressBar.length > 0) {
-                            progressBar.css('width', item.persen + '%').attr('aria-valuenow', item.persen);
-                            progressBar.text(item.persen + '%');
-                            progressText.text(item.persen + '% (' + item.remain + ' dz / ' + item.target + ' dz)'); // Mengubah teks ke 'tes'
-                        } else {
-                            console.error('Progress bar element not found for ID:', progressBarId);
-                        }
-                    });
-                }
-
-                setInterval(fetchData, 10000000);
-                fetchData();
-            });
-        </script>
-        <script>
-            let productionData = <?php echo json_encode($Produksi); ?>;
-            let labels = productionData.map(item => item.tgl_produksi);
-            let values = productionData.map(item => (item.qty_produksi / 24).toFixed(0));
-            var ctx2 = document.getElementById("mixed-chart").getContext("2d");
-
-            var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
-            gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
-            gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-            gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)');
-
-            var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
-            gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
-            gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-            gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)');
-
-            new Chart(ctx2, {
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        type: "bar",
-                        label: "Jumlah Produksi",
-                        borderWidth: 0,
-                        pointRadius: 30,
-                        backgroundColor: "#3A416F",
-                        fill: true,
-                        data: values,
-                        maxBarThickness: 20
-                    }, ],
+        new Chart(ctx2, {
+            data: {
+                labels: labels,
+                datasets: [{
+                    type: "bar",
+                    label: "Jumlah Produksi",
+                    borderWidth: 0,
+                    pointRadius: 30,
+                    backgroundColor: "#3A416F",
+                    fill: true,
+                    data: values,
+                    maxBarThickness: 20
+                }, ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    }
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            drawBorder: false,
+                            display: true,
+                            drawOnChartArea: true,
+                            drawTicks: false,
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            display: true,
+                            padding: 10,
+                            color: '#b2b9bf',
+                            font: {
+                                size: 11,
+                                family: "Open Sans",
+                                style: 'normal',
+                                lineHeight: 2
+                            },
+                        }
+                    },
+                    x: {
+                        grid: {
+                            drawBorder: false,
                             display: false,
+                            drawOnChartArea: false,
+                            drawTicks: false,
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            display: true,
+                            color: '#b2b9bf',
+                            padding: 20,
+                            font: {
+                                size: 11,
+                                family: "Open Sans",
+                                style: 'normal',
+                                lineHeight: 2
+                            },
                         }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index',
-                    },
-                    scales: {
-                        y: {
-                            grid: {
-                                drawBorder: false,
-                                display: true,
-                                drawOnChartArea: true,
-                                drawTicks: false,
-                                borderDash: [5, 5]
-                            },
-                            ticks: {
-                                display: true,
-                                padding: 10,
-                                color: '#b2b9bf',
-                                font: {
-                                    size: 11,
-                                    family: "Open Sans",
-                                    style: 'normal',
-                                    lineHeight: 2
-                                },
-                            }
-                        },
-                        x: {
-                            grid: {
-                                drawBorder: false,
-                                display: false,
-                                drawOnChartArea: false,
-                                drawTicks: false,
-                                borderDash: [5, 5]
-                            },
-                            ticks: {
-                                display: true,
-                                color: '#b2b9bf',
-                                padding: 20,
-                                font: {
-                                    size: 11,
-                                    family: "Open Sans",
-                                    style: 'normal',
-                                    lineHeight: 2
-                                },
-                            }
-                        },
                     },
                 },
-            });
-        </script>
-        <script>
-            $(document).ready(function() {
-                function fetchData() {
-                    $.ajax({
-                        url: '<?= base_url('capacity/produksiareachart') ?>',
-                        type: 'GET',
-                        success: function(response) {
-                            updatechart(response)
-                        },
-                        error: function(xhr, status, error) {
-                            console.error(xhr.responseText);
-                        }
-                    });
-                }
+            },
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            function fetchData() {
+                $.ajax({
+                    url: '<?= base_url('capacity/produksiareachart') ?>',
+                    type: 'GET',
+                    success: function(response) {
+                        updatechart(response)
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            }
 
-                function updatechart(response) {
-                    var produksi = JSON.parse(response);
-                    for (const key in produksi) {
-                        const value = produksi[key];
-                        var canvasId = key + '-chart';
-                        var canvasElement = document.getElementById(canvasId);
-                        if (canvasElement.chart) {
-                            canvasElement.chart.destroy();
-                        }
-                        var ctx2 = canvasElement.getContext("2d");
+            function updatechart(response) {
+                var produksi = JSON.parse(response);
+                for (const key in produksi) {
+                    const value = produksi[key];
+                    var canvasId = key + '-chart';
+                    var canvasElement = document.getElementById(canvasId);
+                    if (canvasElement.chart) {
+                        canvasElement.chart.destroy();
+                    }
+                    var ctx2 = canvasElement.getContext("2d");
 
-                        // Check if value is an array or a single object
-                        if (Array.isArray(value)) {
-                            var tanggal = value.map(item => item.tgl_produksi);
-                            var values = value.map(item => (item.qty_produksi / 24).toFixed(0));
+                    // Check if value is an array or a single object
+                    if (Array.isArray(value)) {
+                        var tanggal = value.map(item => item.tgl_produksi);
+                        var values = value.map(item => (item.qty_produksi / 24).toFixed(0));
 
-                            var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
-                            gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
-                            gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-                            gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)');
+                        var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
+                        gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
+                        gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
+                        gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)');
 
-                            var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
-                            gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
-                            gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-                            gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)');
+                        var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
+                        gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
+                        gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
+                        gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)');
 
-                            new Chart(ctx2, {
-                                data: {
-                                    labels: tanggal,
-                                    datasets: [{
-                                        type: "bar",
-                                        label: "Jumlah Produksi",
-                                        borderWidth: 0,
-                                        pointRadius: 30,
-                                        backgroundColor: "#3A416F",
-                                        fill: true,
-                                        data: values,
-                                        maxBarThickness: 20
-                                    }, ],
+                        new Chart(ctx2, {
+                            data: {
+                                labels: tanggal,
+                                datasets: [{
+                                    type: "bar",
+                                    label: "Jumlah Produksi",
+                                    borderWidth: 0,
+                                    pointRadius: 30,
+                                    backgroundColor: "#3A416F",
+                                    fill: true,
+                                    data: values,
+                                    maxBarThickness: 20
+                                }, ],
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: false,
+                                    }
                                 },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        legend: {
-                                            display: false,
+                                interaction: {
+                                    intersect: false,
+                                    mode: 'index',
+                                },
+                                scales: {
+                                    y: {
+                                        grid: {
+                                            drawBorder: false,
+                                            display: true,
+                                            drawOnChartArea: true,
+                                            drawTicks: false,
+                                            borderDash: [5, 5]
+                                        },
+                                        ticks: {
+                                            display: true,
+                                            padding: 10,
+                                            color: '#b2b9bf',
+                                            font: {
+                                                size: 11,
+                                                family: "Open Sans",
+                                                style: 'normal',
+                                                lineHeight: 2
+                                            },
                                         }
                                     },
-                                    interaction: {
-                                        intersect: false,
-                                        mode: 'index',
-                                    },
-                                    scales: {
-                                        y: {
-                                            grid: {
-                                                drawBorder: false,
-                                                display: true,
-                                                drawOnChartArea: true,
-                                                drawTicks: false,
-                                                borderDash: [5, 5]
-                                            },
-                                            ticks: {
-                                                display: true,
-                                                padding: 10,
-                                                color: '#b2b9bf',
-                                                font: {
-                                                    size: 11,
-                                                    family: "Open Sans",
-                                                    style: 'normal',
-                                                    lineHeight: 2
-                                                },
-                                            }
+                                    x: {
+                                        grid: {
+                                            drawBorder: false,
+                                            display: false,
+                                            drawOnChartArea: false,
+                                            drawTicks: false,
+                                            borderDash: [5, 5]
                                         },
-                                        x: {
-                                            grid: {
-                                                drawBorder: false,
-                                                display: false,
-                                                drawOnChartArea: false,
-                                                drawTicks: false,
-                                                borderDash: [5, 5]
+                                        ticks: {
+                                            display: true,
+                                            color: '#b2b9bf',
+                                            padding: 20,
+                                            font: {
+                                                size: 11,
+                                                family: "Open Sans",
+                                                style: 'normal',
+                                                lineHeight: 2
                                             },
-                                            ticks: {
-                                                display: true,
-                                                color: '#b2b9bf',
-                                                padding: 20,
-                                                font: {
-                                                    size: 11,
-                                                    family: "Open Sans",
-                                                    style: 'normal',
-                                                    lineHeight: 2
-                                                },
-                                            }
-                                        },
+                                        }
                                     },
-
                                 },
-                            });
 
-
-                        }
+                            },
+                        });
 
 
                     }
 
 
                 }
-                setInterval(fetchData, 100000000000);
-                fetchData();
 
-            });
-        </script>
 
-    </div>
-    <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
-    <?php $this->endSection(); ?>
+            }
+            setInterval(fetchData, 100000000000);
+            fetchData();
+
+        });
+    </script>
+
+</div>
+<script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+<?php $this->endSection(); ?>

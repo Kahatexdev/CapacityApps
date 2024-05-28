@@ -34,8 +34,8 @@
                             Detail Data Model <?= $noModel ?> Delivery <?= date('d-M-Y', strtotime($delivery)) ?>
                         </h5>
                         <a href="<?= base_url('capacity/semuaOrder/') ?>" class="btn bg-gradient-dark d-inline-flex align-items-center">
-                            <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i> 
-                        Back
+                            <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
+                            Back
                         </a>
 
                     </div>
@@ -224,90 +224,179 @@
                 </div>
             </div>
         </div>
-        <script>
-            $(document).ready(function() {
-                $('#dataTable').DataTable({
-                    "pageLength": 35,
-                    "footerCallback": function(row, data, start, end, display) {
-                        var api = this.api();
+    </div>
 
-                        // Calculate the total of the 4th column (Qty in dozens) - index 3
-                        var totalQty = api.column(3, {
-                            page: 'current'
-                        }).data().reduce(function(a, b) {
-                            return parseInt(a) + parseInt(b);
-                        }, 0);
+    <div class="row my-2">
+        <div class="col-lg-12">
+            <div class="card z-index-2">
+                <div class="card-header">
 
-                        // Calculate the total of the 5th column (Remaining Qty in dozens) - index 4
-                        var totalRemainingQty = api.column(4, {
-                            page: 'current'
-                        }).data().reduce(function(a, b) {
-                            return parseInt(a) + parseInt(b);
-                        }, 0);
+                    <h6 class="card-title"> Progress chart active order</h6>
+                </div>
 
-                        var totalqty = numberWithDots(totalQty) + " Dz";
-                        var totalsisa = numberWithDots(totalRemainingQty) + " Dz";
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-2">
+                            <h6 class="card-title">PDK</h6>
+                        </div>
 
-                        // Update the footer cell for the total Qty
-                        $(api.column(3).footer()).html(totalqty);
+                        <div class="col-lg-10">
+                            <h6 class="card-title">Progress</h6>
+                        </div>
+                    </div>
 
-                        // Update the footer cell for the total Remaining Qty
-                        $(api.column(4).footer()).html(totalsisa);
+                    <div id="progress-container">
+                        <?php foreach ($progress as $key) : ?>
+                            <div class="row">
+                                <div class="col-lg-2">
+                                    <h6 class="card-title"><?= $key['mastermodel'] ?></h6>
+                                </div>
+                                <div class="col-lg-8">
+                                    <div class="progress-wrapper">
+                                        <div class="progress-info">
+                                            <div class="progress-percentage">
+                                                <span class="text-sm font-weight-bold " id="<?= $key['mastermodel'] ?>-progressText"> <?= $key['persen'] ?>% (<?= $key['remain'] ?> dz / <?= $key['target'] ?> dz)</span>
+                                            </div>
+                                        </div>
+                                        <!-- Tambahkan ID ke elemen progress bar -->
+                                        <div class="progress">
+                                            <div id="<?= $key['mastermodel'] ?>-progress-bar" class="progress-bar bg-info" role="progressbar" aria-valuenow="<?= $key['persen'] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $key['persen'] ?>%; height: 10px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach ?>
+                    </div>
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                "pageLength": 35,
+                "footerCallback": function(row, data, start, end, display) {
+                    var api = this.api();
+
+                    // Calculate the total of the 4th column (Qty in dozens) - index 3
+                    var totalQty = api.column(3, {
+                        page: 'current'
+                    }).data().reduce(function(a, b) {
+                        return parseInt(a) + parseInt(b);
+                    }, 0);
+
+                    // Calculate the total of the 5th column (Remaining Qty in dozens) - index 4
+                    var totalRemainingQty = api.column(4, {
+                        page: 'current'
+                    }).data().reduce(function(a, b) {
+                        return parseInt(a) + parseInt(b);
+                    }, 0);
+
+                    var totalqty = numberWithDots(totalQty) + " Dz";
+                    var totalsisa = numberWithDots(totalRemainingQty) + " Dz";
+
+                    // Update the footer cell for the total Qty
+                    $(api.column(3).footer()).html(totalqty);
+
+                    // Update the footer cell for the total Remaining Qty
+                    $(api.column(4).footer()).html(totalsisa);
+                }
+            });
+
+            function numberWithDots(x) {
+                return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            }
+
+
+            $('.import-btn').click(function() {
+                var apsperstyle = $(this).data('id');
+                var noModel = $(this).data('no-model');
+                var delivery = $(this).data('delivery');
+                var jarum = $(this).data('jarum');
+                var style = $(this).data('style');
+                var qty = $(this).data('qty');
+                var sisa = $(this).data('sisa');
+                var seam = $(this).data('seam');
+                var smv = $(this).data('smv');
+                var production_unit = $(this).data('production_unit');
+                var factory = $(this).data('factory');
+
+                var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
+
+                $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/updatedetailorder/') ?>' + apsperstyle);
+                $('#ModalEdit').find('input[name="idapsperstyle"]').val(apsperstyle);
+                $('#ModalEdit').find('input[name="style"]').val(style);
+                $('#ModalEdit').find('input[name="no_model"]').val(noModel);
+                $('#ModalEdit').find('input[name="delivery"]').val(formattedDelivery);
+                $('#ModalEdit').find('input[name="qty"]').val(qty);
+                $('#ModalEdit').find('input[name="sisa"]').val(sisa);
+                $('#ModalEdit').find('input[name="seam"]').val(seam);
+                $('#ModalEdit').find('input[name="smv"]').val(smv);
+                $('#ModalEdit').find('input[name="production_unit"]').val(production_unit);
+                $('#ModalEdit').find('input[name="factory"]').val(factory);
+
+                $('#ModalEdit').modal('show'); // Show the modal
+            });
+            $('.delete-btn').click(function() {
+                var noModel = $(this).data('no-model');
+                var delivery = $(this).data('delivery');
+                var apsperstyle = $(this).data('id');
+                var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
+                $('#ModalDelete').find('form').attr('action', '<?= base_url('capacity/deletedetailstyle/') ?>' + apsperstyle);
+                $('#ModalDelete').find('input[name="idapsperstyle"]').val(apsperstyle);
+                $('#ModalDelete').find('input[name="no_model"]').val(noModel);
+                $('#ModalDelete').find('input[name="delivery"]').val(formattedDelivery);
+                $('#ModalDelete').modal('show'); // Show the modal
+            });
+            $('.btn-delete-all').click(function() {
+                var noModel = $(this).data('no-model');
+                $('#ModalDeleteAll').find('form').attr('action', '<?= base_url('capacity/deletedetailorder/') ?>' + noModel);
+                $('#ModalDeleteAll').find('input[name="idapsperstyle"]').val(noModel);
+                $('#ModalDeleteAll').modal('show'); // Show the modal
+            });
+        });
+    </script>
+    <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+    <script>
+        $(document).ready(function() {
+            function fetchData() {
+                var noModel = $(this).data('no-model');
+
+                $.ajax({
+                    url: '<?= base_url('capacity/dataprogress/') ?>' + noModel,
+                    type: 'GET',
+                    success: function(responseData) {
+
+                        updateProgressBars(responseData);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
                     }
                 });
+            }
 
-                function numberWithDots(x) {
-                    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                }
-
-
-                $('.import-btn').click(function() {
-                    var apsperstyle = $(this).data('id');
-                    var noModel = $(this).data('no-model');
-                    var delivery = $(this).data('delivery');
-                    var jarum = $(this).data('jarum');
-                    var style = $(this).data('style');
-                    var qty = $(this).data('qty');
-                    var sisa = $(this).data('sisa');
-                    var seam = $(this).data('seam');
-                    var smv = $(this).data('smv');
-                    var production_unit = $(this).data('production_unit');
-                    var factory = $(this).data('factory');
-
-                    var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
-
-                    $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/updatedetailorder/') ?>' + apsperstyle);
-                    $('#ModalEdit').find('input[name="idapsperstyle"]').val(apsperstyle);
-                    $('#ModalEdit').find('input[name="style"]').val(style);
-                    $('#ModalEdit').find('input[name="no_model"]').val(noModel);
-                    $('#ModalEdit').find('input[name="delivery"]').val(formattedDelivery);
-                    $('#ModalEdit').find('input[name="qty"]').val(qty);
-                    $('#ModalEdit').find('input[name="sisa"]').val(sisa);
-                    $('#ModalEdit').find('input[name="seam"]').val(seam);
-                    $('#ModalEdit').find('input[name="smv"]').val(smv);
-                    $('#ModalEdit').find('input[name="production_unit"]').val(production_unit);
-                    $('#ModalEdit').find('input[name="factory"]').val(factory);
-
-                    $('#ModalEdit').modal('show'); // Show the modal
+            function updateProgressBars(progressData) {
+                var tes = JSON.parse(progressData);
+                tes.forEach(function(item) {
+                    var progressBarId = item.mastermodel + '-progress-bar';
+                    var progressBar = $('#' + progressBarId);
+                    var progressTextId = item.mastermodel + '-progressText';
+                    var progressText = $('#' + progressTextId);
+                    if (progressBar.length > 0) {
+                        progressBar.css('width', item.persen + '%').attr('aria-valuenow', item.persen);
+                        progressBar.text(item.persen + '%');
+                        progressText.text(item.persen + '% (' + item.remain + ' dz / ' + item.target + ' dz)'); // Mengubah teks ke 'tes'
+                    } else {
+                        console.error('Progress bar element not found for ID:', progressBarId);
+                    }
                 });
-                $('.delete-btn').click(function() {
-                    var noModel = $(this).data('no-model');
-                    var delivery = $(this).data('delivery');
-                    var apsperstyle = $(this).data('id');
-                    var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
-                    $('#ModalDelete').find('form').attr('action', '<?= base_url('capacity/deletedetailstyle/') ?>' + apsperstyle);
-                    $('#ModalDelete').find('input[name="idapsperstyle"]').val(apsperstyle);
-                    $('#ModalDelete').find('input[name="no_model"]').val(noModel);
-                    $('#ModalDelete').find('input[name="delivery"]').val(formattedDelivery);
-                    $('#ModalDelete').modal('show'); // Show the modal
-                });
-                $('.btn-delete-all').click(function() {
-                    var noModel = $(this).data('no-model');
-                    $('#ModalDeleteAll').find('form').attr('action', '<?= base_url('capacity/deletedetailorder/') ?>' + noModel);
-                    $('#ModalDeleteAll').find('input[name="idapsperstyle"]').val(noModel);
-                    $('#ModalDeleteAll').modal('show'); // Show the modal
-                });
-            });
-        </script>
-        <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
-        <?php $this->endSection(); ?>
+            }
+
+            setInterval(fetchData, 10000000);
+            fetchData();
+        });
+    </script>
+    <?php $this->endSection(); ?>

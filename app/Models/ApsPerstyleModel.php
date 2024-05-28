@@ -177,9 +177,10 @@ class ApsPerstyleModel extends Model
         return $this->get()->getResultArray();
     }
 
-    public function getProgress()
+    public function getProgress($noModel)
     {
         $res = $this->select('mastermodel, SUM(qty) as target, SUM(sisa) as remain')
+            ->where('mastermodel', $noModel)
             ->groupBy('mastermodel')
             ->get()
             ->getResultArray();
@@ -201,19 +202,31 @@ class ApsPerstyleModel extends Model
         }
         return $reset;
     }
+    public function getIdMinus($validate)
+    {
+        return $this->select('idapsperstyle, delivery, sisa')
+            ->where('mastermodel', $validate['no_model'])
+            ->where('sisa <', 0)
+            ->where('size', $validate['style'])
+            ->first();
+    }
+
     public function getIdProd($validate)
     {
-        $result = $this->select('idapsperstyle, delivery,sisa')->where('mastermodel', $validate['no_model'])
+        return $this->select('idapsperstyle, delivery, sisa')
+            ->where('mastermodel', $validate['no_model'])
             ->where('sisa >', 0)
-            ->where('size', $validate['style'])->first();
-        return $result;
+            ->where('size', $validate['style'])
+            ->first();
     }
+
     public function getIdBawahnya($validate)
     {
-        $result = $this->select('idapsperstyle, delivery,sisa')->where('mastermodel', $validate['no_model'])
+        return $this->select('idapsperstyle, delivery, sisa')
+            ->where('mastermodel', $validate['no_model'])
             ->where('sisa >', $validate['sisa'])
-            ->where('size', $validate['style'])->first();
-        return $result;
+            ->where('size', $validate['style'])
+            ->first();
     }
     public function getDetailPlanning($area, $jarum)
     {

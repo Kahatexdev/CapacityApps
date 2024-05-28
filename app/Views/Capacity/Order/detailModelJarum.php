@@ -33,14 +33,15 @@
                         <h5>
                             Detail Data Model <?= $noModel ?> Delivery <?= date('d-M-Y', strtotime($delivery)) ?>
                         </h5>
-                        <a href="<?= base_url('capacity/dataorderperjarumblndetail/'.date('F/Y', strtotime($delivery)).'/'.$jarum) ?>" class="btn bg-gradient-dark d-inline-flex align-items-center">
-                            <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i> 
+                        <a href="<?= base_url('capacity/dataorderperjarumblndetail/' . date('F/Y', strtotime($delivery)) . '/' . $jarum) ?>" class="btn bg-gradient-dark d-inline-flex align-items-center">
+                            <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
                             Back
                         </a>
 
                     </div>
                 </div>
                 <div class="card-body p-3">
+
                     <div class="row">
                         <div class="table-responsive">
                             <table id="dataTable" class="display compact striped" style="width:100%">
@@ -109,6 +110,7 @@
 
             </div>
         </div>
+
         <div class="modal fade" id="ModalEdit" tabindex="-1" role="dialog" aria-labelledby="modalEdit" aria-hidden="true">
             <div class="modal-dialog   role=" document">
                 <div class="modal-content">
@@ -216,7 +218,10 @@
                 </div>
             </div>
         </div>
-        <!-- <script>
+    </div>
+</div>
+
+<!-- <script>
             function valildasi() {
                 let qty = parseInt(document.getElementById("qty").value);
                 let sisa = parseInt(document.getElementById("sisa").value);
@@ -227,87 +232,88 @@
                 }
             }
         </script> -->
-        <script>
-            $(document).ready(function() {
-                $('#dataTable').DataTable({
-                    "footerCallback": function (row, data, start, end, display) {
-                        var api = this.api();
+<script>
+    $(document).ready(function() {
+        $('#dataTable').DataTable({
+            "footerCallback": function(row, data, start, end, display) {
+                var api = this.api();
 
-                        var qty = api.column(3, {
-                            page: 'current'
-                        }).data().reduce(function(a, b) {
-                            return parseInt(a) + parseInt(b);
-                        }, 0);
+                var qty = api.column(3, {
+                    page: 'current'
+                }).data().reduce(function(a, b) {
+                    return parseInt(a) + parseInt(b);
+                }, 0);
 
-                        // Calculate the total of the 5th column (Remaining Qty in dozens) - index 4
-                        var sisa = api.column(4, {
-                            page: 'current'
-                        }).data().reduce(function(a, b) {
-                            return parseInt(a) + parseInt(b);
-                        }, 0);
+                // Calculate the total of the 5th column (Remaining Qty in dozens) - index 4
+                var sisa = api.column(4, {
+                    page: 'current'
+                }).data().reduce(function(a, b) {
+                    return parseInt(a) + parseInt(b);
+                }, 0);
 
-                        // Format totalqty and totalsisa with " Dz" suffix and dots for thousands
-                        var totalqty = numberWithDots(qty) + " Dz";
-                        var totalsisa = numberWithDots(sisa) + " Dz";
+                // Format totalqty and totalsisa with " Dz" suffix and dots for thousands
+                var totalqty = numberWithDots(qty) + " Dz";
+                var totalsisa = numberWithDots(sisa) + " Dz";
 
-                        // Update the footer cell for the total Qty
-                        $(api.column(3).footer()).html(totalqty);
+                // Update the footer cell for the total Qty
+                $(api.column(3).footer()).html(totalqty);
 
-                        // Update the footer cell for the total Sisa
-                        $(api.column(4).footer()).html(totalsisa);
-                      
-                    }
-                });
+                // Update the footer cell for the total Sisa
+                $(api.column(4).footer()).html(totalsisa);
 
-                function numberWithDots(x) {
-                    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                }
+            }
+        });
 
-                $('.import-btn').click(function() {
-                    var apsperstyle = $(this).data('id');
-                    var noModel = $(this).data('no-model');
-                    var delivery = $(this).data('delivery');
-                    var jarum = $(this).data('jarum');
-                    var style = $(this).data('style');
-                    var qty = $(this).data('qty');
-                    var sisa = $(this).data('sisa');
-                    var seam = $(this).data('seam');
-                    var factory = $(this).data('factory');
+        function numberWithDots(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
 
-                    var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
+        $('.import-btn').click(function() {
+            var apsperstyle = $(this).data('id');
+            var noModel = $(this).data('no-model');
+            var delivery = $(this).data('delivery');
+            var jarum = $(this).data('jarum');
+            var style = $(this).data('style');
+            var qty = $(this).data('qty');
+            var sisa = $(this).data('sisa');
+            var seam = $(this).data('seam');
+            var factory = $(this).data('factory');
 
-                    $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/updatedetailjarum/') ?>' + apsperstyle);
-                    $('#ModalEdit').find('input[name="style"]').val(style);
-                    $('#ModalEdit').find('input[name="no_model"]').val(noModel);
-                    $('#ModalEdit').find('input[name="jarum"]').val(jarum);
-                    $('#ModalEdit').find('input[name="delivery"]').val(formattedDelivery);
-                    $('#ModalEdit').find('input[name="qty"]').val(qty);
-                    $('#ModalEdit').find('input[name="sisa"]').val(sisa);
-                    $('#ModalEdit').find('input[name="seam"]').val(seam);
-                    $('#ModalEdit').find('input[name="factory"]').val(factory);
+            var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
 
-                    $('#ModalEdit').modal('show'); // Show the modal
-                });
-                $('.delete-btn').click(function() {
-                    var noModel = $(this).data('no-model');
-                    var delivery = $(this).data('delivery');
-                    var jarum = $(this).data('jarum');
-                    var apsperstyle = $(this).data('id');
-                    var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
-                    $('#ModalDelete').find('form').attr('action', '<?= base_url('capacity/deletedetailjarum/') ?>' + apsperstyle);
-                    $('#ModalDelete').find('input[name="idapsperstyle"]').val(apsperstyle);
-                    $('#ModalDelete').find('input[name="no_model"]').val(noModel);
-                    $('#ModalDelete').find('input[name="delivery"]').val(formattedDelivery);
-                    $('#ModalDelete').find('input[name="jarum"]').val(jarum);
-                    $('#ModalDelete').modal('show'); // Show the modal
-                });
-                $('.btn-delete-all').click(function() {
-                    var noModel = $(this).data('no-model');
-                    $('#ModalDeleteAll').find('form').attr('action', '<?= base_url('capacity/deletedetailorder/') ?>' + noModel);
-                    $('#ModalDeleteAll').find('input[name="idapsperstyle"]').val(noModel);
-                    $('#ModalDeleteAll').modal('show'); // Show the modal
-                });
-            });
-        </script>
-        <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
-        <?php $this->endSection(); ?>
+            $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/updatedetailjarum/') ?>' + apsperstyle);
+            $('#ModalEdit').find('input[name="style"]').val(style);
+            $('#ModalEdit').find('input[name="no_model"]').val(noModel);
+            $('#ModalEdit').find('input[name="jarum"]').val(jarum);
+            $('#ModalEdit').find('input[name="delivery"]').val(formattedDelivery);
+            $('#ModalEdit').find('input[name="qty"]').val(qty);
+            $('#ModalEdit').find('input[name="sisa"]').val(sisa);
+            $('#ModalEdit').find('input[name="seam"]').val(seam);
+            $('#ModalEdit').find('input[name="factory"]').val(factory);
+
+            $('#ModalEdit').modal('show'); // Show the modal
+        });
+        $('.delete-btn').click(function() {
+            var noModel = $(this).data('no-model');
+            var delivery = $(this).data('delivery');
+            var jarum = $(this).data('jarum');
+            var apsperstyle = $(this).data('id');
+            var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
+            $('#ModalDelete').find('form').attr('action', '<?= base_url('capacity/deletedetailjarum/') ?>' + apsperstyle);
+            $('#ModalDelete').find('input[name="idapsperstyle"]').val(apsperstyle);
+            $('#ModalDelete').find('input[name="no_model"]').val(noModel);
+            $('#ModalDelete').find('input[name="delivery"]').val(formattedDelivery);
+            $('#ModalDelete').find('input[name="jarum"]').val(jarum);
+            $('#ModalDelete').modal('show'); // Show the modal
+        });
+        $('.btn-delete-all').click(function() {
+            var noModel = $(this).data('no-model');
+            $('#ModalDeleteAll').find('form').attr('action', '<?= base_url('capacity/deletedetailorder/') ?>' + noModel);
+            $('#ModalDeleteAll').find('input[name="idapsperstyle"]').val(noModel);
+            $('#ModalDeleteAll').modal('show'); // Show the modal
+        });
+    });
+</script>
+<script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+
+<?php $this->endSection(); ?>

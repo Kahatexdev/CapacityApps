@@ -63,6 +63,7 @@ class OrderController extends BaseController
 
     public function detailModelCapacity($noModel, $delivery)
     {
+        $pdkProgress = $this->ApsPerstyleModel->getProgress($noModel);
         $dataApsPerstyle = $this->ApsPerstyleModel->detailModel($noModel, $delivery); // Call the model method
         $data = [
             'title' => 'Data Order',
@@ -76,6 +77,7 @@ class OrderController extends BaseController
             'dataAps' => $dataApsPerstyle,
             'noModel' => $noModel,
             'delivery' => $delivery,
+            'progress' => $pdkProgress
         ];
         return view('Capacity/Order/detailOrder', $data);
     }
