@@ -163,43 +163,7 @@
     <!-- Skrip JavaScript -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
-    <script>
-        $(document).ready(function() {
-            function fetchData() {
-                $.ajax({
-                    url: '<?= base_url('capacity/dataprogress') ?>',
-                    type: 'GET',
-                    success: function(responseData) {
 
-                        updateProgressBars(responseData);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(xhr.responseText);
-                    }
-                });
-            }
-
-            function updateProgressBars(progressData) {
-                var tes = JSON.parse(progressData);
-                tes.forEach(function(item) {
-                    var progressBarId = item.mastermodel + '-progress-bar';
-                    var progressBar = $('#' + progressBarId);
-                    var progressTextId = item.mastermodel + '-progressText';
-                    var progressText = $('#' + progressTextId);
-                    if (progressBar.length > 0) {
-                        progressBar.css('width', item.persen + '%').attr('aria-valuenow', item.persen);
-                        progressBar.text(item.persen + '%');
-                        progressText.text(item.persen + '% (' + item.remain + ' dz / ' + item.target + ' dz)'); // Mengubah teks ke 'tes'
-                    } else {
-                        console.error('Progress bar element not found for ID:', progressBarId);
-                    }
-                });
-            }
-
-            setInterval(fetchData, 10000000);
-            fetchData();
-        });
-    </script>
     <script>
         let productionData = <?php echo json_encode($Produksi); ?>;
         let labels = productionData.map(item => item.tgl_produksi);

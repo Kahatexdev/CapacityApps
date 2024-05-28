@@ -67,7 +67,7 @@ class ProduksiModel extends Model
         $result = $this->select('DATE(tgl_produksi) as tgl_produksi, SUM(qty_produksi) as qty_produksi')
             ->where('MONTH(tgl_produksi)', $bulan)
             ->where('area', $area)
-            ->like('storage_awal', 'RS')
+
             ->like('storage_akhir', '-')
             ->groupBy('DATE(tgl_produksi)')
             ->orderBy('tgl_produksi')
