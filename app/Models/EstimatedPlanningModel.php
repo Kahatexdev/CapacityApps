@@ -39,4 +39,19 @@ class EstimatedPlanningModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getId($id_pln)
+    {
+        return $this->select('id_est_qty')
+            ->where('id_detail_pln', $id_pln)
+            ->orderBy('id_est_qty', 'desc')
+            ->first();
+    }
+    public function listPlanning($id){
+        return $this->select('estimated_planning.*, MIN(tanggal_planning.date) AS start_date, MAX(tanggal_planning.date) AS stop_date, mesin')
+        ->join('tanggal_planning', 'estimated_planning.id_est_qty = tanggal_planning.id_est_qty','RIGHT')
+        ->where('estimated_planning.id_detail_pln',$id)
+        ->groupBy('id_est_qty')
+        ->findAll();
+    }
 }
