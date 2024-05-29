@@ -58,13 +58,15 @@ class UserController extends BaseController
     }
     public function produksi()
     {
+        $dataPdk = $this->ApsPerstyleModel->getPdkProduksi();
         $data = [
             'title' => 'Dashboard',
             'active1' => '',
             'active2' => 'active',
             'targetProd' => 0,
             'produksiBulan' => 0,
-            'produksiHari' => 0
+            'produksiHari' => 0,
+            'pdk' => $dataPdk
 
         ];
         return view('User/produksi', $data);

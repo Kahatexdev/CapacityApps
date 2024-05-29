@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use PHPUnit\TextUI\XmlConfiguration\Group;
 
 class ApsPerstyleModel extends Model
 {
@@ -241,6 +242,12 @@ class ApsPerstyleModel extends Model
     {
         return $this->select('idapsperstyle,mastermodel,size,smv')
             ->groupBy('size', 'mastermodel')
+            ->findAll();
+    }
+    public function getPdkProduksi()
+    {
+        return $this->select('mastermodel, sum(qty) as totalqty, sum(sisa) as totalsisa, sum(qty)-sum(sisa) as totalproduksi')
+            ->groupBy('mastermodel')
             ->findAll();
     }
 }

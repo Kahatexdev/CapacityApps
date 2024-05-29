@@ -231,7 +231,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
 
 // user
 $routes->group('/user', ['filter' => 'user'], function ($routes) {
-    $routes->get('', 'UserController::index');
+    $routes->get('', 'UserController::produksi');
     $routes->get('produksi', 'UserController::produksi');
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
 });
