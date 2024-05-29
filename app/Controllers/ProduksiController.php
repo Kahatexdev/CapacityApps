@@ -205,6 +205,8 @@ class ProduksiController extends BaseController
                             $existingProduction = $this->produksiModel->existingData($dataInsert);
                             if (!$existingProduction) {
                                 $this->produksiModel->insert($dataInsert);
+                            } else {
+                                $failedRows[] = $rowIndex; // Add to failed rows if production data already exists
                             }
                         } else {
                             $failedRows[] = $rowIndex;
@@ -273,6 +275,13 @@ class ProduksiController extends BaseController
                     if (!$existingProduction) {
                         $this->produksiModel->insert($dataInsert);
                         $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
+                    } else {
+                        $idexist = $existingProduction['id_produksi'];
+                        $sumqty = $existingProduction['qty_produksi'] + $qty;
+                        $this->produksiModel->update($idexist, ['qty_produksi' => $sumqty]);
+                        $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
+
+                        // $failedRows[] = $rowIndex; // Add to failed rows if production data already exists
                     }
                 }
             } catch (\Exception $e) {

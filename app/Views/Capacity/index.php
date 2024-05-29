@@ -183,7 +183,7 @@
     console.log(data)
     // Ekstraksi tanggal dan jumlah produksi dari data
     let labels = data.map(item => item.created_at);
-    let values = data.map(item => item.total_produksi);
+    let values = data.map(item => item.total_produksi / 24);
 
 
     var ctx2 = document.getElementById("mixed-chart").getContext("2d");
