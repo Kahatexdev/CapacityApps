@@ -132,6 +132,7 @@
                                 <a href="#" class="btn btn-info order-btn" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">Booking to Order</a>
                                 <a href="" class="btn btn-success" Data-bs-toggle="modal" data-bs-target="#ModalEdit">Edit Booking</a>
                                 <a href="" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#ModalCancel">Cancel Booking</a>
+                                <a href="" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#ModalDelete">Delete Booking</a>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -367,7 +368,7 @@
     </div>
 
 
-    <!-- modal delete
+    <!-- modal delete -->
     <div class="modal fade  bd-example-modal-lg" id="ModalDelete" tabindex="-1" role="dialog" aria-labelledby="modaldelete" aria-hidden="true">
         <div class="modal-dialog  modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -389,7 +390,7 @@
                 </form>
             </div>
         </div>
-    </div> -->
+    </div>
 
     <div class="modal fade  bd-example-modal-lg" id="ModalCancel" tabindex="-1" role="dialog" aria-labelledby="modalCancel" aria-hidden="true">
         <div class="modal-dialog  modal-dialog-centered" role="document">

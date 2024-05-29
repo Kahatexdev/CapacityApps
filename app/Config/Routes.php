@@ -52,6 +52,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('importModel', 'OrderController::importModel');
     $routes->get('turunOrder', 'OrderController::getTurunOrder');
     $routes->get('detailturunorder/(:any)/(:any)', 'OrderController::detailturunorder/$1/$2');
+    $routes->post('tampilPerdelivery', 'OrderController::tampilPerdelivery');
 
 
     // produksi

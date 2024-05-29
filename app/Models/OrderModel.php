@@ -51,22 +51,58 @@ class OrderModel extends Model
     {
         return $this->where('no_model', $no_model)->first();
     }
-    public function tampilPerdelivery()
+    public function tampilPerdelivery($searchValue = null)
     {
         $builder = $this->db->table('data_model');
 
-        $builder->select('data_model.*, mastermodel,no_order, machinetypeid, ROUND(SUM(QTy), 0) AS qty, ROUND(SUM(sisa), 0) AS sisa, factory, delivery, product_type');
-        $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
-        $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
-        $builder->where('no_model !=','');
-        $builder->orderby('created_at', 'desc');
-        $builder->orderby('no_model', 'asc');
-        $builder->orderby('delivery', 'asc');
-        $builder->groupBy('delivery,machinetypeid');
-        $builder->groupBy('data_model.no_model');
+        // Selecting the columns
+        $builder->select('data_model.created_at, 
+                        data_model.kd_buyer_order, 
+                        data_model.no_model, 
+                        apsperstyle.no_order, 
+                        apsperstyle.machinetypeid, 
+                        master_product_type.product_type, 
+                        data_model.description, 
+                        data_model.seam, 
+                        data_model.leadtime, 
+                        ROUND(SUM(apsperstyle.qty), 0) AS qty, 
+                        ROUND(SUM(apsperstyle.sisa), 0) AS sisa, 
+                        apsperstyle.delivery')
+                // Joining the required tables
+                ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left')
+                ->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left')
+                // Filtering out records where no_model is not empty
+                ->where('no_model !=', '');
 
-        return $builder->get()->getResult();
+        // Apply search filter if search value is provided
+        if ($searchValue !== null) {
+            $builder->groupStart()
+                    ->like('data_model.created_at', $searchValue)
+                    ->orLike('data_model.kd_buyer_order', $searchValue)
+                    ->orLike('data_model.no_model', $searchValue)
+                    ->orLike('apsperstyle.no_order', $searchValue)
+                    ->orLike('apsperstyle.machinetypeid', $searchValue)
+                    ->orLike('master_product_type.product_type', $searchValue)
+                    ->orLike('data_model.description', $searchValue)
+                    ->orLike('data_model.seam', $searchValue)
+                    ->orLike('data_model.leadtime', $searchValue)
+                    ->orLike('apsperstyle.delivery', $searchValue)
+                    ->groupEnd();
+        }
+
+        // Grouping and ordering
+        $builder->groupBy('apsperstyle.delivery')
+                ->groupBy('apsperstyle.machinetypeid')
+                ->groupBy('data_model.no_model')
+                ->orderBy('data_model.created_at', 'DESC')
+                ->orderBy('data_model.no_model', 'ASC')
+                ->orderBy('apsperstyle.delivery', 'ASC');
+
+        // Fetching data
+        $query = $builder->get();
+        return $query->getResult();
     }
+
     public function tampilBelumImport()
     {
         $builder = $this->db->table('data_model');
