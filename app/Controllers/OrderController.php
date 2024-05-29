@@ -111,7 +111,11 @@ class OrderController extends BaseController
         $orderDir = $requestData['order'][0]['dir'] ?? 'asc';
         $orderColumn = $requestData['columns'][$orderIndex]['data'] ?? '';
 
-        $tampilperdelivery = $this->orderModel->tampilPerdelivery();
+        // Extract search value from request
+        $searchValue = $requestData['search']['value'] ?? '';
+
+        // Fetch data from the model with search filter
+        $tampilperdelivery = $this->orderModel->tampilPerdelivery($searchValue);
 
         $data = array_slice($tampilperdelivery, $start, $length);
 
@@ -127,6 +131,7 @@ class OrderController extends BaseController
 
         return $this->response->setJSON($response);
     }
+
 
     public function belumImport()
     {
