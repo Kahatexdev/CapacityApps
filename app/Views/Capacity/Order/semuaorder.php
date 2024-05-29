@@ -29,58 +29,26 @@
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table id="example" class="display compact " style="width:100%">
-                        <thead>
-                            <tr>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Turun PDK</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Buyer</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Model</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Order</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Needle</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Desc</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Seam</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Leadtime</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Shipment</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Order</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Order</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($tampildata as $order) : ?>
-                                <tr>
-                                    <td class="text-xs"><?= date('d-M-y', strtotime($order->created_at)); ?></td>
-                                    <td class="text-xs"><?= $order->kd_buyer_order; ?></td>
-                                    <td class="text-xs"><?= $order->no_model; ?></td>
-                                    <td class="text-xs"><?= $order->no_order; ?></td>
-                                    <td class="text-xs"><?= $order->machinetypeid; ?></td>
-                                    <td class="text-xs"><?= $order->product_type; ?></td>
-                                    <td class="text-xs"><?= $order->description; ?></td>
-                                    <td class="text-xs"><?= $order->seam; ?></td>
-                                    <td class="text-xs"><?= $order->leadtime; ?> Days</td>
-                                    <td class="text-xs"><?= date('d-M-y', strtotime($order->delivery)); ?></td>
-                                    <td class="text-xs"><?= number_format(round($order->qty / 24), 0, ',', '.'); ?> Dz</td>
-                                    <td class="text-xs"><?= number_format(round($order->sisa / 24), 0, ',', '.'); ?> Dz</td>
-
-                                    <td class="text-xs">
-                                        <?php if ($order->qty === null) : ?>
-                                            <!-- If qty is null, set action to Import -->
-                                            <button type="button" class="btn import-btn btn-success text-xs" data-toggle="modal" data-target="#importModal" data-id="<?= $order->id_model; ?>" data-no-model="<?= $order->no_model; ?>">
-                                                Import
-                                            </button>
-                                        <?php else : ?>
-                                            <!-- If qty is not null, set action to Details -->
-                                            <a href="<?= base_url('capacity/detailmodel/' . $order->no_model . '/' . $order->delivery); ?>"><button type="button" class="btn btn-info btn-sm details-btn">
-                                                Details
-                                                </button>
-                                            </a>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                <table id="example" class="display compact" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Created At</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Buyer</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Model</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Order</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Needle</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Desc</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Seam</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Leadtime</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Order</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Order</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Delivery</th>
+                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
                 </div>
             </div>
 
@@ -171,6 +139,82 @@
             });
             
             $('#example').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    url: '<?= base_url('capacity/tampilPerdelivery') ?>',
+                    type: 'POST'
+                },
+                "columns": [
+                    { 
+                        "data": "created_at",
+                        "render": function(data, type, row) {
+                            if (data) {
+                                // Parse the date and format it as d-M-Y
+                                var date = new Date(data);
+                                var day = ('0' + date.getDate()).slice(-2);
+                                var month = date.toLocaleString('default', { month: 'short' });
+                                var year = date.getFullYear();
+                                return `${day}-${month}-${year}`;
+                            }
+                            return data;
+                        }
+                    },
+                    { "data": "kd_buyer_order" },
+                    { "data": "no_model" },
+                    { "data": "no_order" },
+                    { "data": "machinetypeid" },
+                    { "data": "product_type" },
+                    { "data": "description" },
+                    { "data": "seam" },
+                    { "data": "leadtime" },
+                    { 
+                        "data": "qty",
+                        "render": function(data, type, row) {
+                            if (data) {
+                                return parseFloat(data).toLocaleString('en-US', { minimumFractionDigits: 0 });
+                            }
+                            return data;
+                        }
+                    },
+                    { 
+                        "data": "sisa",
+                        "render": function(data, type, row) {
+                            if (data) {
+                                return parseFloat(data).toLocaleString('en-US', { minimumFractionDigits: 0 });
+                            }
+                            return data;
+                        }
+                    },
+                    { 
+                        "data": "delivery",
+                        "render": function(data, type, row) {
+                            if (data) {
+                                // Parse the date and format it as d-M-Y
+                                var date = new Date(data);
+                                var day = ('0' + date.getDate()).slice(-2);
+                                var month = date.toLocaleString('default', { month: 'short' });
+                                var year = date.getFullYear();
+                                return `${day}-${month}-${year}`;
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        "data": null,
+                        "render": function(data, type, row) {
+                            if (row.qty === null) {
+                                return `<button type="button" class="btn import-btn btn-success text-xs" data-toggle="modal" data-target="#importModal" data-id="${row.id_model}" data-no-model="${row.no_model}">
+                                            Import
+                                        </button>`;
+                            } else {
+                                return `<a href="<?= base_url('capacity/detailmodel') ?>/${row.no_model}/${row.delivery}">
+                                            <button type="button" class="btn btn-info btn-sm details-btn">Details</button>
+                                        </a>`;
+                            }
+                        }
+                    }
+                ],
                 "order": []
             });
         });

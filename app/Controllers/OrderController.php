@@ -84,7 +84,6 @@ class OrderController extends BaseController
 
     public function semuaOrder()
     {
-        $tampilperdelivery = $this->orderModel->tampilPerdelivery();
         $product = $this->productModel->findAll();
         $data = [
             'title' => 'Data Order',
@@ -95,12 +94,38 @@ class OrderController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-            'tampildata' => $tampilperdelivery,
             'product' => $product,
-
-
         ];
         return view('Capacity/Order/semuaorder', $data);
+    }
+
+    public function tampilPerdelivery()
+    {
+        $request = service('request');
+        $requestData = $request->getPost();
+        log_message('debug', 'POST data: ' . print_r($requestData, true));
+
+        $start = $requestData['start'] ?? 0;
+        $length = $requestData['length'] ?? 10;
+        $orderIndex = $requestData['order'][0]['column'] ?? 0;
+        $orderDir = $requestData['order'][0]['dir'] ?? 'asc';
+        $orderColumn = $requestData['columns'][$orderIndex]['data'] ?? '';
+
+        $tampilperdelivery = $this->orderModel->tampilPerdelivery();
+
+        $data = array_slice($tampilperdelivery, $start, $length);
+
+        $recordsTotal = count($tampilperdelivery);
+        $recordsFiltered = $recordsTotal;
+
+        $response = [
+            'draw' => $requestData['draw'] ?? 0,
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data
+        ];
+
+        return $this->response->setJSON($response);
     }
 
     public function belumImport()
