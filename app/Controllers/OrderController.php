@@ -146,7 +146,7 @@ class OrderController extends BaseController
 
 
         ];
-        return view('Capacity/Order/semuaorder', $data);
+        return view('Capacity/Order/semuaorder2', $data);
     }
 
     public function orderPerJarum()
