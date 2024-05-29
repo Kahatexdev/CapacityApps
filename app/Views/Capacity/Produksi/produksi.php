@@ -134,9 +134,11 @@
                                 </div>
                                 <div class="col-4 text-end">
                                     <?php if (stripos($ar, 'KK8J') !== false || stripos($ar, '13G') !== false) : ?>
-                                        <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i>
+
+                                        <a href="<?= base_url('capacity/detailproduksi/' . $ar) ?>" class="btn btn-info btn-sm"> <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i> Details</a>
+
                                     <?php else : ?>
-                                        <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i>
+                                        <a href="<?= base_url('capacity/detailproduksi/' . $ar) ?>" class="btn btn-info btn-sm"> <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i> Details</a>
                                     <?php endif; ?>
                                 </div>
 

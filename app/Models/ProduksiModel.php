@@ -47,7 +47,8 @@ class ProduksiModel extends Model
     }
     public function existingData($insert)
     {
-        return $this->where('idapsperstyle', $insert['idapsperstyle'])->where('tgl_produksi', $insert['tgl_produksi'])->where('qty_produksi', $insert['qty_produksi'])
+        return $this->select('id_produksi,qty_produksi')
+            ->where('idapsperstyle', $insert['idapsperstyle'])->where('tgl_produksi', $insert['tgl_produksi'])->where('qty_produksi', $insert['qty_produksi'])
             ->where('shift', $insert['shift'])
             ->where('no_box', $insert['no_box'])
             ->first();
