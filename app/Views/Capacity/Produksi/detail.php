@@ -31,7 +31,7 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <h5>
-                            Data Produksi <?= $area ?>
+                            Data Produksi <?= $area ?> <?= $bulan ?>
                         </h5>
                         <a href="<?= base_url('capacity/dataproduksi/') ?>" class="btn bg-gradient-info"> Kembali</a>
                     </div>
@@ -43,24 +43,22 @@
                                 <thead>
                                     <tr>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tgl Produksi</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jarum</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">PDK</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Style</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Delivery</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Area</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Order</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Produksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php foreach ($produksi as $order) : ?>
                                         <tr>
                                             <td class="text-sm"><?= $order['tgl_produksi']; ?></td>
-                                            <td class="text-sm"><?= $order['machinetypeid']; ?></td>
+                                            <td class="text-sm"><?= $order['mastermodel']; ?></td>
                                             <td class="text-sm"><?= $order['size']; ?></td>
                                             <td class="text-sm"><?= $order['delivery']; ?></td>
+                                            <td class="text-sm"><?= $order['qty']; ?></td>
                                             <td class="text-sm"><?= $order['qty_produksi']; ?></td>
-                                            <td class="text-sm"><?= $order['sisa']; ?></td>
-                                            <td class="text-sm"><?= $order['factory']; ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>

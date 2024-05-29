@@ -58,8 +58,9 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
     $routes->get('dataprogress/:(any)', 'ProduksiController::progressData/$1');
     $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
-    $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
+
 
     // mesin
     $routes->get('datamesin', 'MesinController::index');

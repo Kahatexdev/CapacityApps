@@ -40,10 +40,14 @@ class ProduksiModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getProduksi($area)
+    public function getProduksi($area, $bulan)
     {
-        return $this->join('apsperstyle', 'apsperstyle.idapsperstyle= data_produksi.idapsperstyle')
-            ->select('*')->where('apsperstyle.factory', $area)->orderBy('data_produksi.tgl_produksi')->findAll();
+        return $this->join('apsperstyle', 'apsperstyle.idapsperstyle= produksi.idapsperstyle')
+            ->select('tgl_produksi,mastermodel,size,produksi.delivery,sum(qty) as qty,  sum(qty_produksi) as qty_produksi')->where('produksi.area', $area)->orderBy('produksi.tgl_produksi')
+            ->groupBy('size')
+            ->groupBy('tgl_produksi')
+            ->where('Month(tgl_produksi)', $bulan)
+            ->findAll();
     }
     public function existingData($insert)
     {
