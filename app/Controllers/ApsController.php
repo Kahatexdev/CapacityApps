@@ -551,7 +551,7 @@ class ApsController extends BaseController
         $idutama = $this->request->getGet('id_utama');
         $detailplan = $this->DetailPlanningModel->getDetailPlanning($id);//get data model with detail quantity,model etc.
         $listPlanning = $this->EstimatedPlanningModel->listPlanning($id);//get data planning per page and fetch it into datatable at bottom datatables
-        $mesinpertgl = $this->TanggalPlanningModel->getMesinByDate($idutama);//get data machine per date and return into array
+        // $mesinpertgl = $this->TanggalPlanningModel->getMesinByDate($idutama);//get data machine per date and return into array
         $data = [
             'title' => 'Data Order',
             'active1' => '',
@@ -582,11 +582,22 @@ class ApsController extends BaseController
     // Return the total number of holidays as a JSON response
     return $this->response->setJSON(['status' => 'success', 'total_libur' => $totalLibur]);
     }
+
     public function getMesinByDate($id){
-        $date = $this->request->getPost('date');
-        $machine = $this->TanggalPlanningModel->getMesinByDate($id,$date);
-        return $this->response->setJSON(['mesin' => $availableMachines]);
+        $date = $this->request->getGet('date');
+        $machines = $this->TanggalPlanningModel->getMesinByDate($id, $date);
+        
+        // Check if machines data is empty
+        if (empty($machines)) {
+            $availableMachines = 0; // Return 1 if no machines are found
+        } else {
+            // Extract the sum of mesin
+            $availableMachines = array_sum(array_column($machines, 'mesin'));
+        }
+    
+        return $this->response->setJSON(['status' => 'success', 'available' => $availableMachines]);
     }
+
     public function saveplanning(){
         $model = $this->request->getPost('model');
         $delivery = $this->request->getPost('delivery');
