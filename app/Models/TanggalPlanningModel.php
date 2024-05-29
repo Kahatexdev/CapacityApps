@@ -40,12 +40,13 @@ class TanggalPlanningModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getMesinByDate($id,$date){
-        return $this->select('tanggal_planning.DATE as tanggal, SUM(tanggal_planning.mesin) AS mesin')
-        ->join('detail_planning', 'tanggal_planning.id_detail_pln = detail_planning.id_detail_pln', 'left')
-        ->where('detail_planning.id_pln_mc', $id)
-        ->where('tanggal',$date)
-        ->groupBy('tanggal_planning.DATE')
-        ->get()->getResultArray();
-    }
+    public function getMesinByDate($id, $date) {
+        return $this->select('tanggal_planning.DATE as date, SUM(tanggal_planning.mesin) AS mesin')
+            ->join('detail_planning', 'tanggal_planning.id_detail_pln = detail_planning.id_detail_pln', 'left')
+            ->where('tanggal_planning.DATE', $date)
+            ->where('detail_planning.id_pln_mc', $id)
+            ->groupBy('tanggal_planning.DATE')
+            ->get()
+            ->getResultArray();
+    }   
 }

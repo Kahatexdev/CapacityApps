@@ -226,6 +226,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('planningpage/(:any)', 'ApsController::planningpage/$1');
     $routes->post('getDataLibur', 'ApsController::getDataLibur');
     $routes->post('saveplanning', 'ApsController::saveplanning');
+    $routes->get('getMesinByDate/(:any)', 'ApsController::getMesinByDate/$1');
 });
 
 // user

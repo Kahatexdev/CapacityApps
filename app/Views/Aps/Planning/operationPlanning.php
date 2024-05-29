@@ -235,26 +235,21 @@
 </div>
 <script>
     $(document).ready(function() {
-        var table = $('#dataTable').DataTable({
-            // Add your DataTables options here if needed
-            "footerCallback": function (row, data, start, end, display) {
-                var api = this.api();
-                var total = api.column(7, { page: 'current' }).data().reduce(function (acc, val) {
-                    var num = parseFloat(val.replace(/[^\d.-]/g, '')); // Extract numeric values
-                    return acc + (isNaN(num) ? 0 : num); // Add numeric values, treat NaN as 0
-                }, 0);
+    var table = $('#dataTable').DataTable({
+        // Add your DataTables options here if needed
+        "footerCallback": function (row, data, start, end, display) {
+            var api = this.api();
+            var total = api.column(7, { page: 'current' }).data().reduce(function (acc, val) {
+                var num = parseFloat(val.replace(/[^\d.-]/g, '')); // Extract numeric values
+                return acc + (isNaN(num) ? 0 : num); // Add numeric values, treat NaN as 0
+            }, 0);
 
-                // Update the footer with the total sum
-                $('#total-est-qty').text(total.toLocaleString('en', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' Dz');
-            }
-        });
-
-        // Optionally, recalculate the total on table redraw (e.g., when sorting or filtering)
-        table.on('draw', function() {
-            table.api().draw(false);
-        });
+            // Update the footer with the total sum
+            $('#total-est-qty').text(total.toLocaleString('en', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' Dz');
+        }
     });
-
+    });
+    
     function calculateTarget(key) {
         var percentageInput = document.getElementById('percentage-' + key);
         var percentage = parseFloat(percentageInput.value);
@@ -273,28 +268,17 @@
         fillMachineSuggestion();
     }
 
-    // Add event listener to percentage input fields
-    var percentageInputs = document.querySelectorAll('input[name="persen_target"]');
-    percentageInputs.forEach(function(input) {
-        input.addEventListener('input', function() {
-            // Get the key from the input id
-            var key = input.id.split('-').pop();
-            calculateTarget(key);
-        });
-        
-        // Add blur event listener
-        input.addEventListener('blur', function() {
-            fillMachineSuggestion(); // Call your desired function when the input loses focus
-        });
-    });
-
     function initCalculations() {
         var keys = <?= json_encode(array_keys($planning)) ?>;
         keys.forEach(function(key) {
             calculateTarget(key);
         });
-        calculateDaysCount(); // Calculate days count on initial load
-        fillMachineSuggestion();
+        calculateDaysCount(function() {
+            fillUnplannedQty();
+            fillMachineSuggestion();
+            var startDate = document.querySelector('input[name="start_date"]').value;
+            updateAvailableMachines(startDate); // Call updateAvailableMachines with the start date
+        });
     }
 
     function calculateDaysCount(callback) {
@@ -320,14 +304,16 @@
                             title: 'Invalid Dates',
                             text: 'Stop date and start date are invalid.',
                         }).then((result) => {
-                        // Reset the stop date
-                        var deliveryDate = new Date(document.getElementById('delivery-<?= $key ?>').value);
-                        var newStopDate = new Date(deliveryDate.getTime() - (3 * 24 * 60 * 60 * 1000)); // 3 days before delivery
+                            var deliveryDate = new Date(document.getElementById('delivery-<?= $key ?>').value);
+                            var newStopDate = new Date(deliveryDate.getTime() - (3 * 24 * 60 * 60 * 1000)); // 3 days before delivery
+                            var newStartDate =  new Date(newStopDate.getTime() - (7 * 24 * 60 * 60 * 1000)); // 7 days before delivery
 
-                        document.querySelector('.stop-date').value = newStopDate.toISOString().split('T')[0];
-                        calculateDaysCount(function() {
-                            fillMachineSuggestion(); // Call fillMachineSuggestion() after calculateDaysCount() finishes
-                        });
+                            document.querySelector('.stop-date').value = newStopDate.toISOString().split('T')[0];
+                            document.querySelector('.start-date').value = newStartDate.toISOString().split('T')[0];
+                            calculateDaysCount(function() {
+                                fillMachineSuggestion();
+                                fillUnplannedQty();
+                            });
                         });
                     }
                     var daysWithoutHolidays = totalDays - totalHolidays;
@@ -335,13 +321,11 @@
                     document.querySelector('.days-count').value = daysWithoutHolidays;
                     document.querySelector('.holiday-count').value = totalHolidays;
 
-                    calculateEstimatedQty(); // Calculate estimated quantity after days count is updated
+                    calculateEstimatedQty();
 
-                    // Call the callback function if it's provided
                     if (typeof callback === 'function') {
                         callback();
                     }
-                    fillMachineSuggestion();
                 } else {
                     console.error('Error: ' + response.message);
                 }
@@ -353,16 +337,16 @@
     }
 
     function calculateEstimatedQty() {
-        var daysCount = parseFloat(document.querySelector('.days-count').value);
-        var machineCount = parseFloat(document.getElementById('machine_count').value);
-        var targetPercentageInput = document.querySelector('[id^="calculated-target-"]').value;
-        var targetPercentage = parseFloat(targetPercentageInput.split(' ')[0]);
+    var daysCount = parseFloat(document.querySelector('.days-count').value);
+    var machineCount = parseFloat(document.getElementById('machine_count').value);
+    var targetPercentageInput = document.querySelector('[id^="calculated-target-"]').value;
+    var targetPercentage = parseFloat(targetPercentageInput.split(' ')[0]);
 
-        if (!isNaN(daysCount) && !isNaN(machineCount) && !isNaN(targetPercentage)) {
-            var estimatedQty = daysCount * machineCount * targetPercentage;
-            document.querySelector('.estimated-qty').value = estimatedQty.toFixed(2);
-        }
+    if (!isNaN(daysCount) && !isNaN(machineCount) && !isNaN(targetPercentage)) {
+        var estimatedQty = daysCount * machineCount * targetPercentage;
+        document.querySelector('.estimated-qty').value = estimatedQty.toFixed(2);
     }
+}
 
     function fillMachineSuggestion(){
         var daysCount = parseFloat(document.querySelector('.days-count').value);
@@ -380,33 +364,73 @@
     function fillUnplannedQty() {
         var remainingQty = parseFloat(document.querySelector('[id^="remaining-qty-"]').value);
         var totalEstQty = parseFloat(document.getElementById('total-est-qty').innerText.replace(/[^\d.-]/g, ''));
-        var unplannedQty = Math.ceil(remainingQty - totalEstQty); // Round up the unplanned quantity
+        var unplannedQty = Math.ceil(remainingQty - totalEstQty);
         document.getElementById('unplanned-qty-<?= $key ?>').value = unplannedQty.toFixed(2);
 
-        // Get the save button element
         var saveButton = document.querySelector('button[type="submit"]');
-        // Check if unplannedQty is less than or equal to 0
         if (unplannedQty <= 0) {
-            // If unplannedQty is less than or equal to 0, disable the save button and change its text
             saveButton.disabled = true;
             saveButton.textContent = 'Qty Has Been Planned Successfully';
         } else {
-            // If unplannedQty is greater than 0, enable the save button and revert its text
             saveButton.disabled = false;
             saveButton.textContent = 'Save Planning';
         }
     }
-    
 
-    document.querySelector('.stop-date').addEventListener('change', calculateDaysCount);
-    document.querySelector('input[name="start_date"]').addEventListener('change', calculateDaysCount);
-    window.onload = function() {
-    initCalculations(); // Assuming this function is synchronous and doesn't involve AJAX calls
-    calculateDaysCount(function() {
-        fillMachineSuggestion(); // Call fillMachineSuggestion() after calculateDaysCount() finishes
-        fillUnplannedQty();
+    function updateAvailableMachines(date) {
+        $.ajax({
+            url: '<?= base_url("aps/getMesinByDate/") . $id_pln ?>', // Adjust the URL to pass the ID if needed
+            type: 'GET',
+            dataType: 'json',
+            data: { date: date },
+            success: function(response) {
+                if (response && response.available !== undefined) {
+                    // Calculate the reduced available machines value
+                    var reducedAvailableMachines =<?= $mesin ?> - response.available;
+                    
+                    // Update the HTML element with the new value
+                    $('#available_machine').text("(Available : " + reducedAvailableMachines + ")");
+                } else {
+                    console.error('Error: Invalid response format.');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error: ' + error);
+            }
+        });
+    }
+
+    document.querySelector('input[name="start_date"]').addEventListener('change', function() {
+        var startDate = this.value;
+        updateAvailableMachines(startDate);
+        calculateDaysCount(function() {
+            fillMachineSuggestion();
+            fillUnplannedQty();
+        });
     });
-};
+
+    document.querySelector('.stop-date').addEventListener('change', function() {
+        calculateDaysCount(function() {
+            fillMachineSuggestion();
+            fillUnplannedQty();
+        });
+    });
+
+    var percentageInputs = document.querySelectorAll('input[name="persen_target"]');
+    percentageInputs.forEach(function(input) {
+        input.addEventListener('input', function() {
+            var key = input.id.split('-').pop();
+            calculateTarget(key);
+        });
+        
+        input.addEventListener('blur', function() {
+            fillMachineSuggestion();
+        });
+    });
+
+    initCalculations();
+
+
 </script>
 
 <?php $this->endSection(); ?>
