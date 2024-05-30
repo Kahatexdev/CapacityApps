@@ -149,7 +149,6 @@ class OrderController extends BaseController
             'tampildata' => $tampilperdelivery,
             'product' => $product,
 
-
         ];
         return view('Capacity/Order/semuaorder2', $data);
     }
@@ -239,6 +238,7 @@ class OrderController extends BaseController
     {
         $tampilperdelivery = $this->orderModel->tampilPerjarum($jarum);
         $product = $this->productModel->findAll();
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $booking = $data = [
             'title' => 'Data Order',
             'active1' => '',
@@ -251,6 +251,7 @@ class OrderController extends BaseController
             'jarum' => $jarum,
             'tampildata' => $tampilperdelivery,
             'product' => $product,
+            'jenisJarum' => $totalMesin,
 
         ];
         return view('Capacity/Order/semuaorderjarum', $data);
@@ -523,6 +524,43 @@ class OrderController extends BaseController
             }
         }
     }
+    public function inputOrderManual(){
+        $tgl = $this->request->getPost('tgl_turun');
+        $model = $this->request->getPost('no_model');
+        $jarum = $this->request->getPost('jarum');
+        $prod = $this->request->getPost('productType');
+        $id = $this->request->getPost('id');
+
+        $getId = [
+            'jarum' => $jarum,
+            'prodtype' => $prod
+        ];
+        $idProdtype = $this->productModel->getId($getId);
+
+
+        if($model){
+            $check = $this->orderModel->checkExist($model);
+            if ($check) {
+                return redirect()->to(base_url('capacity/dataorderperjarum/'.$id))->withInput()->with('error', 'Data Model Exist');
+            }
+            else{
+            $insert = $this->orderModel->insert([
+                'no_model' => $model,
+                'id_product_type' => $idProdtype,
+                'created_at' => $tgl
+            ]);
+            }
+            if($insert){
+                return redirect()->to(base_url('capacity/dataorderperjarum/'.$id))->withInput()->with('success', 'Data Model Inserted');
+            }else{
+                return redirect()->to(base_url('capacity/dataorderperjarum/'.$id))->withInput()->with('error', 'Data Model Not Insert');
+            }
+        }else{
+            return redirect()->to(base_url('capacity/dataorderperjarum/'.$id))->withInput()->with('error', 'Please Check Model number');
+        }
+
+    }
+
     public function importModel()
     {
         $file = $this->request->getFile('excel_file');

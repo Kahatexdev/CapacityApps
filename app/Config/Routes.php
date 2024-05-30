@@ -49,6 +49,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('deletedetailorder/(:any)', 'OrderController::deletedetailorder/$1');
     $routes->post('deletedetailjarum/(:any)', 'OrderController::deletedetailmodeljarum/$1');
     $routes->post('inputOrder', 'OrderController::inputOrder');
+    $routes->post('inputOrderManual', 'OrderController::inputOrderManual');
     $routes->post('importModel', 'OrderController::importModel');
     $routes->get('turunOrder', 'OrderController::getTurunOrder');
     $routes->get('detailturunorder/(:any)/(:any)', 'OrderController::detailturunorder/$1/$2');
