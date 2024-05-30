@@ -207,7 +207,7 @@ class ApsPerstyleModel extends Model
     {
         return $this->select('idapsperstyle, delivery, sisa')
             ->where('mastermodel', $validate['no_model'])
-            ->where('sisa <', 0)
+            ->where('sisa <=', 0)
             ->where('size', $validate['style'])
             ->first();
     }

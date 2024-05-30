@@ -72,7 +72,8 @@ class ProduksiController extends BaseController
     }
     public function produksiPerArea($area)
     {
-        $produksi = $this->produksiModel->getProduksi($area);
+        $bulan = date('m');
+        $produksi = $this->produksiModel->getProduksi($area, $bulan);
         $data = [
             'title' => 'Data Produksi',
             'active1' => '',
@@ -82,7 +83,7 @@ class ProduksiController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-
+            'bulan' => date('M-Y'),
             'produksi' => $produksi,
             'area' => $area
         ];
@@ -206,6 +207,7 @@ class ProduksiController extends BaseController
                             if (!$existingProduction) {
                                 $this->produksiModel->insert($dataInsert);
                             } else {
+
                                 $failedRows[] = $rowIndex; // Add to failed rows if production data already exists
                             }
                         } else {
