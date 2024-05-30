@@ -234,6 +234,8 @@ class ApsPerstyleModel extends Model
         return $this->select('mastermodel AS model,delivery,SUM(qty)/24 AS qty ,SUM(sisa)/24 AS sisa, AVG(smv) AS smv')
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
+            ->where('sisa > ',0)
+            ->where('delivery > now()')
             ->groupby('delivery', 'mastermodel')
             ->findAll();
     }
