@@ -229,14 +229,14 @@ class ApsPerstyleModel extends Model
             ->where('size', $validate['style'])
             ->first();
     }
-    public function getDetailPlanning($area, $jarum)
+    public function getDetailPlanning($area, $jarum) // funtion ieu kudu diganti where na kade ulah poho
     {
         return $this->select('mastermodel AS model, delivery, SUM(qty)/24 AS qty, SUM(sisa)/24 AS sisa, AVG(smv) AS smv')
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
-            ->where('sisa >', 0) // corrected to 'sisa >'
-            ->where('delivery >', 'NOW()', false) // corrected to 'NOW()' and adding false to prevent CI from quoting
-            ->groupBy(['delivery', 'mastermodel']) // corrected to groupBy and passed an array
+            ->where('sisa >', 0)
+            ->where('delivery > DATE_ADD(NOW(), INTERVAL 7 DAY)', null, false) // Add 7 days to current date
+            ->groupBy(['delivery', 'mastermodel'])
             ->findAll();
     }
 
