@@ -92,8 +92,8 @@
                     <table id="dataTable" class="display">
                         <thead>
                             <th>Judul</th>
-                            <th>Area</th>
                             <th>Jarum</th>
+                            <th>Area</th>
                             <th>Last Update</th>
                             <th>Details</th>
                         </thead>

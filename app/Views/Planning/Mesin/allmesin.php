@@ -22,8 +22,8 @@
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jarum</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Total Mesin</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Brand</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Mesin Jalan</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Mesin Mati</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Mesin Jalan</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Production Unit</th>
                                     </tr>
                                 </thead>
@@ -34,8 +34,8 @@
                                             <td class="text-sm"><?= $order['jarum']; ?></td>
                                             <td class="text-sm"><?= $order['total_mc']; ?></td>
                                             <td class="text-sm"><?= $order['brand']; ?></td>
-                                            <td class="text-sm"><?= $order['mesin_jalan']; ?></td>
                                             <td class="text-sm"><?= $order['mesin_mati']; ?></td>
+                                            <td class="text-sm"><?= $order['mesin_jalan']; ?></td>
                                             <td class="text-sm"><?= $order['pu']; ?></td>
                                         </tr>
                                     <?php endforeach; ?>

@@ -67,8 +67,8 @@
                                             <td class="text-sm"><?= $order['jarum']; ?></td>
                                             <td class="text-sm"><?= $order['total_mc']; ?> Mc</td>
                                             <td class="text-sm"><?= $order['brand']; ?></td>
-                                            <td class="text-sm"><?= $order['mesin_jalan']; ?> Mc</td>
                                             <td class="text-sm"><?= $order['total_mc'] - $order['mesin_jalan']; ?> Mc</td>
+                                            <td class="text-sm"><?= $order['mesin_jalan']; ?> Mc</td>
                                             <td class="text-sm">
                                                 <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['id_data_mesin']; ?>" data-area="<?= $order['area']; ?>" data-total="<?= $order['total_mc']; ?>" data-jarum="<?= $order['jarum']; ?>" data-mc-jalan="<?= $order['mesin_jalan']; ?>" data-brand="<?= $order['brand']; ?>" data-pu="<?= $order['pu']; ?>">
                                                     Edit
