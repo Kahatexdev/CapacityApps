@@ -1,5 +1,28 @@
 <?php $this->extend('Capacity/layout'); ?>
 <?php $this->section('content'); ?>
+<?php if (session()->getFlashdata('success')) : ?>
+        <script>
+            $(document).ready(function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '<?= session()->getFlashdata('success') ?>',
+                });
+            });
+        </script>
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('error')) : ?>
+        <script>
+            $(document).ready(function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: '<?= session()->getFlashdata('error') ?>',
+                });
+            });
+        </script>
+    <?php endif; ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
@@ -18,7 +41,7 @@
                             <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-success bg-gradient-success shadow text-center border-radius-md">
                                 Input Data Order
                             </button>
-                            <!-- <a href="<?= base_url('capacity/orderPerjarum/')?>" class="btn bg-gradient-info"> Back</a> -->
+                            <a href="<?= base_url('capacity/orderPerjarum/')?>" class="btn bg-gradient-info"> Back</a>
                         </div>
                     </div>
                 </div>
@@ -34,7 +57,8 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form action="<?= base_url('capacity/inputOrder') ?>" method="post">
+                            <form action="<?= base_url('capacity/inputOrderManual') ?>" method="post">
+                            <input type="hidden" class="form-control" name="id" value=<?=$jarum?>>
                                 <div class="form-group">
                                     <label for="tgl-bk-form-label">Tanggal Turun Order</label>
                                     <input type="date" class="form-control" name="tgl_turun">
@@ -42,6 +66,21 @@
                                 <div class="form-group">
                                     <label for="No Model" class="col-form-label">No Model</label>
                                     <input type="text" name="no_model" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="jarum" class="col-form-label">Needle</label>
+                                    <select class="form-control" id="jarum" name="jarum">
+                                        <option value="">Choose</option>
+                                        <?php foreach ($jenisJarum as $jj) : ?>
+                                            <option value="<?= $jj['jarum'] ?>"><?= $jj['jarum'] ?></option>
+                                        <?php endforeach ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="productType" class="col-form-label">Product Type</label>
+                                    <select class="form-control" id="productType" name="productType">
+                                        <option value="">Choose</option>
+                                    </select>
                                 </div>
                         </div>
                         <div class="modal-footer">
@@ -124,29 +163,7 @@
 
         </div>
     </div>
-    <?php if (session()->getFlashdata('success')) : ?>
-        <script>
-            $(document).ready(function() {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: '<?= session()->getFlashdata('success') ?>',
-                });
-            });
-        </script>
-    <?php endif; ?>
-
-    <?php if (session()->getFlashdata('error')) : ?>
-        <script>
-            $(document).ready(function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: '<?= session()->getFlashdata('error') ?>',
-                });
-            });
-        </script>
-    <?php endif; ?>
+    
 
     <!-- modal -->
     <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModal" aria-hidden="true">
@@ -239,6 +256,36 @@
                 $('#importModal').find('input[name="no_model"]').val(noModel);
 
                 $('#importModal').modal('show'); // Show the modal
+            });
+            $('#jarum').change(function() {
+                var selectedJarum = $(this).val();
+                if (selectedJarum) {
+                    $.ajax({
+                        url: '<?= base_url('capacity/getTypebyJarum') ?>', // Ubah dengan URL controller Anda
+                        type: 'POST',
+                        data: {
+                            jarum: selectedJarum
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+
+                            var productTypeSelect = $('#productType');
+                            productTypeSelect.empty();
+                            productTypeSelect.append('<option value="">Choose</option>'); // Tambahkan opsi default
+
+                            // Iterasi melalui data yang diterima dan tambahkan ke select option
+                            $.each(response, function(index, productType) {
+                                productTypeSelect.append('<option value="' + productType + '">' + productType + '</option>');
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching data:', error);
+                        }
+                    });
+                } else {
+                    $('#productType').empty();
+                    $('#productType').append('<option value="">Choose</option>');
+                }
             });
         });
     </script>

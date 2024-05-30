@@ -454,6 +454,9 @@ class BookingController extends BaseController
 
         $needle = $this->request->getPost("jarum");
         $productType = $this->request->getPost('productType');
+
+        // dd($this->request->getPost("jarum"));
+        
         $getId = [
             'jarum' => $needle,
             'prodtype' => $productType
