@@ -132,6 +132,23 @@ class BookingController extends BaseController
         return view('Capacity/Booking/jarumbulan', $data);
     }
 
+    public function allbooking()
+    {
+        $booking = $this->bookingModel->getAllData();
+        $data = [
+            'title' => 'Data Booking',
+            'active1' => '',
+            'active2' => 'active',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'booking' => $booking,
+        ];
+        return view('Capacity/Booking/allbooking', $data);
+    }
+
     public function inputbooking()
     {
         $jarum = $this->request->getPost("jarum");
