@@ -370,9 +370,11 @@ class ApsController extends BaseController
 
         return view('Aps/Order/detailModelJarum', $data);
     }
-    public function planningmesin(){
+    public function planningmesin()
+    {
+        $id = session()->get('id_user');
         $planarea = $this->KebutuhanAreaModel->findAll();
-        $area = $this->jarumModel->getArea();
+        $area = $this->aksesModel->getArea($id);
         $data = [
             'title' => 'Data Planning Area',
             'active1' => '',
@@ -383,25 +385,26 @@ class ApsController extends BaseController
             'active6' => 'active',
             'active7' => '',
             'planarea' => $planarea,
-            'area'=> $area,        
+            'area' => $area,
         ];
         return view('Aps/Planning/PilihJudulArea', $data);
     }
 
-    public function saveplanningmesin() {
+    public function saveplanningmesin()
+    {
         $validation = $this->validate([
             'judul' => 'required',
             'area' => 'required',
             'jarum' => 'required'
         ]);
-    
+
         if (!$validation) {
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'All fields are required.'
             ]);
         }
-    
+
         $data = [
             'judul' => $this->request->getPost('judul'),
             'area' => $this->request->getPost('area'),
@@ -410,7 +413,7 @@ class ApsController extends BaseController
         $save = $this->KebutuhanAreaModel->save($data);
         if ($save) {
             $planarea = $this->KebutuhanAreaModel->findAll();
-            $dataplan= $this->response->setJSON([
+            $dataplan = $this->response->setJSON([
                 'status' => 'success',
                 'message' => 'Data saved successfully.',
                 'planarea' => $planarea
@@ -423,7 +426,8 @@ class ApsController extends BaseController
             ]);
         }
     }
-    public function fetch_jarum() {
+    public function fetch_jarum()
+    {
         try {
             $area = $this->request->getPost('area');
             $jarumData = $this->jarumModel->getJarumByArea($area);
@@ -433,13 +437,14 @@ class ApsController extends BaseController
             return $this->response->setStatusCode(500)->setBody($e->getMessage());
         }
     }
-    public function detailplanmc($id){
+    public function detailplanmc($id)
+    {
         $detailplan = $this->DetailPlanningModel->getDataPlanning($id);
         // dd($detailplan);
         $judul = $this->request->getGet('judul');
         $area = $this->request->getGet('area');
         $jarum = $this->request->getGet('jarum');
-        $mesinarea = $this->jarumModel->getMesinByArea($area,$jarum); //mesin yang dipakai semua mesin tanpa melibatkan head planning
+        $mesinarea = $this->jarumModel->getMesinByArea($area, $jarum); //mesin yang dipakai semua mesin tanpa melibatkan head planning
         // $mesinplanning = $this->MesinPlanningModel->getMesinByArea($area,$jarum); //mesin yang dipilih oleh head planning di teruskan ke bagian aps
         $data = [
             'title' => 'Data Planning',
@@ -532,25 +537,27 @@ class ApsController extends BaseController
         ];
         return view('Aps/Order/semuaorderarea', $data);
     }
-    public function fetchdetailorderarea(){
+    public function fetchdetailorderarea()
+    {
         $area = $this->request->getGet('area');
         $jarum = $this->request->getGet('jarum');
         $id_pln_mc = $this->request->getGet('id_pln_mc');
 
-        $data = $this->ApsPerstyleModel->getDetailPlanning($area,$jarum);
+        $data = $this->ApsPerstyleModel->getDetailPlanning($area, $jarum);
         foreach ($data as $row) {
             $row['id_pln_mc'] = $id_pln_mc;
             $this->DetailPlanningModel->insert($row);
         }
     }
-    public function planningpage($id){
+    public function planningpage($id)
+    {
         $area = $this->request->getGet('area');
         $jarum = $this->request->getGet('jarum');
         $mesin = $this->request->getGet('mesin');
         $judul = $this->request->getGet('judul');
         $idutama = $this->request->getGet('id_utama');
-        $detailplan = $this->DetailPlanningModel->getDetailPlanning($id);//get data model with detail quantity,model etc.
-        $listPlanning = $this->EstimatedPlanningModel->listPlanning($id);//get data planning per page and fetch it into datatable at bottom datatables
+        $detailplan = $this->DetailPlanningModel->getDetailPlanning($id); //get data model with detail quantity,model etc.
+        $listPlanning = $this->EstimatedPlanningModel->listPlanning($id); //get data planning per page and fetch it into datatable at bottom datatables
         // $mesinpertgl = $this->TanggalPlanningModel->getMesinByDate($idutama);//get data machine per date and return into array
         $data = [
             'title' => 'Data Order',
@@ -572,21 +579,23 @@ class ApsController extends BaseController
         ];
         return view('Aps/Planning/operationPlanning', $data);
     }
-    public function getDataLibur(){
-    $startDate = $this->request->getPost('startDate');
-    $endDate = $this->request->getPost('endDate');
+    public function getDataLibur()
+    {
+        $startDate = $this->request->getPost('startDate');
+        $endDate = $this->request->getPost('endDate');
 
-    // Fetch total number of holidays between the given dates from the model
-    $totalLibur = $this->liburModel->getTotalLiburBetweenDates($startDate, $endDate);
+        // Fetch total number of holidays between the given dates from the model
+        $totalLibur = $this->liburModel->getTotalLiburBetweenDates($startDate, $endDate);
 
-    // Return the total number of holidays as a JSON response
-    return $this->response->setJSON(['status' => 'success', 'total_libur' => $totalLibur]);
+        // Return the total number of holidays as a JSON response
+        return $this->response->setJSON(['status' => 'success', 'total_libur' => $totalLibur]);
     }
 
-    public function getMesinByDate($id){
+    public function getMesinByDate($id)
+    {
         $date = $this->request->getGet('date');
         $machines = $this->TanggalPlanningModel->getMesinByDate($id, $date);
-        
+
         // Check if machines data is empty
         if (empty($machines)) {
             $availableMachines = 0; // Return 1 if no machines are found
@@ -594,11 +603,12 @@ class ApsController extends BaseController
             // Extract the sum of mesin
             $availableMachines = array_sum(array_column($machines, 'mesin'));
         }
-    
+
         return $this->response->setJSON(['status' => 'success', 'available' => $availableMachines]);
     }
 
-    public function saveplanning(){
+    public function saveplanning()
+    {
         $model = $this->request->getPost('model');
         $delivery = $this->request->getPost('delivery');
         $qty = $this->request->getPost('qty');
@@ -620,7 +630,7 @@ class ApsController extends BaseController
 
         $startDateTime = new \DateTime($start);
         $stopDateTime = new \DateTime($stop);
-    
+
         $interval = new \DateInterval('P1D'); // 1 day interval
         $datePeriod = new \DatePeriod($startDateTime, $interval, $stopDateTime->modify('+1 day')); // +1 day to include the end date
 
@@ -647,17 +657,17 @@ class ApsController extends BaseController
                 'id_est_qty' => $idOrder,
                 'date' => $date->format('Y-m-d'), // Insert the current date in the range
                 'mesin' => $mesin,
-            ];    
+            ];
             $this->TanggalPlanningModel->insert($data);
         }
-        
-       
 
-        if($saveest){
-            return redirect()->to(base_url('aps/planningpage/'.$id_save.'?id_utama='.$id_pln.'?mesin='.$mc.'&area='.$area.'&jarum='.$jrm))->withInput()->with('success', 'Data Berhasil Disimpan');
-        }else{
-            return redirect()->to(base_url('aps/planningpage/'.$id_save.'?id_utama='.$id_pln.'?mesin='.$mc.'&area='.$area.'&jarum='.$jrm))->withInput()->with('error', 'Data Gagal Disimpan');
-        }    
+
+
+        if ($saveest) {
+            return redirect()->to(base_url('aps/planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm))->withInput()->with('success', 'Data Berhasil Disimpan');
+        } else {
+            return redirect()->to(base_url('aps/planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm))->withInput()->with('error', 'Data Gagal Disimpan');
+        }
 
 
         dd($dataestqty);
