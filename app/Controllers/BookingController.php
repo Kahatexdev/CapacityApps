@@ -318,6 +318,7 @@ class BookingController extends BaseController
             $startRow = 12; // Ganti dengan nomor baris mulai
             foreach ($spreadsheet->getActiveSheet()->getRowIterator($startRow) as $row) {
                 $cellIterator = $row->getCellIterator();
+                $baris = $row->getRowIndex();
                 $cellIterator->setIterateOnlyExistingCells(false);
                 $data = [];
                 foreach ($cellIterator as $cell) {
@@ -343,7 +344,11 @@ class BookingController extends BaseController
                     $product_type = $data[2];
                     $sisa = $data[8];
                     $getIdProd = ['prodtype' => $product_type, 'jarum' => $jarum];
+
                     $idprod = $this->productModel->getId($getIdProd);
+                    if (!$idprod) {
+                        return redirect()->to(base_url('/capacity/databooking'))->withInput()->with('error', 'Data gagal di import, Target tidak di temukan silahkan' . $jarum . '-' . $product_type . ' pada baris ' . $baris);
+                    }
 
 
                     if ($data[5] == null) {
@@ -730,7 +735,7 @@ class BookingController extends BaseController
         if ($id) {
             $this->productModel->set('konversi', $target)
                 ->set('keterangan', $keterangan)
-                ->set('product_type',$product)
+                ->set('product_type', $product)
                 ->where('id_product_type', $id)
                 ->update();
             return redirect()->to(base_url('capacity/datatargetjarum/' . $jarum))->withInput()->with('success', 'Data Has Been Updated');
@@ -750,22 +755,22 @@ class BookingController extends BaseController
             'jarum' => $jarum
         ];
         $insert =   $this->productModel->insert($input);
-        if($insert){
+        if ($insert) {
             return redirect()->to(base_url('capacity/datatargetjarum/' . $jarum))->withInput()->with('success', 'Data Berhasil Diinput');
-        }else{
+        } else {
             return redirect()->to(base_url('capacity/datatargetjarum/' . $jarum))->withInput()->with('error', 'Data Gagal Diinput');
-        }       
-        
+        }
     }
-    public function deletetarget(){
+    public function deletetarget()
+    {
         $id = $this->request->getPost("id");
         $jarum = $this->request->getPost("jarum");
         $del = $this->productModel->delete($id);
-        if($del){
+        if ($del) {
             return redirect()->to(base_url('capacity/datatargetjarum/' . $jarum))->withInput()->with('success', 'Data Berhasil Dihapus');
-        }else{
+        } else {
             return redirect()->to(base_url('capacity/datatargetjarum/' . $jarum))->withInput()->with('error', 'Data Gagal Dihapus');
-        }    
+        }
     }
     public function getTypebyJarum()
     {
