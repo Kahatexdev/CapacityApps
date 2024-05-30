@@ -231,12 +231,12 @@ class ApsPerstyleModel extends Model
     }
     public function getDetailPlanning($area, $jarum)
     {
-        return $this->select('mastermodel AS model,delivery,SUM(qty)/24 AS qty ,SUM(sisa)/24 AS sisa, AVG(smv) AS smv')
+        return $this->select('mastermodel AS model, delivery, SUM(qty)/24 AS qty, SUM(sisa)/24 AS sisa, AVG(smv) AS smv')
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
-            ->where('sisa > ',0)
-            ->where('delivery > now()')
-            ->groupby('delivery', 'mastermodel')
+            ->where('sisa >', 0) // corrected to 'sisa >'
+            ->where('delivery >', 'NOW()', false) // corrected to 'NOW()' and adding false to prevent CI from quoting
+            ->groupBy(['delivery', 'mastermodel']) // corrected to groupBy and passed an array
             ->findAll();
     }
 
