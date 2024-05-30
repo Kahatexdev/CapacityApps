@@ -191,6 +191,22 @@ class PlanningController extends BaseController
         ];
         return view('Planning/Planning/listPlanning', $data);
     }
+    public function listplanningAps()
+    {
+        $dataBooking = $this->KebutuhanMesinModel->listPlan();
+        $data = [
+            'title' => 'List Planning From Capacity',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => 'active',
+            'active6' => '',
+            'active7' => '',
+            'data' => $dataBooking
+        ];
+        return view('Aps/Planning/listPlanning', $data);
+    }
 
     public function detaillistplanning($judul)
     {
@@ -208,6 +224,23 @@ class PlanningController extends BaseController
             'judul' => $judul,
         ];
         return view('Planning/Planning/detailPlanning', $data);
+    }
+    public function detaillistplanningAps($judul)
+    {
+        $dataplan = $this->KebutuhanMesinModel->jarumPlan($judul);
+        $data = [
+            'title' => 'List Planning From Capacity',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => 'active',
+            'active6' => '',
+            'active7' => '',
+            'data' => $dataplan,
+            'judul' => $judul,
+        ];
+        return view('Aps/Planning/detailPlanning', $data);
     }
 
     public function pickmachine($jarum)
@@ -270,5 +303,30 @@ class PlanningController extends BaseController
 
         ];
         return view('Planning/Planning/mesinSelected', $data);
+    }
+    public function viewdetailAps($id)
+    {
+
+        $datamc = $this->MesinPlanningModel->getDataPlanning($id);
+        $judulData = $this->KebutuhanMesinModel->find($id);
+        $judul = $judulData ? $judulData['judul'] : null;
+        $mesin = $judulData ? $judulData['mesin'] : null;
+        $jarum = $judulData ? $judulData['jarum'] : null;
+        $data = [
+            'title' => 'View Detail Machine Choosen',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => 'active',
+            'active6' => '',
+            'active7' => '',
+            'datamc' => $datamc,
+            'judul' => $judul,
+            'mesin' => $mesin,
+            'jarum' => $jarum,
+
+        ];
+        return view('Aps/Planning/mesinSelected', $data);
     }
 }

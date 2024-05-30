@@ -211,11 +211,11 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('allmachine', 'MesinController::allmachinePlan');
 
     //planning
-    $routes->get('dataplanning', 'PlanningController::listplanning');
-    $routes->get('detaillistplanning/(:any)', 'PlanningController::detaillistplanning/$1');
+    $routes->get('dataplanning', 'PlanningController::listplanningAps');
+    $routes->get('detaillistplanning/(:any)', 'PlanningController::detaillistplanningAps/$1');
     $routes->post('pickmachine/(:any)', 'PlanningController::pickmachine/$1');
     $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
-    $routes->post('viewdetail/(:any)', 'PlanningController::viewdetail/$1');
+    $routes->post('viewdetail/(:any)', 'PlanningController::viewdetailAps/$1');
 
     $routes->get('dataproduksi', 'GodController::viewProduksiPlan');
     $routes->get('dataprogress', 'GodController::progressData');
