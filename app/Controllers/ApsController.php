@@ -627,6 +627,7 @@ class ApsController extends BaseController
         $mc = $this->request->getPost('mesin');
         $area = $this->request->getPost('area');
         $jrm = $this->request->getPost('jarum');
+        $judul = $this->request->getPost('judul');
 
         $startDateTime = new \DateTime($start);
         $stopDateTime = new \DateTime($stop);
@@ -664,9 +665,9 @@ class ApsController extends BaseController
 
 
         if ($saveest) {
-            return redirect()->to(base_url('aps/planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm))->withInput()->with('success', 'Data Berhasil Disimpan');
+            return redirect()->to(base_url('aps/planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm.'&judul='.$judul))->withInput()->with('success', 'Data Berhasil Disimpan');
         } else {
-            return redirect()->to(base_url('aps/planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm))->withInput()->with('error', 'Data Gagal Disimpan');
+            return redirect()->to(base_url('aps/planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm.'&judul='.$judul))->withInput()->with('error', 'Data Gagal Disimpan');
         }
 
 

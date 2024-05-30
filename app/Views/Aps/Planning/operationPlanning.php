@@ -170,6 +170,7 @@
                             <input type="hidden" name="mesin" value=<?= $mesin ?>>
                             <input type="hidden" name="area" value=<?= $area ?>>
                             <input type="hidden" name="jarum" value=<?= $jarum ?>>
+                            <input type="hidden" name="judul" value=<?= $judul ?>>
                             <button type="submit" class="btn btn-info btn-block" style="width: 100%;">Save Planning</button>
                         </div>
                     </div>
