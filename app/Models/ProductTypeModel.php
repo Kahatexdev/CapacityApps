@@ -12,7 +12,7 @@ class ProductTypeModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_product_type', 'konversi', 'product_type', 'keterangan','jarum'];
+    protected $allowedFields    = ['id_product_type', 'konversi', 'product_type', 'keterangan', 'jarum'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -46,7 +46,12 @@ class ProductTypeModel extends Model
             ->where('product_type', $getIdProd['prodtype'])
             ->where('jarum', $getIdProd['jarum'])
             ->first();
-        return reset($query);
+        if ($query) {
+
+            return reset($query);
+        } else {
+            return null;
+        }
     }
     public function getKategori()
     {
