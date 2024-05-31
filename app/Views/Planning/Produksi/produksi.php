@@ -1,4 +1,4 @@
-<?php $this->extend('Planning/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
@@ -337,7 +337,7 @@
             $(document).ready(function() {
                 function fetchData() {
                     $.ajax({
-                        url: '<?= base_url('planning/produksiareachart') ?>',
+                        url: '<?= base_url($role . '/produksiareachart') ?>',
                         type: 'GET',
                         success: function(response) {
                             updatechart(response)

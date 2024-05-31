@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -33,15 +33,15 @@
                         <h5>
                             Detail Data Area <?= $area ?>
                         </h5>
-                        <div>                            
+                        <div>
                             <button type="button" class="btn btn-add bg-gradient-info d-inline-flex align-items-center" data-toggle="modal" data-target="#modalTambah">
                                 <i class="fas fa-plus-circle me-2 text-lg opacity-10"></i>
                                 Input Data Machine
                             </button>
 
-                            <a href="<?= base_url('capacity/mesinperarea/'.$pu) ?>" class="btn bg-gradient-dark">
-                                <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i> 
-                            Back</a>
+                            <a href="<?= base_url($role . '/mesinperarea/' . $pu) ?>" class="btn bg-gradient-dark">
+                                <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
+                                Back</a>
                         </div>
                     </div>
                 </div>
@@ -278,7 +278,7 @@
         <script>
             $(document).ready(function() {
                 $('#dataTable').DataTable({
-                    "footerCallback": function (row, data, start, end, display) {
+                    "footerCallback": function(row, data, start, end, display) {
                         var api = this.api();
 
                         var totalMesin = api.column(2, {
@@ -293,7 +293,7 @@
                         }).data().reduce(function(a, b) {
                             return parseInt(a) + parseInt(b);
                         }, 0);
-                        
+
                         var mesinMati = totalMesin - mesinJalan;
 
                         // Format totalMesin and mesinJalan with " Mc" suffix and dots for thousands
@@ -308,7 +308,7 @@
                         $(api.column(4).footer()).html(mesinJalanFormatted);
 
                         // Update the footer cell for the percentage
-                        $(api.column(5).footer()).html(mesinMatiFormatted);                        
+                        $(api.column(5).footer()).html(mesinMatiFormatted);
                     },
                 });
 
@@ -317,7 +317,7 @@
                 }
 
                 $('.btn-add').click(function() {
-                    $('#modalTambah').find('form').attr('action', '<?= base_url('capacity/tambahmesinperarea/') ?>');
+                    $('#modalTambah').find('form').attr('action', '<?= base_url($role . '/tambahmesinperarea/') ?>');
 
                     $('#modalTambah').modal('show'); // Show the modal
                 });
@@ -332,7 +332,7 @@
                     var pu = $(this).data('pu');
                     var mesin_mati = total_mc - mesin_jalan;
 
-                    $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/updatemesinperjarum/') ?>' + id_data_mesin);
+                    $('#ModalEdit').find('form').attr('action', '<?= base_url($role . '/updatemesinperjarum/') ?>' + id_data_mesin);
                     $('#ModalEdit').find('input[name="id"]').val(id_data_mesin);
                     $('#ModalEdit').find('input[name="area"]').val(area);
                     $('#ModalEdit').find('input[name="jarum"]').val(jarum);
@@ -350,7 +350,7 @@
                 });
                 $('.delete-btn').click(function() {
                     var id = $(this).data('id');
-                    $('#ModalDelete').find('form').attr('action', '<?= base_url('capacity/deletemesinareal/') ?>' + id);
+                    $('#ModalDelete').find('form').attr('action', '<?= base_url($role . '/deletemesinareal/') ?>' + id);
                     $('#ModalDelete').find('input[name="id_data_mesin"]').val(id);
                     $('#ModalDelete').modal('show'); // Show the modal
                 });

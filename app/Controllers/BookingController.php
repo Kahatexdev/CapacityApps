@@ -35,7 +35,7 @@ class BookingController extends BaseController
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         $this->cancelModel = new cancelModel();
-        if ($this->filters   = ['role' => ['capacity', 'planning', 'god']] != session()->get('role')) {
+        if ($this->filters   = ['role' => ['capacity', session()->get('role') . '', 'god', 'sudo']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
         $this->isLogedin();
@@ -57,6 +57,7 @@ class BookingController extends BaseController
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
 
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -68,7 +69,7 @@ class BookingController extends BaseController
             'Jarum' => $dataJarum,
             'TotalMesin' => $totalMesin,
         ];
-        return view('Capacity/Booking/booking', $data);
+        return view(session()->get('role') . '/Booking/booking', $data);
     }
     public function bookingPerJarum($jarum)
     {
@@ -76,6 +77,7 @@ class BookingController extends BaseController
         $booking = $this->bookingModel->getDataPerjarum($jarum);
 
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -89,13 +91,14 @@ class BookingController extends BaseController
             'booking' => $booking
 
         ];
-        return view('Capacity/Booking/jarum', $data);
+        return view(session()->get('role') . '/Booking/jarum', $data);
     }
 
     public function bookingPerBulanJarum($jarum)
     {
         $bulan = $this->bookingModel->getbulan($jarum);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -107,7 +110,7 @@ class BookingController extends BaseController
             'bulan' => $bulan,
             'jarum' => $jarum,
         ];
-        return view('Capacity/Booking/bookingbulan', $data);
+        return view(session()->get('role') . '/Booking/bookingbulan', $data);
     }
 
     public function bookingPerBulanJarumTampil($bulan, $tahun, $jarum)
@@ -115,6 +118,7 @@ class BookingController extends BaseController
         $booking = $this->bookingModel->getDataPerjarumbulan($bulan, $tahun, $jarum);
         $product = $this->productModel->getJarum($jarum);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -129,13 +133,14 @@ class BookingController extends BaseController
             'tahun' => $tahun,
             'jarum' => $jarum,
         ];
-        return view('Capacity/Booking/jarumbulan', $data);
+        return view(session()->get('role') . '/Booking/jarumbulan', $data);
     }
 
     public function allbooking()
     {
         $booking = $this->bookingModel->getAllData();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -146,7 +151,7 @@ class BookingController extends BaseController
             'active7' => '',
             'booking' => $booking,
         ];
-        return view('Capacity/Booking/allbooking', $data);
+        return view(session()->get('role') . '/Booking/allbooking', $data);
     }
 
     public function inputbooking()
@@ -189,12 +194,12 @@ class BookingController extends BaseController
             ];
             $insert =   $this->bookingModel->insert($input);
             if ($insert) {
-                return redirect()->to(base_url('/capacity/databooking/' . $jarum))->withInput()->with('success', 'Data Berhasil Di Input');
+                return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('success', 'Data Berhasil Di Input');
             } else {
-                return redirect()->to(base_url('/capacity/databooking/' . $jarum))->withInput()->with('error', 'Data Gagal Di Input');
+                return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('error', 'Data Gagal Di Input');
             }
         } else {
-            return redirect()->to(base_url('/capacity/databooking/' . $jarum))->withInput()->with('error', 'Data Sudah Ada, Silahkan Cek Ulang Kembali Inputanya');
+            return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('error', 'Data Sudah Ada, Silahkan Cek Ulang Kembali Inputanya');
         }
     }
     public function detailbooking($idBooking)
@@ -206,6 +211,7 @@ class BookingController extends BaseController
         $childOrder = $this->orderModel->getChild($idBooking);
         $childBooking = $this->bookingModel->getChild($idBooking);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -222,7 +228,7 @@ class BookingController extends BaseController
             'childBooking' => $childBooking
 
         ];
-        return view('Capacity/Booking/detail', $data);
+        return view(session()->get('role') . '/Booking/detail', $data);
     }
     public function inputOrder()
     {
@@ -237,7 +243,7 @@ class BookingController extends BaseController
         $check = $this->orderModel->checkExist($no_model);
         if ($check) {
             $this->bookingModel->update($id_booking, ['sisa_booking' => $sisa_booking]);
-            return redirect()->to(base_url('capacity/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
+            return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
         } else {
 
             $inputModel = [
@@ -248,7 +254,7 @@ class BookingController extends BaseController
             ];
             $input = $this->orderModel->insert($inputModel);
             if (!$input) {
-                return redirect()->to(base_url('capacity/detailbooking/' . $id_booking))->withInput()->with('error', 'Gagal Ambil Order');
+                return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $id_booking))->withInput()->with('error', 'Gagal Ambil Order');
             } else {
                 $id = $id_booking;
                 $status = "";
@@ -258,11 +264,12 @@ class BookingController extends BaseController
                     $status = "Aktif";
                 }
                 $data = [
+                    'role' => session()->get('role'),
                     'sisa_booking' => $sisa_booking,
                     'status' => $status
                 ];
                 $this->bookingModel->update($id, $data);
-                return redirect()->to(base_url('capacity/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
+                return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
             }
         }
     }
@@ -318,12 +325,12 @@ class BookingController extends BaseController
 
             if ($insert) {
                 $this->bookingModel->update($id_booking, ['sisa_booking' => $this->request->getPost("sisa")]);
-                return redirect()->to(base_url('/capacity/databooking/' . $jarum))->withInput()->with('success', 'Data Berhasil Di Input');
+                return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('success', 'Data Berhasil Di Input');
             } else {
-                return redirect()->to(base_url('/capacity/databooking/' . $jarum))->withInput()->with('error', 'Data Gagal Di Input');
+                return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('error', 'Data Gagal Di Input');
             }
         } else {
-            return redirect()->to(base_url('/capacity/databooking/' . $jarum))->withInput()->with('error', 'Data Sudah Ada, Silahkan Cek Ulang Kembali Inputanya');
+            return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('error', 'Data Sudah Ada, Silahkan Cek Ulang Kembali Inputanya');
         }
     }
     public function importbooking()
@@ -337,7 +344,7 @@ class BookingController extends BaseController
                 $cellIterator = $row->getCellIterator();
                 $baris = $row->getRowIndex();
                 $cellIterator->setIterateOnlyExistingCells(false);
-                $data = [];
+                $data = ['role' => session()->get('role'),];
                 foreach ($cellIterator as $cell) {
                     $data[] = $cell->getValue();
                 }
@@ -364,7 +371,7 @@ class BookingController extends BaseController
 
                     $idprod = $this->productModel->getId($getIdProd);
                     if (!$idprod) {
-                        return redirect()->to(base_url('/capacity/databooking'))->withInput()->with('error', 'Data gagal di import, Target tidak di temukan silahkan' . $jarum . '-' . $product_type . ' pada baris ' . $baris);
+                        return redirect()->to(base_url(session()->get('role') . '/databooking'))->withInput()->with('error', 'Data gagal di import, Target tidak di temukan silahkan' . $jarum . '-' . $product_type . ' pada baris ' . $baris);
                     }
 
 
@@ -394,9 +401,9 @@ class BookingController extends BaseController
                     }
                 }
             }
-            return redirect()->to(base_url('/capacity/databooking'))->withInput()->with('success', 'Data Berhasil di Import');
+            return redirect()->to(base_url(session()->get('role') . '/databooking'))->withInput()->with('success', 'Data Berhasil di Import');
         } else {
-            return redirect()->to(base_url('/capacity/databooking'))->with('error', 'No data found in the Excel file');
+            return redirect()->to(base_url(session()->get('role') . '/databooking'))->with('error', 'No data found in the Excel file');
         }
     }
     public function importpecahbooking()
@@ -412,7 +419,7 @@ class BookingController extends BaseController
             foreach ($spreadsheet->getActiveSheet()->getRowIterator($startRow) as $row) {
                 $cellIterator = $row->getCellIterator();
                 $cellIterator->setIterateOnlyExistingCells(false);
-                $data = [];
+                $data = ['role' => session()->get('role'),];
                 foreach ($cellIterator as $cell) {
                     $data[] = $cell->getValue();
                 }
@@ -466,9 +473,9 @@ class BookingController extends BaseController
                     }
                 }
             }
-            return redirect()->to(base_url('/capacity/detailbooking/' . $refId))->withInput()->with('success', 'Data Berhasil di Import');
+            return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $refId))->withInput()->with('success', 'Data Berhasil di Import');
         } else {
-            return redirect()->to(base_url('/capacity/detailbooking/' . $refId))->with('error', 'No data found in the Excel file');
+            return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $refId))->with('error', 'No data found in the Excel file');
         }
     }
     public function updatebooking($idBooking)
@@ -478,7 +485,7 @@ class BookingController extends BaseController
         $productType = $this->request->getPost('productType');
 
         // dd($this->request->getPost("jarum"));
-        
+
         $getId = [
             'jarum' => $needle,
             'prodtype' => $productType
@@ -486,6 +493,7 @@ class BookingController extends BaseController
         $idProdtype = $this->productModel->getId($getId);
 
         $data = [
+            'role' => session()->get('role'),
             'no_order' => $this->request->getPost("no_order"),
             'no_booking' =>  $this->request->getPost("no_booking"),
             'desc' => $this->request->getPost("desc"),
@@ -500,9 +508,9 @@ class BookingController extends BaseController
         $id = $idBooking;
         $update = $this->bookingModel->update($id, $data);
         if ($update) {
-            return redirect()->to(base_url('capacity/detailbooking/' . $idBooking))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $idBooking))->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url('capacity/detailbooking/' . $idBooking))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $idBooking))->withInput()->with('error', 'Gagal Update Data');
         }
     }
     public function deletebooking($idBooking)
@@ -512,9 +520,9 @@ class BookingController extends BaseController
         $id = $idBooking;
         $delete = $this->bookingModel->delete($id);
         if ($delete) {
-            return redirect()->to(base_url('capacity/databooking/' . $jarum))->withInput()->with('success', 'Data Berhasil Di Hapus');
+            return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
-            return redirect()->to(base_url('capacity/databooking/' . $jarum))->withInput()->with('error', 'Gagal Hapus Data');
+            return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
     public function cancelbooking($idBooking)
@@ -546,9 +554,9 @@ class BookingController extends BaseController
 
         // Redirect with success or error message
         if ($input) {
-            return redirect()->to(base_url('capacity/databooking/' . $jarum))->withInput()->with('success', 'Bookingan Berhasil Di Cancel');
+            return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('success', 'Bookingan Berhasil Di Cancel');
         } else {
-            return redirect()->to(base_url('capacity/databooking/' . $jarum))->withInput()->with('error', 'Gagal Cancel Booking');
+            return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('error', 'Gagal Cancel Booking');
         }
     }
 
@@ -559,6 +567,7 @@ class BookingController extends BaseController
         $bulan = array_keys($charts['details']);
         $jumlahPembatalan = array_values($charts['totals']);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Summary Cancel Booking',
             'active1' => '',
             'active2' => '',
@@ -573,7 +582,7 @@ class BookingController extends BaseController
             'jumlahPembatalan' => $jumlahPembatalan,
             'totalChart' => $charts['totals']
         ];
-        return view('Capacity/Booking/cancelbooking', $data);
+        return view(session()->get('role') . '/Booking/cancelbooking', $data);
     }
 
     public function detailcancelbooking($week, $buyer)
@@ -581,6 +590,7 @@ class BookingController extends BaseController
 
         $resultCancelBooking = $this->bookingModel->getDetailCancelBooking($week, $buyer);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Detail Cancel Booking',
             'active1' => '',
             'active2' => '',
@@ -591,7 +601,7 @@ class BookingController extends BaseController
             'active7' => '',
             'data' => $resultCancelBooking,
         ];
-        return view('Capacity/Booking/detailcancelbooking', $data);
+        return view(session()->get('role') . '/Booking/detailcancelbooking', $data);
     }
 
     public function getTurunOrder()
@@ -607,6 +617,7 @@ class BookingController extends BaseController
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
 
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -617,13 +628,14 @@ class BookingController extends BaseController
             'Jarum' => $dataJarum,
             'TotalMesin' => $totalMesin,
         ];
-        return view('Planning/Booking/booking', $data);
+        return view(session()->get('role') . '/Booking/booking', $data);
     }
 
     public function bookingPerBulanJarumPLan($jarum)
     {
         $bulan = $this->bookingModel->getbulan($jarum);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -635,13 +647,14 @@ class BookingController extends BaseController
             'bulan' => $bulan,
             'jarum' => $jarum,
         ];
-        return view('Planning/Booking/bookingbulan', $data);
+        return view(session()->get('role') . '/Booking/bookingbulan', $data);
     }
     public function bookingPerBulanJarumTampilPlan($bulan, $tahun, $jarum)
     {
         $booking = $this->bookingModel->getDataPerjarumbulan($bulan, $tahun, $jarum);
         $product = $this->productModel->getJarum($jarum);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -656,7 +669,7 @@ class BookingController extends BaseController
             'tahun' => $tahun,
             'jarum' => $jarum,
         ];
-        return view('Planning/Booking/jarumbulan', $data);
+        return view(session()->get('role') . '/Booking/jarumbulan', $data);
     }
     public function bookingPerJarumPLan($jarum)
     {
@@ -664,6 +677,7 @@ class BookingController extends BaseController
         $booking = $this->bookingModel->getDataPerjarum($jarum);
 
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -677,7 +691,7 @@ class BookingController extends BaseController
             'booking' => $booking
 
         ];
-        return view('Planning/Booking/jarum', $data);
+        return view(session()->get('role') . '/Booking/jarum', $data);
     }
     public function detailbookingPlan($idBooking)
     {
@@ -688,6 +702,7 @@ class BookingController extends BaseController
         $childOrder = $this->orderModel->getChild($idBooking);
         $childBooking = $this->bookingModel->getChild($idBooking);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -704,13 +719,14 @@ class BookingController extends BaseController
             'childBooking' => $childBooking
 
         ];
-        return view('Planning/Booking/detail', $data);
+        return view(session()->get('role') . '/Booking/detail', $data);
     }
     public function target()
     {
         $Jarum = $this->jarumModel->getJarum();
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Target',
             'active1' => '',
             'active2' => '',
@@ -722,7 +738,7 @@ class BookingController extends BaseController
             'Jarum' => $Jarum,
             'TotalMesin' => $totalMesin,
         ];
-        return view('Capacity/Target/index', $data);
+        return view(session()->get('role') . '/Target/index', $data);
     }
     public function targetjarum($jarum)
     {
@@ -731,6 +747,7 @@ class BookingController extends BaseController
             ->orderBy('id_product_type', 'asc')
             ->findAll();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Target by Needle',
             'active1' => '',
             'active2' => '',
@@ -742,7 +759,7 @@ class BookingController extends BaseController
             'product' => $product,
             'jarum' => $jarum
         ];
-        return view('Capacity/Target/target', $data);
+        return view(session()->get('role') . '/Target/target', $data);
     }
     public function edittarget()
     {
@@ -758,7 +775,7 @@ class BookingController extends BaseController
                 ->set('product_type', $product)
                 ->where('id_product_type', $id)
                 ->update();
-            return redirect()->to(base_url('capacity/datatargetjarum/' . $jarum))->withInput()->with('success', 'Data Has Been Updated');
+            return redirect()->to(base_url(session()->get('role') . '/datatargetjarum/' . $jarum))->withInput()->with('success', 'Data Has Been Updated');
         }
     }
     public function addtarget()
@@ -776,9 +793,9 @@ class BookingController extends BaseController
         ];
         $insert =   $this->productModel->insert($input);
         if ($insert) {
-            return redirect()->to(base_url('capacity/datatargetjarum/' . $jarum))->withInput()->with('success', 'Data Berhasil Diinput');
+            return redirect()->to(base_url(session()->get('role') . '/datatargetjarum/' . $jarum))->withInput()->with('success', 'Data Berhasil Diinput');
         } else {
-            return redirect()->to(base_url('capacity/datatargetjarum/' . $jarum))->withInput()->with('error', 'Data Gagal Diinput');
+            return redirect()->to(base_url(session()->get('role') . '/datatargetjarum/' . $jarum))->withInput()->with('error', 'Data Gagal Diinput');
         }
     }
     public function deletetarget()
@@ -787,9 +804,9 @@ class BookingController extends BaseController
         $jarum = $this->request->getPost("jarum");
         $del = $this->productModel->delete($id);
         if ($del) {
-            return redirect()->to(base_url('capacity/datatargetjarum/' . $jarum))->withInput()->with('success', 'Data Berhasil Dihapus');
+            return redirect()->to(base_url(session()->get('role') . '/datatargetjarum/' . $jarum))->withInput()->with('success', 'Data Berhasil Dihapus');
         } else {
-            return redirect()->to(base_url('capacity/datatargetjarum/' . $jarum))->withInput()->with('error', 'Data Gagal Dihapus');
+            return redirect()->to(base_url(session()->get('role') . '/datatargetjarum/' . $jarum))->withInput()->with('error', 'Data Gagal Dihapus');
         }
     }
     public function getTypebyJarum()
@@ -814,7 +831,7 @@ class BookingController extends BaseController
                 ->update();
             $this->cancelModel->where('id_booking', $id)
                 ->delete();
-            return redirect()->to(base_url('capacity/cancelBooking/'))->withInput()->with('success', 'Data Uncancel Success');
+            return redirect()->to(base_url(session()->get('role') . '/cancelBooking/'))->withInput()->with('success', 'Data Uncancel Success');
         }
     }
 }

@@ -55,6 +55,7 @@ class ProduksiController extends BaseController
         $totalMesin = $this->jarumModel->getArea();
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Produksi',
             'active1' => '',
             'active2' => 'active',
@@ -75,6 +76,7 @@ class ProduksiController extends BaseController
         $bulan = date('m');
         $produksi = $this->produksiModel->getProduksi($area, $bulan);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Produksi',
             'active1' => '',
             'active2' => '',
@@ -110,7 +112,7 @@ class ProduksiController extends BaseController
                 $rowIndex = $row->getRowIndex();
                 $cellIterator = $row->getCellIterator();
                 $cellIterator->setIterateOnlyExistingCells(false);
-                $data = [];
+                $data = ['role' => session()->get('role'),];
                 foreach ($cellIterator as $cell) {
                     $data[] = $cell->getValue();
                 }
@@ -306,6 +308,7 @@ class ProduksiController extends BaseController
         }
 
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Produksi',
             'active1' => '',
             'active2' => '',
@@ -351,6 +354,7 @@ class ProduksiController extends BaseController
         }
 
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Produksi',
             'active1' => '',
             'active2' => '',

@@ -1,6 +1,6 @@
 <?php ini_set('display_errors', 1);
 error_reporting(E_ALL); ?>
-<?php $this->extend('Planning/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -37,7 +37,7 @@ error_reporting(E_ALL); ?>
                         </h5>
                     </div>
                     <div>
-                        <a href="<?= base_url('planning/semuaOrder/') ?>" class="btn bg-gradient-info"> Kembali</a>
+                        <a href="<?= base_url($role . '/semuaOrder/') ?>" class="btn bg-gradient-info"> Kembali</a>
                         <button type="button" class="btn bg-gradient-warning btn-assign" data-toggle="modal" data-target="#ModalAssign"> Arahkan Ke Areal</button>
                     </div>
                 </div>
@@ -114,7 +114,7 @@ error_reporting(E_ALL); ?>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form action="<?= base_url('planning/assignareal') ?>" method="post">
+                        <form action="<?= base_url($role . '/assignareal') ?>" method="post">
                             <input type="text" name="no_model" id="" hidden value="<?= $noModel ?>">
                             <div id="confirmationMessage"></div>
                             <div class="form-group">
@@ -159,7 +159,7 @@ error_reporting(E_ALL); ?>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form action="<?= base_url('planning/assignarealall') ?>" method="post">
+                        <form action="<?= base_url($role . '/assignarealall') ?>" method="post">
                             <input type="text" name="no_model" id="" hidden value="<?= $noModel ?>">
                             <div id="confirmationMessage"></div>
                             <div class="form-group">

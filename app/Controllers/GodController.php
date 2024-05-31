@@ -45,7 +45,7 @@ class GodController extends BaseController
         $this->aksesModel = new AksesModel();
         $this->userModel = new UserModel();
         $this->areaModel = new AreaModel();
-        if ($this->filters   = ['role' => ['capacity', 'planning', 'god']] != session()->get('role')) {
+        if ($this->filters   = ['role' => ['capacity', 'planning', 'god', 'sudo']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
         $this->isLogedin();

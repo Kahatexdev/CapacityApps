@@ -1,4 +1,4 @@
-<?php $this->extend('Aps/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 
 <div class="container-fluid py-4">
@@ -85,10 +85,10 @@
                                     <td class="text-xs">
                                         <?php if ($bk['status'] == 'Cancel Booking') : ?>
                                             <!-- If qty is null, set action to Import -->
-                                            <a href="<?= base_url('aps/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-secondary btn-sm text-xxs">detail</a>
+                                            <a href="<?= base_url($role . '/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-secondary btn-sm text-xxs">detail</a>
                                         <?php else : ?>
                                             <!-- If qty is not null, set action to Details -->
-                                            <a href="<?= base_url('aps/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm text-xxs">detail</a>
+                                            <a href="<?= base_url($role . '/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm text-xxs">detail</a>
                                         <?php endif; ?>
 
                                     </td>

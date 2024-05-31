@@ -58,6 +58,7 @@ class ApsPerstyleModel extends Model
             ->where('size', $validate['size'])
             ->where('country', $validate['country'])
             ->where('delivery', $validate['delivery'])
+            ->where('qty', $validate['qty'])
             ->get()
             ->getRow();
         return $result;

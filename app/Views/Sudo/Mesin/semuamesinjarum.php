@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
@@ -31,7 +31,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form action="<?= base_url('capacity/inputOrder') ?>" method="post">
+                            <form action="<?= base_url($role . '/inputOrder') ?>" method="post">
                                 <div class="form-group">
                                     <label for="tgl-bk-form-label">Tanggal Turun Order</label>
                                     <input type="date" class="form-control" name="tgl_turun">
@@ -97,7 +97,7 @@
                                             </button>
                                         <?php else : ?>
                                             <!-- If qty is not null, set action to Details -->
-                                            <a href="<?= base_url('capacity/detailmodeljarum/' . $order->no_model . '/' . $order->delivery . '/' . $order->machinetypeid); ?>" <button type="button" class="btn btn-info btn-sm details-btn">
+                                            <a href="<?= base_url($role . '/detailmodeljarum/' . $order->no_model . '/' . $order->delivery . '/' . $order->machinetypeid); ?>" <button type="button" class="btn btn-info btn-sm details-btn">
                                                 Details
                                                 </button>
                                             </a>
@@ -162,7 +162,7 @@
                     <div class="row mt-2">
                         <div class="col-9 pl-0">
 
-                            <form action="<?= base_url('capacity/importModel') ?>" id="modalForm" method="POST" enctype="multipart/form-data">
+                            <form action="<?= base_url($role . '/importModel') ?>" id="modalForm" method="POST" enctype="multipart/form-data">
                                 <input type="text" class="form-control" name="id_model" hidden>
                                 <input type="text" class="form-control" name="no_model" hidden>
                                 <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control ">

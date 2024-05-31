@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Models\AksesModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\DataMesinModel;
 use App\Models\OrderModel;
@@ -12,6 +13,7 @@ use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use App\Models\CylinderModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+
 
 class MesinController extends BaseController
 {
@@ -23,9 +25,11 @@ class MesinController extends BaseController
     protected $orderModel;
     protected $ApsPerstyleModel;
     protected $cylinderModel;
+    protected $aksesModel;
 
     public function __construct()
     {
+        $this->aksesModel = new AksesModel();
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
@@ -33,7 +37,7 @@ class MesinController extends BaseController
         $this->orderModel = new OrderModel();
         $this->cylinderModel = new cylinderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
-        if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
+        if ($this->filters   = ['role' => ['capacity'], 'god', 'sudo'] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
         $this->isLogedin();
@@ -47,6 +51,7 @@ class MesinController extends BaseController
     public function index()
     {
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Mesin',
             'active1' => '',
             'active2' => '',
@@ -56,12 +61,13 @@ class MesinController extends BaseController
             'active6' => '',
             'active7' => '',
         ];
-        return view('Capacity/Mesin/Mastermesin', $data);
+        return view(session()->get('role') . '/Mesin/Mastermesin', $data);
     }
     public function mesinPerJarum($pu)
     {
         $totalMesin = $this->jarumModel->getTotalMesinByJarum2($pu);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Mesin',
             'active1' => '',
             'active2' => '',
@@ -73,12 +79,13 @@ class MesinController extends BaseController
             'pu' => $pu,
             'TotalMesin' => $totalMesin,
         ];
-        return view('Capacity/Mesin/mesinjarum', $data);
+        return view(session()->get('role') . '/Mesin/mesinjarum', $data);
     }
     public function mesinPerJarumPlan($pu)
     {
         $totalMesin = $this->jarumModel->getTotalMesinByJarum2($pu);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Mesin',
             'active1' => '',
             'active2' => '',
@@ -90,12 +97,13 @@ class MesinController extends BaseController
             'pu' => $pu,
             'TotalMesin' => $totalMesin,
         ];
-        return view('Planning/Mesin/mesinjarum', $data);
+        return view(session()->get('role') . '/Mesin/mesinjarum', $data);
     }
     public function stockcylinder()
     {
         $totalCylinder = $this->cylinderModel->findAll();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Cylinder',
             'active1' => '',
             'active2' => '',
@@ -106,12 +114,13 @@ class MesinController extends BaseController
             'active7' => '',
             'tampildata' => $totalCylinder,
         ];
-        return view('Capacity/Mesin/dataCylinder', $data);
+        return view(session()->get('role') . '/Mesin/dataCylinder', $data);
     }
     public function stockcylinderPlan()
     {
         $totalCylinder = $this->cylinderModel->findAll();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Cylinder',
             'active1' => '',
             'active2' => '',
@@ -122,13 +131,14 @@ class MesinController extends BaseController
             'active7' => '',
             'tampildata' => $totalCylinder,
         ];
-        return view('Planning/Mesin/dataCylinder', $data);
+        return view(session()->get('role') . '/Mesin/dataCylinder', $data);
     }
     public function mesinperarea($pu)
     {
         $tampilperarea = $this->jarumModel->getArea2($pu);
         $product = $this->productModel->findAll();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Mesin',
             'active1' => '',
             'active2' => '',
@@ -141,12 +151,13 @@ class MesinController extends BaseController
             'product' => $product,
 
         ];
-        return view('Capacity/Mesin/mesinarea', $data);
+        return view(session()->get('role') . '/Mesin/mesinarea', $data);
     }
     public function allmachine()
     {
         $tampilperarea = $this->jarumModel->getAllMachine();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Mesin',
             'active1' => '',
             'active2' => '',
@@ -157,12 +168,13 @@ class MesinController extends BaseController
             'active7' => '',
             'tampildata' => $tampilperarea,
         ];
-        return view('Capacity/Mesin/allmesin', $data);
+        return view(session()->get('role') . '/Mesin/allmesin', $data);
     }
     public function allmachinePlan()
     {
         $tampilperarea = $this->jarumModel->getAllMachine();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Mesin',
             'active1' => '',
             'active2' => '',
@@ -173,12 +185,13 @@ class MesinController extends BaseController
             'active7' => '',
             'tampildata' => $tampilperarea,
         ];
-        return view('Planning/Mesin/allmesin', $data);
+        return view(session()->get('role') . '/Mesin/allmesin', $data);
     }
     public function DetailMesinPerJarum($jarum, $pu)
     {
         $tampilperarea = $this->jarumModel->getMesinPerJarum($jarum, $pu);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Mesin',
             'active1' => '',
             'active2' => '',
@@ -192,13 +205,14 @@ class MesinController extends BaseController
             'tampildata' => $tampilperarea,
         ];
 
-        return view('Capacity/Mesin/detailMesinJarum', $data);
+        return view(session()->get('role') . '/Mesin/detailMesinJarum', $data);
     }
     public function DetailMesinPerArea($area)
     {
         $tampilperarea = $this->jarumModel->getJarumArea($area);
         $getPU = $this->jarumModel->getpu($area);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Mesin',
             'active1' => '',
             'active2' => '',
@@ -212,7 +226,7 @@ class MesinController extends BaseController
             'tampildata' => $tampilperarea,
         ];
 
-        return view('Capacity/Mesin/detailMesinArea', $data);
+        return view(session()->get('role') . '/Mesin/detailMesinArea', $data);
     }
     public function inputmesinperarea()
     {
@@ -232,9 +246,9 @@ class MesinController extends BaseController
 
         $insert =   $this->jarumModel->insert($input);
         if ($insert) {
-            return redirect()->to(base_url('/capacity/datamesinperjarum/' . $area))->withInput()->with('success', 'Data Berhasil Di Input');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperjarum/' . $area))->withInput()->with('success', 'Data Berhasil Di Input');
         } else {
-            return redirect()->to(base_url('/capacity/datamesinperjarum/' . $area))->withInput()->with('error', 'Data Gagal Di Input');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperjarum/' . $area))->withInput()->with('error', 'Data Gagal Di Input');
         }
     }
     public function inputcylinder()
@@ -255,15 +269,16 @@ class MesinController extends BaseController
 
         $insert =   $this->cylinderModel->insert($input);
         if ($insert) {
-            return redirect()->to(base_url('/capacity/stockcylinder/'))->withInput()->with('success', 'Data Berhasil Di Input');
+            return redirect()->to(base_url(session()->get('role') . '/stockcylinder/'))->withInput()->with('success', 'Data Berhasil Di Input');
         } else {
-            return redirect()->to(base_url('/capacity/stockcylinder/'))->withInput()->with('error', 'Data Gagal Di Input');
+            return redirect()->to(base_url(session()->get('role') . '/stockcylinder/'))->withInput()->with('error', 'Data Gagal Di Input');
         }
     }
     public function editcylinder($idDataCylinder)
     {
 
         $data = [
+            'role' => session()->get('role'),
             'needle' => $this->request->getPost("needle"),
             'production_unit' => $this->request->getPost("production_unit"),
             'type_machine' => $this->request->getPost("type_machine"),
@@ -273,9 +288,9 @@ class MesinController extends BaseController
         $id = $idDataCylinder;
         $update = $this->cylinderModel->update($id, $data);
         if ($update) {
-            return redirect()->to(base_url('capacity/stockcylinder/'))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->to(base_url(session()->get('role') . '/stockcylinder/'))->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url('capacity/stockcylinder/'))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->to(base_url(session()->get('role') . '/stockcylinder/'))->withInput()->with('error', 'Gagal Update Data');
         }
     }
     public function inputcylinderPlan()
@@ -296,15 +311,16 @@ class MesinController extends BaseController
 
         $insert =   $this->cylinderModel->insert($input);
         if ($insert) {
-            return redirect()->to(base_url('/planning/stockcylinder/'))->withInput()->with('success', 'Data Berhasil Di Input');
+            return redirect()->to(base_url(session()->get('role') . '/stockcylinder/'))->withInput()->with('success', 'Data Berhasil Di Input');
         } else {
-            return redirect()->to(base_url('/planning/stockcylinder/'))->withInput()->with('error', 'Data Gagal Di Input');
+            return redirect()->to(base_url(session()->get('role') . '/stockcylinder/'))->withInput()->with('error', 'Data Gagal Di Input');
         }
     }
     public function editcylinderPlan($idDataCylinder)
     {
 
         $data = [
+            'role' => session()->get('role'),
             'needle' => $this->request->getPost("needle"),
             'production_unit' => $this->request->getPost("production_unit"),
             'type_machine' => $this->request->getPost("type_machine"),
@@ -314,15 +330,16 @@ class MesinController extends BaseController
         $id = $idDataCylinder;
         $update = $this->cylinderModel->update($id, $data);
         if ($update) {
-            return redirect()->to(base_url('planning/stockcylinder/'))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->to(base_url(session()->get('role') . '/stockcylinder/'))->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url('planning/stockcylinder/'))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->to(base_url(session()->get('role') . '/stockcylinder/'))->withInput()->with('error', 'Gagal Update Data');
         }
     }
     public function updatemesinperjarum($idDataMesin)
     {
 
         $data = [
+            'role' => session()->get('role'),
             'total_mesin' => $this->request->getPost("total_mc"),
             'brand' => $this->request->getPost("brand"),
             'mesin_jalan' => $this->request->getPost("mesin_jalan"),
@@ -331,36 +348,36 @@ class MesinController extends BaseController
         $update = $this->jarumModel->update($id, $data);
         $area = $this->request->getPost("area");
         if ($update) {
-            return redirect()->to(base_url('capacity/datamesinperjarum/' . $area))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperjarum/' . $area))->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url('capacity/datamesinperjarum/' . $area))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperjarum/' . $area))->withInput()->with('error', 'Gagal Update Data');
         }
     }
     public function deletemesinareal($idDataMesin)
     {
         $delete = $this->jarumModel->delete($idDataMesin);
         if ($delete) {
-            return redirect()->to(base_url('capacity/datamesin'))->withInput()->with('success', 'Data Berhasil Di Hapus');
+            return redirect()->to(base_url(session()->get('role') . '/datamesin'))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
-            return redirect()->to(base_url('capacity/datamesin'))->withInput()->with('error', 'Gagal Hapus Data');
+            return redirect()->to(base_url(session()->get('role') . '/datamesin'))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
     public function deletecylinder($idDataCylinder)
     {
         $delete = $this->cylinderModel->delete($idDataCylinder);
         if ($delete) {
-            return redirect()->to(base_url('capacity/stockcylinder'))->withInput()->with('success', 'Data Berhasil Di Hapus');
+            return redirect()->to(base_url(session()->get('role') . '/stockcylinder'))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
-            return redirect()->to(base_url('capacity/stockcylinder'))->withInput()->with('error', 'Gagal Hapus Data');
+            return redirect()->to(base_url(session()->get('role') . '/stockcylinder'))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
     public function deletecylinderPlan($idDataCylinder)
     {
         $delete = $this->cylinderModel->delete($idDataCylinder);
         if ($delete) {
-            return redirect()->to(base_url('planning/stockcylinder'))->withInput()->with('success', 'Data Berhasil Di Hapus');
+            return redirect()->to(base_url(session()->get('role') . '/stockcylinder'))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
-            return redirect()->to(base_url('planning/stockcylinder'))->withInput()->with('error', 'Gagal Hapus Data');
+            return redirect()->to(base_url(session()->get('role') . '/stockcylinder'))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
 
@@ -368,6 +385,7 @@ class MesinController extends BaseController
     public function indexPlan()
     {
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Mesin',
             'active1' => '',
             'active2' => '',
@@ -377,13 +395,14 @@ class MesinController extends BaseController
             'active6' => '',
             'active7' => '',
         ];
-        return view('Planning/Mesin/index', $data);
+        return view(session()->get('role') . '/Mesin/index', $data);
     }
     public function mesinperareaPlan($pu)
     {
         $tampilperarea = $this->jarumModel->getArea2($pu);
         $product = $this->productModel->findAll();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Mesin',
             'active1' => '',
             'active2' => '',
@@ -396,13 +415,35 @@ class MesinController extends BaseController
             'product' => $product,
 
         ];
-        return view('Planning/Mesin/mesinarea', $data);
+        return view(session()->get('role') . '/Mesin/mesinarea', $data);
+    }
+    public function mesinperareaAps()
+    {
+        $id = session()->get('id_user');
+        $area = $this->aksesModel->getArea($id);
+        $product = $this->productModel->findAll();
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Mesin',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => 'active',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'tampildata' => $area,
+            'product' => $product,
+
+        ];
+        return view(session()->get('role') . '/Mesin/mesinarea', $data);
     }
     public function DetailMesinPerAreaPlan($area)
     {
         $tampilperarea = $this->jarumModel->getJarumArea($area);
         $getPU = $this->jarumModel->getpu($area);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Mesin',
             'active1' => '',
             'active2' => '',
@@ -416,12 +457,13 @@ class MesinController extends BaseController
             'tampildata' => $tampilperarea,
         ];
 
-        return view('Planning/Mesin/detailMesinArea', $data);
+        return view(session()->get('role') . '/Mesin/detailMesinArea', $data);
     }
     public function updatemesinperjarumPlan($idDataMesin)
     {
 
         $data = [
+            'role' => session()->get('role'),
             'total_mesin' => $this->request->getPost("total_mc"),
             'brand' => $this->request->getPost("brand"),
             'mesin_jalan' => $this->request->getPost("mesin_jalan"),
@@ -430,18 +472,18 @@ class MesinController extends BaseController
         $update = $this->jarumModel->update($id, $data);
         $area = $this->request->getPost("area");
         if ($update) {
-            return redirect()->to(base_url('planning/datamesinperarea/' . $area))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url('planning/datamesinperarea/' . $area))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('error', 'Gagal Update Data');
         }
     }
     public function deletemesinarealPlan($idDataMesin)
     {
         $delete = $this->jarumModel->delete($idDataMesin);
         if ($delete) {
-            return redirect()->to(base_url('planning/datamesinPlan'))->withInput()->with('success', 'Data Berhasil Di Hapus');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinPlan'))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
-            return redirect()->to(base_url('planning/datamesinPlan'))->withInput()->with('error', 'Gagal Hapus Data');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinPlan'))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
     public function inputmesinperareaPlan()
@@ -462,15 +504,16 @@ class MesinController extends BaseController
 
         $insert =   $this->jarumModel->insert($input);
         if ($insert) {
-            return redirect()->to(base_url('/planning/datamesinperjarum/' . $area))->withInput()->with('success', 'Data Berhasil Di Input');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperjarum/' . $area))->withInput()->with('success', 'Data Berhasil Di Input');
         } else {
-            return redirect()->to(base_url('/planning/datamesinperjarum/' . $area))->withInput()->with('error', 'Data Gagal Di Input');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperjarum/' . $area))->withInput()->with('error', 'Data Gagal Di Input');
         }
     }
     public function DetailMesinPerJarumPlan($jarum, $pu)
     {
         $tampilperarea = $this->jarumModel->getMesinPerJarum($jarum, $pu);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Mesin',
             'active1' => '',
             'active2' => '',
@@ -484,6 +527,6 @@ class MesinController extends BaseController
             'tampildata' => $tampilperarea,
         ];
 
-        return view('Planning/Mesin/detailMesinJarum', $data);
+        return view(session()->get('role') . '/Mesin/detailMesinJarum', $data);
     }
 }

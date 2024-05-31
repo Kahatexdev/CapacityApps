@@ -60,7 +60,8 @@ class CalendarController extends BaseController
         $kebutuhanMC = $this->kebMc->getOrder();
         $stopMc = 0;
         $data = [
-            'title' => 'Planning Order',
+            'role' => session()->get('role'),
+            'title' => session()->get('role') . ' Order',
             'active1' => '',
             'active2' => '',
             'active3' => '',
@@ -74,7 +75,7 @@ class CalendarController extends BaseController
             'kebutuhanMc' => $kebutuhanMC,
             'stopMc' => $stopMc,
         ];
-        return view('Capacity/Calendar/index', $data);
+        return view(session()->get('role') . '/Calendar/index', $data);
     }
     public function planningBooking()
     {
@@ -83,7 +84,8 @@ class CalendarController extends BaseController
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $kebutuhanMC = $this->kebMc->getBooking();
         $data = [
-            'title' => 'Planning Booking',
+            'role' => session()->get('role'),
+            'title' => session()->get('role') . ' Booking',
             'active1' => '',
             'active2' => '',
             'active3' => '',
@@ -96,7 +98,7 @@ class CalendarController extends BaseController
             'DaftarLibur' => $holidays,
             'kebutuhanMc' => $kebutuhanMC
         ];
-        return view('Capacity/Calendar/booking', $data);
+        return view(session()->get('role') . '/Calendar/booking', $data);
     }
     public function planOrder($jarum)
     {
@@ -252,6 +254,7 @@ class CalendarController extends BaseController
         }
         $stopmc = max(array_column($KebMesin, 'stopmc'));
         $data = [
+            'role' => session()->get('role'),
             'active1' => '',
             'active2' => '',
             'active3' => '',
@@ -267,11 +270,11 @@ class CalendarController extends BaseController
             'end' => $akhir,
             'jarum' => $jarum,
             'jmlHari' => $maxHari,
-            'title' => 'Planning Order',
+            'title' => session()->get('role') . ' Order',
             'stopmc' => $stopmc,
             'desk' => 'ORDER',
         ];
-        return view('Capacity/Calendar/calendar', $data);
+        return view(session()->get('role') . '/Calendar/calendar', $data);
     }
     public function planBooking($jarum)
     {
@@ -428,7 +431,8 @@ class CalendarController extends BaseController
         $kategori = $this->productModel->getKategori();
 
         $data = [
-            'title' => 'Capacity System',
+            'role' => session()->get('role'),
+            'title' => session()->get('role') . ' System',
             'active1' => '',
             'active2' => '',
             'active3' => '',
@@ -448,7 +452,7 @@ class CalendarController extends BaseController
             'stopmc' => $stopmc,
             'desk' => 'BOOKING',
         ];
-        return view('Capacity/Calendar/calendar', $data);
+        return view(session()->get('role') . '/Calendar/calendar', $data);
     }
 
     private function hitungKebutuhanMC($get, $type)
@@ -534,14 +538,15 @@ class CalendarController extends BaseController
         $tanggal = $this->request->getPost('tgl_libur');
         $nama = $this->request->getPost('nama');
         $data = [
+            'role' => session()->get('role'),
             'tanggal' => $tanggal,
             'nama' => $nama
         ];
         $insert = $this->liburModel->insert($data);
         if ($insert) {
-            return redirect()->to(base_url('/capacity/Calendar'))->withInput()->with('success', 'Tanggal Berhasil Di Input');
+            return redirect()->to(base_url(session()->get('role') . '/Calendar'))->withInput()->with('success', 'Tanggal Berhasil Di Input');
         } else {
-            return redirect()->to(base_url('/capacity/Calendar'))->withInput()->with('error', 'Gagal Input Tanggal');
+            return redirect()->to(base_url(session()->get('role') . '/Calendar'))->withInput()->with('error', 'Gagal Input Tanggal');
         }
     }
 
@@ -572,7 +577,8 @@ class CalendarController extends BaseController
             $jumlahMc += (int)$val['mesin'];
         }
         $data = [
-            'planning' => $groupedData,
+            'role' => session()->get('role'),
+            session()->get('role') . '' => $groupedData,
             'jumlahMc' => $jumlahMc,
             'judul' => $judul,
             'range' => $range,
@@ -591,7 +597,7 @@ class CalendarController extends BaseController
             'kebutuhanMc' => $kebutuhanMC,
             'chartstat' => $planning
         ];
-        return view('Capacity/Calendar/detail', $data);
+        return view(session()->get('role') . '/Calendar/detail', $data);
     }
     public function detailPlanningbook($judul)
     {
@@ -618,7 +624,8 @@ class CalendarController extends BaseController
             $jumlahMc += (int)$val['mesin'];
         }
         $data = [
-            'planning' => $groupedData,
+            'role' => session()->get('role'),
+            session()->get('role') . '' => $groupedData,
             'jumlahMc' => $jumlahMc,
             'judul' => $judul,
             'range' => $range,
@@ -637,6 +644,6 @@ class CalendarController extends BaseController
             'kebutuhanMc' => $kebutuhanMC,
             'chartstat' => $planning
         ];
-        return view('Capacity/Calendar/detailbook', $data);
+        return view(session()->get('role') . '/Calendar/detailbook', $data);
     }
 }

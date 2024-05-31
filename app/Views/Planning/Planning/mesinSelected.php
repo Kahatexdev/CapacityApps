@@ -15,7 +15,7 @@ if ($mesin != 0) { // Avoid division by zero error
 ?>
 <?php ini_set('display_errors', 1);
 error_reporting(E_ALL); ?>
-<?php $this->extend('Planning/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -47,15 +47,15 @@ error_reporting(E_ALL); ?>
             <div class="card">
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
-                    <h5>
-                        List Data Machine Choosen by Needle <strong style="color: orange;"><?= $jarum ?></strong>
-                    </h5>
-                    <h5>
-                        Title <strong style="color: orange;"><?= $judul ?></strong>
-                    </h5>
-                    <h5>
-                        Machine Requirement <strong style="color: orange;"><?= $mesin ?></strong>
-                    </h5>
+                        <h5>
+                            List Data Machine Choosen by Needle <strong style="color: orange;"><?= $jarum ?></strong>
+                        </h5>
+                        <h5>
+                            Title <strong style="color: orange;"><?= $judul ?></strong>
+                        </h5>
+                        <h5>
+                            Machine Requirement <strong style="color: orange;"><?= $mesin ?></strong>
+                        </h5>
                     </div>
                     <div>
                         <h4 class="card-title">Machine Utilization: <?= number_format($percentage, 2); ?>%</h4>
@@ -85,7 +85,7 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm"><?= $order['total_mc']; ?> Mc</td>
                                             <td class="text-sm"><?= $order['mesin_jalan']; ?> Mc</td>
                                             <td class="text-sm"><strong class="font-weight-bold" style="color: green;"><?= $order['mc_nyala']; ?> Mc</strong></td>
-                                            <?php 
+                                            <?php
                                             $percentage = ($order['mc_nyala'] / $order['total_mc']) * 100; // Calculate percentage
                                             ?>
                                             <td class="text-sm"><strong class="font-weight-bold" style="color: green;"><?= number_format($percentage, 2); ?> %</strong></td>
@@ -106,7 +106,7 @@ error_reporting(E_ALL); ?>
                     </div>
                 </div>
             </div>
-        </div>       
+        </div>
         <script>
             $(document).ready(function() {
                 $('#dataTable').DataTable();

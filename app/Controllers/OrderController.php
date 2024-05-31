@@ -23,19 +23,22 @@ class OrderController extends BaseController
     protected $orderModel;
     protected $ApsPerstyleModel;
     protected $liburModel;
+    protected $roleSession;
 
     public function __construct()
     {
+        session();
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
         $this->produksiModel = new ProduksiModel();
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
-        if ($this->filters   = ['role' => ['capacity', 'planning', 'aps', 'god']] != session()->get('role')) {
+        if ($this->filters   = ['role' => ['capacity',  'planning', 'aps', 'god']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
         $this->isLogedin();
+        $this->roleSession =  session()->get('role');
     }
     protected function isLogedin()
     {
@@ -45,8 +48,10 @@ class OrderController extends BaseController
     }
     public function order()
     {
+        $role = session()->get('role');
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -56,8 +61,9 @@ class OrderController extends BaseController
             'active6' => '',
             'active7' => '',
             'TotalMesin' => $totalMesin,
+            'role' => $role
         ];
-        return view('Capacity/Order/ordermaster', $data);
+        return view($role . '/Order/ordermaster', $data);
     }
 
 
@@ -65,7 +71,10 @@ class OrderController extends BaseController
     {
         $pdkProgress = $this->ApsPerstyleModel->getProgress($noModel);
         $dataApsPerstyle = $this->ApsPerstyleModel->detailModel($noModel, $delivery); // Call the model method
+        $role = session()->get('role');
+
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -77,15 +86,20 @@ class OrderController extends BaseController
             'dataAps' => $dataApsPerstyle,
             'noModel' => $noModel,
             'delivery' => $delivery,
-            'progress' => $pdkProgress
+            'progress' => $pdkProgress,
+            'role' => $role
+
         ];
-        return view('Capacity/Order/detailOrder', $data);
+        return view(session()->get('role') . '/Order/detailOrder', $data);
     }
 
     public function semuaOrder()
     {
+        $role = session()->get('role');
+
         $product = $this->productModel->findAll();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -95,8 +109,10 @@ class OrderController extends BaseController
             'active6' => '',
             'active7' => '',
             'product' => $product,
+            'role' => $role
+
         ];
-        return view('Capacity/Order/semuaorder', $data);
+        return view($role . '/Order/semuaorder', $data);
     }
 
     public function tampilPerdelivery()
@@ -135,9 +151,12 @@ class OrderController extends BaseController
 
     public function belumImport()
     {
+        $role = session()->get('role');
+
         $tampilperdelivery = $this->orderModel->tampilbelumImport();
         $product = $this->productModel->findAll();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -148,15 +167,20 @@ class OrderController extends BaseController
             'active7' => '',
             'tampildata' => $tampilperdelivery,
             'product' => $product,
+            'role' => $role
+
 
         ];
-        return view('Capacity/Order/semuaorder2', $data);
+        return view($role . '/Order/semuaorder2', $data);
     }
 
     public function orderPerJarum()
     {
+        $role = session()->get('role');
+
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -166,13 +190,16 @@ class OrderController extends BaseController
             'active6' => '',
             'active7' => '',
             'TotalMesin' => $totalMesin,
+            'role' => $role
+
         ];
-        return view('Capacity/Order/orderjarum', $data);
+        return view(session()->get('role') . '/Order/orderjarum', $data);
     }
     public function orderPerJarumBln()
     {
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -183,7 +210,7 @@ class OrderController extends BaseController
             'active7' => '',
             'TotalMesin' => $totalMesin,
         ];
-        return view('Capacity/Order/orderjarumbln', $data);
+        return view(session()->get('role') . '/Order/orderjarumbln', $data);
     }
 
     public function detailmodeljarum($noModel, $delivery, $jarum)
@@ -191,6 +218,7 @@ class OrderController extends BaseController
         $apsPerstyleModel = new ApsPerstyleModel(); // Create an instance of the model
         $dataApsPerstyle = $apsPerstyleModel->detailModelJarum($noModel, $delivery, $jarum); // Call the model method
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -205,7 +233,7 @@ class OrderController extends BaseController
             'delivery' => $delivery,
         ];
 
-        return view('Capacity/Order/detailModelJarum', $data);
+        return view(session()->get('role') . '/Order/detailModelJarum', $data);
     }
     public function detailmodeljarumPlan($noModel, $delivery, $jarum)
     {
@@ -214,6 +242,7 @@ class OrderController extends BaseController
         $area = new AreaModel();
         $dataArea = $area->findALl();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -229,7 +258,7 @@ class OrderController extends BaseController
             'area' => $dataArea
         ];
 
-        return view('Planning/Order/detailModelJarum', $data);
+        return view(session()->get('role') . '/Order/detailModelJarum', $data);
     }
 
 
@@ -240,6 +269,7 @@ class OrderController extends BaseController
         $product = $this->productModel->findAll();
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $booking = $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -254,7 +284,7 @@ class OrderController extends BaseController
             'jenisJarum' => $totalMesin,
 
         ];
-        return view('Capacity/Order/semuaorderjarum', $data);
+        return view(session()->get('role') . '/Order/semuaorderjarum', $data);
     }
 
     public function DetailOrderPerJarumBlnDetail($bulan, $tahun, $jarum)
@@ -262,6 +292,7 @@ class OrderController extends BaseController
         $tampilperdelivery = $this->orderModel->tampilPerjarumBulan($bulan, $tahun, $jarum);
         $product = $this->productModel->findAll();
         $booking = $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -275,7 +306,7 @@ class OrderController extends BaseController
             'product' => $product,
 
         ];
-        return view('Capacity/Order/semuaorderjarum', $data);
+        return view(session()->get('role') . '/Order/semuaorderjarum', $data);
     }
 
     public function DetailOrderPerJarumBln($jarum)
@@ -283,6 +314,7 @@ class OrderController extends BaseController
         $bulan = $this->ApsPerstyleModel->getBulan($jarum);
         $product = $this->productModel->findAll();
         $booking = $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -296,13 +328,14 @@ class OrderController extends BaseController
             'product' => $product,
 
         ];
-        return view('Capacity/Order/orderjarumblngroup', $data);
+        return view(session()->get('role') . '/Order/orderjarumblngroup', $data);
     }
     public function DetailOrderPerJarumPlan($jarum)
     {
         $tampilperdelivery = $this->orderModel->tampilPerjarum($jarum);
         $product = $this->productModel->findAll();
         $booking = $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -316,13 +349,14 @@ class OrderController extends BaseController
             'product' => $product,
 
         ];
-        return view('Planning/Order/semuaorderjarum', $data);
+        return view(session()->get('role') . '/Order/semuaorderjarum', $data);
     }
     public function DetailOrderPerAreaPlan($area)
     {
         $tampilperdelivery = $this->orderModel->tampilPerarea($area);
         $product = $this->productModel->findAll();
         $booking = $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -336,12 +370,13 @@ class OrderController extends BaseController
             'product' => $product,
 
         ];
-        return view('Planning/Order/semuaorderarea', $data);
+        return view(session()->get('role') . '/Order/semuaorderarea', $data);
     }
     public function updateorder($idOrder)
     {
 
         $data = [
+            'role' => session()->get('role'),
             'mastermodel' => $this->request->getPost("no_model"),
             'size' =>  $this->request->getPost("style"),
             'delivery' => $this->request->getPost("delivery"),
@@ -356,15 +391,16 @@ class OrderController extends BaseController
         $modl = $this->request->getPost("no_model");
         $del = $this->request->getPost("delivery");
         if ($update) {
-            return redirect()->to(base_url('capacity/detailmodel/' . $modl . '/' . $del))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->to(base_url(session()->get('role') . '/detailmodel/' . $modl . '/' . $del))->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url('capacity/detailmodel/' . $modl . '/' . $del))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->to(base_url(session()->get('role') . '/detailmodel/' . $modl . '/' . $del))->withInput()->with('error', 'Gagal Update Data');
         }
     }
     public function updateorderjarum($idOrder)
     {
 
         $data = [
+            'role' => session()->get('role'),
             'mastermodel' => $this->request->getPost("no_model"),
             'size' =>  $this->request->getPost("style"),
             'delivery' => $this->request->getPost("delivery"),
@@ -379,15 +415,16 @@ class OrderController extends BaseController
         $del = $this->request->getPost("delivery");
         $jrm = $this->request->getPost("jarum");
         if ($update) {
-            return redirect()->to(base_url('capacity/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->to(base_url(session()->get('role') . '/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url('capacity/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->to(base_url(session()->get('role') . '/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('error', 'Gagal Update Data');
         }
     }
     public function updateorderjarumplan($idOrder)
     {
 
         $data = [
+            'role' => session()->get('role'),
             'mastermodel' => $this->request->getPost("no_model"),
             'size' =>  $this->request->getPost("style"),
             'delivery' => $this->request->getPost("delivery"),
@@ -402,9 +439,9 @@ class OrderController extends BaseController
         $del = $this->request->getPost("delivery");
         $jrm = $this->request->getPost("jarum");
         if ($update) {
-            return redirect()->to(base_url('planning/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->to(base_url(session()->get('role') . '/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url('planning/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->to(base_url(session()->get('role') . '/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('error', 'Gagal Update Data');
         }
     }
 
@@ -412,6 +449,7 @@ class OrderController extends BaseController
     {
 
         $data = [
+            'role' => session()->get('role'),
             'total_mesin' => $this->request->getPost("total_mc"),
             'brand' => $this->request->getPost("brand"),
             'mesin_jalan' => $this->request->getPost("mesin_jalan"),
@@ -420,9 +458,9 @@ class OrderController extends BaseController
         $update = $this->jarumModel->update($id, $data);
         $area = $this->request->getPost("area");
         if ($update) {
-            return redirect()->to(base_url('capacity/datamesinperjarum/' . $area))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperjarum/' . $area))->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url('capacity/datamesinperjarum/' . $area))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperjarum/' . $area))->withInput()->with('error', 'Gagal Update Data');
         }
     }
 
@@ -435,9 +473,9 @@ class OrderController extends BaseController
         $modl = $this->request->getPost("no_model");
         $del = $this->request->getPost("delivery");
         if ($delete) {
-            return redirect()->to(base_url('capacity/detailmodel/' . $modl . '/' . $del))->withInput()->with('success', 'Data Berhasil Di Hapus');
+            return redirect()->to(base_url(session()->get('role') . '/detailmodel/' . $modl . '/' . $del))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
-            return redirect()->to(base_url('capacity/detailmodel/' . $modl . '/' . $del))->withInput()->with('error', 'Gagal Hapus Data');
+            return redirect()->to(base_url(session()->get('role') . '/detailmodel/' . $modl . '/' . $del))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
 
@@ -451,9 +489,9 @@ class OrderController extends BaseController
         $del = $this->request->getPost("delivery");
         $jrm = $this->request->getPost("jarum");
         if ($delete) {
-            return redirect()->to(base_url('capacity/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Hapus');
+            return redirect()->to(base_url(session()->get('role') . '/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
-            return redirect()->to(base_url('capacity/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('error', 'Gagal Hapus Data');
+            return redirect()->to(base_url(session()->get('role') . '/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
     public function deletedetailmodeljarumplan($idOrder)
@@ -466,9 +504,9 @@ class OrderController extends BaseController
         $del = $this->request->getPost("delivery");
         $jrm = $this->request->getPost("jarum");
         if ($delete) {
-            return redirect()->to(base_url('planning/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Hapus');
+            return redirect()->to(base_url(session()->get('role') . '/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
-            return redirect()->to(base_url('planning/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('error', 'Gagal Hapus Data');
+            return redirect()->to(base_url(session()->get('role') . '/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
     public function inputOrder()
@@ -491,11 +529,12 @@ class OrderController extends BaseController
                 $status = "Aktif";
             }
             $data = [
+                'role' => session()->get('role'),
                 'sisa_booking' => $sisa_booking,
                 'status' => $status
             ];
             $this->bookingModel->update($id, $data);
-            return redirect()->to(base_url('capacity/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
+            return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
         } else {
 
             $inputModel = [
@@ -506,7 +545,7 @@ class OrderController extends BaseController
             ];
             $input = $this->orderModel->insert($inputModel);
             if (!$input) {
-                return redirect()->to(base_url('capacity/detailbooking/' . $id_booking))->withInput()->with('error', 'Gagal Ambil Order');
+                return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $id_booking))->withInput()->with('error', 'Gagal Ambil Order');
             } else {
                 $id = $id_booking;
                 $status = "";
@@ -516,15 +555,17 @@ class OrderController extends BaseController
                     $status = "Aktif";
                 }
                 $data = [
+                    'role' => session()->get('role'),
                     'sisa_booking' => $sisa_booking,
                     'status' => $status
                 ];
                 $this->bookingModel->update($id, $data);
-                return redirect()->to(base_url('capacity/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
+                return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
             }
         }
     }
-    public function inputOrderManual(){
+    public function inputOrderManual()
+    {
         $tgl = $this->request->getPost('tgl_turun');
         $model = $this->request->getPost('no_model');
         $jarum = $this->request->getPost('jarum');
@@ -538,27 +579,25 @@ class OrderController extends BaseController
         $idProdtype = $this->productModel->getId($getId);
 
 
-        if($model){
+        if ($model) {
             $check = $this->orderModel->checkExist($model);
             if ($check) {
-                return redirect()->to(base_url('capacity/dataorderperjarum/'.$id))->withInput()->with('error', 'Data Model Exist');
+                return redirect()->to(base_url(session()->get('role') . '/dataorderperjarum/' . $id))->withInput()->with('error', 'Data Model Exist');
+            } else {
+                $insert = $this->orderModel->insert([
+                    'no_model' => $model,
+                    'id_product_type' => $idProdtype,
+                    'created_at' => $tgl
+                ]);
             }
-            else{
-            $insert = $this->orderModel->insert([
-                'no_model' => $model,
-                'id_product_type' => $idProdtype,
-                'created_at' => $tgl
-            ]);
+            if ($insert) {
+                return redirect()->to(base_url(session()->get('role') . '/dataorderperjarum/' . $id))->withInput()->with('success', 'Data Model Inserted');
+            } else {
+                return redirect()->to(base_url(session()->get('role') . '/dataorderperjarum/' . $id))->withInput()->with('error', 'Data Model Not Insert');
             }
-            if($insert){
-                return redirect()->to(base_url('capacity/dataorderperjarum/'.$id))->withInput()->with('success', 'Data Model Inserted');
-            }else{
-                return redirect()->to(base_url('capacity/dataorderperjarum/'.$id))->withInput()->with('error', 'Data Model Not Insert');
-            }
-        }else{
-            return redirect()->to(base_url('capacity/dataorderperjarum/'.$id))->withInput()->with('error', 'Please Check Model number');
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/dataorderperjarum/' . $id))->withInput()->with('error', 'Please Check Model number');
         }
-
     }
 
     public function importModel()
@@ -582,10 +621,10 @@ class OrderController extends BaseController
                     $firstSpacePosition = strpos($no_models, ' '); // Cari posisi spasi pertama
                     $no_model = substr($no_models, 0, $firstSpacePosition);
                     if ($no_model != $nomodel) {
-                        return redirect()->to(base_url('/capacity/semuaOrder'))->with('error', 'Nomor Model Tidak Sama. Silahkan periksa kembali');
+                        return redirect()->to(base_url(session()->get('role') . '/semuaOrder'))->with('error', 'Nomor Model Tidak Sama. Silahkan periksa kembali');
                     } else {
                         if ($row[5] == null) {
-                            return redirect()->to(base_url('/capacity/semuaOrder'))->with('error', 'GAGAL');
+                            return redirect()->to(base_url(session()->get('role') . '/semuaOrder'))->with('error', 'GAGAL');
                         } else {
                             $recordID = $row[0];
                             $articleNo = $row[30];
@@ -644,7 +683,8 @@ class OrderController extends BaseController
                                 'size' => $size,
                                 'delivery' => $delivery2,
                                 'mastermodel' => $nomodel,
-                                'country' => $country
+                                'country' => $country,
+                                'qty' => $qty
                             ];
 
                             $existingAps = $this->ApsPerstyleModel->checkAps($validate);
@@ -652,19 +692,14 @@ class OrderController extends BaseController
                                 $this->ApsPerstyleModel->insert($simpandata);
 
                                 $this->orderModel->update($idModel, $updateData);
-                            } else {
-                                // $sumqty = $existingAps->qty + $qty;
-                                // $sumsisa = $existingAps->sisa + $qty;
-                                // $idAps = $existingAps->idapsperstyle;
-                                // $this->ApsPerstyleModel->update($idAps, ['qty' => $sumqty, 'sisa' => $sumsisa]);
                             }
                         }
                     }
                 }
             }
-            return redirect()->to(base_url('/capacity/belumImport'))->withInput()->with('success', 'Data Berhasil di Import');
+            return redirect()->to(base_url(session()->get('role') . '/belumImport'))->withInput()->with('success', 'Data Berhasil di Import');
         } else {
-            return redirect()->to(base_url('/capacity/belumImport'))->with('error', 'No data found in the Excel file');
+            return redirect()->to(base_url(session()->get('role') . '/belumImport'))->with('error', 'No data found in the Excel file');
         }
     }
     public function deletedetailorder($idModel)
@@ -674,9 +709,9 @@ class OrderController extends BaseController
         $id = $idModel;
         $delete = $this->ApsPerstyleModel->where('Mastermodel', $id)->delete();
         if ($delete) {
-            return redirect()->to(base_url('capacity/semuaOrder/'))->withInput()->with('success', 'Data Berhasil Di Hapus');
+            return redirect()->to(base_url(session()->get('role') . '/semuaOrder/'))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
-            return redirect()->to(base_url('capacity/semuaOrder/'))->withInput()->with('error', 'Gagal Hapus Data');
+            return redirect()->to(base_url(session()->get('role') . '/semuaOrder/'))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
 
@@ -686,6 +721,7 @@ class OrderController extends BaseController
         $dataApsPerstyle = $this->ApsPerstyleModel->detailModel($noModel, $delivery);
         $dataMc = $this->jarumModel->getAreaModel($noModel);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -699,7 +735,7 @@ class OrderController extends BaseController
             'delivery' => $delivery,
             'dataMc' => $dataMc,
         ];
-        return view('Planning/Order/detailOrder', $data);
+        return view(session()->get('role') . '/Order/detailOrder', $data);
     }
 
     public function orderBlmAdaAreal()
@@ -707,6 +743,7 @@ class OrderController extends BaseController
         $tampilperdelivery = $this->orderModel->tampilPerModelBlmAdaArea();
         $product = $this->productModel->findAll();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -719,13 +756,14 @@ class OrderController extends BaseController
             'product' => $product,
 
         ];
-        return view('Planning/Order/orderBlmAdaArea', $data);
+        return view(session()->get('role') . '/Order/orderBlmAdaArea', $data);
     }
     public function semuaOrderPlan()
     {
         $tampilperdelivery = $this->orderModel->tampilPerdelivery();
         $product = $this->productModel->findAll();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -739,12 +777,13 @@ class OrderController extends BaseController
 
 
         ];
-        return view('Planning/Order/semuaorder', $data);
+        return view(session()->get('role') . '/Order/semuaorder', $data);
     }
     public function orderPerJarumPlan()
     {
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -755,12 +794,13 @@ class OrderController extends BaseController
             'active7' => '',
             'TotalMesin' => $totalMesin,
         ];
-        return view('Planning/Order/orderjarum', $data);
+        return view(session()->get('role') . '/Order/orderjarum', $data);
     }
     public function orderPerAreaPlan()
     {
         $totalMesin = $this->jarumModel->getArea();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -771,7 +811,7 @@ class OrderController extends BaseController
             'active7' => '',
             'TotalMesin' => $totalMesin,
         ];
-        return view('Planning/Order/orderarea', $data);
+        return view(session()->get('role') . '/Order/orderarea', $data);
     }
     public function getTurunOrder()
     {
@@ -780,6 +820,7 @@ class OrderController extends BaseController
         $bulan = array_keys($charts['details']);
         $jumlahTurun = array_values($charts['totals']);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Summary Turun Order',
             'active1' => '',
             'active2' => '',
@@ -794,13 +835,14 @@ class OrderController extends BaseController
             'jumlahPembatalan' => $jumlahTurun,
             'totalChart' => $charts['totals']
         ];
-        return view('Capacity/Order/turunOrder', $data);
+        return view(session()->get('role') . '/Order/turunOrder', $data);
     }
 
     public function detailturunorder($week, $buyer)
     {
         $resultTurun = $this->orderModel->getDetailTurunOrder($week, $buyer);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Detail Confirm Order',
             'active1' => '',
             'active2' => '',
@@ -811,6 +853,6 @@ class OrderController extends BaseController
             'active7' => '',
             'data' => $resultTurun,
         ];
-        return view('Capacity/Order/detailturunorder', $data);
+        return view(session()->get('role') . '/Order/detailturunorder', $data);
     }
 }

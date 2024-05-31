@@ -1,4 +1,4 @@
-<?php $this->extend('Sudo/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row mt-2 mb-4">
@@ -7,7 +7,7 @@
                 <div class="card-header pb-0 d-flex justify-content-between">
                     <h6>Grafik Cancel Booking Per Bulan</h6>
                     <div>
-                        <a href="<?= base_url('sudo/databooking') ?>" class="btn btn-info">Kembali</a>
+                        <a href="<?= base_url($role . '/databooking') ?>" class="btn btn-info">Kembali</a>
                     </div>
                 </div>
                 <div class="card-body p-3">

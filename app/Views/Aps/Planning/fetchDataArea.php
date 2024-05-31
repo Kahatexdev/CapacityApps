@@ -1,6 +1,6 @@
 <?php ini_set('display_errors', 1);
 error_reporting(E_ALL); ?>
-<?php $this->extend('Aps/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -30,32 +30,32 @@ error_reporting(E_ALL); ?>
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
 
             <div class="card">
-            <div class="card-header">
-                <div class="row">
-                    <div class="col">
-                        <h5>
-                            Pick Data for Planning for Area <strong style="color: green;"><?= $area; ?></strong> by Needle <strong style="color: orange;"><?= $jarum; ?></strong>
-                        </h5>
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col">
+                            <h5>
+                                Pick Data for Planning for Area <strong style="color: green;"><?= $area; ?></strong> by Needle <strong style="color: orange;"><?= $jarum; ?></strong>
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h6>
+                                Machine Available is <strong style="color: green;"><?= $mesin; ?> Machine </strong>
+                            </h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h6>
+                                Judul : <?= $judul; ?>
+                            </h6>
+                        </div>
+                        <div class="col-auto">
+                            <a href="<?= base_url($role . '/planningmesin') ?>" class="btn btn-secondary">Back</a>
+                        </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col">
-                        <h6>
-                            Machine Available is <strong style="color: green;"><?= $mesin; ?> Machine </strong>
-                        </h6>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <h6>
-                            Judul : <?= $judul; ?>
-                        </h6>
-                    </div>
-                    <div class="col-auto">
-                        <a href="<?= base_url('aps/planningmesin')?>" class="btn btn-secondary">Back</a>
-                    </div>
-                </div>
-            </div>
 
                 <div class="card-body p-3">
                     <div class="row">
@@ -97,7 +97,7 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm"><?= htmlspecialchars($order['hari']); ?> Days</td>
                                             <td class="text-sm">
                                                 <?php if ($order['est_qty'] < $order['sisa']) : ?>
-                                                    <form action="<?= base_url('aps/planningpage/' . $order['id_detail_pln']); ?>" method="get">    
+                                                    <form action="<?= base_url($role . '/planningpage/' . $order['id_detail_pln']); ?>" method="get">
                                                         <input type="hidden" name="id_utama" value="<?= $id_pln_mc; ?>">
                                                         <input type="hidden" name="mesin" value="<?= $mesin; ?>">
                                                         <input type="hidden" name="area" value="<?= $area; ?>">
@@ -107,7 +107,7 @@ error_reporting(E_ALL); ?>
                                                         <button type="submit" class="btn btn-primary">Planning</button>
                                                     </form>
                                                 <?php else : ?>
-                                                    <form action="<?= base_url('aps/planningpage/' . $order['id_detail_pln']); ?>" method="get">
+                                                    <form action="<?= base_url($role . '/planningpage/' . $order['id_detail_pln']); ?>" method="get">
                                                         <input type="hidden" name="id_utama" value="<?= $id_pln_mc; ?>">
                                                         <input type="hidden" name="mesin" value="<?= $mesin; ?>">
                                                         <input type="hidden" name="area" value="<?= $area; ?>">
@@ -150,7 +150,7 @@ error_reporting(E_ALL); ?>
                     var id_pln_mc = '<?= $id_pln_mc ?>'
 
                     $.ajax({
-                        url: '<?= base_url('aps/fetchdetailorderarea'); ?>',
+                        url: '<?= base_url($role . '/fetchdetailorderarea'); ?>',
                         type: 'GET',
                         data: {
                             area: area,

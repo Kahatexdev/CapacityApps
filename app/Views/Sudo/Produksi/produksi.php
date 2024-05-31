@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
@@ -75,7 +75,7 @@
                         <div class="row mt-2">
                             <div class="col-9 pl-0">
 
-                                <form action="<?= base_url('capacity/importproduksi') ?>" id="modalForm" method="POST" enctype="multipart/form-data">
+                                <form action="<?= base_url($role . '/importproduksi') ?>" id="modalForm" method="POST" enctype="multipart/form-data">
                                     <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control ">
                             </div>
                             <div class="col-3 pl-0">
@@ -213,7 +213,7 @@
             $(document).ready(function() {
                 function fetchData() {
                     $.ajax({
-                        url: '<?= base_url('capacity/dataprogress') ?>',
+                        url: '<?= base_url($role . '/dataprogress') ?>',
                         type: 'GET',
                         success: function(responseData) {
 
@@ -337,7 +337,7 @@
             $(document).ready(function() {
                 function fetchData() {
                     $.ajax({
-                        url: '<?= base_url('capacity/produksiareachart') ?>',
+                        url: '<?= base_url($role . '/produksiareachart') ?>',
                         type: 'GET',
                         success: function(response) {
                             updatechart(response)

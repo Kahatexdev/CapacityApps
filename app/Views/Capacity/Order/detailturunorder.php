@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 
 <div class="container-fluid py-4">
@@ -54,9 +54,9 @@
                         <thead>
                             <tr>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Tgl Confirm</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Buyer</th>                                
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No PDK</th>                               
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Order</th>                               
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Buyer</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No PDK</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Order</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Delivery</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jarum</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty</th>
@@ -72,7 +72,7 @@
                                     <td class="text-xs"><?= $bk['no_order'] ?></td>
                                     <td class="text-xs"><?= $bk['delivery'] ?></td>
                                     <td class="text-xs"><?= $bk['machinetypeid'] ?></td>
-                                    <td class="text-xs"><?= round($bk['qty']/24) ?> Dz</td>
+                                    <td class="text-xs"><?= round($bk['qty'] / 24) ?> Dz</td>
                                     <td class="text-xs"><?= $bk['description'] ?></td>
                                 </tr>
                             <?php endforeach ?>

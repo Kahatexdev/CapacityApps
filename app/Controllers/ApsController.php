@@ -127,6 +127,7 @@ class ApsController extends BaseController
         }
         $area = session()->get('username');
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Capacity System',
             'active1' => 'active',
             'active2' => '',
@@ -154,6 +155,7 @@ class ApsController extends BaseController
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
 
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -173,6 +175,7 @@ class ApsController extends BaseController
         $booking = $this->bookingModel->getDataPerjarum($jarum);
 
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -193,6 +196,7 @@ class ApsController extends BaseController
     {
         $bulan = $this->bookingModel->getbulan($jarum);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -212,6 +216,7 @@ class ApsController extends BaseController
         $booking = $this->bookingModel->getDataPerjarumbulan($bulan, $tahun, $jarum);
         $product = $this->productModel->getJarum($jarum);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -239,6 +244,7 @@ class ApsController extends BaseController
         $childOrder = $this->orderModel->getChild($idBooking);
         $childBooking = $this->bookingModel->getChild($idBooking);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -261,6 +267,7 @@ class ApsController extends BaseController
     {
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -278,6 +285,7 @@ class ApsController extends BaseController
         $tampilperdelivery = $this->orderModel->tampilPerdelivery();
         $product = $this->productModel->findAll();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -298,6 +306,7 @@ class ApsController extends BaseController
         $dataApsPerstyle = $this->ApsPerstyleModel->detailModel($noModel, $delivery);
         $dataMc = $this->jarumModel->getAreaModel($noModel);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -317,6 +326,7 @@ class ApsController extends BaseController
     {
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -334,6 +344,7 @@ class ApsController extends BaseController
         $tampilperdelivery = $this->orderModel->tampilPerjarum($jarum);
         $product = $this->productModel->findAll();
         $booking = $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -354,6 +365,7 @@ class ApsController extends BaseController
         $apsPerstyleModel = new ApsPerstyleModel(); // Create an instance of the model
         $dataApsPerstyle = $apsPerstyleModel->detailModelJarum($noModel, $delivery, $jarum); // Call the model method
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -376,6 +388,7 @@ class ApsController extends BaseController
         $planarea = $this->KebutuhanAreaModel->findAll();
         $area = $this->aksesModel->getArea($id);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Planning Area',
             'active1' => '',
             'active2' => '',
@@ -406,6 +419,7 @@ class ApsController extends BaseController
         }
 
         $data = [
+            'role' => session()->get('role'),
             'judul' => $this->request->getPost('judul'),
             'area' => $this->request->getPost('area'),
             'jarum' => $this->request->getPost('jarum')
@@ -447,6 +461,7 @@ class ApsController extends BaseController
         $mesinarea = $this->jarumModel->getMesinByArea($area, $jarum); //mesin yang dipakai semua mesin tanpa melibatkan head planning
         // $mesinplanning = $this->MesinPlanningModel->getMesinByArea($area,$jarum); //mesin yang dipilih oleh head planning di teruskan ke bagian aps
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Planning',
             'active1' => '',
             'active2' => '',
@@ -469,6 +484,7 @@ class ApsController extends BaseController
     {
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -486,6 +502,7 @@ class ApsController extends BaseController
         $tampilperdelivery = $this->orderModel->tampilPerModelBlmAdaArea();
         $product = $this->productModel->findAll();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -506,6 +523,7 @@ class ApsController extends BaseController
         $area = $this->aksesModel->getArea($id);
         $totalMesin = $this->jarumModel->getArea();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -523,6 +541,7 @@ class ApsController extends BaseController
         $tampilperdelivery = $this->orderModel->tampilPerarea($area);
         $product = $this->productModel->findAll();
         $booking = $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -560,6 +579,7 @@ class ApsController extends BaseController
         $listPlanning = $this->EstimatedPlanningModel->listPlanning($id); //get data planning per page and fetch it into datatable at bottom datatables
         // $mesinpertgl = $this->TanggalPlanningModel->getMesinByDate($idutama);//get data machine per date and return into array
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -628,6 +648,7 @@ class ApsController extends BaseController
         $area = $this->request->getPost('area');
         $jrm = $this->request->getPost('jarum');
         $judul = $this->request->getPost('judul');
+        dd($judul);
 
         $startDateTime = new \DateTime($start);
         $stopDateTime = new \DateTime($stop);
@@ -654,6 +675,7 @@ class ApsController extends BaseController
                 continue; // Skip this date
             }
             $data = [
+                'role' => session()->get('role'),
                 'id_detail_pln' => $id_save,
                 'id_est_qty' => $idOrder,
                 'date' => $date->format('Y-m-d'), // Insert the current date in the range
@@ -665,9 +687,9 @@ class ApsController extends BaseController
 
 
         if ($saveest) {
-            return redirect()->to(base_url('aps/planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm.'&judul='.$judul))->withInput()->with('success', 'Data Berhasil Disimpan');
+            return redirect()->to(base_url('aps/planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm . '&judul=' . $judul))->withInput()->with('success', 'Data Berhasil Disimpan');
         } else {
-            return redirect()->to(base_url('aps/planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm.'&judul='.$judul))->withInput()->with('error', 'Data Gagal Disimpan');
+            return redirect()->to(base_url('aps/planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm . '&judul=' . $judul))->withInput()->with('error', 'Data Gagal Disimpan');
         }
 
 

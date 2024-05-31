@@ -1,4 +1,4 @@
-<?php $this->extend('Aps/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
@@ -48,10 +48,10 @@
                 });
             </script>
         <?php endif; ?>
-       
+
         <?php foreach ($TotalMesin as $jr) : ?>
             <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-                <a href="<?= base_url('aps/databookingbulan/' . $jr['jarum']) ?>">
+                <a href="<?= base_url($role . '/databookingbulan/' . $jr['jarum']) ?>">
                     <div class="card">
                         <div class="card-body p-3">
                             <div class="row">
@@ -66,15 +66,15 @@
                                 </div>
                                 <div class="col-4 text-end">
                                     <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                    <?php if (stripos($jr['jarum'], '10g') !== false || stripos($jr['jarum'], '13G') !== false): ?>
-                                        <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i>
-                                    <?php elseif (stripos($jr['jarum'], '240N') !== false): ?>
-                                        <i class="fab fa-redhat text-lg opacity-10" aria-hidden="true"></i>
-                                    <?php elseif (stripos($jr['jarum'], 'POM') !== false): ?>
-                                        <i class="fas fa-atom text-lg opacity-10" aria-hidden="true"></i>
-                                    <?php else: ?>
-                                        <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i>
-                                    <?php endif; ?>
+                                        <?php if (stripos($jr['jarum'], '10g') !== false || stripos($jr['jarum'], '13G') !== false) : ?>
+                                            <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i>
+                                        <?php elseif (stripos($jr['jarum'], '240N') !== false) : ?>
+                                            <i class="fab fa-redhat text-lg opacity-10" aria-hidden="true"></i>
+                                        <?php elseif (stripos($jr['jarum'], 'POM') !== false) : ?>
+                                            <i class="fas fa-atom text-lg opacity-10" aria-hidden="true"></i>
+                                        <?php else : ?>
+                                            <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
 

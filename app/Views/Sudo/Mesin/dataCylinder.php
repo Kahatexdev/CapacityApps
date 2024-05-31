@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -34,7 +34,7 @@
                             Detail Stock Cylinder
                         </h5>
                         <div>
-                            <a href="<?= base_url('capacity/mesinperarea') ?>" class="btn bg-gradient-info"> Back</a>
+                            <a href="<?= base_url($role . '/mesinperarea') ?>" class="btn bg-gradient-info"> Back</a>
                             <button type="button" class="btn btn-add bg-gradient-success" data-toggle="modal" data-target="#modalTambah">Input Data Mesin</button>
                         </div>
                     </div>
@@ -59,10 +59,10 @@
                                             <td class="text-sm"><?= $order['needle']; ?></td>
                                             <td class="text-sm"><?= $order['production_unit']; ?></td>
                                             <td class="text-sm"><?= $order['type_machine']; ?></td>
-                                            <td class="text-sm"><?= $order['qty'];?> Unit</td>
+                                            <td class="text-sm"><?= $order['qty']; ?> Unit</td>
                                             <td class="text-sm"><?= $order['needle_detail']; ?></td>
                                             <td class="text-sm">
-                                                <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['id']; ?>" data-needle="<?= $order['needle']; ?>" data-pu="<?= $order['production_unit']; ?>" data-type="<?= $order['type_machine']; ?>" data-qty="<?= $order['qty']; ?>" data-nd="<?= $order['needle_detail']; ?>" >
+                                                <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['id']; ?>" data-needle="<?= $order['needle']; ?>" data-pu="<?= $order['production_unit']; ?>" data-type="<?= $order['type_machine']; ?>" data-qty="<?= $order['qty']; ?>" data-nd="<?= $order['needle_detail']; ?>">
                                                     Edit
                                                 </button>
                                             </td>
@@ -90,7 +90,7 @@
         </div>
 
         <div class="modal fade" id="modalTambah" tabindex="-1" role="dialog" aria-labelledby="modalTambah" aria-hidden="true">
-            <div class="modal-dialog"   role=" document">
+            <div class="modal-dialog" role=" document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Tambah Data Mesin</h5>
@@ -99,7 +99,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form action="<?=base_url('capacity/addcylinder')?>" method="post">
+                        <form action="<?= base_url($role . '/addcylinder') ?>" method="post">
                             <div class="row">
                                 <div class="col-lg-6 col-sm-6">
                                     <div class="form-group">
@@ -156,7 +156,7 @@
 
 
         <div class="modal fade" id="ModalEdit" tabindex="-1" role="dialog" aria-labelledby="modalEdit" aria-hidden="true">
-            <div class="modal-dialog"   role=" document">
+            <div class="modal-dialog" role=" document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Edit Data Cylinder</h5>
@@ -165,8 +165,8 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form action="<?=base_url('capacity/editycylinder')?>" method="post">
-                        <div class="row">
+                        <form action="<?= base_url($role . '/editycylinder') ?>" method="post">
+                            <div class="row">
                                 <div class="col-lg-6 col-sm-6">
                                     <div class="form-group">
                                         <label for="tgl-bk" class="col-form-label">Needle</label>
@@ -258,7 +258,7 @@
 
                 $('.btn-add').click(function() {
                     var form = $('#modalTambah').find('form');
-                
+
                     $('#modalTambah').modal('show'); // Show the modal
                 });
 
@@ -271,7 +271,7 @@
                     var nd = $(this).data('nd');
 
                     // Set form action
-                    $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/editcylinder/') ?>' + id);
+                    $('#ModalEdit').find('form').attr('action', '<?= base_url($role . '/editcylinder/') ?>' + id);
 
                     // Set input values
                     $('#ModalEdit').find('input[name="needle"]').val(needle);
@@ -291,9 +291,9 @@
 
                 $('.delete-btn').click(function() {
                     var id = $(this).data('id');
-                    $('#ModalDelete').find('form').attr('action', '<?= base_url('capacity/deletecylinder/') ?>' + id);
+                    $('#ModalDelete').find('form').attr('action', '<?= base_url($role . '/deletecylinder/') ?>' + id);
                     $('#ModalDelete').find('input[name="id"]').val(id);
-                    
+
                     $('#ModalDelete').modal('show'); // Show the modal
                 });
 

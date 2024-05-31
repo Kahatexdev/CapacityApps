@@ -244,6 +244,7 @@
                                         <option> Planning</option>
                                         <option> Aps</option>
                                         <option> User</option>
+                                        <option> Sudo</option>
 
                                     </select>
                                 </div>

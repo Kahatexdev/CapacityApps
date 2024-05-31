@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
@@ -47,7 +47,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="<?= base_url('capacity/inputLibur') ?>" method="post">
+                    <form action="<?= base_url($role . '/inputLibur') ?>" method="post">
                         <div class="form-group">
                             <label for="tgl-bk-form-label">Tanggal</label>
                             <input type="date" class="form-control" name="tgl_libur">
@@ -97,7 +97,7 @@
                                     <tr>
                                         <td><?= $libur['tanggal'] ?></td>
                                         <td><?= $libur['nama'] ?></td>
-                                        <td><a href="<?= base_url('capacity/hapusLibur/' . $libur['id']) ?>" class="btn btn-danger"><i class="fas fa-trash-alt"></i></a></td>
+                                        <td><a href="<?= base_url($role . '/hapusLibur/' . $libur['id']) ?>" class="btn btn-danger"><i class="fas fa-trash-alt"></i></a></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -158,13 +158,13 @@
                                 </div>
                                 <div class="col-4 text-end">
 
-                                    <?php if (stripos($jr['jarum'], '10g') !== false || stripos($jr['jarum'], '13G') !== false): ?>
+                                    <?php if (stripos($jr['jarum'], '10g') !== false || stripos($jr['jarum'], '13G') !== false) : ?>
                                         <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i>
-                                    <?php elseif (stripos($jr['jarum'], '240N') !== false): ?>
+                                    <?php elseif (stripos($jr['jarum'], '240N') !== false) : ?>
                                         <i class="fab fa-redhat text-lg opacity-10" aria-hidden="true"></i>
-                                    <?php elseif (stripos($jr['jarum'], 'POM') !== false): ?>
+                                    <?php elseif (stripos($jr['jarum'], 'POM') !== false) : ?>
                                         <i class="fas fa-atom text-lg opacity-10" aria-hidden="true"></i>
-                                    <?php else: ?>
+                                    <?php else : ?>
                                         <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i>
                                     <?php endif; ?>
 
@@ -185,7 +185,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form action="<?= base_url('capacity/calendar/'); ?>" method="POST">
+                            <form action="<?= base_url($role . '/calendar/'); ?>" method="POST">
                                 <div class="form-group">
                                     <label for="awal">Dari</label>
                                     <input type="date" class="form-control" name="awal">
@@ -239,7 +239,7 @@
                                         <td><?= $mc['judul'] ?></td>
                                         <td><?= $mc['total'] ?> Mesin</td>
                                         <td><?= $mc['jumlah_hari'] ?> Hari</td>
-                                        <td> <a class="btn bg-gradient-info" href="<?= base_url('capacity/detailplan/' . $mc['judul']) ?>"> Details </a></td>
+                                        <td> <a class="btn bg-gradient-info" href="<?= base_url($role . '/detailplan/' . $mc['judul']) ?>"> Details </a></td>
 
                                     </tr>
                                 <?php endforeach ?>
@@ -266,7 +266,7 @@
 <script script>
     $('.pilih-jarum').click(function() {
         var jarum = $(this).data('id');
-        $('#generate').find('form').attr('action', '<?= base_url('capacity/calendar/') ?>' + jarum);
+        $('#generate').find('form').attr('action', '<?= base_url($role . '/calendar/') ?>' + jarum);
     })
 </script>
 <?php $this->endSection(); ?>

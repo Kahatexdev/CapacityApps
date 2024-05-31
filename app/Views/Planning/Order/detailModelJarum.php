@@ -1,4 +1,4 @@
-<?php $this->extend('Planning/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -33,7 +33,7 @@
                         <h5>
                             Detail Data Model <?= $noModel ?> Delivery <?= date('d-M-Y', strtotime($delivery)) ?>
                         </h5>
-                        <a href="<?= base_url('planning/dataorder') ?>" class="btn bg-gradient-dark d-inline-flex align-items-center">
+                        <a href="<?= base_url($role . '/dataorder') ?>" class="btn bg-gradient-dark d-inline-flex align-items-center">
                             <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
                             Back
                         </a>
@@ -286,7 +286,7 @@
 
                     var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
 
-                    $('#ModalEdit').find('form').attr('action', '<?= base_url('planning/updatedetailjarum/') ?>' + apsperstyle);
+                    $('#ModalEdit').find('form').attr('action', '<?= base_url($role . '/updatedetailjarum/') ?>' + apsperstyle);
                     $('#ModalEdit').find('input[name="style"]').val(style);
                     $('#ModalEdit').find('input[name="no_model"]').val(noModel);
                     $('#ModalEdit').find('input[name="jarum"]').val(jarum);
@@ -304,7 +304,7 @@
                     var jarum = $(this).data('jarum');
                     var apsperstyle = $(this).data('id');
                     var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
-                    $('#ModalDelete').find('form').attr('action', '<?= base_url('planning/deletedetailjarum/') ?>' + apsperstyle);
+                    $('#ModalDelete').find('form').attr('action', '<?= base_url($role . '/deletedetailjarum/') ?>' + apsperstyle);
                     $('#ModalDelete').find('input[name="idapsperstyle"]').val(apsperstyle);
                     $('#ModalDelete').find('input[name="no_model"]').val(noModel);
                     $('#ModalDelete').find('input[name="delivery"]').val(formattedDelivery);

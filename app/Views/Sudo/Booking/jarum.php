@@ -1,4 +1,4 @@
-<?php $this->extend('Sudo/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 
 <div class="container-fluid py-4">
@@ -58,7 +58,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form action="<?= base_url('sudo/inputbooking') ?>" method="post">
+                            <form action="<?= base_url($role . '/inputbooking') ?>" method="post">
                                 <div class="row">
                                     <div class="col-lg-6 col-sm-12">
                                         <div class="form-group">
@@ -163,10 +163,10 @@
                                     <td class="text-xs">
                                         <?php if ($bk['status'] == 'Cancel Booking') : ?>
                                             <!-- If qty is null, set action to Import -->
-                                            <a href="<?= base_url('sudo/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-secondary btn-sm text-xxs">detail</a>
+                                            <a href="<?= base_url($role . '/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-secondary btn-sm text-xxs">detail</a>
                                         <?php else : ?>
                                             <!-- If qty is not null, set action to Details -->
-                                            <a href="<?= base_url('sudo/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm text-xxs">detail</a>
+                                            <a href="<?= base_url($role . '/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm text-xxs">detail</a>
                                         <?php endif; ?>
 
                                     </td>

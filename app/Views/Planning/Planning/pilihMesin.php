@@ -1,6 +1,6 @@
 <?php ini_set('display_errors', 1);
 error_reporting(E_ALL); ?>
-<?php $this->extend('Planning/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -33,10 +33,10 @@ error_reporting(E_ALL); ?>
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <h5>
-                            Pick Data for Planning by Needle  <strong style="color: orange;"><?= $jarum; ?></strong>
+                            Pick Data for Planning by Needle <strong style="color: orange;"><?= $jarum; ?></strong>
                         </h5>
                     </div>
-                    
+
                     <div>
                         <h6>
                             Machine Requirement is <strong style="color: orange;"><?= $mesin; ?> Machine </strong>
@@ -47,8 +47,8 @@ error_reporting(E_ALL); ?>
                             Status : <?= $status; ?>
                         </h6>
                     </div>
-                    
-                    
+
+
                 </div>
                 <div class="card-body p-3">
                     <div class="row">
@@ -91,7 +91,7 @@ error_reporting(E_ALL); ?>
 
                         </div>
                     </div>
-                    <form id="saveForm" action="<?= base_url('planning/Savemesin/' . $id) ?>" method="POST">
+                    <form id="saveForm" action="<?= base_url($role . '/Savemesin/' . $id) ?>" method="POST">
                         <div class="card-body p-3">
                             <!-- Your table and other content here -->
                             <input type="hidden" name="dataToSave" id="dataToSaveInput" value="">
@@ -104,124 +104,124 @@ error_reporting(E_ALL); ?>
                     </form>
                 </div>
             </div>
-        </div>       
+        </div>
 
         <script>
-        $(document).ready(function() {
-            var table = $('#dataTable').DataTable({
-                "order": [],
-                "pageLength": 50
-            });
-
-            // Calculate and display subtotal in footer
-            function calculateSubtotal() {
-                var subtotal = 0;
-                $('#dataTable tbody tr').each(function() {
-                    var machineTotal = parseInt($(this).find('td:eq(2)').text().replace(/\D/g, ''));
-                    var inputMachine = parseInt($(this).find('.input-machine').val().trim());
-                    subtotal += Math.min(machineTotal, inputMachine);
+            $(document).ready(function() {
+                var table = $('#dataTable').DataTable({
+                    "order": [],
+                    "pageLength": 50
                 });
-                $('#dataTable tfoot .subtotal-column').text(subtotal);
-            }
 
-            // Event listener for input fields
-            $('#dataTable tbody').on('input', '.input-machine', function() {
-                var row = table.row($(this).closest('tr'));
-                var machineTotal = parseInt(row.data()[2].replace(/\D/g, ''));
-                var inputMachine = parseInt($(this).val().trim());
+                // Calculate and display subtotal in footer
+                function calculateSubtotal() {
+                    var subtotal = 0;
+                    $('#dataTable tbody tr').each(function() {
+                        var machineTotal = parseInt($(this).find('td:eq(2)').text().replace(/\D/g, ''));
+                        var inputMachine = parseInt($(this).find('.input-machine').val().trim());
+                        subtotal += Math.min(machineTotal, inputMachine);
+                    });
+                    $('#dataTable tfoot .subtotal-column').text(subtotal);
+                }
 
-                // Check if inputMachine exceeds machineTotal
-                if (inputMachine > machineTotal) {
-                    // Display SweetAlert
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Input Machine exceeds Machine Total',
-                        text: 'Please set the running machines correctly.',
+                // Event listener for input fields
+                $('#dataTable tbody').on('input', '.input-machine', function() {
+                    var row = table.row($(this).closest('tr'));
+                    var machineTotal = parseInt(row.data()[2].replace(/\D/g, ''));
+                    var inputMachine = parseInt($(this).val().trim());
+
+                    // Check if inputMachine exceeds machineTotal
+                    if (inputMachine > machineTotal) {
+                        // Display SweetAlert
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Input Machine exceeds Machine Total',
+                            text: 'Please set the running machines correctly.',
+                        });
+
+                        // Set input value to machineTotal
+                        $(this).val(machineTotal);
+                    }
+
+                    // Recalculate and update subtotal
+                    calculateSubtotal();
+                });
+
+                // Access PHP variable in JavaScript
+                var status = '<?= $status; ?>';
+
+                $('#saveForm').on('submit', function(e) {
+                    // Here you can implement your save logic
+                    // For example, you can iterate through DataTable rows and collect data
+                    var dataToSave = [];
+                    table.rows().every(function() {
+                        var inputMachine = parseInt($(this.node()).find('.input-machine').val().trim());
+                        if (inputMachine !== 0) { // Exclude rows with zero inputMachine values
+                            var rowData = this.data();
+                            dataToSave.push([
+                                rowData[0], // Column 0
+                                rowData[1], // Column 1
+                                rowData[3], // Column 3
+                                inputMachine, // Column 5
+                            ]);
+                        }
                     });
 
-                    // Set input value to machineTotal
-                    $(this).val(machineTotal);
-                }
+                    // Calculate the required subtotal based on the percentage
+                    var requiredPercentage = 80; // 80% required
+                    var machineRequirement = <?= $mesin; ?>; // Total machine requirement
+                    var subtotal = parseInt($('#dataTable tfoot .subtotal-column').text());
+                    var requiredSubtotal = (requiredPercentage / 100) * machineRequirement;
 
-                // Recalculate and update subtotal
-                calculateSubtotal();
-            });
-
-            // Access PHP variable in JavaScript
-            var status = '<?= $status; ?>';
-
-            $('#saveForm').on('submit', function(e) {
-                // Here you can implement your save logic
-                // For example, you can iterate through DataTable rows and collect data
-                var dataToSave = [];
-                table.rows().every(function() {
-                    var inputMachine = parseInt($(this.node()).find('.input-machine').val().trim());
-                    if (inputMachine !== 0) { // Exclude rows with zero inputMachine values
-                        var rowData = this.data();
-                        dataToSave.push([
-                            rowData[0], // Column 0
-                            rowData[1], // Column 1
-                            rowData[3], // Column 3
-                            inputMachine, // Column 5
-                        ]);
+                    // Use the status variable in the condition
+                    if (status === 'BOOKING') {
+                        if (subtotal < requiredSubtotal) {
+                            // Display error message with the minimum required machine value
+                            var minimumRequiredMachine = Math.ceil(machineRequirement * requiredPercentage / 100);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error!',
+                                html: 'Booking requires at least <strong>' + minimumRequiredMachine + ' Machines</strong>, which is 80% of the total machine requirement <strong>' + machineRequirement + ' Machines</strong>.',
+                            });
+                            e.preventDefault(); // Prevent form submission
+                        } else if (isNaN(subtotal)) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Error!',
+                                text: 'There was an error calculating the minimum required machines. Please check the data.',
+                            });
+                            e.preventDefault(); // Prevent form submission
+                        } else {
+                            // Serialize the dataToSave array and set it as the value of the hidden input field
+                            $('#dataToSaveInput').val(JSON.stringify(dataToSave));
+                        }
+                    } else if (status === 'ORDER') {
+                        if (subtotal < requiredSubtotal) {
+                            // Display error message with the minimum required machine value
+                            var minimumRequiredMachine = Math.ceil(machineRequirement * 100 / 100);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error!',
+                                html: 'Order requires 100% of the total machine requirement which is <strong>' + machineRequirement + ' Machines</strong>.',
+                            });
+                            e.preventDefault(); // Prevent form submission
+                        } else if (isNaN(subtotal)) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Error!',
+                                text: 'There was an error calculating the minimum required machines. Please check the data.',
+                            });
+                            e.preventDefault(); // Prevent form submission
+                        } else {
+                            // Serialize the dataToSave array and set it as the value of the hidden input field
+                            $('#dataToSaveInput').val(JSON.stringify(dataToSave));
+                        }
                     }
                 });
 
-                // Calculate the required subtotal based on the percentage
-                var requiredPercentage = 80; // 80% required
-                var machineRequirement = <?= $mesin; ?>; // Total machine requirement
-                var subtotal = parseInt($('#dataTable tfoot .subtotal-column').text());
-                var requiredSubtotal = (requiredPercentage / 100) * machineRequirement;
-
-                // Use the status variable in the condition
-                if (status === 'BOOKING') {
-                    if (subtotal < requiredSubtotal) {
-                        // Display error message with the minimum required machine value
-                        var minimumRequiredMachine = Math.ceil(machineRequirement * requiredPercentage / 100);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Validation Error!',
-                            html: 'Booking requires at least <strong>' + minimumRequiredMachine + ' Machines</strong>, which is 80% of the total machine requirement <strong>' + machineRequirement + ' Machines</strong>.',
-                        });
-                        e.preventDefault(); // Prevent form submission
-                    } else if (isNaN(subtotal)) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Error!',
-                            text: 'There was an error calculating the minimum required machines. Please check the data.',
-                        });
-                        e.preventDefault(); // Prevent form submission
-                    } else {
-                        // Serialize the dataToSave array and set it as the value of the hidden input field
-                        $('#dataToSaveInput').val(JSON.stringify(dataToSave));
-                    }
-                } else if (status === 'ORDER') {
-                    if (subtotal < requiredSubtotal) {
-                        // Display error message with the minimum required machine value
-                        var minimumRequiredMachine = Math.ceil(machineRequirement * 100 / 100);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Validation Error!',
-                            html: 'Order requires 100% of the total machine requirement which is <strong>' + machineRequirement + ' Machines</strong>.',
-                        });
-                        e.preventDefault(); // Prevent form submission
-                    } else if (isNaN(subtotal)) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Error!',
-                            text: 'There was an error calculating the minimum required machines. Please check the data.',
-                        });
-                        e.preventDefault(); // Prevent form submission
-                    } else {
-                        // Serialize the dataToSave array and set it as the value of the hidden input field
-                        $('#dataToSaveInput').val(JSON.stringify(dataToSave));
-                    }
-                }
+                // Initial calculation of subtotal
+                calculateSubtotal();
             });
-
-            // Initial calculation of subtotal
-            calculateSubtotal();
-        });
         </script>
 
         <?php $this->endSection(); ?>

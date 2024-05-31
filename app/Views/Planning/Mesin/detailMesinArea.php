@@ -1,4 +1,4 @@
-<?php $this->extend('Planning/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -39,7 +39,7 @@
                                 Input Data Machine
                             </button>
 
-                            <a href="<?= base_url('planning/mesinperarea/' . $pu) ?>" class="btn bg-gradient-dark">
+                            <a href="<?= base_url($role . '/mesinperarea/' . $pu) ?>" class="btn bg-gradient-dark">
                                 <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
                                 Back</a>
                         </div>
@@ -317,7 +317,7 @@
                 }
 
                 $('.btn-add').click(function() {
-                    $('#modalTambah').find('form').attr('action', '<?= base_url('planning/tambahmesinperarea/') ?>');
+                    $('#modalTambah').find('form').attr('action', '<?= base_url($role . '/tambahmesinperarea/') ?>');
 
                     $('#modalTambah').modal('show'); // Show the modal
                 });
@@ -332,7 +332,7 @@
                     var pu = $(this).data('pu');
                     var mesin_mati = total_mc - mesin_jalan;
 
-                    $('#ModalEdit').find('form').attr('action', '<?= base_url('planning/updatemesinperjarum/') ?>' + id_data_mesin);
+                    $('#ModalEdit').find('form').attr('action', '<?= base_url($role . '/updatemesinperjarum/') ?>' + id_data_mesin);
                     $('#ModalEdit').find('input[name="id"]').val(id_data_mesin);
                     $('#ModalEdit').find('input[name="area"]').val(area);
                     $('#ModalEdit').find('input[name="jarum"]').val(jarum);
@@ -350,7 +350,7 @@
                 });
                 $('.delete-btn').click(function() {
                     var id = $(this).data('id');
-                    $('#ModalDelete').find('form').attr('action', '<?= base_url('planning/deletemesinareal/') ?>' + id);
+                    $('#ModalDelete').find('form').attr('action', '<?= base_url($role . '/deletemesinareal/') ?>' + id);
                     $('#ModalDelete').find('input[name="id_data_mesin"]').val(id);
                     $('#ModalDelete').modal('show'); // Show the modal
                 });

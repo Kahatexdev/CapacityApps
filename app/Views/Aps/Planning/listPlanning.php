@@ -1,6 +1,6 @@
 <?php ini_set('display_errors', 1);
 error_reporting(E_ALL); ?>
-<?php $this->extend('Aps/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -59,7 +59,7 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm"><?= $order['jarum']; ?> Needle</td>
                                             <td class="text-sm"><?= $order['mesin']; ?> Mc</td>
                                             <td class="text-sm">
-                                                <form method="GET" action="<?= base_url('aps/detaillistplanning/' . $order['judul']); ?>">
+                                                <form method="GET" action="<?= base_url($role . '/detaillistplanning/' . $order['judul']); ?>">
                                                     <button type="submit" class="btn btn-info btn-sm">
                                                         Detail
                                                     </button>

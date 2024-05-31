@@ -1,4 +1,4 @@
-<?php $this->extend('Planning/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
@@ -29,7 +29,7 @@
 
         <?php foreach ($TotalMesin as $jr) : ?>
             <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-                <a href="<?= base_url('planning/dataorderperjarum/' . $jr['jarum']) ?>">
+                <a href="<?= base_url($role . '/dataorderperjarum/' . $jr['jarum']) ?>">
                     <div class="card">
                         <div class="card-body p-3">
                             <div class="row">

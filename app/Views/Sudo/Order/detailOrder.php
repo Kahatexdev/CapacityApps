@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -33,9 +33,9 @@
                         <h5>
                             Detail Data Model <?= $noModel ?> Delivery <?= date('d-M-Y', strtotime($delivery)) ?>
                         </h5>
-                        <a href="<?= base_url('capacity/semuaOrder/') ?>" class="btn bg-gradient-dark d-inline-flex align-items-center">
-                            <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i> 
-                        Back
+                        <a href="<?= base_url($role . '/semuaOrder/') ?>" class="btn bg-gradient-dark d-inline-flex align-items-center">
+                            <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
+                            Back
                         </a>
 
                     </div>
@@ -276,7 +276,7 @@
 
                     var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
 
-                    $('#ModalEdit').find('form').attr('action', '<?= base_url('capacity/updatedetailorder/') ?>' + apsperstyle);
+                    $('#ModalEdit').find('form').attr('action', '<?= base_url($role . '/updatedetailorder/') ?>' + apsperstyle);
                     $('#ModalEdit').find('input[name="idapsperstyle"]').val(apsperstyle);
                     $('#ModalEdit').find('input[name="style"]').val(style);
                     $('#ModalEdit').find('input[name="no_model"]').val(noModel);
@@ -295,7 +295,7 @@
                     var delivery = $(this).data('delivery');
                     var apsperstyle = $(this).data('id');
                     var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
-                    $('#ModalDelete').find('form').attr('action', '<?= base_url('capacity/deletedetailstyle/') ?>' + apsperstyle);
+                    $('#ModalDelete').find('form').attr('action', '<?= base_url($role . '/deletedetailstyle/') ?>' + apsperstyle);
                     $('#ModalDelete').find('input[name="idapsperstyle"]').val(apsperstyle);
                     $('#ModalDelete').find('input[name="no_model"]').val(noModel);
                     $('#ModalDelete').find('input[name="delivery"]').val(formattedDelivery);
@@ -303,7 +303,7 @@
                 });
                 $('.btn-delete-all').click(function() {
                     var noModel = $(this).data('no-model');
-                    $('#ModalDeleteAll').find('form').attr('action', '<?= base_url('capacity/deletedetailorder/') ?>' + noModel);
+                    $('#ModalDeleteAll').find('form').attr('action', '<?= base_url($role . '/deletedetailorder/') ?>' + noModel);
                     $('#ModalDeleteAll').find('input[name="idapsperstyle"]').val(noModel);
                     $('#ModalDeleteAll').modal('show'); // Show the modal
                 });

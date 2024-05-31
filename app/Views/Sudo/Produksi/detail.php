@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -33,7 +33,7 @@
                         <h5>
                             Data Produksi <?= $area ?>
                         </h5>
-                        <a href="<?= base_url('capacity/dataproduksi/') ?>" class="btn bg-gradient-info"> Kembali</a>
+                        <a href="<?= base_url($role . '/dataproduksi/') ?>" class="btn bg-gradient-info"> Kembali</a>
                     </div>
                 </div>
                 <div class="card-body p-3">

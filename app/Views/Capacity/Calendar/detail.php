@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/Calendar/index'); ?>
+<?php $this->extend($role . '/Calendar/index'); ?>
 <?php $this->section('generate'); ?>
 
 <div class="row mt-5">

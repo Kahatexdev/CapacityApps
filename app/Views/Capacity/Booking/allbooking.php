@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 
 <div class="container-fluid py-4">
@@ -16,7 +16,7 @@
                             </div>
                         </div>
                         <div>
-                            <a href="<?= base_url('capacity/databooking/') ?>" class="btn btn-sm bg-gradient-dark">
+                            <a href="<?= base_url($role . '/databooking/') ?>" class="btn btn-sm bg-gradient-dark">
                                 <i class="fas fa-arrow-circle-left text-lg opacity-10" aria-hidden="true" style="margin-right: 0.5rem;"></i>Back
                             </a>
                         </div>
@@ -77,7 +77,7 @@
                         <tbody>
                             <?php foreach ($booking as $bk) : ?>
                                 <tr>
-                                    <td class="text-xs"><?= date('d-M-Y',strtotime($bk['tgl_terima_booking'])) ?></td>
+                                    <td class="text-xs"><?= date('d-M-Y', strtotime($bk['tgl_terima_booking'])) ?></td>
                                     <td class="text-xs"><?= $bk['kd_buyer_booking'] ?></td>
                                     <td class="text-xs"><?= $bk['no_order'] ?></td>
                                     <td class="text-xs"><?= $bk['no_booking'] ?></td>
@@ -85,17 +85,17 @@
                                     <td class="text-xs"><?= $bk['needle'] ?></td>
                                     <td class="text-xs"><?= number_format($bk['qty_booking'], 0, '.', '.') ?> Pcs</td>
                                     <td class="text-xs"><?= number_format($bk['sisa_booking'], 0, '.', '.') ?> Pcs</td>
-                                    <td class="text-xs"><?= number_format(round($bk['sisa_booking']/24), 0, '.', '.') ?> Dz</td>
+                                    <td class="text-xs"><?= number_format(round($bk['sisa_booking'] / 24), 0, '.', '.') ?> Dz</td>
                                     <td class="text-xs"><?= date('d-M-Y', strtotime($bk['delivery'])) ?></td>
                                     <td class="text-xs"><?= $bk['status'] ?></td>
 
                                     <td class="text-xs">
                                         <?php if ($bk['status'] == 'Cancel Booking') : ?>
                                             <!-- If qty is null, set action to Import -->
-                                            <a href="<?= base_url('capacity/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-secondary btn-sm text-xxs">detail</a>
+                                            <a href="<?= base_url($role . '/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-secondary btn-sm text-xxs">detail</a>
                                         <?php else : ?>
                                             <!-- If qty is not null, set action to Details -->
-                                            <a href="<?= base_url('capacity/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm text-xxs">detail</a>
+                                            <a href="<?= base_url($role . '/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm text-xxs">detail</a>
                                         <?php endif; ?>
 
                                     </td>

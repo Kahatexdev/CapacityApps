@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
@@ -15,7 +15,7 @@
                             </div>
                         </div>
                         <div>
-                            
+
                         </div>
                     </div>
                 </div>
@@ -95,7 +95,7 @@
                     </div>
                     <div class="row mt-2">
                         <div class="col-9 pl-0">
-                            <form action="<?= base_url('capacity/importModel') ?>" id="modalForm" method="POST" enctype="multipart/form-data">
+                            <form action="<?= base_url($role . '/importModel') ?>" id="modalForm" method="POST" enctype="multipart/form-data">
                                 <input type="text" class="form-control" name="id_model" hidden>
                                 <input type="text" class="form-control" name="no_model" hidden>
                                 <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control ">
@@ -125,63 +125,86 @@
 
                 $('#importModal').modal('show'); // Show the modal
             });
-            
+
             $('#example').DataTable({
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
-                    url: '<?= base_url('capacity/tampilPerdelivery') ?>',
+                    url: '<?= base_url($role . '/tampilPerdelivery') ?>',
                     type: 'POST'
                 },
-                "columns": [
-                    { 
+                "columns": [{
                         "data": "created_at",
                         "render": function(data, type, row) {
                             if (data) {
                                 // Parse the date and format it as d-M-Y
                                 var date = new Date(data);
                                 var day = ('0' + date.getDate()).slice(-2);
-                                var month = date.toLocaleString('default', { month: 'short' });
+                                var month = date.toLocaleString('default', {
+                                    month: 'short'
+                                });
                                 var year = date.getFullYear();
                                 return `${day}-${month}-${year}`;
                             }
                             return data;
                         }
                     },
-                    { "data": "kd_buyer_order" },
-                    { "data": "no_model" },
-                    { "data": "no_order" },
-                    { "data": "machinetypeid" },
-                    { "data": "product_type" },
-                    { "data": "description" },
-                    { "data": "seam" },
-                    { "data": "leadtime" },
-                    { 
+                    {
+                        "data": "kd_buyer_order"
+                    },
+                    {
+                        "data": "no_model"
+                    },
+                    {
+                        "data": "no_order"
+                    },
+                    {
+                        "data": "machinetypeid"
+                    },
+                    {
+                        "data": "product_type"
+                    },
+                    {
+                        "data": "description"
+                    },
+                    {
+                        "data": "seam"
+                    },
+                    {
+                        "data": "leadtime"
+                    },
+                    {
                         "data": "qty",
                         "render": function(data, type, row) {
                             if (data) {
-                                return parseFloat(data).toLocaleString('en-US', { minimumFractionDigits: 0 });
+                                return parseFloat(data).toLocaleString('en-US', {
+                                    minimumFractionDigits: 0
+                                });
                             }
                             return data;
                         }
                     },
-                    { 
+                    {
                         "data": "sisa",
                         "render": function(data, type, row) {
                             if (data) {
-                                return parseFloat(data).toLocaleString('en-US', { minimumFractionDigits: 0 });
+                                return parseFloat(data).toLocaleString('en-US', {
+                                    minimumFractionDigits: 0
+                                });
                             }
                             return data;
                         }
                     },
-                    { 
+                    {
                         "data": "delivery",
                         "render": function(data, type, row) {
                             if (data) {
                                 // Parse the date and format it as d-M-Y
                                 var date = new Date(data);
                                 var day = ('0' + date.getDate()).slice(-2);
-                                var month = date.toLocaleString('default', { month: 'short' });
+                                var month = date.toLocaleString('default', {
+                                    month: 'short'
+                                });
                                 var year = date.getFullYear();
                                 return `${day}-${month}-${year}`;
                             }
@@ -203,7 +226,7 @@
                             Import
                         </button>`;
             } else {
-                return `<a href="<?= base_url('capacity/detailmodel') ?>/${row.no_model}/${row.delivery}">
+                return `<a href="<?= base_url($role . '/detailmodel') ?>/${row.no_model}/${row.delivery}">
                             <button type="button" class="btn btn-info btn-sm details-btn">Details</button>
                         </a>`;
             }

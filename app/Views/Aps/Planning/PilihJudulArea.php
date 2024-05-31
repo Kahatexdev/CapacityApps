@@ -1,4 +1,4 @@
-<?php $this->extend('Aps/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -105,7 +105,7 @@
                                     <td><?= $order['area'] ?></td>
                                     <td><?= date('F j, Y \a\t g:i A', strtotime($order['updated_at'])) ?></td>
                                     <td>
-                                        <form action="<?= base_url('aps/detailplnmc/' . $order['id_pln_mc']) ?>" method="get">
+                                        <form action="<?= base_url($role . '/detailplnmc/' . $order['id_pln_mc']) ?>" method="get">
                                             <input type="hidden" name="judul" value="<?= $order['judul'] ?>">
                                             <input type="hidden" name="area" value="<?= $order['area'] ?>">
                                             <input type="hidden" name="jarum" value="<?= $order['jarum'] ?>">
@@ -151,7 +151,7 @@
             if (area) {
                 $.ajax({
                     type: 'POST',
-                    url: '<?= base_url('aps/fetch_jarum') ?>',
+                    url: '<?= base_url($role . '/fetch_jarum') ?>',
                     data: {
                         area: area
                     },
@@ -171,7 +171,7 @@
             e.preventDefault();
             $.ajax({
                 type: 'POST',
-                url: '<?= base_url('aps/SimpanJudul') ?>',
+                url: '<?= base_url($role . '/SimpanJudul') ?>',
                 data: $(this).serialize(),
                 success: function(response) {
                     if (response.status === 'success') {

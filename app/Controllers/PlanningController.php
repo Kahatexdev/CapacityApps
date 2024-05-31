@@ -110,6 +110,7 @@ class PlanningController extends BaseController
             $weekCount++;
         }
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Capacity System',
             'active1' => 'active',
             'active2' => '',
@@ -128,12 +129,13 @@ class PlanningController extends BaseController
 
 
         ];
-        return view('Planning/index', $data);
+        return view(session()->get('role') . '/index', $data);
     }
     public function order()
     {
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Order',
             'active1' => '',
             'active2' => '',
@@ -145,40 +147,43 @@ class PlanningController extends BaseController
 
             'TotalMesin' => $totalMesin,
         ];
-        return view('Planning/Order/ordermaster', $data);
+        return view(session()->get('role') . '/Order/ordermaster', $data);
     }
 
     public function assignareal()
     {
         $data = [
+            'role' => session()->get('role'),
             'mastermodel' => $this->request->getPost("no_model"),
             'jarum' => $this->request->getPost("jarum"),
             'area' => $this->request->getPost("area"),
         ];
         $assign = $this->ApsPerstyleModel->asignAreal($data);
         if ($assign) {
-            return redirect()->to(base_url('planning/dataorder/'))->withInput()->with('success', 'Berhasil Assign Area');
+            return redirect()->to(base_url(session()->get('role') . '/dataorder/'))->withInput()->with('success', 'Berhasil Assign Area');
         } else {
-            return redirect()->to(base_url('planning/dataorder/'))->withInput()->with('error', 'Gagal Assign Area');
+            return redirect()->to(base_url(session()->get('role') . '/dataorder/'))->withInput()->with('error', 'Gagal Assign Area');
         }
     }
     public function assignarealall()
     {
         $data = [
+            'role' => session()->get('role'),
             'mastermodel' => $this->request->getPost("no_model"),
             'area' => $this->request->getPost("area"),
         ];
         $assign = $this->ApsPerstyleModel->asignArealall($data);
         if ($assign) {
-            return redirect()->to(base_url('planning/dataorder/'))->withInput()->with('success', 'Berhasil Assign Area');
+            return redirect()->to(base_url(session()->get('role') . '/dataorder/'))->withInput()->with('success', 'Berhasil Assign Area');
         } else {
-            return redirect()->to(base_url('planning/dataorder/'))->withInput()->with('error', 'Gagal Assign Area');
+            return redirect()->to(base_url(session()->get('role') . '/dataorder/'))->withInput()->with('error', 'Gagal Assign Area');
         }
     }
     public function listplanning()
     {
         $dataBooking = $this->KebutuhanMesinModel->listPlan();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'List Planning From Capacity',
             'active1' => '',
             'active2' => '',
@@ -189,12 +194,13 @@ class PlanningController extends BaseController
             'active7' => '',
             'data' => $dataBooking
         ];
-        return view('Planning/Planning/listPlanning', $data);
+        return view(session()->get('role') . '/Planning/listPlanning', $data);
     }
     public function listplanningAps()
     {
         $dataBooking = $this->KebutuhanMesinModel->listPlan();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'List Planning From Capacity',
             'active1' => '',
             'active2' => '',
@@ -205,13 +211,14 @@ class PlanningController extends BaseController
             'active7' => '',
             'data' => $dataBooking
         ];
-        return view('Aps/Planning/listPlanning', $data);
+        return view(session()->get('role') . '/Planning/listPlanning', $data);
     }
 
     public function detaillistplanning($judul)
     {
         $dataplan = $this->KebutuhanMesinModel->jarumPlan($judul);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'List Planning From Capacity',
             'active1' => '',
             'active2' => '',
@@ -223,12 +230,13 @@ class PlanningController extends BaseController
             'data' => $dataplan,
             'judul' => $judul,
         ];
-        return view('Planning/Planning/detailPlanning', $data);
+        return view(session()->get('role') . '/Planning/detailPlanning', $data);
     }
     public function detaillistplanningAps($judul)
     {
         $dataplan = $this->KebutuhanMesinModel->jarumPlan($judul);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'List Planning From Capacity',
             'active1' => '',
             'active2' => '',
@@ -240,7 +248,7 @@ class PlanningController extends BaseController
             'data' => $dataplan,
             'judul' => $judul,
         ];
-        return view('Aps/Planning/detailPlanning', $data);
+        return view(session()->get('role') . '/Planning/detailPlanning', $data);
     }
 
     public function pickmachine($jarum)
@@ -250,6 +258,7 @@ class PlanningController extends BaseController
         $status = $this->request->getPost('deskripsi');
         $id = $this->request->getPost('id');
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Pick Machine',
             'active1' => '',
             'active2' => '',
@@ -264,7 +273,7 @@ class PlanningController extends BaseController
             'id' => $id,
             'jarum' => $jarum,
         ];
-        return view('Planning/Planning/pilihMesin', $data);
+        return view(session()->get('role') . '/Planning/pilihMesin', $data);
     }
 
     public function savemachine($id)
@@ -273,9 +282,9 @@ class PlanningController extends BaseController
         $judulData = $this->KebutuhanMesinModel->find($id);
         $judul = $judulData ? $judulData['judul'] : null;
         if ($data) {
-            return redirect()->to(base_url('planning/detaillistplanning/' . $judul . '/' . $id))->withInput()->with('success', 'Success Pick Machine Area');
+            return redirect()->to(base_url(session()->get('role') . '/detaillistplanning/' . $judul . '/' . $id))->withInput()->with('success', 'Success Pick Machine Area');
         } else {
-            return redirect()->to(base_url('planning/detaillistplanning/' . $judul . '/' . $id))->withInput()->with('error', 'Error Pick Machine Area');
+            return redirect()->to(base_url(session()->get('role') . '/detaillistplanning/' . $judul . '/' . $id))->withInput()->with('error', 'Error Pick Machine Area');
         }
     }
 
@@ -288,6 +297,7 @@ class PlanningController extends BaseController
         $mesin = $judulData ? $judulData['mesin'] : null;
         $jarum = $judulData ? $judulData['jarum'] : null;
         $data = [
+            'role' => session()->get('role'),
             'title' => 'View Detail Machine Choosen',
             'active1' => '',
             'active2' => '',
@@ -302,7 +312,7 @@ class PlanningController extends BaseController
             'jarum' => $jarum,
 
         ];
-        return view('Planning/Planning/mesinSelected', $data);
+        return view(session()->get('role') . '/Planning/mesinSelected', $data);
     }
     public function viewdetailAps($id)
     {
@@ -313,6 +323,7 @@ class PlanningController extends BaseController
         $mesin = $judulData ? $judulData['mesin'] : null;
         $jarum = $judulData ? $judulData['jarum'] : null;
         $data = [
+            'role' => session()->get('role'),
             'title' => 'View Detail Machine Choosen',
             'active1' => '',
             'active2' => '',
@@ -327,6 +338,6 @@ class PlanningController extends BaseController
             'jarum' => $jarum,
 
         ];
-        return view('Aps/Planning/mesinSelected', $data);
+        return view(session()->get('role') . '/Planning/mesinSelected', $data);
     }
 }

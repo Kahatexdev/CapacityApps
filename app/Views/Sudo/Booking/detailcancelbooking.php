@@ -1,4 +1,4 @@
-<?php $this->extend('Sudo/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 
 <div class="container-fluid py-4">
@@ -76,7 +76,7 @@
                                     <td class="text-xs"><?= round($bk['qty_cancel'] / 24) ?> Dz</td>
                                     <td class="text-xs"><?= $bk['alasan'] ?></td>
                                     <td class="text-xs">
-                                        <form action="<?= base_url() . 'sudo/uncancelbooking/' . $bk['id_booking']; ?>" method="post">
+                                        <form action="<?= base_url() . $role . '/uncancelbooking/' . $bk['id_booking']; ?>" method="post">
                                             <input type="hidden" name="qty_cancel" value="<?= $bk['qty_cancel'] ?>">
                                             <button type="submit" class="btn btn-primary btn-sm">Uncancel</button>
                                         </form>

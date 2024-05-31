@@ -1,6 +1,6 @@
 <?php ini_set('display_errors', 1);
 error_reporting(E_ALL); ?>
-<?php $this->extend('Aps/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -67,7 +67,7 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm"><?= $order['mc_nyala'] !== null ? $order['mc_nyala'] . ' Mc' : 'Mc not choosen yet'; ?></td>
                                             <td class="text-sm">
                                                 <?php if ($order['mc_nyala'] === null) : ?>
-                                                    <form method="POST" action="<?= base_url('planning/pickmachine/' . $order['jarum']); ?>">
+                                                    <form method="POST" action="<?= base_url($role . '/pickmachine/' . $order['jarum']); ?>">
                                                         <input type="hidden" name="id" value="<?= $order['id']; ?>">
                                                         <input type="hidden" name="mesin" value="<?= $order['mesin']; ?>">
                                                         <input type="hidden" name="deskripsi" value="<?= $order['deskripsi']; ?>">
@@ -76,7 +76,7 @@ error_reporting(E_ALL); ?>
                                                         </button>
                                                     </form>
                                                 <?php else : ?>
-                                                    <form method="POST" action="<?= base_url('aps/viewdetail/' . $order['id']); ?>">
+                                                    <form method="POST" action="<?= base_url($role . '/viewdetail/' . $order['id']); ?>">
                                                         <button type="submit" class="btn btn-primary btn-sm">
                                                             View Machine Details
                                                         </button>

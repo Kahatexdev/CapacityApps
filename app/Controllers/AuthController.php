@@ -41,6 +41,9 @@ class AuthController extends BaseController
             case 'god':
                 return redirect()->to(base_url('/sudo'));
                 break;
+            case 'sudo':
+                return redirect()->to(base_url('/sudo'));
+                break;
             case 'ie':
                 return redirect()->to(base_url('/ie'));
                 break;

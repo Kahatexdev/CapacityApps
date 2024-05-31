@@ -1,28 +1,28 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <?php if (session()->getFlashdata('success')) : ?>
-        <script>
-            $(document).ready(function() {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: '<?= session()->getFlashdata('success') ?>',
-                });
+    <script>
+        $(document).ready(function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '<?= session()->getFlashdata('success') ?>',
             });
-        </script>
-    <?php endif; ?>
+        });
+    </script>
+<?php endif; ?>
 
-    <?php if (session()->getFlashdata('error')) : ?>
-        <script>
-            $(document).ready(function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: '<?= session()->getFlashdata('error') ?>',
-                });
+<?php if (session()->getFlashdata('error')) : ?>
+    <script>
+        $(document).ready(function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '<?= session()->getFlashdata('error') ?>',
             });
-        </script>
-    <?php endif; ?>
+        });
+    </script>
+<?php endif; ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
@@ -41,7 +41,7 @@
                             <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-success bg-gradient-success shadow text-center border-radius-md">
                                 Input Data Order
                             </button>
-                            <a href="<?= base_url('capacity/orderPerjarum/')?>" class="btn bg-gradient-info"> Back</a>
+                            <a href="<?= base_url($role . '/orderPerjarum/') ?>" class="btn bg-gradient-info"> Back</a>
                         </div>
                     </div>
                 </div>
@@ -57,8 +57,8 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form action="<?= base_url('capacity/inputOrderManual') ?>" method="post">
-                            <input type="hidden" class="form-control" name="id" value=<?=$jarum?>>
+                            <form action="<?= base_url($role . '/inputOrderManual') ?>" method="post">
+                                <input type="hidden" class="form-control" name="id" value=<?= $jarum ?>>
                                 <div class="form-group">
                                     <label for="tgl-bk-form-label">Tanggal Turun Order</label>
                                     <input type="date" class="form-control" name="tgl_turun">
@@ -121,7 +121,7 @@
                         <tbody>
                             <?php foreach ($tampildata as $order) : ?>
                                 <tr>
-                                <td class="text-xs"><?= date('d-M-y', strtotime($order->created_at)); ?></td>
+                                    <td class="text-xs"><?= date('d-M-y', strtotime($order->created_at)); ?></td>
                                     <td class="text-xs"><?= $order->kd_buyer_order; ?></td>
                                     <td class="text-xs"><?= $order->no_model; ?></td>
                                     <td class="text-xs"><?= $order->no_order; ?></td>
@@ -129,7 +129,7 @@
                                     <td class="text-xs"><?= $order->product_type; ?></td>
                                     <td class="text-xs"><?= $order->description; ?></td>
                                     <td class="text-xs"><?= $order->seam; ?></td>
-                                    <td class="text-xs"><?= $order->leadtime; ?>  Days</td>
+                                    <td class="text-xs"><?= $order->leadtime; ?> Days</td>
                                     <td class="text-xs"><?= date('d-M-y', strtotime($order->delivery)); ?></td>
                                     <td class="text-xs"><?= number_format(round($order->qty / 24), 0, ',', '.'); ?> Dz</td>
                                     <td class="text-xs"><?= number_format(round($order->sisa / 24), 0, ',', '.'); ?> Dz</td>
@@ -141,7 +141,7 @@
                                             </button>
                                         <?php else : ?>
                                             <!-- If qty is not null, set action to Details -->
-                                            <a href="<?= base_url('capacity/detailmodeljarum/' . $order->no_model . '/' . $order->delivery .'/' . $order->machinetypeid); ?>" <button type="button" class="btn btn-info btn-sm details-btn">
+                                            <a href="<?= base_url($role . '/detailmodeljarum/' . $order->no_model . '/' . $order->delivery . '/' . $order->machinetypeid); ?>" <button type="button" class="btn btn-info btn-sm details-btn">
                                                 Details
                                                 </button>
                                             </a>
@@ -151,7 +151,7 @@
                             <?php endforeach; ?>
                         </tbody>
                         <tfoot>
-                            <th colspan = 9></th>
+                            <th colspan=9></th>
                             <th> Total : </th>
                             <th></th>
                             <th></th>
@@ -163,7 +163,7 @@
 
         </div>
     </div>
-    
+
 
     <!-- modal -->
     <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModal" aria-hidden="true">
@@ -191,7 +191,7 @@
                     <div class="row mt-2">
                         <div class="col-9 pl-0">
 
-                            <form action="<?= base_url('capacity/importModel') ?>" id="modalForm" method="POST" enctype="multipart/form-data">
+                            <form action="<?= base_url($role . '/importModel') ?>" id="modalForm" method="POST" enctype="multipart/form-data">
                                 <input type="text" class="form-control" name="id_model" hidden>
                                 <input type="text" class="form-control" name="no_model" hidden>
                                 <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control ">
@@ -213,35 +213,35 @@
         $(document).ready(function() {
             $('#example').DataTable({
                 "order": [],
-                "footerCallback": function (row, data, start, end, display) {
-                        var api = this.api();
+                "footerCallback": function(row, data, start, end, display) {
+                    var api = this.api();
 
-                        var qty = api.column(10, {
-                            page: 'current'
-                        }).data().reduce(function(a, b) {
-                            return parseInt(a) + parseInt(b);
-                        }, 0);
+                    var qty = api.column(10, {
+                        page: 'current'
+                    }).data().reduce(function(a, b) {
+                        return parseInt(a) + parseInt(b);
+                    }, 0);
 
-                        // Calculate the total of the 5th column (Remaining Qty in dozens) - index 4
-                        var sisa = api.column(11, {
-                            page: 'current'
-                        }).data().reduce(function(a, b) {
-                            return parseInt(a) + parseInt(b);
-                        }, 0);
+                    // Calculate the total of the 5th column (Remaining Qty in dozens) - index 4
+                    var sisa = api.column(11, {
+                        page: 'current'
+                    }).data().reduce(function(a, b) {
+                        return parseInt(a) + parseInt(b);
+                    }, 0);
 
-                        // Format totalqty and totalsisa with " Dz" suffix and dots for thousands
-                        var totalqty = numberWithDots(qty) + " Dz";
-                        var totalsisa = numberWithDots(sisa) + " Dz";
+                    // Format totalqty and totalsisa with " Dz" suffix and dots for thousands
+                    var totalqty = numberWithDots(qty) + " Dz";
+                    var totalsisa = numberWithDots(sisa) + " Dz";
 
-                        // Update the footer cell for the total Qty
-                        $(api.column(10).footer()).html(totalqty);
+                    // Update the footer cell for the total Qty
+                    $(api.column(10).footer()).html(totalqty);
 
-                        // Update the footer cell for the total Sisa
-                        $(api.column(11).footer()).html(totalsisa);
-                      
-                    }
+                    // Update the footer cell for the total Sisa
+                    $(api.column(11).footer()).html(totalsisa);
+
+                }
             });
-            
+
             // Function to add dots for thousands
             function numberWithDots(x) {
                 return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -261,7 +261,7 @@
                 var selectedJarum = $(this).val();
                 if (selectedJarum) {
                     $.ajax({
-                        url: '<?= base_url('capacity/getTypebyJarum') ?>', // Ubah dengan URL controller Anda
+                        url: '<?= base_url($role . '/getTypebyJarum') ?>', // Ubah dengan URL controller Anda
                         type: 'POST',
                         data: {
                             jarum: selectedJarum

@@ -20,6 +20,7 @@ class KebutuhanMesin extends BaseController
     {
         $desk = $this->request->getPost("deskripsi");
         $data = [
+            'role' => session()->get('role'),
             'judul' => $this->request->getPost("judul"),
             'jarum' => $this->request->getPost("jarum"),
             'mesin' => $this->request->getPost("totalMc"),
@@ -33,9 +34,9 @@ class KebutuhanMesin extends BaseController
         $insert = $this->kebMC->insert($data);
 
         if ($insert) {
-            return redirect()->to(base_url('/capacity'))->withInput()->with('success', 'Data Berhasil Di input');
+            return redirect()->to(base_url(session()->get('role') . ''))->withInput()->with('success', 'Data Berhasil Di input');
         } else {
-            return redirect()->to(base_url('/capacity'))->withInput()->with('error', 'Data Gagal Di input');
+            return redirect()->to(base_url(session()->get('role') . ''))->withInput()->with('error', 'Data Gagal Di input');
         }
     }
 }

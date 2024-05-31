@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
@@ -28,7 +28,7 @@
     <div class="row">
 
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-            <a href="<?= base_url('capacity/semuaOrder/') ?>">
+            <a href="<?= base_url($role . '/semuaOrder/') ?>">
                 <div class="card">
                     <div class="card-body p-3">
                         <div class="row">
@@ -52,10 +52,10 @@
                 </div>
             </a>
         </div>
-        
+
 
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-            <a href="<?= base_url('capacity/orderPerjarum/') ?>">
+            <a href="<?= base_url($role . '/orderPerjarum/') ?>">
                 <div class="card">
                     <div class="card-body p-3">
                         <div class="row">
@@ -81,7 +81,7 @@
         </div>
 
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-            <a href="<?= base_url('capacity/orderPerjarumBln/') ?>">
+            <a href="<?= base_url($role . '/orderPerjarumBln/') ?>">
                 <div class="card">
                     <div class="card-body p-3">
                         <div class="row">
@@ -107,7 +107,7 @@
         </div>
 
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-            <a href="<?= base_url('capacity/belumImport/') ?>">
+            <a href="<?= base_url($role . '/belumImport/') ?>">
                 <div class="card">
                     <div class="card-body p-3">
                         <div class="row">

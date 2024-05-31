@@ -50,6 +50,7 @@ class IeController extends BaseController
     {
         $orders = $this->ApsPerstyleModel->getSmv();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Dashboard',
             'active1' => 'active',
             'active2' => '',

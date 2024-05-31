@@ -1,4 +1,4 @@
-<?php $this->extend('Planning/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
@@ -80,7 +80,7 @@
                                     <td class="text-xs"><?= $order->sisa; ?></td>
                                     <td class="text-xs">
                                         <!-- If qty is not null, set action to Details -->
-                                        <a href="<?= base_url('planning/detailModelPlanning/' . $order->no_model . '/' . $order->delivery); ?>" <button type="button" class="btn btn-info btn-sm details-btn">
+                                        <a href="<?= base_url($role . '/detailModelPlanning/' . $order->no_model . '/' . $order->delivery); ?>" <button type="button" class="btn btn-info btn-sm details-btn">
                                             Details
                                             </button>
                                         </a>

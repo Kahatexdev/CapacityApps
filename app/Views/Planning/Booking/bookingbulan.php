@@ -1,4 +1,4 @@
-<?php $this->extend('Planning/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
@@ -16,7 +16,7 @@
                         </div>
                         <div class="col-4 text-end">
 
-                            <a href="<?= base_url('planning/databooking') ?>" class="btn btn-sm bg-gradient-dark shadow text-center border-radius-md d-inline-flex align-items-center">
+                            <a href="<?= base_url($role . '/databooking') ?>" class="btn btn-sm bg-gradient-dark shadow text-center border-radius-md d-inline-flex align-items-center">
                                 <i class="fas fa-arrow-circle-left text-lg opacity-10" aria-hidden="true" style="margin-right: 0.5rem;"></i> Back
                             </a>
                         </div>
@@ -54,7 +54,7 @@
 
         <?php foreach ($bulan as $jr) : ?>
             <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-                <a href="<?= base_url('planning/databookingbulantampil/' . $jr['bulan'] . '/' . $jr['tahun']) . '/' . $jarum ?>">
+                <a href="<?= base_url($role . '/databookingbulantampil/' . $jr['bulan'] . '/' . $jr['tahun']) . '/' . $jarum ?>">
                     <div class="card">
                         <div class="card-body p-3">
                             <div class="row">

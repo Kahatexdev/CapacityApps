@@ -34,7 +34,7 @@ class CapacityController extends BaseController
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         $this->liburModel = new LiburModel();
-        if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
+        if ($this->filters   = ['role' => ['capaciity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
         $this->isLogedin();
@@ -101,7 +101,8 @@ class CapacityController extends BaseController
             $weekCount++;
         }
         $data = [
-            'title' => 'Capacity System',
+            'role' => session()->get('role'),
+            'title' => session()->get('role') . ' System',
             'active1' => 'active',
             'active2' => '',
             'active3' => '',
@@ -119,21 +120,22 @@ class CapacityController extends BaseController
 
 
         ];
-        return view('Capacity/index', $data);
+        return view(session()->get('role') . '/index', $data);
     }
     public function inputLibur()
     {
         $tanggal = $this->request->getPost('tgl_libur');
         $nama = $this->request->getPost('nama');
         $data = [
+            'role' => session()->get('role'),
             'tanggal' => $tanggal,
             'nama' => $nama
         ];
         $insert = $this->liburModel->insert($data);
         if ($insert) {
-            return redirect()->to(base_url('/capacity'))->withInput()->with('success', 'Tanggal Berhasil Di Input');
+            return redirect()->to(base_url(session()->get('role') . ''))->withInput()->with('success', 'Tanggal Berhasil Di Input');
         } else {
-            return redirect()->to(base_url('/capacity'))->withInput()->with('error', 'Gagal Input Tanggal');
+            return redirect()->to(base_url(session()->get('role') . ''))->withInput()->with('error', 'Gagal Input Tanggal');
         }
     }
 }

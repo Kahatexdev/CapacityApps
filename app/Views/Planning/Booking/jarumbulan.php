@@ -1,4 +1,4 @@
-<?php $this->extend('Planning/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 
 <div class="container-fluid py-4">
@@ -16,7 +16,7 @@
                             </div>
                         </div>
                         <div>
-                            <a href="<?= base_url('planning/databookingbulan/' . $jarum) ?>" class="btn btn-sm bg-gradient-dark">
+                            <a href="<?= base_url($role . '/databookingbulan/' . $jarum) ?>" class="btn btn-sm bg-gradient-dark">
                                 <i class="fas fa-arrow-circle-left text-lg opacity-10" aria-hidden="true" style="margin-right: 0.5rem;"></i>Back
                             </a>
                         </div>
@@ -93,10 +93,10 @@
                                 <td class="text-xs">
                                     <?php if ($bk['status'] == 'Cancel Booking') : ?>
                                         <!-- If qty is null, set action to Import -->
-                                        <a href="<?= base_url('planning/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-secondary btn-sm text-xxs">detail</a>
+                                        <a href="<?= base_url($role . '/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-secondary btn-sm text-xxs">detail</a>
                                     <?php else : ?>
                                         <!-- If qty is not null, set action to Details -->
-                                        <a href="<?= base_url('planning/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm text-xxs">detail</a>
+                                        <a href="<?= base_url($role . '/detailbooking/' . $bk['id_booking']) ?>" class="btn bg-gradient-success btn-sm text-xxs">detail</a>
                                     <?php endif; ?>
 
                                 </td>

@@ -1,4 +1,4 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row mt-2 mb-4">
@@ -130,7 +130,7 @@
                                             <p class="text-xs font-weight-bold mb-0"><?= number_format(round($detail['qty_turun'] / 24), 0, ',', '.') ?> Dz</p>
                                         </td>
                                         <td> <!-- Actions column -->
-                                            <form id="detailForm" action="<?= base_url() ?>capacity/detailturunorder/<?= $detail['week_number'] ?>/<?= $detail['kd_buyer_order'] ?>" method="POST">
+                                            <form id="detailForm" action="<?= base_url($role . '/detailturunorder/' . $detail['week_number'] . '/' . $detail['kd_buyer_order']) ?>" method="POST">
                                                 <button type="submit" class="btn btn-success">Detail</button>
                                             </form>
                                         </td>

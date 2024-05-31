@@ -1,4 +1,4 @@
-<?php $this->extend('Sudo/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
@@ -18,7 +18,7 @@
                             <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Import Data
                             </button>
-                            <a href="<?= base_url('sudo/databooking') ?>" class="btn btn-sm bg-gradient-dark shadow text-center border-radius-md d-inline-flex align-items-center">
+                            <a href="<?= base_url($role . '/databooking') ?>" class="btn btn-sm bg-gradient-dark shadow text-center border-radius-md d-inline-flex align-items-center">
                                 <i class="fas fa-arrow-circle-left text-lg opacity-10" aria-hidden="true" style="margin-right: 0.5rem;"></i> Back
                             </a>
                         </div>
@@ -78,7 +78,7 @@
                         <div class="row mt-2">
                             <div class="col-9 pl-0">
 
-                                <form action="<?= base_url('sudo/importbooking') ?>" id="modalForm" method="POST" enctype="multipart/form-data">
+                                <form action="<?= base_url($role . '/importbooking') ?>" id="modalForm" method="POST" enctype="multipart/form-data">
                                     <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control ">
                             </div>
                             <div class="col-3 pl-0">
@@ -94,7 +94,7 @@
         </div>
         <?php foreach ($bulan as $jr) : ?>
             <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-                <a href="<?= base_url('sudo/databookingbulantampil/' . $jr['bulan'] . '/' . $jr['tahun']) . '/' . $jarum ?>">
+                <a href="<?= base_url($role . '/databookingbulantampil/' . $jr['bulan'] . '/' . $jr['tahun']) . '/' . $jarum ?>">
                     <div class="card">
                         <div class="card-body p-3">
                             <div class="row">

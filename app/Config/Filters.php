@@ -29,6 +29,7 @@ class Filters extends BaseConfig
         'aps' => \App\Filters\ApsAuth::class,
         'user' => \App\Filters\UserFilter::class,
         'god' => \App\Filters\God::class,
+        'sudo' => \App\Filters\Sudo::class,
         'ie' => \App\Filters\IEFilter::class,
 
     ];
@@ -87,6 +88,9 @@ class Filters extends BaseConfig
         ],
         'god' => [
             'before' => ['god/*'],
+        ],
+        'sudo' => [
+            'before' => ['sudo/*'],
         ],
         'ie' => [
             'before' => ['ie/*'],

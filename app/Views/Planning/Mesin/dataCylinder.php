@@ -1,4 +1,4 @@
-<?php $this->extend('Planning/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -34,7 +34,7 @@
                             Detail Stock Cylinder
                         </h5>
                         <div>
-                            <a href="<?= base_url('planning/datamesin') ?>" class="btn bg-gradient-info"> Back</a>
+                            <a href="<?= base_url($role . '/datamesin') ?>" class="btn bg-gradient-info"> Back</a>
                             <button type="button" class="btn btn-add bg-gradient-success" data-toggle="modal" data-target="#modalTambah">Input Data Mesin</button>
                         </div>
                     </div>
@@ -99,7 +99,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form action="<?= base_url('planning/addcylinder') ?>" method="post">
+                        <form action="<?= base_url($role . '/addcylinder') ?>" method="post">
                             <div class="row">
                                 <div class="col-lg-6 col-sm-6">
                                     <div class="form-group">
@@ -165,7 +165,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form action="<?= base_url('planning/editycylinder') ?>" method="post">
+                        <form action="<?= base_url($role . '/editycylinder') ?>" method="post">
                             <div class="row">
                                 <div class="col-lg-6 col-sm-6">
                                     <div class="form-group">
@@ -271,7 +271,7 @@
                     var nd = $(this).data('nd');
 
                     // Set form action
-                    $('#ModalEdit').find('form').attr('action', '<?= base_url('planning/editcylinder/') ?>' + id);
+                    $('#ModalEdit').find('form').attr('action', '<?= base_url($role . '/editcylinder/') ?>' + id);
 
                     // Set input values
                     $('#ModalEdit').find('input[name="needle"]').val(needle);
@@ -291,7 +291,7 @@
 
                 $('.delete-btn').click(function() {
                     var id = $(this).data('id');
-                    $('#ModalDelete').find('form').attr('action', '<?= base_url('planning/deletecylinder/') ?>' + id);
+                    $('#ModalDelete').find('form').attr('action', '<?= base_url($role . '/deletecylinder/') ?>' + id);
                     $('#ModalDelete').find('input[name="id"]').val(id);
 
                     $('#ModalDelete').modal('show'); // Show the modal
