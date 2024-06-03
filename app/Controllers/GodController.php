@@ -254,12 +254,12 @@ class GodController extends BaseController
             ];
             $insert =   $this->bookingModel->insert($input);
             if ($insert) {
-                return redirect()->to(base_url('/Sudo/databooking/' . $jarum))->withInput()->with('success', 'Data Berhasil Di Input');
+                return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('success', 'Data Berhasil Di Input');
             } else {
-                return redirect()->to(base_url('/Sudo/databooking/' . $jarum))->withInput()->with('error', 'Data Gagal Di Input');
+                return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('error', 'Data Gagal Di Input');
             }
         } else {
-            return redirect()->to(base_url('/Sudo/databooking/' . $jarum))->withInput()->with('error', 'Data Sudah Ada, Silahkan Cek Ulang Kembali Inputanya');
+            return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('error', 'Data Sudah Ada, Silahkan Cek Ulang Kembali Inputanya');
         }
     }
     public function detailbooking($idBooking)
@@ -383,12 +383,12 @@ class GodController extends BaseController
 
             if ($insert) {
                 $this->bookingModel->update($id_booking, ['sisa_booking' => $this->request->getPost("sisa")]);
-                return redirect()->to(base_url('/Sudo/databooking/' . $jarum))->withInput()->with('success', 'Data Berhasil Di Input');
+                return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('success', 'Data Berhasil Di Input');
             } else {
-                return redirect()->to(base_url('/Sudo/databooking/' . $jarum))->withInput()->with('error', 'Data Gagal Di Input');
+                return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('error', 'Data Gagal Di Input');
             }
         } else {
-            return redirect()->to(base_url('/Sudo/databooking/' . $jarum))->withInput()->with('error', 'Data Sudah Ada, Silahkan Cek Ulang Kembali Inputanya');
+            return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('error', 'Data Sudah Ada, Silahkan Cek Ulang Kembali Inputanya');
         }
     }
     public function importbooking()
@@ -454,9 +454,9 @@ class GodController extends BaseController
                     }
                 }
             }
-            return redirect()->to(base_url('/Sudo/databooking'))->withInput()->with('success', 'Data Berhasil di Import');
+            return redirect()->to(base_url(session()->get('role') . '/databooking'))->withInput()->with('success', 'Data Berhasil di Import');
         } else {
-            return redirect()->to(base_url('/Sudo/databooking'))->with('error', 'No data found in the Excel file');
+            return redirect()->to(base_url(session()->get('role') . '/databooking'))->with('error', 'No data found in the Excel file');
         }
     }
     public function importpecahbooking()
@@ -526,9 +526,9 @@ class GodController extends BaseController
                     }
                 }
             }
-            return redirect()->to(base_url('/Sudo/detailbooking/' . $refId))->withInput()->with('success', 'Data Berhasil di Import');
+            return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $refId))->withInput()->with('success', 'Data Berhasil di Import');
         } else {
-            return redirect()->to(base_url('/Sudo/detailbooking/' . $refId))->with('error', 'No data found in the Excel file');
+            return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $refId))->with('error', 'No data found in the Excel file');
         }
     }
     public function updatebooking($idBooking)
