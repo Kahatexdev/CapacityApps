@@ -160,7 +160,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetail/$1');
 
-    $routes->get('dataproduksi', 'GodController::viewProduksiPlan');
+    $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
     $routes->get('dataprogress', 'GodController::progressData');
     $routes->get('produksiareachart', 'GodController::produksiAreaChart');
     $routes->get('dataproduksi/(:any)', 'GodController::produksiPerArea/$1');
@@ -217,11 +217,11 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetailAps/$1');
 
-    $routes->get('dataproduksi', 'GodController::viewProduksiPlan');
-    $routes->get('dataprogress', 'GodController::progressData');
-    $routes->get('produksiareachart', 'GodController::produksiAreaChart');
-    $routes->get('dataproduksi/(:any)', 'GodController::produksiPerArea/$1');
-    $routes->post('importproduksi', 'GodController::importproduksi');
+    $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
+    $routes->get('dataprogress', 'ProduksiController::progressData');
+    $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
+    $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->post('importproduksi', 'ProduksiController::importproduksi');
     $routes->get('planningmesin', 'ApsController::planningmesin');
     $routes->post('fetch_jarum', 'ApsController::fetch_jarum');
     $routes->post('SimpanJudul', 'ApsController::saveplanningmesin');
@@ -286,11 +286,13 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
 
 
     // produksi
-    $routes->get('dataproduksi', 'GodController::viewProduksi');
-    $routes->get('dataprogress', 'GodController::progressData');
-    $routes->get('produksiareachart', 'GodController::produksiAreaChart');
-    $routes->get('dataproduksi/(:any)', 'GodController::produksiPerArea/$1');
-    $routes->post('importproduksi', 'GodController::importproduksi');
+    $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
+    $routes->get('produksi', 'ProduksiController::produksi');
+    $routes->get('dataprogress', 'ProduksiController::progressData');
+    $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
+    $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->post('importproduksi', 'ProduksiController::importproduksi');
+
 
     // mesin
     $routes->get('datamesin', 'MesinController::index');

@@ -12,6 +12,7 @@ use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpParser\Node\Stmt\Else_;
 
 class ProduksiController extends BaseController
 {
@@ -33,7 +34,7 @@ class ProduksiController extends BaseController
         $this->produksiModel = new ProduksiModel();
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
-        if ($this->filters   = ['role' => ['capacity'], 'role' => ['user'], 'role' => ['planning']] != session()->get('role')) {
+        if ($this->filters   = ['role' => [session()->get('role') . ''], 'role' => ['user'], 'role' => ['planning']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
         $this->isLogedin();
@@ -54,22 +55,24 @@ class ProduksiController extends BaseController
         $month = date('F');
         $totalMesin = $this->jarumModel->getArea();
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
+        $dataPdk = $this->ApsPerstyleModel->getPdkProduksi();
+
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Produksi',
             'active1' => '',
-            'active2' => 'active',
+            'active2' => '',
             'active3' => '',
-            'active4' => '',
+            'active4' => 'active',
             'active5' => '',
             'active6' => '',
             'active7' => '',
-
+            'pdk' => $dataPdk,
             'Area' => $totalMesin,
             'Produksi' => $dataProduksi,
             'bulan' => $month
         ];
-        return view('User/produksi', $data);
+        return view(session()->get('role') . '/produksi', $data);
     }
     public function produksiPerArea($area)
     {
@@ -89,7 +92,7 @@ class ProduksiController extends BaseController
             'produksi' => $produksi,
             'area' => $area
         ];
-        return view('Capacity/Produksi/detail', $data);
+        return view(session()->get('role') . '/Produksi/detail', $data);
     }
     public function importproduksi()
     {
@@ -136,12 +139,12 @@ class ProduksiController extends BaseController
             if (!empty($failedRows)) {
                 $failedRowsStr = implode(', ', $failedRows);
                 $errorMessage = "Baris berikut gagal diimpor: $failedRowsStr";
-                return redirect()->to(base_url('/user/produksi'))->with('error', $errorMessage);
+                return redirect()->to(base_url(session()->get('role') . '/produksi'))->with('error', $errorMessage);
             }
 
-            return redirect()->to(base_url('/user/produksi'))->withInput()->with('success', 'Data Berhasil di Import');
+            return redirect()->to(base_url(session()->get('role') . '/produksi'))->withInput()->with('success', 'Data Berhasil di Import');
         } else {
-            return redirect()->to(base_url('/user/produksi'))->with('error', 'No data found in the Excel file');
+            return redirect()->to(base_url(session()->get('role') . '/produksi'))->with('error', 'No data found in the Excel file');
         }
     }
 
@@ -205,6 +208,7 @@ class ProduksiController extends BaseController
                                 'delivery' => $deliv,
                                 'area' => $area
                             ];
+                            dd($dataInsert);
                             $existingProduction = $this->produksiModel->existingData($dataInsert);
                             if (!$existingProduction) {
                                 $this->produksiModel->insert($dataInsert);
@@ -277,8 +281,13 @@ class ProduksiController extends BaseController
                     ];
                     $existingProduction = $this->produksiModel->existingData($dataInsert);
                     if (!$existingProduction) {
-                        $this->produksiModel->insert($dataInsert);
-                        $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
+                        $insert =  $this->produksiModel->insert($dataInsert);
+                        if ($insert) {
+                            $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
+                        } else {
+                            $failedRows[] = $rowIndex;
+                            continue;
+                        }
                     } else {
                         $idexist = $existingProduction['id_produksi'];
                         $sumqty = $existingProduction['qty_produksi'] + $qty;
@@ -323,7 +332,7 @@ class ProduksiController extends BaseController
             'bulan' => $month,
 
         ];
-        return view('Capacity/Produksi/produksi', $data);
+        return view(session()->get('role') . '/Produksi/produksi', $data);
     }
     public function progressData($noModel)
     {

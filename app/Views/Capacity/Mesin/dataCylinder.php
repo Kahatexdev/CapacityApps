@@ -34,7 +34,7 @@
                             Detail Stock Cylinder
                         </h5>
                         <div>
-                            <a href="<?= base_url($role . '/mesinperarea') ?>" class="btn bg-gradient-info"> Back</a>
+                            <a href="<?= base_url($role . '/datamesin') ?>" class="btn bg-gradient-info"> Back</a>
                             <button type="button" class="btn btn-add bg-gradient-success" data-toggle="modal" data-target="#modalTambah">Input Data Mesin</button>
                         </div>
                     </div>

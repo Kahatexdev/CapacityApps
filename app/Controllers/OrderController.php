@@ -289,6 +289,7 @@ class OrderController extends BaseController
 
     public function DetailOrderPerJarumBlnDetail($bulan, $tahun, $jarum)
     {
+        $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $tampilperdelivery = $this->orderModel->tampilPerjarumBulan($bulan, $tahun, $jarum);
         $product = $this->productModel->findAll();
         $booking = $data = [
@@ -304,6 +305,7 @@ class OrderController extends BaseController
             'jarum' => $jarum,
             'tampildata' => $tampilperdelivery,
             'product' => $product,
+            'jenisJarum' => $totalMesin,
 
         ];
         return view(session()->get('role') . '/Order/semuaorderjarum', $data);

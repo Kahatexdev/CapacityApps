@@ -39,7 +39,7 @@
                                 Input Data Machine
                             </button>
 
-                            <a href="<?= base_url($role . '/mesinperarea/' . $pu) ?>" class="btn bg-gradient-dark">
+                            <a href="<?= base_url($role . '/datamesin') ?>" class="btn bg-gradient-dark">
                                 <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
                                 Back</a>
                         </div>
