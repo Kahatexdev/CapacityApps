@@ -1,4 +1,4 @@
-<?php $this->extend('Sudo/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>

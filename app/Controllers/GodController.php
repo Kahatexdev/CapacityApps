@@ -112,6 +112,7 @@ class GodController extends BaseController
             $weekCount++;
         }
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Capacity System',
             'active1' => 'active',
             'active2' => '',
@@ -139,6 +140,7 @@ class GodController extends BaseController
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
 
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -158,6 +160,7 @@ class GodController extends BaseController
         $booking = $this->bookingModel->getDataPerjarum($jarum);
 
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -178,6 +181,7 @@ class GodController extends BaseController
     {
         $bulan = $this->bookingModel->getbulan($jarum);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -197,6 +201,7 @@ class GodController extends BaseController
         $booking = $this->bookingModel->getDataPerjarumbulan($bulan, $tahun, $jarum);
         $product = $this->productModel->getJarum($jarum);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -271,6 +276,7 @@ class GodController extends BaseController
         $childOrder = $this->orderModel->getChild($idBooking);
         $childBooking = $this->bookingModel->getChild($idBooking);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -323,6 +329,7 @@ class GodController extends BaseController
                     $status = "Aktif";
                 }
                 $data = [
+                    'role' => session()->get('role'),
                     'sisa_booking' => $sisa_booking,
                     'status' => $status
                 ];
@@ -401,7 +408,7 @@ class GodController extends BaseController
             foreach ($spreadsheet->getActiveSheet()->getRowIterator($startRow) as $row) {
                 $cellIterator = $row->getCellIterator();
                 $cellIterator->setIterateOnlyExistingCells(false);
-                $data = [];
+                $data = ['role' => session()->get('role'),];
                 foreach ($cellIterator as $cell) {
                     $data[] = $cell->getValue();
                 }
@@ -472,7 +479,7 @@ class GodController extends BaseController
             foreach ($spreadsheet->getActiveSheet()->getRowIterator($startRow) as $row) {
                 $cellIterator = $row->getCellIterator();
                 $cellIterator->setIterateOnlyExistingCells(false);
-                $data = [];
+                $data = ['role' => session()->get('role'),];
                 foreach ($cellIterator as $cell) {
                     $data[] = $cell->getValue();
                 }
@@ -535,6 +542,7 @@ class GodController extends BaseController
     {
 
         $data = [
+            'role' => session()->get('role'),
             'no_booking' =>  $this->request->getPost("no_booking"),
             'desc' => $this->request->getPost("desc"),
             'opd' =>  $this->request->getPost("opd"),
@@ -605,6 +613,7 @@ class GodController extends BaseController
         $bulan = array_keys($charts['details']);
         $jumlahPembatalan = array_values($charts['totals']);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Summary Cancel Booking',
             'active1' => '',
             'active2' => '',
@@ -627,6 +636,7 @@ class GodController extends BaseController
 
         $resultCancelBooking = $this->bookingModel->getDetailCancelBooking($week, $buyer);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Detail Cancel Booking',
             'active1' => '',
             'active2' => '',
@@ -653,6 +663,7 @@ class GodController extends BaseController
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
 
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -670,6 +681,7 @@ class GodController extends BaseController
     {
         $bulan = $this->bookingModel->getbulan($jarum);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -688,6 +700,7 @@ class GodController extends BaseController
         $booking = $this->bookingModel->getDataPerjarumbulan($bulan, $tahun, $jarum);
         $product = $this->productModel->getJarum($jarum);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -710,6 +723,7 @@ class GodController extends BaseController
         $booking = $this->bookingModel->getDataPerjarum($jarum);
 
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -734,6 +748,7 @@ class GodController extends BaseController
         $childOrder = $this->orderModel->getChild($idBooking);
         $childBooking = $this->bookingModel->getChild($idBooking);
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Booking',
             'active1' => '',
             'active2' => 'active',
@@ -757,6 +772,7 @@ class GodController extends BaseController
         $Jarum = $this->jarumModel->getJarum();
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Target',
             'active1' => '',
             'active2' => '',
@@ -777,6 +793,7 @@ class GodController extends BaseController
             ->orderBy('id_product_type', 'asc')
             ->findAll();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Data Target by Needle',
             'active1' => '',
             'active2' => '',
@@ -836,6 +853,7 @@ class GodController extends BaseController
         $userdata = $this->userModel->getData();
         $areadata = $this->areaModel->findAll();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Account management',
             'active1' => '',
             'active2' => '',
@@ -874,6 +892,7 @@ class GodController extends BaseController
                 $exists = $this->aksesModel->where(['user_id' => $userId, 'area_id' => $areaId])->first();
                 if (!$exists) {
                     $data = [
+                        'role' => session()->get('role'),
                         'user_id' => $userId,
                         'area_id' => $areaId,
                     ];
@@ -922,6 +941,7 @@ class GodController extends BaseController
                 foreach ($areaList as $areaId) {
 
                     $data = [
+                        'role' => session()->get('role'),
                         'user_id' => $id,
                         'area_id' => $areaId,
                     ];

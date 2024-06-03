@@ -1,4 +1,5 @@
-<?php $this->extend('Sudo/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
+
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
