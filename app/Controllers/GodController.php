@@ -45,7 +45,7 @@ class GodController extends BaseController
         $this->aksesModel = new AksesModel();
         $this->userModel = new UserModel();
         $this->areaModel = new AreaModel();
-        if ($this->filters   = ['role' => ['capacity', 'planning', 'god', 'sudo']] != session()->get('role')) {
+        if ($this->filters   = ['role' => ['capacity', 'planning', 'god', session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
         $this->isLogedin();
@@ -130,7 +130,7 @@ class GodController extends BaseController
 
 
         ];
-        return view('Sudo/index', $data);
+        return view(session()->get('role') . '/index', $data);
     }
 
     public function booking()
@@ -150,7 +150,7 @@ class GodController extends BaseController
             'Jarum' => $dataJarum,
             'TotalMesin' => $totalMesin,
         ];
-        return view('Sudo/Booking/booking', $data);
+        return view(session()->get('role') . '/Booking/booking', $data);
     }
     public function bookingPerJarum($jarum)
     {
@@ -171,7 +171,7 @@ class GodController extends BaseController
             'booking' => $booking
 
         ];
-        return view('Sudo/Booking/jarum', $data);
+        return view(session()->get('role') . '/Booking/jarum', $data);
     }
 
     public function bookingPerBulanJarum($jarum)
@@ -189,7 +189,7 @@ class GodController extends BaseController
             'bulan' => $bulan,
             'jarum' => $jarum,
         ];
-        return view('Sudo/Booking/bookingbulan', $data);
+        return view(session()->get('role') . '/Booking/bookingbulan', $data);
     }
 
     public function bookingPerBulanJarumTampil($bulan, $tahun, $jarum)
@@ -211,7 +211,7 @@ class GodController extends BaseController
             'tahun' => $tahun,
             'jarum' => $jarum,
         ];
-        return view('Sudo/Booking/jarumbulan', $data);
+        return view(session()->get('role') . '/Booking/jarumbulan', $data);
     }
 
     public function inputbooking()
@@ -287,7 +287,7 @@ class GodController extends BaseController
             'childBooking' => $childBooking
 
         ];
-        return view('Sudo/Booking/detail', $data);
+        return view(session()->get('role') . '/Booking/detail', $data);
     }
     public function inputOrder()
     {
@@ -302,7 +302,7 @@ class GodController extends BaseController
         $check = $this->orderModel->checkExist($no_model);
         if ($check) {
             $this->bookingModel->update($id_booking, ['sisa_booking' => $sisa_booking]);
-            return redirect()->to(base_url('Sudo/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
+            return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
         } else {
 
             $inputModel = [
@@ -313,7 +313,7 @@ class GodController extends BaseController
             ];
             $input = $this->orderModel->insert($inputModel);
             if (!$input) {
-                return redirect()->to(base_url('Sudo/detailbooking/' . $id_booking))->withInput()->with('error', 'Gagal Ambil Order');
+                return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $id_booking))->withInput()->with('error', 'Gagal Ambil Order');
             } else {
                 $id = $id_booking;
                 $status = "";
@@ -327,7 +327,7 @@ class GodController extends BaseController
                     'status' => $status
                 ];
                 $this->bookingModel->update($id, $data);
-                return redirect()->to(base_url('Sudo/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
+                return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
             }
         }
     }
@@ -546,9 +546,9 @@ class GodController extends BaseController
         $id = $idBooking;
         $update = $this->bookingModel->update($id, $data);
         if ($update) {
-            return redirect()->to(base_url('Sudo/detailbooking/' . $idBooking))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $idBooking))->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url('Sudo/detailbooking/' . $idBooking))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $idBooking))->withInput()->with('error', 'Gagal Update Data');
         }
     }
     public function deletebooking($idBooking)
@@ -558,9 +558,9 @@ class GodController extends BaseController
         $id = $idBooking;
         $delete = $this->bookingModel->delete($id);
         if ($delete) {
-            return redirect()->to(base_url('Sudo/databooking/' . $jarum))->withInput()->with('success', 'Data Berhasil Di Hapus');
+            return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
-            return redirect()->to(base_url('Sudo/databooking/' . $jarum))->withInput()->with('error', 'Gagal Hapus Data');
+            return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
     public function cancelbooking($idBooking)
@@ -592,9 +592,9 @@ class GodController extends BaseController
 
         // Redirect with success or error message
         if ($input) {
-            return redirect()->to(base_url('Sudo/databooking/' . $jarum))->withInput()->with('success', 'Bookingan Berhasil Di Cancel');
+            return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('success', 'Bookingan Berhasil Di Cancel');
         } else {
-            return redirect()->to(base_url('Sudo/databooking/' . $jarum))->withInput()->with('error', 'Gagal Cancel Booking');
+            return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('error', 'Gagal Cancel Booking');
         }
     }
 
@@ -619,7 +619,7 @@ class GodController extends BaseController
             'jumlahPembatalan' => $jumlahPembatalan,
             'totalChart' => $charts['totals']
         ];
-        return view('Sudo/Booking/cancelbooking', $data);
+        return view(session()->get('role') . '/Booking/cancelbooking', $data);
     }
 
     public function detailcancelbooking($week, $buyer)
@@ -637,7 +637,7 @@ class GodController extends BaseController
             'active7' => '',
             'data' => $resultCancelBooking,
         ];
-        return view('Sudo/Booking/detailcancelbooking', $data);
+        return view(session()->get('role') . '/Booking/detailcancelbooking', $data);
     }
 
     public function getTurunOrder()
@@ -768,7 +768,7 @@ class GodController extends BaseController
             'Jarum' => $Jarum,
             'TotalMesin' => $totalMesin,
         ];
-        return view('Sudo/Target/index', $data);
+        return view(session()->get('role') . '/Target/index', $data);
     }
     public function targetjarum($jarum)
     {
@@ -788,7 +788,7 @@ class GodController extends BaseController
             'product' => $product,
             'jarum' => $jarum
         ];
-        return view('Sudo/Target/target', $data);
+        return view(session()->get('role') . '/Target/target', $data);
     }
     public function edittarget()
     {
@@ -802,7 +802,7 @@ class GodController extends BaseController
                 ->set('keterangan', $keterangan)
                 ->where('id_product_type', $id)
                 ->update();
-            return redirect()->to(base_url('Sudo/datatargetjarum/' . $jarum))->withInput()->with('success', 'Data Berhasil Diinput');
+            return redirect()->to(base_url(session()->get('role') . '/datatargetjarum/' . $jarum))->withInput()->with('success', 'Data Berhasil Diinput');
         }
     }
     public function getTypebyJarum()
@@ -827,7 +827,7 @@ class GodController extends BaseController
                 ->update();
             $this->cancelModel->where('id_booking', $id)
                 ->delete();
-            return redirect()->to(base_url('Sudo/cancelBooking/'))->withInput()->with('success', 'Data Uncancel Success');
+            return redirect()->to(base_url(session()->get('role') . '/cancelBooking/'))->withInput()->with('success', 'Data Uncancel Success');
         }
     }
 
@@ -848,7 +848,7 @@ class GodController extends BaseController
             'area' => $areadata
 
         ];
-        return view('Sudo/Account/index', $data);
+        return view(session()->get('role') . '/Account/index', $data);
     }
     public function addaccount()
     {
@@ -859,9 +859,9 @@ class GodController extends BaseController
         ];
         $query = $this->userModel->insert($insert);
         if ($query) {
-            return redirect()->to(base_url('sudo/account'))->with('success', 'User Berhasil di input');
+            return redirect()->to(base_url(session()->get('role') . '/account'))->with('success', 'User Berhasil di input');
         } else {
-            return redirect()->to(base_url('sudo/account'))->with('error', 'User Gagal di input');
+            return redirect()->to(base_url(session()->get('role') . '/account'))->with('error', 'User Gagal di input');
         }
     }
     public function assignarea()
@@ -880,22 +880,22 @@ class GodController extends BaseController
                     $query = "INSERT INTO user_areas (user_id, area_id) VALUES (?, ?)";
                     $db->query($query, [$userId, $areaId]);
                     if (!$db) {
-                        return redirect()->to(base_url('sudo/account'))->with('error', 'User Gagal di input');
+                        return redirect()->to(base_url(session()->get('role') . '/account'))->with('error', 'User Gagal di input');
                     }
                 }
             }
-            return redirect()->to(base_url('sudo/account'))->with('success', 'User Berhasil di input');
+            return redirect()->to(base_url(session()->get('role') . '/account'))->with('success', 'User Berhasil di input');
         } else {
-            return redirect()->to(base_url('sudo/account'))->with('error', 'Tidak ada data');
+            return redirect()->to(base_url(session()->get('role') . '/account'))->with('error', 'Tidak ada data');
         }
     }
     public function deleteaccount($id)
     {
         $delete = $this->userModel->delete($id);
         if ($delete) {
-            return redirect()->to(base_url('sudo/account'))->with('success', 'User Berhasil di hapus');
+            return redirect()->to(base_url(session()->get('role') . '/account'))->with('success', 'User Berhasil di hapus');
         } else {
-            return redirect()->to(base_url('sudo/account'))->with('error', 'User Gagal di hapus');
+            return redirect()->to(base_url(session()->get('role') . '/account'))->with('error', 'User Gagal di hapus');
         }
     }
     public function updateaccount($id)
@@ -928,7 +928,7 @@ class GodController extends BaseController
                     $query = "INSERT INTO user_areas (user_id, area_id) VALUES (?, ?)";
                     $db->query($query, [$id, $areaId]);
                     if (!$db) {
-                        return redirect()->to(base_url('sudo/account'))->with('error', 'User Gagal di input');
+                        return redirect()->to(base_url(session()->get('role') . '/account'))->with('error', 'User Gagal di input');
                     }
                 }
             }
@@ -936,13 +936,13 @@ class GodController extends BaseController
             $db->transComplete();
 
             if ($db->transStatus() === FALSE) {
-                return redirect()->to(base_url('sudo/account'))->with('error', 'User Gagal di Update');
+                return redirect()->to(base_url(session()->get('role') . '/account'))->with('error', 'User Gagal di Update');
             } else {
-                return redirect()->to(base_url('sudo/account'))->with('success', 'User Berhasil di Update');
+                return redirect()->to(base_url(session()->get('role') . '/account'))->with('success', 'User Berhasil di Update');
             }
         } else {
             $db->transRollback();
-            return redirect()->to(base_url('sudo/account'))->with('error', 'User Gagal di Update');
+            return redirect()->to(base_url(session()->get('role') . '/account'))->with('error', 'User Gagal di Update');
         }
     }
 }
