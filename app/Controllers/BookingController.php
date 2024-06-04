@@ -205,7 +205,7 @@ class BookingController extends BaseController
     public function detailbooking($idBooking)
     {
         $needle = $this->bookingModel->getNeedle($idBooking);
-        $product = $this->productModel->findAll();
+        $product = $this->productModel->getProdType();
         $booking = $this->bookingModel->getDataById($idBooking);
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $childOrder = $this->orderModel->getChild($idBooking);
@@ -491,7 +491,6 @@ class BookingController extends BaseController
             'prodtype' => $productType
         ];
         $idProdtype = $this->productModel->getId($getId);
-
         $data = [
             'role' => session()->get('role'),
             'no_order' => $this->request->getPost("no_order"),

@@ -1,4 +1,4 @@
-<?php $this->extend($role . '/layout'); ?>
+<?php $this->extend('capacity/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -33,7 +33,7 @@
                         <h5>
                             Detail Booking
                         </h5>
-                        <a href="<?= base_url($role . '/databookingbulantampil/' . date('F/Y', strtotime($booking['delivery'])) . '/' . $jarum['needle']) ?>" class="btn bg-gradient-dark">
+                        <a href="<?= base_url('capacity/databookingbulantampil/' . date('F/Y', strtotime($booking['delivery'])) . '/' . $jarum['needle']) ?>" class="btn bg-gradient-dark">
                             <i class="fas fa-arrow-circle-left text-lg opacity-10" aria-hidden="true" style="margin-right: 0.5rem;"></i> Back
                         </a>
                     </div>
@@ -288,7 +288,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="<?= base_url($role . '/updatebooking/' . $booking['id_booking']) ?>" method="post">
+                    <form action="<?= base_url('capacity/updatebooking/' . $booking['id_booking']) ?>" method="post">
                         <div class="row">
                             <div class="col-lg-6 col-sm-12">
                                 <div class="form-group">
@@ -315,7 +315,10 @@
                                 <div class="form-group">
                                     <label for="productType" class="col-form-label">Product Type</label>
                                     <select class="form-control" id="productType" name="productType">
-                                        <option value="">Choose</option>
+                                        <option value=""> Choose</option>
+                                        <?php foreach ($product as $key => $val) : ?>
+                                            <option value="<?= $val['product_type'] ?>"><?= $val['product_type'] ?></option>
+                                        <?php endforeach ?>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -379,7 +382,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="<?= base_url($role . '/deletebooking/' . $booking['id_booking']) ?>" method="post">
+                    <form action="<?= base_url('capacity/deletebooking/' . $booking['id_booking']) ?>" method="post">
                         <input type="text" name="jarum" id="" hidden value="<?= $booking['needle'] ?>">
                         Are you sure to Delete Data Booking?
                 </div>
@@ -401,7 +404,7 @@
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <form action="<?= base_url($role . '/cancelbooking/' . $booking['id_booking']) ?>" method="post">
+                <form action="<?= base_url('capacity/cancelbooking/' . $booking['id_booking']) ?>" method="post">
                     <div class="modal-body">
                         <label for="sisa_booking">Quantity Available:</label>
                         <input type="text" name="sisa_booking" id="sisa_booking" class="form-control" value="<?= $booking['sisa_booking'] ?>" readonly>
@@ -452,7 +455,7 @@
                 <div class="row mt-2">
                     <div class="col-9 pl-0">
 
-                        <form action="<?= base_url($role . '/importpecahbooking/' . $booking['id_booking']) ?>" id="modalForm" method="POST" enctype="multipart/form-data">
+                        <form action="<?= base_url('capacity/importpecahbooking/' . $booking['id_booking']) ?>" id="modalForm" method="POST" enctype="multipart/form-data">
                             <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control ">
                             Sisa: <input type="number" id="sisa" name="sisa" class="form-control">
                             <div class="form-group">
@@ -481,7 +484,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="<?= base_url($role . '/pecahbooking/' . $booking['id_booking']) ?>" method="post">
+                <form action="<?= base_url('capacity/pecahbooking/' . $booking['id_booking']) ?>" method="post">
                     <div class="row">
                         <div class="col-lg-6 col-sm-12">
                             <div class="form-group">
@@ -504,7 +507,10 @@
                             <div class="form-group">
                                 <label for="productType" class="col-form-label">Product Type</label>
                                 <select class="form-control" id="productType" name="productType">
-                                    <option value="">Choose</option>
+                                    <option value=""> Choose</option>
+                                    <?php foreach ($product as $key => $val) : ?>
+                                        <option value="<?= $val['product_type'] ?>"><?= $val['product_type'] ?></option>
+                                    <?php endforeach ?>
                                 </select>
                             </div>
 
@@ -644,21 +650,22 @@
     }
 
     document.getElementById('cancelBookingBtn').addEventListener('click', cancelBooking);
-</script>
-<script>
+
+
     $(document).ready(function() {
         $('#jarum').change(function() {
             var selectedJarum = $(this).val();
+            console.log(selectedJarum)
             if (selectedJarum) {
                 $.ajax({
-                    url: '<?= base_url($role . '/getTypebyJarum') ?>', // Ubah dengan URL controller Anda
+                    url: '<?= base_url('capacity/getTypebyJarum') ?>', // Ubah dengan URL controller Anda
                     type: 'POST',
                     data: {
-                        jarum: selectedJarum
+                        jarum: selectedJarumss
                     },
                     dataType: 'json',
                     success: function(response) {
-
+                        console.log(response)
                         var productTypeSelect = $('#productType');
                         productTypeSelect.empty();
                         productTypeSelect.append('<option value="">Choose</option>'); // Tambahkan opsi default
@@ -678,6 +685,9 @@
             }
         });
     });
+</script>
+<script>
+
 </script>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <?php $this->endSection(); ?>

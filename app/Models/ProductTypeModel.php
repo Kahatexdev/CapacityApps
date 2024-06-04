@@ -74,4 +74,8 @@ class ProductTypeModel extends Model
         $query = $this->select('product_type')->where('jarum', $jarum)->get();
         return array_column($query->getResultArray(), 'product_type');
     }
+    public function getProdType()
+    {
+        return $this->select('product_type')->distinct()->findAll();
+    }
 }
