@@ -147,7 +147,7 @@ class ApsController extends BaseController
 
 
         ];
-        return view('Aps/index', $data);
+        return view(session()->get('role') . 'index', $data);
     }
     public function booking()
     {
@@ -167,7 +167,7 @@ class ApsController extends BaseController
             'Jarum' => $dataJarum,
             'TotalMesin' => $totalMesin,
         ];
-        return view('Aps/Booking/booking', $data);
+        return view(session()->get('role') . 'Booking/booking', $data);
     }
     public function bookingPerJarum($jarum)
     {
@@ -189,7 +189,7 @@ class ApsController extends BaseController
             'booking' => $booking
 
         ];
-        return view('Aps/Booking/jarum', $data);
+        return view(session()->get('role') . 'Booking/jarum', $data);
     }
 
     public function bookingPerBulanJarum($jarum)
@@ -208,7 +208,7 @@ class ApsController extends BaseController
             'bulan' => $bulan,
             'jarum' => $jarum,
         ];
-        return view('Aps/Booking/bookingbulan', $data);
+        return view(session()->get('role') . 'Booking/bookingbulan', $data);
     }
 
     public function bookingPerBulanJarumTampil($bulan, $tahun, $jarum)
@@ -231,7 +231,7 @@ class ApsController extends BaseController
             'tahun' => $tahun,
             'jarum' => $jarum,
         ];
-        return view('Aps/Booking/jarumbulan', $data);
+        return view(session()->get('role') . 'Booking/jarumbulan', $data);
     }
 
 
@@ -261,7 +261,7 @@ class ApsController extends BaseController
             'childBooking' => $childBooking
 
         ];
-        return view('Aps/Booking/detail', $data);
+        return view(session()->get('role') . 'Booking/detail', $data);
     }
     public function order()
     {
@@ -278,7 +278,7 @@ class ApsController extends BaseController
             'active7' => '',
             'TotalMesin' => $totalMesin,
         ];
-        return view('Aps/Order/ordermaster', $data);
+        return view(session()->get('role') . 'Order/ordermaster', $data);
     }
     public function semuaOrder()
     {
@@ -299,7 +299,7 @@ class ApsController extends BaseController
 
 
         ];
-        return view('Aps/Order/semuaorder', $data);
+        return view(session()->get('role') . 'Order/semuaorder', $data);
     }
     public function detailModel($noModel, $delivery)
     {
@@ -320,7 +320,7 @@ class ApsController extends BaseController
             'delivery' => $delivery,
             'dataMc' => $dataMc,
         ];
-        return view('Aps/Order/detailOrder', $data);
+        return view(session()->get('role') . 'Order/detailOrder', $data);
     }
     public function orderPerJarum()
     {
@@ -337,7 +337,7 @@ class ApsController extends BaseController
             'active7' => '',
             'TotalMesin' => $totalMesin,
         ];
-        return view('Aps/Order/orderjarum', $data);
+        return view(session()->get('role') . 'Order/orderjarum', $data);
     }
     public function DetailOrderPerJarum($jarum)
     {
@@ -358,7 +358,7 @@ class ApsController extends BaseController
             'product' => $product,
 
         ];
-        return view('Aps/Order/semuaorderjarum', $data);
+        return view(session()->get('role') . 'Order/semuaorderjarum', $data);
     }
     public function detailmodeljarum($noModel, $delivery, $jarum)
     {
@@ -380,7 +380,7 @@ class ApsController extends BaseController
             'delivery' => $delivery,
         ];
 
-        return view('Aps/Order/detailModelJarum', $data);
+        return view(session()->get('role') . 'Order/detailModelJarum', $data);
     }
     public function planningmesin()
     {
@@ -400,7 +400,7 @@ class ApsController extends BaseController
             'planarea' => $planarea,
             'area' => $area,
         ];
-        return view('Aps/Planning/PilihJudulArea', $data);
+        return view(session()->get('role') . 'Planning/PilihJudulArea', $data);
     }
 
     public function saveplanningmesin()
@@ -477,7 +477,7 @@ class ApsController extends BaseController
             'mesin' => $mesinarea,
             'id_pln_mc' => $id,
         ];
-        return view('Aps/Planning/fetchDataArea', $data);
+        return view(session()->get('role') . 'Planning/fetchDataArea', $data);
     }
 
     public function orderPerJarumBln()
@@ -495,7 +495,7 @@ class ApsController extends BaseController
             'active7' => '',
             'TotalMesin' => $totalMesin,
         ];
-        return view('Aps/Order/orderjarumbln', $data);
+        return view(session()->get('role') . 'Order/orderjarumbln', $data);
     }
     public function orderBlmAdaAreal()
     {
@@ -515,7 +515,7 @@ class ApsController extends BaseController
             'product' => $product,
 
         ];
-        return view('Aps/Order/orderBlmAdaArea', $data);
+        return view(session()->get('role') . 'Order/orderBlmAdaArea', $data);
     }
     public function orderPerArea()
     {
@@ -534,7 +534,7 @@ class ApsController extends BaseController
             'active7' => '',
             'TotalMesin' => $area,
         ];
-        return view('Aps/Order/orderarea', $data);
+        return view(session()->get('role') . 'Order/orderarea', $data);
     }
     public function DetailOrderPerArea($area)
     {
@@ -554,7 +554,7 @@ class ApsController extends BaseController
             'tampildata' => $tampilperdelivery,
             'product' => $product,
         ];
-        return view('Aps/Order/semuaorderarea', $data);
+        return view(session()->get('role') . 'Order/semuaorderarea', $data);
     }
     public function fetchdetailorderarea()
     {
@@ -597,7 +597,7 @@ class ApsController extends BaseController
             'id_save' => $id,
             'judul' => $judul
         ];
-        return view('Aps/Planning/operationPlanning', $data);
+        return view(session()->get('role') . 'Planning/operationPlanning', $data);
     }
     public function getDataLibur()
     {
@@ -687,9 +687,9 @@ class ApsController extends BaseController
 
 
         if ($saveest) {
-            return redirect()->to(base_url('aps/planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm . '&judul=' . $judul))->withInput()->with('success', 'Data Berhasil Disimpan');
+            return redirect()->to(base_url(session()->get('role') . 'planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm . '&judul=' . $judul))->withInput()->with('success', 'Data Berhasil Disimpan');
         } else {
-            return redirect()->to(base_url('aps/planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm . '&judul=' . $judul))->withInput()->with('error', 'Data Gagal Disimpan');
+            return redirect()->to(base_url(session()->get('role') . 'planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm . '&judul=' . $judul))->withInput()->with('error', 'Data Gagal Disimpan');
         }
 
 

@@ -43,7 +43,10 @@ class BookingModel extends Model
     public function checkExist($validate)
     {
         $query = $this->where('no_order', $validate['no_order'])
-            ->where('no_booking ', $validate['no_pdk'])->first();
+            ->where('no_booking ', $validate['no_pdk'])
+            ->where('tgl_terima_booking', $validate('tgl_terima_booking'))
+            ->where('delivery', $validate('delivery'))
+            ->first();
         return $query;
     }
     public function getAllData()
