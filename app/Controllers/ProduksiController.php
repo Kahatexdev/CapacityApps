@@ -392,7 +392,7 @@ class ProduksiController extends BaseController
             $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
             $worksheet = $spreadsheet->getActiveSheet();
 
-            $startRow = 18; // Ganti dengan nomor baris mulai
+            $startRow = 10; // Ganti dengan nomor baris mulai
             $batchSize = 100; // Ukuran batch
             $batchData = [];
             $failedRows = []; // Array untuk menyimpan informasi baris yang gagal
@@ -443,8 +443,8 @@ class ProduksiController extends BaseController
             $data = $batchItem['data'];
 
             try {
-                $no_model = $data[21];
-                $style = $data[4];
+                $no_model = $data[2];
+                $style = $data[3];
                 $validate = [
                     'no_model' => $no_model,
                     'style' => $style
@@ -459,27 +459,27 @@ class ProduksiController extends BaseController
                             $idnext = $idMinus['idapsperstyle'];
                             $qtysisa = $idMinus['sisa'];
                             $deliv = $idMinus['delivery'];
-                            $sisa = $qtysisa - $data[12];
+                            $sisa = $qtysisa - $data[14];
                             $this->ApsPerstyleModel->update($idnext, ['sisa' => $sisa]);
 
-                            $tglprod = $data[1];
-                            $strReplace = str_replace('.', '-', $tglprod);
-                            $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
-                            $tgl_produksi = $dateTime->format('Y-m-d');
-                            $bagian = $data[2];
-                            $storage1 = $data[2];
-                            $storage2 = $data[10] ?? '-';
-                            $qtyerp = $data[12];
+                            $tglprod = $data[0];
+                            // $strReplace = str_replace('.', '-', $tglprod);
+                            // $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
+                            // $tgl_produksi = $dateTime->format('Y-m-d');
+                            $bagian = "-";
+                            $storage1 = "-";
+                            $storage2 = "-" ?? '-';
+                            $qtyerp = $data[14];
                             $qty = str_replace('-', '', $qtyerp);
-                            $kategoriBs = $data[29] ?? '-';
-                            $no_mesin = $data[25];
-                            $shift = $data[30];
-                            $no_box = $data[23];
-                            $no_label = $data[22];
-                            $area = $data[26];
+                            $kategoriBs = "-" ?? '-';
+                            $no_mesin = $data[8];
+                            $shift = "-";
+                            $no_box = $data[12];
+                            $no_label = $data[13];
+                            $area = "-";
                             $admin = session()->get('username');
                             $dataInsert = [
-                                'tgl_produksi' => $tgl_produksi,
+                                'tgl_produksi' => $tglprod,
                                 'idapsperstyle' => $idMinus['idapsperstyle'],
                                 'bagian' => $bagian,
                                 'storage_awal' => $storage1,
@@ -513,14 +513,14 @@ class ProduksiController extends BaseController
                     $sisaOrder = $idAps['sisa'];
                     $delivery = $idAps['delivery'];
 
-                    $tglprod = $data[1];
-                    $strReplace = str_replace('.', '-', $tglprod);
-                    $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
-                    $tgl_produksi = $dateTime->format('Y-m-d');
-                    $bagian = $data[2];
-                    $storage1 = $data[2];
-                    $storage2 = $data[10] ?? '-';
-                    $qtyerp = $data[12];
+                    $tglprod = $data[0];
+                    // $strReplace = str_replace('.', '-', $tglprod);
+                    // $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
+                    // $tgl_produksi = $dateTime->format('Y-m-d');
+                    $bagian = "-";
+                    $storage1 = "-";
+                    $storage2 = "-" ?? '-';
+                    $qtyerp = $data[14];
                     $qty = str_replace('-', '', $qtyerp);
                     $sisaQty = $sisaOrder - $qty;
                     if ($sisaQty < 0) {
@@ -542,15 +542,15 @@ class ProduksiController extends BaseController
                             $sisaQty = $minus;
                         }
                     }
-                    $kategoriBs = $data[29] ?? '-';
-                    $no_mesin = $data[25];
-                    $shift = $data[30];
-                    $no_box = $data[23];
-                    $no_label = $data[22];
-                    $area = $data[26];
+                    $kategoriBs = "-" ?? '-';
+                    $no_mesin = $data[8];
+                    $shift = "-";
+                    $no_box = $data[12];
+                    $no_label = $data[13];
+                    $area = "-";
                     $admin = session()->get('username');
                     $dataInsert = [
-                        'tgl_produksi' => $tgl_produksi,
+                        'tgl_produksi' => $tglprod,
                         'idapsperstyle' => $id,
                         'bagian' => $bagian,
                         'storage_awal' => $storage1,

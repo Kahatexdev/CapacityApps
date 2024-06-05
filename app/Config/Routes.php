@@ -237,7 +237,8 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
 $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('', 'UserController::produksi');
     $routes->get('produksi', 'UserController::produksi');
-    $routes->post('importproduksi', 'ProduksiController::importproduksi');
+    // $routes->post('importproduksi', 'ProduksiController::importproduksi');
+    $routes->post('importproduksi', 'ProduksiController::importproduksinew');
 });
 
 // sudo
