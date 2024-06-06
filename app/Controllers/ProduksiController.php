@@ -495,7 +495,6 @@ class ProduksiController extends BaseController
                                 'delivery' => $deliv,
                                 'area' => $area
                             ];
-                            dd($dataInsert);
                             $existingProduction = $this->produksiModel->existingData($dataInsert);
                             if (!$existingProduction) {
                                 $this->produksiModel->insert($dataInsert);

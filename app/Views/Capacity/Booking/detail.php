@@ -129,7 +129,8 @@
                             <?php if ($booking['status'] !== 'Cancel Booking') : ?>
                                 <a href="" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#importPecahBooking">Import Booking to Booking</a>
                                 <a href="" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#ModalBooking">Booking to Booking</a>
-                                <a href="#" class="btn btn-info order-btn" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">Booking to Order</a>
+                                <a href="#" class="btn btn-info order-btn" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">Booking To Order</a>
+                                <a href="#" class="btn btn-success tf-btn" data-bs-toggle="modal" data-bs-target="#tfModal">Transfer QTY</a>
                                 <a href="" class="btn btn-success" Data-bs-toggle="modal" data-bs-target="#ModalEdit">Edit Booking</a>
                                 <a href="" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#ModalCancel">Cancel Booking</a>
                                 <a href="" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#ModalDelete">Delete Booking</a>

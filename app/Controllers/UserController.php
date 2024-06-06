@@ -46,6 +46,7 @@ class UserController extends BaseController
     public function index()
     {
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Dashboard',
             'active1' => 'active',
             'active2' => '',
@@ -54,12 +55,13 @@ class UserController extends BaseController
             'produksiHari' => 0
 
         ];
-        return view('User/index', $data);
+        return view(session()->get('role') . '/index', $data);
     }
     public function produksi()
     {
         $dataPdk = $this->ApsPerstyleModel->getPdkProduksi();
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Dashboard',
             'active1' => '',
             'active2' => 'active',
@@ -69,6 +71,6 @@ class UserController extends BaseController
             'pdk' => $dataPdk
 
         ];
-        return view('User/produksi', $data);
+        return view(session()->get('role') . '/produksi', $data);
     }
 }

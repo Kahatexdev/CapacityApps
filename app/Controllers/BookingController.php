@@ -835,4 +835,7 @@ class BookingController extends BaseController
             return redirect()->to(base_url(session()->get('role') . '/cancelBooking/'))->withInput()->with('success', 'Data Uncancel Success');
         }
     }
+    public function transferQTy()
+    {
+    }
 }
