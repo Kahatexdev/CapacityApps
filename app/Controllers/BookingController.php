@@ -302,7 +302,9 @@ class BookingController extends BaseController
 
         $validate = [
             'no_order' => $no_order,
-            'no_pdk' => $no_pdk
+            'no_pdk' => $no_pdk,
+            'tgl_terima_booking' => $tglbk,
+            'delivery' => $shipment
         ];
         $check = $this->bookingModel->checkExist($validate);
         if (!$check) {

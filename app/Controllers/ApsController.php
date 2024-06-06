@@ -648,7 +648,7 @@ class ApsController extends BaseController
         $area = $this->request->getPost('area');
         $jrm = $this->request->getPost('jarum');
         $judul = $this->request->getPost('judul');
-        dd($judul);
+
 
         $startDateTime = new \DateTime($start);
         $stopDateTime = new \DateTime($stop);
