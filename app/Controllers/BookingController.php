@@ -839,5 +839,22 @@ class BookingController extends BaseController
     }
     public function transferQTy()
     {
+
+        $getIdBooking = [
+            'no_booking' => $this->request->getPost('no_booking'),
+            'no_order' => $this->request->getPost('no_order'),
+            'kd_buyer' => $this->request->getPost('kd_buyer')
+        ];
+        $tujuan = $this->bookingModel->getIdForTransfer($getIdBooking);
+        $asal = $this->request->getPost('id_booking');
+        $qtyTransfer = $this->request->getPost('transferQty');
+        $totalqty = $tujuan['qty_booking'] + $qtyTransfer;
+        $data = [
+            'from_id' => $asal,
+            'qty_transfer' => $qtyTransfer,
+            'to_id' => $tujuan['id_booking']
+        ];
+        if ($data) {
+        }
     }
 }

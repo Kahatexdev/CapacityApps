@@ -278,6 +278,59 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade  bd-example-modal-lg" id="tfModal" tabindex="-1" role="dialog" aria-labelledby="tfModalTitle" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Transfer Qty</h5>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="<?= base_url($role . '/transferQty'); ?>" method="post">
+                        <input type="text" name="id_booking" value="<?= $booking['id_booking']; ?>" hidden>
+                        <input type="text" name="jarum" value="<?= $booking['needle']; ?>" hidden>
+                        <div class="row">
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="col-lg-6 col-sm-12">Buyer Code</label>
+                                    <input type="text" class="form-control" name="kd_buyer">
+                                </div>
+                                <div class="form-group">
+                                    <label for="col-lg-6 col-sm-12">No Booking</label>
+                                    <input type="text" class="form-control" name="no_booking">
+                                </div>
+                                <div class="form-group">
+                                    <label for="col-lg-6 col-sm-12">No Order</label>
+                                    <input type="text" class="form-control" name="no_order" oninput="this.value = this.value.toUpperCase()">
+                                </div>
+
+                            </div>
+                            <div class="col-lg-6 col-sm-12">
+
+                                <div class="form-group">
+                                    <label for="col-lg-6 col-sm-12">Qty Transfer</label>
+                                    <input type="text" name="transferQty" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="col-lg-6 col-sm-12">Ending Remaining Booking</label>
+                                    <input type="text" name="sisaQty" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-gradient-primary">Save</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <!-- modal edit -->
     <div class="modal fade  bd-example-modal-lg" id="ModalEdit" tabindex="-1" role="dialog" aria-labelledby="modalEdit" aria-hidden="true">
         <div class="modal-dialog  modal-dialog-centered" role="document">

@@ -32,6 +32,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('detailcancelbooking/(:any)/(:any)', 'BookingController::detailcancelbooking/$1/$2');
     $routes->post('uncancelbooking/(:any)', 'BookingController::uncancelbooking/$1');
     $routes->get('allbooking', 'BookingController::allbooking');
+    $routes->post('transferQty', 'BookingController::transferQty');
 
     // order
     $routes->get('dataorder', 'OrderController::order');

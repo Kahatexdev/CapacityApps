@@ -231,4 +231,14 @@ class BookingModel extends Model
 
         return $result ?? "tidak Ada Data";
     }
+
+    public function getIdForTransfer($data)
+    {
+        $result = $this->select('id_booking, qty_booking')
+            ->where('kd_buyer_booking', $data['kd_buyer'])
+            ->where('no_booking', $data['no_booking'])
+            ->where('no_order', $data['no_order'])
+            ->first();
+        return $result;
+    }
 }
