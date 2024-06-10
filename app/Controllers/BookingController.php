@@ -12,6 +12,7 @@ use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use App\Models\CancelModel;
+use App\Models\TransferModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class BookingController extends BaseController
@@ -839,22 +840,38 @@ class BookingController extends BaseController
     }
     public function transferQTy()
     {
+        $asal = $this->request->getPost('id_booking');
 
+        $delivery = $this->request->getPost('delivery');
         $getIdBooking = [
             'no_booking' => $this->request->getPost('no_booking'),
             'no_order' => $this->request->getPost('no_order'),
-            'kd_buyer' => $this->request->getPost('kd_buyer')
+            'kd_buyer' => $this->request->getPost('kd_buyer'),
+            'delivery' => $delivery
         ];
         $tujuan = $this->bookingModel->getIdForTransfer($getIdBooking);
-        $asal = $this->request->getPost('id_booking');
-        $qtyTransfer = $this->request->getPost('transferQty');
-        $totalqty = $tujuan['qty_booking'] + $qtyTransfer;
-        $data = [
-            'from_id' => $asal,
-            'qty_transfer' => $qtyTransfer,
-            'to_id' => $tujuan['id_booking']
-        ];
-        if ($data) {
+        if (!$tujuan) {
+            return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $asal))->with('error', 'Data booking tujuan transfer tidak ditemukan');
+        } else {
+            $sisa = $this->request->getPost('sisaQty');
+            $qtyTransfer = $this->request->getPost('transferQty');
+            $totalqty = $tujuan['qty_booking'] + $qtyTransfer;
+            $sisaTotalQty = $tujuan['sisa_booking'] + $qtyTransfer;
+            $data = [
+                'from_id' => $asal,
+                'qty_transfer' => $qtyTransfer,
+                'to_id' => $tujuan['id_booking']
+            ];
+            $tfModel = new \App\Models\TransferModel();
+            $insert = $tfModel->insert($data);
+
+            if ($insert) {
+                $this->bookingModel->update($asal, ['sisa_booking' => $sisa]);
+                $this->bookingModel->update($tujuan['id_booking'], ['qty_booking' => $totalqty, 'sisa_booking' => $sisaTotalQty]);
+                return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $asal))->with('success', 'Data transfer berhasil disimpan dan data booking berhasil diperbarui.');
+            } else {
+                return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $asal))->with('error', 'Data transfer gagal disimpan dan data booking berhasil diperbarui.');
+            }
         }
     }
 }
