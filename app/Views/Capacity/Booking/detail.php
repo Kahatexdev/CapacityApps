@@ -188,18 +188,13 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="dataTable1" class="display">
+                        <table id="dataTable3" class="display">
                             <thead>
-
-                                <th>
-                                    Booking Receipt Date
-                                </th>
-                                <th>Buyer Booking</th>
+                                <th>Tanggal Transfer</th>
                                 <th>No Booking</th>
-                                <th>Qty Booking</th>
-                                <th>Desc</th>
-                                <th>Needle</th>
-                                <th>Seam</th>
+                                <th>No Order</th>
+                                <th>Delivery</th>
+                                <th>Qty Transfer</th>
                             </thead>
                             <tbody>
                                 <?php foreach ($childBooking as $data) : ?>
@@ -210,7 +205,6 @@
                                         <td><?= $data['qty_booking'] ?> </td>
                                         <td><?= $data['desc'] ?> </td>
                                         <td><?= $data['needle'] ?> </td>
-                                        <td><?= $data['seam'] ?></td>
                                     </tr>
                                 <?php endforeach ?>
                             </tbody>
@@ -677,6 +671,7 @@
     $(document).ready(function() {
         $('#dataTable').DataTable();
         $('#dataTable1').DataTable();
+        $('#dataTable3').DataTable();
     });
 
     function hitungJumlahHari() {

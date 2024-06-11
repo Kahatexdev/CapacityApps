@@ -242,4 +242,8 @@ class BookingModel extends Model
             ->first();
         return $result;
     }
+    public function getTransferData($idBooking)
+    {
+        $result = $this->where('from_id', $idBooking);
+    }
 }
