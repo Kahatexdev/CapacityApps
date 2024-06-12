@@ -178,42 +178,7 @@
             </div>
         </div>
     </div>
-    <div class="row mt-4">
-        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
-            <div class="card">
-                <div class="card-header">
-                    <h5>
-                        Detail Transfer Qty
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table id="dataTable3" class="display">
-                            <thead>
-                                <th>Tanggal Transfer</th>
-                                <th>No Booking</th>
-                                <th>No Order</th>
-                                <th>Delivery</th>
-                                <th>Qty Transfer</th>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($childBooking as $data) : ?>
-                                    <tr>
-                                        <td><?= date_format(new DateTime($data['tgl_terima_booking']), 'd-F-Y') ?></td>
-                                        <td><?= $data['kd_buyer_booking'] ?></td>
-                                        <td><?= $data['no_booking'] ?></td>
-                                        <td><?= $data['qty_booking'] ?> </td>
-                                        <td><?= $data['desc'] ?> </td>
-                                        <td><?= $data['needle'] ?> </td>
-                                    </tr>
-                                <?php endforeach ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
     <div class="row mt-4">
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
             <div class="card">
@@ -247,6 +212,45 @@
                                         <td><?= $data['desc'] ?> </td>
                                         <td><?= $data['needle'] ?> </td>
                                         <td><?= $data['seam'] ?></td>
+                                    </tr>
+                                <?php endforeach ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
+            <div class="card">
+                <div class="card-header">
+                    <h5>
+                        Data Transfer Qty
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="dataTable3" class="display">
+                            <thead>
+                                <th>Tanggal Transfer</th>
+                                <th>Buyer</th>
+                                <th>No Booking</th>
+                                <th>No Order</th>
+                                <th>Desc</th>
+                                <th>Delivery</th>
+                                <th>Qty Transfer</th>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($transferData as $data) : ?>
+                                    <tr>
+                                        <td><?= date_format(new DateTime($data['created_at']), 'd-F-Y') ?></td>
+                                        <td><?= $data['kd_buyer_booking'] ?></td>
+                                        <td><?= $data['no_booking'] ?></td>
+                                        <td><?= $data['no_order'] ?></td>
+                                        <td><?= $data['desc'] ?> </td>
+                                        <td><?= $data['delivery'] ?> </td>
+                                        <td><?= $data['qty_transfer'] ?> </td>
                                     </tr>
                                 <?php endforeach ?>
                             </tbody>
