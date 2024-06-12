@@ -76,7 +76,7 @@
                     <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Master Data</h6>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?= $active2 ?> " href="<?= base_url($role . '/databooking') ?>">
+                    <a class="nav-link <?= $active2z ?> " href="<?= base_url($role . '/databooking') ?>">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                             <svg width="12px" height="12px" viewBox="0 0 40 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                                 <title>document</title>
@@ -98,7 +98,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?= $active3 ?> " href=" <?= base_url($role . '/dataorder') ?>">
+                    <a class="nav-link <?= $active3z ?> " href=" <?= base_url($role . '/dataorder') ?>">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                             <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                                 <title>office</title>
@@ -120,7 +120,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?= $active4 ?> " href="<?= base_url($role . '/dataproduksi') ?>">
+                    <a class="nav-link <?= $active4z ?> " href="<?= base_url($role . '/dataproduksi') ?>">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                             <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -141,7 +141,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?= $active5 ?> " href="<?= base_url($role . '/datamesin') ?>">
+                    <a class="nav-link <?= $active5z ?> " href="<?= base_url($role . '/datamesin') ?>">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                             <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -163,7 +163,7 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link <?= $active6 ?> " href="<?= base_url($role . '/planningorder') ?>">
+                    <a class="nav-link <?= $active6z ?> " href="<?= base_url($role . '/planningorder') ?>">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                             <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -184,7 +184,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?= $active7 ?> " href="<?= base_url($role . '/planningbooking') ?>">
+                    <a class="nav-link <?= $active7z ?> " href="<?= base_url($role . '/planningbooking') ?>">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                             <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
