@@ -234,11 +234,16 @@ class BookingModel extends Model
 
     public function getIdForTransfer($data)
     {
-        $result = $this->select('id_booking, qty_booking')
+        $result = $this->select('id_booking, qty_booking,sisa_booking')
             ->where('kd_buyer_booking', $data['kd_buyer'])
             ->where('no_booking', $data['no_booking'])
             ->where('no_order', $data['no_order'])
+            ->where('delivery', $data['delivery'])
             ->first();
         return $result;
+    }
+    public function getTransferData($idBooking)
+    {
+        $result = $this->where('from_id', $idBooking);
     }
 }

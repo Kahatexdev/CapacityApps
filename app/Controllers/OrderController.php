@@ -689,12 +689,12 @@ class OrderController extends BaseController
                                 'qty' => $qty
                             ];
 
-                            $existingAps = $this->ApsPerstyleModel->checkAps($validate);
-                            if (!$existingAps) {
-                                $this->ApsPerstyleModel->insert($simpandata);
+                            // $existingAps = $this->ApsPerstyleModel->checkAps($validate);
+                            // if (!$existingAps) {
+                            $this->ApsPerstyleModel->insert($simpandata);
 
-                                $this->orderModel->update($idModel, $updateData);
-                            }
+                            $this->orderModel->update($idModel, $updateData);
+                            // }
                         }
                     }
                 }

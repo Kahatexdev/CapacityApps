@@ -183,6 +183,42 @@
             <div class="card">
                 <div class="card-header">
                     <h5>
+                        Detail Transfer Qty
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="dataTable3" class="display">
+                            <thead>
+                                <th>Tanggal Transfer</th>
+                                <th>No Booking</th>
+                                <th>No Order</th>
+                                <th>Delivery</th>
+                                <th>Qty Transfer</th>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($childBooking as $data) : ?>
+                                    <tr>
+                                        <td><?= date_format(new DateTime($data['tgl_terima_booking']), 'd-F-Y') ?></td>
+                                        <td><?= $data['kd_buyer_booking'] ?></td>
+                                        <td><?= $data['no_booking'] ?></td>
+                                        <td><?= $data['qty_booking'] ?> </td>
+                                        <td><?= $data['desc'] ?> </td>
+                                        <td><?= $data['needle'] ?> </td>
+                                    </tr>
+                                <?php endforeach ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
+            <div class="card">
+                <div class="card-header">
+                    <h5>
                         Detail Booking To Booking
                     </h5>
                 </div>
@@ -309,7 +345,10 @@
 
                             </div>
                             <div class="col-lg-6 col-sm-12">
-
+                                <div class="form-group">
+                                    <label for="col-lg-6 col-sm-12">Delivery</label>
+                                    <input type="date" name="delivery" class="form-control">
+                                </div>
                                 <div class="form-group">
                                     <label for="col-lg-6 col-sm-12">Qty Transfer</label>
                                     <input type="text" name="transferQty" class="form-control">
@@ -318,6 +357,7 @@
                                     <label for="col-lg-6 col-sm-12">Ending Remaining Booking</label>
                                     <input type="text" name="sisaQty" class="form-control">
                                 </div>
+
                             </div>
                         </div>
 
@@ -631,6 +671,7 @@
     $(document).ready(function() {
         $('#dataTable').DataTable();
         $('#dataTable1').DataTable();
+        $('#dataTable3').DataTable();
     });
 
     function hitungJumlahHari() {
