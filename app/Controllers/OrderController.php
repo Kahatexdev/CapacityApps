@@ -877,8 +877,8 @@ class OrderController extends BaseController
 
                 if (!empty($rowData)) {
                     $validate = [
-                        'mastermodel' => $rowData[0],
-                        'size' => $rowData[1]
+                        'mastermodel' => $rowData[6],
+                        'size' => $rowData[7]
                     ];
                     $id = $this->ApsPerstyleModel->getIdSmv($validate);
 
@@ -886,9 +886,10 @@ class OrderController extends BaseController
                         $errorRows[] = "ID not found at row " . ($rowIndex + $startRow);
                         continue;
                     }
+                    $Id = $id['idapsperstyle'] ?? 0;
 
-                    $smv = $rowData[30];
-                    $update = $this->orderModel->update($id, ['smv' => $smv]);
+                    $smv = $rowData[8];
+                    $update = $this->ApsPerstyleModel->update($Id, ['smv' => $smv]);
 
                     if (!$update) {
                         $errorRows[] = "Failed to update row " . ($rowIndex + $startRow);
@@ -898,12 +899,13 @@ class OrderController extends BaseController
 
             if (!empty($errorRows)) {
                 $errorMessage = "Errors occurred:\n" . implode("\n", $errorRows);
-                return redirect()->to(base_url(session()->get('role') . '/smvimport'))->with('error', $errorMessage);
+                dd($errorMessage);
+                return redirect()->to(base_url(session()->get('role') . '/databooking'))->withInput()->with('error', $errorMessage);
             } else {
-                return redirect()->to(base_url(session()->get('role') . '/smvimport'))->with('success', 'Data Berhasil di Import');
+                return redirect()->to(base_url(session()->get('role') . '/databooking'))->withInput()->with('success', 'Data Berhasil di Update');
             }
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/smvimport'))->with('error', 'No data found in the Excel file');
+            return redirect()->to(base_url(session()->get('role') . '/databooking'))->withInput()->with('error', 'No data found in the Excel file');
         }
     }
     public function smvimport()
