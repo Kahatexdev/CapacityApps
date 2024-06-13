@@ -213,7 +213,8 @@ class BookingController extends BaseController
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $childOrder = $this->orderModel->getChild($idBooking);
         $childBooking = $this->bookingModel->getChild($idBooking);
-        $transferData = $this->bookingModel->getTransferData($idBooking);
+        $transferModel = new TransferModel();
+        $transferData = $transferModel->getTransferData($idBooking);
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Booking',
@@ -229,7 +230,8 @@ class BookingController extends BaseController
             'product' => $product,
             'jenisJarum' => $totalMesin,
             'childOrder' => $childOrder,
-            'childBooking' => $childBooking
+            'childBooking' => $childBooking,
+            'transferData' => $transferData
 
         ];
         return view(session()->get('role') . '/Booking/detail', $data);
