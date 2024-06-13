@@ -857,4 +857,57 @@ class OrderController extends BaseController
         ];
         return view(session()->get('role') . '/Order/detailturunorder', $data);
     }
+
+    public function importsmv()
+    {
+        $file = $this->request->getFile('excel_file');
+        if ($file->isValid() && !$file->hasMoved()) {
+            $spreadsheet = IOFactory::load($file);
+            $sheet = $spreadsheet->getActiveSheet();
+            $startRow = 2; // Ganti dengan nomor baris mulai
+            $errorRows = [];
+
+            foreach ($sheet->getRowIterator($startRow) as $rowIndex => $row) {
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = $cell->getValue();
+                }
+
+                if (!empty($rowData)) {
+                    $validate = [
+                        'mastermodel' => $rowData[0],
+                        'size' => $rowData[1]
+                    ];
+                    $id = $this->ApsPerstyleModel->getIdSmv($validate);
+
+                    if ($id === null) {
+                        $errorRows[] = "ID not found at row " . ($rowIndex + $startRow);
+                        continue;
+                    }
+
+                    $smv = $rowData[30];
+                    $update = $this->orderModel->update($id, ['smv' => $smv]);
+
+                    if (!$update) {
+                        $errorRows[] = "Failed to update row " . ($rowIndex + $startRow);
+                    }
+                }
+            }
+
+            if (!empty($errorRows)) {
+                $errorMessage = "Errors occurred:\n" . implode("\n", $errorRows);
+                return redirect()->to(base_url(session()->get('role') . '/smvimport'))->with('error', $errorMessage);
+            } else {
+                return redirect()->to(base_url(session()->get('role') . '/smvimport'))->with('success', 'Data Berhasil di Import');
+            }
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/smvimport'))->with('error', 'No data found in the Excel file');
+        }
+    }
+    public function smvimport()
+    {
+        return view(session()->get('role') . '/smvimport');
+    }
 }
