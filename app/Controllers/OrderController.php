@@ -857,4 +857,40 @@ class OrderController extends BaseController
         ];
         return view(session()->get('role') . '/Order/detailturunorder', $data);
     }
+
+    public function importsmv()
+    {
+        $file = $this->request->getFile('excel_file');
+        if ($file->isValid() && !$file->hasMoved()) {
+            $spreadsheet = IOFactory::load($file);
+            $row = $spreadsheet->getActiveSheet();
+            $startRow = 2; // Ganti dengan nomor baris mulai
+            foreach ($spreadsheet->getActiveSheet()->getRowIterator($startRow) as $row) {
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+                $row = [];
+                foreach ($cellIterator as $cell) {
+                    $row[] = $cell->getValue();
+                }
+                if (!empty($row)) {
+                    $validate = [
+                        'mastermodel' => $row[0],
+                        'size' => $row[1]
+                    ];
+                    $id = $this->ApsPerstyleModel->getIdSmv($validate);
+
+                    $smv = $row[30];
+                    $update = $this->orderModel->update($id, ['smv' => $smv]);
+                    if (!$update) {
+                        continue;
+                    } else {
+                        return redirect()->to(base_url(session()->get('role') . '/smvpage'))->withInput()->with('success', 'Data Berhasil di Import');
+                    }
+                }
+            }
+            return redirect()->to(base_url(session()->get('role') . '/smvpage'))->withInput()->with('success', 'Data Berhasil di Import');
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/smvpage'))->with('error', 'No data found in the Excel file');
+        }
+    }
 }
