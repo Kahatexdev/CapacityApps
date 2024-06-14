@@ -863,34 +863,53 @@ class OrderController extends BaseController
         $file = $this->request->getFile('excel_file');
         if ($file->isValid() && !$file->hasMoved()) {
             $spreadsheet = IOFactory::load($file);
-            $row = $spreadsheet->getActiveSheet();
+            $sheet = $spreadsheet->getActiveSheet();
             $startRow = 2; // Ganti dengan nomor baris mulai
-            foreach ($spreadsheet->getActiveSheet()->getRowIterator($startRow) as $row) {
+            $errorRows = [];
+
+            foreach ($sheet->getRowIterator($startRow) as $rowIndex => $row) {
                 $cellIterator = $row->getCellIterator();
                 $cellIterator->setIterateOnlyExistingCells(false);
-                $row = [];
+                $rowData = [];
                 foreach ($cellIterator as $cell) {
-                    $row[] = $cell->getValue();
+                    $rowData[] = $cell->getValue();
                 }
-                if (!empty($row)) {
+
+                if (!empty($rowData)) {
                     $validate = [
-                        'mastermodel' => $row[0],
-                        'size' => $row[1]
+                        'mastermodel' => $rowData[6],
+                        'size' => $rowData[7]
                     ];
                     $id = $this->ApsPerstyleModel->getIdSmv($validate);
 
-                    $smv = $row[30];
-                    $update = $this->orderModel->update($id, ['smv' => $smv]);
-                    if (!$update) {
+                    if ($id === null) {
+                        $errorRows[] = "ID not found at row " . ($rowIndex + $startRow);
                         continue;
-                    } else {
-                        return redirect()->to(base_url(session()->get('role') . '/smvpage'))->withInput()->with('success', 'Data Berhasil di Import');
+                    }
+                    $Id = $id['idapsperstyle'] ?? 0;
+
+                    $smv = $rowData[8];
+                    $update = $this->ApsPerstyleModel->update($Id, ['smv' => $smv]);
+
+                    if (!$update) {
+                        $errorRows[] = "Failed to update row " . ($rowIndex + $startRow);
                     }
                 }
             }
-            return redirect()->to(base_url(session()->get('role') . '/smvpage'))->withInput()->with('success', 'Data Berhasil di Import');
+
+            if (!empty($errorRows)) {
+                $errorMessage = "Errors occurred:\n" . implode("\n", $errorRows);
+                dd($errorMessage);
+                return redirect()->to(base_url(session()->get('role') . '/databooking'))->withInput()->with('error', $errorMessage);
+            } else {
+                return redirect()->to(base_url(session()->get('role') . '/databooking'))->withInput()->with('success', 'Data Berhasil di Update');
+            }
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/smvpage'))->with('error', 'No data found in the Excel file');
+            return redirect()->to(base_url(session()->get('role') . '/databooking'))->withInput()->with('error', 'No data found in the Excel file');
         }
+    }
+    public function smvimport()
+    {
+        return view(session()->get('role') . '/smvimport');
     }
 }

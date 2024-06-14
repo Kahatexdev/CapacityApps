@@ -284,7 +284,9 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('turunOrder', 'OrderController::getTurunOrder');
     $routes->post('detailturunorder/(:any)/(:any)', 'OrderController::detailturunorder/$1/$2');
     $routes->post('tampilPerdelivery', 'OrderController::tampilPerdelivery');
-    $routes->get('importsmv', 'OrderController::importsmv');
+    $routes->get('smvimport', 'OrderController::smvimport');
+    $routes->post('importsmv', 'OrderController::importsmv');
+
 
 
 
