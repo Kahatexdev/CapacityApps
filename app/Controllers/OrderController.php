@@ -881,7 +881,6 @@ class OrderController extends BaseController
                         'size' => $rowData[7]
                     ];
                     $id = $this->ApsPerstyleModel->getIdSmv($validate);
-
                     if ($id === null) {
                         $errorRows[] = "ID not found at row " . ($rowIndex + $startRow);
                         continue;
