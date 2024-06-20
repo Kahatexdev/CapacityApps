@@ -500,10 +500,10 @@ class ProduksiController extends BaseController
                                 $this->produksiModel->insert($dataInsert);
                             } else {
 
-                                $failedRows[] = $rowIndex; // Add to failed rows if production data already exists
+                                //$failedRows[] = $rowIndex . "duplikat"; // Add to failed rows if production data already exists
                             }
                         } else {
-                            $failedRows[] = $rowIndex;
+                            $failedRows[] = "style tidak ditemukan" . $rowIndex;
                             continue;
                         }
                     }
