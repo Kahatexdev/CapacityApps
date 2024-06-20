@@ -54,6 +54,7 @@ class ExportController extends BaseController
     public function index()
     {
         $data = [
+            'role' => session()->get('role'),
             'title' => 'Sales Position',
             'active1' => '',
             'active2' => '',
@@ -63,7 +64,7 @@ class ExportController extends BaseController
             'active6' => '',
             'active7' => '',
         ];
-        return view('Capacity/Sales/index', $data);
+        return view('capacity/Sales/index', $data);
     }
 
     public function export()
