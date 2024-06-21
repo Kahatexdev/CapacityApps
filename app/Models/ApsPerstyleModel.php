@@ -253,6 +253,7 @@ class ApsPerstyleModel extends Model
             ->groupBy('mastermodel')
             ->findAll();
     }
+
     public function getIdSmv($validate)
     {
         $id = $this->select('idapsperstyle')
