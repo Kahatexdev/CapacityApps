@@ -185,7 +185,7 @@ class ProduksiController extends BaseController
                             $qtyerp = $data[12];
                             $qty = str_replace('-', '', $qtyerp);
                             $kategoriBs = $data[29] ?? '-';
-                            $no_mesin = $data[25];
+                            $no_mesin = $data[25] ?? 0;
                             $shift = $data[30];
                             $no_box = $data[23];
                             $no_label = $data[22];
@@ -256,7 +256,7 @@ class ProduksiController extends BaseController
                         }
                     }
                     $kategoriBs = $data[29] ?? '-';
-                    $no_mesin = $data[25];
+                    $no_mesin = $data[25] ?? 0;
                     $shift = $data[30];
                     $no_box = $data[23];
                     $no_label = $data[22];
@@ -472,7 +472,7 @@ class ProduksiController extends BaseController
                             $qtyerp = $data[14];
                             $qty = str_replace('-', '', $qtyerp);
                             $kategoriBs = "-" ?? '-';
-                            $no_mesin = $data[8];
+                            $no_mesin = $data[8] ?? 0;
                             $shift = "-";
                             $no_box = $data[12];
                             $no_label = $data[13];
@@ -542,7 +542,7 @@ class ProduksiController extends BaseController
                         }
                     }
                     $kategoriBs = "-" ?? '-';
-                    $no_mesin = $data[8];
+                    $no_mesin = $data[8] ?? 0;
                     $shift = "-";
                     $no_box = $data[12];
                     $no_label = $data[13];
