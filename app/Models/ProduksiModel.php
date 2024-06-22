@@ -94,4 +94,9 @@ class ProduksiModel extends Model
             ->groupBy('apsperstyle.mastermodel, DATE(produksi.created_at)')
             ->findAll();
     }
+
+    public function deleteSesuai(array $idaps)
+    {
+        return $this->whereIn('idapsperstyle', $idaps)->delete();
+    }
 }

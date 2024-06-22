@@ -263,4 +263,18 @@ class ApsPerstyleModel extends Model
 
         return $id;
     }
+
+    public function getIdAps($pdk)
+    {
+        $results = $this->select('idapsperstyle')->where('mastermodel', $pdk)->findAll();
+        return array_column($results, 'idapsperstyle');
+    }
+
+    public function resetSisa($pdk)
+    {
+        return $this->db->table($this->table)
+            ->set('sisa', 'qty', false)  // 'false' agar 'qty' tidak dianggap sebagai string literal
+            ->where('mastermodel', $pdk)
+            ->update();
+    }
 }

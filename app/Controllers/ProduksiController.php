@@ -589,4 +589,14 @@ class ProduksiController extends BaseController
         }
         $db->transComplete();
     }
+
+    public function resetproduksi()
+    {
+        $pdk = $this->request->getPost('pdk');
+
+        $idaps = $this->ApsPerstyleModel->getIdAps($pdk);
+        $this->ApsPerstyleModel->resetSisa($pdk);
+        $this->produksiModel->deleteSesuai($idaps);
+        return redirect()->to(base_url(session()->get('role') . '/produksi'))->withInput()->with('success', 'Data Berhasil di reset');
+    }
 }
