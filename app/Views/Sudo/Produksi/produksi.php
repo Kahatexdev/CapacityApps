@@ -94,7 +94,7 @@
                         </button>
                     </div>
                     <div class="modal-body align-items-center">
-                        <form action="<?= base_url($role . '/resetproduksi/'); ?>" method="POST">
+                        <form action="<?= base_url($role . '/resetproduksi/'); ?>" method="post">
                             <div class="form-group">
                                 <label for="awal">PDK</label>
                                 <input type="text" class="form-control" name="pdk">
