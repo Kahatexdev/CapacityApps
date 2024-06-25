@@ -253,6 +253,7 @@ class ApsPerstyleModel extends Model
             ->groupBy('mastermodel')
             ->findAll();
     }
+
     public function getIdSmv($validate)
     {
         $id = $this->select('idapsperstyle')
@@ -261,5 +262,19 @@ class ApsPerstyleModel extends Model
             ->first();
 
         return $id;
+    }
+
+    public function getIdAps($pdk)
+    {
+        $results = $this->select('idapsperstyle')->where('mastermodel', $pdk)->findAll();
+        return array_column($results, 'idapsperstyle');
+    }
+
+    public function resetSisa($pdk)
+    {
+        return $this->db->table($this->table)
+            ->set('sisa', 'qty', false)  // 'false' agar 'qty' tidak dianggap sebagai string literal
+            ->where('mastermodel', $pdk)
+            ->update();
     }
 }

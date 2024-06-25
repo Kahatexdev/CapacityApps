@@ -60,6 +60,7 @@ class UserController extends BaseController
     public function produksi()
     {
         $dataPdk = $this->ApsPerstyleModel->getPdkProduksi();
+        $produksi = $this->produksiModel->getProduksiHarian();
         $data = [
             'role' => session()->get('role'),
             'title' => 'Dashboard',
@@ -68,7 +69,8 @@ class UserController extends BaseController
             'targetProd' => 0,
             'produksiBulan' => 0,
             'produksiHari' => 0,
-            'pdk' => $dataPdk
+            'pdk' => $dataPdk,
+            'produksi' => $produksi
 
         ];
         return view(session()->get('role') . '/produksi', $data);

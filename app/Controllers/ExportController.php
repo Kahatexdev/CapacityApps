@@ -64,7 +64,7 @@ class ExportController extends BaseController
             'active6' => '',
             'active7' => '',
         ];
-        return view('Capacity/Sales/index', $data);
+        return view('capacity/Sales/index', $data);
     }
 
     public function export()
@@ -399,6 +399,7 @@ class ExportController extends BaseController
                 ],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
             ]);
+        // TEST
         // machine data
         $sheet->setCellValue('C6', 'Dk')->getStyle('C6')
             ->applyFromArray([

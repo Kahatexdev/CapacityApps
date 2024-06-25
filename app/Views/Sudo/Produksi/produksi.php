@@ -21,6 +21,9 @@
                             <a href="<?= base_url($role . '/produksi') ?>" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Import Produksi
                             </a>
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-warning shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#reset">
+                                <i class="fas fa-trash text-lg opacity-10" aria-hidden="true"></i> Reset PDK Produksi
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -76,6 +79,31 @@
                     <div class="modal-footer">
                         <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn bg-gradient-info">Generate</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="reset" tabindex="-1" role="dialog" aria-labelledby="reset" aria-hidden="true">
+            <div class="modal-dialog " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Reset Produksi</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body align-items-center">
+                        <form action="<?= base_url($role . '/resetproduksi/'); ?>" method="post">
+                            <div class="form-group">
+                                <label for="awal">PDK</label>
+                                <input type="text" class="form-control" name="pdk">
+                            </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-info">Reset</button>
                     </div>
                     </form>
                 </div>

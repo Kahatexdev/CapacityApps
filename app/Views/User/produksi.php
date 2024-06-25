@@ -73,6 +73,57 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <h5>
+                            Data Produksi Harian
+                        </h5>
+                    </div>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="table-responsive">
+                            <table id="dataTable0" class="display  striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal Upload</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">PDK</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">QTY Upload</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Order</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Order</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Admin</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($produksi as $prd) : ?>
+                                        <tr>
+                                            <td class="text-sm"><?= $prd['tgl_upload']; ?></td>
+                                            <td class="text-sm"><?= $prd['mastermodel']; ?></td>
+                                            <td class="text-sm"><?= $prd['qty']; ?></td>
+                                            <td class="text-sm"><?= $prd['qty_order']; ?></td>
+                                            <td class="text-sm"><?= $prd['sisa']; ?></td>
+                                            <td class="text-sm"><?= $prd['admin']; ?></td>
+
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <!-- <div class="row">
+        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between">
+                        <h5>
                             Data Pdk
                         </h5>
                     </div>
@@ -112,13 +163,14 @@
 
             </div>
         </div>
-    </div>
+    </div> -->
 
 
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script type="text/javascript">
     $(document).ready(function() {
+        $('#dataTable0').DataTable({});
         $('#dataTable').DataTable({});
 
         // Trigger import modal when import button is clicked

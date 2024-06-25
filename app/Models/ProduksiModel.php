@@ -87,4 +87,16 @@ class ProduksiModel extends Model
             return $result;
         }
     }
+    public function getProduksiHarian()
+    {
+        return $this->select('apsperstyle.mastermodel, DATE(produksi.created_at) as tgl_upload, produksi.tgl_produksi, produksi.admin, SUM(produksi.qty_produksi) as qty, SUM(apsperstyle.sisa) as sisa, SUM(apsperstyle.qty) as qty_order')
+            ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle')
+            ->groupBy('apsperstyle.mastermodel, DATE(produksi.created_at)')
+            ->findAll();
+    }
+
+    public function deleteSesuai(array $idaps)
+    {
+        return $this->whereIn('idapsperstyle', $idaps)->delete();
+    }
 }
