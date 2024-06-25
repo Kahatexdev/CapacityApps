@@ -64,7 +64,8 @@ class DataMesinModel extends Model
         return $uniqueArea;
     }
 
-    public function getJarumByArea($area) {
+    public function getJarumByArea($area)
+    {
         $query = $this->distinct()
             ->select('jarum')
             ->orderBy('id_data_mesin', 'ASC')
@@ -198,7 +199,35 @@ class DataMesinModel extends Model
     }
     public function getBabyComp()
     {
-        return $this->select('aliasjarum, jarum')->like('aliasjarum', 'Baby Comp')->groupBy('aliasjarum')->findAll();
+        return $this->select('aliasjarum, jarum')->like('aliasjarum', 'Baby Comp N84')->orLike('aliasjarum', 'Baby Comp N96')->groupBy('aliasjarum')->findAll();
+    }
+    public function getBabyComp108()
+    {
+        return $this->select('aliasjarum, jarum')->like('aliasjarum', 'Baby Comp N108')->groupBy('aliasjarum')->findAll();
+    }
+    public function getChildComp120()
+    {
+        return $this->select('aliasjarum, jarum')->like('aliasjarum', 'Child Comp N120')->groupBy('aliasjarum')->findAll();
+    }
+    public function getLadyComp()
+    {
+        return $this->select('aliasjarum, jarum')->like('aliasjarum', 'Ladies Comp')->groupBy('aliasjarum')->findAll();
+    }
+    public function getMensComp168()
+    {
+        return $this->select('aliasjarum, jarum')->like('aliasjarum', 'Mens Comp N168')->groupBy('aliasjarum')->findAll();
+    }
+    public function getMensComp200()
+    {
+        return $this->select('aliasjarum, jarum')->like('aliasjarum', 'Mens Comp N200')->groupBy('aliasjarum')->findAll();
+    }
+    public function getChildComp132()
+    {
+        return $this->select('aliasjarum, jarum')->like('aliasjarum', 'Child Comp N132')->groupBy('aliasjarum')->findAll();
+    }
+    public function getMensComp156()
+    {
+        return $this->select('aliasjarum, jarum')->like('aliasjarum', 'Mens Comp N156')->groupBy('aliasjarum')->findAll();
     }
     public function getBrand($jarum, $brand)
     {
@@ -253,11 +282,12 @@ class DataMesinModel extends Model
             ->orderBy('pu', 'total_mc', 'Desc')
             ->findAll();
     }
-    public function getMesinByArea($area,$jarum){
+    public function getMesinByArea($area, $jarum)
+    {
         $a = $this->select('sum(total_mc) as mesin')
-        ->where('area',$area)
-        ->where('jarum',$jarum)
-        ->first();
+            ->where('area', $area)
+            ->where('jarum', $jarum)
+            ->first();
 
         $mesin = reset($a);
         return $mesin;
