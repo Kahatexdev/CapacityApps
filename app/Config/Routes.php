@@ -98,8 +98,8 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
     $routes->post('getTypebyJarum', 'BookingController::getTypebyJarum');
 
-    $routes->get('sales', 'ExportController::index');
-    $routes->get('exportsales', 'ExportController::export');
+    $routes->get('sales', 'ExcelController::index');
+    $routes->get('exportsales', 'ExcelController::export');
 
     //target
     $routes->get('datatarget', 'BookingController::target');
@@ -320,8 +320,8 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
 
     $routes->post('getTypebyJarum', 'GodController::getTypebyJarum');
 
-    $routes->get('sales', 'ExportController::index');
-    $routes->get('exportsales', 'ExportController::export');
+    $routes->get('sales', 'ExcelController::index');
+    $routes->get('exportsales', 'ExcelController::export');
 
     //target
     $routes->get('datatarget', 'GodController::target');
