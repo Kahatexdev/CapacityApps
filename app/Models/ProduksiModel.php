@@ -43,7 +43,7 @@ class ProduksiModel extends Model
     public function getProduksi($area, $bulan)
     {
         return $this->join('apsperstyle', 'apsperstyle.idapsperstyle= produksi.idapsperstyle')
-            ->select('tgl_produksi,mastermodel,size,produksi.delivery,sum(qty) as qty,  sum(qty_produksi) as qty_produksi')->where('produksi.area', $area)->orderBy('produksi.tgl_produksi')
+            ->select('tgl_produksi,mastermodel,size,produksi.delivery,sum(qty) as qty,  sum(qty_produksi) as qty_produksi')->where('produksi.admin', $area)->orderBy('produksi.tgl_produksi')
             ->groupBy('size')
             ->groupBy('tgl_produksi')
             ->where('Month(tgl_produksi)', $bulan)
@@ -70,7 +70,7 @@ class ProduksiModel extends Model
     {
         $result = $this->select('DATE(tgl_produksi) as tgl_produksi, SUM(qty_produksi) as qty_produksi')
             ->where('MONTH(tgl_produksi)', $bulan)
-            ->where('area', $area)
+            ->where('admin', $area)
 
             ->like('storage_akhir', '-')
             ->groupBy('DATE(tgl_produksi)')
@@ -92,6 +92,15 @@ class ProduksiModel extends Model
         return $this->select('apsperstyle.mastermodel, DATE(produksi.created_at) as tgl_upload, produksi.tgl_produksi, produksi.admin, SUM(produksi.qty_produksi) as qty, SUM(apsperstyle.sisa) as sisa, SUM(apsperstyle.qty) as qty_order')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle')
             ->groupBy('apsperstyle.mastermodel, DATE(produksi.created_at)')
+            ->findAll();
+    }
+    public function getProduksiHarianArea()
+    {
+        return $this->select(' DATE(produksi.created_at) as tgl_upload, produksi.tgl_produksi, produksi.admin, SUM(produksi.qty_produksi) as qty')
+            ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle')
+            ->like('produksi.admin', 'KK')
+            ->groupBy('DATE(produksi.created_at), produksi.admin')
+            ->orderBy('DATE(produksi.created_at)', 'DESC')
             ->findAll();
     }
 

@@ -60,7 +60,7 @@ class UserController extends BaseController
     public function produksi()
     {
         $dataPdk = $this->ApsPerstyleModel->getPdkProduksi();
-        $produksi = $this->produksiModel->getProduksiHarian();
+        $produksi = $this->produksiModel->getProduksiHarianArea();
         $data = [
             'role' => session()->get('role'),
             'title' => 'Dashboard',

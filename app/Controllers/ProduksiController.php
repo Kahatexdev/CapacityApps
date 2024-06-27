@@ -599,4 +599,14 @@ class ProduksiController extends BaseController
         $this->produksiModel->deleteSesuai($idaps);
         return redirect()->to(base_url(session()->get('role') . '/produksi'))->withInput()->with('success', 'Data Berhasil di reset');
     }
+    public function resetproduksiarea()
+    {
+        $area = $this->request->getPost('area');
+        $tgl_produksi = $this->request->getPost('tgl_produksi');
+
+        $idaps = $this->ApsPerstyleModel->getDataForReset($area, $tgl_produksi);
+        $this->ApsPerstyleModel->resetSisa($pdk);
+        $this->produksiModel->deleteSesuai($idaps);
+        return redirect()->to(base_url(session()->get('role') . '/produksi'))->withInput()->with('success', 'Data Berhasil di reset');
+    }
 }
