@@ -168,7 +168,7 @@
     $(document).ready(function() {
         $('#dataTable0').DataTable({
             "order": [
-                [0, "desc"]
+                [1, "desc"]
             ]
         });
         $('#dataTable').DataTable({});

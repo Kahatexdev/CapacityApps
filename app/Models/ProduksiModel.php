@@ -99,8 +99,8 @@ class ProduksiModel extends Model
         return $this->select(' DATE(produksi.created_at) as tgl_upload, produksi.tgl_produksi, produksi.admin, SUM(produksi.qty_produksi) as qty')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle')
             ->like('produksi.admin', 'KK')
-            ->groupBy('DATE(produksi.created_at), produksi.admin')
-            ->orderBy('DATE(produksi.created_at)', 'DESC')
+            ->groupBy('DATE(produksi.tgl_produksi), produksi.admin')
+            ->orderBy('DATE(produksi.tgl_produksi)', 'DESC')
             ->findAll();
     }
 
