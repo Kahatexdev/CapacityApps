@@ -300,6 +300,8 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->post('importproduksi', 'ProduksiController::importproduksinew');
     $routes->post('resetproduksi', 'ProduksiController::resetproduksi');
     $routes->post('resetproduksiarea', 'ProduksiController::resetproduksiarea');
+    $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+
 
 
     // mesin

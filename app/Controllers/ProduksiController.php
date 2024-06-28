@@ -604,9 +604,16 @@ class ProduksiController extends BaseController
         $area = $this->request->getPost('area');
         $tgl_produksi = $this->request->getPost('tgl_produksi');
 
-        $idaps = $this->ApsPerstyleModel->getDataForReset($area, $tgl_produksi);
-        $this->ApsPerstyleModel->resetSisa($pdk);
-        $this->produksiModel->deleteSesuai($idaps);
+        $produksi = $this->produksiModel->getDataForReset($area, $tgl_produksi);
+        foreach ($produksi as $pr) {
+            $idProduksi = $pr['id_produksi'];
+            $qtyproduksi = $pr['qty_produksi'];
+            $idaps = $pr['idapsperstyle'];
+            $sisaOrder = $this->ApsPerstyleModel->getSisaOrder($idaps);
+            $setSisa = $qtyproduksi + $sisaOrder;
+            $this->ApsPerstyleModel->update($idaps, ['sisa' => $setSisa]);
+            $this->produksiModel->delete($idProduksi);
+        }
         return redirect()->to(base_url(session()->get('role') . '/produksi'))->withInput()->with('success', 'Data Berhasil di reset');
     }
 }

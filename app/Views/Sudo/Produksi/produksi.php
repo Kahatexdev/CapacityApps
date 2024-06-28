@@ -125,7 +125,7 @@
                         <form action="<?= base_url($role . '/resetproduksiarea/'); ?>" method="post">
                             <div class="form-group">
                                 <label for="awal">Area</label>
-                                <input type="text" class="form-control" name="pdk" required>
+                                <input type="text" class="form-control" name="area" required>
                             </div>
                             <div class="form-group">
                                 <label for="awal">Tanggal Input Produksi</label>

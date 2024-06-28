@@ -108,4 +108,11 @@ class ProduksiModel extends Model
     {
         return $this->whereIn('idapsperstyle', $idaps)->delete();
     }
+    public function getDataForReset($area, $tanggal)
+    {
+        return $this->select('id_produksi,idapsperstyle,qty_produksi')
+            ->where('admin', $area)
+            ->where('tgl_produksi', $tanggal)
+            ->findAll();
+    }
 }
