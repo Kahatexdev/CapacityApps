@@ -51,8 +51,11 @@ class ProduksiModel extends Model
     }
     public function existingData($insert)
     {
+        dd($insert);
         return $this->select('id_produksi,qty_produksi')
-            ->where('idapsperstyle', $insert['idapsperstyle'])->where('tgl_produksi', $insert['tgl_produksi'])->where('qty_produksi', $insert['qty_produksi'])
+            ->where('idapsperstyle', $insert['idapsperstyle'])
+            ->where('tgl_produksi', $insert['tgl_produksi'])
+            ->where('qty_produksi', $insert['qty_produksi'])
             ->where('no_box', $insert['no_box'])
             ->where('no_label', $insert['no_label'])
             ->where('no_mesin', $insert['no_mesin'])
