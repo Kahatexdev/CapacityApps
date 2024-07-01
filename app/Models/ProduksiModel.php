@@ -99,4 +99,15 @@ class ProduksiModel extends Model
     {
         return $this->whereIn('idapsperstyle', $idaps)->delete();
     }
+
+    public function getdataSummaryPertgl($data)
+    {
+        return $this->select('apsperstyle.idapsperstyle, produksi.id_produksi, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, SUM(apsperstyle.qty) AS qty, COUNT(produksi.tgl_produksi) AS running, SUM(produksi.qty_produksi) AS qty_produksi, COUNT(produksi.no_mesin) AS jl_mc, produksi.tgl_produksi')
+        ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle')
+        ->where('apsperstyle.mastermodel', $data['pdk'])
+        ->groupBy('apsperstyle.size, produksi.tgl_produksi')
+        ->orderBy('apsperstyle.size, produksi.tgl_produksi', 'ASC')
+        ->findAll();
+    }
+
 }
