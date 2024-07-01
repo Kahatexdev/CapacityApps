@@ -65,6 +65,10 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
 
+    
+    //summary
+    $routes->post('summaryproduksi', 'ProduksiController::summaryPerTanggal');
+
 
     // mesin
     $routes->get('datamesin', 'MesinController::index');

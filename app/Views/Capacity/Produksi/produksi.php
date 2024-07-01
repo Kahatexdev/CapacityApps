@@ -59,8 +59,12 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
+                    <form action="<?= base_url($role . '/summaryproduksi/'); ?>" method="POST">
                     <div class="modal-body align-items-center">
-                        <form action="<?= base_url($role . '/summaryproduksi/'); ?>" method="POST">
+                            <div class="form-group">
+                                <label for="no_model">No Model</label>
+                                <input type="text" class="form-control" name="no_model">
+                            </div>
                             <div class="form-group">
                                 <label for="awal">Dari</label>
                                 <input type="date" class="form-control" name="awal">
