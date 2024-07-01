@@ -208,7 +208,6 @@ class ProduksiController extends BaseController
                                 'delivery' => $deliv,
                                 'area' => $area
                             ];
-                            dd($dataInsert);
                             $existingProduction = $this->produksiModel->existingData($dataInsert);
                             if (!$existingProduction) {
                                 $this->produksiModel->insert($dataInsert);
@@ -500,7 +499,7 @@ class ProduksiController extends BaseController
                                 $this->produksiModel->insert($dataInsert);
                             } else {
 
-                                //$failedRows[] = $rowIndex . "duplikat"; // Add to failed rows if production data already exists
+                                $failedRows[] = $rowIndex . "duplikat"; // Add to failed rows if production data already exists
                             }
                         } else {
                             $failedRows[] = "style tidak ditemukan" . $rowIndex;
@@ -580,7 +579,7 @@ class ProduksiController extends BaseController
                         $this->produksiModel->update($idexist, ['qty_produksi' => $sumqty]);
                         $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
 
-                        // $failedRows[] = $rowIndex; // Add to failed rows if production data already exists
+                        $failedRows[] = $rowIndex; // Add to failed rows if production data already exists
                     }
                 }
             } catch (\Exception $e) {
@@ -599,4 +598,82 @@ class ProduksiController extends BaseController
         $this->produksiModel->deleteSesuai($idaps);
         return redirect()->to(base_url(session()->get('role') . '/produksi'))->withInput()->with('success', 'Data Berhasil di reset');
     }
+    public function resetproduksiarea()
+    {
+        $area = $this->request->getPost('area');
+        $tgl_produksi = $this->request->getPost('tgl_produksi');
+
+        $produksi = $this->produksiModel->getDataForReset($area, $tgl_produksi);
+        foreach ($produksi as $pr) {
+            $idProduksi = $pr['id_produksi'];
+            $qtyproduksi = $pr['qty_produksi'];
+            $idaps = $pr['idapsperstyle'];
+            $sisaOrder = $this->ApsPerstyleModel->getSisaOrder($idaps);
+            $setSisa = $qtyproduksi + $sisaOrder;
+            $this->ApsPerstyleModel->update($idaps, ['sisa' => $setSisa]);
+            $this->produksiModel->delete($idProduksi);
+        }
+        return redirect()->to(base_url(session()->get('role') . '/produksi'))->withInput()->with('success', 'Data Berhasil di reset');
+    }
+    public function summaryProdPerTanggal() {
+        $pdk = $this->request->getPost('pdk');
+        $awal = $this->request->getPost('awal');
+        $akhir = $this->request->getPost('akhir');
+        
+        $data = [
+            'pdk' => $pdk,
+            'awal' => $awal,
+            'akhir' => $akhir,
+        ];
+
+        $dataSummaryPertgl = $this->produksiModel->getdataSummaryPertgl($data);
+        // supaya data menjadi unik
+        $tgl_produksi = [];
+        foreach ($dataSummaryPertgl as $item) {
+            $tgl_produksi[$item['tgl_produksi']] = $item['tgl_produksi'];
+        }
+        $tgl_produksi = array_values($tgl_produksi);
+        // Sort ASC
+        sort($tgl_produksi);
+        
+        $uniqueData = [];
+        foreach ($dataSummaryPertgl as $item) {
+            $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'];
+            $qty =+ $item['qty'];
+            if (!isset($uniqueData[$key])) {
+                $uniqueData[$key] = [
+                    'machinetypeid' => $item['machinetypeid'],
+                    'mastermodel' => $item['mastermodel'],
+                    'size' => $item['size'],
+                    'qty' => 0,
+                    'running' => 0,
+                    'ttl_prod' => 0,
+                    'ttl_jlmc' => 0,
+                ];
+            }
+            $uniqueData[$key]['qty'] += $item['qty']/24;
+            $uniqueData[$key]['running'] += $item['running'];
+            $uniqueData[$key]['ttl_prod'] += $item['qty_produksi']/24;
+            $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
+        }
+        // Sort ASC
+        sort($uniqueData);
+        // dd($dataSummaryPertgl);
+        $data2 = [
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => 'active',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'dataSummaryPertgl' => $dataSummaryPertgl,
+            'tglProdUnik' => $tgl_produksi,
+            'uniqueData' => $uniqueData,
+            'role' => session()->get('role'),
+            'title' => $pdk,
+        ];
+        return view('Capacity/Produksi/summaryPertanggal', $data2);
+    }
 }
+

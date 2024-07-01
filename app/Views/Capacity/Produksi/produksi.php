@@ -6,7 +6,7 @@
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
-                        <div class="col-8">
+                        <div class="col-4">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
@@ -14,8 +14,11 @@
                                 </h5>
                             </div>
                         </div>
-                        <div class="col-4 text-end">
+                        <div class="col-8 text-end">
                             <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">
+                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary Produksi Pertanggal
+                            </button>
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage2">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary Produksi
                             </button>
                         </div>
@@ -50,6 +53,7 @@
                 });
             </script>
         <?php endif; ?>
+        <!-- modal summary produksi pertanggal -->
         <div class="modal fade" id="exampleModalMessage" tabindex="-1" role="dialog" aria-labelledby="exampleModalMessageTitle" aria-hidden="true">
             <div class="modal-dialog " role="document">
                 <div class="modal-content">
@@ -59,30 +63,55 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
-                    <form action="<?= base_url($role . '/summaryproduksi/'); ?>" method="POST">
-                    <div class="modal-body align-items-center">
+                    <form action="<?= base_url($role . '/summaryProdPerTanggal/'); ?>" method="POST">
+                        <div class="modal-body align-items-center">
                             <div class="form-group">
-                                <label for="no_model">No Model</label>
-                                <input type="text" class="form-control" name="no_model">
+                                <label for="pdk">No Model</label>
+                                <input type="text" class="form-control" name="pdk">
                             </div>
                             <div class="form-group">
-                                <label for="awal">Dari</label>
-                                <input type="date" class="form-control" name="awal">
+                                <label for="awal" class="col-form-label d-none">Dari</label>
+                                <input type="date" class="form-control d-none" name="awal">
                             </div>
                             <div class="form-group">
-                                <label for="akhir" class="col-form-label">Sampai</label>
-                                <input type="date" name="akhir" class="form-control">
+                                <label for="akhir" class="col-form-label d-none">Sampai</label>
+                                <input type="date" class="form-control d-none" name="akhir">
                             </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn bg-gradient-info">Generate</button>
-                    </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-info">Generate</button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
-
+        <!-- modal summary produksi -->
+        <div class="modal fade" id="exampleModalMessage2" tabindex="-1" role="dialog" aria-labelledby="exampleModalMessageTitle" aria-hidden="true">
+            <div class="modal-dialog " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Summary Produksi</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <form action="<?= base_url($role . '/summaryProd/'); ?>" method="POST">
+                        <div class="modal-body align-items-center">
+                            <div class="form-group">
+                                <label for="no_model">No Model</label>
+                                <input type="text" class="form-control" name="no_model">
+                            </div>
+                            
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-info">Generate</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>
@@ -373,7 +402,7 @@
 
 
         }
-        setInterval(fetchData, 100000000000);
+        setInterval(fetchData, 5000);
         fetchData();
 
     });

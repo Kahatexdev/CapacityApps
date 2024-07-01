@@ -70,6 +70,11 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('summaryproduksi', 'ProduksiController::summaryPerTanggal');
 
 
+    //summary produksi
+    $routes->post('summaryProdPerTanggal', 'ProduksiController::summaryProdPerTanggal');
+    $routes->post('summaryProd', 'SummaryController::summaryProd');
+
+
     // mesin
     $routes->get('datamesin', 'MesinController::index');
     $routes->get('mesinPerJarum/(:any)', 'MesinController::mesinPerJarum/$1');
@@ -303,6 +308,9 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('importproduksi', 'ProduksiController::importproduksinew');
     $routes->post('resetproduksi', 'ProduksiController::resetproduksi');
+    $routes->post('resetproduksiarea', 'ProduksiController::resetproduksiarea');
+    $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+
 
 
     // mesin
