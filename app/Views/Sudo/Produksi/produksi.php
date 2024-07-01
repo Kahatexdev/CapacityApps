@@ -129,7 +129,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="awal">Tanggal Input Produksi</label>
-                                <input type="date" class="form-control" name="tgl_produksi" required>
+                                <input type="date" class="form-control" name="tgl_produksi">
                             </div>
 
                     </div>
