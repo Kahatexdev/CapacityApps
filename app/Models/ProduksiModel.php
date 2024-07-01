@@ -43,7 +43,7 @@ class ProduksiModel extends Model
     public function getProduksi($area, $bulan)
     {
         return $this->join('apsperstyle', 'apsperstyle.idapsperstyle= produksi.idapsperstyle')
-            ->select('tgl_produksi,mastermodel,size,produksi.delivery,sum(qty) as qty,  sum(qty_produksi) as qty_produksi')->where('produksi.area', $area)->orderBy('produksi.tgl_produksi')
+            ->select('tgl_produksi,mastermodel,size,produksi.delivery,sum(qty) as qty,  sum(qty_produksi) as qty_produksi')->where('produksi.admin', $area)->orderBy('produksi.tgl_produksi')
             ->groupBy('size')
             ->groupBy('tgl_produksi')
             ->where('Month(tgl_produksi)', $bulan)
@@ -51,10 +51,14 @@ class ProduksiModel extends Model
     }
     public function existingData($insert)
     {
+        dd($insert);
         return $this->select('id_produksi,qty_produksi')
-            ->where('idapsperstyle', $insert['idapsperstyle'])->where('tgl_produksi', $insert['tgl_produksi'])->where('qty_produksi', $insert['qty_produksi'])
-            ->where('shift', $insert['shift'])
+            ->where('idapsperstyle', $insert['idapsperstyle'])
+            ->where('tgl_produksi', $insert['tgl_produksi'])
+            ->where('qty_produksi', $insert['qty_produksi'])
             ->where('no_box', $insert['no_box'])
+            ->where('no_label', $insert['no_label'])
+            ->where('no_mesin', $insert['no_mesin'])
             ->first();
     }
     public function getProduksiPerhari($bulan)
@@ -70,7 +74,7 @@ class ProduksiModel extends Model
     {
         $result = $this->select('DATE(tgl_produksi) as tgl_produksi, SUM(qty_produksi) as qty_produksi')
             ->where('MONTH(tgl_produksi)', $bulan)
-            ->where('area', $area)
+            ->where('admin', $area)
 
             ->like('storage_akhir', '-')
             ->groupBy('DATE(tgl_produksi)')
@@ -94,10 +98,26 @@ class ProduksiModel extends Model
             ->groupBy('apsperstyle.mastermodel, DATE(produksi.created_at)')
             ->findAll();
     }
+    public function getProduksiHarianArea()
+    {
+        return $this->select(' DATE(produksi.created_at) as tgl_upload, produksi.tgl_produksi, produksi.admin, SUM(produksi.qty_produksi) as qty')
+            ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle')
+            ->like('produksi.admin', 'KK')
+            ->groupBy('DATE(produksi.tgl_produksi), produksi.admin')
+            ->orderBy('DATE(produksi.tgl_produksi)', 'DESC')
+            ->findAll();
+    }
 
     public function deleteSesuai(array $idaps)
     {
         return $this->whereIn('idapsperstyle', $idaps)->delete();
+    }
+    public function getDataForReset($area, $tanggal)
+    {
+        return $this->select('id_produksi,idapsperstyle,qty_produksi')
+            ->where('admin', $area)
+            ->where('tgl_produksi', $tanggal)
+            ->findAll();
     }
 
     public function getdataSummaryPertgl($data)

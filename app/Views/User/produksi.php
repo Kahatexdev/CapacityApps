@@ -84,21 +84,17 @@
                                 <thead>
                                     <tr>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal Upload</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">PDK</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal Produksi</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">QTY Upload</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Order</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Order</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Admin</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Area</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php foreach ($produksi as $prd) : ?>
                                         <tr>
                                             <td class="text-sm"><?= $prd['tgl_upload']; ?></td>
-                                            <td class="text-sm"><?= $prd['mastermodel']; ?></td>
+                                            <td class="text-sm"><?= $prd['tgl_produksi']; ?></td>
                                             <td class="text-sm"><?= $prd['qty']; ?></td>
-                                            <td class="text-sm"><?= $prd['qty_order']; ?></td>
-                                            <td class="text-sm"><?= $prd['sisa']; ?></td>
                                             <td class="text-sm"><?= $prd['admin']; ?></td>
 
                                         </tr>
@@ -170,7 +166,11 @@
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#dataTable0').DataTable({});
+        $('#dataTable0').DataTable({
+            "order": [
+                [1, "desc"]
+            ]
+        });
         $('#dataTable').DataTable({});
 
         // Trigger import modal when import button is clicked

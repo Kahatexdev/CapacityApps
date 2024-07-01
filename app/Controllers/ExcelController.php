@@ -2,7 +2,6 @@
 
 namespace App\Controllers;
 
-
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\DataMesinModel;
@@ -20,8 +19,9 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\{Border, Alignment, Fill};
 
 
-class ExportController extends BaseController
+class ExcelController extends BaseController
 {
+
     protected $filters;
     protected $jarumModel;
     protected $productModel;
@@ -561,7 +561,7 @@ class ExportController extends BaseController
         $rowBC108 = $totalBCRow + 1;
         $totalBC108Row = count($babyComp108) + $rowBC108;
         $rowCC120 = $totalBC108Row + 1;
-        $totalCC120Row = count($childComp120) + $rowCC120;
+        $totalCC120Row = 12 + $rowCC120;
         $rowLC = $totalCC120Row + 1;
         $totalLCRow = count($ladyComp) + $rowLC;
         $rowMC168 = $totalLCRow + 1;
@@ -770,7 +770,6 @@ class ExportController extends BaseController
             $totalMjRun +=  $item['mjRun'];
             $ttlMcDcRunperPU = $item['cjRun'] + $item['mjRun'];
             $totalMcDcRunperPU +=  $ttlMcDcRunperPU;
-            $mergerow = $rowBC + 4;
 
             $sheet->setCellValue('A' . $rowBC, $key)
                 ->setCellValue('C' . $rowBC, $item['dakong'])
@@ -778,27 +777,7 @@ class ExportController extends BaseController
                 ->setCellValue('E' . $rowBC, $item['mekanik'])
                 ->setCellValue('F' . $rowBC, $item['lonati'])
                 ->setCellValue('B' . $rowBC, "0")
-                ->mergeCells('A' . $rowBC . ':A' . $mergerow)
-                ->mergeCells('B' . $rowBC . ':B' . $mergerow)
-                ->mergeCells('C' . $rowBC . ':C' . $mergerow)
-                ->mergeCells('D' . $rowBC . ':D' . $mergerow)
-                ->mergeCells('E' . $rowBC . ':E' . $mergerow)
-                ->mergeCells('F' . $rowBC . ':F' . $mergerow)
-                ->mergeCells('G' . $rowBC . ':G' . $mergerow)
-                ->mergeCells('H' . $rowBC . ':H' . $mergerow)
-                ->mergeCells('I' . $rowBC . ':I' . $mergerow)
-                ->mergeCells('J' . $rowBC . ':J' . $mergerow)
-                ->mergeCells('K' . $rowBC . ':K' . $mergerow)
-                ->mergeCells('L' . $rowBC . ':L' . $mergerow)
-                ->mergeCells('M' . $rowBC . ':M' . $mergerow)
-                ->mergeCells('N' . $rowBC . ':N' . $mergerow)
-                ->mergeCells('O' . $rowBC . ':O' . $mergerow)
-                ->mergeCells('P' . $rowBC . ':P' . $mergerow)
-                ->mergeCells('Q' . $rowBC . ':Q' . $mergerow)
-                ->mergeCells('R' . $rowBC . ':R' . $mergerow)
-                ->mergeCells('S' . $rowBC . ':S' . $mergerow)
-                ->mergeCells('T' . $rowBC . ':T' . $mergerow)
-                ->mergeCells('U' . $rowBC . ':U' . $mergerow)
+
                 ->setCellValue('G' . $rowBC, $totalMc);
             $cellCoordinates = ['A' . $rowBC, 'C' . $rowBC, 'D' . $rowBC, 'F' . $rowBC, 'G' . $rowBC, 'B' . $rowBC, 'E' . $rowBC,];
             foreach ($cellCoordinates as $cellCoordinate) {
@@ -884,24 +863,24 @@ class ExportController extends BaseController
 
                     ]);
                 }
-                // WEEK & Capasity Produksi
-                // $sheet
-                //     ->setCellValue('V' . $totalBCRow, 'week 1')
-                //     ->setCellValue('W' . $totalBCRow, $minus3)
-                //     ->setCellValue('X' . $totalBCRow, $po28hari)
-                //     ->setCellValue('V' . $rowBC, "0")
-                //     ->setCellValue('W' . $rowBC, "0")
-                //     ->setCellValue('X' . $rowBC, "0");
-                // $cellCoordinates = ['V' . $rowBC, 'W' . $rowBC, 'X' . $rowBC,];
-                // foreach ($cellCoordinates as $cellCoordinate) {
-                //     $sheet->getStyle($cellCoordinate)->applyFromArray([
-                //         'borders' => [
-                //             'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                //         ],
-                //         'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+                //WEEK & Capasity Produksi
+                $sheet
+                    ->setCellValue('V' . $totalBCRow, $week)
+                    ->setCellValue('W' . $totalBCRow, $minus3)
+                    ->setCellValue('X' . $totalBCRow, $po28hari)
+                    ->setCellValue('V' . $rowBC, "0")
+                    ->setCellValue('W' . $rowBC, "0")
+                    ->setCellValue('X' . $rowBC, "0");
+                $cellCoordinates = ['V' . $rowBC, 'W' . $rowBC, 'X' . $rowBC,];
+                foreach ($cellCoordinates as $cellCoordinate) {
+                    $sheet->getStyle($cellCoordinate)->applyFromArray([
+                        'borders' => [
+                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+                        ],
+                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
 
-                //     ]);
-                // }
+                    ]);
+                }
 
                 $totalStyle = ['U' . $rowBC, 'M' . $rowBC, 'G' . $rowBC, 'G' . $totalBCRow, 'M' . $totalBCRow, 'U' . $totalBCRow,];
                 foreach ($totalStyle  as $styleTotal) {
@@ -1193,23 +1172,7 @@ class ExportController extends BaseController
                     ]);
                 }
                 // WEEK & Capasity Produksi
-                $sheet
-                    ->setCellValue('V' . $totalCC120Row, $week)
-                    ->setCellValue('W' . $totalCC120Row, $minus3)
-                    ->setCellValue('X' . $totalCC120Row, $po28hari)
-                    ->setCellValue('V' . $rowCC120, "0")
-                    ->setCellValue('W' . $rowCC120, "0")
-                    ->setCellValue('X' . $rowCC120, "0");
-                $cellCoordinates = ['V' . $rowCC120, 'W' . $rowCC120, 'X' . $rowCC120,];
-                foreach ($cellCoordinates as $cellCoordinate) {
-                    $sheet->getStyle($cellCoordinate)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
 
-                    ]);
-                }
 
                 $totalStyle = ['U' . $rowCC120, 'M' . $rowCC120, 'G' . $rowCC120, 'G' . $totalCC120Row, 'M' . $totalCC120Row, 'U' . $totalCC120Row,];
                 foreach ($totalStyle  as $styleTotal) {
@@ -1228,699 +1191,11 @@ class ExportController extends BaseController
 
             $rowCC120++;
         }
-
-        //LADY COMP
-        foreach ($ladyComp as $key => $item) {
-            $totalMc = $item['dakong'] + $item['rosso'] + $item['mekanik'] + $item['lonati'];
-            $totalDakong  += $item['dakong'];
-            $totalThs  += $item['mekanik'];
-            $totalRosso  += $item['rosso'];
-            $totalLon  += $item['lonati'];
-            $totalDc  += $totalMc;
-
-            $totalMcDcRun = $item['dakongRun'] + $item['rossoRun'] + $item['mekanikRun'] + $item['lonatiRun'];
-            $totalDakongRun  += $item['dakongRun'];
-            $totalThsRun  += $item['mekanikRun'];
-            $totalRossoRun  += $item['rossoRun'];
-            $totalLonRun  += $item['lonatiRun'];
-            $totalDcRun += $totalMcDcRun;
-
-            $totalStockCylDk += $item['stockCylDk'];
-            $totalStockCylThs += $item['stockCylThs'];
-            $totalStockCylRosso += $item['stockCylRosso'];
-
-            $totalCjRun += $item['cjRun'];
-            $totalMjRun +=  $item['mjRun'];
-            $ttlMcDcRunperPU = $item['cjRun'] + $item['mjRun'];
-            $totalMcDcRunperPU +=  $ttlMcDcRunperPU;
-
-            $mergerow = $rowLC + 4;
-            $sheet //->mergeCells('A' . $rowLC . ':A' . $mergerow)
-                ->setCellValue('A' . $rowLC, $key)
-                ->setCellValue('C' . $rowLC, $item['dakong'])
-                //  ->mergeCells('C' . $rowLC . ':C' . $mergerow - 1)
-                ->setCellValue('D' . $rowLC, $item['rosso'])
-                //->mergeCells('D' . $rowLC . ':D' . $mergerow)
-                ->setCellValue('E' . $rowLC, $item['mekanik'])
-                //->mergeCells('E' . $rowLC . ':E' . $mergerow)
-                ->setCellValue('F' . $rowLC, $item['lonati'])
-                //->mergeCells('F ' . $rowLC . ':F ' . $mergerow)
-                //  ->mergeCells('B' . $rowLC . ':B' . $mergerow)
-                ->setCellValue('B' . $rowLC, "0")
-                //->mergeCells('G' . $rowLC . ':G' . $mergerow)
-                ->setCellValue('G' . $rowLC, $totalMc);
-            $cellCoordinates = ['A' . $rowLC, 'C' . $rowLC, 'D' . $rowLC, 'F' . $rowLC, 'G' . $rowLC, 'B' . $rowLC, 'E' . $rowLC,];
-            foreach ($cellCoordinates as $cellCoordinate) {
-                $sheet->getStyle($cellCoordinate)->applyFromArray([
-                    'borders' => [
-                        'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                    ],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-                ]);
-            }
-            // total mesin BC
-            $sheet->setCellValue('A' . $totalLCRow, 'TOTAL CHILD COMP N 120 + N120 SP')
-                ->setCellValue('C' . $totalLCRow, $totalDakong)
-                ->setCellValue('D' . $totalLCRow, $totalRosso)
-                ->setCellValue('E' . $totalLCRow, $totalThs)
-                ->setCellValue('G' . $totalLCRow, $totalDc)
-                ->setCellValue('F' . $totalLCRow, $totalLon)
-                ->setCellValue('H' . $totalLCRow, $totalDakongRun)
-                ->setCellValue('I' . $totalLCRow, $totalRossoRun)
-                ->setCellValue('J' . $totalLCRow, $totalThsRun)
-                ->setCellValue('K' . $totalLCRow, $totalLonRun)
-                ->setCellValue('M' . $totalLCRow, $totalDcRun);
-            $boldStyle = ['A' . $totalLCRow, 'C' . $totalLCRow, 'B' . $totalLCRow, 'D' . $totalLCRow, 'E' . $totalLCRow, 'F' . $totalLCRow,  'H' . $totalLCRow, 'I' . $totalLCRow, 'J' . $totalLCRow, 'K' . $totalLCRow, 'M' . $totalLCRow, 'L' . $totalLCRow, 'N' . $totalLCRow, 'O' . $totalLCRow, 'P' . $totalLCRow, 'Q' . $totalLCRow,  'R' . $totalLCRow, 'S' . $totalLCRow, 'T' . $totalLCRow, 'V' . $totalLCRow, 'W' . $totalLCRow, 'X' . $totalLCRow,];
-            foreach ($boldStyle as $bs) {
-                $sheet->getStyle($bs)->applyFromArray([
-                    'font' => ['bold' => true],
-                    'borders' => [
-                        'outline' => ['borderStyle' => Border::BORDER_THICK, 'color' => ['rgb' => '000000']],
-                    ],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-                ]);
-            }
-            // totalRunningMc
-            $sheet
-                ->setCellValue('H' . $rowLC, $item['dakongRun'])
-                ->setCellValue('I' . $rowLC, $item['rossoRun'])
-                ->setCellValue('J' . $rowLC, $item['mekanikRun'])
-                ->setCellValue('K' . $rowLC, $item['lonatiRun'])
-                ->setCellValue('M' . $rowLC, $totalMcDcRun);
-            $cellCoordinates = ['H' . $rowLC, 'I' . $rowLC, 'J' . $rowLC, 'K' . $rowLC,  'N' . $rowLC, 'L' . $rowLC,  'O' . $rowLC,  'P' . $rowLC,  'Q' . $rowLC,];
-            foreach ($cellCoordinates as $cellCoordinate) {
-                $sheet->getStyle($cellCoordinate)->applyFromArray([
-                    'borders' => [
-                        'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                    ],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                ]);
-                // stockCylinderBc
-                $sheet
-                    ->setCellValue('P' . $rowLC, $item['stockCylDk'])
-                    ->setCellValue('Q' . $rowLC, $item['stockCylThs'])
-                    ->setCellValue('R' . $rowLC, $item['stockCylRosso'])
-                    ->setCellValue('P' . $totalLCRow, $totalStockCylDk)
-                    ->setCellValue('Q' . $totalLCRow, $totalStockCylThs)
-                    ->setCellValue('R' . $totalLCRow, $totalStockCylRosso);
-
-                $cellCoordinates = ['P' . $rowLC, 'Q' . $rowLC, 'J' . $rowLC, 'R' . $rowLC,];
-                foreach ($cellCoordinates as $cellCoordinate) {
-                    $sheet->getStyle($cellCoordinate)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                    ]);
-                }
-                // totalRunningMc PU &stockCYl
-                $sheet
-                    ->setCellValue('S' . $totalLCRow, $totalCjRun)
-                    ->setCellValue('T' . $totalLCRow, $totalMjRun)
-                    ->setCellValue('U' . $totalLCRow, $totalMcDcRunperPU)
-                    ->setCellValue('S' . $rowLC, $item['cjRun'])
-                    ->setCellValue('T' . $rowLC, $item['mjRun'])
-                    ->setCellValue('U' . $rowLC, $ttlMcDcRunperPU);
-                $cellCoordinates = ['S' . $rowLC, 'T' . $rowLC, 'U' . $rowLC,];
-                foreach ($cellCoordinates as $cellCoordinate) {
-                    $sheet->getStyle($cellCoordinate)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                    ]);
-                }
-                // WEEK & Capasity Produksi
-                $sheet
-                    ->setCellValue('V' . $totalLCRow, $week)
-                    ->setCellValue('W' . $totalLCRow, $minus3)
-                    ->setCellValue('X' . $totalLCRow, $po28hari)
-                    ->setCellValue('V' . $rowLC, "0")
-                    ->setCellValue('W' . $rowLC, "0")
-                    ->setCellValue('X' . $rowLC, "0");
-                $cellCoordinates = ['V' . $rowLC, 'W' . $rowLC, 'X' . $rowLC,];
-                foreach ($cellCoordinates as $cellCoordinate) {
-                    $sheet->getStyle($cellCoordinate)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                    ]);
-                }
-
-                $totalStyle = ['U' . $rowLC, 'M' . $rowLC, 'G' . $rowLC, 'G' . $totalLCRow, 'M' . $totalLCRow, 'U' . $totalLCRow,];
-                foreach ($totalStyle  as $styleTotal) {
-                    $sheet->getStyle($styleTotal)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-                        'fill' => [
-                            'fillType' => Fill::FILL_SOLID,
-                            'startColor' => ['rgb' => 'FFA500'], // Orange color
-                        ],
-                    ]);
-                }
-            }
-
-            $rowLC++;
-        }
-
-        //MENS COMP N168
-        foreach ($mensComp as $key => $item) {
-            $totalMc = $item['dakong'] + $item['rosso'] + $item['mekanik'] + $item['lonati'];
-            $totalDakong  += $item['dakong'];
-            $totalThs  += $item['mekanik'];
-            $totalRosso  += $item['rosso'];
-            $totalLon  += $item['lonati'];
-            $totalDc  += $totalMc;
-
-            $totalMcDcRun = $item['dakongRun'] + $item['rossoRun'] + $item['mekanikRun'] + $item['lonatiRun'];
-            $totalDakongRun  += $item['dakongRun'];
-            $totalThsRun  += $item['mekanikRun'];
-            $totalRossoRun  += $item['rossoRun'];
-            $totalLonRun  += $item['lonatiRun'];
-            $totalDcRun += $totalMcDcRun;
-
-            $totalStockCylDk += $item['stockCylDk'];
-            $totalStockCylThs += $item['stockCylThs'];
-            $totalStockCylRosso += $item['stockCylRosso'];
-
-            $totalCjRun += $item['cjRun'];
-            $totalMjRun +=  $item['mjRun'];
-            $ttlMcDcRunperPU = $item['cjRun'] + $item['mjRun'];
-            $totalMcDcRunperPU +=  $ttlMcDcRunperPU;
-
-
-            $sheet->setCellValue('A' . $rowMC168, $key)
-                ->setCellValue('C' . $rowMC168, $item['dakong'])
-                ->setCellValue('D' . $rowMC168, $item['rosso'])
-                ->setCellValue('E' . $rowMC168, $item['mekanik'])
-                ->setCellValue('F' . $rowMC168, $item['lonati'])
-                ->setCellValue('B' . $rowMC168, "0")
-                ->setCellValue('G' . $rowMC168, $totalMc);
-            $cellCoordinates = ['A' . $rowMC168, 'C' . $rowMC168, 'D' . $rowMC168, 'F' . $rowMC168, 'G' . $rowMC168, 'B' . $rowMC168, 'E' . $rowMC168,];
-            foreach ($cellCoordinates as $cellCoordinate) {
-                $sheet->getStyle($cellCoordinate)->applyFromArray([
-                    'borders' => [
-                        'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                    ],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-                ]);
-            }
-            // total mesin BC
-            $sheet->setCellValue('A' . $totalMC168Row, 'TOTAL MENS COMP N168 + N168 SP')
-                ->setCellValue('C' . $totalMC168Row, $totalDakong)
-                ->setCellValue('D' . $totalMC168Row, $totalRosso)
-                ->setCellValue('E' . $totalMC168Row, $totalThs)
-                ->setCellValue('G' . $totalMC168Row, $totalDc)
-                ->setCellValue('F' . $totalMC168Row, $totalLon)
-                ->setCellValue('H' . $totalMC168Row, $totalDakongRun)
-                ->setCellValue('I' . $totalMC168Row, $totalRossoRun)
-                ->setCellValue('J' . $totalMC168Row, $totalThsRun)
-                ->setCellValue('K' . $totalMC168Row, $totalLonRun)
-                ->setCellValue('M' . $totalMC168Row, $totalDcRun);
-            $boldStyle = ['A' . $totalMC168Row, 'C' . $totalMC168Row, 'B' . $totalMC168Row, 'D' . $totalMC168Row, 'E' . $totalMC168Row, 'F' . $totalMC168Row,  'H' . $totalMC168Row, 'I' . $totalMC168Row, 'J' . $totalMC168Row, 'K' . $totalMC168Row, 'M' . $totalMC168Row, 'L' . $totalMC168Row, 'N' . $totalMC168Row, 'O' . $totalMC168Row, 'P' . $totalMC168Row, 'Q' . $totalMC168Row,  'R' . $totalMC168Row, 'S' . $totalMC168Row, 'T' . $totalMC168Row, 'V' . $totalMC168Row, 'W' . $totalMC168Row, 'X' . $totalMC168Row,];
-            foreach ($boldStyle as $bs) {
-                $sheet->getStyle($bs)->applyFromArray([
-                    'font' => ['bold' => true],
-                    'borders' => [
-                        'outline' => ['borderStyle' => Border::BORDER_THICK, 'color' => ['rgb' => '000000']],
-                    ],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-                ]);
-            }
-            // totalRunningMc
-            $sheet
-                ->setCellValue('H' . $rowMC168, $item['dakongRun'])
-                ->setCellValue('I' . $rowMC168, $item['rossoRun'])
-                ->setCellValue('J' . $rowMC168, $item['mekanikRun'])
-                ->setCellValue('K' . $rowMC168, $item['lonatiRun'])
-                ->setCellValue('M' . $rowMC168, $totalMcDcRun);
-            $cellCoordinates = ['H' . $rowMC168, 'I' . $rowMC168, 'J' . $rowMC168, 'K' . $rowMC168,  'N' . $rowMC168, 'L' . $rowMC168,  'O' . $rowMC168,  'P' . $rowMC168,  'Q' . $rowMC168,];
-            foreach ($cellCoordinates as $cellCoordinate) {
-                $sheet->getStyle($cellCoordinate)->applyFromArray([
-                    'borders' => [
-                        'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                    ],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                ]);
-                // stockCylinderBc
-                $sheet
-                    ->setCellValue('P' . $rowMC168, $item['stockCylDk'])
-                    ->setCellValue('Q' . $rowMC168, $item['stockCylThs'])
-                    ->setCellValue('R' . $rowMC168, $item['stockCylRosso'])
-                    ->setCellValue('P' . $totalMC168Row, $totalStockCylDk)
-                    ->setCellValue('Q' . $totalMC168Row, $totalStockCylThs)
-                    ->setCellValue('R' . $totalMC168Row, $totalStockCylRosso);
-
-                $cellCoordinates = ['P' . $rowMC168, 'Q' . $rowMC168, 'J' . $rowMC168, 'R' . $rowMC168,];
-                foreach ($cellCoordinates as $cellCoordinate) {
-                    $sheet->getStyle($cellCoordinate)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                    ]);
-                }
-                // totalRunningMc PU &stockCYl
-                $sheet
-                    ->setCellValue('S' . $totalMC168Row, $totalCjRun)
-                    ->setCellValue('T' . $totalMC168Row, $totalMjRun)
-                    ->setCellValue('U' . $totalMC168Row, $totalMcDcRunperPU)
-                    ->setCellValue('S' . $rowMC168, $item['cjRun'])
-                    ->setCellValue('T' . $rowMC168, $item['mjRun'])
-                    ->setCellValue('U' . $rowMC168, $ttlMcDcRunperPU);
-                $cellCoordinates = ['S' . $rowMC168, 'T' . $rowMC168, 'U' . $rowMC168,];
-                foreach ($cellCoordinates as $cellCoordinate) {
-                    $sheet->getStyle($cellCoordinate)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                    ]);
-                }
-                // WEEK & Capasity Produksi
-                $sheet
-                    ->setCellValue('V' . $totalMC168Row, $week)
-                    ->setCellValue('W' . $totalMC168Row, $minus3)
-                    ->setCellValue('X' . $totalMC168Row, $po28hari)
-                    ->setCellValue('V' . $rowMC168, "0")
-                    ->setCellValue('W' . $rowMC168, "0")
-                    ->setCellValue('X' . $rowMC168, "0");
-                $cellCoordinates = ['V' . $rowMC168, 'W' . $rowMC168, 'X' . $rowMC168,];
-                foreach ($cellCoordinates as $cellCoordinate) {
-                    $sheet->getStyle($cellCoordinate)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                    ]);
-                }
-
-                $totalStyle = ['U' . $rowMC168, 'M' . $rowMC168, 'G' . $rowMC168, 'G' . $totalMC168Row, 'M' . $totalMC168Row, 'U' . $totalMC168Row,];
-                foreach ($totalStyle  as $styleTotal) {
-                    $sheet->getStyle($styleTotal)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-                        'fill' => [
-                            'fillType' => Fill::FILL_SOLID,
-                            'startColor' => ['rgb' => 'FFA500'], // Orange color
-                        ],
-                    ]);
-                }
-            }
-
-            $rowMC168++;
-        }
-
-        //MENS COMP N200
-        foreach ($mensComp200 as $key => $item) {
-            $totalMc = $item['dakong'] + $item['rosso'] + $item['mekanik'] + $item['lonati'];
-            $totalDakong  += $item['dakong'];
-            $totalThs  += $item['mekanik'];
-            $totalRosso  += $item['rosso'];
-            $totalLon  += $item['lonati'];
-            $totalDc  += $totalMc;
-
-            $totalMcDcRun = $item['dakongRun'] + $item['rossoRun'] + $item['mekanikRun'] + $item['lonatiRun'];
-            $totalDakongRun  += $item['dakongRun'];
-            $totalThsRun  += $item['mekanikRun'];
-            $totalRossoRun  += $item['rossoRun'];
-            $totalLonRun  += $item['lonatiRun'];
-            $totalDcRun += $totalMcDcRun;
-
-            $totalStockCylDk += $item['stockCylDk'];
-            $totalStockCylThs += $item['stockCylThs'];
-            $totalStockCylRosso += $item['stockCylRosso'];
-
-            $totalCjRun += $item['cjRun'];
-            $totalMjRun +=  $item['mjRun'];
-            $ttlMcDcRunperPU = $item['cjRun'] + $item['mjRun'];
-            $totalMcDcRunperPU +=  $ttlMcDcRunperPU;
-
-
-            $sheet->setCellValue('A' . $rowMC200, $key)
-                ->setCellValue('C' . $rowMC200, $item['dakong'])
-                ->setCellValue('D' . $rowMC200, $item['rosso'])
-                ->setCellValue('E' . $rowMC200, $item['mekanik'])
-                ->setCellValue('F' . $rowMC200, $item['lonati'])
-                ->setCellValue('B' . $rowMC200, "0")
-                ->setCellValue('G' . $rowMC200, $totalMc);
-            $cellCoordinates = ['A' . $rowMC200, 'C' . $rowMC200, 'D' . $rowMC200, 'F' . $rowMC200, 'G' . $rowMC200, 'B' . $rowMC200, 'E' . $rowMC200,];
-            foreach ($cellCoordinates as $cellCoordinate) {
-                $sheet->getStyle($cellCoordinate)->applyFromArray([
-                    'borders' => [
-                        'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                    ],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-                ]);
-            }
-
-            // totalRunningMc
-            $sheet
-                ->setCellValue('H' . $rowMC200, $item['dakongRun'])
-                ->setCellValue('I' . $rowMC200, $item['rossoRun'])
-                ->setCellValue('J' . $rowMC200, $item['mekanikRun'])
-                ->setCellValue('K' . $rowMC200, $item['lonatiRun'])
-                ->setCellValue('M' . $rowMC200, $totalMcDcRun);
-            $cellCoordinates = ['H' . $rowMC200, 'I' . $rowMC200, 'J' . $rowMC200, 'K' . $rowMC200,  'N' . $rowMC200, 'L' . $rowMC200,  'O' . $rowMC200,  'P' . $rowMC200,  'Q' . $rowMC200,];
-            foreach ($cellCoordinates as $cellCoordinate) {
-                $sheet->getStyle($cellCoordinate)->applyFromArray([
-                    'borders' => [
-                        'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                    ],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                ]);
-                // stockCylinderBc
-                $sheet
-                    ->setCellValue('P' . $rowMC200, $item['stockCylDk'])
-                    ->setCellValue('Q' . $rowMC200, $item['stockCylThs'])
-                    ->setCellValue('R' . $rowMC200, $item['stockCylRosso']);
-
-                $cellCoordinates = ['P' . $rowMC200, 'Q' . $rowMC200, 'J' . $rowMC200, 'R' . $rowMC200,];
-                foreach ($cellCoordinates as $cellCoordinate) {
-                    $sheet->getStyle($cellCoordinate)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                    ]);
-                }
-                // totalRunningMc PU &stockCYl
-                $sheet
-                    ->setCellValue('S' . $rowMC200, $item['cjRun'])
-                    ->setCellValue('T' . $rowMC200, $item['mjRun'])
-                    ->setCellValue('U' . $rowMC200, $ttlMcDcRunperPU);
-                $cellCoordinates = ['S' . $rowMC200, 'T' . $rowMC200, 'U' . $rowMC200,];
-                foreach ($cellCoordinates as $cellCoordinate) {
-                    $sheet->getStyle($cellCoordinate)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                    ]);
-                }
-                // WEEK & Capasity Produksi
-                $sheet
-                    ->setCellValue('V' . $rowMC200, "0")
-                    ->setCellValue('W' . $rowMC200, "0")
-                    ->setCellValue('X' . $rowMC200, "0");
-                $cellCoordinates = ['V' . $rowMC200, 'W' . $rowMC200, 'X' . $rowMC200,];
-                foreach ($cellCoordinates as $cellCoordinate) {
-                    $sheet->getStyle($cellCoordinate)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                    ]);
-                }
-
-                $totalStyle = ['U' . $rowMC200, 'M' . $rowMC200, 'G' . $rowMC200,];
-                foreach ($totalStyle  as $styleTotal) {
-                    $sheet->getStyle($styleTotal)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-                        'fill' => [
-                            'fillType' => Fill::FILL_SOLID,
-                            'startColor' => ['rgb' => 'FFA500'], // Orange color
-                        ],
-                    ]);
-                }
-            }
-
-            $rowMC200++;
-        }
-
-        //CHILD COMP N132
-        foreach ($childComp132 as $key => $item) {
-            $totalMc = $item['dakong'] + $item['rosso'] + $item['mekanik'] + $item['lonati'];
-            $totalDakong  += $item['dakong'];
-            $totalThs  += $item['mekanik'];
-            $totalRosso  += $item['rosso'];
-            $totalLon  += $item['lonati'];
-            $totalDc  += $totalMc;
-
-            $totalMcDcRun = $item['dakongRun'] + $item['rossoRun'] + $item['mekanikRun'] + $item['lonatiRun'];
-            $totalDakongRun  += $item['dakongRun'];
-            $totalThsRun  += $item['mekanikRun'];
-            $totalRossoRun  += $item['rossoRun'];
-            $totalLonRun  += $item['lonatiRun'];
-            $totalDcRun += $totalMcDcRun;
-
-            $totalStockCylDk += $item['stockCylDk'];
-            $totalStockCylThs += $item['stockCylThs'];
-            $totalStockCylRosso += $item['stockCylRosso'];
-
-            $totalCjRun += $item['cjRun'];
-            $totalMjRun +=  $item['mjRun'];
-            $ttlMcDcRunperPU = $item['cjRun'] + $item['mjRun'];
-            $totalMcDcRunperPU +=  $ttlMcDcRunperPU;
-
-
-            $sheet->setCellValue('A' . $rowCC132, $key)
-                ->setCellValue('C' . $rowCC132, $item['dakong'])
-                ->setCellValue('D' . $rowCC132, $item['rosso'])
-                ->setCellValue('E' . $rowCC132, $item['mekanik'])
-                ->setCellValue('F' . $rowCC132, $item['lonati'])
-                ->setCellValue('B' . $rowCC132, "0")
-                ->setCellValue('G' . $rowCC132, $totalMc);
-            $cellCoordinates = ['A' . $rowCC132, 'C' . $rowCC132, 'D' . $rowCC132, 'F' . $rowCC132, 'G' . $rowCC132, 'B' . $rowCC132, 'E' . $rowCC132,];
-            foreach ($cellCoordinates as $cellCoordinate) {
-                $sheet->getStyle($cellCoordinate)->applyFromArray([
-                    'borders' => [
-                        'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                    ],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-                ]);
-            }
-
-            // totalRunningMc
-            $sheet
-                ->setCellValue('H' . $rowCC132, $item['dakongRun'])
-                ->setCellValue('I' . $rowCC132, $item['rossoRun'])
-                ->setCellValue('J' . $rowCC132, $item['mekanikRun'])
-                ->setCellValue('K' . $rowCC132, $item['lonatiRun'])
-                ->setCellValue('M' . $rowCC132, $totalMcDcRun);
-            $cellCoordinates = ['H' . $rowCC132, 'I' . $rowCC132, 'J' . $rowCC132, 'K' . $rowCC132,  'N' . $rowCC132, 'L' . $rowCC132,  'O' . $rowCC132,  'P' . $rowCC132,  'Q' . $rowCC132,];
-            foreach ($cellCoordinates as $cellCoordinate) {
-                $sheet->getStyle($cellCoordinate)->applyFromArray([
-                    'borders' => [
-                        'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                    ],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                ]);
-                // stockCylinderBc
-                $sheet
-                    ->setCellValue('P' . $rowCC132, $item['stockCylDk'])
-                    ->setCellValue('Q' . $rowCC132, $item['stockCylThs'])
-                    ->setCellValue('R' . $rowCC132, $item['stockCylRosso']);
-
-                $cellCoordinates = ['P' . $rowCC132, 'Q' . $rowCC132, 'J' . $rowCC132, 'R' . $rowCC132,];
-                foreach ($cellCoordinates as $cellCoordinate) {
-                    $sheet->getStyle($cellCoordinate)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                    ]);
-                }
-                // totalRunningMc PU &stockCYl
-                $sheet
-                    ->setCellValue('S' . $rowCC132, $item['cjRun'])
-                    ->setCellValue('T' . $rowCC132, $item['mjRun'])
-                    ->setCellValue('U' . $rowCC132, $ttlMcDcRunperPU);
-                $cellCoordinates = ['S' . $rowCC132, 'T' . $rowCC132, 'U' . $rowCC132,];
-                foreach ($cellCoordinates as $cellCoordinate) {
-                    $sheet->getStyle($cellCoordinate)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                    ]);
-                }
-                // WEEK & Capasity Produksi
-                $sheet
-                    ->setCellValue('V' . $rowCC132, "0")
-                    ->setCellValue('W' . $rowCC132, "0")
-                    ->setCellValue('X' . $rowCC132, "0");
-                $cellCoordinates = ['V' . $rowCC132, 'W' . $rowCC132, 'X' . $rowCC132,];
-                foreach ($cellCoordinates as $cellCoordinate) {
-                    $sheet->getStyle($cellCoordinate)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                    ]);
-                }
-
-                $totalStyle = ['U' . $rowCC132, 'M' . $rowCC132, 'G' . $rowCC132,];
-                foreach ($totalStyle  as $styleTotal) {
-                    $sheet->getStyle($styleTotal)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-                        'fill' => [
-                            'fillType' => Fill::FILL_SOLID,
-                            'startColor' => ['rgb' => 'FFA500'], // Orange color
-                        ],
-                    ]);
-                }
-            }
-
-            $rowCC132++;
-        }
-
-        //MENS COMP N156
-        foreach ($mensComp156 as $key => $item) {
-            $totalMc = $item['dakong'] + $item['rosso'] + $item['mekanik'] + $item['lonati'];
-            $totalDakong  += $item['dakong'];
-            $totalThs  += $item['mekanik'];
-            $totalRosso  += $item['rosso'];
-            $totalLon  += $item['lonati'];
-            $totalDc  += $totalMc;
-
-            $totalMcDcRun = $item['dakongRun'] + $item['rossoRun'] + $item['mekanikRun'] + $item['lonatiRun'];
-            $totalDakongRun  += $item['dakongRun'];
-            $totalThsRun  += $item['mekanikRun'];
-            $totalRossoRun  += $item['rossoRun'];
-            $totalLonRun  += $item['lonatiRun'];
-            $totalDcRun += $totalMcDcRun;
-
-            $totalStockCylDk += $item['stockCylDk'];
-            $totalStockCylThs += $item['stockCylThs'];
-            $totalStockCylRosso += $item['stockCylRosso'];
-
-            $totalCjRun += $item['cjRun'];
-            $totalMjRun +=  $item['mjRun'];
-            $ttlMcDcRunperPU = $item['cjRun'] + $item['mjRun'];
-            $totalMcDcRunperPU +=  $ttlMcDcRunperPU;
-
-
-            $sheet->setCellValue('A' . $rowMC156, $key)
-                ->setCellValue('C' . $rowMC156, $item['dakong'])
-                ->setCellValue('D' . $rowMC156, $item['rosso'])
-                ->setCellValue('E' . $rowMC156, $item['mekanik'])
-                ->setCellValue('F' . $rowMC156, $item['lonati'])
-                ->setCellValue('B' . $rowMC156, "0")
-                ->setCellValue('G' . $rowMC156, $totalMc);
-            $cellCoordinates = ['A' . $rowMC156, 'C' . $rowMC156, 'D' . $rowMC156, 'F' . $rowMC156, 'G' . $rowMC156, 'B' . $rowMC156, 'E' . $rowMC156,];
-            foreach ($cellCoordinates as $cellCoordinate) {
-                $sheet->getStyle($cellCoordinate)->applyFromArray([
-                    'borders' => [
-                        'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                    ],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-                ]);
-            }
-
-            // totalRunningMc
-            $sheet
-                ->setCellValue('H' . $rowMC156, $item['dakongRun'])
-                ->setCellValue('I' . $rowMC156, $item['rossoRun'])
-                ->setCellValue('J' . $rowMC156, $item['mekanikRun'])
-                ->setCellValue('K' . $rowMC156, $item['lonatiRun'])
-                ->setCellValue('M' . $rowMC156, $totalMcDcRun);
-            $cellCoordinates = ['H' . $rowMC156, 'I' . $rowMC156, 'J' . $rowMC156, 'K' . $rowMC156,  'N' . $rowMC156, 'L' . $rowMC156,  'O' . $rowMC156,  'P' . $rowMC156,  'Q' . $rowMC156,];
-            foreach ($cellCoordinates as $cellCoordinate) {
-                $sheet->getStyle($cellCoordinate)->applyFromArray([
-                    'borders' => [
-                        'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                    ],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                ]);
-                // stockCylinderBc
-                $sheet
-                    ->setCellValue('P' . $rowMC156, $item['stockCylDk'])
-                    ->setCellValue('Q' . $rowMC156, $item['stockCylThs'])
-                    ->setCellValue('R' . $rowMC156, $item['stockCylRosso']);
-
-                $cellCoordinates = ['P' . $rowMC156, 'Q' . $rowMC156, 'J' . $rowMC156, 'R' . $rowMC156,];
-                foreach ($cellCoordinates as $cellCoordinate) {
-                    $sheet->getStyle($cellCoordinate)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                    ]);
-                }
-                // totalRunningMc PU &stockCYl
-                $sheet
-                    ->setCellValue('S' . $rowMC156, $item['cjRun'])
-                    ->setCellValue('T' . $rowMC156, $item['mjRun'])
-                    ->setCellValue('U' . $rowMC156, $ttlMcDcRunperPU);
-                $cellCoordinates = ['S' . $rowMC156, 'T' . $rowMC156, 'U' . $rowMC156,];
-                foreach ($cellCoordinates as $cellCoordinate) {
-                    $sheet->getStyle($cellCoordinate)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                    ]);
-                }
-                // WEEK & Capasity Produksi
-                $sheet
-                    ->setCellValue('V' . $rowMC156, "0")
-                    ->setCellValue('W' . $rowMC156, "0")
-                    ->setCellValue('X' . $rowMC156, "0");
-                $cellCoordinates = ['V' . $rowMC156, 'W' . $rowMC156, 'X' . $rowMC156,];
-                foreach ($cellCoordinates as $cellCoordinate) {
-                    $sheet->getStyle($cellCoordinate)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-
-                    ]);
-                }
-
-                $totalStyle = ['U' . $rowMC156, 'M' . $rowMC156, 'G' . $rowMC156,];
-                foreach ($totalStyle  as $styleTotal) {
-                    $sheet->getStyle($styleTotal)->applyFromArray([
-                        'borders' => [
-                            'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
-                        ],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-                        'fill' => [
-                            'fillType' => Fill::FILL_SOLID,
-                            'startColor' => ['rgb' => 'FFA500'], // Orange color
-                        ],
-                    ]);
-                }
-            }
-
-            $rowMC156++;
-        }
-        // week1-5bc N84
         $weekCol = [];
         $week = [];
-        for ($i = 17; $i <= 21; $i++) {
+        for ($i = 24; $i <= 36; $i++) {
             $weekCol[] = 'V' . $i;
-            $week[] = 'WEEK ' . ($i - 16);
+            $week[] = 'WEEK ' . ($i - 23);
         }
 
         // Atur nilai sel dan gaya dalam satu loop
@@ -1933,6 +1208,695 @@ class ExportController extends BaseController
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
                 ]);
         }
+
+        //LADY COMP
+        // foreach ($ladyComp as $key => $item) {
+        //     $totalMc = $item['dakong'] + $item['rosso'] + $item['mekanik'] + $item['lonati'];
+        //     $totalDakong  += $item['dakong'];
+        //     $totalThs  += $item['mekanik'];
+        //     $totalRosso  += $item['rosso'];
+        //     $totalLon  += $item['lonati'];
+        //     $totalDc  += $totalMc;
+
+        //     $totalMcDcRun = $item['dakongRun'] + $item['rossoRun'] + $item['mekanikRun'] + $item['lonatiRun'];
+        //     $totalDakongRun  += $item['dakongRun'];
+        //     $totalThsRun  += $item['mekanikRun'];
+        //     $totalRossoRun  += $item['rossoRun'];
+        //     $totalLonRun  += $item['lonatiRun'];
+        //     $totalDcRun += $totalMcDcRun;
+
+        //     $totalStockCylDk += $item['stockCylDk'];
+        //     $totalStockCylThs += $item['stockCylThs'];
+        //     $totalStockCylRosso += $item['stockCylRosso'];
+
+        //     $totalCjRun += $item['cjRun'];
+        //     $totalMjRun +=  $item['mjRun'];
+        //     $ttlMcDcRunperPU = $item['cjRun'] + $item['mjRun'];
+        //     $totalMcDcRunperPU +=  $ttlMcDcRunperPU;
+
+        //     $mergerow = $rowLC + 4;
+        //     $sheet //->mergeCells('A' . $rowLC . ':A' . $mergerow)
+        //         ->setCellValue('A' . $rowLC, $key)
+        //         ->setCellValue('C' . $rowLC, $item['dakong'])
+        //         //  ->mergeCells('C' . $rowLC . ':C' . $mergerow - 1)
+        //         ->setCellValue('D' . $rowLC, $item['rosso'])
+        //         //->mergeCells('D' . $rowLC . ':D' . $mergerow)
+        //         ->setCellValue('E' . $rowLC, $item['mekanik'])
+        //         //->mergeCells('E' . $rowLC . ':E' . $mergerow)
+        //         ->setCellValue('F' . $rowLC, $item['lonati'])
+        //         //->mergeCells('F ' . $rowLC . ':F ' . $mergerow)
+        //         //  ->mergeCells('B' . $rowLC . ':B' . $mergerow)
+        //         ->setCellValue('B' . $rowLC, "0")
+        //         //->mergeCells('G' . $rowLC . ':G' . $mergerow)
+        //         ->setCellValue('G' . $rowLC, $totalMc);
+        //     $cellCoordinates = ['A' . $rowLC, 'C' . $rowLC, 'D' . $rowLC, 'F' . $rowLC, 'G' . $rowLC, 'B' . $rowLC, 'E' . $rowLC,];
+        //     foreach ($cellCoordinates as $cellCoordinate) {
+        //         $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //             'borders' => [
+        //                 'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //             ],
+        //             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+        //         ]);
+        //     }
+        //     // total mesin BC
+        //     $sheet->setCellValue('A' . $totalLCRow, 'TOTAL CHILD COMP N 120 + N120 SP')
+        //         ->setCellValue('C' . $totalLCRow, $totalDakong)
+        //         ->setCellValue('D' . $totalLCRow, $totalRosso)
+        //         ->setCellValue('E' . $totalLCRow, $totalThs)
+        //         ->setCellValue('G' . $totalLCRow, $totalDc)
+        //         ->setCellValue('F' . $totalLCRow, $totalLon)
+        //         ->setCellValue('H' . $totalLCRow, $totalDakongRun)
+        //         ->setCellValue('I' . $totalLCRow, $totalRossoRun)
+        //         ->setCellValue('J' . $totalLCRow, $totalThsRun)
+        //         ->setCellValue('K' . $totalLCRow, $totalLonRun)
+        //         ->setCellValue('M' . $totalLCRow, $totalDcRun);
+        //     $boldStyle = ['A' . $totalLCRow, 'C' . $totalLCRow, 'B' . $totalLCRow, 'D' . $totalLCRow, 'E' . $totalLCRow, 'F' . $totalLCRow,  'H' . $totalLCRow, 'I' . $totalLCRow, 'J' . $totalLCRow, 'K' . $totalLCRow, 'M' . $totalLCRow, 'L' . $totalLCRow, 'N' . $totalLCRow, 'O' . $totalLCRow, 'P' . $totalLCRow, 'Q' . $totalLCRow,  'R' . $totalLCRow, 'S' . $totalLCRow, 'T' . $totalLCRow, 'V' . $totalLCRow, 'W' . $totalLCRow, 'X' . $totalLCRow,];
+        //     foreach ($boldStyle as $bs) {
+        //         $sheet->getStyle($bs)->applyFromArray([
+        //             'font' => ['bold' => true],
+        //             'borders' => [
+        //                 'outline' => ['borderStyle' => Border::BORDER_THICK, 'color' => ['rgb' => '000000']],
+        //             ],
+        //             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+        //         ]);
+        //     }
+        //     // totalRunningMc
+        //     $sheet
+        //         ->setCellValue('H' . $rowLC, $item['dakongRun'])
+        //         ->setCellValue('I' . $rowLC, $item['rossoRun'])
+        //         ->setCellValue('J' . $rowLC, $item['mekanikRun'])
+        //         ->setCellValue('K' . $rowLC, $item['lonatiRun'])
+        //         ->setCellValue('M' . $rowLC, $totalMcDcRun);
+        //     $cellCoordinates = ['H' . $rowLC, 'I' . $rowLC, 'J' . $rowLC, 'K' . $rowLC,  'N' . $rowLC, 'L' . $rowLC,  'O' . $rowLC,  'P' . $rowLC,  'Q' . $rowLC,];
+        //     foreach ($cellCoordinates as $cellCoordinate) {
+        //         $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //             'borders' => [
+        //                 'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //             ],
+        //             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //         ]);
+        //         // stockCylinderBc
+        //         $sheet
+        //             ->setCellValue('P' . $rowLC, $item['stockCylDk'])
+        //             ->setCellValue('Q' . $rowLC, $item['stockCylThs'])
+        //             ->setCellValue('R' . $rowLC, $item['stockCylRosso'])
+        //             ->setCellValue('P' . $totalLCRow, $totalStockCylDk)
+        //             ->setCellValue('Q' . $totalLCRow, $totalStockCylThs)
+        //             ->setCellValue('R' . $totalLCRow, $totalStockCylRosso);
+
+        //         $cellCoordinates = ['P' . $rowLC, 'Q' . $rowLC, 'J' . $rowLC, 'R' . $rowLC,];
+        //         foreach ($cellCoordinates as $cellCoordinate) {
+        //             $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //             ]);
+        //         }
+        //         // totalRunningMc PU &stockCYl
+        //         $sheet
+        //             ->setCellValue('S' . $totalLCRow, $totalCjRun)
+        //             ->setCellValue('T' . $totalLCRow, $totalMjRun)
+        //             ->setCellValue('U' . $totalLCRow, $totalMcDcRunperPU)
+        //             ->setCellValue('S' . $rowLC, $item['cjRun'])
+        //             ->setCellValue('T' . $rowLC, $item['mjRun'])
+        //             ->setCellValue('U' . $rowLC, $ttlMcDcRunperPU);
+        //         $cellCoordinates = ['S' . $rowLC, 'T' . $rowLC, 'U' . $rowLC,];
+        //         foreach ($cellCoordinates as $cellCoordinate) {
+        //             $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //             ]);
+        //         }
+        //         // WEEK & Capasity Produksi
+        //         $sheet
+        //             ->setCellValue('V' . $totalLCRow, $week)
+        //             ->setCellValue('W' . $totalLCRow, $minus3)
+        //             ->setCellValue('X' . $totalLCRow, $po28hari)
+        //             ->setCellValue('V' . $rowLC, "0")
+        //             ->setCellValue('W' . $rowLC, "0")
+        //             ->setCellValue('X' . $rowLC, "0");
+        //         $cellCoordinates = ['V' . $rowLC, 'W' . $rowLC, 'X' . $rowLC,];
+        //         foreach ($cellCoordinates as $cellCoordinate) {
+        //             $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //             ]);
+        //         }
+
+        //         $totalStyle = ['U' . $rowLC, 'M' . $rowLC, 'G' . $rowLC, 'G' . $totalLCRow, 'M' . $totalLCRow, 'U' . $totalLCRow,];
+        //         foreach ($totalStyle  as $styleTotal) {
+        //             $sheet->getStyle($styleTotal)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+        //                 'fill' => [
+        //                     'fillType' => Fill::FILL_SOLID,
+        //                     'startColor' => ['rgb' => 'FFA500'], // Orange color
+        //                 ],
+        //             ]);
+        //         }
+        //     }
+
+        //     $rowLC++;
+        // }
+
+        // //MENS COMP N168
+        // foreach ($mensComp as $key => $item) {
+        //     $totalMc = $item['dakong'] + $item['rosso'] + $item['mekanik'] + $item['lonati'];
+        //     $totalDakong  += $item['dakong'];
+        //     $totalThs  += $item['mekanik'];
+        //     $totalRosso  += $item['rosso'];
+        //     $totalLon  += $item['lonati'];
+        //     $totalDc  += $totalMc;
+
+        //     $totalMcDcRun = $item['dakongRun'] + $item['rossoRun'] + $item['mekanikRun'] + $item['lonatiRun'];
+        //     $totalDakongRun  += $item['dakongRun'];
+        //     $totalThsRun  += $item['mekanikRun'];
+        //     $totalRossoRun  += $item['rossoRun'];
+        //     $totalLonRun  += $item['lonatiRun'];
+        //     $totalDcRun += $totalMcDcRun;
+
+        //     $totalStockCylDk += $item['stockCylDk'];
+        //     $totalStockCylThs += $item['stockCylThs'];
+        //     $totalStockCylRosso += $item['stockCylRosso'];
+
+        //     $totalCjRun += $item['cjRun'];
+        //     $totalMjRun +=  $item['mjRun'];
+        //     $ttlMcDcRunperPU = $item['cjRun'] + $item['mjRun'];
+        //     $totalMcDcRunperPU +=  $ttlMcDcRunperPU;
+
+
+        //     $sheet->setCellValue('A' . $rowMC168, $key)
+        //         ->setCellValue('C' . $rowMC168, $item['dakong'])
+        //         ->setCellValue('D' . $rowMC168, $item['rosso'])
+        //         ->setCellValue('E' . $rowMC168, $item['mekanik'])
+        //         ->setCellValue('F' . $rowMC168, $item['lonati'])
+        //         ->setCellValue('B' . $rowMC168, "0")
+        //         ->setCellValue('G' . $rowMC168, $totalMc);
+        //     $cellCoordinates = ['A' . $rowMC168, 'C' . $rowMC168, 'D' . $rowMC168, 'F' . $rowMC168, 'G' . $rowMC168, 'B' . $rowMC168, 'E' . $rowMC168,];
+        //     foreach ($cellCoordinates as $cellCoordinate) {
+        //         $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //             'borders' => [
+        //                 'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //             ],
+        //             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+        //         ]);
+        //     }
+        //     // total mesin BC
+        //     $sheet->setCellValue('A' . $totalMC168Row, 'TOTAL MENS COMP N168 + N168 SP')
+        //         ->setCellValue('C' . $totalMC168Row, $totalDakong)
+        //         ->setCellValue('D' . $totalMC168Row, $totalRosso)
+        //         ->setCellValue('E' . $totalMC168Row, $totalThs)
+        //         ->setCellValue('G' . $totalMC168Row, $totalDc)
+        //         ->setCellValue('F' . $totalMC168Row, $totalLon)
+        //         ->setCellValue('H' . $totalMC168Row, $totalDakongRun)
+        //         ->setCellValue('I' . $totalMC168Row, $totalRossoRun)
+        //         ->setCellValue('J' . $totalMC168Row, $totalThsRun)
+        //         ->setCellValue('K' . $totalMC168Row, $totalLonRun)
+        //         ->setCellValue('M' . $totalMC168Row, $totalDcRun);
+        //     $boldStyle = ['A' . $totalMC168Row, 'C' . $totalMC168Row, 'B' . $totalMC168Row, 'D' . $totalMC168Row, 'E' . $totalMC168Row, 'F' . $totalMC168Row,  'H' . $totalMC168Row, 'I' . $totalMC168Row, 'J' . $totalMC168Row, 'K' . $totalMC168Row, 'M' . $totalMC168Row, 'L' . $totalMC168Row, 'N' . $totalMC168Row, 'O' . $totalMC168Row, 'P' . $totalMC168Row, 'Q' . $totalMC168Row,  'R' . $totalMC168Row, 'S' . $totalMC168Row, 'T' . $totalMC168Row, 'V' . $totalMC168Row, 'W' . $totalMC168Row, 'X' . $totalMC168Row,];
+        //     foreach ($boldStyle as $bs) {
+        //         $sheet->getStyle($bs)->applyFromArray([
+        //             'font' => ['bold' => true],
+        //             'borders' => [
+        //                 'outline' => ['borderStyle' => Border::BORDER_THICK, 'color' => ['rgb' => '000000']],
+        //             ],
+        //             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+        //         ]);
+        //     }
+        //     // totalRunningMc
+        //     $sheet
+        //         ->setCellValue('H' . $rowMC168, $item['dakongRun'])
+        //         ->setCellValue('I' . $rowMC168, $item['rossoRun'])
+        //         ->setCellValue('J' . $rowMC168, $item['mekanikRun'])
+        //         ->setCellValue('K' . $rowMC168, $item['lonatiRun'])
+        //         ->setCellValue('M' . $rowMC168, $totalMcDcRun);
+        //     $cellCoordinates = ['H' . $rowMC168, 'I' . $rowMC168, 'J' . $rowMC168, 'K' . $rowMC168,  'N' . $rowMC168, 'L' . $rowMC168,  'O' . $rowMC168,  'P' . $rowMC168,  'Q' . $rowMC168,];
+        //     foreach ($cellCoordinates as $cellCoordinate) {
+        //         $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //             'borders' => [
+        //                 'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //             ],
+        //             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //         ]);
+        //         // stockCylinderBc
+        //         $sheet
+        //             ->setCellValue('P' . $rowMC168, $item['stockCylDk'])
+        //             ->setCellValue('Q' . $rowMC168, $item['stockCylThs'])
+        //             ->setCellValue('R' . $rowMC168, $item['stockCylRosso'])
+        //             ->setCellValue('P' . $totalMC168Row, $totalStockCylDk)
+        //             ->setCellValue('Q' . $totalMC168Row, $totalStockCylThs)
+        //             ->setCellValue('R' . $totalMC168Row, $totalStockCylRosso);
+
+        //         $cellCoordinates = ['P' . $rowMC168, 'Q' . $rowMC168, 'J' . $rowMC168, 'R' . $rowMC168,];
+        //         foreach ($cellCoordinates as $cellCoordinate) {
+        //             $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //             ]);
+        //         }
+        //         // totalRunningMc PU &stockCYl
+        //         $sheet
+        //             ->setCellValue('S' . $totalMC168Row, $totalCjRun)
+        //             ->setCellValue('T' . $totalMC168Row, $totalMjRun)
+        //             ->setCellValue('U' . $totalMC168Row, $totalMcDcRunperPU)
+        //             ->setCellValue('S' . $rowMC168, $item['cjRun'])
+        //             ->setCellValue('T' . $rowMC168, $item['mjRun'])
+        //             ->setCellValue('U' . $rowMC168, $ttlMcDcRunperPU);
+        //         $cellCoordinates = ['S' . $rowMC168, 'T' . $rowMC168, 'U' . $rowMC168,];
+        //         foreach ($cellCoordinates as $cellCoordinate) {
+        //             $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //             ]);
+        //         }
+        //         // WEEK & Capasity Produksi
+        //         $sheet
+        //             ->setCellValue('V' . $totalMC168Row, $week)
+        //             ->setCellValue('W' . $totalMC168Row, $minus3)
+        //             ->setCellValue('X' . $totalMC168Row, $po28hari)
+        //             ->setCellValue('V' . $rowMC168, "0")
+        //             ->setCellValue('W' . $rowMC168, "0")
+        //             ->setCellValue('X' . $rowMC168, "0");
+        //         $cellCoordinates = ['V' . $rowMC168, 'W' . $rowMC168, 'X' . $rowMC168,];
+        //         foreach ($cellCoordinates as $cellCoordinate) {
+        //             $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //             ]);
+        //         }
+
+        //         $totalStyle = ['U' . $rowMC168, 'M' . $rowMC168, 'G' . $rowMC168, 'G' . $totalMC168Row, 'M' . $totalMC168Row, 'U' . $totalMC168Row,];
+        //         foreach ($totalStyle  as $styleTotal) {
+        //             $sheet->getStyle($styleTotal)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+        //                 'fill' => [
+        //                     'fillType' => Fill::FILL_SOLID,
+        //                     'startColor' => ['rgb' => 'FFA500'], // Orange color
+        //                 ],
+        //             ]);
+        //         }
+        //     }
+
+        //     $rowMC168++;
+        // }
+
+        // //MENS COMP N200
+        // foreach ($mensComp200 as $key => $item) {
+        //     $totalMc = $item['dakong'] + $item['rosso'] + $item['mekanik'] + $item['lonati'];
+        //     $totalDakong  += $item['dakong'];
+        //     $totalThs  += $item['mekanik'];
+        //     $totalRosso  += $item['rosso'];
+        //     $totalLon  += $item['lonati'];
+        //     $totalDc  += $totalMc;
+
+        //     $totalMcDcRun = $item['dakongRun'] + $item['rossoRun'] + $item['mekanikRun'] + $item['lonatiRun'];
+        //     $totalDakongRun  += $item['dakongRun'];
+        //     $totalThsRun  += $item['mekanikRun'];
+        //     $totalRossoRun  += $item['rossoRun'];
+        //     $totalLonRun  += $item['lonatiRun'];
+        //     $totalDcRun += $totalMcDcRun;
+
+        //     $totalStockCylDk += $item['stockCylDk'];
+        //     $totalStockCylThs += $item['stockCylThs'];
+        //     $totalStockCylRosso += $item['stockCylRosso'];
+
+        //     $totalCjRun += $item['cjRun'];
+        //     $totalMjRun +=  $item['mjRun'];
+        //     $ttlMcDcRunperPU = $item['cjRun'] + $item['mjRun'];
+        //     $totalMcDcRunperPU +=  $ttlMcDcRunperPU;
+
+
+        //     $sheet->setCellValue('A' . $rowMC200, $key)
+        //         ->setCellValue('C' . $rowMC200, $item['dakong'])
+        //         ->setCellValue('D' . $rowMC200, $item['rosso'])
+        //         ->setCellValue('E' . $rowMC200, $item['mekanik'])
+        //         ->setCellValue('F' . $rowMC200, $item['lonati'])
+        //         ->setCellValue('B' . $rowMC200, "0")
+        //         ->setCellValue('G' . $rowMC200, $totalMc);
+        //     $cellCoordinates = ['A' . $rowMC200, 'C' . $rowMC200, 'D' . $rowMC200, 'F' . $rowMC200, 'G' . $rowMC200, 'B' . $rowMC200, 'E' . $rowMC200,];
+        //     foreach ($cellCoordinates as $cellCoordinate) {
+        //         $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //             'borders' => [
+        //                 'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //             ],
+        //             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+        //         ]);
+        //     }
+
+        //     // totalRunningMc
+        //     $sheet
+        //         ->setCellValue('H' . $rowMC200, $item['dakongRun'])
+        //         ->setCellValue('I' . $rowMC200, $item['rossoRun'])
+        //         ->setCellValue('J' . $rowMC200, $item['mekanikRun'])
+        //         ->setCellValue('K' . $rowMC200, $item['lonatiRun'])
+        //         ->setCellValue('M' . $rowMC200, $totalMcDcRun);
+        //     $cellCoordinates = ['H' . $rowMC200, 'I' . $rowMC200, 'J' . $rowMC200, 'K' . $rowMC200,  'N' . $rowMC200, 'L' . $rowMC200,  'O' . $rowMC200,  'P' . $rowMC200,  'Q' . $rowMC200,];
+        //     foreach ($cellCoordinates as $cellCoordinate) {
+        //         $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //             'borders' => [
+        //                 'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //             ],
+        //             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //         ]);
+        //         // stockCylinderBc
+        //         $sheet
+        //             ->setCellValue('P' . $rowMC200, $item['stockCylDk'])
+        //             ->setCellValue('Q' . $rowMC200, $item['stockCylThs'])
+        //             ->setCellValue('R' . $rowMC200, $item['stockCylRosso']);
+
+        //         $cellCoordinates = ['P' . $rowMC200, 'Q' . $rowMC200, 'J' . $rowMC200, 'R' . $rowMC200,];
+        //         foreach ($cellCoordinates as $cellCoordinate) {
+        //             $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //             ]);
+        //         }
+        //         // totalRunningMc PU &stockCYl
+        //         $sheet
+        //             ->setCellValue('S' . $rowMC200, $item['cjRun'])
+        //             ->setCellValue('T' . $rowMC200, $item['mjRun'])
+        //             ->setCellValue('U' . $rowMC200, $ttlMcDcRunperPU);
+        //         $cellCoordinates = ['S' . $rowMC200, 'T' . $rowMC200, 'U' . $rowMC200,];
+        //         foreach ($cellCoordinates as $cellCoordinate) {
+        //             $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //             ]);
+        //         }
+        //         // WEEK & Capasity Produksi
+        //         $sheet
+        //             ->setCellValue('V' . $rowMC200, "0")
+        //             ->setCellValue('W' . $rowMC200, "0")
+        //             ->setCellValue('X' . $rowMC200, "0");
+        //         $cellCoordinates = ['V' . $rowMC200, 'W' . $rowMC200, 'X' . $rowMC200,];
+        //         foreach ($cellCoordinates as $cellCoordinate) {
+        //             $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //             ]);
+        //         }
+
+        //         $totalStyle = ['U' . $rowMC200, 'M' . $rowMC200, 'G' . $rowMC200,];
+        //         foreach ($totalStyle  as $styleTotal) {
+        //             $sheet->getStyle($styleTotal)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+        //                 'fill' => [
+        //                     'fillType' => Fill::FILL_SOLID,
+        //                     'startColor' => ['rgb' => 'FFA500'], // Orange color
+        //                 ],
+        //             ]);
+        //         }
+        //     }
+
+        //     $rowMC200++;
+        // }
+
+        // //CHILD COMP N132
+        // foreach ($childComp132 as $key => $item) {
+        //     $totalMc = $item['dakong'] + $item['rosso'] + $item['mekanik'] + $item['lonati'];
+        //     $totalDakong  += $item['dakong'];
+        //     $totalThs  += $item['mekanik'];
+        //     $totalRosso  += $item['rosso'];
+        //     $totalLon  += $item['lonati'];
+        //     $totalDc  += $totalMc;
+
+        //     $totalMcDcRun = $item['dakongRun'] + $item['rossoRun'] + $item['mekanikRun'] + $item['lonatiRun'];
+        //     $totalDakongRun  += $item['dakongRun'];
+        //     $totalThsRun  += $item['mekanikRun'];
+        //     $totalRossoRun  += $item['rossoRun'];
+        //     $totalLonRun  += $item['lonatiRun'];
+        //     $totalDcRun += $totalMcDcRun;
+
+        //     $totalStockCylDk += $item['stockCylDk'];
+        //     $totalStockCylThs += $item['stockCylThs'];
+        //     $totalStockCylRosso += $item['stockCylRosso'];
+
+        //     $totalCjRun += $item['cjRun'];
+        //     $totalMjRun +=  $item['mjRun'];
+        //     $ttlMcDcRunperPU = $item['cjRun'] + $item['mjRun'];
+        //     $totalMcDcRunperPU +=  $ttlMcDcRunperPU;
+
+
+        //     $sheet->setCellValue('A' . $rowCC132, $key)
+        //         ->setCellValue('C' . $rowCC132, $item['dakong'])
+        //         ->setCellValue('D' . $rowCC132, $item['rosso'])
+        //         ->setCellValue('E' . $rowCC132, $item['mekanik'])
+        //         ->setCellValue('F' . $rowCC132, $item['lonati'])
+        //         ->setCellValue('B' . $rowCC132, "0")
+        //         ->setCellValue('G' . $rowCC132, $totalMc);
+        //     $cellCoordinates = ['A' . $rowCC132, 'C' . $rowCC132, 'D' . $rowCC132, 'F' . $rowCC132, 'G' . $rowCC132, 'B' . $rowCC132, 'E' . $rowCC132,];
+        //     foreach ($cellCoordinates as $cellCoordinate) {
+        //         $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //             'borders' => [
+        //                 'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //             ],
+        //             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+        //         ]);
+        //     }
+
+        //     // totalRunningMc
+        //     $sheet
+        //         ->setCellValue('H' . $rowCC132, $item['dakongRun'])
+        //         ->setCellValue('I' . $rowCC132, $item['rossoRun'])
+        //         ->setCellValue('J' . $rowCC132, $item['mekanikRun'])
+        //         ->setCellValue('K' . $rowCC132, $item['lonatiRun'])
+        //         ->setCellValue('M' . $rowCC132, $totalMcDcRun);
+        //     $cellCoordinates = ['H' . $rowCC132, 'I' . $rowCC132, 'J' . $rowCC132, 'K' . $rowCC132,  'N' . $rowCC132, 'L' . $rowCC132,  'O' . $rowCC132,  'P' . $rowCC132,  'Q' . $rowCC132,];
+        //     foreach ($cellCoordinates as $cellCoordinate) {
+        //         $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //             'borders' => [
+        //                 'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //             ],
+        //             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //         ]);
+        //         // stockCylinderBc
+        //         $sheet
+        //             ->setCellValue('P' . $rowCC132, $item['stockCylDk'])
+        //             ->setCellValue('Q' . $rowCC132, $item['stockCylThs'])
+        //             ->setCellValue('R' . $rowCC132, $item['stockCylRosso']);
+
+        //         $cellCoordinates = ['P' . $rowCC132, 'Q' . $rowCC132, 'J' . $rowCC132, 'R' . $rowCC132,];
+        //         foreach ($cellCoordinates as $cellCoordinate) {
+        //             $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //             ]);
+        //         }
+        //         // totalRunningMc PU &stockCYl
+        //         $sheet
+        //             ->setCellValue('S' . $rowCC132, $item['cjRun'])
+        //             ->setCellValue('T' . $rowCC132, $item['mjRun'])
+        //             ->setCellValue('U' . $rowCC132, $ttlMcDcRunperPU);
+        //         $cellCoordinates = ['S' . $rowCC132, 'T' . $rowCC132, 'U' . $rowCC132,];
+        //         foreach ($cellCoordinates as $cellCoordinate) {
+        //             $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //             ]);
+        //         }
+        //         // WEEK & Capasity Produksi
+        //         $sheet
+        //             ->setCellValue('V' . $rowCC132, "0")
+        //             ->setCellValue('W' . $rowCC132, "0")
+        //             ->setCellValue('X' . $rowCC132, "0");
+        //         $cellCoordinates = ['V' . $rowCC132, 'W' . $rowCC132, 'X' . $rowCC132,];
+        //         foreach ($cellCoordinates as $cellCoordinate) {
+        //             $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //             ]);
+        //         }
+
+        //         $totalStyle = ['U' . $rowCC132, 'M' . $rowCC132, 'G' . $rowCC132,];
+        //         foreach ($totalStyle  as $styleTotal) {
+        //             $sheet->getStyle($styleTotal)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+        //                 'fill' => [
+        //                     'fillType' => Fill::FILL_SOLID,
+        //                     'startColor' => ['rgb' => 'FFA500'], // Orange color
+        //                 ],
+        //             ]);
+        //         }
+        //     }
+
+        //     $rowCC132++;
+        // }
+
+        // //MENS COMP N156
+        // foreach ($mensComp156 as $key => $item) {
+        //     $totalMc = $item['dakong'] + $item['rosso'] + $item['mekanik'] + $item['lonati'];
+        //     $totalDakong  += $item['dakong'];
+        //     $totalThs  += $item['mekanik'];
+        //     $totalRosso  += $item['rosso'];
+        //     $totalLon  += $item['lonati'];
+        //     $totalDc  += $totalMc;
+
+        //     $totalMcDcRun = $item['dakongRun'] + $item['rossoRun'] + $item['mekanikRun'] + $item['lonatiRun'];
+        //     $totalDakongRun  += $item['dakongRun'];
+        //     $totalThsRun  += $item['mekanikRun'];
+        //     $totalRossoRun  += $item['rossoRun'];
+        //     $totalLonRun  += $item['lonatiRun'];
+        //     $totalDcRun += $totalMcDcRun;
+
+        //     $totalStockCylDk += $item['stockCylDk'];
+        //     $totalStockCylThs += $item['stockCylThs'];
+        //     $totalStockCylRosso += $item['stockCylRosso'];
+
+        //     $totalCjRun += $item['cjRun'];
+        //     $totalMjRun +=  $item['mjRun'];
+        //     $ttlMcDcRunperPU = $item['cjRun'] + $item['mjRun'];
+        //     $totalMcDcRunperPU +=  $ttlMcDcRunperPU;
+
+
+        //     $sheet->setCellValue('A' . $rowMC156, $key)
+        //         ->setCellValue('C' . $rowMC156, $item['dakong'])
+        //         ->setCellValue('D' . $rowMC156, $item['rosso'])
+        //         ->setCellValue('E' . $rowMC156, $item['mekanik'])
+        //         ->setCellValue('F' . $rowMC156, $item['lonati'])
+        //         ->setCellValue('B' . $rowMC156, "0")
+        //         ->setCellValue('G' . $rowMC156, $totalMc);
+        //     $cellCoordinates = ['A' . $rowMC156, 'C' . $rowMC156, 'D' . $rowMC156, 'F' . $rowMC156, 'G' . $rowMC156, 'B' . $rowMC156, 'E' . $rowMC156,];
+        //     foreach ($cellCoordinates as $cellCoordinate) {
+        //         $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //             'borders' => [
+        //                 'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //             ],
+        //             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+        //         ]);
+        //     }
+
+        //     // totalRunningMc
+        //     $sheet
+        //         ->setCellValue('H' . $rowMC156, $item['dakongRun'])
+        //         ->setCellValue('I' . $rowMC156, $item['rossoRun'])
+        //         ->setCellValue('J' . $rowMC156, $item['mekanikRun'])
+        //         ->setCellValue('K' . $rowMC156, $item['lonatiRun'])
+        //         ->setCellValue('M' . $rowMC156, $totalMcDcRun);
+        //     $cellCoordinates = ['H' . $rowMC156, 'I' . $rowMC156, 'J' . $rowMC156, 'K' . $rowMC156,  'N' . $rowMC156, 'L' . $rowMC156,  'O' . $rowMC156,  'P' . $rowMC156,  'Q' . $rowMC156,];
+        //     foreach ($cellCoordinates as $cellCoordinate) {
+        //         $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //             'borders' => [
+        //                 'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //             ],
+        //             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //         ]);
+        //         // stockCylinderBc
+        //         $sheet
+        //             ->setCellValue('P' . $rowMC156, $item['stockCylDk'])
+        //             ->setCellValue('Q' . $rowMC156, $item['stockCylThs'])
+        //             ->setCellValue('R' . $rowMC156, $item['stockCylRosso']);
+
+        //         $cellCoordinates = ['P' . $rowMC156, 'Q' . $rowMC156, 'J' . $rowMC156, 'R' . $rowMC156,];
+        //         foreach ($cellCoordinates as $cellCoordinate) {
+        //             $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //             ]);
+        //         }
+        //         // totalRunningMc PU &stockCYl
+        //         $sheet
+        //             ->setCellValue('S' . $rowMC156, $item['cjRun'])
+        //             ->setCellValue('T' . $rowMC156, $item['mjRun'])
+        //             ->setCellValue('U' . $rowMC156, $ttlMcDcRunperPU);
+        //         $cellCoordinates = ['S' . $rowMC156, 'T' . $rowMC156, 'U' . $rowMC156,];
+        //         foreach ($cellCoordinates as $cellCoordinate) {
+        //             $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //             ]);
+        //         }
+        //         // WEEK & Capasity Produksi
+        //         $sheet
+        //             ->setCellValue('V' . $rowMC156, "0")
+        //             ->setCellValue('W' . $rowMC156, "0")
+        //             ->setCellValue('X' . $rowMC156, "0");
+        //         $cellCoordinates = ['V' . $rowMC156, 'W' . $rowMC156, 'X' . $rowMC156,];
+        //         foreach ($cellCoordinates as $cellCoordinate) {
+        //             $sheet->getStyle($cellCoordinate)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+
+        //             ]);
+        //         }
+
+        //         $totalStyle = ['U' . $rowMC156, 'M' . $rowMC156, 'G' . $rowMC156,];
+        //         foreach ($totalStyle  as $styleTotal) {
+        //             $sheet->getStyle($styleTotal)->applyFromArray([
+        //                 'borders' => [
+        //                     'outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
+        //                 ],
+        //                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+        //                 'fill' => [
+        //                     'fillType' => Fill::FILL_SOLID,
+        //                     'startColor' => ['rgb' => 'FFA500'], // Orange color
+        //                 ],
+        //             ]);
+        //         }
+        //     }
+
+        //     $rowMC156++;
+        // }
+        // week1-5bc N84
+
 
         // total SINGLE CYLINDER COMP
         $sheet->setCellValue('A' . $totalSCCompRow, 'TOTAL SINGLE CYLINDER COMP')

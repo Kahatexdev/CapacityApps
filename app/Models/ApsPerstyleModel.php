@@ -277,4 +277,17 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $pdk)
             ->update();
     }
+    public function getSisaOrder($idaps)
+    {
+        $res = $this->select('sisa')->where('idapsperstyle', $idaps)->first();
+        $result = reset($res);
+        return $result;
+    }
+    public function resetProduksiArea($pr)
+    {
+        return $this->db->table($this->table)
+            ->set('sisa', 'qty', false)
+            ->where('idapsperstyle', $pr['idapsperstyle'])
+            ->update();
+    }
 }

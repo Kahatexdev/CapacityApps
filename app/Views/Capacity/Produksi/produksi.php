@@ -402,7 +402,7 @@
 
 
         }
-        setInterval(fetchData, 100000000000);
+        setInterval(fetchData, 5000);
         fetchData();
 
     });

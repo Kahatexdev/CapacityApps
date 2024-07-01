@@ -599,7 +599,23 @@ class ProduksiController extends BaseController
         $this->produksiModel->deleteSesuai($idaps);
         return redirect()->to(base_url(session()->get('role') . '/produksi'))->withInput()->with('success', 'Data Berhasil di reset');
     }
+    public function resetproduksiarea()
+    {
+        $area = $this->request->getPost('area');
+        $tgl_produksi = $this->request->getPost('tgl_produksi');
 
+        $produksi = $this->produksiModel->getDataForReset($area, $tgl_produksi);
+        foreach ($produksi as $pr) {
+            $idProduksi = $pr['id_produksi'];
+            $qtyproduksi = $pr['qty_produksi'];
+            $idaps = $pr['idapsperstyle'];
+            $sisaOrder = $this->ApsPerstyleModel->getSisaOrder($idaps);
+            $setSisa = $qtyproduksi + $sisaOrder;
+            $this->ApsPerstyleModel->update($idaps, ['sisa' => $setSisa]);
+            $this->produksiModel->delete($idProduksi);
+        }
+        return redirect()->to(base_url(session()->get('role') . '/produksi'))->withInput()->with('success', 'Data Berhasil di reset');
+    }
     public function summaryProdPerTanggal() {
         $pdk = $this->request->getPost('pdk');
         $awal = $this->request->getPost('awal');
@@ -648,9 +664,9 @@ class ProduksiController extends BaseController
             'active1' => '',
             'active2' => '',
             'active3' => '',
-            'active4' => '',
+            'active4' => 'active',
             'active5' => '',
-            'active6' => 'active',
+            'active6' => '',
             'active7' => '',
             'dataSummaryPertgl' => $dataSummaryPertgl,
             'tglProdUnik' => $tgl_produksi,
