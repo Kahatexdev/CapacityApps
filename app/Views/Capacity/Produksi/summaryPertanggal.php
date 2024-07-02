@@ -31,49 +31,56 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <h5>
-                            Summary Produksi Per Tanggal  <?= $title ?> 
+                            <?= $title ?> 
                         </h5>
-                        <div>
+                        <div class="col-8 text-end">
+                            <a href="<?= base_url('capacity/exportSummaryPerTgl') ?>" class="btn btn-info">
+                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Report Excel
+                            </a>
                         </div>
                     </div>
                 </div>
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="table-responsive">
-                            <table id="table" class="display compact striped" style="width:100%">
+                            <table id="example" class="table table-bordered" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" colspan="7">Tanggal</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" colspan="7" style="text-align: center;">Tanggal</th>
                                         <?php foreach ($tglProdUnik as $tgl_produksi) : ?>
-                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" colspan="2"><?= date('d-M', strtotime($tgl_produksi)) ?></th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" colspan="2" style="text-align: center;"><?= date('d-M', strtotime($tgl_produksi)) ?></th>
                                         <?php endforeach; ?>
                                     </tr>
                                     <tr>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Needle</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Model</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Style Size</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty PO (dz)</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Running</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Total Prod</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Total Jl Mc</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Qty PO (dz)</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Running</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Total Prod</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Total Jl Mc</th>
                                         <?php foreach ($tglProdUnik as $tgl_produksi) : ?>
-                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Prod (dz)</td>
-                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jl Mc</td>
+                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Prod (dz)</td>
+                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Jl Mc</td>
                                         <?php endforeach; ?>
                                         <!-- <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Prod</th> -->
                                         <!-- <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jl Mc</th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($uniqueData as $id) : ?>                                            
+                                    <?php 
+                                    $ttl = 0;
+                                    foreach ($uniqueData as $id) : 
+                                        $ttl += $id['ttl_prod'];
+                                        ?>                                            
                                         <tr>
                                             <td class="text-sm"><?= $id['machinetypeid']; ?></td>
                                             <td class="text-sm"><?= $id['mastermodel']; ?></td>
                                             <td class="text-sm"><?= $id['size']; ?></td>
-                                            <td class="text-sm"><?= number_format($id['qty'],2); ?></td>
-                                            <td class="text-sm"><?= $id['running']; ?> days</td>
-                                            <td class="text-sm"><?= number_format($id['ttl_prod'],2); ?></td>
-                                            <td class="text-sm"><?= $id['ttl_jlmc']; ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= number_format($id['qty'],2); ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= $id['running']; ?> days</td>
+                                            <td class="text-sm" style="text-align: center;"><?= number_format($id['ttl_prod'],2); ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= $id['ttl_jlmc']; ?></td>
                                             <?php foreach ($tglProdUnik as $tgl_produksi2) : ?>
                                                 <?php
                                                 $qty_produksi = 0;
@@ -89,21 +96,21 @@
                                                     }
                                                 }
                                                 ?>
-                                                <td class="text-sm"><?= $qty_produksi; ?></td>
-                                                <td class="text-sm"><?= $jl_mc; ?></td>  
+                                                <td class="text-sm" style="text-align: center;"><?= number_format($qty_produksi/24,2); ?></td>
+                                                <td class="text-sm" style="text-align: center;"><?= $jl_mc; ?></td>  
                                                 <?php endforeach; ?>
                                         </tr>
-                                    <?php endforeach; ?>
+                                    <?php 
+                                endforeach; ?>
                                 </tbody>
                                 <tfoot>
-                                    <th></th>
-                                    <th>Total :</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
+                                    <tr>
+                                        <th colspan="5" style="text-align: center;">Total : </th>
+                                        <th><?= number_format($ttl, 2); ?></th>
+                                        <?php foreach ($tglProdUnik as $tgl_produksi) : ?>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2"></th>
+                                        <?php endforeach; ?>
+                                    </tr>
                                 </tfoot>
                             </table>
                         </div>

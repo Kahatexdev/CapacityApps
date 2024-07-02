@@ -617,11 +617,17 @@ class ProduksiController extends BaseController
         return redirect()->to(base_url(session()->get('role') . '/produksi'))->withInput()->with('success', 'Data Berhasil di reset');
     }
     public function summaryProdPerTanggal() {
+        $buyer = $this->request->getPost('buyer');
+        $area = $this->request->getPost('area');
+        $jarum = $this->request->getPost('jarum');
         $pdk = $this->request->getPost('pdk');
         $awal = $this->request->getPost('awal');
         $akhir = $this->request->getPost('akhir');
         
         $data = [
+            'buyer' => $buyer,
+            'area' => $area,
+            'jarum' => $jarum,
             'pdk' => $pdk,
             'awal' => $awal,
             'akhir' => $akhir,
@@ -672,7 +678,7 @@ class ProduksiController extends BaseController
             'tglProdUnik' => $tgl_produksi,
             'uniqueData' => $uniqueData,
             'role' => session()->get('role'),
-            'title' => $pdk,
+            'title' => 'Summary Produksi Per Tanggal ' . $pdk,
         ];
         return view('Capacity/Produksi/summaryPertanggal', $data2);
     }

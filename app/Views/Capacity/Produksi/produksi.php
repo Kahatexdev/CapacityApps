@@ -66,16 +66,28 @@
                     <form action="<?= base_url($role . '/summaryProdPerTanggal/'); ?>" method="POST">
                         <div class="modal-body align-items-center">
                             <div class="form-group">
+                                <label for="buyer">Buyer</label>
+                                <input type="text" class="form-control" name="buyer">
+                            </div>
+                            <div class="form-group">
+                                <label for="area">Area</label>
+                                <input type="text" class="form-control" name="area">
+                            </div>
+                            <div class="form-group">
+                                <label for="jarum">Jarum</label>
+                                <input type="text" class="form-control" name="jarum">
+                            </div>
+                            <div class="form-group">
                                 <label for="pdk">No Model</label>
                                 <input type="text" class="form-control" name="pdk">
                             </div>
                             <div class="form-group">
-                                <label for="awal" class="col-form-label d-none">Dari</label>
-                                <input type="date" class="form-control d-none" name="awal">
+                                <label for="awal" class="col-form-label">Dari</label>
+                                <input type="date" class="form-control" name="awal">
                             </div>
                             <div class="form-group">
-                                <label for="akhir" class="col-form-label d-none">Sampai</label>
-                                <input type="date" class="form-control d-none" name="akhir">
+                                <label for="akhir" class="col-form-label">Sampai</label>
+                                <input type="date" class="form-control" name="akhir">
                             </div>
                         </div>
                         <div class="modal-footer">
