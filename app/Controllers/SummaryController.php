@@ -29,7 +29,8 @@ class SummaryController extends BaseController
     protected $ApsPerstyleModel;
     protected $liburModel;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
@@ -42,7 +43,6 @@ class SummaryController extends BaseController
         }
         $this->isLogedin();
     }
-
     protected function isLogedin()
     {
         if (!session()->get('id_user')) {

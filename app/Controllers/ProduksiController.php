@@ -208,7 +208,6 @@ class ProduksiController extends BaseController
                                 'delivery' => $deliv,
                                 'area' => $area
                             ];
-                            dd($dataInsert);
                             $existingProduction = $this->produksiModel->existingData($dataInsert);
                             if (!$existingProduction) {
                                 $this->produksiModel->insert($dataInsert);
@@ -500,7 +499,7 @@ class ProduksiController extends BaseController
                                 $this->produksiModel->insert($dataInsert);
                             } else {
 
-                                //$failedRows[] = $rowIndex . "duplikat"; // Add to failed rows if production data already exists
+                                $failedRows[] = $rowIndex . "duplikat"; // Add to failed rows if production data already exists
                             }
                         } else {
                             $failedRows[] = "style tidak ditemukan" . $rowIndex;
@@ -580,7 +579,7 @@ class ProduksiController extends BaseController
                         $this->produksiModel->update($idexist, ['qty_produksi' => $sumqty]);
                         $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
 
-                        // $failedRows[] = $rowIndex; // Add to failed rows if production data already exists
+                        $failedRows[] = $rowIndex; // Add to failed rows if production data already exists
                     }
                 }
             } catch (\Exception $e) {
