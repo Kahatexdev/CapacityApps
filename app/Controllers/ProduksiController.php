@@ -56,21 +56,22 @@ class ProduksiController extends BaseController
         $totalMesin = $this->jarumModel->getArea();
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
         $dataPdk = $this->ApsPerstyleModel->getPdkProduksi();
-
+        $produksi = $this->produksiModel->getProduksiHarianArea();
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Produksi',
             'active1' => '',
             'active2' => '',
             'active3' => '',
-            'active4' => 'active',
+            'active4' => '',
             'active5' => '',
             'active6' => '',
             'active7' => '',
             'pdk' => $dataPdk,
             'Area' => $totalMesin,
             'Produksi' => $dataProduksi,
-            'bulan' => $month
+            'bulan' => $month,
+            'produksi' => $produksi
         ];
         return view(session()->get('role') . '/produksi', $data);
     }
@@ -615,11 +616,12 @@ class ProduksiController extends BaseController
         }
         return redirect()->to(base_url(session()->get('role') . '/produksi'))->withInput()->with('success', 'Data Berhasil di reset');
     }
-    public function summaryProdPerTanggal() {
+    public function summaryProdPerTanggal()
+    {
         $pdk = $this->request->getPost('pdk');
         $awal = $this->request->getPost('awal');
         $akhir = $this->request->getPost('akhir');
-        
+
         $data = [
             'pdk' => $pdk,
             'awal' => $awal,
@@ -635,11 +637,11 @@ class ProduksiController extends BaseController
         $tgl_produksi = array_values($tgl_produksi);
         // Sort ASC
         sort($tgl_produksi);
-        
+
         $uniqueData = [];
         foreach ($dataSummaryPertgl as $item) {
             $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'];
-            $qty =+ $item['qty'];
+            $qty = +$item['qty'];
             if (!isset($uniqueData[$key])) {
                 $uniqueData[$key] = [
                     'machinetypeid' => $item['machinetypeid'],
@@ -651,9 +653,9 @@ class ProduksiController extends BaseController
                     'ttl_jlmc' => 0,
                 ];
             }
-            $uniqueData[$key]['qty'] += $item['qty']/24;
+            $uniqueData[$key]['qty'] += $item['qty'] / 24;
             $uniqueData[$key]['running'] += $item['running'];
-            $uniqueData[$key]['ttl_prod'] += $item['qty_produksi']/24;
+            $uniqueData[$key]['ttl_prod'] += $item['qty_produksi'] / 24;
             $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
         }
         // Sort ASC
@@ -676,4 +678,3 @@ class ProduksiController extends BaseController
         return view('Capacity/Produksi/summaryPertanggal', $data2);
     }
 }
-

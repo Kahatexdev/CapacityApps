@@ -88,9 +88,12 @@
 <div class="row my-3">
     <div class="col-lg-12">
         <div class="card z-index-2">
-            <div class="card-header pb-0">
-                <h6 class="card-title">Data Produksi Harian bulan <?= $bulan ?></h6>
+            <div class="card-header pb-0 d-flex justify-content-between">
+                <div>
 
+                    <h6 class="card-title">Data Produksi Harian bulan <?= $bulan ?> </h6>
+                </div>
+                <div><a href="<?= base_url($role . '/produksi') ?>" class="btn btn-sm btn-info"> Details</a></div>
             </div>
             <div class="card-body p-3">
                 <div class="row">

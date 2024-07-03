@@ -154,6 +154,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('deletemesinareal/(:any)', 'MesinController::deletemesinarealPlan/$1');
     $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarumPlan/$1');
     $routes->post('tambahmesinperarea', 'MesinController::inputmesinperareaPlan');
+    $routes->post('tambahmesinperjarum', 'MesinController::inputmesinperjarumPlan');
     $routes->post('addcylinder', 'MesinController::inputcylinderPlan');
     $routes->post('editcylinder/(:any)', 'MesinController::editcylinderPlan/$1');
     $routes->post('deletecylinder/(:any)', 'MesinController::deletecylinderPlan/$1');
@@ -166,11 +167,13 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetail/$1');
 
+    // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
-    $routes->get('dataprogress', 'GodController::progressData');
-    $routes->get('produksiareachart', 'GodController::produksiAreaChart');
-    $routes->get('dataproduksi/(:any)', 'GodController::produksiPerArea/$1');
-    $routes->post('importproduksi', 'GodController::importproduksi');
+    $routes->get('dataprogress', 'ProduksiController::progressData');
+    $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
+    $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->post('importproduksi', 'ProduksiController::importproduksi');
+    $routes->get('produksi', 'ProduksiController::produksi');
 });
 
 

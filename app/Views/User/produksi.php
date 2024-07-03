@@ -83,7 +83,6 @@
                             <table id="dataTable0" class="display  striped" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal Upload</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal Produksi</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">QTY Upload</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Area</th>
@@ -92,7 +91,6 @@
                                 <tbody>
                                     <?php foreach ($produksi as $prd) : ?>
                                         <tr>
-                                            <td class="text-sm"><?= $prd['tgl_upload']; ?></td>
                                             <td class="text-sm"><?= $prd['tgl_produksi']; ?></td>
                                             <td class="text-sm"><?= $prd['qty']; ?></td>
                                             <td class="text-sm"><?= $prd['admin']; ?></td>
@@ -168,7 +166,7 @@
     $(document).ready(function() {
         $('#dataTable0').DataTable({
             "order": [
-                [1, "desc"]
+                [0, "desc"]
             ]
         });
         $('#dataTable').DataTable({});

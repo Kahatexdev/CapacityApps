@@ -486,14 +486,14 @@ class MesinController extends BaseController
             return redirect()->to(base_url(session()->get('role') . '/datamesinPlan'))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
-    public function inputmesinperareaPlan()
+    public function inputmesinperjarumPlan()
     {
         $area = $this->request->getPost("area");
         $jarum = $this->request->getPost("jarum");
         $total_mc = $this->request->getPost("total_mc");
         $brand = $this->request->getPost("brand");
         $mesin_jalan = $this->request->getPost("mesin_jalan");
-
+        $pu = $this->request->getPost("production_unit");
         $input = [
             'area' => $area,
             'jarum' => $jarum,
@@ -504,9 +504,32 @@ class MesinController extends BaseController
 
         $insert =   $this->jarumModel->insert($input);
         if ($insert) {
-            return redirect()->to(base_url(session()->get('role') . '/datamesinperjarum/' . $area))->withInput()->with('success', 'Data Berhasil Di Input');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperjarum/' . $jarum) . '/' . $pu)->withInput()->with('success', 'Data Berhasil Di Input');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/datamesinperjarum/' . $area))->withInput()->with('error', 'Data Gagal Di Input');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperjarum/' . $jarum . '/' . $pu))->withInput()->with('error', 'Data Gagal Di Input');
+        }
+    }
+    public function inputmesinperareaPlan()
+    {
+        $area = $this->request->getPost("area");
+        $jarum = $this->request->getPost("jarum");
+        $total_mc = $this->request->getPost("total_mc");
+        $brand = $this->request->getPost("brand");
+        $mesin_jalan = $this->request->getPost("mesin_jalan");
+        $pu = $this->request->getPost("production_unit");
+        $input = [
+            'area' => $area,
+            'jarum' => $jarum,
+            'total_mc' => $total_mc,
+            'brand' => $brand,
+            'mesin_jalan' => $mesin_jalan,
+        ];
+
+        $insert =   $this->jarumModel->insert($input);
+        if ($insert) {
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('success', 'Data Berhasil Di Input');
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('error', 'Data Gagal Di Input');
         }
     }
     public function DetailMesinPerJarumPlan($jarum, $pu)

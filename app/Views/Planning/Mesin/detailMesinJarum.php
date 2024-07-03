@@ -188,12 +188,12 @@
                                 <div class="col-lg-6 col-sm-6">
                                     <div class="form-group">
                                         <label for="tgl-bk" class="col-form-label">Jarum</label>
-                                        <input type="text" class="form-control" name="area" value=<?= $jarum ?>>
+                                        <input type="text" class="form-control" name="jarum" value=<?= $jarum ?>>
                                         <input type="hidden" name="id">
                                     </div>
                                     <div class="form-group">
-                                        <label for="tgl-bk" class="col-form-label">Jarum</label>
-                                        <input type="text" class="form-control" name="jarum">
+                                        <label for="tgl-bk" class="col-form-label">Area</label>
+                                        <input type="text" class="form-control" name="area">
                                     </div>
                                     <div class="form-group">
                                         <label for="buyer" class="col-form-label">Brand</label>
@@ -318,7 +318,7 @@
                 }
 
                 $('.btn-add').click(function() {
-                    $('#modalTambah').find('form').attr('action', '<?= base_url($role . '/tambahmesinperarea/') ?>');
+                    $('#modalTambah').find('form').attr('action', '<?= base_url($role . '/tambahmesinperjarum/') ?>');
 
                     $('#modalTambah').modal('show'); // Show the modal
                 });
