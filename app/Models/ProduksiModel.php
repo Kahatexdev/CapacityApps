@@ -122,12 +122,33 @@ class ProduksiModel extends Model
 
     public function getdataSummaryPertgl($data)
     {
-        return $this->select('apsperstyle.idapsperstyle, produksi.id_produksi, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, SUM(apsperstyle.qty) AS qty, COUNT(produksi.tgl_produksi) AS running, SUM(produksi.qty_produksi) AS qty_produksi, COUNT(produksi.no_mesin) AS jl_mc, produksi.tgl_produksi')
-        ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle')
-        ->where('apsperstyle.mastermodel', $data['pdk'])
-        ->groupBy('apsperstyle.size, produksi.tgl_produksi')
-        ->orderBy('apsperstyle.size, produksi.tgl_produksi', 'ASC')
-        ->findAll();
+        $this->select('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, SUM(apsperstyle.qty) AS qty, COUNT(DISTINCT produksi.tgl_produksi) AS running, SUM(produksi.qty_produksi) AS qty_produksi, COUNT(DISTINCT produksi.no_mesin) AS jl_mc, produksi.tgl_produksi')
+            ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle')
+            ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model');
+
+        if (!empty($data['buyer'])) {
+            $this->where('data_model.kd_buyer_order', $data['buyer']);
+        }
+        if (!empty($data['area'])) {
+            $this->where('produksi.admin', $data['area']);
+        }
+        if (!empty($data['jarum'])) {
+            $this->where('apsperstyle.machinetypeid', $data['jarum']);
+        }
+        if (!empty($data['pdk'])) {
+            $this->where('apsperstyle.mastermodel', $data['pdk']);
+        }
+        if (!empty($data['awal'])) {
+            $this->where('produksi.tgl_produksi >=', $data['awal']);
+        }
+        if (!empty($data['akhir'])) {
+            $this->where('produksi.tgl_produksi <=', $data['akhir']);
+        }
+
+        return $this->groupBy('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, produksi.tgl_produksi')
+                    ->orderBy('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, produksi.tgl_produksi', 'ASC')
+                    ->findAll();
+                    
     }
 
 }
