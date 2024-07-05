@@ -43,7 +43,7 @@ class ProduksiModel extends Model
     public function getProduksi($area, $bulan)
     {
         $today = date('Y-m-d');
-        $threeDaysAgo = date('Y-m-d', strtotime('-4 days'));
+        $threeDaysAgo = date('Y-m-d', strtotime('-2 days'));
 
         return $this->join('apsperstyle', 'apsperstyle.idapsperstyle= produksi.idapsperstyle')
             ->select('tgl_produksi,mastermodel,size,produksi.*, sisa')
