@@ -147,6 +147,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('deletedetailjarum/(:any)', 'OrderController::deletedetailmodeljarumplan/$1');
     $routes->post('assignareal', 'PlanningController::assignareal');
     $routes->post('splitarea', 'PlanningController::splitarea');
+    $routes->post('editarea', 'PlanningController::editarea');
     $routes->post('assignarealall', 'PlanningController::assignarealall');
 
     // mesin

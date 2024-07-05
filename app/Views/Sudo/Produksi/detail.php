@@ -103,11 +103,11 @@
                                     <input type="text" name="area" id="" hidden class="form-control" value="<?= $area ?>">
                                     <div class="form-group">
                                         <label for="mastermodel">No Model:</label>
-                                        <input type="text" name="no_model" id="no_model" class="form-control" value="">
+                                        <input type="text" name="no_model" id="no_model" class="form-control" readonly value="">
                                     </div>
                                     <div class="form-group">
                                         <label for="style">Style :</label>
-                                        <input type="text" name="style" id="style" class="form-control" value="">
+                                        <input type="text" name="style" id="style" class="form-control" readonly value="">
                                     </div>
                                     <div class="form-group">
                                         <label for="style">Tgl Input Produksi :</label>

@@ -235,7 +235,8 @@ class PlanningController extends BaseController
             'sisa' => $this->request->getPost('qty2'),
             'factory' => $this->request->getPost('area2'),
             'production_unit' => "PU Belum Di Pilih",
-            'smv' => $this->request->getPost('smv')
+            'smv' => $this->request->getPost('smv'),
+            'seam' => $this->request->getPost('seam')
 
         ];
         $u = $this->ApsPerstyleModel->update($idaps, $update);
@@ -371,5 +372,18 @@ class PlanningController extends BaseController
 
         ];
         return view(session()->get('role') . '/Planning/mesinSelected', $data);
+    }
+    public function editarea()
+    {
+        $id = $this->request->getPost('id');
+        $area = $this->request->getPost('area');
+        $pdk = $this->request->getPost('pdk');
+        $deliv = $this->request->getPost('deliv');
+        $update = $this->ApsPerstyleModel->update($id, ['factory' => $area]);
+        if ($update) {
+            return redirect()->to(base_url(session()->get('role') . '/detailModelPlanning/' . $pdk . '/' . $deliv))->withInput()->with('success', 'Berhasil Mengubah Area');
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/detailModelPlanning/' . $pdk . '/' . $deliv))->withInput()->with('error', 'Gagal Mengubah Area');
+        }
     }
 }

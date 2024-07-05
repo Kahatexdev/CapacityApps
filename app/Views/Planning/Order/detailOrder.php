@@ -71,8 +71,8 @@ error_reporting(E_ALL); ?>
                                                 <button type="button" class="btn btn-warning btn-sm split-btn" data-toggle="modal" data-target="#splitModal" data-id="<?= $order['idapsperstyle']; ?>" data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>" data-jarum="<?= $order['machinetypeid']; ?>" data-style="<?= $order['size']; ?>" data-qty="<?= $order['qty']; ?>" data-sisa="<?= $order['sisa']; ?>" data-seam="<?= $order['seam']; ?>" data-factory="<?= $order['factory']; ?>" data-smv=" <?= $order['smv']; ?> " data-order=" <?= $order['no_order']; ?> " data-country=" <?= $order['country']; ?> ">
                                                     Split
                                                 </button>
-                                                <button type=" button" class="btn btn-danger btn-sm delete-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $order['idapsperstyle']; ?>" data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>">
-                                                    Delete
+                                                <button type=" button" class="btn btn-info btn-sm edit-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $order['idapsperstyle']; ?>" data-area="<?= $order['factory']; ?>" data-pdk="<?= $order['mastermodel']; ?>" data-deliv="<?= $order['delivery']; ?>">
+                                                    Edit Area
                                                 </button>
                                             </td>
 
@@ -84,7 +84,7 @@ error_reporting(E_ALL); ?>
                         </div>
                     </div>
 
-                    <div class="card-footer">
+                    <div class=" card-footer">
                         <div>
                             <br>
                             <div class="col-md-3">
@@ -243,6 +243,44 @@ error_reporting(E_ALL); ?>
                 </div>
             </div>
         </div>
+        <div class="modal fade bd-example-modal-lg" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Edit <Area:d></Area:d>
+                        </h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="<?= base_url($role . '/editarea') ?>" method="post">
+                            <input type="text" name="id" id="" hidden value="">
+                            <input type="text" name="pdk" id="" hidden value="">
+                            <input type="text" name="deliv" id="" hidden value="">
+                            <div id="confirmationMessage"></div>
+                            <div class="form-group">
+                            </div>
+                            <div class="form-group">
+                                <label for="selectArea">Pilih Area:</label>
+                                <select class="form-control" id="selectArea" name="area">
+                                    <?php
+                                    $uniqueAreas = array_unique(array_column($dataMc, 'area'));
+                                    foreach ($uniqueAreas as $area) :
+                                    ?>
+                                        <option value="<?= $area; ?>"><?= $area; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-danger">Ya</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
         <script>
@@ -286,6 +324,17 @@ error_reporting(E_ALL); ?>
                     $('#splitModal').find('input[name="country"]').val(country);
 
                     document.getElementById('confirmationMessage').innerHTML = "Apakah anda yakin memecah" + noModel + " dengan jarum " + selectedMachineTypeId + " ke " + selectedArea;
+                });
+                $('.edit-btn').click(function() {
+                    var idAps = $(this).data('id');
+                    var area = $(this).data('area');
+                    var pdk = $(this).data('pdk');
+                    var deliv = $(this).data('deliv');
+                    $('#editModal').modal('show'); // Show the modal
+                    $('#editModal').find('input[name="area"]').val(area);
+                    $('#editModal').find('input[name="id"]').val(idAps);
+                    $('#editModal').find('input[name="pdk"]').val(pdk);
+                    $('#editModal').find('input[name="deliv"]').val(deliv);
                 });
             });
         </script>
