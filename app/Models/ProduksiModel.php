@@ -42,11 +42,16 @@ class ProduksiModel extends Model
 
     public function getProduksi($area, $bulan)
     {
+        $today = date('Y-m-d');
+        $threeDaysAgo = date('Y-m-d', strtotime('-4 days'));
+
         return $this->join('apsperstyle', 'apsperstyle.idapsperstyle= produksi.idapsperstyle')
-            ->select('tgl_produksi,mastermodel,size,produksi.delivery,sum(qty) as qty,  sum(qty_produksi) as qty_produksi')->where('produksi.admin', $area)->orderBy('produksi.tgl_produksi')
-            ->groupBy('size')
-            ->groupBy('tgl_produksi')
+            ->select('tgl_produksi,mastermodel,size,produksi.*, sisa')
+            ->where('produksi.admin', $area)
+            ->where('tgl_produksi >=', $threeDaysAgo)
+            ->where('tgl_produksi <=', $today)
             ->where('Month(tgl_produksi)', $bulan)
+            ->orderBy('produksi.tgl_produksi')
             ->findAll();
     }
     public function existingData($insert)
@@ -146,9 +151,7 @@ class ProduksiModel extends Model
         }
 
         return $this->groupBy('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, produksi.tgl_produksi')
-                    ->orderBy('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, produksi.tgl_produksi', 'ASC')
-                    ->findAll();
-                    
+            ->orderBy('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, produksi.tgl_produksi', 'ASC')
+            ->findAll();
     }
-
 }

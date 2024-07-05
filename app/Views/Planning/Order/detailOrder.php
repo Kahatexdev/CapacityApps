@@ -68,15 +68,14 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm"><?= $order['seam']; ?></td>
                                             <td class="text-sm"><?= $order['factory']; ?></td>
                                             <td class="text-sm">
-                                                <button type="button" class="btn btn-warning btn-sm import-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['idapsperstyle']; ?>" data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>" data-jarum="<?= $order['machinetypeid']; ?>" data-style="<?= $order['size']; ?>" data-qty="<?= $order['qty']; ?>" data-sisa="<?= $order['sisa']; ?>" data-seam="<?= $order['seam']; ?>" data-factory="<?= $order['factory']; ?>">
-                                                    Edit
+                                                <button type="button" class="btn btn-warning btn-sm split-btn" data-toggle="modal" data-target="#splitModal" data-id="<?= $order['idapsperstyle']; ?>" data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>" data-jarum="<?= $order['machinetypeid']; ?>" data-style="<?= $order['size']; ?>" data-qty="<?= $order['qty']; ?>" data-sisa="<?= $order['sisa']; ?>" data-seam="<?= $order['seam']; ?>" data-factory="<?= $order['factory']; ?>" data-smv=" <?= $order['smv']; ?> " data-order=" <?= $order['no_order']; ?> " data-country=" <?= $order['country']; ?> ">
+                                                    Split
                                                 </button>
-                                            </td>
-                                            <!-- <td>
-                                                <button type="button" class="btn btn-danger btn-sm delete-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $order['idapsperstyle']; ?>"data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>">
+                                                <button type=" button" class="btn btn-danger btn-sm delete-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $order['idapsperstyle']; ?>" data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>">
                                                     Delete
                                                 </button>
-                                            </td> -->
+                                            </td>
+
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -148,6 +147,66 @@ error_reporting(E_ALL); ?>
                 </div>
             </div>
         </div>
+        <div class="modal fade bd-example-modal-lg" id="splitModal" tabindex="-1" role="dialog" aria-labelledby="splitModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Split Area</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="<?= base_url($role . '/splitarea') ?>" method="post">
+                            <input type="text" name="noModel" id="noModel" hidden value="">
+                            <input type="text" name="idaps" id="idaps" hidden value="">
+                            <input type="text" name="smv" id="smv" hidden value="">
+                            <input type="text" name="delivery" id="delivery" hidden value="">
+                            <input type="text" name="seam" id="seam" hidden value="">
+                            <input type="text" name="jarum" id="jarum" hidden value="">
+                            <input type="text" name="style" id="style" hidden value="">
+                            <input type="text" name="order" id="order" hidden value="">
+                            <input type="text" name="country" id="country" hidden value="">
+                            <div id="confirmationMessage"></div>
+                            <div class="form-group">
+                                <label for="selectArea">Area 1:</label>
+                                <select class="form-control" id="selectArea" name="area1">
+                                    <?php
+                                    $uniqueAreas = array_unique(array_column($dataMc, 'area'));
+                                    foreach ($uniqueAreas as $area) :
+                                    ?>
+                                        <option value="<?= $area; ?>"><?= $area; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="qty">Qty Area 1:</label>
+                                <input type="number" name="qty1" class="form-control" id="">
+                            </div>
+                            <div class="form-group">
+                                <label for="selectArea">Area 2:</label>
+                                <select class="form-control" id="selectArea" name="area2">
+                                    <?php
+                                    $uniqueAreas = array_unique(array_column($dataMc, 'area'));
+                                    foreach ($uniqueAreas as $area) :
+                                    ?>
+                                        <option value="<?= $area; ?>"><?= $area; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="qty">Qty Area 2:</label>
+                                <input type="number" name="qty2" class="form-control" id="">
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-danger">Simpan</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="modal fade bd-example-modal-lg" id="ModalAssignAll" tabindex="-1" role="dialog" aria-labelledby="ModalAssignAll" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
@@ -202,6 +261,31 @@ error_reporting(E_ALL); ?>
                     var selectedMachineTypeId = document.getElementById("machinetypeid").value;
                     var selectedArea = document.getElementById("area").value;
                     document.getElementById('confirmationMessage').innerHTML = "Apakah anda yakin mengarahkan PDK " + noModel + " dengan jarum " + selectedMachineTypeId + " ke " + selectedArea;
+                });
+                $('.split-btn').click(function() {
+                    var noModel = $(this).data('no-model');
+                    var idAps = $(this).data('id');
+                    var style = $(this).data('style');
+                    var smv = $(this).data('smv');
+                    var delivery = $(this).data('delivery');
+                    var seam = $(this).data('seam');
+                    var jarum = $(this).data('jarum');
+                    var order = $(this).data('order');
+                    var country = $(this).data('country');
+
+
+                    $('#splitModal').modal('show'); // Show the modal
+                    $('#splitModal').find('input[name="noModel"]').val(noModel);
+                    $('#splitModal').find('input[name="idaps"]').val(idAps);
+                    $('#splitModal').find('input[name="style"]').val(style);
+                    $('#splitModal').find('input[name="delivery"]').val(delivery);
+                    $('#splitModal').find('input[name="smv"]').val(smv);
+                    $('#splitModal').find('input[name="seam"]').val(seam);
+                    $('#splitModal').find('input[name="jarum"]').val(jarum);
+                    $('#splitModal').find('input[name="order"]').val(order);
+                    $('#splitModal').find('input[name="country"]').val(country);
+
+                    document.getElementById('confirmationMessage').innerHTML = "Apakah anda yakin memecah" + noModel + " dengan jarum " + selectedMachineTypeId + " ke " + selectedArea;
                 });
             });
         </script>

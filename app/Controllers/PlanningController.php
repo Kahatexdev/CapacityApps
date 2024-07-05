@@ -213,7 +213,39 @@ class PlanningController extends BaseController
         ];
         return view(session()->get('role') . '/Planning/listPlanning', $data);
     }
+    public function splitarea()
+    {
+        $idaps = $this->request->getPost('idaps');
+        $pdk = $this->request->getPost('noModel');
+        $deliv = $this->request->getPost('delivery');
 
+        $update = [
+            'factory' => $this->request->getPost('area1'),
+            'qty' => $this->request->getPost('qty1'),
+            'sisa' => $this->request->getPost('qty1'),
+        ];
+        $insert = [
+            'machinetypeid' => $this->request->getPost('jarum'),
+            'no_order' => $this->request->getPost('order'),
+            'size' => $this->request->getPost('style'),
+            'country' => $this->request->getPost('country'),
+            'mastermodel' => $pdk,
+            'delivery' => $deliv,
+            'qty' => $this->request->getPost('qty2'),
+            'sisa' => $this->request->getPost('qty2'),
+            'factory' => $this->request->getPost('area2'),
+            'production_unit' => "PU Belum Di Pilih",
+            'smv' => $this->request->getPost('smv')
+
+        ];
+        $u = $this->ApsPerstyleModel->update($idaps, $update);
+        if ($u) {
+            $this->ApsPerstyleModel->insert($insert);
+            return redirect()->to(base_url(session()->get('role') . '/detailModelPlanning/' . $pdk . '/' . $deliv))->withInput()->with('success', 'Berhasil Split Style Area');
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/detailModelPlanning/' . $pdk . '/' . $deliv))->withInput()->with('error', 'Gagal Membagi Style');
+        }
+    }
     public function detaillistplanning($judul)
     {
         $dataplan = $this->KebutuhanMesinModel->jarumPlan($judul);

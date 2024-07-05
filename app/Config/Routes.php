@@ -65,7 +65,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
 
-    
+
     //summary
     $routes->post('summaryproduksi', 'ProduksiController::summaryPerTanggal');
 
@@ -146,6 +146,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('deletedetailorder/(:any)', 'OrderController::deletedetailorder/$1');
     $routes->post('deletedetailjarum/(:any)', 'OrderController::deletedetailmodeljarumplan/$1');
     $routes->post('assignareal', 'PlanningController::assignareal');
+    $routes->post('splitarea', 'PlanningController::splitarea');
     $routes->post('assignarealall', 'PlanningController::assignarealall');
 
     // mesin
@@ -178,6 +179,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
     $routes->get('produksi', 'ProduksiController::produksi');
+    $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
 });
 
 
@@ -312,6 +314,7 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->post('importproduksi', 'ProduksiController::importproduksinew');
     $routes->post('resetproduksi', 'ProduksiController::resetproduksi');
     $routes->post('resetproduksiarea', 'ProduksiController::resetproduksiarea');
+    $routes->post('editproduksi', 'ProduksiController::editproduksi');
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
 
 

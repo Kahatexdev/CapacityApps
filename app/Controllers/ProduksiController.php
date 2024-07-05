@@ -322,7 +322,7 @@ class ProduksiController extends BaseController
             'active1' => '',
             'active2' => '',
             'active3' => '',
-            'active4' => 'active',
+            'active4' => '',
             'active5' => '',
             'active6' => '',
             'active7' => '',
@@ -370,7 +370,7 @@ class ProduksiController extends BaseController
             'active3' => '',
             'active4' => '',
             'active5' => '',
-            'active6' => 'active',
+            'active6' => '',
             'active7' => '',
             'produksiArea' => $produksiPerArea,
             'Area' => $totalMesin,
@@ -671,7 +671,7 @@ class ProduksiController extends BaseController
             'active1' => '',
             'active2' => '',
             'active3' => '',
-            'active4' => 'active',
+            'active4' => '',
             'active5' => '',
             'active6' => '',
             'active7' => '',
@@ -682,5 +682,33 @@ class ProduksiController extends BaseController
             'title' => 'Summary Produksi Per Tanggal ' . $pdk,
         ];
         return view('Capacity/Produksi/summaryPertanggal', $data2);
+    }
+    public function editproduksi()
+    {
+        $id = $this->request->getPost('id');
+        $area = $this->request->getPost('area');
+        $idaps = $this->request->getPost('idaps');
+        $sisa = $this->request->getPost('sisa');
+        $curr = $this->request->getPost('qtycurrent');
+        $qtynow = $this->request->getPost('qty_prod');
+        $realqty = $sisa + $curr;
+        $updateqty = $realqty - $qtynow;
+        $updateSisaAps = $this->ApsPerstyleModel->update($idaps, ['sisa' => $updateqty]);
+        if ($updateSisaAps) {
+            $update = [
+                'no_mesin' => $this->request->getPost('no_mc'),
+                'no_label' => $this->request->getPost('no_label'),
+                'no_box' => $this->request->getPost('no_box'),
+                'qty_produksi' => $qtynow,
+            ];
+            $u = $this->produksiModel->update($id, $update);
+            if ($u) {
+                return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('success', 'Berhasil Update Data Produksi');
+            } else {
+                return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Gagal Update Data Produksi');
+            }
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Gagal Update Sisa Order');
+        }
     }
 }
