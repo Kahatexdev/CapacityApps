@@ -476,7 +476,7 @@ class ProduksiController extends BaseController
                             $shift = "-";
                             $no_box = $data[12];
                             $no_label = $data[13];
-                            $area = "-";
+                            $area = session()->get('username');
                             $admin = session()->get('username');
                             $dataInsert = [
                                 'tgl_produksi' => $tglprod,
@@ -546,7 +546,7 @@ class ProduksiController extends BaseController
                     $shift = "-";
                     $no_box = $data[12];
                     $no_label = $data[13];
-                    $area = "-";
+                    $area = session()->get('username');
                     $admin = session()->get('username');
                     $dataInsert = [
                         'tgl_produksi' => $tglprod,

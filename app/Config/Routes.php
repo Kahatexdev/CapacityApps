@@ -233,11 +233,15 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetailAps/$1');
 
+    // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
     $routes->get('dataprogress', 'ProduksiController::progressData');
     $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
     $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
+    $routes->get('produksi', 'ProduksiController::produksi');
+    $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+
     $routes->get('planningmesin', 'ApsController::planningmesin');
     $routes->post('fetch_jarum', 'ApsController::fetch_jarum');
     $routes->post('SimpanJudul', 'ApsController::saveplanningmesin');
