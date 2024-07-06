@@ -206,7 +206,7 @@
                     <div class="modal-body">
                         <form action="<?= base_url('/logout') ?>" method="post">
 
-                            Apakah anda yakin ingin Cancel Keluar?
+                            Apakah anda yakin ingin Keluar?
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>

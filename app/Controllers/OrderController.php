@@ -623,6 +623,7 @@ class OrderController extends BaseController
                     $firstSpacePosition = strpos($no_models, ' '); // Cari posisi spasi pertama
                     $no_model = substr($no_models, 0, $firstSpacePosition);
                     if ($no_model != $nomodel) {
+                        dd($no_models);
                         return redirect()->to(base_url(session()->get('role') . '/semuaOrder'))->with('error', 'Nomor Model Tidak Sama. Silahkan periksa kembali');
                     } else {
                         if ($row[5] == null) {
