@@ -101,8 +101,7 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Machine Running</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    <?= $mcJalan ?>
-                                    <span class=" text-sm font-weight-bolder">/ <?= $totalMc ?> </span>
+
 
                                 </h5>
                             </div>
@@ -139,20 +138,55 @@
             </div>
         </div>
     </div>
-    <div class="row my-3">
-        <div class="col-lg-12">
-            <div class="card z-index-2">
-                <div class="card-header pb-0">
-                    <h6>Daily Placed Order</h6>
+    <div class="row">
+        <?php foreach ($Area as $ar) : ?>
 
-                </div>
-                <div class="card-body p-3">
-                    <div class="chart">
-                        <canvas id="mixed-chart" class="chart-canvas" height="300"></canvas>
+            <div class="col-xl-6 col-sm-3 mb-xl-0 mb-4 mt-2">
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="numbers">
+                                    <?php if (stripos($ar['area'], "Gedung") !== false) : ?>
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Majalaya <?= $ar['area'] ?></p>
+                                    <?php else : ?>
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Status Mesin <?= $ar['area'] ?></p>
+                                    <?php endif; ?>
+                                    <h5 class="font-weight-bolder mb-0">
+                                    </h5>
+                                </div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <?php if (stripos($ar['area'], 'KK8J') !== false || stripos($ar['area'], '13G') !== false) : ?>
+
+                                    <a href="<?= base_url($role . '/detailproduksi/' . $ar['area']) ?>" class="btn btn-info btn-sm"> <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i> Details</a>
+
+                                <?php else : ?>
+                                    <a href="<?= base_url($role . '/detailproduksi/' . $ar['area']) ?>" class="btn btn-info btn-sm"> <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i> Details</a>
+                                <?php endif; ?>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12">
+
+                                <div class="chart">
+                                    <canvas id="<?= $ar['area'] ?>-chart" class="chart-canvas" height="300"></canvas>
+                                </div>
+                                <p>
+                                    Total Mesin : <?= $ar['total_mc'] ?>
+                                </p>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
+
             </div>
-        </div>
+        <?php endforeach ?>
     </div>
 
 
@@ -286,5 +320,73 @@
             },
         },
     });
+</script>
+<script>
+    let mesin = <?php echo json_encode($Area); ?>;
+    // console.log(data1)
+    for (const key in mesin) {
+        const value = mesin[key]
+        var mcjalan = value.mesin_jalan
+        var mcmati = value.mesin_mati
+        var totalmc = value.total_mc
+        var area = value.area
+        var ctx4 = document.getElementById(area + "-chart").getContext("2d");
+
+        new Chart(ctx4, {
+            type: "pie",
+            data: {
+                labels: ['Mesin Jalan', 'Mesin Mati'],
+                datasets: [{
+                    label: "Projects",
+                    weight: 9,
+                    cutout: 0,
+                    tension: 0.9,
+                    pointRadius: 2,
+                    borderWidth: 2,
+                    backgroundColor: ['#17c1e8', '#c0c0c0 '],
+                    data: [mcjalan, mcmati],
+                    fill: false
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            drawBorder: false,
+                            display: false,
+                            drawOnChartArea: false,
+                            drawTicks: false,
+                        },
+                        ticks: {
+                            display: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            drawBorder: false,
+                            display: false,
+                            drawOnChartArea: false,
+                            drawTicks: false,
+                        },
+                        ticks: {
+                            display: false,
+                        }
+                    },
+                },
+            },
+        });
+
+    }
 </script>
 <?php $this->endSection(); ?>

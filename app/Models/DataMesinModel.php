@@ -292,4 +292,13 @@ class DataMesinModel extends Model
         $mesin = reset($a);
         return $mesin;
     }
+    public function getJalanMesinPerArea()
+    {
+        $query = $this->select('area, jarum, SUM(total_mc) AS total_mc, SUM(mesin_jalan) AS mesin_jalan,SUM(total_mc)-SUM(mesin_jalan) as mesin_mati, pu')
+            ->groupBy('pu, area')
+            ->orderBy('pu ASC, SUBSTRING(AREA, 3) + 0 ASC, AREA ASC') // Sorting by 'pu' first, then by KK number, then by Area
+            ->findAll();
+
+        return $query;
+    }
 }
