@@ -11,6 +11,7 @@ use App\Models\BookingModel;
 use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
+use DateTime;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpParser\Node\Stmt\Else_;
 
@@ -461,8 +462,10 @@ class ProduksiController extends BaseController
                             $deliv = $idMinus['delivery'];
                             $sisa = $qtysisa - $data[14];
                             $this->ApsPerstyleModel->update($idnext, ['sisa' => $sisa]);
-
-                            $tglprod = $data[0];
+                            $tglInputProduksi = $data[0];
+                            $date = new DateTime($tglInputProduksi);
+                            $date->modify('-1 day');
+                            $tglprod = $date->format('Y-m-d');
                             // $strReplace = str_replace('.', '-', $tglprod);
                             // $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
                             // $tgl_produksi = $dateTime->format('Y-m-d');
@@ -512,7 +515,10 @@ class ProduksiController extends BaseController
                     $sisaOrder = $idAps['sisa'];
                     $delivery = $idAps['delivery'];
 
-                    $tglprod = $data[0];
+                    $tglInputProduksi = $data[0];
+                    $date = new DateTime($tglInputProduksi);
+                    $date->modify('-1 day');
+                    $tglprod = $date->format('Y-m-d');
                     // $strReplace = str_replace('.', '-', $tglprod);
                     // $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
                     // $tgl_produksi = $dateTime->format('Y-m-d');
