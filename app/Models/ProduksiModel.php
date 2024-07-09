@@ -42,11 +42,16 @@ class ProduksiModel extends Model
 
     public function getProduksi($area, $bulan)
     {
+        $today = date('Y-m-d');
+        $threeDaysAgo = date('Y-m-d', strtotime('-2 days'));
+
         return $this->join('apsperstyle', 'apsperstyle.idapsperstyle= produksi.idapsperstyle')
-            ->select('tgl_produksi,mastermodel,size,produksi.delivery,sum(qty) as qty,  sum(qty_produksi) as qty_produksi')->where('produksi.admin', $area)->orderBy('produksi.tgl_produksi')
-            ->groupBy('size')
-            ->groupBy('tgl_produksi')
+            ->select('tgl_produksi,mastermodel,size,produksi.*, sisa')
+            ->where('produksi.admin', $area)
+            ->where('tgl_produksi >=', $threeDaysAgo)
+            ->where('tgl_produksi <=', $today)
             ->where('Month(tgl_produksi)', $bulan)
+            ->orderBy('produksi.tgl_produksi')
             ->findAll();
     }
     public function existingData($insert)
@@ -117,6 +122,36 @@ class ProduksiModel extends Model
         return $this->select('id_produksi,idapsperstyle,qty_produksi')
             ->where('admin', $area)
             ->where('tgl_produksi', $tanggal)
+            ->findAll();
+    }
+
+    public function getdataSummaryPertgl($data)
+    {
+        $this->select('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, SUM(apsperstyle.qty) AS qty, COUNT(DISTINCT produksi.tgl_produksi) AS running, SUM(produksi.qty_produksi) AS qty_produksi, COUNT(DISTINCT produksi.no_mesin) AS jl_mc, produksi.tgl_produksi')
+            ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle')
+            ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model');
+
+        if (!empty($data['buyer'])) {
+            $this->where('data_model.kd_buyer_order', $data['buyer']);
+        }
+        if (!empty($data['area'])) {
+            $this->where('produksi.admin', $data['area']);
+        }
+        if (!empty($data['jarum'])) {
+            $this->where('apsperstyle.machinetypeid', $data['jarum']);
+        }
+        if (!empty($data['pdk'])) {
+            $this->where('apsperstyle.mastermodel', $data['pdk']);
+        }
+        if (!empty($data['awal'])) {
+            $this->where('produksi.tgl_produksi >=', $data['awal']);
+        }
+        if (!empty($data['akhir'])) {
+            $this->where('produksi.tgl_produksi <=', $data['akhir']);
+        }
+
+        return $this->groupBy('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, produksi.tgl_produksi')
+            ->orderBy('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, produksi.tgl_produksi', 'ASC')
             ->findAll();
     }
 }

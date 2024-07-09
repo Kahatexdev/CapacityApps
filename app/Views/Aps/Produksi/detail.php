@@ -50,7 +50,6 @@
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Box</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Label</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Produksi</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -64,10 +63,7 @@
                                             <td class="text-sm"><?= $order['no_box']; ?></td>
                                             <td class="text-sm"><?= $order['no_label']; ?></td>
                                             <td class="text-sm"><?= $order['qty_produksi']; ?></td>
-                                            <td class="text-sm">
-                                                <button class="btn btn-warning edit-btn" data-id="<?= $order['id_produksi']; ?>" data-pdk="<?= $order['mastermodel']; ?>" data-style="<?= $order['size']; ?>" data-nomc="<?= $order['no_mesin']; ?>" data-nobox="<?= $order['no_box']; ?>" data-nolabel="<?= $order['no_label']; ?>" data-qty="<?= $order['qty_produksi']; ?>" data-tgl="<?= $order['tgl_produksi']; ?>" data-sisa="<?= $order['sisa']; ?>" data-idaps="<?= $order['idapsperstyle']; ?>">
-                                                    Edit</button>
-                                            </td>
+
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>

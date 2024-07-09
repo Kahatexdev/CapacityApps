@@ -5,8 +5,8 @@
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
             <div class="card">
                 <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-8">
+                    <div class="row d-flex justify-content-between">
+                        <div class="col-4">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
@@ -14,9 +14,18 @@
                                 </h5>
                             </div>
                         </div>
-                        <div class="col-4 text-end">
+                        <div class="col-8 text-end">
                             <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary Produksi
+                            </button>
+                            <a href="<?= base_url($role . '/produksi') ?>" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md">
+                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Import Produksi
+                            </a>
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-warning shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#reset">
+                                <i class="fas fa-trash text-lg opacity-10" aria-hidden="true"></i> Reset PDK Produksi
+                            </button>
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-warning shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#resetarea">
+                                <i class="fas fa-trash text-lg opacity-10" aria-hidden="true"></i> Reset Produksi Area
                             </button>
                         </div>
                     </div>
@@ -78,6 +87,60 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="reset" tabindex="-1" role="dialog" aria-labelledby="reset" aria-hidden="true">
+            <div class="modal-dialog " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Reset Produksi</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body align-items-center">
+                        <form action="<?= base_url($role . '/resetproduksi/'); ?>" method="post">
+                            <div class="form-group">
+                                <label for="awal">PDK</label>
+                                <input type="text" class="form-control" name="pdk">
+                            </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-info">Reset</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="resetarea" tabindex="-1" role="dialog" aria-labelledby="resetarea" aria-hidden="true">
+            <div class="modal-dialog " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Reset Produksi Area</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body align-items-center">
+                        <form action="<?= base_url($role . '/resetproduksiarea/'); ?>" method="post">
+                            <div class="form-group">
+                                <label for="awal">Area</label>
+                                <input type="text" class="form-control" name="area" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="awal">Tanggal Input Produksi</label>
+                                <input type="date" class="form-control" name="tgl_produksi">
+                            </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-info">Reset</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
     </div>
 
@@ -88,12 +151,9 @@
 <div class="row my-3">
     <div class="col-lg-12">
         <div class="card z-index-2">
-            <div class="card-header pb-0 d-flex justify-content-between">
-                <div>
+            <div class="card-header pb-0">
+                <h6 class="card-title">Data Produksi Harian bulan <?= $bulan ?></h6>
 
-                    <h6 class="card-title">Data Produksi Harian bulan <?= $bulan ?> </h6>
-                </div>
-                <div><a href="<?= base_url($role . '/produksi') ?>" class="btn btn-sm btn-info"> Details</a></div>
             </div>
             <div class="card-body p-3">
                 <div class="row">
@@ -372,7 +432,7 @@
 
 
         }
-        setInterval(fetchData, 100000000000);
+        setInterval(fetchData, 5000);
         fetchData();
 
     });

@@ -11,6 +11,7 @@ use App\Models\BookingModel;
 use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
+use DateTime;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpParser\Node\Stmt\Else_;
 
@@ -56,21 +57,22 @@ class ProduksiController extends BaseController
         $totalMesin = $this->jarumModel->getArea();
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
         $dataPdk = $this->ApsPerstyleModel->getPdkProduksi();
-
+        $produksi = $this->produksiModel->getProduksiHarianArea();
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Produksi',
             'active1' => '',
             'active2' => '',
             'active3' => '',
-            'active4' => 'active',
+            'active4' => '',
             'active5' => '',
             'active6' => '',
             'active7' => '',
             'pdk' => $dataPdk,
             'Area' => $totalMesin,
             'Produksi' => $dataProduksi,
-            'bulan' => $month
+            'bulan' => $month,
+            'produksi' => $produksi
         ];
         return view(session()->get('role') . '/produksi', $data);
     }
@@ -324,7 +326,7 @@ class ProduksiController extends BaseController
             'active1' => '',
             'active2' => '',
             'active3' => '',
-            'active4' => 'active',
+            'active4' => '',
             'active5' => '',
             'active6' => '',
             'active7' => '',
@@ -374,7 +376,7 @@ class ProduksiController extends BaseController
             'active3' => '',
             'active4' => '',
             'active5' => '',
-            'active6' => 'active',
+            'active6' => '',
             'active7' => '',
             'produksiArea' => $produksiPerArea,
             'Area' => $totalMesin,
@@ -465,8 +467,10 @@ class ProduksiController extends BaseController
                             $deliv = $idMinus['delivery'];
                             $sisa = $qtysisa - $data[14];
                             $this->ApsPerstyleModel->update($idnext, ['sisa' => $sisa]);
-
-                            $tglprod = $data[0];
+                            $tglInputProduksi = $data[0];
+                            $date = new DateTime($tglInputProduksi);
+                            $date->modify('-1 day');
+                            $tglprod = $date->format('Y-m-d');
                             // $strReplace = str_replace('.', '-', $tglprod);
                             // $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
                             // $tgl_produksi = $dateTime->format('Y-m-d');
@@ -480,7 +484,7 @@ class ProduksiController extends BaseController
                             $shift = "-";
                             $no_box = $data[12];
                             $no_label = $data[13];
-                            $area = "-";
+                            $area = session()->get('username');
                             $admin = session()->get('username');
                             $dataInsert = [
                                 'tgl_produksi' => $tglprod,
@@ -516,7 +520,10 @@ class ProduksiController extends BaseController
                     $sisaOrder = $idAps['sisa'];
                     $delivery = $idAps['delivery'];
 
-                    $tglprod = $data[0];
+                    $tglInputProduksi = $data[0];
+                    $date = new DateTime($tglInputProduksi);
+                    $date->modify('-1 day');
+                    $tglprod = $date->format('Y-m-d');
                     // $strReplace = str_replace('.', '-', $tglprod);
                     // $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
                     // $tgl_produksi = $dateTime->format('Y-m-d');
@@ -550,7 +557,7 @@ class ProduksiController extends BaseController
                     $shift = "-";
                     $no_box = $data[12];
                     $no_label = $data[13];
-                    $area = "-";
+                    $area = session()->get('username');
                     $admin = session()->get('username');
                     $dataInsert = [
                         'tgl_produksi' => $tglprod,
@@ -620,14 +627,15 @@ class ProduksiController extends BaseController
         }
         return redirect()->to(base_url(session()->get('role') . '/produksi'))->withInput()->with('success', 'Data Berhasil di reset');
     }
-    public function summaryProdPerTanggal() {
+    public function summaryProdPerTanggal()
+    {
         $buyer = $this->request->getPost('buyer');
         $area = $this->request->getPost('area');
         $jarum = $this->request->getPost('jarum');
         $pdk = $this->request->getPost('pdk');
         $awal = $this->request->getPost('awal');
         $akhir = $this->request->getPost('akhir');
-        
+
         $data = [
             'buyer' => $buyer,
             'area' => $area,
@@ -648,10 +656,11 @@ class ProduksiController extends BaseController
         $tgl_produksi = array_values($tgl_produksi);
         // Sort ASC
         sort($tgl_produksi);
-        
+
         $uniqueData = [];
         foreach ($dataSummaryPertgl as $item) {
             $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'];
+            $qty = +$item['qty'];
             if (!isset($uniqueData[$key])) {
                 $uniqueData[$key] = [
                     'machinetypeid' => $item['machinetypeid'],
@@ -675,7 +684,7 @@ class ProduksiController extends BaseController
             'active1' => '',
             'active2' => '',
             'active3' => '',
-            'active4' => 'active',
+            'active4' => '',
             'active5' => '',
             'active6' => '',
             'active7' => '',
@@ -687,7 +696,7 @@ class ProduksiController extends BaseController
             'title' => 'Summary Produksi Per Tanggal ' . $pdk,
             'dataFilter' => $data,
         ];
-        return view('Capacity/Produksi/summaryPertanggal', $data2);
+        return view(session()->get('role').'/Produksi/summaryPertanggal', $data2);
     }
     public function summaryProduksi() {
         $buyer = $this->request->getPost('buyer');
@@ -740,6 +749,35 @@ class ProduksiController extends BaseController
             'title' => 'Summary Produksi' . $pdk,
             'dataFilter' => $data,
         ];
-        return view('Capacity/Produksi/summaryProduksi', $data2);
+        return view(session()->get('role').'/Produksi/summaryProduksi', $data2);
+    }
+
+    public function editproduksi()
+    {
+        $id = $this->request->getPost('id');
+        $area = $this->request->getPost('area');
+        $idaps = $this->request->getPost('idaps');
+        $sisa = $this->request->getPost('sisa');
+        $curr = $this->request->getPost('qtycurrent');
+        $qtynow = $this->request->getPost('qty_prod');
+        $realqty = $sisa + $curr;
+        $updateqty = $realqty - $qtynow;
+        $updateSisaAps = $this->ApsPerstyleModel->update($idaps, ['sisa' => $updateqty]);
+        if ($updateSisaAps) {
+            $update = [
+                'no_mesin' => $this->request->getPost('no_mc'),
+                'no_label' => $this->request->getPost('no_label'),
+                'no_box' => $this->request->getPost('no_box'),
+                'qty_produksi' => $qtynow,
+            ];
+            $u = $this->produksiModel->update($id, $update);
+            if ($u) {
+                return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('success', 'Berhasil Update Data Produksi');
+            } else {
+                return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Gagal Update Data Produksi');
+            }
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Gagal Update Sisa Order');
+        }
     }
 }

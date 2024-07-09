@@ -59,18 +59,13 @@
                                         <td class="text-xs"><?= $order->qty; ?></td>
                                         <td class="text-xs"><?= $order->sisa; ?></td>
                                         <td class="text-xs">
-                                            <?php if ($order->qty === null) : ?>
-                                                <!-- If qty is null, set action to Import -->
-                                                <button type="button" class="btn import-btn btn-success text-xs" data-toggle="modal" data-target="#importModal" data-id="<?= $order->id_model; ?>" data-no-model="<?= $order->no_model; ?>">
-                                                    Import
+
+
+                                            <a href="<?= base_url('capacity/detailmodel/' . $order->no_model . '/' . $order->delivery); ?>"><button type="button" class="btn btn-info btn-sm details-btn">
+                                                    Details
                                                 </button>
-                                            <?php else : ?>
-                                                <!-- If qty is not null, set action to Details -->
-                                                <a href="<?= base_url('capacity/detailmodel/' . $order->no_model . '/' . $order->delivery); ?>"><button type="button" class="btn btn-info btn-sm details-btn">
-                                                        Details
-                                                    </button>
-                                                </a>
-                                            <?php endif; ?>
+                                            </a>
+
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

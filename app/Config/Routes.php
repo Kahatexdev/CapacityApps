@@ -65,7 +65,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
 
-    
+
     //summary
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
 
@@ -146,6 +146,8 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('deletedetailorder/(:any)', 'OrderController::deletedetailorder/$1');
     $routes->post('deletedetailjarum/(:any)', 'OrderController::deletedetailmodeljarumplan/$1');
     $routes->post('assignareal', 'PlanningController::assignareal');
+    $routes->post('splitarea', 'PlanningController::splitarea');
+    $routes->post('editarea', 'PlanningController::editarea');
     $routes->post('assignarealall', 'PlanningController::assignarealall');
 
     // mesin
@@ -158,6 +160,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('deletemesinareal/(:any)', 'MesinController::deletemesinarealPlan/$1');
     $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarumPlan/$1');
     $routes->post('tambahmesinperarea', 'MesinController::inputmesinperareaPlan');
+    $routes->post('tambahmesinperjarum', 'MesinController::inputmesinperjarumPlan');
     $routes->post('addcylinder', 'MesinController::inputcylinderPlan');
     $routes->post('editcylinder/(:any)', 'MesinController::editcylinderPlan/$1');
     $routes->post('deletecylinder/(:any)', 'MesinController::deletecylinderPlan/$1');
@@ -170,11 +173,14 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetail/$1');
 
+    // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
-    $routes->get('dataprogress', 'GodController::progressData');
-    $routes->get('produksiareachart', 'GodController::produksiAreaChart');
-    $routes->get('dataproduksi/(:any)', 'GodController::produksiPerArea/$1');
-    $routes->post('importproduksi', 'GodController::importproduksi');
+    $routes->get('dataprogress', 'ProduksiController::progressData');
+    $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
+    $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->post('importproduksi', 'ProduksiController::importproduksi');
+    $routes->get('produksi', 'ProduksiController::produksi');
+    $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
 });
 
 
@@ -227,11 +233,15 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetailAps/$1');
 
+    // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
     $routes->get('dataprogress', 'ProduksiController::progressData');
     $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
     $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
+    $routes->get('produksi', 'ProduksiController::produksi');
+    $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+
     $routes->get('planningmesin', 'ApsController::planningmesin');
     $routes->post('fetch_jarum', 'ApsController::fetch_jarum');
     $routes->post('SimpanJudul', 'ApsController::saveplanningmesin');
@@ -309,6 +319,7 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->post('importproduksi', 'ProduksiController::importproduksinew');
     $routes->post('resetproduksi', 'ProduksiController::resetproduksi');
     $routes->post('resetproduksiarea', 'ProduksiController::resetproduksiarea');
+    $routes->post('editproduksi', 'ProduksiController::editproduksi');
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
 
 
