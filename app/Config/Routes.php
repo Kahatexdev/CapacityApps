@@ -67,12 +67,12 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
     
     //summary
-    $routes->post('summaryproduksi', 'ProduksiController::summaryPerTanggal');
+    $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
 
 
     //summary produksi
     $routes->post('summaryProdPerTanggal', 'ProduksiController::summaryProdPerTanggal');
-    $routes->get('exportSummaryPerTgl', 'SummaryController::excelSummaryPerTgl');
+    $routes->post('exportSummaryPerTgl', 'SummaryController::excelSummaryPerTgl');
 
 
     // mesin
@@ -346,6 +346,9 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->post('assignarea', 'GodController::assignarea');
     $routes->post('updateaccount/(:any)', 'GodController::updateaccount/$1');
     $routes->post('deleteaccount/(:any)', 'GodController::deleteaccount/$1');
+
+    // chat
+    $routes->get('chat', 'ChatController::pesan');
 });
 
 // ie

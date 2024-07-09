@@ -267,4 +267,101 @@ class OrderModel extends Model
             ->groupby('data_model.no_model')
             ->findAll();
     }
+
+    public function getdataSummaryPertgl($data)
+    {
+        $this->select('apsperstyle.idapsperstyle, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, SUM(DISTINCT(apsperstyle.qty)) AS qty, COUNT(DISTINCT produksi.tgl_produksi) AS running, SUM(produksi.qty_produksi) as qty_produksi, COUNT(produksi.no_mesin) AS jl_mc')
+            ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT')
+            ->join('produksi', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'LEFT');
+
+        if (!empty($data['buyer'])) {
+            $this->where('data_model.kd_buyer_order', $data['buyer']);
+        }
+        if (!empty($data['area'])) {
+            $this->where('produksi.admin', $data['area']);
+        }
+        if (!empty($data['jarum'])) {
+            $this->where('apsperstyle.machinetypeid', $data['jarum']);
+        }
+        if (!empty($data['pdk'])) {
+            $this->where('data_model.no_model', $data['pdk']);
+        }
+        if (!empty($data['awal'])) {
+            $this->where('produksi.tgl_produksi >=', $data['awal']);
+        }
+        if (!empty($data['akhir'])) {
+            $this->where('produksi.tgl_produksi <=', $data['akhir']);
+        }
+
+        return $this->groupBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size')
+                    ->orderBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size', 'ASC')
+                    ->findAll();
+                    
+    }
+
+    public function getProdSummaryPertgl($data)
+    {
+        $this->select('apsperstyle.idapsperstyle, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, SUM(produksi.qty_produksi) as qty_produksi, COUNT(produksi.no_mesin) AS jl_mc, produksi.tgl_produksi')
+            ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT')
+            ->join('produksi', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'LEFT')
+            ->where('produksi.tgl_produksi IS NOT NULL');
+
+        if (!empty($data['buyer'])) {
+            $this->where('data_model.kd_buyer_order', $data['buyer']);
+        }
+        if (!empty($data['area'])) {
+            $this->where('produksi.admin', $data['area']);
+        }
+        if (!empty($data['jarum'])) {
+            $this->where('apsperstyle.machinetypeid', $data['jarum']);
+        }
+        if (!empty($data['pdk'])) {
+            $this->where('data_model.no_model', $data['pdk']);
+        }
+        if (!empty($data['awal'])) {
+            $this->where('produksi.tgl_produksi >=', $data['awal']);
+        }
+        if (!empty($data['akhir'])) {
+            $this->where('produksi.tgl_produksi <=', $data['akhir']);
+        }
+
+        return $this->groupBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size, produksi.tgl_produksi')
+                    ->orderBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size, produksi.tgl_produksi', 'ASC')
+                    ->findAll();
+                    
+    }
+
+    public function getBuyer() 
+    {
+        return $this->select('kd_buyer_order')->DISTINCT()
+            ->orderBy('kd_buyer_order', 'ASC')
+            ->findAll();
+    }
+
+    public function getProdSummary($data)
+    {
+        $this->select('data_model.seam, apsperstyle.delivery, COUNT(DISTINCT produksi.tgl_produksi) AS running, data_model.kd_buyer_order, apsperstyle.no_order, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, SUM(DISTINCT(apsperstyle.qty)) AS qty_deliv, SUM(produksi.qty_produksi) as bruto, COUNT(produksi.no_mesin) AS jl_mc')
+            ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT')
+            ->join('produksi', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'LEFT')
+            ->where('produksi.tgl_produksi IS NOT NULL');
+
+        if (!empty($data['buyer'])) {
+            $this->where('data_model.kd_buyer_order', $data['buyer']);
+        }
+        if (!empty($data['area'])) {
+            $this->where('produksi.admin', $data['area']);
+        }
+        if (!empty($data['jarum'])) {
+            $this->where('apsperstyle.machinetypeid', $data['jarum']);
+        }
+        if (!empty($data['pdk'])) {
+            $this->where('data_model.no_model', $data['pdk']);
+        }
+
+        return $this->groupBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size, apsperstyle.delivery')
+                    ->orderBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size, apsperstyle.delivery', 'ASC')
+                    ->findAll();
+                    
+    }
+
 }

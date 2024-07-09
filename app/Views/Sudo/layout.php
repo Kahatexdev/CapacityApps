@@ -31,6 +31,9 @@
     <link href="<?= base_url('assets/css/select2.min.css') ?>" rel="stylesheet" />
     <link href="<?= base_url('assets/node_modules/sweetalert2/dist/sweetalert2.min.css') ?>" rel="stylesheet">
 
+    <!-- CSS Chat -->
+     <link rel="stylesheet" href="<?= base_url('assets/chat/css/style.css') ?>">
+     <link rel="stylesheet" href="<?= base_url('assets/chat/css/component.css') ?>">
 
 </head>
 

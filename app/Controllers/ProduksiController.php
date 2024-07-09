@@ -309,6 +309,9 @@ class ProduksiController extends BaseController
         $month = date('F');
         $totalMesin = $this->jarumModel->getArea();
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
+        $dataBuyer = $this->orderModel->getBuyer();
+        $dataArea = $this->jarumModel->getArea();
+        $dataJarum = $this->jarumModel->getJarum();
 
         $produksiPerArea = [];
         foreach ($totalMesin as $area) {
@@ -329,7 +332,9 @@ class ProduksiController extends BaseController
             'Area' => $totalMesin,
             'Produksi' => $dataProduksi,
             'bulan' => $month,
-
+            'buyer' => $dataBuyer,
+            'area' => $dataArea,
+            'jarum' => $dataJarum,
         ];
         return view(session()->get('role') . '/Produksi/produksi', $data);
     }
@@ -632,10 +637,12 @@ class ProduksiController extends BaseController
             'akhir' => $akhir,
         ];
 
-        $dataSummaryPertgl = $this->produksiModel->getdataSummaryPertgl($data);
-        // supaya data menjadi unik
+        $dataSummaryPertgl = $this->orderModel->getdataSummaryPertgl($data);
+        $prodSummaryPertgl = $this->orderModel->getProdSummaryPertgl($data);
+
+        // agar data tgl produksi menjadi unik
         $tgl_produksi = [];
-        foreach ($dataSummaryPertgl as $item) {
+        foreach ($prodSummaryPertgl as $item) {
             $tgl_produksi[$item['tgl_produksi']] = $item['tgl_produksi'];
         }
         $tgl_produksi = array_values($tgl_produksi);
@@ -645,7 +652,6 @@ class ProduksiController extends BaseController
         $uniqueData = [];
         foreach ($dataSummaryPertgl as $item) {
             $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'];
-            $qty =+ $item['qty'];
             if (!isset($uniqueData[$key])) {
                 $uniqueData[$key] = [
                     'machinetypeid' => $item['machinetypeid'],
@@ -657,14 +663,14 @@ class ProduksiController extends BaseController
                     'ttl_jlmc' => 0,
                 ];
             }
-            $uniqueData[$key]['qty'] += $item['qty']/24;
+            $uniqueData[$key]['qty'] += $item['qty'];
             $uniqueData[$key]['running'] += $item['running'];
-            $uniqueData[$key]['ttl_prod'] += $item['qty_produksi']/24;
+            $uniqueData[$key]['ttl_prod'] += $item['qty_produksi'];
             $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
         }
         // Sort ASC
         sort($uniqueData);
-        // dd($dataSummaryPertgl);
+
         $data2 = [
             'active1' => '',
             'active2' => '',
@@ -676,10 +682,64 @@ class ProduksiController extends BaseController
             'dataSummaryPertgl' => $dataSummaryPertgl,
             'tglProdUnik' => $tgl_produksi,
             'uniqueData' => $uniqueData,
+            'prodSummaryPertgl' => $prodSummaryPertgl,
             'role' => session()->get('role'),
             'title' => 'Summary Produksi Per Tanggal ' . $pdk,
+            'dataFilter' => $data,
         ];
         return view('Capacity/Produksi/summaryPertanggal', $data2);
     }
-}
+    public function summaryProduksi() {
+        $buyer = $this->request->getPost('buyer');
+        $area = $this->request->getPost('area');
+        $jarum = $this->request->getPost('jarum');
+        $pdk = $this->request->getPost('pdk');
+        
+        $data = [
+            'buyer' => $buyer,
+            'area' => $area,
+            'jarum' => $jarum,
+            'pdk' => $pdk,
+        ];
 
+        $dataSummary = $this->orderModel->getProdSummary($data);
+
+        $uniqueData = [];
+        foreach ($dataSummary as $item) {
+            $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'] . '-' . $item['delivery'];
+            if (!isset($uniqueData[$key])) {
+                $uniqueData[$key] = [
+                    'machinetypeid' => $item['machinetypeid'],
+                    'mastermodel' => $item['mastermodel'],
+                    'size' => $item['size'],
+                    'delivery' => $item['delivery'],
+                    'qty_deliv' => 0,
+                    'running' => 0,
+                    'bruto' => 0,
+                    'ttl_jlmc' => 0,
+                ];
+            }
+            $uniqueData[$key]['qty_deliv'] += $item['qty_deliv'];
+            $uniqueData[$key]['running'] += $item['running'];
+            $uniqueData[$key]['bruto'] += $item['bruto'];
+            $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
+        }
+        // Sort ASC
+        sort($uniqueData);
+
+        $data2 = [
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => 'active',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'uniqueData' => $uniqueData,
+            'role' => session()->get('role'),
+            'title' => 'Summary Produksi' . $pdk,
+            'dataFilter' => $data,
+        ];
+        return view('Capacity/Produksi/summaryProduksi', $data2);
+    }
+}

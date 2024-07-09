@@ -66,19 +66,34 @@
                     <form action="<?= base_url($role . '/summaryProdPerTanggal/'); ?>" method="POST">
                         <div class="modal-body align-items-center">
                             <div class="form-group">
-                                <label for="buyer">Buyer</label>
-                                <input type="text" class="form-control" name="buyer">
+                                <label for="buyer" class="col-form-label">Buyer</label>
+                                <select class="form-control" id="buyer" name="buyer">
+                                    <option></option>
+                                    <?php foreach ($buyer as $buy) : ?>
+                                        <option><?= $buy['kd_buyer_order'] ?></option>
+                                    <?php endforeach ?>
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label for="area">Area</label>
-                                <input type="text" class="form-control" name="area">
+                                <label for="area" class="col-form-label">Area</label>
+                                <select class="form-control" id="area" name="area">
+                                    <option></option>
+                                    <?php foreach ($area as $ar) : ?>
+                                        <option><?= $ar ?></option>
+                                    <?php endforeach ?>
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label for="jarum">Jarum</label>
-                                <input type="text" class="form-control" name="jarum">
+                                <label for="jarum" class="col-form-label">Jarum</label>
+                                <select class="form-control" id="jarum" name="jarum">
+                                    <option></option>
+                                    <?php foreach ($jarum as $jrm) : ?>
+                                        <option><?= $jrm ?></option>
+                                    <?php endforeach ?>
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label for="pdk">No Model</label>
+                                <label for="pdk" class="col-form-label">No Model</label>
                                 <input type="text" class="form-control" name="pdk">
                             </div>
                             <div class="form-group">
@@ -108,13 +123,39 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
-                    <form action="<?= base_url($role . '/summaryProd/'); ?>" method="POST">
+                    <form action="<?= base_url($role . '/summaryproduksi/'); ?>" method="POST">
                         <div class="modal-body align-items-center">
-                            <div class="form-group">
-                                <label for="no_model">No Model</label>
-                                <input type="text" class="form-control" name="no_model">
+                        <div class="form-group">
+                                <label for="buyer" class="col-form-label">Buyer</label>
+                                <select class="form-control" id="buyer" name="buyer">
+                                    <option></option>
+                                    <?php foreach ($buyer as $buy) : ?>
+                                        <option><?= $buy['kd_buyer_order'] ?></option>
+                                    <?php endforeach ?>
+                                </select>
                             </div>
-                            
+                            <div class="form-group">
+                                <label for="area" class="col-form-label">Area</label>
+                                <select class="form-control" id="area" name="area">
+                                    <option></option>
+                                    <?php foreach ($area as $ar) : ?>
+                                        <option><?= $ar ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="jarum" class="col-form-label">Jarum</label>
+                                <select class="form-control" id="jarum" name="jarum">
+                                    <option></option>
+                                    <?php foreach ($jarum as $jrm) : ?>
+                                        <option><?= $jrm ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pdk" class="col-form-label">No Model</label>
+                                <input type="text" class="form-control" name="pdk">
+                            </div>                            
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
