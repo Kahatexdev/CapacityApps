@@ -712,12 +712,23 @@ class ProduksiController extends BaseController
         ];
 
         $dataSummary = $this->orderModel->getProdSummary($data);
+        $totalShip = $this->orderModel->getTotalShipment($data);
+        
+        // Debugging to check if $totalShip is an array
+        if (!is_array($totalShip)) {
+            echo "Error: totalShip is not an array!";
+            print_r($totalShip);
+            exit; // Stop execution to debug
+        }
 
         $uniqueData = [];
         foreach ($dataSummary as $item) {
             $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'] . '-' . $item['delivery'];
             if (!isset($uniqueData[$key])) {
                 $uniqueData[$key] = [
+                    'seam' => $item['seam'],
+                    'buyer' => $item['kd_buyer_order'],
+                    'no_order' => $item['no_order'],
                     'machinetypeid' => $item['machinetypeid'],
                     'mastermodel' => $item['mastermodel'],
                     'size' => $item['size'],
@@ -745,6 +756,7 @@ class ProduksiController extends BaseController
             'active6' => '',
             'active7' => '',
             'uniqueData' => $uniqueData,
+            'total_ship' => $totalShip,
             'role' => session()->get('role'),
             'title' => 'Summary Produksi' . $pdk,
             'dataFilter' => $data,

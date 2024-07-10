@@ -319,4 +319,215 @@ class SummaryController extends BaseController
         $writer->save('php://output');
         exit;
     }
+
+    public function excelSummaryPerTod()
+    {
+        $buyer = $this->request->getPost('buyer');
+        $area = $this->request->getPost('area');
+        $jarum = $this->request->getPost('jarum');
+        $pdk = $this->request->getPost('pdk');
+
+        $data = [
+            'buyer' => $buyer,
+            'area' => $area,
+            'jarum' => $jarum,
+            'pdk' => $pdk,
+        ];
+
+        $dataSummary = $this->orderModel->getProdSummary($data);
+        $totalShip = $this->orderModel->getTotalShipment($data);
+        
+        // Debugging to check if $totalShip is an array
+        if (!is_array($totalShip)) {
+            echo "Error: totalShip is not an array!";
+            print_r($totalShip);
+            exit; // Stop execution to debug
+        }
+
+        $uniqueData = [];
+        foreach ($dataSummary as $item) {
+            $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'] . '-' . $item['delivery'];
+            if (!isset($uniqueData[$key])) {
+                $uniqueData[$key] = [
+                    'seam' => $item['seam'],
+                    'buyer' => $item['kd_buyer_order'],
+                    'no_order' => $item['no_order'],
+                    'machinetypeid' => $item['machinetypeid'],
+                    'mastermodel' => $item['mastermodel'],
+                    'size' => $item['size'],
+                    'delivery' => $item['delivery'],
+                    'qty_deliv' => 0,
+                    'running' => 0,
+                    'bruto' => 0,
+                    'ttl_jlmc' => 0,
+                ];
+            }
+            $uniqueData[$key]['qty_deliv'] += $item['qty_deliv'];
+            $uniqueData[$key]['running'] += $item['running'];
+            $uniqueData[$key]['bruto'] += $item['bruto'];
+            $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
+        }
+        // Sort ASC
+        sort($uniqueData);
+
+        // Buat spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // border
+        $styleHeader = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+        $styleBody = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+
+        // Judul
+        $sheet->setCellValue('A1', 'SUMMARY PRODUKSI PER TOD');
+        $sheet->mergeCells('A1:O1');
+        // Mengatur teks menjadi rata tengah dan huruf tebal
+        $sheet->getStyle('A1')->getFont()->setBold(true);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $row_header = 3;
+        // Isi header
+        $sheet->setCellValue('A'.$row_header, 'Seam');
+        $sheet->setCellValue('B'.$row_header, 'Delivery');
+        $sheet->setCellValue('C'.$row_header, 'Sisa Hari');
+        $sheet->setCellValue('D'.$row_header, 'Jln Order');
+        $sheet->setCellValue('E'.$row_header, 'Buyer');
+        $sheet->setCellValue('F'.$row_header, 'No Order');
+        $sheet->setCellValue('G'.$row_header, 'Jarum');
+        $sheet->setCellValue('H'.$row_header, 'No Model');
+        $sheet->setCellValue('I'.$row_header, 'Style');
+        $sheet->setCellValue('J'.$row_header, 'Qty Shipment');
+        $sheet->setCellValue('K'.$row_header, 'Total Shipment');
+        $sheet->setCellValue('L'.$row_header, 'Prod (bruto)');
+        $sheet->setCellValue('M'.$row_header, 'Prod (netto)');
+        $sheet->setCellValue('N'.$row_header, 'Sisa Prod');
+        $sheet->setCellValue('O'.$row_header, 'Sisa Shipment');
+        $sheet->setCellValue('P'.$row_header, '% Prod');
+        $sheet->setCellValue('Q'.$row_header, 'BS Setting');
+        $sheet->setCellValue('R'.$row_header, 'Running');
+        // style untuk header
+        $sheet->getStyle('A'.$row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('B'.$row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('C'.$row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('D'.$row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('E'.$row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('F'.$row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('G'.$row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('H'.$row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('I'.$row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('J'.$row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('K'.$row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('L'.$row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('M'.$row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('N'.$row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('O'.$row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('P'.$row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('Q'.$row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('R'.$row_header)->applyFromArray($styleHeader);
+
+        // Isi data
+        $row = 4;
+        $prevSize = null;
+        foreach ($uniqueData as $key => $id) {
+            $today = date('Y-m-d'); // Get current date in yyyy-mm-dd format
+            $delivery_date = $id['delivery']; // Assuming $id['delivery'] is also in yyyy-mm-dd format
+    
+            // Calculate remaining days
+            $sisa_hari = (strtotime($delivery_date) - strtotime($today)) / (60 * 60 * 24);
+
+            if ($id['size'] != $prevSize) {
+                $sheet->setCellValue('A' . $row, $id['seam']);
+                $sheet->setCellValue('E' . $row, $id['buyer']);
+                $sheet->setCellValue('F' . $row, $id['no_order']);
+                $total_ship_found = false;
+                foreach ($totalShip as $ts) {
+                    if ($ts['mastermodel'] == $id['mastermodel'] && $ts['size'] == $id['size']) {
+                        $total_ship_found = true;
+                        $sheet->setCellValue('K' . $row, number_format($ts['ttl_ship']/24, 2));
+                        break;
+                    }
+                }
+                if (!$total_ship_found) {
+                    $sheet->setCellValue('K' . $row, '0');
+                }
+                $sheet->setCellValue('L' . $row, number_format($id['bruto']/24, 2));
+                $prevSize = $id['size'];
+            } else {
+                $sheet->setCellValue('A' . $row, '');
+                $sheet->setCellValue('E' . $row, '');
+                $sheet->setCellValue('F' . $row, '');
+                $sheet->setCellValue('K' . $row, '');
+                $sheet->setCellValue('L' . $row, '');
+            }
+            $sheet->setCellValue('B' . $row, $id['delivery']);
+            $sheet->setCellValue('C' . $row, $sisa_hari .' days');
+            $sheet->setCellValue('D' . $row, $id['running'].' days');
+            $sheet->setCellValue('G' . $row, $id['machinetypeid']);
+            $sheet->setCellValue('H' . $row, $id['mastermodel']);
+            $sheet->setCellValue('I' . $row, $id['size']);
+            $sheet->setCellValue('J' . $row, number_format($id['qty_deliv']/24, 2));
+            $sheet->setCellValue('M' . $row, '');
+            $sheet->setCellValue('N' . $row, '');
+            $sheet->setCellValue('O' . $row, '');
+            $sheet->setCellValue('P' . $row, '');
+            $sheet->setCellValue('Q' . $row, '');
+            $sheet->setCellValue('R' . $row, $id['ttl_jlmc'].' mc');
+
+            $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('C' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('D' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('E' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('F' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('G' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('H' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('I' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('J' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('K' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('L' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('M' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('N' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('O' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('P' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('Q' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('R' . $row)->applyFromArray($styleBody);
+
+            $row++;
+        }
+
+        // Set judul file dan header untuk download
+        $filename = 'SUMMARY PRODUKSI.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        // Tulis file excel ke output
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
 }

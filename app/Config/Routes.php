@@ -68,6 +68,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
     //summary
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
+    $routes->post('exportSummaryPerTod', 'SummaryController::excelSummaryPerTod');
 
 
     //summary produksi

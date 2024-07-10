@@ -63,7 +63,7 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
-                    <form action="<?= base_url($role . '/summaryProdPerTanggal/'); ?>" method="POST">
+                    <form action="<?= base_url($role . '/summaryProdPerTanggal'); ?>" method="POST">
                         <div class="modal-body align-items-center">
                             <div class="form-group">
                                 <label for="buyer" class="col-form-label">Buyer</label>
