@@ -323,6 +323,12 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->post('editproduksi', 'ProduksiController::editproduksi');
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
 
+    $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
+
+
+    //summary produksi
+    $routes->post('summaryProdPerTanggal', 'ProduksiController::summaryProdPerTanggal');
+    $routes->post('exportSummaryPerTgl', 'SummaryController::excelSummaryPerTgl');
 
 
     // mesin
