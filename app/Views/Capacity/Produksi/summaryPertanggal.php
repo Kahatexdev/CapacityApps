@@ -33,7 +33,7 @@
                             <?= $title ?> 
                         </h5>
                         <div class="col-8 text-end">
-                            <form action="<?= base_url('capacity/exportSummaryPerTgl/') ?>" method="post" ?>
+                            <form action="<?= base_url('capacity/exportSummaryPerTgl') ?>" method="post" ?>
                                 <input type="hidden" class="form-control" name="buyer" value="<?= $dataFilter['buyer'] ?>">
                                 <input type="hidden" class="form-control" name="jarum" value="<?= $dataFilter['jarum'] ?>">
                                 <input type="hidden" class="form-control" name="pdk" value="<?= $dataFilter['pdk'] ?>">
