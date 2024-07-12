@@ -13,7 +13,7 @@
         </script>
     <?php endif; ?>
 
-    <?php if (session()->getFlashdata('error')) : ?>
+     <?php if (session()->getFlashdata('error')) : ?>
         <script>
             $(document).ready(function() {
                 Swal.fire({

@@ -482,7 +482,10 @@ class ProduksiController extends BaseController
                             $kategoriBs = "-" ?? '-';
                             $no_mesin = $data[8] ?? 0;
                             $shift = "-";
-                            $no_box = $data[12];
+                            $shifta = $data[9]??0;
+                            $shiftb = $data[10]??0;
+                            $shiftc = $data[11]??0;
+                            $no_box = $data[12]??0;
                             $no_label = $data[13];
                             $area = session()->get('username');
                             $admin = session()->get('username');
@@ -499,6 +502,9 @@ class ProduksiController extends BaseController
                                 'no_label' => $no_label,
                                 'admin' => $admin,
                                 'shift' => $shift,
+                                'shift_a' => $shifta,
+                                'shift_b' => $shiftb,
+                                'shift_c' => $shiftc,
                                 'no_mesin' => $no_mesin,
                                 'delivery' => $deliv,
                                 'area' => $area
@@ -555,6 +561,10 @@ class ProduksiController extends BaseController
                     $kategoriBs = "-" ?? '-';
                     $no_mesin = $data[8] ?? 0;
                     $shift = "-";
+                    $shifta = $data[9]??0;
+                    $shiftb = $data[10]??0;
+                    $shiftc = $data[11]??0;
+                    $no_box = $data[12]??0;
                     $no_box = $data[12];
                     $no_label = $data[13];
                     $area = session()->get('username');
@@ -572,6 +582,9 @@ class ProduksiController extends BaseController
                         'no_label' => $no_label,
                         'admin' => $admin,
                         'shift' => $shift,
+                        'shift_a' => $shifta,
+                        'shift_b' => $shiftb,
+                        'shift_c' => $shiftc,
                         'no_mesin' => $no_mesin,
                         'delivery' => $delivery,
                         'area' => $area

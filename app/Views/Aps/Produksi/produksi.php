@@ -15,18 +15,7 @@
                             </div>
                         </div>
                         <div class="col-8 text-end">
-                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">
-                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary Produksi
-                            </button>
-                            <a href="<?= base_url($role . '/produksi') ?>" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md">
-                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Import Produksi
-                            </a>
-                            <button type="button" class="btn btn-sm btn-success bg-gradient-warning shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#reset">
-                                <i class="fas fa-trash text-lg opacity-10" aria-hidden="true"></i> Reset PDK Produksi
-                            </button>
-                            <button type="button" class="btn btn-sm btn-success bg-gradient-warning shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#resetarea">
-                                <i class="fas fa-trash text-lg opacity-10" aria-hidden="true"></i> Reset Produksi Area
-                            </button>
+                          
                         </div>
                     </div>
                 </div>

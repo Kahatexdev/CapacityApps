@@ -236,7 +236,8 @@ class ApsPerstyleModel extends Model
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
             ->where('sisa >', 0)
-            ->where('delivery > DATE_ADD(NOW(), INTERVAL 7 DAY)', null, false) // Add 7 days to current date
+            ->where('delivery > NOW()', null, false) // Add 7 days to current date
+           // ->where('delivery > DATE_ADD(NOW(), INTERVAL 7 DAY)', null, false) // Add 7 days to current date
             ->groupBy(['delivery', 'mastermodel'])
             ->findAll();
     }
