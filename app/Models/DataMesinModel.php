@@ -301,4 +301,37 @@ class DataMesinModel extends Model
 
         return $query;
     }
+    public function jarumPerArea(){
+        $query = $this->select('area, jarum, SUM(total_mc) AS total_mc, SUM(mesin_jalan) AS mesin_jalan, SUM(total_mc) - SUM(mesin_jalan) as mesin_mati, pu')
+        ->groupBy('pu, area, jarum')
+        ->orderBy('pu ASC, SUBSTRING(AREA, 3) + 0 ASC, AREA ASC')
+        ->findAll();
+
+    // Array untuk menyimpan hasil akhir
+    $formattedData = [];
+
+    foreach ($query as $row) {
+        $area = strtoupper($row['area']);
+        $jarum = strtolower($row['jarum']);
+
+        // Jika area belum ada di array, tambahkan dengan array kosong
+        if (!isset($formattedData[$area])) {
+            $formattedData[$area] = [
+                'totalmc' => 0
+            ];
+        }
+
+        // Tambahkan total_mc untuk jarum tertentu
+        if (!isset($formattedData[$area][$jarum])) {
+            $formattedData[$area][$jarum] = 0;
+        }
+
+        $formattedData[$area][$jarum] += $row['total_mc'];
+
+        // Tambahkan total_mc untuk area
+        $formattedData[$area]['totalmc'] += $row['total_mc'];
+    }
+
+    return $formattedData;
+    }
 }

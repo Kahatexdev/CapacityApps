@@ -7,8 +7,7 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',
-                    text: '<?= session()->getFlashdata('success') ?>',
-                });
+                    text: '<?= session()->getFlashdata('success') ?>',});
             });
         </script>
     <?php endif; ?>
