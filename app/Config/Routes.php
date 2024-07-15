@@ -174,6 +174,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetail/$1');
 
+
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
     $routes->get('dataprogress', 'ProduksiController::progressData');
@@ -233,6 +234,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('pickmachine/(:any)', 'PlanningController::pickmachine/$1');
     $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetailAps/$1');
+
 
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');

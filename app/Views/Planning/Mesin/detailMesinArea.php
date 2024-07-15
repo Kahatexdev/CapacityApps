@@ -46,6 +46,35 @@
                     </div>
                 </div>
                 <div class="card-body p-3">
+                    <div class="row mb-3">
+                      <h6>
+                        Capacity Mesin Per Area for a week
+                      </h6>
+                        <?php foreach ($capacity as $cp => $key): ?>
+                        <div class="col-lg-4 mb-3">
+                            <strong>
+                                <?=$key['jarum']?>
+                            </strong>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                   Maximum Capacity 
+                                </div>
+                                <div class="col-lg-6">
+                                    : <?=$key['max']?> dz
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                   Available Capacity 
+                                </div>
+                                <div class="col-lg-6">
+                                    : 2139012dz
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach;?>
+
+                    </div>
                     <div class="row">
                         <div class="table-responsive">
                             <table id="dataTable" class="display compact striped" style="width:100%">

@@ -160,10 +160,10 @@
                             <div class="col-4 text-end">
                                 <?php if (stripos($ar, 'KK8J') !== false || stripos($ar, '13G') !== false) : ?>
 
-                                    <a href="<?= base_url($role . '/detailproduksi/' . $ar) ?>" class="btn btn-info btn-sm"> <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i> Details</a>
+                                    <a href="<?= base_url($role . '/datamesinperarea/' . $ar) ?>" class="btn btn-info btn-sm"> <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i> Details</a>
 
                                 <?php else : ?>
-                                    <a href="<?= base_url($role . '/detailproduksi/' . $ar) ?>" class="btn btn-info btn-sm"> <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i> Details</a>
+                                    <a href="<?= base_url($role . '/datamesinperarea/' . $ar) ?>" class="btn btn-info btn-sm"> <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i> Details</a>
                                 <?php endif; ?>
                             </div>
 
@@ -187,18 +187,8 @@
                                 <p>
                                     Total Mesin : <?= $key['totalmc'] ?>
                                 </p>
-                                <div class="col-lg-6">
-                                    Mesin data per jarum
-                                     <ul>
-                                        <?php foreach ($key as $jarum => $total) : ?>
-                                            <?php if ($jarum !== 'totalmc') : ?>
-                                                <li><?= $jarum ?>: <?= $total ?></li>
-                                            <?php endif; ?>
-                                        <?php endforeach; ?>
-                                    </ul>
-                               </div>
-                                <div class="col-lg-6"></div>
-                        </div>
+                                
+             </div>
               </div>
                 </div>
 

@@ -440,9 +440,11 @@ class MesinController extends BaseController
     }
     public function DetailMesinPerAreaPlan($area)
     {
+        $capacity = $this->jarumModel->getCapacityArea($area);
         $tampilperarea = $this->jarumModel->getJarumArea($area);
         $getPU = $this->jarumModel->getpu($area);
         $data = [
+            'capacity'=>$capacity,
             'role' => session()->get('role'),
             'title' => 'Data Mesin',
             'active1' => '',
