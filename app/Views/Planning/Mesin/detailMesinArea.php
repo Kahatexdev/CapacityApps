@@ -38,6 +38,7 @@
                                 <i class="fas fa-plus-circle me-2 text-lg opacity-10"></i>
                                 Input Data Machine
                             </button>
+                           
 
                             <a href="<?= base_url($role . '/mesinperarea/' . $pu) ?>" class="btn bg-gradient-dark">
                                 <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
@@ -46,35 +47,7 @@
                     </div>
                 </div>
                 <div class="card-body p-3">
-                    <div class="row mb-3">
-                      <h6>
-                        Capacity Mesin Per Area for a week
-                      </h6>
-                        <?php foreach ($capacity as $cp => $key): ?>
-                        <div class="col-lg-4 mb-3">
-                            <strong>
-                                <?=$key['jarum']?>
-                            </strong>
-                            <div class="row">
-                                <div class="col-lg-6">
-                                   Maximum Capacity 
-                                </div>
-                                <div class="col-lg-6">
-                                    : <?=$key['max']?> dz
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-6">
-                                   Available Capacity 
-                                </div>
-                                <div class="col-lg-6">
-                                    : 2139012dz
-                                </div>
-                            </div>
-                        </div>
-                        <?php endforeach;?>
-
-                    </div>
+                  
                     <div class="row">
                         <div class="table-responsive">
                             <table id="dataTable" class="display compact striped" style="width:100%">
@@ -86,7 +59,7 @@
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Brand</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Machine Running</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Machine Not Running</th>
-                                        <th colspan=2 class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
+                                        <th colspan=3 class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -98,11 +71,20 @@
                                             <td class="text-sm"><?= $order['brand']; ?></td>
                                             <td class="text-sm"><?= $order['total_mc'] - $order['mesin_jalan']; ?> Mc</td>
                                             <td class="text-sm"><?= $order['mesin_jalan']; ?> Mc</td>
+                                             <td class="text-sm">
+                                                <form action="<?=base_url($role.'/capacityperarea/'.$area)?>" method="post">
+                                                    <input type="text" name="jarum" value="<?= $order['jarum']; ?>" hidden>
+                                                <button type="submit" class="btn btn-info btn-sm ?>">
+                                                    Cek Kapasitas
+                                                </button>
+                                                </form>
+                                            </td>
                                             <td class="text-sm">
                                                 <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['id_data_mesin']; ?>" data-area="<?= $order['area']; ?>" data-total="<?= $order['total_mc']; ?>" data-jarum="<?= $order['jarum']; ?>" data-mc-jalan="<?= $order['mesin_jalan']; ?>" data-brand="<?= $order['brand']; ?>" data-pu="<?= $order['pu']; ?>">
                                                     Edit
                                                 </button>
                                             </td>
+                                           
                                             <td>
                                                 <button type="button" class="btn btn-danger btn-sm delete-btn" data-toggle="modal" data-target="#ModalDelete" data-id="<?= $order['id_data_mesin']; ?>">
                                                     Delete
@@ -135,8 +117,11 @@
 
             </div>
         </div>
+        <div class="row">
+        <?= $this->renderSection('capacity'); ?>
+        </div>
         <div class="modal fade" id="ModalEdit" tabindex="-1" role="dialog" aria-labelledby="modalEdit" aria-hidden="true">
-            <div class="modal-dialog   role=" document">
+            <div class="modal-dialog"   role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Edit Data Machine</h5>
@@ -292,6 +277,31 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade  bd-example-modal-lg" id="ModalCapacity" tabindex="-1" role="dialog" aria-labelledby="modalCapacity" aria-hidden="true">
+            <div class="modal-dialog  modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Pilih Jarum</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="" method="post">
+                        <select name="jarum" id="jarum" class='form-control'>Pilih
+                        <?php foreach($tampildata as $jarum):?>
+                        <option value="<?=$jarum['jarum']?>"><?=$jarum['jarum']?></option>
+                        <?php endforeach;?>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-info">Pilih</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <!-- <script>
             function valildasi() {
@@ -382,6 +392,11 @@
                     $('#ModalDelete').find('form').attr('action', '<?= base_url($role . '/deletemesinareal/') ?>' + id);
                     $('#ModalDelete').find('input[name="id_data_mesin"]').val(id);
                     $('#ModalDelete').modal('show'); // Show the modal
+                });
+                $('.btn-capacity').click(function() {
+                    var area = $(this).data('area');
+                    $('#ModalCapacity').find('form').attr('action', '<?= base_url($role . '/capacityperarea/') ?>' + area);               
+                    $('#ModalCapacity').modal('show'); // Show the modal
                 });
 
             });

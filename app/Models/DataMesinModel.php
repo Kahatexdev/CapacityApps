@@ -334,52 +334,18 @@ class DataMesinModel extends Model
 
     return $formattedData;
     }
-    public function getCapacityArea($area){
-        $today = date('Y-m-d'); 
-        $nextWeek = date('Y-m-d', strtotime('+7 days'));
-        $maxDays =  date('Y-m-d', strtotime('+90 days'));
-
-        $mesin= $this->select('sum(total_mc) as total, jarum')
-        ->where('area',$area)
-        ->groupby('jarum')
-        ->findAll();
-
-        $avail = $this->db->table('apsperstyle')
-        ->select('mastermodel,, machinetypeid, factory, delivery,SUM(sisa/24) as sisa, smv, ')
-        ->where('factory', $area)
-        ->where('sisa >', 0)
-        ->where('delivery >', $nextWeek)
-        ->where('delivery <', $maxDays)
-        ->groupBy('machinetypeid, mastermodel')
-        ->get()
-        ->getResultArray();
-
-        foreach ($avail as &$row) {
-                $sisa = round($row['sisa']);
-                $smv = ceil((86400 / ($row['smv'] * 0.8)) / 24);
-
-                $deliveryDate = new DateTime($row['delivery']);
-                $todayDate = new DateTime($today);
-                $interval = $todayDate->diff($deliveryDate);
-                $days = $interval->days;
-                $minleadtime = $days-7;
-                $mesin = $sisa / $minleadtime / $smv;
-                $produksiPerhari = $smv*$mesin;
-                
-                $row['target'] = $smv;
-                $row['days'] = $days;
-                $row['leadtime'] = $days-7;
-                $row['mesin'] = ceil($mesin);
-                $row['produksiperhari'] =ceil( $produksiPerhari);
-        }
-        dd($avail);
-        $maxCapacity=[];
-        foreach($mesin as $mc){
-            $mcn= $mc['total'];
-            $jarum = $mc['jarum'];
-            $max = $mcn * 7*14;
-            $maxCapacity [$jarum]=['max'=> $max,'jarum'=>$jarum];
-        }
-        return $maxCapacity;
+    public function maxCapacity($area,$jarum){
+       $totalmc= $this->select('sum(total_mc) as total')->where('area',$area)->where('jarum',$jarum)->first();
+       $maxCapacity = $totalmc['total']*7*14;
+       $data =['totalmesin'=>$totalmc['total'],
+                'maxCapacity'=>$maxCapacity];
+       return $data;
     }
+    public function getCapacityArea($area,$jarum){
+        $today=date('Y-m-d');
+        $maxDay= strtotime('+90 Days');
+
+   
+    }
+    
 }

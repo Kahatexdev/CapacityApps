@@ -158,6 +158,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('stockcylinder', 'MesinController::stockcylinderPlan');
     $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarumPlan/$1/$2');
     $routes->get('datamesinperarea/(:any)', 'MesinController::DetailMesinPerAreaPlan/$1');
+    $routes->post('capacityperarea/(:any)', 'MesinController::capacityperarea/$1');
     $routes->post('deletemesinareal/(:any)', 'MesinController::deletemesinarealPlan/$1');
     $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarumPlan/$1');
     $routes->post('tambahmesinperarea', 'MesinController::inputmesinperareaPlan');

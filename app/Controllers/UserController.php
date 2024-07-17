@@ -50,6 +50,7 @@ class UserController extends BaseController
             'title' => 'Dashboard',
             'active1' => 'active',
             'active2' => '',
+            'active3' => '',
             'targetProd' => 0,
             'produksiBulan' => 0,
             'produksiHari' => 0
@@ -65,6 +66,7 @@ class UserController extends BaseController
             'role' => session()->get('role'),
             'title' => 'Dashboard',
             'active1' => '',
+            'active3' => '',
             'active2' => 'active',
             'targetProd' => 0,
             'produksiBulan' => 0,

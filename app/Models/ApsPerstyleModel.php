@@ -291,4 +291,18 @@ class ApsPerstyleModel extends Model
             ->where('idapsperstyle', $pr['idapsperstyle'])
             ->update();
     }
+    public function CapacityArea($area,$jarum){
+        $today = date('Y-m-d');
+        $maxDeliv = date('Y-m-d',strtotime('+90 Days'));
+
+        return $this->select('mastermodel,sum(sisa)as sisa,delivery,smv')
+        ->where('factory',$area)
+        ->where('machinetypeid',$jarum)
+        ->where('sisa >',0)
+        ->where('delivery <',$maxDeliv)
+        ->where('delivery >',$today)
+        ->groupBy('machinetypeid, mastermodel')
+        ->get()
+      ->getResultArray();
+    }
 }
