@@ -77,4 +77,18 @@ class UserController extends BaseController
         ];
         return view(session()->get('role') . '/produksi', $data);
     }
+    public function bssetting(){
+        
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Dashboard',
+            'active1' => '',
+            'active3' => 'active',
+            'active2' => '',
+            'targetProd' => 0,
+     
+
+        ];
+        return view(session()->get('role') . '/bssetting', $data);
+    }
 }

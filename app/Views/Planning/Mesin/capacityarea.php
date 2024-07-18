@@ -36,7 +36,7 @@
                         </h5>
                         <div class="row">
                             <div class="col-lg-4"> Maximum Capacity</div>
-                            <div class="col-lg-6">: <?=$headerData['maxCapacity']?> dz</div>
+                            <div class="col-lg-6">: <?=$max?> dz</div>
                         </div>
                         <div class="row">
                             <div class="col-lg-4"> Total Mesin</div>
@@ -71,36 +71,105 @@
             </div>
 
             <div class="card mt-2">
-            <div class="card-header">
+                <div class="card-header">
 
-            </div>
+                 </div>
             <div class="card-body">
                 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Minggu</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Available Capacity</th>
-                <th>Available Machines</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($weeklyAvailableCapacity as $week => $capacity): ?>
+            <table class="table table-bordered">
+            <thead>
                 <tr>
-                    <td>Week <?= $week ?></td>
-                    <td><?= $calendar[$week][0] ?? 'N/A' ?></td>
-                    <td><?= $calendar[$week][6] ?? 'N/A' ?></td>
-                    <td><?= $capacity ?> dz</td>
-                    <td><?= ceil( $weeklyAvailableMachines[$week]) ?></td>
+                    <th>Week</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Available Capacity</th>
+                    <th>Available Machines</th>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-            </div>
-        </div>
+            </thead>
+            <tbody>
+                <?php
+                foreach ($availableCapacity as $week => $capacity) {
+                    $startDate = $calendar[$week][0] ?? 'N/A';
+                    $endDate = end($calendar[$week]) ?? 'N/A';
+                    ?>
+                    <tr>
+                        <td>Week <?= $week ?></td>
+                        <td><?= $startDate ?></td>
+                        <td><?= $endDate ?></td>
+                        <td><?= $capacity ?></td>
+                        <td><?=ceil( $availableMachines[$week]) ?></td>
+                    </tr>
+                <?php } ?>
+            </tbody>
+        </table>
+                </div>
+                </div>
+                <div class="card">
+                <div class="card-header">
 
+                    <h2>Order Production per Week</h2>
+                </div>
+               
+        <?php foreach ($orderWeek as $order): ?>
+            <div class="card-body">
+                    
+                
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>PDK</th>
+                    <th>Sisa</th>
+                    <th>Leadtime</th>
+                    <th>Target Per Mesin</th>
+                    <th>Produksi</th>
+                    <th>Kebutuhan Mesin</th>
+                </tr>
+            </thead>
+            <tbody>
+                    <tr>
+                        <td><?= $order['PDK'] ?></td>
+                        <td><?= $order['sisa'] ?></td>
+                        <td><?= $order['leadtime'] ?></td>
+                        <td><?= $order['targetPerMesin'] ?></td>
+                        <td><?= $order['produksi'] ?></td>
+                        <td><?= ceil($order['kebMesin'] )?></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Hari</th>
+                                        <th>Tanggal</th>
+                                        <th>Produksi</th>
+                                        <th>Kebutuhan Mesin</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($order['produksiHarian'] as $produksiHarian): ?>
+                                        <tr>
+                                            <td><?= $produksiHarian['hari'] ?></td>
+                                            <td>
+                                                <?php
+                                                $currentWeek = floor(($produksiHarian['hari'] - 1) / 7) + $startWeek;
+                                                $dayIndex = ($produksiHarian['hari'] - 1) % 7;
+                                                echo $calendar[$currentWeek][$dayIndex] ?? 'N/A';
+                                                ?>
+                                            </td>
+                                            <td><?= $produksiHarian['produksi'] ?></td>
+                                            <td><?= ceil($produksiHarian['kebMesin'] )?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <?php endforeach; ?>
+                </div>
+            </div>
+            
         </div>
 
       

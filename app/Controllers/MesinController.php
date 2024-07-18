@@ -553,124 +553,131 @@ class MesinController extends BaseController
 
         return view(session()->get('role') . '/Mesin/detailMesinJarum', $data);
     }
-    public function capacityperarea($area){
-        $today = new DateTime();
-        $jarum = $this->request->getPost('jarum');
-        $listjarum = $this->jarumModel->getJarumByArea($area);
-        $maxCapacity = $this->jarumModel->maxCapacity($area, $jarum);
-        $capacity = $this->ApsPerstyleModel->CapacityArea($area, $jarum);
-    
-        $orderWeek = [];
-        $totalProduksi = 0;
-        $totalKebMesin = 0;
-        $weeklyProduction = [];
-        $weeklyMachines = [];
-        $calendar = [];
-    
-        // Initialize the calendar with null values
-        $currentDate = clone $today;
-        $startWeek = (int)$currentDate->format("W");
-    
-        // Fill the calendar with dates
-        while ($currentDate <= (clone $today)->modify("+90 days")) {
-            $weekOfYear = (int)$currentDate->format("W");
-            if (!isset($calendar[$weekOfYear])) {
-                $calendar[$weekOfYear] = array_fill(0, 7, null);
-            }
-            for ($i = 0; $i < 7; $i++) {
-                if ($calendar[$weekOfYear][$i] === null) {
-                    $calendar[$weekOfYear][$i] = $currentDate->format("Y-m-d");
-                    $currentDate->modify("+1 day");
-                }
-            }
+    public function capacityperarea($area)
+{
+    $today = new DateTime();
+    $today->setTime(0, 0);  // Ensuring the time is set to midnight
+    $jarum = $this->request->getPost('jarum');
+    $listjarum = $this->jarumModel->getJarumByArea($area);
+    $maxCapacity = $this->jarumModel->maxCapacity($area, $jarum);
+    $capacity = $this->ApsPerstyleModel->CapacityArea($area, $jarum);
+
+    $orderWeek = [];
+    $totalProduksi = 0;
+    $totalKebMesin = 0;
+    $calendar = [];
+    $startWeek = 1;
+
+    // Creating the calendar starting from today
+    $currentDate = clone $today;
+    $firstWeekDays = [];
+    $dayOfWeek = (int)$currentDate->format('N'); // Day of the week (1 for Monday, 7 for Sunday)
+
+    // Fill the first week starting from today
+    for ($day = $dayOfWeek; $day <= 7; $day++) {
+        $firstWeekDays[] = $currentDate->format('Y-m-d');
+        $currentDate->modify('+1 day');
+    }
+    $calendar[$startWeek] = $firstWeekDays;
+
+    // Generate subsequent weeks from Monday to Sunday
+    for ($week = $startWeek + 1; $week <= 12; $week++) {
+        $weekDays = [];
+        for ($day = 1; $day <= 7; $day++) {
+            $weekDays[] = $currentDate->format('Y-m-d');
+            $currentDate->modify('+1 day');
         }
-    
-        foreach ($capacity as $row) {
-            $sisa = ceil($row['sisa']/24);
-            $deliveryDate = new DateTime($row['delivery']);
-            $time = $today->diff($deliveryDate);
-            $leadtime = $time->days;
-    
-            // SMV adalah target per hari untuk setiap mesin
-            $targetPerMesin = ceil((86400 / ($row['smv'] * 0.8)) / 24);
-            $kebMesin = ceil($sisa / ($leadtime * $targetPerMesin));
-            $produksi = $targetPerMesin * $kebMesin;
-    
-            $totalProduksi += $produksi;
-            $totalKebMesin += $kebMesin;
-    
-            $orderWeek[] = [
-                'PDK' => $row['mastermodel'],
-                'sisa' => $sisa,
-                'leadtime' => $leadtime,
-                'targetPerMesin' => $targetPerMesin,
-                'produksi' => $produksi,
+        $calendar[$week] = $weekDays;
+    }
+
+    // Initialize weekly production and machines array
+    $weeklyProduction = array_fill($startWeek, 12, 0);
+    $weeklyMachines = array_fill($startWeek, 12, 0);
+
+    foreach ($capacity as $row) {
+        $smv = $row['smv'];
+        $targetPerMesin = ceil((86400 / ($smv * 0.8)) / 24);
+        $sisa = ceil($row['sisa']/24);
+        $deliveryDate = new DateTime($row['delivery']);
+        $time = $today->diff($deliveryDate);
+        $leadtime = max($time->days, 1);  // Ensuring leadtime is at least 1 to avoid division by zero
+
+        // Calculate weekly production and machine needs
+        $kebMesin = ceil($sisa / ($leadtime * $targetPerMesin));
+        $produksi = $targetPerMesin * $kebMesin;
+
+        $totalProduksi += $produksi;
+        $totalKebMesin += $kebMesin;
+
+        $produksiHarian = [];
+        $sisaOrder = $sisa;
+
+        for ($i = 0; $i < $leadtime; $i++) {
+            if ($sisaOrder <= 0) {
+                break;
+            }
+            // $produksiHariIni = min($targetPerMesin, $sisaOrder);
+            $produksiHariIni = $produksi;
+            $sisaOrder -= $produksiHariIni;
+            $produksiHarian[] = [
+                'hari' => $i + 1,
+                'produksi' => $produksiHariIni,
                 'kebMesin' => $kebMesin
             ];
-    
-            // Menghitung produksi harian dan penggunaan mesin harian
-            $produksiHarian = [];
-            $sisaOrder = $sisa;
-            for ($i = 0; $i < $leadtime; $i++) {
-                if ($sisaOrder <= 0) {
-                    break;
-                }
-    
-                $produksiHariIni = min($targetPerMesin, $sisaOrder);
-                $sisaOrder -= $produksiHariIni;
-                $produksiHarian[] = [
-                    'hari' => $i + 1,
-                    'produksi' => $produksiHariIni,
-                    'kebMesin' => $produksiHariIni > 0 ? $kebMesin : 0
-                ];
-    
-                // Menghitung produksi mingguan
-                $currentWeek = floor($i / 7) + $startWeek;
-                if (!isset($weeklyProduction[$currentWeek])) {
-                    $weeklyProduction[$currentWeek] = 0;
-                    $weeklyMachines[$currentWeek] = 0;
-                }
-                $weeklyProduction[$currentWeek] += $produksiHariIni;
-                $weeklyMachines[$currentWeek] += $produksiHariIni > 0 ? $kebMesin : 0;
-            }
-    
-            $orderWeek[count($orderWeek) - 1]['produksiHarian'] = $produksiHarian;
+
+            // Menghitung produksi mingguan
+            $currentWeek = floor($i / 7) + $startWeek;
+            $weeklyProduction[$currentWeek] += $produksiHariIni;
+            $weeklyMachines[$currentWeek] += $kebMesin;
         }
-    
-        $weeklyAverageMachines = [];
-        foreach ($weeklyMachines as $week => $totalMachines) {
-            $weeklyAverageMachines[$week] = $totalMachines / 7;
-        }
-    
-        $weeklyAvailableCapacity = [];
-        $weeklyAvailableMachines = [];
-        foreach ($weeklyProduction as $week => $production) {
-            $weeklyAvailableCapacity[$week] = $maxCapacity['maxCapacity'] - $production;
-            $weeklyAvailableMachines[$week] = $maxCapacity['totalmesin'] - $weeklyAverageMachines[$week];
-        }
-    
+
+        $orderWeek[] = [
+            'PDK' => $row['mastermodel'],
+            'sisa' => $sisa,
+            'leadtime' => $leadtime,
+            'targetPerMesin' => $targetPerMesin,
+            'produksi' => $produksi,
+            'kebMesin' => $kebMesin,
+            'produksiHarian' => $produksiHarian
+        ];
+    }
+
+    // Calculate max capacity per week
+    $maxCapacityPerWeek = $maxCapacity['totalmesin'] * 7 * $targetPerMesin;
+    // Calculate available capacity per week
+    $availableCapacity = [];
+    foreach ($weeklyProduction as $week => $production) {
+        $availableCapacity[$week] = $maxCapacityPerWeek - $production;
+    }
+
+    // Calculate available machines per week
+    $availableMachines = [];
+    foreach ($weeklyMachines as $week => $machines) {
+        $averageMachinesUsed = $machines / 7;
+        $availableMachines[$week] = $maxCapacity['totalmesin'] - $averageMachinesUsed;
+    }
         $tampilperarea = $this->jarumModel->getJarumArea($area);
         $getPU = $this->jarumModel->getpu($area);
         $data = [
-            'role' => session()->get('role'),
-            'title' => 'Data Mesin',
-            'active1' => '',
-            'active2' => '',
-            'active3' => '',
-            'active4' => 'active',
-            'active5' => '',
-            'active6' => '',
-            'active7' => '',
-            'listjarum' => $listjarum,
-            'area' => $area,
-            'jarum' => $jarum,
-            'headerData' => $maxCapacity,
-            'orderWeek' => $orderWeek,
-            'weeklyAvailableCapacity' => $weeklyAvailableCapacity,
-            'weeklyAvailableMachines' => $weeklyAvailableMachines,
-            'calendar' => $calendar,
-            'totalProduksi' => $totalProduksi,
-            'totalKebMesin' => $totalKebMesin,
+           'role' => session()->get('role'),
+        'title' => 'Data Mesin',
+        'active1' => '',
+        'active2' => '',
+        'active3' => '',
+        'active4' => '',
+        'active5' => 'active',
+        'active6' => '',
+        'active7' => '',
+        'listjarum' => $listjarum,
+        'area' => $area,
+        'jarum' => $jarum,
+        'max'=>$maxCapacityPerWeek,
+        'headerData' => $maxCapacity,
+        'orderWeek' => $orderWeek,
+        'weeklyProduction' => $weeklyProduction,
+        'calendar' => $calendar,
+        'availableMachines' => $availableMachines,
+        'availableCapacity' => $availableCapacity,
             'pu' => $getPU,
             'jarum' => $jarum,
             'tampildata' => $tampilperarea,
@@ -680,6 +687,5 @@ class MesinController extends BaseController
         return view(session()->get('role') . '/Mesin/capacityarea', $data);
     }
     
-
     
 }
