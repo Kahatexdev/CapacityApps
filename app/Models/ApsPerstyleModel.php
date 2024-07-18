@@ -292,7 +292,7 @@ class ApsPerstyleModel extends Model
             ->update();
     }
     public function CapacityArea($area,$jarum){
-        $today = date('Y-m-d');
+        $today = date('Y-m-d',strtotime('+1 Days'));
         $maxDeliv = date('Y-m-d',strtotime('+90 Days'));
 
         return $this->select('mastermodel,sum(sisa)as sisa,delivery,smv')

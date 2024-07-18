@@ -75,36 +75,7 @@
 
             </div>
             <div class="card-body">
-            <h2>Produksi Harian</h2>
-    <?php foreach ($orderWeek as $order): ?>
-        <h3>PDK: <?= $order['PDK'] ?></h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Hari</th>
-                    <th>Tanggal</th>
-                    <th>Produksi</th>
-                    <th>Kebutuhan Mesin</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($order['produksiHarian'] as $produksiHarian): ?>
-                    <tr>
-                        <td><?= $produksiHarian['hari'] ?></td>
-                        <td>
-                            <?php
-                                $currentWeek = floor(($produksiHarian['hari'] - 1) / 7) + $startWeek;
-                                $dayIndex = ($produksiHarian['hari'] - 1) % 7;
-                                echo $calendar[$currentWeek][$dayIndex] ?? 'N/A';
-                            ?>
-                        </td>
-                        <td><?= $produksiHarian['produksi'] ?></td>
-                        <td><?= $produksiHarian['kebMesin'] ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    <?php endforeach; ?>
+                
     <table class="table">
         <thead>
             <tr>
