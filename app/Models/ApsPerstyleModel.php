@@ -237,7 +237,7 @@ class ApsPerstyleModel extends Model
             ->where('machinetypeid', $jarum)
             ->where('sisa >', 0)
             ->where('delivery > NOW()', null, false) // Add 7 days to current date
-           // ->where('delivery > DATE_ADD(NOW(), INTERVAL 7 DAY)', null, false) // Add 7 days to current date
+            // ->where('delivery > DATE_ADD(NOW(), INTERVAL 7 DAY)', null, false) // Add 7 days to current date
             ->groupBy(['delivery', 'mastermodel'])
             ->findAll();
     }
@@ -291,18 +291,26 @@ class ApsPerstyleModel extends Model
             ->where('idapsperstyle', $pr['idapsperstyle'])
             ->update();
     }
-    public function CapacityArea($area,$jarum){
-        $today = date('Y-m-d',strtotime('+1 Days'));
-        $maxDeliv = date('Y-m-d',strtotime('+90 Days'));
+    public function CapacityArea($area, $jarum)
+    {
+        $today = date('Y-m-d', strtotime('+1 Days'));
+        $maxDeliv = date('Y-m-d', strtotime('+90 Days'));
 
         return $this->select('mastermodel,sum(sisa)as sisa,delivery,smv')
-        ->where('factory',$area)
-        ->where('machinetypeid',$jarum)
-        ->where('sisa >',0)
-        ->where('delivery <',$maxDeliv)
-        ->where('delivery >',$today)
-        ->groupBy('machinetypeid, mastermodel')
-        ->get()
-      ->getResultArray();
+            ->where('factory', $area)
+            ->where('machinetypeid', $jarum)
+            ->where('sisa >', 0)
+            ->where('delivery <', $maxDeliv)
+            ->where('delivery >', $today)
+            ->groupBy('machinetypeid, mastermodel')
+            ->get()
+            ->getResultArray();
+    }
+    public function getIdBs($validate)
+    {
+        return $this->select('idapsperstyle, delivery, sisa')
+            ->where('mastermodel', $validate['no_model'])
+            ->where('size', $validate['style'])
+            ->first();
     }
 }

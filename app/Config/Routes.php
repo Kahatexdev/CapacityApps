@@ -264,6 +264,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('bssetting', 'UserController::bssetting');
     // $routes->post('importproduksi', 'ProduksiController::importproduksi');
     $routes->post('importproduksi', 'ProduksiController::importproduksinew');
+    $routes->post('importbssetting', 'ProduksiController::importbssetting');
 });
 
 // sudo
