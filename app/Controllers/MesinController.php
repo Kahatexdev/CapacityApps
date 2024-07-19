@@ -555,6 +555,7 @@ class MesinController extends BaseController
     }
     public function capacityperarea($area)
 {
+    $targetInput = $this->request->getPost('target');
     $today = new DateTime();
     $today->setTime(0, 0);  // Ensuring the time is set to midnight
     $jarum = $this->request->getPost('jarum');
@@ -643,7 +644,7 @@ class MesinController extends BaseController
     }
 
     // Calculate max capacity per week
-    $maxCapacityPerWeek = $maxCapacity['totalmesin'] * 7 * $targetPerMesin;
+    $maxCapacityPerWeek = $maxCapacity['totalmesin'] * 7 * $targetInput;
     // Calculate available capacity per week
     $availableCapacity = [];
     foreach ($weeklyProduction as $week => $production) {

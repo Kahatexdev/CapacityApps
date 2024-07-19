@@ -72,12 +72,12 @@
                                             <td class="text-sm"><?= $order['total_mc'] - $order['mesin_jalan']; ?> Mc</td>
                                             <td class="text-sm"><?= $order['mesin_jalan']; ?> Mc</td>
                                              <td class="text-sm">
-                                                <form action="<?=base_url($role.'/capacityperarea/'.$area)?>" method="post">
-                                                    <input type="text" name="jarum" value="<?= $order['jarum']; ?>" hidden>
-                                                <button type="submit" class="btn btn-info btn-sm ?>">
+                                             
+                                                   
+                                                <button type="button" class="btn btn-capacity btn-info btn-sm ?>" data-jarum="<?= $order['jarum']; ?>">
                                                     Cek Kapasitas
                                                 </button>
-                                                </form>
+                                           
                                             </td>
                                             <td class="text-sm">
                                                 <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['id_data_mesin']; ?>" data-area="<?= $order['area']; ?>" data-total="<?= $order['total_mc']; ?>" data-jarum="<?= $order['jarum']; ?>" data-mc-jalan="<?= $order['mesin_jalan']; ?>" data-brand="<?= $order['brand']; ?>" data-pu="<?= $order['pu']; ?>">
@@ -281,18 +281,15 @@
             <div class="modal-dialog  modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Pilih Jarum</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Input Target</h5>
                         <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <form action="" method="post">
-                        <select name="jarum" id="jarum" class='form-control'>Pilih
-                        <?php foreach($tampildata as $jarum):?>
-                        <option value="<?=$jarum['jarum']?>"><?=$jarum['jarum']?></option>
-                        <?php endforeach;?>
-                        </select>
+                       <input type="text" name="jarum" id="jarum" class="form-control">
+                       <input type="number" name="target" id="target" class="form-control" placeholder="Masukan target">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
@@ -395,7 +392,10 @@
                 });
                 $('.btn-capacity').click(function() {
                     var area = $(this).data('area');
-                    $('#ModalCapacity').find('form').attr('action', '<?= base_url($role . '/capacityperarea/') ?>' + area);               
+                     var jarum = $(this).data('jarum');
+                    $('#ModalCapacity').find('form').attr('action', '<?= base_url($role . '/capacityperarea/') ?>' + area);         
+                    $('#ModalCapacity').find('input[name="jarum"]').val(jarum);
+
                     $('#ModalCapacity').modal('show'); // Show the modal
                 });
 

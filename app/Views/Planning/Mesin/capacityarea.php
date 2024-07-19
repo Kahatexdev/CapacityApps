@@ -53,6 +53,7 @@
                                 <option value="<?=$jrm?>"><?=$jrm?></option>
                                 <?php endforeach;?>
                                 </select>
+                                <input type="number" name="target" id="" class="form-control" placeholder="target">
                           </div>
                                
                         <div class="col-lg-12 mt-2">
