@@ -393,7 +393,7 @@
                 $('.btn-capacity').click(function() {
                     var area = $(this).data('area');
                      var jarum = $(this).data('jarum');
-                    $('#ModalCapacity').find('form').attr('action', '<?= base_url($role . '/capacityperarea/') ?>' + area);         
+                    $('#ModalCapacity').find('form').attr('action', '<?= base_url($role . '/capacityperarea/'.$area )?>');         
                     $('#ModalCapacity').find('input[name="jarum"]').val(jarum);
 
                     $('#ModalCapacity').modal('show'); // Show the modal
