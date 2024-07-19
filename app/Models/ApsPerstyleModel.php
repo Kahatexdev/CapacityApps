@@ -65,8 +65,10 @@ class ApsPerstyleModel extends Model
     }
     public function detailModel($noModel, $delivery)
     {
-        return $this->where('mastermodel', $noModel)
+        return $this->select('idapsperstyle,mastermodel,no_order,country, smv, sum(sisa) as sisa, sum(qty) as qty, machinetypeid,size,delivery,seam,factory')
+             ->where('mastermodel', $noModel)
             ->where('delivery', $delivery)
+            ->groupby('size, machinetypeid')
             ->findAll();
     }
     public function detailModelJarum($noModel, $delivery, $jarum)

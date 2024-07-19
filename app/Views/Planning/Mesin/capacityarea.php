@@ -53,6 +53,7 @@
                                 <option value="<?=$jrm?>"><?=$jrm?></option>
                                 <?php endforeach;?>
                                 </select>
+                                <input type="number" name="target" id="" class="form-control" placeholder="target">
                           </div>
                                
                         <div class="col-lg-12 mt-2">
@@ -76,31 +77,28 @@
                  </div>
             <div class="card-body">
                 
-            <table class="table table-bordered">
-            <thead>
+            <table class="table">
+        <thead>
+            <tr>
+                <th>Week</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Available Capacity</th>
+                <th>Available Machines</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($calendar as $weekData): ?>
                 <tr>
-                    <th>Week</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th>Available Capacity</th>
-                    <th>Available Machines</th>
+                    <td><?= $weekData['week'] ?></td>
+                    <td><?= $weekData['start_date'] ?></td>
+                    <td><?= $weekData['end_date'] ?></td>
+                    <td><?= $weekData['available_capacity'] ?></td>
+                    <td><?= ceil($weekData['available_machines']) ?></td>
                 </tr>
-            </thead>
-            <tbody>
-                <?php
-                foreach ($availableCapacity as $week => $capacity) {
-                    $startDate = $calendar[$week][0] ?? 'N/A';
-                    $endDate = end($calendar[$week]) ?? 'N/A';
-                    ?>
-                    <tr>
-                        <td>Week <?= $week ?></td>
-                        <td><?= $startDate ?></td>
-                        <td><?= $endDate ?></td>
-                        <td><?= $capacity ?></td>
-                        <td><?=ceil( $availableMachines[$week]) ?></td>
-                    </tr>
-                <?php } ?>
-            </tbody>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
         </table>
                 </div>
                 </div>

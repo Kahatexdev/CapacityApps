@@ -555,6 +555,7 @@ class MesinController extends BaseController
     }
     public function capacityperarea($area)
 {
+    $targetInput = $this->request->getPost('target');
     $today = new DateTime();
     $today->setTime(0, 0);  // Ensuring the time is set to midnight
     $jarum = $this->request->getPost('jarum');
@@ -572,6 +573,8 @@ class MesinController extends BaseController
     $currentDate = clone $today;
     $firstWeekDays = [];
     $dayOfWeek = (int)$currentDate->format('N'); // Day of the week (1 for Monday, 7 for Sunday)
+    $currentMonth = $currentDate->format('m');  // Track the current month
+    $weekInMonth = 1;  // Initialize week counter for the current month
 
     // Fill the first week starting from today
     for ($day = $dayOfWeek; $day <= 7; $day++) {
@@ -587,7 +590,15 @@ class MesinController extends BaseController
             $weekDays[] = $currentDate->format('Y-m-d');
             $currentDate->modify('+1 day');
         }
+
+        // Check if month has changed
+        if ($currentDate->format('m') !== $currentMonth) {
+            $currentMonth = $currentDate->format('m');
+            $weekInMonth = 1;  // Reset week counter for the new month
+        }
+
         $calendar[$week] = $weekDays;
+        $weekInMonth++;
     }
 
     // Initialize weekly production and machines array
@@ -597,7 +608,7 @@ class MesinController extends BaseController
     foreach ($capacity as $row) {
         $smv = $row['smv'];
         $targetPerMesin = ceil((86400 / ($smv * 0.8)) / 24);
-        $sisa = ceil($row['sisa']/24);
+        $sisa = ceil($row['sisa'] / 24);
         $deliveryDate = new DateTime($row['delivery']);
         $time = $today->diff($deliveryDate);
         $leadtime = max($time->days, 1);  // Ensuring leadtime is at least 1 to avoid division by zero
@@ -616,7 +627,6 @@ class MesinController extends BaseController
             if ($sisaOrder <= 0) {
                 break;
             }
-            // $produksiHariIni = min($targetPerMesin, $sisaOrder);
             $produksiHariIni = $produksi;
             $sisaOrder -= $produksiHariIni;
             $produksiHarian[] = [
@@ -643,7 +653,7 @@ class MesinController extends BaseController
     }
 
     // Calculate max capacity per week
-    $maxCapacityPerWeek = $maxCapacity['totalmesin'] * 7 * $targetPerMesin;
+    $maxCapacityPerWeek = $maxCapacity['totalmesin'] * 7 * $targetInput;
     // Calculate available capacity per week
     $availableCapacity = [];
     foreach ($weeklyProduction as $week => $production) {
@@ -656,10 +666,38 @@ class MesinController extends BaseController
         $averageMachinesUsed = $machines / 7;
         $availableMachines[$week] = $maxCapacity['totalmesin'] - $averageMachinesUsed;
     }
-        $tampilperarea = $this->jarumModel->getJarumArea($area);
-        $getPU = $this->jarumModel->getpu($area);
-        $data = [
-           'role' => session()->get('role'),
+
+    // Menambahkan format minggu dengan bulan
+    $formattedCalendar = [];
+    $weekCounter = 1;
+    $lastMonth = '';
+
+    foreach ($calendar as $weekNum => $days) {
+        $startOfWeek = new DateTime($days[0]);
+        $endOfWeek = new DateTime(end($days));
+        $startMonth = $startOfWeek->format('F');
+
+        if ($startMonth !== $lastMonth) {
+            $weekCounter = 1;
+            $lastMonth = $startMonth;
+        }
+
+        $weekLabel = 'Week ' . $weekCounter . ' ' . $startMonth;
+        $weekCounter++;
+
+        $formattedCalendar[] = [
+            'week' => $weekLabel,
+            'start_date' => $startOfWeek->format('Y-m-d'),
+            'end_date' => $endOfWeek->format('Y-m-d'),
+            'available_capacity' => $availableCapacity[$weekNum],
+            'available_machines' => $availableMachines[$weekNum]
+        ];
+    }
+
+    $tampilperarea = $this->jarumModel->getJarumArea($area);
+    $getPU = $this->jarumModel->getpu($area);
+    $data = [
+        'role' => session()->get('role'),
         'title' => 'Data Mesin',
         'active1' => '',
         'active2' => '',
@@ -671,21 +709,30 @@ class MesinController extends BaseController
         'listjarum' => $listjarum,
         'area' => $area,
         'jarum' => $jarum,
-        'max'=>$maxCapacityPerWeek,
+        'max' => $maxCapacityPerWeek,
         'headerData' => $maxCapacity,
         'orderWeek' => $orderWeek,
         'weeklyProduction' => $weeklyProduction,
-        'calendar' => $calendar,
+        'calendar' => $formattedCalendar,
         'availableMachines' => $availableMachines,
         'availableCapacity' => $availableCapacity,
-            'pu' => $getPU,
-            'jarum' => $jarum,
-            'tampildata' => $tampilperarea,
-            'startWeek' => $startWeek
-        ];
-    
-        return view(session()->get('role') . '/Mesin/capacityarea', $data);
+        'pu' => $getPU,
+        'jarum' => $jarum,
+        'tampildata' => $tampilperarea,
+        'startWeek' => $startWeek
+    ];
+
+    return view(session()->get('role') . '/Mesin/capacityarea', $data);
+}
+
+    public function recomendationarea(){
+        $model= $this->request->getPost("pdk");
+        $deliv = $this->request->getPost("deliv");
+        $start = $this->request->getPost("start");
+        $stop = $this->request->getPost("stop");
+
+        $pdk=0;
+
     }
-    
     
 }

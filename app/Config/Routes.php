@@ -150,6 +150,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('splitarea', 'PlanningController::splitarea');
     $routes->post('editarea', 'PlanningController::editarea');
     $routes->post('assignarealall', 'PlanningController::assignarealall');
+    $routes->post('recomendationarea', 'MesinController::recomendationarea');
 
     // mesin
     $routes->get('datamesin', 'MesinController::indexPlan');
