@@ -66,21 +66,21 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($tampildata as $order) : ?>
+                            <?php foreach ($tampildata as $order=>$key) : ?>
                                 <tr>
-                                    <td class="text-xs"><?= $order->created_at; ?></td>
-                                    <td class="text-xs"><?= $order->kd_buyer_order; ?></td>
-                                    <td class="text-xs"><?= $order->no_model; ?></td>
-                                    <td class="text-xs"><?= $order->product_type; ?></td>
-                                    <td class="text-xs"><?= $order->description; ?></td>
-                                    <td class="text-xs"><?= $order->seam; ?></td>
-                                    <td class="text-xs"><?= $order->leadtime; ?></td>
-                                    <td class="text-xs"><?= $order->delivery; ?></td>
-                                    <td class="text-xs"><?= $order->qty; ?></td>
-                                    <td class="text-xs"><?= $order->sisa; ?></td>
+                                    <td class="text-xs"><?= $key['created_at'] ?></td>
+                                    <td class="text-xs"><?= $key['kd_buyer_order'] ?></td>
+                                    <td class="text-xs"><?= $key['no_model'] ?></td>
+                                    <td class="text-xs"><?= $key['product_type'] ?></td>
+                                    <td class="text-xs"><?= $key['description'] ?></td>
+                                    <td class="text-xs"><?= $key['seam'] ?></td>
+                                    <td class="text-xs"><?= $key['sisahari'] ?> days</td>
+                                    <td class="text-xs"><?= $key['delivery'] ?></td>
+                                    <td class="text-xs"><?= $key['qty'] ?> pcs</td>
+                                    <td class="text-xs"><?= $key['sisa'] ?> pcs</td>
                                     <td class="text-xs">
-                                        <!-- If qty is not null, set action to Details -->
-                                        <a href="<?= base_url($role . '/detailModelPlanning/' . $order->no_model . '/' . $order->delivery); ?>" <button type="button" class="btn btn-info btn-sm details-btn">
+                                   
+                                        <a href="<?= base_url($role . '/detailModelPlanning/' . $key['no_model'] . '/' . $key['delivery']); ?>" <button type="button" class="btn btn-info btn-sm details-btn">
                                             Details
                                             </button>
                                         </a>
