@@ -728,11 +728,14 @@ class MesinController extends BaseController
     public function recomendationarea(){
         $model= $this->request->getPost("pdk");
         $deliv = $this->request->getPost("deliv");
+        $delivery = strtotime($deliv);
+        $tanggal = date('Y-m-d', $delivery);
         $start = $this->request->getPost("start");
         $stop = $this->request->getPost("stop");
 
-        $pdk=0;
+        $pdk=$this->ApsPerstyleModel->getSisaPerJarum($model,$tanggal);
+        dd($pdk);
 
-    }
+    }   
     
 }

@@ -65,7 +65,7 @@ class ApsPerstyleModel extends Model
     }
     public function detailModel($noModel, $delivery)
     {
-        return $this->select('idapsperstyle,mastermodel,no_order,country, smv, sum(sisa) as sisa, sum(qty) as qty, machinetypeid,size,delivery,seam,factory')
+        return $this->select('idapsperstyle,mastermodel,no_order,country, smv, sum(sisa) as sisa, sum(qty) as qty, machinetypeid,size,delivery,seam,factory,production_unit')
              ->where('mastermodel', $noModel)
             ->where('delivery', $delivery)
             ->groupby('size, machinetypeid')
@@ -314,5 +314,13 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $validate['no_model'])
             ->where('size', $validate['style'])
             ->first();
+    }
+    public function getSisaPerJarum($model,$tanggal){
+       return $this->select('sum(sisa) as sisa, machinetypeid')
+         ->where('mastermodel',$model)
+        // ->where('delivery', $tanggal)
+        ->where ('sisa >', 0)
+        ->groupby('machinetypeid')
+        ->findAll();
     }
 }

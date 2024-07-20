@@ -295,7 +295,7 @@ error_reporting(E_ALL); ?>
                     <div class="modal-body">
                         <form action="<?= base_url($role . '/recomendationarea') ?>" method="post">
                             <input type="text" name="pdk" id="" hidden value="" >
-                            <input type="date" name="deliv" id=""hidden  value="" >
+                            <input type="text" name="deliv" id=""hidden  value="" >
                             
                             <div class="form-group">
                             </div>
