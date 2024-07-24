@@ -294,7 +294,7 @@ error_reporting(E_ALL); ?>
                     </div>
                     <div class="modal-body">
                         <form action="<?= base_url($role . '/recomendationarea') ?>" method="post">
-                            <input type="text" name="pdk" id="" hidden value="" >
+                            <input type="text" name="pdk" id="" hidden value="<?=$noModel?>" >
                             <input type="text" name="deliv" id=""hidden  value="" >
                             
                             <div class="form-group">
@@ -377,7 +377,7 @@ error_reporting(E_ALL); ?>
                     var deliv = $(this).data('delivery');
                     $('#recomendModal').modal('show'); // Show the modal
                    
-                    $('#recomendModal').find('input[name="pdk"]').val(pdk);
+                
                     $('#recomendModal').find('input[name="deliv"]').val(deliv);
                 });
             });

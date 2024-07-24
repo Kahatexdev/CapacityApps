@@ -1,0 +1,8 @@
+{
+    "editor.formatOnSave": true,
+    "notebook.formatOnSave.enabled": true,
+    "php.validate.run": "onType",
+    "notebook.codeActionsOnSave": {
+        
+    }
+}

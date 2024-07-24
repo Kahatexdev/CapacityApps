@@ -734,8 +734,22 @@ class MesinController extends BaseController
         $stop = $this->request->getPost("stop");
 
         $pdk=$this->ApsPerstyleModel->getSisaPerJarum($model,$tanggal);
-        dd($pdk);
-
+        $maxCapacity=[];
+        $sisaOrder=[];
+        foreach ($pdk as $perjarum){
+            $jarum = $perjarum['machinetypeid'];
+            $sisaOrder[$jarum]= $this->ApsPerstyleModel->getSisaOrderforRec($jarum,$start,$stop );          
+        }
+      foreach($sisaOrder as $jarum => $props){
+        foreach($props as $val){
+            $sisa =$val['sisa']/24;
+            $startMc = new DateTime ($start);
+            $deliv = new DateTime($val['delivery']);
+            $time = $startMc->diff($deliv);
+            $leadtime = $time->days;
+            dd($leadtime);
+        }
+      }
     }   
     
 }

@@ -341,6 +341,7 @@ class DataMesinModel extends Model
                 'maxCapacity'=>$maxCapacity];
        return $data;
     }
+    
     public function getCapacityArea($area,$jarum){
         $today=date('Y-m-d');
         $maxDay= strtotime('+90 Days');
