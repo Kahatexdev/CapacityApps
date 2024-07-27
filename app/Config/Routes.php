@@ -77,7 +77,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
     //timter produksi
     $routes->post('timterProduksi', 'ProduksiController::timterProduksi');
-    $routes->post('exportTimter', 'timterController::excelTimter');
+    $routes->post('exportTimter', 'TimterController::excelTimter');
 
 
     // mesin
