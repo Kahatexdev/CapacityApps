@@ -290,4 +290,16 @@ class ApsPerstyleModel extends Model
             ->where('idapsperstyle', $pr['idapsperstyle'])
             ->update();
     }
+    public function getDataTimter($data)
+    {
+        $this->select('data_model.kd_buyer_order, mastermodel,no_order')
+            ->join('data_model', ' data_model.no_model = apsperstyle.mastermodel', 'LEFT')
+            ->where('apsperstyle.machinetypeid', $data['jarum'])
+            ->where('apsperstyle.factory', $data['area']);
+        if (!empty($data['pdk'])) {
+            $this->where('apsperstyle.mastermodel', $data['pdk']);
+        }
+        return $this->groupBy('mastermodel')
+            ->findAll();
+    }
 }
