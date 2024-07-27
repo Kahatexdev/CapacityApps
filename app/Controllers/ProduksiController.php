@@ -482,7 +482,10 @@ class ProduksiController extends BaseController
                             $kategoriBs = "-" ?? '-';
                             $no_mesin = $data[8] ?? 0;
                             $shift = "-";
-                            $no_box = $data[12];
+                            $shifta = $data[9] ?? 0;
+                            $shiftb = $data[10] ?? 0;
+                            $shiftc = $data[11] ?? 0;
+                            $no_box = $data[12] ?? 0;
                             $no_label = $data[13];
                             $area = session()->get('username');
                             $admin = session()->get('username');
@@ -499,6 +502,9 @@ class ProduksiController extends BaseController
                                 'no_label' => $no_label,
                                 'admin' => $admin,
                                 'shift' => $shift,
+                                'shift_a' => $shifta,
+                                'shift_b' => $shiftb,
+                                'shift_c' => $shiftc,
                                 'no_mesin' => $no_mesin,
                                 'delivery' => $deliv,
                                 'area' => $area
@@ -555,6 +561,10 @@ class ProduksiController extends BaseController
                     $kategoriBs = "-" ?? '-';
                     $no_mesin = $data[8] ?? 0;
                     $shift = "-";
+                    $shifta = $data[9] ?? 0;
+                    $shiftb = $data[10] ?? 0;
+                    $shiftc = $data[11] ?? 0;
+                    $no_box = $data[12] ?? 0;
                     $no_box = $data[12];
                     $no_label = $data[13];
                     $area = session()->get('username');
@@ -572,6 +582,9 @@ class ProduksiController extends BaseController
                         'no_label' => $no_label,
                         'admin' => $admin,
                         'shift' => $shift,
+                        'shift_a' => $shifta,
+                        'shift_b' => $shiftb,
+                        'shift_c' => $shiftc,
                         'no_mesin' => $no_mesin,
                         'delivery' => $delivery,
                         'area' => $area
@@ -857,5 +870,100 @@ class ProduksiController extends BaseController
         } else {
             return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Gagal Update Sisa Order');
         }
+    }
+
+    public function importbssetting()
+    {
+        $file = $this->request->getFile('excel_file');
+        ini_set('memory_limit', '512M');
+        set_time_limit(180);
+
+        $file = $this->request->getFile('excel_file');
+        if ($file->isValid() && !$file->hasMoved()) {
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
+            $worksheet = $spreadsheet->getActiveSheet();
+
+            $startRow = 10; // Ganti dengan nomor baris mulai
+            $batchSize = 15; // Ukuran batch
+            $batchData = [];
+            $failedRows = []; // Array untuk menyimpan informasi baris yang gagal
+            $db = \Config\Database::connect();
+
+            foreach ($worksheet->getRowIterator($startRow) as $row) {
+                $rowIndex = $row->getRowIndex();
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+                $data = ['role' => session()->get('role'),];
+                foreach ($cellIterator as $cell) {
+                    $data[] = $cell->getValue();
+                }
+
+                if (!empty($data)) {
+                    $batchData[] = ['rowIndex' => $rowIndex, 'data' => $data];
+                    // Process batch
+                    if (count($batchData) >= $batchSize) {
+                        $this->prossesBs($batchData, $db, $failedRows);
+                        $batchData = []; // Reset batch data
+                    }
+                }
+            }
+
+            // Process any remaining data
+            if (!empty($batchData)) {
+                $this->prossesBs($batchData, $db, $failedRows);
+            }
+
+            // Prepare notification message for failed rows
+            if (!empty($failedRows)) {
+                $failedRowsStr = implode(', ', $failedRows);
+                $errorMessage = "Baris berikut gagal diimpor: $failedRowsStr";
+                return redirect()->to(base_url(session()->get('role') . '/produksi'))->with('error', $errorMessage);
+            }
+
+            return redirect()->to(base_url(session()->get('role') . '/produksi'))->withInput()->with('success', 'Data Berhasil di Import');
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/produksi'))->with('error', 'No data found in the Excel file');
+        }
+    }
+    private function prossesBs($batchData, $db, &$failedRows)
+    {
+        $db->transStart();
+        foreach ($batchData as $batchItem) {
+            $rowIndex = $batchItem['rowIndex'];
+            $data = $batchItem['data'];
+
+            try {
+                $no_model = $data[2];
+                $style = $data[3];
+                $validate = [
+                    'no_model' => $no_model,
+                    'style' => $style
+                ];
+                $idAps = $this->ApsPerstyleModel->getId($validate);
+                if (!$idAps) {
+                    if ($data[0] == null) {
+                        continue; // Skip empty rows
+                    } else {
+                        $failedRows[] = "style tidak ditemukan" . $rowIndex;
+                        continue;
+                    }
+                } else {
+                    $id = $idAps['idapsperstyle'];
+                    $sisaOrder = $idAps['sisa'];
+                    $qtyerp = $data[14];
+                    $qty = str_replace('-', '', $qtyerp);
+                    $sisaQty = $sisaOrder + $qty;
+
+                    $updateBs = $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
+                    if (!$updateBs) {
+                        $failedRows[] = $rowIndex;
+                        continue;
+                    }
+                }
+            } catch (\Exception $e) {
+                $failedRows[] = $rowIndex;
+            }
+        }
+        $db->transComplete();
     }
 }

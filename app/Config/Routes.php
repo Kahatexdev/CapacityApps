@@ -154,6 +154,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('splitarea', 'PlanningController::splitarea');
     $routes->post('editarea', 'PlanningController::editarea');
     $routes->post('assignarealall', 'PlanningController::assignarealall');
+    $routes->post('recomendationarea', 'MesinController::recomendationarea');
 
     // mesin
     $routes->get('datamesin', 'MesinController::indexPlan');
@@ -162,6 +163,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('stockcylinder', 'MesinController::stockcylinderPlan');
     $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarumPlan/$1/$2');
     $routes->get('datamesinperarea/(:any)', 'MesinController::DetailMesinPerAreaPlan/$1');
+    $routes->post('capacityperarea/(:any)', 'MesinController::capacityperarea/$1');
     $routes->post('deletemesinareal/(:any)', 'MesinController::deletemesinarealPlan/$1');
     $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarumPlan/$1');
     $routes->post('tambahmesinperarea', 'MesinController::inputmesinperareaPlan');
@@ -177,6 +179,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('pickmachine/(:any)', 'PlanningController::pickmachine/$1');
     $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetail/$1');
+
 
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
@@ -238,6 +241,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetailAps/$1');
 
+
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
     $routes->get('dataprogress', 'ProduksiController::progressData');
@@ -262,8 +266,10 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
 $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('', 'UserController::produksi');
     $routes->get('produksi', 'UserController::produksi');
+    $routes->get('bssetting', 'UserController::bssetting');
     // $routes->post('importproduksi', 'ProduksiController::importproduksi');
     $routes->post('importproduksi', 'ProduksiController::importproduksinew');
+    $routes->post('importbssetting', 'ProduksiController::importbssetting');
 });
 
 // sudo

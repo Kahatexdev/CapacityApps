@@ -7,12 +7,13 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',
-                    text: '<?= session()->getFlashdata('success') ?>',});
+                    text: '<?= session()->getFlashdata('success') ?>',
+                });
             });
         </script>
     <?php endif; ?>
 
-     <?php if (session()->getFlashdata('error')) : ?>
+    <?php if (session()->getFlashdata('error')) : ?>
         <script>
             $(document).ready(function() {
                 Swal.fire({
@@ -30,7 +31,7 @@
                 <div class="card pb-0">
                     <div class="card-header d-flex justify-content-between">
                         <h5>
-                            Import Data Produksi
+                            Import BS Setting
                         </h5>
                     </div>
                     <div class="card-body">
@@ -52,7 +53,7 @@
                         <div class="row">
                             <div class="col-12 pl-0">
 
-                                <form action="<?= base_url('sudo/importproduksi') ?>" method="post" enctype="multipart/form-data">
+                                <form action="<?= base_url('user/importbssetting') ?>" method="post" enctype="multipart/form-data">
                                     <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control mx-3">
                                     <button type="submit" class="btn btn-info btn-block w-100 mx-3"> Simpan</button>
                                 </form>
@@ -65,111 +66,19 @@
         </div>
 
     </div>
-    <div class="row">
-        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
 
-            <div class="card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between">
-                        <h5>
-                            Data Pdk
-                        </h5>
-                    </div>
-                </div>
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="table-responsive">
-                            <table id="dataTable" class="display  striped" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">PDK</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Produksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($pdk as $order) : ?>
-                                        <tr>
-                                            <td class="text-sm"><?= $order['mastermodel']; ?></td>
-                                            <td class="text-sm"><?= $order['totalqty']; ?></td>
-                                            <td class="text-sm"><?= $order['totalsisa']; ?></td>
-                                            <td class="text-sm"><?= $order['totalproduksi']; ?></td>
-
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-
-                        </div>
-                    </div>
-
-
-
-                </div>
-
-
-            </div>
-
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
-
-            <div class="card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between">
-                        <h5>
-                            Data Produksi Harian
-                        </h5>
-                    </div>
-                </div>
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="table-responsive">
-                            <table id="dataTable0" class="display  striped" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal Produksi</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">QTY Upload</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Area</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($produksi as $prd) : ?>
-                                        <tr>
-                                            <td class="text-sm"><?= $prd['tgl_produksi']; ?></td>
-                                            <td class="text-sm"><?= $prd['qty']; ?></td>
-                                            <td class="text-sm"><?= $prd['admin']; ?></td>
-
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-
-                        </div>
-                    </div>
-
-
-
-                </div>
-
-
-            </div>
-        </div>
-    </div>
 
 
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#dataTable').DataTable({});
         $('#dataTable0').DataTable({
             "order": [
                 [0, "desc"]
             ]
         });
+        $('#dataTable').DataTable({});
 
         // Trigger import modal when import button is clicked
         $('.import-btn').click(function() {

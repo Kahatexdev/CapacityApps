@@ -139,7 +139,7 @@
         </div>
     </div>
     <div class="row">
-        <?php foreach ($Area as $ar) : ?>
+        <?php foreach ($jarum as $ar => $key) : ?>
 
             <div class="col-xl-6 col-sm-3 mb-xl-0 mb-4 mt-2">
 
@@ -148,22 +148,22 @@
                         <div class="row">
                             <div class="col-8">
                                 <div class="numbers">
-                                    <?php if (stripos($ar['area'], "Gedung") !== false) : ?>
-                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Majalaya <?= $ar['area'] ?></p>
+                                    <?php if (stripos($ar, "Gedung") !== false) : ?>
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Majalaya <?= $ar ?></p>
                                     <?php else : ?>
-                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Status Mesin <?= $ar['area'] ?></p>
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Status Mesin <?= $ar ?></p>
                                     <?php endif; ?>
                                     <h5 class="font-weight-bolder mb-0">
                                     </h5>
                                 </div>
                             </div>
                             <div class="col-4 text-end">
-                                <?php if (stripos($ar['area'], 'KK8J') !== false || stripos($ar['area'], '13G') !== false) : ?>
+                                <?php if (stripos($ar, 'KK8J') !== false || stripos($ar, '13G') !== false) : ?>
 
-                                    <a href="<?= base_url($role . '/detailproduksi/' . $ar['area']) ?>" class="btn btn-info btn-sm"> <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i> Details</a>
+                                    <a href="<?= base_url($role . '/datamesinperarea/' . $ar) ?>" class="btn btn-info btn-sm"> <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i> Details</a>
 
                                 <?php else : ?>
-                                    <a href="<?= base_url($role . '/detailproduksi/' . $ar['area']) ?>" class="btn btn-info btn-sm"> <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i> Details</a>
+                                    <a href="<?= base_url($role . '/datamesinperarea/' . $ar) ?>" class="btn btn-info btn-sm"> <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i> Details</a>
                                 <?php endif; ?>
                             </div>
 
@@ -174,15 +174,22 @@
                             <div class="col-lg-12 col-md-12">
 
                                 <div class="chart">
-                                    <canvas id="<?= $ar['area'] ?>-chart" class="chart-canvas" height="300"></canvas>
+                                    <canvas id="<?= $ar ?>-chart" class="chart-canvas" height="300"></canvas>
                                 </div>
-                                <p>
-                                    Total Mesin : <?= $ar['total_mc'] ?>
-                                </p>
+                              
                             </div>
 
                         </div>
+                       
                     </div>
+              <div class="card-footer">
+              <div class="row">
+                                <p>
+                                    Total Mesin : <?= $key['totalmc'] ?>
+                                </p>
+                                
+             </div>
+              </div>
                 </div>
 
             </div>
@@ -322,20 +329,34 @@
     });
 </script>
 <script>
-    let mesin = <?php echo json_encode($Area); ?>;
+    let area = <?php echo json_encode($jarum); ?>;
     // console.log(data1)
-    for (const key in mesin) {
-        const value = mesin[key]
-        var mcjalan = value.mesin_jalan
-        var mcmati = value.mesin_mati
-        var totalmc = value.total_mc
-        var area = value.area
-        var ctx4 = document.getElementById(area + "-chart").getContext("2d");
+    for (const key in area) {
+        const value = area[key];
+        const jarumLabels = [];
+        const totalMcData = [];
+        
+        // Looping untuk setiap jarum dalam area
+        for (const jarum in value) {
+            if (jarum !== 'totalmc') { // Skip totalmc field
+                jarumLabels.push(jarum);
+                totalMcData.push(value[jarum]);
+            }
+        }
+        
+        // Membuat elemen canvas untuk setiap chart
+        var canvasId = key + "-chart";
+        var canvas = document.createElement('canvas');
+        canvas.id = canvasId;
+        document.body.appendChild(canvas);
+        
+        var ctx4 = document.getElementById(canvasId).getContext("2d");
 
+        // Membuat pie chart
         new Chart(ctx4, {
             type: "pie",
             data: {
-                labels: ['Mesin Jalan', 'Mesin Mati'],
+                labels: jarumLabels,
                 datasets: [{
                     label: "Projects",
                     weight: 9,
@@ -343,8 +364,8 @@
                     tension: 0.9,
                     pointRadius: 2,
                     borderWidth: 2,
-                    backgroundColor: ['#17c1e8', '#c0c0c0 '],
-                    data: [mcjalan, mcmati],
+                    backgroundColor: ['#17c1e8', '#c0c0c0', '#dfc731','#113367','#dc346c','#aa579f','#4c325c'],
+                    data: totalMcData,
                     fill: false
                 }],
             },
