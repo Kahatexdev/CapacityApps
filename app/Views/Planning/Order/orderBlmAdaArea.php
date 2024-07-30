@@ -66,7 +66,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($tampildata as $order=>$key) : ?>
+                            <?php foreach ($tampildata as $order => $key) : ?>
                                 <tr>
                                     <td class="text-xs"><?= $key['created_at'] ?></td>
                                     <td class="text-xs"><?= $key['kd_buyer_order'] ?></td>
@@ -76,10 +76,10 @@
                                     <td class="text-xs"><?= $key['seam'] ?></td>
                                     <td class="text-xs"><?= $key['sisahari'] ?> days</td>
                                     <td class="text-xs"><?= $key['delivery'] ?></td>
-                                    <td class="text-xs"><?= $key['qty'] ?> pcs</td>
-                                    <td class="text-xs"><?= $key['sisa'] ?> pcs</td>
+                                    <td class="text-xs"><?= ceil($key['qty'] / 24) ?> dz</td>
+                                    <td class="text-xs"><?= ceil($key['sisa'] / 24) ?> dz</td>
                                     <td class="text-xs">
-                                   
+
                                         <a href="<?= base_url($role . '/detailModelPlanning/' . $key['no_model'] . '/' . $key['delivery']); ?>" <button type="button" class="btn btn-info btn-sm details-btn">
                                             Details
                                             </button>

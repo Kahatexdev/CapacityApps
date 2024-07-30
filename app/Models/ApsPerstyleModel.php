@@ -328,7 +328,7 @@ class ApsPerstyleModel extends Model
     public function getSisaOrderforRec($jarum, $start, $stop)
     {
         $maxDeliv = date('Y-m-d', strtotime($start . '+90 Days'));
-        return $this->select('sum(sisa) as sisa, machinetypeid, mastermodel,factory, delivery')
+        return $this->select('idapsperstyle,sum(sisa) as sisa, machinetypeid, mastermodel,factory, delivery')
             ->where('delivery >', $start)
             ->where('machinetypeid', $jarum)
             ->where('sisa >', 0)
