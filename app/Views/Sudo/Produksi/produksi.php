@@ -214,8 +214,12 @@
                                 <input type="text" class="form-control" name="area" required>
                             </div>
                             <div class="form-group">
-                                <label for="awal">Tanggal Input Produksi</label>
-                                <input type="date" class="form-control" name="tgl_produksi">
+                                <label for="awal">Awal</label>
+                                <input type="date" class="form-control" name="awal" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="awal">Akhir</label>
+                                <input type="date" class="form-control" name="akhir" required>
                             </div>
 
                     </div>

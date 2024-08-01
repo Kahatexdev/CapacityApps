@@ -626,19 +626,55 @@ class ProduksiController extends BaseController
     public function resetproduksiarea()
     {
         $area = $this->request->getPost('area');
-        $tgl_produksi = $this->request->getPost('tgl_produksi');
+        $awal = $this->request->getPost('awal');
+        $akhir = $this->request->getPost('akhir');
 
-        $produksi = $this->produksiModel->getDataForReset($area, $tgl_produksi);
+        $produksi = $this->produksiModel->getDataForReset($area, $awal, $akhir);
+        $errorMessages = [];
+        $totalProcessed = 0;
+        $totalErrors = 0;
+
+        // Set batch size
+        $batchSize = 100;
+        $batchCounter = 0;
+
         foreach ($produksi as $pr) {
-            $idProduksi = $pr['id_produksi'];
-            $qtyproduksi = $pr['qty_produksi'];
-            $idaps = $pr['idapsperstyle'];
-            $sisaOrder = $this->ApsPerstyleModel->getSisaOrder($idaps);
-            $setSisa = $qtyproduksi + $sisaOrder;
-            $this->ApsPerstyleModel->update($idaps, ['sisa' => $setSisa]);
-            $this->produksiModel->delete($idProduksi);
+            try {
+                $idProduksi = $pr['id_produksi'];
+                $qtyproduksi = $pr['qty_produksi'];
+                $idaps = $pr['idapsperstyle'];
+                $sisaOrder = $this->ApsPerstyleModel->getSisaOrder($idaps);
+                $setSisa = $qtyproduksi + $sisaOrder;
+
+                // Update 'sisa' di tabel ApsPerstyle
+                $this->ApsPerstyleModel->update($idaps, ['sisa' => $setSisa]);
+
+                // Hapus data produksi
+                $this->produksiModel->delete($idProduksi);
+
+                $totalProcessed++;
+            } catch (\Exception $e) {
+                // Simpan pesan error jika terjadi
+                $errorMessages[] = "Error processing ID: $idProduksi - " . $e->getMessage();
+                $totalErrors++;
+            }
+
+            $batchCounter++;
+
+            // Kalau sudah mencapai batch size, simpan checkpoint dan lanjut ke batch berikutnya
+            if ($batchCounter >= $batchSize) {
+                // Reset batch counter
+                $batchCounter = 0;
+                // Di sini lo bisa simpan ke log atau lakukan tindakan lain kalau perlu
+            }
         }
-        return redirect()->to(base_url(session()->get('role') . '/produksi'))->withInput()->with('success', 'Data Berhasil di reset');
+
+        // Redirect dengan pesan sukses atau error
+        if ($totalErrors > 0) {
+            return redirect()->to(base_url(session()->get('role') . '/dataproduksi'))->withInput()->with('error', "Data berhasil di reset sebagian. $totalErrors data tidak terproses.");
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/dataproduksi'))->withInput()->with('success', 'Semua data berhasil di reset');
+        }
     }
     public function summaryProdPerTanggal()
     {

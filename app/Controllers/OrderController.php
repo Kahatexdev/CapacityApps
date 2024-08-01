@@ -13,6 +13,7 @@ use App\Models\AreaModel;
 use App\Models\ProduksiModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use DateTime;
+
 class OrderController extends BaseController
 {
     protected $filters;
@@ -743,17 +744,16 @@ class OrderController extends BaseController
 
     public function orderBlmAdaAreal()
     {
-   
+
         $tampilperdelivery = $this->orderModel->tampilPerModelBlmAdaArea();
-        foreach($tampilperdelivery as &$key){
+        foreach ($tampilperdelivery as &$key) {
             $delivery = new DateTime($key['delivery']);
             $ayeuna = new DateTime(); // Assuming $today is already set as $ayeuna
-            
+
             $sisahari = $ayeuna->diff($delivery)->days;
             $key['sisahari'] = $sisahari;
-           
         }
-    
+
         $product = $this->productModel->findAll();
         $data = [
             'role' => session()->get('role'),
