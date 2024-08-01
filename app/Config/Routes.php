@@ -251,6 +251,10 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('produksi', 'ProduksiController::produksi');
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
 
+    // deffect
+    $routes->get('datadeffect', 'ProduksiController::dataDeffect');
+
+
     $routes->get('planningmesin', 'ApsController::planningmesin');
     $routes->post('fetch_jarum', 'ApsController::fetch_jarum');
     $routes->post('SimpanJudul', 'ApsController::saveplanningmesin');
