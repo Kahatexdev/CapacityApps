@@ -36,9 +36,9 @@ error_reporting(E_ALL); ?>
                             Detail Data Model <?= $noModel ?> Delivery <?= date('d-M-Y', strtotime($delivery)) ?>
                         </h5>
                         <div>
-                            <button type="button" class="btn bg-gradient-success btn-recomend" data-model=" <?= $noModel ?>" data-delivery=" <?= $delivery ?>"  data-toggle="modal" data-target="#ModalRecomend"> Area Recomendation</button>
+                            <button type="button" class="btn bg-gradient-success btn-recomend" data-model=" <?= $noModel ?>" data-delivery=" <?= $delivery ?>" data-toggle="modal" data-target="#ModalRecomend"> Area Recomendation</button>
                             <button type="button" class="btn bg-gradient-warning btn-assign" data-toggle="modal" data-target="#ModalAssign"> Arahkan Ke Areal</button>
-                            <a href="<?= base_url($role . '/semuaOrder/') ?>" class="btn bg-gradient-info"> Kembali</a>
+                            <a href="<?= base_url($role . '/blmAdaArea/') ?>" class="btn bg-gradient-info"> Kembali</a>
                         </div>
                     </div>
                 </div>
@@ -64,8 +64,8 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm"><?= $order['machinetypeid']; ?></td>
                                             <td class="text-sm"><?= $order['size']; ?></td>
                                             <td class="text-sm"><?= $order['delivery']; ?></td>
-                                            <td class="text-sm"><?= ceil($order['qty']/24); ?> dz</td>
-                                            <td class="text-sm"><?= ceil($order['sisa']/24); ?> dz</td>
+                                            <td class="text-sm"><?= ceil($order['qty'] / 24); ?> dz</td>
+                                            <td class="text-sm"><?= ceil($order['sisa'] / 24); ?> dz</td>
                                             <td class="text-sm"><?= $order['seam']; ?></td>
                                             <td class="text-sm"><?= $order['factory']; ?></td>
                                             <td class="text-sm">
@@ -265,6 +265,8 @@ error_reporting(E_ALL); ?>
                             <div class="form-group">
                                 <label for="selectArea">Pilih Area:</label>
                                 <select class="form-control" id="selectArea" name="area">
+                                    <option value="">-- Choose --</option>
+
                                     <?php
                                     $uniqueAreas = array_unique(array_column($dataMc, 'area'));
                                     foreach ($uniqueAreas as $area) :
@@ -294,18 +296,18 @@ error_reporting(E_ALL); ?>
                     </div>
                     <div class="modal-body">
                         <form action="<?= base_url($role . '/recomendationarea') ?>" method="post">
-                            <input type="text" name="pdk" id="" hidden value="<?=$noModel?>" >
-                            <input type="text" name="deliv" id=""hidden  value="" >
-                            
+                            <input type="text" name="pdk" id="" hidden value="<?= $noModel ?>">
+                            <input type="text" name="deliv" id="" hidden value="">
+
                             <div class="form-group">
                             </div>
                             <div class="form-group">
                                 <label for="selectArea">Estimated Start Machine:</label>
-                               <input type="date" class="form-control" name="start">
+                                <input type="date" class="form-control" name="start">
                             </div>
                             <div class="form-group">
                                 <label for="selectArea">Estimated Stop Machine:</label>
-                               <input type="date" class="form-control" name="stop">
+                                <input type="date" class="form-control" name="stop">
                             </div>
                     </div>
                     <div class="modal-footer">
@@ -372,12 +374,12 @@ error_reporting(E_ALL); ?>
                     $('#editModal').find('input[name="deliv"]').val(deliv);
                 });
                 $('.btn-recomend').click(function() {
-                 
+
                     var pdk = $(this).data('model');
                     var deliv = $(this).data('delivery');
                     $('#recomendModal').modal('show'); // Show the modal
-                   
-                
+
+
                     $('#recomendModal').find('input[name="deliv"]').val(deliv);
                 });
             });

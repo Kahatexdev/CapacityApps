@@ -21,6 +21,9 @@
                             <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage2">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary Produksi
                             </button>
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage3">
+                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Timter Produksi
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -58,7 +61,7 @@
             <div class="modal-dialog " role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Summary Produksi</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Summary Produksi Per Tanggal</h5>
                         <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
@@ -123,7 +126,7 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
-                    <form action="<?= base_url($role . '/summaryproduksi/'); ?>" method="POST">
+                    <form action="<?= base_url($role . '/summaryproduksi'); ?>" method="POST">
                         <div class="modal-body align-items-center">
                         <div class="form-group">
                                 <label for="buyer" class="col-form-label">Buyer</label>
@@ -156,6 +159,53 @@
                                 <label for="pdk" class="col-form-label">No Model</label>
                                 <input type="text" class="form-control" name="pdk">
                             </div>                            
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-info">Generate</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- modal timter produksi -->
+        <div class="modal fade" id="exampleModalMessage3" tabindex="-1" role="dialog" aria-labelledby="exampleModalMessageTitle" aria-hidden="true">
+            <div class="modal-dialog " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Timter Produksi</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <form action="<?= base_url($role . '/timterProduksi'); ?>" method="POST">
+                        <div class="modal-body align-items-center">
+                            <div class="form-group">
+                                <label for="area" class="col-form-label">Area</label>
+                                <select class="form-control" id="area" name="area" required>
+                                    <option></option>
+                                    <?php foreach ($area as $ar) : ?>
+                                        <option><?= $ar ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="jarum" class="col-form-label">Jarum</label>
+                                <select class="form-control" id="jarum" name="jarum" required>
+                                    <option></option>
+                                    <?php foreach ($jarum as $jrm) : ?>
+                                        <option><?= $jrm ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pdk" class="col-form-label">No Model</label>
+                                <input type="text" class="form-control" name="pdk">
+                            </div>
+                            <div class="form-group">
+                                <label for="awal" class="col-form-label">Tanggal Produksi</label>
+                                <input type="date" class="form-control" name="awal" required>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>

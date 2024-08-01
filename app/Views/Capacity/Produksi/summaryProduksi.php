@@ -39,6 +39,10 @@
                                 <input type="hidden" class="form-control" name="jarum" value="<?= $dataFilter['jarum'] ?>">
                                 <input type="hidden" class="form-control" name="pdk" value="<?= $dataFilter['pdk'] ?>">
                                 <button type="submit" class="btn btn-info"><i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Report Excel</button>
+                                
+                                <a href="<?= base_url($role . '/dataproduksi') ?>" class="btn bg-gradient-dark">
+                                    <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
+                                Back</a>
                             </form>
                         </div>
                     </div>
@@ -49,6 +53,7 @@
                             <table id="example" class="table table-border" style="width:100%">
                                 <thead>
                                     <tr>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Area</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Seam</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Delivery Shipment</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Sisa Hari</th>
@@ -80,6 +85,7 @@
                                         $sisa_hari = (strtotime($delivery_date) - strtotime($today)) / (60 * 60 * 24);
                                         ?>                                            
                                         <tr>
+                                            <td class="text-sm"><?= ($id['size'] != $prevSize) ? $id['area'] : ''; ?></td>
                                             <td class="text-sm"><?= ($id['size'] != $prevSize) ? $id['seam'] : ''; ?></td>
                                             <td class="text-sm"><?= $delivery_date; ?></td>
                                             <td class="text-sm"><?= $sisa_hari; ?> days</td>

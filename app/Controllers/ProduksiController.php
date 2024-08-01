@@ -709,9 +709,9 @@ class ProduksiController extends BaseController
         $uniqueData = [];
         foreach ($dataSummaryPertgl as $item) {
             $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'];
-            $qty = +$item['qty'];
             if (!isset($uniqueData[$key])) {
                 $uniqueData[$key] = [
+                    'area' => $item['area'],
                     'machinetypeid' => $item['machinetypeid'],
                     'mastermodel' => $item['mastermodel'],
                     'size' => $item['size'],
@@ -776,6 +776,7 @@ class ProduksiController extends BaseController
             $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'] . '-' . $item['delivery'];
             if (!isset($uniqueData[$key])) {
                 $uniqueData[$key] = [
+                    'area' => $item['area'],
                     'seam' => $item['seam'],
                     'buyer' => $item['kd_buyer_order'],
                     'no_order' => $item['no_order'],
@@ -808,11 +809,75 @@ class ProduksiController extends BaseController
             'uniqueData' => $uniqueData,
             'total_ship' => $totalShip,
             'role' => session()->get('role'),
-            'title' => 'Summary Produksi' . $pdk,
+            'title' => 'Summary Produksi ' . $pdk,
             'dataFilter' => $data,
         ];
         return view(session()->get('role') . '/Produksi/summaryProduksi', $data2);
     }
+    public function timterProduksi()
+    {
+        $area = $this->request->getPost('area');
+        $jarum = $this->request->getPost('jarum');
+        $pdk = $this->request->getPost('pdk');
+        $awal = $this->request->getPost('awal');
+
+        $data = [
+            'area' => $area,
+            'jarum' => $jarum,
+            'pdk' => $pdk,
+            'awal' => $awal,
+        ];
+
+        $dataTimter = $this->orderModel->getDataTimter($data);
+        $prodTimter = $this->orderModel->getDetailProdTimter($data);
+        $jlMC = $this->orderModel->getprodSummaryPertgl($data);
+        // dd($dataTimter);
+        $uniqueData = [];
+        foreach ($prodTimter as $item) {
+            $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'] . '-' . $item['no_mesin'];
+            if (!isset($uniqueData[$key])) {
+                $uniqueData[$key] = [
+                    'seam' => $item['seam'],
+                    'kd_buyer_order' => $item['kd_buyer_order'],
+                    'area' => $item['area'],
+                    'no_order' => $item['no_order'],
+                    'machinetypeid' => $item['machinetypeid'],
+                    'mastermodel' => $item['mastermodel'],
+                    'size' => $item['size'],
+                    'smv' => $item['smv'],
+                    'delivery' => $item['delivery'],
+                    'qty' => 0,
+                    'running' => 0,
+                    'ttl_prod' => 0,
+                    'ttl_jlmc' => 0,
+                    'no_mesin' => $item['no_mesin'],
+                ];
+            }
+            $uniqueData[$key]['qty'] += $item['qty'];
+            $uniqueData[$key]['running'] += $item['running'];
+            $uniqueData[$key]['ttl_prod'] += $item['qty_produksi'];
+            $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
+        }
+        $data3 = [
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => 'active',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'dataTimter' => $dataTimter,
+            'prodTimter' => $prodTimter,
+            'jlMC' => $jlMC,
+            'uniqueData' => $uniqueData,
+            'role' => session()->get('role'),
+            'title' => 'Timter Produksi ' . $pdk . ' Tanggal ' . $awal,
+            'dataFilter' => $data,
+            'header' => $area,
+        ];
+        return view(session()->get('role') . '/Produksi/timterProduksi', $data3);
+    }
+
 
     public function editproduksi()
     {

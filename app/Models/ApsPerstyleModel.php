@@ -53,7 +53,7 @@ class ApsPerstyleModel extends Model
     }
     public function checkAps($validate)
     {
-        
+
         $result = $this->select('*')
             ->where('mastermodel', $validate['mastermodel'])
             ->where('size', $validate['size'])
@@ -67,7 +67,7 @@ class ApsPerstyleModel extends Model
     public function detailModel($noModel, $delivery)
     {
         return $this->select('idapsperstyle,mastermodel,no_order,country, smv, sum(sisa) as sisa, sum(qty) as qty, machinetypeid,size,delivery,seam,factory,production_unit')
-             ->where('mastermodel', $noModel)
+            ->where('mastermodel', $noModel)
             ->where('delivery', $delivery)
             ->groupby('size, machinetypeid')
             ->findAll();
@@ -313,26 +313,27 @@ class ApsPerstyleModel extends Model
     {
         return $this->select('idapsperstyle, delivery, sisa')
             ->where('mastermodel', $validate['no_model'])
-            ->where('size', $validate['style'])                         
+            ->where('size', $validate['style'])
             ->first();
     }
-    public function getSisaPerJarum($model,$tanggal){
-       return $this->select('sum(sisa) as sisa, machinetypeid, mastermodel')
-         ->where('delivery', $tanggal)
-         ->where('mastermodel', $model)
-        ->where ('sisa >', 0)
-        ->groupby('machinetypeid')
-        ->findAll();
+    public function getSisaPerJarum($model, $tanggal)
+    {
+        return $this->select('sum(sisa) as sisa, machinetypeid, mastermodel')
+            ->where('delivery', $tanggal)
+            ->where('mastermodel', $model)
+            ->where('sisa >', 0)
+            ->groupby('machinetypeid')
+            ->findAll();
     }
-    public function getSisaOrderforRec($jarum,$start,$stop ){
-        $maxDeliv = date('Y-m-d', strtotime($start.'+90 Days'));
-       return $this->select('sum(sisa) as sisa, machinetypeid, mastermodel,factory, delivery')
-       ->where('delivery >', $start)
-       ->where('machinetypeid', $jarum)
-      ->where ('sisa >', 0)
-      ->where ('factory !=','Belum Ada Area')
-      ->groupby('machinetypeid,factory')
-       ->findAll();
-
+    public function getSisaOrderforRec($jarum, $start, $stop)
+    {
+        $maxDeliv = date('Y-m-d', strtotime($start . '+90 Days'));
+        return $this->select('idapsperstyle,sum(sisa) as sisa, machinetypeid, mastermodel,factory, delivery')
+            ->where('delivery >', $start)
+            ->where('machinetypeid', $jarum)
+            ->where('sisa >', 0)
+            ->where('factory !=', 'Belum Ada Area')
+            ->groupby('machinetypeid,factory')
+            ->findAll();
     }
 }
