@@ -251,8 +251,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('produksi', 'ProduksiController::produksi');
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
 
-    // deffect
-    $routes->get('datadeffect', 'ProduksiController::dataDeffect');
+
 
 
     $routes->get('planningmesin', 'ApsController::planningmesin');
@@ -371,6 +370,10 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('datatarget', 'GodController::target');
     $routes->get('datatargetjarum/(:any)', 'GodController::targetjarum/$1');
     $routes->post('edittarget', 'GodController::edittarget');
+
+    // deffect
+    $routes->get('datadeffect', 'DeffectController::datadeffect');
+    $routes->post('inputKode', 'DeffectController::inputKode');
 
     // usermanageement
     $routes->get('account', 'GodController::account');

@@ -57,7 +57,8 @@ class DeffectController extends BaseController
     {
 
         $master = $this->deffectModel->findAll();
-        $databs = $this->deffectModel->getDataBs();
+        //$databs = $this->BsModel->getDataBs();
+
         $data = [
             'role' => session()->get('role'),
             'title' => session()->get('role') . ' System',
@@ -68,9 +69,29 @@ class DeffectController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-            '' => $master,
-            'databs' => $databs
+            'kode' => $master,
+            //'databs' => $databs
         ];
-        return view(session()->get('role') . '/index', $data);
+        return view(session()->get('role') . '/Deffect/databs', $data);
+    }
+    public function inputKode()
+    {
+
+        $kode = $this->request->getPost('kode');
+        $keterangan = $this->request->getPost('keterangan');
+        $data = [
+            'kode_deffect' => $kode,
+            'Keterangan' => $keterangan
+        ];
+        try {
+            $input = $this->deffectModel->insert($data); // Assuming save() is a better method name
+            if ($input == false) {
+                return redirect()->to(session()->get('role') . '/datadeffect')->with('success', 'Data Deffect Berhasil Di input');
+            } else {
+                return redirect()->to(session()->get('role') . '/datadeffect')->with('error', 'Data Deffect Gagal Di input');
+            }
+        } catch (\Exception $e) {
+            return redirect()->to(session()->get('role') . '/datadeffect')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 }

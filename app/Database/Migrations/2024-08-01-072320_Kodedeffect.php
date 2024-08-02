@@ -13,7 +13,6 @@ class Kodedeffect extends Migration
                 'type' => 'VARCHAR',
                 'constraint' => 11,
 
-
             ],
             'Keterangan' => [
                 'type' => 'VARCHAR',

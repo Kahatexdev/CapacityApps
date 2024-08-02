@@ -39,4 +39,13 @@ class BsModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+
+    public function getDataBs()
+    {
+        return $this->select('no_label, no_box, area, apsperstyle.mastermodel, apsperstyle.size')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle')
+            ->groupBy('area')
+            ->findAll();
+    }
 }
