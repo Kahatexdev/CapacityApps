@@ -336,4 +336,14 @@ class ApsPerstyleModel extends Model
             ->groupby('machinetypeid,factory')
             ->findAll();
     }
+    public function getIdForBs($validate)
+    {
+        $data = $this->select('idapsperstyle, delivery, sisa,qty')
+            ->where('mastermodel', $validate['no_model'])
+            ->where('size', $validate['style'])
+            ->orderBy('sisa', 'ASC') // Mengurutkan berdasarkan 'sisa' dari yang terkecil
+            ->first(); // Mengambil data pertama (yang terkecil)
+
+        return $data;
+    }
 }

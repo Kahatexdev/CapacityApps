@@ -12,7 +12,7 @@ class BsModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['idapsperstyle', 'no_label', 'no_box', 'qty', 'kode_deffect', 'created_at', 'updated_at'];
+    protected $allowedFields    = ['idapsperstyle', 'no_label', 'area', 'tgl_instocklot', 'no_box', 'qty', 'kode_deffect', 'created_at', 'updated_at'];
 
     protected bool $allowEmptyInserts = false;
 

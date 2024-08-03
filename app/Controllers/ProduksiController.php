@@ -13,6 +13,7 @@ use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use App\Models\BsModel;
 use PhpParser\Node\Stmt\Else_;
 
 class ProduksiController extends BaseController
@@ -25,6 +26,8 @@ class ProduksiController extends BaseController
     protected $orderModel;
     protected $ApsPerstyleModel;
     protected $liburModel;
+    protected $BsModel;
+
     public function __construct()
     {
 
@@ -35,6 +38,8 @@ class ProduksiController extends BaseController
         $this->produksiModel = new ProduksiModel();
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
+        $this->BsModel = new BsModel();
+
         if ($this->filters   = ['role' => [session()->get('role') . ''], 'role' => ['user'], 'role' => ['planning']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -919,7 +924,7 @@ class ProduksiController extends BaseController
             $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
             $worksheet = $spreadsheet->getActiveSheet();
 
-            $startRow = 10; // Ganti dengan nomor baris mulai
+            $startRow = 18; // Ganti dengan nomor baris mulai
             $batchSize = 15; // Ukuran batch
             $batchData = [];
             $failedRows = []; // Array untuk menyimpan informasi baris yang gagal
@@ -969,30 +974,61 @@ class ProduksiController extends BaseController
             $data = $batchItem['data'];
 
             try {
-                $no_model = $data[2];
-                $style = $data[3];
+                $no_model = $data[21];
+                $style = $data[4];
                 $validate = [
                     'no_model' => $no_model,
                     'style' => $style
                 ];
-                $idAps = $this->ApsPerstyleModel->getId($validate);
+                $idAps = $this->ApsPerstyleModel->getIdForBs($validate);
                 if (!$idAps) {
                     if ($data[0] == null) {
                         continue; // Skip empty rows
                     } else {
-                        $failedRows[] = "style tidak ditemukan" . $rowIndex;
+                        $failedRows[] = "style tidak ditemukan " . $rowIndex;
                         continue;
                     }
                 } else {
                     $id = $idAps['idapsperstyle'];
                     $sisaOrder = $idAps['sisa'];
-                    $qtyerp = $data[14];
+                    $qtyOrder = $idAps['qty'];
+                    $qtyerp = $data[12];
                     $qty = str_replace('-', '', $qtyerp);
                     $sisaQty = $sisaOrder + $qty;
+                    $tgl = $data[1];
+                    $date = new DateTime($tgl);
+                    $tglprod = $date->format('Y-m-d');
+                    // $strReplace = str_replace('.', '-', $tglprod);
+                    // $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
+                    $idProduksi = $this->produksiModel
+                        ->where('idapsperstyle', $id)
+                        ->where('bs_prod <=', $qtyOrder)
+                        ->first();
+                    if (!$idProduksi) {
+                        $failedRows[] = "style: " . $style . "baris:" . $rowIndex . "idaps:" . $id . "tidak ada di database produksi";
+                        continue;
+                    }
+                    $bs = $idProduksi['bs_prod'] + $qty;
 
+                    $datainsert = [
+                        'tgl_instocklot' => $tglprod,
+                        'idapsperstyle' => $id,
+                        'area' => $data[26],
+                        'no_label' => $data[22],
+                        'no_box' => $data[23],
+                        'qty' => $qty,
+                        'kode_deffect' => $data[29]
+
+                    ];
+                    $this->BsModel->insert($datainsert);
+                    $updateproduksi = $this->produksiModel->update($idProduksi['id_produksi'], ['bs_prod' => $bs]);
+                    if (!$updateproduksi) {
+                        $failedRows[] = "baris " . $rowIndex . "Gagal Update Data Produksi";
+                        continue;
+                    }
                     $updateBs = $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
                     if (!$updateBs) {
-                        $failedRows[] = $rowIndex;
+                        $failedRows[] = "baris" . $rowIndex . "gagal Update Data BS";
                         continue;
                     }
                 }
