@@ -553,10 +553,10 @@ class ProduksiController extends BaseController
                         ];
                         $nextid = $this->ApsPerstyleModel->getIdBawahnya($second);
                         if ($nextid) {
-                            $idnext = $nextid['idapsperstyle'];
+                            $id = $nextid['idapsperstyle'];
                             $qtysisa = $nextid['sisa'];
                             $sisa = $qtysisa + $minus;
-                            $this->ApsPerstyleModel->update($idnext, ['sisa' => $sisa]);
+                            $this->ApsPerstyleModel->update($id, ['sisa' => $sisa]);
 
                             $sisaQty = 0;
                         } else {
