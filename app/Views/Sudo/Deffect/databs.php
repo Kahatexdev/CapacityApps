@@ -137,18 +137,18 @@
 
                     </div>
                     <div class="card-body p-3">
-                        <form action="">
+                        <form action="<?= base_url($role . '/viewDataBs') ?>" method="POST">
                             <div class="row">
                                 <div class="col-lg-3">
                                     <div class="form-group">
                                         <label for="area" class="col-form-label">Dari</label>
-                                        <input type="date" name="awal" class="form-control">
+                                        <input type="date" name="awal" class="form-control" required>
                                     </div>
                                 </div>
                                 <div class="col-lg-3">
                                     <div class="form-group">
                                         <label for="area" class="col-form-label">sampai</label>
-                                        <input type="date" name="akhir" class="form-control">
+                                        <input type="date" name="akhir" class="form-control" required>
                                     </div>
                                 </div>
                                 <div class="col-lg-3">
@@ -167,7 +167,7 @@
                             </div>
                             <div class="row justify-content-end">
                                 <div class="col-lg-2 justify-content-end text-end">
-                                    <button class="btn btn-info"> Display</button>
+                                    <button type="submit" class="btn btn-info"> Display</button>
                                 </div>
                             </div>
                         </form>
@@ -190,6 +190,7 @@
                     [0, "desc"]
                 ]
             });
+
         });
     </script>
 

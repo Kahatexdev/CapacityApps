@@ -48,4 +48,60 @@ class BsModel extends Model
             ->groupBy('area')
             ->findAll();
     }
+    public function  getDataBsFilter($theData)
+    {
+
+        $this->select('apsperstyle.idapsperstyle, apsperstyle.mastermodel, apsperstyle.size, data_bs.*, master_deffect.Keterangan')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle')
+            ->join('master_deffect', 'master_deffect.kode_deffect = data_bs.kode_deffect')
+            ->where('tgl_instocklot >=', $theData['awal'])
+            ->where('tgl_instocklot <=', $theData['akhir']);
+
+        if (!empty($theData['pdk'])) {
+            $this->where('apsperstyle.mastermodel', $theData['pdk']);
+        }
+        if (!empty($theData['area'])) {
+            $this->where('area', $theData['area']);
+        }
+
+        return $this->groupBy('apsperstyle.size')->findAll();
+    }
+    public function  totalBs($theData)
+    {
+
+        $this->select('sum(data_bs.qty) as qty')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle')
+            ->join('master_deffect', 'master_deffect.kode_deffect = data_bs.kode_deffect')
+            ->where('tgl_instocklot >=', $theData['awal'])
+            ->where('tgl_instocklot <=', $theData['akhir']);
+
+        if (!empty($theData['pdk'])) {
+            $this->where('apsperstyle.mastermodel', $theData['pdk']);
+        }
+        if (!empty($theData['area'])) {
+            $this->where('area', $theData['area']);
+        }
+
+        $result = $this->first();
+        return $result['qty'] ?? '0';
+    }
+    public function chartData($theData)
+    {
+        $this->select('master_deffect.Keterangan, sum(data_bs.qty) as qty, ')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle')
+            ->join('master_deffect', 'master_deffect.kode_deffect = data_bs.kode_deffect')
+            ->where('tgl_instocklot >=', $theData['awal'])
+            ->where('tgl_instocklot <=', $theData['akhir']);
+
+        if (!empty($theData['pdk'])) {
+            $this->where('apsperstyle.mastermodel', $theData['pdk']);
+        }
+        if (!empty($theData['area'])) {
+            $this->where('area', $theData['area']);
+        }
+
+        return $this->groupBy('Keterangan')
+            ->orderBy('qty', 'DESC')
+            ->findAll();
+    }
 }

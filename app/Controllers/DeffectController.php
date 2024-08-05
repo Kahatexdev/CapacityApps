@@ -94,4 +94,43 @@ class DeffectController extends BaseController
             return redirect()->to(session()->get('role') . '/datadeffect')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
+    public function viewDataBs()
+    {
+        $master = $this->deffectModel->findAll();
+
+        $awal = $this->request->getPost('awal');
+        $akhir = $this->request->getPost('akhir');
+        $pdk = $this->request->getPost('pdk');
+        $area = $this->request->getPost('area');
+        $theData = [
+            'awal' => $awal,
+            'akhir' => $akhir,
+            'pdk' => $pdk,
+            'area' => $area
+        ];
+        $getData = $this->BsModel->getDataBsFilter($theData);
+        $total = $this->BsModel->totalBs($theData);
+        $chartData = $this->BsModel->chartData($theData);
+        $data = [
+            'role' => session()->get('role'),
+            'title' => session()->get('role') . ' System',
+            'active1' => 'active',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'kode' => $master,
+            'databs' => $getData,
+            'awal' => $awal,
+            'akhir' => $akhir,
+            'pdk' => $pdk,
+            'area' => $area,
+            'totalbs' => $total,
+            'chart' => $chartData
+        ];
+        return view(session()->get('role') . '/Deffect/bstabel', $data);
+    }
 }
