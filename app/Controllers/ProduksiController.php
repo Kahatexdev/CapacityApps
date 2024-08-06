@@ -471,56 +471,42 @@ class ProduksiController extends BaseController
                             $qtysisa = $idMinus['sisa'];
                             $deliv = $idMinus['delivery'];
                             $sisa = $qtysisa - $data[14];
-                            $this->ApsPerstyleModel->update($idnext, ['sisa' => $sisa]);
+
+                            // Insert production even if sisa is negative
                             $tglInputProduksi = $data[0];
                             $date = new DateTime($tglInputProduksi);
                             $date->modify('-1 day');
                             $tglprod = $date->format('Y-m-d');
-                            // $strReplace = str_replace('.', '-', $tglprod);
-                            // $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
-                            // $tgl_produksi = $dateTime->format('Y-m-d');
-                            $bagian = "-";
-                            $storage1 = "-";
-                            $storage2 = "-" ?? '-';
                             $qtyerp = $data[14];
                             $qty = str_replace('-', '', $qtyerp);
-                            $kategoriBs = "-" ?? '-';
-                            $no_mesin = $data[8] ?? 0;
-                            $shift = "-";
-                            $shifta = $data[9] ?? 0;
-                            $shiftb = $data[10] ?? 0;
-                            $shiftc = $data[11] ?? 0;
-                            $no_box = $data[12] ?? 0;
-                            $no_label = $data[13];
-                            $area = session()->get('username');
-                            $admin = session()->get('username');
+
+                            // Prepare data for insert
                             $dataInsert = [
                                 'tgl_produksi' => $tglprod,
-                                'idapsperstyle' => $idMinus['idapsperstyle'],
-                                'bagian' => $bagian,
-                                'storage_awal' => $storage1,
-                                'storage_akhir' => $storage2,
+                                'idapsperstyle' => $idnext,
                                 'qty_produksi' => $qty,
                                 'bs_prod' => 0,
-                                'kategori_bs' => $kategoriBs,
-                                'no_box' => $no_box,
-                                'no_label' => $no_label,
-                                'admin' => $admin,
-                                'shift' => $shift,
-                                'shift_a' => $shifta,
-                                'shift_b' => $shiftb,
-                                'shift_c' => $shiftc,
-                                'no_mesin' => $no_mesin,
+                                'no_box' => $data[12] ?? 0,
+                                'no_label' => $data[13],
+                                'admin' => session()->get('username'),
+                                'shift_a' => $data[9] ?? 0,
+                                'shift_b' => $data[10] ?? 0,
+                                'shift_c' => $data[11] ?? 0,
+                                'no_mesin' => $data[8] ?? 0,
                                 'delivery' => $deliv,
-                                'area' => $area
+                                'area' => session()->get('username')
                             ];
+
+                            // Insert the production data
                             $existingProduction = $this->produksiModel->existingData($dataInsert);
                             if (!$existingProduction) {
                                 $this->produksiModel->insert($dataInsert);
                             } else {
-
-                                $failedRows[] = $rowIndex . "duplikat"; // Add to failed rows if production data already exists
+                                $failedRows[] = $rowIndex . "duplikat";
                             }
+
+                            // Update the sisa value after inserting production
+                            $this->ApsPerstyleModel->update($idnext, ['sisa' => $sisa]);
                         } else {
                             $failedRows[] = "style tidak ditemukan" . $rowIndex;
                             continue;
@@ -535,15 +521,10 @@ class ProduksiController extends BaseController
                     $date = new DateTime($tglInputProduksi);
                     $date->modify('-1 day');
                     $tglprod = $date->format('Y-m-d');
-                    // $strReplace = str_replace('.', '-', $tglprod);
-                    // $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
-                    // $tgl_produksi = $dateTime->format('Y-m-d');
-                    $bagian = "-";
-                    $storage1 = "-";
-                    $storage2 = "-" ?? '-';
                     $qtyerp = $data[14];
                     $qty = str_replace('-', '', $qtyerp);
                     $sisaQty = $sisaOrder - $qty;
+
                     if ($sisaQty < 0) {
                         $minus = $sisaQty;
                         $second = [
@@ -552,51 +533,46 @@ class ProduksiController extends BaseController
                             'sisa' => $sisaOrder
                         ];
                         $nextid = $this->ApsPerstyleModel->getIdBawahnya($second);
+
                         if ($nextid) {
                             $id = $nextid['idapsperstyle'];
                             $qtysisa = $nextid['sisa'];
                             $sisa = $qtysisa + $minus;
+
+                            // Update sisa qty di id yang ditemukan
                             $this->ApsPerstyleModel->update($id, ['sisa' => $sisa]);
 
+                            // Reset sisaQty ke 0 karena sisa sudah diambil alih
                             $sisaQty = 0;
                         } else {
-                            $sisaQty = $minus;
+                            // Tidak ada id berikutnya, tetap pakai id yang terakhir dan insert minus
+                            $this->ApsPerstyleModel->update($id, ['sisa' => 0]);
+                            $sisaQty = $minus; // Akan tetap minus di produksi
+                            dd($id);
                         }
                     }
-                    $kategoriBs = "-" ?? '-';
-                    $no_mesin = $data[8] ?? 0;
-                    $shift = "-";
-                    $shifta = $data[9] ?? 0;
-                    $shiftb = $data[10] ?? 0;
-                    $shiftc = $data[11] ?? 0;
-                    $no_box = $data[12] ?? 0;
-                    $no_box = $data[12];
-                    $no_label = $data[13];
-                    $area = session()->get('username');
-                    $admin = session()->get('username');
+
+                    // Prepare data for insert
                     $dataInsert = [
                         'tgl_produksi' => $tglprod,
                         'idapsperstyle' => $id,
-                        'bagian' => $bagian,
-                        'storage_awal' => $storage1,
-                        'storage_akhir' => $storage2,
                         'qty_produksi' => $qty,
                         'bs_prod' => 0,
-                        'kategori_bs' => $kategoriBs,
-                        'no_box' => $no_box,
-                        'no_label' => $no_label,
-                        'admin' => $admin,
-                        'shift' => $shift,
-                        'shift_a' => $shifta,
-                        'shift_b' => $shiftb,
-                        'shift_c' => $shiftc,
-                        'no_mesin' => $no_mesin,
+                        'no_box' => $data[12] ?? 0,
+                        'no_label' => $data[13],
+                        'admin' => session()->get('username'),
+                        'shift_a' => $data[9] ?? 0,
+                        'shift_b' => $data[10] ?? 0,
+                        'shift_c' => $data[11] ?? 0,
+                        'no_mesin' => $data[8] ?? 0,
                         'delivery' => $delivery,
-                        'area' => $area
+                        'area' => session()->get('username')
                     ];
+
+                    // Insert the production data
                     $existingProduction = $this->produksiModel->existingData($dataInsert);
                     if (!$existingProduction) {
-                        $insert =  $this->produksiModel->insert($dataInsert);
+                        $insert = $this->produksiModel->insert($dataInsert);
                         if ($insert) {
                             $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
                         } else {
@@ -609,7 +585,7 @@ class ProduksiController extends BaseController
                         $this->produksiModel->update($idexist, ['qty_produksi' => $sumqty]);
                         $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
 
-                        $failedRows[] = $rowIndex; // Add to failed rows if production data already exists
+                        $failedRows[] = $rowIndex;
                     }
                 }
             } catch (\Exception $e) {
@@ -618,6 +594,8 @@ class ProduksiController extends BaseController
         }
         $db->transComplete();
     }
+
+
 
     public function resetproduksi()
     {

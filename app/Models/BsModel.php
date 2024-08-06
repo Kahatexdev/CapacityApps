@@ -64,7 +64,7 @@ class BsModel extends Model
             $this->where('area', $theData['area']);
         }
 
-        return $this->groupBy('apsperstyle.size')->findAll();
+        return $this->groupBy('tgl_instocklot,apsperstyle.size')->findAll();
     }
     public function  totalBs($theData)
     {
