@@ -54,10 +54,10 @@
                                         <td class="text-xs"><?= $order->product_type; ?></td>
                                         <td class="text-xs"><?= $order->description; ?></td>
                                         <td class="text-xs"><?= $order->seam; ?></td>
-                                        <td class="text-xs"><?= $order->leadtime; ?></td>
+                                        <td class="text-xs"><?= $order->leadtime; ?> days</td>
                                         <td class="text-xs"><?= $order->delivery; ?></td>
-                                        <td class="text-xs"><?= $order->qty; ?></td>
-                                        <td class="text-xs"><?= $order->sisa; ?></td>
+                                        <td class="text-xs"><?= $order->qty; ?> pcs</td>
+                                        <td class="text-xs"><?= $order->sisa; ?> pcs</td>
                                         <td class="text-xs">
 
 
