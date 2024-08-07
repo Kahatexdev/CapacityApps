@@ -57,7 +57,7 @@
                                 <thead>
                                     <tr>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">Seam</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">Code Buyer</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">Buyer</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">No Order</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">Jarum</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">No Model</th>
@@ -66,18 +66,21 @@
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">Smv</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">Delivery</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">Target</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">Jumlah Mc</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">Jml Mc</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">No MC</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="2">A</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="2">B</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="2">C</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="2">PA</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="2">Total</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="2">Qty Delivery</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="2">Produksi</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="2">Qty Delivery</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="2">Total Produksi</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="2">Sisa Produksi</th>
                                     </tr>
                                     <tr>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Dz</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Pcs</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Dz</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Pcs</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Dz</th>
@@ -103,27 +106,35 @@
                                     foreach ($uniqueData as $key => $id) :
                                         $smv = $id['smv'];
                                         if (!empty($smv)) {
-                                            $target = 86400 / (floatval($smv) * 0.8) / 24;
+                                            $target = 86400 / floatval($smv) * 0.8 / 24;
                                         } else {
                                             $target = 0;
                                         }
                                     ?>
                                         <tr>
-                                            <td class="text-sm"><?= ($id['mastermodel'] != $prevModel) ? $id['seam'] : ''; ?></td>
-                                            <td class="text-sm"><?= ($id['mastermodel'] != $prevModel) ? $id['kd_buyer_order'] : ''; ?></td>
-                                            <td class="text-sm"><?= ($id['mastermodel'] != $prevModel) ? $id['no_order'] : ''; ?></td>
-                                            <td class="text-sm"><?= ($id['mastermodel'] != $prevModel) ? $id['machinetypeid'] : ''; ?></td>
-                                            <td class="text-sm"><?= ($id['mastermodel'] != $prevModel) ? $id['mastermodel'] : ''; ?></td>
-                                            <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['size'] : ''; ?></td>
-                                            <td class="text-sm"></td>
-                                            <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['smv'] : ''; ?></td>
-                                            <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['delivery'] : ''; ?></td>
-                                            <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($target, 2) : ''; ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] != $prevModel) ? $id['seam'] : ''; ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] != $prevModel) ? $id['kd_buyer_order'] : ''; ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] != $prevModel) ? $id['no_order'] : ''; ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] != $prevModel) ? $id['machinetypeid'] : ''; ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] != $prevModel) ? $id['mastermodel'] : ''; ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['size'] : ''; ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['color'] : ''; ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['smv'] : ''; ?></td>
+                                            <?php foreach ($poTimter as $po) {
+                                                if ($po['machinetypeid'] == $id['machinetypeid'] && $po['mastermodel'] == $id['mastermodel'] && $po['size'] == $id['size']) {
+                                            ?>
+                                                    <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $po['delivery'] : ''; ?></td>
+                                            <?php
+                                                    break;
+                                                }
+                                            }
+                                            ?>
+                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($target, 0) : ''; ?></td>
                                             <?php
                                             foreach ($jlMC as $jl) {
                                                 if ($jl['mastermodel'] == $id['mastermodel'] && $jl['size'] == $id['size']) {
                                             ?>
-                                                    <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $jl['jl_mc'] . 'mc' : ''; ?></td>
+                                                    <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $jl['jl_mc'] : ''; ?></td>
                                                 <?php
                                                     break;
                                                 }
@@ -171,17 +182,33 @@
                                                     break; // Keluar dari loop setelah menemukan kecocokan
                                                 }
                                             }
-                                            foreach ($dataTimter as $data) {
-                                                if ($data['machinetypeid'] == $id['machinetypeid'] && $data['mastermodel'] == $id['mastermodel'] && $data['size'] == $id['size']) {
-                                                    $sisa = $data['qty'] - $data['qty_produksi'];
+                                            foreach ($jlMC as $prod) {
+                                                if ($prod['mastermodel'] == $id['mastermodel'] && $prod['size'] == $id['size']) {
                                                 ?>
-                                                    <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($data['qty'] / 24) : ''; ?></td>
-                                                    <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($data['qty'] % 24) : ''; ?></td>
-                                                    <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($data['qty_produksi'] / 24) : ''; ?></td>
-                                                    <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($data['qty_produksi'] % 24) : ''; ?></td>
-                                                    <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($sisa / 24) : ''; ?></td>
-                                                    <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($sisa % 24) : ''; ?></td>
+                                                    <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($prod['qty_produksi'] / 24) : ''; ?></td>
+                                                    <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($prod['qty_produksi'] % 24) : ''; ?></td>
+                                                <?php
+                                                    break;
+                                                }
+                                            }
+                                            foreach ($poTimter as $po) {
+                                                if ($po['machinetypeid'] == $id['machinetypeid'] && $po['mastermodel'] == $id['mastermodel'] && $po['size'] == $id['size']) {
+                                                ?>
+                                                    <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($po['qty'] / 24) : ''; ?></td>
+                                                    <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($po['qty'] % 24) : ''; ?></td>
+                                                    <?php
+                                                    foreach ($dataTimter as $data) {
+                                                        if ($data['machinetypeid'] == $id['machinetypeid'] && $data['mastermodel'] == $id['mastermodel'] && $data['size'] == $id['size']) {
+                                                            $sisa = $po['qty'] - $data['qty_produksi'];
+                                                    ?>
+                                                            <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($data['qty_produksi'] / 24) : ''; ?></td>
+                                                            <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($data['qty_produksi'] % 24) : ''; ?></td>
+                                                            <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($sisa / 24) : ''; ?></td>
+                                                            <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($sisa % 24) : ''; ?></td>
                                             <?php
+                                                            break;
+                                                        }
+                                                    }
                                                     break;
                                                 }
                                             }

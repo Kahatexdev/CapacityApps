@@ -30,11 +30,12 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <h5>
-                            <?= $title ?> 
+                            <?= $title ?>
                         </h5>
                         <div class="col-8 text-end">
                             <form action="<?= base_url('capacity/exportSummaryPerTgl') ?>" method="post" ?>
                                 <input type="hidden" class="form-control" name="buyer" value="<?= $dataFilter['buyer'] ?>">
+                                <input type="hidden" class="form-control" name="area" value="<?= $dataFilter['area'] ?>">
                                 <input type="hidden" class="form-control" name="jarum" value="<?= $dataFilter['jarum'] ?>">
                                 <input type="hidden" class="form-control" name="pdk" value="<?= $dataFilter['pdk'] ?>">
                                 <input type="hidden" class="form-control" name="awal" value="<?= $dataFilter['awal'] ?>">
@@ -43,7 +44,7 @@
 
                                 <a href="<?= base_url($role . '/dataproduksi') ?>" class="btn bg-gradient-dark">
                                     <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
-                                Back</a>
+                                    Back</a>
                             </form>
                         </div>
                     </div>
@@ -68,7 +69,7 @@
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Total Prod (dz)</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Sisa (dz)</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Rata-rata Jl Mc</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Running</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Running (days)</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Day Stop</th>
                                         <?php foreach ($tglProdUnik as $tgl_produksi) : ?>
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Prod (dz)</th>
@@ -77,7 +78,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php 
+                                    <?php
+                                    $sisa = 0;
                                     $ttl_qty = 0;
                                     $ttl_prod = 0;
                                     $ttl_jlmc = 0;
@@ -85,69 +87,75 @@
                                     $ttl_rata2 = 0;
                                     $totalProdPerModel = array_fill_keys($tglProdUnik, 0);
                                     $totalJlMcPerModel = array_fill_keys($tglProdUnik, 0);
-                                    foreach ($uniqueData as $key => $id) : 
+                                    foreach ($uniqueData as $key => $id) :
+                                        $today = date('Y-m-d');
+                                        // 
                                         $ttl_qty += $id['qty'];
                                         $ttl_prod += $id['ttl_prod'];
                                         $ttl_jlmc += $id['ttl_jlmc'];
                                         // Pastikan $id['running'] tidak bernilai nol sebelum dibagi
-                                        $rata2 = ($id['running'] != 0) ? $id['ttl_jlmc'] / $id['running'] : 0;
-                                        // Pastikan $id['ttl_prod'] tidak bernilai nol sebelum dibagi
-                                        $sisa = ($id['ttl_prod'] != 0) ? ($id['qty']/24) - ($id['ttl_prod']/24) : 0;
+                                        $rata2 = ($id['running'] != 0) ? number_format($id['ttl_jlmc'] / $id['running'], 0) : 0;
                                         $target_normal_socks = 14;
-                                        $hitung_day_stop = ($rata2 != 0) ? $sisa / ($rata2 * $target_normal_socks) : 0;
-                                        $today = date('Y-m-d');
-
+                                        $sisa = $id['qty'] - $id['qty_produksi'];
                                         $ttl_sisa += $sisa;
+                                        $hitung_day_stop = ($rata2 != 0) ? ($sisa / 24) / ($rata2 * $target_normal_socks) : 0;
+                                        $day_stop = ($id['max_delivery'] > $today && $sisa > 0 && $rata2 != 0) ? date('Y-m-d', strtotime($today . ' + ' . round($hitung_day_stop) . ' days')) : '';
+
                                         $ttl_rata2 += $rata2;
-                                        ?>                                            
+                                    ?>
                                         <tr>
-                                            <td class="text-sm"><?= $id['area']; ?></td>
+                                            <td class="text-sm"><?= strtoupper($id['area']); ?></td>
                                             <td class="text-sm"><?= $id['machinetypeid']; ?></td>
                                             <td class="text-sm"><?= $id['mastermodel']; ?></td>
                                             <td class="text-sm"><?= $id['size']; ?></td>
-                                            <td class="text-sm" style="text-align: center;"><?= number_format($id['qty']/24,2); ?></td>
-                                            <td class="text-sm" style="text-align: center;"><?= number_format($id['ttl_prod']/24,2); ?></td>
-                                            <td class="text-sm" style="text-align: center;"><?= number_format($sisa, 2); ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= number_format($id['qty'] / 24, 2); ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= number_format($id['qty_produksi'] / 24, 2); ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= number_format($sisa / 24, 2); ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= number_format($rata2, 0); ?></td>
-                                            <td class="text-sm" style="text-align: center;"><?= $id['running']; ?> days</td>
-                                            <td class="text-sm" style="text-align: center;"><?= date('Y-m-d', strtotime($today . ' + ' . round($hitung_day_stop) . ' days')); ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= $id['running']; ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= $day_stop ?></td>
                                             <?php foreach ($tglProdUnik as $tgl_produksi2) : ?>
-                                                <?php 
+                                                <?php
                                                 $qty_produksi = 0;
                                                 $jl_mc = 0;
-                                                foreach ($prodSummaryPertgl as $prod) :  
-                                                    if ($id['machinetypeid'] == $prod['machinetypeid'] && $id['mastermodel'] == $prod['mastermodel']
-                                                    && $id['size'] == $prod['size'] && $tgl_produksi2 == $prod['tgl_produksi']) :
+                                                foreach ($prodSummaryPertgl as $prod) :
+                                                    if (
+                                                        $id['machinetypeid'] == $prod['machinetypeid'] && $id['mastermodel'] == $prod['mastermodel']
+                                                        && $id['size'] == $prod['size'] && $tgl_produksi2 == $prod['tgl_produksi']
+                                                    ) :
                                                         $qty_produksi = $prod['qty_produksi'];
                                                         $jl_mc = $prod['jl_mc'];
                                                         break;
-                                                    endif; 
-                                                endforeach; 
+                                                    endif;
+                                                endforeach;
                                                 $totalProdPerModel[$tgl_produksi2] += $qty_produksi;
                                                 $totalJlMcPerModel[$tgl_produksi2] += $jl_mc;
                                                 ?>
-                                                <td class="text-sm" style="text-align: center;"><?= number_format($qty_produksi/24,2); ?></td>
+                                                <td class="text-sm" style="text-align: center;"><?= number_format($qty_produksi / 24, 2); ?></td>
                                                 <td class="text-sm" style="text-align: center;"><?= $jl_mc; ?></td>
                                             <?php endforeach; ?>
                                         </tr>
-                                        <?php if (!isset($uniqueData[$key+1]) || (isset($uniqueData[$key+1]) && $uniqueData[$key+1]['mastermodel'] != $id['mastermodel'])) : ?>
+                                        <?php if (!isset($uniqueData[$key + 1]) || (isset($uniqueData[$key + 1]) && $uniqueData[$key + 1]['mastermodel'] != $id['mastermodel'])) : ?>
                                             <tr>
                                                 <th colspan="3" style="text-align: center;">Total <?= $id['mastermodel'] ?></th>
                                                 <th style="text-align: right;">:</th>
-                                                <th style="text-align: center;"><?= number_format($ttl_qty/24, 2); ?></th>
-                                                <th style="text-align: center;"><?= number_format($ttl_prod/24, 2); ?></th>
-                                                <th style="text-align: center;"><?= number_format($ttl_sisa, 2); ?></th>
+                                                <th style="text-align: center;"><?= number_format($ttl_qty / 24, 2); ?></th>
+                                                <th style="text-align: center;"><?= number_format($ttl_prod / 24, 2); ?></th>
+                                                <th style="text-align: center;"><?= number_format($ttl_sisa / 24, 2); ?></th>
                                                 <th style="text-align: center;"><?= number_format($ttl_rata2, 0); ?></th>
                                                 <th style="text-align: center;"></th>
                                                 <th style="text-align: center;"></th>
                                                 <?php foreach ($tglProdUnik as $tgl_produksi) : ?>
-                                                    <th style="text-align: center;"><?= number_format($totalProdPerModel[$tgl_produksi]/24, 2); ?></th>
+                                                    <th style="text-align: center;"><?= number_format($totalProdPerModel[$tgl_produksi] / 24, 2); ?></th>
                                                     <th style="text-align: center;"><?= $totalJlMcPerModel[$tgl_produksi]; ?></th>
                                                 <?php endforeach; ?>
                                             </tr>
-                                            <?php
+                                    <?php
+                                            $ttl_qty = 0;
                                             $ttl_prod = 0;
                                             $ttl_jlmc = 0;
+                                            $ttl_sisa = 0;
+                                            $ttl_rata2 = 0;
                                             $totalProdPerModel = array_fill_keys($tglProdUnik, 0);
                                             $totalJlMcPerModel = array_fill_keys($tglProdUnik, 0);
                                         endif;
@@ -162,6 +170,6 @@
             </div>
         </div>
     </div>
-</div>        
+</div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <?php $this->endSection(); ?>

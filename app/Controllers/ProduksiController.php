@@ -352,7 +352,7 @@ class ProduksiController extends BaseController
     }
     public function produksiAreaChart()
     {
-        $bulan = date('m');
+        $bulan = 07;
         $month = date('F');
         $totalMesin = $this->jarumModel->getArea();
         $produksiPerArea = [];
@@ -743,6 +743,7 @@ class ProduksiController extends BaseController
 
         $dataSummaryPertgl = $this->orderModel->getdataSummaryPertgl($data);
         $prodSummaryPertgl = $this->orderModel->getProdSummaryPertgl($data);
+        $totalProd = $this->orderModel->getDataTimter($data);
 
         // agar data tgl produksi menjadi unik
         $tgl_produksi = [];
@@ -762,6 +763,8 @@ class ProduksiController extends BaseController
                     'machinetypeid' => $item['machinetypeid'],
                     'mastermodel' => $item['mastermodel'],
                     'size' => $item['size'],
+                    'qty_produksi' => $item['qty_produksi'],
+                    'max_delivery' => $item['max_delivery'],
                     'qty' => 0,
                     'running' => 0,
                     'ttl_prod' => 0,
@@ -780,7 +783,7 @@ class ProduksiController extends BaseController
             'active1' => '',
             'active2' => '',
             'active3' => '',
-            'active4' => '',
+            'active4' => 'active',
             'active5' => '',
             'active6' => '',
             'active7' => '',
@@ -788,6 +791,7 @@ class ProduksiController extends BaseController
             'tglProdUnik' => $tgl_produksi,
             'uniqueData' => $uniqueData,
             'prodSummaryPertgl' => $prodSummaryPertgl,
+            'total' => $totalProd,
             'role' => session()->get('role'),
             'title' => 'Summary Produksi Per Tanggal ' . $pdk,
             'dataFilter' => $data,
@@ -810,7 +814,7 @@ class ProduksiController extends BaseController
 
         $dataSummary = $this->orderModel->getProdSummary($data);
         $totalShip = $this->orderModel->getTotalShipment($data);
-
+        $totalProd = $this->orderModel->getdataSummaryPertgl($data);
         // Debugging to check if $totalShip is an array
         if (!is_array($totalShip)) {
             echo "Error: totalShip is not an array!";
@@ -830,6 +834,7 @@ class ProduksiController extends BaseController
                     'machinetypeid' => $item['machinetypeid'],
                     'mastermodel' => $item['mastermodel'],
                     'size' => $item['size'],
+                    'color' => $item['color'],
                     'delivery' => $item['delivery'],
                     'qty_deliv' => 0,
                     'running' => 0,
@@ -842,8 +847,6 @@ class ProduksiController extends BaseController
             $uniqueData[$key]['bruto'] += $item['bruto'];
             $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
         }
-        // Sort ASC
-        sort($uniqueData);
 
         $data2 = [
             'active1' => '',
@@ -855,6 +858,7 @@ class ProduksiController extends BaseController
             'active7' => '',
             'uniqueData' => $uniqueData,
             'total_ship' => $totalShip,
+            'total_prod' => $totalProd,
             'role' => session()->get('role'),
             'title' => 'Summary Produksi ' . $pdk,
             'dataFilter' => $data,
@@ -876,6 +880,7 @@ class ProduksiController extends BaseController
         ];
 
         $dataTimter = $this->orderModel->getDataTimter($data);
+        $poTimter = $this->orderModel->getQtyPOTimter($data);
         $prodTimter = $this->orderModel->getDetailProdTimter($data);
         $jlMC = $this->orderModel->getprodSummaryPertgl($data);
         // dd($dataTimter);
@@ -891,6 +896,7 @@ class ProduksiController extends BaseController
                     'machinetypeid' => $item['machinetypeid'],
                     'mastermodel' => $item['mastermodel'],
                     'size' => $item['size'],
+                    'color' => $item['color'],
                     'smv' => $item['smv'],
                     'delivery' => $item['delivery'],
                     'qty' => 0,
@@ -914,6 +920,7 @@ class ProduksiController extends BaseController
             'active6' => '',
             'active7' => '',
             'dataTimter' => $dataTimter,
+            'poTimter' => $poTimter,
             'prodTimter' => $prodTimter,
             'jlMC' => $jlMC,
             'uniqueData' => $uniqueData,
@@ -924,7 +931,6 @@ class ProduksiController extends BaseController
         ];
         return view(session()->get('role') . '/Produksi/timterProduksi', $data3);
     }
-
 
     public function editproduksi()
     {
