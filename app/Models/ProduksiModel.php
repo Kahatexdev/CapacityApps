@@ -12,7 +12,7 @@ class ProduksiModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_produksi', 'idapsperstyle', 'tgl_produksi', 'qty_produksi', 'bagian', 'storage_awal', 'storage_akhir', 'bs_prod', 'katefori_bs', 'no_box', 'no_label', 'no_mesin', 'created_at', 'updated_at', 'admin', 'kode_shipment', 'delivery', 'shift', 'area','shift_a','shift_b','shift_c',];
+    protected $allowedFields    = ['id_produksi', 'idapsperstyle', 'tgl_produksi', 'qty_produksi', 'bagian', 'storage_awal', 'storage_akhir', 'bs_prod', 'katefori_bs', 'no_box', 'no_label', 'no_mesin', 'created_at', 'updated_at', 'admin', 'kode_shipment', 'delivery', 'shift', 'area', 'shift_a', 'shift_b', 'shift_c',];
 
     protected bool $allowEmptyInserts = false;
 
@@ -117,11 +117,12 @@ class ProduksiModel extends Model
     {
         return $this->whereIn('idapsperstyle', $idaps)->delete();
     }
-    public function getDataForReset($area, $tanggal)
+    public function getDataForReset($area, $tanggal, $akhir)
     {
         return $this->select('id_produksi,idapsperstyle,qty_produksi')
             ->where('admin', $area)
-            ->where('tgl_produksi', $tanggal)
+            ->where('tgl_produksi >=', $tanggal)
+            ->where('tgl_produksi <=', $akhir)
             ->findAll();
     }
 

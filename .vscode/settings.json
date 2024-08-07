@@ -2,7 +2,8 @@
     "editor.formatOnSave": true,
     "notebook.formatOnSave.enabled": true,
     "php.validate.run": "onType",
-    "notebook.codeActionsOnSave": {
-        
-    }
+    "notebook.codeActionsOnSave": {},
+    "intelephense.diagnostics.undefinedFunctions": false,
+    "intelephense.diagnostics.undefinedMethods": false,
+    "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
 }

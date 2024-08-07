@@ -13,7 +13,7 @@ class ApsPerstyleModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['idapsperstyle', 'machinetypeid', 'mastermodel', 'size', 'color', 'delivery', 'qty', 'sisa', 'seam', 'factory', 'production_unit', 'smv', 'no_order', 'country'];
+    protected $allowedFields    = ['idapsperstyle', 'machinetypeid', 'mastermodel', 'size', 'delivery', 'qty', 'sisa', 'seam', 'factory', 'production_unit', 'smv', 'no_order', 'country', 'color'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -328,12 +328,22 @@ class ApsPerstyleModel extends Model
     public function getSisaOrderforRec($jarum, $start, $stop)
     {
         $maxDeliv = date('Y-m-d', strtotime($start . '+90 Days'));
-        return $this->select('sum(sisa) as sisa, machinetypeid, mastermodel,factory, delivery')
+        return $this->select('idapsperstyle,sum(sisa) as sisa, machinetypeid, mastermodel,factory, delivery')
             ->where('delivery >', $start)
             ->where('machinetypeid', $jarum)
             ->where('sisa >', 0)
             ->where('factory !=', 'Belum Ada Area')
             ->groupby('machinetypeid,factory')
             ->findAll();
+    }
+    public function getIdForBs($validate)
+    {
+        $data = $this->select('idapsperstyle, delivery, sisa,qty')
+            ->where('mastermodel', $validate['no_model'])
+            ->where('size', $validate['style'])
+            ->orderBy('sisa', 'ASC') // Mengurutkan berdasarkan 'sisa' dari yang terkecil
+            ->first(); // Mengambil data pertama (yang terkecil)
+
+        return $data;
     }
 }

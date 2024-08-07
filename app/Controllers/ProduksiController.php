@@ -13,6 +13,7 @@ use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use App\Models\BsModel;
 use PhpParser\Node\Stmt\Else_;
 
 class ProduksiController extends BaseController
@@ -25,6 +26,8 @@ class ProduksiController extends BaseController
     protected $orderModel;
     protected $ApsPerstyleModel;
     protected $liburModel;
+    protected $BsModel;
+
     public function __construct()
     {
 
@@ -35,6 +38,8 @@ class ProduksiController extends BaseController
         $this->produksiModel = new ProduksiModel();
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
+        $this->BsModel = new BsModel();
+
         if ($this->filters   = ['role' => [session()->get('role') . ''], 'role' => ['user'], 'role' => ['planning']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -466,50 +471,42 @@ class ProduksiController extends BaseController
                             $qtysisa = $idMinus['sisa'];
                             $deliv = $idMinus['delivery'];
                             $sisa = $qtysisa - $data[14];
-                            $this->ApsPerstyleModel->update($idnext, ['sisa' => $sisa]);
+
+                            // Insert production even if sisa is negative
                             $tglInputProduksi = $data[0];
                             $date = new DateTime($tglInputProduksi);
                             $date->modify('-1 day');
                             $tglprod = $date->format('Y-m-d');
-                            // $strReplace = str_replace('.', '-', $tglprod);
-                            // $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
-                            // $tgl_produksi = $dateTime->format('Y-m-d');
-                            $bagian = "-";
-                            $storage1 = "-";
-                            $storage2 = "-" ?? '-';
                             $qtyerp = $data[14];
                             $qty = str_replace('-', '', $qtyerp);
-                            $kategoriBs = "-" ?? '-';
-                            $no_mesin = $data[8] ?? 0;
-                            $shift = "-";
-                            $no_box = $data[12];
-                            $no_label = $data[13];
-                            $area = session()->get('username');
-                            $admin = session()->get('username');
+
+                            // Prepare data for insert
                             $dataInsert = [
                                 'tgl_produksi' => $tglprod,
-                                'idapsperstyle' => $idMinus['idapsperstyle'],
-                                'bagian' => $bagian,
-                                'storage_awal' => $storage1,
-                                'storage_akhir' => $storage2,
+                                'idapsperstyle' => $idnext,
                                 'qty_produksi' => $qty,
                                 'bs_prod' => 0,
-                                'kategori_bs' => $kategoriBs,
-                                'no_box' => $no_box,
-                                'no_label' => $no_label,
-                                'admin' => $admin,
-                                'shift' => $shift,
-                                'no_mesin' => $no_mesin,
+                                'no_box' => $data[12] ?? 0,
+                                'no_label' => $data[13],
+                                'admin' => session()->get('username'),
+                                'shift_a' => $data[9] ?? 0,
+                                'shift_b' => $data[10] ?? 0,
+                                'shift_c' => $data[11] ?? 0,
+                                'no_mesin' => $data[8] ?? 0,
                                 'delivery' => $deliv,
-                                'area' => $area
+                                'area' => session()->get('username')
                             ];
+
+                            // Insert the production data
                             $existingProduction = $this->produksiModel->existingData($dataInsert);
                             if (!$existingProduction) {
                                 $this->produksiModel->insert($dataInsert);
                             } else {
-
-                                $failedRows[] = $rowIndex . "duplikat"; // Add to failed rows if production data already exists
+                                $failedRows[] = $rowIndex . "duplikat";
                             }
+
+                            // Update the sisa value after inserting production
+                            $this->ApsPerstyleModel->update($idnext, ['sisa' => $sisa]);
                         } else {
                             $failedRows[] = "style tidak ditemukan" . $rowIndex;
                             continue;
@@ -524,15 +521,10 @@ class ProduksiController extends BaseController
                     $date = new DateTime($tglInputProduksi);
                     $date->modify('-1 day');
                     $tglprod = $date->format('Y-m-d');
-                    // $strReplace = str_replace('.', '-', $tglprod);
-                    // $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
-                    // $tgl_produksi = $dateTime->format('Y-m-d');
-                    $bagian = "-";
-                    $storage1 = "-";
-                    $storage2 = "-" ?? '-';
                     $qtyerp = $data[14];
                     $qty = str_replace('-', '', $qtyerp);
                     $sisaQty = $sisaOrder - $qty;
+
                     if ($sisaQty < 0) {
                         $minus = $sisaQty;
                         $second = [
@@ -541,44 +533,46 @@ class ProduksiController extends BaseController
                             'sisa' => $sisaOrder
                         ];
                         $nextid = $this->ApsPerstyleModel->getIdBawahnya($second);
+
                         if ($nextid) {
-                            $idnext = $nextid['idapsperstyle'];
+                            $id = $nextid['idapsperstyle'];
                             $qtysisa = $nextid['sisa'];
                             $sisa = $qtysisa + $minus;
-                            $this->ApsPerstyleModel->update($idnext, ['sisa' => $sisa]);
 
+                            // Update sisa qty di id yang ditemukan
+                            $this->ApsPerstyleModel->update($id, ['sisa' => $sisa]);
+
+                            // Reset sisaQty ke 0 karena sisa sudah diambil alih
                             $sisaQty = 0;
                         } else {
-                            $sisaQty = $minus;
+                            // Tidak ada id berikutnya, tetap pakai id yang terakhir dan insert minus
+                            $this->ApsPerstyleModel->update($id, ['sisa' => 0]);
+                            $sisaQty = $minus; // Akan tetap minus di produksi
+                            dd($id);
                         }
                     }
-                    $kategoriBs = "-" ?? '-';
-                    $no_mesin = $data[8] ?? 0;
-                    $shift = "-";
-                    $no_box = $data[12];
-                    $no_label = $data[13];
-                    $area = session()->get('username');
-                    $admin = session()->get('username');
+
+                    // Prepare data for insert
                     $dataInsert = [
                         'tgl_produksi' => $tglprod,
                         'idapsperstyle' => $id,
-                        'bagian' => $bagian,
-                        'storage_awal' => $storage1,
-                        'storage_akhir' => $storage2,
                         'qty_produksi' => $qty,
                         'bs_prod' => 0,
-                        'kategori_bs' => $kategoriBs,
-                        'no_box' => $no_box,
-                        'no_label' => $no_label,
-                        'admin' => $admin,
-                        'shift' => $shift,
-                        'no_mesin' => $no_mesin,
+                        'no_box' => $data[12] ?? 0,
+                        'no_label' => $data[13],
+                        'admin' => session()->get('username'),
+                        'shift_a' => $data[9] ?? 0,
+                        'shift_b' => $data[10] ?? 0,
+                        'shift_c' => $data[11] ?? 0,
+                        'no_mesin' => $data[8] ?? 0,
                         'delivery' => $delivery,
-                        'area' => $area
+                        'area' => session()->get('username')
                     ];
+
+                    // Insert the production data
                     $existingProduction = $this->produksiModel->existingData($dataInsert);
                     if (!$existingProduction) {
-                        $insert =  $this->produksiModel->insert($dataInsert);
+                        $insert = $this->produksiModel->insert($dataInsert);
                         if ($insert) {
                             $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
                         } else {
@@ -591,7 +585,7 @@ class ProduksiController extends BaseController
                         $this->produksiModel->update($idexist, ['qty_produksi' => $sumqty]);
                         $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
 
-                        $failedRows[] = $rowIndex; // Add to failed rows if production data already exists
+                        $failedRows[] = $rowIndex;
                     }
                 }
             } catch (\Exception $e) {
@@ -600,6 +594,8 @@ class ProduksiController extends BaseController
         }
         $db->transComplete();
     }
+
+
 
     public function resetproduksi()
     {
@@ -613,19 +609,55 @@ class ProduksiController extends BaseController
     public function resetproduksiarea()
     {
         $area = $this->request->getPost('area');
-        $tgl_produksi = $this->request->getPost('tgl_produksi');
+        $awal = $this->request->getPost('awal');
+        $akhir = $this->request->getPost('akhir');
 
-        $produksi = $this->produksiModel->getDataForReset($area, $tgl_produksi);
+        $produksi = $this->produksiModel->getDataForReset($area, $awal, $akhir);
+        $errorMessages = [];
+        $totalProcessed = 0;
+        $totalErrors = 0;
+
+        // Set batch size
+        $batchSize = 100;
+        $batchCounter = 0;
+
         foreach ($produksi as $pr) {
-            $idProduksi = $pr['id_produksi'];
-            $qtyproduksi = $pr['qty_produksi'];
-            $idaps = $pr['idapsperstyle'];
-            $sisaOrder = $this->ApsPerstyleModel->getSisaOrder($idaps);
-            $setSisa = $qtyproduksi + $sisaOrder;
-            $this->ApsPerstyleModel->update($idaps, ['sisa' => $setSisa]);
-            $this->produksiModel->delete($idProduksi);
+            try {
+                $idProduksi = $pr['id_produksi'];
+                $qtyproduksi = $pr['qty_produksi'];
+                $idaps = $pr['idapsperstyle'];
+                $sisaOrder = $this->ApsPerstyleModel->getSisaOrder($idaps);
+                $setSisa = $qtyproduksi + $sisaOrder;
+
+                // Update 'sisa' di tabel ApsPerstyle
+                $this->ApsPerstyleModel->update($idaps, ['sisa' => $setSisa]);
+
+                // Hapus data produksi
+                $this->produksiModel->delete($idProduksi);
+
+                $totalProcessed++;
+            } catch (\Exception $e) {
+                // Simpan pesan error jika terjadi
+                $errorMessages[] = "Error processing ID: $idProduksi - " . $e->getMessage();
+                $totalErrors++;
+            }
+
+            $batchCounter++;
+
+            // Kalau sudah mencapai batch size, simpan checkpoint dan lanjut ke batch berikutnya
+            if ($batchCounter >= $batchSize) {
+                // Reset batch counter
+                $batchCounter = 0;
+                // Di sini lo bisa simpan ke log atau lakukan tindakan lain kalau perlu
+            }
         }
-        return redirect()->to(base_url(session()->get('role') . '/produksi'))->withInput()->with('success', 'Data Berhasil di reset');
+
+        // Redirect dengan pesan sukses atau error
+        if ($totalErrors > 0) {
+            return redirect()->to(base_url(session()->get('role') . '/dataproduksi'))->withInput()->with('error', "Data berhasil di reset sebagian. $totalErrors data tidak terproses.");
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/dataproduksi'))->withInput()->with('success', 'Semua data berhasil di reset');
+        }
     }
     public function summaryProdPerTanggal()
     {
@@ -863,5 +895,131 @@ class ProduksiController extends BaseController
         } else {
             return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Gagal Update Sisa Order');
         }
+    }
+
+    public function importbssetting()
+    {
+        $file = $this->request->getFile('excel_file');
+        ini_set('memory_limit', '512M');
+        set_time_limit(180);
+
+        $file = $this->request->getFile('excel_file');
+        if ($file->isValid() && !$file->hasMoved()) {
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
+            $worksheet = $spreadsheet->getActiveSheet();
+
+            $startRow = 18; // Ganti dengan nomor baris mulai
+            $batchSize = 15; // Ukuran batch
+            $batchData = [];
+            $failedRows = []; // Array untuk menyimpan informasi baris yang gagal
+            $db = \Config\Database::connect();
+
+            foreach ($worksheet->getRowIterator($startRow) as $row) {
+                $rowIndex = $row->getRowIndex();
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+                $data = ['role' => session()->get('role'),];
+                foreach ($cellIterator as $cell) {
+                    $data[] = $cell->getValue();
+                }
+
+                if (!empty($data)) {
+                    $batchData[] = ['rowIndex' => $rowIndex, 'data' => $data];
+                    // Process batch
+                    if (count($batchData) >= $batchSize) {
+                        $this->prossesBs($batchData, $db, $failedRows);
+                        $batchData = []; // Reset batch data
+                    }
+                }
+            }
+
+            // Process any remaining data
+            if (!empty($batchData)) {
+                $this->prossesBs($batchData, $db, $failedRows);
+            }
+
+            // Prepare notification message for failed rows
+            if (!empty($failedRows)) {
+                $failedRowsStr = implode(', ', $failedRows);
+                $errorMessage = "Baris berikut gagal diimpor: $failedRowsStr";
+                return redirect()->to(base_url(session()->get('role') . '/produksi'))->with('error', $errorMessage);
+            }
+
+            return redirect()->to(base_url(session()->get('role') . '/produksi'))->withInput()->with('success', 'Data Berhasil di Import');
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/produksi'))->with('error', 'No data found in the Excel file');
+        }
+    }
+    private function prossesBs($batchData, $db, &$failedRows)
+    {
+        $db->transStart();
+        foreach ($batchData as $batchItem) {
+            $rowIndex = $batchItem['rowIndex'];
+            $data = $batchItem['data'];
+
+            try {
+                $no_model = $data[21];
+                $style = $data[4];
+                $validate = [
+                    'no_model' => $no_model,
+                    'style' => $style
+                ];
+                $idAps = $this->ApsPerstyleModel->getIdForBs($validate);
+                if (!$idAps) {
+                    if ($data[0] == null) {
+                        continue; // Skip empty rows
+                    } else {
+                        $failedRows[] = "style tidak ditemukan " . $rowIndex;
+                        continue;
+                    }
+                } else {
+                    $id = $idAps['idapsperstyle'];
+                    $sisaOrder = $idAps['sisa'];
+                    $qtyOrder = $idAps['qty'];
+                    $qtyerp = $data[12];
+                    $qty = str_replace('-', '', $qtyerp);
+                    $sisaQty = $sisaOrder + $qty;
+                    $tgl = $data[1];
+                    $date = new DateTime($tgl);
+                    $tglprod = $date->format('Y-m-d');
+                    // $strReplace = str_replace('.', '-', $tglprod);
+                    // $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
+                    $idProduksi = $this->produksiModel
+                        ->where('idapsperstyle', $id)
+                        ->where('bs_prod <=', $qtyOrder)
+                        ->first();
+                    if (!$idProduksi) {
+                        $failedRows[] = "style: " . $style . "baris:" . $rowIndex . "idaps:" . $id . "tidak ada di database produksi";
+                        continue;
+                    }
+                    $bs = $idProduksi['bs_prod'] + $qty;
+
+                    $datainsert = [
+                        'tgl_instocklot' => $tglprod,
+                        'idapsperstyle' => $id,
+                        'area' => $data[26],
+                        'no_label' => $data[22],
+                        'no_box' => $data[23],
+                        'qty' => $qty,
+                        'kode_deffect' => $data[29]
+
+                    ];
+                    $this->BsModel->insert($datainsert);
+                    $updateproduksi = $this->produksiModel->update($idProduksi['id_produksi'], ['bs_prod' => $bs]);
+                    if (!$updateproduksi) {
+                        $failedRows[] = "baris " . $rowIndex . "Gagal Update Data Produksi";
+                        continue;
+                    }
+                    $updateBs = $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
+                    if (!$updateBs) {
+                        $failedRows[] = "baris" . $rowIndex . "gagal Update Data BS";
+                        continue;
+                    }
+                }
+            } catch (\Exception $e) {
+                $failedRows[] = $rowIndex;
+            }
+        }
+        $db->transComplete();
     }
 }
