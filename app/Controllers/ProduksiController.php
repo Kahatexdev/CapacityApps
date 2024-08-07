@@ -347,7 +347,7 @@ class ProduksiController extends BaseController
     }
     public function produksiAreaChart()
     {
-        $bulan = date('m');
+        $bulan = 07;
         $month = date('F');
         $totalMesin = $this->jarumModel->getArea();
         $produksiPerArea = [];
@@ -482,10 +482,7 @@ class ProduksiController extends BaseController
                             $kategoriBs = "-" ?? '-';
                             $no_mesin = $data[8] ?? 0;
                             $shift = "-";
-                            $shifta = $data[9] ?? 0;
-                            $shiftb = $data[10] ?? 0;
-                            $shiftc = $data[11] ?? 0;
-                            $no_box = $data[12] ?? 0;
+                            $no_box = $data[12];
                             $no_label = $data[13];
                             $area = session()->get('username');
                             $admin = session()->get('username');
@@ -502,9 +499,6 @@ class ProduksiController extends BaseController
                                 'no_label' => $no_label,
                                 'admin' => $admin,
                                 'shift' => $shift,
-                                'shift_a' => $shifta,
-                                'shift_b' => $shiftb,
-                                'shift_c' => $shiftc,
                                 'no_mesin' => $no_mesin,
                                 'delivery' => $deliv,
                                 'area' => $area
@@ -561,10 +555,6 @@ class ProduksiController extends BaseController
                     $kategoriBs = "-" ?? '-';
                     $no_mesin = $data[8] ?? 0;
                     $shift = "-";
-                    $shifta = $data[9] ?? 0;
-                    $shiftb = $data[10] ?? 0;
-                    $shiftc = $data[11] ?? 0;
-                    $no_box = $data[12] ?? 0;
                     $no_box = $data[12];
                     $no_label = $data[13];
                     $area = session()->get('username');
@@ -582,9 +572,6 @@ class ProduksiController extends BaseController
                         'no_label' => $no_label,
                         'admin' => $admin,
                         'shift' => $shift,
-                        'shift_a' => $shifta,
-                        'shift_b' => $shiftb,
-                        'shift_c' => $shiftc,
                         'no_mesin' => $no_mesin,
                         'delivery' => $delivery,
                         'area' => $area
@@ -660,6 +647,7 @@ class ProduksiController extends BaseController
 
         $dataSummaryPertgl = $this->orderModel->getdataSummaryPertgl($data);
         $prodSummaryPertgl = $this->orderModel->getProdSummaryPertgl($data);
+        $totalProd = $this->orderModel->getDataTimter($data);
 
         // agar data tgl produksi menjadi unik
         $tgl_produksi = [];
@@ -679,6 +667,8 @@ class ProduksiController extends BaseController
                     'machinetypeid' => $item['machinetypeid'],
                     'mastermodel' => $item['mastermodel'],
                     'size' => $item['size'],
+                    'qty_produksi' => $item['qty_produksi'],
+                    'max_delivery' => $item['max_delivery'],
                     'qty' => 0,
                     'running' => 0,
                     'ttl_prod' => 0,
@@ -697,7 +687,7 @@ class ProduksiController extends BaseController
             'active1' => '',
             'active2' => '',
             'active3' => '',
-            'active4' => '',
+            'active4' => 'active',
             'active5' => '',
             'active6' => '',
             'active7' => '',
@@ -705,6 +695,7 @@ class ProduksiController extends BaseController
             'tglProdUnik' => $tgl_produksi,
             'uniqueData' => $uniqueData,
             'prodSummaryPertgl' => $prodSummaryPertgl,
+            'total' => $totalProd,
             'role' => session()->get('role'),
             'title' => 'Summary Produksi Per Tanggal ' . $pdk,
             'dataFilter' => $data,
@@ -727,7 +718,7 @@ class ProduksiController extends BaseController
 
         $dataSummary = $this->orderModel->getProdSummary($data);
         $totalShip = $this->orderModel->getTotalShipment($data);
-
+        $totalProd = $this->orderModel->getdataSummaryPertgl($data);
         // Debugging to check if $totalShip is an array
         if (!is_array($totalShip)) {
             echo "Error: totalShip is not an array!";
@@ -747,6 +738,7 @@ class ProduksiController extends BaseController
                     'machinetypeid' => $item['machinetypeid'],
                     'mastermodel' => $item['mastermodel'],
                     'size' => $item['size'],
+                    'color' => $item['color'],
                     'delivery' => $item['delivery'],
                     'qty_deliv' => 0,
                     'running' => 0,
@@ -759,8 +751,6 @@ class ProduksiController extends BaseController
             $uniqueData[$key]['bruto'] += $item['bruto'];
             $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
         }
-        // Sort ASC
-        sort($uniqueData);
 
         $data2 = [
             'active1' => '',
@@ -772,6 +762,7 @@ class ProduksiController extends BaseController
             'active7' => '',
             'uniqueData' => $uniqueData,
             'total_ship' => $totalShip,
+            'total_prod' => $totalProd,
             'role' => session()->get('role'),
             'title' => 'Summary Produksi ' . $pdk,
             'dataFilter' => $data,
@@ -793,6 +784,7 @@ class ProduksiController extends BaseController
         ];
 
         $dataTimter = $this->orderModel->getDataTimter($data);
+        $poTimter = $this->orderModel->getQtyPOTimter($data);
         $prodTimter = $this->orderModel->getDetailProdTimter($data);
         $jlMC = $this->orderModel->getprodSummaryPertgl($data);
         // dd($dataTimter);
@@ -808,6 +800,7 @@ class ProduksiController extends BaseController
                     'machinetypeid' => $item['machinetypeid'],
                     'mastermodel' => $item['mastermodel'],
                     'size' => $item['size'],
+                    'color' => $item['color'],
                     'smv' => $item['smv'],
                     'delivery' => $item['delivery'],
                     'qty' => 0,
@@ -831,6 +824,7 @@ class ProduksiController extends BaseController
             'active6' => '',
             'active7' => '',
             'dataTimter' => $dataTimter,
+            'poTimter' => $poTimter,
             'prodTimter' => $prodTimter,
             'jlMC' => $jlMC,
             'uniqueData' => $uniqueData,
@@ -841,7 +835,6 @@ class ProduksiController extends BaseController
         ];
         return view(session()->get('role') . '/Produksi/timterProduksi', $data3);
     }
-
 
     public function editproduksi()
     {
@@ -870,100 +863,5 @@ class ProduksiController extends BaseController
         } else {
             return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Gagal Update Sisa Order');
         }
-    }
-
-    public function importbssetting()
-    {
-        $file = $this->request->getFile('excel_file');
-        ini_set('memory_limit', '512M');
-        set_time_limit(180);
-
-        $file = $this->request->getFile('excel_file');
-        if ($file->isValid() && !$file->hasMoved()) {
-            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
-            $worksheet = $spreadsheet->getActiveSheet();
-
-            $startRow = 10; // Ganti dengan nomor baris mulai
-            $batchSize = 15; // Ukuran batch
-            $batchData = [];
-            $failedRows = []; // Array untuk menyimpan informasi baris yang gagal
-            $db = \Config\Database::connect();
-
-            foreach ($worksheet->getRowIterator($startRow) as $row) {
-                $rowIndex = $row->getRowIndex();
-                $cellIterator = $row->getCellIterator();
-                $cellIterator->setIterateOnlyExistingCells(false);
-                $data = ['role' => session()->get('role'),];
-                foreach ($cellIterator as $cell) {
-                    $data[] = $cell->getValue();
-                }
-
-                if (!empty($data)) {
-                    $batchData[] = ['rowIndex' => $rowIndex, 'data' => $data];
-                    // Process batch
-                    if (count($batchData) >= $batchSize) {
-                        $this->prossesBs($batchData, $db, $failedRows);
-                        $batchData = []; // Reset batch data
-                    }
-                }
-            }
-
-            // Process any remaining data
-            if (!empty($batchData)) {
-                $this->prossesBs($batchData, $db, $failedRows);
-            }
-
-            // Prepare notification message for failed rows
-            if (!empty($failedRows)) {
-                $failedRowsStr = implode(', ', $failedRows);
-                $errorMessage = "Baris berikut gagal diimpor: $failedRowsStr";
-                return redirect()->to(base_url(session()->get('role') . '/produksi'))->with('error', $errorMessage);
-            }
-
-            return redirect()->to(base_url(session()->get('role') . '/produksi'))->withInput()->with('success', 'Data Berhasil di Import');
-        } else {
-            return redirect()->to(base_url(session()->get('role') . '/produksi'))->with('error', 'No data found in the Excel file');
-        }
-    }
-    private function prossesBs($batchData, $db, &$failedRows)
-    {
-        $db->transStart();
-        foreach ($batchData as $batchItem) {
-            $rowIndex = $batchItem['rowIndex'];
-            $data = $batchItem['data'];
-
-            try {
-                $no_model = $data[2];
-                $style = $data[3];
-                $validate = [
-                    'no_model' => $no_model,
-                    'style' => $style
-                ];
-                $idAps = $this->ApsPerstyleModel->getId($validate);
-                if (!$idAps) {
-                    if ($data[0] == null) {
-                        continue; // Skip empty rows
-                    } else {
-                        $failedRows[] = "style tidak ditemukan" . $rowIndex;
-                        continue;
-                    }
-                } else {
-                    $id = $idAps['idapsperstyle'];
-                    $sisaOrder = $idAps['sisa'];
-                    $qtyerp = $data[14];
-                    $qty = str_replace('-', '', $qtyerp);
-                    $sisaQty = $sisaOrder + $qty;
-
-                    $updateBs = $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
-                    if (!$updateBs) {
-                        $failedRows[] = $rowIndex;
-                        continue;
-                    }
-                }
-            } catch (\Exception $e) {
-                $failedRows[] = $rowIndex;
-            }
-        }
-        $db->transComplete();
     }
 }

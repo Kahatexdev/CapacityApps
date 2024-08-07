@@ -66,6 +66,7 @@ class TimterController extends BaseController
         ];
 
         $dataTimter = $this->orderModel->getDataTimter($data);
+        $poTimter = $this->orderModel->getQtyPOTimter($data);
         $prodTimter = $this->orderModel->getDetailProdTimter($data);
         $jlMC = $this->orderModel->getprodSummaryPertgl($data);
         // dd($dataTimter);
@@ -81,6 +82,7 @@ class TimterController extends BaseController
                     'machinetypeid' => $item['machinetypeid'],
                     'mastermodel' => $item['mastermodel'],
                     'size' => $item['size'],
+                    'color' => $item['color'],
                     'smv' => $item['smv'],
                     'delivery' => $item['delivery'],
                     'qty' => 0,
@@ -101,10 +103,11 @@ class TimterController extends BaseController
         $sheet = $spreadsheet->getActiveSheet();
 
         // Style
-        $styleHeaderIso = [
+        $styleHeader = [
             'font' => [
                 'size' => 12,
                 'bold' => true,
+                'name' => 'Arial',
             ],
             'alignment' => [
                 'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
@@ -112,16 +115,16 @@ class TimterController extends BaseController
             ],
             'borders' => [
                 'outline' => [
-                    'borderStyle' => Border::BORDER_DOUBLE, // Gaya garis tipis
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
                     'color' => ['argb' => 'FF000000'],    // Warna garis hitam
                 ],
             ],
         ];
-
-        $styleHeader = [
+        $styleHeader2 = [
             'font' => [
-                'size' => 12,
+                'size' => 11,
                 'bold' => true,
+                'name' => 'Arial',
             ],
             'alignment' => [
                 'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
@@ -135,6 +138,10 @@ class TimterController extends BaseController
             ],
         ];
         $styleBody = [
+            'font' => [
+                'size' => 11,
+                'name' => 'Arial',
+            ],
             'alignment' => [
                 'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
                 'vertical' => Alignment::VERTICAL_CENTER, // Alignment rata tengah
@@ -148,10 +155,10 @@ class TimterController extends BaseController
         ];
         // mengatur tinggi semua baris
         $sheet->getDefaultRowDimension()->setRowHeight(19);
-        // Mendefinisikan kolom A sampai Z
-        $columns = range('A', 'Z');
+        // Mendefinisikan kolom B sampai AD
+        $columns = range('B', 'AF');
 
-        // Mengatur autosize untuk setiap kolom dalam range A sampai Z
+        // Mengatur autosize untuk setiap kolom dalam range B sampai AD
         foreach ($columns as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
@@ -165,33 +172,53 @@ class TimterController extends BaseController
         $drawing->setPath($pathToImage);
         $drawing->setCoordinates('A1');
         // Set ukuran gambar
-        $drawing->setHeight(50);
-        $drawing->setWidth(50);
+        $sizeInCm = 1.25;
+        $sizeInPixels = $sizeInCm * 37.7952755906;
+        $drawing->setHeight($sizeInPixels);
+        $drawing->setWidth($sizeInPixels);
         $drawing->setOffsetY(5);
-        $drawing->setOffsetX(27);
+        $drawing->setOffsetX(70);
 
         $drawing->setWorksheet($sheet);
 
-        $sheet->mergeCells('A1:A3')->getStyle('A1:A3')
-            ->applyFromArray([
-                'alignment' => [
-                    'horizontal' => Alignment::HORIZONTAL_CENTER,
-                    'vertical' => Alignment::VERTICAL_TOP
+        $sheet->mergeCells('A1:A3')->getStyle('A1:A3')->applyFromArray([
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_TOP
+            ],
+            'borders' => [
+                'top' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
                 ],
-                'borders' => [
-                    'outline' => [
-                        'borderStyle' => Border::BORDER_DOUBLE,
-                        'color' => ['rgb' => '000000']
-                    ],
+                'bottom' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
                 ],
-            ]);
-        $sheet->getColumnDimension('A')->setWidth(15);
+                'left' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'right' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+        ]);
+
+        // mengatur lebar kolom A
+        $sheet->getColumnDimension('A')->setWidth(221);
+        // mengatur tinggi baris 1
+        $heightInCm = 0.98;
+        $heightInPoints = $heightInCm / 0.0352778;
+        $sheet->getRowDimension('1')->setRowHeight($heightInPoints);
 
         $sheet->setCellValue('A1', 'PT. KAHATEX');
         $sheet->getStyle('A1')->applyFromArray([
             'font' => [
                 'bold' => true,
-                'size' => 12,
+                'size' => 11,
+                'name' => 'Arial',
             ],
             'alignment' => [
                 'horizontal' => Alignment::HORIZONTAL_CENTER,
@@ -200,19 +227,28 @@ class TimterController extends BaseController
         ]);
 
         $sheet->setCellValue('B1', 'FORMULIR');
-        $sheet->mergeCells('B1:AD1')->getStyle('B1:AD1')->applyFromArray([
+        $sheet->mergeCells('B1:AF1')->getStyle('B1:AF1')->applyFromArray([
             'font' => [
                 'bold' => true,
-                'size' => 12,
+                'size' => 16,
+                'name' => 'Arial',
             ],
             'alignment' => [
                 'horizontal' => Alignment::HORIZONTAL_CENTER,
                 'vertical' => Alignment::VERTICAL_CENTER,
             ],
             'borders' => [
-                'outline' => [
+                'top' => [
                     'borderStyle' => Border::BORDER_DOUBLE,
-                    'color' => ['rgb' => '000000']
+                    'color' => ['rgb' => '000000'],
+                ],
+                'left' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'right' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
                 ],
             ],
             'fill' => [
@@ -223,82 +259,244 @@ class TimterController extends BaseController
             ],
         ]);
 
+        // mengatur tinggi baris 2 & 3
+        $heightInCm2 = 0.56;
+        $heightInPoints2 = $heightInCm2 / 0.0352778;
+        $sheet->getRowDimension('2')->setRowHeight($heightInPoints2);
+        $sheet->getRowDimension('3')->setRowHeight($heightInPoints2);
+
         $sheet->setCellValue('B2', 'DEPARTEMEN KAOSKAKI');
-        $sheet->mergeCells('B2:AD2')->getStyle('B2:AD2')->applyFromArray($styleHeaderIso);
+        $sheet->mergeCells('B2:AF2')->getStyle('B2:AF2')->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'size' => 12,
+                'name' => 'Arial',
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'left' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'right' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+        ]);
 
         $sheet->setCellValue('B3', 'TIMBANG TERIMA');
-        $sheet->mergeCells('B3:AD3')->getStyle('B3:AD3')->applyFromArray($styleHeaderIso);
+        $sheet->mergeCells('B3:AF3')->getStyle('B3:AF3')->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'size' => 12,
+                'name' => 'Arial',
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'bottom' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'left' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'right' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+        ]);
 
         $sheet->setCellValue('A4', 'No. Dokumen');
-        $sheet->getStyle('A4')->applyFromArray($styleHeaderIso);
+        $sheet->getStyle('A4')->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'size' => 11,
+                'name' => 'Arial',
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_LEFT,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'top' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'bottom' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'left' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'right' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+        ]);
 
         $sheet->setCellValue('B4', ' FOR–KK–025/REV-01/HAL_/_');
         $sheet->mergeCells('B4:W4')->getStyle('B4:W4')->applyFromArray([
             'font' => [
-                'size' => 12,
+                'size' => 11,
                 'bold' => true,
+                'name' => 'Arial',
             ],
             'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_LEFT, // Alignment rata kiri
-                'vertical' => Alignment::VERTICAL_CENTER, // Alignment rata tengah
+                'horizontal' => Alignment::HORIZONTAL_LEFT,
+                'vertical' => Alignment::VERTICAL_CENTER,
             ],
             'borders' => [
-                'outline' => [
-                    'borderStyle' => Border::BORDER_DOUBLE, // Gaya garis tipis
-                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                'top' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'bottom' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'left' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'right' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
                 ],
             ],
         ]);
 
-        $sheet->setCellValue('X4', 'Tanggal Revisi 31 Desember 2018');
-        $sheet->mergeCells('X4:AD4')->getStyle('U4:AD4')->applyFromArray([
+        $sheet->setCellValue('X4', 'Tanggal Revisi ');
+        $sheet->mergeCells('X4:AA4')->getStyle('X4:AA4')->applyFromArray([
             'font' => [
-                'size' => 12,
+                'size' => 11,
                 'bold' => true,
+                'name' => 'Arial',
             ],
             'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_LEFT, // Alignment rata kiri
-                'vertical' => Alignment::VERTICAL_CENTER, // Alignment rata tengah
+                'horizontal' => Alignment::HORIZONTAL_LEFT,
+                'vertical' => Alignment::VERTICAL_CENTER,
             ],
             'borders' => [
-                'outline' => [
-                    'borderStyle' => Border::BORDER_DOUBLE, // Gaya garis tipis
-                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                'top' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'bottom' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'left' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'right' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
                 ],
             ],
         ]);
+
+        $sheet->setCellValue('AB4', '31 Desember 2018');
+        $sheet->mergeCells('AB4:AF4')->getStyle('AB4:AF4')->applyFromArray([
+            'font' => [
+                'size' => 11,
+                'bold' => true,
+                'name' => 'Arial',
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'top' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'bottom' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'left' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'right' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+        ]);
+
         $sheet->setCellValue('A5', ' AREA : ' . $area);
         $sheet->mergeCells('A5:W5')->getStyle('A5:W5')->applyFromArray([
             'font' => [
                 'size' => 12,
                 'bold' => true,
+                'name' => 'Arial',
             ],
             'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_LEFT, // Alignment rata kiri
-                'vertical' => Alignment::VERTICAL_CENTER, // Alignment rata tengah
+                'horizontal' => Alignment::HORIZONTAL_LEFT,
+                'vertical' => Alignment::VERTICAL_CENTER,
             ],
             'borders' => [
-                'outline' => [
-                    'borderStyle' => Border::BORDER_DOUBLE, // Gaya garis tipis
-                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                'top' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'bottom' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'left' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'right' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
                 ],
             ],
         ]);
 
         $sheet->setCellValue('X5', 'Tanggal : ' . $awal);
-        $sheet->mergeCells('X5:AD5')->getStyle('U5:AD5')->applyFromArray([
+        $sheet->mergeCells('X5:AF5')->getStyle('U5:AF5')->applyFromArray([
             'font' => [
                 'size' => 12,
                 'bold' => true,
+                'name' => 'Arial',
             ],
             'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_LEFT, // Alignment rata kiri
-                'vertical' => Alignment::VERTICAL_CENTER, // Alignment rata tengah
+                'horizontal' => Alignment::HORIZONTAL_LEFT,
+                'vertical' => Alignment::VERTICAL_CENTER,
             ],
             'borders' => [
-                'outline' => [
-                    'borderStyle' => Border::BORDER_DOUBLE, // Gaya garis tipis
-                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                'top' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'bottom' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'left' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'right' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
                 ],
             ],
         ]);
@@ -306,9 +504,37 @@ class TimterController extends BaseController
 
         // header tabel timter
         $sheet->setCellValue('A6', 'SEAM');
-        $sheet->mergeCells('A6:A7')->getStyle('A6:A7')->applyFromArray($styleHeader);
+        $sheet->mergeCells('A6:A7')->getStyle('A6:A7')->applyFromArray([
+            'font' => [
+                'size' => 12,
+                'bold' => true,
+                'name' => 'Arial',
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'top' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'bottom' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'left' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'right' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+        ]);
 
-        $sheet->setCellValue('B6', 'CODE BUYER');
+        $sheet->setCellValue('B6', 'BUYER');
         $sheet->mergeCells('B6:B7')->getStyle('B6:B7')->applyFromArray($styleHeader);
 
         $sheet->setCellValue('C6', 'NO ORDER');
@@ -338,7 +564,7 @@ class TimterController extends BaseController
         $sheet->setCellValue('K6', 'TARGET');
         $sheet->mergeCells('K6:K7')->getStyle('K6:K7')->applyFromArray($styleHeader);
 
-        $sheet->setCellValue('L6', 'JUMLAH MC');
+        $sheet->setCellValue('L6', 'JML MC');
         $sheet->mergeCells('L6:L7')->getStyle('L6:L7')->applyFromArray($styleHeader);
 
         $sheet->setCellValue('M6', 'NO MC');
@@ -347,63 +573,97 @@ class TimterController extends BaseController
         $sheet->setCellValue('N6', 'A');
         $sheet->mergeCells('N6:O6')->getStyle('N6:O6')->applyFromArray($styleHeader);
         $sheet->setCellValue('N7', 'DZ');
-        $sheet->getStyle('N7')->applyFromArray($styleHeader);
+        $sheet->getStyle('N7')->applyFromArray($styleHeader2);
         $sheet->setCellValue('O7', 'PCS');
-        $sheet->getStyle('O7')->applyFromArray($styleHeader);
+        $sheet->getStyle('O7')->applyFromArray($styleHeader2);
 
         $sheet->setCellValue('P6', 'B');
         $sheet->mergeCells('P6:Q6')->getStyle('P6:Q6')->applyFromArray($styleHeader);
         $sheet->setCellValue('P7', 'DZ');
-        $sheet->getStyle('P7')->applyFromArray($styleHeader);
+        $sheet->getStyle('P7')->applyFromArray($styleHeader2);
         $sheet->setCellValue('Q7', 'PCS');
-        $sheet->getStyle('Q7')->applyFromArray($styleHeader);
+        $sheet->getStyle('Q7')->applyFromArray($styleHeader2);
 
         $sheet->setCellValue('R6', 'C');
         $sheet->mergeCells('R6:S6')->getStyle('R6:S6')->applyFromArray($styleHeader);
         $sheet->setCellValue('R7', 'DZ');
-        $sheet->getStyle('R7')->applyFromArray($styleHeader);
+        $sheet->getStyle('R7')->applyFromArray($styleHeader2);
         $sheet->setCellValue('S7', 'PCS');
-        $sheet->getStyle('S7')->applyFromArray($styleHeader);
+        $sheet->getStyle('S7')->applyFromArray($styleHeader2);
 
         $sheet->setCellValue('T6', 'PA');
         $sheet->mergeCells('T6:U6')->getStyle('T6:U6')->applyFromArray($styleHeader);
         $sheet->setCellValue('T7', 'DZ');
-        $sheet->getStyle('T7')->applyFromArray($styleHeader);
+        $sheet->getStyle('T7')->applyFromArray($styleHeader2);
         $sheet->setCellValue('U7', 'PCS');
-        $sheet->getStyle('U7')->applyFromArray($styleHeader);
+        $sheet->getStyle('U7')->applyFromArray($styleHeader2);
 
         $sheet->setCellValue('V6', 'TOTAL');
         $sheet->mergeCells('V6:W6')->getStyle('V6:W6')->applyFromArray($styleHeader);
         $sheet->setCellValue('V7', 'DZ');
-        $sheet->getStyle('V7')->applyFromArray($styleHeader);
+        $sheet->getStyle('V7')->applyFromArray($styleHeader2);
         $sheet->setCellValue('W7', 'PCS');
-        $sheet->getStyle('W7')->applyFromArray($styleHeader);
+        $sheet->getStyle('W7')->applyFromArray($styleHeader2);
 
-        $sheet->setCellValue('X6', 'QTY DELIVERY');
+        $sheet->setCellValue('X6', 'PRODUKSI');
         $sheet->mergeCells('X6:Y6')->getStyle('X6:Y6')->applyFromArray($styleHeader);
         $sheet->setCellValue('X7', 'DZ');
-        $sheet->getStyle('X7')->applyFromArray($styleHeader);
+        $sheet->getStyle('X7')->applyFromArray($styleHeader2);
         $sheet->setCellValue('Y7', 'PCS');
-        $sheet->getStyle('Y7')->applyFromArray($styleHeader);
+        $sheet->getStyle('Y7')->applyFromArray($styleHeader2);
 
-        $sheet->setCellValue('Z6', 'PRODUKSI');
+        $sheet->setCellValue('Z6', 'QTY DELIVERY');
         $sheet->mergeCells('Z6:AA6')->getStyle('Z6:AA6')->applyFromArray($styleHeader);
         $sheet->setCellValue('Z7', 'DZ');
-        $sheet->getStyle('Z7')->applyFromArray($styleHeader);
+        $sheet->getStyle('Z7')->applyFromArray($styleHeader2);
         $sheet->setCellValue('AA7', 'PCS');
-        $sheet->getStyle('AA7')->applyFromArray($styleHeader);
+        $sheet->getStyle('AA7')->applyFromArray($styleHeader2);
 
-        $sheet->setCellValue('AB6', 'SISA PRODUKSI');
+        $sheet->setCellValue('AB6', 'TOTAL PRODUKSI');
         $sheet->mergeCells('AB6:AC6')->getStyle('AB6:AC6')->applyFromArray($styleHeader);
         $sheet->setCellValue('AB7', 'DZ');
-        $sheet->getStyle('AB7')->applyFromArray($styleHeader);
+        $sheet->getStyle('AB7')->applyFromArray($styleHeader2);
         $sheet->setCellValue('AC7', 'PCS');
-        $sheet->getStyle('AC7')->applyFromArray($styleHeader);
+        $sheet->getStyle('AC7')->applyFromArray($styleHeader2);
 
-        $sheet->setCellValue('AD6', 'KETERANGAN');
-        $sheet->mergeCells('AD6:AD7')->getStyle('AB6:AD7')->applyFromArray($styleHeader);
-        $sheet->getStyle('AD7')->applyFromArray($styleHeader);
-        $sheet->getColumnDimension('AD')->setAutoSize(true);
+        $sheet->setCellValue('AD6', 'SISA PRODUKSI');
+        $sheet->mergeCells('AD6:AE6')->getStyle('AD6:AE6')->applyFromArray($styleHeader);
+        $sheet->setCellValue('AD7', 'DZ');
+        $sheet->getStyle('AD7')->applyFromArray($styleHeader2);
+        $sheet->setCellValue('AE7', 'PCS');
+        $sheet->getStyle('AE7')->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('AF6', 'KETERANGAN');
+        $sheet->mergeCells('AF6:AF7')->getStyle('AF6:AF7')->applyFromArray([
+            'font' => [
+                'size' => 12,
+                'bold' => true,
+                'name' => 'Arial',
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'top' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'bottom' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'left' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'right' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+        ]);
+        $sheet->getColumnDimension('AF')->setAutoSize(true);
         // end Header Timter
 
         // body start
@@ -413,7 +673,7 @@ class TimterController extends BaseController
         foreach ($uniqueData as $key => $id) :
             $smv = $id['smv'];
             if (!empty($smv)) {
-                $target = 86400 / (floatval($smv) * 0.8) / 24;
+                $target = 86400 / floatval($smv) * 0.8 / 24;
             } else {
                 $target = 0;
             }
@@ -424,13 +684,18 @@ class TimterController extends BaseController
             $sheet->setCellValue('E' . $row, ($id['mastermodel'] != $prevModel) ? $id['mastermodel'] : '');
             $sheet->setCellValue('F' . $row, '');
             $sheet->setCellValue('G' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['size'] : '');
-            $sheet->setCellValue('H' . $row, '');
+            $sheet->setCellValue('H' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['color'] : '');
             $sheet->setCellValue('I' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['smv'] : '');
-            $sheet->setCellValue('J' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['delivery'] : '');
-            $sheet->setCellValue('K' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $target : '');
+            foreach ($poTimter as $po) {
+                if ($po['machinetypeid'] == $id['machinetypeid'] && $po['mastermodel'] == $id['mastermodel'] && $po['size'] == $id['size']) {
+                    $sheet->setCellValue('J' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $po['delivery'] : '');
+                    break;
+                }
+            }
+            $sheet->setCellValue('K' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($target, 0) : '');
             foreach ($jlMC as $jl) {
                 if ($jl['mastermodel'] == $id['mastermodel'] && $jl['size'] == $id['size']) {
-                    $sheet->setCellValue('L' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $jl['jl_mc'] . 'mc' : '');
+                    $sheet->setCellValue('L' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $jl['jl_mc'] : '');
                     break;
                 }
             }
@@ -474,24 +739,63 @@ class TimterController extends BaseController
                     break;
                 }
             }
-            foreach ($dataTimter as $data) {
-                if ($data['machinetypeid'] == $id['machinetypeid'] && $data['mastermodel'] == $id['mastermodel'] && $data['size'] == $id['size']) {
-                    $sisa = $data['qty'] - $data['qty_produksi'];
-                    $sheet->setCellValue('X' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($data['qty'] / 24) : '');
-                    $sheet->setCellValue('Y' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($data['qty'] % 24) : '');
-                    $sheet->setCellValue('Z' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($data['qty_produksi'] / 24) : '');
-                    $sheet->setCellValue('AA' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($data['qty_produksi'] % 24) : '');
-                    $sheet->setCellValue('AB' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($sisa / 24) : '');
-                    $sheet->setCellValue('AC' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($sisa % 24) : '');
+            foreach ($jlMC as $prod) {
+                if ($prod['mastermodel'] == $id['mastermodel'] && $prod['size'] == $id['size']) {
+                    $sheet->setCellValue('X' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($prod['qty_produksi'] / 24) : '');
+                    $sheet->setCellValue('Y' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($prod['qty_produksi'] % 24) : '');
                     break;
                 }
             }
-            $sheet->setCellValue('AD' . $row, '');
+            foreach ($poTimter as $po) {
+                if ($po['machinetypeid'] == $id['machinetypeid'] && $po['mastermodel'] == $id['mastermodel'] && $po['size'] == $id['size']) {
+                    $sheet->setCellValue('Z' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($po['qty'] / 24) : '');
+                    $sheet->setCellValue('AA' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($po['qty'] % 24) : '');
+                    foreach ($dataTimter as $data) {
+                        if ($data['machinetypeid'] == $id['machinetypeid'] && $data['mastermodel'] == $id['mastermodel'] && $data['size'] == $id['size']) {
+                            $sisa = $po['qty'] - $data['qty_produksi'];
+                            $sheet->setCellValue('AB' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($data['qty_produksi'] / 24) : '');
+                            $sheet->setCellValue('AC' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($data['qty_produksi'] % 24) : '');
+                            $sheet->setCellValue('AD' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($sisa / 24) : '');
+                            $sheet->setCellValue('AE' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($sisa % 24) : '');
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+            $sheet->setCellValue('AF' . $row, '');
             $prevModel = $id['mastermodel'];
             $prevSize = $id['mastermodel'] . $id['size'];
 
             // style body
-            $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('A' . $row)->applyFromArray([
+                'font' => [
+                    'size' => 11,
+                    'name' => 'Arial',
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'top' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'bottom' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'left' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'right' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                ],
+            ]);
             $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('C' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('D' . $row)->applyFromArray($styleBody);
@@ -521,6 +825,35 @@ class TimterController extends BaseController
             $sheet->getStyle('AB' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('AC' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('AD' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('AE' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('AF' . $row)->applyFromArray([
+                'font' => [
+                    'size' => 11,
+                    'name' => 'Arial',
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'top' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'bottom' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'left' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'right' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                ],
+            ]);
             $row++;
         endforeach;
 
