@@ -316,10 +316,11 @@ class ApsPerstyleModel extends Model
             ->where('size', $validate['style'])
             ->first();
     }
-    public function getSisaPerJarum($model, $tanggal)
+    public function getSisaPerJarum($model, $start, $stop)
     {
-        return $this->select('sum(sisa) as sisa, machinetypeid, mastermodel')
-            ->where('delivery', $tanggal)
+        return $this->select('sum(sisa) as sisa, machinetypeid, mastermodel, factory')
+            ->where('delivery >=', $start)
+            ->where('delivery <=', $stop)
             ->where('mastermodel', $model)
             ->where('sisa >', 0)
             ->groupby('machinetypeid')
@@ -341,6 +342,7 @@ class ApsPerstyleModel extends Model
         $data = $this->select('idapsperstyle, delivery, sisa,qty')
             ->where('mastermodel', $validate['no_model'])
             ->where('size', $validate['style'])
+            ->where('qty != sisa')
             ->orderBy('sisa', 'ASC') // Mengurutkan berdasarkan 'sisa' dari yang terkecil
             ->first(); // Mengambil data pertama (yang terkecil)
 

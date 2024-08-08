@@ -155,4 +155,11 @@ class ProduksiModel extends Model
             ->orderBy('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, produksi.tgl_produksi', 'ASC')
             ->findAll();
     }
+    public function getIdForBs($validate)
+    {
+        return $this->where('no_box', $validate['no_box'])
+            ->where('no_label', $validate['no_label'])
+            ->where('no_mesin', $validate['no_mesin'])
+            ->first();
+    }
 }

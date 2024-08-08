@@ -48,9 +48,8 @@ class BsModel extends Model
             ->groupBy('area')
             ->findAll();
     }
-    public function  getDataBsFilter($theData)
+    public function getDataBsFilter($theData)
     {
-
         $this->select('apsperstyle.idapsperstyle, apsperstyle.mastermodel, apsperstyle.size, data_bs.*, master_deffect.Keterangan')
             ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle')
             ->join('master_deffect', 'master_deffect.kode_deffect = data_bs.kode_deffect')
@@ -61,11 +60,13 @@ class BsModel extends Model
             $this->where('apsperstyle.mastermodel', $theData['pdk']);
         }
         if (!empty($theData['area'])) {
-            $this->where('area', $theData['area']);
+            $this->where('data_bs.area', $theData['area']);
         }
 
-        return $this->groupBy('tgl_instocklot,apsperstyle.size')->findAll();
+        $data = $this->groupBy('tgl_instocklot, apsperstyle.size')->findAll();
+        return $data;
     }
+
     public function  totalBs($theData)
     {
 
