@@ -736,7 +736,7 @@ class MesinController extends BaseController
         $stop = $this->request->getPost("stop");
 
         // Mendapatkan data sisa kapasitas per jarum
-        $pdk = $this->ApsPerstyleModel->getSisaPerJarum($model, $tanggal);
+        $pdk = $this->ApsPerstyleModel->getSisaPerJarum($model, $start, $stop);
         dd($pdk);
         $sisaOrder = [];
         $rekomendasiArea = [];

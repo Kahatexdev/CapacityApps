@@ -593,7 +593,7 @@ class ProduksiController extends BaseController
                             if (!$existingProduction) {
                                 $insert =  $this->produksiModel->insert($dataInsert);
                                 if ($insert) {
-                                    $this->ApsPerstyleModel->update($idnext, ['sisa' => $sisa]);
+                                    $this->ApsPerstyleModel->update($idnext, ['sisa' => $sisa, 'factory' => $area]);
                                 } else {
                                     $failedRows[] = $rowIndex;
                                     continue;
@@ -636,7 +636,7 @@ class ProduksiController extends BaseController
                     if (!$existingProduction) {
                         $insert =  $this->produksiModel->insert($dataInsert);
                         if ($insert) {
-                            $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
+                            $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty,  'factory' => $area]);
                         } else {
                             $failedRows[] = $rowIndex;
                             continue;

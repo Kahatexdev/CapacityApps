@@ -316,10 +316,11 @@ class ApsPerstyleModel extends Model
             ->where('size', $validate['style'])
             ->first();
     }
-    public function getSisaPerJarum($model, $tanggal)
+    public function getSisaPerJarum($model, $start, $stop)
     {
-        return $this->select('sum(sisa) as sisa, machinetypeid, mastermodel')
-            ->where('delivery', $tanggal)
+        return $this->select('sum(sisa) as sisa, machinetypeid, mastermodel, factory')
+            ->where('delivery >=', $start)
+            ->where('delivery <=', $stop)
             ->where('mastermodel', $model)
             ->where('sisa >', 0)
             ->groupby('machinetypeid')

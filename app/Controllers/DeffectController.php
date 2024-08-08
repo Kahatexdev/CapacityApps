@@ -114,8 +114,8 @@ class DeffectController extends BaseController
         $chartData = $this->BsModel->chartData($theData);
         $data = [
             'role' => session()->get('role'),
-            'title' => session()->get('role') . ' System',
-            'active1' => 'active',
+            'title' => ' Data BS',
+            'active1' => '',
             'active2' => '',
             'active3' => '',
             'active4' => '',
@@ -131,6 +131,7 @@ class DeffectController extends BaseController
             'totalbs' => $total,
             'chart' => $chartData
         ];
+
         return view(session()->get('role') . '/Deffect/bstabel', $data);
     }
 }
