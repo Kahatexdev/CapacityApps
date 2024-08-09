@@ -352,7 +352,7 @@ class ProduksiController extends BaseController
     }
     public function produksiAreaChart()
     {
-        $bulan = 07;
+        $bulan = date('m');
         $month = date('F');
         $totalMesin = $this->jarumModel->getArea();
         $produksiPerArea = [];
@@ -452,7 +452,6 @@ class ProduksiController extends BaseController
         foreach ($batchData as $batchItem) {
             $rowIndex = $batchItem['rowIndex'];
             $data = $batchItem['data'];
-
             try {
                 $no_model = $data[2];
                 $style = $data[3];
@@ -461,6 +460,7 @@ class ProduksiController extends BaseController
                     'style' => $style
                 ];
                 $idAps = $this->ApsPerstyleModel->getIdProd($validate);
+
                 if (!$idAps) {
                     if ($data[0] == null) {
                         continue; // Skip empty rows
@@ -564,7 +564,47 @@ class ProduksiController extends BaseController
                             'sisa' => $sisaOrder
                         ];
                         $nextid = $this->ApsPerstyleModel->getIdBawahnya($second);
-                        if ($nextid) {
+                        if (!$nextid) {
+                            $dataInsert = [
+                                'tgl_produksi' => $tglprod,
+                                'idapsperstyle' => $id,
+                                'bagian' => $bagian,
+                                'storage_awal' => $storage1,
+                                'storage_akhir' => $storage2,
+                                'qty_produksi' => $qty,
+                                'bs_prod' => 0,
+                                'kategori_bs' => $kategoriBs,
+                                'no_box' => $no_box,
+                                'no_label' => $no_label,
+                                'admin' => $admin,
+                                'shift' => $shift,
+                                'shift_a' => $shifta,
+                                'shift_b' => $shiftb,
+                                'shift_c' => $shiftc,
+                                'no_mesin' => $no_mesin,
+                                'delivery' => $delivery,
+                                'area' => $area
+                            ];
+
+                            $existingProduction = $this->produksiModel->existingData($dataInsert);
+                            if (!$existingProduction) {
+                                $insert =  $this->produksiModel->insert($dataInsert);
+                                if ($insert) {
+                                    $this->ApsPerstyleModel->update($id, ['sisa' => $minus,  'factory' => $area]);
+                                } else {
+                                    $failedRows[] = $rowIndex;
+                                    continue;
+                                }
+                            } else {
+                                $idexist = $existingProduction['id_produksi'];
+                                // $sumqty = $existingProduction['qty_produksi'] + $qty;
+                                // $this->produksiModel->update($idexist, ['qty_produksi' => $sumqty]);
+                                // $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
+
+                                $failedRows[] = $rowIndex; // Add to failed rows if production data already exists
+
+                            }
+                        } else {
                             $idnext = $nextid['idapsperstyle'];
                             $qtysisa = $nextid['sisa'];
                             $sisa = $qtysisa + $minus;
@@ -608,47 +648,46 @@ class ProduksiController extends BaseController
                                 $failedRows[] = $rowIndex; // Add to failed rows if production data already exists
                             }
                             $sisaQty = 0;
-                        } else {
-                            $sisaQty = $minus;
-                        }
-                    }
-                    $dataInsert = [
-                        'tgl_produksi' => $tglprod,
-                        'idapsperstyle' => $id,
-                        'bagian' => $bagian,
-                        'storage_awal' => $storage1,
-                        'storage_akhir' => $storage2,
-                        'qty_produksi' => $qty,
-                        'bs_prod' => 0,
-                        'kategori_bs' => $kategoriBs,
-                        'no_box' => $no_box,
-                        'no_label' => $no_label,
-                        'admin' => $admin,
-                        'shift' => $shift,
-                        'shift_a' => $shifta,
-                        'shift_b' => $shiftb,
-                        'shift_c' => $shiftc,
-                        'no_mesin' => $no_mesin,
-                        'delivery' => $delivery,
-                        'area' => $area
-                    ];
-                    $existingProduction = $this->produksiModel->existingData($dataInsert);
-                    if (!$existingProduction) {
-                        $insert =  $this->produksiModel->insert($dataInsert);
-                        if ($insert) {
-                            $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty,  'factory' => $area]);
-                        } else {
-                            $failedRows[] = $rowIndex;
-                            continue;
                         }
                     } else {
-                        $idexist = $existingProduction['id_produksi'];
-                        // $sumqty = $existingProduction['qty_produksi'] + $qty;
-                        // $this->produksiModel->update($idexist, ['qty_produksi' => $sumqty]);
-                        // $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
+                        $dataInsert = [
+                            'tgl_produksi' => $tglprod,
+                            'idapsperstyle' => $id,
+                            'bagian' => $bagian,
+                            'storage_awal' => $storage1,
+                            'storage_akhir' => $storage2,
+                            'qty_produksi' => $qty,
+                            'bs_prod' => 0,
+                            'kategori_bs' => $kategoriBs,
+                            'no_box' => $no_box,
+                            'no_label' => $no_label,
+                            'admin' => $admin,
+                            'shift' => $shift,
+                            'shift_a' => $shifta,
+                            'shift_b' => $shiftb,
+                            'shift_c' => $shiftc,
+                            'no_mesin' => $no_mesin,
+                            'delivery' => $delivery,
+                            'area' => $area
+                        ];
+                        $existingProduction = $this->produksiModel->existingData($dataInsert);
+                        if (!$existingProduction) {
+                            $insert =  $this->produksiModel->insert($dataInsert);
+                            if ($insert) {
+                                $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty,  'factory' => $area]);
+                            } else {
+                                $failedRows[] = $rowIndex;
+                                continue;
+                            }
+                        } else {
+                            $idexist = $existingProduction['id_produksi'];
+                            // $sumqty = $existingProduction['qty_produksi'] + $qty;
+                            // $this->produksiModel->update($idexist, ['qty_produksi' => $sumqty]);
+                            // $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
 
-                        $failedRows[] = $rowIndex; // Add to failed rows if production data already exists
+                            $failedRows[] = $rowIndex; // Add to failed rows if production data already exists
 
+                        }
                     }
                 }
             } catch (\Exception $e) {
