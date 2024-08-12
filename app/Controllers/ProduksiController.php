@@ -458,7 +458,6 @@ class ProduksiController extends BaseController
         foreach ($batchData as $batchItem) {
             $rowIndex = $batchItem['rowIndex'];
             $data = $batchItem['data'];
-
             try {
                 $no_model = $data[2];
                 $style = $data[3];
