@@ -316,11 +316,10 @@ class ApsPerstyleModel extends Model
             ->where('size', $validate['style'])
             ->first();
     }
-    public function getSisaPerJarum($model, $start, $stop)
+    public function getSisaPerJarum($model, $tanggal)
     {
-        return $this->select('sum(sisa) as sisa, machinetypeid, mastermodel, factory')
-            ->where('delivery >=', $start)
-            ->where('delivery <=', $stop)
+        return $this->select('sum(sisa) as sisa, machinetypeid, mastermodel')
+            ->where('delivery', $tanggal)
             ->where('mastermodel', $model)
             ->where('sisa >', 0)
             ->groupby('machinetypeid')
@@ -347,5 +346,12 @@ class ApsPerstyleModel extends Model
             ->first(); // Mengambil data pertama (yang terkecil)
 
         return $data;
+    }
+    public function getStyle($pdk)
+    {
+        return $this->select('idapsperstyle, mastermodel, size,sum(qty) as qty')
+            ->where('mastermodel', $pdk)
+            ->groupBy('size')
+            ->findAll();
     }
 }

@@ -736,8 +736,7 @@ class MesinController extends BaseController
         $stop = $this->request->getPost("stop");
 
         // Mendapatkan data sisa kapasitas per jarum
-        $pdk = $this->ApsPerstyleModel->getSisaPerJarum($model, $start, $stop);
-        dd($pdk);
+        $pdk = $this->ApsPerstyleModel->getSisaPerJarum($model, $tanggal);
         $sisaOrder = [];
         $rekomendasiArea = [];
 
@@ -746,8 +745,9 @@ class MesinController extends BaseController
             $sisaOrder[$jarum] = $this->ApsPerstyleModel->getSisaOrderforRec($jarum, $start, $stop);
         }
 
+
         // Mengelompokkan sisa order berdasarkan area (factory) per jarum
-        $sisaKapasitasArea = [];
+        $usedCapacitydaily = [];
         foreach ($sisaOrder as $jarum => $orders) {
             foreach ($orders as $order) {
                 $sisa = $order['sisa'] / 24;  // Mengubah sisa menjadi lusin
@@ -758,19 +758,18 @@ class MesinController extends BaseController
 
                 // Hitung sisa kapasitas per hari
                 $sisaPerHari = $sisa / $leadtime;
-
                 // Grouping berdasarkan factory per jarum
                 $factory = $order['factory'];
-                if (!isset($sisaKapasitasArea[$jarum])) {
-                    $sisaKapasitasArea[$jarum] = [];
+                if (!isset($usedCapacitydaily[$jarum])) {
+                    $usedCapacitydaily[$jarum] = [];
                 }
-                if (!isset($sisaKapasitasArea[$jarum][$factory])) {
-                    $sisaKapasitasArea[$jarum][$factory] = 0;
+                if (!isset($usedCapacitydaily[$jarum][$factory])) {
+                    $usedCapacitydaily[$jarum][$factory] = 0;
                 }
-                $sisaKapasitasArea[$jarum][$factory] += $sisaPerHari;
+                $usedCapacitydaily[$jarum][$factory] += $sisaPerHari;
             }
         }
-
+        dd($usedCapacitydaily);
         // Cari area dengan kapasitas yang mendekati quantity order baru untuk setiap jarum
 
         foreach ($pdk as $perjarum) {

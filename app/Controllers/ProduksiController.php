@@ -14,6 +14,7 @@ use App\Models\ProduksiModel;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\BsModel;
+use CodeIgniter\Controller;
 use PhpParser\Node\Stmt\Else_;
 
 class ProduksiController extends BaseController
@@ -27,11 +28,12 @@ class ProduksiController extends BaseController
     protected $ApsPerstyleModel;
     protected $liburModel;
     protected $BsModel;
+    protected $db;
 
     public function __construct()
     {
 
-
+        $this->db = \Config\Database::connect();
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
@@ -408,12 +410,16 @@ class ProduksiController extends BaseController
             $batchData = [];
             $failedRows = []; // Array untuk menyimpan informasi baris yang gagal
             $db = \Config\Database::connect();
-
+            $areal = $worksheet->getCell('A3')->getValue();
+            $parts = explode(' ', $areal);
+            $area = $parts[1];
             foreach ($worksheet->getRowIterator($startRow) as $row) {
                 $rowIndex = $row->getRowIndex();
+
                 $cellIterator = $row->getCellIterator();
                 $cellIterator->setIterateOnlyExistingCells(false);
                 $data = ['role' => session()->get('role'),];
+
                 foreach ($cellIterator as $cell) {
                     $data[] = $cell->getValue();
                 }
@@ -422,7 +428,7 @@ class ProduksiController extends BaseController
                     $batchData[] = ['rowIndex' => $rowIndex, 'data' => $data];
                     // Process batch
                     if (count($batchData) >= $batchSize) {
-                        $this->processBatchnew($batchData, $db, $failedRows);
+                        $this->processBatchnew($batchData, $db, $failedRows, $area);
                         $batchData = []; // Reset batch data
                     }
                 }
@@ -430,7 +436,7 @@ class ProduksiController extends BaseController
 
             // Process any remaining data
             if (!empty($batchData)) {
-                $this->processBatchnew($batchData, $db, $failedRows);
+                $this->processBatchnew($batchData, $db, $failedRows, $area);
             }
 
             // Prepare notification message for failed rows
@@ -446,12 +452,13 @@ class ProduksiController extends BaseController
         }
     }
 
-    private function processBatchnew($batchData, $db, &$failedRows)
+    private function processBatchnew($batchData, $db, &$failedRows, $area)
     {
         $db->transStart();
         foreach ($batchData as $batchItem) {
             $rowIndex = $batchItem['rowIndex'];
             $data = $batchItem['data'];
+
             try {
                 $no_model = $data[2];
                 $style = $data[3];
@@ -492,7 +499,7 @@ class ProduksiController extends BaseController
                             $shiftc = $data[11] ?? 0;
                             $no_box = $data[12] ?? 0;
                             $no_label = $data[13];
-                            $area = session()->get('username');
+
                             $admin = session()->get('username');
                             $dataInsert = [
                                 'tgl_produksi' => $tglprod,
@@ -514,7 +521,6 @@ class ProduksiController extends BaseController
                                 'delivery' => $deliv,
                                 'area' => $area
                             ];
-                            dd($dataInsert);
                             $existingProduction = $this->produksiModel->existingData($dataInsert);
                             if (!$existingProduction) {
                                 $this->produksiModel->insert($dataInsert);
@@ -554,7 +560,6 @@ class ProduksiController extends BaseController
                     $no_box = $data[12] ?? 0;
                     $no_box = $data[12];
                     $no_label = $data[13];
-                    $area = session()->get('username');
                     $admin = session()->get('username');
                     if ($sisaQty < 0) {
                         $minus = $sisaQty;
@@ -1085,6 +1090,7 @@ class ProduksiController extends BaseController
                     $tgl = $data[1];
                     $date = new DateTime($tgl);
                     $tglprod = $date->format('Y-m-d');
+                    $kodeDeffect =  substr($data[29] ?? '16A', 0, 3);
 
                     // $strReplace = str_replace('.', '-', $tglprod);
                     // $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
@@ -1112,7 +1118,7 @@ class ProduksiController extends BaseController
                         'no_label' => $data[22],
                         'no_box' => $data[23],
                         'qty' => $qty,
-                        'kode_deffect' => $data[29]
+                        'kode_deffect' => $kodeDeffect
 
                     ];
                     $insert = $this->BsModel->insert($datainsert);
@@ -1137,5 +1143,134 @@ class ProduksiController extends BaseController
             }
         }
         $db->transComplete();
+    }
+    public function plusPacking()
+    {
+        $role = session()->get('role');
+        $data = [
+            'role' => $role,
+            'title' => 'Data Produksi',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+        ];
+        return view($role . '/pluspacking', $data);
+    }
+    public function viewModelPlusPacking($pdk)
+    {
+
+        $styleData = $this->ApsPerstyleModel->getStyle($pdk);
+        foreach ($styleData as &$sd) {
+            $id = $sd['idapsperstyle'];
+            $pluspacking = $this->produksiModel->getPlusPacking($id);
+            $sd['pluspacking'] = $pluspacking;
+        }
+        $role = session()->get('role');
+        $data = [
+            'role' => $role,
+            'title' => 'Data Produksi',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'style' => $styleData,
+            'pdk' => $pdk,
+        ];
+        return view($role . '/detailplus', $data);
+    }
+    public function updatepo()
+    {
+        $pdk = $this->request->getPost('pdk');
+        $ids = $this->request->getPost('id');
+        $pos = $this->request->getPost('po');
+        $role = session()->get('role');
+
+        if (count($ids) !== count($pos)) {
+            return redirect()->back()->with('error', 'Jumlah ID dan PO tidak sesuai.');
+        }
+
+        // Mulai transaction untuk memastikan integritas data
+        $this->db->transStart();
+
+        try {
+            foreach ($ids as $key => $id) {
+                $po = $pos[$key];
+
+                // Pastikan nilai PO valid
+                if (!is_numeric($po) || $po < 0) {
+                    throw new \Exception('Nilai PO tidak valid.');
+                }
+
+                // Temukan produksi yang terkait dengan idapsperstyle
+                $produksiList = $this->produksiModel
+                    ->where('idapsperstyle', $id)
+                    ->orderBy('qty_produksi', 'desc')
+                    ->orderBy('bs_prod', 'asc')
+                    ->findAll();
+
+                // Cek apakah produksi ditemukan
+                if (empty($produksiList)) {
+                    throw new \Exception('Data produksi tidak ditemukan untuk ID: ' . $id);
+                }
+
+                // Temukan produksi dengan nilai plus_packing terendah
+                $minBsProd = min(array_column($produksiList, 'plus_packing'));
+                $produksiToUpdate = array_filter($produksiList, function ($prod) use ($minBsProd) {
+                    return $prod['plus_packing'] == $minBsProd;
+                });
+                if (empty($produksiToUpdate)) {
+                    throw new \Exception('Tidak dapat menemukan produksi yang cocok untuk ID: ' . $id);
+                }
+
+                $produksiToUpdate = reset($produksiToUpdate); // Ambil elemen pertama
+
+                // Pastikan id ada di array
+                if (!isset($produksiToUpdate['id_produksi'])) {
+                    throw new \Exception('ID tidak ditemukan dalam produksi yang dipilih untuk ID: ' . $id);
+                }
+
+                // Update kolom plus_packing pada produksi yang dipilih
+                $updateResult = $this->produksiModel->update($produksiToUpdate['id_produksi'], [
+                    'plus_packing' => $po
+                ]);
+
+                // Cek apakah update berhasil
+                if (!$updateResult) {
+                    throw new \Exception('Gagal mengupdate data produksi untuk ID: ' . $id);
+                }
+
+                // Update kolom sisa pada tabel order
+                $updateOrderResult = $this->ApsPerstyleModel->set('sisa', 'sisa + ' . $po, false)
+                    ->where('idapsperstyle', $id)
+                    ->update();
+
+                if (!$updateOrderResult) {
+                    throw new \Exception('Gagal mengupdate data order untuk ID: ' . $id);
+                }
+            }
+
+            // Selesaikan transaksi
+            $this->db->transComplete();
+
+            // Cek apakah transaksi sukses
+            if ($this->db->transStatus() === false) {
+                throw new \Exception('Terjadi kesalahan saat menyimpan data.');
+            }
+
+            return redirect()->back()->with('success', 'Data berhasil diupdate');
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi error
+            $this->db->transRollback();
+
+            // Redirect dengan pesan error
+            return redirect()->to($role . '/viewModelPlusPacking/' . $pdk)->with('error', 'Error: ' . $e->getMessage());
+        }
     }
 }
