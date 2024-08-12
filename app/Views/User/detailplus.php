@@ -36,14 +36,18 @@
 
                     <th>Style </th>
                     <th> Qty Po</th>
-                    <th> PO (+)</th>
+                    <th colspan="2"> PO (+)</th>
                 </thead>
                 <tbody>
                     <?php foreach ($style as $st) : ?>
                         <tr>
                             <td><?= $st['size'] ?></td>
                             <td><?= ceil($st['qty'] / 24) ?> dz</td>
-                            <td> <input type="number" class="form" name="po[]" value="<?= $st['pluspacking'] ?>"> pcs
+                            <td>
+                                <input type="number" class="PoDz" name="PoDz[]" onchange="toPcs(this)" value="<?= ceil($st['pluspacking'] / 24) ?>" <?= $st['pluspacking'] > 0 ? 'readonly' : '' ?>> dz
+                            </td>
+                            <td>
+                                <input type="number" class="form po" name="po[]" value="<?= $st['pluspacking'] ?>" <?= $st['pluspacking'] > 0 ? 'readonly' : '' ?>> pcs
                                 <input type="hidden" class="form" name="id[]" value="<?= $st['idapsperstyle'] ?>">
                             </td>
                         </tr>
@@ -51,17 +55,26 @@
                 </tbody>
             </table>
 
-    </div>
-</div>
-<div class="card-footer">
-    <div class="row d-flex justify-content-end">
-
-        <button class="btn btn-info" type="submit">
-            Simpan
-        </button>
+            <div class="card-footer">
+                <div class="row d-flex justify-content-end">
+                    <button class="btn btn-info" type="submit">Simpan</button>
         </form>
     </div>
 </div>
+
+<script>
+    function toPcs(element) {
+        // Ambil nilai dari PoDz input
+        let poDzValue = element.value;
+
+        // Hitung nilai po (PoDz * 24)
+        let poValue = poDzValue * 24;
+
+        // Temukan input po[] yang sesuai dalam baris yang sama
+        let poInput = element.closest('tr').querySelector('.po');
+        poInput.value = poValue;
+    }
+</script>
 
 
 <?php $this->endSection(); ?>

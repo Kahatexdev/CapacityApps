@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use DateTime;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\DataMesinModel;
@@ -79,8 +80,8 @@ class PlanningController extends BaseController
             'totalMc' => $totalMc,
             'Area' => $totalMesin,
             'order' => $this->ApsPerstyleModel->getTurunOrder($bulan),
-            'jarum'=> $jarum
-         ];
+            'jarum' => $jarum
+        ];
         return view(session()->get('role') . '/index', $data);
     }
     public function order()
@@ -337,5 +338,29 @@ class PlanningController extends BaseController
         } else {
             return redirect()->to(base_url(session()->get('role') . '/detailModelPlanning/' . $pdk . '/' . $deliv))->withInput()->with('error', 'Gagal Mengubah Area');
         }
+    }
+    public function jalanmesin()
+    {
+        $role = session()->get('role');
+        $bulanIni = [];
+        $currentDate = new DateTime(); // Tanggal sekarang
+
+        for ($i = 0; $i < 12; $i++) {
+            $bulanIni[] = $currentDate->format('F Y'); // Format bulan dan tahun (e.g., "August 2024")
+            $currentDate->modify('+1 month'); // Tambah satu bulan
+        }
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Jalan Mesin',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'bulan' => $bulanIni
+        ];
+        return view($role . '/Planning/jalanmesin', $data);
     }
 }
