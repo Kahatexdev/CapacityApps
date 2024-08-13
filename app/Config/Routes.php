@@ -181,6 +181,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetail/$1');
 
     $routes->get('jalanmesin', 'PlanningController::jalanmesin');
+    $routes->get('jalanmesin/(:any)', 'PlanningController::jalanmesindetail/$1');
 
 
 

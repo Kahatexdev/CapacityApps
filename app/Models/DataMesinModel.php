@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use DateTime;
 use CodeIgniter\Model;
 
@@ -301,52 +302,93 @@ class DataMesinModel extends Model
 
         return $query;
     }
-    public function jarumPerArea(){
+    public function jarumPerArea()
+    {
         $query = $this->select('area, jarum, SUM(total_mc) AS total_mc, SUM(mesin_jalan) AS mesin_jalan, SUM(total_mc) - SUM(mesin_jalan) as mesin_mati, pu')
-        ->groupBy('pu, area, jarum')
-        ->orderBy('pu ASC, SUBSTRING(AREA, 3) + 0 ASC, AREA ASC')
-        ->findAll();
+            ->groupBy('pu, area, jarum')
+            ->orderBy('pu ASC, SUBSTRING(AREA, 3) + 0 ASC, AREA ASC')
+            ->findAll();
 
-    // Array untuk menyimpan hasil akhir
-    $formattedData = [];
+        // Array untuk menyimpan hasil akhir
+        $formattedData = [];
 
-    foreach ($query as $row) {
-        $area = strtoupper($row['area']);
-        $jarum = strtolower($row['jarum']);
+        foreach ($query as $row) {
+            $area = strtoupper($row['area']);
+            $jarum = strtolower($row['jarum']);
 
-        // Jika area belum ada di array, tambahkan dengan array kosong
-        if (!isset($formattedData[$area])) {
-            $formattedData[$area] = [
-                'totalmc' => 0
-            ];
+            // Jika area belum ada di array, tambahkan dengan array kosong
+            if (!isset($formattedData[$area])) {
+                $formattedData[$area] = [
+                    'totalmc' => 0
+                ];
+            }
+
+            // Tambahkan total_mc untuk jarum tertentu
+            if (!isset($formattedData[$area][$jarum])) {
+                $formattedData[$area][$jarum] = 0;
+            }
+
+            $formattedData[$area][$jarum] += $row['total_mc'];
+
+            // Tambahkan total_mc untuk area
+            $formattedData[$area]['totalmc'] += $row['total_mc'];
         }
 
-        // Tambahkan total_mc untuk jarum tertentu
-        if (!isset($formattedData[$area][$jarum])) {
-            $formattedData[$area][$jarum] = 0;
+        return $formattedData;
+    }
+    public function maxCapacity($area, $jarum)
+    {
+        $totalmc = $this->select('sum(total_mc) as total')->where('area', $area)->where('jarum', $jarum)->first();
+        $maxCapacity = $totalmc['total'] * 7 * 14;
+        $data = [
+            'totalmesin' => $totalmc['total'],
+            'maxCapacity' => $maxCapacity
+        ];
+        return $data;
+    }
+
+    public function getCapacityArea($area, $jarum)
+    {
+        $today = date('Y-m-d');
+        $maxDay = strtotime('+90 Days');
+    }
+    public function getAreaAndJarum()
+    {
+        $customOrder = [
+            'JC84' => 1,
+            'JC96' => 2,
+            'JC108' => 3,
+            'JC120' => 4,
+            'JC144' => 5,
+            'JC168' => 6,
+            'TJ96' => 7,
+            'TJ108' => 8,
+            'TJ120' => 9,
+            'TJ144' => 10,
+            'TJ168' => 11
+        ];
+
+        // Generate the CASE statement for custom ordering
+        $caseStatement = "CASE ";
+        foreach ($customOrder as $jarum => $index) {
+            $caseStatement .= "WHEN jarum = '$jarum' THEN $index ";
         }
+        // For '10G', '13G', '240N', and 'POM-POM' entries, set the index to a very large number to move them to the end
+        $caseStatement .= "WHEN jarum LIKE '10G%' THEN 1000 ";
+        $caseStatement .= "WHEN jarum = '13G' THEN 1001 ";
+        $caseStatement .= "WHEN jarum = '240N' THEN 1002 ";
+        $caseStatement .= "WHEN jarum = 'POM-POM' THEN 1003 ";
+        $caseStatement .= "ELSE " . (count($customOrder) + 1) . " END";
 
-        $formattedData[$area][$jarum] += $row['total_mc'];
-
-        // Tambahkan total_mc untuk area
-        $formattedData[$area]['totalmc'] += $row['total_mc'];
+        return $this->select('jarum, SUM(total_mc) as total')
+            ->groupBy('jarum')
+            ->orderBy($caseStatement . ', jarum')
+            ->findAll();
     }
-
-    return $formattedData;
+    public function totalMcArea($ar)
+    {
+        return $this->select('sum(total_mc) as Total')
+            ->where('area', $ar)
+            ->first();
     }
-    public function maxCapacity($area,$jarum){
-       $totalmc= $this->select('sum(total_mc) as total')->where('area',$area)->where('jarum',$jarum)->first();
-       $maxCapacity = $totalmc['total']*7*14;
-       $data =['totalmesin'=>$totalmc['total'],
-                'maxCapacity'=>$maxCapacity];
-       return $data;
-    }
-    
-    public function getCapacityArea($area,$jarum){
-        $today=date('Y-m-d');
-        $maxDay= strtotime('+90 Days');
-
-   
-    }
-    
 }

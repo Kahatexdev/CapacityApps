@@ -363,4 +363,65 @@ class PlanningController extends BaseController
         ];
         return view($role . '/Planning/jalanmesin', $data);
     }
+    public function jalanmesindetail($bulan)
+    {
+        $role = session()->get('role');
+
+        $area = $this->jarumModel->getArea();
+        $dataArea = [];
+        $totalArea = [];
+        foreach ($area as $ar) {
+            $totalArea[$ar] = $this->jarumModel->totalMcArea($ar);
+        }
+
+        $date = DateTime::createFromFormat('F-Y', $bulan);
+
+
+        $startDate = new \DateTime('first day of this month');
+        $LiburModel = new LiburModel();
+        $holidays = $LiburModel->findAll();
+        $currentMonth = $startDate->format('F');
+        $weekCount = 1; // Initialize week count for the first week of the month
+        $monthlyData = [];
+        for ($i = 0; $i < 4; $i++) {
+            $startOfWeek = clone $startDate;
+            $startOfWeek->modify("+$i week");
+            $startOfWeek->modify('Monday this week');
+            $start = $startOfWeek->format('Y-m-d');
+
+            $endOfWeek = clone $startOfWeek;
+            $endOfWeek->modify('Sunday this week');
+            $numberOfDays = $startOfWeek->diff($endOfWeek)->days + 1;
+
+            $startOfWeekFormatted = $startOfWeek->format('d-F');
+            $endOfWeekFormatted = $endOfWeek->format('d-F');
+
+
+            $jarum = $this->jarumModel->getAreaAndJarum();
+            $sisa = [];
+            foreach ($area as $ar) {
+                foreach ($jarum as $jr) {
+                    $sisa[$ar][$jr['jarum']] = $this->ApsPerstyleModel->ambilSisaOrder('kk8j', $start, '10G106N') ?? 0;
+                    dd($sisa);
+                }
+            }
+        }
+
+        // dd($totalArea);
+
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Planning Jalan MC ' . $bulan,
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'bulan' => $bulanIni,
+            'jarum' => $jarum
+        ];
+        return view($role . '/Planning/planningjalanMCPerBulan', $data);
+    }
 }

@@ -5,5 +5,6 @@
     "notebook.codeActionsOnSave": {},
     "intelephense.diagnostics.undefinedFunctions": false,
     "intelephense.diagnostics.undefinedMethods": false,
-    "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
+    "editor.defaultFormatter": "bmewburn.vscode-intelephense-client",
+    "intelephense.diagnostics.enable": false
 }
