@@ -358,34 +358,33 @@ class ApsPerstyleModel extends Model
 
     public function ambilSisaOrder($ar, $bulan, $jarum)
     {
-        $today = date('Y-m-d');
-        $ld = date('Y-m-d', strtotime('+90 days'));
+        $todayDate = new DateTime(); // Current date
+        $ld = (clone $todayDate)->modify('+90 days')->format('Y-m-d');
+
         $data = $this->select('mastermodel, delivery, SUM(sisa) AS sisa, smv, factory, machinetypeid')
-            ->where('machinetypeid =', $jarum)
+            ->where('machinetypeid', $jarum)
             ->where('delivery >', $bulan)
             ->where('delivery <', $ld)
             ->where('sisa >', 0)
-            ->where('factory =', $ar)
-            ->where('factory !=', 'Belum Ada Area')
-            ->where('factory !=', 'MJ')
+            ->where('factory', $ar)
+            ->whereNotIn('factory', ['Belum Ada Area', 'MJ'])
             ->groupBy('machinetypeid, factory, mastermodel')
             ->findAll();
 
         $totalKebMesin = 0;
-        foreach ($data as &$dt) {
-            $deliv = $dt['delivery'];
-            $todayDate = new DateTime($today);
-            $delivDate = new DateTime($deliv);
-            // Hitung lead time dalam hari
+
+        foreach ($data as $dt) {
+            $delivDate = new DateTime($dt['delivery']);
             $leadtime = $delivDate->diff($todayDate)->days;
-            //hitung target 
-            $target = 86400 / $dt['smv'] / 24;
+
+            $smv = $dt['smv'];
+            $target = 3600 / $smv; // Simplified target calculation
             $kebMesin = $dt['sisa'] / $target / $leadtime;
             $kebutuhanMc = ceil($kebMesin);
-            $dt['kebmesin'] = $kebutuhanMc;
 
             $totalKebMesin += $kebutuhanMc;
         }
-        return $data ?? 0;
+
+        return $totalKebMesin;
     }
 }

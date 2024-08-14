@@ -367,51 +367,57 @@ class PlanningController extends BaseController
     {
         $role = session()->get('role');
 
-        $area = $this->jarumModel->getArea();
-        $dataArea = [];
-        $totalArea = [];
-        foreach ($area as $ar) {
-            $totalArea[$ar] = $this->jarumModel->totalMcArea($ar);
+        $areas = $this->jarumModel->getArea();
+        $totalArea = array_map(fn($ar) => $this->jarumModel->totalMcArea($ar), $areas);
+
+        // Parse the $bulan string to a DateTime object
+        $date = DateTime::createFromFormat('F-Y', $bulan);
+        if (!$date) {
+            throw new \Exception("Invalid date format. Please use 'F-Y' format.");
         }
 
-        $date = DateTime::createFromFormat('F-Y', $bulan);
+        $bulanIni = $date->format('F-Y');
+        $startDate = new \DateTime($date->format('Y-m-01')); // First day of the given month
 
-
-        $startDate = new \DateTime('first day of this month');
-        $LiburModel = new LiburModel();
-        $holidays = $LiburModel->findAll();
-        $currentMonth = $startDate->format('F');
-        $weekCount = 1; // Initialize week count for the first week of the month
         $monthlyData = [];
         for ($i = 0; $i < 4; $i++) {
             $startOfWeek = clone $startDate;
             $startOfWeek->modify("+$i week");
-            $startOfWeek->modify('Monday this week');
-            $start = $startOfWeek->format('Y-m-d');
+
+            // Ensure we start on Monday and stay within the month
+            $startOfWeek->modify($startOfWeek->format('N') === '1' ? 'this Monday' : 'next Monday');
+            if ($startOfWeek->format('m') !== $startDate->format('m')) break;
 
             $endOfWeek = clone $startOfWeek;
             $endOfWeek->modify('Sunday this week');
-            $numberOfDays = $startOfWeek->diff($endOfWeek)->days + 1;
 
-            $startOfWeekFormatted = $startOfWeek->format('d-F');
-            $endOfWeekFormatted = $endOfWeek->format('d-F');
+            $monthlyData[] = [
+                'week' => $i + 1,
+                'start_date' => $startOfWeek->format('Y-m-d'),
+                'end_date' => $endOfWeek->format('Y-m-d'),
+                'number_of_days' => $startOfWeek->diff($endOfWeek)->days + 1,
+            ];
+        }
 
+        $jarum = $this->jarumModel->getAreaAndJarum();
+        $sisa = [];
 
-            $jarum = $this->jarumModel->getAreaAndJarum();
-            $sisa = [];
-            foreach ($area as $ar) {
+        // Fetch sisa orders efficiently
+        foreach ($monthlyData as $wk) {
+            foreach ($areas as $ar) {
                 foreach ($jarum as $jr) {
-                    $sisa[$ar][$jr['jarum']] = $this->ApsPerstyleModel->ambilSisaOrder('kk8j', $start, '10G106N') ?? 0;
-                    dd($sisa);
+                    $weekNumber = $wk['week'];
+                    $sisa[$weekNumber][$ar][$jr['jarum']] = $this->ApsPerstyleModel->ambilSisaOrder($ar, $wk['start_date'], $jr['jarum']) ?? 0;
                 }
             }
         }
 
-        // dd($totalArea);
+        // Debugging output removed for production
+        dd($sisa);
 
         $data = [
-            'role' => session()->get('role'),
-            'title' => 'Planning Jalan MC ' . $bulan,
+            'role' => $role,
+            'title' => 'Planning Jalan MC ' . $bulanIni,
             'active1' => '',
             'active2' => '',
             'active3' => '',
@@ -420,8 +426,10 @@ class PlanningController extends BaseController
             'active6' => '',
             'active7' => '',
             'bulan' => $bulanIni,
-            'jarum' => $jarum
+            'jarum' => $jarum,
+            'sisa' => $sisa
         ];
+
         return view($role . '/Planning/planningjalanMCPerBulan', $data);
     }
 }
