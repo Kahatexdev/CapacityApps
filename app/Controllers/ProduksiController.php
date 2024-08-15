@@ -352,7 +352,7 @@ class ProduksiController extends BaseController
     }
     public function produksiAreaChart()
     {
-        $bulan = 07;
+        $bulan = date('m');
         $month = date('F');
         $totalMesin = $this->jarumModel->getArea();
         $produksiPerArea = [];

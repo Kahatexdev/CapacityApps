@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use DateTime;
 use CodeIgniter\Model;
 
@@ -176,6 +177,15 @@ class DataMesinModel extends Model
             ->findAll();
     }
 
+    public function getTotalMesinCjByJarum($jarum)
+    {
+        return $this->select('jarum, SUM(total_mc) as total')
+            ->where('pu', 'CJ')
+            ->where('jarum', $jarum)
+            ->groupBy('jarum')
+            ->orderBy('jarum', 'ASC')
+            ->findAll();
+    }
 
     public function mcJalan()
     {
@@ -228,6 +238,10 @@ class DataMesinModel extends Model
     public function getMensComp156()
     {
         return $this->select('aliasjarum, jarum')->like('aliasjarum', 'Mens Comp N156')->groupBy('aliasjarum')->findAll();
+    }
+    public function getAllBrand($jarum)
+    {
+        return $this->select('brand, SUM(total_mc) AS total_mc, SUM(mesin_jalan) AS mesin_jalan, SUM(IF(pu="CJ", total_mc, 0)) AS cj, SUM(IF(pu="MJ", total_mc, 0)) AS mj')->where('jarum', $jarum)->groupBy('brand')->findAll();
     }
     public function getBrand($jarum, $brand)
     {
@@ -301,52 +315,54 @@ class DataMesinModel extends Model
 
         return $query;
     }
-    public function jarumPerArea(){
+    public function jarumPerArea()
+    {
         $query = $this->select('area, jarum, SUM(total_mc) AS total_mc, SUM(mesin_jalan) AS mesin_jalan, SUM(total_mc) - SUM(mesin_jalan) as mesin_mati, pu')
-        ->groupBy('pu, area, jarum')
-        ->orderBy('pu ASC, SUBSTRING(AREA, 3) + 0 ASC, AREA ASC')
-        ->findAll();
+            ->groupBy('pu, area, jarum')
+            ->orderBy('pu ASC, SUBSTRING(AREA, 3) + 0 ASC, AREA ASC')
+            ->findAll();
 
-    // Array untuk menyimpan hasil akhir
-    $formattedData = [];
+        // Array untuk menyimpan hasil akhir
+        $formattedData = [];
 
-    foreach ($query as $row) {
-        $area = strtoupper($row['area']);
-        $jarum = strtolower($row['jarum']);
+        foreach ($query as $row) {
+            $area = strtoupper($row['area']);
+            $jarum = strtolower($row['jarum']);
 
-        // Jika area belum ada di array, tambahkan dengan array kosong
-        if (!isset($formattedData[$area])) {
-            $formattedData[$area] = [
-                'totalmc' => 0
-            ];
+            // Jika area belum ada di array, tambahkan dengan array kosong
+            if (!isset($formattedData[$area])) {
+                $formattedData[$area] = [
+                    'totalmc' => 0
+                ];
+            }
+
+            // Tambahkan total_mc untuk jarum tertentu
+            if (!isset($formattedData[$area][$jarum])) {
+                $formattedData[$area][$jarum] = 0;
+            }
+
+            $formattedData[$area][$jarum] += $row['total_mc'];
+
+            // Tambahkan total_mc untuk area
+            $formattedData[$area]['totalmc'] += $row['total_mc'];
         }
 
-        // Tambahkan total_mc untuk jarum tertentu
-        if (!isset($formattedData[$area][$jarum])) {
-            $formattedData[$area][$jarum] = 0;
-        }
-
-        $formattedData[$area][$jarum] += $row['total_mc'];
-
-        // Tambahkan total_mc untuk area
-        $formattedData[$area]['totalmc'] += $row['total_mc'];
+        return $formattedData;
+    }
+    public function maxCapacity($area, $jarum)
+    {
+        $totalmc = $this->select('sum(total_mc) as total')->where('area', $area)->where('jarum', $jarum)->first();
+        $maxCapacity = $totalmc['total'] * 7 * 14;
+        $data = [
+            'totalmesin' => $totalmc['total'],
+            'maxCapacity' => $maxCapacity
+        ];
+        return $data;
     }
 
-    return $formattedData;
+    public function getCapacityArea($area, $jarum)
+    {
+        $today = date('Y-m-d');
+        $maxDay = strtotime('+90 Days');
     }
-    public function maxCapacity($area,$jarum){
-       $totalmc= $this->select('sum(total_mc) as total')->where('area',$area)->where('jarum',$jarum)->first();
-       $maxCapacity = $totalmc['total']*7*14;
-       $data =['totalmesin'=>$totalmc['total'],
-                'maxCapacity'=>$maxCapacity];
-       return $data;
-    }
-    
-    public function getCapacityArea($area,$jarum){
-        $today=date('Y-m-d');
-        $maxDay= strtotime('+90 Days');
-
-   
-    }
-    
 }

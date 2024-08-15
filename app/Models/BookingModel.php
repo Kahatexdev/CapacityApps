@@ -242,4 +242,18 @@ class BookingModel extends Model
             ->first();
         return $result;
     }
+
+    public function getTotalBookingByJarum($cek)
+    {
+        $results = $this->groupBy('delivery')
+            ->select('delivery, SUM(qty_booking) as total_booking, SUM(sisa_booking) AS sisa_booking')
+            ->where('status!=', 'Cancel Booking')
+            ->where('needle', $cek['jarum'])
+            ->where('delivery >=', $cek['start'])
+            ->where('delivery <=', $cek['end'])
+            ->get()
+            ->getResultArray();
+
+        return $results;
+    }
 }
