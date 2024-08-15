@@ -644,7 +644,7 @@ class OrderController extends BaseController
                             $size = $row[19];
                             $sam = $row[20];
                             if ($sam == null) {
-                                $sam = 10;
+                                $sam = 185;
                             }
                             $machinetypeid = $row[22];
                             $prodtype = [

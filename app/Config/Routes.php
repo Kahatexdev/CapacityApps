@@ -180,6 +180,10 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetail/$1');
 
+    $routes->get('jalanmesin', 'PlanningController::jalanmesin');
+    $routes->get('jalanmesin/(:any)', 'PlanningController::jalanmesindetail/$1');
+
+
 
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
@@ -273,6 +277,9 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     // $routes->post('importproduksi', 'ProduksiController::importproduksi');
     $routes->post('importproduksi', 'ProduksiController::importproduksinew');
     $routes->post('importbssetting', 'ProduksiController::importbssetting');
+    $routes->get('viewModelPlusPacking/(:any)', 'ProduksiController::viewModelPlusPacking/$1');
+    $routes->get('pluspacking', 'ProduksiController::pluspacking');
+    $routes->post('inputpo', 'ProduksiController::updatepo');
 });
 
 // sudo

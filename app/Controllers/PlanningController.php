@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use DateTime;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\DataMesinModel;
@@ -79,8 +80,8 @@ class PlanningController extends BaseController
             'totalMc' => $totalMc,
             'Area' => $totalMesin,
             'order' => $this->ApsPerstyleModel->getTurunOrder($bulan),
-            'jarum'=> $jarum
-         ];
+            'jarum' => $jarum
+        ];
         return view(session()->get('role') . '/index', $data);
     }
     public function order()
@@ -337,5 +338,98 @@ class PlanningController extends BaseController
         } else {
             return redirect()->to(base_url(session()->get('role') . '/detailModelPlanning/' . $pdk . '/' . $deliv))->withInput()->with('error', 'Gagal Mengubah Area');
         }
+    }
+    public function jalanmesin()
+    {
+        $role = session()->get('role');
+        $bulanIni = [];
+        $currentDate = new DateTime(); // Tanggal sekarang
+
+        for ($i = 0; $i < 12; $i++) {
+            $bulanIni[] = $currentDate->format('F Y'); // Format bulan dan tahun (e.g., "August 2024")
+            $currentDate->modify('+1 month'); // Tambah satu bulan
+        }
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Jalan Mesin',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'bulan' => $bulanIni
+        ];
+        return view($role . '/Planning/jalanmesin', $data);
+    }
+    public function jalanmesindetail($bulan)
+    {
+        $role = session()->get('role');
+
+        $areas = $this->jarumModel->getArea();
+        $totalArea = array_map(fn($ar) => $this->jarumModel->totalMcArea($ar), $areas);
+
+        // Parse the $bulan string to a DateTime object
+        $date = DateTime::createFromFormat('F-Y', $bulan);
+        if (!$date) {
+            throw new \Exception("Invalid date format. Please use 'F-Y' format.");
+        }
+
+        $bulanIni = $date->format('F-Y');
+        $startDate = new \DateTime($date->format('Y-m-01')); // First day of the given month
+
+        $monthlyData = [];
+        for ($i = 0; $i < 4; $i++) {
+            $startOfWeek = clone $startDate;
+            $startOfWeek->modify("+$i week");
+
+            // Ensure we start on Monday and stay within the month
+            $startOfWeek->modify($startOfWeek->format('N') === '1' ? 'this Monday' : 'next Monday');
+            if ($startOfWeek->format('m') !== $startDate->format('m')) break;
+
+            $endOfWeek = clone $startOfWeek;
+            $endOfWeek->modify('Sunday this week');
+
+            $monthlyData[] = [
+                'week' => $i + 1,
+                'start_date' => $startOfWeek->format('Y-m-d'),
+                'end_date' => $endOfWeek->format('Y-m-d'),
+                'number_of_days' => $startOfWeek->diff($endOfWeek)->days + 1,
+            ];
+        }
+
+        $jarum = $this->jarumModel->getAreaAndJarum();
+        $sisa = [];
+
+        // Fetch sisa orders efficiently
+        foreach ($monthlyData as $wk) {
+            foreach ($areas as $ar) {
+                foreach ($jarum as $jr) {
+                    $weekNumber = $wk['week'];
+                    $sisa[$weekNumber][$ar][$jr['jarum']] = $this->ApsPerstyleModel->ambilSisaOrder($ar, $wk['start_date'], $jr['jarum']) ?? 0;
+                }
+            }
+        }
+
+        // Debugging output removed for production
+        dd($sisa);
+
+        $data = [
+            'role' => $role,
+            'title' => 'Planning Jalan MC ' . $bulanIni,
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'bulan' => $bulanIni,
+            'jarum' => $jarum,
+            'sisa' => $sisa
+        ];
+
+        return view($role . '/Planning/planningjalanMCPerBulan', $data);
     }
 }

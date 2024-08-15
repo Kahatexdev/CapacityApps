@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use DateTime;
 use CodeIgniter\Model;
 use PHPUnit\TextUI\XmlConfiguration\Group;
 
@@ -316,11 +317,10 @@ class ApsPerstyleModel extends Model
             ->where('size', $validate['style'])
             ->first();
     }
-    public function getSisaPerJarum($model, $start, $stop)
+    public function getSisaPerJarum($model, $tanggal)
     {
-        return $this->select('sum(sisa) as sisa, machinetypeid, mastermodel, factory')
-            ->where('delivery >=', $start)
-            ->where('delivery <=', $stop)
+        return $this->select('sum(sisa) as sisa, machinetypeid, mastermodel')
+            ->where('delivery', $tanggal)
             ->where('mastermodel', $model)
             ->where('sisa >', 0)
             ->groupby('machinetypeid')
@@ -347,5 +347,44 @@ class ApsPerstyleModel extends Model
             ->first(); // Mengambil data pertama (yang terkecil)
 
         return $data;
+    }
+    public function getStyle($pdk)
+    {
+        return $this->select('idapsperstyle, mastermodel, size,sum(qty) as qty')
+            ->where('mastermodel', $pdk)
+            ->groupBy('size')
+            ->findAll();
+    }
+
+    public function ambilSisaOrder($ar, $bulan, $jarum)
+    {
+        $todayDate = new DateTime(); // Current date
+        $ld = (clone $todayDate)->modify('+90 days')->format('Y-m-d');
+
+        $data = $this->select('mastermodel, delivery, SUM(sisa) AS sisa, smv, factory, machinetypeid')
+            ->where('machinetypeid', $jarum)
+            ->where('delivery >', $bulan)
+            ->where('delivery <', $ld)
+            ->where('sisa >', 0)
+            ->where('factory', $ar)
+            ->whereNotIn('factory', ['Belum Ada Area', 'MJ'])
+            ->groupBy('machinetypeid, factory, mastermodel')
+            ->findAll();
+
+        $totalKebMesin = 0;
+
+        foreach ($data as $dt) {
+            $delivDate = new DateTime($dt['delivery']);
+            $leadtime = $delivDate->diff($todayDate)->days;
+
+            $smv = $dt['smv'];
+            $target = 3600 / $smv; // Simplified target calculation
+            $kebMesin = $dt['sisa'] / $target / $leadtime;
+            $kebutuhanMc = ceil($kebMesin);
+
+            $totalKebMesin += $kebutuhanMc;
+        }
+
+        return $totalKebMesin;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+
 use DateTime;
 use CodeIgniter\Model;
 
@@ -364,5 +365,44 @@ class DataMesinModel extends Model
     {
         $today = date('Y-m-d');
         $maxDay = strtotime('+90 Days');
+    }
+    public function getAreaAndJarum()
+    {
+        $customOrder = [
+            'JC84' => 1,
+            'JC96' => 2,
+            'JC108' => 3,
+            'JC120' => 4,
+            'JC144' => 5,
+            'JC168' => 6,
+            'TJ96' => 7,
+            'TJ108' => 8,
+            'TJ120' => 9,
+            'TJ144' => 10,
+            'TJ168' => 11
+        ];
+
+        // Generate the CASE statement for custom ordering
+        $caseStatement = "CASE ";
+        foreach ($customOrder as $jarum => $index) {
+            $caseStatement .= "WHEN jarum = '$jarum' THEN $index ";
+        }
+        // For '10G', '13G', '240N', and 'POM-POM' entries, set the index to a very large number to move them to the end
+        $caseStatement .= "WHEN jarum LIKE '10G%' THEN 1000 ";
+        $caseStatement .= "WHEN jarum = '13G' THEN 1001 ";
+        $caseStatement .= "WHEN jarum = '240N' THEN 1002 ";
+        $caseStatement .= "WHEN jarum = 'POM-POM' THEN 1003 ";
+        $caseStatement .= "ELSE " . (count($customOrder) + 1) . " END";
+
+        return $this->select('jarum, SUM(total_mc) as total')
+            ->groupBy('jarum')
+            ->orderBy($caseStatement . ', jarum')
+            ->findAll();
+    }
+    public function totalMcArea($ar)
+    {
+        return $this->select('sum(total_mc) as Total')
+            ->where('area', $ar)
+            ->first();
     }
 }
