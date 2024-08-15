@@ -372,19 +372,29 @@ class ApsPerstyleModel extends Model
             ->findAll();
 
         $totalKebMesin = 0;
+        $outputDz = 0;
 
         foreach ($data as $dt) {
             $delivDate = new DateTime($dt['delivery']);
             $leadtime = $delivDate->diff($todayDate)->days;
 
-            $smv = $dt['smv'];
-            $target = 3600 / $smv; // Simplified target calculation
-            $kebMesin = $dt['sisa'] / $target / $leadtime;
-            $kebutuhanMc = ceil($kebMesin);
+            if ($dt['smv'] > 0 && $leadtime > 0) {
+                $smv = $dt['smv'];
+                $target = 3600 / $smv; // Simplified target calculation
+                $kebMesin = $dt['sisa'] / $target / $leadtime;
+                $kebutuhanMc = ceil($kebMesin);
+                $dz = $kebutuhanMc * $target;
 
-            $totalKebMesin += $kebutuhanMc;
+                $outputDz += $dz;
+                $totalKebMesin += $kebutuhanMc;
+            } else {
+                continue; // Skip this iteration if either is zero
+            }
         }
 
-        return $totalKebMesin;
+        return [
+            'totalKebMesin' => $totalKebMesin,
+            'outputDz' => $outputDz
+        ];
     }
 }

@@ -368,7 +368,10 @@ class PlanningController extends BaseController
         $role = session()->get('role');
 
         $areas = $this->jarumModel->getArea();
-        $totalArea = array_map(fn($ar) => $this->jarumModel->totalMcArea($ar), $areas);
+        $totalArea = [];
+        foreach ($areas as $ar) {
+            $totalArea[$ar] = $this->jarumModel->totalMcArea($ar);
+        }
 
         // Parse the $bulan string to a DateTime object
         $date = DateTime::createFromFormat('F-Y', $bulan);
@@ -400,21 +403,24 @@ class PlanningController extends BaseController
         }
 
         $jarum = $this->jarumModel->getAreaAndJarum();
-        $sisa = [];
+        $kebutuhanMesin = [];
+        $outputDz = []; // Initialize outputDz array
 
         // Fetch sisa orders efficiently
         foreach ($monthlyData as $wk) {
             foreach ($areas as $ar) {
+                $outputDz[$wk['week']][$ar] = 0; // Initialize the outputDz for each week and area
                 foreach ($jarum as $jr) {
                     $weekNumber = $wk['week'];
-                    $sisa[$weekNumber][$ar][$jr['jarum']] = $this->ApsPerstyleModel->ambilSisaOrder($ar, $wk['start_date'], $jr['jarum']) ?? 0;
+                    $sisaOrder = $this->ApsPerstyleModel->ambilSisaOrder($ar, $wk['start_date'], $jr['jarum']);
+
+                    $kebutuhanMesin[$weekNumber][$ar][$jr['jarum']] = $sisaOrder['totalKebMesin'] ?? 0;
+                    $outputDz[$weekNumber][$ar] += $sisaOrder['outputDz'] ?? 0; // Summing outputDz per week per area
                 }
             }
         }
 
         // Debugging output removed for production
-        dd($sisa);
-
         $data = [
             'role' => $role,
             'title' => 'Planning Jalan MC ' . $bulanIni,
@@ -427,7 +433,10 @@ class PlanningController extends BaseController
             'active7' => '',
             'bulan' => $bulanIni,
             'jarum' => $jarum,
-            'sisa' => $sisa
+            'kebutuhanMesin' => $kebutuhanMesin,
+            'totalMc' => $totalArea,
+            'data' => $outputDz, // Pass outputDz data to the view
+            'monthlyData' => $monthlyData,
         ];
 
         return view($role . '/Planning/planningjalanMCPerBulan', $data);
