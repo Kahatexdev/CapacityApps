@@ -78,4 +78,8 @@ class ProductTypeModel extends Model
     {
         return $this->select('product_type')->distinct()->findAll();
     }
+    public function getKonversi($jarum)
+    {
+        return $this->select('konversi, jarum')->where('jarum', $jarum)->where('product_type', 'NS-PS')->orWhere('product_type', 'GL-PL')->groupBy('jarum')->findAll();
+    }
 }
