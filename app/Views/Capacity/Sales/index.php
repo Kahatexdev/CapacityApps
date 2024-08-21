@@ -1,116 +1,142 @@
-<?php $this->extend('Capacity/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
+    <?php if (session()->getFlashdata('success')) : ?>
+        <script>
+            $(document).ready(function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '<?= session()->getFlashdata('success') ?>',
+                });
+            });
+        </script>
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('error')) : ?>
+        <script>
+            $(document).ready(function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: '<?= session()->getFlashdata('error') ?>',
+                });
+            });
+        </script>
+    <?php endif; ?>
     <div class="row my-4">
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-8">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    Sales Position
+                                    Analytical Dashboard
                                 </h5>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                <i class="ni ni-chart-bar-32 text-lg opacity-10" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Booking </p>
+                                <h5 class="font-weight-bolder mb-0">
+                                    <span class=" text-sm font-weight-bolder">This Month</span>
+                                    <?= $TerimaBooking ?>
+
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                <i class="fas fa-book text-lg opacity-10" aria-hidden="true"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="row">
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-            <a href="#">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-capitalize font-weight-bold">A</p>
-                                    <!-- <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Machine : //$jr['total'] </p> -->
-                                    <h5 class="font-weight-bolder mb-0">
-                                    </h5>
-                                </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Active Order </p>
+                                <h5 class="font-weight-bolder mb-0">
+                                    <?= $jalan ?>
+                                </h5>
                             </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                <i class="fas fa-tasks text-lg opacity-10" aria-hidden="true"></i>
                             </div>
                         </div>
                     </div>
                 </div>
-            </a>
+            </div>
         </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Machine Running</p>
+                                <h5 class="font-weight-bolder mb-0">
+                                    <?= $mcJalan ?>
+                                    <span class=" text-sm font-weight-bolder">/ <?= $totalMc ?> </span>
 
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-            <a href="#">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-capitalize font-weight-bold">B</p>
-                                    <!-- <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Machine : //$jr['total'] </p> -->
-                                    <h5 class="font-weight-bolder mb-0">
-                                    </h5>
-                                </div>
+                                </h5>
                             </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                <i class="ni ni-settings text-lg opacity-10" aria-hidden="true"></i>
                             </div>
                         </div>
                     </div>
                 </div>
-            </a>
+            </div>
         </div>
-
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-            <a href="#">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-capitalize font-weight-bold">C</p>
-                                    <!-- <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Machine : //$jr['total'] </p> -->
-                                    <h5 class="font-weight-bolder mb-0">
-                                    </h5>
-                                </div>
+        <div class="col-xl-3 col-sm-6">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Order Finished</p>
+                                <h5 class="font-weight-bolder mb-0">
+                                    8
+                                    <span class=" text-sm font-weight-bolder">This Month</span>
+                                </h5>
                             </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                <i class="ni ni-check-bold text-lg opacity-10" aria-hidden="true"></i>
                             </div>
                         </div>
                     </div>
                 </div>
-            </a>
-        </div>
-
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-            <a href="#">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-capitalize font-weight-bold">D</p>
-                                    <!-- <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Machine : //$jr['total'] </p> -->
-                                    <h5 class="font-weight-bolder mb-0">
-                                    </h5>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
+            </div>
         </div>
     </div>
 
@@ -317,7 +343,7 @@
                                                         </div>
                                                         <div class="col-lg-5">
                                                             <h6>
-                                                                <?= ceil(floatval($range['dataBooking'])); ?> dz
+                                                                <?= ceil(floatval($range['dataSisaBooking'])); ?> dz
                                                             </h6>
                                                         </div>
                                                     </div>

@@ -52,6 +52,10 @@ class SalesController extends BaseController
     {
         $dataJarum = $this->jarumModel->getJarum(); // data all jarum
         $jarum = $this->request->getGet('jarum'); // data filter jarum
+        $terimaBooking = $this->bookingModel->getBookingMasuk();
+        $orderJalan = $this->bookingModel->getOrderJalan();
+        $mcJalan = $this->jarumModel->mcJalan();
+        $totalMc = $this->jarumModel->totalMc();
         $dataMesin = $this->jarumModel->getAllBrand($jarum); // data mesin per jarum
         $dataTarget = $this->productModel->getKonversi($jarum); // data target per jarum
         $dataMesinByJarum = $this->jarumModel->getTotalMesinCjByJarum($jarum); // data target per jarum
@@ -110,17 +114,15 @@ class SalesController extends BaseController
             ];
             $dataBookingByJarum = $this->bookingModel->getTotalBookingByJarum($cek); // data booking per jarum
             $totalBooking = 0;
+            $sisaBooking = 0;
 
             // Jika dataBookingByJarum adalah array dari hasil, lakukan penjumlahan
             foreach ($dataBookingByJarum as $booking) {
                 $totalBooking += !empty($booking['total_booking']) ? $booking['total_booking'] / 24 : 0; // Ganti 'jumlah' dengan kunci yang sesuai
+                $sisaBooking += !empty($booking['sisa_booking']) ? $booking['sisa_booking'] / 24 : 0; // Ganti 'jumlah' dengan kunci yang sesuai
             }
-            // Format total booking
-            $formattedBooking = $totalBooking != 0 ? number_format($totalBooking, 0, ',', '.') : '-';
-            // print_r($formattedBooking) . '<br>';
-            // exit;
 
-            // //
+            //
             $jumlahMcByJrm = 0;
             $totalHari = $numberOfDays; // Hitung total hari yang tidak libur per minggu
             $maxCapacity = 0; // Reset total kapasitas untuk minggu ini
@@ -148,6 +150,7 @@ class SalesController extends BaseController
                 'maxCapacity' => $maxCapacity,
                 'totalMonthlyCapacity' => $totalMonthlyCapacity,
                 'dataBooking' => $totalBooking,
+                'dataSisaBooking' => $sisaBooking,
             ];
 
             $weekCount++;
@@ -166,6 +169,11 @@ class SalesController extends BaseController
             'dataMesin' => $dataMesin,
             'my' => $month,
             'weeklyRanges' => $monthlyData,
+            'TerimaBooking' => $terimaBooking,
+            'jalan' => $orderJalan,
+            'mcJalan' => $mcJalan,
+            'totalMc' => $totalMc,
+
         ];
         return view('capacity/Sales/index', $data);
     }
