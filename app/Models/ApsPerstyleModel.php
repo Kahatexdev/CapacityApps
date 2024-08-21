@@ -377,9 +377,10 @@ class ApsPerstyleModel extends Model
         foreach ($data as $dt) {
             $delivDate = new DateTime($dt['delivery']);
             $leadtime = $delivDate->diff($todayDate)->days;
+            $smv = intval($dt['smv']);
+            $smv = $smv == 0 ? 14 : $smv;
 
-            if ($dt['smv'] > 0 && $leadtime > 0) {
-                $smv = $dt['smv'];
+            if ($leadtime > 0) {
                 $target = 3600 / $smv; // Simplified target calculation
                 $kebMesin = $dt['sisa'] / $target / $leadtime;
                 $kebutuhanMc = ceil($kebMesin);
