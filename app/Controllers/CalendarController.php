@@ -462,7 +462,7 @@ class CalendarController extends BaseController
         $qtyTotal = 0;
         foreach ($query as $key => $data) {
             $qty1 = $data['sisa_booking'];
-            $hari1 = $data['totalhari'];
+            $hari1 = intval($data['totalhari']);
             $deliv = $data['delivery'];
             $target = $data['konversi'];
             $type = $data['product_type'];
@@ -473,6 +473,8 @@ class CalendarController extends BaseController
             } else {
                 $value[] = [
                     'kebutuhanMc' => ceil($qtyTotal / $target / $hari1 / 24),
+                    'qty' => ceil($qtyTotal),
+                    'target' => ceil($target),
                     'JumlahHari' => $hari1,
                     'delivery' => $deliv,
                     'type' => $type
@@ -503,7 +505,7 @@ class CalendarController extends BaseController
         $qtyTotal = 0;
         foreach ($query as $key => $data) {
             $qty1 = $data['sisa'];
-            $hari1 = $data['totalhari'];
+            $hari1 = intval($data['totalhari']);
             $deliv = $data['delivery'];
             $target = $data['smv'];
             $type = $data['product_type'];
@@ -511,6 +513,8 @@ class CalendarController extends BaseController
 
             $value[] = [
                 'kebutuhanMc' => ceil($qtyTotal / $target / $hari1 / 24),
+                'qty' => ceil($qtyTotal),
+                'target' => ceil($target),
                 'JumlahHari' => $hari1,
                 'delivery' => $deliv,
                 'type' => $type

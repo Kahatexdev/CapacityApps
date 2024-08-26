@@ -1,118 +1,6 @@
 <?php $this->extend('Capacity/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
-    <div class="row my-4">
-        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    Sales Position
-                                </h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-            <a href="#">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-capitalize font-weight-bold">A</p>
-                                    <!-- <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Machine : //$jr['total'] </p> -->
-                                    <h5 class="font-weight-bolder mb-0">
-                                    </h5>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-            <a href="#">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-capitalize font-weight-bold">B</p>
-                                    <!-- <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Machine : //$jr['total'] </p> -->
-                                    <h5 class="font-weight-bolder mb-0">
-                                    </h5>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-            <a href="#">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-capitalize font-weight-bold">C</p>
-                                    <!-- <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Machine : //$jr['total'] </p> -->
-                                    <h5 class="font-weight-bolder mb-0">
-                                    </h5>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-            <a href="#">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-capitalize font-weight-bold">D</p>
-                                    <!-- <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Machine : //$jr['total'] </p> -->
-                                    <h5 class="font-weight-bolder mb-0">
-                                    </h5>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-    </div>
 
     <div class="row my-4">
         <form action="<?= base_url($role . '/sales') ?>" method="get">
@@ -123,7 +11,7 @@
                             <div class="col-9">
                                 <div class="numbers">
                                     <h5 class="font-weight-bolder mb-0">
-                                        Machine Availablelity
+                                        Sales Position
                                     </h5>
                                 </div>
                             </div>
@@ -246,7 +134,7 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-5">
-                                                <h6>Available</h6>
+                                                <h6>Available Capacity</h6>
                                             </div>
                                             <div class="col-1">
                                                 <h6>:</h6>
@@ -254,7 +142,7 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-5">
-                                                <h6>Total Machine</h6>
+                                                <h6>Sisa Order</h6>
                                             </div>
                                             <div class="col-1">
                                                 <h6>:</h6>
@@ -262,7 +150,7 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-5">
-                                                <h6>Order</h6>
+                                                <h6>Sisa Booking</h6>
                                             </div>
                                             <div class="col-1">
                                                 <h6>:</h6>
@@ -284,7 +172,7 @@
                                                 <div class="col-lg-5">
                                                     <div class="row">
                                                         <div class="col-lg-5">
-                                                            <h6>Max</h6>
+                                                            <h6>Max Capacity</h6>
                                                         </div>
                                                         <div class="col-lg-1">
                                                             <h6>:</h6>
@@ -297,7 +185,7 @@
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-lg-5">
-                                                            <h6>Available</h6>
+                                                            <h6>Available Capacity</h6>
                                                         </div>
                                                         <div class="col-lg-1">
                                                             <h6>:</h6>
@@ -310,7 +198,7 @@
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-lg-5">
-                                                            <h6>Used</h6>
+                                                            <h6>Sisa Booking</h6>
                                                         </div>
                                                         <div class="col-lg-1">
                                                             <h6>:</h6>
@@ -323,7 +211,20 @@
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-lg-5">
-                                                            <h6>Confirm</h6>
+                                                            <h6>Sisa Order</h6>
+                                                        </div>
+                                                        <div class="col-lg-1">
+                                                            <h6>:</h6>
+                                                        </div>
+                                                        <div class="col-lg-5">
+                                                            <h6>
+                                                                - dz
+                                                            </h6>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-lg-5">
+                                                            <h6>Confirm Order</h6>
                                                         </div>
                                                         <div class="col-lg-1">
                                                             <h6>:</h6>

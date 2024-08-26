@@ -31,7 +31,7 @@ error_reporting(E_ALL); ?>
 
             <div class="card">
                 <div class="card-header">
-                    <div class="d-flex justify-content-between">
+                    <div class="row d-flex justify-content-between">
                         <h5>
                             Detail Data Model <?= $noModel ?> Delivery <?= date('d-M-Y', strtotime($delivery)) ?>
                         </h5>
@@ -41,7 +41,9 @@ error_reporting(E_ALL); ?>
                             <a href="<?= base_url($role . '/blmAdaArea/') ?>" class="btn bg-gradient-info"> Kembali</a>
                         </div>
                     </div>
+
                 </div>
+
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="table-responsive">
@@ -296,8 +298,8 @@ error_reporting(E_ALL); ?>
                     </div>
                     <div class="modal-body">
                         <form action="<?= base_url($role . '/recomendationarea') ?>" method="post">
-                            <input type="text" name="pdk" id="" hidden value="<?= $noModel ?>">
-                            <input type="text" name="deliv" id="" hidden value="">
+                            <input type="text" name="pdkRecomen" id="" hidden value="<?= $noModel ?>">
+                            <input type="text" name="delivRecomen" id="" hidden value="<?= $delivery ?>">
 
                             <div class="form-group">
                             </div>
@@ -309,10 +311,11 @@ error_reporting(E_ALL); ?>
                                 <label for="selectArea">Estimated Stop Machine:</label>
                                 <input type="date" class="form-control" name="stop">
                             </div>
+                            <div id="recommendationResult" class="mt-3"></div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn bg-gradient-info">Sumbit</button>
+                        <button type="button" class="btn bg-gradient-info rekomenBtn" onclick="areaRecomendation()">Sumbit</button>
                         </form>
                     </div>
                 </div>
@@ -321,6 +324,67 @@ error_reporting(E_ALL); ?>
 
 
         <script>
+            function areaRecomendation() {
+                // Ambil nilai dari form di dalam modal
+                var pdk = $('input[name="pdkRecomen"]').val();
+                var start = $('input[name="start"]').val();
+                var stop = $('input[name="stop"]').val();
+                var deliv = $('input[name="delivRecomen"]').val(); // Tambahkan pengambilan delivery date
+                var data = {
+                    pdk: pdk,
+                    start: start,
+                    stop: stop,
+                    deliv: deliv
+                };
+                console.log(data)
+                $.ajax({
+                    url: '<?= base_url($role . "/recomendationarea") ?>', // URL ke controller function
+                    type: 'POST',
+                    data: {
+                        pdk: pdk,
+                        start: start,
+                        stop: stop,
+                        deliv: deliv
+                    },
+                    beforeSend: function() {
+                        // Opsional: tampilkan loading spinner atau ubah teks tombol
+                        $('.rekomenBtn').text('Loading...');
+                    },
+                    success: function(response) {
+                        console.log(data);
+                        if (response.status === 'success') {
+
+                            // Jika sukses, tampilkan rekomendasi di dalam elemen #recommendationResult
+                            var resultHtml = '';
+                            $.each(response.rekomendasi_area, function(jarum, rekomendasi) {
+                                resultHtml += '<h5>Jarum: ' + jarum + '</h5>';
+                                resultHtml += '<ul>';
+                                $.each(rekomendasi, function(index, area) {
+                                    resultHtml += '<li>Factory: ' + area.factory + '<br>';
+                                    resultHtml += 'Kebutuhan Kapasitas Perhari: ' + area['Kebutuhan Kapasitas Perhari'] + ' dz' + '<br>';
+                                    resultHtml += 'Sisa Kapasitas: ' + area.sisa_kapasitas + ' dz' + '<br>';
+                                    resultHtml += 'Selisih: ' + area.difference + ' dz' + '</li>';
+                                });
+                                resultHtml += '</ul>';
+                            });
+                            $('#recommendationResult').html(resultHtml);
+                        } else {
+                            // Jika tidak ada rekomendasi atau terjadi error
+                            $('#recommendationResult').html('<p>No recommendation available.</p>');
+                        }
+                        // Kembalikan teks tombol ke "Submit"
+                        $('.btn.bg-gradient-info').text('Submit');
+                    },
+                    error: function(xhr, status, error) {
+                        // Tangani error
+                        console.error('Error: ' + error);
+                        $('#recommendationResult').html('<p>An error occurred. Please try again later.</p>');
+                        $('.btn.bg-gradient-info').text('Submit');
+                    }
+                });
+            }
+
+
             $(document).ready(function() {
                 $('#dataTable').DataTable();
                 $('.btn-assign').click(function() {
@@ -382,6 +446,8 @@ error_reporting(E_ALL); ?>
 
                     $('#recomendModal').find('input[name="deliv"]').val(deliv);
                 });
+
+
             });
         </script>
         <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>

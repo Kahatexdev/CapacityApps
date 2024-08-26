@@ -745,7 +745,6 @@ class MesinController extends BaseController
             $sisaOrder[$jarum] = $this->ApsPerstyleModel->getSisaOrderforRec($jarum, $start, $stop);
         }
 
-
         // Mengelompokkan sisa order berdasarkan area (factory) per jarum
         $usedCapacitydaily = [];
         foreach ($sisaOrder as $jarum => $orders) {
@@ -769,35 +768,42 @@ class MesinController extends BaseController
                 $usedCapacitydaily[$jarum][$factory] += $sisaPerHari;
             }
         }
-        dd($usedCapacitydaily);
-        // Cari area dengan kapasitas yang mendekati quantity order baru untuk setiap jarum
 
+        // Cari area dengan kapasitas yang paling mendekati tetapi tetap lebih besar dari atau sama dengan quantity order baru untuk setiap jarum
         foreach ($pdk as $perjarum) {
             $jarum = $perjarum['machinetypeid'];
-            $orderBaruQuantity = $perjarum['sisa'] / 24;  // Mengubah order baru menjadi lusin
-            $areaTerbaik = null;
-            $kapasitasTerdekat = PHP_INT_MAX;
+            $orderBaruQuantity = $perjarum['sisa'] / 24 / $leadtime;  // Mengubah order baru menjadi lusin
+            $areaRekomendasi = [];
 
-            if (isset($sisaKapasitasArea[$jarum])) {
-                foreach ($sisaKapasitasArea[$jarum] as $factory => $kapasitas) {
-                    // Menghitung kapasitas tersedia
-                    $kapasitasTersedia = $kapasitas - $orderBaruQuantity;
-                    if ($kapasitasTersedia >= 0 && $kapasitasTersedia < $kapasitasTerdekat) {
-                        $kapasitasTerdekat = $kapasitasTersedia;
-                        $areaTerbaik = $factory;
-                    } else {
-                    }
+            if (isset($usedCapacitydaily[$jarum])) {
+                foreach ($usedCapacitydaily[$jarum] as $factory => $kapasitas) {
+                    $difference = abs($kapasitas - $orderBaruQuantity);
+                    // Tambahkan hasilnya ke array rekomendasi
+                    $areaRekomendasi[] = [
+                        'factory' => $factory,
+                        'Kebutuhan Kapasitas Perhari' => ceil($orderBaruQuantity),
+                        'difference' => ceil($difference),
+                        'sisa_kapasitas' => ceil($kapasitas)
+                    ];
                 }
+
+                // Urutkan area berdasarkan perbedaan kapasitas terkecil
+                usort($areaRekomendasi, function ($a, $b) {
+                    return $a['difference'] <=> $b['difference'];
+                });
+
+                // Ambil top 3 area dengan perbedaan terkecil
+                $top3Rekomendasi = array_slice($areaRekomendasi, 0, 3);
+            } else {
+                $top3Rekomendasi = [];
             }
 
-            // Simpan rekomendasi untuk jarum ini
-            $rekomendasiArea[$jarum] = [
-                'factory' => $areaTerbaik,
-                'sisa_kapasitas' => $kapasitasTerdekat
-            ];
+            // Simpan rekomendasi top 3 untuk jarum ini
+            $rekomendasiArea[$jarum] = $top3Rekomendasi;
         }
 
         // Kembalikan data rekomendasi area
+
         return $this->response->setJSON([
             'status' => 'success',
             'rekomendasi_area' => $rekomendasiArea

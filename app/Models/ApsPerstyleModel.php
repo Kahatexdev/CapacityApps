@@ -248,10 +248,13 @@ class ApsPerstyleModel extends Model
 
     public function getSmv()
     {
+        $monthago = date('Y-m-d', strtotime('20 days ago')); // Menggunakan format tanggal yang benar
         return $this->select('idapsperstyle,mastermodel,size,smv')
-            ->groupBy('size', 'mastermodel')
+            ->where('delivery >', $monthago) // Perbaiki spasi di operator where
+            ->groupBy(['size', 'mastermodel']) // Menggunakan array untuk groupBy
             ->findAll();
     }
+
     public function getPdkProduksi()
     {
         return $this->select('mastermodel, sum(qty) as totalqty, sum(sisa) as totalsisa, sum(qty)-sum(sisa) as totalproduksi')
