@@ -875,7 +875,7 @@ class OrderController extends BaseController
         if ($file->isValid() && !$file->hasMoved()) {
             $spreadsheet = IOFactory::load($file);
             $sheet = $spreadsheet->getActiveSheet();
-            $startRow = 2; // Ganti dengan nomor baris mulai
+            $startRow = 4; // Ganti dengan nomor baris mulai
             $errorRows = [];
 
             foreach ($sheet->getRowIterator($startRow) as $rowIndex => $row) {
@@ -885,11 +885,17 @@ class OrderController extends BaseController
                 foreach ($cellIterator as $cell) {
                     $rowData[] = $cell->getValue();
                 }
-
+                if ($rowData[0] == null) {
+                    break;
+                }
                 if (!empty($rowData)) {
+                    $no_models = $rowData[29];
+                    $firstSpacePosition = strpos($no_models, ' '); // Cari posisi spasi pertama
+                    $no_model = substr($no_models, 0, $firstSpacePosition);
+                    $size = $rowData[19];
                     $validate = [
-                        'mastermodel' => $rowData[6],
-                        'size' => $rowData[7]
+                        'mastermodel' => $no_model,
+                        'size' => $rowData[19]
                     ];
                     $id = $this->ApsPerstyleModel->getIdSmv($validate);
                     if ($id === null) {
@@ -898,7 +904,7 @@ class OrderController extends BaseController
                     }
                     $Id = $id['idapsperstyle'] ?? 0;
 
-                    $smv = $rowData[8];
+                    $smv = $rowData[20];
                     $update = $this->ApsPerstyleModel->update($Id, ['smv' => $smv]);
 
                     if (!$update) {

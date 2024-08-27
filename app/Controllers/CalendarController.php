@@ -507,12 +507,12 @@ class CalendarController extends BaseController
             $qty1 = $data['sisa'];
             $hari1 = intval($data['totalhari']);
             $deliv = $data['delivery'];
-            $target = $data['smv'];
+            $target = intval($data['smv']) ?? 185;
             $type = $data['product_type'];
             $qtyTotal += $qty1;
 
             $value[] = [
-                'kebutuhanMc' => ceil($qtyTotal / $target / $hari1 / 24),
+                'kebutuhanMc' => ceil(intval($qtyTotal) / $target / $hari1 / 24),
                 'qty' => ceil($qtyTotal),
                 'target' => ceil($target),
                 'JumlahHari' => $hari1,
