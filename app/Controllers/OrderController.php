@@ -917,12 +917,12 @@ class OrderController extends BaseController
             if (!empty($errorRows)) {
                 $errorMessage = "Errors occurred:\n" . implode("\n", $errorRows);
                 dd($errorMessage);
-                return redirect()->to(base_url(session()->get('role') . '/databooking'))->withInput()->with('error', $errorMessage);
+                return redirect()->to(base_url(session()->get('role') . '/smvimport'))->withInput()->with('error', $errorMessage);
             } else {
-                return redirect()->to(base_url(session()->get('role') . '/databooking'))->withInput()->with('success', 'Data Berhasil di Update');
+                return redirect()->to(base_url(session()->get('role') . '/smvimport'))->withInput()->with('success', 'Data Berhasil di Update');
             }
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/databooking'))->withInput()->with('error', 'No data found in the Excel file');
+            return redirect()->to(base_url(session()->get('role') . '/smvimport'))->withInput()->with('error', 'No data found in the Excel file');
         }
     }
     public function smvimport()
