@@ -223,6 +223,7 @@ class BookingModel extends Model
             ->where('master_product_type.product_type', $type)
             ->where('master_product_type.jarum', $get['jarum'])
             ->where('sisa_booking > ', 0)
+            ->where('status != ', 'Cancel Booking')
             ->where("data_booking.delivery > DATE_ADD(CURDATE(), INTERVAL 7 DAY)")
             ->where('data_booking.delivery >=', $get['start'])
             ->where('data_booking.delivery <=', $get['end'])

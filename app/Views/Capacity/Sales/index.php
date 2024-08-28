@@ -29,7 +29,7 @@
                             <div class="col-5">
                                 <div class="numbers">
                                     <h5 class="font-weight-bolder mb-0">
-                                        Machine Availablelity
+                                        Sales Position
                                     </h5>
                                 </div>
                             </div>
