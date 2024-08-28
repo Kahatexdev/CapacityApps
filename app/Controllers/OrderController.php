@@ -885,7 +885,7 @@ class OrderController extends BaseController
                 foreach ($cellIterator as $cell) {
                     $rowData[] = $cell->getValue();
                 }
-                if ($rowData[0] == null) {
+                if ($rowData[19] == null) {
                     break;
                 }
                 if (!empty($rowData)) {
@@ -893,9 +893,11 @@ class OrderController extends BaseController
                     $firstSpacePosition = strpos($no_models, ' '); // Cari posisi spasi pertama
                     $no_model = substr($no_models, 0, $firstSpacePosition);
                     $size = $rowData[19];
+                    $smv = $rowData[20];
                     $validate = [
                         'mastermodel' => $no_model,
-                        'size' => $rowData[19]
+                        'size' => $rowData[19],
+                        'smv' => $smv
                     ];
                     $id = $this->ApsPerstyleModel->getIdSmv($validate);
                     if ($id === null) {
@@ -904,7 +906,6 @@ class OrderController extends BaseController
                     }
                     $Id = $id['idapsperstyle'] ?? 0;
 
-                    $smv = $rowData[20];
                     $update = $this->ApsPerstyleModel->update($Id, ['smv' => $smv]);
 
                     if (!$update) {
