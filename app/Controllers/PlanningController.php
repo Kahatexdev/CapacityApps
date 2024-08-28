@@ -383,7 +383,7 @@ class PlanningController extends BaseController
         $startDate = new \DateTime($date->format('Y-m-01')); // First day of the given month
 
         $monthlyData = [];
-        for ($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             $startOfWeek = clone $startDate;
             $startOfWeek->modify("+$i week");
 

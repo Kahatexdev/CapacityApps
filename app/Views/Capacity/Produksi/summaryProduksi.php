@@ -58,6 +58,7 @@
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Delivery Shipment</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Sisa Hari</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Jalan Order</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Running (Days)</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Buyer</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">No Order</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Jarum</th>
@@ -72,7 +73,7 @@
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Sisa Shipment (dz)</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">% Prod</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Bs Setting (dz)</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Running MC</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Qty + Pck (dz)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -110,6 +111,7 @@
                                                 }
                                             }
                                             ?>
+                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['running'] : ''; ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['buyer'] : ''; ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['no_order'] : ''; ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= $id['machinetypeid']; ?></td>
@@ -142,7 +144,7 @@
                                             foreach ($total_prod as $pr) {
                                                 if ($pr['mastermodel'] == $id['mastermodel'] && $pr['size'] == $id['size']) {
                                                     $bruto = $pr['qty_produksi'] ?? 0;
-                                                    $bs_st = 0;
+                                                    $bs_st = $pr['bs_prod'] ?? 0;
                                                     $netto = $bruto - $bs_st ?? 0;
                                                     $production_found = true;
 
@@ -178,6 +180,7 @@
                                                     <td class="text-sm" style="text-align: center;"><?= ($sisa_ship > 0 ? number_format($sisa_ship / 24, 2) : '0.00'); ?></td>
                                                     <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($persentase, 2) . '%' : ''; ?></td>
                                                     <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($bs_st, 2) : ''; ?></td>
+                                                    <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($pr['plus_packing'], 2) : ''; ?></td>
                                                 <?php
                                                     break;
                                                 }
@@ -191,10 +194,10 @@
                                                 <td class="text-sm" style="text-align: center;">0.00</td>
                                                 <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? '0.00%' : '' ?></td>
                                                 <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? '0.00' : '' ?></td>
+                                                <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? '0.00' : '' ?></td>
                                             <?php
                                             }
                                             ?>
-                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['running'] : ''; ?></td>
                                         </tr>
                                     <?php
                                         $prevSize = $id['mastermodel'] . $id['size'];

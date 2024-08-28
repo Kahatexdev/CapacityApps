@@ -398,4 +398,16 @@ class ApsPerstyleModel extends Model
             'outputDz' => $outputDz
         ];
     }
+
+    public function getTotalOrderWeek($cek)
+    {
+        return $this->select('machinetypeid, SUM(qty) AS qty, SUM(sisa) AS sisa, delivery')
+            ->where('factory!=', ['MJ'])
+            ->where('sisa>', '0')
+            ->where('machinetypeid', $cek['jarum'])
+            ->where('delivery>=', $cek['start'])
+            ->where('delivery<=', $cek['end'])
+            ->groupBy('machinetypeid')
+            ->findAll();
+    }
 }

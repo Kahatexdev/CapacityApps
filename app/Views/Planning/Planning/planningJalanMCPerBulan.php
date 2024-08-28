@@ -32,7 +32,7 @@
                         Save</a>
                 </div>
                 <!-- Menampilkan Planning MC Per Week -->
-                <?php for ($i = 1; $i <= 4; $i++): ?>
+                <?php for ($i = 1; $i <= 5; $i++): ?>
                     <?php if (!empty($kebutuhanMesin[$i])): ?>
                         <div class="card mt-3">
                             <div class="card-header">
