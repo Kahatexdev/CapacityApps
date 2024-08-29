@@ -476,6 +476,22 @@ class SummaryController extends BaseController
         $sheet->setCellValue('R' . $row_header, '% Prod');
         $sheet->setCellValue('S' . $row_header, 'BS Setting');
         $sheet->setCellValue('T' . $row_header, 'Qty (+)Pck');
+        $sheet->setCellValue('E' . $row_header, 'Running (days)');
+        $sheet->setCellValue('F' . $row_header, 'Buyer');
+        $sheet->setCellValue('G' . $row_header, 'No Order');
+        $sheet->setCellValue('H' . $row_header, 'Jarum');
+        $sheet->setCellValue('I' . $row_header, 'No Model');
+        $sheet->setCellValue('J' . $row_header, 'Style');
+        $sheet->setCellValue('K' . $row_header, 'Color');
+        $sheet->setCellValue('L' . $row_header, 'Qty Shipment');
+        $sheet->setCellValue('M' . $row_header, 'Total Shipment');
+        $sheet->setCellValue('N' . $row_header, 'Prod (bruto)');
+        $sheet->setCellValue('O' . $row_header, 'Prod (netto)');
+        $sheet->setCellValue('P' . $row_header, 'Sisa Prod');
+        $sheet->setCellValue('Q' . $row_header, 'Sisa Shipment');
+        $sheet->setCellValue('R' . $row_header, '% Prod');
+        $sheet->setCellValue('S' . $row_header, 'BS Setting');
+        $sheet->setCellValue('T' . $row_header, 'Qty (+)Pck');
 
         $sheet->getStyle('A' . $row_header)->applyFromArray($styleHeader);
         $sheet->getStyle('B' . $row_header)->applyFromArray($styleHeader);

@@ -155,63 +155,18 @@ class CalendarController extends BaseController
                 'start' => $start,
                 'end' => $end,
             ];
-            $nsmp = $this->ApsPerstyleModel->getPlanJarum($cek, "NS-MP");
-            $nsfp = $this->ApsPerstyleModel->getPlanJarum($cek, "NS-FP");
-            $nsps = $this->ApsPerstyleModel->getPlanJarum($cek, "NS-PS");
-            $smp = $this->ApsPerstyleModel->getPlanJarum($cek, "S-MP");
-            $sfp = $this->ApsPerstyleModel->getPlanJarum($cek, "S-FP");
-            $sps = $this->ApsPerstyleModel->getPlanJarum($cek, "S-PS");
-            $ssmp = $this->ApsPerstyleModel->getPlanJarum($cek, "SS-MP");
-            $ssfp = $this->ApsPerstyleModel->getPlanJarum($cek, "SS-FP");
-            $ssps = $this->ApsPerstyleModel->getPlanJarum($cek, "SS-PS");
-            $fmp = $this->ApsPerstyleModel->getPlanJarum($cek, "F-MP");
-            $ffp = $this->ApsPerstyleModel->getPlanJarum($cek, "F-FP");
-            $fps = $this->ApsPerstyleModel->getPlanJarum($cek, "F-PS");
-            $khmp = $this->ApsPerstyleModel->getPlanJarum($cek, "KH-MP");
-            $khfp = $this->ApsPerstyleModel->getPlanJarum($cek, "KH-FP");
-            $khps = $this->ApsPerstyleModel->getPlanJarum($cek, "KH-PS");
-            $tgmp = $this->ApsPerstyleModel->getPlanJarum($cek, "TG-MP");
-            $tgfp = $this->ApsPerstyleModel->getPlanJarum($cek, "TG-FP");
-            $tgps = $this->ApsPerstyleModel->getPlanJarum($cek, "TG-PS");
-            $glfl = $this->ApsPerstyleModel->getPlanJarum($cek, "GL-FL");
-            $glmt = $this->ApsPerstyleModel->getPlanJarum($cek, "GL-MT");
-            $glpt = $this->ApsPerstyleModel->getPlanJarum($cek, "GL-PT");
-            $glst = $this->ApsPerstyleModel->getPlanJarum($cek, "GL-ST");
-            $htst = $this->ApsPerstyleModel->getPlanJarum($cek, "HT-ST");
-            $htpl = $this->ApsPerstyleModel->getPlanJarum($cek, "HT-pl");
+            $order = $this->ApsPerstyleModel->getPlanJarum($cek);
+            foreach ($order as $order) {
+                $monthlyData[$currentMonth][] = [
+                    'week' => $weekCount,
+                    'start_date' => $startOfWeekFormatted,
+                    'end_date' => $endOfWeekFormatted,
+                    'number_of_days' => $numberOfDays,
+                    'holidays' => $weekHolidays,
+                    $order['mastermodel'] => $order['total_qty'] != 0 ? number_format($order['total_qty'], 0, ',', '.') : '-',
 
-            $monthlyData[$currentMonth][] = [
-                'week' => $weekCount,
-                'start_date' => $startOfWeekFormatted,
-                'end_date' => $endOfWeekFormatted,
-                'number_of_days' => $numberOfDays,
-                'holidays' => $weekHolidays,
-                'nsps' => $nsps != 0 ? number_format($nsps, 0, ',', '.') : '-',
-                'nsmp' => $nsmp != 0 ? number_format($nsmp, 0, ',', '.') : '-',
-                'nsfp' => $nsfp != 0 ? number_format($nsfp, 0, ',', '.') : '-',
-                'sps' => $sps != 0 ? number_format($sps, 0, ',', '.') : '-',
-                'smp' => $smp != 0 ? number_format($smp, 0, ',', '.') : '-',
-                'sfp' => $sfp != 0 ? number_format($sfp, 0, ',', '.') : '-',
-                'ssps' => $ssps != 0 ? number_format($ssps, 0, ',', '.') : '-',
-                'ssmp' => $ssmp != 0 ? number_format($ssmp, 0, ',', '.') : '-',
-                'ssfp' => $ssfp != 0 ? number_format($ssfp, 0, ',', '.') : '-',
-                'khps' => $khps != 0 ? number_format($khps, 0, ',', '.') : '-',
-                'khmp' => $khmp != 0 ? number_format($khmp, 0, ',', '.') : '-',
-                'khfp' => $khfp != 0 ? number_format($khfp, 0, ',', '.') : '-',
-                'ffp' => $ffp != 0 ? number_format($ffp, 0, ',', '.') : '-',
-                'fmp' => $fmp != 0 ? number_format($fmp, 0, ',', '.') : '-',
-                'fps' => $fps != 0 ? number_format($fps, 0, ',', '.') : '-',
-                'tgps' => $tgps != 0 ? number_format($tgps, 0, ',', '.') : '-',
-                'tgmp' => $tgmp != 0 ? number_format($tgmp, 0, ',', '.') : '-',
-                'tgfp' => $tgfp != 0 ? number_format($tgfp, 0, ',', '.') : '-',
-                'glfl' => $glfl != 0 ? number_format($glfl, 0, ',', '.') : '-',
-                'glmt' => $glmt != 0 ? number_format($glmt, 0, ',', '.') : '-',
-                'glpt' => $glpt != 0 ? number_format($glpt, 0, ',', '.') : '-',
-                'glst' => $glst != 0 ? number_format($glst, 0, ',', '.') : '-',
-                'htst' => $htst != 0 ? number_format($htst, 0, ',', '.') : '-',
-                'htpl' => $htpl != 0 ? number_format($htpl, 0, ',', '.') : '-',
-            ];
-
+                ];
+            }
             $weekCount++;
         }
         $get = [
@@ -220,32 +175,8 @@ class CalendarController extends BaseController
             'end' => $akhir,
         ];
 
-        $KebMesin = [
-            'fps' =>  $this->hitungMcOrder($get, 'F-PS'),
-            'fmp' =>  $this->hitungMcOrder($get, 'F-MP'),
-            'ffp' =>  $this->hitungMcOrder($get, 'F-FP'),
-            'sps' =>  $this->hitungMcOrder($get, 'S-PS'),
-            'smp' =>  $this->hitungMcOrder($get, 'S-MP'),
-            'sfp' =>  $this->hitungMcOrder($get, 'S-FP'),
-            'ssps' => $this->hitungMcOrder($get, 'SS-PS'),
-            'ssmp' => $this->hitungMcOrder($get, 'SS-MP'),
-            'ssfp' => $this->hitungMcOrder($get, 'SS-FP'),
-            'nsps' => $this->hitungMcOrder($get, 'NS-PS'),
-            'nsmp' => $this->hitungMcOrder($get, 'NS-MP'),
-            'nsfp' => $this->hitungMcOrder($get, 'NS-FP'),
-            'khps' => $this->hitungMcOrder($get, 'KH-PS'),
-            'khmp' => $this->hitungMcOrder($get, 'KH-MP'),
-            'khfp' => $this->hitungMcOrder($get, 'KH-FP'),
-            'tgps' => $this->hitungMcOrder($get, 'TG-PS'),
-            'tgmp' => $this->hitungMcOrder($get, 'TG-MP'),
-            'tgfp' => $this->hitungMcOrder($get, 'TG-FP'),
-            'glfl' => $this->hitungMcOrder($get, 'GL-FL'),
-            'glmt' => $this->hitungMcOrder($get, 'GL-MT'),
-            'glpt' => $this->hitungMcOrder($get, 'GL-PT'),
-            'glst' => $this->hitungMcOrder($get, 'GL-ST'),
-            'htst' => $this->hitungMcOrder($get, 'HT-ST'),
-            'htpl' => $this->hitungMcOrder($get, 'HT-PL'),
-        ];
+        $KebMesin =  $this->hitungMcOrder($get);
+
         $kategori = $this->productModel->getKategori();
         $maxHari = max(array_column($KebMesin, 'JumlahHari'));
         $totalKebutuhanMC = 0;
@@ -462,7 +393,7 @@ class CalendarController extends BaseController
         $qtyTotal = 0;
         foreach ($query as $key => $data) {
             $qty1 = $data['sisa_booking'];
-            $hari1 = $data['totalhari'];
+            $hari1 = intval($data['totalhari']);
             $deliv = $data['delivery'];
             $target = $data['konversi'];
             $type = $data['product_type'];
@@ -473,6 +404,8 @@ class CalendarController extends BaseController
             } else {
                 $value[] = [
                     'kebutuhanMc' => ceil($qtyTotal / $target / $hari1 / 24),
+                    'qty' => ceil($qtyTotal),
+                    'target' => ceil($target),
                     'JumlahHari' => $hari1,
                     'delivery' => $deliv,
                     'type' => $type
@@ -496,26 +429,31 @@ class CalendarController extends BaseController
             return $hasil;
         }
     }
-    public function hitungMcOrder($get, $type)
+    public function hitungMcOrder($get)
     {
-        $query = $this->ApsPerstyleModel->hitungMesin($get, $type);
+        $query = $this->ApsPerstyleModel->hitungMesin($get);
         $value = [];
         $qtyTotal = 0;
         foreach ($query as $key => $data) {
             $qty1 = $data['sisa'];
-            $hari1 = $data['totalhari'];
+            $hari1 = intval($data['totalhari']);
             $deliv = $data['delivery'];
-            $target = $data['smv'];
-            $type = $data['product_type'];
+            $target = ((86400 / (intval($data['smv'])  * 0.8)) / 24);
+
+            $type = $data['mastermodel'];
             $qtyTotal += $qty1;
 
             $value[] = [
-                'kebutuhanMc' => ceil($qtyTotal / $target / $hari1 / 24),
+                'kebutuhanMc' => ceil(intval($qtyTotal / 24) / $target / $hari1),
+                'smv' => $data['smv'],
+                'qty' => ceil($qtyTotal),
+                'target' => ceil($target),
                 'JumlahHari' => $hari1,
                 'delivery' => $deliv,
                 'type' => $type
             ];
         }
+        dd($value);
         if (!$value) {
             $value =  ['kebutuhanMc' => 0, 'JumlahHari' => 0, 'delivery' => 0, 'type' => $type, 'stopmc' => 0];
             return $value;

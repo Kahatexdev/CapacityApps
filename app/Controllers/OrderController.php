@@ -875,7 +875,7 @@ class OrderController extends BaseController
         if ($file->isValid() && !$file->hasMoved()) {
             $spreadsheet = IOFactory::load($file);
             $sheet = $spreadsheet->getActiveSheet();
-            $startRow = 2; // Ganti dengan nomor baris mulai
+            $startRow = 4; // Ganti dengan nomor baris mulai
             $errorRows = [];
 
             foreach ($sheet->getRowIterator($startRow) as $rowIndex => $row) {
@@ -885,11 +885,19 @@ class OrderController extends BaseController
                 foreach ($cellIterator as $cell) {
                     $rowData[] = $cell->getValue();
                 }
-
+                if ($rowData[19] == null) {
+                    break;
+                }
                 if (!empty($rowData)) {
+                    $no_models = $rowData[29];
+                    $firstSpacePosition = strpos($no_models, ' '); // Cari posisi spasi pertama
+                    $no_model = substr($no_models, 0, $firstSpacePosition);
+                    $size = $rowData[19];
+                    $smv = $rowData[20];
                     $validate = [
-                        'mastermodel' => $rowData[6],
-                        'size' => $rowData[7]
+                        'mastermodel' => $no_model,
+                        'size' => $rowData[19],
+                        'smv' => $smv
                     ];
                     $id = $this->ApsPerstyleModel->getIdSmv($validate);
                     if ($id === null) {
@@ -898,7 +906,6 @@ class OrderController extends BaseController
                     }
                     $Id = $id['idapsperstyle'] ?? 0;
 
-                    $smv = $rowData[8];
                     $update = $this->ApsPerstyleModel->update($Id, ['smv' => $smv]);
 
                     if (!$update) {
@@ -910,12 +917,12 @@ class OrderController extends BaseController
             if (!empty($errorRows)) {
                 $errorMessage = "Errors occurred:\n" . implode("\n", $errorRows);
                 dd($errorMessage);
-                return redirect()->to(base_url(session()->get('role') . '/databooking'))->withInput()->with('error', $errorMessage);
+                return redirect()->to(base_url(session()->get('role') . '/smvimport'))->withInput()->with('error', $errorMessage);
             } else {
-                return redirect()->to(base_url(session()->get('role') . '/databooking'))->withInput()->with('success', 'Data Berhasil di Update');
+                return redirect()->to(base_url(session()->get('role') . '/smvimport'))->withInput()->with('success', 'Data Berhasil di Update');
             }
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/databooking'))->withInput()->with('error', 'No data found in the Excel file');
+            return redirect()->to(base_url(session()->get('role') . '/smvimport'))->withInput()->with('error', 'No data found in the Excel file');
         }
     }
     public function smvimport()

@@ -171,7 +171,6 @@ class PlanningController extends BaseController
         $idaps = $this->request->getPost('idaps');
         $pdk = $this->request->getPost('noModel');
         $deliv = $this->request->getPost('delivery');
-
         $update = [
             'factory' => $this->request->getPost('area1'),
             'qty' => $this->request->getPost('qty1'),
@@ -368,6 +367,10 @@ class PlanningController extends BaseController
         $role = session()->get('role');
 
         $areas = $this->jarumModel->getArea();
+        $totalArea = [];
+        foreach ($areas as $ar) {
+            $totalArea[$ar] = $this->jarumModel->totalMcArea($ar);
+        }
         $totalArea = [];
         foreach ($areas as $ar) {
             $totalArea[$ar] = $this->jarumModel->totalMcArea($ar);

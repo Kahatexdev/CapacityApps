@@ -69,24 +69,23 @@
 
                         </thead>
                         <tbody>
-                            <?php foreach ($planning as $plan) : ?>
-                                <?php foreach ($plan as $key) : ?>
-                                    <tr class="text-center">
-                                        <td>
-                                            <?= $key['jarum'] ?>
-                                        </td>
-                                        <td>
-                                            <?= $key['mesin'] ?>
-                                        </td>
-                                        <td>
-                                            <?= $key['startmc'] ?>
-                                        </td>
-                                        <td>
-                                            <?= $key['stopmc'] ?>
-                                        </td>
+                            <?php foreach ($chartstat as $plan) : ?>
 
-                                    </tr>
-                                <?php endforeach ?>
+                                <tr class="text-center">
+                                    <td>
+                                        <?= $plan['jarum'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $plan['mesin'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $plan['start_mesin'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $plan['stop_mesin'] ?>
+                                    </td>
+
+                                </tr>
                             <?php endforeach ?>
                         </tbody>
                     </table>

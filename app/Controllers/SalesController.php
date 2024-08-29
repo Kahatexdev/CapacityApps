@@ -55,22 +55,21 @@ class SalesController extends BaseController
         $terimaBooking = $this->bookingModel->getBookingMasuk();
         $mcJalan = $this->jarumModel->mcJalan();
         $totalMc = $this->jarumModel->totalMc();
-        $dataJarum = $this->jarumModel->getJarum(); // data all jarum
-        $jarum = $this->request->getGet('jarum'); // data filter jarum
-        $dataMesin = $this->jarumModel->getAllBrand($jarum); // data mesin per jarum
+        $dataJarum = $this->jarumModel->getAliasJrm(); // data all jarum
+        $aliasjarum = $this->request->getGet('aliasjarum'); // data filter jarum
+        $dataMesin = $this->jarumModel->getAllBrand($aliasjarum); // data mesin per jarum
+        $jarum = !empty($dataMesin) ? $dataMesin[0]['jarum'] : null;
         $dataTarget = $this->productModel->getKonversi($jarum); // data target per jarum
-        $dataMesinByJarum = $this->jarumModel->getTotalMesinCjByJarum($jarum); // data target per jarum
-
+        $dataMesinByJarum = $this->jarumModel->getTotalMesinCjByJarum($jarum, $aliasjarum); // data target per jarum
         $month = date('F-Y');
         $startDate = new \DateTime(); // Tanggal hari ini
         $startDate->modify('Monday this week'); // Memastikan start date dimulai dari hari Senin minggu ini
         $endDate = new \DateTime('+1 year'); // Tanggal satu tahun ke depan
-
-
+        // 
         $jumlahHari = $endDate->diff($startDate)->days + 1; // Hitung jumlah hari bulan ini
         $LiburModel = new LiburModel();
         $holidays = $LiburModel->findAll();
-
+        // 
         $currentMonth = $startDate->format('F');
         $range = ceil($jumlahHari / 7); // Pembulatan ke atas untuk rentang minggu
         $weekCount = 1; // Inisialisasi minggu
@@ -86,6 +85,7 @@ class SalesController extends BaseController
             $startOfWeek->modify('Monday this week');
             $endOfWeek = clone $startOfWeek;
             $endOfWeek->modify('Sunday this week');
+            $numberOfDays = $startOfWeek->diff($endOfWeek)->days + 1;
 
             if ($endOfWeek > $endDate) {
                 $endOfWeek = clone $endDate;
@@ -101,6 +101,7 @@ class SalesController extends BaseController
                         'tanggal' => $holidayDate->format('d-F'),
                     ];
                     $holidaysCount++;
+                    $numberOfDays--;
                 }
             }
 
@@ -108,10 +109,11 @@ class SalesController extends BaseController
             if (!isset($monthlyData[$currentMonthOfYear])) {
                 $monthlyData[$currentMonthOfYear] = [
                     'monthlySummary' => [
-                        'totalCapacity' => 0,
+                        'totalMaxCapacity' => 0,
                         'totalAvailable' => 0,
-                        'totalMachine' => 0,
-                        'totalOrder' => 0,
+                        'totalSisaBooking' => 0,
+                        'totalConfirmOrder' => 0,
+                        'totalSisaConfirmOrder' => 0,
                     ],
                     'weeks' => []
                 ];
@@ -122,6 +124,7 @@ class SalesController extends BaseController
             $start = $startOfWeek->format('Y-m-d');
             $end = $endOfWeek->format('Y-m-d');
             $cek = [
+                'aliasjarum' => $aliasjarum,
                 'jarum' => $jarum,
                 'start' => $start,
                 'end' => $end,
@@ -129,9 +132,11 @@ class SalesController extends BaseController
             $dataBookingByJarum = $this->bookingModel->getTotalBookingByJarum($cek); // Data booking per jarum
             $dataOrderWeekByJarum = $this->ApsPerstyleModel->getTotalOrderWeek($cek); // Data order per jarum
 
-            $confirmOrder = 0;
+            $ConfirmOrder = 0;
+            $sisaConfirmOrder = 0;
             foreach ($dataOrderWeekByJarum as $order) {
-                $confirmOrder = !empty($order['qty']) ? $order['qty'] / 24 : 0;
+                $ConfirmOrder = !empty($order['qty']) ? $order['qty'] / 24 : 0;
+                $sisaConfirmOrder = !empty($order['sisa']) ? $order['sisa'] / 24 : 0;
             }
 
             $totalBooking = 0;
@@ -142,18 +147,19 @@ class SalesController extends BaseController
             }
 
             $jumlahMcByJrm = 0;
-            $totalHari = $startOfWeek->diff($endOfWeek)->days + 1;
+            $totalHari = $numberOfDays;
             $maxCapacity = 0;
             foreach ($dataMesinByJarum as $mc) {
                 $jumlahMcByJrm = $mc['total'];
                 foreach ($dataTarget as $target) {
-                    $konversi = !empty($target['konversi']) ? $target['konversi'] : 14;
+                    $konversi = !empty($target['konversi']) ? $target['konversi'] : 0;
                     if ($jumlahMcByJrm > 0) {
                         $maxCapacity = ($jumlahMcByJrm * $konversi * $totalHari) / 24;
                     }
                 }
             }
-
+            // var_dump($jumlahMcByJrm);
+            // exit;
             $monthlyData[$currentMonthOfYear]['weeks'][] = [
                 'countWeek' => $weekCount,
                 'start_date' => $startOfWeekFormatted,
@@ -161,16 +167,18 @@ class SalesController extends BaseController
                 'number_of_days' => $totalHari,
                 'holidays' => $weekHolidays,
                 'maxCapacity' => $maxCapacity,
-                'available' => $maxCapacity - $sisaBooking - $confirmOrder,
+                'available' => $maxCapacity - $sisaBooking - $sisaConfirmOrder,
                 'totalBooking' => $totalBooking,
                 'sisaBooking' => $sisaBooking,
-                'confirmOrder' => $confirmOrder,
+                'ConfirmOrder' => $ConfirmOrder,
+                'sisaConfirmOrder' => $sisaConfirmOrder,
             ];
 
-            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalCapacity'] += $maxCapacity;
-            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalAvailable'] += $maxCapacity - $sisaBooking - $confirmOrder;
-            // $monthlyData[$currentMonthOfYear]['monthlySummary']['totalMachine'] += $jumlahMcByJrm;
-            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalOrder'] += $confirmOrder;
+            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalMaxCapacity'] += $maxCapacity;
+            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalAvailable'] += $maxCapacity - $sisaBooking - $sisaConfirmOrder;
+            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalSisaBooking'] += $sisaBooking;
+            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalConfirmOrder'] += $ConfirmOrder;
+            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalSisaConfirmOrder'] += $sisaConfirmOrder;
 
             $startDate->modify('next week');
             $weekCount++;
@@ -192,7 +200,6 @@ class SalesController extends BaseController
             'totalMc' => $totalMc,
             'dataJarum' => $dataJarum,
             'dataMesin' => $dataMesin,
-            'my' => $month,
             'weeklyRanges' => $monthlyData,
         ];
 

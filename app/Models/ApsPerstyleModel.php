@@ -116,18 +116,16 @@ class ApsPerstyleModel extends Model
     {
         return $this->select('idapsperstyle')->where('mastermodel', $validate['no_model'])->where('delivery', $validate['delivery'])->where('size', $validate['style'])->first();
     }
-    public function getPlanJarum($cek, $type)
+    public function getPlanJarum($cek)
     {
-        $results = $this->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
-            ->join('master_product_type', 'master_product_type.id_product_type = data_model.id_product_type')
-            ->groupBy('apsperstyle.delivery, master_product_type.keterangan')
-            ->select('apsperstyle.delivery,apsperstyle.mastermodel, master_product_type.keterangan, SUM(apsperstyle.sisa) AS total_qty')
-            ->where('apsperstyle.machinetypeid', $cek['jarum'])
-            ->where('apsperstyle.delivery >=', $cek['start'])
-            ->where('apsperstyle.delivery <=', $cek['end'])
-            ->where('master_product_type.product_type', $type)
-            ->get()
-            ->getResultArray();
+        $results = $this
+            ->select('delivery,mastermodel, SUM(sisa) AS total_qty')
+            ->where('machinetypeid', $cek['jarum'])
+            ->where('delivery >=', $cek['start'])
+            ->where('delivery <=', $cek['end'])
+            ->where('sisa >', 0)
+            ->groupBy('mastermodel,delivery')
+            ->findAll();
 
         // Inisialisasi array untuk menyimpan hasil yang dikelompokkan berdasarkan keterangan
         $total_qty = 0;
@@ -137,7 +135,7 @@ class ApsPerstyleModel extends Model
             $total_qty += $result['total_qty'] ?? 0;
         }
 
-        return $total_qty;
+        return $results;
     }
 
     public function asignareal($data)
@@ -165,20 +163,17 @@ class ApsPerstyleModel extends Model
             ->findAll();
     }
 
-    public function hitungMesin($cek, $type)
+    public function hitungMesin($cek)
     {
-        $this->select('delivery,smv, SUM(sisa) AS sisa, 
+        $this->select('mastermodel,size, delivery,smv, SUM(sisa) AS sisa, 
        DATEDIFF(delivery, CURDATE()) - 
-       (SELECT COUNT(tanggal) FROM data_libur WHERE tanggal BETWEEN CURDATE() AND apsperstyle.delivery)-3 AS totalhari,
-       master_product_type.product_type');
-        $this->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'left');
-        $this->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
-        $this->where('apsperstyle.machinetypeid', $cek['jarum'])
-            ->where('apsperstyle.delivery >=', $cek['start'])
-            ->where('apsperstyle.delivery <=', $cek['end'])
-            ->where('master_product_type.product_type', $type);
-        $this->where('apsperstyle.sisa >', 0);
-        $this->groupBy('apsperstyle.delivery, master_product_type.product_type');
+       (SELECT COUNT(tanggal) FROM data_libur WHERE tanggal BETWEEN CURDATE() AND apsperstyle.delivery)-3 AS totalhari,');
+        $this->where('machinetypeid', $cek['jarum'])
+            ->where('delivery >=', $cek['start'])
+            ->where('delivery <=', $cek['end'])
+            ->where('production_unit !=', 'MAJALAYA');
+        // $this->where('sisa >', 0);
+        $this->groupBy('smv,delivery');
 
         return $this->get()->getResultArray();
     }
@@ -248,10 +243,13 @@ class ApsPerstyleModel extends Model
 
     public function getSmv()
     {
+        $monthago = date('Y-m-d', strtotime('20 days ago')); // Menggunakan format tanggal yang benar
         return $this->select('idapsperstyle,mastermodel,size,smv')
-            ->groupBy('size', 'mastermodel')
+            ->where('delivery >', $monthago) // Perbaiki spasi di operator where
+            ->groupBy(['size', 'mastermodel']) // Menggunakan array untuk groupBy
             ->findAll();
     }
+
     public function getPdkProduksi()
     {
         return $this->select('mastermodel, sum(qty) as totalqty, sum(sisa) as totalsisa, sum(qty)-sum(sisa) as totalproduksi')
@@ -264,6 +262,7 @@ class ApsPerstyleModel extends Model
         $id = $this->select('idapsperstyle')
             ->where('mastermodel', $validate['mastermodel'])
             ->where('size', $validate['size'])
+            ->where('smv !=', $validate['smv'])
             ->first();
 
         return $id;

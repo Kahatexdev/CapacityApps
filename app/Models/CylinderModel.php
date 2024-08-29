@@ -12,7 +12,7 @@ class CylinderModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id','needle','production_unit','type_machine','qty','needle_detail'];
+    protected $allowedFields    = ['id', 'needle', 'production_unit', 'type_machine', 'qty', 'needle_detail'];
 
     protected bool $allowEmptyInserts = false;
 

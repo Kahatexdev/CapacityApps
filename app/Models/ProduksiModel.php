@@ -43,11 +43,11 @@ class ProduksiModel extends Model
     public function getProduksi($area, $bulan)
     {
         $today = date('Y-m-d');
-        $threeDaysAgo = date('Y-m-d', strtotime('-2 days'));
-
-        return $this->join('apsperstyle', 'apsperstyle.idapsperstyle= produksi.idapsperstyle')
+        $threeDaysAgo = date('Y-m-d', strtotime('-20 days'));
+        return $this
             ->select('tgl_produksi,mastermodel,size,produksi.*, sisa')
-            ->where('produksi.admin', $area)
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle= produksi.idapsperstyle')
+            ->where('produksi.area', $area)
             ->where('tgl_produksi >=', $threeDaysAgo)
             ->where('tgl_produksi <=', $today)
             ->where('Month(tgl_produksi)', $bulan)
