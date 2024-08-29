@@ -1,6 +1,35 @@
 <?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
+    <div class="row my-4">
+        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
+                                <h5 class="font-weight-bolder mb-0">
+                                    <?= $title ?>
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="col-8 text-end">
+                            <form action="<?= base_url($role . '/exportPlanningJlMc/' . $bulan) ?>" method="post" ?>
+                                <!-- <a href="" class="btn btn-save bg-gradient-info d-inline-flex align-items-center">
+                                    Save</a> -->
+                                <button type="submit" class="btn btn-info"><i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Report Excel</button>
+
+                                <a href="<?= base_url($role . '/jalanmesin') ?>" class="btn bg-gradient-dark">
+                                    <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
+                                    Back</a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <?php if (session()->getFlashdata('success')) : ?>
         <script>
             $(document).ready(function() {
@@ -26,47 +55,142 @@
     <?php endif; ?>
     <div class="row">
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
-            <div class="card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between">
-                        <h5>
-                            <?= $title ?>
-                        </h5>
+            <form action="">
+                <!-- Menampilkan Planning MC Per Week -->
+                <?php for ($i = 1; $i <= 5; $i++): ?>
+                    <?php if (!empty($kebutuhanMesin[$i])): ?>
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h3>Week-<?= $i ?> (<?= date('d-m', strtotime($monthlyData[$i - 1]['start_date'])) ?> - <?= date('d-m', strtotime($monthlyData[$i - 1]['end_date'])) ?>)</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="table-responsive">
+                                        <table id="example" class="table table-border" style="width:100%">
+                                            <thead>
+                                                <tr class=" text-center">
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" rowspan="2" style="text-align: center;">Area</th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" rowspan="2" style="text-align: center;">Jumlah MC</th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" rowspan="2" style="text-align: center;">Planning MC</th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" colspan="27" style="text-align: center;">Rincian Planning Jalan MC</th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" rowspan="2" style="text-align: center;">Output (dz)</th>
+                                                </tr>
+                                                <tr>
+                                                    <?php foreach ($jarum as $jrm): ?>
+                                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= $jrm['jarum']; ?></th>
+                                                    <?php endforeach; ?>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                $totalMcSocks = 0;
+                                                $planMcSocks = 0;
+                                                $totalMcGloves = 0;
+                                                $planMcGloves = 0;
+                                                $totalMcAll = 0;
+                                                $planMcAll = 0;
+                                                $totalPlanMcJrm = [];
+                                                $outputDzSocks = 0;
+                                                $outputDzGloves = 0;
+                                                $totalOutputDz = 0;
+                                                foreach ($kebutuhanMesin[$i] as $area => $jarums):
+                                                    $planMcArea = 0;
+                                                    $outputDz = 0;
+                                                    foreach ($jarum as $jrm) {
+                                                        $planMcJrm = $jarums[$jrm['jarum']] ?? 0; // Planning MC untuk jenis jarum tertentu
+                                                        $planMcArea += $planMcJrm;
+                                                        // Menambahkan nilai ke total per jarum
+                                                        if (!isset($totalPlanMcJrm[$jrm['jarum']])) {
+                                                            $totalPlanMcJrm[$jrm['jarum']] = 0;
+                                                        }
+                                                        $totalPlanMcJrm[$jrm['jarum']] += $planMcJrm;
+                                                    }
+                                                    // Ambil nilai outputDz dari $output berdasarkan $i dan $area
+                                                    $outputDz = isset($output[$i][$area]) ? $output[$i][$area] : 0;
 
-                    </div>
-                </div>
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="table-responsive">
-                            <table id="example" class="table table-border" style="width:100%">
-                                <thead>
-                                    <tr class="text-center">
-                                        <th rowspan="2" class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Area</th>
-                                        <th rowspan="2" class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Jumlah MC</th>
-                                        <th rowspan="2" class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Planning MC</th>
-                                        <th colspan="27" class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Rincian Planning Jalan Mc</th>
-                                    </tr>
-                                    <tr>
-                                        <?php foreach ($jarum as $jrm) : ?>
-                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= $jrm['jarum']; ?></th>
-                                        <?php endforeach; ?>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($area as $ar): ?>
-                                        <tr>
-                                            <td><?= $ar['area'] ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                                <!--  -->
-                            </table>
+                                                    // Menambahkan total MC per area ke variabel total seluruh area
+                                                    if ($area != 'KK8J') {
+                                                        $totalMcSocks += $totalMc[$area]['Total'] ?? 0;
+                                                        $planMcSocks += $planMcArea ?? 0;
+                                                        $outputDzSocks += $outputDz ?? 0;
+                                                    } else if ($area == 'KK8J') {
+                                                        $totalMcGloves = $totalMc[$area]['Total'] ?? 0;
+                                                        $planMcGloves = $planMcArea ?? 0;
+                                                        $outputDzGloves += $outputDz ?? 0;
+                                                    }
+                                                    $totalMcAll = $totalMcSocks + $totalMcGloves;
+                                                    $planMcAll = $planMcSocks + $planMcGloves;
+                                                    $totalOutputDz = $outputDzSocks + $outputDzGloves;
+
+                                                    // Jika area adalah kk8j, simpan total MC-nya
+
+                                                ?>
+                                                    <tr>
+                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $area ?></td>
+                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $totalMc[$area]['Total'] ?? 0; ?></td>
+                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $planMcArea; ?></td>
+                                                        <?php foreach ($jarum as $jrm): ?>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><input type="number" class="form-control" style="text-align: center; font-size: 0.7rem; width: 65px;" value="<?= $jarums[$jrm['jarum']] ?? 0; ?>"></td>
+                                                        <?php endforeach; ?>
+                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= number_format($outputDz, 0); ?></td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                                <tr>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Total MC Sock</th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= $totalMcSocks; ?></th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= $planMcSocks; ?></th>
+                                                    <?php foreach ($jarum as $jrm): ?>
+                                                        <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= $totalPlanMcJrm[$jrm['jarum']] ?? 0; ?></td>
+                                                    <?php endforeach; ?>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= number_format($outputDzSocks, 0); ?></th>
+                                                </tr>
+                                                <tr>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">% Sock</th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"></th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= number_format(($totalMcSocks / $planMcSocks) * 100, 2) ?>%</th>
+                                                    <?php foreach ($jarum as $jrm): ?>
+                                                        <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"></td>
+                                                    <?php endforeach; ?>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"></th>
+                                                </tr>
+                                                <tr>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Total MC Gloves</th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= $totalMcGloves; ?></th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= $planMcGloves; ?></th>
+                                                    <?php foreach ($jarum as $jrm): ?>
+                                                        <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"></td>
+                                                    <?php endforeach; ?>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= number_format($outputDzGloves, 0); ?></th>
+                                                </tr>
+                                                <tr>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Total</th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= $totalMcAll; ?></th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= $planMcAll; ?></th>
+                                                    <?php foreach ($jarum as $jrm): ?>
+                                                        <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"></td>
+                                                    <?php endforeach; ?>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= number_format($totalOutputDz, 0); ?></th>
+                                                </tr>
+                                                <tr>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">% Total MC</th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"></th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= number_format($totalMcAll / $planMcAll * 100, 2); ?>%</th>
+                                                    <?php foreach ($jarum as $jrm): ?>
+                                                        <td class="text-sm" style="text-align: center;"></td>
+                                                    <?php endforeach; ?>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"></th>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="card-footer">
-                    </div>
-                </div>
-            </div>
+                    <?php endif; ?>
+                <?php endfor; ?>
+            </form>
         </div>
     </div>
 </div>

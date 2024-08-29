@@ -11,6 +11,7 @@ use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use App\Models\LiburModel;
+use App\Models\CylinderModel;
 // 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -50,6 +51,10 @@ class SalesController extends BaseController
     }
     public function index()
     {
+        $orderJalan = $this->bookingModel->getOrderJalan();
+        $terimaBooking = $this->bookingModel->getBookingMasuk();
+        $mcJalan = $this->jarumModel->mcJalan();
+        $totalMc = $this->jarumModel->totalMc();
         $dataJarum = $this->jarumModel->getJarum(); // data all jarum
         $jarum = $this->request->getGet('jarum'); // data filter jarum
         $dataMesin = $this->jarumModel->getAllBrand($jarum); // data mesin per jarum
@@ -58,7 +63,9 @@ class SalesController extends BaseController
 
         $month = date('F-Y');
         $startDate = new \DateTime(); // Tanggal hari ini
+        $startDate->modify('Monday this week'); // Memastikan start date dimulai dari hari Senin minggu ini
         $endDate = new \DateTime('+1 year'); // Tanggal satu tahun ke depan
+
 
         $jumlahHari = $endDate->diff($startDate)->days + 1; // Hitung jumlah hari bulan ini
         $LiburModel = new LiburModel();
@@ -67,18 +74,22 @@ class SalesController extends BaseController
         $currentMonth = $startDate->format('F');
         $range = ceil($jumlahHari / 7); // Pembulatan ke atas untuk rentang minggu
         $weekCount = 1; // Inisialisasi minggu
+
         $monthlyData = [];
-        $totalMonthlyCapacity = 0; // Inisialisasi total kapasitas bulanan
+        $totalMonthlyCapacity = 0;
+        $totalMonthlyAvailable = 0;
+        $totalMonthlyMachine = 0;
+        $totalMonthlyOrder = 0;
 
-        for ($i = 0; $i < $range; $i++) {
+        while ($startDate <= $endDate) {
             $startOfWeek = clone $startDate;
-            $startOfWeek->modify("+$i week");
             $startOfWeek->modify('Monday this week');
-
-
             $endOfWeek = clone $startOfWeek;
             $endOfWeek->modify('Sunday this week');
-            $numberOfDays = $startOfWeek->diff($endOfWeek)->days + 1;
+
+            if ($endOfWeek > $endDate) {
+                $endOfWeek = clone $endDate;
+            }
 
             $holidaysCount = 0;
             $weekHolidays = [];
@@ -89,14 +100,21 @@ class SalesController extends BaseController
                         'nama' => $holiday['nama'],
                         'tanggal' => $holidayDate->format('d-F'),
                     ];
-                    $holidaysCount++; // Menambah jumlah hari libur
-                    $numberOfDays--;
+                    $holidaysCount++;
                 }
             }
-            $currentMonthOfYear = $startOfWeek->format('F');
-            if ($currentMonth !== $currentMonthOfYear) {
-                $currentMonth = $currentMonthOfYear;
-                $monthlyData[$currentMonth] = [];
+
+            $currentMonthOfYear = $startOfWeek->format('F-Y');
+            if (!isset($monthlyData[$currentMonthOfYear])) {
+                $monthlyData[$currentMonthOfYear] = [
+                    'monthlySummary' => [
+                        'totalCapacity' => 0,
+                        'totalAvailable' => 0,
+                        'totalMachine' => 0,
+                        'totalOrder' => 0,
+                    ],
+                    'weeks' => []
+                ];
             }
 
             $startOfWeekFormatted = $startOfWeek->format('d-m');
@@ -108,50 +126,56 @@ class SalesController extends BaseController
                 'start' => $start,
                 'end' => $end,
             ];
-            $dataBookingByJarum = $this->bookingModel->getTotalBookingByJarum($cek); // data booking per jarum
-            $totalBooking = 0;
+            $dataBookingByJarum = $this->bookingModel->getTotalBookingByJarum($cek); // Data booking per jarum
+            $dataOrderWeekByJarum = $this->ApsPerstyleModel->getTotalOrderWeek($cek); // Data order per jarum
 
-            // Jika dataBookingByJarum adalah array dari hasil, lakukan penjumlahan
-            foreach ($dataBookingByJarum as $booking) {
-                $totalBooking += !empty($booking['total_booking']) ? $booking['total_booking'] / 24 : 0; // Ganti 'jumlah' dengan kunci yang sesuai
+            $confirmOrder = 0;
+            foreach ($dataOrderWeekByJarum as $order) {
+                $confirmOrder = !empty($order['qty']) ? $order['qty'] / 24 : 0;
             }
-            // Format total booking
-            $formattedBooking = $totalBooking != 0 ? number_format($totalBooking, 0, ',', '.') : '-';
-            // print_r($formattedBooking) . '<br>';
-            // exit;
 
-            // //
+            $totalBooking = 0;
+            $sisaBooking = 0;
+            foreach ($dataBookingByJarum as $booking) {
+                $totalBooking = !empty($booking['total_booking']) ? $booking['total_booking'] / 24 : 0;
+                $sisaBooking = !empty($booking['sisa_booking']) ? $booking['sisa_booking'] / 24 : 0;
+            }
+
             $jumlahMcByJrm = 0;
-            $totalHari = $numberOfDays; // Hitung total hari yang tidak libur per minggu
-            $maxCapacity = 0; // Reset total kapasitas untuk minggu ini
-            // Hitung total mesin di cijerah per jarum
+            $totalHari = $startOfWeek->diff($endOfWeek)->days + 1;
+            $maxCapacity = 0;
             foreach ($dataMesinByJarum as $mc) {
-                $jumlahMcByJrm = $mc['total']; // Total mesin di cijerah per jarum
-                // hitung max capacity
+                $jumlahMcByJrm = $mc['total'];
                 foreach ($dataTarget as $target) {
                     $konversi = !empty($target['konversi']) ? $target['konversi'] : 14;
                     if ($jumlahMcByJrm > 0) {
                         $maxCapacity = ($jumlahMcByJrm * $konversi * $totalHari) / 24;
                     }
                 }
-                // hitung available
             }
-            // var_dump($startOfWeekFormatted, $endOfWeekFormatted);
-            // exit;
-            // Debugging output untuk memeriksa hasil
-            $monthlyData[$currentMonth][] = [
-                'week' => $weekCount,
+
+            $monthlyData[$currentMonthOfYear]['weeks'][] = [
+                'countWeek' => $weekCount,
                 'start_date' => $startOfWeekFormatted,
                 'end_date' => $endOfWeekFormatted,
-                'number_of_days' => $numberOfDays,
+                'number_of_days' => $totalHari,
                 'holidays' => $weekHolidays,
                 'maxCapacity' => $maxCapacity,
-                'totalMonthlyCapacity' => $totalMonthlyCapacity,
-                'dataBooking' => $totalBooking,
+                'available' => $maxCapacity - $sisaBooking - $confirmOrder,
+                'totalBooking' => $totalBooking,
+                'sisaBooking' => $sisaBooking,
+                'confirmOrder' => $confirmOrder,
             ];
 
+            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalCapacity'] += $maxCapacity;
+            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalAvailable'] += $maxCapacity - $sisaBooking - $confirmOrder;
+            // $monthlyData[$currentMonthOfYear]['monthlySummary']['totalMachine'] += $jumlahMcByJrm;
+            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalOrder'] += $confirmOrder;
+
+            $startDate->modify('next week');
             $weekCount++;
         }
+
         $data = [
             'role' => session()->get('role'),
             'title' => 'Sales Position',
@@ -162,11 +186,16 @@ class SalesController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
+            'jalan' => $orderJalan,
+            'TerimaBooking' => $terimaBooking,
+            'mcJalan' => $mcJalan,
+            'totalMc' => $totalMc,
             'dataJarum' => $dataJarum,
             'dataMesin' => $dataMesin,
             'my' => $month,
             'weeklyRanges' => $monthlyData,
         ];
+
         return view('capacity/Sales/index', $data);
     }
 }

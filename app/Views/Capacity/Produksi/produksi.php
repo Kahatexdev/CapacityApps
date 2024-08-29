@@ -15,20 +15,19 @@
                             </div>
                         </div>
                         <div class="col-8 text-end">
-                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#summaryPertgl">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary Produksi Pertanggal
                             </button>
-                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage2">
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#summaryTOD">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary Produksi
                             </button>
-                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage3">
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#timter">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Timter Produksi
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -57,7 +56,7 @@
             </script>
         <?php endif; ?>
         <!-- modal summary produksi pertanggal -->
-        <div class="modal fade" id="exampleModalMessage" tabindex="-1" role="dialog" aria-labelledby="exampleModalMessageTitle" aria-hidden="true">
+        <div class="modal fade" id="summaryPertgl" tabindex="-1" role="dialog" aria-labelledby="summaryPerTgl" aria-hidden="true">
             <div class="modal-dialog " role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -90,9 +89,20 @@
                                 <label for="jarum" class="col-form-label">Jarum</label>
                                 <select class="form-control" id="jarum" name="jarum">
                                     <option></option>
-                                    <?php foreach ($jarum as $jrm) : ?>
-                                        <option><?= $jrm ?></option>
-                                    <?php endforeach ?>
+                                    <option value="13">13</option>
+                                    <option value="84">84</option>
+                                    <option value="92">92</option>
+                                    <option value="96">96</option>
+                                    <option value="106">106</option>
+                                    <option value="108">108</option>
+                                    <option value="116">116</option>
+                                    <option value="120">120</option>
+                                    <option value="124">124</option>
+                                    <option value="126">126</option>
+                                    <option value="144">144</option>
+                                    <option value="168">168</option>
+                                    <option value="240">240</option>
+                                    <option value="POM-POM">POM-POM</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -117,7 +127,7 @@
             </div>
         </div>
         <!-- modal summary produksi -->
-        <div class="modal fade" id="exampleModalMessage2" tabindex="-1" role="dialog" aria-labelledby="exampleModalMessageTitle" aria-hidden="true">
+        <div class="modal fade" id="summaryTOD" tabindex="-1" role="dialog" aria-labelledby="summaryTOD" aria-hidden="true">
             <div class="modal-dialog " role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -128,7 +138,7 @@
                     </div>
                     <form action="<?= base_url($role . '/summaryproduksi'); ?>" method="POST">
                         <div class="modal-body align-items-center">
-                        <div class="form-group">
+                            <div class="form-group">
                                 <label for="buyer" class="col-form-label">Buyer</label>
                                 <select class="form-control" id="buyer" name="buyer">
                                     <option></option>
@@ -150,15 +160,26 @@
                                 <label for="jarum" class="col-form-label">Jarum</label>
                                 <select class="form-control" id="jarum" name="jarum">
                                     <option></option>
-                                    <?php foreach ($jarum as $jrm) : ?>
-                                        <option><?= $jrm ?></option>
-                                    <?php endforeach ?>
+                                    <option value="13">13</option>
+                                    <option value="84">84</option>
+                                    <option value="92">92</option>
+                                    <option value="96">96</option>
+                                    <option value="106">106</option>
+                                    <option value="108">108</option>
+                                    <option value="116">116</option>
+                                    <option value="120">120</option>
+                                    <option value="124">124</option>
+                                    <option value="126">126</option>
+                                    <option value="144">144</option>
+                                    <option value="168">168</option>
+                                    <option value="240">240</option>
+                                    <option value="POM-POM">POM-POM</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="pdk" class="col-form-label">No Model</label>
                                 <input type="text" class="form-control" name="pdk">
-                            </div>                            
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
@@ -169,7 +190,7 @@
             </div>
         </div>
         <!-- modal timter produksi -->
-        <div class="modal fade" id="exampleModalMessage3" tabindex="-1" role="dialog" aria-labelledby="exampleModalMessageTitle" aria-hidden="true">
+        <div class="modal fade" id="timter" tabindex="-1" role="dialog" aria-labelledby="timter" aria-hidden="true">
             <div class="modal-dialog " role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -193,9 +214,20 @@
                                 <label for="jarum" class="col-form-label">Jarum</label>
                                 <select class="form-control" id="jarum" name="jarum" required>
                                     <option></option>
-                                    <?php foreach ($jarum as $jrm) : ?>
-                                        <option><?= $jrm ?></option>
-                                    <?php endforeach ?>
+                                    <option value="13">13</option>
+                                    <option value="84">84</option>
+                                    <option value="92">92</option>
+                                    <option value="96">96</option>
+                                    <option value="106">106</option>
+                                    <option value="108">108</option>
+                                    <option value="116">116</option>
+                                    <option value="120">120</option>
+                                    <option value="124">124</option>
+                                    <option value="126">126</option>
+                                    <option value="144">144</option>
+                                    <option value="168">168</option>
+                                    <option value="240">240</option>
+                                    <option value="POM-POM">POM-POM</option>
                                 </select>
                             </div>
                             <div class="form-group">

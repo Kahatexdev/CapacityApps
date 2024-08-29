@@ -15,7 +15,15 @@
                             </div>
                         </div>
                         <div class="col-8 text-end">
-                          
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#summaryPertgl">
+                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary Produksi Pertanggal
+                            </button>
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#summaryTOD">
+                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary Produksi
+                            </button>
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#timter">
+                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Timter Produksi
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -48,7 +56,79 @@
                 });
             </script>
         <?php endif; ?>
-        <div class="modal fade" id="exampleModalMessage" tabindex="-1" role="dialog" aria-labelledby="exampleModalMessageTitle" aria-hidden="true">
+        <!-- modal summary produksi pertanggal -->
+        <div class="modal fade" id="summaryPertgl" tabindex="-1" role="dialog" aria-labelledby="summaryPerTgl" aria-hidden="true">
+            <div class="modal-dialog " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Summary Produksi Per Tanggal</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <form action="<?= base_url($role . '/summaryProdPerTanggal'); ?>" method="POST">
+                        <div class="modal-body align-items-center">
+                            <div class="form-group">
+                                <label for="buyer" class="col-form-label">Buyer</label>
+                                <select class="form-control" id="buyer" name="buyer">
+                                    <option></option>
+                                    <?php foreach ($buyer as $buy) : ?>
+                                        <option><?= $buy['kd_buyer_order'] ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="area" class="col-form-label">Area</label>
+                                <select class="form-control" id="area" name="area">
+                                    <option></option>
+                                    <?php foreach ($area as $ar) : ?>
+                                        <option><?= $ar ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="jarum" class="col-form-label">Jarum</label>
+                                <select class="form-control" id="jarum" name="jarum">
+                                    <option></option>
+                                    <option value="13">13</option>
+                                    <option value="84">84</option>
+                                    <option value="92">92</option>
+                                    <option value="96">96</option>
+                                    <option value="106">106</option>
+                                    <option value="108">108</option>
+                                    <option value="116">116</option>
+                                    <option value="120">120</option>
+                                    <option value="124">124</option>
+                                    <option value="126">126</option>
+                                    <option value="144">144</option>
+                                    <option value="168">168</option>
+                                    <option value="240">240</option>
+                                    <option value="POM-POM">POM-POM</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pdk" class="col-form-label">No Model</label>
+                                <input type="text" class="form-control" name="pdk">
+                            </div>
+                            <div class="form-group">
+                                <label for="awal" class="col-form-label">Dari</label>
+                                <input type="date" class="form-control" name="awal">
+                            </div>
+                            <div class="form-group">
+                                <label for="akhir" class="col-form-label">Sampai</label>
+                                <input type="date" class="form-control" name="akhir">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-info">Generate</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- modal summary produksi -->
+        <div class="modal fade" id="summaryTOD" tabindex="-1" role="dialog" aria-labelledby="summaryTOD" aria-hidden="true">
             <div class="modal-dialog " role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -57,75 +137,113 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
-                    <div class="modal-body align-items-center">
-                        <form action="<?= base_url($role . '/summaryproduksi/'); ?>" method="POST">
+                    <form action="<?= base_url($role . '/summaryproduksi'); ?>" method="POST">
+                        <div class="modal-body align-items-center">
                             <div class="form-group">
-                                <label for="awal">Dari</label>
-                                <input type="date" class="form-control" name="awal">
+                                <label for="buyer" class="col-form-label">Buyer</label>
+                                <select class="form-control" id="buyer" name="buyer">
+                                    <option></option>
+                                    <?php foreach ($buyer as $buy) : ?>
+                                        <option><?= $buy['kd_buyer_order'] ?></option>
+                                    <?php endforeach ?>
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label for="akhir" class="col-form-label">Sampai</label>
-                                <input type="date" name="akhir" class="form-control">
+                                <label for="area" class="col-form-label">Area</label>
+                                <select class="form-control" id="area" name="area">
+                                    <option></option>
+                                    <?php foreach ($area as $ar) : ?>
+                                        <option><?= $ar ?></option>
+                                    <?php endforeach ?>
+                                </select>
                             </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn bg-gradient-info">Generate</button>
-                    </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="reset" tabindex="-1" role="dialog" aria-labelledby="reset" aria-hidden="true">
-            <div class="modal-dialog " role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Reset Produksi</h5>
-                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body align-items-center">
-                        <form action="<?= base_url($role . '/resetproduksi/'); ?>" method="post">
                             <div class="form-group">
-                                <label for="awal">PDK</label>
+                                <label for="jarum" class="col-form-label">Jarum</label>
+                                <select class="form-control" id="jarum" name="jarum">
+                                    <option></option>
+                                    <option value="13">13</option>
+                                    <option value="84">84</option>
+                                    <option value="92">92</option>
+                                    <option value="96">96</option>
+                                    <option value="106">106</option>
+                                    <option value="108">108</option>
+                                    <option value="116">116</option>
+                                    <option value="120">120</option>
+                                    <option value="124">124</option>
+                                    <option value="126">126</option>
+                                    <option value="144">144</option>
+                                    <option value="168">168</option>
+                                    <option value="240">240</option>
+                                    <option value="POM-POM">POM-POM</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pdk" class="col-form-label">No Model</label>
                                 <input type="text" class="form-control" name="pdk">
                             </div>
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn bg-gradient-info">Reset</button>
-                    </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-info">Generate</button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="resetarea" tabindex="-1" role="dialog" aria-labelledby="resetarea" aria-hidden="true">
+        <!-- modal timter produksi -->
+        <div class="modal fade" id="timter" tabindex="-1" role="dialog" aria-labelledby="timter" aria-hidden="true">
             <div class="modal-dialog " role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Reset Produksi Area</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Timter Produksi</h5>
                         <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
-                    <div class="modal-body align-items-center">
-                        <form action="<?= base_url($role . '/resetproduksiarea/'); ?>" method="post">
+                    <form action="<?= base_url($role . '/timterProduksi'); ?>" method="POST">
+                        <div class="modal-body align-items-center">
                             <div class="form-group">
-                                <label for="awal">Area</label>
-                                <input type="text" class="form-control" name="area" required>
+                                <label for="area" class="col-form-label">Area</label>
+                                <select class="form-control" id="area" name="area" required>
+                                    <option></option>
+                                    <?php foreach ($area as $ar) : ?>
+                                        <option><?= $ar ?></option>
+                                    <?php endforeach ?>
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label for="awal">Tanggal Input Produksi</label>
-                                <input type="date" class="form-control" name="tgl_produksi">
+                                <label for="jarum" class="col-form-label">Jarum</label>
+                                <select class="form-control" id="jarum" name="jarum" required>
+                                    <option></option>
+                                    <option value="13">13</option>
+                                    <option value="84">84</option>
+                                    <option value="92">92</option>
+                                    <option value="96">96</option>
+                                    <option value="106">106</option>
+                                    <option value="108">108</option>
+                                    <option value="116">116</option>
+                                    <option value="120">120</option>
+                                    <option value="124">124</option>
+                                    <option value="126">126</option>
+                                    <option value="144">144</option>
+                                    <option value="168">168</option>
+                                    <option value="240">240</option>
+                                    <option value="POM-POM">POM-POM</option>
+                                </select>
                             </div>
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn bg-gradient-info">Reset</button>
-                    </div>
+                            <div class="form-group">
+                                <label for="pdk" class="col-form-label">No Model</label>
+                                <input type="text" class="form-control" name="pdk">
+                            </div>
+                            <div class="form-group">
+                                <label for="awal" class="col-form-label">Tanggal Produksi</label>
+                                <input type="date" class="form-control" name="awal" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-info">Generate</button>
+                        </div>
                     </form>
                 </div>
             </div>
