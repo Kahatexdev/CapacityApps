@@ -172,8 +172,8 @@ class ApsPerstyleModel extends Model
             ->where('delivery >=', $cek['start'])
             ->where('delivery <=', $cek['end'])
             ->where('production_unit !=', 'MAJALAYA');
-        // $this->where('sisa >', 0);
-        $this->groupBy('smv,delivery');
+        $this->where('sisa >', 0);
+        $this->groupBy('smv,mastermodel');
 
         return $this->get()->getResultArray();
     }

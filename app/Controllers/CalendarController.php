@@ -176,14 +176,18 @@ class CalendarController extends BaseController
         ];
 
         $KebMesin =  $this->hitungMcOrder($get);
-
         $kategori = $this->productModel->getKategori();
         $maxHari = max(array_column($KebMesin, 'JumlahHari'));
         $totalKebutuhanMC = 0;
-        foreach ($KebMesin as $kebutuhanMesin) {
-            $totalKebutuhanMC += $kebutuhanMesin['kebutuhanMc']; // Adjust this line based on the structure of your data
-        }
-        $stopmc = max(array_column($KebMesin, 'stopmc'));
+        $kebutuhanMcArray = array_column($KebMesin, 'kebutuhanMc');
+
+        // Menghitung total dan jumlah elemen
+        $total = array_sum($kebutuhanMcArray);
+        $jumlahElemen = count($kebutuhanMcArray);
+
+        // Menghitung rata-rata
+        $rataRata = $jumlahElemen > 0 ? $total / $jumlahElemen : 0;
+
         $data = [
             'role' => session()->get('role'),
             'active1' => '',
@@ -196,16 +200,15 @@ class CalendarController extends BaseController
             'weeklyRanges' => $monthlyData,
             'DaftarLibur' => $holidays,
             'kebMesin' => $KebMesin,
-            'totalKebutuhan' => $totalKebutuhanMC,
+            'totalKebutuhan' => $rataRata,
             'start' => $awal,
             'end' => $akhir,
             'jarum' => $jarum,
             'jmlHari' => $maxHari,
             'title' => session()->get('role') . ' Order',
-            'stopmc' => $stopmc,
             'desk' => 'ORDER',
         ];
-        return view(session()->get('role') . '/Calendar/calendar', $data);
+        return view(session()->get('role') . '/Calendar/planOrder', $data);
     }
     public function planBooking($jarum)
     {
@@ -440,33 +443,25 @@ class CalendarController extends BaseController
             $deliv = $data['delivery'];
             $target = ((86400 / (intval($data['smv'])  * 0.8)) / 24);
 
-            $type = $data['mastermodel'];
-            $qtyTotal += $qty1;
+            $mastermodel = $data['mastermodel'];
+            //$qtyTotal += $qty1;
 
             $value[] = [
-                'kebutuhanMc' => ceil(intval($qtyTotal / 24) / $target / $hari1),
+                'kebutuhanMc' => ceil(intval($qty1 / 24) / $target / $hari1),
                 'smv' => $data['smv'],
-                'qty' => ceil($qtyTotal),
+                'qty' => ceil($qty1),
                 'target' => ceil($target),
                 'JumlahHari' => $hari1,
                 'delivery' => $deliv,
-                'type' => $type
+                'mastermodel' => $mastermodel
             ];
         }
-        dd($value);
         if (!$value) {
-            $value =  ['kebutuhanMc' => 0, 'JumlahHari' => 0, 'delivery' => 0, 'type' => $type, 'stopmc' => 0];
+            $value =  ['kebutuhanMc' => 0, 'JumlahHari' => 0, 'delivery' => 0, 'mastermodel' => $mastermodel, 'stopmc' => 0];
             return $value;
         } else {
-            $kebutuhanMc = max(array_column($value, 'kebutuhanMc'));
-            $smc = max(array_column($value, 'delivery'));
-            $result = array_filter($value, function ($val) use ($kebutuhanMc) {
 
-                return $val['kebutuhanMc'] == $kebutuhanMc;
-            });
-            $hasil = reset($result);
-            $hasil['stopmc'] = $smc;
-            return $hasil;
+            return $value;
         }
     }
 
