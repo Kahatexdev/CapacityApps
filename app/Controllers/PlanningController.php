@@ -371,6 +371,10 @@ class PlanningController extends BaseController
         foreach ($areas as $ar) {
             $totalArea[$ar] = $this->jarumModel->totalMcArea($ar);
         }
+        $totalArea = [];
+        foreach ($areas as $ar) {
+            $totalArea[$ar] = $this->jarumModel->totalMcArea($ar);
+        }
 
         // Parse the $bulan string to a DateTime object
         $date = DateTime::createFromFormat('F-Y', $bulan);
@@ -382,7 +386,7 @@ class PlanningController extends BaseController
         $startDate = new \DateTime($date->format('Y-m-01')); // First day of the given month
 
         $monthlyData = [];
-        for ($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             $startOfWeek = clone $startDate;
             $startOfWeek->modify("+$i week");
 
@@ -434,7 +438,7 @@ class PlanningController extends BaseController
             'jarum' => $jarum,
             'kebutuhanMesin' => $kebutuhanMesin,
             'totalMc' => $totalArea,
-            'data' => $outputDz, // Pass outputDz data to the view
+            'output' => $outputDz, // Pass outputDz data to the view
             'monthlyData' => $monthlyData,
         ];
 

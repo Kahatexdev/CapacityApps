@@ -314,6 +314,7 @@ class ProduksiController extends BaseController
 
     public function viewProduksi()
     {
+        $role = session()->get('role');
         $bulan = date('m');
         $month = date('F');
         $totalMesin = $this->jarumModel->getArea();
@@ -345,7 +346,11 @@ class ProduksiController extends BaseController
             'area' => $dataArea,
             'jarum' => $dataJarum,
         ];
-        return view(session()->get('role') . '/Produksi/produksi', $data);
+        if ($role == 'user') {
+            return view(session()->get('role') . '/produksi', $data);
+        } else {
+            return view(session()->get('role') . '/Produksi/produksi', $data);
+        }
     }
     public function progressData($noModel)
     {
@@ -768,6 +773,7 @@ class ProduksiController extends BaseController
     }
     public function summaryProdPerTanggal()
     {
+        $role = session()->get('role');
         $buyer = $this->request->getPost('buyer');
         $area = $this->request->getPost('area');
         $jarum = $this->request->getPost('jarum');
@@ -826,7 +832,7 @@ class ProduksiController extends BaseController
             'active1' => '',
             'active2' => '',
             'active3' => '',
-            'active4' => 'active',
+            'active4' => '',
             'active5' => '',
             'active6' => '',
             'active7' => '',
@@ -835,14 +841,19 @@ class ProduksiController extends BaseController
             'uniqueData' => $uniqueData,
             'prodSummaryPertgl' => $prodSummaryPertgl,
             'total' => $totalProd,
-            'role' => session()->get('role'),
-            'title' => 'Summary Produksi Per Tanggal ' . $pdk,
+            'role' => $role,
+            'title' => 'Summary Produksi Per Tanggal ' . $buyer . ' ' . $area . ' ' . $pdk,
             'dataFilter' => $data,
         ];
-        return view(session()->get('role') . '/Produksi/summaryPertanggal', $data2);
+        if ($role == 'user') {
+            return view(session()->get('role') . '/summaryPertanggal', $data2);
+        } else {
+            return view(session()->get('role') . '/Produksi/summaryPertanggal', $data2);
+        }
     }
     public function summaryProduksi()
     {
+        $role = session()->get('role');
         $buyer = $this->request->getPost('buyer');
         $area = $this->request->getPost('area');
         $jarum = $this->request->getPost('jarum');
@@ -895,21 +906,26 @@ class ProduksiController extends BaseController
             'active1' => '',
             'active2' => '',
             'active3' => '',
-            'active4' => 'active',
+            'active4' => '',
             'active5' => '',
             'active6' => '',
             'active7' => '',
             'uniqueData' => $uniqueData,
             'total_ship' => $totalShip,
             'total_prod' => $totalProd,
-            'role' => session()->get('role'),
-            'title' => 'Summary Produksi ' . $pdk,
+            'role' => $role,
+            'title' => 'Summary Produksi ' . $buyer . ' ' . $area . ' ' . $pdk,
             'dataFilter' => $data,
         ];
-        return view(session()->get('role') . '/Produksi/summaryProduksi', $data2);
+        if ($role == 'user') {
+            return view(session()->get('role') . '/summaryProduksi', $data2);
+        } else {
+            return view(session()->get('role') . '/Produksi/summaryProduksi', $data2);
+        }
     }
     public function timterProduksi()
     {
+        $role = session()->get('role');
         $area = $this->request->getPost('area');
         $jarum = $this->request->getPost('jarum');
         $pdk = $this->request->getPost('pdk');
@@ -958,7 +974,7 @@ class ProduksiController extends BaseController
             'active1' => '',
             'active2' => '',
             'active3' => '',
-            'active4' => 'active',
+            'active4' => '',
             'active5' => '',
             'active6' => '',
             'active7' => '',
@@ -967,12 +983,16 @@ class ProduksiController extends BaseController
             'prodTimter' => $prodTimter,
             'jlMC' => $jlMC,
             'uniqueData' => $uniqueData,
-            'role' => session()->get('role'),
-            'title' => 'Timter Produksi ' . $pdk . ' Tanggal ' . $awal,
+            'role' => $role,
+            'title' => 'Timter Produksi ' . $area . ' ' . $pdk . ' Tanggal ' . $awal,
             'dataFilter' => $data,
             'header' => $area,
         ];
-        return view(session()->get('role') . '/Produksi/timterProduksi', $data3);
+        if ($role == 'user') {
+            return view(session()->get('role') . '/timterProduksi', $data3);
+        } else {
+            return view(session()->get('role') . '/Produksi/timterProduksi', $data3);
+        }
     }
 
     public function editproduksi()

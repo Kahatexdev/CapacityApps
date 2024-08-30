@@ -246,7 +246,7 @@ class BookingModel extends Model
 
     public function getTotalBookingByJarum($cek)
     {
-        $results = $this->groupBy('delivery')
+        $results = $this->groupBy('needle')
             ->select('delivery, SUM(qty_booking) as total_booking, SUM(sisa_booking) AS sisa_booking')
             ->where('status!=', 'Cancel Booking')
             ->where('needle', $cek['jarum'])

@@ -178,10 +178,11 @@ class DataMesinModel extends Model
             ->findAll();
     }
 
-    public function getTotalMesinCjByJarum($jarum)
+    public function getTotalMesinCjByJarum($jarum, $aliasjarum)
     {
         return $this->select('jarum, SUM(total_mc) as total')
             ->where('pu', 'CJ')
+            ->where('aliasjarum', $aliasjarum)
             ->where('jarum', $jarum)
             ->groupBy('jarum')
             ->orderBy('jarum', 'ASC')
@@ -240,9 +241,9 @@ class DataMesinModel extends Model
     {
         return $this->select('aliasjarum, jarum')->like('aliasjarum', 'Mens Comp N156')->groupBy('aliasjarum')->findAll();
     }
-    public function getAllBrand($jarum)
+    public function getAllBrand($aliasjarum)
     {
-        return $this->select('brand, SUM(total_mc) AS total_mc, SUM(mesin_jalan) AS mesin_jalan, SUM(IF(pu="CJ", total_mc, 0)) AS cj, SUM(IF(pu="MJ", total_mc, 0)) AS mj')->where('jarum', $jarum)->groupBy('brand')->findAll();
+        return $this->select('brand, jarum, SUM(total_mc) AS total_mc, SUM(mesin_jalan) AS mesin_jalan, SUM(IF(pu="CJ", total_mc, 0)) AS cj, SUM(IF(pu="MJ", total_mc, 0)) AS mj')->where('aliasjarum', $aliasjarum)->groupBy('brand')->findAll();
     }
     public function getBrand($jarum, $brand)
     {
@@ -404,5 +405,10 @@ class DataMesinModel extends Model
         return $this->select('sum(total_mc) as Total')
             ->where('area', $ar)
             ->first();
+    }
+
+    public function getAliasJrm()
+    {
+        return $this->select('aliasjarum, jarum')->groupBy('aliasjarum')->findAll();
     }
 }

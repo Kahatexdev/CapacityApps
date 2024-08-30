@@ -79,6 +79,11 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('timterProduksi', 'ProduksiController::timterProduksi');
     $routes->post('exportTimter', 'TimterController::excelTimter');
 
+    // deffect
+    $routes->get('datadeffect', 'DeffectController::datadeffect');
+    $routes->post('inputKode', 'DeffectController::inputKode');
+    $routes->post('viewDataBs', 'DeffectController::viewDataBs');
+
 
     // mesin
     $routes->get('datamesin', 'MesinController::index');
@@ -182,7 +187,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
 
     $routes->get('jalanmesin', 'PlanningController::jalanmesin');
     $routes->get('jalanmesin/(:any)', 'PlanningController::jalanmesindetail/$1');
-
+    $routes->post('exportPlanningJlMc/(:any)', 'PlanningJalanMcController::excelPlanningJlMc/$1');
 
 
     // produksi
@@ -193,6 +198,24 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
     $routes->get('produksi', 'ProduksiController::produksi');
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+
+
+    //summary
+    $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
+    $routes->post('exportSummaryPerTod', 'SummaryController::excelSummaryPerTod');
+
+    //summary produksi
+    $routes->post('summaryProdPerTanggal', 'ProduksiController::summaryProdPerTanggal');
+    $routes->post('exportSummaryPerTgl', 'SummaryController::excelSummaryPerTgl');
+
+    //timter produksi
+    $routes->post('timterProduksi', 'ProduksiController::timterProduksi');
+    $routes->post('exportTimter', 'TimterController::excelTimter');
+
+    // deffect
+    $routes->get('datadeffect', 'DeffectController::datadeffect');
+    $routes->post('inputKode', 'DeffectController::inputKode');
+    $routes->post('viewDataBs', 'DeffectController::viewDataBs');
 });
 
 
@@ -255,8 +278,17 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('produksi', 'ProduksiController::produksi');
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
 
+    //summary
+    $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
+    $routes->post('exportSummaryPerTod', 'SummaryController::excelSummaryPerTod');
 
+    //summary produksi
+    $routes->post('summaryProdPerTanggal', 'ProduksiController::summaryProdPerTanggal');
+    $routes->post('exportSummaryPerTgl', 'SummaryController::excelSummaryPerTgl');
 
+    //timter produksi
+    $routes->post('timterProduksi', 'ProduksiController::timterProduksi');
+    $routes->post('exportTimter', 'TimterController::excelTimter');
 
     $routes->get('planningmesin', 'ApsController::planningmesin');
     $routes->post('fetch_jarum', 'ApsController::fetch_jarum');
@@ -267,6 +299,11 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('getDataLibur', 'ApsController::getDataLibur');
     $routes->post('saveplanning', 'ApsController::saveplanning');
     $routes->get('getMesinByDate/(:any)', 'ApsController::getMesinByDate/$1');
+
+    // deffect
+    $routes->get('datadeffect', 'DeffectController::datadeffect');
+    $routes->post('inputKode', 'DeffectController::inputKode');
+    $routes->post('viewDataBs', 'DeffectController::viewDataBs');
 });
 
 // user
@@ -280,6 +317,18 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('viewModelPlusPacking/(:any)', 'ProduksiController::viewModelPlusPacking/$1');
     $routes->get('pluspacking', 'ProduksiController::pluspacking');
     $routes->post('inputpo', 'ProduksiController::updatepo');
+
+    //summary
+    $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
+    $routes->post('exportSummaryPerTod', 'SummaryController::excelSummaryPerTod');
+
+    //summary produksi
+    $routes->post('summaryProdPerTanggal', 'ProduksiController::summaryProdPerTanggal');
+    $routes->post('exportSummaryPerTgl', 'SummaryController::excelSummaryPerTgl');
+
+    //timter produksi
+    $routes->post('timterProduksi', 'ProduksiController::timterProduksi');
+    $routes->post('exportTimter', 'TimterController::excelTimter');
 });
 
 // sudo
@@ -346,9 +395,17 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
 
 
+    //summary
+    $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
+    $routes->post('exportSummaryPerTod', 'SummaryController::excelSummaryPerTod');
+
     //summary produksi
     $routes->post('summaryProdPerTanggal', 'ProduksiController::summaryProdPerTanggal');
     $routes->post('exportSummaryPerTgl', 'SummaryController::excelSummaryPerTgl');
+
+    //timter produksi
+    $routes->post('timterProduksi', 'ProduksiController::timterProduksi');
+    $routes->post('exportTimter', 'TimterController::excelTimter');
 
 
     // mesin

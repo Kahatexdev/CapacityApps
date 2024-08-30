@@ -62,6 +62,9 @@ class UserController extends BaseController
     {
         $dataPdk = $this->ApsPerstyleModel->getPdkProduksi();
         $produksi = $this->produksiModel->getProduksiHarianArea();
+        $dataBuyer = $this->orderModel->getBuyer();
+        $dataArea = $this->jarumModel->getArea();
+        $dataJarum = $this->jarumModel->getJarum();
         $data = [
             'role' => session()->get('role'),
             'title' => 'Dashboard',
@@ -72,13 +75,17 @@ class UserController extends BaseController
             'produksiBulan' => 0,
             'produksiHari' => 0,
             'pdk' => $dataPdk,
-            'produksi' => $produksi
+            'produksi' => $produksi,
+            'buyer' => $dataBuyer,
+            'area' => $dataArea,
+            'jarum' => $dataJarum,
 
         ];
         return view(session()->get('role') . '/produksi', $data);
     }
-    public function bssetting(){
-        
+    public function bssetting()
+    {
+
         $data = [
             'role' => session()->get('role'),
             'title' => 'Dashboard',
@@ -86,7 +93,7 @@ class UserController extends BaseController
             'active3' => 'active',
             'active2' => '',
             'targetProd' => 0,
-     
+
 
         ];
         return view(session()->get('role') . '/bssetting', $data);
