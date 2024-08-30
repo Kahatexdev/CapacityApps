@@ -339,14 +339,17 @@ class MesinController extends BaseController
     public function updatemesinperjarum($idDataMesin)
     {
 
-        $data = [
-            'role' => session()->get('role'),
-            'total_mesin' => $this->request->getPost("total_mc"),
-            'brand' => $this->request->getPost("brand"),
-            'mesin_jalan' => $this->request->getPost("mesin_jalan"),
-        ];
+
+        $total_mesin = $this->request->getPost("total_mc");
+        $brand = $this->request->getPost("brand");
+        $mesin_jalan = $this->request->getPost("mesin_jalan");
+
         $id = $idDataMesin;
-        $update = $this->jarumModel->update($id, $data);
+        $update = $this->jarumModel->update($id, [
+            'total_mc' => $total_mesin,
+            'brand' => $brand,
+            'mesin_jalan' => $mesin_jalan
+        ]);
         $area = $this->request->getPost("area");
         if ($update) {
             return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('success', 'Data Berhasil Di Update');
