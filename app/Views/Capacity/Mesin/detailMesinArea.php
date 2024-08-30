@@ -253,6 +253,7 @@
                     <div class="modal-body">
                         <form action="" method="post">
                             <input type="text" name="id_data_mesin" id="" hidden value="">
+                            <input type="text" name="area" id="" hidden value="<?= $area ?>">
                             Are you sure you want to delete ?
                     </div>
                     <div class="modal-footer">

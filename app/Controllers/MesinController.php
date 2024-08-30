@@ -247,9 +247,9 @@ class MesinController extends BaseController
 
         $insert =   $this->jarumModel->insert($input);
         if ($insert) {
-            return redirect()->to(base_url(session()->get('role') . '/datamesinperjarum/' . $area))->withInput()->with('success', 'Data Berhasil Di Input');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('success', 'Data Berhasil Di Input');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/datamesinperjarum/' . $area))->withInput()->with('error', 'Data Gagal Di Input');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('error', 'Data Gagal Di Input');
         }
     }
     public function inputcylinder()
@@ -349,18 +349,19 @@ class MesinController extends BaseController
         $update = $this->jarumModel->update($id, $data);
         $area = $this->request->getPost("area");
         if ($update) {
-            return redirect()->to(base_url(session()->get('role') . '/datamesinperjarum/' . $area))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/datamesinperjarum/' . $area))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('error', 'Gagal Update Data');
         }
     }
     public function deletemesinareal($idDataMesin)
     {
+        $area = $this->request->getPost("area");
         $delete = $this->jarumModel->delete($idDataMesin);
         if ($delete) {
-            return redirect()->to(base_url(session()->get('role') . '/datamesin'))->withInput()->with('success', 'Data Berhasil Di Hapus');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/datamesin'))->withInput()->with('error', 'Gagal Hapus Data');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
     public function deletecylinder($idDataCylinder)
