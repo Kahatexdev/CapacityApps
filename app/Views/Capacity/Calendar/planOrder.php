@@ -67,7 +67,7 @@
                             <?php foreach ($kebMesin as $type => $value) : ?>
                                 <div class="col-lg-3 col-md-3">
                                     <div class="form-group">
-                                        <label for="jarum" class="form-control-label"><?= $value['mastermodel'] ?></label>
+                                        <label for="jarum" class="form-control-label"><?= $value['mastermodel']  ?> <?= $value['style']  ?></label>
                                         <input class="form-control <?= $value['kebutuhanMc'] != 0 ? 'border-info text-bold' : '' ?>" type="text" value="<?= $value['kebutuhanMc'] ?> Mesin <?= $value['JumlahHari'] ?> Hari" id="text-input" readonly>
                                     </div>
                                 </div>

@@ -111,7 +111,7 @@ class CalendarController extends BaseController
 
         $jumlahHari = ($tgl_akhir - $tgl_awal) / (60 * 60 * 24);
 
-        $startDate = new \DateTime('first day of this month');
+        $startDate = new \DateTime();
         $LiburModel = new LiburModel();
         $holidays = $LiburModel->findAll();
         $currentMonth = $startDate->format('F');
@@ -200,7 +200,7 @@ class CalendarController extends BaseController
             'weeklyRanges' => $monthlyData,
             'DaftarLibur' => $holidays,
             'kebMesin' => $KebMesin,
-            'totalKebutuhan' => $rataRata,
+            'totalKebutuhan' => $total,
             'start' => $awal,
             'end' => $akhir,
             'jarum' => $jarum,
@@ -229,7 +229,7 @@ class CalendarController extends BaseController
         $range = $jumlahHari / 7;
         $value = []; // Initialize $value array
 
-        for ($i = 0; $i < $range; $i++) {
+        for ($i = 0; $i < 52; $i++) {
             $startOfWeek = clone $startDate;
             $startOfWeek->modify("+$i week");
             $startOfWeek->modify('Monday this week');
@@ -444,7 +444,6 @@ class CalendarController extends BaseController
             $target = ((86400 / (intval($data['smv'])  * 0.8)) / 24);
 
             $mastermodel = $data['mastermodel'];
-            //$qtyTotal += $qty1;
 
             $value[] = [
                 'kebutuhanMc' => ceil(intval($qty1 / 24) / $target / $hari1),
@@ -453,7 +452,8 @@ class CalendarController extends BaseController
                 'target' => ceil($target),
                 'JumlahHari' => $hari1,
                 'delivery' => $deliv,
-                'mastermodel' => $mastermodel
+                'mastermodel' => $mastermodel,
+                'style' => $data['size']
             ];
         }
         if (!$value) {
