@@ -55,24 +55,17 @@
                                     <input class="form-control" type="text" value="<?= $totalKebutuhan ?>" id="totalMc" name="totalMc" readonly>
                                 </div>
 
+                                <input type="date" value="<?= $start ?>" hidden name="startMc">
+                                <input type="date" value="<?= $end ?>" hidden name="stopMc">
                                 <input type="date" value="<?= $start ?>" hidden name="tgl_awal">
                                 <input type="date" value="<?= $end ?>" hidden name="tgl_akhir">
+                                <input type="text" value="<?= $jmlHari ?>" hidden name="hari">
                                 <input type="text" value="<?= $desk ?>" hidden name="deskripsi">
 
                             </div>
 
                         </div>
                         <hr>
-                        <div class="row">
-                            <?php foreach ($kebMesin as $type => $value) : ?>
-                                <div class="col-lg-3 col-md-3">
-                                    <div class="form-group">
-                                        <label for="jarum" class="form-control-label"><?= $value['mastermodel']  ?> <?= $value['style']  ?></label>
-                                        <input class="form-control <?= $value['kebutuhanMc'] != 0 ? 'border-info text-bold' : '' ?>" type="text" value="<?= $value['kebutuhanMc'] ?> Mesin <?= $value['JumlahHari'] ?> Hari" id="text-input" readonly>
-                                    </div>
-                                </div>
-                            <?php endforeach ?>
-                        </div>
                         <div class="row">
                             <div class="col-lg-12">
                                 <button type="submit" class="btn bg-gradient-info w-100">
@@ -90,7 +83,7 @@
 
 
     <!-- kalender -->
-    <?php foreach ($weeklyRanges as $month => $ranges) : ?>
+    <?php foreach ($planMc as $month => $ranges) : ?>
         <div class="row mt-3">
             <div class="col-lg-12">
                 <div class="card">
@@ -99,149 +92,58 @@
                             <h3><?= $month ?></h3>
                             <div class="holiday">
                                 <div class="week-holiday d-flex justify-content-between">
-                                    <?php foreach ($ranges as $index => $range) : ?>
-                                        <?php if (isset($range['holidays']) && !empty($range['holidays'])) : ?>
-                                            <div class="week ">
-                                                <h5>Week <?= $index + 1 ?> :</h5>
-                                                <ul class="">
-                                                    <?php foreach ($range['holidays'] as $holiday) : ?>
-                                                        <li class="text-danger"><span class="badge bg-danger">
-                                                                <?= $holiday['nama'] ?> (<?= $holiday['tanggal'] ?>)
-                                                            </span>
-                                                        </li>
-                                                    <?php endforeach; ?>
-                                                </ul>
-                                            </div>
+                                    <?php foreach ($ranges as $index => $value) : ?>
+                                        <?php if (is_array($value) && isset($value['week'])) : ?>
+                                            <?php if (isset($value['holidays']) && !empty($value['holidays'])) : ?>
+                                                <h5>Week <?= $value['week'] + 1 ?> :</h5>
+                                                <div class="week">
+                                                    <ul>
+                                                        <?php foreach ($value['holidays'] as $holiday) : ?>
+                                                            <li class="text-danger"><span class="badge bg-danger">
+                                                                    <?= $holiday['nama'] ?> (<?= $holiday['tanggal'] ?>)
+                                                                </span></li>
+                                                        <?php endforeach; ?>
+                                                    </ul>
+                                                </div>
+                                            <?php endif; ?>
                                         <?php endif; ?>
                                     <?php endforeach; ?>
                                 </div>
                             </div>
                         </div>
                         <div class="table-responsive">
-                            <table class="table ">
+                            <table class="table">
                                 <thead>
                                     <tr>
-                                        <th rowspan="4" class="text-center">PDK</th>
-                                        <?php foreach ($ranges as $index => $range) : ?>
-                                            <th class="text-center">Week <?= $range['week'] ?></th>
-                                        <?php endforeach; ?>
-                                    </tr>
-                                    <tr>
-                                        <?php foreach ($ranges as $index => $range) : ?>
-                                            <th class="text-xs"> <span><?= $range['start_date'] ?> - <?= $range['end_date'] ?> </span></th>
-                                        <?php endforeach; ?>
-                                    </tr>
-                                    <tr>
-                                        <?php foreach ($ranges as $index => $range) : ?>
-                                            <th class="text-xs "> <span class="badge bg-success"> Hari Kerja : <?= $range['number_of_days'] ?> </span></th>
-                                        <?php endforeach; ?>
+                                        <th>Minggu Ke</th>
+                                        <th> Range</th>
+                                        <th>Jumlah Hari</th>
+                                        <th>Sisa Order</th>
+                                        <th>Kebutuhan Mesin </th>
                                     </tr>
                                 </thead>
-                                <tbody class="text-center">
-                                    <tr>
-                                        <td>F-PS</td>
-
-                                    </tr>
-
-                                    <tr>
-                                        <td>F-MP</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>F-FP</td>
-
-                                    </tr>
-
-                                    <tr>
-                                        <td>S-PS</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>S-MP</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>S-FP</td>
-
-                                    <tr>
-                                    <tr>
-                                        <td>SS-PS</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>SS-MP</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>SS-FP</td>
-
-                                    <tr>
-                                        <td>NS-PS</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>NS-MP</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>NS-FP</td>
-
-                                    </tr>
-
-
-                                    </tr>
-
-                                    <tr>
-                                        <td>KH-PS</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>KH-MP</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>KH-FP</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>TG-PS</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>TG-MP</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>TG-FP</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>GL-FL</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>GL-MT</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>GL-PT</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>GL-ST</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>HT-ST</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>HT-PL</td>
-
-                                    </tr>
-
-
+                                <tbody class="text">
+                                    <?php foreach ($ranges as $index => $value) : ?>
+                                        <?php if (is_array($value) && isset($value['week'])) : ?> <!-- Pastikan $value adalah array dan punya key 'week' -->
+                                            <tr>
+                                                <td>Week - <?= $value['week'] ?> </td>
+                                                <td><?= $value['start_date'] ?> - <?= $value['end_date'] ?> </td>
+                                                <td><?= $value['number_of_days'] ?> hari </td>
+                                                <td><?= ceil($value['sisa']) ?> dz</td>
+                                                <td><?= $value['totalMc'] ?> mesin</td>
+                                            </tr>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
                                 </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="3" class="text-end"> Kebutuhan Bulan <?= $month ?> :</th>
+                                        <th>
+                                            <?= $ranges['kebutuhanMcPerbulan'] ?> Mesin
+
+                                        </th>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
@@ -249,6 +151,7 @@
             </div>
         </div>
     <?php endforeach; ?>
+
 </div>
 
 

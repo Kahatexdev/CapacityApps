@@ -111,7 +111,7 @@ class CalendarController extends BaseController
 
         $jumlahHari = ($tgl_akhir - $tgl_awal) / (60 * 60 * 24);
 
-        $startDate = new \DateTime();
+        $startDate = new \DateTime($awal);
         $LiburModel = new LiburModel();
         $holidays = $LiburModel->findAll();
         $currentMonth = $startDate->format('F');
@@ -119,8 +119,9 @@ class CalendarController extends BaseController
         $monthlyData = [];
         $range = $jumlahHari / 7;
         $value = []; // Initialize $value array
+        $planMc = [];
 
-        for ($i = 0; $i < 52; $i++) {
+        for ($i = 0; $i < $range; $i++) {
             $startOfWeek = clone $startDate;
             $startOfWeek->modify("+$i week");
             $startOfWeek->modify('Monday this week');
@@ -146,8 +147,8 @@ class CalendarController extends BaseController
                 $monthlyData[$currentMonth] = [];
             }
 
-            $startOfWeekFormatted = $startOfWeek->format('d-m');
-            $endOfWeekFormatted = $endOfWeek->format('d-m');
+            $startOfWeekFormatted = $startOfWeek->format('d-F');
+            $endOfWeekFormatted = $endOfWeek->format('d-F');
             $start = $startOfWeek->format('Y-m-d');
             $end = $endOfWeek->format('Y-m-d');
             $cek = [
@@ -167,8 +168,36 @@ class CalendarController extends BaseController
 
                 ];
             }
+
+            $planMc[$currentMonth][$weekCount][] = $this->hitungMcOrder($cek);
+            $allData = array_merge(...$planMc[$currentMonth][$weekCount]);
+            $mesin = array_column($allData, 'kebutuhanMc');
+            $sisa =  array_column($allData, 'qty');
+            $totalMc = array_sum($mesin);
+            $sisaOrder = array_sum($sisa) / 24;
+            $planMc[$currentMonth][$weekCount]['week'] = $weekCount;
+            $planMc[$currentMonth][$weekCount]['totalMc'] = $totalMc;
+            $planMc[$currentMonth][$weekCount]['start_date'] = $startOfWeekFormatted;
+            $planMc[$currentMonth][$weekCount]['end_date'] = $endOfWeekFormatted;
+            $planMc[$currentMonth][$weekCount]['number_of_days'] = $numberOfDays;
+            $planMc[$currentMonth][$weekCount]['holidays'] = $weekHolidays;
+            $planMc[$currentMonth][$weekCount]['sisa'] = $sisaOrder;
+
+            $maxTotalMcPerMonth = 0;
+
+            foreach ($planMc[$currentMonth] as $weekData) {
+                if (isset($weekData['totalMc'])) {
+                    if ($weekData['totalMc'] > $maxTotalMcPerMonth) {
+                        $maxTotalMcPerMonth = $weekData['totalMc'];
+                    }
+                }
+            }
+            $planMc[$currentMonth]['kebutuhanMcPerbulan'] = $maxTotalMcPerMonth;
+
+
             $weekCount++;
         }
+        dd($planMc);
         $get = [
             'jarum' => $jarum,
             'start' => $awal,
@@ -178,15 +207,8 @@ class CalendarController extends BaseController
         $KebMesin =  $this->hitungMcOrder($get);
         $kategori = $this->productModel->getKategori();
         $maxHari = max(array_column($KebMesin, 'JumlahHari'));
-        $totalKebutuhanMC = 0;
-        $kebutuhanMcArray = array_column($KebMesin, 'kebutuhanMc');
+        $kebutuhanMcTotal = max(array_column($planMc, 'kebutuhanMcPerbulan'));
 
-        // Menghitung total dan jumlah elemen
-        $total = array_sum($kebutuhanMcArray);
-        $jumlahElemen = count($kebutuhanMcArray);
-
-        // Menghitung rata-rata
-        $rataRata = $jumlahElemen > 0 ? $total / $jumlahElemen : 0;
 
         $data = [
             'role' => session()->get('role'),
@@ -197,10 +219,11 @@ class CalendarController extends BaseController
             'active5' => '',
             'active6' => 'active',
             'active7' => '',
+            'planMc' => $planMc,
             'weeklyRanges' => $monthlyData,
             'DaftarLibur' => $holidays,
             'kebMesin' => $KebMesin,
-            'totalKebutuhan' => $total,
+            'totalKebutuhan' => $kebutuhanMcTotal,
             'start' => $awal,
             'end' => $akhir,
             'jarum' => $jarum,
@@ -220,7 +243,7 @@ class CalendarController extends BaseController
 
         $jumlahHari = ($tgl_akhir - $tgl_awal) / (60 * 60 * 24);
 
-        $startDate = new \DateTime();
+        $startDate = new \DateTime($awal);
         $LiburModel = new LiburModel();
         $holidays = $LiburModel->findAll();
         $currentMonth = $startDate->format('F');
@@ -229,7 +252,7 @@ class CalendarController extends BaseController
         $range = $jumlahHari / 7;
         $value = []; // Initialize $value array
 
-        for ($i = 0; $i < 52; $i++) {
+        for ($i = 0; $i < $range; $i++) {
             $startOfWeek = clone $startDate;
             $startOfWeek->modify("+$i week");
             $startOfWeek->modify('Monday this week');
@@ -437,6 +460,7 @@ class CalendarController extends BaseController
         $query = $this->ApsPerstyleModel->hitungMesin($get);
         $value = [];
         $qtyTotal = 0;
+        $mastermodel = '';
         foreach ($query as $key => $data) {
             $qty1 = $data['sisa'];
             $hari1 = intval($data['totalhari']);
@@ -448,7 +472,7 @@ class CalendarController extends BaseController
             $value[] = [
                 'kebutuhanMc' => ceil(intval($qty1 / 24) / $target / $hari1),
                 'smv' => $data['smv'],
-                'qty' => ceil($qty1),
+                'qty' => ceil($qty1 / 24),
                 'target' => ceil($target),
                 'JumlahHari' => $hari1,
                 'delivery' => $deliv,
