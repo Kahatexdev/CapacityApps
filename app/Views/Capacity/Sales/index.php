@@ -5,25 +5,6 @@
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
             <div class="card">
                 <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    Sales Position
-                                </h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row my-4">
-        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
                     <form action="<?= base_url($role . '/sales') ?>" method="get">
                         <div class="row">
                             <div class="col-5">

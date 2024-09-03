@@ -54,6 +54,10 @@
                                     <input class="form-control" type="text" value="<?= $jmlHari ?>" id="jarum" name="hari" readonly>
                                 </div>
                                 <div class="form-group">
+                                    <label for="jarum" class="form-control-label">Sisa Booking</label>
+                                    <input class="form-control" type="text" value="<?= ceil($sisa / 24) ?> dz" id="sisa" name="sisa" readonly>
+                                </div>
+                                <div class="form-group">
                                     <label for="jarum" class="form-control-label">Total Kebutuhan Mesin</label>
                                     <input class="form-control" type="text" value="<?= $totalKebutuhan ?>" id="totalMc" name="totalMc" readonly>
                                 </div>

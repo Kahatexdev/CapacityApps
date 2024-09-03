@@ -1,6 +1,35 @@
 <?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
+    <div class="row my-4">
+        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
+                                <h5 class="font-weight-bolder mb-0">
+                                    <?= $title ?>
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="col-8 text-end">
+                            <form action="<?= base_url($role . '/exportPlanningJlMc/' . $bulan) ?>" method="post" ?>
+                                <!-- <a href="" class="btn btn-save bg-gradient-info d-inline-flex align-items-center">
+                                    Save</a> -->
+                                <button type="submit" class="btn btn-info"><i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Report Excel</button>
+
+                                <a href="<?= base_url($role . '/jalanmesin') ?>" class="btn bg-gradient-dark">
+                                    <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
+                                    Back</a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <?php if (session()->getFlashdata('success')) : ?>
         <script>
             $(document).ready(function() {
@@ -27,10 +56,6 @@
     <div class="row">
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
             <form action="">
-                <div class="col-lg-12" align="right">
-                    <a href="" class="btn btn-save bg-gradient-info d-inline-flex align-items-center">
-                        Save</a>
-                </div>
                 <!-- Menampilkan Planning MC Per Week -->
                 <?php for ($i = 1; $i <= 5; $i++): ?>
                     <?php if (!empty($kebutuhanMesin[$i])): ?>
@@ -74,14 +99,15 @@
                                                     foreach ($jarum as $jrm) {
                                                         $planMcJrm = $jarums[$jrm['jarum']] ?? 0; // Planning MC untuk jenis jarum tertentu
                                                         $planMcArea += $planMcJrm;
-                                                        $dz = $planMcJrm * 14; // Menjumlahkan Planning MC per jarum untuk total area
-                                                        $outputDz += $dz; // Menjumlahkan Planning MC per jarum untuk total area
                                                         // Menambahkan nilai ke total per jarum
                                                         if (!isset($totalPlanMcJrm[$jrm['jarum']])) {
                                                             $totalPlanMcJrm[$jrm['jarum']] = 0;
                                                         }
                                                         $totalPlanMcJrm[$jrm['jarum']] += $planMcJrm;
                                                     }
+                                                    // Ambil nilai outputDz dari $output berdasarkan $i dan $area
+                                                    $outputDz = isset($output[$i][$area]) ? $output[$i][$area] : 0;
+
                                                     // Menambahkan total MC per area ke variabel total seluruh area
                                                     if ($area != 'KK8J') {
                                                         $totalMcSocks += $totalMc[$area]['Total'] ?? 0;
@@ -106,7 +132,7 @@
                                                         <?php foreach ($jarum as $jrm): ?>
                                                             <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><input type="number" class="form-control" style="text-align: center; font-size: 0.7rem; width: 65px;" value="<?= $jarums[$jrm['jarum']] ?? 0; ?>"></td>
                                                         <?php endforeach; ?>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $outputDz; ?></td>
+                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= number_format($outputDz, 0); ?></td>
                                                     </tr>
                                                 <?php endforeach; ?>
                                                 <tr>
@@ -116,7 +142,7 @@
                                                     <?php foreach ($jarum as $jrm): ?>
                                                         <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= $totalPlanMcJrm[$jrm['jarum']] ?? 0; ?></td>
                                                     <?php endforeach; ?>
-                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= $outputDzSocks; ?></th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= number_format($outputDzSocks, 0); ?></th>
                                                 </tr>
                                                 <tr>
                                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">% Sock</th>
@@ -134,7 +160,7 @@
                                                     <?php foreach ($jarum as $jrm): ?>
                                                         <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"></td>
                                                     <?php endforeach; ?>
-                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= $outputDzGloves; ?></th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= number_format($outputDzGloves, 0); ?></th>
                                                 </tr>
                                                 <tr>
                                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Total</th>
@@ -143,7 +169,7 @@
                                                     <?php foreach ($jarum as $jrm): ?>
                                                         <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"></td>
                                                     <?php endforeach; ?>
-                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= $totalOutputDz; ?></th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= number_format($totalOutputDz, 0); ?></th>
                                                 </tr>
                                                 <tr>
                                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">% Total MC</th>

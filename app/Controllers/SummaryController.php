@@ -153,7 +153,7 @@ class SummaryController extends BaseController
         ];
 
         // Judul
-        $sheet->setCellValue('A1', 'SUMMARY PRODUKSI');
+        $sheet->setCellValue('A1', 'SUMMARY PRODUKSI ' . $area);
         $sheet->mergeCells('A1:J1');
         // Mengatur teks menjadi rata tengah dan huruf tebal
         $sheet->getStyle('A1')->getFont()->setBold(true);
@@ -360,7 +360,7 @@ class SummaryController extends BaseController
         // kolom total per no model
 
         // Set judul file dan header untuk download
-        $filename = 'SUMMARY PRODUKSI PER TANGGAL.xlsx';
+        $filename = 'SUMMARY PRODUKSI PER TANGGAL ' . $buyer . ' ' . $area . ' ' . $jarum . ' ' . $pdk . ' ' . $awal . '-' . $akhir . '.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
@@ -451,7 +451,7 @@ class SummaryController extends BaseController
         ];
 
         $sheet->setCellValue('A1', 'SUMMARY PRODUKSI PER TOD');
-        $sheet->mergeCells('A1:O1');
+        $sheet->mergeCells('A1:T1');
         $sheet->getStyle('A1')->getFont()->setBold(true);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
@@ -460,6 +460,22 @@ class SummaryController extends BaseController
         $sheet->setCellValue('B' . $row_header, 'Delivery');
         $sheet->setCellValue('C' . $row_header, 'Sisa Hari');
         $sheet->setCellValue('D' . $row_header, 'Jln Order');
+        $sheet->setCellValue('E' . $row_header, 'Running (days)');
+        $sheet->setCellValue('F' . $row_header, 'Buyer');
+        $sheet->setCellValue('G' . $row_header, 'No Order');
+        $sheet->setCellValue('H' . $row_header, 'Jarum');
+        $sheet->setCellValue('I' . $row_header, 'No Model');
+        $sheet->setCellValue('J' . $row_header, 'Style');
+        $sheet->setCellValue('K' . $row_header, 'Color');
+        $sheet->setCellValue('L' . $row_header, 'Qty Shipment');
+        $sheet->setCellValue('M' . $row_header, 'Total Shipment');
+        $sheet->setCellValue('N' . $row_header, 'Prod (bruto)');
+        $sheet->setCellValue('O' . $row_header, 'Prod (netto)');
+        $sheet->setCellValue('P' . $row_header, 'Sisa Prod');
+        $sheet->setCellValue('Q' . $row_header, 'Sisa Shipment');
+        $sheet->setCellValue('R' . $row_header, '% Prod');
+        $sheet->setCellValue('S' . $row_header, 'BS Setting');
+        $sheet->setCellValue('T' . $row_header, 'Qty (+)Pck');
         $sheet->setCellValue('E' . $row_header, 'Running (days)');
         $sheet->setCellValue('F' . $row_header, 'Buyer');
         $sheet->setCellValue('G' . $row_header, 'No Order');
@@ -496,7 +512,7 @@ class SummaryController extends BaseController
         $sheet->getStyle('Q' . $row_header)->applyFromArray($styleHeader);
         $sheet->getStyle('R' . $row_header)->applyFromArray($styleHeader);
         $sheet->getStyle('S' . $row_header)->applyFromArray($styleHeader);
-        $sheet->getStyle('S' . $row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('T' . $row_header)->applyFromArray($styleHeader);
 
         $row = 4;
         $prevSize = null;
@@ -511,36 +527,27 @@ class SummaryController extends BaseController
             if (!isset($sisa_ship_prev[$group_key])) {
                 $sisa_ship_prev[$group_key] = null;
             }
-
-            $sheet->setCellValue('A' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['seam'] : '');
-            $sheet->setCellValue('E' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['buyer'] : '');
-            $sheet->setCellValue('F' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['no_order'] : '');
             $total_ship_found = false;
 
             foreach ($totalShip as $ts) {
                 if ($ts['mastermodel'] == $id['mastermodel'] && $ts['size'] == $id['size']) {
                     $total_ship_found = true;
                     $sheet->setCellValue('K' . $row, number_format($ts['ttl_ship'] / 24, 2));
+                    $sheet->setCellValue('M' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($ts['ttl_ship'] / 24, 2) : '');
                     break;
                 }
             }
             if (!$total_ship_found) {
                 $sheet->setCellValue('K' . $row, '0');
             }
-            foreach ($totalShip as $ship) {
-                if ($ship['mastermodel'] == $id['mastermodel'] && $ship['size'] == $id['size']) {
-                    $sheet->setCellValue('L' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($ship['ttl_ship'] / 24, 2) : '');
-                    break;
-                }
-            }
             foreach ($totalProd as $pr) {
                 if ($pr['mastermodel'] == $id['mastermodel'] && $pr['size'] == $id['size']) {
                     $bruto = $pr['qty_produksi'] ?? 0;
-                    $bs_st = 0;
+                    $bs_st = $pr['bs_prod'] ?? 0;
                     $netto = $bruto - $bs_st ?? 0;
 
                     //sisa per inisial
-                    $sisa = $ship['ttl_ship'] - $netto ?? 0;
+                    $sisa = $ts['ttl_ship'] - $netto ?? 0;
                     if ($sisa > 0) {
                         $sisa;
                     } else {
@@ -560,36 +567,33 @@ class SummaryController extends BaseController
                     }
 
                     // Calculate percentage
-                    $persentase = ($ship['ttl_ship'] != 0) ? ($netto / $ship['ttl_ship']) * 100 : 0;
+                    $persentase = ($ts['ttl_ship'] != 0) ? ($netto / $ts['ttl_ship']) * 100 : 0;
 
                     // Update sisa_ship_prev for the next iteration
                     $sisa_ship_prev[$group_key] = $sisa_ship;
-
-                    $sheet->setCellValue('M' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($bruto / 24, 2) : '');
-                    $sheet->setCellValue('N' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($netto / 24, 2) : '');
-                    $sheet->setCellValue('O' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $sisa > 0 ? number_format($sisa / 24, 2) : '0.00' : '');
-                    $sheet->setCellValue('P' . $row, $sisa_ship > 0 ? number_format($sisa_ship / 24, 2) : '0.00');
-                    $sheet->setCellValue('Q' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($persentase, 2) . '%' : '');
-                    $sheet->setCellValue('R' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($bs_st / 24, 2) : '');
+                    $sheet->setCellValue('D' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $pr['start_mc'] : '');
+                    $sheet->setCellValue('N' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($bruto / 24, 2) : '');
+                    $sheet->setCellValue('O' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($netto / 24, 2) : '');
+                    $sheet->setCellValue('P' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $sisa > 0 ? number_format($sisa / 24, 2) : '0.00' : '');
+                    $sheet->setCellValue('Q' . $row, $sisa_ship > 0 ? number_format($sisa_ship / 24, 2) : '0.00');
+                    $sheet->setCellValue('R' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($persentase, 2) . '%' : '');
+                    $sheet->setCellValue('S' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($bs_st / 24, 2) : '');
+                    $sheet->setCellValue('T' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $pr['plus_packing'] : '');
                     break;
                 }
             }
 
+            $sheet->setCellValue('A' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['seam'] : '');
             $sheet->setCellValue('B' . $row, $id['delivery']);
             $sheet->setCellValue('C' . $row, $sisa_hari);
-            foreach ($totalProd as $sm) {
-                if ($sm['mastermodel'] == $id['mastermodel'] && $sm['size'] == $id['size']) {
-                    $sheet->setCellValue('D' . $row, $sm['start_mc']);
-                    break;
-                }
-            }
-            $sheet->setCellValue('G' . $row, $id['machinetypeid']);
-            $sheet->setCellValue('H' . $row, $id['mastermodel']);
-            $sheet->setCellValue('I' . $row, $id['size']);
-            $sheet->setCellValue('J' . $row, $id['color']);
-            $sheet->setCellValue('K' . $row, number_format($id['qty_deliv'] / 24, 2));
-            $sheet->setCellValue('S' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['running'] : '');
-            $sheet->setCellValue('T' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['running'] : '');
+            $sheet->setCellValue('E' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['running'] : '');
+            $sheet->setCellValue('F' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['buyer'] : '');
+            $sheet->setCellValue('G' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['no_order'] : '');
+            $sheet->setCellValue('H' . $row, $id['machinetypeid']);
+            $sheet->setCellValue('I' . $row, $id['mastermodel']);
+            $sheet->setCellValue('J' . $row, $id['size']);
+            $sheet->setCellValue('K' . $row, $id['color']);
+            $sheet->setCellValue('L' . $row, number_format($id['qty_deliv'] / 24, 2));
 
             $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
@@ -616,7 +620,7 @@ class SummaryController extends BaseController
             $prevSize = $id['mastermodel'] . $id['size'];
         }
 
-        $filename = 'SUMMARY PRODUKSI ' . $area . ' ' . $jarum . ' ' . $pdk . '.xlsx';
+        $filename = 'SUMMARY PRODUKSI ' . $buyer . ' ' . $area . ' ' . $jarum . ' ' . $pdk . '.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Cache-Control: max-age=0');

@@ -13,7 +13,7 @@ class KebutuhanMesinModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'judul', 'jarum', 'mesin', 'jumlah_hari', 'tanggal_awal', 'tanggal_akhir', 'start_mesin', 'stop_mesin', 'created_at', 'updated_at', 'deskripsi'];
+    protected $allowedFields    = ['id', 'judul', 'jarum', 'sisa', 'mesin', 'jumlah_hari', 'tanggal_awal', 'tanggal_akhir', 'start_mesin', 'stop_mesin', 'created_at', 'updated_at', 'deskripsi'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -52,9 +52,20 @@ class KebutuhanMesinModel extends Model
         return $result;
     }
 
-    public function getData($judul)
+    public function getDataOrder($judul)
     {
-        $result = $this->where('judul', $judul)->distinct('judul')->orderBy('jarum', 'asc')->findAll();
+        $result = $this->where('judul', $judul)
+            ->where('deskripsi', 'ORDER')
+            ->distinct('judul')->orderBy('jarum', 'asc')->groupBy('deskripsi,jarum')
+            ->findAll();
+        return $result;
+    }
+    public function getDataBooking($judul)
+    {
+        $result = $this->where('judul', $judul)
+            ->where('deskripsi', 'BOOKING')
+            ->distinct('judul')->orderBy('jarum', 'asc')->groupBy('deskripsi,jarum')
+            ->findAll();
         return $result;
     }
     public function tglPlan($judul)

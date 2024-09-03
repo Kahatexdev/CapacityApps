@@ -305,7 +305,7 @@ class OrderModel extends Model
             $mainQuery->where('subquery.mastermodel', $data['pdk']);
         }
         if (!empty($data['jarum'])) {
-            $mainQuery->where('subquery.machinetypeid', $data['jarum']);
+            $mainQuery->like('subquery.machinetypeid', $data['jarum']);
         }
         $mainQuery->groupBy('subquery.machinetypeid, subquery.mastermodel, subquery.size')
             ->orderBy('area, subquery.machinetypeid, subquery.mastermodel, subquery.size', 'ASC');
@@ -327,7 +327,7 @@ class OrderModel extends Model
             $this->where('produksi.area', $data['area']);
         }
         if (!empty($data['jarum'])) {
-            $this->where('apsperstyle.machinetypeid', $data['jarum']);
+            $this->like('apsperstyle.machinetypeid', $data['jarum']);
         }
         if (!empty($data['pdk'])) {
             $this->where('data_model.no_model', $data['pdk']);
@@ -380,7 +380,7 @@ class OrderModel extends Model
             $mainQuery->where('subquery.kd_buyer_order', $data['buyer']);
         }
         if (!empty($data['jarum'])) {
-            $mainQuery->where('subquery.machinetypeid', $data['jarum']);
+            $mainQuery->like('subquery.machinetypeid', $data['jarum']);
         }
         if (!empty($data['pdk'])) {
             $mainQuery->where('subquery.mastermodel', $data['pdk']);
@@ -402,7 +402,7 @@ class OrderModel extends Model
             $this->where('apsperstyle.factory', $data['area']);
         }
         if (!empty($data['jarum'])) {
-            $this->where('apsperstyle.machinetypeid', $data['jarum']);
+            $this->like('apsperstyle.machinetypeid', $data['jarum']);
         }
         if (!empty($data['pdk'])) {
             $this->where('data_model.no_model', $data['pdk']);
@@ -423,7 +423,7 @@ class OrderModel extends Model
             $this->where('produksi.area', $data['area']);
         }
         if (!empty($data['jarum'])) {
-            $this->where('apsperstyle.machinetypeid', $data['jarum']);
+            $this->like('apsperstyle.machinetypeid', $data['jarum']);
         }
         if (!empty($data['pdk'])) {
             $this->where('data_model.no_model', $data['pdk']);
@@ -439,7 +439,7 @@ class OrderModel extends Model
         $this->select('apsperstyle.idapsperstyle, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, MAX(apsperstyle.delivery) AS delivery, SUM(apsperstyle.qty) AS qty')
             ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT');
         if (!empty($data['jarum'])) {
-            $this->where('apsperstyle.machinetypeid', $data['jarum']);
+            $this->like('apsperstyle.machinetypeid', $data['jarum']);
         }
         if (!empty($data['pdk'])) {
             $this->where('data_model.no_model', $data['pdk']);
@@ -461,7 +461,7 @@ class OrderModel extends Model
             $this->where('produksi.area', $data['area']);
         }
         if (!empty($data['jarum'])) {
-            $this->where('apsperstyle.machinetypeid', $data['jarum']);
+            $this->like('apsperstyle.machinetypeid', $data['jarum']);
         }
         if (!empty($data['pdk'])) {
             $this->where('data_model.no_model', $data['pdk']);

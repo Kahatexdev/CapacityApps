@@ -74,9 +74,14 @@ class SalesController extends BaseController
         $currentMonth = $startDate->format('F');
         $range = ceil($jumlahHari / 7); // Pembulatan ke atas untuk rentang minggu
         $weekCount = 1; // Inisialisasi minggu
+
         $monthlyData = [];
         $exess = 0;
-        // 
+        $totalMonthlyCapacity = 0;
+        $totalMonthlyAvailable = 0;
+        $totalMonthlyMachine = 0;
+        $totalMonthlyOrder = 0;
+
         while ($startDate <= $endDate) {
             $startOfWeek = clone $startDate;
             $startOfWeek->modify('Monday this week');
