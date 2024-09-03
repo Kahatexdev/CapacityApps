@@ -409,6 +409,32 @@ class DataMesinModel extends Model
 
     public function getAliasJrm()
     {
-        return $this->select('aliasjarum, jarum')->groupBy('aliasjarum')->findAll();
+        // Daftar alias jarum gloves
+        $orderedAliasJarums = [
+            'Ladies/Mens 13G',
+            'Ladies/Mens 10G (126N)',
+            'Ladies/Mens 10G (116N)',
+            // 
+            'Lds / Child 13 G (126 N)-->Lokal',
+            'Lds / Child 10 G (116 N)-->Lokal',
+            'Lds / Child 10 G (106 N)-->Lokal',
+            'Mc Fluff Ball',
+            'Mc Topi 10inch (240N)',
+            'Head Band 10" (320 N)',
+            'Lds / Child 10 G (116 N)',
+            'Child/Ladies 10G (106N)',
+            'Baby 10G (92N)',
+            'Baby 10G (84N)',
+        ];
+
+        // Menghasilkan SQL CASE statement untuk urutan kustom
+        $caseStatement = '';
+        foreach ($orderedAliasJarums as $index => $alias) {
+            $caseStatement .= "WHEN aliasjarum = '{$alias}' THEN {$index} ";
+        }
+        return $this->select('aliasjarum, jarum, brand')
+            ->groupBy('aliasjarum')
+            ->orderBy("CASE {$caseStatement} ELSE 999 END", 'DESC')
+            ->findAll();
     }
 }
