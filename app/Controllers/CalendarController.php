@@ -193,17 +193,29 @@ class CalendarController extends BaseController
                 }
             }
             $planMc[$currentMonth]['kebutuhanMcPerbulan'] = $maxTotalMcPerMonth;
-
+            $totalSisa = 0;
+            foreach ($planMc[$currentMonth] as $weekData) {
+                if (isset($weekData['sisa'])) {
+                    $totalSisa += $weekData['sisa'];
+                }
+            }
+            $planMc[$currentMonth]['totalSisa'] = $totalSisa;
+            $greatSisa = 0;
+            foreach ($planMc as $weekData) {
+                if (isset($weekData['totalSisa'])) {
+                    if ($weekData['totalSisa'] > $greatSisa) {
+                        $greatSisa = $weekData['totalSisa'];
+                    }
+                }
+            }
 
             $weekCount++;
         }
-        dd($planMc);
         $get = [
             'jarum' => $jarum,
             'start' => $awal,
             'end' => $akhir,
         ];
-
         $KebMesin =  $this->hitungMcOrder($get);
         $kategori = $this->productModel->getKategori();
         $maxHari = max(array_column($KebMesin, 'JumlahHari'));
@@ -224,6 +236,7 @@ class CalendarController extends BaseController
             'DaftarLibur' => $holidays,
             'kebMesin' => $KebMesin,
             'totalKebutuhan' => $kebutuhanMcTotal,
+            'grandSisa' => $greatSisa,
             'start' => $awal,
             'end' => $akhir,
             'jarum' => $jarum,
@@ -383,6 +396,10 @@ class CalendarController extends BaseController
         foreach ($KebMesin as $kebutuhanMesin) {
             $totalKebutuhanMC += $kebutuhanMesin['kebutuhanMc']; // Adjust this line based on the structure of your data
         }
+        $grandSisa = 0;
+        foreach ($KebMesin as $kebutuhanMesin) {
+            $grandSisa += $kebutuhanMesin['qty']; // Adjust this line based on the structure of your data
+        }
         $stopmc = max(array_column($KebMesin, 'stopmc'));
         // Di sini Anda mungkin perlu memanggil model lain untuk mendapatkan data lain yang diperlukan
         $kategori = $this->productModel->getKategori();
@@ -408,6 +425,7 @@ class CalendarController extends BaseController
             'totalKebutuhan' => $totalKebutuhanMC,
             'stopmc' => $stopmc,
             'desk' => 'BOOKING',
+            'sisa' => $grandSisa,
         ];
         return view(session()->get('role') . '/Calendar/calendar', $data);
     }
@@ -425,7 +443,7 @@ class CalendarController extends BaseController
             $type = $data['product_type'];
             $qtyTotal += $qty1;
             if ($hari1 == null) {
-                $value =  ['kebutuhanMc' => 0, 'JumlahHari' => 0, 'delivery' => 0, 'type' => $type, 'stopmc' => 0];
+                $value =  ['kebutuhanMc' => 0, 'qty' => 0, 'JumlahHari' => 0, 'delivery' => 0, 'type' => $type, 'stopmc' => 0];
                 return $value;
             } else {
                 $value[] = [
@@ -514,13 +532,17 @@ class CalendarController extends BaseController
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $kebutuhanMC = $this->kebMc->getOrder();
 
-        $planning = $this->kebMc->getData($judul);
+        $planningOrder = $this->kebMc->getDataOrder($judul);
+        $planningBooking = $this->kebMc->getDataBooking($judul);
         $tgl_plan = $this->kebMc->tglPlan($judul);
 
         $range = $this->kebMc->range($judul);
         $groupedData = [];
-        $jumlahMc = 0;
-        foreach ($planning as $val) {
+        $jumlahMcOrder = 0;
+        $jumlahMcBooking = 0;
+        $totalSisaOrder = 0;
+        $totalSisaBooking = 0;
+        foreach ($planningOrder as $val) {
             $judul = $val['judul'];
             if (!array_key_exists($judul, $groupedData)) {
                 $groupedData[$judul] = [];
@@ -528,15 +550,35 @@ class CalendarController extends BaseController
             $groupedData[$judul][] = [
                 'jarum' => $val['jarum'],
                 'mesin' => $val['mesin'],
+                'sisa' => $val['sisa'],
                 'startmc' => $val['start_mesin'],
                 'stopmc' => $val['stop_mesin']
             ];
-            $jumlahMc += (int)$val['mesin'];
+            $jumlahMcOrder += (int)$val['mesin'];
+            $totalSisaOrder += (int)$val['sisa'];
+        }
+        foreach ($planningBooking as $val) {
+            $judul = $val['judul'];
+            if (!array_key_exists($judul, $groupedData)) {
+                $groupedData[$judul] = [];
+            }
+            $groupedData[$judul][] = [
+                'jarum' => $val['jarum'],
+                'mesin' => $val['mesin'],
+                'sisa' => $val['sisa'],
+                'startmc' => $val['start_mesin'],
+                'stopmc' => $val['stop_mesin']
+            ];
+            $jumlahMcBooking += (int)$val['mesin'];
+            $totalSisaBooking += (int)$val['sisa'];
         }
         $data = [
             'role' => session()->get('role'),
             session()->get('role') . '' => $groupedData,
-            'jumlahMc' => $jumlahMc,
+            'jumlahMcOrder' => $jumlahMcOrder,
+            'totalSisaBooking' => $totalSisaBooking,
+            'totalSisaOrder' => $totalSisaOrder,
+            'jumlahMcBooking' => $jumlahMcBooking,
             'judul' => $judul,
             'range' => $range,
             'tglplan' => $tgl_plan,
@@ -552,7 +594,9 @@ class CalendarController extends BaseController
             'TotalMesin' => $totalMesin,
             'DaftarLibur' => $holidays,
             'kebutuhanMc' => $kebutuhanMC,
-            'chartstat' => $planning
+            'chartstat' => $planningOrder,
+            'order' => $planningOrder,
+            'booking' => $planningBooking
         ];
         return view(session()->get('role') . '/Calendar/detail', $data);
     }
@@ -561,13 +605,19 @@ class CalendarController extends BaseController
         $holidays = $this->liburModel->findAll();
         $dataJarum = $this->jarumModel->getJarum();
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
-        $kebutuhanMC = $this->kebMc->getBooking();
-        $planning = $this->kebMc->getData($judul);
+        $kebutuhanMC = $this->kebMc->getOrder();
+
+        $planningOrder = $this->kebMc->getDataOrder($judul);
+        $planningBooking = $this->kebMc->getDataBooking($judul);
         $tgl_plan = $this->kebMc->tglPlan($judul);
+
         $range = $this->kebMc->range($judul);
         $groupedData = [];
-        $jumlahMc = 0;
-        foreach ($planning as $val) {
+        $jumlahMcOrder = 0;
+        $jumlahMcBooking = 0;
+        $totalSisaOrder = 0;
+        $totalSisaBooking = 0;
+        foreach ($planningOrder as $val) {
             $judul = $val['judul'];
             if (!array_key_exists($judul, $groupedData)) {
                 $groupedData[$judul] = [];
@@ -575,15 +625,35 @@ class CalendarController extends BaseController
             $groupedData[$judul][] = [
                 'jarum' => $val['jarum'],
                 'mesin' => $val['mesin'],
+                'sisa' => $val['sisa'],
                 'startmc' => $val['start_mesin'],
                 'stopmc' => $val['stop_mesin']
             ];
-            $jumlahMc += (int)$val['mesin'];
+            $jumlahMcOrder += (int)$val['mesin'];
+            $totalSisaOrder += (int)$val['sisa'];
+        }
+        foreach ($planningBooking as $val) {
+            $judul = $val['judul'];
+            if (!array_key_exists($judul, $groupedData)) {
+                $groupedData[$judul] = [];
+            }
+            $groupedData[$judul][] = [
+                'jarum' => $val['jarum'],
+                'mesin' => $val['mesin'],
+                'sisa' => $val['sisa'],
+                'startmc' => $val['start_mesin'],
+                'stopmc' => $val['stop_mesin']
+            ];
+            $jumlahMcBooking += (int)$val['mesin'];
+            $totalSisaBooking += (int)$val['sisa'];
         }
         $data = [
             'role' => session()->get('role'),
             session()->get('role') . '' => $groupedData,
-            'jumlahMc' => $jumlahMc,
+            'jumlahMcOrder' => $jumlahMcOrder,
+            'totalSisaBooking' => $totalSisaBooking,
+            'totalSisaOrder' => $totalSisaOrder,
+            'jumlahMcBooking' => $jumlahMcBooking,
             'judul' => $judul,
             'range' => $range,
             'tglplan' => $tgl_plan,
@@ -593,13 +663,15 @@ class CalendarController extends BaseController
             'active3' => '',
             'active4' => '',
             'active5' => '',
-            'active6' => '',
-            'active7' => 'active',
+            'active6' => 'active',
+            'active7' => '',
             'Jarum' => $dataJarum,
             'TotalMesin' => $totalMesin,
             'DaftarLibur' => $holidays,
             'kebutuhanMc' => $kebutuhanMC,
-            'chartstat' => $planning
+            'chartstat' => $planningOrder,
+            'order' => $planningOrder,
+            'booking' => $planningBooking
         ];
         return view(session()->get('role') . '/Calendar/detailbook', $data);
     }

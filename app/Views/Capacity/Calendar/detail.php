@@ -28,19 +28,7 @@
                             </div>
 
                         </div>
-                        <div class="row">
-                            <div class="col-lg-4 text-lg">
-                                Total Kebutuhan Mesin
-                            </div>
-                            <div class="col-lg-8 text-lg">
-                                <strong>
 
-                                    : <?= $jumlahMc ?> mesin
-
-                                </strong>
-                            </div>
-
-                        </div>
                         <div class="row">
                             <div class="col-lg-4 text-lg">
                                 Range Planning
@@ -57,38 +45,87 @@
                     </div>
                 </div>
                 <div class="table-responsive">
-
-                    <table class="table align-items-center mt-3" id="table">
-                        <thead class="bg-dark">
-                            <tr class="text-center text-white">
-                                <th class="text-white">Jarum</th>
-                                <th class="text-white">Kebutuhan Mesin</th>
-                                <th class="text-white">Start Mesin</th>
-                                <th class="text-white">Stop Mesin</th>
-                            </tr>
-
-                        </thead>
-                        <tbody>
-                            <?php foreach ($chartstat as $plan) : ?>
-
-                                <tr class="text-center">
-                                    <td>
-                                        <?= $plan['jarum'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $plan['mesin'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $plan['start_mesin'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $plan['stop_mesin'] ?>
-                                    </td>
+                    <?php if ($booking != null): ?>
+                        <h5 class="mt-3">
+                            Data Booking
+                        </h5>
+                        <table class="table align-items-center mt-3" id="tablebook">
+                            <thead class="bg-dark">
+                                <tr class="text-center text-white">
+                                    <th class="text-white">Jarum</th>
+                                    <th class="text-white">Sisa Booking</th>
+                                    <th class="text-white">Kebutuhan Mesin</th>
 
                                 </tr>
-                            <?php endforeach ?>
-                        </tbody>
-                    </table>
+
+                            </thead>
+                            <tbody>
+                                <?php foreach ($booking as $plan) : ?>
+
+                                    <tr class="text-center">
+                                        <td>
+                                            <?= $plan['jarum'] ?>
+                                        </td>
+                                        <td>
+                                            <?= $plan['sisa'] ?> dz
+                                        </td>
+                                        <td>
+                                            <?= $plan['mesin'] ?>
+                                        </td>
+
+                                    </tr>
+                                <?php endforeach ?>
+                            </tbody>
+                            <tfoot>
+                                <tr class="text-center">
+                                    <th>Total</th>
+                                    <th><?= $totalSisaBooking ?> dz</th>
+                                    <th><?= $jumlahMcBooking ?></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    <?php endif ?>
+                    <?php if ($order != null): ?>
+                        <h5 class="mt3">
+                            Data Order
+                        </h5>
+                        <table class="table align-items-center mt-3" id="table">
+                            <thead class="bg-dark">
+                                <tr class="text-center text-white">
+                                    <th class="text-white">Jarum</th>
+                                    <th class="text-white">Sisa Order</th>
+                                    <th class="text-white">Kebutuhan Mesin</th>
+
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                <?php foreach ($order as $plan) : ?>
+
+                                    <tr class="text-center">
+                                        <td>
+                                            <?= $plan['jarum'] ?>
+                                        </td>
+                                        <td>
+                                            <?= $plan['sisa'] ?> dz
+                                        </td>
+                                        <td>
+                                            <?= $plan['mesin'] ?>
+                                        </td>
+
+                                    </tr>
+                                <?php endforeach ?>
+                            </tbody>
+                            <tfoot>
+                                <tr class="text-center">
+                                    <th>Total</th>
+                                    <th><?= $totalSisaOrder ?> dz</th>
+                                    <th><?= $jumlahMcOrder ?></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    <?php endif ?>
+
                 </div>
 
             </div>
@@ -97,35 +134,6 @@
 
 </div>
 
-<div class="row my-3">
-    <div class="col-lg-12">
-        <div class="card z-index-2">
-            <div class="card-header pb-0">
-                <h6 class="card-title">Chart Kebutuhan Mesin <?= $judul ?></h6>
-
-            </div>
-            <div class="card-body p-3">
-                <div class="row">
-                    <div class="col-lg-6 col-md-6 border">
-                        Bar Chart
-                        <div class="chart">
-                            <canvas id="mixed-chart" class="chart-canvas" height="300"></canvas>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-6 border">
-                        <div class="form-label text-center">
-                            Pie Chart
-                        </div>
-                        <div class="chart">
-                            <canvas id="pie-chart" class="chart-canvas" height="300px"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-</div>
 
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script>

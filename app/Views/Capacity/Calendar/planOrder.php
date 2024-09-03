@@ -54,6 +54,10 @@
                                     <label for="jarum" class="form-control-label">Total Kebutuhan Mesin</label>
                                     <input class="form-control" type="text" value="<?= $totalKebutuhan ?>" id="totalMc" name="totalMc" readonly>
                                 </div>
+                                <div class="form-group">
+                                    <label for="jarum" class="form-control-label">Sisa Order</label>
+                                    <input class="form-control" type="text" value="<?= ceil($grandSisa) ?>" id="sisa" name="sisa" readonly>
+                                </div>
 
                                 <input type="date" value="<?= $start ?>" hidden name="startMc">
                                 <input type="date" value="<?= $end ?>" hidden name="stopMc">
@@ -138,6 +142,10 @@
                                 <tfoot>
                                     <tr>
                                         <th colspan="3" class="text-end"> Kebutuhan Bulan <?= $month ?> :</th>
+
+                                        <th>
+                                            <?= ceil($ranges['totalSisa']) ?> dz
+                                        </th>
                                         <th>
                                             <?= $ranges['kebutuhanMcPerbulan'] ?> Mesin
 
