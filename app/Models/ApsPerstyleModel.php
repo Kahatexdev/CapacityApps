@@ -210,6 +210,7 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $validate['no_model'])
             ->where('sisa <=', 0)
             ->where('size', $validate['style'])
+            ->orderBy('delivery', 'ASC')
             ->first();
     }
 
@@ -219,6 +220,7 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $validate['no_model'])
             ->where('sisa >', 0)
             ->where('size', $validate['style'])
+            ->orderBy('delivery', 'ASC')
             ->first();
     }
 
@@ -228,7 +230,21 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $validate['no_model'])
             ->where('sisa >', $validate['sisa'])
             ->where('size', $validate['style'])
+            ->orderBy('delivery', 'ASC')
             ->first();
+    }
+    public function getAllForModelStyleAndSize($validate)
+    {
+        return $this->where('mastermodel', $validate['no_model'])
+            ->where('size', $validate['style'])
+            ->orderBy('delivery', 'ASC') // Optional: sort berdasarkan delivery date, bisa diubah sesuai kebutuhan
+            ->findAll();
+    }
+
+    // Fungsi update sisa
+    public function updateSisa($id, $data)
+    {
+        return $this->update($id, $data);
     }
     public function getDetailPlanning($area, $jarum) // funtion ieu kudu diganti where na kade ulah poho
     {

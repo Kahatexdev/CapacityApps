@@ -299,11 +299,11 @@
                             </div>
                             <div class="form-group">
                                 <label for="awal">Awal</label>
-                                <input type="date" class="form-control" name="awal" required>
+                                <input type="date" class="form-control" name="awal">
                             </div>
                             <div class="form-group">
                                 <label for="awal">Akhir</label>
-                                <input type="date" class="form-control" name="akhir" required>
+                                <input type="date" class="form-control" name="akhir">
                             </div>
 
                     </div>
