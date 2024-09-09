@@ -741,6 +741,35 @@ class OrderController extends BaseController
         ];
         return view(session()->get('role') . '/Order/detailOrder', $data);
     }
+    public function detailPdk($noModel, $jarum)
+    {
+        $dataApsPerstyle = $this->ApsPerstyleModel->detailPdk($noModel, $jarum);
+        $pdk = $this->ApsPerstyleModel->getSisaPerDeliv($noModel, $jarum);
+        $sisaOrder = [];
+        $rekomendasiArea = [];
+
+        foreach ($pdk as $perjarum) {
+            $jarum = $perjarum['machinetypeid'];
+            $sisaOrder[$jarum] = $this->ApsPerstyleModel->getSisaOrderforRec($jarum, $start, $stop);
+        }
+        $dataMc = $this->jarumModel->getAreaModel($noModel);
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'dataAps' => $dataApsPerstyle,
+            'noModel' => $noModel,
+            'dataMc' => $dataMc,
+            'jarum' => $jarum,
+        ];
+        return view(session()->get('role') . '/Order/detailPdk', $data);
+    }
 
     public function orderBlmAdaAreal()
     {

@@ -73,6 +73,14 @@ class ApsPerstyleModel extends Model
             ->groupby('size, machinetypeid')
             ->findAll();
     }
+    public function detailPdk($noModel, $jarum)
+    {
+        return $this->select('idapsperstyle,mastermodel,no_order,country, smv, sum(sisa) as sisa, sum(qty) as qty, machinetypeid,size,delivery,seam,factory,production_unit')
+            ->where('mastermodel', $noModel)
+            ->where('machinetypeid', $jarum)
+            ->groupby(' delivery,size,')
+            ->findAll();
+    }
     public function detailModelJarum($noModel, $delivery, $jarum)
     {
         return $this->where('mastermodel', $noModel)
@@ -340,6 +348,15 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $model)
             ->where('sisa >', 0)
             ->groupby('machinetypeid')
+            ->findAll();
+    }
+    public function getSisaPerDeliv($model, $jarum)
+    {
+        return $this->select('sum(sisa) as sisa, delivery, mastermodel')
+            ->where('machinetypeid', $jarum)
+            ->where('mastermodel', $model)
+            ->where('sisa >', 0)
+            ->groupby('delivery')
             ->findAll();
     }
     public function getSisaOrderforRec($jarum, $start, $stop)
