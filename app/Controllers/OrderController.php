@@ -753,8 +753,8 @@ class OrderController extends BaseController
             $start = date('Y-m-d', strtotime('+3 days'));
             $stop = date('Y-m-d', strtotime($deliv . ' -3 days'));
             $sisaOrder[$deliv] = $this->ApsPerstyleModel->getSisaOrderforRec($jarum, $start, $stop);
-            dd($jarum);
         }
+        dd($jarum);
         $usedCapacitydaily = [];
         foreach ($sisaOrder as $delivDate => $orders) {
             foreach ($orders as $order) {
