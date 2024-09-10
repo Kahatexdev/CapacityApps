@@ -31,15 +31,36 @@ error_reporting(E_ALL); ?>
 
             <div class="card">
                 <div class="card-header">
-                    <div class="row d-flex justify-content-between">
-                        <h5>
-                            Detail Data Model <?= $noModel ?> Jarum <?= $jarum ?>
-                        </h5>
-                        <div>
-                            <button type="button" class="btn bg-gradient-success btn-recomend" data-model=" <?= $noModel ?>" data-toggle="modal" data-target="#ModalRecomend"> Area Recomendation</button>
-                            <button type="button" class="btn bg-gradient-warning btn-assign" data-toggle="modal" data-target="#ModalAssign"> Arahkan Ke Areal</button>
-                            <a href="<?= base_url($role . '/blmAdaArea/') ?>" class="btn bg-gradient-info"> Kembali</a>
+                    <div class="row justify-content-between align-items-center mb-3">
+                        <div class="col-auto">
+                            <h5>
+                                Detail Data Model <?= esc($noModel) ?> Jarum <?= esc($jarum) ?>
+                            </h5>
                         </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn bg-gradient-warning btn-assign" data-toggle="modal" data-target="#ModalAssign">
+                                Arahkan Ke Areal
+                            </button>
+                            <a href="<?= base_url($role . '/blmAdaArea/') ?>" class="btn bg-gradient-info">Kembali</a>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <h6>Recomended Area</h6>
+                        <?php foreach ($rekomendasi as $rec => $data): ?>
+                            <div class="col-md-4">
+                                <?php if (date(strtotime($rec)) > date(strtotime('today'))): ?>
+                                    <ul>
+                                        Delivery : <?= $rec ?>
+                                        <?php foreach ($data as $val): ?>
+                                            <li>Area : <?= $val['factory']; ?></li>
+                                            Kapasitas Tersedia : <?= $val['sisa_kapasitas']; ?>
+                                        <?php endforeach
+                                        ?>
+                                    </ul>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach ?>
                     </div>
 
                 </div>
@@ -72,9 +93,7 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm"><?= $order['seam']; ?></td>
                                             <td class="text-sm"><?= $order['factory']; ?></td>
                                             <td class="text-sm">
-                                                <button type="button" class="btn btn-warning btn-sm split-btn" data-toggle="modal" data-target="#splitModal" data-id="<?= $order['idapsperstyle']; ?>" data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>" data-jarum="<?= $order['machinetypeid']; ?>" data-style="<?= $order['size']; ?>" data-qty="<?= $order['qty']; ?>" data-sisa="<?= $order['sisa']; ?>" data-seam="<?= $order['seam']; ?>" data-factory="<?= $order['factory']; ?>" data-smv=" <?= $order['smv']; ?> " data-order=" <?= $order['no_order']; ?> " data-country=" <?= $order['country']; ?> ">
-                                                    Split
-                                                </button>
+
                                                 <button type=" button" class="btn btn-info btn-sm edit-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $order['idapsperstyle']; ?>" data-area="<?= $order['factory']; ?>" data-pdk="<?= $order['mastermodel']; ?>" data-deliv="<?= $order['delivery']; ?>">
                                                     Edit Area
                                                 </button>

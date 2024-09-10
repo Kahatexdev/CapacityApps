@@ -753,6 +753,7 @@ class OrderController extends BaseController
             $start = date('Y-m-d', strtotime('+3 days'));
             $stop = date('Y-m-d', strtotime($deliv . ' -3 days'));
             $sisaOrder[$deliv] = $this->ApsPerstyleModel->getSisaOrderforRec($jarum, $start, $stop);
+            dd($jarum);
         }
         $usedCapacitydaily = [];
         foreach ($sisaOrder as $delivDate => $orders) {
@@ -762,7 +763,6 @@ class OrderController extends BaseController
                 $delivDate = new DateTime($order['delivery']);
                 $time = $startMc->diff($delivDate);
                 $leadtime = $time->days;
-
                 // Hitung sisa kapasitas per hari
                 $sisaPerHari = $sisa / $leadtime;
                 // Grouping berdasarkan factory per jarum
