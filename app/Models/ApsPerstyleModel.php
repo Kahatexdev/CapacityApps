@@ -73,11 +73,12 @@ class ApsPerstyleModel extends Model
             ->groupby('size, machinetypeid')
             ->findAll();
     }
-    public function detailPdk($noModel, $jarum)
+    public function detailPdk($noModel, $jarum, $delivery)
     {
         return $this->select('idapsperstyle,mastermodel,no_order,country, smv, sum(sisa) as sisa, sum(qty) as qty, machinetypeid,size,delivery,seam,factory,production_unit')
             ->where('mastermodel', $noModel)
             ->where('machinetypeid', $jarum)
+            ->where('delivery', $delivery)
             ->groupby(' delivery,size,')
             ->findAll();
     }
@@ -149,8 +150,10 @@ class ApsPerstyleModel extends Model
     public function asignareal($data)
     {
         $this->set('factory', $data['area'])
+            ->set('production_unit', $data['pu'])
             ->where('mastermodel', $data['mastermodel'])
             ->where('machinetypeid', $data['jarum'])
+            ->where('delivery', $data['delivery'])
             ->update();
 
         return $this->affectedRows();
@@ -352,12 +355,24 @@ class ApsPerstyleModel extends Model
     }
     public function getSisaPerDeliv($model, $jarum)
     {
-        return $this->select('sum(sisa) as sisa, delivery, mastermodel')
+        return $this->select('sum(sisa) as sisa,sum(qty) as qty, delivery, mastermodel')
             ->where('machinetypeid', $jarum)
             ->where('mastermodel', $model)
-            ->where('sisa >', 0)
+            ->where('sisa >=', 0)
             ->groupby('delivery')
             ->findAll();
+    }
+    public function getSisaPerDlv($model, $jarum, $deliv)
+    {
+        $sisa = $this->select('idapsperstyle,mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,factory, production_unit, delivery')
+            ->where('machinetypeid', $jarum)
+            ->where('mastermodel', $model)
+            ->where('delivery', $deliv)
+            ->where('sisa >=', 0)
+            ->groupBy('size')
+            ->findAll();
+        $final = reset($sisa);
+        return $sisa;
     }
     public function getSisaOrderforRec($jarum, $start, $stop)
     {
@@ -441,6 +456,13 @@ class ApsPerstyleModel extends Model
             ->where('delivery>=', $cek['start'])
             ->where('delivery<=', $cek['end'])
             ->groupBy('machinetypeid')
+            ->findAll();
+    }
+    public function getIdByDeliv($pdk, $size, $deliv)
+    {
+        return $this->select('idapsperstyle')
+            ->where('mastermodel', $pdk)
+            ->where('size', $size)
             ->findAll();
     }
 }

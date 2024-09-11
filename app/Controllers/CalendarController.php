@@ -203,9 +203,7 @@ class CalendarController extends BaseController
             $greatSisa = 0;
             foreach ($planMc as $weekData) {
                 if (isset($weekData['totalSisa'])) {
-                    if ($weekData['totalSisa'] > $greatSisa) {
-                        $greatSisa = $weekData['totalSisa'];
-                    }
+                    $greatSisa += $weekData['totalSisa'];
                 }
             }
 
