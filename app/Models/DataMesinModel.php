@@ -437,4 +437,12 @@ class DataMesinModel extends Model
             ->orderBy("CASE {$caseStatement} ELSE 999 END", 'DESC')
             ->findAll();
     }
+    public function mesinPerArea($jarum, $area)
+    {
+        return $this->select('sum(total_mc) as totalMesin, target, area')
+            ->where('jarum', $jarum)
+            ->where('area', $area)
+            ->get()
+            ->getResultArray();
+    }
 }

@@ -355,7 +355,7 @@ class ApsPerstyleModel extends Model
     }
     public function getSisaPerDeliv($model, $jarum)
     {
-        return $this->select('sum(sisa) as sisa,sum(qty) as qty, delivery, mastermodel')
+        return $this->select('sum(sisa) as sisa,sum(qty) as qty, delivery, mastermodel,smv')
             ->where('machinetypeid', $jarum)
             ->where('mastermodel', $model)
             ->where('sisa >=', 0)
@@ -464,5 +464,19 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $pdk)
             ->where('size', $size)
             ->findAll();
+    }
+    public function rekomenarea($noModel, $jarum)
+    {
+        $this->select('size, delivery, smv, SUM(sisa) AS sisa, size, 
+        DATEDIFF(DATE_SUB(delivery, INTERVAL 7 DAY), DATE_ADD(CURDATE(), INTERVAL 7 DAY)) - 
+        (SELECT COUNT(tanggal) FROM data_libur WHERE tanggal BETWEEN DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND DATE_SUB(apsperstyle.delivery, INTERVAL 7 DAY)) AS totalhari');
+        $this->where('machinetypeid', $jarum)
+            ->where('mastermodel', $noModel)
+            ->where('production_unit !=', 'MAJALAYA');
+        $this->where('sisa >', 0);
+        $this->groupBy('smv, mastermodel, delivery');
+        $this->orderBy('delivery');
+
+        return $this->get()->getResultArray();
     }
 }

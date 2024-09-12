@@ -744,13 +744,9 @@ class OrderController extends BaseController
     public function detailPdk($noModel, $jarum)
     {
         $pdk = $this->ApsPerstyleModel->getSisaPerDeliv($noModel, $jarum);
-        $dataApsPerstyle = [];
         $sisaPerDeliv = [];
         foreach ($pdk as $perdeliv) {
             $deliv = $perdeliv['delivery'];
-            $dataApsPerstyle[$deliv] = $this->ApsPerstyleModel->detailPdk($noModel, $jarum, $deliv);
-            $start = date('Y-m-d', strtotime('+3 days'));
-            $stop = date('Y-m-d', strtotime($deliv . ' -7 days'));
             $sisaPerDeliv[$deliv] = $this->ApsPerstyleModel->getSisaPerDlv($noModel, $jarum, $deliv);
         }
         foreach ($sisaPerDeliv as $deliv => $list) {
@@ -766,7 +762,73 @@ class OrderController extends BaseController
             }
             $sisaPerDeliv[$deliv]['totalQty'] = $totalqty;
         }
+        // ini ngambil jumlah qty
+        $sisaArray = array_column($pdk, 'sisa');
+        $maxValue = max($sisaArray);
+        $indexMax = array_search($maxValue, $sisaArray);
+        $totalQty = 0;
+        for ($i = 0; $i <= $indexMax; $i++) {
+            $totalQty += $sisaArray[$i];
+        }
 
+        // ini ngambil jumlah hari
+        usort($pdk, function ($a, $b) {
+            return strtotime($a['delivery']) - strtotime($b['delivery']);
+        });
+        $totalQty = round($totalQty / 24);
+        $deliveryTerjauh = end($pdk)['delivery'];
+        $today = new DateTime(date('Y-m-d')); // Hari ini
+        $deliveryDate = new DateTime($deliveryTerjauh); // Tanggal delivery terjauh
+        $diff = $today->diff($deliveryDate);
+        $hari = $diff->days - 7;
+
+        // disini ngambil rata rata target.
+        $smvArray = array_column($pdk, 'smv');
+        $smvArray = array_map('intval', $smvArray);
+        $averageSmv = array_sum($smvArray) / count($smvArray);
+        $target = round((86400 / (intval($averageSmv))) * 0.8 / 24);
+
+        // ini baru kalkulasi
+        $mesin = round($totalQty / $target / $hari);
+        $targetPerhari = round($mesin * $target);
+
+
+        // ini bagian rekomendasi (hard bgt bjir)
+        $start = date('Y-m-d', strtotime('+7 days'));
+        $rekomen = $this->ApsPerstyleModel->getSisaOrderforRec($jarum, $start, $deliveryTerjauh);
+        $rekomendasi = [];
+        foreach ($rekomen as $rec) {
+            $sisa = round($rec['sisa'] / 24);
+            $area = $rec['factory'];
+            $mesinPerarea = $this->jarumModel->mesinPerArea($jarum, $area);
+
+            if (!empty($mesinPerarea)) {
+                $target = $mesinPerarea[0]['target'];
+                $totalMesin = $mesinPerarea[0]['totalMesin'];
+                $kapasitasPerhari = ($target * $totalMesin);
+                $usedCapacityDaily = round($sisa / $hari);
+                $availCapacityDaily = $kapasitasPerhari - $usedCapacityDaily;
+
+                // Tetap simpan area, tapi label avail sebagai 'N/A' jika kapasitas avail kurang dari target
+                $avail = ($availCapacityDaily >= $targetPerhari) ? $availCapacityDaily : 'Only ' . $availCapacityDaily;
+
+                $rekomendasi[$area] = [
+                    'area' => $area,
+                    'max' => $kapasitasPerhari,
+                    'used' => $usedCapacityDaily,
+                    'avail' => $avail
+                ];
+            }
+        }
+        usort($rekomendasi, function ($a, $b) {
+            // Handle string "Only" vs angka
+            if (is_string($a['avail'])) return 1; // Push "Only" ke belakang
+            if (is_string($b['avail'])) return -1; // Push "Only" ke belakang
+
+            // Jika keduanya angka, bandingkan nilai 'avail'
+            return $b['avail'] <=> $a['avail'];
+        });
+        $top3Rekomendasi = array_slice($rekomendasi, 0, 3);
 
         $dataMc = $this->jarumModel->getAreaModel($noModel);
         $data = [
@@ -781,10 +843,13 @@ class OrderController extends BaseController
             'active7' => '',
             'order' => $sisaPerDeliv,
             'headerRow' => $pdk,
-            'dataAps' => $dataApsPerstyle,
             'noModel' => $noModel,
             'dataMc' => $dataMc,
             'jarum' => $jarum,
+            'kebMesin' => $mesin,
+            'target' => $targetPerhari,
+            'hari' => $hari,
+            'rekomendasi' => $top3Rekomendasi
         ];
         return view(session()->get('role') . '/Order/detailPdk', $data);
     }

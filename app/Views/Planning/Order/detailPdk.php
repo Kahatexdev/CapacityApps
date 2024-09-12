@@ -46,7 +46,7 @@ error_reporting(E_ALL); ?>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <h6>
                                 Qty Order Perdelivery
                             </h6>
@@ -54,10 +54,37 @@ error_reporting(E_ALL); ?>
                                 <li><?= date('d M Y', strtotime($val['delivery']))  ?> : <?= round($val['qty'] / 24) ?> dz</li>
                             <?php endforeach ?>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <h6>Summarize <?= $noModel ?> <?= $jarum ?></h6>
+                            <li>Machine Requirments : <?= $kebMesin ?> Machine</li>
+                            <li>Duration : <?= $hari ?> days </li>
+                            <li>Daily Target : <?= $target ?> dz/day</li>
+
+                        </div>
+                        <div class="col-md-4">
                             <h6>Recomended Area</h6>
+                            <ol>
+                                <?php foreach ($rekomendasi as $val): ?>
 
+                                    <li><?= strtoupper($val['area']) ?></li>
+                                    <ul>
+                                        <li>
+                                            Maximum Capacity : <?= $val['max'] ?> dz/day
+                                        </li>
+                                        <li>
+                                            Used : <?= $val['used'] ?> dz
+                                        </li>
+                                        <li>
 
+                                            Availabel Capacity :
+                                            <?php if (is_string($val['avail'])): ?> <span class="badge bg-warning"><?= $val['avail'] ?> dz</span>
+                                            <?php else: ?> <span class="badge bg-info"> <?= $val['avail'] ?> dz</span>
+                                            <?php endif ?>
+                                        </li>
+                                    </ul>
+
+                                <?php endforeach ?>
+                            </ol>
 
                         </div>
 
