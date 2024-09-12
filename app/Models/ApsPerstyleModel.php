@@ -73,6 +73,15 @@ class ApsPerstyleModel extends Model
             ->groupby('size, machinetypeid')
             ->findAll();
     }
+    public function detailPdk($noModel, $jarum, $delivery)
+    {
+        return $this->select('idapsperstyle,mastermodel,no_order,country, smv, sum(sisa) as sisa, sum(qty) as qty, machinetypeid,size,delivery,seam,factory,production_unit')
+            ->where('mastermodel', $noModel)
+            ->where('machinetypeid', $jarum)
+            ->where('delivery', $delivery)
+            ->groupby(' delivery,size,')
+            ->findAll();
+    }
     public function detailModelJarum($noModel, $delivery, $jarum)
     {
         return $this->where('mastermodel', $noModel)
@@ -141,8 +150,10 @@ class ApsPerstyleModel extends Model
     public function asignareal($data)
     {
         $this->set('factory', $data['area'])
+            ->set('production_unit', $data['pu'])
             ->where('mastermodel', $data['mastermodel'])
             ->where('machinetypeid', $data['jarum'])
+            ->where('delivery', $data['delivery'])
             ->update();
 
         return $this->affectedRows();
@@ -210,6 +221,7 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $validate['no_model'])
             ->where('sisa <=', 0)
             ->where('size', $validate['style'])
+            ->orderBy('delivery', 'ASC')
             ->first();
     }
 
@@ -219,6 +231,7 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $validate['no_model'])
             ->where('sisa >', 0)
             ->where('size', $validate['style'])
+            ->orderBy('delivery', 'ASC')
             ->first();
     }
 
@@ -228,7 +241,21 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $validate['no_model'])
             ->where('sisa >', $validate['sisa'])
             ->where('size', $validate['style'])
+            ->orderBy('delivery', 'ASC')
             ->first();
+    }
+    public function getAllForModelStyleAndSize($validate)
+    {
+        return $this->where('mastermodel', $validate['no_model'])
+            ->where('size', $validate['style'])
+            ->orderBy('delivery', 'ASC') // Optional: sort berdasarkan delivery date, bisa diubah sesuai kebutuhan
+            ->findAll();
+    }
+
+    // Fungsi update sisa
+    public function updateSisa($id, $data)
+    {
+        return $this->update($id, $data);
     }
     public function getDetailPlanning($area, $jarum) // funtion ieu kudu diganti where na kade ulah poho
     {
@@ -326,6 +353,27 @@ class ApsPerstyleModel extends Model
             ->groupby('machinetypeid')
             ->findAll();
     }
+    public function getSisaPerDeliv($model, $jarum)
+    {
+        return $this->select('sum(sisa) as sisa,sum(qty) as qty, delivery, mastermodel')
+            ->where('machinetypeid', $jarum)
+            ->where('mastermodel', $model)
+            ->where('sisa >=', 0)
+            ->groupby('delivery')
+            ->findAll();
+    }
+    public function getSisaPerDlv($model, $jarum, $deliv)
+    {
+        $sisa = $this->select('idapsperstyle,mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,factory, production_unit, delivery')
+            ->where('machinetypeid', $jarum)
+            ->where('mastermodel', $model)
+            ->where('delivery', $deliv)
+            ->where('sisa >=', 0)
+            ->groupBy('size')
+            ->findAll();
+        $final = reset($sisa);
+        return $sisa;
+    }
     public function getSisaOrderforRec($jarum, $start, $stop)
     {
         $maxDeliv = date('Y-m-d', strtotime($start . '+90 Days'));
@@ -408,6 +456,13 @@ class ApsPerstyleModel extends Model
             ->where('delivery>=', $cek['start'])
             ->where('delivery<=', $cek['end'])
             ->groupBy('machinetypeid')
+            ->findAll();
+    }
+    public function getIdByDeliv($pdk, $size, $deliv)
+    {
+        return $this->select('idapsperstyle')
+            ->where('mastermodel', $pdk)
+            ->where('size', $size)
             ->findAll();
     }
 }

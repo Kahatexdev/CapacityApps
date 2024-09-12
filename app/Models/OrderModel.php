@@ -129,11 +129,9 @@ class OrderModel extends Model
         $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
         $builder->where('factory', "Belum Ada Area");
         $builder->where('delivery >', $nextweek);
-        $builder->groupBy('delivery');
-        $builder->groupBy('data_model.no_model');
+        $builder->groupBy('data_model.no_model, apsperstyle.machinetypeid');
         $builder->orderby('created_at', 'desc');
         $builder->orderby('no_model', 'asc');
-        $builder->orderby('delivery', 'asc');
 
 
         return $builder->get()->getResultArray();

@@ -741,6 +741,53 @@ class OrderController extends BaseController
         ];
         return view(session()->get('role') . '/Order/detailOrder', $data);
     }
+    public function detailPdk($noModel, $jarum)
+    {
+        $pdk = $this->ApsPerstyleModel->getSisaPerDeliv($noModel, $jarum);
+        $dataApsPerstyle = [];
+        $sisaPerDeliv = [];
+        foreach ($pdk as $perdeliv) {
+            $deliv = $perdeliv['delivery'];
+            $dataApsPerstyle[$deliv] = $this->ApsPerstyleModel->detailPdk($noModel, $jarum, $deliv);
+            $start = date('Y-m-d', strtotime('+3 days'));
+            $stop = date('Y-m-d', strtotime($deliv . ' -7 days'));
+            $sisaPerDeliv[$deliv] = $this->ApsPerstyleModel->getSisaPerDlv($noModel, $jarum, $deliv);
+        }
+        foreach ($sisaPerDeliv as $deliv => $list) {
+            $totalqty = 0;
+            $qty = 0;
+            if (is_array($list)) {
+                foreach ($list as $val) {
+                    if (isset($val['sisa'])) {
+                        $qty += $val['qty'];
+                        $totalqty = $qty;
+                    }
+                }
+            }
+            $sisaPerDeliv[$deliv]['totalQty'] = $totalqty;
+        }
+
+
+        $dataMc = $this->jarumModel->getAreaModel($noModel);
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'order' => $sisaPerDeliv,
+            'headerRow' => $pdk,
+            'dataAps' => $dataApsPerstyle,
+            'noModel' => $noModel,
+            'dataMc' => $dataMc,
+            'jarum' => $jarum,
+        ];
+        return view(session()->get('role') . '/Order/detailPdk', $data);
+    }
 
     public function orderBlmAdaAreal()
     {

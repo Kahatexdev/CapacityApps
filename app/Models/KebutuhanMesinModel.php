@@ -119,4 +119,11 @@ class KebutuhanMesinModel extends Model
             ->orderBy('total_mc', 'Desc')
             ->findAll();
     }
+    public function cekData($cek)
+    {
+        return $this->where('judul', $cek['judul'])
+            ->where('jarum', $cek['jarum'])
+            ->where('deskripsi', $cek['desk'])
+            ->first();
+    }
 }

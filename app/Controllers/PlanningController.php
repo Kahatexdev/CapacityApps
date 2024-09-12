@@ -105,18 +105,31 @@ class PlanningController extends BaseController
 
     public function assignareal()
     {
-        $data = [
-            'role' => session()->get('role'),
-            'mastermodel' => $this->request->getPost("no_model"),
-            'jarum' => $this->request->getPost("jarum"),
-            'area' => $this->request->getPost("area"),
-        ];
-        $assign = $this->ApsPerstyleModel->asignAreal($data);
-        if ($assign) {
-            return redirect()->to(base_url(session()->get('role') . '/dataorder/'))->withInput()->with('success', 'Berhasil Assign Area');
+        $deliv = $this->request->getPost('delivery');
+        $pdk = $this->request->getPost("no_model");
+        $jarum = $this->request->getPost("jarum");
+        $area = $this->request->getPost("area");
+        if (strpos($area, 'kk' !== 'false')) {
+            $pu = 'CJ';
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/dataorder/'))->withInput()->with('error', 'Gagal Assign Area');
+            $pu = 'MJ';
         }
+        foreach ($deliv as $del) {
+            $data = [
+                'role' => session()->get('role'),
+                'mastermodel' => $pdk,
+                'jarum' => $jarum,
+                'area' => $area,
+                'delivery' => $del,
+                'pu' => $pu
+            ];
+            $assign = $this->ApsPerstyleModel->asignAreal($data);
+            if (!$assign) {
+                dd($data);
+                return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $pdk . '/' . $jarum))->withInput()->with('error', 'Gagal Assign Area');
+            }
+        }
+        return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $pdk . '/' . $jarum))->withInput()->with('success', 'Berhasil Assign Area');
     }
     public function assignarealall()
     {
@@ -327,16 +340,25 @@ class PlanningController extends BaseController
     }
     public function editarea()
     {
-        $id = $this->request->getPost('id');
         $area = $this->request->getPost('area');
-        $pdk = $this->request->getPost('pdk');
-        $deliv = $this->request->getPost('deliv');
-        $update = $this->ApsPerstyleModel->update($id, ['factory' => $area]);
-        if ($update) {
-            return redirect()->to(base_url(session()->get('role') . '/detailModelPlanning/' . $pdk . '/' . $deliv))->withInput()->with('success', 'Berhasil Mengubah Area');
+        if (strpos($area, 'kk' !== 'false')) {
+            $pu = 'CJ';
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/detailModelPlanning/' . $pdk . '/' . $deliv))->withInput()->with('error', 'Gagal Mengubah Area');
+            $pu = 'MJ';
         }
+        $pdk = $this->request->getPost('pdk');
+        $size = $this->request->getPost('size');
+        $deliv = $this->request->getPost('deliv');
+        $id = $this->ApsPerstyleModel->getIdByDeliv($pdk, $size, $deliv);
+        $jarum = $this->request->getPost('jarum');
+        foreach ($id as $i) {
+            $aps = $i['idapsperstyle'];
+            $update = $this->ApsPerstyleModel->update($aps, ['factory' => $area, 'production_unit' => $pu]);
+            if (!$update) {
+                return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $pdk . '/' . $jarum))->withInput()->with('error', 'Gagal Mengubah Area');
+            }
+        }
+        return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $pdk . '/' . $jarum))->withInput()->with('success', 'Berhasil Mengubah Area');
     }
     public function jalanmesin()
     {
