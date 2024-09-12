@@ -14,7 +14,7 @@ class DataMesinModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_data_mesin', 'area', 'jarum', 'total_mc', 'brand', 'mesin_jalan', 'aliasjarum`'];
+    protected $allowedFields    = ['id_data_mesin', 'area', 'jarum', 'total_mc', 'brand', 'mesin_jalan', 'aliasjarum', 'target'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -241,9 +241,23 @@ class DataMesinModel extends Model
     {
         return $this->select('aliasjarum, jarum')->like('aliasjarum', 'Mens Comp N156')->groupBy('aliasjarum')->findAll();
     }
-    public function getAllBrand($aliasjarum)
+    public function getTotalMcPerBrand($brand, $aliasjarum)
     {
-        return $this->select('brand, jarum, SUM(total_mc) AS total_mc, SUM(mesin_jalan) AS mesin_jalan, SUM(IF(pu="CJ", total_mc, 0)) AS cj, SUM(IF(pu="MJ", total_mc, 0)) AS mj')->where('aliasjarum', $aliasjarum)->groupBy('brand')->findAll();
+        // return 
+        $query = $this->select('jarum, SUM(total_mc) as total_mc, SUM(mesin_jalan) as running, SUM(CASE WHEN pu = "CJ" THEN total_mc ELSE 0 END) AS cj, SUM(CASE WHEN pu = "MJ" THEN total_mc ELSE 0 END) AS mj, target')
+            ->where('aliasjarum', $aliasjarum) // Kondisi where untuk aliasjarum
+            ->where('brand LIKE', '%' . $brand . '%') // Kondisi where untuk brand
+            ->orderBy('brand') // Urutkan berdasarkan "brand"
+            ->get();
+
+        $result = $query->getResultArray(); // Mengambil hasil sebagai array
+
+        // Jika hasil query kosong, kembalikan array kosong
+        return !empty($result) ? $result : [];
+    }
+    public function getTotalMcPerAliasJrm($aliasjarum)
+    {
+        return $result = $this->select('SUM(total_mc) as total_mc, SUM(IF(pu = "cj", mesin_jalan, 0)) AS total_running, SUM(CASE WHEN pu="CJ" THEN total_mc ELSE 0 END) AS total_cj, SUM(CASE WHEN pu="MJ" THEN total_mc ELSE 0 END)AS total_mj,')->where('aliasjarum', $aliasjarum)->where('pu!=', 'MJ')->get()->getRow();
     }
     public function getBrand($jarum, $brand)
     {
@@ -436,5 +450,13 @@ class DataMesinModel extends Model
             ->groupBy('aliasjarum')
             ->orderBy("CASE {$caseStatement} ELSE 999 END", 'DESC')
             ->findAll();
+    }
+
+    public function getJrmByAliasjrm($aliasjarum)
+    {
+        $result = $this->select('jarum')->where('aliasjarum', $aliasjarum)->get()->getRow();
+
+        // Periksa apakah hasilnya ada sebelum mengembalikannya
+        return $result ? $result->jarum : 0; // Mengembalikan total_mc jika ada, jika tidak, kembalikan 0 atau nilai default lainnya
     }
 }

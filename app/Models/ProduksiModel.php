@@ -170,4 +170,30 @@ class ProduksiModel extends Model
         $plus = reset($po);
         return $plus;
     }
+    public function resetQtyBs($idaps)
+    {
+        foreach ($idaps as $idap) {
+            $this->db->table($this->table)
+                ->set('bs_prod', 0)  // Mengurangi nilai kolom sisa dengan qtyBs
+                ->where('idapsperstyle', $idap)
+                ->update();
+        }
+    }
+    public function getBsProd($idap, $bs)
+    {
+        $result = $this->select('bs_prod')
+            ->where('idapsperstyle', $idap)
+            ->where('bs_prod >=', $bs)
+            ->first();
+
+        // Mengembalikan hasil sebagai string
+        return isset($result['bs_prod']) ? (string) $result['bs_prod'] : '';
+    }
+    public function updateBsProd($idap, $newBs)
+    {
+        $this->db->table($this->table)
+            ->set('bs_prod', $newBs)
+            ->where('idapsperstyle', $idap)
+            ->update();
+    }
 }
