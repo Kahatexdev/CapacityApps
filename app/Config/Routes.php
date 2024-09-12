@@ -118,8 +118,9 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('getTypebyJarum', 'BookingController::getTypebyJarum');
 
     $routes->get('sales', 'SalesController::index');
+    $routes->post('sales/position', 'SalesController::index');
     // $routes->get('exportsales', 'ExcelController::export');
-    $routes->get('exportsales/(:any)', 'SalesController::exportExcelByJarum/$1');
+    $routes->post('exportsales', 'SalesController::exportExcelByJarum');
     $routes->get('generatesales', 'SalesController::generateExcel');
 
     //target
@@ -442,6 +443,8 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('datadeffect', 'DeffectController::datadeffect');
     $routes->post('inputKode', 'DeffectController::inputKode');
     $routes->post('viewDataBs', 'DeffectController::viewDataBs');
+    $routes->post('resetbspdk', 'DeffectController::resetbs');
+    $routes->post('resetbsarea', 'DeffectController::resetbsarea');
 
     // usermanageement
     $routes->get('account', 'GodController::account');

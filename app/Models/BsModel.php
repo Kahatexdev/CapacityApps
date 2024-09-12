@@ -105,4 +105,37 @@ class BsModel extends Model
             ->orderBy('qty', 'DESC')
             ->findAll();
     }
+    public function getTotalBs($idaps)
+    {
+        return $this->select('idapsperstyle, SUM(qty) AS qty')
+            ->whereIn('idapsperstyle', $idaps)
+            ->groupBy('idapsperstyle')
+            ->findAll(); // Ambil satu hasil
+    }
+    public function getQtyBs($idaps)
+    {
+        return $this->select('idapsperstyle, qty')
+            ->whereIn('idapsperstyle', $idaps)
+            ->findAll(); // Ambil satu hasil
+    }
+    public function deleteSesuai(array $idaps)
+    {
+        return $this->whereIn('idapsperstyle', $idaps)->delete();
+    }
+    public function getDataForReset($area, $awal, $akhir)
+    {
+        $results = $this->select('idapsperstyle')
+            ->where('area', $area)
+            ->where('tgl_instocklot >=', $awal)
+            ->where('tgl_instocklot <=', $akhir)
+            ->findAll();
+        return array_column($results, 'idapsperstyle');
+    }
+    public function deleteBSArea($area, $awal, $akhir)
+    {
+        return $this->where('area', $area)
+            ->where('tgl_instocklot >=', $awal)
+            ->where('tgl_instocklot <=', $akhir)
+            ->delete();
+    }
 }

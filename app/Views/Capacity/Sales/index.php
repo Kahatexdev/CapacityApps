@@ -1,109 +1,125 @@
 <?php $this->extend($role . '/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
             <div class="card">
                 <div class="card-body p-3">
-                    <form action="<?= base_url($role . '/sales') ?>" method="get">
-                        <div class="row">
-                            <div class="col-5">
-                                <div class="numbers">
-                                    <h5 class="font-weight-bolder mb-0">
-                                        Sales Position
-                                    </h5>
-                                </div>
+                    <div class="row">
+                        <div class="col-5">
+                            <div class="numbers">
+                                <h5 class="font-weight-bolder mb-0">
+                                    Sales Position
+                                </h5>
                             </div>
-                            <div class="col-3 d-flex flex-column align-items-end">
+                        </div>
+                        <div class="col-3 d-flex flex-column align-items-end">
+                            <form action="<?= base_url($role . '/sales/position') ?>" method="POST">
                                 <select name=" aliasjarum" class="form-control">
                                     <option value="">Pilih Jarum</option>
                                     <?php if (!empty($dataJarum)) : ?>
                                         <?php foreach ($dataJarum as $jrm) : ?>
-                                            <option value="<?= $jrm['aliasjarum'] ?>"><?= $jrm['aliasjarum'] ?></option>
+                                            <option value="<?= $jrm['aliasjarum'] ?>" name="aliasjarum"><?= $jrm['aliasjarum'] ?></option>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
                                 </select>
-                            </div>
-                            <div class="col-4">
-                                <button type=" submit" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md">OK</button>
-                                <a href="<?= base_url($role . '/generatesales') ?>" class="btn btn-sm bg-gradient-success shadow text-center border-radius-md">Generate Excel</a>
-                                <?php if (!empty($_GET['aliasjarum'])) :
-                                    $aliasjarum = $_GET['aliasjarum']; ?>
-                                    <a href="<?= base_url($role . '/exportsales/' . $aliasjarum) ?>" class="btn btn-sm bg-gradient-success shadow text-center border-radius-md">Export Excel</a>
-                                <?php endif; ?>
-                            </div>
                         </div>
-                    </form>
+                        <div class="col-4">
+                            <button type=" submit" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md">OK</button>
+                            </form>
+                            <a href="<?= base_url($role . '/generatesales') ?>" class="btn btn-sm bg-gradient-success shadow text-center border-radius-md">Generate Excel</a>
+                            <?php if (!empty($aliasjarum)) : ?>
+                                <form action="<?= base_url($role . '/exportsales') ?>" method="post">
+                                    <input type="text" value="<?= $aliasjarum ?>" name="aliasjarum" hidden>
+                                    <button type="submit" class="btn btn-sm bg-gradient-success shadow text-center border-radius-md">Export Excel</button>
+                                </form>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <?php if (!empty($_GET['aliasjarum'])) : ?>
+    <?php if (!empty($aliasjarum)) : ?>
         <div class="card-body p-3">
             <div class="row">
                 <div class="card">
                     <div class="card-body">
                         <div class="table-responsive">
-                            <h4 class="text-center"><span><?= $_GET['aliasjarum'] ?></span></h4>
+                            <h4 class="text-center"><span><?= $aliasjarum ?></span></h4>
                             <table id="example" class="table table-border" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Machine</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Jumlah</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Running</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Stock Cylinder</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">CJ</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">MJ</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Prod 28days (CJ)</th>
+                                        <th class="text-xs font-weight-bolder" style="text-align: center;">Machine</th>
+                                        <th class="text-xs font-weight-bolder" style="text-align: center;">Jumlah</th>
+                                        <th class="text-xs font-weight-bolder" style="text-align: center;">Running</th>
+                                        <th class="text-xs font-weight-bolder" style="text-align: center;">Stock Cylinder</th>
+                                        <th class="text-xs font-weight-bolder" style="text-align: center;">CJ</th>
+                                        <!-- <th class="text-xs font-weight-bolder" style="text-align: center;">MJ</th> -->
+                                        <th class="text-xs font-weight-bolder" style="text-align: center;">Prod 28days</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php if (!empty($dataMesin)) : ?>
-                                        <?php
-                                        $total_mc = 0;
-                                        $total_running = 0;
-                                        $total_cj = 0;
-                                        $total_mj = 0;
-                                        $totalProd28 = 0;
-                                        foreach ($dataMesin as $mc) :
-                                            // Hitung total untuk setiap kolom
-                                            $total_mc += $mc['total_mc'];
-                                            $total_running += $mc['mesin_jalan'];
-                                            $total_cj += $mc['cj'];
-                                            $total_mj += $mc['mj'];
-                                            // 
-                                            $prod28 = 0;
-                                            foreach ($dataTarget as $target) {
-                                                $konversi = !empty($target['konversi']) ? $target['konversi'] : 0;
-                                                if ($mc['cj'] > 0) {
-                                                    $prod28 = ceil(($mc['mesin_jalan'] * $konversi * 28) / 24);
-                                                }
-                                                break;
-                                            }
-                                            $totalProd28 += $prod28;
-                                        ?>
-                                            <tr>
-                                                <td class="text-xs" style="text-align: center;"><?= $mc['brand'] ?></td>
-                                                <td class="text-xs" style="text-align: center;"><?= $mc['total_mc'] ?></td>
-                                                <td class="text-xs" style="text-align: center;"><?= $mc['mesin_jalan'] ?></td>
-                                                <td class="text-xs" style="text-align: center;">0</td>
-                                                <td class="text-xs" style="text-align: center;"><?= $mc['cj'] ?></td>
-                                                <td class="text-xs" style="text-align: center;"><?= $mc['mj'] ?></td>
-                                                <td class="text-xs" style="text-align: center;"><?= $prod28 ?></td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                        <tr>
-                                            <th class="text-xs" style="text-align: center; font-weight: bold;">Total</th>
-                                            <th class="text-xs" style="text-align: center; font-weight: bold;"><?= $total_mc ?></th>
-                                            <th class="text-xs" style="text-align: center; font-weight: bold;"><?= $total_running ?></th>
-                                            <th class="text-xs" style="text-align: center; font-weight: bold;">0</th>
-                                            <th class="text-xs" style="text-align: center; font-weight: bold;"><?= $total_cj ?></th>
-                                            <th class="text-xs" style="text-align: center; font-weight: bold;"><?= $total_mj ?></th>
-                                            <th class="text-xs" style="text-align: center; font-weight: bold;"><?= $totalProd28 ?></th>
-                                        </tr>
-                                    <?php endif; ?>
+                                    <!-- DAKONG -->
+                                    <tr>
+                                        <td class="text-xs" style="text-align: center;">DAKONG</td>
+                                        <?php if (!empty($dakong) && is_array($dakong)) : ?>
+                                            <td class="text-xs" style="text-align: center;"><?= $dakong['totalMc'] ?? 0 ?></td>
+                                            <td class="text-xs" style="text-align: center;"><?= $dakong['totalRunning'] ?? 0 ?></td>
+                                            <td class="text-xs" style="text-align: center;">0</td>
+                                            <td class="text-xs" style="text-align: center;"><?= $dakong['totalCj'] ?? 0 ?></td>
+                                            <td class="text-xs" style="text-align: center;"><?= ceil($dakong['totalProd'] ?? 0) ?></td>
+                                        <?php endif; ?>
+                                    </tr>
+
+                                    <!-- ROSSO -->
+                                    <tr>
+                                        <td class="text-xs" style="text-align: center;">ROSSO</td>
+                                        <?php if (!empty($rosso) && is_array($rosso)) : ?>
+                                            <td class="text-xs" style="text-align: center;"><?= $rosso['totalMc'] ?? 0 ?></td>
+                                            <td class="text-xs" style="text-align: center;"><?= $rosso['totalRunning'] ?? 0 ?></td>
+                                            <td class="text-xs" style="text-align: center;">0</td>
+                                            <td class="text-xs" style="text-align: center;"><?= $rosso['totalCj'] ?? 0 ?></td>
+                                            <td class="text-xs" style="text-align: center;"><?= ceil($rosso['totalProd'] ?? 0) ?></td>
+                                        <?php endif; ?>
+                                    </tr>
+
+                                    <!-- THS -->
+                                    <tr>
+                                        <td class="text-xs" style="text-align: center;">THS</td>
+                                        <?php if (!empty($ths) && is_array($ths)) : ?>
+                                            <td class="text-xs" style="text-align: center;"><?= $ths['totalMc'] ?? 0 ?></td>
+                                            <td class="text-xs" style="text-align: center;"><?= $ths['totalRunning'] ?? 0 ?></td>
+                                            <td class="text-xs" style="text-align: center;">0</td>
+                                            <td class="text-xs" style="text-align: center;"><?= $ths['totalCj'] ?? 0 ?></td>
+                                            <td class="text-xs" style="text-align: center;"><?= ceil($ths['totalProd'] ?? 0) ?></td>
+                                        <?php endif; ?>
+                                    </tr>
+
+                                    <!-- LONATI -->
+                                    <tr>
+                                        <td class="text-xs" style="text-align: center;">LONATI</td>
+                                        <?php if (!empty($lonati) && is_array($lonati)) : ?>
+                                            <td class="text-xs" style="text-align: center;"><?= $lonati['totalMc'] ?? 0 ?></td>
+                                            <td class="text-xs" style="text-align: center;"><?= $lonati['totalRunning'] ?? 0 ?></td>
+                                            <td class="text-xs" style="text-align: center;">0</td>
+                                            <td class="text-xs" style="text-align: center;"><?= $lonati['totalCj'] ?? 0 ?></td>
+                                            <td class="text-xs" style="text-align: center;"><?= ceil($lonati['totalProd'] ?? 0) ?></td>
+                                        <?php endif; ?>
+                                    </tr>
                                 </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th class="text-xs font-weight-bolder" style="text-align: center;">Total</th>
+                                        <th class="text-xs font-weight-bolder" style="text-align: center;"><?= $ttlMc['totalMc'] ?? 0 ?></th>
+                                        <th class="text-xs font-weight-bolder" style="text-align: center;"><?= $ttlMc['totalRunning'] ?? 0 ?></th>
+                                        <th class="text-xs font-weight-bolder" style="text-align: center;">0</th>
+                                        <th class="text-xs font-weight-bolder" style="text-align: center;"><?= $ttlMc['totalCj'] ?? 0 ?></th>
+                                        <th class="text-xs font-weight-bolder" style="text-align: center;"><?= ceil($ttlMc['totalProd'] ?? 0) ?></th>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
@@ -158,6 +174,7 @@
                                                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Sisa Order</th>
                                                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Sisa Booking</th>
                                                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">(+) Exess</th>
+                                                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">%</th>
                                                                         </tr>
                                                                     </thead>
                                                                     <?php foreach ($data['weeks'] as $week) : ?>
@@ -165,11 +182,12 @@
                                                                             <tr>
                                                                                 <td class="text-sm" style="text-align: center;"> <?= $week['start_date'] ?> - <?= $week['end_date'] ?> (<?= $week['countWeek'] ?>)</td>
                                                                                 <td class="text-sm" style="text-align: center;"> <?= $week['number_of_days'] ?></td>
-                                                                                <td class="text-sm" style="text-align: center;"> <?= ceil($week['maxCapacity']); ?></td>
-                                                                                <td class="text-sm" style="text-align: center;"> <?= ceil($week['ConfirmOrder']); ?></td>
-                                                                                <td class="text-sm" style="text-align: center;"> <?= ceil($week['sisaConfirmOrder']); ?></td>
-                                                                                <td class="text-sm" style="text-align: center;"> <?= ceil($week['sisaBooking']); ?></td>
-                                                                                <td class="text-sm" style="text-align: center;"> <?= floor($week['exess']); ?></td>
+                                                                                <td class="text-sm" style="text-align: center;"> <?= $week['maxCapacity']; ?></td>
+                                                                                <td class="text-sm" style="text-align: center;"> <?= $week['ConfirmOrder']; ?></td>
+                                                                                <td class="text-sm" style="text-align: center;"> <?= $week['sisaConfirmOrder']; ?></td>
+                                                                                <td class="text-sm" style="text-align: center;"> <?= $week['sisaBooking']; ?></td>
+                                                                                <td class="text-sm" style="text-align: center;"> <?= $week['exess']; ?></td>
+                                                                                <td class="text-sm" style="text-align: center;"> <?= $week['exessPercentage']; ?>%</td>
                                                                             </tr>
                                                                         </tbody>
                                                                     <?php endforeach; ?>
@@ -181,6 +199,7 @@
                                                                             <th class="text-sm" style="text-align: center;"> <?= ceil($data['monthlySummary']['totalSisaConfirmOrder']); ?></th>
                                                                             <th class="text-sm" style="text-align: center;"> <?= ceil($data['monthlySummary']['totalSisaBooking']); ?></th>
                                                                             <th class="text-sm" style="text-align: center;"> <?= ceil($data['monthlySummary']['totalExess']); ?></th>
+                                                                            <th class="text-sm" style="text-align: center;"> <?= ceil($data['monthlySummary']['totalExessPercentage']); ?>%</th>
                                                                         </tr>
                                                                     </footer>
                                                                 </table>
