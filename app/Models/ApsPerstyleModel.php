@@ -430,7 +430,7 @@ class ApsPerstyleModel extends Model
 
             if ($leadtime > 0) {
                 $target = 3600 / $smv; // Simplified target calculation
-                $kebMesin = $dt['sisa'] / $target / $leadtime;
+                $kebMesin = ($dt['sisa'] / $target / $leadtime) / 24;
                 $kebutuhanMc = ceil($kebMesin);
                 $dz = $kebutuhanMc * $target;
 
