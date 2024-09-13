@@ -46,75 +46,111 @@ error_reporting(E_ALL); ?>
                     </div>
 
                     <div class="row">
-                        <h6>Recomended Area</h6>
-                        <?php foreach ($rekomendasi as $rec => $data): ?>
-                            <div class="col-md-4">
-                                <?php if (date(strtotime($rec)) > date(strtotime('today'))): ?>
+                        <div class="col-md-4">
+                            <h6>
+                                Qty Order Perdelivery
+                            </h6>
+                            <?php foreach ($headerRow as $val): ?>
+                                <li><?= date('d M Y', strtotime($val['delivery']))  ?> : <?= round($val['qty'] / 24) ?> dz</li>
+                            <?php endforeach ?>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Summarize <?= $noModel ?> <?= $jarum ?></h6>
+                            <li>Machine Requirments : <?= $kebMesin ?> Machine</li>
+                            <li>Duration : <?= $hari ?> days </li>
+                            <li>Daily Target : <?= $target ?> dz/day</li>
+
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Recomended Area</h6>
+                            <ol>
+                                <?php foreach ($rekomendasi as $val): ?>
+
+                                    <li><?= strtoupper($val['area']) ?></li>
                                     <ul>
-                                        Delivery : <?= $rec ?>
-                                        <?php foreach ($data as $val): ?>
-                                            <li>Area : <?= $val['factory']; ?></li>
-                                            Kapasitas Tersedia : <?= $val['sisa_kapasitas']; ?>
-                                        <?php endforeach
-                                        ?>
+                                        <li>
+                                            Maximum Capacity : <?= $val['max'] ?> dz/day
+                                        </li>
+                                        <li>
+                                            Used : <?= $val['used'] ?> dz
+                                        </li>
+                                        <li>
+
+                                            Availabel Capacity :
+                                            <?php if (is_string($val['avail'])): ?> <span class="badge bg-warning"><?= $val['avail'] ?> dz</span>
+                                            <?php else: ?> <span class="badge bg-info"> <?= $val['avail'] ?> dz</span>
+                                            <?php endif ?>
+                                        </li>
                                     </ul>
-                                <?php endif; ?>
-                            </div>
-                        <?php endforeach ?>
+
+                                <?php endforeach ?>
+                            </ol>
+
+                        </div>
+
                     </div>
 
                 </div>
 
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="table-responsive">
-                            <table id="dataTable" class="display compact striped" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jarum</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Style</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Delivery</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Seam</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Factory</th>
-                                        <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($dataAps as $order) : ?>
+                <div class="card-body">
+                    <?php foreach ($order as $deliv => $val): ?>
+                        <div class="row mt-3">
+                            <div class="d-flex justify-content-between align-item-center">
+                                <h5> <span class='badge  badge-pill badge-lg bg-gradient-info'>Detail Order Delivery <?= date('d M Y', strtotime($deliv)) ?> </span></h5>
+                                <h5> <span class='badge  badge-pill badge-lg bg-gradient-info'>Qty Order <?= round($val['totalQty'] / 24) ?> dz</span></h5>
+
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
                                         <tr>
-                                            <td class="text-sm"><?= $order['machinetypeid']; ?></td>
-                                            <td class="text-sm"><?= $order['size']; ?></td>
-                                            <td class="text-sm"><?= date('d-F-Y', strtotime($order['delivery'])); ?></td>
-
-                                            <td class="text-sm"><?= ceil($order['qty'] / 24); ?> dz</td>
-                                            <td class="text-sm"><?= ceil($order['sisa'] / 24); ?> dz</td>
-                                            <td class="text-sm"><?= $order['seam']; ?></td>
-                                            <td class="text-sm"><?= $order['factory']; ?></td>
-                                            <td class="text-sm">
-
-                                                <button type=" button" class="btn btn-info btn-sm edit-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $order['idapsperstyle']; ?>" data-area="<?= $order['factory']; ?>" data-pdk="<?= $order['mastermodel']; ?>" data-deliv="<?= $order['delivery']; ?>">
-                                                    Edit Area
-                                                </button>
-                                            </td>
-
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Size</th>
+                                            <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Qty</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Sisa</th>
+                                            <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Area</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Factory</th>
+                                            <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Action</th>
                                         </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($val as $key => $list): ?>
+                                            <?php if (is_array($list)): // Pastikan $list adalah array 
+                                            ?>
+                                                <tr>
+                                                    <td> <?= $list['size'] ?></td>
+                                                    <td><?= round($list['qty'] / 24) ?> dz</td>
+                                                    <td><?= round($list['sisa'] / 24) ?> dz</td>
+                                                    <td><?= $list['factory'] ?></td>
+                                                    <td><?= $list['production_unit'] ?></td>x
+                                                    <td>
+                                                        <button type=" button" class="btn btn-info btn-sm edit-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $list['idapsperstyle']; ?>" data-area="<?= $list['factory']; ?>" data-pdk="<?= $list['mastermodel']; ?>" data-deliv="<?= $list['delivery']; ?> " data-size="<?= $list['size']; ?>" data-jarum="<?= $jarum ?>">
+                                                            Edit Area
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            <?php endif; ?>
+                                        <?php endforeach ?>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                                <hr>
+                            </div>
                         </div>
-                    </div>
-
+                    <?php endforeach ?>
                     <div class=" card-footer">
                         <div>
                             <br>
-                            <div class="col-md-3">
-                                <button type="button" class="btn btn-success btn-sm btn-assignall" data-toggle="modal" data-target="#ModalAssignAll" data-id="<?= $order['idapsperstyle']; ?>" data-no-model="<?= $order['mastermodel']; ?>" data-delivery="<?= $order['delivery']; ?>">
-                                    Arahkan Seluruh Model ke
-                                </button>
-                            </div>
+
                         </div>
                     </div>
 
@@ -139,16 +175,16 @@ error_reporting(E_ALL); ?>
                         <form action="<?= base_url($role . '/assignareal') ?>" method="post">
                             <input type="text" name="no_model" id="" hidden value="<?= $noModel ?>">
                             <div id="confirmationMessage"></div>
+                            <input class="form-check-input" type="text" value="<?= $jarum ?>" name="jarum" id="jarum">
+
                             <div class="form-group">
-                                <label for="selectMachineType">Pilih Tipe Mesin:</label>
-                                <select class="form-control" id="selectMachineType" name="jarum">
-                                    <?php
-                                    $uniqueMachineTypeIds = array_unique(array_column($dataAps, 'machinetypeid'));
-                                    foreach ($uniqueMachineTypeIds as $machinetypeid) :
-                                    ?>
-                                        <option value="<?= $machinetypeid; ?>"><?= $machinetypeid; ?></option>
-                                    <?php endforeach; ?>
-                                </select>
+                                <label for="selectMachineType">Pilih Delivery:</label>
+                                <?php foreach ($headerRow as $row): ?>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="<?= $row['delivery'] ?>" name="delivery[]" id="ceklist">
+                                        <label class="custom-control-label" for="customCheck1"> <?= date('d-F-y', strtotime($row['delivery'])) ?></label>
+                                    </div>
+                                <?php endforeach ?>
                             </div>
                             <div class="form-group">
                                 <label for="selectArea">Pilih Area:</label>
@@ -281,6 +317,8 @@ error_reporting(E_ALL); ?>
                             <input type="text" name="id" id="" hidden value="">
                             <input type="text" name="pdk" id="" hidden value="">
                             <input type="text" name="deliv" id="" hidden value="">
+                            <input type="text" name="size" id="" hidden value="">
+                            <input type="text" name="jarum" id="" hidden value="">
                             <div id="confirmationMessage"></div>
                             <div class="form-group">
                             </div>
@@ -410,7 +448,7 @@ error_reporting(E_ALL); ?>
                 $('.btn-assign').click(function() {
                     var noModel = $(this).data('no-model');
                     $('#ModalAssign').modal('show'); // Show the modal
-                    var selectedMachineTypeId = document.getElementById("machinetypeid").value;
+                    var selectedMachineTypeId = document.getElementById("jarum").value;
                     var selectedArea = document.getElementById("area").value;
                     document.getElementById('confirmationMessage').innerHTML = "Apakah anda yakin mengarahkan PDK " + noModel + " dengan jarum " + selectedMachineTypeId + " ke " + selectedArea;
                 });
@@ -451,11 +489,15 @@ error_reporting(E_ALL); ?>
                     var area = $(this).data('area');
                     var pdk = $(this).data('pdk');
                     var deliv = $(this).data('deliv');
+                    var size = $(this).data('size');
+                    var jarum = $(this).data('jarum');
                     $('#editModal').modal('show'); // Show the modal
                     $('#editModal').find('input[name="area"]').val(area);
                     $('#editModal').find('input[name="id"]').val(idAps);
                     $('#editModal').find('input[name="pdk"]').val(pdk);
                     $('#editModal').find('input[name="deliv"]').val(deliv);
+                    $('#editModal').find('input[name="size"]').val(size);
+                    $('#editModal').find('input[name="jarum"]').val(jarum);
                 });
                 $('.btn-recomend').click(function() {
 

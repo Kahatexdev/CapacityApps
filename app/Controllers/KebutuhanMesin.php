@@ -19,6 +19,13 @@ class KebutuhanMesin extends BaseController
     public function inputMesinBooking()
     {
         $desk = $this->request->getPost("deskripsi");
+        $cek = [
+            'desk' => $desk,
+            'judul' => $this->request->getPost("judul"),
+            'jarum' => $this->request->getPost("jarum"),
+        ];
+
+
         $data = [
             'role' => session()->get('role'),
             'judul' => $this->request->getPost("judul"),
@@ -32,12 +39,18 @@ class KebutuhanMesin extends BaseController
             'deskripsi' => $this->request->getPost("deskripsi"),
             'sisa' => $this->request->getPost("sisa")
         ];
-        $insert = $this->kebMC->insert($data);
-
-        if ($insert) {
-            return redirect()->to(base_url(session()->get('role') . ''))->withInput()->with('success', 'Data Berhasil Di input');
+        $exist = $this->kebMC->cekData($cek);
+        if ($exist) {
+            $this->kebMC->update($exist['id'], $data);
+            return redirect()->to(base_url(session()->get('role') . ''))->withInput()->with('success', 'Data ' . $this->request->getPost('judul') . ' Berhasil Di Perbarui');
         } else {
-            return redirect()->to(base_url(session()->get('role') . ''))->withInput()->with('error', 'Data Gagal Di input');
+            $insert = $this->kebMC->insert($data);
+
+            if ($insert) {
+                return redirect()->to(base_url(session()->get('role') . ''))->withInput()->with('success', 'Data Berhasil Di input');
+            } else {
+                return redirect()->to(base_url(session()->get('role') . ''))->withInput()->with('error', 'Data Gagal Di input');
+            }
         }
     }
 }

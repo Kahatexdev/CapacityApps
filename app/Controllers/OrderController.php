@@ -743,71 +743,93 @@ class OrderController extends BaseController
     }
     public function detailPdk($noModel, $jarum)
     {
-        $dataApsPerstyle = $this->ApsPerstyleModel->detailPdk($noModel, $jarum);
         $pdk = $this->ApsPerstyleModel->getSisaPerDeliv($noModel, $jarum);
-        $sisaOrder = [];
-        $rekomendasiArea = [];
-
+        $sisaPerDeliv = [];
         foreach ($pdk as $perdeliv) {
             $deliv = $perdeliv['delivery'];
-            $start = date('Y-m-d', strtotime('+3 days'));
-            $stop = date('Y-m-d', strtotime($deliv . ' -3 days'));
-            $sisaOrder[$deliv] = $this->ApsPerstyleModel->getSisaOrderforRec($jarum, $start, $stop);
+            $sisaPerDeliv[$deliv] = $this->ApsPerstyleModel->getSisaPerDlv($noModel, $jarum, $deliv);
         }
-        dd($jarum);
-        $usedCapacitydaily = [];
-        foreach ($sisaOrder as $delivDate => $orders) {
-            foreach ($orders as $order) {
-                $sisa = $order['sisa'] / 24;  // Mengubah sisa menjadi lusin
-                $startMc = new DateTime($start);
-                $delivDate = new DateTime($order['delivery']);
-                $time = $startMc->diff($delivDate);
-                $leadtime = $time->days;
-                // Hitung sisa kapasitas per hari
-                $sisaPerHari = $sisa / $leadtime;
-                // Grouping berdasarkan factory per jarum
-                $factory = $order['factory'];
-                if (!isset($usedCapacitydaily[$deliv])) {
-                    $usedCapacitydaily[$deliv] = [];
+        foreach ($sisaPerDeliv as $deliv => $list) {
+            $totalqty = 0;
+            $qty = 0;
+            if (is_array($list)) {
+                foreach ($list as $val) {
+                    if (isset($val['sisa'])) {
+                        $qty += $val['qty'];
+                        $totalqty = $qty;
+                    }
                 }
-                if (!isset($usedCapacitydaily[$deliv][$factory])) {
-                    $usedCapacitydaily[$deliv][$factory] = 0;
-                }
-                $usedCapacitydaily[$deliv][$factory] += $sisaPerHari;
+            }
+            $sisaPerDeliv[$deliv]['totalQty'] = $totalqty;
+        }
+        // ini ngambil jumlah qty
+        $sisaArray = array_column($pdk, 'sisa');
+        $maxValue = max($sisaArray);
+        $indexMax = array_search($maxValue, $sisaArray);
+        $totalQty = 0;
+        for ($i = 0; $i <= $indexMax; $i++) {
+            $totalQty += $sisaArray[$i];
+        }
+
+        // ini ngambil jumlah hari
+        usort($pdk, function ($a, $b) {
+            return strtotime($a['delivery']) - strtotime($b['delivery']);
+        });
+        $totalQty = round($totalQty / 24);
+        $deliveryTerjauh = end($pdk)['delivery'];
+        $today = new DateTime(date('Y-m-d')); // Hari ini
+        $deliveryDate = new DateTime($deliveryTerjauh); // Tanggal delivery terjauh
+        $diff = $today->diff($deliveryDate);
+        $hari = $diff->days - 7;
+
+        // disini ngambil rata rata target.
+        $smvArray = array_column($pdk, 'smv');
+        $smvArray = array_map('intval', $smvArray);
+        $averageSmv = array_sum($smvArray) / count($smvArray);
+        $target = round((86400 / (intval($averageSmv))) * 0.8 / 24);
+
+        // ini baru kalkulasi
+        $mesin = round($totalQty / $target / $hari);
+        $targetPerhari = round($mesin * $target);
+
+
+        // ini bagian rekomendasi (hard bgt bjir)
+        $start = date('Y-m-d', strtotime('+7 days'));
+        $rekomen = $this->ApsPerstyleModel->getSisaOrderforRec($jarum, $start, $deliveryTerjauh);
+        $rekomendasi = [];
+        foreach ($rekomen as $rec) {
+            $sisa = round($rec['sisa'] / 24);
+            $area = $rec['factory'];
+            $mesinPerarea = $this->jarumModel->mesinPerArea($jarum, $area);
+
+            if (!empty($mesinPerarea)) {
+                $target = $mesinPerarea[0]['target'];
+                $totalMesin = $mesinPerarea[0]['totalMesin'];
+                $kapasitasPerhari = ($target * $totalMesin);
+                $usedCapacityDaily = round($sisa / $hari);
+                $availCapacityDaily = $kapasitasPerhari - $usedCapacityDaily;
+
+                // Tetap simpan area, tapi label avail sebagai 'N/A' jika kapasitas avail kurang dari target
+                $avail = ($availCapacityDaily >= $targetPerhari) ? $availCapacityDaily : 'Only ' . $availCapacityDaily;
+
+                $rekomendasi[$area] = [
+                    'area' => $area,
+                    'max' => $kapasitasPerhari,
+                    'used' => $usedCapacityDaily,
+                    'avail' => $avail
+                ];
             }
         }
-        foreach ($pdk as $perdeliv) {
-            $deliv = $perdeliv['delivery'];
-            $orderBaruQuantity = $perdeliv['sisa'] / 24 / $leadtime;  // Mengubah order baru menjadi lusin
-            $areaRekomendasi = [];
+        usort($rekomendasi, function ($a, $b) {
+            // Handle string "Only" vs angka
+            if (is_string($a['avail'])) return 1; // Push "Only" ke belakang
+            if (is_string($b['avail'])) return -1; // Push "Only" ke belakang
 
-            if (isset($usedCapacitydaily[$deliv])) {
-                foreach ($usedCapacitydaily[$deliv] as $factory => $kapasitas) {
-                    $difference = abs($kapasitas - $orderBaruQuantity);
-                    // Tambahkan hasilnya ke array rekomendasi
-                    $areaRekomendasi[] = [
-                        'factory' => $factory,
-                        'Kebutuhan Kapasitas Perhari' => ceil($orderBaruQuantity),
-                        'difference' => ceil($difference),
-                        'sisa_kapasitas' => ceil($kapasitas)
-                    ];
-                }
+            // Jika keduanya angka, bandingkan nilai 'avail'
+            return $b['avail'] <=> $a['avail'];
+        });
+        $top3Rekomendasi = array_slice($rekomendasi, 0, 3);
 
-                // Urutkan area berdasarkan perbedaan kapasitas terkecil
-                usort($areaRekomendasi, function ($a, $b) {
-                    return $a['difference'] <=> $b['difference'];
-                });
-
-                // Ambil top 3 area dengan perbedaan terkecil
-                $top3Rekomendasi = array_slice($areaRekomendasi, 0, 3);
-            } else {
-                $top3Rekomendasi = [];
-            }
-
-            // Simpan rekomendasi top 3 untuk deliv ini
-            $rekomendasiArea[$deliv] = $top3Rekomendasi;
-        }
-        dd($rekomendasiArea);
         $dataMc = $this->jarumModel->getAreaModel($noModel);
         $data = [
             'role' => session()->get('role'),
@@ -819,11 +841,15 @@ class OrderController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-            'dataAps' => $dataApsPerstyle,
+            'order' => $sisaPerDeliv,
+            'headerRow' => $pdk,
             'noModel' => $noModel,
             'dataMc' => $dataMc,
             'jarum' => $jarum,
-            'rekomendasi' => $rekomendasiArea
+            'kebMesin' => $mesin,
+            'target' => $targetPerhari,
+            'hari' => $hari,
+            'rekomendasi' => $top3Rekomendasi
         ];
         return view(session()->get('role') . '/Order/detailPdk', $data);
     }
