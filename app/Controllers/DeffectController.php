@@ -134,4 +134,52 @@ class DeffectController extends BaseController
 
         return view(session()->get('role') . '/Deffect/bstabel', $data);
     }
+
+    public function resetbs()
+    {
+        $pdk = $this->request->getPost('pdk');
+
+        $idaps = $this->ApsPerstyleModel->getIdAps($pdk);
+        $qtyBs = $this->BsModel->getTotalBs($idaps);
+
+        $this->produksiModel->resetQtyBs($idaps);
+        foreach ($qtyBs as $idap) {
+            $bs = $idap['qty'];
+            $sisa = $this->ApsPerstyleModel->getSisaOrder($idap['idapsperstyle']);
+            $newSisa = $sisa - $bs;
+            $this->ApsPerstyleModel->update($idap['idapsperstyle'], ['sisa' => $newSisa]);
+        }
+
+        $this->BsModel->deleteSesuai($idaps);
+        return redirect()->to(base_url(session()->get('role') . '/datadeffect'))->withInput()->with('success', 'Data Berhasil di reset');
+    }
+
+    public function resetbsarea()
+    {
+        $area = $this->request->getPost('area');
+        $awal = $this->request->getPost('awal');
+        $akhir = $this->request->getPost('akhir');
+
+        $idaps = $this->BsModel->getDataForReset($area, $awal, $akhir);
+        $qtyBs = $this->BsModel->getQtyBs($idaps);
+        $ttlBs = $this->BsModel->getTotalBs($idaps);
+
+        foreach ($qtyBs as $idap) {
+            $bs = $idap['qty'];
+            $bs_prod = $this->produksiModel->getBsProd($idap['idapsperstyle'], $bs);
+            $newBs = $bs_prod - $bs;
+            $this->produksiModel->update($idap['idapsperstyle'], ['bs_prod' => $newBs]);
+        }
+
+        foreach ($ttlBs as $idap) {
+            $bs = $idap['qty'];
+            $sisa = $this->ApsPerstyleModel->getSisaOrder($idap['idapsperstyle']);
+            $newSisa = $sisa - $bs;
+            $this->ApsPerstyleModel->update($idap['idapsperstyle'], ['sisa' => $newSisa]);
+        }
+
+        $this->BsModel->deleteBSArea($area, $awal, $akhir);
+
+        return redirect()->to(base_url(session()->get('role') . '/datadeffect'))->withInput()->with('success', 'Data Berhasil di reset');
+    }
 }

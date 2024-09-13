@@ -442,6 +442,8 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('datadeffect', 'DeffectController::datadeffect');
     $routes->post('inputKode', 'DeffectController::inputKode');
     $routes->post('viewDataBs', 'DeffectController::viewDataBs');
+    $routes->post('resetbspdk', 'DeffectController::resetbs');
+    $routes->post('resetbsarea', 'DeffectController::resetbsarea');
 
     // usermanageement
     $routes->get('account', 'GodController::account');

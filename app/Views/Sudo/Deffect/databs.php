@@ -21,7 +21,12 @@
                             <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage2">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Input Kode Deffect
                             </button>
-
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-warning shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#reset">
+                                <i class="fas fa-trash text-lg opacity-10" aria-hidden="true"></i> Reset BS PDK
+                            </button>
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-warning shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#resetarea">
+                                <i class="fas fa-trash text-lg opacity-10" aria-hidden="true"></i> Reset BS Area
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -173,6 +178,66 @@
                         </form>
 
                     </div>
+                </div>
+            </div>
+        </div>
+        <!-- modal reset bs pdk -->
+        <div class="modal fade" id="reset" tabindex="-1" role="dialog" aria-labelledby="reset" aria-hidden="true">
+            <div class="modal-dialog " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Reset BS PDK</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body align-items-center">
+                        <form action="<?= base_url($role . '/resetbspdk/'); ?>" method="post">
+                            <div class="form-group">
+                                <label for="awal">PDK</label>
+                                <input type="text" class="form-control" name="pdk">
+                            </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-info">Reset</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- modal reset bs area -->
+        <div class="modal fade" id="resetarea" tabindex="-1" role="dialog" aria-labelledby="resetarea" aria-hidden="true">
+            <div class="modal-dialog " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Reset BS Area</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body align-items-center">
+                        <form action="<?= base_url($role . '/resetbsarea/'); ?>" method="post">
+                            <div class="form-group">
+                                <label for="awal">Area</label>
+                                <input type="text" class="form-control" name="area" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="awal">Awal</label>
+                                <input type="date" class="form-control" name="awal" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="awal">Akhir</label>
+                                <input type="date" class="form-control" name="akhir" required>
+                            </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-info">Reset</button>
+                    </div>
+                    </form>
                 </div>
             </div>
         </div>
