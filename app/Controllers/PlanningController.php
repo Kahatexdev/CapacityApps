@@ -110,9 +110,9 @@ class PlanningController extends BaseController
         $jarum = $this->request->getPost("jarum");
         $area = $this->request->getPost("area");
         if (strpos($area, 'kk' !== 'false')) {
-            $pu = 'CJ';
-        } else {
             $pu = 'MJ';
+        } else {
+            $pu = 'CJ';
         }
         foreach ($deliv as $del) {
             $data = [
@@ -125,7 +125,6 @@ class PlanningController extends BaseController
             ];
             $assign = $this->ApsPerstyleModel->asignAreal($data);
             if (!$assign) {
-                dd($data);
                 return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $pdk . '/' . $jarum))->withInput()->with('error', 'Gagal Assign Area');
             }
         }

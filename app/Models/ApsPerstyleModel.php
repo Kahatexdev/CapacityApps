@@ -58,11 +58,8 @@ class ApsPerstyleModel extends Model
         $result = $this->select('*')
             ->where('mastermodel', $validate['mastermodel'])
             ->where('size', $validate['size'])
-            ->where('country', $validate['country'])
             ->where('delivery', $validate['delivery'])
-            ->where('qty', $validate['qty'])
-            ->get()
-            ->getRow();
+            ->first();
         return $result;
     }
     public function detailModel($noModel, $delivery)
@@ -478,5 +475,23 @@ class ApsPerstyleModel extends Model
         $this->orderBy('delivery');
 
         return $this->get()->getResultArray();
+    }
+    public function resetSisaDlv($update)
+    {
+        $sisa = 0;
+        $this->set('sisa', $sisa)
+            ->where('mastermodel', $update['mastermodel'])
+            ->where('delivery', $update['delivery'])
+            ->where('size', $update['size'])
+            ->update();
+        return $this->affectedRows();
+    }
+    public function getIdPerDeliv($update)
+    {
+        return $this->select('idapsperstyle')
+            ->where('mastermodel', $update['mastermodel'])
+            ->where('delivery', $update['delivery'])
+            ->where('size', $update['size'])
+            ->first();
     }
 }
