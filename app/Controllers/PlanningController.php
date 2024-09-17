@@ -110,9 +110,9 @@ class PlanningController extends BaseController
         $jarum = $this->request->getPost("jarum");
         $area = $this->request->getPost("area");
         if (strpos($area, 'kk' !== 'false')) {
-            $pu = 'MJ';
-        } else {
             $pu = 'CJ';
+        } else {
+            $pu = 'MJ';
         }
         foreach ($deliv as $del) {
             $data = [

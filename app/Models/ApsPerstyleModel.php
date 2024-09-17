@@ -330,7 +330,7 @@ class ApsPerstyleModel extends Model
             ->where('sisa >', 0)
             ->where('delivery <', $maxDeliv)
             ->where('delivery >', $today)
-            ->groupBy('machinetypeid, mastermodel')
+            ->groupBy(' mastermodel')
             ->get()
             ->getResultArray();
     }
@@ -361,7 +361,7 @@ class ApsPerstyleModel extends Model
     }
     public function getSisaPerDlv($model, $jarum, $deliv)
     {
-        $sisa = $this->select('idapsperstyle,mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,factory, production_unit, delivery')
+        $sisa = $this->select('idapsperstyle,mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,factory, production_unit, delivery,smv')
             ->where('machinetypeid', $jarum)
             ->where('mastermodel', $model)
             ->where('delivery', $deliv)
@@ -493,5 +493,13 @@ class ApsPerstyleModel extends Model
             ->where('delivery', $update['delivery'])
             ->where('size', $update['size'])
             ->first();
+    }
+    public function totalPo($model)
+    {
+        $po = $this->select('sum(qty) as totalPo')
+            ->where('mastermodel', $model)
+            ->findAll();
+        $order = reset($po);
+        return $order;
     }
 }

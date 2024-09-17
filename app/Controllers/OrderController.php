@@ -768,6 +768,7 @@ class OrderController extends BaseController
             }
             $sisaPerDeliv[$deliv]['totalQty'] = $totalqty;
         }
+        $totalPo = $this->ApsPerstyleModel->totalPo($noModel);
         // ini ngambil jumlah qty
         $sisaArray = array_column($pdk, 'sisa');
         $maxValue = max($sisaArray);
@@ -783,7 +784,7 @@ class OrderController extends BaseController
         });
         $totalQty = round($totalQty / 24);
         $deliveryTerjauh = end($pdk)['delivery'];
-        $today = new DateTime(date('Y-m-d')); // Hari ini
+        $today = new DateTime(date('Y-m-d'));
         $deliveryDate = new DateTime($deliveryTerjauh); // Tanggal delivery terjauh
         $diff = $today->diff($deliveryDate);
         $hari = $diff->days - 7;
@@ -842,7 +843,6 @@ class OrderController extends BaseController
             return $b['avail'] <=> $a['avail'];
         });
         $top3Rekomendasi = array_slice($rekomendasi, 0, 3);
-
         $dataMc = $this->jarumModel->getAreaModel($noModel);
         $data = [
             'role' => session()->get('role'),
@@ -862,7 +862,8 @@ class OrderController extends BaseController
             'kebMesin' => $mesin,
             'target' => $targetPerhari,
             'hari' => $hari,
-            'rekomendasi' => $top3Rekomendasi
+            'rekomendasi' => $top3Rekomendasi,
+            'totalPo' => $totalPo
         ];
         return view(session()->get('role') . '/Order/detailPdk', $data);
     }

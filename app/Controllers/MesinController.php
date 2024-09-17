@@ -612,7 +612,7 @@ class MesinController extends BaseController
 
         foreach ($capacity as $row) {
             $smv = $row['smv'];
-            $targetPerMesin = ceil((86400 / ($smv * 0.8)) / 24);
+            $targetPerMesin = round((86400 / (intval($smv))) * 0.85 / 24);
             $sisa = ceil($row['sisa'] / 24);
             $deliveryDate = new DateTime($row['delivery']);
             $time = $today->diff($deliveryDate);
