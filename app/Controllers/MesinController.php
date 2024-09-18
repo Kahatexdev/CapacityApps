@@ -566,8 +566,12 @@ class MesinController extends BaseController
         $jarum = $this->request->getPost('jarum');
         $listjarum = $this->jarumModel->getJarumByArea($area);
         $maxCapacity = $this->jarumModel->maxCapacity($area, $jarum);
-        $capacity = $this->ApsPerstyleModel->CapacityArea($area, $jarum);
-
+        $listOrder = $this->ApsPerstyleModel->listOrderArea($area, $jarum);
+        $capacity = [];
+        foreach ($listOrder as $order) {
+            $pdk = $order['mastermodel'];
+            $capacity[] = $this->ApsPerstyleModel->CapacityArea($pdk, $area, $jarum);
+        }
         $orderWeek = [];
         $totalProduksi = 0;
         $totalKebMesin = 0;
@@ -609,19 +613,17 @@ class MesinController extends BaseController
         // Initialize weekly production and machines array
         $weeklyProduction = array_fill($startWeek, 12, 0);
         $weeklyMachines = array_fill($startWeek, 12, 0);
-
         foreach ($capacity as $row) {
+            $pdk = $row['mastermodel'];
             $smv = $row['smv'];
             $targetPerMesin = round((86400 / (intval($smv))) * 0.85 / 24);
-            $sisa = ceil($row['sisa'] / 24);
+            $sisa = $row['sisa'];
             $deliveryDate = new DateTime($row['delivery']);
             $time = $today->diff($deliveryDate);
-            $leadtime = max($time->days, 1);  // Ensuring leadtime is at least 1 to avoid division by zero
-
+            $leadtime = $row['targetHari'];
             // Calculate weekly production and machine needs
-            $kebMesin = ceil($sisa / ($leadtime * $targetPerMesin));
+            $kebMesin = ceil($sisa / $leadtime / $targetPerMesin);
             $produksi = $targetPerMesin * $kebMesin;
-
             $totalProduksi += $produksi;
             $totalKebMesin += $kebMesin;
 
@@ -647,7 +649,7 @@ class MesinController extends BaseController
             }
 
             $orderWeek[] = [
-                'PDK' => $row['mastermodel'],
+                'PDK' => $pdk,
                 'sisa' => $sisa,
                 'leadtime' => $leadtime,
                 'targetPerMesin' => $targetPerMesin,
@@ -658,8 +660,7 @@ class MesinController extends BaseController
         }
 
         // Calculate max capacity per week
-        $maxCapacityPerWeek = $maxCapacity['totalmesin'] * 7 * $targetInput;
-        // Calculate available capacity per week
+        $maxCapacityPerWeek = $maxCapacity['maxCapacity'];
         $availableCapacity = [];
         foreach ($weeklyProduction as $week => $production) {
             $availableCapacity[$week] = $maxCapacityPerWeek - $production;

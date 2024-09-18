@@ -319,20 +319,61 @@ class ApsPerstyleModel extends Model
             ->where('idapsperstyle', $pr['idapsperstyle'])
             ->update();
     }
-    public function CapacityArea($area, $jarum)
+    public function listOrderArea($area, $jarum)
     {
         $today = date('Y-m-d', strtotime('+1 Days'));
         $maxDeliv = date('Y-m-d', strtotime('+90 Days'));
 
-        return $this->select('mastermodel,sum(sisa)as sisa,delivery,smv')
+        return $this->select('mastermodel')
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
             ->where('sisa >', 0)
             ->where('delivery <', $maxDeliv)
             ->where('delivery >', $today)
-            ->groupBy(' mastermodel')
+            ->groupBy('mastermodel')
+            ->findAll();
+    }
+    public function CapacityArea($pdk, $area, $jarum)
+    {
+        $data = $this->select('mastermodel,sum(sisa)as sisa,delivery,smv')
+            ->where('mastermodel', $pdk)
+            ->where('factory', $area)
+            ->where('machinetypeid', $jarum)
+            ->groupBy('mastermodel,delivery')
             ->get()
             ->getResultArray();
+        $sisaArray = array_column($data, 'sisa');
+        $maxValue = max($sisaArray);
+        $indexMax = array_search($maxValue, $sisaArray);
+        $totalQty = 0;
+        for ($i = 0; $i <= $indexMax; $i++) {
+            $totalQty += $sisaArray[$i];
+        }
+        $totalQty = round($totalQty / 24);
+
+        $deliveryTerjauh = end($data)['delivery'];
+        $today = new DateTime(date('Y-m-d'));
+        $deliveryDate = new DateTime($deliveryTerjauh); // Tanggal delivery terjauh
+        $diff = $today->diff($deliveryDate);
+        $hari = $diff->days - 7;
+
+        $deliveryMax = $data[$indexMax]['delivery'];
+        $tglDeliv = new DateTime($deliveryMax); // Tanggal delivery terjauh
+        $beda = $today->diff($tglDeliv);
+        $hariTarget = $beda->days - 7;
+        $smvArray = array_column($data, 'smv');
+        $smvArray = array_map('intval', $smvArray);
+        $averageSmv = array_sum($smvArray) / count($smvArray);
+
+        $pdk = $data[$indexMax]['mastermodel'];
+        $order = [
+            'mastermodel' => $pdk,
+            'sisa' => $totalQty,
+            'delivery' => $deliveryTerjauh,
+            'targetHari' => $hariTarget,
+            'smv' => $averageSmv
+        ];
+        return $order;
     }
     public function getIdBs($validate)
     {
