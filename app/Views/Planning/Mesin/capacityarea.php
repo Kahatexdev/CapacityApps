@@ -36,7 +36,7 @@
                             </h5>
                             <div class="row">
                                 <div class="col-lg-4"> Maximum Capacity</div>
-                                <div class="col-lg-6">: <?= $max ?> dz</div>
+                                <div class="col-lg-6">: <?= $max ?> dz / Week</div>
                             </div>
                             <div class="row">
                                 <div class="col-lg-4"> Total Mesin</div>
@@ -73,6 +73,7 @@
 
             <div class="card mt-2">
                 <div class="card-header">
+                    <h4>Capacity Area Per Week</h4>
 
                 </div>
                 <div class="card-body">
@@ -93,8 +94,8 @@
                                     <td><?= $weekData['week'] ?></td>
                                     <td><?= $weekData['start_date'] ?></td>
                                     <td><?= $weekData['end_date'] ?></td>
-                                    <td><?= $weekData['available_capacity'] ?></td>
-                                    <td><?= ceil($weekData['available_machines']) ?></td>
+                                    <td><?= $weekData['available_capacity'] ?> dz</td>
+                                    <td><?= ceil($weekData['available_machines']) ?> Machine</td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -102,70 +103,38 @@
                     </table>
                 </div>
             </div>
-            <div class="card">
+            <div class="card mt-2">
                 <div class="card-header">
 
-                    <h2>Order Production per Week</h2>
+                    <h5>PDK in Area</h5>
                 </div>
-
-                <?php foreach ($orderWeek as $order) : ?>
-                    <div class="card-body">
-
-
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>PDK</th>
-                                    <th>Sisa</th>
-                                    <th>Leadtime</th>
-                                    <th>Target Per Mesin</th>
-                                    <th>Produksi</th>
-                                    <th>Kebutuhan Mesin</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>PDK</th>
+                                <th>Sisa</th>
+                                <th>Leadtime</th>
+                                <th>Target Mesin</th>
+                                <th>Kebutuhan Mesin</th>
+                                <th>Produksi Perhari</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($orderWeek as $order) : ?>
                                 <tr>
                                     <td><?= $order['PDK'] ?></td>
-                                    <td><?= $order['sisa'] ?></td>
-                                    <td><?= $order['leadtime'] ?></td>
-                                    <td><?= $order['targetPerMesin'] ?></td>
-                                    <td><?= $order['produksi'] ?></td>
-                                    <td><?= ceil($order['kebMesin']) ?></td>
+                                    <td><?= $order['sisa'] ?> dz</td>
+                                    <td><?= $order['leadtime'] ?> days</td>
+                                    <td><?= $order['targetPerMesin'] ?> dz/machine</td>
+                                    <td><?= round($order['kebMesin']) ?> Machine</td>
+                                    <td><?= $order['produksi'] ?> dz</td>
                                 </tr>
-                                <tr>
-                                    <td colspan="6">
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Hari</th>
-                                                    <th>Tanggal</th>
-                                                    <th>Produksi</th>
-                                                    <th>Kebutuhan Mesin</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php foreach ($order['produksiHarian'] as $produksiHarian) : ?>
-                                                    <tr>
-                                                        <td><?= $produksiHarian['hari'] ?></td>
-                                                        <td>
-                                                            <?php
-                                                            $currentWeek = floor(($produksiHarian['hari'] - 1) / 7) + $startWeek;
-                                                            $dayIndex = ($produksiHarian['hari'] - 1) % 7;
-                                                            echo $calendar[$currentWeek][$dayIndex] ?? 'N/A';
-                                                            ?>
-                                                        </td>
-                                                        <td><?= $produksiHarian['produksi'] ?></td>
-                                                        <td><?= ceil($produksiHarian['kebMesin']) ?></td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    <?php endforeach; ?>
-                    </div>
+                            <?php endforeach; ?>
+
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
         </div>

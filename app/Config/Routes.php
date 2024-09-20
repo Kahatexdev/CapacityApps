@@ -379,6 +379,8 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->post('tampilPerdelivery', 'OrderController::tampilPerdelivery');
     $routes->get('smvimport', 'OrderController::smvimport');
     $routes->post('importsmv', 'OrderController::importsmv');
+    $routes->get('sisa', 'OrderController::smvimport');
+    $routes->post('updateSisa', 'GodController::updateSisa');
 
 
 

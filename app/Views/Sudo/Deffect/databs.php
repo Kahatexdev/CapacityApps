@@ -246,7 +246,6 @@
     </div>
 </div>
 </div>
-</div>
 <!-- modal reset bs area -->
 <div class="modal fade" id="resetarea" tabindex="-1" role="dialog" aria-labelledby="resetarea" aria-hidden="true">
     <div class="modal-dialog " role="document">

@@ -368,7 +368,8 @@ class DataMesinModel extends Model
     public function maxCapacity($area, $jarum)
     {
         $totalmc = $this->select('sum(total_mc) as total')->where('area', $area)->where('jarum', $jarum)->first();
-        $maxCapacity = $totalmc['total'] * 7 * 14;
+        $target = $this->select('target')->where('area', $area)->where('jarum', $jarum)->first();
+        $maxCapacity = $totalmc['total'] * 7 * $target['target'];
         $data = [
             'totalmesin' => $totalmc['total'],
             'maxCapacity' => $maxCapacity

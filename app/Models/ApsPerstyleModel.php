@@ -58,11 +58,8 @@ class ApsPerstyleModel extends Model
         $result = $this->select('*')
             ->where('mastermodel', $validate['mastermodel'])
             ->where('size', $validate['size'])
-            ->where('country', $validate['country'])
             ->where('delivery', $validate['delivery'])
-            ->where('qty', $validate['qty'])
-            ->get()
-            ->getRow();
+            ->first();
         return $result;
     }
     public function detailModel($noModel, $delivery)
@@ -322,20 +319,61 @@ class ApsPerstyleModel extends Model
             ->where('idapsperstyle', $pr['idapsperstyle'])
             ->update();
     }
-    public function CapacityArea($area, $jarum)
+    public function listOrderArea($area, $jarum)
     {
         $today = date('Y-m-d', strtotime('+1 Days'));
         $maxDeliv = date('Y-m-d', strtotime('+90 Days'));
 
-        return $this->select('mastermodel,sum(sisa)as sisa,delivery,smv')
+        return $this->select('mastermodel')
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
             ->where('sisa >', 0)
             ->where('delivery <', $maxDeliv)
             ->where('delivery >', $today)
-            ->groupBy('machinetypeid, mastermodel')
+            ->groupBy('mastermodel')
+            ->findAll();
+    }
+    public function CapacityArea($pdk, $area, $jarum)
+    {
+        $data = $this->select('mastermodel,sum(sisa)as sisa,delivery,smv')
+            ->where('mastermodel', $pdk)
+            ->where('factory', $area)
+            ->where('machinetypeid', $jarum)
+            ->groupBy('mastermodel,delivery')
             ->get()
             ->getResultArray();
+        $sisaArray = array_column($data, 'sisa');
+        $maxValue = max($sisaArray);
+        $indexMax = array_search($maxValue, $sisaArray);
+        $totalQty = 0;
+        for ($i = 0; $i <= $indexMax; $i++) {
+            $totalQty += $sisaArray[$i];
+        }
+        $totalQty = round($totalQty / 24);
+
+        $deliveryTerjauh = end($data)['delivery'];
+        $today = new DateTime(date('Y-m-d'));
+        $deliveryDate = new DateTime($deliveryTerjauh); // Tanggal delivery terjauh
+        $diff = $today->diff($deliveryDate);
+        $hari = $diff->days - 7;
+
+        $deliveryMax = $data[$indexMax]['delivery'];
+        $tglDeliv = new DateTime($deliveryMax); // Tanggal delivery terjauh
+        $beda = $today->diff($tglDeliv);
+        $hariTarget = $beda->days - 7;
+        $smvArray = array_column($data, 'smv');
+        $smvArray = array_map('intval', $smvArray);
+        $averageSmv = array_sum($smvArray) / count($smvArray);
+
+        $pdk = $data[$indexMax]['mastermodel'];
+        $order = [
+            'mastermodel' => $pdk,
+            'sisa' => $totalQty,
+            'delivery' => $deliveryTerjauh,
+            'targetHari' => $hariTarget,
+            'smv' => $averageSmv
+        ];
+        return $order;
     }
     public function getIdBs($validate)
     {
@@ -364,7 +402,7 @@ class ApsPerstyleModel extends Model
     }
     public function getSisaPerDlv($model, $jarum, $deliv)
     {
-        $sisa = $this->select('idapsperstyle,mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,factory, production_unit, delivery')
+        $sisa = $this->select('idapsperstyle,mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,factory, production_unit, delivery,smv')
             ->where('machinetypeid', $jarum)
             ->where('mastermodel', $model)
             ->where('delivery', $deliv)
@@ -431,7 +469,7 @@ class ApsPerstyleModel extends Model
 
             if ($leadtime > 0) {
                 $target = 3600 / $smv; // Simplified target calculation
-                $kebMesin = $dt['sisa'] / $target / $leadtime;
+                $kebMesin = ($dt['sisa'] / $target / $leadtime) / 24;
                 $kebutuhanMc = ceil($kebMesin);
                 $dz = $kebutuhanMc * $target;
 
@@ -479,5 +517,31 @@ class ApsPerstyleModel extends Model
         $this->orderBy('delivery');
 
         return $this->get()->getResultArray();
+    }
+    public function resetSisaDlv($update)
+    {
+        $sisa = 0;
+        $this->set('sisa', $sisa)
+            ->where('mastermodel', $update['mastermodel'])
+            ->where('delivery', $update['delivery'])
+            ->where('size', $update['size'])
+            ->update();
+        return $this->affectedRows();
+    }
+    public function getIdPerDeliv($update)
+    {
+        return $this->select('idapsperstyle')
+            ->where('mastermodel', $update['mastermodel'])
+            ->where('delivery', $update['delivery'])
+            ->where('size', $update['size'])
+            ->first();
+    }
+    public function totalPo($model)
+    {
+        $po = $this->select('sum(qty) as totalPo')
+            ->where('mastermodel', $model)
+            ->findAll();
+        $order = reset($po);
+        return $order;
     }
 }

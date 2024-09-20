@@ -613,6 +613,7 @@ class OrderController extends BaseController
             $idModel = $this->orderModel->getId($nomodel);
             $startRow = 4; // Ganti dengan nomor baris mulai
             foreach ($spreadsheet->getActiveSheet()->getRowIterator($startRow) as $row) {
+                $rowIndex = $row->getRowIndex();
                 $cellIterator = $row->getCellIterator();
                 $cellIterator->setIterateOnlyExistingCells(false);
                 $row = [];
@@ -624,8 +625,7 @@ class OrderController extends BaseController
                     $firstSpacePosition = strpos($no_models, ' '); // Cari posisi spasi pertama
                     $no_model = substr($no_models, 0, $firstSpacePosition);
                     if ($no_model != $nomodel) {
-                        dd($no_models);
-                        return redirect()->to(base_url(session()->get('role') . '/semuaOrder'))->with('error', 'Nomor Model Tidak Sama. Silahkan periksa kembali');
+                        return redirect()->to(base_url(session()->get('role') . '/semuaOrder'))->with('error', 'Nomor Model Tidak Sama. Silahkan periksa kembali' . $rowIndex);
                     } else {
                         if ($row[5] == null) {
                             return redirect()->to(base_url(session()->get('role') . '/semuaOrder'))->with('error', 'GAGAL');
@@ -692,11 +692,17 @@ class OrderController extends BaseController
                                 'qty' => $qty
                             ];
 
-                            // $existingAps = $this->ApsPerstyleModel->checkAps($validate);
-                            // if (!$existingAps) {
-                            $this->ApsPerstyleModel->insert($simpandata);
-
+                            $existingAps = $this->ApsPerstyleModel->checkAps($validate);
+                            if (!$existingAps) {
+                                $this->ApsPerstyleModel->insert($simpandata);
+                            } else {
+                                $id = $existingAps['idapsperstyle'];
+                                $qtyLama = $existingAps['qty'];
+                                $qtyBaru = $qty + $qtyLama;
+                                $this->ApsPerstyleModel->update($id, ['qty' => $qtyBaru, 'sisa' => $qtyBaru]);
+                            }
                             $this->orderModel->update($idModel, $updateData);
+
                             // }
                         }
                     }
@@ -763,6 +769,7 @@ class OrderController extends BaseController
             }
             $sisaPerDeliv[$deliv]['totalQty'] = $totalqty;
         }
+        $totalPo = $this->ApsPerstyleModel->totalPo($noModel);
         // ini ngambil jumlah qty
         $sisaArray = array_column($pdk, 'sisa');
         $maxValue = max($sisaArray);
@@ -778,19 +785,26 @@ class OrderController extends BaseController
         });
         $totalQty = round($totalQty / 24);
         $deliveryTerjauh = end($pdk)['delivery'];
-        $today = new DateTime(date('Y-m-d')); // Hari ini
+        $today = new DateTime(date('Y-m-d'));
         $deliveryDate = new DateTime($deliveryTerjauh); // Tanggal delivery terjauh
         $diff = $today->diff($deliveryDate);
         $hari = $diff->days - 7;
+
+        // ini ngambil delivery bottleneck
+
+        $deliveryMax = $pdk[$indexMax]['delivery'];
+        $tglDeliv = new DateTime($deliveryMax); // Tanggal delivery terjauh
+        $beda = $today->diff($tglDeliv);
+        $hariTarget = $beda->days - 7;
 
         // disini ngambil rata rata target.
         $smvArray = array_column($pdk, 'smv');
         $smvArray = array_map('intval', $smvArray);
         $averageSmv = array_sum($smvArray) / count($smvArray);
-        $target = round((86400 / (intval($averageSmv))) * 0.8 / 24);
+        $target = round((86400 / (intval($averageSmv))) * 0.85 / 24);
 
         // ini baru kalkulasi
-        $mesin = round($totalQty / $target / $hari);
+        $mesin = round($totalQty / $target / $hariTarget);
         $targetPerhari = round($mesin * $target);
 
 
@@ -807,7 +821,7 @@ class OrderController extends BaseController
                 $target = $mesinPerarea[0]['target'];
                 $totalMesin = $mesinPerarea[0]['totalMesin'];
                 $kapasitasPerhari = ($target * $totalMesin);
-                $usedCapacityDaily = round($sisa / $hari);
+                $usedCapacityDaily = round($sisa / $hariTarget);
                 $availCapacityDaily = $kapasitasPerhari - $usedCapacityDaily;
 
                 // Tetap simpan area, tapi label avail sebagai 'N/A' jika kapasitas avail kurang dari target
@@ -830,7 +844,6 @@ class OrderController extends BaseController
             return $b['avail'] <=> $a['avail'];
         });
         $top3Rekomendasi = array_slice($rekomendasi, 0, 3);
-
         $dataMc = $this->jarumModel->getAreaModel($noModel);
         $data = [
             'role' => session()->get('role'),
@@ -850,7 +863,8 @@ class OrderController extends BaseController
             'kebMesin' => $mesin,
             'target' => $targetPerhari,
             'hari' => $hari,
-            'rekomendasi' => $top3Rekomendasi
+            'rekomendasi' => $top3Rekomendasi,
+            'totalPo' => $totalPo
         ];
         return view(session()->get('role') . '/Order/detailPdk', $data);
     }

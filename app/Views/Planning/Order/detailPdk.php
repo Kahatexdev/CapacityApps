@@ -53,6 +53,10 @@ error_reporting(E_ALL); ?>
                             <?php foreach ($headerRow as $val): ?>
                                 <li><?= date('d M Y', strtotime($val['delivery']))  ?> : <?= round($val['qty'] / 24) ?> dz</li>
                             <?php endforeach ?>
+                            <p>---------------------------------------------</p>
+
+                            Total Order : <?= round($totalPo['totalPo'] / 24) ?> dz
+
                         </div>
                         <div class="col-md-4">
                             <h6>Summarize <?= $noModel ?> <?= $jarum ?></h6>
@@ -108,6 +112,7 @@ error_reporting(E_ALL); ?>
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Size</th>
                                             <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Qty</th>
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Sisa</th>
+                                            <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">SMV</th>
                                             <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Area</th>
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Factory</th>
                                             <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Action</th>
@@ -121,6 +126,7 @@ error_reporting(E_ALL); ?>
                                                     <td> <?= $list['size'] ?></td>
                                                     <td><?= round($list['qty'] / 24) ?> dz</td>
                                                     <td><?= round($list['sisa'] / 24) ?> dz</td>
+                                                    <td><?= $list['smv'] ?></td>
                                                     <td><?= $list['factory'] ?></td>
                                                     <td><?= $list['production_unit'] ?></td>x
                                                     <td>

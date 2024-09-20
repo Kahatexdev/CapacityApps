@@ -125,7 +125,6 @@ class PlanningController extends BaseController
             ];
             $assign = $this->ApsPerstyleModel->asignAreal($data);
             if (!$assign) {
-                dd($data);
                 return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $pdk . '/' . $jarum))->withInput()->with('error', 'Gagal Assign Area');
             }
         }

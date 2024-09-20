@@ -57,9 +57,11 @@
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Model</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jarum</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Desc</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Prod Type</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Seam</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Order</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Order</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Hari</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
                             </tr>
                         </thead>
@@ -70,10 +72,12 @@
                                     <td class="text-xs"><?= $key['kd_buyer_order'] ?></td>
                                     <td class="text-xs"><?= $key['no_model'] ?></td>
                                     <td class="text-xs"><?= $key['machinetypeid'] ?></td>
+                                    <td class="text-xs"><?= $key['product_type'] ?></td>
                                     <td class="text-xs"><?= $key['description'] ?></td>
                                     <td class="text-xs"><?= $key['seam'] ?></td>
                                     <td class="text-xs"><?= ceil($key['qty'] / 24) ?> dz</td>
                                     <td class="text-xs"><?= ceil($key['sisa'] / 24) ?> dz</td>
+                                    <td class="text-xs"><?= ceil($key['sisahari']) ?> days</td>
                                     <td class="text-xs">
 
                                         <a href="<?= base_url($role . '/detailPdk/' . $key['no_model'] . '/' . $key['machinetypeid']); ?>" <button type="button" class="btn btn-info btn-sm details-btn">
