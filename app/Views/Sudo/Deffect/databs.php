@@ -217,8 +217,8 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
-                    <div class="modal-body align-items-center">
-                        <form action="<?= base_url($role . '/resetbsarea/'); ?>" method="post">
+                    <form action="<?= base_url($role . '/resetbsarea/'); ?>" method="post">
+                        <div class="modal-body align-items-center">
                             <div class="form-group">
                                 <label for="awal">Area</label>
                                 <input type="text" class="form-control" name="area" required>
@@ -232,11 +232,11 @@
                                 <input type="date" class="form-control" name="akhir" required>
                             </div>
 
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn bg-gradient-info">Reset</button>
-                    </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-info">Reset</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -244,11 +244,6 @@
         <?= $this->renderSection('bstabel'); ?>
 
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn bg-gradient-info">Reset</button>
-    </div>
-    </form>
 </div>
 </div>
 </div>
@@ -262,8 +257,8 @@
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
-            <div class="modal-body align-items-center">
-                <form action="<?= base_url($role . '/resetbsarea/'); ?>" method="post">
+            <form action="<?= base_url($role . '/resetbsarea/'); ?>" method="post">
+                <div class="modal-body align-items-center">
                     <div class="form-group">
                         <label for="awal">Area</label>
                         <input type="text" class="form-control" name="area" required>
@@ -276,12 +271,11 @@
                         <label for="awal">Akhir</label>
                         <input type="date" class="form-control" name="akhir" required>
                     </div>
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn bg-gradient-info">Reset</button>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-gradient-info">Reset</button>
+                </div>
             </form>
         </div>
     </div>

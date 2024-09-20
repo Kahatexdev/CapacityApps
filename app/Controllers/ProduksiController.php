@@ -959,9 +959,11 @@ class ProduksiController extends BaseController
             try {
                 $no_model = $data[21];
                 $style = $data[4];
+                $area = $data[26];
                 $validate = [
                     'no_model' => $no_model,
-                    'style' => $style
+                    'style' => $style,
+                    'area' => $area,
                 ];
                 $idAps = $this->ApsPerstyleModel->getIdForBs($validate);
                 if (!$idAps) {
@@ -987,6 +989,7 @@ class ProduksiController extends BaseController
                     // $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
                     $idProduksi = $this->produksiModel
                         ->where('idapsperstyle', $id)
+                        ->where('area', $area)
                         ->where('bs_prod <=', $qtyOrder)
                         ->orderBy('qty_produksi', 'desc')
                         ->orderBy('bs_prod', 'asc')
@@ -1000,16 +1003,18 @@ class ProduksiController extends BaseController
                         return $prod['bs_prod'] == $minBsProd;
                     });
                     $idprod = reset($idprod);
+                    $idprd = $idprod['id_produksi'];
                     $bs = $idprod['bs_prod'] + $qty;
 
                     $datainsert = [
                         'tgl_instocklot' => $tglprod,
                         'idapsperstyle' => $id,
-                        'area' => $data[26],
+                        'area' => $area,
                         'no_label' => $data[22],
                         'no_box' => $data[23],
                         'qty' => $qty,
-                        'kode_deffect' => $kodeDeffect
+                        'kode_deffect' => $kodeDeffect,
+                        'id_produksi' => $idprd
 
                     ];
                     $insert = $this->BsModel->insert($datainsert);
