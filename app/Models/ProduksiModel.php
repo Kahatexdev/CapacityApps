@@ -179,15 +179,14 @@ class ProduksiModel extends Model
                 ->update();
         }
     }
-    public function getBsProd($idap, $bs)
+    public function getBsProd($id)
     {
-        $result = $this->select('bs_prod')
-            ->where('idapsperstyle', $idap)
-            ->where('bs_prod >=', $bs)
+        return $this->select('bs_prod')
+            ->where('id_produksi', $id)
+            ->orderBy('bs_prod')
             ->first();
 
         // Mengembalikan hasil sebagai string
-        return isset($result['bs_prod']) ? (string) $result['bs_prod'] : '';
     }
     public function updateBsProd($idap, $newBs)
     {

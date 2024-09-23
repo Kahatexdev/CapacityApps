@@ -428,6 +428,7 @@ class ApsPerstyleModel extends Model
         $data = $this->select('idapsperstyle, delivery, sisa,qty')
             ->where('mastermodel', $validate['no_model'])
             ->where('size', $validate['style'])
+            ->where('factory', $validate['area'])
             ->where('qty != sisa')
             ->orderBy('sisa', 'ASC') // Mengurutkan berdasarkan 'sisa' dari yang terkecil
             ->first(); // Mengambil data pertama (yang terkecil)

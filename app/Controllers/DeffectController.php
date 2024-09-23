@@ -29,9 +29,12 @@ class DeffectController extends BaseController
     protected $liburModel;
     protected $deffectModel;
     protected $BsModel;
+    protected $db;
+
 
     public function __construct()
     {
+        $this->db = \Config\Database::connect();
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
@@ -140,17 +143,24 @@ class DeffectController extends BaseController
         $pdk = $this->request->getPost('pdk');
 
         $idaps = $this->ApsPerstyleModel->getIdAps($pdk);
-        $qtyBs = $this->BsModel->getTotalBs($idaps);
+        // Cek apakah $idaps tidak kosong
+        if (!empty($idaps)) {
+            $qtyBs = $this->BsModel->getTotalBs($idaps);
 
-        $this->produksiModel->resetQtyBs($idaps);
-        foreach ($qtyBs as $idap) {
-            $bs = $idap['qty'];
-            $sisa = $this->ApsPerstyleModel->getSisaOrder($idap['idapsperstyle']);
-            $newSisa = $sisa - $bs;
-            $this->ApsPerstyleModel->update($idap['idapsperstyle'], ['sisa' => $newSisa]);
+            $this->produksiModel->resetQtyBs($idaps);
+
+            foreach ($qtyBs as $idap) {
+                $bs = $idap['qty'];
+                $sisa = $this->ApsPerstyleModel->getSisaOrder($idap['idapsperstyle']);
+                $newSisa = $sisa - $bs;
+                $this->ApsPerstyleModel->update($idap['idapsperstyle'], ['sisa' => $newSisa]);
+            }
+
+            $this->BsModel->deleteSesuai($idaps);
+        } else {
+            // Jika $idaps kosong, lakukan penanganan lain, misalnya logging atau redirect dengan pesan error
+            return redirect()->to(base_url(session()->get('role') . '/datadeffect'))->withInput()->with('error', 'Tidak ada data yang ditemukan untuk di-reset.');
         }
-
-        $this->BsModel->deleteSesuai($idaps);
         return redirect()->to(base_url(session()->get('role') . '/datadeffect'))->withInput()->with('success', 'Data Berhasil di reset');
     }
 
@@ -161,25 +171,57 @@ class DeffectController extends BaseController
         $akhir = $this->request->getPost('akhir');
 
         $idaps = $this->BsModel->getDataForReset($area, $awal, $akhir);
-        $qtyBs = $this->BsModel->getQtyBs($idaps);
-        $ttlBs = $this->BsModel->getTotalBs($idaps);
+        if (!empty($idaps)) {
+            // Memulai transaksi
+            $this->db->transBegin();
 
-        foreach ($qtyBs as $idap) {
-            $bs = $idap['qty'];
-            $bs_prod = $this->produksiModel->getBsProd($idap['idapsperstyle'], $bs);
-            $newBs = $bs_prod - $bs;
-            $this->produksiModel->update($idap['idapsperstyle'], ['bs_prod' => $newBs]);
+            $failedIds = []; // Array untuk menyimpan ID yang gagal
+
+            foreach ($idaps as $data) {
+                $qtyBs = intval($data['qty']);
+                $idProduksi = $data['id_produksi'];
+                $idbs = $data['idbs'];
+                $id = $data['idapsperstyle'];
+                $area = $data['area'];
+
+                // Update tabel produksi
+                $dataProduksi = $this->produksiModel->getBsProd($idProduksi);
+                // Mengecek jika dataProduksi tidak ada
+                if (empty($dataProduksi)) {
+                    $failedIds[] = 'Tidak ada Data Produksi : ' . $idbs . ' Qty BS = ' . $qtyBs . 'idaps = ' . $id . 'Area =' . $area;
+                    continue;
+                }
+
+                $dataOrder = $this->ApsPerstyleModel->getSisaOrder($id);
+                $newOrder = $dataOrder - $qtyBs;
+                $newBs = $dataProduksi['bs_prod'] - $qtyBs;
+
+                $updateProduksi = $this->produksiModel->update($idProduksi, ['bs_prod' => $newBs]);
+
+                if ($updateProduksi) {
+                    $updateOrder = $this->ApsPerstyleModel->update($id, ['sisa' => $newOrder]);
+                    $this->BsModel->delete($idbs);
+                } else {
+                    $failedIds[] = 'Gagal update Data produksi' . $idbs;
+                    continue;
+                }
+            }
+
+            if ($this->db->transStatus() === FALSE || !empty($failedIds)) {
+                // Rollback jika ada yang gagal
+                $this->db->transRollback();
+
+                // Menyusun pesan kesalahan
+                $errorMsg = 'Gagal melakukan reset pada ID: ' . implode(', ', $failedIds);
+                return redirect()->to(base_url(session()->get('role') . '/datadeffect'))->withInput()->with('error', $errorMsg);
+            } else {
+                // Commit transaksi jika semua sukses
+                $this->db->transCommit();
+                return redirect()->to(base_url(session()->get('role') . '/datadeffect'))->withInput()->with('success', 'Data Berhasil di-reset');
+            }
+        } else {
+            // Jika $idaps kosong
+            return redirect()->to(base_url(session()->get('role') . '/datadeffect'))->withInput()->with('error', 'Tidak ada data yang ditemukan untuk di-reset.');
         }
-
-        foreach ($ttlBs as $idap) {
-            $bs = $idap['qty'];
-            $sisa = $this->ApsPerstyleModel->getSisaOrder($idap['idapsperstyle']);
-            $newSisa = $sisa - $bs;
-            $this->ApsPerstyleModel->update($idap['idapsperstyle'], ['sisa' => $newSisa]);
-        }
-
-        $this->BsModel->deleteBSArea($area, $awal, $akhir);
-
-        return redirect()->to(base_url(session()->get('role') . '/datadeffect'))->withInput()->with('success', 'Data Berhasil di reset');
     }
 }

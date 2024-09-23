@@ -655,6 +655,7 @@ class OrderController extends BaseController
 
                             $leadtime = $row[24];
                             $processRoute = $row[25];
+                            dd($processRoute);
                             $lcoDate = $row[26];
                             $rlcoDate = str_replace('/', '-', (substr($lcoDate, -10)));
                             $lcoDate2 = date('Y-m-d', strtotime($rlcoDate));
