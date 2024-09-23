@@ -467,9 +467,9 @@ class MesinController extends BaseController
     public function updatemesinperjarumPlan($idDataMesin)
     {
 
-
         $data = [
             'role' => session()->get('role'),
+            'jarum' => $this->request->getPost("jarum"),
             'total_mc' => $this->request->getPost("total_mc"),
             'brand' => $this->request->getPost("brand"),
             'mesin_jalan' => $this->request->getPost("mesin_jalan"),

@@ -1,4 +1,4 @@
-<?php $this->extend('Ie/layout'); ?>
+<?php $this->extend('ie/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">

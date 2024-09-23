@@ -457,19 +457,18 @@ class ApsPerstyleModel extends Model
             ->whereNotIn('factory', ['Belum Ada Area', 'MJ'])
             ->groupBy('machinetypeid, factory, mastermodel')
             ->findAll();
-
         $totalKebMesin = 0;
         $outputDz = 0;
 
         foreach ($data as $dt) {
             $delivDate = new DateTime($dt['delivery']);
             $leadtime = $delivDate->diff($todayDate)->days;
-            $smv = intval($dt['smv']);
-            $smv = $smv == 0 ? 14 : $smv;
-
+            $smv = intval($dt['smv']) ?? 185;
+            $sisa = round($dt['sisa'] / 24);
             if ($leadtime > 0) {
-                $target = 3600 / $smv; // Simplified target calculation
-                $kebMesin = ($dt['sisa'] / $target / $leadtime) / 24;
+                $target = round((86400 / $smv) * 0.85 / 24); // Simplified target calculation
+                $kebMesin = $sisa / $target / $leadtime;
+
                 $kebutuhanMc = ceil($kebMesin);
                 $dz = $kebutuhanMc * $target;
 

@@ -48,6 +48,7 @@ class IeController extends BaseController
     }
     public function index()
     {
+        $role = session()->get('role');
         $orders = $this->ApsPerstyleModel->getSmv();
         $data = [
             'role' => session()->get('role'),
@@ -59,7 +60,7 @@ class IeController extends BaseController
             'produksiHari' => 0,
             'order' => $orders
         ];
-        return view('Ie/index', $data);
+        return view($role . '/index', $data);
     }
     public function inputsmv()
     {

@@ -456,13 +456,52 @@ class PlanningController extends BaseController
             'active6' => '',
             'active7' => '',
             'bulan' => $bulanIni,
-            'jarum' => $jarum,
-            'kebutuhanMesin' => $kebutuhanMesin,
-            'totalMc' => $totalArea,
-            'output' => $outputDz, // Pass outputDz data to the view
-            'monthlyData' => $monthlyData,
+
         ];
 
         return view($role . '/Planning/planningjalanMCPerBulan', $data);
+    }
+    public function monthlyMachine($bulan)
+    {
+        $role = session()->get('role');
+        $date = DateTime::createFromFormat('F-Y', $bulan);
+        $bulanIni = $date->format('F-Y');
+        $awalBulan = $date->format('Y-m-01');
+
+        $area = $this->jarumModel->getArea();
+        $monthlyData = [];
+        foreach ($area as $ar) {
+            $mesin = $this->jarumModel->areaMc($ar);
+            $totalMesin = 0;
+            $planningMc = 0;
+            $outputDz = 0;
+            foreach ($mesin as $jarum) {
+                $sisaOrder = $this->ApsPerstyleModel->ambilSisaOrder($ar, $awalBulan, $jarum['jarum']);
+                $monthlyData[$ar][$jarum['jarum']]['kebutuhanMesin'] = $sisaOrder['totalKebMesin'];
+                $monthlyData[$ar][$jarum['jarum']]['output'] = $sisaOrder['outputDz'];
+                $totalMesin += $jarum['total'];
+                $planningMc += $sisaOrder['totalKebMesin'];
+                $outputDz += $sisaOrder['outputDz'];
+            }
+            $monthlyData[$ar]['totalMesin'] = $totalMesin;
+            $monthlyData[$ar]['planningMc'] = $planningMc;
+            $monthlyData[$ar]['outputDz'] = $outputDz;
+        }
+        dd($monthlyData);
+        $summary;
+        $data = [
+            'role' => $role,
+            'title' => 'Planning Jalan MC ' . $bulanIni,
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'bulan' => $bulanIni,
+        ];
+
+        return view($role . '/Planning/monthlyMachine', $data);
     }
 }
