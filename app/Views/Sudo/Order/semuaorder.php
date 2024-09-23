@@ -226,7 +226,7 @@
                             Import
                         </button>`;
             } else {
-                return `<a href="<?= base_url($role . '/detailmodel') ?>/${row.no_model}/${row.delivery}">
+                return `<a href="<?= base_url($role . '/detailPdk') ?>/${row.no_model}/${row.machinetypeid}">
                             <button type="button" class="btn btn-info btn-sm details-btn">Details</button>
                         </a>`;
             }
