@@ -13,6 +13,7 @@ use App\Models\AreaModel;
 use App\Models\ProduksiModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use DateTime;
+use App\Models\HistorySmvModel;
 
 class OrderController extends BaseController
 {
@@ -25,6 +26,8 @@ class OrderController extends BaseController
     protected $ApsPerstyleModel;
     protected $liburModel;
     protected $roleSession;
+    protected $historysmv;
+
 
     public function __construct()
     {
@@ -35,6 +38,7 @@ class OrderController extends BaseController
         $this->produksiModel = new ProduksiModel();
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
+        $this->historysmv = new HistorySmvModel();
         if ($this->filters   = ['role' => ['capacity',  'planning', 'aps', 'god']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -655,7 +659,6 @@ class OrderController extends BaseController
 
                             $leadtime = $row[24];
                             $processRoute = $row[25];
-                            dd($processRoute);
                             $lcoDate = $row[26];
                             $rlcoDate = str_replace('/', '-', (substr($lcoDate, -10)));
                             $lcoDate2 = date('Y-m-d', strtotime($rlcoDate));
@@ -1050,6 +1053,65 @@ class OrderController extends BaseController
             }
         } else {
             return redirect()->to(base_url(session()->get('role') . '/smvimport'))->withInput()->with('error', 'No data found in the Excel file');
+        }
+    }
+    public function importupdatesmv()
+    {
+        $file = $this->request->getFile('excel_file');
+        if ($file->isValid() && !$file->hasMoved()) {
+            $spreadsheet = IOFactory::load($file);
+            $sheet = $spreadsheet->getActiveSheet();
+            $startRow = 5; // Ganti dengan nomor baris mulai
+            $errorRows = [];
+
+            foreach ($sheet->getRowIterator($startRow) as $rowIndex => $row) {
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = $cell->getValue();
+                }
+                if ($rowData[2] == null) {
+                    break;
+                }
+                if (!empty($rowData)) {
+                    $no_model = $rowData[1];
+                    $size = $rowData[2];
+                    $smv = $rowData[3];
+                    $validate = [
+                        'mastermodel' => $no_model,
+                        'size' => $size,
+                        'smv' => $smv
+                    ];
+                    $id = $this->ApsPerstyleModel->getIdSmv($validate);
+                    if ($id === null) {
+                        $errorRows[] = "ID not found at row " . ($rowIndex + $startRow);
+                        continue;
+                    }
+                    foreach ($id as $Id) {
+                        $idaps = $Id['idapsperstyle'];
+                        $update = $this->ApsPerstyleModel->update($Id, ['smv' => $smv]);
+                        $insert = [
+                            'style' => $size,
+                            'smv_old' => $Id['smv'],
+                        ];
+                        if (!$update) {
+                            $errorRows[] = "Failed to update row " . ($rowIndex + $startRow);
+                        } else {
+                            $this->historysmv->insert($insert);
+                        }
+                    }
+                }
+            }
+            if (!empty($errorRows)) {
+                $errorMessage = "Errors occurred:\n" . implode("\n", $errorRows);
+                dd($errorMessage);
+                return redirect()->to(base_url(session()->get('role') . '/updatesmv'))->withInput()->with('error', $errorMessage);
+            } else {
+                return redirect()->to(base_url(session()->get('role') . '/updatesmv'))->withInput()->with('success', 'Data Berhasil di Update');
+            }
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/updatesmv'))->withInput()->with('error', 'No data found in the Excel file');
         }
     }
     public function smvimport()

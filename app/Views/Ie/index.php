@@ -1,4 +1,4 @@
-<?php $this->extend('ie/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
@@ -16,7 +16,9 @@
                         </div>
                         <div>
 
-
+                            <div>
+                                <a href="<?= $role . '/updatesmv' ?>" class="btn btn-info">Import Data</a>
+                            </div>
 
                         </div>
                     </div>

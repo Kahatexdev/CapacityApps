@@ -476,7 +476,8 @@ class PlanningController extends BaseController
             $planningMc = 0;
             $outputDz = 0;
             foreach ($mesin as $jarum) {
-                $sisaOrder = $this->ApsPerstyleModel->ambilSisaOrder($ar, $awalBulan, $jarum['jarum']);
+                $sisaOrder = $this->ApsPerstyleModel->ambilSisaOrder($ar, $awalBulan, 'tj144');
+                dd($sisaOrder);
                 $monthlyData[$ar][$jarum['jarum']]['kebutuhanMesin'] = $sisaOrder['totalKebMesin'];
                 $monthlyData[$ar][$jarum['jarum']]['output'] = $sisaOrder['outputDz'];
                 $totalMesin += $jarum['total'];

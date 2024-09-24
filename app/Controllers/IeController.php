@@ -62,6 +62,18 @@ class IeController extends BaseController
         ];
         return view($role . '/index', $data);
     }
+    public function updatesmv()
+    {
+        $role = session()->get('role');
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Dashboard',
+            'active1' => 'active',
+            'active2' => '',
+
+        ];
+        return view($role . '/updateview', $data);
+    }
     public function inputsmv()
     {
 

@@ -485,4 +485,7 @@ $routes->group('/ie', ['filter' => 'ie'], function ($routes) {
     $routes->post('editcylinder/(:any)', 'MesinController::editcylinderPlan/$1');
     $routes->post('deletecylinder/(:any)', 'MesinController::deletecylinderPlan/$1');
     $routes->get('allmachine', 'MesinController::allmachinePlan');
+
+    $routes->get('updatesmv', 'IeController::updatesmv');
+    $routes->post('importupdate', 'OrderController::importupdatesmv');
 });
