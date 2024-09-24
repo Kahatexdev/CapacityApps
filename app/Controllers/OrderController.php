@@ -393,14 +393,15 @@ class OrderController extends BaseController
             'smv' => $this->request->getPost("smv"),
             'factory' => $this->request->getPost("factory"),
         ];
+        $jrm = $this->request->getPost("jarum");
         $id = $idOrder;
         $update = $this->ApsPerstyleModel->update($id, $data);
         $modl = $this->request->getPost("no_model");
         $del = $this->request->getPost("delivery");
         if ($update) {
-            return redirect()->to(base_url(session()->get('role') . '/detailmodel/' . $modl . '/' . $del))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $modl . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/detailmodel/' . $modl . '/' . $del))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $modl . '/' . $jrm))->withInput()->with('error', 'Gagal Update Data');
         }
     }
     public function updateorderjarum($idOrder)
@@ -422,9 +423,9 @@ class OrderController extends BaseController
         $del = $this->request->getPost("delivery");
         $jrm = $this->request->getPost("jarum");
         if ($update) {
-            return redirect()->to(base_url(session()->get('role') . '/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $modl . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $modl . '/' . $jrm))->withInput()->with('error', 'Gagal Update Data');
         }
     }
     public function updateorderjarumplan($idOrder)
