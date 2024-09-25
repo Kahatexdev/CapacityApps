@@ -488,7 +488,44 @@ class PlanningController extends BaseController
             $monthlyData[$ar]['planningMc'] = $planningMc;
             $monthlyData[$ar]['outputDz'] = $outputDz;
         }
-        $summary;
+        $totalAllMesin = 0;
+
+        $totalOutput = 0;
+        $totalMcPlanning = 0;
+
+        foreach ($monthlyData as $data) {
+            $totalAllMesin += $data['totalMesin'];
+            $totalOutput += $data['outputDz'];
+            $totalMcPlanning += $data['planningMc'];
+        }
+        $totalKebGloves = 0; // Initialize outside the loop
+
+        foreach ($monthlyData['KK8J'] as $data) {
+            if (is_array($data) && isset($data['kebutuhanMesin'])) {
+                $totalKebGloves += $data['kebutuhanMesin'];
+            }
+        }
+        $totalKebSock = $totalMcPlanning - $totalKebGloves;
+        $totalMcSocks = $this->jarumModel->totalMcSock();
+        $totalMcSocks = intval($totalMcSocks['total']);
+        $totalMcGloves = $totalAllMesin - $totalMcSocks;
+        $persenSocks = round(($totalKebSock / $totalMcSocks) * 100);
+        $persenGloves = round(($totalKebGloves / $totalMcGloves) * 100);
+        $persenTotal = round(($totalMcPlanning / $totalAllMesin) * 100);
+        $summary = [
+            'totalMc' => $totalAllMesin,
+            'OutputTotal' => $totalOutput,
+            'totalPlanning' => $totalMcPlanning,
+            'totalPersen' => $persenTotal,
+
+            'mcSocks' => $totalMcSocks,
+            'planMcSocks' => $totalKebSock,
+            'persenSocks' => $persenSocks,
+
+            'mcGloves' => $totalMcGloves,
+            'planMcGloves' => $totalKebGloves,
+            'persenGloves' => $persenGloves
+        ];
         $data = [
             'role' => $role,
             'title' => 'Planning Jalan MC ' . $bulanIni,
@@ -500,7 +537,8 @@ class PlanningController extends BaseController
             'active6' => '',
             'active7' => '',
             'bulan' => $bulanIni,
-            'data' => $monthlyData
+            'data' => $monthlyData,
+            'summary' => $summary
         ];
 
         return view($role . '/Planning/monthlyMachine', $data);

@@ -54,6 +54,38 @@
         </script>
     <?php endif; ?>
     <div class="row" id="card-container">
+        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
+            <div class="card">
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <h6>Global</h6>
+                            <li>Total Mesin : <?= $summary['totalMc'] ?> Mesin</li>
+                            <li>Total Planning : <?= $summary['totalPlanning'] ?> Mesin </li>
+                            <li>Persentase : <?= $summary['totalPersen'] ?>% </li>
+                            <li>Total Output : <?= $summary['OutputTotal'] ?> dz </li>
+
+                        </div>
+                        <div class="col-lg-4">
+                            <h6> Socks </h6>
+                            <li>Total Mesin : <?= $summary['mcSocks'] ?> Mesin</li>
+                            <li>Total Planning : <?= $summary['planMcSocks'] ?> Mesin </li>
+                            <li>Persentase : <?= $summary['persenSocks'] ?>% </li>
+                        </div>
+                        <div class="col-lg-4">
+                            <h6> Gloves </h6>
+                            <li>Total Mesin : <?= $summary['mcGloves'] ?> Mesin</li>
+                            <li>Total Planning : <?= $summary['planMcGloves'] ?> Mesin </li>
+                            <li>Persentase : <?= $summary['persenGloves'] ?>% </li>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="row" id="card-container">
         <?php foreach ($data as $area => $jarum): ?>
             <div class="col-xl-6 col-sm-12 mb-xl-0 mb-4 mt-2">
                 <div class="card equal-height">
