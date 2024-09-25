@@ -53,13 +53,63 @@
             });
         </script>
     <?php endif; ?>
-    <div class="row">
-
-
+    <div class="row" id="card-container">
+        <?php foreach ($data as $area => $jarum): ?>
+            <div class="col-xl-6 col-sm-12 mb-xl-0 mb-4 mt-2">
+                <div class="card equal-height">
+                    <div class="card-header">
+                        <div class="row">
+                            <h6> <?= $area ?></h6>
+                        </div>
+                        <div class="row text-bold">
+                            <div class="col-lg-4"> Total Mesin: <?= $jarum['totalMesin']; ?></div>
+                            <div class="col-lg-4"> Planning Mesin : <?= $jarum['planningMc']; ?></div>
+                            <div class="col-lg-4"> Output (dz) : <?= $jarum['outputDz']; ?> dz</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table">
+                            <table class="table">
+                                <thead class="bg-dark">
+                                    <th class=" text-white"> Jarum </th>
+                                    <th class=" text-white"> Plan Mesin </th>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($jarum as $jr): ?>
+                                        <?php if (!is_array($jr)) continue; ?>
+                                        <tr>
+                                            <td><?= $jr['jr'] ?></td>
+                                            <td><?= $jr['kebutuhanMesin'] ?></td>
+                                        </tr>
+                                    <?php endforeach ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
     </div>
+
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let cards = document.querySelectorAll('.equal-height');
+        let maxHeight = 0;
 
+        // Loop untuk cek tinggi tertinggi
+        cards.forEach(function(card) {
+            let cardHeight = card.offsetHeight;
+            if (cardHeight > maxHeight) {
+                maxHeight = cardHeight;
+            }
+        });
+
+        // Set tinggi semua card ke maxHeight
+        cards.forEach(function(card) {
+            card.style.height = maxHeight + 'px';
+        });
+    });
 </script>
 <?php $this->endSection(); ?>

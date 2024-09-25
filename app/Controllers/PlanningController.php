@@ -476,10 +476,10 @@ class PlanningController extends BaseController
             $planningMc = 0;
             $outputDz = 0;
             foreach ($mesin as $jarum) {
-                $sisaOrder = $this->ApsPerstyleModel->ambilSisaOrder($ar, $awalBulan, 'tj144');
-                dd($sisaOrder);
+                $sisaOrder = $this->ApsPerstyleModel->ambilSisaOrder($ar, $awalBulan, $jarum['jarum']);
                 $monthlyData[$ar][$jarum['jarum']]['kebutuhanMesin'] = $sisaOrder['totalKebMesin'];
                 $monthlyData[$ar][$jarum['jarum']]['output'] = $sisaOrder['outputDz'];
+                $monthlyData[$ar][$jarum['jarum']]['jr'] = $jarum['jarum'];
                 $totalMesin += $jarum['total'];
                 $planningMc += $sisaOrder['totalKebMesin'];
                 $outputDz += $sisaOrder['outputDz'];
@@ -488,7 +488,6 @@ class PlanningController extends BaseController
             $monthlyData[$ar]['planningMc'] = $planningMc;
             $monthlyData[$ar]['outputDz'] = $outputDz;
         }
-        dd($monthlyData);
         $summary;
         $data = [
             'role' => $role,
@@ -501,6 +500,7 @@ class PlanningController extends BaseController
             'active6' => '',
             'active7' => '',
             'bulan' => $bulanIni,
+            'data' => $monthlyData
         ];
 
         return view($role . '/Planning/monthlyMachine', $data);

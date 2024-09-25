@@ -21,6 +21,7 @@
 
     <link href="<?= base_url('assets/css/nucleo-svg.css') ?>" rel=" stylesheet" />
     <!-- CSS Files -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/cardstyle.css') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/css/bootstrap.min.css') ?>">
     <link id="pagestyle" href="<?= base_url('assets/css/soft-ui-dashboard.css?v=1.0.7') ?>" rel="stylesheet" />
     <!-- Nepcha Analytics (nepcha.com) -->
