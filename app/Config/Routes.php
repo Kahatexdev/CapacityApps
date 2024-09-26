@@ -193,7 +193,9 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('jalanmesin', 'PlanningController::jalanmesin');
     // $routes->get('jalanmesin/(:any)', 'PlanningController::jalanmesindetail/$1');
     $routes->get('jalanmesin/(:any)', 'PlanningController::monthlyMachine/$1');
+
     $routes->post('exportPlanningJlMc/(:any)', 'PlanningJalanMcController::excelPlanningJlMc/$1');
+    $routes->post('saveMonthlyMc', 'PlanningJalanMcController::saveMonthlyMc');
 
 
     // produksi

@@ -478,6 +478,7 @@ class DataMesinModel extends Model
     public function totalMcSock()
     {
         $data = $this->select('SUM(total_mc) as total')
+            ->where('pu !=', 'MJ')
             ->groupStart()
             ->like('jarum', 'DC')
             ->orLike('jarum', 'JC')
