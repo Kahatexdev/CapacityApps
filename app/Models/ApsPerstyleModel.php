@@ -455,7 +455,7 @@ class ApsPerstyleModel extends Model
             ->where('sisa >', 0)
             ->where('factory', $ar)
             ->whereNotIn('factory', ['Belum Ada Area', 'MJ'])
-            ->groupBy('machinetypeid, factory, mastermodel')
+            ->groupBy('delivery, machinetypeid, factory, mastermodel')
             ->findAll();
 
         $totalKebMesin = 0;

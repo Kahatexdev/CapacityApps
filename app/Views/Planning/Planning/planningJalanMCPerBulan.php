@@ -66,7 +66,7 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="table-responsive">
-                                        <table id="example" class="table table-border" style="width:100%">
+                                        <table id="example-<?= $i ?>" class="table table-border" style="width:100%">
                                             <thead>
                                                 <tr class=" text-center">
                                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" rowspan="2" style="text-align: center;">Area</th>
@@ -137,7 +137,7 @@
                                                                 <input type="number" class="form-control plan_mc<?= $row; ?>" id="plan_mc<?= $no; ?>"
                                                                     style="text-align: center; font-size: 0.7rem; width: 65px;"
                                                                     value="<?= $jarums[$jrm['jarum']] ?? 0; ?>"
-                                                                    data-jarum="<?= $jrm['jarum']; ?>" onchange="updateTotals(<?= $row; ?>)">
+                                                                    data-jarum="<?= $jrm['jarum']; ?>" data-area="<?= $area ?>" onchange="updateTotals(<?= $row; ?>,<?= $no; ?>,<?= $i; ?>)">
                                                             </td>
                                                         <?php
                                                             $no++; // Increment variabel $no
@@ -164,7 +164,7 @@
                                                 <tr>
                                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">% Sock</th>
                                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"></th>
-                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= number_format(($totalMcSocks / $planMcSocks) * 100, 2) ?>%</th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= number_format(($planMcSocks / $totalMcSocks) * 100, 2) ?>%</th>
                                                     <?php foreach ($jarum as $jrm): ?>
                                                         <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"></td>
                                                     <?php endforeach; ?>
@@ -191,7 +191,7 @@
                                                 <tr>
                                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">% Total MC</th>
                                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"></th>
-                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= number_format($totalMcAll / $planMcAll * 100, 2); ?>%</th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= number_format($planMcAll / $totalMcAll * 100, 2); ?>%</th>
                                                     <?php foreach ($jarum as $jrm): ?>
                                                         <td class="text-sm" style="text-align: center;"></td>
                                                     <?php endforeach; ?>
@@ -211,48 +211,43 @@
         </div>
     </div>
 </div>
-<canvas id="myCanvas" width="200" height="100"></canvas>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const canvas = document.getElementById('myCanvas');
-        if (canvas) {
-            const ctx = canvas.getContext('2d');
-            // Gambar sesuatu di canvas jika perlu
-            ctx.fillStyle = 'blue';
-            ctx.fillRect(0, 0, 200, 100);
-        } else {
-            console.error("Canvas not found");
-        }
-    });
-
-    function updateTotals(row) {
-        // Menghitung total untuk area (baris)
+    function updateTotals(row, no, cardIndex) {
+        // Inisialisasi total untuk area dan jenis jarum
         let totalArea = 0;
-        const areaInputs = document.querySelectorAll('#plan_mc' + row); // Gunakan id
+        const jarumCount = <?= count($jarum) ?>;
 
-        areaInputs.forEach(input => {
-            const value = parseInt(input.value) || 0; // Ambil nilai input atau 0 jika kosong
-            totalArea += value; // Tambahkan ke total area
-        });
+        // Kalkulasi total untuk area (baris)
+        for (let i = 1; i <= jarumCount; i++) {
+            const input = document.querySelector(`.card:nth-child(${cardIndex}) .plan_mc${row}[id=plan_mc${i}]`);
+            if (input) {
+                const value = parseInt(input.value) || 0;
+                totalArea += value;
+            }
+        }
+        document.querySelector(`.card:nth-child(${cardIndex}) #totalPlanArea${row}`).innerText = totalArea;
 
-        // Tampilkan total area di elemen yang sesuai
-        document.getElementById('totalPlanArea' + row).textContent = totalArea;
+        // Kalkulasi total untuk setiap jenis jarum (kolom)
+        let totalPlanPerJarum = {};
+        for (let i = 1; i <= jarumCount; i++) {
+            totalPlanPerJarum[i] = 0;
+        }
 
-        // Menghitung total untuk setiap jenis jarum (kolom)
-        const jarumCount = <?= count($jarum) ?>; // Ganti dengan jumlah jenis jarum yang sesuai
-        for (let no = 1; no <= jarumCount; no++) {
-            let totalPlan = 0;
-            const columnInputs = document.querySelectorAll('.plan_mc' + no); // Gunakan class
+        for (let i = 1; i <= jarumCount; i++) {
+            for (let j = 1; j <= row; j++) {
+                const input = document.querySelector(`.card:nth-child(${cardIndex}) .plan_mc${j}[id=plan_mc${i}]`);
+                if (input) {
+                    const value = parseInt(input.value) || 0;
+                    totalPlanPerJarum[i] += value;
+                }
+            }
+        }
 
-            columnInputs.forEach(input => {
-                const value = parseInt(input.value) || 0; // Ambil nilai input atau 0 jika kosong
-                totalPlan += value; // Tambahkan ke total plan
-            });
-
-            // Tampilkan total plan di elemen yang sesuai
-            document.getElementById('totalPlan' + no).textContent = totalPlan;
+        for (let i = 1; i <= jarumCount; i++) {
+            document.querySelector(`.card:nth-child(${cardIndex}) #totalPlan${i}`).innerText = totalPlanPerJarum[i];
         }
     }
 </script>
+
 <?php $this->endSection(); ?>

@@ -392,10 +392,6 @@ class PlanningController extends BaseController
         foreach ($areas as $ar) {
             $totalArea[$ar] = $this->jarumModel->totalMcArea($ar);
         }
-        $totalArea = [];
-        foreach ($areas as $ar) {
-            $totalArea[$ar] = $this->jarumModel->totalMcArea($ar);
-        }
 
         // Parse the $bulan string to a DateTime object
         $date = DateTime::createFromFormat('F-Y', $bulan);
@@ -405,25 +401,53 @@ class PlanningController extends BaseController
 
         $bulanIni = $date->format('F-Y');
         $startDate = new \DateTime($date->format('Y-m-01')); // First day of the given month
+        $endDate = (clone $startDate)->modify('last day of this month'); // Last day of the month
 
         $monthlyData = [];
-        for ($i = 0; $i < 5; $i++) {
-            $startOfWeek = clone $startDate;
-            $startOfWeek->modify("+$i week");
+        $weekCount = 1; // Inisialisasi minggu
+        $LiburModel = new LiburModel();
+        $holidays = $LiburModel->findAll(); // Ambil data libur
 
-            // Ensure we start on Monday and stay within the month
-            $startOfWeek->modify($startOfWeek->format('N') === '1' ? 'this Monday' : 'next Monday');
-            if ($startOfWeek->format('m') !== $startDate->format('m')) break;
+        while ($startDate <= $endDate) {
+            // Tentukan akhir minggu (hari Minggu)
+            $endOfWeek = (clone $startDate)->modify('Sunday this week');
 
-            $endOfWeek = clone $startOfWeek;
-            $endOfWeek->modify('Sunday this week');
+            // Tentukan akhir bulan dari tanggal awal saat ini
+            $endOfMonth = new \DateTime($startDate->format('Y-m-t')); // Akhir bulan saat ini
+
+            // Jika akhir minggu melebihi akhir bulan, batasi hingga akhir bulan
+            if ($endOfWeek > $endOfMonth) {
+                $endOfWeek = clone $endOfMonth; // Akhiri minggu di akhir bulan
+            }
+
+            // Hitung jumlah hari di minggu ini
+            $numberOfDays = $startDate->diff($endOfWeek)->days + 1;
+
+            // Hitung libur minggu ini
+            $weekHolidays = array_filter($holidays, function ($holiday) use ($startDate, $endOfWeek) {
+                $holidayDate = new \DateTime($holiday['tanggal']);
+                return $holidayDate >= $startDate && $holidayDate <= $endOfWeek;
+            });
+
+            $holidaysCount = count($weekHolidays);
+            $numberOfDays -= $holidaysCount; // Kurangi jumlah hari dengan jumlah libur
 
             $monthlyData[] = [
-                'week' => $i + 1,
-                'start_date' => $startOfWeek->format('Y-m-d'),
+                'week' => $weekCount,
+                'start_date' => $startDate->format('Y-m-d'),
                 'end_date' => $endOfWeek->format('Y-m-d'),
-                'number_of_days' => $startOfWeek->diff($endOfWeek)->days + 1,
+                'number_of_days' => $numberOfDays,
+                'holidays' => array_map(function ($holiday) {
+                    return [
+                        'nama' => $holiday['nama'],
+                        'tanggal' => (new \DateTime($holiday['tanggal']))->format('d-F'),
+                    ];
+                }, $weekHolidays),
             ];
+
+            // Perbarui tanggal awal untuk minggu berikutnya
+            $startDate = (clone $endOfWeek)->modify('+1 day');
+            $weekCount++;
         }
 
         $jarum = $this->jarumModel->getAreaAndJarum();
