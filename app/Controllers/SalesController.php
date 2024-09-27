@@ -19,6 +19,7 @@ use PhpOffice\PhpSpreadsheet\Style\{Border, Alignment, Fill};
 use PhpParser\Node\Stmt\Foreach_;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpParser\Node\Stmt\Echo_;
 
 class SalesController extends BaseController
 {
@@ -85,13 +86,13 @@ class SalesController extends BaseController
             foreach ($data as $item) {
                 // Pastikan $item adalah array dan memiliki kunci yang dibutuhkan
                 if (is_array($item)) {
-                    $prod = ($item['cj'] * $item['target'] * 28) / 24;
+                    $prod = $item['running'] * $item['target'] * 28;
 
                     // Tambahkan hasil perhitungan ke total per brand
                     $brandTotals['totalMc'] += $item['total_mc'] ?? 0;
                     $brandTotals['totalRunning'] += $item['running'] ?? 0;
                     $brandTotals['totalCj'] += $item['cj'] ?? 0;
-                    $brandTotals['totalMj'] += $item['mj'] ?? 0;
+                    // $brandTotals['totalMj'] += $item['mj'] ?? 0;
                     $brandTotals['target'] = $item['target'] ?? 0;
                     $brandTotals['totalProd'] += ceil($prod);
                 }
@@ -203,7 +204,7 @@ class SalesController extends BaseController
                         $jumlahMc = $brandData[$brand]['totalCj'] ?? 0;
                         $target = $brandData[$brand]['target'] ?? 0; // Pastikan target juga ada di $brandData
                         if ($jumlahMc > 0) {
-                            $brandCapacity = ceil(($jumlahMc * $target * $numberOfDays) / 24);
+                            $brandCapacity = ceil($jumlahMc * $target * $numberOfDays);
                         }
                     }
                 }
@@ -238,12 +239,18 @@ class SalesController extends BaseController
             ];
 
             // Update data bulanan
-            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalMaxCapacity'] += ceil($maxCapacity);
+            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalMaxCapacity'] += $maxCapacity;
             $monthlyData[$currentMonthOfYear]['monthlySummary']['totalSisaBooking'] += $sisaBooking;
             $monthlyData[$currentMonthOfYear]['monthlySummary']['totalConfirmOrder'] += $ConfirmOrder;
             $monthlyData[$currentMonthOfYear]['monthlySummary']['totalSisaConfirmOrder'] += $sisaConfirmOrder;
             $monthlyData[$currentMonthOfYear]['monthlySummary']['totalExess'] += $exess;
-            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalExessPercentage'] +=  $exessPercentage;
+
+            // Ambil total max kapasitas dan exess setelah penjumlahan
+            $totalMaxCapacity = $monthlyData[$currentMonthOfYear]['monthlySummary']['totalMaxCapacity'];
+            $totalExess = $monthlyData[$currentMonthOfYear]['monthlySummary']['totalExess'];
+            // Hitung persentase setelah penjumlahan
+            $exessPercentage = ($totalMaxCapacity > 0) ? (($totalExess / $totalMaxCapacity) * 100) : 0;
+            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalExessPercentage'] = $exessPercentage;
 
             // Perbarui tanggal awal untuk minggu berikutnya
             if ($endOfWeek == $endOfMonth) {
@@ -282,7 +289,6 @@ class SalesController extends BaseController
 
     public function exportExcelByJarum()
     {
-        $dataJarum = $this->jarumModel->getAliasJrm(); // data all jarum
         $aliasjarum = $this->request->getPost('aliasjarum') ?? '';
 
         $brands = ['Dakong', 'Rosso', 'Mechanic', 'Lonati'];
@@ -314,7 +320,7 @@ class SalesController extends BaseController
             foreach ($data as $item) {
                 // Pastikan $item adalah array dan memiliki kunci yang dibutuhkan
                 if (is_array($item)) {
-                    $prod = ($item['cj'] * $item['target'] * 28) / 24;
+                    $prod = $item['running'] * $item['target'] * 28;
 
                     // Tambahkan hasil perhitungan ke total per brand
                     $brandTotals['totalMc'] += $item['total_mc'] ?? 0;
@@ -343,7 +349,7 @@ class SalesController extends BaseController
 
         $startDate = new \DateTime(); // Tanggal hari ini
         // $startDate->modify('Monday this week'); // Memastikan start date dimulai dari hari Senin minggu ini
-        $endDate = new \DateTime('+3 month'); // Tanggal satu tahun ke depan
+        $endDate = new \DateTime('+1 years'); // Tanggal satu tahun ke depan
 
         $LiburModel = new LiburModel();
         $holidays = $LiburModel->findAll();
@@ -432,7 +438,7 @@ class SalesController extends BaseController
                         $jumlahMc = $brandData[$brand]['totalCj'] ?? 0;
                         $target = $brandData[$brand]['target'] ?? 0; // Pastikan target juga ada di $brandData
                         if ($jumlahMc > 0) {
-                            $brandCapacity = ceil(($jumlahMc * $target * $numberOfDays) / 24);
+                            $brandCapacity = ceil($jumlahMc * $target * $numberOfDays);
                         }
                     }
                 }
@@ -458,21 +464,27 @@ class SalesController extends BaseController
                     ];
                 }, $weekHolidays),
                 'maxCapacity' => $maxCapacity,
+                'totalBooking' => $totalBooking,
+                'sisaBooking' => $sisaBooking,
                 'ConfirmOrder' => $ConfirmOrder,
                 'sisaConfirmOrder' => $sisaConfirmOrder,
-                'sisaBooking' => $sisaBooking,
-                'totalBooking' => $totalBooking,
                 'exess' => $exess,
                 'exessPercentage' => $exessPercentage,
             ];
 
             // Update data bulanan
-            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalMaxCapacity'] += ceil($maxCapacity);
+            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalMaxCapacity'] += $maxCapacity;
             $monthlyData[$currentMonthOfYear]['monthlySummary']['totalSisaBooking'] += $sisaBooking;
             $monthlyData[$currentMonthOfYear]['monthlySummary']['totalConfirmOrder'] += $ConfirmOrder;
             $monthlyData[$currentMonthOfYear]['monthlySummary']['totalSisaConfirmOrder'] += $sisaConfirmOrder;
             $monthlyData[$currentMonthOfYear]['monthlySummary']['totalExess'] += $exess;
-            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalExessPercentage'] +=  $exessPercentage;
+
+            // Ambil total max kapasitas dan exess setelah penjumlahan
+            $totalMaxCapacity = $monthlyData[$currentMonthOfYear]['monthlySummary']['totalMaxCapacity'];
+            $totalExess = $monthlyData[$currentMonthOfYear]['monthlySummary']['totalExess'];
+            // Hitung persentase setelah penjumlahan
+            $exessPercentage = ($totalMaxCapacity > 0) ? (($totalExess / $totalMaxCapacity) * 100) : 0;
+            $monthlyData[$currentMonthOfYear]['monthlySummary']['totalExessPercentage'] = $exessPercentage;
 
             // Perbarui tanggal awal untuk minggu berikutnya
             if ($endOfWeek == $endOfMonth) {
@@ -661,10 +673,16 @@ class SalesController extends BaseController
             ->getStyle('Q' . $endMergHeader)
             ->applyFromArray($styleHeader2);
 
+        $sheet->setCellValue('R' . $rowHeader, 'Prod 28days')
+            ->mergeCells('R' . $rowHeader . ':R' . $endMergHeader)
+            ->getStyle('R' . $rowHeader . ':R' . $endMergHeader)
+            ->applyFromArray($styleHeader)
+            ->getAlignment()->setWrapText(true); // Menambahkan pengaturan wrap text
 
-        $column = 'R'; // Kolom awal untuk bulan
+
+        $column = 'S'; // Kolom awal untuk bulan
         $col_index = Coordinate::columnIndexFromString($column); // Konversi huruf kolom ke nomor indeks kolom
-        $column2 = 'R';
+        $column2 = 'S';
         $col_index2 = Coordinate::columnIndexFromString($column2);
         foreach ($monthlyData as $month => $data) :
             // month
@@ -768,37 +786,36 @@ class SalesController extends BaseController
         $rowBody = 7;
         // total mc
         $sheet->setCellValue('A' . $rowBody, $aliasjarum)
-            ->getStyle('A' . $rowBody)
-            ->applyFromArray($styleBody);
-        $sheet->setCellValue('B' . $rowBody, isset($brandData['Dakong']['totalMc']) ? $brandData['Dakong']['totalMc'] : 0)
+            ->getStyle('A' . $rowBody);
+        $sheet->setCellValue('B' . $rowBody, isset($brandData['Dakong']['totalCj']) ? $brandData['Dakong']['totalCj'] : 0)
             ->getStyle('B' . $rowBody)
             ->applyFromArray($styleBody);
-        $sheet->setCellValue('C' . $rowBody, isset($brandData['Rosso']['totalMc']) ? $brandData['Rosso']['totalMc'] : 0)
+        $sheet->setCellValue('C' . $rowBody, isset($brandData['Rosso']['totalCj']) ? $brandData['Rosso']['totalCj'] : 0)
             ->getStyle('C' . $rowBody)
             ->applyFromArray($styleBody);
-        $sheet->setCellValue('D' . $rowBody, isset($brandData['Mechanic']['totalMc']) ? $brandData['Mechanic']['totalMc'] : 0)
+        $sheet->setCellValue('D' . $rowBody, isset($brandData['Mechanic']['totalCj']) ? $brandData['Mechanic']['totalCj'] : 0)
             ->getStyle('D' . $rowBody)
             ->applyFromArray($styleBody);
-        $sheet->setCellValue('E' . $rowBody, isset($brandData['Lonati']['totalMc']) ? $brandData['Lonati']['totalMc'] : 0)
+        $sheet->setCellValue('E' . $rowBody, isset($brandData['Lonati']['totalCj']) ? $brandData['Lonati']['totalCj'] : 0)
             ->getStyle('E' . $rowBody)
             ->applyFromArray($styleBody);
-        $sheet->setCellValue('F' . $rowBody, isset($totals['totalMc']) ? $totals['totalMc'] : 0)
+        $sheet->setCellValue('F' . $rowBody, isset($totals['totalCj']) ? $totals['totalCj'] : 0)
             ->getStyle('F' . $rowBody)
             ->applyFromArray($styleBody);
         // running mc by system
-        $sheet->setCellValue('G' . $rowBody, isset($brandData['Dakong']['totalRunning']) ? $brandData['Dakong']['totalMc'] : 0)
+        $sheet->setCellValue('G' . $rowBody, isset($brandData['Dakong']['totalRunning']) ? $brandData['Dakong']['totalRunning'] : 0)
             ->getStyle('G' . $rowBody)
             ->applyFromArray($styleBody);
-        $sheet->setCellValue('H' . $rowBody, isset($brandData['Rosso']['totalRunning']) ? $brandData['Rosso']['totalMc'] : 0)
+        $sheet->setCellValue('H' . $rowBody, isset($brandData['Rosso']['totalRunning']) ? $brandData['Rosso']['totalRunning'] : 0)
             ->getStyle('H' . $rowBody)
             ->applyFromArray($styleBody);
-        $sheet->setCellValue('I' . $rowBody, isset($brandData['Lonati']['totalRunning']) ? $brandData['Mechanic']['totalMc'] : 0)
+        $sheet->setCellValue('I' . $rowBody, isset($brandData['Mechanic']['totalRunning']) ? $brandData['Mechanic']['totalRunning'] : 0)
             ->getStyle('I' . $rowBody)
             ->applyFromArray($styleBody);
-        $sheet->setCellValue('J' . $rowBody, isset($brandData['Mechanic']['totalRunning']) ? $brandData['Lonati']['totalMc'] : 0)
+        $sheet->setCellValue('J' . $rowBody, isset($brandData['Lonati']['totalRunning']) ? $brandData['Lonati']['totalRunning'] : 0)
             ->getStyle('J' . $rowBody)
             ->applyFromArray($styleBody);
-        $sheet->setCellValue('K' . $rowBody, isset($totals['totalMc']) ? $totals['totalRunning'] : 0)
+        $sheet->setCellValue('K' . $rowBody, isset($totals['totalRunning']) ? $totals['totalRunning'] : 0)
             ->getStyle('K' . $rowBody)
             ->applyFromArray($styleBody);
         // stock cylinder
@@ -822,14 +839,17 @@ class SalesController extends BaseController
             ->getStyle('Q' . $rowBody)
             ->applyFromArray($styleBody);
 
+        $sheet->setCellValue('R' . $rowBody, $totals['totalProd'])
+            ->getStyle('R' . $rowBody)
+            ->applyFromArray($styleBody);
 
-        $columnBody = 'R'; // Kolom awal 
+
+        $columnBody = 'S'; // Kolom awal 
         $colBody_index = Coordinate::columnIndexFromString($columnBody); // Konversi huruf kolom ke nomor indeks kolom
         foreach ($monthlyData as $month => $data) :
             $startColumnBody = $columnBody; // Kolom awal 
 
             foreach ($data['weeks'] as $week) :
-                // dd($data['weeks']);
                 $sheet->setCellValue($startColumnBody . $rowBody, isset($week['maxCapacity']) ? $week['maxCapacity'] : 0)
                     ->getStyle($startColumnBody . $rowBody)
                     ->applyFromArray($styleBody);
@@ -892,7 +912,6 @@ class SalesController extends BaseController
 
         // Tulis file excel ke output
         $writer = new Xlsx($spreadsheet);
-        // dd($writer);
         $writer->save('php://output');
         // return redirect(session()->get('role') . '/sales');
         exit;
@@ -900,13 +919,219 @@ class SalesController extends BaseController
 
     public function generateExcel()
     {
-        $dataJarum = $this->jarumModel->getAliasJrm();
-        // foreach ($dataJarum as $key => $jrm) {
-        //     $gloves = $jrm['aliasjarum'] == "Baby 10G (84N)" or $jrm['aliasjarum'] == " Baby 10G (92N)" or $jrm['aliasjarum'] == "Child/Ladies 10G (106N)";
-        //     if ($gloves) {
-        //     }
-        //     dd($dataJarum);
-        // }
+        $dataJarum = $this->jarumModel->getAliasJrm(); // data all jarum
+        $brands = ['Dakong', 'Rosso', 'Mechanic', 'Lonati'];
+
+        $allData = [];
+        foreach ($dataJarum as $alias) {
+            $aliasjarum = $alias['aliasjarum'];
+            $brandData = [];
+            $totals = [
+                'totalMc' => 0,
+                'totalRunning' => 0,
+                'totalCj' => 0,
+                // 'totalMj' => 0,
+                'totalProd' => 0 // Untuk menyimpan total $prod
+            ];
+            // Ambil data kapasitas per brand dan hitung total
+            foreach ($brands as $brand) {
+                $data = $this->jarumModel->getTotalMcPerBrand($brand, $aliasjarum);
+
+                // Inisialisasi total per brand
+                $brandTotals = [
+                    'totalMc' => 0,
+                    'totalRunning' => 0,
+                    'totalCj' => 0,
+                    // 'totalMj' => 0,
+                    'target' => 0,
+                    'totalProd' => 0
+                ];
+
+                // Hitung total untuk setiap brand
+                foreach ($data as $item) {
+                    // Pastikan $item adalah array dan memiliki kunci yang dibutuhkan
+                    if (is_array($item)) {
+                        $prod = $item['running'] * $item['target'] * 28;
+
+                        // Tambahkan hasil perhitungan ke total per brand
+                        $brandTotals['totalMc'] += $item['total_mc'] ?? 0;
+                        $brandTotals['totalRunning'] += $item['running'] ?? 0;
+                        $brandTotals['totalCj'] += $item['cj'] ?? 0;
+                        // $brandTotals['totalMj'] += $item['mj'] ?? 0;
+                        $brandTotals['target'] = $item['target'] ?? 0;
+                        $brandTotals['totalProd'] += ceil($prod);
+                    }
+                }
+
+                // Simpan total per brand ke dalam $brandData
+                $brandData[$brand] = $brandTotals;
+
+                // Tambahkan ke total keseluruhan
+                $totals['totalMc'] += $brandTotals['totalMc'] ?? 0;
+                $totals['totalRunning'] += $brandTotals['totalRunning'] ?? 0;
+                $totals['totalCj'] += $brandTotals['totalCj'] ?? 0;
+                // $totals['totalMj'] += $brandTotals['totalMj'] ?? 0;
+                $totals['totalProd'] += $brandTotals['totalProd'] ?? 0;
+            }
+
+            $startDate = new \DateTime(); // Tanggal hari ini
+            $endDate = new \DateTime('+1 years'); // Tanggal satu tahun ke depan
+
+            $LiburModel = new LiburModel();
+            $holidays = $LiburModel->findAll();
+
+            // Ambil total kapasitas dan jenis jarum per alias
+            $jarum = $alias['jarum']; // get jenis jarum per aliasjarum
+            $weekCount = 1; // Inisialisasi minggu
+            $monthlyData = [];
+            // $exess =  $exessPercentage = $totalMonthlyCapacity = $totalMonthlyAvailable = $totalMonthlyMachine = 0;
+            while ($startDate <= $endDate) {
+                $endOfWeek = (clone $startDate)->modify('Sunday this week');
+
+                // Tentukan akhir bulan dari tanggal awal saat ini
+                $endOfMonth = new \DateTime($startDate->format('Y-m-t')); // Akhir bulan saat ini
+
+                // Jika akhir minggu melebihi akhir bulan, batasi hingga akhir bulan
+                if ($endOfWeek > $endOfMonth) {
+                    $endOfWeek = clone $endOfMonth; // Akhiri minggu di akhir bulan
+                }
+
+                $numberOfDays = $startDate->diff($endOfWeek)->days + 1; //hitung jumlah hari week ini
+
+                // Hitung libur minggu ini
+                $weekHolidays = array_filter($holidays, function ($holiday) use ($startDate, $endOfWeek) {
+                    $holidayDate = new \DateTime($holiday['tanggal']);
+                    return $holidayDate >= $startDate && $holidayDate <= $endOfWeek;
+                });
+
+                $holidaysCount = count($weekHolidays);
+                $numberOfDays -= $holidaysCount;
+
+                $currentMonthOfYear = $startDate->format('F-Y');
+                if (!isset($monthlyData[$currentMonthOfYear])) {
+                    $monthlyData[$currentMonthOfYear] = [
+                        'monthlySummary' => [
+                            'totalMaxCapacity' => 0,
+                            'totalSisaBooking' => 0,
+                            'totalConfirmOrder' => 0,
+                            'totalSisaConfirmOrder' => 0,
+                            'totalExess' => 0,
+                            'totalExessPercentage' => 0,
+                        ],
+                        'weeks' => []
+                    ];
+                }
+
+                // Ambil data booking dan order per minggu
+                $cek = [
+                    'jarum' => $jarum,
+                    'start' => $startDate->format('Y-m-d'),
+                    'end' => $endOfWeek->format('Y-m-d'),
+                ];
+
+                $dataBookingByJarum = $this->bookingModel->getTotalBookingByJarum($cek); // Data booking per jarum
+                $dataOrderWeekByJarum = $this->ApsPerstyleModel->getTotalOrderWeek($cek); // Data order per jarum
+
+                $ConfirmOrder = array_reduce($dataOrderWeekByJarum, function ($carry, $order) {
+                    $qty = !empty($order['qty']) ? ceil($order['qty'] / 24) : 0;
+                    $carry += $qty;
+                    return $carry;
+                }, 0);
+
+                $sisaConfirmOrder = array_reduce($dataOrderWeekByJarum, function ($carry, $order) {
+                    $sisa = !empty($order['sisa']) ? ceil($order['sisa'] / 24) : 0;
+                    $carry += $sisa;
+                    return $carry;
+                }, 0);
+
+                $totalBooking = array_reduce($dataBookingByJarum, function ($carry, $booking) {
+                    $total = !empty($booking['total_booking']) ? ceil($booking['total_booking'] / 24) : 0;
+                    $carry += $total;
+                    return $carry;
+                }, 0);
+
+                $sisaBooking = array_reduce($dataBookingByJarum, function ($carry, $booking) {
+                    $sisa = !empty($booking['sisa_booking']) ? ceil($booking['sisa_booking'] / 24) : 0;
+                    $carry += $sisa;
+                    return $carry;
+                }, 0);
+
+                $maxCapacity = array_reduce($brands, function ($carry, $brand) use ($brandData, $numberOfDays) {
+                    $brandCapacity = 0;
+                    // Periksa apakah $brandData[$brand] adalah array
+                    if (isset($brandData[$brand]) && is_array($brandData[$brand])) {
+                        // Pastikan $brandData[$brand] ada dan berisi array
+                        if (isset($brandData[$brand])) {
+                            $jumlahMc = $brandData[$brand]['totalCj'] ?? 0;
+                            $target = $brandData[$brand]['target'] ?? 0; // Pastikan target juga ada di $brandData
+                            if ($jumlahMc > 0) {
+                                $brandCapacity = ceil($jumlahMc * $target * $numberOfDays);
+                            }
+                        }
+                    }
+                    $carry += $brandCapacity;
+                    return $carry;
+                }, 0);
+
+                $countExess = ($maxCapacity > 0) ? -$maxCapacity + $sisaBooking + $sisaConfirmOrder : 0;
+                $exess = ($countExess > 0) ? ceil($countExess) : floor($countExess);
+
+                $countExessPercentage = ($maxCapacity > 0) ? ($exess / $maxCapacity) * 100 : 0;
+                $exessPercentage = ($countExessPercentage > 0) ? ceil($countExessPercentage) : floor($countExessPercentage);
+
+                $monthlyData[$currentMonthOfYear]['weeks'][] = [
+                    'countWeek' => $weekCount,
+                    'start_date' => $startDate->format('d-m'),
+                    'end_date' => $endOfWeek->format('d-m'),
+                    'number_of_days' => $numberOfDays,
+                    'holidays' => array_map(function ($holiday) {
+                        return [
+                            'nama' => $holiday['nama'],
+                            'tanggal' => (new \DateTime($holiday['tanggal']))->format('d-F'),
+                        ];
+                    }, $weekHolidays),
+                    'maxCapacity' => $maxCapacity,
+                    'totalBooking' => $totalBooking,
+                    'sisaBooking' => $sisaBooking,
+                    'ConfirmOrder' => $ConfirmOrder,
+                    'sisaConfirmOrder' => $sisaConfirmOrder,
+                    'exess' => $exess,
+                    'exessPercentage' => $exessPercentage,
+                ];
+
+                // Update data bulanan
+                $monthlyData[$currentMonthOfYear]['monthlySummary']['totalMaxCapacity'] += $maxCapacity;
+                $monthlyData[$currentMonthOfYear]['monthlySummary']['totalSisaBooking'] += $sisaBooking;
+                $monthlyData[$currentMonthOfYear]['monthlySummary']['totalConfirmOrder'] += $ConfirmOrder;
+                $monthlyData[$currentMonthOfYear]['monthlySummary']['totalSisaConfirmOrder'] += $sisaConfirmOrder;
+                $monthlyData[$currentMonthOfYear]['monthlySummary']['totalExess'] += $exess;
+
+                // Ambil total max kapasitas dan exess setelah penjumlahan
+                $totalMaxCapacity = $monthlyData[$currentMonthOfYear]['monthlySummary']['totalMaxCapacity'];
+                $totalExess = $monthlyData[$currentMonthOfYear]['monthlySummary']['totalExess'];
+                // Hitung persentase setelah penjumlahan
+                $exessPercentage = ($totalMaxCapacity > 0) ? (($totalExess / $totalMaxCapacity) * 100) : 0;
+                $monthlyData[$currentMonthOfYear]['monthlySummary']['totalExessPercentage'] = $exessPercentage;
+
+                // Perbarui tanggal awal untuk minggu berikutnya
+                if ($endOfWeek == $endOfMonth) {
+                    // Mulai dari hari berikutnya setelah akhir bulan
+                    $startDate = (clone $endOfMonth)->modify('+1 day');
+                } else {
+                    // Lanjutkan dari hari berikutnya setelah akhir minggu
+                    $startDate = (clone $endOfWeek)->modify('+1 day');
+                }
+                $weekCount++;
+            }
+            // Setelah semua data mingguan diproses, tampilkan hasil per aliasjarum
+            $allData[$aliasjarum] = [
+                'jarum' => $jarum,
+                'brandData' => $brandData,
+                'totals' => $totals,
+                'monthlyData' => $monthlyData,
+            ];
+        }
+
         // Buat spreadsheet
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -915,10 +1140,27 @@ class SalesController extends BaseController
         $styleHeader = [
             'font' => [
                 'bold' => true, // Tebalkan teks
+                'size' => 14,
             ],
             'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER,
-                'vertical' => Alignment::VERTICAL_CENTER,
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+                'vertical' => Alignment::VERTICAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+        $styleHeader2 = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'size' => 12,
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+                'vertical' => Alignment::VERTICAL_CENTER, // Alignment rata tengah
             ],
             'borders' => [
                 'outline' => [
@@ -943,7 +1185,8 @@ class SalesController extends BaseController
                 'bold' => true, // Tebalkan teks
             ],
             'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_RIGHT, // Alignment rata tengah
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+                'vertical' => Alignment::VERTICAL_CENTER, // Alignment rata tengah
             ],
             'borders' => [
                 'outline' => [
@@ -952,39 +1195,723 @@ class SalesController extends BaseController
                 ],
             ],
         ];
+        $styleGrandTotal = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'size' => 12,
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_LEFT, // Alignment rata tengah
+                'vertical' => Alignment::VERTICAL_CENTER, // Alignment rata tengah
+            ],
+        ];
+
+        // Autosize kolom
+        foreach (range('A', 'BC') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
 
         // Judul
-        $sheet->setCellValue('A1', 'SALES POSITION');
+        $sheet->setCellValue('A1', 'Sales Position');
         $sheet->mergeCells('A1:J1');
         // Mengatur teks menjadi rata tengah dan huruf tebal
-        $sheet->getStyle('A1')->getFont()->setBold(true);
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         $rowHeader = 3;
+        $rowHeader2 = 4;
+        $rowHeader3 = 5;
+        $endMergHeader = 6;
         // Header
-        $sheet->setCellValue('A' . $rowHeader, 'KIND OF MACHINE')
-            ->mergeCells('A' . $rowHeader . ':A5')
-            ->getStyle('A' . $rowHeader . ':A5')
+        $sheet->setCellValue('A' . $rowHeader, 'Kind Of Machine')
+            ->mergeCells('A' . $rowHeader . ':A' . $endMergHeader)
+            ->getStyle('A' . $rowHeader . ':A' . $endMergHeader)
             ->applyFromArray($styleHeader);
 
+        $sheet->setCellValue('B' . $rowHeader, 'No Of Mc')
+            ->mergeCells('B' . $rowHeader . ':N' . $rowHeader2)
+            ->getStyle('B' . $rowHeader . ':N' . $rowHeader2)
+            ->applyFromArray($styleHeader);
+        // jumlah mesin
+        $sheet->setCellValue('B' . $rowHeader3, 'Machine')
+            ->mergeCells('B' . $rowHeader3 . ':F' . $rowHeader3)
+            ->getStyle('B' . $rowHeader3 . ':F' . $rowHeader3)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('B' . $endMergHeader, 'Dakong')
+            ->getStyle('B' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('C' . $endMergHeader, 'Rosso')
+            ->getStyle('C' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('D' . $endMergHeader, 'Ths')
+            ->getStyle('D' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('E' . $endMergHeader, 'Lonati')
+            ->getStyle('E' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('F' . $endMergHeader, 'Total')
+            ->getStyle('F' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+        // mesin running
+        $sheet->setCellValue('G' . $rowHeader3, 'Running')
+            ->mergeCells('G' . $rowHeader3 . ':K' . $rowHeader3)
+            ->getStyle('G' . $rowHeader3 . ':K' . $rowHeader3)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('G' . $endMergHeader, 'Dakong')
+            ->getStyle('G' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('H' . $endMergHeader, 'Rosso')
+            ->getStyle('H' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('I' . $endMergHeader, 'Ths')
+            ->getStyle('I' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('J' . $endMergHeader, 'Lonati')
+            ->getStyle('J' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('K' . $endMergHeader, 'Total')
+            ->getStyle('K' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+        // stock cylinder
+        $sheet->setCellValue('L' . $rowHeader3, 'Stock Cylinder')
+            ->mergeCells('L' . $rowHeader3 . ':N' . $rowHeader3)
+            ->getStyle('L' . $rowHeader3 . ':N' . $rowHeader3)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('L' . $endMergHeader, 'Dakong')
+            ->getStyle('L' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('M' . $endMergHeader, 'Rosso')
+            ->getStyle('M' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('N' . $endMergHeader, 'Ths')
+            ->getStyle('N' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+        // actual running mc
+        $sheet->setCellValue('O' . $rowHeader, 'Running Mc Actual')
+            ->mergeCells('O' . $rowHeader . ':Q' . $rowHeader3)
+            ->getStyle('O' . $rowHeader . ':Q' . $rowHeader3)
+            ->applyFromArray($styleHeader)
+            ->getAlignment()->setWrapText(true); // Menambahkan pengaturan wrap text
+
+        $sheet->setCellValue('O' . $endMergHeader, 'CJ')
+            ->getStyle('O' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('P' . $endMergHeader, 'MJ')
+            ->getStyle('P' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('Q' . $endMergHeader, 'Total')
+            ->getStyle('Q' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('R' . $rowHeader, 'Prod 28days')
+            ->mergeCells('R' . $rowHeader . ':R' . $endMergHeader)
+            ->getStyle('R' . $rowHeader . ':R' . $endMergHeader)
+            ->applyFromArray($styleHeader)
+            ->getAlignment()->setWrapText(true); // Menambahkan pengaturan wrap text
+
+
+        $column = 'S'; // Kolom awal untuk bulan
+        $col_index = Coordinate::columnIndexFromString($column); // Konversi huruf kolom ke nomor indeks kolom
+        $column2 = 'S';
+        $col_index2 = Coordinate::columnIndexFromString($column2);
+        foreach ($monthlyData as $month => $data) :
+            // month
+            $weekCount = count($data['weeks']); // Hitung jumlah minggu dalam bulan
+            $startColumn = $column;
+            $endCol_index = $col_index + ($weekCount * 6) - 1; // Dikurangi 1 karena kolom awal tidak terhitung
+            $endColumn = Coordinate::stringFromColumnIndex($endCol_index); // Konversi kembali dari nomor indeks kolom ke huruf kolom
+
+            // Merge cells untuk bulan ini sesuai dengan jumlah minggu
+            $sheet->setCellValue($startColumn . $rowHeader, $month);
+            if ($startColumn !== $endColumn) {
+                $sheet->mergeCells($startColumn . $rowHeader . ':' . $endColumn . $rowHeader)
+                    ->getStyle($startColumn . $rowHeader . ':' . $endColumn . $rowHeader)
+                    ->applyFromArray($styleHeader);
+            } else {
+                $sheet->getStyle($startColumn . $rowHeader)
+                    ->applyFromArray($styleHeader);
+            }
+
+            // Pastikan $column2 dan $col_index2 berada di luar loop bulan
+            $rowWeek = $rowHeader + 1; // Baris awal untuk week
+            foreach ($data['weeks'] as $week) :
+                $startDate = $week['start_date'];
+                $endDate = $week['end_date'];
+                $countWeek = $week['countWeek'];
+                $tgl = $startDate . '-' . $endDate . ' (' . $countWeek . ')';
+                $rowWh = $rowWeek + 1;
+
+                $startColumn2 = $column2;
+                $endCol_index2 = $col_index2 + 5; // Misalnya, 4 kolom untuk setiap minggu
+                $endColumn2 = Coordinate::stringFromColumnIndex($endCol_index2);
+
+                // Set value dan merge cells untuk minggu
+                $sheet->setCellValue($startColumn2 . $rowWeek, $tgl);
+                $sheet->mergeCells($startColumn2 . $rowWeek . ':' . $endColumn2 . $rowWeek)
+                    ->getStyle($startColumn2 . $rowWeek . ':' . $endColumn2 . $rowWeek)
+                    ->applyFromArray($styleHeader2);
+
+                // Set value dan merge cells untuk hari kerja
+                $sheet->setCellValue($startColumn2 . $rowWh, $week['number_of_days'] . ' hari');
+                $sheet->mergeCells($startColumn2 . $rowWh . ':' . $endColumn2 . $rowWh)
+                    ->getStyle($startColumn2 . $rowWh . ':' . $endColumn2 . $rowWh)
+                    ->applyFromArray($styleHeader2);
+
+                $rowTitle = $rowWh + 1;
+                foreach ($data['weeks'] as $week) :
+                    $sheet->setCellValue($startColumn2 . $rowTitle, 'Max Capacity')
+                        ->getStyle($startColumn2 . $rowTitle)
+                        ->applyFromArray($styleHeader2);
+                    // 
+                    $max_index = $col_index2 + 1; // Next Column
+                    $nextColumn = Coordinate::stringFromColumnIndex($max_index);
+                    // 
+                    $sheet->setCellValue($nextColumn . $rowTitle, 'Confirm Order')
+                        ->getStyle($nextColumn . $rowTitle)
+                        ->applyFromArray($styleHeader2);
+                    // 
+                    $confirm_index = $max_index + 1; // Next Column
+                    $nextColumn = Coordinate::stringFromColumnIndex($confirm_index);
+                    // 
+                    $sheet->setCellValue($nextColumn . $rowTitle, 'Sisa Order')
+                        ->getStyle($nextColumn . $rowTitle)
+                        ->applyFromArray($styleHeader2);
+                    // 
+                    $order_index = $confirm_index + 1; // Next Column
+                    $nextColumn = Coordinate::stringFromColumnIndex($order_index);
+                    // 
+                    $sheet->setCellValue($nextColumn . $rowTitle, 'Sisa Booking')
+                        ->getStyle($nextColumn . $rowTitle)
+                        ->applyFromArray($styleHeader2);
+                    // 
+                    $booking_index = $order_index + 1; // Next Column
+                    $nextColumn = Coordinate::stringFromColumnIndex($booking_index);
+                    // 
+                    $sheet->setCellValue($nextColumn . $rowTitle, '(+)Exess')
+                        ->getStyle($nextColumn . $rowTitle)
+                        ->applyFromArray($styleHeader2);
+                    // 
+                    $exess_index = $booking_index + 1; // Next Column
+                    $nextColumn = Coordinate::stringFromColumnIndex($exess_index);
+                    // 
+
+                    $sheet->setCellValue($nextColumn . $rowTitle, '%')
+                        ->getStyle($nextColumn . $rowTitle)
+                        ->applyFromArray($styleHeader2);
+                    // 
+                    $exessPercentage_index = $booking_index + 1; // Next Column
+                    $startColumn2 = Coordinate::stringFromColumnIndex($exessPercentage_index);
+                endforeach;
+                // Update ke indeks kolom berikutnya
+                $col_index2 = $endCol_index2 + 1;
+                $column2 = Coordinate::stringFromColumnIndex($col_index2);
+            endforeach;
+            // Pindah ke kolom berikutnya setelah melakukan merge
+            $col_index = $endCol_index + 1; // Update ke indeks kolom berikutnya
+            $column = Coordinate::stringFromColumnIndex($col_index); // Konversi kembali ke huruf kolom
+        endforeach;
+
         // Body
-        $rowBody = 6;
-        foreach ($dataJarum as $key => $id) {
-            $sheet->setCellValue('A' . $rowBody, $id['aliasjarum']);
-            // style untuk body
-            $sheet->getStyle('A' . $rowBody)->applyFromArray([
-                'alignment' => [
-                    'horizontal' => Alignment::HORIZONTAL_RIGHT, // Alignment rata tengah
-                ],
-                'borders' => [
-                    'outline' => [
-                        'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
-                        'color' => ['argb' => 'FF000000'],    // Warna garis hitam
-                    ],
-                ],
-            ]);
-            $rowBody++;
+        $rowBody = 7;
+        foreach ($allData as $aliasjarum => $data) {
+            $sheet->setCellValue('A' . $rowBody, $aliasjarum)
+                ->getStyle('A' . $rowBody);
+            $sheet->setCellValue('B' . $rowBody, isset($data['brandData']['Dakong']['totalCj']) ? $data['brandData']['Dakong']['totalCj'] : 0)
+                ->getStyle('B' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('C' . $rowBody, isset($data['brandData']['Rosso']['totalCj']) ? $data['brandData']['Rosso']['totalCj'] : 0)
+                ->getStyle('C' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('D' . $rowBody, isset($data['brandData']['Mechanic']['totalCj']) ? $data['brandData']['Mechanic']['totalCj'] : 0)
+                ->getStyle('D' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('E' . $rowBody, isset($data['brandData']['Lonati']['totalCj']) ? $data['brandData']['Lonati']['totalCj'] : 0)
+                ->getStyle('E' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('F' . $rowBody, isset($data['totals']['totalCj']) ? $data['totals']['totalCj'] : 0)
+                ->getStyle('F' . $rowBody)
+                ->applyFromArray($styleBody);
+            // running mc by system
+            $sheet->setCellValue('G' . $rowBody, isset($data['brandData']['Dakong']['totalRunning']) ? $data['brandData']['Dakong']['totalRunning'] : 0)
+                ->getStyle('G' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('H' . $rowBody, isset($data['brandData']['Rosso']['totalRunning']) ? $data['brandData']['Rosso']['totalRunning'] : 0)
+                ->getStyle('H' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('I' . $rowBody, isset($data['brandData']['Mechanic']['totalRunning']) ? $data['brandData']['Mechanic']['totalRunning'] : 0)
+                ->getStyle('I' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('J' . $rowBody, isset($data['brandData']['Lonati']['totalRunning']) ? $data['brandData']['Lonati']['totalRunning'] : 0)
+                ->getStyle('J' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('K' . $rowBody, isset($data['totals']['totalRunning']) ? $data['totals']['totalRunning'] : 0)
+                ->getStyle('K' . $rowBody)
+                ->applyFromArray($styleBody);
+            // stock cylinder
+            $sheet->setCellValue('L' . $rowBody, 0)
+                ->getStyle('L' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('M' . $rowBody, 0)
+                ->getStyle('M' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('N' . $rowBody, 0)
+                ->getStyle('N' . $rowBody)
+                ->applyFromArray($styleBody);
+            // running mc actual
+            $sheet->setCellValue('O' . $rowBody, 0)
+                ->getStyle('O' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('P' . $rowBody, 0)
+                ->getStyle('P' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('Q' . $rowBody, 0)
+                ->getStyle('Q' . $rowBody)
+                ->applyFromArray($styleBody);
+
+            $sheet->setCellValue('R' . $rowBody, isset($data['totals']['totalProd']) ? $data['totals']['totalProd'] : 0)
+                ->getStyle('R' . $rowBody)
+                ->applyFromArray($styleBody);
+
+
+            $columnBody = 'S'; // Kolom awal 
+            $colBody_index = Coordinate::columnIndexFromString($columnBody); // Konversi huruf kolom ke nomor indeks kolom
+            if (isset($data['monthlyData']) && is_array($data['monthlyData'])) {
+                foreach ($data['monthlyData'] as $month => $currentMonth) :
+                    $startColumnBody = $columnBody; // Kolom awal 
+                    foreach ($currentMonth['weeks'] as $week) :
+                        // dd($week);
+                        $sheet->setCellValue($startColumnBody . $rowBody, isset($week['maxCapacity']) ? $week['maxCapacity'] : 0)
+                            ->getStyle($startColumnBody . $rowBody)
+                            ->applyFromArray($styleBody);
+                        $colBody_index++;
+                        $nextColumnBody = Coordinate::stringFromColumnIndex($colBody_index); // Konversi 
+
+                        $sheet->setCellValue($nextColumnBody . $rowBody, isset($week['ConfirmOrder']) ? $week['ConfirmOrder'] : 0)
+                            ->getStyle($nextColumnBody . $rowBody)
+                            ->applyFromArray($styleBody);
+                        $colBody_index++;
+                        $nextColumnBody = Coordinate::stringFromColumnIndex($colBody_index); // Konversi 
+
+                        $sheet->setCellValue($nextColumnBody . $rowBody, isset($week['sisaConfirmOrder']) ? $week['sisaConfirmOrder'] : 0)
+                            ->getStyle($nextColumnBody . $rowBody)
+                            ->applyFromArray($styleBody);
+                        $colBody_index++;
+                        $nextColumnBody = Coordinate::stringFromColumnIndex($colBody_index); // Konversi 
+
+                        $sheet->setCellValue($nextColumnBody . $rowBody, isset($week['sisaBooking']) ? $week['sisaBooking'] : 0)
+                            ->getStyle($nextColumnBody . $rowBody)
+                            ->applyFromArray($styleBody);
+                        $colBody_index++;
+                        $nextColumnBody = Coordinate::stringFromColumnIndex($colBody_index); // Konversi 
+
+                        $sheet->setCellValue($nextColumnBody . $rowBody, isset($week['exess']) ? $week['exess'] : 0)
+                            ->getStyle($nextColumnBody . $rowBody)
+                            ->applyFromArray($styleBody);
+                        $colBody_index++;
+                        $nextColumnBody = Coordinate::stringFromColumnIndex($colBody_index); // Konversi 
+
+                        $sheet->setCellValue($nextColumnBody . $rowBody, isset($week['exessPercentage']) ? $week['exessPercentage'] . '%' : 0)
+                            ->getStyle($nextColumnBody . $rowBody)
+                            ->applyFromArray($styleBody);
+
+                        $colBody_index++;
+                        $startColumnBody = Coordinate::stringFromColumnIndex($colBody_index); // Konversi 
+                    endforeach;
+                    $columnBody = Coordinate::stringFromColumnIndex($colBody_index); // Konversi 
+                    // style kolom body
+                    $sheet->getStyle('A' . $rowBody)->applyFromArray([
+                        'alignment' => [
+                            'horizontal' => Alignment::HORIZONTAL_LEFT, // Alignment rata tengah
+                            'vertical' => Alignment::VERTICAL_CENTER, // Alignment rata tengah
+                        ],
+                        'borders' => [
+                            'outline' => [
+                                'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                                'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                            ],
+                        ],
+                    ]);
+                endforeach;
+                $rowBody++;
+            }
         }
+        $rowSubtotal = $rowBody;
+        // kolom subtotal di mulai
+        $sheet->setCellValue('A' . $rowBody, 'Sub Total')
+            ->getStyle('A' . $rowBody . ':A' . $rowBody)
+            ->applyFromArray($styleSubTotal);
+        $sumRowAwal = $rowTitle + 1;
+        $sumRowAkhir = $rowBody - 1;
+        // Kolom subtotal mc
+        $sheet->setCellValue('B' . $rowSubtotal, "=SUM(B" . $sumRowAwal . ":B" . $sumRowAkhir . ")")
+            ->getStyle('B' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        $sheet->setCellValue('C' . $rowSubtotal, "=SUM(C" . $sumRowAwal . ":C" . $sumRowAkhir . ")")
+            ->getStyle('C' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        $sheet->setCellValue('D' . $rowSubtotal, "=SUM(D" . $sumRowAwal . ":D" . $sumRowAkhir . ")")
+            ->getStyle('D' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        $sheet->setCellValue('E' . $rowSubtotal, "=SUM(E" . $sumRowAwal . ":E" . $sumRowAkhir . ")")
+            ->getStyle('E' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        $sheet->setCellValue('F' . $rowSubtotal, "=SUM(F" . $sumRowAwal . ":F" . $sumRowAkhir . ")")
+            ->getStyle('F' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        // Kolom subtotal running
+        $sheet->setCellValue('G' . $rowSubtotal, "=SUM(G" . $sumRowAwal . ":G" . $sumRowAkhir . ")")
+            ->getStyle('G' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        $sheet->setCellValue('H' . $rowSubtotal, "=SUM(H" . $sumRowAwal . ":H" . $sumRowAkhir . ")")
+            ->getStyle('H' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        $sheet->setCellValue('I' . $rowSubtotal, "=SUM(I" . $sumRowAwal . ":I" . $sumRowAkhir . ")")
+            ->getStyle('I' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        $sheet->setCellValue('J' . $rowSubtotal, "=SUM(J" . $sumRowAwal . ":J" . $sumRowAkhir . ")")
+            ->getStyle('J' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        $sheet->setCellValue('K' . $rowSubtotal, "=SUM(K" . $sumRowAwal . ":K" . $sumRowAkhir . ")")
+            ->getStyle('K' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        // Kolom subtotal Stock Cylinder
+        $sheet->setCellValue('L' . $rowSubtotal, "=SUM(L" . $sumRowAwal . ":L" . $sumRowAkhir . ")")
+            ->getStyle('L' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        $sheet->setCellValue('M' . $rowSubtotal, "=SUM(M" . $sumRowAwal . ":M" . $sumRowAkhir . ")")
+            ->getStyle('M' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        $sheet->setCellValue('N' . $rowSubtotal, "=SUM(N" . $sumRowAwal . ":N" . $sumRowAkhir . ")")
+            ->getStyle('N' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        // Kolom subtotal Running actual mc
+        $sheet->setCellValue('O' . $rowSubtotal, "=SUM(O" . $sumRowAwal . ":O" . $sumRowAkhir . ")")
+            ->getStyle('O' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        $sheet->setCellValue('P' . $rowSubtotal, "=SUM(P" . $sumRowAwal . ":P" . $sumRowAkhir . ")")
+            ->getStyle('P' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        $sheet->setCellValue('Q' . $rowSubtotal, "=SUM(Q" . $sumRowAwal . ":Q" . $sumRowAkhir . ")")
+            ->getStyle('Q' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        // Kolom subtotal Prod 28days
+        $sheet->setCellValue('R' . $rowSubtotal, "=SUM(R" . $sumRowAwal . ":R" . $sumRowAkhir . ")")
+            ->getStyle('R' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+
+        foreach ($allData as $aliasjarum => $data) {
+            $columnBody = 'S'; // Kolom awal 
+            $colBody_index = Coordinate::columnIndexFromString($columnBody); // Konversi huruf kolom ke nomor indeks kolom
+            if (isset($data['monthlyData']) && is_array($data['monthlyData'])) {
+                foreach ($data['monthlyData'] as $month => $currentMonth) :
+                    $startColumnBody = $columnBody; // Kolom awal 
+                    foreach ($currentMonth['weeks'] as $week) :
+                        // Kolom subtotal Max Capacity
+                        $sheet->setCellValue($startColumnBody . $rowSubtotal, "=SUM(" . $startColumnBody . $sumRowAwal . ":" . $startColumnBody . $sumRowAkhir . ")")
+                            ->getStyle($startColumnBody . $rowSubtotal)
+                            ->applyFromArray($styleSubTotal);
+                        $colBody_index++;
+                        $nextColumnBody = Coordinate::stringFromColumnIndex($colBody_index); // Konversi 
+
+                        // Kolom subtotal Confirm Order
+                        $sheet->setCellValue($nextColumnBody . $rowSubtotal, "=SUM(" . $nextColumnBody . $sumRowAwal . ":" . $nextColumnBody . $sumRowAkhir . ")")
+                            ->getStyle($nextColumnBody . $rowSubtotal)
+                            ->applyFromArray($styleSubTotal);
+                        $colBody_index++;
+                        $nextColumnBody = Coordinate::stringFromColumnIndex($colBody_index); // Konversi 
+                        // Kolom subtotal Sisa Order
+                        $sheet->setCellValue($nextColumnBody . $rowSubtotal, "=SUM(" . $nextColumnBody . $sumRowAwal . ":" . $nextColumnBody . $sumRowAkhir . ")")
+                            ->getStyle($nextColumnBody . $rowSubtotal)
+                            ->applyFromArray($styleSubTotal);
+                        $colBody_index++;
+                        $nextColumnBody = Coordinate::stringFromColumnIndex($colBody_index); // Konversi 
+                        // Kolom subtotal Sisa Booking
+                        $sheet->setCellValue($nextColumnBody . $rowSubtotal, "=SUM(" . $nextColumnBody . $sumRowAwal . ":" . $nextColumnBody . $sumRowAkhir . ")")
+                            ->getStyle($nextColumnBody . $rowSubtotal)
+                            ->applyFromArray($styleSubTotal);
+                        $colBody_index++;
+                        $nextColumnBody = Coordinate::stringFromColumnIndex($colBody_index); // Konversi 
+                        // Kolom subtotal (+)Exess
+                        $sheet->setCellValue($nextColumnBody . $rowSubtotal, "=SUM(" . $nextColumnBody . $sumRowAwal . ":" . $nextColumnBody . $sumRowAkhir . ")")
+                            ->getStyle($nextColumnBody . $rowSubtotal)
+                            ->applyFromArray($styleSubTotal);
+                        $colBody_index++;
+                        $nextColumnBody = Coordinate::stringFromColumnIndex($colBody_index); // Konversi 
+                        // Kolom subtotal (+)Exess%
+                        //ambil kolom total exess dan max capacity
+                        $colSubtotalExess_index = $colBody_index - 1;
+                        $colSubtotalExess = Coordinate::stringFromColumnIndex($colSubtotalExess_index); // Konversi
+                        $colSubtotalMaxCapacity_index = $colBody_index - 5;
+                        $colSubtotalMaxCapacity = Coordinate::stringFromColumnIndex($colSubtotalMaxCapacity_index); // Konversi
+                        // persentase exess
+                        $sheet->setCellValue($nextColumnBody . $rowSubtotal, "=(" . $colSubtotalExess . $rowBody . "/" . $colSubtotalMaxCapacity . $rowBody . ")")
+                            ->getStyle($nextColumnBody . $rowSubtotal)
+                            ->applyFromArray($styleSubTotal);
+                        // Set format kolom menjadi persentase 
+                        $sheet->getStyle($nextColumnBody . $rowSubtotal)
+                            ->getNumberFormat()
+                            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_PERCENTAGE);
+
+                        $colBody_index++;
+                        $startColumnBody = Coordinate::stringFromColumnIndex($colBody_index); // Konversi 
+                    endforeach;
+                    $columnBody = Coordinate::stringFromColumnIndex($colBody_index); // Konversi 
+                endforeach;
+            }
+        }
+        $rowSubtotal++;
+
+        $rowGrandtotal = $rowSubtotal;
+        // baris grand total per bulan
+        $column = 'S'; // Kolom awal untuk bulan
+        $col_index = Coordinate::columnIndexFromString($column); // Konversi huruf kolom ke nomor indeks kolom
+        $columnGrandTotal = 'S'; // Kolom awal untuk bulan
+        $colGrandTotalMaxCap = Coordinate::columnIndexFromString($columnGrandTotal); // Konversi huruf kolom ke nomor indeks kolom
+        $colGrandTotalConfirm = Coordinate::columnIndexFromString($columnGrandTotal) + 1; // Konversi huruf kolom ke nomor indeks kolom
+        $colGrandTotalSisaOrder = Coordinate::columnIndexFromString($columnGrandTotal) + 2; // Konversi huruf kolom ke nomor indeks kolom
+        $colGrandTotalSisaBooking = Coordinate::columnIndexFromString($columnGrandTotal) + 3; // Konversi huruf kolom ke nomor indeks kolom
+        $colGrandTotalExess = Coordinate::columnIndexFromString($columnGrandTotal) + 4; // Konversi huruf kolom ke nomor indeks kolom
+        $colGrandTotalPersentaseExess = Coordinate::columnIndexFromString($columnGrandTotal) + 5; // Konversi huruf kolom ke nomor indeks kolom
+        foreach ($monthlyData as $month => $data) :
+            // month
+            $weekCount = count($data['weeks']); // Hitung jumlah minggu dalam bulan
+            $startColumn = $column;
+            $endCol_index = $col_index + ($weekCount * 6) - 1; // Dikurangi 1 karena kolom awal tidak terhitung
+            $endColumn = Coordinate::stringFromColumnIndex($endCol_index); // Konversi kembali dari nomor indeks kolom ke huruf kolom
+            $endColTitle_index = $col_index + 1; // untuk title grandTotal
+            $endColumnTitle = Coordinate::stringFromColumnIndex($endColTitle_index); // Konversi kembali dari nomor indeks kolom ke huruf kolom
+            $startColGrandtotal_index = $endColTitle_index + 1; // Konversi kembali dari nomor indeks kolom ke huruf kolom
+            $startColumnGrandtotal = Coordinate::stringFromColumnIndex($startColGrandtotal_index); // untuk isi grandTotal
+            $totalWeeks = 0; // Inisialisasi total minggu
+            // untuk menghitung total minggu
+            if (isset($data['weeks']) && is_array($data['weeks'])) {
+                // Hitung jumlah minggu untuk bulan ini
+                $totalWeeks = count($data['weeks']);
+            }
+            $rowTotal = $rowGrandtotal - 1;
+
+            // Merge cells untuk bulan ini sesuai dengan jumlah minggu
+            $sheet->setCellValue($startColumn . $rowGrandtotal, "Total " . $month);
+            if ($startColumn !== $endColumn) {
+                $sheet->mergeCells($startColumn . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+                    ->getStyle($startColumn . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+                    ->applyFromArray($styleGrandTotal);
+            } else {
+                $sheet->getStyle($startColumn . $rowHeader)
+                    ->applyFromArray($styleGrandTotal);
+            }
+            $rowGrandtotal++;
+
+            // Grand total Max Capacity Per bulan
+            $sheet->setCellValue($startColumn . $rowGrandtotal, "Max Capacity")
+                ->mergeCells($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
+                ->getStyle($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+
+
+            // Buat formula berdasarkan total minggu
+            $grandTotalMaxCap = "=SUM(";
+            $grandTotalPartsMaxCap = []; // Untuk menyimpan tiap bagian formula SUM
+
+            for ($week = 0; $week < $totalWeeks; $week++) {
+                // Kolom awal setiap bulan dimulai dari index yang sesuai
+                $currentColumnIndex = $colGrandTotalMaxCap + ($week * 6); // Kolom pertama tiap minggu
+                $currentColumn = Coordinate::stringFromColumnIndex($currentColumnIndex); // Mengubah indeks kolom jadi string
+
+                // Tambahkan kolom ke formula hanya untuk minggu yang relevan
+                $grandTotalPartsMaxCap[] = "{$currentColumn}{$rowTotal}";
+            }
+
+            // Gabungkan bagian formula dengan koma
+            $grandTotalMaxCap .= implode(', ', $grandTotalPartsMaxCap) . ")";
+
+            // Update kolom untuk bulan berikutnya
+            $colGrandTotalMaxCap = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+
+            $sheet->setCellValue($startColumnGrandtotal . $rowGrandtotal, $grandTotalMaxCap);
+            $sheet->mergeCells($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+                ->getStyle($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+
+            $startColGrandtotal_index = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+
+            $rowGrandtotal++; // Pindah ke baris berikutnya jika ingin menyusun hasil di baris yang berbeda
+
+            // Grand total Confirm Order Per bulan
+            $sheet->setCellValue($startColumn . $rowGrandtotal, "Confirm Order")
+                ->mergeCells($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
+                ->getStyle($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+
+            // Buat formula berdasarkan total minggu
+            $grandTotalConfirm = "=SUM(";
+            $grandTotalPartsConfirm = []; // Untuk menyimpan tiap bagian formula SUM
+
+            for ($week = 0; $week < $totalWeeks; $week++) {
+                // Kolom awal setiap bulan dimulai dari index yang sesuai
+                $currentColumnIndex = $colGrandTotalConfirm + ($week * 6); // Kolom pertama tiap minggu +1 supaya di mulai dari kolom u
+                $currentColumn = Coordinate::stringFromColumnIndex($currentColumnIndex); // Mengubah indeks kolom jadi string
+
+                // Tambahkan kolom ke formula hanya untuk minggu yang relevan
+                $grandTotalPartsConfirm[] = "{$currentColumn}{$rowTotal}";
+            }
+
+            // Gabungkan bagian formula dengan koma
+            $grandTotalConfirm .= implode(', ', $grandTotalPartsConfirm) . ")";
+
+            // Update kolom untuk bulan berikutnya
+            $colGrandTotalConfirm = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+
+            $sheet->setCellValue($startColumnGrandtotal . $rowGrandtotal, $grandTotalConfirm);
+            $sheet->mergeCells($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+                ->getStyle($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+
+            $startColGrandtotal_index = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+
+            $rowGrandtotal++;
+
+            // Grand total Sisa Order perbulan
+            $sheet->setCellValue($startColumn . $rowGrandtotal, "Sisa Order")
+                ->mergeCells($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
+                ->getStyle($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+
+            // Buat formula berdasarkan total minggu
+            $grandTotalSisaOrder = "=SUM(";
+            $grandTotalPartsSisaOrder = []; // Untuk menyimpan tiap bagian formula SUM
+
+            for ($week = 0; $week < $totalWeeks; $week++) {
+                // Kolom awal setiap bulan dimulai dari index yang sesuai
+                $currentColumnIndex = $colGrandTotalSisaOrder + ($week * 6); // Kolom pertama tiap minggu +1 supaya di mulai dari kolom u
+                $currentColumn = Coordinate::stringFromColumnIndex($currentColumnIndex); // Mengubah indeks kolom jadi string
+
+                // Tambahkan kolom ke formula hanya untuk minggu yang relevan
+                $grandTotalPartsSisaOrder[] = "{$currentColumn}{$rowTotal}";
+            }
+
+            // Gabungkan bagian formula dengan koma
+            $grandTotalSisaOrder .= implode(', ', $grandTotalPartsSisaOrder) . ")";
+
+            // Update kolom untuk bulan berikutnya
+            $colGrandTotalSisaOrder = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+
+            $sheet->setCellValue($startColumnGrandtotal . $rowGrandtotal, $grandTotalSisaOrder);
+            $sheet->mergeCells($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+                ->getStyle($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+
+            $startColGrandtotal_index = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+
+            $rowGrandtotal++;
+
+            // Grand Total Sisa Booking perbulan
+            $sheet->setCellValue($startColumn . $rowGrandtotal, "Sisa Booking")
+                ->mergeCells($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
+                ->getStyle($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+
+            // Buat formula berdasarkan total minggu
+            $grandTotalSisaBooking = "=SUM(";
+            $grandTotalPartsSisaBooking = []; // Untuk menyimpan tiap bagian formula SUM
+
+            for ($week = 0; $week < $totalWeeks; $week++) {
+                // Kolom awal setiap bulan dimulai dari index yang sesuai
+                $currentColumnIndex = $colGrandTotalSisaBooking + ($week * 6); // Kolom pertama tiap minggu +1 supaya di mulai dari kolom u
+                $currentColumn = Coordinate::stringFromColumnIndex($currentColumnIndex); // Mengubah indeks kolom jadi string
+
+                // Tambahkan kolom ke formula hanya untuk minggu yang relevan
+                $grandTotalPartsSisaBooking[] = "{$currentColumn}{$rowTotal}";
+            }
+
+            // Gabungkan bagian formula dengan koma
+            $grandTotalSisaBooking .= implode(', ', $grandTotalPartsSisaBooking) . ")";
+
+            // Update kolom untuk bulan berikutnya
+            $colGrandTotalSisaBooking = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+
+            $sheet->setCellValue($startColumnGrandtotal . $rowGrandtotal, $grandTotalSisaBooking);
+            $sheet->mergeCells($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+                ->getStyle($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+
+            $startColGrandtotal_index = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+
+            $rowGrandtotal++;
+
+            // Grand Total Exess perbulan
+            $sheet->setCellValue($startColumn . $rowGrandtotal, "(+)Exess")
+                ->mergeCells($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
+                ->getStyle($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+
+            // Buat formula berdasarkan total minggu
+            $grandTotalExess = "=SUM(";
+            $grandTotalPartsExess = []; // Untuk menyimpan tiap bagian formula SUM
+
+            for ($week = 0; $week < $totalWeeks; $week++) {
+                // Kolom awal setiap bulan dimulai dari index yang sesuai
+                $currentColumnIndex = $colGrandTotalExess + ($week * 6); // Kolom pertama tiap minggu +1 supaya di mulai dari kolom u
+                $currentColumn = Coordinate::stringFromColumnIndex($currentColumnIndex); // Mengubah indeks kolom jadi string
+
+                // Tambahkan kolom ke formula hanya untuk minggu yang relevan
+                $grandTotalPartsExess[] = "{$currentColumn}{$rowTotal}";
+            }
+
+            // Gabungkan bagian formula dengan koma
+            $grandTotalExess .= implode(', ', $grandTotalPartsExess) . ")";
+
+            // Update kolom untuk bulan berikutnya
+            $colGrandTotalExess = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+
+            $sheet->setCellValue($startColumnGrandtotal . $rowGrandtotal, $grandTotalExess);
+            $sheet->mergeCells($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+                ->getStyle($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+
+            $startColGrandtotal_index = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+
+            $rowGrandtotal++;
+
+            // Grand Total Exess perbulan
+            $sheet->setCellValue($startColumn . $rowGrandtotal, "%")
+                ->mergeCells($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
+                ->getStyle($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+
+            $rowGtMaxCap = $rowGrandtotal - 5;
+            $rowGtExess = $rowGrandtotal - 1;
+            $sheet->setCellValue($startColumnGrandtotal . $rowGrandtotal, "=(" . $startColumnGrandtotal . $rowGtExess . "/" . $startColumnGrandtotal . $rowGtMaxCap . ")");
+            $sheet->mergeCells($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+                ->getStyle($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+            // Set format kolom menjadi persentase 
+            $sheet->getStyle($startColumnGrandtotal . $rowGrandtotal)
+                ->getNumberFormat()
+                ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_PERCENTAGE);
+
+            // Pindah ke kolom berikutnya setelah melakukan merge
+            $col_index = $endCol_index + 1; // Update ke indeks kolom berikutnya
+            $column = Coordinate::stringFromColumnIndex($col_index); // Konversi kembali ke huruf kolom
+
+            // agar baris kembali ke baris pertama grandtotal
+            $rowGrandtotal -= 6;
+        endforeach;
 
         // Set judul file dan header untuk download
         $filename = 'Sales Position.xlsx';
