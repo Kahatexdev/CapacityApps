@@ -426,6 +426,7 @@ class ApsPerstyleModel extends Model
 
         $data = $this->select('mastermodel, delivery, SUM(sisa) AS sisa, smv, factory, machinetypeid')
             ->where('machinetypeid', $jarum)
+            ->where('sisa >', '0')
             ->where('delivery >', $bulan)
             ->where('delivery <', $ld)
             ->where('factory', $ar)

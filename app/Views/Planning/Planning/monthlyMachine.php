@@ -81,36 +81,7 @@
                         </div>
                     </div>
                     <div class="row text-end">
-                        <form action="<?= base_url($role . '/saveMonthlyMc') ?>" method="post">
-                            <input type="text" name="judul" value="<?= $title ?>" hidden>
-                            <input type="text" name="totalMc" value="<?= $summary['totalMc'] ?>" hidden>
-                            <input type="text" name="totalPlanning" value="<?= $summary['totalPlanning'] ?>" hidden>
-                            <input type="text" name="totalPersen" value="<?= $summary['totalPersen'] ?>" hidden>
-                            <input type="text" name="OutputTotal" value="<?= $summary['OutputTotal'] ?>" hidden>
 
-                            <input type="text" name="mcSocks" value="<?= $summary['mcSocks'] ?>" hidden>
-                            <input type="text" name="planMcSocks" value="<?= $summary['planMcSocks'] ?>" hidden>
-                            <input type="text" name="persenSocks" value="<?= $summary['persenSocks'] ?>" hidden>
-
-                            <input type="text" name="mcGloves" value="<?= $summary['mcGloves'] ?>" hidden>
-                            <input type="text" name="planMcGloves" value="<?= $summary['planMcGloves'] ?>" hidden>
-                            <input type="text" name="persenGloves" value="<?= $summary['persenGloves'] ?>" hidden>
-                            <?php foreach ($data as $tempat => $jarum): ?>
-                                <input type="text" name="area[]" value="<?= $tempat ?>" hidden>
-
-                                <input type="text" name="totalMesin[]" value="<?= $jarum['totalMesin']; ?>" hidden>
-                                <input type="text" name="planningMc[]" value="<?= $jarum['planningMc']; ?>" hidden>
-                                <input type="text" name="outputDz[]" value="<?= $jarum['outputDz']; ?>" hidden>
-                                <?php foreach ($jarum as $jr): ?>
-                                    <?php if (!is_array($jr)) continue; ?>
-                                    <input type="text" name="jarum[]" value="<?= $jr['jr']  ?>" hidden>
-                                    <input type="text" name="kebutuhanMesin[]" value="<?= $jr['kebutuhanMesin']  ?>" hidden>
-                                <?php endforeach ?>
-
-                            <?php endforeach ?>
-
-                            <button type="submit" class="btn btn-info btn-block"> Save </button>
-                        </form>
                     </div>
                 </div>
             </div>
