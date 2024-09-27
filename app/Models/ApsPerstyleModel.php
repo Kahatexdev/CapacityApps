@@ -334,13 +334,17 @@ class ApsPerstyleModel extends Model
     }
     public function CapacityArea($pdk, $area, $jarum)
     {
+        $oneweek = date('Y-m-d', strtotime('+7 Days'));
         $data = $this->select('mastermodel,sum(sisa)as sisa,delivery,smv')
             ->where('mastermodel', $pdk)
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
+            ->where('sisa>', 0)
+            ->where('delivery >', $oneweek)
             ->groupBy('mastermodel,delivery')
             ->get()
             ->getResultArray();
+
         $sisaArray = array_column($data, 'sisa');
         $maxValue = max($sisaArray);
         $indexMax = array_search($maxValue, $sisaArray);
