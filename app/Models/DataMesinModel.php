@@ -244,10 +244,23 @@ class DataMesinModel extends Model
     public function getTotalMcPerBrand($brand, $aliasjarum)
     {
         // return 
-        $query = $this->select('jarum, SUM(total_mc) as total_mc, SUM(mesin_jalan) as running, SUM(CASE WHEN pu = "CJ" THEN total_mc ELSE 0 END) AS cj, SUM(CASE WHEN pu = "MJ" THEN total_mc ELSE 0 END) AS mj, target')
+        $query = $this->select('jarum, SUM(total_mc) as total_mc, SUM(CASE WHEN pu = "CJ" THEN mesin_jalan ELSE 0 END) as running, SUM(CASE WHEN pu = "CJ" THEN total_mc ELSE 0 END) AS cj, SUM(CASE WHEN pu = "MJ" THEN total_mc ELSE 0 END) AS mj, target')
             ->where('aliasjarum', $aliasjarum) // Kondisi where untuk aliasjarum
             ->where('brand LIKE', '%' . $brand . '%') // Kondisi where untuk brand
             ->orderBy('brand') // Urutkan berdasarkan "brand"
+            ->get();
+
+        $result = $query->getResultArray(); // Mengambil hasil sebagai array
+
+        // Jika hasil query kosong, kembalikan array kosong
+        return !empty($result) ? $result : [];
+    }
+    public function getTotalMcAllAlias($brand)
+    {
+        // return 
+        $query = $this->select('aliasjarum, jarum, SUM(total_mc) as total_mc, SUM(CASE WHEN pu = "CJ" THEN mesin_jalan ELSE 0 END) as running, SUM(CASE WHEN pu = "CJ" THEN total_mc ELSE 0 END) AS cj, SUM(CASE WHEN pu = "MJ" THEN total_mc ELSE 0 END) AS mj, target')
+            ->where('brand LIKE', '%' . $brand . '%') // Kondisi where untuk brand
+            ->orderBy('aliasjarum, brand') // Urutkan berdasarkan "brand"
             ->get();
 
         $result = $query->getResultArray(); // Mengambil hasil sebagai array
@@ -426,6 +439,7 @@ class DataMesinModel extends Model
     {
         // Daftar alias jarum gloves
         $orderedAliasJarums = [
+            // Mc Gloves
             'Ladies/Mens 13G',
             'Ladies/Mens 10G (126N)',
             'Ladies/Mens 10G (116N)',
@@ -448,8 +462,9 @@ class DataMesinModel extends Model
             $caseStatement .= "WHEN aliasjarum = '{$alias}' THEN {$index} ";
         }
         return $this->select('aliasjarum, jarum, brand')
+            ->where('aliasjarum!=', '')
             ->groupBy('aliasjarum')
-            ->orderBy("CASE {$caseStatement} ELSE 999 END", 'DESC')
+            ->orderBy("CASE {$caseStatement} ELSE " . (count($orderedAliasJarums)) . " END DESC, aliasjarum ASC")
             ->findAll();
     }
 
