@@ -212,7 +212,7 @@ class SalesController extends BaseController
                 return $carry;
             }, 0);
 
-            $countExess = ($maxCapacity > 0) ? -$maxCapacity + $sisaBooking + $sisaConfirmOrder : 0;
+            $countExess = -$maxCapacity + $sisaBooking + $sisaConfirmOrder;
             $exess = ($countExess > 0) ? ceil($countExess) : floor($countExess);
 
             $countExessPercentage = ($maxCapacity > 0) ? ($exess / $maxCapacity) * 100 : 0;
