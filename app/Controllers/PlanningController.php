@@ -125,7 +125,6 @@ class PlanningController extends BaseController
             ];
             $assign = $this->ApsPerstyleModel->asignAreal($data);
             if (!$assign) {
-                dd($data);
                 return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $pdk . '/' . $jarum))->withInput()->with('error', 'Gagal Assign Area');
             }
         }
@@ -457,13 +456,96 @@ class PlanningController extends BaseController
             'active6' => '',
             'active7' => '',
             'bulan' => $bulanIni,
-            'jarum' => $jarum,
-            'kebutuhanMesin' => $kebutuhanMesin,
-            'totalMc' => $totalArea,
-            'output' => $outputDz, // Pass outputDz data to the view
-            'monthlyData' => $monthlyData,
+
         ];
 
         return view($role . '/Planning/planningjalanMCPerBulan', $data);
+    }
+    public function monthlyMachine($bulan)
+    {
+        $role = session()->get('role');
+        $date = DateTime::createFromFormat('F-Y', $bulan);
+        $bulanIni = $date->format('F-Y');
+        $awalBulan = $date->format('Y-m-01');
+
+        $filteredArea = $this->jarumModel->getArea();
+        $area = array_filter($filteredArea, function ($item) {
+            return strpos($item, 'Gedung') === false;
+        });
+        $area = array_values($area);
+        $monthlyData = [];
+        foreach ($area as $ar) {
+            $mesin = $this->jarumModel->areaMc($ar);
+            $totalMesin = 0;
+            $planningMc = 0;
+            $outputDz = 0;
+            foreach ($mesin as $jarum) {
+                $sisaOrder = $this->ApsPerstyleModel->ambilSisaOrder($ar, $awalBulan, $jarum['jarum']);
+                $monthlyData[$ar][$jarum['jarum']]['kebutuhanMesin'] = $sisaOrder['totalKebMesin'];
+                $monthlyData[$ar][$jarum['jarum']]['output'] = $sisaOrder['outputDz'];
+                $monthlyData[$ar][$jarum['jarum']]['jr'] = $jarum['jarum'];
+                $totalMesin += $jarum['total'];
+                $planningMc += $sisaOrder['totalKebMesin'];
+                $outputDz += $sisaOrder['outputDz'];
+            }
+            $monthlyData[$ar]['totalMesin'] = $totalMesin;
+            $monthlyData[$ar]['planningMc'] = $planningMc;
+            $monthlyData[$ar]['outputDz'] = $outputDz;
+        }
+        $totalAllMesin = 0;
+
+        $totalOutput = 0;
+        $totalMcPlanning = 0;
+
+        foreach ($monthlyData as $data) {
+            $totalAllMesin += $data['totalMesin'];
+            $totalOutput += $data['outputDz'];
+            $totalMcPlanning += $data['planningMc'];
+        }
+        $totalKebGloves = 0; // Initialize outside the loop
+        foreach ($monthlyData['KK8J'] as $data) {
+            if (is_array($data) && isset($data['kebutuhanMesin'])) {
+                $totalKebGloves += $data['kebutuhanMesin'];
+            }
+        }
+
+        $totalKebSock = $totalMcPlanning - $totalKebGloves;
+        $totalMcSocks = $this->jarumModel->totalMcSock();
+        $totalMcSocks = intval($totalMcSocks['total']);
+        $totalMcGloves = $totalAllMesin - $totalMcSocks;
+
+        $persenSocks = round(($totalKebSock / $totalMcSocks) * 100);
+        $persenGloves = round(($totalKebGloves / $totalMcGloves) * 100);
+        $persenTotal = round(($totalMcPlanning / $totalAllMesin) * 100);
+        $summary = [
+            'totalMc' => $totalAllMesin,
+            'OutputTotal' => $totalOutput,
+            'totalPlanning' => $totalMcPlanning,
+            'totalPersen' => $persenTotal,
+
+            'mcSocks' => $totalMcSocks,
+            'planMcSocks' => $totalKebSock,
+            'persenSocks' => $persenSocks,
+
+            'mcGloves' => $totalMcGloves,
+            'planMcGloves' => $totalKebGloves,
+            'persenGloves' => $persenGloves
+        ];
+        $data = [
+            'role' => $role,
+            'title' =>  $bulanIni,
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'bulan' => $bulanIni,
+            'data' => $monthlyData,
+            'summary' => $summary
+        ];
+
+        return view($role . '/Planning/monthlyMachine', $data);
     }
 }

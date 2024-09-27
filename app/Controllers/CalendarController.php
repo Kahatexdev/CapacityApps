@@ -481,7 +481,7 @@ class CalendarController extends BaseController
             $qty1 = $data['sisa'];
             $hari1 = intval($data['totalhari']);
             $deliv = $data['delivery'];
-            $target = ((86400 / (intval($data['smv'])  * 0.8)) / 24);
+            $target = ((86400 / (intval($data['smv']))) * 0.8 / 24);
 
             $mastermodel = $data['mastermodel'];
 

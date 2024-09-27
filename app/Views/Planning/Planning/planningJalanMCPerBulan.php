@@ -72,7 +72,7 @@
                                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" rowspan="2" style="text-align: center;">Area</th>
                                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" rowspan="2" style="text-align: center;">Jumlah MC</th>
                                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" rowspan="2" style="text-align: center;">Planning MC</th>
-                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" colspan="27" style="text-align: center;">Rincian Planning Jalan MC</th>
+                                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" colspan="<?= count($jarum); ?>" style="text-align: center;">Rincian Planning Jalan MC</th>
                                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" rowspan="2" style="text-align: center;">Output (dz)</th>
                                                 </tr>
                                                 <tr>
@@ -93,6 +93,7 @@
                                                 $outputDzSocks = 0;
                                                 $outputDzGloves = 0;
                                                 $totalOutputDz = 0;
+                                                $row = 1;
                                                 foreach ($kebutuhanMesin[$i] as $area => $jarums):
                                                     $planMcArea = 0;
                                                     $outputDz = 0;
@@ -128,20 +129,36 @@
                                                     <tr>
                                                         <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $area ?></td>
                                                         <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $totalMc[$area]['Total'] ?? 0; ?></td>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $planMcArea; ?></td>
-                                                        <?php foreach ($jarum as $jrm): ?>
-                                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><input type="number" class="form-control" style="text-align: center; font-size: 0.7rem; width: 65px;" value="<?= $jarums[$jrm['jarum']] ?? 0; ?>"></td>
-                                                        <?php endforeach; ?>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= number_format($outputDz, 0); ?></td>
+                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" id="totalPlanArea<?= $row; ?>"><?= $planMcArea; ?></td>
+                                                        <?php
+                                                        $no = 1; // Deklarasi variabel sebelum loop
+                                                        foreach ($jarum as $jrm): ?>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">
+                                                                <input type="number" class="form-control plan_mc<?= $row; ?>" id="plan_mc<?= $no; ?>"
+                                                                    style="text-align: center; font-size: 0.7rem; width: 65px;"
+                                                                    value="<?= $jarums[$jrm['jarum']] ?? 0; ?>"
+                                                                    data-jarum="<?= $jrm['jarum']; ?>" onchange="updateTotals(<?= $row; ?>)">
+                                                            </td>
+                                                        <?php
+                                                            $no++; // Increment variabel $no
+                                                        endforeach; ?>
+                                                        <td class=" text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= number_format($outputDz, 0); ?>
+                                                        </td>
                                                     </tr>
-                                                <?php endforeach; ?>
+                                                <?php
+                                                    $row++;
+                                                endforeach; ?>
                                                 <tr>
                                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Total MC Sock</th>
                                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= $totalMcSocks; ?></th>
                                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= $planMcSocks; ?></th>
-                                                    <?php foreach ($jarum as $jrm): ?>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= $totalPlanMcJrm[$jrm['jarum']] ?? 0; ?></td>
-                                                    <?php endforeach; ?>
+                                                    <?php
+                                                    $no = 1;
+                                                    foreach ($jarum as $jrm): ?>
+                                                        <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" id="totalPlan<?= $no ?>"><?= $totalPlanMcJrm[$jrm['jarum']] ?? 0; ?></td>
+                                                    <?php
+                                                        $no++;
+                                                    endforeach; ?>
                                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= number_format($outputDzSocks, 0); ?></th>
                                                 </tr>
                                                 <tr>
@@ -194,5 +211,48 @@
         </div>
     </div>
 </div>
+<canvas id="myCanvas" width="200" height="100"></canvas>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const canvas = document.getElementById('myCanvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            // Gambar sesuatu di canvas jika perlu
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(0, 0, 200, 100);
+        } else {
+            console.error("Canvas not found");
+        }
+    });
+
+    function updateTotals(row) {
+        // Menghitung total untuk area (baris)
+        let totalArea = 0;
+        const areaInputs = document.querySelectorAll('#plan_mc' + row); // Gunakan id
+
+        areaInputs.forEach(input => {
+            const value = parseInt(input.value) || 0; // Ambil nilai input atau 0 jika kosong
+            totalArea += value; // Tambahkan ke total area
+        });
+
+        // Tampilkan total area di elemen yang sesuai
+        document.getElementById('totalPlanArea' + row).textContent = totalArea;
+
+        // Menghitung total untuk setiap jenis jarum (kolom)
+        const jarumCount = <?= count($jarum) ?>; // Ganti dengan jumlah jenis jarum yang sesuai
+        for (let no = 1; no <= jarumCount; no++) {
+            let totalPlan = 0;
+            const columnInputs = document.querySelectorAll('.plan_mc' + no); // Gunakan class
+
+            columnInputs.forEach(input => {
+                const value = parseInt(input.value) || 0; // Ambil nilai input atau 0 jika kosong
+                totalPlan += value; // Tambahkan ke total plan
+            });
+
+            // Tampilkan total plan di elemen yang sesuai
+            document.getElementById('totalPlan' + no).textContent = totalPlan;
+        }
+    }
+</script>
 <?php $this->endSection(); ?>

@@ -58,11 +58,8 @@ class ApsPerstyleModel extends Model
         $result = $this->select('*')
             ->where('mastermodel', $validate['mastermodel'])
             ->where('size', $validate['size'])
-            ->where('country', $validate['country'])
             ->where('delivery', $validate['delivery'])
-            ->where('qty', $validate['qty'])
-            ->get()
-            ->getRow();
+            ->first();
         return $result;
     }
     public function detailModel($noModel, $delivery)
@@ -244,7 +241,7 @@ class ApsPerstyleModel extends Model
 
     public function getSmv()
     {
-        $monthago = date('Y-m-d', strtotime('20 days ago')); // Menggunakan format tanggal yang benar
+        $monthago = date('Y-m-d', strtotime('10 days ago')); // Menggunakan format tanggal yang benar
         return $this->select('idapsperstyle,mastermodel,size,smv')
             ->where('delivery >', $monthago) // Perbaiki spasi di operator where
             ->groupBy(['size', 'mastermodel']) // Menggunakan array untuk groupBy
@@ -260,11 +257,10 @@ class ApsPerstyleModel extends Model
 
     public function getIdSmv($validate)
     {
-        $id = $this->select('idapsperstyle')
+        $id = $this->select('idapsperstyle,smv')
             ->where('mastermodel', $validate['mastermodel'])
             ->where('size', $validate['size'])
-            ->where('smv !=', $validate['smv'])
-            ->first();
+            ->findAll();
 
         return $id;
     }
@@ -295,20 +291,61 @@ class ApsPerstyleModel extends Model
             ->where('idapsperstyle', $pr['idapsperstyle'])
             ->update();
     }
-    public function CapacityArea($area, $jarum)
+    public function listOrderArea($area, $jarum)
     {
         $today = date('Y-m-d', strtotime('+1 Days'));
         $maxDeliv = date('Y-m-d', strtotime('+90 Days'));
 
-        return $this->select('mastermodel,sum(sisa)as sisa,delivery,smv')
+        return $this->select('mastermodel')
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
             ->where('sisa >', 0)
             ->where('delivery <', $maxDeliv)
             ->where('delivery >', $today)
-            ->groupBy('machinetypeid, mastermodel')
+            ->groupBy('mastermodel')
+            ->findAll();
+    }
+    public function CapacityArea($pdk, $area, $jarum)
+    {
+        $data = $this->select('mastermodel,sum(sisa)as sisa,delivery,smv')
+            ->where('mastermodel', $pdk)
+            ->where('factory', $area)
+            ->where('machinetypeid', $jarum)
+            ->groupBy('mastermodel,delivery')
             ->get()
             ->getResultArray();
+        $sisaArray = array_column($data, 'sisa');
+        $maxValue = max($sisaArray);
+        $indexMax = array_search($maxValue, $sisaArray);
+        $totalQty = 0;
+        for ($i = 0; $i <= $indexMax; $i++) {
+            $totalQty += $sisaArray[$i];
+        }
+        $totalQty = round($totalQty / 24);
+
+        $deliveryTerjauh = end($data)['delivery'];
+        $today = new DateTime(date('Y-m-d'));
+        $deliveryDate = new DateTime($deliveryTerjauh); // Tanggal delivery terjauh
+        $diff = $today->diff($deliveryDate);
+        $hari = $diff->days - 7;
+
+        $deliveryMax = $data[$indexMax]['delivery'];
+        $tglDeliv = new DateTime($deliveryMax); // Tanggal delivery terjauh
+        $beda = $today->diff($tglDeliv);
+        $hariTarget = $beda->days - 7;
+        $smvArray = array_column($data, 'smv');
+        $smvArray = array_map('intval', $smvArray);
+        $averageSmv = array_sum($smvArray) / count($smvArray);
+
+        $pdk = $data[$indexMax]['mastermodel'];
+        $order = [
+            'mastermodel' => $pdk,
+            'sisa' => $totalQty,
+            'delivery' => $deliveryTerjauh,
+            'targetHari' => $hariTarget,
+            'smv' => $averageSmv
+        ];
+        return $order;
     }
     public function getIdBs($validate)
     {
@@ -326,6 +363,27 @@ class ApsPerstyleModel extends Model
             ->groupby('machinetypeid')
             ->findAll();
     }
+    public function getSisaPerDeliv($model, $jarum)
+    {
+        return $this->select('sum(sisa) as sisa,sum(qty) as qty, delivery, mastermodel,smv')
+            ->where('machinetypeid', $jarum)
+            ->where('mastermodel', $model)
+            ->where('sisa >=', 0)
+            ->groupby('delivery')
+            ->findAll();
+    }
+    public function getSisaPerDlv($model, $jarum, $deliv)
+    {
+        $sisa = $this->select('idapsperstyle,mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,factory, production_unit, delivery,smv')
+            ->where('machinetypeid', $jarum)
+            ->where('mastermodel', $model)
+            ->where('delivery', $deliv)
+            ->where('sisa >=', 0)
+            ->groupBy('size')
+            ->findAll();
+        $final = reset($sisa);
+        return $sisa;
+    }
     public function getSisaOrderforRec($jarum, $start, $stop)
     {
         $maxDeliv = date('Y-m-d', strtotime($start . '+90 Days'));
@@ -342,6 +400,7 @@ class ApsPerstyleModel extends Model
         $data = $this->select('idapsperstyle, delivery, sisa,qty')
             ->where('mastermodel', $validate['no_model'])
             ->where('size', $validate['style'])
+            ->where('factory', $validate['area'])
             ->where('qty != sisa')
             ->orderBy('sisa', 'ASC') // Mengurutkan berdasarkan 'sisa' dari yang terkecil
             ->first(); // Mengambil data pertama (yang terkecil)
@@ -365,24 +424,20 @@ class ApsPerstyleModel extends Model
             ->where('machinetypeid', $jarum)
             ->where('delivery >', $bulan)
             ->where('delivery <', $ld)
-            ->where('sisa >', 0)
             ->where('factory', $ar)
-            ->whereNotIn('factory', ['Belum Ada Area', 'MJ'])
-            ->groupBy('machinetypeid, factory, mastermodel')
+            ->groupBy('smv,delivery,machinetypeid, factory, mastermodel')
             ->findAll();
-
         $totalKebMesin = 0;
         $outputDz = 0;
-
         foreach ($data as $dt) {
             $delivDate = new DateTime($dt['delivery']);
             $leadtime = $delivDate->diff($todayDate)->days;
-            $smv = intval($dt['smv']);
-            $smv = $smv == 0 ? 14 : $smv;
-
+            $smv = intval($dt['smv']) ?? 185;
+            $sisa = round($dt['sisa'] / 24);
             if ($leadtime > 0) {
-                $target = 3600 / $smv; // Simplified target calculation
-                $kebMesin = $dt['sisa'] / $target / $leadtime;
+                $target = round((86400 / $smv) * 0.85 / 24); // Simplified target calculation
+                $kebMesin = $sisa / $target / $leadtime;
+
                 $kebutuhanMc = ceil($kebMesin);
                 $dz = $kebutuhanMc * $target;
 
@@ -409,5 +464,52 @@ class ApsPerstyleModel extends Model
             ->where('delivery<=', $cek['end'])
             ->groupBy('machinetypeid')
             ->findAll();
+    }
+    public function getIdByDeliv($pdk, $size, $deliv)
+    {
+        return $this->select('idapsperstyle')
+            ->where('mastermodel', $pdk)
+            ->where('size', $size)
+            ->findAll();
+    }
+    public function rekomenarea($noModel, $jarum)
+    {
+        $this->select('size, delivery, smv, SUM(sisa) AS sisa, size, 
+        DATEDIFF(DATE_SUB(delivery, INTERVAL 7 DAY), DATE_ADD(CURDATE(), INTERVAL 7 DAY)) - 
+        (SELECT COUNT(tanggal) FROM data_libur WHERE tanggal BETWEEN DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND DATE_SUB(apsperstyle.delivery, INTERVAL 7 DAY)) AS totalhari');
+        $this->where('machinetypeid', $jarum)
+            ->where('mastermodel', $noModel)
+            ->where('production_unit !=', 'MAJALAYA');
+        $this->where('sisa >', 0);
+        $this->groupBy('smv, mastermodel, delivery');
+        $this->orderBy('delivery');
+
+        return $this->get()->getResultArray();
+    }
+    public function resetSisaDlv($update)
+    {
+        $sisa = 0;
+        $this->set('sisa', $sisa)
+            ->where('mastermodel', $update['mastermodel'])
+            ->where('delivery', $update['delivery'])
+            ->where('size', $update['size'])
+            ->update();
+        return $this->affectedRows();
+    }
+    public function getIdPerDeliv($update)
+    {
+        return $this->select('idapsperstyle')
+            ->where('mastermodel', $update['mastermodel'])
+            ->where('delivery', $update['delivery'])
+            ->where('size', $update['size'])
+            ->first();
+    }
+    public function totalPo($model)
+    {
+        $po = $this->select('sum(qty) as totalPo')
+            ->where('mastermodel', $model)
+            ->findAll();
+        $order = reset($po);
+        return $order;
     }
 }

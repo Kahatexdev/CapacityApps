@@ -16,7 +16,7 @@ use App\Models\AksesModel;
 use App\Models\AreaModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\UserModel;
-
+use DateTime;
 
 class GodController extends BaseController
 {
@@ -964,5 +964,94 @@ class GodController extends BaseController
             $db->transRollback();
             return redirect()->to(base_url(session()->get('role') . '/account'))->with('error', 'User Gagal di Update');
         }
+    }
+    public function updateSisa()
+    {
+        ini_set('memory_limit', '512M');
+        set_time_limit(500);
+
+        $file = $this->request->getFile('excel_file');
+        if ($file->isValid() && !$file->hasMoved()) {
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
+            $worksheet = $spreadsheet->getActiveSheet();
+
+            $startRow = 2; // Ganti dengan nomor baris mulai
+            $batchSize = 100; // Ukuran batch
+            $batchData = [];
+            $failedRows = []; // Array untuk menyimpan informasi baris yang gagal
+            $db = \Config\Database::connect();
+            foreach ($worksheet->getRowIterator($startRow) as $row) {
+                $rowIndex = $row->getRowIndex();
+
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+                $data = ['role' => session()->get('role'),];
+
+                foreach ($cellIterator as $cell) {
+                    $data[] = $cell->getValue();
+                }
+
+                if (!empty($data)) {
+                    $batchData[] = ['rowIndex' => $rowIndex, 'data' => $data];
+                    // Process batch
+                    if (count($batchData) >= $batchSize) {
+                        $this->processBatchnew($batchData, $db, $failedRows);
+                        $batchData = []; // Reset batch data
+                    }
+                }
+            }
+
+            // Process any remaining data
+            if (!empty($batchData)) {
+                $this->processBatchnew($batchData, $db, $failedRows);
+            }
+
+            // Prepare notification message for failed rows
+            if (!empty($failedRows)) {
+                $failedRowsStr = implode(', ', $failedRows);
+                $errorMessage = "Baris berikut gagal diimpor: $failedRowsStr";
+                return redirect()->to(base_url(session()->get('role') . '/produksi'))->with('error', $errorMessage);
+            }
+
+            return redirect()->to(base_url(session()->get('role') . '/produksi'))->withInput()->with('success', 'Data Berhasil di Import');
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/produksi'))->with('error', 'No data found in the Excel file');
+        }
+    }
+    private function processBatchnew($batchData, $db, &$failedRows)
+    {
+        $db->transStart();
+        foreach ($batchData as $batchItem) {
+            $rowIndex = $batchItem['rowIndex'];
+            $data = $batchItem['data'];
+            try {
+                $area = $data[0];
+                $no_model = $data[1];
+                $style = $data[3];
+                $jarum = $data[2];
+                $tgl = $data[4]; // Misal ini timestamp (jumlah detik sejak 1970-01-01)
+                $delivery = date('Y-m-d', strtotime($tgl));
+                $sisa = intval($data[5]);
+                $update = [
+                    'mastermodel' => $no_model,
+                    'size' => $style,
+                    'delivery' => $delivery,
+                ];
+
+                // Fetch data based on model, style, and delivery
+                $resetSisa = $this->ApsPerstyleModel->resetSisaDlv($update);
+
+                $getId = $this->ApsPerstyleModel->getIdPerDeliv($update);
+
+                $update = $this->ApsPerstyleModel->update($getId['idapsperstyle'], ['sisa' => $sisa]);
+                if (!$update) {
+                    $failedRows[] = 'Error on row ' . $rowIndex . ': Gagal Update ';
+                }
+            } catch (\Exception $e) {
+                log_message('error', 'Error in row ' . $rowIndex . ': ' . $e->getMessage());
+                $failedRows[] = 'Error on row ' . $rowIndex . ': ' . $e->getMessage();
+            }
+        }
+        $db->transComplete();
     }
 }

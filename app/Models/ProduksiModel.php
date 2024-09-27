@@ -68,32 +68,40 @@ class ProduksiModel extends Model
     }
     public function getProduksiPerhari($bulan)
     {
-        return $this->select('DATE(tgl_produksi) as tgl_produksi, SUM(qty_produksi) as qty_produksi')
+        $results = $this->select('DATE(tgl_produksi) as tgl_produksi, SUM(qty_produksi) as qty_produksi')
             ->where('MONTH(tgl_produksi)', $bulan)
             ->like('storage_akhir', '-')
             ->groupBy('DATE(tgl_produksi)')
             ->orderBy('tgl_produksi')
             ->findAll();
+
+        // Format tanggal ke d-F
+        return array_map(function ($result) {
+            $result['tgl_produksi'] = date('d/m', strtotime($result['tgl_produksi']));
+            return $result;
+        }, $results);
     }
     public function getProduksiPerArea($bulan, $area)
     {
         $result = $this->select('DATE(tgl_produksi) as tgl_produksi, SUM(qty_produksi) as qty_produksi')
             ->where('MONTH(tgl_produksi)', $bulan)
-            ->where('admin', $area)
-
+            ->where('area', $area)
             ->like('storage_akhir', '-')
             ->groupBy('DATE(tgl_produksi)')
             ->orderBy('tgl_produksi')
             ->findAll();
+
         if (!$result) {
-            $nul = [
+            return [
                 'tgl_produksi' => 0,
                 'qty_produksi' => 0,
-
             ];
-            return $nul;
         } else {
-            return $result;
+            // Format tanggal ke d/m
+            return array_map(function ($item) {
+                $item['tgl_produksi'] = date('d/m', strtotime($item['tgl_produksi']));
+                return $item;
+            }, $result);
         }
     }
     public function getProduksiHarian()
@@ -179,15 +187,14 @@ class ProduksiModel extends Model
                 ->update();
         }
     }
-    public function getBsProd($idap, $bs)
+    public function getBsProd($id)
     {
-        $result = $this->select('bs_prod')
-            ->where('idapsperstyle', $idap)
-            ->where('bs_prod >=', $bs)
+        return $this->select('bs_prod')
+            ->where('id_produksi', $id)
+            ->orderBy('bs_prod')
             ->first();
 
         // Mengembalikan hasil sebagai string
-        return isset($result['bs_prod']) ? (string) $result['bs_prod'] : '';
     }
     public function updateBsProd($idap, $newBs)
     {

@@ -12,7 +12,7 @@ class BsModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['idapsperstyle', 'no_label', 'area', 'tgl_instocklot', 'no_box', 'qty', 'kode_deffect', 'created_at', 'updated_at'];
+    protected $allowedFields    = ['idapsperstyle', 'no_label', 'area', 'tgl_instocklot', 'no_box', 'qty', 'kode_deffect', 'created_at', 'updated_at', 'id_produksi'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -124,12 +124,11 @@ class BsModel extends Model
     }
     public function getDataForReset($area, $awal, $akhir)
     {
-        $results = $this->select('idapsperstyle')
+        return $this->select('idbs,idapsperstyle,qty,area,id_produksi')
             ->where('area', $area)
             ->where('tgl_instocklot >=', $awal)
             ->where('tgl_instocklot <=', $akhir)
             ->findAll();
-        return array_column($results, 'idapsperstyle');
     }
     public function deleteBSArea($area, $awal, $akhir)
     {

@@ -13,6 +13,7 @@ use App\Models\AreaModel;
 use App\Models\ProduksiModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use DateTime;
+use App\Models\HistorySmvModel;
 
 class OrderController extends BaseController
 {
@@ -25,6 +26,8 @@ class OrderController extends BaseController
     protected $ApsPerstyleModel;
     protected $liburModel;
     protected $roleSession;
+    protected $historysmv;
+
 
     public function __construct()
     {
@@ -35,6 +38,7 @@ class OrderController extends BaseController
         $this->produksiModel = new ProduksiModel();
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
+        $this->historysmv = new HistorySmvModel();
         if ($this->filters   = ['role' => ['capacity',  'planning', 'aps', 'god']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -389,14 +393,15 @@ class OrderController extends BaseController
             'smv' => $this->request->getPost("smv"),
             'factory' => $this->request->getPost("factory"),
         ];
+        $jrm = $this->request->getPost("jarum");
         $id = $idOrder;
         $update = $this->ApsPerstyleModel->update($id, $data);
         $modl = $this->request->getPost("no_model");
         $del = $this->request->getPost("delivery");
         if ($update) {
-            return redirect()->to(base_url(session()->get('role') . '/detailmodel/' . $modl . '/' . $del))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $modl . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/detailmodel/' . $modl . '/' . $del))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $modl . '/' . $jrm))->withInput()->with('error', 'Gagal Update Data');
         }
     }
     public function updateorderjarum($idOrder)
@@ -418,9 +423,9 @@ class OrderController extends BaseController
         $del = $this->request->getPost("delivery");
         $jrm = $this->request->getPost("jarum");
         if ($update) {
-            return redirect()->to(base_url(session()->get('role') . '/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $modl . '/' . $jrm))->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/detailmodeljarum/' . $modl . '/' . $del . '/' . $jrm))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $modl . '/' . $jrm))->withInput()->with('error', 'Gagal Update Data');
         }
     }
     public function updateorderjarumplan($idOrder)
@@ -613,6 +618,7 @@ class OrderController extends BaseController
             $idModel = $this->orderModel->getId($nomodel);
             $startRow = 4; // Ganti dengan nomor baris mulai
             foreach ($spreadsheet->getActiveSheet()->getRowIterator($startRow) as $row) {
+                $rowIndex = $row->getRowIndex();
                 $cellIterator = $row->getCellIterator();
                 $cellIterator->setIterateOnlyExistingCells(false);
                 $row = [];
@@ -624,8 +630,7 @@ class OrderController extends BaseController
                     $firstSpacePosition = strpos($no_models, ' '); // Cari posisi spasi pertama
                     $no_model = substr($no_models, 0, $firstSpacePosition);
                     if ($no_model != $nomodel) {
-                        dd($no_models);
-                        return redirect()->to(base_url(session()->get('role') . '/semuaOrder'))->with('error', 'Nomor Model Tidak Sama. Silahkan periksa kembali');
+                        return redirect()->to(base_url(session()->get('role') . '/semuaOrder'))->with('error', 'Nomor Model Tidak Sama. Silahkan periksa kembali' . $rowIndex);
                     } else {
                         if ($row[5] == null) {
                             return redirect()->to(base_url(session()->get('role') . '/semuaOrder'))->with('error', 'GAGAL');
@@ -691,11 +696,17 @@ class OrderController extends BaseController
                                 'qty' => $qty
                             ];
 
-                            // $existingAps = $this->ApsPerstyleModel->checkAps($validate);
-                            // if (!$existingAps) {
-                            $this->ApsPerstyleModel->insert($simpandata);
-
+                            $existingAps = $this->ApsPerstyleModel->checkAps($validate);
+                            if (!$existingAps) {
+                                $this->ApsPerstyleModel->insert($simpandata);
+                            } else {
+                                $id = $existingAps['idapsperstyle'];
+                                $qtyLama = $existingAps['qty'];
+                                $qtyBaru = $qty + $qtyLama;
+                                $this->ApsPerstyleModel->update($id, ['qty' => $qtyBaru, 'sisa' => $qtyBaru]);
+                            }
                             $this->orderModel->update($idModel, $updateData);
+
                             // }
                         }
                     }
@@ -744,13 +755,9 @@ class OrderController extends BaseController
     public function detailPdk($noModel, $jarum)
     {
         $pdk = $this->ApsPerstyleModel->getSisaPerDeliv($noModel, $jarum);
-        $dataApsPerstyle = [];
         $sisaPerDeliv = [];
         foreach ($pdk as $perdeliv) {
             $deliv = $perdeliv['delivery'];
-            $dataApsPerstyle[$deliv] = $this->ApsPerstyleModel->detailPdk($noModel, $jarum, $deliv);
-            $start = date('Y-m-d', strtotime('+3 days'));
-            $stop = date('Y-m-d', strtotime($deliv . ' -7 days'));
             $sisaPerDeliv[$deliv] = $this->ApsPerstyleModel->getSisaPerDlv($noModel, $jarum, $deliv);
         }
         foreach ($sisaPerDeliv as $deliv => $list) {
@@ -766,8 +773,81 @@ class OrderController extends BaseController
             }
             $sisaPerDeliv[$deliv]['totalQty'] = $totalqty;
         }
+        $totalPo = $this->ApsPerstyleModel->totalPo($noModel);
+        // ini ngambil jumlah qty
+        $sisaArray = array_column($pdk, 'sisa');
+        $maxValue = max($sisaArray);
+        $indexMax = array_search($maxValue, $sisaArray);
+        $totalQty = 0;
+        for ($i = 0; $i <= $indexMax; $i++) {
+            $totalQty += $sisaArray[$i];
+        }
+
+        // ini ngambil jumlah hari
+        usort($pdk, function ($a, $b) {
+            return strtotime($a['delivery']) - strtotime($b['delivery']);
+        });
+        $totalQty = round($totalQty / 24);
+        $deliveryTerjauh = end($pdk)['delivery'];
+        $today = new DateTime(date('Y-m-d'));
+        $deliveryDate = new DateTime($deliveryTerjauh); // Tanggal delivery terjauh
+        $diff = $today->diff($deliveryDate);
+        $hari = $diff->days - 7;
+
+        // ini ngambil delivery bottleneck
+
+        $deliveryMax = $pdk[$indexMax]['delivery'];
+        $tglDeliv = new DateTime($deliveryMax); // Tanggal delivery terjauh
+        $beda = $today->diff($tglDeliv);
+        $hariTarget = $beda->days - 7;
+
+        // disini ngambil rata rata target.
+        $smvArray = array_column($pdk, 'smv');
+        $smvArray = array_map('intval', $smvArray);
+        $averageSmv = array_sum($smvArray) / count($smvArray);
+        $target = round((86400 / (intval($averageSmv))) * 0.85 / 24);
+
+        // ini baru kalkulasi
+        $mesin = round($totalQty / $target / $hariTarget);
+        $targetPerhari = round($mesin * $target);
 
 
+        // ini bagian rekomendasi (hard bgt bjir)
+        $start = date('Y-m-d', strtotime('+7 days'));
+        $rekomen = $this->ApsPerstyleModel->getSisaOrderforRec($jarum, $start, $deliveryTerjauh);
+        $rekomendasi = [];
+        foreach ($rekomen as $rec) {
+            $sisa = round($rec['sisa'] / 24);
+            $area = $rec['factory'];
+            $mesinPerarea = $this->jarumModel->mesinPerArea($jarum, $area);
+
+            if (!empty($mesinPerarea)) {
+                $target = $mesinPerarea[0]['target'];
+                $totalMesin = $mesinPerarea[0]['totalMesin'];
+                $kapasitasPerhari = ($target * $totalMesin);
+                $usedCapacityDaily = round($sisa / $hariTarget);
+                $availCapacityDaily = $kapasitasPerhari - $usedCapacityDaily;
+
+                // Tetap simpan area, tapi label avail sebagai 'N/A' jika kapasitas avail kurang dari target
+                $avail = ($availCapacityDaily >= $targetPerhari) ? $availCapacityDaily : 'Only ' . $availCapacityDaily;
+
+                $rekomendasi[$area] = [
+                    'area' => $area,
+                    'max' => $kapasitasPerhari,
+                    'used' => $usedCapacityDaily,
+                    'avail' => $avail
+                ];
+            }
+        }
+        usort($rekomendasi, function ($a, $b) {
+            // Handle string "Only" vs angka
+            if (is_string($a['avail'])) return 1; // Push "Only" ke belakang
+            if (is_string($b['avail'])) return -1; // Push "Only" ke belakang
+
+            // Jika keduanya angka, bandingkan nilai 'avail'
+            return $b['avail'] <=> $a['avail'];
+        });
+        $top3Rekomendasi = array_slice($rekomendasi, 0, 3);
         $dataMc = $this->jarumModel->getAreaModel($noModel);
         $data = [
             'role' => session()->get('role'),
@@ -781,10 +861,14 @@ class OrderController extends BaseController
             'active7' => '',
             'order' => $sisaPerDeliv,
             'headerRow' => $pdk,
-            'dataAps' => $dataApsPerstyle,
             'noModel' => $noModel,
             'dataMc' => $dataMc,
             'jarum' => $jarum,
+            'kebMesin' => $mesin,
+            'target' => $targetPerhari,
+            'hari' => $hari,
+            'rekomendasi' => $top3Rekomendasi,
+            'totalPo' => $totalPo
         ];
         return view(session()->get('role') . '/Order/detailPdk', $data);
     }
@@ -970,6 +1054,65 @@ class OrderController extends BaseController
             }
         } else {
             return redirect()->to(base_url(session()->get('role') . '/smvimport'))->withInput()->with('error', 'No data found in the Excel file');
+        }
+    }
+    public function importupdatesmv()
+    {
+        $file = $this->request->getFile('excel_file');
+        if ($file->isValid() && !$file->hasMoved()) {
+            $spreadsheet = IOFactory::load($file);
+            $sheet = $spreadsheet->getActiveSheet();
+            $startRow = 5; // Ganti dengan nomor baris mulai
+            $errorRows = [];
+
+            foreach ($sheet->getRowIterator($startRow) as $rowIndex => $row) {
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = $cell->getValue();
+                }
+                if ($rowData[2] == null) {
+                    break;
+                }
+                if (!empty($rowData)) {
+                    $no_model = $rowData[1];
+                    $size = $rowData[2];
+                    $smv = $rowData[3];
+                    $validate = [
+                        'mastermodel' => $no_model,
+                        'size' => $size,
+                        'smv' => $smv
+                    ];
+                    $id = $this->ApsPerstyleModel->getIdSmv($validate);
+                    if ($id === null) {
+                        $errorRows[] = "ID not found at row " . ($rowIndex + $startRow);
+                        continue;
+                    }
+                    foreach ($id as $Id) {
+                        $idaps = $Id['idapsperstyle'];
+                        $update = $this->ApsPerstyleModel->update($Id, ['smv' => $smv]);
+                        $insert = [
+                            'style' => $size,
+                            'smv_old' => $Id['smv'],
+                        ];
+                        if (!$update) {
+                            $errorRows[] = "Failed to update row " . ($rowIndex + $startRow);
+                        } else {
+                            $this->historysmv->insert($insert);
+                        }
+                    }
+                }
+            }
+            if (!empty($errorRows)) {
+                $errorMessage = "Errors occurred:\n" . implode("\n", $errorRows);
+                dd($errorMessage);
+                return redirect()->to(base_url(session()->get('role') . '/updatesmv'))->withInput()->with('error', $errorMessage);
+            } else {
+                return redirect()->to(base_url(session()->get('role') . '/updatesmv'))->withInput()->with('success', 'Data Berhasil di Update');
+            }
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/updatesmv'))->withInput()->with('error', 'No data found in the Excel file');
         }
     }
     public function smvimport()

@@ -38,9 +38,8 @@ error_reporting(E_ALL); ?>
                             </h5>
                         </div>
                         <div class="col-auto">
-                            <button type="button" class="btn bg-gradient-warning btn-assign" data-toggle="modal" data-target="#ModalAssign">
-                                Arahkan Ke Areal
-                            </button>
+
+                            <a href="#" class="btn btn-danger btn-delete-all" Data-bs-toggle="modal" data-bs-target="ModalDeleteAll" data-no-model="<?= $noModel ?>">Delete All</a>
                             <a href="<?= base_url($role . '/blmAdaArea/') ?>" class="btn bg-gradient-info">Kembali</a>
                         </div>
                     </div>
@@ -130,8 +129,9 @@ error_reporting(E_ALL); ?>
                                                     <td><?= $list['factory'] ?></td>
                                                     <td><?= $list['production_unit'] ?></td>x
                                                     <td>
-                                                        <button type=" button" class="btn btn-info btn-sm edit-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $list['idapsperstyle']; ?>" data-area="<?= $list['factory']; ?>" data-pdk="<?= $list['mastermodel']; ?>" data-deliv="<?= $list['delivery']; ?> " data-size="<?= $list['size']; ?>" data-jarum="<?= $jarum ?>">
-                                                            Edit Area
+
+                                                        <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#editModal" data-id="<?= $list['idapsperstyle']; ?>" data-no-model="<?= $list['mastermodel']; ?>" data-delivery="<?= $list['delivery']; ?>" data-jarum="<?= $jarum; ?>" data-style="<?= $list['size']; ?>" data-qty="<?= $list['qty']; ?>" data-sisa="<?= $list['sisa']; ?>" data-factory="<?= $list['factory']; ?>" data-production_unit="<?= $list['production_unit']; ?>">
+                                                            Edit
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -167,7 +167,28 @@ error_reporting(E_ALL); ?>
 
             </div>
         </div>
-
+        <div class="modal fade  bd-example-modal-lg" id="ModalDeleteAll" tabindex="-1" role="dialog" aria-labelledby="modaldeleteall" aria-hidden="true">
+            <div class="modal-dialog  modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Hapus Semua Style ?</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="" method="post">
+                            <input type="text" name="no_model" id="" hidden value="<?= $noModel ?>">
+                            Apakah anda yakin menghapus semua style di Model <?= $noModel ?>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-danger">Hapus</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
         <div class="modal fade bd-example-modal-lg" id="ModalAssign" tabindex="-1" role="dialog" aria-labelledby="ModalAssign" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -319,28 +340,55 @@ error_reporting(E_ALL); ?>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form action="<?= base_url($role . '/editarea') ?>" method="post">
-                            <input type="text" name="id" id="" hidden value="">
-                            <input type="text" name="pdk" id="" hidden value="">
-                            <input type="text" name="deliv" id="" hidden value="">
-                            <input type="text" name="size" id="" hidden value="">
-                            <input type="text" name="jarum" id="" hidden value="">
-                            <div id="confirmationMessage"></div>
-                            <div class="form-group">
-                            </div>
-                            <div class="form-group">
-                                <label for="selectArea">Pilih Area:</label>
-                                <select class="form-control" id="selectArea" name="area">
-                                    <option value="">-- Choose --</option>
+                        <form action="" method="post">
+                            <div class="row">
+                                <div class="col-lg-12 col-sm-12">
+                                    <div class="form-group">
+                                        <label for="" class="col-form-label">ID</label>
+                                        <input type="text" class="form-control" name="idapsperstyle" readonly>
+                                        <input type="text" class="form-control" name="jarum" value="<?= $jarum ?>" hidden>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-form-label">No Model</label>
+                                        <input type="text" class="form-control" name="no_model" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-form-label">Style</label>
+                                        <input type="text" class="form-control" name="style">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-form-label">Delivery</label>
+                                        <input type="date" name="delivery" id="" class="form-control">
+                                    </div>
+                                    <div class=" form-group">
+                                        <label for="" class="col-form-label">Quantity</label>
+                                        <input type="number" name="qty" id="" class="form-control">
+                                    </div>
+                                    <div class=" form-group">
+                                        <label for="" class="col-form-label">Sisa</label>
+                                        <input type="text" name="sisa" id="" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-form-label">Seam</label>
+                                        <input type="text" name="seam" id="" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-form-label">SMV</label>
+                                        <input type="text" name="smv" id="" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-form-label">Production Unit</label>
+                                        <input type="text" name="production_unit" id="" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-form-label">Areal</label>
+                                        <input type="text" name="factory" id="" class="form-control">
+                                    </div>
 
-                                    <?php
-                                    $uniqueAreas = array_unique(array_column($dataMc, 'area'));
-                                    foreach ($uniqueAreas as $area) :
-                                    ?>
-                                        <option value="<?= $area; ?>"><?= $area; ?></option>
-                                    <?php endforeach; ?>
-                                </select>
+                                </div>
                             </div>
+
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
@@ -491,19 +539,32 @@ error_reporting(E_ALL); ?>
                     document.getElementById('confirmationMessage').innerHTML = "Apakah anda yakin memecah" + noModel + " dengan jarum " + selectedMachineTypeId + " ke " + selectedArea;
                 });
                 $('.edit-btn').click(function() {
-                    var idAps = $(this).data('id');
-                    var area = $(this).data('area');
-                    var pdk = $(this).data('pdk');
-                    var deliv = $(this).data('deliv');
-                    var size = $(this).data('size');
+                    var apsperstyle = $(this).data('id');
+                    var noModel = $(this).data('no-model');
+                    var delivery = $(this).data('delivery');
                     var jarum = $(this).data('jarum');
+                    var style = $(this).data('style');
+                    var qty = $(this).data('qty');
+                    var sisa = $(this).data('sisa');
+                    var seam = $(this).data('seam');
+                    var smv = $(this).data('smv');
+                    var production_unit = $(this).data('production_unit');
+                    var factory = $(this).data('factory');
+
+                    var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
+                    $('#editModal').find('form').attr('action', '<?= base_url($role . '/updatedetailorder/') ?>' + apsperstyle);
+                    $('#editModal').find('input[name="idapsperstyle"]').val(apsperstyle);
+                    $('#editModal').find('input[name="style"]').val(style);
+                    $('#editModal').find('input[name="no_model"]').val(noModel);
+                    $('#editModal').find('input[name="delivery"]').val(formattedDelivery);
+                    $('#editModal').find('input[name="qty"]').val(qty);
+                    $('#editModal').find('input[name="sisa"]').val(sisa);
+                    $('#editModal').find('input[name="seam"]').val(seam);
+                    $('#editModal').find('input[name="smv"]').val(smv);
+                    $('#editModal').find('input[name="production_unit"]').val(production_unit);
+                    $('#editModal').find('input[name="factory"]').val(factory);
+
                     $('#editModal').modal('show'); // Show the modal
-                    $('#editModal').find('input[name="area"]').val(area);
-                    $('#editModal').find('input[name="id"]').val(idAps);
-                    $('#editModal').find('input[name="pdk"]').val(pdk);
-                    $('#editModal').find('input[name="deliv"]').val(deliv);
-                    $('#editModal').find('input[name="size"]').val(size);
-                    $('#editModal').find('input[name="jarum"]').val(jarum);
                 });
                 $('.btn-recomend').click(function() {
 
@@ -513,6 +574,12 @@ error_reporting(E_ALL); ?>
 
 
                     $('#recomendModal').find('input[name="deliv"]').val(deliv);
+                });
+                $('.btn-delete-all').click(function() {
+                    var noModel = $(this).data('no-model');
+                    $('#ModalDeleteAll').find('form').attr('action', '<?= base_url($role . '/deletedetailorder/') ?>' + noModel);
+                    $('#ModalDeleteAll').find('input[name="idapsperstyle"]').val(noModel);
+                    $('#ModalDeleteAll').modal('show'); // Show the modal
                 });
 
 

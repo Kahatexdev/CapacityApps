@@ -381,7 +381,8 @@ class DataMesinModel extends Model
     public function maxCapacity($area, $jarum)
     {
         $totalmc = $this->select('sum(total_mc) as total')->where('area', $area)->where('jarum', $jarum)->first();
-        $maxCapacity = $totalmc['total'] * 7 * 14;
+        $target = $this->select('target')->where('area', $area)->where('jarum', $jarum)->first();
+        $maxCapacity = $totalmc['total'] * 7 * $target['target'];
         $data = [
             'totalmesin' => $totalmc['total'],
             'maxCapacity' => $maxCapacity
@@ -473,5 +474,34 @@ class DataMesinModel extends Model
 
         // Periksa apakah hasilnya ada sebelum mengembalikannya
         return $result ? $result->jarum : 0; // Mengembalikan total_mc jika ada, jika tidak, kembalikan 0 atau nilai default lainnya
+    }
+    public function mesinPerArea($jarum, $area)
+    {
+        return $this->select('sum(total_mc) as totalMesin, target, area')
+            ->where('jarum', $jarum)
+            ->where('area', $area)
+            ->get()
+            ->getResultArray();
+    }
+    public function areaMc($area)
+    {
+        return $this->select('*, sum(total_mc) as total')
+            ->where('area', $area)
+            ->groupBy('jarum')
+            ->findAll();
+    }
+    public function totalMcSock()
+    {
+        $data = $this->select('SUM(total_mc) as total')
+            ->where('pu !=', 'MJ')
+            ->groupStart()
+            ->like('jarum', 'DC')
+            ->orLike('jarum', 'JC')
+            ->orLike('jarum', 'TJ')
+            ->groupEnd()
+            ->findAll();
+
+        $res = reset($data);
+        return $res;
     }
 }
