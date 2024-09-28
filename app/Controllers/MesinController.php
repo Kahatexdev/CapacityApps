@@ -617,11 +617,14 @@ class MesinController extends BaseController
             $pdk = $row['mastermodel'];
             $smv = $row['smv'];
             $targetPerMesin = round((86400 / (intval($smv))) * 0.85 / 24);
-            $sisa = $row['sisa'];
+            $sisa = $row['sisa'] / 24;
             $deliveryDate = new DateTime($row['delivery']);
             $time = $today->diff($deliveryDate);
             $leadtime = $row['targetHari'];
             // Calculate weekly production and machine needs
+            if ($leadtime < 1) {
+                $leadtime = 1;
+            }
             $kebMesin = ceil($sisa / $leadtime / $targetPerMesin);
             $produksi = $targetPerMesin * $kebMesin;
             $totalProduksi += $produksi;
@@ -730,6 +733,7 @@ class MesinController extends BaseController
 
         return view(session()->get('role') . '/Mesin/capacityarea', $data);
     }
+
 
     public function recomendationarea()
     {

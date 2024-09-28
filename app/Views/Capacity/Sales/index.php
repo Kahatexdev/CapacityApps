@@ -1,5 +1,4 @@
 <?php $this->extend($role . '/layout'); ?>
-<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
@@ -7,7 +6,7 @@
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
-                        <div class="col-5">
+                        <div class="col-6">
                             <div class="numbers">
                                 <h5 class="font-weight-bolder mb-0">
                                     Sales Position
@@ -25,18 +24,28 @@
                                     <?php endif; ?>
                                 </select>
                         </div>
-                        <div class="col-4">
-                            <button type=" submit" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md">OK</button>
-                            </form>
-                            <a href="<?= base_url($role . '/generatesales') ?>" class="btn btn-sm bg-gradient-success shadow text-center border-radius-md">Generate Excel</a>
-                            <?php if (!empty($aliasjarum)) : ?>
+                        <div class="col-3">
+                            <div class="row">
+                                <div class="col-4">
+                                    <button type=" submit" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md">OK</button>
+                                </div>
+                                </form>
+                                <div class="col-8 d-flex justify-content-end">
+                                    <a href="<?= base_url($role . '/generatesales') ?>" class="btn btn-sm bg-gradient-success shadow text-center border-radius-md">Generate Excel</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php if (!empty($aliasjarum)) : ?>
+                        <div class="row">
+                            <div class="col-12 d-flex justify-content-end">
                                 <form action="<?= base_url($role . '/exportsales') ?>" method="post">
                                     <input type="text" value="<?= $aliasjarum ?>" name="aliasjarum" hidden>
                                     <button type="submit" class="btn btn-sm bg-gradient-success shadow text-center border-radius-md">Export Excel</button>
                                 </form>
-                            <?php endif; ?>
+                            </div>
                         </div>
-                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

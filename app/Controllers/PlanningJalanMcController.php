@@ -12,6 +12,9 @@ use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use App\Models\LiburModel;
+use App\Models\MonthlyMcModel;
+use App\Models\AreaMachineModel;
+use App\Models\DetailAreaMachineModel;
 use LengthException;
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Week;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -30,9 +33,15 @@ class PlanningJalanMcController extends BaseController
     protected $orderModel;
     protected $ApsPerstyleModel;
     protected $liburModel;
+    protected $globalModel;
+    protected $areaMcModel;
+    protected $detailAreaMc;
 
     public function __construct()
     {
+        $this->detailAreaMc = new DetailAreaMachineModel();
+        $this->areaMcModel = new AreaMachineModel();
+        $this->globalModel = new MonthlyMcModel();
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
@@ -315,5 +324,70 @@ class PlanningJalanMcController extends BaseController
         header('Cache-Control: max-age=0');
         $writer->save('php://output');
         exit;
+    }
+
+    public function saveMonthlyMc()
+    {
+        $global = [
+            'judul' => $this->request->getPost('judul'),
+            'total_mc' => $this->request->getPost('totalMc'),
+            'planning_mc' => $this->request->getPost('totalPlanning'),
+            'total_output' => $this->request->getPost('OutputTotal'),
+            'mc_socks' => $this->request->getPost('mcSocks'),
+            'plan_mc_socks' => $this->request->getPost('planMcSocks'),
+            'mc_gloves' => $this->request->getPost('mcGloves'),
+            'plan_mc_gloves' => $this->request->getPost('planMcGloves'),
+        ];
+        $jarum          = $this->request->getPost('jarum');         // array
+        $kebutuhanMesin = $this->request->getPost('kebutuhanMesin');
+        $totalMesin     = $this->request->getPost('totalMesin');
+        $planningMc     = $this->request->getPost('planningMc');
+        $outputDz     = $this->request->getPost('outputDz');
+        $areas = $this->request->getPost('area');
+        dd($kebutuhanMesin);
+
+
+        $chek = $this->globalModel->cekExist($global);
+        if (!$chek) {
+            $this->globalModel->insert($global);
+            $getId = $this->globalModel->cekExist($global);
+            $idGlobal = $getId['id_monthly_mc'];
+            $areaMcInsert = [];
+
+            foreach ($areas as $key => $area) {
+                $areaMcInsert = [
+                    'id_monthly_mc' => $idGlobal,
+                    'area' => $area,
+                    'total_mc' => $totalMesin[$key],
+                    'planning_mc' => $planningMc[$key],
+                    'output' => $outputDz[$key]
+                ];
+            }
+        } else {
+            $idGlobal = $chek['id_monthly_mc'];
+            $this->globalModel->update($idGlobal, $global);
+            $getId = $this->globalModel->cekExist($global);
+            $idGlobal = $getId['id_monthly_mc'];
+            $areaMcInsert = [];
+
+            foreach ($areas as $key => $area) {
+                $areaMcInsert = [
+                    'id_monthly_mc' => $idGlobal,
+                    'area' => $area,
+                    'total_mc' => $totalMesin[$key],
+                    'planning_mc' => $planningMc[$key],
+                    'output' => $outputDz[$key]
+                ];
+                $cekDataArea = $this->areaMcModel->existData($areaMcInsert);
+                if (!$cekDataArea) {
+                    $this->areaMcModel->insert($areaMcInsert);
+                    $getIdArea = $this->areaMcModel->existData($areaMcInsert);
+                    $idArea = $getIdArea['id_area_machine'];
+                    $childData = [];
+                } else {
+                    $idArea = $cekDataArea['id_area_machine'];
+                }
+            }
+        }
     }
 }

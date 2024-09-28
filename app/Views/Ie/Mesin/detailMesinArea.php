@@ -353,7 +353,7 @@
                 }
 
                 $('.btn-add').click(function() {
-                    $('#modalTambah').find('form').attr('action', '<?= base_url($role . '/tambahmesinperarea/') ?>');
+                    $('#modalTambah').find('form').attr('action', '<?= base_url($role . '/tambahmesinperarea') ?>');
 
                     $('#modalTambah').modal('show'); // Show the modal
                 });

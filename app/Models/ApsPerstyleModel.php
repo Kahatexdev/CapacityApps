@@ -70,15 +70,6 @@ class ApsPerstyleModel extends Model
             ->groupby('size, machinetypeid')
             ->findAll();
     }
-    public function detailPdk($noModel, $jarum, $delivery)
-    {
-        return $this->select('idapsperstyle,mastermodel,no_order,country, smv, sum(sisa) as sisa, sum(qty) as qty, machinetypeid,size,delivery,seam,factory,production_unit')
-            ->where('mastermodel', $noModel)
-            ->where('machinetypeid', $jarum)
-            ->where('delivery', $delivery)
-            ->groupby(' delivery,size,')
-            ->findAll();
-    }
     public function detailModelJarum($noModel, $delivery, $jarum)
     {
         return $this->where('mastermodel', $noModel)
@@ -147,10 +138,8 @@ class ApsPerstyleModel extends Model
     public function asignareal($data)
     {
         $this->set('factory', $data['area'])
-            ->set('production_unit', $data['pu'])
             ->where('mastermodel', $data['mastermodel'])
             ->where('machinetypeid', $data['jarum'])
-            ->where('delivery', $data['delivery'])
             ->update();
 
         return $this->affectedRows();
@@ -218,7 +207,6 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $validate['no_model'])
             ->where('sisa <=', 0)
             ->where('size', $validate['style'])
-            ->orderBy('delivery', 'ASC')
             ->first();
     }
 
@@ -228,7 +216,6 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $validate['no_model'])
             ->where('sisa >', 0)
             ->where('size', $validate['style'])
-            ->orderBy('delivery', 'ASC')
             ->first();
     }
 
@@ -238,21 +225,7 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $validate['no_model'])
             ->where('sisa >', $validate['sisa'])
             ->where('size', $validate['style'])
-            ->orderBy('delivery', 'ASC')
             ->first();
-    }
-    public function getAllForModelStyleAndSize($validate)
-    {
-        return $this->where('mastermodel', $validate['no_model'])
-            ->where('size', $validate['style'])
-            ->orderBy('delivery', 'ASC') // Optional: sort berdasarkan delivery date, bisa diubah sesuai kebutuhan
-            ->findAll();
-    }
-
-    // Fungsi update sisa
-    public function updateSisa($id, $data)
-    {
-        return $this->update($id, $data);
     }
     public function getDetailPlanning($area, $jarum) // funtion ieu kudu diganti where na kade ulah poho
     {
@@ -334,13 +307,17 @@ class ApsPerstyleModel extends Model
     }
     public function CapacityArea($pdk, $area, $jarum)
     {
+        $oneweek = date('Y-m-d', strtotime('+7 Days'));
         $data = $this->select('mastermodel,sum(sisa)as sisa,delivery,smv')
             ->where('mastermodel', $pdk)
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
+            ->where('sisa>', 0)
+            ->where('delivery >', $oneweek)
             ->groupBy('mastermodel,delivery')
             ->get()
             ->getResultArray();
+
         $sisaArray = array_column($data, 'sisa');
         $maxValue = max($sisaArray);
         $indexMax = array_search($maxValue, $sisaArray);
@@ -449,6 +426,7 @@ class ApsPerstyleModel extends Model
 
         $data = $this->select('mastermodel, delivery, SUM(sisa) AS sisa, smv, factory, machinetypeid')
             ->where('machinetypeid', $jarum)
+            ->where('sisa >', '0')
             ->where('delivery >', $bulan)
             ->where('delivery <', $ld)
             ->where('factory', $ar)

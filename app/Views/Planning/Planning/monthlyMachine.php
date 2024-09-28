@@ -10,7 +10,7 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    <?= $title ?>
+                                    Planning Jalan Mesin <?= $title ?>
                                 </h5>
                             </div>
                         </div>

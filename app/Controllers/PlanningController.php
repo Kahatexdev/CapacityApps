@@ -492,7 +492,11 @@ class PlanningController extends BaseController
         $bulanIni = $date->format('F-Y');
         $awalBulan = $date->format('Y-m-01');
 
-        $area = $this->jarumModel->getArea();
+        $filteredArea = $this->jarumModel->getArea();
+        $area = array_filter($filteredArea, function ($item) {
+            return strpos($item, 'Gedung') === false;
+        });
+        $area = array_values($area);
         $monthlyData = [];
         foreach ($area as $ar) {
             $mesin = $this->jarumModel->areaMc($ar);
@@ -523,16 +527,17 @@ class PlanningController extends BaseController
             $totalMcPlanning += $data['planningMc'];
         }
         $totalKebGloves = 0; // Initialize outside the loop
-
         foreach ($monthlyData['KK8J'] as $data) {
             if (is_array($data) && isset($data['kebutuhanMesin'])) {
                 $totalKebGloves += $data['kebutuhanMesin'];
             }
         }
+
         $totalKebSock = $totalMcPlanning - $totalKebGloves;
         $totalMcSocks = $this->jarumModel->totalMcSock();
         $totalMcSocks = intval($totalMcSocks['total']);
         $totalMcGloves = $totalAllMesin - $totalMcSocks;
+
         $persenSocks = round(($totalKebSock / $totalMcSocks) * 100);
         $persenGloves = round(($totalKebGloves / $totalMcGloves) * 100);
         $persenTotal = round(($totalMcPlanning / $totalAllMesin) * 100);
@@ -552,7 +557,7 @@ class PlanningController extends BaseController
         ];
         $data = [
             'role' => $role,
-            'title' => 'Planning Jalan MC ' . $bulanIni,
+            'title' =>  $bulanIni,
             'active1' => '',
             'active2' => '',
             'active3' => '',
