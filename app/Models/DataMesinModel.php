@@ -468,4 +468,24 @@ class DataMesinModel extends Model
             ->get()
             ->getResultArray();
     }
+    public function areaMc($area)
+    {
+        return $this->select('*, sum(total_mc) as total')
+            ->where('area', $area)
+            ->groupBy('jarum')
+            ->findAll();
+    }
+    public function totalMcSock()
+    {
+        $data = $this->select('SUM(total_mc) as total')
+            ->groupStart()
+            ->like('jarum', 'DC')
+            ->orLike('jarum', 'JC')
+            ->orLike('jarum', 'TJ')
+            ->groupEnd()
+            ->findAll();
+
+        $res = reset($data);
+        return $res;
+    }
 }

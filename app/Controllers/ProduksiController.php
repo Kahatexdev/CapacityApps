@@ -319,6 +319,7 @@ class ProduksiController extends BaseController
         $month = date('F');
         $totalMesin = $this->jarumModel->getArea();
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
+
         $dataBuyer = $this->orderModel->getBuyer();
         $dataArea = $this->jarumModel->getArea();
         $dataJarum = $this->jarumModel->getJarum();

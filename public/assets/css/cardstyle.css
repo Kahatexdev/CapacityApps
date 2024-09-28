@@ -1,0 +1,10 @@
+.equal-height {
+    min-height: 300px; /* Ganti sesuai kebutuhan lo */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.equal-height-container {
+    display: flex;
+    flex-wrap: wrap;
+}

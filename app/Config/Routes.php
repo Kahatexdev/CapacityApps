@@ -56,6 +56,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('turunOrder', 'OrderController::getTurunOrder');
     $routes->get('detailturunorder/(:any)/(:any)', 'OrderController::detailturunorder/$1/$2');
     $routes->post('tampilPerdelivery', 'OrderController::tampilPerdelivery');
+    $routes->get('detailPdk/(:any)/(:any)', 'OrderController::detailPdk/$1/$2');
 
 
     // produksi
@@ -190,7 +191,8 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetail/$1');
 
     $routes->get('jalanmesin', 'PlanningController::jalanmesin');
-    $routes->get('jalanmesin/(:any)', 'PlanningController::jalanmesindetail/$1');
+    // $routes->get('jalanmesin/(:any)', 'PlanningController::jalanmesindetail/$1');
+    $routes->get('jalanmesin/(:any)', 'PlanningController::monthlyMachine/$1');
     $routes->post('exportPlanningJlMc/(:any)', 'PlanningJalanMcController::excelPlanningJlMc/$1');
 
 
@@ -381,6 +383,7 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->post('importsmv', 'OrderController::importsmv');
     $routes->get('sisa', 'OrderController::smvimport');
     $routes->post('updateSisa', 'GodController::updateSisa');
+    $routes->get('detailPdk/(:any)/(:any)', 'OrderController::detailPdk/$1/$2');
 
 
 
@@ -465,4 +468,25 @@ $routes->group('/ie', ['filter' => 'ie'], function ($routes) {
     $routes->get('historysmv', 'IeController::historysmv');
     $routes->post('inputsmv', 'IeController::inputsmv');
     $routes->post('gethistory', 'IeController::gethistory');
+
+
+    $routes->get('mesinperarea/(:any)', 'MesinController::mesinperareaPlan/$1');
+    $routes->get('datamesin', 'MesinController::indexPlan');
+    $routes->get('mesinPerJarum/(:any)', 'MesinController::mesinPerJarumPlan/$1');
+    $routes->get('mesinperarea/(:any)', 'MesinController::mesinperareaPlan/$1');
+    $routes->get('stockcylinder', 'MesinController::stockcylinderPlan');
+    $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarumPlan/$1/$2');
+    $routes->get('datamesinperarea/(:any)', 'MesinController::DetailMesinPerAreaPlan/$1');
+    $routes->post('capacityperarea/(:any)', 'MesinController::capacityperarea/$1');
+    $routes->post('deletemesinareal/(:any)', 'MesinController::deletemesinarealPlan/$1');
+    $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarumPlan/$1');
+    $routes->post('tambahmesinperarea', 'MesinController::inputmesinperareaPlan');
+    $routes->post('tambahmesinperjarum', 'MesinController::inputmesinperjarumPlan');
+    $routes->post('addcylinder', 'MesinController::inputcylinderPlan');
+    $routes->post('editcylinder/(:any)', 'MesinController::editcylinderPlan/$1');
+    $routes->post('deletecylinder/(:any)', 'MesinController::deletecylinderPlan/$1');
+    $routes->get('allmachine', 'MesinController::allmachinePlan');
+
+    $routes->get('updatesmv', 'IeController::updatesmv');
+    $routes->post('importupdate', 'OrderController::importupdatesmv');
 });

@@ -268,7 +268,7 @@ class ApsPerstyleModel extends Model
 
     public function getSmv()
     {
-        $monthago = date('Y-m-d', strtotime('20 days ago')); // Menggunakan format tanggal yang benar
+        $monthago = date('Y-m-d', strtotime('10 days ago')); // Menggunakan format tanggal yang benar
         return $this->select('idapsperstyle,mastermodel,size,smv')
             ->where('delivery >', $monthago) // Perbaiki spasi di operator where
             ->groupBy(['size', 'mastermodel']) // Menggunakan array untuk groupBy
@@ -284,11 +284,10 @@ class ApsPerstyleModel extends Model
 
     public function getIdSmv($validate)
     {
-        $id = $this->select('idapsperstyle')
+        $id = $this->select('idapsperstyle,smv')
             ->where('mastermodel', $validate['mastermodel'])
             ->where('size', $validate['size'])
-            ->where('smv !=', $validate['smv'])
-            ->first();
+            ->findAll();
 
         return $id;
     }
@@ -452,24 +451,20 @@ class ApsPerstyleModel extends Model
             ->where('machinetypeid', $jarum)
             ->where('delivery >', $bulan)
             ->where('delivery <', $ld)
-            ->where('sisa >', 0)
             ->where('factory', $ar)
-            ->whereNotIn('factory', ['Belum Ada Area', 'MJ'])
-            ->groupBy('delivery, machinetypeid, factory, mastermodel')
+            ->groupBy('smv,delivery,machinetypeid, factory, mastermodel')
             ->findAll();
-
         $totalKebMesin = 0;
         $outputDz = 0;
-
         foreach ($data as $dt) {
             $delivDate = new DateTime($dt['delivery']);
             $leadtime = $delivDate->diff($todayDate)->days;
-            $smv = intval($dt['smv']);
-            $smv = $smv == 0 ? 14 : $smv;
-
+            $smv = intval($dt['smv']) ?? 185;
+            $sisa = round($dt['sisa'] / 24);
             if ($leadtime > 0) {
-                $target = 3600 / $smv; // Simplified target calculation
-                $kebMesin = ($dt['sisa'] / $target / $leadtime) / 24;
+                $target = round((86400 / $smv) * 0.85 / 24); // Simplified target calculation
+                $kebMesin = $sisa / $target / $leadtime;
+
                 $kebutuhanMc = ceil($kebMesin);
                 $dz = $kebutuhanMc * $target;
 

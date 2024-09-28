@@ -59,56 +59,60 @@ class PlanningJalanMcController extends BaseController
 
     public function excelPlanningJlMc($bulan)
     {
-        // Inisialisasi model dan data
         $role = session()->get('role');
-        log_message('info', 'Received bulan value: ' . $bulan);
-        $date = DateTime::createFromFormat('F-Y', $bulan);
 
+        // Log the input for debugging
+        log_message('info', 'Received bulan value: ' . $bulan);
+
+        // Parse the $bulan string to a DateTime object
+        $date = \DateTime::createFromFormat('F-Y', $bulan);
         if (!$date) {
-            throw new \Exception("Invalid date format. Please use 'F-Y' format.");
+            throw new \Exception("Invalid date format: '{$bulan}'. Please use 'F-Y' format.");
         }
 
         $bulanIni = $date->format('F-Y');
-        $startDate = new \DateTime($date->format('Y-m-01'));
-        $endDate = (clone $startDate)->modify('last day of this month');
+        $startDate = new \DateTime($date->format('Y-m-01')); // First day of the given month
         $monthlyData = [];
-        $weekCount = 1;
-        $LiburModel = new LiburModel();
-        $holidays = $LiburModel->findAll();
+        for ($i = 0; $i < 5; $i++) {
+            $startOfWeek = clone $startDate;
+            $startOfWeek->modify("+$i week");
 
-        // Looping untuk menghitung minggu
-        while ($startDate <= $endDate) {
-            $endOfWeek = (clone $startDate)->modify('Sunday this week');
-            $endOfMonth = new \DateTime($startDate->format('Y-m-t'));
+            // Ensure we start on Monday and stay within the month
+            $startOfWeek->modify($startOfWeek->format('N') === '1' ? 'this Monday' : 'next Monday');
+            if ($startOfWeek->format('m') !== $startDate->format('m')) break;
 
-            if ($endOfWeek > $endOfMonth) {
-                $endOfWeek = clone $endOfMonth;
-            }
-
-            $numberOfDays = $startDate->diff($endOfWeek)->days + 1;
-            $weekHolidays = array_filter($holidays, function ($holiday) use ($startDate, $endOfWeek) {
-                $holidayDate = new \DateTime($holiday['tanggal']);
-                return $holidayDate >= $startDate && $holidayDate <= $endOfWeek;
-            });
-
-            $holidaysCount = count($weekHolidays);
-            $numberOfDays -= $holidaysCount;
+            $endOfWeek = clone $startOfWeek;
+            $endOfWeek->modify('Sunday this week');
 
             $monthlyData[] = [
-                'week' => $weekCount,
-                'start_date' => $startDate->format('Y-m-d'),
+                'week' => $i + 1,
+                'start_date' => $startOfWeek->format('Y-m-d'),
                 'end_date' => $endOfWeek->format('Y-m-d'),
-                'number_of_days' => $numberOfDays,
-                'holidays' => array_map(function ($holiday) {
-                    return [
-                        'nama' => $holiday['nama'],
-                        'tanggal' => (new \DateTime($holiday['tanggal']))->format('d-F'),
-                    ];
-                }, $weekHolidays),
+                'number_of_days' => $startOfWeek->diff($endOfWeek)->days + 1,
             ];
+        }
 
-            $startDate = (clone $endOfWeek)->modify('+1 day');
-            $weekCount++;
+        $jarum = $this->jarumModel->getAreaAndJarum();
+        $kebutuhanMesin = [];
+        $outputDz = []; // Initialize outputDz array
+
+        $areas = $this->jarumModel->getArea();
+        $totalArea = [];
+        foreach ($areas as $ar) {
+            $totalArea[$ar] = $this->jarumModel->totalMcArea($ar);
+        }
+        // Fetch sisa orders efficiently
+        foreach ($monthlyData as $wk) {
+            foreach ($areas as $ar) {
+                $outputDz[$wk['week']][$ar] = 0; // Initialize the outputDz for each week and area
+                foreach ($jarum as $jr) {
+                    $weekNumber = $wk['week'];
+                    $sisaOrder = $this->ApsPerstyleModel->ambilSisaOrder($ar, $wk['start_date'], $jr['jarum']);
+
+                    $kebutuhanMesin[$weekNumber][$ar][$jr['jarum']] = $sisaOrder['totalKebMesin'] ?? 0;
+                    $outputDz[$weekNumber][$ar] += $sisaOrder['outputDz'] ?? 0; // Summing outputDz per week per area
+                }
+            }
         }
 
         // Generate Excel
@@ -210,10 +214,6 @@ class PlanningJalanMcController extends BaseController
                         }
                         $totalPlanMcJrm[$jrm['jarum']] += $planMcJrm;
                     }
-
-                    // Ambil nilai outputDz dari $output berdasarkan $i dan $area
-                    $outputDz = isset($output[$i][$area]) ? $output[$i][$area] : 0;
-
                     // Memastikan totalMc sudah diisi sebelumnya
                     if (isset($totalArea[$area]['Total'])) {
                         // Menambahkan total MC per area ke variabel total seluruh area
@@ -300,23 +300,8 @@ class PlanningJalanMcController extends BaseController
                 $sheet->setCellValue("A$row", '% Total MC');
                 $sheet->setCellValue("C$row", number_format(($totalMcAll / $planMcAll) * 100, 2) . '%');
                 $sheet->getStyle("A$row:AE$row")->applyFromArray($styleTotal);
-            } else {
-                // Jika $kebutuhanMesin[$i] kosong, tidak ada sheet yang dibuat
-                log_message('info', 'Kebutuhan mesin untuk minggu ' . $i . ' kosong. Sheet tidak dibuat.');
             }
         }
-
-        // Jika tidak ada sheet yang dibuat, berhenti atau kembalikan error
-        if (count($spreadsheet->getAllSheets()) === 0) {
-            throw new \Exception("Tidak ada sheet yang dibuat. Pastikan ada data yang valid untuk diolah.");
-        }
-
-        // // Hapus worksheet kosong
-        // foreach ($spreadsheet->getAllSheets() as $index => $sheet) {
-        //     if ($sheet->getHighestRow() < 4) { // Pastikan tidak ada data yang ditambahkan
-        //         $spreadsheet->removeSheetByIndex($index);
-        //     }
-        // }
 
         // Set sheet pertama sebagai active sheet
         $spreadsheet->setActiveSheetIndex(0);
