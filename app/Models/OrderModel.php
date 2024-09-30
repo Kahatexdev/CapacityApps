@@ -208,7 +208,7 @@ class OrderModel extends Model
         $builder->orderby('created_at', 'desc');
         $builder->orderby('no_model', 'asc');
         $builder->orderby('delivery', 'asc');
-        $builder->groupBy('delivery');
+        $builder->groupBy('machinetypeid');
         $builder->groupBy('data_model.no_model');
         $builder->groupBy('factory');
 
