@@ -312,7 +312,7 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $pdk)
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
-            ->where('sisa>', 0)
+            ->where('sisa >', 0)
             ->where('delivery >', $oneweek)
             ->groupBy('mastermodel,delivery')
             ->get()

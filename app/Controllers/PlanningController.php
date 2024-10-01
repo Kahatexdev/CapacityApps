@@ -572,4 +572,53 @@ class PlanningController extends BaseController
 
         return view($role . '/Planning/monthlyMachine', $data);
     }
+    public function savePlanning()
+    {
+        // Ambil data yang dikirim dari JavaScript (JSON string)
+        $jsonData = $this->request->getPost('data');
+
+        // Decode JSON string menjadi array PHP
+        $data = json_decode($jsonData, true);
+
+        // Check if the JSON data is valid
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            // Handle JSON error
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Invalid JSON data'
+            ]);
+        }
+
+        // Contoh: Akses data global
+        $globalMc = $data['global']['globalMc'];
+        $globalPlan = $data['global']['globalPlan'];
+        $globalOutput = $data['global']['globalOutput'];
+
+        // Contoh: Akses data area plan (array)
+        $areaPlans = $data['area'];
+        foreach ($areaPlans as $areaPlan) {
+            $area = $areaPlan['area'];
+            $ttlMc = $areaPlan['ttlMc'];
+            $planMc = $areaPlan['planMc'];
+            $outputDz = $areaPlan['outputDz'];
+
+            // Lakukan penyimpanan ke database, atau proses lainnya
+        }
+
+        // Contoh: Akses data detail plan (array)
+        $detailPlans = $data['detail'];
+        foreach ($detailPlans as $detailPlan) {
+            $area = $detailPlan['area'];
+            $jarum = $detailPlan['jarum'];
+            $kebMesin = $detailPlan['kebMesin'];
+
+            // Lakukan penyimpanan atau proses lainnya
+        }
+
+        // Kirimkan respons sukses jika diperlukan
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Data planning berhasil disimpan.'
+        ]);
+    }
 }

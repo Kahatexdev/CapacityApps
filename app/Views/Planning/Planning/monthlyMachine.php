@@ -61,9 +61,9 @@
                     <div class="row" id="global">
                         <div class="col-lg-4">
                             <h6>Global</h6>
-                            <li id="globalttlmc">Total Mesin : <?= $summary['totalMc'] ?> Mesin</li>
-                            <li id="globalttlplanning">Total Planning : <?= $summary['totalPlanning'] ?> Mesin </li>
-                            <li id="globalttlpersen">Persentase : <?= $summary['totalPersen'] ?>% </li>
+                            <li id="globalmc">Total Mesin : <?= $summary['totalMc'] ?> Mesin</li>
+                            <li id="globalplanning">Total Planning : <?= $summary['totalPlanning'] ?> Mesin </li>
+                            <li id="globalpersen">Persentase : <?= $summary['totalPersen'] ?>% </li>
                             <li id="globaloutput">Total Output : <?= $summary['OutputTotal'] ?> dz </li>
 
                         </div>
@@ -81,7 +81,7 @@
                         </div>
                     </div>
                     <div class="row text-end">
-                        <button class="btn btn-info" onclick="saveAll()">SAVE</button>
+                        <button class="btn btn-info save" onclick="saveAll()">SAVE</button>
                     </div>
                 </div>
             </div>
@@ -96,7 +96,7 @@
                 <div class="card equal-height">
                     <div class="card-header" id="area_mc">
                         <div class="row">
-                            <h6> <?= $area ?></h6>
+                            <h6 id="area<?= $no ?>"> <?= $area ?></h6>
                         </div>
                         <div class="row text-bold">
                             <div class="col-lg-4" id="ttlmc<?= $no ?>"> Total Mesin: <?= $jarum['totalMesin']; ?></div>
@@ -156,139 +156,67 @@
     });
 
     function saveAll() {
-        // Buat array untuk menampung semua data
-        let ids = [];
+        // GLOBAL
+        let global = {
+            globalMc: document.querySelector("#globalmc") ? document.querySelector("#globalmc").textContent : null,
+            globalPlan: document.querySelector("#globalplanning") ? document.querySelector("#globalplanning").textContent : null,
+            globalOutput: document.querySelector("#globaloutput") ? document.querySelector("#globaloutput").textContent : null,
+            ttlMcSocks: document.querySelector("#ttlmcsocks") ? document.querySelector("#ttlmcsocks").textContent : null,
+            ttlPlanSocks: document.querySelector("#ttlplanningsocks") ? document.querySelector("#ttlplanningsocks").textContent : null,
+            ttlPersenSocks: document.querySelector("#ttlpersensocks") ? document.querySelector("#ttlpersensocks").textContent : null,
+            ttlMcGloves: document.querySelector("#ttlmcgloves") ? document.querySelector("#ttlmcgloves").textContent : null,
+            ttlPlanGloves: document.querySelector("#ttlplanninggloves") ? document.querySelector("#ttlplanninggloves").textContent : null,
+            ttlPersenGloves: document.querySelector("#ttlpersengloves") ? document.querySelector("#ttlpersengloves").textContent : null
+        };
 
-        // global
-        let globalmcElements = document.querySelectorAll("[id^='globalttlmc']");
-        let globalplanElements = document.querySelectorAll("[id^='globalttlplanning']");
-        let globalpersenElements = document.querySelectorAll("[id^='globalttlpersen']");
-        let globaloutputElements = document.querySelectorAll("[id^='globaloutput']");
-
-        let ttlmcsocksElements = document.querySelectorAll("[id^='ttlmcsocks']");
-        let ttlplansocksElements = document.querySelectorAll("[id^='ttlplanningsocks']");
-        let ttlpersensocksElements = document.querySelectorAll("[id^='ttlpersensocks']");
-
-        let ttlmcglovesElements = document.querySelectorAll("[id^='ttlmcgloves']");
-        let ttlplanglovesElements = document.querySelectorAll("[id^='ttlplanninggloves']");
-        let ttlpersenglovesElements = document.querySelectorAll("[id^='ttlpersengloves']");
-
-        // area
-        let ttlmcElements = document.querySelectorAll("[id^='ttlmc']");
-        let planmcElements = document.querySelectorAll("[id^='planmc']");
-        let outputdzElements = document.querySelectorAll("[id^='outputdz']");
-
-        //detail
-        let jarumElements = document.querySelectorAll("[id^='jarum']");
-        let kebmesinElements = document.querySelectorAll("[id^='kebmesin']");
-
-        // Loop untuk menyimpan data dari setiap elemen ke array
-        globalmcElements.forEach(function(element) {
-            ids.push({
-                id: element.id,
-                value: element.innerText
-            });
-        });
-        globalplanElements.forEach(function(element) {
-            ids.push({
-                id: element.id,
-                value: element.innerText
-            });
-        });
-        globalpersenElements.forEach(function(element) {
-            ids.push({
-                id: element.id,
-                value: element.innerText
-            });
-        });
-        globaloutputElements.forEach(function(element) {
-            ids.push({
-                id: element.id,
-                value: element.innerText
-            });
-        });
-        ttlmcsocksElements.forEach(function(element) {
-            ids.push({
-                id: element.id,
-                value: element.innerText
-            });
-        });
-        ttlplanglovesElements.forEach(function(element) {
-            ids.push({
-                id: element.id,
-                value: element.innerText
-            });
-        });
-        ttlpersensocksElements.forEach(function(element) {
-            ids.push({
-                id: element.id,
-                value: element.innerText
-            });
-        });
-        ttlmcglovesElements.forEach(function(element) {
-            ids.push({
-                id: element.id,
-                value: element.innerText
-            });
-        });
-        ttlplanglovesElements.forEach(function(element) {
-            ids.push({
-                id: element.id,
-                value: element.innerText
-            });
-        });
-        ttlpersenglovesElements.forEach(function(element) {
-            ids.push({
-                id: element.id,
-                value: element.innerText
+        // AREA
+        let areaPlan = [];
+        document.querySelectorAll("[id^='area']").forEach((areaElement, index) => {
+            areaPlan.push({
+                area: areaElement.textContent, // Ambil konten area
+                ttlMc: document.querySelector(`#ttlmc${index + 1}`) ? document.querySelector(`#ttlmc${index + 1}`).textContent : null,
+                planMc: document.querySelector(`#planmc${index + 1}`) ? document.querySelector(`#planmc${index + 1}`).textContent : null,
+                outputDz: document.querySelector(`#outputdz${index + 1}`) ? document.querySelector(`#outputdz${index + 1}`).textContent : null
             });
         });
 
-
-        ttlmcElements.forEach(function(element) {
-            ids.push({
-                id: element.id,
-                value: element.innerText
-            });
-        });
-        planmcElements.forEach(function(element) {
-            ids.push({
-                id: element.id,
-                value: element.innerText
-            });
-        });
-        outputdzElements.forEach(function(element) {
-            ids.push({
-                id: element.id,
-                value: element.innerText
-            });
-        });
-        jarumElements.forEach(function(element) {
-            ids.push({
-                id: element.id,
-                value: element.innerText
-            });
-        });
-        kebmesinElements.forEach(function(element) {
-            ids.push({
-                id: element.id,
-                value: element.innerText
+        // DETAIL
+        let detailPlan = [];
+        document.querySelectorAll("[id^='detail_area']").forEach((detailRow, index) => {
+            let jarum = detailRow.querySelector("[id^='jarum']");
+            let kebMesin = detailRow.querySelector("[id^='kebmesin']");
+            detailPlan.push({
+                area: document.querySelector(`#area${Math.floor(index / 3) + 1}`) ? document.querySelector(`#area${Math.floor(index / 3) + 1}`).textContent : null, // Mengambil area sesuai indeks
+                jarum: jarum ? jarum.textContent : null,
+                kebMesin: kebMesin ? kebMesin.textContent : null
             });
         });
 
-        // Optional: Convert to JSON if needed for form submission or AJAX
-        console.log(ids); // Debugging untuk memastikan data sudah benar
+        // Membuat wadah 'data' untuk menyimpan global, areaPlan, dan detailPlan
+        let data = {
+            global: global,
+            area: areaPlan,
+            detail: detailPlan
+        };
 
-        // Kirim data dengan AJAX atau masukkan ke dalam input tersembunyi dalam form
-        let form = document.querySelector('form'); // Ambil form yang sudah ada
-        let hiddenInput = document.createElement('input'); // Buat input hidden baru
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'ids'; // Nama parameter yang akan dikirim
-        hiddenInput.value = JSON.stringify(ids); // Data ID yang akan dikirim
-        form.appendChild(hiddenInput); // Tambahkan input hidden ke dalam form
+        // Debugging untuk memastikan struktur data sudah benar
+        console.log(data);
 
-        // Submit form
-        form.submit();
+        // Kirim data menggunakan fetch
+        fetch('PlanningController/savePlanning', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log('Sukses:', result);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     }
 </script>
 <?php $this->endSection(); ?>
