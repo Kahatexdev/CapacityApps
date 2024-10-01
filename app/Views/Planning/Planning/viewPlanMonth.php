@@ -15,10 +15,10 @@
                             </div>
                         </div>
                         <div class="col-8 text-end">
-                            <form action="<?= base_url($role . '/exportPlanningJlMc/' . $bulan) ?>" method="post" ?>
+                            <form action="<?= base_url($role . '/exportPlanningJlMc/' . $title) ?>" method="post" ?>
                                 <!-- <a href="" class="btn btn-save bg-gradient-info d-inline-flex align-items-center">
                                     Save</a> -->
-
+                                <button type="submit" class="btn btn-info"><i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Report Excel</button>
 
                                 <a href="<?= base_url($role . '/jalanmesin') ?>" class="btn bg-gradient-dark">
                                     <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
@@ -62,56 +62,34 @@
                         <div class="col-lg-4">
                             <h6>Global</h6>
                             <input type="text" id="judulPlan" value="<?= $title ?>" hidden>
-                            <li>Total Mesin : <?= $summary['totalMc'] ?> Mesin
-                                <input type="number" id="globalmc" value="<?= $summary['totalMc'] ?>" hidden>
-
+                            <li>Total Mesin : <?= $summary['total_mc'] ?> Mesin
                             </li>
-                            <li>Total Planning : <?= $summary['totalPlanning'] ?> Mesin
-                                <input type="number" id="globalplanning" value="<?= $summary['totalPlanning'] ?>" hidden>
-
+                            <li>Total Planning : <?= $summary['planning_mc'] ?> Mesin
                             </li>
-                            <li>Persentase : <?= $summary['totalPersen'] ?>%
-                                <input type="number" id="globalpersen" value="<?= $summary['totalPersen'] ?>" hidden>
-
+                            <li>Persentase : <?= round(($summary['planning_mc'] / $summary['total_mc']) * 100) ?>%
                             </li>
-                            <li>Total Output : <?= $summary['OutputTotal'] ?> dz
-                                <input type="number" id="globaloutput" value="<?= $summary['OutputTotal'] ?>" hidden>
-
+                            <li>Total Output : <?= $summary['total_output'] ?> dz
                             </li>
 
                         </div>
                         <div class="col-lg-4">
                             <h6> Socks </h6>
-                            <li>Total Mesin : <?= $summary['mcSocks'] ?> Mesin
-                                <input type="number" id="ttlmcsocks" value="<?= $summary['mcSocks'] ?>" hidden>
-
+                            <li>Total Mesin : <?= $summary['mc_socks'] ?> Mesin
                             </li>
-                            <li>Total Planning : <?= $summary['planMcSocks'] ?> Mesin
-                                <input type="number" id="ttlplanningsocks" value="<?= $summary['planMcSocks'] ?>" hidden>
-
+                            <li>Total Planning : <?= $summary['plan_mc_socks'] ?> Mesin
                             </li>
-                            <li>Persentase : <?= $summary['persenSocks'] ?>%
-                                <input type="number" id="ttlpersensocks" value="<?= $summary['persenSocks'] ?>" hidden>
-
+                            <li>Persentase : <?= round(($summary['plan_mc_socks'] / $summary['mc_socks']) * 100) ?>%
                             </li>
                         </div>
                         <div class="col-lg-4">
                             <h6> Gloves </h6>
-                            <li>Total Mesin : <?= $summary['mcGloves'] ?> Mesin
-                                <input type="number" id="ttlmcgloves" value="<?= $summary['mcGloves'] ?>" hidden>
+                            <li>Total Mesin : <?= $summary['mc_gloves'] ?> Mesin
                             </li>
-                            <li>Total Planning : <?= $summary['planMcGloves'] ?> Mesin
-                                <input type="number" id="ttlplanninggloves" value="<?= $summary['planMcGloves'] ?>" hidden>
-
+                            <li>Total Planning : <?= $summary['plan_mc_gloves'] ?> Mesin
                             </li>
-                            <li>Persentase : <?= $summary['persenGloves'] ?>%
-                                <input type="number" id="ttlpersengloves" value="<?= $summary['persenGloves'] ?>" hidden>
-
+                            <li>Persentase : <?= round(($summary['plan_mc_gloves'] / $summary['mc_gloves']) * 100) ?>%
                             </li>
                         </div>
-                    </div>
-                    <div class="row text-end">
-                        <button class="btn btn-info save" onclick="saveAll()">SAVE</button>
                     </div>
                 </div>
             </div>
@@ -119,66 +97,44 @@
         </div>
     </div>
     <div class="row" id="card-container">
-        <?php
-        $no = 1;
-        foreach ($data as $area => $jarum): ?>
+        <?php foreach ($data as $area => $detailArea): ?>
             <div class="col-xl-6 col-sm-12 mb-xl-0 mb-4 mt-2">
                 <div class="card equal-height">
                     <div class="card-header" id="area_mc">
                         <div class="row">
-                            <h6> <?= $area ?></h6>
-                            <input type="text" id="area<?= $no ?>" value="<?= $area ?>" hidden>
+                            <h6><?= $area ?></h6>
                         </div>
                         <div class="row text-bold">
-                            <div class="col-lg-4"> Total Mesin: <?= $jarum['totalMesin']; ?>
-                                <input type="text" id="ttlmc<?= $no ?>" value="<?= $jarum['totalMesin']; ?>" hidden>
-                            </div>
-                            <div class="col-lg-4"> Planning Mesin : <?= $jarum['planningMc']; ?>
-                                <input type="text" id="planmc<?= $no ?>" value="<?= $jarum['planningMc']; ?>" hidden>
-
-                            </div>
-                            <div class="col-lg-4"> Output (dz) : <?= $jarum['outputDz']; ?> dz
-                                <input type="text" id="outputdz<?= $no ?>" value=" <?= $jarum['outputDz']; ?> " hidden>
-
-                            </div>
+                            <div class="col-lg-4"> Total Mesin: <?= $detailArea['totalMesin']; ?> </div>
+                            <div class="col-lg-4"> Planning Mesin: <?= $detailArea['planningMc']; ?> </div>
+                            <div class="col-lg-4"> Output (dz): <?= $detailArea['outputDz']; ?> dz </div>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="table">
                             <table class="table">
                                 <thead class="bg-dark">
-                                    <th class=" text-white"> Jarum </th>
-                                    <th class=" text-white"> Plan Mesin </th>
+                                    <tr>
+                                        <th class="text-white"> Jarum </th>
+                                        <th class="text-white"> Plan Mesin </th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                    <?php
-                                    $row = 1;
-                                    foreach ($jarum as $jr): ?>
-                                        <?php if (!is_array($jr)) continue; ?>
+                                    <?php foreach ($detailArea['jarum'] as $jarumDetail): ?>
                                         <tr id="detail_area">
-                                            <td><?= $jr['jr'] ?>
-                                                <input type="text" id="jarum<?= $row ?>" value="<?= $jr['jr'] ?>" hidden>
-
-                                            </td>
-                                            <td><?= $jr['kebutuhanMesin'] ?>
-                                                <input type="text" id="kebmesin<?= $row ?>" value="<?= $jr['kebutuhanMesin'] ?>" hidden>
-
-                                                <input type="text" id="areaDetail" value="<?= $area ?>" hidden>
-                                            </td>
+                                            <td><?= $jarumDetail['jarum'] ?></td>
+                                            <td><?= $jarumDetail['planning_mc'] ?></td>
                                         </tr>
-                                    <?php
-                                        $row++;
-                                    endforeach ?>
+                                    <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
-        <?php
-            $no++;
-        endforeach; ?>
+        <?php endforeach; ?>
     </div>
+
 
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
@@ -284,40 +240,10 @@
             .then(response => response.json())
             .then(result => {
                 console.log('Sukses:', result);
-
-                if (result.status === 'success') {
-                    // Tampilkan SweetAlert untuk pesan sukses
-                    Swal.fire({
-                        title: 'Sukses!',
-                        text: result.message,
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        // Redirect setelah SweetAlert ditutup
-                        window.location.href = 'http://localhost:8080/planning/viewPlan/' + document.querySelector("#judulPlan").value;
-                    });
-                } else {
-                    // Tampilkan SweetAlert untuk pesan error
-                    Swal.fire({
-                        title: 'Gagal!',
-                        text: result.message,
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                }
             })
             .catch(error => {
                 console.error('Error:', error);
-
-                // Tampilkan SweetAlert jika ada error dalam proses fetch
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Terjadi kesalahan saat menyimpan data!',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
             });
-
     }
 </script>
 <?php $this->endSection(); ?>

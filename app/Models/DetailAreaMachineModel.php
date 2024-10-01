@@ -40,4 +40,13 @@ class DetailAreaMachineModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function cekData($data)
+    {
+        return $this->select('id_detail_area_machine')->where($data)->first();
+    }
+    public function getData($id)
+    {
+        return $this->select('jarum,planning_mc')->where('id_area_machine', $id)->findAll();
+    }
 }

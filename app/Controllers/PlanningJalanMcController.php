@@ -328,66 +328,108 @@ class PlanningJalanMcController extends BaseController
 
     public function saveMonthlyMc()
     {
-        $global = [
-            'judul' => $this->request->getPost('judul'),
-            'total_mc' => $this->request->getPost('totalMc'),
-            'planning_mc' => $this->request->getPost('totalPlanning'),
-            'total_output' => $this->request->getPost('OutputTotal'),
-            'mc_socks' => $this->request->getPost('mcSocks'),
-            'plan_mc_socks' => $this->request->getPost('planMcSocks'),
-            'mc_gloves' => $this->request->getPost('mcGloves'),
-            'plan_mc_gloves' => $this->request->getPost('planMcGloves'),
+        // Ambil data JSON dari fetch
+        $jsonData = $this->request->getJSON(true);
+
+        // Dump dan die untuk cek isi JSON yang diterima
+        // Berikut ini adalah logic insert yang akan dilakukan setelah data dicek
+        $global = $jsonData['global'];
+        $areaData = $jsonData['area'];
+        $detailData = $jsonData['detail'];
+
+        // Insert ke tabel global
+        $globalData = [
+            'judul' => $global['judulPlan'],
+            'total_mc' => $global['globalMc'],
+            'planning_mc' => $global['globalPlan'],
+            'total_output' => $global['globalOutput'],
+            'mc_socks' => $global['ttlMcSocks'],
+            'plan_mc_socks' => $global['ttlPlanSocks'],
+            'mc_gloves' => $global['ttlMcGloves'],
+            'plan_mc_gloves' => $global['ttlPlanGloves'],
         ];
-        $jarum          = $this->request->getPost('jarum');         // array
-        $kebutuhanMesin = $this->request->getPost('kebutuhanMesin');
-        $totalMesin     = $this->request->getPost('totalMesin');
-        $planningMc     = $this->request->getPost('planningMc');
-        $outputDz     = $this->request->getPost('outputDz');
-        $areas = $this->request->getPost('area');
-        dd($kebutuhanMesin);
 
-
-        $chek = $this->globalModel->cekExist($global);
-        if (!$chek) {
-            $this->globalModel->insert($global);
-            $getId = $this->globalModel->cekExist($global);
-            $idGlobal = $getId['id_monthly_mc'];
-            $areaMcInsert = [];
-
-            foreach ($areas as $key => $area) {
-                $areaMcInsert = [
-                    'id_monthly_mc' => $idGlobal,
-                    'area' => $area,
-                    'total_mc' => $totalMesin[$key],
-                    'planning_mc' => $planningMc[$key],
-                    'output' => $outputDz[$key]
-                ];
-            }
+        // Cek apakah sudah ada data global dengan judul yang sama
+        $globalCheck = $this->globalModel->cekExist($globalData);
+        if (!$globalCheck) {
+            $this->globalModel->insert($globalData);
+            $idGlobal = $this->globalModel->cekExist($globalData)['id_monthly_mc'];
         } else {
-            $idGlobal = $chek['id_monthly_mc'];
-            $this->globalModel->update($idGlobal, $global);
-            $getId = $this->globalModel->cekExist($global);
-            $idGlobal = $getId['id_monthly_mc'];
-            $areaMcInsert = [];
+            $idGlobal = $globalCheck['id_monthly_mc'];
+            $this->globalModel->update($idGlobal, $globalData);
+        }
 
-            foreach ($areas as $key => $area) {
-                $areaMcInsert = [
-                    'id_monthly_mc' => $idGlobal,
-                    'area' => $area,
-                    'total_mc' => $totalMesin[$key],
-                    'planning_mc' => $planningMc[$key],
-                    'output' => $outputDz[$key]
-                ];
-                $cekDataArea = $this->areaMcModel->existData($areaMcInsert);
-                if (!$cekDataArea) {
-                    $this->areaMcModel->insert($areaMcInsert);
-                    $getIdArea = $this->areaMcModel->existData($areaMcInsert);
-                    $idArea = $getIdArea['id_area_machine'];
-                    $childData = [];
-                } else {
-                    $idArea = $cekDataArea['id_area_machine'];
+        // Loop untuk insert area ke tabel area_mc
+        foreach ($areaData as $key => $area) {
+            $areaInsert = [
+                'id_monthly_mc' => $idGlobal,
+                'area' => $area['area'],
+                'total_mc' => $area['ttlMc'],
+                'planning_mc' => $area['planMc'],
+                'output' => $area['outputDz']
+            ];
+
+            $cekDataArea = $this->areaMcModel->existData($areaInsert);
+            if (!$cekDataArea) {
+                $this->areaMcModel->insert($areaInsert);
+                $idArea = $this->areaMcModel->existData($areaInsert)['id_area_machine'];
+            } else {
+                $idArea = $cekDataArea['id_area_machine'];
+                $this->areaMcModel->update($idArea, $areaInsert);
+            }
+
+            // Loop untuk insert detail area (jarum dan kebutuhan mesin)
+            foreach ($detailData as $detail) {
+                if ($detail['areaDetail'] == $area['area']) {  // Cocokkan area
+                    $detailInsert = [
+                        'id_area_machine' => $idArea,
+                        'jarum' => $detail['jarum'],
+                        'planning_mc' => $detail['kebMesin']
+                    ];
+                    $cekDataDetail = $this->detailAreaMc->cekData($detailInsert);
+                    if (!$cekDataDetail) {
+                        $this->detailAreaMc->insert($detailInsert);
+                        $idDetail = $this->detailAreaMc->cekData($detailInsert)['id_detail_area_machine'];
+                    } else {
+                        $idDetail = $cekDataDetail['id_detail_area_machine'];
+                        $this->detailAreaMc->update($idDetail, $detailInsert);
+                    }
                 }
             }
         }
+
+        return $this->response->setJSON(['status' => 'success']);
+    }
+    public function viewPlan($judul)
+    {
+        $role = session()->get('role');
+
+        $global = $this->globalModel->getData($judul);
+        $idGlobal = $global['id_monthly_mc'];
+        $areaMachine = $this->areaMcModel->getData($idGlobal);
+        $monthlyData = [];
+        foreach ($areaMachine as $area) {
+            $idAreaMc = $area['id_area_machine'];
+            $monthlyData[$area['area']]['totalMesin'] = $area['total_mc'];
+            $monthlyData[$area['area']]['planningMc'] = $area['planning_mc'];
+            $monthlyData[$area['area']]['outputDz'] = $area['output'];
+            $monthlyData[$area['area']]['jarum'] = $this->detailAreaMc->getData($idAreaMc);
+        }
+
+        $data = [
+            'role' => $role,
+            'title' =>  $judul,
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'summary' => $global,
+            'data' => $monthlyData
+        ];
+
+        return view($role . '/Planning/viewPlanMonth', $data);
     }
 }

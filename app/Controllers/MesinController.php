@@ -343,12 +343,14 @@ class MesinController extends BaseController
         $total_mesin = $this->request->getPost("total_mc");
         $brand = $this->request->getPost("brand");
         $mesin_jalan = $this->request->getPost("mesin_jalan");
+        $target = $this->request->getPost("target");
 
         $id = $idDataMesin;
         $update = $this->jarumModel->update($id, [
             'total_mc' => $total_mesin,
             'brand' => $brand,
-            'mesin_jalan' => $mesin_jalan
+            'mesin_jalan' => $mesin_jalan,
+            'target' => $target,
         ]);
         $area = $this->request->getPost("area");
         if ($update) {
@@ -473,6 +475,7 @@ class MesinController extends BaseController
             'total_mc' => $this->request->getPost("total_mc"),
             'brand' => $this->request->getPost("brand"),
             'mesin_jalan' => $this->request->getPost("mesin_jalan"),
+            'target' => $this->request->getPost("target"),
         ];
         $id = $idDataMesin;
         $update = $this->jarumModel->update($id, $data);
