@@ -269,6 +269,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('editcylinder/(:any)', 'MesinController::editcylinderPlan/$1');
     $routes->post('deletecylinder/(:any)', 'MesinController::deletecylinderPlan/$1');
     $routes->get('allmachine', 'MesinController::allmachinePlan');
+    $routes->post('capacityperarea/(:any)', 'MesinController::capacityperarea/$1');
 
     //planning
     $routes->get('dataplanning', 'PlanningController::listplanningAps');

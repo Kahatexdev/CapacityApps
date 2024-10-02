@@ -238,6 +238,13 @@ class ApsPerstyleModel extends Model
             ->groupBy(['delivery', 'mastermodel'])
             ->findAll();
     }
+    public function getAllForModelStyleAndSize($validate)
+    {
+        return $this->where('mastermodel', $validate['no_model'])
+            ->where('size', $validate['style'])
+            ->orderBy('delivery', 'ASC') // Optional: sort berdasarkan delivery date, bisa diubah sesuai kebutuhan
+            ->findAll();
+    }
 
     public function getSmv()
     {
