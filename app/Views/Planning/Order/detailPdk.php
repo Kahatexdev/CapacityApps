@@ -214,7 +214,6 @@ error_reporting(E_ALL); ?>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                        </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
