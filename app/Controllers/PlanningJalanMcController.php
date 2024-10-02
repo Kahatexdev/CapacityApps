@@ -301,14 +301,32 @@ class PlanningJalanMcController extends BaseController
 
     public function saveMonthlyMc()
     {
+        // Set CORS Headers untuk mengizinkan request dari origin lain
+        $this->response->setHeader('Access-Control-Allow-Origin', '*');
+        $this->response->setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        $this->response->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+        // Tangani preflight request (OPTIONS) untuk CORS
+        if ($this->request->getMethod() === 'options') {
+            return $this->response->setStatusCode(200); // Tidak perlu lanjut jika preflight request
+        }
+
         // Ambil data JSON dari fetch
         $jsonData = $this->request->getJSON(true);
 
-        // Dump dan die untuk cek isi JSON yang diterima
-        // Berikut ini adalah logic insert yang akan dilakukan setelah data dicek
-        $global = $jsonData['global'];
-        $areaData = $jsonData['area'];
-        $detailData = $jsonData['detail'];
+        // Cek jika JSON tidak valid atau kosong
+        if (!$jsonData) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid JSON data'])->setStatusCode(400);
+        }
+
+        // Ambil data global, area, dan detail dari JSON
+        $global = $jsonData['global'] ?? null;
+        $areaData = $jsonData['area'] ?? [];
+        $detailData = $jsonData['detail'] ?? [];
+
+        if (!$global || empty($areaData) || empty($detailData)) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Incomplete data'])->setStatusCode(400);
+        }
 
         // Insert ke tabel global
         $globalData = [
@@ -371,8 +389,9 @@ class PlanningJalanMcController extends BaseController
             }
         }
 
-        return $this->response->setJSON(['status' => 'success']);
+        return $this->response->setJSON(['status' => 'success', 'message' => 'Data saved successfully'])->setStatusCode(200);
     }
+
 
     public function viewPlan($judul)
     {
