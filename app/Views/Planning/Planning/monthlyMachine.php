@@ -116,9 +116,9 @@
                                     $row = 1;
                                     foreach ($jarum as $jr): ?>
                                         <?php if (!is_array($jr)) continue; ?>
-                                        <tr id="detail_area">
-                                            <td id="jarum<?= $row ?>"><?= $jr['jr'] ?></td>
-                                            <td id="kebmesin<?= $row ?>"><?= $jr['kebutuhanMesin'] ?></td>
+                                        <tr id="detail_area<?= $no ?>_<?= $row ?>">>
+                                            <td id="jarum<?= $no ?>_<?= $row ?>"><?= $jr['jr'] ?></td>
+                                            <td id="kebmesin<?= $no ?>_<?= $row ?>"><?= $jr['kebutuhanMesin'] ?></td>
                                         </tr>
                                     <?php
                                         $row++;
@@ -158,39 +158,72 @@
     function saveAll() {
         // GLOBAL
         let global = {
-            globalMc: document.querySelector("#globalmc") ? document.querySelector("#globalmc").textContent : null,
-            globalPlan: document.querySelector("#globalplanning") ? document.querySelector("#globalplanning").textContent : null,
-            globalOutput: document.querySelector("#globaloutput") ? document.querySelector("#globaloutput").textContent : null,
-            ttlMcSocks: document.querySelector("#ttlmcsocks") ? document.querySelector("#ttlmcsocks").textContent : null,
-            ttlPlanSocks: document.querySelector("#ttlplanningsocks") ? document.querySelector("#ttlplanningsocks").textContent : null,
-            ttlPersenSocks: document.querySelector("#ttlpersensocks") ? document.querySelector("#ttlpersensocks").textContent : null,
-            ttlMcGloves: document.querySelector("#ttlmcgloves") ? document.querySelector("#ttlmcgloves").textContent : null,
-            ttlPlanGloves: document.querySelector("#ttlplanninggloves") ? document.querySelector("#ttlplanninggloves").textContent : null,
-            ttlPersenGloves: document.querySelector("#ttlpersengloves") ? document.querySelector("#ttlpersengloves").textContent : null
+            globalMc: document.querySelector("#globalmc") ? document.querySelector("#globalmc").textContent.trim() : null,
+            globalPlan: document.querySelector("#globalplanning") ? document.querySelector("#globalplanning").textContent.trim() : null,
+            globalOutput: document.querySelector("#globaloutput") ? document.querySelector("#globaloutput").textContent.trim() : null,
+            ttlMcSocks: document.querySelector("#ttlmcsocks") ? document.querySelector("#ttlmcsocks").textContent.trim() : null,
+            ttlPlanSocks: document.querySelector("#ttlplanningsocks") ? document.querySelector("#ttlplanningsocks").textContent.trim() : null,
+            ttlPersenSocks: document.querySelector("#ttlpersensocks") ? document.querySelector("#ttlpersensocks").textContent.trim() : null,
+            ttlMcGloves: document.querySelector("#ttlmcgloves") ? document.querySelector("#ttlmcgloves").textContent.trim() : null,
+            ttlPlanGloves: document.querySelector("#ttlplanninggloves") ? document.querySelector("#ttlplanninggloves").textContent.trim() : null,
+            ttlPersenGloves: document.querySelector("#ttlpersengloves") ? document.querySelector("#ttlpersengloves").textContent.trim() : null
         };
+
+        // Debugging global
+        console.log("Global Data:", global);
 
         // AREA
         let areaPlan = [];
-        document.querySelectorAll("[id^='area']").forEach((areaElement, index) => {
-            areaPlan.push({
-                area: areaElement.textContent, // Ambil konten area
-                ttlMc: document.querySelector(`#ttlmc${index + 1}`) ? document.querySelector(`#ttlmc${index + 1}`).textContent : null,
-                planMc: document.querySelector(`#planmc${index + 1}`) ? document.querySelector(`#planmc${index + 1}`).textContent : null,
-                outputDz: document.querySelector(`#outputdz${index + 1}`) ? document.querySelector(`#outputdz${index + 1}`).textContent : null
-            });
+        document.querySelectorAll("[id^='area_mc']").forEach((areaElement, index) => {
+            let area = areaElement.querySelector("h6").textContent.trim();
+            let ttlMc = areaElement.querySelector("#ttlmc" + (index + 1)) ? areaElement.querySelector("#ttlmc" + (index + 1)).textContent.trim() : null;
+            let planMc = areaElement.querySelector("#planmc" + (index + 1)) ? areaElement.querySelector("#planmc" + (index + 1)).textContent.trim() : null;
+            let outputDz = areaElement.querySelector("#outputdz" + (index + 1)) ? areaElement.querySelector("#outputdz" + (index + 1)).textContent.trim() : null;
+
+            if (area && ttlMc && planMc && outputDz) {
+                areaPlan.push({
+                    area: area,
+                    ttlMc: ttlMc,
+                    planMc: planMc,
+                    outputDz: outputDz
+                });
+            } else {
+                console.warn(`Missing data for area ${index + 1}`);
+            }
         });
+
+        // Debugging areaPlan
+        console.log("Area Plan:", areaPlan);
 
         // DETAIL
         let detailPlan = [];
-        document.querySelectorAll("[id^='detail_area']").forEach((detailRow, index) => {
-            let jarum = detailRow.querySelector("[id^='jarum']");
-            let kebMesin = detailRow.querySelector("[id^='kebmesin']");
-            detailPlan.push({
-                area: document.querySelector(`#area${Math.floor(index / 3) + 1}`) ? document.querySelector(`#area${Math.floor(index / 3) + 1}`).textContent : null, // Mengambil area sesuai indeks
-                jarum: jarum ? jarum.textContent : null,
-                kebMesin: kebMesin ? kebMesin.textContent : null
-            });
+        document.querySelectorAll("[id^='area_mc']").forEach((areaElement, index) => {
+            let area = areaElement.querySelector("h6").textContent.trim();
+            let table = areaElement.querySelector("table");
+            if (table) {
+                let tbody = table.querySelector("tbody");
+                if (tbody) {
+                    let rows = tbody.querySelectorAll("tr");
+                    rows.forEach((row, rowIndex) => {
+                        let jarum = row.querySelector("#jarum" + (index + 1) + "_" + (rowIndex + 1)) ? row.querySelector("#jarum" + (index + 1) + "_" + (rowIndex + 1)).textContent.trim() : null;
+                        let kebMesin = row.querySelector("#kebmesin" + (index + 1) + "_" + (rowIndex + 1)) ? row.querySelector("#kebmesin" + (index + 1) + "_" + (rowIndex + 1)).textContent.trim() : null;
+
+                        if (jarum && kebMesin) {
+                            detailPlan.push({
+                                area: area,
+                                jarum: jarum,
+                                kebMesin: kebMesin
+                            });
+                        } else {
+                            console.warn(`Missing data for detail area ${index + 1}, row ${rowIndex + 1}`);
+                        }
+                    });
+                }
+            }
         });
+
+        // Debugging detailPlan
+        console.log("Detail Plan:", detailPlan);
 
         // Membuat wadah 'data' untuk menyimpan global, areaPlan, dan detailPlan
         let data = {
@@ -200,23 +233,27 @@
         };
 
         // Debugging untuk memastikan struktur data sudah benar
-        console.log(data);
+        console.log("Final Data to Send:", data);
 
         // Kirim data menggunakan fetch
-        fetch('PlanningController/savePlanning', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                console.log('Sukses:', result);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+        if (data) {
+            fetch('PlanningController/savePlanning', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(result => {
+                    console.log('Sukses:', result);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        } else {
+            console.error('Data adalah null');
+        }
     }
 </script>
 <?php $this->endSection(); ?>

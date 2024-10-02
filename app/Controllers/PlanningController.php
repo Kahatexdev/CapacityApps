@@ -576,9 +576,21 @@ class PlanningController extends BaseController
     {
         // Ambil data yang dikirim dari JavaScript (JSON string)
         $jsonData = $this->request->getPost('data');
+        if ($jsonData === null) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Data JSON tidak ditemukan'
+            ]);
+        }
 
         // Decode JSON string menjadi array PHP
         $data = json_decode($jsonData, true);
+        if ($data === null) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Data JSON tidak valid'
+            ]);
+        }
 
         // Check if the JSON data is valid
         if (json_last_error() !== JSON_ERROR_NONE) {
