@@ -188,6 +188,7 @@ class PlanningController extends BaseController
         $idaps = $this->request->getPost('idaps');
         $pdk = $this->request->getPost('noModel');
         $deliv = $this->request->getPost('delivery');
+        $jarum = $this->request->getPost('jarum');
         $update = [
             'factory' => $this->request->getPost('area1'),
             'qty' => $this->request->getPost('qty1'),
@@ -211,9 +212,9 @@ class PlanningController extends BaseController
         $u = $this->ApsPerstyleModel->update($idaps, $update);
         if ($u) {
             $this->ApsPerstyleModel->insert($insert);
-            return redirect()->to(base_url(session()->get('role') . '/detailModelPlanning/' . $pdk . '/' . $deliv))->withInput()->with('success', 'Berhasil Split Style Area');
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $pdk . '/' . $jarum))->withInput()->with('success', 'Berhasil Split Style Area');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/detailModelPlanning/' . $pdk . '/' . $deliv))->withInput()->with('error', 'Gagal Membagi Style');
+            return redirect()->to(base_url(session()->get('role') . '/detailModelPlanning/' . $pdk . '/' .  $jarum))->withInput()->with('error', 'Gagal Membagi Style');
         }
     }
     public function detaillistplanning($judul)

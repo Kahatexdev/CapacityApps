@@ -320,7 +320,6 @@ class ApsPerstyleModel extends Model
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
             ->where('sisa >', 0)
-            ->where('delivery >', $oneweek)
             ->groupBy('mastermodel,delivery')
             ->get()
             ->getResultArray();
@@ -343,7 +342,7 @@ class ApsPerstyleModel extends Model
         $deliveryMax = $data[$indexMax]['delivery'];
         $tglDeliv = new DateTime($deliveryMax); // Tanggal delivery terjauh
         $beda = $today->diff($tglDeliv);
-        $hariTarget = $beda->days - 7;
+        $hariTarget = $beda->days;
         $smvArray = array_column($data, 'smv');
         $smvArray = array_map('intval', $smvArray);
         $averageSmv = array_sum($smvArray) / count($smvArray);
@@ -385,12 +384,12 @@ class ApsPerstyleModel extends Model
     }
     public function getSisaPerDlv($model, $jarum, $deliv)
     {
-        $sisa = $this->select('idapsperstyle,mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,factory, production_unit, delivery,smv')
+        $sisa = $this->select('idapsperstyle,mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,factory, production_unit, delivery,smv,seam,country,no_order')
             ->where('machinetypeid', $jarum)
             ->where('mastermodel', $model)
             ->where('delivery', $deliv)
             ->where('sisa >=', 0)
-            ->groupBy('size')
+            ->groupBy('size,factory')
             ->findAll();
         $final = reset($sisa);
         return $sisa;
