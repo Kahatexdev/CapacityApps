@@ -16,6 +16,8 @@ use App\Models\KebutuhanMesinModel;
 use App\Models\MesinPlanningModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
+use App\Models\MonthlyMcModel;
+
 
 
 
@@ -31,9 +33,12 @@ class PlanningController extends BaseController
     protected $liburModel;
     protected $KebutuhanMesinModel;
     protected $MesinPlanningModel;
+    protected $globalModel;
+
 
     public function __construct()
     {
+        $this->globalModel = new MonthlyMcModel();
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
@@ -364,7 +369,7 @@ class PlanningController extends BaseController
         $role = session()->get('role');
         $bulanIni = [];
         $currentDate = new DateTime(); // Tanggal sekarang
-
+        $dataPlan = $this->globalModel->getPlan();
         for ($i = 0; $i < 12; $i++) {
             $bulanIni[] = $currentDate->format('F Y'); // Format bulan dan tahun (e.g., "August 2024")
             $currentDate->modify('+1 month'); // Tambah satu bulan
@@ -379,7 +384,8 @@ class PlanningController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-            'bulan' => $bulanIni
+            'bulan' => $bulanIni,
+            'plan' => $dataPlan
         ];
         return view($role . '/Planning/jalanmesin', $data);
     }
@@ -571,66 +577,5 @@ class PlanningController extends BaseController
         ];
 
         return view($role . '/Planning/monthlyMachine', $data);
-    }
-    public function savePlanning()
-    {
-        // Ambil data yang dikirim dari JavaScript (JSON string)
-        $jsonData = $this->request->getPost('data');
-        if ($jsonData === null) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Data JSON tidak ditemukan'
-            ]);
-        }
-
-        // Decode JSON string menjadi array PHP
-        $data = json_decode($jsonData, true);
-        if ($data === null) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Data JSON tidak valid'
-            ]);
-        }
-
-        // Check if the JSON data is valid
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            // Handle JSON error
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Invalid JSON data'
-            ]);
-        }
-
-        // Contoh: Akses data global
-        $globalMc = $data['global']['globalMc'];
-        $globalPlan = $data['global']['globalPlan'];
-        $globalOutput = $data['global']['globalOutput'];
-
-        // Contoh: Akses data area plan (array)
-        $areaPlans = $data['area'];
-        foreach ($areaPlans as $areaPlan) {
-            $area = $areaPlan['area'];
-            $ttlMc = $areaPlan['ttlMc'];
-            $planMc = $areaPlan['planMc'];
-            $outputDz = $areaPlan['outputDz'];
-
-            // Lakukan penyimpanan ke database, atau proses lainnya
-        }
-
-        // Contoh: Akses data detail plan (array)
-        $detailPlans = $data['detail'];
-        foreach ($detailPlans as $detailPlan) {
-            $area = $detailPlan['area'];
-            $jarum = $detailPlan['jarum'];
-            $kebMesin = $detailPlan['kebMesin'];
-
-            // Lakukan penyimpanan atau proses lainnya
-        }
-
-        // Kirimkan respons sukses jika diperlukan
-        return $this->response->setJSON([
-            'status' => 'success',
-            'message' => 'Data planning berhasil disimpan.'
-        ]);
     }
 }

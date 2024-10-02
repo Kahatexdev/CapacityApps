@@ -43,4 +43,8 @@ class AreaMachineModel extends Model
     {
         return $this->select('id_area_machine')->where($data)->first();
     }
+    public function getData($idGloblal)
+    {
+        return $this->where('id_monthly_mc', $idGloblal)->findAll();
+    }
 }

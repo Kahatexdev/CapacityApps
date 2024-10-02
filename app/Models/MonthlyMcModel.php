@@ -43,6 +43,14 @@ class MonthlyMcModel extends Model
 
     public function cekExist($data)
     {
-        return $this->select('id_monthly_mc')->where($data)->first();
+        return $this->select('id_monthly_mc')->where('judul', $data['judul'])->first();
+    }
+    public function getData($judul)
+    {
+        return $this->where('judul', $judul)->first();
+    }
+    public function getPlan()
+    {
+        return $this->select('judul')->findAll();
     }
 }

@@ -38,7 +38,7 @@
                                 <i class="fas fa-plus-circle me-2 text-lg opacity-10"></i>
                                 Input Data Machine
                             </button>
-                           
+
 
                             <a href="<?= base_url($role . '/mesinperarea/' . $pu) ?>" class="btn bg-gradient-dark">
                                 <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
@@ -47,7 +47,7 @@
                     </div>
                 </div>
                 <div class="card-body p-3">
-                  
+
                     <div class="row">
                         <div class="table-responsive">
                             <table id="dataTable" class="display compact striped" style="width:100%">
@@ -71,20 +71,20 @@
                                             <td class="text-sm"><?= $order['brand']; ?></td>
                                             <td class="text-sm"><?= $order['total_mc'] - $order['mesin_jalan']; ?> Mc</td>
                                             <td class="text-sm"><?= $order['mesin_jalan']; ?> Mc</td>
-                                             <td class="text-sm">
-                                             
-                                                   
+                                            <td class="text-sm">
+
+
                                                 <button type="button" class="btn btn-capacity btn-info btn-sm ?>" data-jarum="<?= $order['jarum']; ?>">
                                                     Cek Kapasitas
                                                 </button>
-                                           
+
                                             </td>
                                             <td class="text-sm">
                                                 <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['id_data_mesin']; ?>" data-area="<?= $order['area']; ?>" data-total="<?= $order['total_mc']; ?>" data-jarum="<?= $order['jarum']; ?>" data-mc-jalan="<?= $order['mesin_jalan']; ?>" data-brand="<?= $order['brand']; ?>" data-pu="<?= $order['pu']; ?>">
                                                     Edit
                                                 </button>
                                             </td>
-                                           
+
                                             <td>
                                                 <button type="button" class="btn btn-danger btn-sm delete-btn" data-toggle="modal" data-target="#ModalDelete" data-id="<?= $order['id_data_mesin']; ?>">
                                                     Delete
@@ -118,10 +118,10 @@
             </div>
         </div>
         <div class="row">
-        <?= $this->renderSection('capacity'); ?>
+            <?= $this->renderSection('capacity'); ?>
         </div>
         <div class="modal fade" id="ModalEdit" tabindex="-1" role="dialog" aria-labelledby="modalEdit" aria-hidden="true">
-            <div class="modal-dialog"   role="document">
+            <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Edit Data Machine</h5>
@@ -146,6 +146,10 @@
                                         <label for="buyer" class="col-form-label">Brand</label>
                                         <input type="text" name="brand" class="form-control">
                                     </div>
+                                    <div class="form-group">
+                                        <label for="buyer" class="col-form-label">Target</label>
+                                        <input type="number" name="targer" class="form-control">
+                                    </div>
 
                                 </div>
                                 <div class="col-lg-6 col-sm-12">
@@ -155,7 +159,7 @@
                                         <input type="text" name="total_mc" class="form-control">
                                     </div>
                                     <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Mesin Runnig</label>
+                                        <label for="buyer" class="col-form-label">Mesin Running</label>
                                         <input type="text" name="mesin_jalan" class="form-control">
                                     </div>
                                     <div class="form-group">
@@ -214,7 +218,10 @@
                                         <label for="buyer" class="col-form-label">Brand</label>
                                         <input type="text" name="brand" class="form-control">
                                     </div>
-
+                                    <div class="form-group">
+                                        <label for="buyer" class="col-form-label">Target</label>
+                                        <input type="number" name="targer" class="form-control">
+                                    </div>
                                 </div>
                                 <div class="col-lg-6 col-sm-12">
 
@@ -288,8 +295,8 @@
                     </div>
                     <div class="modal-body">
                         <form action="" method="post">
-                       <input type="text" name="jarum" id="jarum" class="form-control">
-                       <input type="number" name="target" id="target" class="form-control" placeholder="Masukan target">
+                            <input type="text" name="jarum" id="jarum" class="form-control">
+                            <input type="number" name="target" id="target" class="form-control" placeholder="Masukan target">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
@@ -358,7 +365,7 @@
                     $('#modalTambah').modal('show'); // Show the modal
                 });
 
-                $('.edit-btn').click(function() {
+                $(document).on('click', '.edit-btn', function() {
                     var id_data_mesin = $(this).data('id');
                     var area = $(this).data('area');
                     var jarum = $(this).data('jarum');
@@ -384,16 +391,16 @@
 
                     $('#ModalEdit').modal('show'); // Show the modal
                 });
-                $('.delete-btn').click(function() {
+                $(document).on('click', '.delete-btn', function() {
                     var id = $(this).data('id');
                     $('#ModalDelete').find('form').attr('action', '<?= base_url($role . '/deletemesinareal/') ?>' + id);
                     $('#ModalDelete').find('input[name="id_data_mesin"]').val(id);
                     $('#ModalDelete').modal('show'); // Show the modal
                 });
-                $('.btn-capacity').click(function() {
+                $(document).on('click', '.btn-capacity', function() {
                     var area = $(this).data('area');
-                     var jarum = $(this).data('jarum');
-                    $('#ModalCapacity').find('form').attr('action', '<?= base_url($role . '/capacityperarea/'.$area )?>');         
+                    var jarum = $(this).data('jarum');
+                    $('#ModalCapacity').find('form').attr('action', '<?= base_url($role . '/capacityperarea/' . $area) ?>');
                     $('#ModalCapacity').find('input[name="jarum"]').val(jarum);
 
                     $('#ModalCapacity').modal('show'); // Show the modal

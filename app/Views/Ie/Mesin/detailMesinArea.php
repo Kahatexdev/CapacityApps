@@ -146,6 +146,10 @@
                                         <label for="buyer" class="col-form-label">Brand</label>
                                         <input type="text" name="brand" class="form-control">
                                     </div>
+                                    <div class="form-group">
+                                        <label for="buyer" class="col-form-label">Target</label>
+                                        <input type="number" name="targer" class="form-control">
+                                    </div>
 
                                 </div>
                                 <div class="col-lg-6 col-sm-12">
@@ -214,7 +218,10 @@
                                         <label for="buyer" class="col-form-label">Brand</label>
                                         <input type="text" name="brand" class="form-control">
                                     </div>
-
+                                    <div class="form-group">
+                                        <label for="buyer" class="col-form-label">Target</label>
+                                        <input type="number" name="targer" class="form-control">
+                                    </div>
                                 </div>
                                 <div class="col-lg-6 col-sm-12">
 
@@ -358,7 +365,7 @@
                     $('#modalTambah').modal('show'); // Show the modal
                 });
 
-                $('.edit-btn').click(function() {
+                $(document).on('click', '.edit-btn', function() {
                     var id_data_mesin = $(this).data('id');
                     var area = $(this).data('area');
                     var jarum = $(this).data('jarum');
@@ -384,13 +391,13 @@
 
                     $('#ModalEdit').modal('show'); // Show the modal
                 });
-                $('.delete-btn').click(function() {
+                $(document).on('click', '.delete-btn', function() {
                     var id = $(this).data('id');
                     $('#ModalDelete').find('form').attr('action', '<?= base_url($role . '/deletemesinareal/') ?>' + id);
                     $('#ModalDelete').find('input[name="id_data_mesin"]').val(id);
                     $('#ModalDelete').modal('show'); // Show the modal
                 });
-                $('.btn-capacity').click(function() {
+                $(document).on('click', '.btn-capacity', function() {
                     var area = $(this).data('area');
                     var jarum = $(this).data('jarum');
                     $('#ModalCapacity').find('form').attr('action', '<?= base_url($role . '/capacityperarea/' . $area) ?>');
