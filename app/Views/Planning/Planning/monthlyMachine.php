@@ -216,6 +216,9 @@
             ttlPersenGloves: document.querySelector("#ttlpersengloves") ? document.querySelector("#ttlpersengloves").value : null
         };
 
+        // Debugging global
+        console.log("Global Data:", global);
+
         // AREA
         let areaPlan = [];
         document.querySelectorAll("[id^='area']").forEach((areaElement, index) => {
@@ -240,6 +243,9 @@
                 });
             }
         });
+
+        // Debugging areaPlan
+        console.log("Area Plan:", areaPlan);
 
         // DETAIL
         let detailPlan = [];
