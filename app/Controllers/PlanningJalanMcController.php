@@ -69,63 +69,93 @@ class PlanningJalanMcController extends BaseController
     public function excelPlanningJlMc($bulan)
     {
         $role = session()->get('role');
-
-        // Log the input for debugging
-        log_message('info', 'Received bulan value: ' . $bulan);
-
-        // Parse the $bulan string to a DateTime object
-        $date = \DateTime::createFromFormat('F-Y', $bulan);
-        if (!$date) {
-            throw new \Exception("Invalid date format: '{$bulan}'. Please use 'F-Y' format.");
-        }
-
+        $date = DateTime::createFromFormat('F-Y', $bulan);
         $bulanIni = $date->format('F-Y');
-        $startDate = new \DateTime($date->format('Y-m-01')); // First day of the given month
+        $awalBulan = $date->format('Y-m-01');
+
+        $filteredArea = $this->jarumModel->getArea();
+        $area = array_filter($filteredArea, function ($item) {
+            return strpos($item, 'Gedung') === false;
+        });
+        $area = array_values($area);
         $monthlyData = [];
-        for ($i = 0; $i < 5; $i++) {
-            $startOfWeek = clone $startDate;
-            $startOfWeek->modify("+$i week");
-
-            // Ensure we start on Monday and stay within the month
-            $startOfWeek->modify($startOfWeek->format('N') === '1' ? 'this Monday' : 'next Monday');
-            if ($startOfWeek->format('m') !== $startDate->format('m')) break;
-
-            $endOfWeek = clone $startOfWeek;
-            $endOfWeek->modify('Sunday this week');
-
-            $monthlyData[] = [
-                'week' => $i + 1,
-                'start_date' => $startOfWeek->format('Y-m-d'),
-                'end_date' => $endOfWeek->format('Y-m-d'),
-                'number_of_days' => $startOfWeek->diff($endOfWeek)->days + 1,
-            ];
+        foreach ($area as $ar) {
+            $mesin = $this->jarumModel->areaMc($ar);
+            $totalMesin = 0;
+            $planningMc = 0;
+            $outputDz = 0;
+            foreach ($mesin as $jarum) {
+                $sisaOrder = $this->ApsPerstyleModel->ambilSisaOrder($ar, $awalBulan, $jarum['jarum']);
+                $monthlyData[$ar][$jarum['jarum']]['kebutuhanMesin'] = $sisaOrder['totalKebMesin'];
+                $monthlyData[$ar][$jarum['jarum']]['output'] = $sisaOrder['outputDz'];
+                $monthlyData[$ar][$jarum['jarum']]['jr'] = $jarum['jarum'];
+                $totalMesin += $jarum['total'];
+                $planningMc += $sisaOrder['totalKebMesin'];
+                $outputDz += $sisaOrder['outputDz'];
+            }
+            $monthlyData[$ar]['totalMesin'] = $totalMesin;
+            $monthlyData[$ar]['planningMc'] = $planningMc;
+            $monthlyData[$ar]['outputDz'] = $outputDz;
         }
+        $totalAllMesin = 0;
 
-        $jarum = $this->jarumModel->getAreaAndJarum();
-        $kebutuhanMesin = [];
-        $outputDz = []; // Initialize outputDz array
+        $totalOutput = 0;
+        $totalMcPlanning = 0;
 
-        $areas = $this->jarumModel->getArea();
-        $totalArea = [];
-        foreach ($areas as $ar) {
-            $totalArea[$ar] = $this->jarumModel->totalMcArea($ar);
+        foreach ($monthlyData as $data) {
+            $totalAllMesin += $data['totalMesin'];
+            $totalOutput += $data['outputDz'];
+            $totalMcPlanning += $data['planningMc'];
         }
-        // Fetch sisa orders efficiently
-        foreach ($monthlyData as $wk) {
-            foreach ($areas as $ar) {
-                $outputDz[$wk['week']][$ar] = 0; // Initialize the outputDz for each week and area
-                foreach ($jarum as $jr) {
-                    $weekNumber = $wk['week'];
-                    $sisaOrder = $this->ApsPerstyleModel->ambilSisaOrder($ar, $wk['start_date'], $jr['jarum']);
-
-                    $kebutuhanMesin[$weekNumber][$ar][$jr['jarum']] = $sisaOrder['totalKebMesin'] ?? 0;
-                    $outputDz[$weekNumber][$ar] += $sisaOrder['outputDz'] ?? 0; // Summing outputDz per week per area
-                }
+        $totalKebGloves = 0; // Initialize outside the loop
+        foreach ($monthlyData['KK8J'] as $data) {
+            if (is_array($data) && isset($data['kebutuhanMesin'])) {
+                $totalKebGloves += $data['kebutuhanMesin'];
             }
         }
 
+        $totalKebSock = $totalMcPlanning - $totalKebGloves;
+        $totalMcSocks = $this->jarumModel->totalMcSock();
+        $totalMcSocks = intval($totalMcSocks['total']);
+        $totalMcGloves = $totalAllMesin - $totalMcSocks;
+
+        $persenSocks = round(($totalKebSock / $totalMcSocks) * 100);
+        $persenGloves = round(($totalKebGloves / $totalMcGloves) * 100);
+        $persenTotal = round(($totalMcPlanning / $totalAllMesin) * 100);
+        $summary = [
+            'totalMc' => $totalAllMesin,
+            'OutputTotal' => $totalOutput,
+            'totalPlanning' => $totalMcPlanning,
+            'totalPersen' => $persenTotal,
+
+            'mcSocks' => $totalMcSocks,
+            'planMcSocks' => $totalKebSock,
+            'persenSocks' => $persenSocks,
+
+            'mcGloves' => $totalMcGloves,
+            'planMcGloves' => $totalKebGloves,
+            'persenGloves' => $persenGloves
+        ];
+
         // Generate Excel
         $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle("Planning Mesin");
+
+        $styleGlobal = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_LEFT, // Alignment rata tengah
+            ],
+        ];
+
+        $styleGlobalBody = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_LEFT, // Alignment rata tengah
+            ],
+        ];
 
         // border
         $styleHeader = [
@@ -140,6 +170,10 @@ class PlanningJalanMcController extends BaseController
                     'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
                     'color' => ['argb' => 'FF000000'],    // Warna garis hitam
                 ],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID, // Jenis pengisian solid
+                'startColor' => ['argb' => 'FF67748e'], // Warna latar belakang biru tua (HEX)
             ],
         ];
         $styleBody = [
@@ -168,156 +202,95 @@ class PlanningJalanMcController extends BaseController
             ],
         ];
 
-        for ($i = 1; $i <= count($monthlyData); $i++) {
-            if (!empty($kebutuhanMesin[$i])) {
-                $sheet = $spreadsheet->createSheet();
-                $sheet->setTitle("Week-$i");
+        // Set lebar kolom secara manual
+        $sheet->getColumnDimension('A')->setWidth(25); // Lebar kolom A diatur menjadi 20
+        $sheet->getColumnDimension('B')->setWidth(25); // Lebar kolom B diatur menjadi 25
+        $sheet->getColumnDimension('C')->setWidth(25); // Lebar kolom C diatur menjadi 30
 
-                $sheet->setCellValue('A1', 'REKOMENDASI PLANNING JALAN MC');
-                $sheet->mergeCells('A1:AE1');
-                $sheet->getStyle('A1')->getFont()->setBold(true);
-                $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        // Set header untuk global data
+        $sheet->setCellValue('A1', 'Planning Jalan Mesin ' . $bulan);
+        $sheet->mergeCells('A1:C1');
+        $sheet->getStyle('A1')->getFont()->setBold(true);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-                // Tambahkan header
-                $sheet->setCellValue('A3', 'Area');
-                $sheet->setCellValue('B3', 'Jumlah MC');
-                $sheet->setCellValue('C3', 'Planning MC');
-                $sheet->getStyle('A3')->applyFromArray($styleHeader);
-                $sheet->getStyle('B3')->applyFromArray($styleHeader);
-                $sheet->getStyle('C3')->applyFromArray($styleHeader);
+        // Global
+        $sheet->setCellValue('A3', 'Global');
+        $sheet->setCellValue('A4', 'Total Mesin : ' . $summary['totalMc']);
+        $sheet->setCellValue('A5', 'Total Planning : ' . $summary['totalPlanning']);
+        $sheet->setCellValue('A6', 'Persentase :' . $summary['totalPersen'] . '%');
+        $sheet->setCellValue('A7', 'Total Output : ' . $summary['OutputTotal']);
+        $sheet->getStyle('A3')->applyFromArray($styleGlobal);
+        $sheet->getStyle('A4')->applyFromArray($styleGlobalBody);
+        $sheet->getStyle('A5')->applyFromArray($styleGlobalBody);
+        $sheet->getStyle('A6')->applyFromArray($styleGlobalBody);
+        $sheet->getStyle('A7')->applyFromArray($styleGlobalBody);
 
-                // Tambahkan header untuk setiap jenis jarum
-                $col = 'D';
-                foreach ($jarum as $jrm) {
-                    $sheet->setCellValue($col . '3', $jrm['jarum']);
-                    $sheet->getStyle($col . '3')->applyFromArray($styleHeader);
-                    $col++;
-                }
+        $sheet->setCellValue('B3', 'Socks');
+        $sheet->setCellValue('B4', 'Total Mesin : ' . $summary['mcSocks']);
+        $sheet->setCellValue('B5', 'Total Planning : ' . $summary['planMcSocks']);
+        $sheet->setCellValue('B6', 'Persentase : ' . $summary['persenSocks'] . '%');
+        $sheet->getStyle('B3')->applyFromArray($styleGlobal);
+        $sheet->getStyle('B4')->applyFromArray($styleGlobalBody);
+        $sheet->getStyle('B5')->applyFromArray($styleGlobalBody);
+        $sheet->getStyle('B6')->applyFromArray($styleGlobalBody);
 
-                $sheet->setCellValue($col . '3', 'Output (dz)');
-                $sheet->getStyle($col . '3')->applyFromArray($styleHeader);
 
-                // Tambahkan data per area
-                $totalMcSocks = 0;
-                $planMcSocks = 0;
-                $totalMcGloves = 0;
-                $planMcGloves = 0;
-                $totalMcAll = 0;
-                $planMcAll = 0;
-                $totalPlanMcJrm = [];
-                $outputDzSocks = 0;
-                $outputDzGloves = 0;
-                $totalOutputDz = 0;
-                $row = 4;
-                foreach ($kebutuhanMesin[$i] as $area => $jarums) {
-                    $planMcArea = 0;
-                    $outputDz = 0;
-                    foreach ($jarum as $jrm) {
-                        $planMcJrm = $jarums[$jrm['jarum']] ?? 0; // Planning MC untuk jenis jarum tertentu
-                        $planMcArea += $planMcJrm;
-                        $dz = $planMcJrm * 14; // Menjumlahkan Planning MC per jarum untuk total area
-                        $outputDz += $dz; // Menjumlahkan Planning MC per jarum untuk total area
-                        // Menambahkan nilai ke total per jarum
-                        if (!isset($totalPlanMcJrm[$jrm['jarum']])) {
-                            $totalPlanMcJrm[$jrm['jarum']] = 0;
-                        }
-                        $totalPlanMcJrm[$jrm['jarum']] += $planMcJrm;
-                    }
-                    // Memastikan totalMc sudah diisi sebelumnya
-                    if (isset($totalArea[$area]['Total'])) {
-                        // Menambahkan total MC per area ke variabel total seluruh area
-                        if ($area != 'KK8J') {
-                            $totalMcSocks += $totalArea[$area]['Total'];  // Perbaikan ini memastikan totalMcSocks dihitung dengan benar
-                            $planMcSocks += $planMcArea;
-                            $outputDzSocks += $outputDz;
-                        } else if ($area == 'KK8J') {
-                            $totalMcGloves = $totalArea[$area]['Total'];
-                            $planMcGloves = $planMcArea;
-                            $outputDzGloves += $outputDz;
-                        }
-                    }
-                    $totalMcAll = $totalMcSocks + $totalMcGloves;
-                    $planMcAll = $planMcSocks + $planMcGloves;
-                    $totalOutputDz = $outputDzSocks + $outputDzGloves;
+        $sheet->setCellValue('C3', 'Gloves');
+        $sheet->setCellValue('C4', 'Total Mesin : ' . $summary['mcGloves']);
+        $sheet->setCellValue('C5', 'Total Planning : ' . $summary['planMcGloves']);
+        $sheet->setCellValue('C6', 'Persentase : ' . $summary['persenGloves'] . '%');
+        $sheet->getStyle('C3')->applyFromArray($styleGlobal);
+        $sheet->getStyle('C4')->applyFromArray($styleGlobalBody);
+        $sheet->getStyle('C5')->applyFromArray($styleGlobalBody);
+        $sheet->getStyle('C6')->applyFromArray($styleGlobalBody);
 
-                    $sheet->setCellValue("A$row", $area);
-                    $sheet->setCellValue("B$row", $totalArea[$area]['Total'] ?? 0);
-                    $sheet->setCellValue("C$row", array_sum($jarums));
-                    $sheet->getStyle("A$row")->applyFromArray($styleBody);
-                    $sheet->getStyle("B$row")->applyFromArray($styleBody);
-                    $sheet->getStyle("C$row")->applyFromArray($styleBody);
+        // Looping untuk menampilkan setiap area dan jarum
+        $row = 9; // Start row header area
 
-                    $col = 'D';
-                    foreach ($jarum as $jrm) {
-                        $sheet->setCellValue($col . $row, $jarums[$jrm['jarum']] ?? 0);
-                        $sheet->getStyle($col . $row)->applyFromArray($styleBody);
-                        $col++;
-                    }
+        $areaCounter = 0; // Counter untuk menghitung area
+        foreach ($monthlyData as $area => $jarum) {
 
-                    $sheet->setCellValue($col . $row, array_sum($jarums) * 14); // Output (dz)
-                    $sheet->getStyle($col . $row)->applyFromArray($styleBody);
+            // Header per area
+            $sheet->setCellValue("A$row", $area);
+            $sheet->getStyle("A$row")->applyFromArray($styleGlobal);
+            $row++;
+
+            // Total mesin, planning, dan output per area
+            $sheet->setCellValue("A$row", 'Total Mesin: ' . $jarum['totalMesin']);
+            $sheet->setCellValue("B$row", 'Planning Mesin: ' . $jarum['planningMc']);
+            $sheet->setCellValue("C$row", 'Output (dz): ' . $jarum['outputDz']);
+            $sheet->getStyle("A$row:C$row")->applyFromArray($styleGlobalBody);
+            $row++;
+
+            // Set header untuk tabel jarum di bawah setiap area
+            $sheet->setCellValue("A$row", 'Jarum');
+            $sheet->setCellValue("B$row", 'Kebutuhan Mesin');
+            $sheet->mergeCells("B$row:C$row"); // Merge kolom B dan C untuk header
+            $sheet->getStyle("A$row:C$row")->applyFromArray($styleHeader);
+            $row++;
+
+            // Looping data jarum dalam setiap area
+            foreach ($jarum as $jr) {
+                if (is_array($jr)) { // Pastikan yang di-loop hanya array jarum
+                    $sheet->setCellValue("A$row", $jr['jr']);
+                    $sheet->setCellValue("B$row", $jr['kebutuhanMesin']);
+                    $sheet->mergeCells("B$row:C$row"); // Merge kolom B dan C untuk data kebutuhan mesin
+                    $sheet->getStyle("A$row:C$row")->applyFromArray($styleBody);
                     $row++;
                 }
-
-                // Add total rows
-                $sheet->setCellValue("A$row", 'Total MC Socks');
-                $sheet->setCellValue("B$row", $totalMcSocks);
-                $sheet->setCellValue("C$row", $planMcSocks);
-                $sheet->getStyle("A$row")->applyFromArray($styleTotal);
-                $sheet->getStyle("B$row")->applyFromArray($styleTotal);
-                $sheet->getStyle("C$row")->applyFromArray($styleTotal);
-                $col = 'D';
-                foreach ($jarum as $jrm) {
-                    $sheet->setCellValue($col . $row, $totalPlanMcJrm[$jrm['jarum']] ?? 0);
-                    $sheet->getStyle($col . $row)->applyFromArray($styleTotal);
-
-                    $col++;
-                }
-                $sheet->setCellValue($col . $row, $outputDzSocks);
-                $sheet->getStyle("A$row:{$col}{$row}")->applyFromArray($styleTotal);
-                $row++;
-
-                $sheet->setCellValue("A$row", '% Sock');
-                $sheet->setCellValue("C$row", number_format(($totalMcSocks / $planMcSocks) * 100, 2) . '%');
-                $sheet->getStyle("A$row:AE$row")->applyFromArray($styleTotal);
-                $row++;
-
-                $sheet->setCellValue("A$row", 'Total MC Gloves');
-                $sheet->setCellValue("B$row", $totalMcGloves);
-                $sheet->setCellValue("C$row", $planMcGloves);
-                $sheet->getStyle("A$row:AE$row")->applyFromArray($styleTotal);
-                $col = 'D';
-                foreach ($jarum as $jrm) {
-                    $col++;
-                }
-                $sheet->setCellValue($col . $row, $outputDzGloves);
-                $sheet->getStyle("A$row:{$col}{$row}")->applyFromArray($styleTotal);
-                $row++;
-
-                $sheet->setCellValue("A$row", 'Total');
-                $sheet->setCellValue("B$row", $totalMcAll);
-                $sheet->setCellValue("C$row", $planMcAll);
-                $sheet->getStyle("A$row:AE$row")->applyFromArray($styleTotal);
-                $col = 'D';
-                foreach ($jarum as $jrm) {
-                    $col++;
-                }
-                $sheet->setCellValue($col . $row, $totalOutputDz);
-                $sheet->getStyle("A$row:{$col}{$row}")->applyFromArray($styleTotal);
-                $row++;
-
-                $sheet->setCellValue("A$row", '% Total MC');
-                $sheet->setCellValue("C$row", number_format(($totalMcAll / $planMcAll) * 100, 2) . '%');
-                $sheet->getStyle("A$row:AE$row")->applyFromArray($styleTotal);
             }
+
+            // Spacer antar area: tambahkan beberapa baris kosong
+            $row += 1; // Tambah 1 baris kosong
         }
+
 
         // Set sheet pertama sebagai active sheet
         $spreadsheet->setActiveSheetIndex(0);
 
         // Export file ke Excel
         $writer = new Xlsx($spreadsheet);
-        $filename = 'Rekomendasi Planning Jalan MC ' . $bulanIni . '.xlsx';
+        $filename = 'Planning Jalan MC ' . $bulanIni . '.xlsx';
 
         header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
@@ -400,6 +373,7 @@ class PlanningJalanMcController extends BaseController
 
         return $this->response->setJSON(['status' => 'success']);
     }
+
     public function viewPlan($judul)
     {
         $role = session()->get('role');
