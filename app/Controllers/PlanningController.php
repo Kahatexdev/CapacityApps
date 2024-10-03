@@ -498,7 +498,7 @@ class PlanningController extends BaseController
         $date = DateTime::createFromFormat('F-Y', $bulan);
         $bulanIni = $date->format('F-Y');
         $awalBulan = $date->format('Y-m-01');
-
+        $akhirBulan = date('Y-m-t', strtotime('+2 months'));
         $filteredArea = $this->jarumModel->getArea();
         $area = array_filter($filteredArea, function ($item) {
             return strpos($item, 'Gedung') === false;
@@ -513,11 +513,12 @@ class PlanningController extends BaseController
             foreach ($mesin as $jarum) {
                 $sisaOrder = $this->ApsPerstyleModel->ambilSisaOrder($ar, $awalBulan, $jarum['jarum']);
                 $monthlyData[$ar][$jarum['jarum']]['kebutuhanMesin'] = $sisaOrder['totalKebMesin'];
-                $monthlyData[$ar][$jarum['jarum']]['output'] = $sisaOrder['outputDz'];
+                $monthlyData[$ar][$jarum['jarum']]['output'] = $sisaOrder['totalKebMesin'] * $jarum['target'];
+                $monthlyData[$ar][$jarum['jarum']]['target'] = $jarum['target'];
                 $monthlyData[$ar][$jarum['jarum']]['jr'] = $jarum['jarum'];
                 $totalMesin += $jarum['total'];
                 $planningMc += $sisaOrder['totalKebMesin'];
-                $outputDz += $sisaOrder['outputDz'];
+                $outputDz +=   $monthlyData[$ar][$jarum['jarum']]['output'];
             }
             $monthlyData[$ar]['totalMesin'] = $totalMesin;
             $monthlyData[$ar]['planningMc'] = $planningMc;
@@ -539,7 +540,6 @@ class PlanningController extends BaseController
                 $totalKebGloves += $data['kebutuhanMesin'];
             }
         }
-
         $totalKebSock = $totalMcPlanning - $totalKebGloves;
         $totalMcSocks = $this->jarumModel->totalMcSock();
         $totalMcSocks = intval($totalMcSocks['total']);
@@ -562,6 +562,65 @@ class PlanningController extends BaseController
             'planMcGloves' => $totalKebGloves,
             'persenGloves' => $persenGloves
         ];
+        $statusOrder = [];
+        $statusOrderSocks = $this->ApsPerstyleModel->statusOrderSock($awalBulan, $akhirBulan);
+        $statusOrderGloves = $this->ApsPerstyleModel->statusOrderGloves($awalBulan, $akhirBulan);
+        foreach ($statusOrderSocks as $order) {
+            $month = $order['month']; // Nama bulan
+            // Cek jika bulan sudah ada di $statusOrder
+            if (!isset($statusOrder[$month])) {
+                $statusOrder[$month] = [
+                    'qty' => 0,
+                    'sisa' => 0,
+                    'socks' => [
+                        'qty' => 0,
+                        'sisa' => 0,
+                    ],
+                    'gloves' => [
+                        'qty' => 0,
+                        'sisa' => 0,
+                    ],
+                ];
+            }
+            // Update qty dan sisa untuk socks
+            $statusOrder[$month]['socks']['qty'] += $order['qty'];
+            $statusOrder[$month]['socks']['sisa'] += $order['sisa'];
+        }
+
+        // Gabungkan data gloves
+        foreach ($statusOrderGloves as $order) {
+            $month = $order['month'];
+            // Cek jika bulan sudah ada di $statusOrder
+            if (!isset($statusOrder[$month])) {
+                $statusOrder[$month] = [
+                    'qty' => 0,
+                    'sisa' => 0,
+                    'socks' => [
+                        'qty' => 0,
+                        'sisa' => 0,
+                    ],
+                    'gloves' => [
+                        'qty' => 0,
+                        'sisa' => 0,
+                    ],
+                ];
+            }
+            // Update qty dan sisa untuk gloves
+            $statusOrder[$month]['gloves']['qty'] += $order['qty'];
+            $statusOrder[$month]['gloves']['sisa'] += $order['sisa'];
+        }
+
+        // Menghitung total per bulan
+        foreach ($statusOrder as $month => $data) {
+            $statusOrder[$month]['qty'] = $data['socks']['qty'] + $data['gloves']['qty'];
+            $statusOrder[$month]['sisa'] = $data['socks']['sisa'] + $data['gloves']['sisa'];
+            // $statusOrder['totalOrderSocks'] += $data['socks']['qty'];
+            // $statusOrder['totalOrderGloves'] += $data['gloves']['qty'];
+            // $statusOrder['totalOrder'] += $statusOrder[$month]['qty'];
+            // $statusOrder['totalSisa'] += $statusOrder[$month]['sisa'];
+        }
+
+        dd($statusOrder);
         $data = [
             'role' => $role,
             'title' =>  $bulanIni,
@@ -574,7 +633,8 @@ class PlanningController extends BaseController
             'active7' => '',
             'bulan' => $bulanIni,
             'data' => $monthlyData,
-            'summary' => $summary
+            'summary' => $summary,
+            'statusOrder' => $statusOrder
         ];
 
         return view($role . '/Planning/monthlyMachine', $data);

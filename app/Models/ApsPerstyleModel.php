@@ -4,6 +4,7 @@ namespace App\Models;
 
 use DateTime;
 use CodeIgniter\Model;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Sum;
 use PHPUnit\TextUI\XmlConfiguration\Group;
 
 class ApsPerstyleModel extends Model
@@ -523,5 +524,27 @@ class ApsPerstyleModel extends Model
             ->findAll();
         $order = reset($po);
         return $order;
+    }
+    public function statusOrderSock($startDate, $endDate)
+    {
+        return $this->select('MONTHNAME(delivery) as month, sum(qty/24) as qty, sum(sisa/24) as sisa')
+            ->where('sisa >', 0)
+            ->where('factory !=', 'KK8J')
+            ->where('delivery >=', $startDate)
+            ->where('delivery <=', $endDate)
+            ->groupBy('MONTH(delivery)')
+            ->orderBy('delivery', 'ASC')
+            ->findAll();
+    }
+    public function statusOrderGloves($startDate, $endDate)
+    {
+        return $this->select('MONTHNAME(delivery) as month, sum(qty/24) as qty, sum(sisa/24) as sisa')
+            ->where('sisa >', 0)
+            ->where('factory =', 'KK8J')
+            ->where('delivery >=', $startDate)
+            ->where('delivery <=', $endDate)
+            ->groupBy('MONTH(delivery)')
+            ->orderBy('delivery', 'ASC')
+            ->findAll();
     }
 }

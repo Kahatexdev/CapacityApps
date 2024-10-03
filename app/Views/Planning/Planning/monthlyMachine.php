@@ -62,52 +62,85 @@
                         <div class="col-lg-4">
                             <h6>Global</h6>
                             <input type="text" id="judulPlan" value="<?= $title ?>" hidden>
-                            <li>Total Mesin : <?= $summary['totalMc'] ?> Mesin
-                                <input type="number" id="globalmc" value="<?= $summary['totalMc'] ?>" hidden>
+                            <div class=" form-group">
+                                <label for="">
+                                    Total Mesin :
+                                </label>
+                                <input type="text" id="globalmc" value="<?= $summary['totalMc'] ?> Mesin " class="form-control" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="">
+                                    Total Planning :
+                                </label>
+                                <input type="text" id="globalplanning" value="<?= $summary['totalPlanning'] ?> Mesin" class="form-control" readonly>
 
-                            </li>
-                            <li>Total Planning : <?= $summary['totalPlanning'] ?> Mesin
-                                <input type="number" id="globalplanning" value="<?= $summary['totalPlanning'] ?>" hidden>
+                            </div>
+                            <div class="form-group">
+                                <label for="">
+                                    Persentase :
+                                </label>
+                                <input type="text" id="globalpersen" value="<?= round(($summary['totalPlanning'] / $summary['totalMc']) * 100) ?> %" class="form-control" readonly>
 
-                            </li>
-                            <li>Persentase : <?= $summary['totalPersen'] ?>%
-                                <input type="number" id="globalpersen" value="<?= $summary['totalPersen'] ?>" hidden>
+                            </div>
+                            <div class="form-group">
+                                <label for="">
 
-                            </li>
-                            <li>Total Output : <?= $summary['OutputTotal'] ?> dz
-                                <input type="number" id="globaloutput" value="<?= $summary['OutputTotal'] ?>" hidden>
+                                    Total Output :
+                                </label>
+                                <input type="text" id="globaloutput" value="<?= $summary['OutputTotal'] ?> dz" class="form-control" readonly>
 
-                            </li>
+                            </div>
 
                         </div>
                         <div class="col-lg-4">
                             <h6> Socks </h6>
-                            <li>Total Mesin : <?= $summary['mcSocks'] ?> Mesin
-                                <input type="number" id="ttlmcsocks" value="<?= $summary['mcSocks'] ?>" hidden>
+                            <div class="form-group">
+                                <label for="">
 
-                            </li>
-                            <li>Total Planning : <?= $summary['planMcSocks'] ?> Mesin
-                                <input type="number" id="ttlplanningsocks" value="<?= $summary['planMcSocks'] ?>" hidden>
+                                    Total Mesin :
+                                </label>
+                                <input type="text" id="ttlmcsocks" value="<?= $summary['mcSocks'] ?> Mesin" class="form-control" readonly>
 
-                            </li>
-                            <li>Persentase : <?= $summary['persenSocks'] ?>%
-                                <input type="number" id="ttlpersensocks" value="<?= $summary['persenSocks'] ?>" hidden>
+                            </div>
+                            <div class="form-group">
+                                <label for="">
 
-                            </li>
+                                    Total Planning :
+                                </label>
+                                <input type="text" id="ttlplanningsocks" value="<?= $summary['planMcSocks'] ?> Mesin" class="form-control" readonly>
+
+                            </div>
+                            <div class="form-group">
+                                <label for="">
+
+                                    Persentase :
+                                </label>
+                                <input type="text" id="ttlpersensocks" value="<?= $summary['persenSocks'] ?> %" class="form-control" readonly>
+
+                            </div>
                         </div>
                         <div class="col-lg-4">
                             <h6> Gloves </h6>
-                            <li>Total Mesin : <?= $summary['mcGloves'] ?> Mesin
-                                <input type="number" id="ttlmcgloves" value="<?= $summary['mcGloves'] ?>" hidden>
-                            </li>
-                            <li>Total Planning : <?= $summary['planMcGloves'] ?> Mesin
-                                <input type="number" id="ttlplanninggloves" value="<?= $summary['planMcGloves'] ?>" hidden>
+                            <div class="form-group">
+                                <label for="">
+                                    Total Mesin :
+                                </label>
+                                <input type="text" id="ttlmcgloves" value="<?= $summary['mcGloves'] ?> Mesin" class="form-control" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="">
+                                    Total Planning :
+                                </label>
+                                <input type="text" id="ttlplanninggloves" value="<?= $summary['planMcGloves'] ?> Mesin" class="form-control" readonly>
 
-                            </li>
-                            <li>Persentase : <?= $summary['persenGloves'] ?>%
-                                <input type="number" id="ttlpersengloves" value="<?= $summary['persenGloves'] ?>" hidden>
+                            </div>
+                            <div class="form-group">
+                                <label for="">
+                                    Persentase :
+                                </label>
+                                <input type="text" id="ttlpersengloves" value="<?= $summary['persenGloves'] ?> %" class="form-control" readonly>
 
-                            </li>
+                            </div>
                         </div>
                     </div>
                     <div class="row text-end">
@@ -125,7 +158,7 @@
             <div class="col-xl-6 col-sm-12 mb-xl-0 mb-4 mt-2">
                 <div class="card equal-height">
                     <div class="card-header" id="area_mc">
-                        <div class="row">
+                        <div class="row form-group">
                             <h6> <?= $area ?></h6>
                             <input type="text" id="area<?= $no ?>" value="<?= $area ?>" hidden>
                         </div>
@@ -133,13 +166,12 @@
                             <div class="col-lg-4"> Total Mesin: <?= $jarum['totalMesin']; ?>
                                 <input type="text" id="ttlmc<?= $no ?>" value="<?= $jarum['totalMesin']; ?>" hidden>
                             </div>
-                            <div class="col-lg-4"> Planning Mesin : <?= $jarum['planningMc']; ?>
-                                <input type="text" id="planmc<?= $no ?>" value="<?= $jarum['planningMc']; ?>" hidden>
+                            <div class="col-lg-4  d-flex align-items-center"> Planning Mesin :
+                                <input type="number" class="form-control" id="planmc<?= $no ?>" value="<?= $jarum['planningMc']; ?>" readonly style="width: 70%">
 
                             </div>
-                            <div class="col-lg-4"> Output (dz) : <?= $jarum['outputDz']; ?> dz
-                                <input type="text" id="outputdz<?= $no ?>" value=" <?= $jarum['outputDz']; ?> " hidden>
-
+                            <div class="col-lg-4  d-flex align-items-center"> Output (dz) :
+                                <input type="text" class="form-control" id="outputdz<?= $no ?>" value=" <?= $jarum['outputDz']; ?>" readonly style="width: 70%">
                             </div>
                         </div>
                     </div>
@@ -160,10 +192,13 @@
                                                 <input type="text" id="jarum<?= $row ?>" value="<?= $jr['jr'] ?>" hidden>
 
                                             </td>
-                                            <td><?= $jr['kebutuhanMesin'] ?>
-                                                <input type="text" id="kebmesin<?= $row ?>" value="<?= $jr['kebutuhanMesin'] ?>" hidden>
-
-                                                <input type="text" id="areaDetail" value="<?= $area ?>" hidden>
+                                            <td>
+                                                <div class="form-group">
+                                                    <input type="number" class="form-control" id="kebmesin<?= $row ?>" value="<?= $jr['kebutuhanMesin'] ?>" style="width:40%">
+                                                    <input type="text" id="areaDetail" value="<?= $area ?>" hidden>
+                                                    <input type="text" id="target<?= $row ?>" value="<?= $jr['target'] ?>" hidden>
+                                                    <input type="text" id="output<?= $row ?>" value="<?= $jr['output'] ?>" hidden>
+                                                </div>
                                             </td>
                                         </tr>
                                     <?php
@@ -179,10 +214,107 @@
             $no++;
         endforeach; ?>
     </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6>Status Order</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table">
+                        <table class="table">
+                            <thead>
+
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script>
+    $(document).ready(function() {
+        function updateGlobalValues() {
+            let globalPlanning = 0;
+            let globalOutput = 0;
+            let ttlPlanningGloves = 0;
+
+            const globalMc = parseInt($("#globalmc").val()) || 0;
+            const ttlMcGloves = parseInt($("#ttlmcgloves").val()) || 0;
+            const ttlMcSocks = parseInt($("#ttlmcsocks").val()) || 0;
+
+            // Loop untuk semua planmc dan outputdz
+            $("[id^='planmc']").each(function() {
+                globalPlanning += parseInt($(this).val()) || 0;
+            });
+
+            $("[id^='outputdz']").each(function() {
+                globalOutput += parseInt($(this).val()) || 0;
+            });
+
+            // Ambil nilai planmc terakhir untuk Gloves
+            ttlPlanningGloves = parseInt($("#planmc" + ($("[id^='planmc']").length)).val()) || 0;
+
+            // Update global planning
+            $("#globalplanning").val(globalPlanning + " Mesin");
+
+            // Update global output
+            $("#globaloutput").val(globalOutput + " dz");
+
+            // Update global percentage
+            let globalPercentage = (globalPlanning / globalMc) * 100;
+            $("#globalpersen").val(globalPercentage.toFixed(2) + " %");
+
+            // Update Gloves Planning
+            $("#ttlplanninggloves").val(ttlPlanningGloves + " Mesin");
+
+            // Update Gloves Percentage
+            let glovesPercentage = (ttlPlanningGloves / ttlMcGloves) * 100;
+            $("#ttlpersengloves").val(glovesPercentage.toFixed(2) + " %");
+
+            // Update Socks Planning
+            let ttlPlanningSocks = globalPlanning - ttlPlanningGloves;
+            $("#ttlplanningsocks").val(ttlPlanningSocks + " Mesin");
+
+            // Update Socks Percentage
+            let socksPercentage = (ttlPlanningSocks / ttlMcSocks) * 100;
+            $("#ttlpersensocks").val(socksPercentage.toFixed(2) + " %");
+        }
+
+        // Event listener untuk 'kebmesin'
+        $("[id^='kebmesin']").on('input', function() {
+            var totalMesin = 0;
+            var totalOutput = 0;
+            var no = $(this).closest(".card").find("input[id^='ttlmc']").attr("id").replace("ttlmc", ""); // Get the current card number
+
+            // Loop setiap row dalam card untuk hitung total mesin dan output
+            $(this).closest("tbody").find("[id^='kebmesin']").each(function() {
+                var row = $(this).attr("id").replace("kebmesin", ""); // Ambil row number
+                var kebutuhanMesin = parseInt($(this).val()) || 0;
+                var target = parseInt($("#target" + row).val()) || 0;
+
+                // Hitung output untuk row ini
+                var output = kebutuhanMesin * target;
+                $("#output" + row).val(output); // Update output hidden field
+                totalOutput += output; // Akumulasi output untuk outputdz
+
+                totalMesin += kebutuhanMesin; // Total kebutuhan mesin
+            });
+
+            // Update nilai 'planmc' berdasarkan total kebutuhan mesin
+            $("#planmc" + no).val(totalMesin);
+
+            // Update nilai 'outputdz' berdasarkan total output akumulasi
+            $("#outputdz" + no).val(totalOutput);
+
+            // Setelah setiap update kebmesin, kita update global values
+            updateGlobalValues();
+        });
+    });
+
     document.addEventListener("DOMContentLoaded", function() {
         let cards = document.querySelectorAll('.equal-height');
         let maxHeight = 0;
@@ -200,6 +332,8 @@
             card.style.height = maxHeight + 'px';
         });
     });
+
+
 
     function saveAll() {
         // GLOBAL

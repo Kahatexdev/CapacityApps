@@ -821,7 +821,6 @@ class OrderController extends BaseController
             $sisa = round($rec['sisa'] / 24);
             $area = $rec['factory'];
             $mesinPerarea = $this->jarumModel->mesinPerArea($jarum, $area);
-
             if (!empty($mesinPerarea)) {
                 $target = $mesinPerarea[0]['target'];
                 $totalMesin = $mesinPerarea[0]['totalMesin'];
