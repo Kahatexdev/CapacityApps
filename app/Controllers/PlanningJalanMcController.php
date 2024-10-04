@@ -15,6 +15,7 @@ use App\Models\LiburModel;
 use App\Models\MonthlyMcModel;
 use App\Models\AreaMachineModel;
 use App\Models\DetailAreaMachineModel;
+use App\Services\orderServices;
 use LengthException;
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Week;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -36,9 +37,11 @@ class PlanningJalanMcController extends BaseController
     protected $globalModel;
     protected $areaMcModel;
     protected $detailAreaMc;
+    protected $orderService;
 
     public function __construct()
     {
+        $this->orderService = new orderServices();
         $this->detailAreaMc = new DetailAreaMachineModel();
         $this->areaMcModel = new AreaMachineModel();
         $this->globalModel = new MonthlyMcModel();
@@ -72,7 +75,7 @@ class PlanningJalanMcController extends BaseController
         $date = DateTime::createFromFormat('F-Y', $bulan);
         $bulanIni = $date->format('F-Y');
         $awalBulan = $date->format('Y-m-01');
-
+        $statusOrder = $this->orderService->statusOrder($bulan);
         $filteredArea = $this->jarumModel->getArea();
         $area = array_filter($filteredArea, function ($item) {
             return strpos($item, 'Gedung') === false;
@@ -204,8 +207,14 @@ class PlanningJalanMcController extends BaseController
 
         // Set lebar kolom secara manual
         $sheet->getColumnDimension('A')->setWidth(25); // Lebar kolom A diatur menjadi 20
-        $sheet->getColumnDimension('B')->setWidth(25); // Lebar kolom B diatur menjadi 25
-        $sheet->getColumnDimension('C')->setWidth(25); // Lebar kolom C diatur menjadi 30
+        $sheet->getColumnDimension('B')->setWidth(20); // Lebar kolom B diatur menjadi 25
+        $sheet->getColumnDimension('C')->setWidth(20); // Lebar kolom C diatur menjadi 30
+        $sheet->getColumnDimension('D')->setWidth(20); // Lebar kolom C diatur menjadi 30
+        $sheet->getColumnDimension('E')->setWidth(20); // Lebar kolom C diatur menjadi 30
+        $sheet->getColumnDimension('F')->setWidth(20); // Lebar kolom C diatur menjadi 30
+        $sheet->getColumnDimension('G')->setWidth(20); // Lebar kolom C diatur menjadi 30
+        $sheet->getColumnDimension('H')->setWidth(20); // Lebar kolom C diatur menjadi 30
+        $sheet->getColumnDimension('I')->setWidth(20); // Lebar kolom C diatur menjadi 30
 
         // Set header untuk global data
         $sheet->setCellValue('A1', 'Planning Jalan Mesin ' . $bulan);
@@ -283,6 +292,134 @@ class PlanningJalanMcController extends BaseController
             // Spacer antar area: tambahkan beberapa baris kosong
             $row += 1; // Tambah 1 baris kosong
         }
+
+        // Set starting row after the first loop
+        $endrow = $row;
+        // Inisialisasi baris awal dan kolom awal
+        $row2 = $endrow + 1; // Mulai di baris 2 setelah $endrow
+        $startColumn = 'B'; // Mulai di kolom B untuk bulan pertama
+
+        // Function untuk mendapatkan kolom selanjutnya berdasarkan huruf
+        function getNextColumn($column, $step = 1)
+        {
+            $nextColumn = '';
+            $columnLength = strlen($column);
+
+            for ($i = $columnLength - 1; $i >= 0; $i--) {
+                $currentChar = ord($column[$i]);
+                $newChar = chr($currentChar + $step);
+
+                if ($newChar > 'Z') {
+                    $newChar = 'A';
+                    $step = 1;
+                } else {
+                    $step = 0;
+                }
+
+                $nextColumn = $newChar . $nextColumn;
+            }
+
+            if ($step > 0) {
+                $nextColumn = 'A' . $nextColumn;
+            }
+
+            return $nextColumn;
+        }
+
+        // Set header untuk Status Order dengan rowspan 2 baris
+        $sheet->setCellValue("A$row2", 'STATUS ORDER');
+        $sheet->mergeCells("A$row2:A" . ($row2 + 1)); // Merge 2 baris dari $row2 ke $row2+1
+        $sheet->getStyle("A$row2:A" . ($row2 + 1))->applyFromArray($styleHeader); // Apply style
+
+        // Set header untuk KAOS KAKI dan SARUNG TANGAN di baris yang sesuai
+        $sheet->setCellValue("A" . ($row2 + 2), 'KAOS KAKI');
+        $sheet->setCellValue("A" . ($row2 + 3), 'SARUNG TANGAN');
+        $sheet->getStyle("A" . ($row2 + 2))->applyFromArray($styleBody); // Apply style
+        $sheet->getStyle("A" . ($row2 + 3))->applyFromArray($styleBody); // Apply style
+
+
+        // Looping untuk setiap bulan
+        $currentColumn = $startColumn;
+        foreach ($statusOrder as $month => $data) {
+            if (is_array($data)) {
+                // Set header bulan
+                $sheet->setCellValue($currentColumn . $row2, $month);
+                $sheet->mergeCells($currentColumn . $row2 . ':' . getNextColumn($currentColumn) . $row2); // Merge 2 kolom untuk header bulan
+                $sheet->getStyle($currentColumn . $row2 . ':' . getNextColumn($currentColumn) . $row2)->applyFromArray($styleHeader); // Apply style
+
+
+                // Set header untuk Qty dan Sisa Order
+                $sheet->setCellValue($currentColumn . ($row2 + 1), 'QTY ORDER');
+                $sheet->setCellValue(getNextColumn($currentColumn) . ($row2 + 1), 'SISA ORDER');
+                $sheet->getStyle($currentColumn . ($row2 + 1))->applyFromArray($styleHeader); // Apply style
+                $sheet->getStyle(getNextColumn($currentColumn) . ($row2 + 1))->applyFromArray($styleHeader); // Apply style
+
+
+                // Set isi data untuk KAOSKAKI
+                $sheet->setCellValue($currentColumn . ($row2 + 2), number_format($data['socks']['qty']));
+                $sheet->setCellValue(getNextColumn($currentColumn) . ($row2 + 2), number_format($data['socks']['sisa']));
+                $sheet->getStyle($currentColumn . ($row2 + 2))->applyFromArray($styleBody); // Apply style
+                $sheet->getStyle(getNextColumn($currentColumn) . ($row2 + 2))->applyFromArray($styleBody); // Apply style
+
+                // Set isi data untuk SARUNG TANGAN
+                $sheet->setCellValue($currentColumn . ($row2 + 3), number_format($data['gloves']['qty']));
+                $sheet->setCellValue(getNextColumn($currentColumn) . ($row2 + 3), number_format($data['gloves']['sisa']));
+                $sheet->getStyle($currentColumn . ($row2 + 3))->applyFromArray($styleBody); // Apply style
+                $sheet->getStyle(getNextColumn($currentColumn) . ($row2 + 3))->applyFromArray($styleBody); // Apply style
+
+                // Pindahkan kolom untuk bulan berikutnya (2 kolom)
+                $currentColumn = getNextColumn($currentColumn, 2);
+            }
+        }
+
+        // Setelah looping bulan, tambahkan kolom total
+        $sheet->setCellValue($currentColumn . $row2, 'TOTAL');
+        $sheet->mergeCells($currentColumn . $row2 . ':' . getNextColumn($currentColumn) . $row2); // Merge 2 kolom untuk header Total
+        $sheet->getStyle($currentColumn . $row2 . ':' . getNextColumn($currentColumn) . $row2)->applyFromArray($styleHeader); // Apply style
+
+        // Set header untuk Qty dan Sisa di kolom Total
+        $sheet->setCellValue($currentColumn . ($row2 + 1), 'QTY ORDER');
+        $sheet->setCellValue(getNextColumn($currentColumn) . ($row2 + 1), 'SISA ORDER');
+        $sheet->getStyle($currentColumn . ($row2 + 1))->applyFromArray($styleHeader); // Apply style
+        $sheet->getStyle(getNextColumn($currentColumn) . ($row2 + 1))->applyFromArray($styleHeader); // Apply style
+
+        // Isi data total untuk KAOSKAKI di kolom Total
+        $sheet->setCellValue($currentColumn . ($row2 + 2), number_format($statusOrder['totalOrderSocks']));
+        $sheet->setCellValue(getNextColumn($currentColumn) . ($row2 + 2), number_format($statusOrder['totalSisaSocks']));
+        $sheet->getStyle($currentColumn . ($row2 + 2))->applyFromArray($styleBody); // Apply style
+        $sheet->getStyle(getNextColumn($currentColumn) . ($row2 + 2))->applyFromArray($styleBody); // Apply style
+
+        // Isi data total untuk SARUNG TANGAN di kolom Total
+        $sheet->setCellValue($currentColumn . ($row2 + 3), number_format($statusOrder['totalOrderGloves']));
+        $sheet->setCellValue(getNextColumn($currentColumn) . ($row2 + 3), number_format($statusOrder['totalSisaGloves']));
+        $sheet->getStyle($currentColumn . ($row2 + 3))->applyFromArray($styleBody); // Apply style
+        $sheet->getStyle(getNextColumn($currentColumn) . ($row2 + 3))->applyFromArray($styleBody); // Apply style
+
+        // Isi Grand Total di baris terakhir
+        $sheet->setCellValue($currentColumn . ($row2 + 4), number_format($statusOrder['grandTotalOrder']));
+        $sheet->setCellValue(getNextColumn($currentColumn) . ($row2 + 4), number_format($statusOrder['grandTotalSisa']));
+        $sheet->getStyle($currentColumn . ($row2 + 4))->applyFromArray($styleBody); // Apply style
+        $sheet->getStyle(getNextColumn($currentColumn) . ($row2 + 4))->applyFromArray($styleBody); // Apply style
+
+        // Set total di akhir
+        $sheet->setCellValue("A" . ($row2 + 4), 'TOTAL');
+        $sheet->getStyle("A" . ($row2 + 4))->applyFromArray($styleBody); // Apply style
+        $currentColumn = $startColumn;
+        foreach ($statusOrder as $month => $data) {
+            if (is_array($data)) {
+                $sheet->setCellValue($currentColumn . ($row2 + 4), number_format($data['qty']));
+                $sheet->setCellValue(getNextColumn($currentColumn) . ($row2 + 4), number_format($data['sisa']));
+                $sheet->getStyle($currentColumn . ($row2 + 4))->applyFromArray($styleBody); // Apply style
+                $sheet->getStyle(getNextColumn($currentColumn) . ($row2 + 4))->applyFromArray($styleBody); // Apply style
+
+                // Pindahkan kolom untuk total berikutnya
+                $currentColumn = getNextColumn($currentColumn, 2);
+            }
+        }
+        $sheet->setCellValue($currentColumn . ($row2 + 4), number_format($statusOrder['grandTotalOrder']));
+        $sheet->setCellValue(getNextColumn($currentColumn) . ($row2 + 4), number_format($statusOrder['grandTotalSisa']));
+        $sheet->getStyle($currentColumn . ($row2 + 4))->applyFromArray($styleBody); // Apply style
+        $sheet->getStyle(getNextColumn($currentColumn) . ($row2 + 4))->applyFromArray($styleBody); // Apply style
 
 
         // Set sheet pertama sebagai active sheet

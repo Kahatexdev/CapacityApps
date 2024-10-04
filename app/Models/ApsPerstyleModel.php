@@ -527,7 +527,7 @@ class ApsPerstyleModel extends Model
     }
     public function statusOrderSock($startDate, $endDate)
     {
-        return $this->select('MONTHNAME(delivery) as month, sum(qty/24) as qty, sum(sisa/24) as sisa')
+        return $this->select('MONTHNAME(delivery) as month, sum(round(qty/24)) as qty, sum(round(sisa/24)) as sisa')
             ->where('sisa >', 0)
             ->where('factory !=', 'KK8J')
             ->where('delivery >=', $startDate)
@@ -538,7 +538,7 @@ class ApsPerstyleModel extends Model
     }
     public function statusOrderGloves($startDate, $endDate)
     {
-        return $this->select('MONTHNAME(delivery) as month, sum(qty/24) as qty, sum(sisa/24) as sisa')
+        return $this->select('MONTHNAME(delivery) as month, sum(round(qty/24)) as qty, sum(round(sisa/24)) as sisa')
             ->where('sisa >', 0)
             ->where('factory =', 'KK8J')
             ->where('delivery >=', $startDate)

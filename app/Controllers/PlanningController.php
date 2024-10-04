@@ -17,6 +17,7 @@ use App\Models\MesinPlanningModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
 use App\Models\MonthlyMcModel;
+use App\Services\orderServices;
 
 
 
@@ -34,6 +35,7 @@ class PlanningController extends BaseController
     protected $KebutuhanMesinModel;
     protected $MesinPlanningModel;
     protected $globalModel;
+    protected $orderServices;
 
 
     public function __construct()
@@ -48,6 +50,7 @@ class PlanningController extends BaseController
         $this->liburModel = new LiburModel();
         $this->KebutuhanMesinModel = new KebutuhanMesinModel();
         $this->MesinPlanningModel = new MesinPlanningModel();
+        $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => ['planning']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -562,65 +565,9 @@ class PlanningController extends BaseController
             'planMcGloves' => $totalKebGloves,
             'persenGloves' => $persenGloves
         ];
-        $statusOrder = [];
-        $statusOrderSocks = $this->ApsPerstyleModel->statusOrderSock($awalBulan, $akhirBulan);
-        $statusOrderGloves = $this->ApsPerstyleModel->statusOrderGloves($awalBulan, $akhirBulan);
-        foreach ($statusOrderSocks as $order) {
-            $month = $order['month']; // Nama bulan
-            // Cek jika bulan sudah ada di $statusOrder
-            if (!isset($statusOrder[$month])) {
-                $statusOrder[$month] = [
-                    'qty' => 0,
-                    'sisa' => 0,
-                    'socks' => [
-                        'qty' => 0,
-                        'sisa' => 0,
-                    ],
-                    'gloves' => [
-                        'qty' => 0,
-                        'sisa' => 0,
-                    ],
-                ];
-            }
-            // Update qty dan sisa untuk socks
-            $statusOrder[$month]['socks']['qty'] += $order['qty'];
-            $statusOrder[$month]['socks']['sisa'] += $order['sisa'];
-        }
+        $statusOrder = $this->orderServices->statusOrder($bulan);
 
-        // Gabungkan data gloves
-        foreach ($statusOrderGloves as $order) {
-            $month = $order['month'];
-            // Cek jika bulan sudah ada di $statusOrder
-            if (!isset($statusOrder[$month])) {
-                $statusOrder[$month] = [
-                    'qty' => 0,
-                    'sisa' => 0,
-                    'socks' => [
-                        'qty' => 0,
-                        'sisa' => 0,
-                    ],
-                    'gloves' => [
-                        'qty' => 0,
-                        'sisa' => 0,
-                    ],
-                ];
-            }
-            // Update qty dan sisa untuk gloves
-            $statusOrder[$month]['gloves']['qty'] += $order['qty'];
-            $statusOrder[$month]['gloves']['sisa'] += $order['sisa'];
-        }
-
-        // Menghitung total per bulan
-        foreach ($statusOrder as $month => $data) {
-            $statusOrder[$month]['qty'] = $data['socks']['qty'] + $data['gloves']['qty'];
-            $statusOrder[$month]['sisa'] = $data['socks']['sisa'] + $data['gloves']['sisa'];
-            // $statusOrder['totalOrderSocks'] += $data['socks']['qty'];
-            // $statusOrder['totalOrderGloves'] += $data['gloves']['qty'];
-            // $statusOrder['totalOrder'] += $statusOrder[$month]['qty'];
-            // $statusOrder['totalSisa'] += $statusOrder[$month]['sisa'];
-        }
-
-        dd($statusOrder);
+        // print(json_encode($statusOrder, JSON_PRETTY_PRINT));
         $data = [
             'role' => $role,
             'title' =>  $bulanIni,
