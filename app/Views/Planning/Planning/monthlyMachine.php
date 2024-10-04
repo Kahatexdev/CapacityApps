@@ -163,7 +163,7 @@
                             <input type="text" id="area<?= $no ?>" value="<?= $area ?>" hidden>
                         </div>
                         <div class="row text-bold">
-                            <div class="col-lg-4">
+                            <div class="col-lg-12">
                                 Total Mesin: <?= $jarum['totalMesin']; ?>
                                 <input type="text" id="ttlmc<?= $no ?>" value="<?= $jarum['totalMesin']; ?>" hidden>
                             </div>
@@ -226,9 +226,9 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="table">
+                    <div class="table-responsive">
                         <table class="table">
-                            <thead class="bg-dark ">
+                            <thead class="bg-dark text-sm">
                                 <tr class="text-center">
                                     <th class="text-white" rowspan="2">STATUS ORDER</th>
                                     <?php foreach ($statusOrder as $month => $data): ?>
@@ -241,15 +241,15 @@
                                 <tr>
                                     <?php foreach ($statusOrder as $month => $data): ?>
                                         <?php if (is_array($data)): ?>
-                                            <th class="text-white">QTY ORDER</th>
-                                            <th class="text-white">SISA ORDER</th>
+                                            <th class="text-white text-sm">QTY ORDER</th>
+                                            <th class="text-white text-sm">SISA ORDER</th>
                                         <?php endif; ?>
                                     <?php endforeach; ?>
-                                    <th class="text-white">QTY ORDER</th>
-                                    <th class="text-white">SISA ORDER</th>
+                                    <th class="text-white text-sm">QTY ORDER</th>
+                                    <th class="text-white text-sm">SISA ORDER</th>
                                 </tr>
                             </thead>
-                            <tbody class="text-center">
+                            <tbody class="text-center text-sm">
                                 <tr>
                                     <td>KAOSKAKI</td>
                                     <?php foreach ($statusOrder as $month => $data): ?>
