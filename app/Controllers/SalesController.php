@@ -982,18 +982,71 @@ class SalesController extends BaseController
 
             // Ambil total kapasitas dan jenis jarum per alias
             $jarum = $alias['jarum']; // get jenis jarum per aliasjarum
-            $weekCount = 1; // Inisialisasi minggu
             $monthlyData = [];
-            // $exess =  $exessPercentage = $totalMonthlyCapacity = $totalMonthlyAvailable = $totalMonthlyMachine = 0;
+
+            // Penentuan week
+            $currentYear = (new \DateTime())->format('Y'); // Ambil tahun dari tanggal hari ini
+            $startWeek = new \DateTime("$currentYear-01-01"); // Buat tanggal untuk hari pertama bulan Januari tahun ini
+            $startWeek->modify('first Monday of January'); // ubah ke tgl awal di hari senin
+            $endWeek = new \DateTime('+1 years'); // tanggal satu tahun kedepan dari hari ini
+            $weekCount = 1; // Inisialisasi minggu
+            $weeklyData = []; // Inisialisasi array untuk menyimpan data mingguan
+            $currentYearWeeklyData = []; // Menyimpan data untuk tahun tertentu
+
+            while ($startWeek <= $endWeek) {
+                // Tanggal akhir tahun
+                $endOfYear = new \DateTime("$currentYear-12-31");
+                // Hitung akhir minggu di tahun ini
+                $endOfYears = (clone $endOfYear)->modify('next Sunday');
+                // Hitung akhir minggu (Minggu)
+                $endOfWeeks = (clone $startWeek)->modify('Sunday this week');
+
+                // Simpan data minggu
+                $currentYearWeeklyData[$weekCount] = [
+                    'weekCount' => $weekCount,
+                    'start_date' => $startWeek->format('Y-m-d'),
+                    'end_date' => $endOfWeeks->format('Y-m-d'),
+                ];
+
+                // Update tanggal untuk minggu berikutnya
+                $startWeek->modify('+1 week'); // Tambah satu minggu
+
+                // Cek apakah sudah melewati akhir tahun
+                if ($startWeek > $endOfYears) {
+                    $weeklyData = array_merge($weeklyData, $currentYearWeeklyData); // Simpan data tahun ini ke weeklyData
+
+                    // Reset untuk tahun baru
+                    $currentYear++; // Dapatkan tahun baru
+                    $currentYearWeeklyData = []; // Reset data untuk tahun baru
+                    $weekCount = 1; // Reset weekCount untuk tahun baru
+                } else {
+                    $weekCount++;
+                }
+            }
+
+            // Tambahkan data terakhir jika ada
+            if (!empty($currentYearWeeklyData)) {
+                $weeklyData = array_merge($weeklyData, $currentYearWeeklyData);
+            }
+
             while ($startDate <= $endDate) {
                 $endOfWeek = (clone $startDate)->modify('Sunday this week');
-
                 // Tentukan akhir bulan dari tanggal awal saat ini
                 $endOfMonth = new \DateTime($startDate->format('Y-m-t')); // Akhir bulan saat ini
 
                 // Jika akhir minggu melebihi akhir bulan, batasi hingga akhir bulan
                 if ($endOfWeek > $endOfMonth) {
                     $endOfWeek = clone $endOfMonth; // Akhiri minggu di akhir bulan
+                }
+
+                // Inisialisasi variabel untuk menyimpan minggu saat ini
+                $currentWeekCount = null;
+                foreach ($weeklyData as $weekly) {
+                    // Periksa apakah startDate berada dalam rentang minggu
+                    if ($startDate->format('Y-m-d') >= $weekly['start_date'] && $endOfWeek->format('Y-m-d') <= $weekly['end_date']) {
+                        $currentWeekCount = $weekly['weekCount'];
+                        break; // Jika sudah ditemukan, keluar dari loop
+                    }
                 }
 
                 $numberOfDays = $startDate->diff($endOfWeek)->days + 1; //hitung jumlah hari week ini
@@ -1080,7 +1133,7 @@ class SalesController extends BaseController
                 $exessPercentage = ($countExessPercentage > 0) ? ceil($countExessPercentage) : floor($countExessPercentage);
 
                 $monthlyData[$currentMonthOfYear]['weeks'][] = [
-                    'countWeek' => $weekCount,
+                    'countWeek' => $currentWeekCount,
                     'start_date' => $startDate->format('d-m'),
                     'end_date' => $endOfWeek->format('d-m'),
                     'number_of_days' => $numberOfDays,
@@ -1121,7 +1174,6 @@ class SalesController extends BaseController
                     // Lanjutkan dari hari berikutnya setelah akhir minggu
                     $startDate = (clone $endOfWeek)->modify('+1 day');
                 }
-                $weekCount++;
             }
             // Setelah semua data mingguan diproses, tampilkan hasil per aliasjarum
             $allData[$aliasjarum] = [
@@ -1229,8 +1281,8 @@ class SalesController extends BaseController
             ->applyFromArray($styleHeader);
 
         $sheet->setCellValue('B' . $rowHeader, 'No Of Mc')
-            ->mergeCells('B' . $rowHeader . ':N' . $rowHeader2)
-            ->getStyle('B' . $rowHeader . ':N' . $rowHeader2)
+            ->mergeCells('B' . $rowHeader . ':Q' . $rowHeader2)
+            ->getStyle('B' . $rowHeader . ':Q' . $rowHeader2)
             ->applyFromArray($styleHeader);
         // jumlah mesin
         $sheet->setCellValue('B' . $rowHeader3, 'Machine')
@@ -1275,59 +1327,73 @@ class SalesController extends BaseController
             ->getStyle('I' . $endMergHeader)
             ->applyFromArray($styleHeader2);
 
-        $sheet->setCellValue('J' . $endMergHeader, 'Lonati')
-            ->getStyle('J' . $endMergHeader)
-            ->applyFromArray($styleHeader2);
-
-        $sheet->setCellValue('K' . $endMergHeader, 'Total')
+        $sheet->setCellValue('K' . $endMergHeader, 'Spl')
             ->getStyle('K' . $endMergHeader)
             ->applyFromArray($styleHeader2);
-        // stock cylinder
-        $sheet->setCellValue('L' . $rowHeader3, 'Stock Cylinder')
-            ->mergeCells('L' . $rowHeader3 . ':N' . $rowHeader3)
-            ->getStyle('L' . $rowHeader3 . ':N' . $rowHeader3)
-            ->applyFromArray($styleHeader2);
 
-        $sheet->setCellValue('L' . $endMergHeader, 'Dakong')
+        $sheet->setCellValue('L' . $endMergHeader, 'Total')
             ->getStyle('L' . $endMergHeader)
             ->applyFromArray($styleHeader2);
 
-        $sheet->setCellValue('M' . $endMergHeader, 'Rosso')
-            ->getStyle('M' . $endMergHeader)
-            ->applyFromArray($styleHeader2);
-
-        $sheet->setCellValue('N' . $endMergHeader, 'Ths')
-            ->getStyle('N' . $endMergHeader)
-            ->applyFromArray($styleHeader2);
-        // actual running mc
-        $sheet->setCellValue('O' . $rowHeader, 'Running Mc Actual')
-            ->mergeCells('O' . $rowHeader . ':Q' . $rowHeader3)
-            ->getStyle('O' . $rowHeader . ':Q' . $rowHeader3)
-            ->applyFromArray($styleHeader)
+        // mesin running
+        $sheet->setCellValue('M' . $rowHeader3, 'Mc Break Down')
+            ->mergeCells('M' . $rowHeader3 . ':M' . $endMergHeader)
+            ->getStyle('M' . $rowHeader3 . ':M' . $endMergHeader)
+            ->applyFromArray($styleHeader2)
             ->getAlignment()->setWrapText(true); // Menambahkan pengaturan wrap text
 
-        $sheet->setCellValue('O' . $endMergHeader, 'CJ')
+        // mesin running
+        $sheet->setCellValue('N' . $rowHeader3, 'Mc in Wh')
+            ->mergeCells('N' . $rowHeader3 . ':N' . $endMergHeader)
+            ->getStyle('N' . $rowHeader3 . ':N' . $endMergHeader)
+            ->applyFromArray($styleHeader2)
+            ->getAlignment()->setWrapText(true); // Menambahkan pengaturan wrap text
+        // stock cylinder
+        $sheet->setCellValue('O' . $rowHeader3, 'Stock Cylinder')
+            ->mergeCells('O' . $rowHeader3 . ':Q' . $rowHeader3)
+            ->getStyle('O' . $rowHeader3 . ':Q' . $rowHeader3)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('O' . $endMergHeader, 'Dakong')
             ->getStyle('O' . $endMergHeader)
             ->applyFromArray($styleHeader2);
 
-        $sheet->setCellValue('P' . $endMergHeader, 'MJ')
+        $sheet->setCellValue('P' . $endMergHeader, 'Rosso')
             ->getStyle('P' . $endMergHeader)
             ->applyFromArray($styleHeader2);
 
-        $sheet->setCellValue('Q' . $endMergHeader, 'Total')
+        $sheet->setCellValue('Q' . $endMergHeader, 'Ths')
             ->getStyle('Q' . $endMergHeader)
             ->applyFromArray($styleHeader2);
+        // actual running mc
+        $sheet->setCellValue('R' . $rowHeader, 'Running Mc Actual')
+            ->mergeCells('R' . $rowHeader . ':T' . $rowHeader3)
+            ->getStyle('R' . $rowHeader . ':T' . $rowHeader3)
+            ->applyFromArray($styleHeader)
+            ->getAlignment()->setWrapText(true); // Menambahkan pengaturan wrap text
 
-        $sheet->setCellValue('R' . $rowHeader, 'Prod 28days')
-            ->mergeCells('R' . $rowHeader . ':R' . $endMergHeader)
-            ->getStyle('R' . $rowHeader . ':R' . $endMergHeader)
+        $sheet->setCellValue('R' . $endMergHeader, 'CJ')
+            ->getStyle('R' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('S' . $endMergHeader, 'MJ')
+            ->getStyle('S' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('T' . $endMergHeader, 'Total')
+            ->getStyle('T' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('U' . $rowHeader, 'Prod 28days')
+            ->mergeCells('U' . $rowHeader . ':U' . $endMergHeader)
+            ->getStyle('U' . $rowHeader . ':U' . $endMergHeader)
             ->applyFromArray($styleHeader)
             ->getAlignment()->setWrapText(true); // Menambahkan pengaturan wrap text
 
 
-        $column = 'S'; // Kolom awal untuk bulan
+        $column = 'V'; // Kolom awal untuk bulan
         $col_index = Coordinate::columnIndexFromString($column); // Konversi huruf kolom ke nomor indeks kolom
-        $column2 = 'S';
+        $column2 = 'V';
         $col_index2 = Coordinate::columnIndexFromString($column2);
         foreach ($monthlyData as $month => $data) :
             // month
@@ -1456,23 +1522,24 @@ class SalesController extends BaseController
             $sheet->setCellValue('I' . $rowBody, isset($data['brandData']['Mechanic']['totalRunning']) ? $data['brandData']['Mechanic']['totalRunning'] : 0)
                 ->getStyle('I' . $rowBody)
                 ->applyFromArray($styleBody);
-            $sheet->setCellValue('J' . $rowBody, isset($data['brandData']['Lonati']['totalRunning']) ? $data['brandData']['Lonati']['totalRunning'] : 0)
+            $sheet->setCellValue('J' . $rowBody, isset($brandData['Lonati']['totalRunning']) ? $brandData['Lonati']['totalRunning'] : 0)
                 ->getStyle('J' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('L' . $rowBody, 0)
+                ->getStyle('L' . $rowBody)
                 ->applyFromArray($styleBody);
             $sheet->setCellValue('K' . $rowBody, isset($data['totals']['totalRunning']) ? $data['totals']['totalRunning'] : 0)
                 ->getStyle('K' . $rowBody)
                 ->applyFromArray($styleBody);
-            // stock cylinder
-            $sheet->setCellValue('L' . $rowBody, 0)
-                ->getStyle('L' . $rowBody)
-                ->applyFromArray($styleBody);
+            // mc break down
             $sheet->setCellValue('M' . $rowBody, 0)
                 ->getStyle('M' . $rowBody)
                 ->applyFromArray($styleBody);
+            // mc in wh
             $sheet->setCellValue('N' . $rowBody, 0)
                 ->getStyle('N' . $rowBody)
                 ->applyFromArray($styleBody);
-            // running mc actual
+            // stock cylinder
             $sheet->setCellValue('O' . $rowBody, 0)
                 ->getStyle('O' . $rowBody)
                 ->applyFromArray($styleBody);
@@ -1482,13 +1549,21 @@ class SalesController extends BaseController
             $sheet->setCellValue('Q' . $rowBody, 0)
                 ->getStyle('Q' . $rowBody)
                 ->applyFromArray($styleBody);
-
-            $sheet->setCellValue('R' . $rowBody, isset($data['totals']['totalProd']) ? $data['totals']['totalProd'] : 0)
+            // running mc actual
+            $sheet->setCellValue('R' . $rowBody, 0)
                 ->getStyle('R' . $rowBody)
                 ->applyFromArray($styleBody);
+            $sheet->setCellValue('S' . $rowBody, 0)
+                ->getStyle('S' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('T' . $rowBody, 0)
+                ->getStyle('T' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('U' . $rowBody, isset($data['totals']['totalProd']) ? $data['totals']['totalProd'] : 0)
+                ->getStyle('U' . $rowBody)
+                ->applyFromArray($styleBody);
 
-
-            $columnBody = 'S'; // Kolom awal 
+            $columnBody = 'V'; // Kolom awal 
             $colBody_index = Coordinate::columnIndexFromString($columnBody); // Konversi huruf kolom ke nomor indeks kolom
             if (isset($data['monthlyData']) && is_array($data['monthlyData'])) {
                 foreach ($data['monthlyData'] as $month => $currentMonth) :
@@ -1589,17 +1664,17 @@ class SalesController extends BaseController
         $sheet->setCellValue('K' . $rowSubtotal, "=SUM(K" . $sumRowAwal . ":K" . $sumRowAkhir . ")")
             ->getStyle('K' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
-        // Kolom subtotal Stock Cylinder
         $sheet->setCellValue('L' . $rowSubtotal, "=SUM(L" . $sumRowAwal . ":L" . $sumRowAkhir . ")")
             ->getStyle('L' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
+        // Kolom subtotal Mc Breakdown
         $sheet->setCellValue('M' . $rowSubtotal, "=SUM(M" . $sumRowAwal . ":M" . $sumRowAkhir . ")")
             ->getStyle('M' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
         $sheet->setCellValue('N' . $rowSubtotal, "=SUM(N" . $sumRowAwal . ":N" . $sumRowAkhir . ")")
             ->getStyle('N' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
-        // Kolom subtotal Running actual mc
+        // Kolom subtotal Stock Cylinder
         $sheet->setCellValue('O' . $rowSubtotal, "=SUM(O" . $sumRowAwal . ":O" . $sumRowAkhir . ")")
             ->getStyle('O' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
@@ -1609,13 +1684,23 @@ class SalesController extends BaseController
         $sheet->setCellValue('Q' . $rowSubtotal, "=SUM(Q" . $sumRowAwal . ":Q" . $sumRowAkhir . ")")
             ->getStyle('Q' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
-        // Kolom subtotal Prod 28days
+        // Kolom subtotal Running actual mc
         $sheet->setCellValue('R' . $rowSubtotal, "=SUM(R" . $sumRowAwal . ":R" . $sumRowAkhir . ")")
             ->getStyle('R' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
+        $sheet->setCellValue('S' . $rowSubtotal, "=SUM(S" . $sumRowAwal . ":S" . $sumRowAkhir . ")")
+            ->getStyle('S' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        $sheet->setCellValue('T' . $rowSubtotal, "=SUM(T" . $sumRowAwal . ":T" . $sumRowAkhir . ")")
+            ->getStyle('T' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        // Kolom subtotal Prod 28days
+        $sheet->setCellValue('U' . $rowSubtotal, "=SUM(U" . $sumRowAwal . ":U" . $sumRowAkhir . ")")
+            ->getStyle('U' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
 
         foreach ($allData as $aliasjarum => $data) {
-            $columnBody = 'S'; // Kolom awal 
+            $columnBody = 'V'; // Kolom awal 
             $colBody_index = Coordinate::columnIndexFromString($columnBody); // Konversi huruf kolom ke nomor indeks kolom
             if (isset($data['monthlyData']) && is_array($data['monthlyData'])) {
                 foreach ($data['monthlyData'] as $month => $currentMonth) :
@@ -1678,9 +1763,9 @@ class SalesController extends BaseController
 
         $rowGrandtotal = $rowSubtotal;
         // baris grand total per bulan
-        $column = 'S'; // Kolom awal untuk bulan
+        $column = 'V'; // Kolom awal untuk bulan
         $col_index = Coordinate::columnIndexFromString($column); // Konversi huruf kolom ke nomor indeks kolom
-        $columnGrandTotal = 'S'; // Kolom awal untuk bulan
+        $columnGrandTotal = 'V'; // Kolom awal untuk bulan
         $colGrandTotalMaxCap = Coordinate::columnIndexFromString($columnGrandTotal); // Konversi huruf kolom ke nomor indeks kolom
         $colGrandTotalConfirm = Coordinate::columnIndexFromString($columnGrandTotal) + 1; // Konversi huruf kolom ke nomor indeks kolom
         $colGrandTotalSisaOrder = Coordinate::columnIndexFromString($columnGrandTotal) + 2; // Konversi huruf kolom ke nomor indeks kolom

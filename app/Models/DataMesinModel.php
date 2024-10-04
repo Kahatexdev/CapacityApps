@@ -439,21 +439,51 @@ class DataMesinModel extends Model
     {
         // Daftar alias jarum gloves
         $orderedAliasJarums = [
+            // double cylinder
+            'Double Cylinder N84L (DC168L:2)',
+            'Double Cylinder N108',
+            'Double Cylinder N124',
+            'Double Cylinder N144',
+            'DC N144 Links-Links',
+            'DC N144 2 Feed (Okamoto)',
+            'DC N144 2 Feed',
+            'Double Cylinder N168',
+            'DC N168 Links-Links',
+            'DC N168 2 Feed',
+            'DC 84N Link Bravo',
+            // single cylinder
+            'SC N140',
+            // comp
+            'Baby Comp N84',
+            'Baby Comp N96',
+            'Baby Comp N96 Sp',
+
+            'Baby Comp N108',
+            'Baby Comp N108 Sp',
+
+            'Child Comp N120',
+            'Child Comp N120 Sp',
+
+            'Ladies Comp N144',
+            'Ladies Comp N144 Sp',
+
+            'Mens Comp N168',
+            'Mens Comp N168 Sp',
+
+            'Mens Comp N200',
+            'Child Comp N132',
+            'Mens Comp N156',
             // Mc Gloves
-            'Ladies/Mens 13G',
-            'Ladies/Mens 10G (126N)',
-            'Ladies/Mens 10G (116N)',
-            // 
-            'Lds / Child 13 G (126 N)-->Lokal',
-            'Lds / Child 10 G (116 N)-->Lokal',
-            'Lds / Child 10 G (106 N)-->Lokal',
-            'Mc Fluff Ball',
-            'Mc Topi 10inch (240N)',
-            'Head Band 10" (320 N)',
-            'Lds / Child 10 G (116 N)',
-            'Child/Ladies 10G (106N)',
-            'Baby 10G (92N)',
+
             'Baby 10G (84N)',
+            'Baby 10G (92N)',
+            'Baby 10G (144N)',
+            'Child/Ladies 10G (106N)',
+            'Ladies/Mens 10G (116N)',
+            'Head Band 10inch (320N)',
+            'Mc Topi 10inch (240N)',
+            'Mc Fluff Ball',
+            'Ladies/Mens 10G (126N)',
         ];
 
         // Menghasilkan SQL CASE statement untuk urutan kustom
@@ -464,7 +494,7 @@ class DataMesinModel extends Model
         return $this->select('aliasjarum, jarum, brand')
             ->where('aliasjarum!=', '')
             ->groupBy('aliasjarum')
-            ->orderBy("CASE {$caseStatement} ELSE " . (count($orderedAliasJarums)) . " END DESC, aliasjarum ASC")
+            ->orderBy("CASE {$caseStatement} ELSE " . (count($orderedAliasJarums)) . " END ASC, aliasjarum ASC")
             ->findAll();
     }
 
