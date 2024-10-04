@@ -515,7 +515,7 @@ class DataMesinModel extends Model
     }
     public function areaMc($area)
     {
-        return $this->select('*, sum(total_mc) as total')
+        return $this->select('*, sum(total_mc) as total, target')
             ->where('area', $area)
             ->groupBy('jarum')
             ->findAll();

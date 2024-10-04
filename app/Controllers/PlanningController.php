@@ -16,6 +16,9 @@ use App\Models\KebutuhanMesinModel;
 use App\Models\MesinPlanningModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
+use App\Models\MonthlyMcModel;
+use App\Services\orderServices;
+
 
 
 
@@ -31,9 +34,13 @@ class PlanningController extends BaseController
     protected $liburModel;
     protected $KebutuhanMesinModel;
     protected $MesinPlanningModel;
+    protected $globalModel;
+    protected $orderServices;
+
 
     public function __construct()
     {
+        $this->globalModel = new MonthlyMcModel();
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
@@ -43,6 +50,7 @@ class PlanningController extends BaseController
         $this->liburModel = new LiburModel();
         $this->KebutuhanMesinModel = new KebutuhanMesinModel();
         $this->MesinPlanningModel = new MesinPlanningModel();
+        $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => ['planning']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -183,6 +191,7 @@ class PlanningController extends BaseController
         $idaps = $this->request->getPost('idaps');
         $pdk = $this->request->getPost('noModel');
         $deliv = $this->request->getPost('delivery');
+        $jarum = $this->request->getPost('jarum');
         $update = [
             'factory' => $this->request->getPost('area1'),
             'qty' => $this->request->getPost('qty1'),
@@ -206,9 +215,9 @@ class PlanningController extends BaseController
         $u = $this->ApsPerstyleModel->update($idaps, $update);
         if ($u) {
             $this->ApsPerstyleModel->insert($insert);
-            return redirect()->to(base_url(session()->get('role') . '/detailModelPlanning/' . $pdk . '/' . $deliv))->withInput()->with('success', 'Berhasil Split Style Area');
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $pdk . '/' . $jarum))->withInput()->with('success', 'Berhasil Split Style Area');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/detailModelPlanning/' . $pdk . '/' . $deliv))->withInput()->with('error', 'Gagal Membagi Style');
+            return redirect()->to(base_url(session()->get('role') . '/detailModelPlanning/' . $pdk . '/' .  $jarum))->withInput()->with('error', 'Gagal Membagi Style');
         }
     }
     public function detaillistplanning($judul)
@@ -364,7 +373,7 @@ class PlanningController extends BaseController
         $role = session()->get('role');
         $bulanIni = [];
         $currentDate = new DateTime(); // Tanggal sekarang
-
+        $dataPlan = $this->globalModel->getPlan();
         for ($i = 0; $i < 12; $i++) {
             $bulanIni[] = $currentDate->format('F Y'); // Format bulan dan tahun (e.g., "August 2024")
             $currentDate->modify('+1 month'); // Tambah satu bulan
@@ -379,7 +388,8 @@ class PlanningController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-            'bulan' => $bulanIni
+            'bulan' => $bulanIni,
+            'plan' => $dataPlan
         ];
         return view($role . '/Planning/jalanmesin', $data);
     }
@@ -388,10 +398,6 @@ class PlanningController extends BaseController
         $role = session()->get('role');
 
         $areas = $this->jarumModel->getArea();
-        $totalArea = [];
-        foreach ($areas as $ar) {
-            $totalArea[$ar] = $this->jarumModel->totalMcArea($ar);
-        }
         $totalArea = [];
         foreach ($areas as $ar) {
             $totalArea[$ar] = $this->jarumModel->totalMcArea($ar);
@@ -405,25 +411,53 @@ class PlanningController extends BaseController
 
         $bulanIni = $date->format('F-Y');
         $startDate = new \DateTime($date->format('Y-m-01')); // First day of the given month
+        $endDate = (clone $startDate)->modify('last day of this month'); // Last day of the month
 
         $monthlyData = [];
-        for ($i = 0; $i < 5; $i++) {
-            $startOfWeek = clone $startDate;
-            $startOfWeek->modify("+$i week");
+        $weekCount = 1; // Inisialisasi minggu
+        $LiburModel = new LiburModel();
+        $holidays = $LiburModel->findAll(); // Ambil data libur
 
-            // Ensure we start on Monday and stay within the month
-            $startOfWeek->modify($startOfWeek->format('N') === '1' ? 'this Monday' : 'next Monday');
-            if ($startOfWeek->format('m') !== $startDate->format('m')) break;
+        while ($startDate <= $endDate) {
+            // Tentukan akhir minggu (hari Minggu)
+            $endOfWeek = (clone $startDate)->modify('Sunday this week');
 
-            $endOfWeek = clone $startOfWeek;
-            $endOfWeek->modify('Sunday this week');
+            // Tentukan akhir bulan dari tanggal awal saat ini
+            $endOfMonth = new \DateTime($startDate->format('Y-m-t')); // Akhir bulan saat ini
+
+            // Jika akhir minggu melebihi akhir bulan, batasi hingga akhir bulan
+            if ($endOfWeek > $endOfMonth) {
+                $endOfWeek = clone $endOfMonth; // Akhiri minggu di akhir bulan
+            }
+
+            // Hitung jumlah hari di minggu ini
+            $numberOfDays = $startDate->diff($endOfWeek)->days + 1;
+
+            // Hitung libur minggu ini
+            $weekHolidays = array_filter($holidays, function ($holiday) use ($startDate, $endOfWeek) {
+                $holidayDate = new \DateTime($holiday['tanggal']);
+                return $holidayDate >= $startDate && $holidayDate <= $endOfWeek;
+            });
+
+            $holidaysCount = count($weekHolidays);
+            $numberOfDays -= $holidaysCount; // Kurangi jumlah hari dengan jumlah libur
 
             $monthlyData[] = [
-                'week' => $i + 1,
-                'start_date' => $startOfWeek->format('Y-m-d'),
+                'week' => $weekCount,
+                'start_date' => $startDate->format('Y-m-d'),
                 'end_date' => $endOfWeek->format('Y-m-d'),
-                'number_of_days' => $startOfWeek->diff($endOfWeek)->days + 1,
+                'number_of_days' => $numberOfDays,
+                'holidays' => array_map(function ($holiday) {
+                    return [
+                        'nama' => $holiday['nama'],
+                        'tanggal' => (new \DateTime($holiday['tanggal']))->format('d-F'),
+                    ];
+                }, $weekHolidays),
             ];
+
+            // Perbarui tanggal awal untuk minggu berikutnya
+            $startDate = (clone $endOfWeek)->modify('+1 day');
+            $weekCount++;
         }
 
         $jarum = $this->jarumModel->getAreaAndJarum();
@@ -467,7 +501,7 @@ class PlanningController extends BaseController
         $date = DateTime::createFromFormat('F-Y', $bulan);
         $bulanIni = $date->format('F-Y');
         $awalBulan = $date->format('Y-m-01');
-
+        $akhirBulan = date('Y-m-t', strtotime('+2 months'));
         $filteredArea = $this->jarumModel->getArea();
         $area = array_filter($filteredArea, function ($item) {
             return strpos($item, 'Gedung') === false;
@@ -482,11 +516,12 @@ class PlanningController extends BaseController
             foreach ($mesin as $jarum) {
                 $sisaOrder = $this->ApsPerstyleModel->ambilSisaOrder($ar, $awalBulan, $jarum['jarum']);
                 $monthlyData[$ar][$jarum['jarum']]['kebutuhanMesin'] = $sisaOrder['totalKebMesin'];
-                $monthlyData[$ar][$jarum['jarum']]['output'] = $sisaOrder['outputDz'];
+                $monthlyData[$ar][$jarum['jarum']]['output'] = $sisaOrder['totalKebMesin'] * $jarum['target'];
+                $monthlyData[$ar][$jarum['jarum']]['target'] = $jarum['target'];
                 $monthlyData[$ar][$jarum['jarum']]['jr'] = $jarum['jarum'];
                 $totalMesin += $jarum['total'];
                 $planningMc += $sisaOrder['totalKebMesin'];
-                $outputDz += $sisaOrder['outputDz'];
+                $outputDz +=   $monthlyData[$ar][$jarum['jarum']]['output'];
             }
             $monthlyData[$ar]['totalMesin'] = $totalMesin;
             $monthlyData[$ar]['planningMc'] = $planningMc;
@@ -508,7 +543,6 @@ class PlanningController extends BaseController
                 $totalKebGloves += $data['kebutuhanMesin'];
             }
         }
-
         $totalKebSock = $totalMcPlanning - $totalKebGloves;
         $totalMcSocks = $this->jarumModel->totalMcSock();
         $totalMcSocks = intval($totalMcSocks['total']);
@@ -531,6 +565,9 @@ class PlanningController extends BaseController
             'planMcGloves' => $totalKebGloves,
             'persenGloves' => $persenGloves
         ];
+        $statusOrder = $this->orderServices->statusOrder($bulan);
+
+        // print(json_encode($statusOrder, JSON_PRETTY_PRINT));
         $data = [
             'role' => $role,
             'title' =>  $bulanIni,
@@ -543,7 +580,8 @@ class PlanningController extends BaseController
             'active7' => '',
             'bulan' => $bulanIni,
             'data' => $monthlyData,
-            'summary' => $summary
+            'summary' => $summary,
+            'statusOrder' => $statusOrder
         ];
 
         return view($role . '/Planning/monthlyMachine', $data);

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use DateTime;
 use CodeIgniter\Model;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Sum;
 use PHPUnit\TextUI\XmlConfiguration\Group;
 
 class ApsPerstyleModel extends Model
@@ -238,6 +239,13 @@ class ApsPerstyleModel extends Model
             ->groupBy(['delivery', 'mastermodel'])
             ->findAll();
     }
+    public function getAllForModelStyleAndSize($validate)
+    {
+        return $this->where('mastermodel', $validate['no_model'])
+            ->where('size', $validate['style'])
+            ->orderBy('delivery', 'ASC') // Optional: sort berdasarkan delivery date, bisa diubah sesuai kebutuhan
+            ->findAll();
+    }
 
     public function getSmv()
     {
@@ -307,13 +315,17 @@ class ApsPerstyleModel extends Model
     }
     public function CapacityArea($pdk, $area, $jarum)
     {
+        $oneweek = date('Y-m-d', strtotime('today'));
         $data = $this->select('mastermodel,sum(sisa)as sisa,delivery,smv')
             ->where('mastermodel', $pdk)
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
+            ->where('sisa >', 0)
+            ->where('delivery >', $oneweek)
             ->groupBy('mastermodel,delivery')
             ->get()
             ->getResultArray();
+
         $sisaArray = array_column($data, 'sisa');
         $maxValue = max($sisaArray);
         $indexMax = array_search($maxValue, $sisaArray);
@@ -332,7 +344,7 @@ class ApsPerstyleModel extends Model
         $deliveryMax = $data[$indexMax]['delivery'];
         $tglDeliv = new DateTime($deliveryMax); // Tanggal delivery terjauh
         $beda = $today->diff($tglDeliv);
-        $hariTarget = $beda->days - 7;
+        $hariTarget = $beda->days;
         $smvArray = array_column($data, 'smv');
         $smvArray = array_map('intval', $smvArray);
         $averageSmv = array_sum($smvArray) / count($smvArray);
@@ -374,12 +386,12 @@ class ApsPerstyleModel extends Model
     }
     public function getSisaPerDlv($model, $jarum, $deliv)
     {
-        $sisa = $this->select('idapsperstyle,mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,factory, production_unit, delivery,smv')
+        $sisa = $this->select('idapsperstyle,mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,factory, production_unit, delivery,smv,seam,country,no_order')
             ->where('machinetypeid', $jarum)
             ->where('mastermodel', $model)
             ->where('delivery', $deliv)
             ->where('sisa >=', 0)
-            ->groupBy('size')
+            ->groupBy('size,factory')
             ->findAll();
         $final = reset($sisa);
         return $sisa;
@@ -422,6 +434,7 @@ class ApsPerstyleModel extends Model
 
         $data = $this->select('mastermodel, delivery, SUM(sisa) AS sisa, smv, factory, machinetypeid')
             ->where('machinetypeid', $jarum)
+            ->where('sisa >', '0')
             ->where('delivery >', $bulan)
             ->where('delivery <', $ld)
             ->where('factory', $ar)
@@ -511,5 +524,27 @@ class ApsPerstyleModel extends Model
             ->findAll();
         $order = reset($po);
         return $order;
+    }
+    public function statusOrderSock($startDate, $endDate)
+    {
+        return $this->select('MONTHNAME(delivery) as month, sum(round(qty/24)) as qty, sum(round(sisa/24)) as sisa')
+            ->where('sisa >', 0)
+            ->where('factory !=', 'KK8J')
+            ->where('delivery >=', $startDate)
+            ->where('delivery <=', $endDate)
+            ->groupBy('MONTH(delivery)')
+            ->orderBy('delivery', 'ASC')
+            ->findAll();
+    }
+    public function statusOrderGloves($startDate, $endDate)
+    {
+        return $this->select('MONTHNAME(delivery) as month, sum(round(qty/24)) as qty, sum(round(sisa/24)) as sisa')
+            ->where('sisa >', 0)
+            ->where('factory =', 'KK8J')
+            ->where('delivery >=', $startDate)
+            ->where('delivery <=', $endDate)
+            ->groupBy('MONTH(delivery)')
+            ->orderBy('delivery', 'ASC')
+            ->findAll();
     }
 }

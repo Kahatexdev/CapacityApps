@@ -4,12 +4,29 @@
 
     <div class="row">
         <div class="card">
-
-
             <div class="card-header">
-                <h4>Running MC recomendation PerMonth</h4>
+                <div class="row d-flex justify-content-between">
+                    <div class="col-lg-6">
+
+                        <h4>Running MC recommendation Per Month</h4>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <select class="form-control" id="planSelect">
+                                <option value="">List Plan Jalan Mesin</option>
+                                <?php foreach ($plan as $judul) : ?>
+                                    <option value="<?= base_url(session()->get('role') . '/viewPlan/' . $judul['judul']); ?>"><?= $judul['judul']; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+
+                </div>
             </div>
         </div>
+
+
     </div>
     <div class="row">
         <?php foreach ($bulan as $bl) : ?>
@@ -32,6 +49,13 @@
         <?php endforeach ?>
     </div>
 </div>
-
+<script>
+    document.getElementById('planSelect').onchange = function() {
+        var url = this.value;
+        if (url) { // Jika option memiliki value (URL)
+            window.location.href = url; // Redirect ke URL yang dipilih
+        }
+    };
+</script>
 
 <?php $this->endSection(); ?>

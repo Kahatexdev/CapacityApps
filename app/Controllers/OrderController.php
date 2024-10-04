@@ -800,6 +800,7 @@ class OrderController extends BaseController
         $tglDeliv = new DateTime($deliveryMax); // Tanggal delivery terjauh
         $beda = $today->diff($tglDeliv);
         $hariTarget = $beda->days - 7;
+        $hariTarget = ($hariTarget <= 0) ? 1 : $hariTarget;
 
         // disini ngambil rata rata target.
         $smvArray = array_column($pdk, 'smv');
@@ -820,7 +821,6 @@ class OrderController extends BaseController
             $sisa = round($rec['sisa'] / 24);
             $area = $rec['factory'];
             $mesinPerarea = $this->jarumModel->mesinPerArea($jarum, $area);
-
             if (!empty($mesinPerarea)) {
                 $target = $mesinPerarea[0]['target'];
                 $totalMesin = $mesinPerarea[0]['totalMesin'];

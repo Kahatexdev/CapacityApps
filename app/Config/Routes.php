@@ -193,6 +193,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('jalanmesin', 'PlanningController::jalanmesin');
     // $routes->get('jalanmesin/(:any)', 'PlanningController::jalanmesindetail/$1');
     $routes->get('jalanmesin/(:any)', 'PlanningController::monthlyMachine/$1');
+    $routes->get('viewPlan/(:any)', 'PlanningJalanMcController::viewPlan/$1');
 
     $routes->post('exportPlanningJlMc/(:any)', 'PlanningJalanMcController::excelPlanningJlMc/$1');
     $routes->post('saveMonthlyMc', 'PlanningJalanMcController::saveMonthlyMc');
@@ -268,6 +269,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('editcylinder/(:any)', 'MesinController::editcylinderPlan/$1');
     $routes->post('deletecylinder/(:any)', 'MesinController::deletecylinderPlan/$1');
     $routes->get('allmachine', 'MesinController::allmachinePlan');
+    $routes->post('capacityperarea/(:any)', 'MesinController::capacityperarea/$1');
 
     //planning
     $routes->get('dataplanning', 'PlanningController::listplanningAps');

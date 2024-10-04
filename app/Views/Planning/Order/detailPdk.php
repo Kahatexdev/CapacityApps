@@ -130,6 +130,9 @@ error_reporting(E_ALL); ?>
                                                     <td><?= $list['factory'] ?></td>
                                                     <td><?= $list['production_unit'] ?></td>x
                                                     <td>
+                                                        <button type="button" class="btn btn-warning btn-sm split-btn" data-toggle="modal" data-target="#splitModal" data-id="<?= $list['idapsperstyle']; ?>" data-no-model="<?= $list['mastermodel']; ?>" data-delivery="<?= $list['delivery']; ?>" data-jarum="<?= $jarum ?>" data-style="<?= $list['size']; ?>" data-qty="<?= $list['qty']; ?>" data-sisa="<?= $list['sisa']; ?>" data-seam="<?= $list['seam']; ?>" data-factory="<?= $list['factory']; ?>" data-smv=" <?= $list['smv']; ?> " data-order=" <?= $list['no_order']; ?> " data-country=" <?= $list['country']; ?> ">
+                                                            Split
+                                                        </button>
                                                         <button type=" button" class="btn btn-info btn-sm edit-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $list['idapsperstyle']; ?>" data-area="<?= $list['factory']; ?>" data-pdk="<?= $list['mastermodel']; ?>" data-deliv="<?= $list['delivery']; ?> " data-size="<?= $list['size']; ?>" data-jarum="<?= $jarum ?>">
                                                             Edit Area
                                                         </button>
@@ -179,19 +182,27 @@ error_reporting(E_ALL); ?>
                     </div>
                     <div class="modal-body">
                         <form action="<?= base_url($role . '/assignareal') ?>" method="post">
-                            <input type="text" name="no_model" id="" hidden value="<?= $noModel ?>">
+                            <input type="text" name="no_model" hidden value="<?= $noModel ?>">
                             <div id="confirmationMessage"></div>
                             <input class="form-check-input" type="text" value="<?= $jarum ?>" name="jarum" id="jarum">
 
                             <div class="form-group">
                                 <label for="selectMachineType">Pilih Delivery:</label>
+
+                                <!-- Checkbox untuk Select All -->
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="selectAll" />
+                                    <label class="custom-control-label" for="selectAll">Select All</label>
+                                </div>
+
                                 <?php foreach ($headerRow as $row): ?>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="<?= $row['delivery'] ?>" name="delivery[]" id="ceklist">
+                                        <input class="form-check-input delivery-checkbox" type="checkbox" value="<?= $row['delivery'] ?>" name="delivery[]" id="ceklist">
                                         <label class="custom-control-label" for="customCheck1"> <?= date('d-F-y', strtotime($row['delivery'])) ?></label>
                                     </div>
                                 <?php endforeach ?>
                             </div>
+
                             <div class="form-group">
                                 <label for="selectArea">Pilih Area:</label>
                                 <select class="form-control" id="selectArea" name="area">
@@ -236,21 +247,23 @@ error_reporting(E_ALL); ?>
                             <div class="form-group">
                                 <label for="selectArea">Area 1:</label>
                                 <select class="form-control" id="selectArea" name="area1">
+                                    <option value=""> Pilih Area</option>
                                     <?php
                                     $uniqueAreas = array_unique(array_column($dataMc, 'area'));
-                                    foreach ($uniqueAreas as $area) :
-                                    ?>
-                                        <option value="<?= $area; ?>"><?= $area; ?></option>
+                                    foreach ($uniqueAreas as $area) :  ?>
+                                        <option value="<?= $area; ?>"> <?= $area; ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="qty">Qty Area 1:</label>
-                                <input type="number" name="qty1" class="form-control" id="">
+                                <input type="number" name="qty1" class="form-control" id="" placeholder="pcs">
                             </div>
                             <div class="form-group">
                                 <label for="selectArea">Area 2:</label>
                                 <select class="form-control" id="selectArea" name="area2">
+                                    <option value=""> Pilih Area</option>
+
                                     <?php
                                     $uniqueAreas = array_unique(array_column($dataMc, 'area'));
                                     foreach ($uniqueAreas as $area) :
@@ -261,7 +274,7 @@ error_reporting(E_ALL); ?>
                             </div>
                             <div class="form-group">
                                 <label for="qty">Qty Area 2:</label>
-                                <input type="number" name="qty2" class="form-control" id="">
+                                <input type="number" name="qty2" class="form-control" id="" placeholder="pcs">
                             </div>
                     </div>
                     <div class="modal-footer">
@@ -291,6 +304,7 @@ error_reporting(E_ALL); ?>
                             <div class="form-group">
                                 <label for="selectArea">Pilih Area:</label>
                                 <select class="form-control" id="selectArea" name="area">
+                                    <option value="">Pilih Area</option>
                                     <?php
                                     $uniqueAreas = array_unique(array_column($dataMc, 'area'));
                                     foreach ($uniqueAreas as $area) :
@@ -516,6 +530,12 @@ error_reporting(E_ALL); ?>
                 });
 
 
+            });
+            document.getElementById('selectAll').addEventListener('click', function(e) {
+                var checkboxes = document.querySelectorAll('.delivery-checkbox');
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.checked = e.target.checked;
+                });
             });
         </script>
         <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>

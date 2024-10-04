@@ -69,7 +69,7 @@
                                                 </button>
                                             <?php else : ?>
                                                 <!-- If qty is not null, set action to Details -->
-                                                <a href="<?= base_url($role . '/detailmodeljarum/' . $order->no_model . '/' . $order->delivery . '/' . $order->machinetypeid); ?>" <button type="button" class="btn btn-info btn-sm details-btn">
+                                                <a href="<?= base_url($role . '/detailPdk/' . $order->no_model . '/'  . $order->machinetypeid); ?>" <button type="button" class="btn btn-info btn-sm details-btn">
                                                     Details
                                                     </button>
                                                 </a>

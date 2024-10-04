@@ -343,12 +343,14 @@ class MesinController extends BaseController
         $total_mesin = $this->request->getPost("total_mc");
         $brand = $this->request->getPost("brand");
         $mesin_jalan = $this->request->getPost("mesin_jalan");
+        $target = $this->request->getPost("target");
 
         $id = $idDataMesin;
         $update = $this->jarumModel->update($id, [
             'total_mc' => $total_mesin,
             'brand' => $brand,
-            'mesin_jalan' => $mesin_jalan
+            'mesin_jalan' => $mesin_jalan,
+            'target' => $target,
         ]);
         $area = $this->request->getPost("area");
         if ($update) {
@@ -473,6 +475,7 @@ class MesinController extends BaseController
             'total_mc' => $this->request->getPost("total_mc"),
             'brand' => $this->request->getPost("brand"),
             'mesin_jalan' => $this->request->getPost("mesin_jalan"),
+            'target' => $this->request->getPost("target"),
         ];
         $id = $idDataMesin;
         $update = $this->jarumModel->update($id, $data);
@@ -617,11 +620,14 @@ class MesinController extends BaseController
             $pdk = $row['mastermodel'];
             $smv = $row['smv'];
             $targetPerMesin = round((86400 / (intval($smv))) * 0.85 / 24);
-            $sisa = $row['sisa'];
+            $sisa = $row['sisa'] / 24;
             $deliveryDate = new DateTime($row['delivery']);
             $time = $today->diff($deliveryDate);
             $leadtime = $row['targetHari'];
             // Calculate weekly production and machine needs
+            if ($leadtime < 1) {
+                $leadtime = 1;
+            }
             $kebMesin = ceil($sisa / $leadtime / $targetPerMesin);
             $produksi = $targetPerMesin * $kebMesin;
             $totalProduksi += $produksi;
@@ -730,6 +736,7 @@ class MesinController extends BaseController
 
         return view(session()->get('role') . '/Mesin/capacityarea', $data);
     }
+
 
     public function recomendationarea()
     {
