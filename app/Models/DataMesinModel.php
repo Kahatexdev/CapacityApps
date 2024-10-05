@@ -337,13 +337,23 @@ class DataMesinModel extends Model
     }
     public function getJalanMesinPerArea()
     {
-        $query = $this->select('area, jarum, SUM(total_mc) AS total_mc, SUM(mesin_jalan) AS mesin_jalan,SUM(total_mc)-SUM(mesin_jalan) as mesin_mati, pu')
+        $query = $this->select('area, jarum, SUM(total_mc) AS total_mc, SUM(mesin_jalan) AS mesin_jalan, SUM(total_mc)-SUM(mesin_jalan) as mesin_mati, pu')
             ->groupBy('pu, area')
-            ->orderBy('pu ASC, SUBSTRING(AREA, 3) + 0 ASC, AREA ASC') // Sorting by 'pu' first, then by KK number, then by Area
+            ->orderBy("
+                CASE 
+                    WHEN pu = 'KK' THEN 1 
+                    WHEN pu = 'Gedung' THEN 2
+                    WHEN pu = 'Sample' THEN 3
+                    WHEN pu = 'Warehouse' THEN 4
+                    ELSE 5 
+                END ASC,
+                SUBSTRING(AREA, 3) + 0 ASC, AREA ASC
+            ") // Sorting by custom order first, then by KK number, then by Area
             ->findAll();
 
         return $query;
     }
+
     public function jarumPerArea()
     {
         $query = $this->select('area, jarum, SUM(total_mc) AS total_mc, SUM(mesin_jalan) AS mesin_jalan, SUM(total_mc) - SUM(mesin_jalan) as mesin_mati, pu')
