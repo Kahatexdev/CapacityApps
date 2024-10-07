@@ -176,20 +176,20 @@
                                 <div class="chart">
                                     <canvas id="<?= $ar ?>-chart" class="chart-canvas" height="300"></canvas>
                                 </div>
-                              
+
                             </div>
 
                         </div>
-                       
+
                     </div>
-              <div class="card-footer">
-              <div class="row">
-                                <p>
-                                    Total Mesin : <?= $key['totalmc'] ?>
-                                </p>
-                                
-             </div>
-              </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <p>
+                                Total Mesin : <?= $key['totalmc'] ?>
+                            </p>
+
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -335,7 +335,7 @@
         const value = area[key];
         const jarumLabels = [];
         const totalMcData = [];
-        
+
         // Looping untuk setiap jarum dalam area
         for (const jarum in value) {
             if (jarum !== 'totalmc') { // Skip totalmc field
@@ -343,13 +343,13 @@
                 totalMcData.push(value[jarum]);
             }
         }
-        
+
         // Membuat elemen canvas untuk setiap chart
         var canvasId = key + "-chart";
         var canvas = document.createElement('canvas');
         canvas.id = canvasId;
         document.body.appendChild(canvas);
-        
+
         var ctx4 = document.getElementById(canvasId).getContext("2d");
 
         // Membuat pie chart
@@ -364,7 +364,7 @@
                     tension: 0.9,
                     pointRadius: 2,
                     borderWidth: 2,
-                    backgroundColor: ['#17c1e8', '#c0c0c0', '#dfc731','#113367','#dc346c','#aa579f','#4c325c'],
+                    backgroundColor: ['#17c1e8', '#c0c0c0', '#dfc731', '#113367', '#dc346c', '#aa579f', '#4c325c'],
                     data: totalMcData,
                     fill: false
                 }],

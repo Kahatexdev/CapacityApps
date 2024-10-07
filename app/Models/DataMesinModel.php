@@ -368,7 +368,16 @@ class DataMesinModel extends Model
     {
         $query = $this->select('area, jarum, SUM(total_mc) AS total_mc, SUM(mesin_jalan) AS mesin_jalan, SUM(total_mc) - SUM(mesin_jalan) as mesin_mati, pu')
             ->groupBy('pu, area, jarum')
-            ->orderBy('pu ASC, SUBSTRING(AREA, 3) + 0 ASC, AREA ASC')
+            ->orderBy("
+                CASE 
+                    WHEN area LIKE 'KK%' THEN 1
+                WHEN area LIKE 'GEDUNG%' THEN 2
+                WHEN area LIKE 'SAMPLE%' THEN 3
+                WHEN area LIKE 'WAREHOUSE%' THEN 4
+                ELSE 5 
+                END ASC,
+                SUBSTRING(AREA, 3) + 0 ASC, AREA ASC
+            ")
             ->findAll();
 
         // Array untuk menyimpan hasil akhir
@@ -398,6 +407,7 @@ class DataMesinModel extends Model
 
         return $formattedData;
     }
+
     public function maxCapacity($area, $jarum)
     {
         $totalmc = $this->select('sum(total_mc) as total')->where('area', $area)->where('jarum', $jarum)->first();

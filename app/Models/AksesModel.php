@@ -57,4 +57,14 @@ class AksesModel extends Model
         $dta =  array_column($area, 'name');
         return $dta;
     }
+    public function aksesData($idUser)
+    {
+        $area = $this->select('areas.name')
+            ->join('areas', 'areas.id = user_areas.area_id')
+            ->where('user_id', $idUser)
+            ->get()
+            ->getResultArray();
+        $dta =  array_column($area, 'name');
+        return $dta;
+    }
 }

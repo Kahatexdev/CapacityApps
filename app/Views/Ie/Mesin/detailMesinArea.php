@@ -148,7 +148,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="buyer" class="col-form-label">Target</label>
-                                        <input type="number" name="targer" class="form-control">
+                                        <input type="number" name="targer" class="form-control" required>
                                     </div>
 
                                 </div>
@@ -220,7 +220,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="buyer" class="col-form-label">Target</label>
-                                        <input type="number" name="targer" class="form-control">
+                                        <input type="number" name="targer" class="form-control" required>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-sm-12">
