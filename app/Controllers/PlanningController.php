@@ -425,7 +425,6 @@ class PlanningController extends BaseController
             // Tentukan akhir bulan dari tanggal awal saat ini
             $endOfMonth = new \DateTime($startDate->format('Y-m-t')); // Akhir bulan saat ini
 
-            // Jika akhir minggu melebihi akhir bulan, batasi hingga akhir bulan
             if ($endOfWeek > $endOfMonth) {
                 $endOfWeek = clone $endOfMonth; // Akhiri minggu di akhir bulan
             }
