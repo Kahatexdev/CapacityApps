@@ -115,7 +115,7 @@ class SalesController extends BaseController
 
         $startDate = new \DateTime(); // Tanggal hari ini
         // $startDate->modify('Monday this week'); // Memastikan start date dimulai dari hari Senin minggu ini
-        $endDate = new \DateTime('+1 year'); // Tanggal satu tahun ke depan
+        $endDate = new \DateTime('+1 years'); // Tanggal satu tahun ke depan
 
         $LiburModel = new LiburModel();
         $holidays = $LiburModel->findAll();
@@ -928,21 +928,25 @@ class SalesController extends BaseController
             $brandData = [];
             $totals = [
                 'totalMc' => 0,
-                'totalRunning' => 0,
                 'totalCj' => 0,
-                // 'totalMj' => 0,
+                'totalRunning' => 0,
+                'totalSample' => 0,
+                'totalWarehouse' => 0,
+                'totalBreakdown' => 0,
+                'totalRunningAct' => 0,
                 'totalProd' => 0 // Untuk menyimpan total $prod
             ];
+            $dataRunningSplWh = $this->jarumModel->getRunningMcSplAllAlias($aliasjarum); // get data running sample per aliasjarum
             // Ambil data kapasitas per brand dan hitung total
             foreach ($brands as $brand) {
-                $data = $this->jarumModel->getTotalMcPerBrand($brand, $aliasjarum);
+                $data = $this->jarumModel->getTotalMcPerBrand($brand, $aliasjarum); // total mc per brand + sample & total mc running tanpa sample
 
                 // Inisialisasi total per brand
                 $brandTotals = [
                     'totalMc' => 0,
-                    'totalRunning' => 0,
                     'totalCj' => 0,
-                    // 'totalMj' => 0,
+                    'totalRunning' => 0,
+                    'totalRunningAct' => 0,
                     'target' => 0,
                     'totalProd' => 0
                 ];
@@ -955,23 +959,31 @@ class SalesController extends BaseController
 
                         // Tambahkan hasil perhitungan ke total per brand
                         $brandTotals['totalMc'] += $item['total_mc'] ?? 0;
-                        $brandTotals['totalRunning'] += $item['running'] ?? 0;
                         $brandTotals['totalCj'] += $item['cj'] ?? 0;
-                        // $brandTotals['totalMj'] += $item['mj'] ?? 0;
+                        $brandTotals['totalRunning'] += $item['running'] ?? 0;
                         $brandTotals['target'] = $item['target'] ?? 0;
+                        $brandTotals['totalRunningAct'] += $item['running_act'] ?? 0;
                         $brandTotals['totalProd'] += ceil($prod);
                     }
                 }
+
 
                 // Simpan total per brand ke dalam $brandData
                 $brandData[$brand] = $brandTotals;
 
                 // Tambahkan ke total keseluruhan
                 $totals['totalMc'] += $brandTotals['totalMc'] ?? 0;
-                $totals['totalRunning'] += $brandTotals['totalRunning'] ?? 0;
                 $totals['totalCj'] += $brandTotals['totalCj'] ?? 0;
-                // $totals['totalMj'] += $brandTotals['totalMj'] ?? 0;
+                $totals['totalRunning'] += $brandTotals['totalRunning'] ?? 0;
+                $totals['totalRunningAct'] += $brandTotals['totalRunningAct'] ?? 0;
                 $totals['totalProd'] += $brandTotals['totalProd'] ?? 0;
+            }
+            foreach ($dataRunningSplWh as $splWh) {
+                if (is_array($splWh)) {
+                    $totals['totalSample'] += $splWh['running_spl'] ?? 0;
+                    $totals['totalWarehouse'] += $splWh['warehouse'] ?? 0;
+                    $totals['totalBreakdown'] += $splWh['breakdown'] ?? 0;
+                }
             }
 
             $startDate = new \DateTime(); // Tanggal hari ini
@@ -1183,7 +1195,6 @@ class SalesController extends BaseController
                 'monthlyData' => $monthlyData,
             ];
         }
-
         // Buat spreadsheet
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -1325,6 +1336,10 @@ class SalesController extends BaseController
 
         $sheet->setCellValue('I' . $endMergHeader, 'Ths')
             ->getStyle('I' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('J' . $endMergHeader, 'Lonati')
+            ->getStyle('J' . $endMergHeader)
             ->applyFromArray($styleHeader2);
 
         $sheet->setCellValue('K' . $endMergHeader, 'Spl')
@@ -1522,21 +1537,21 @@ class SalesController extends BaseController
             $sheet->setCellValue('I' . $rowBody, isset($data['brandData']['Mechanic']['totalRunning']) ? $data['brandData']['Mechanic']['totalRunning'] : 0)
                 ->getStyle('I' . $rowBody)
                 ->applyFromArray($styleBody);
-            $sheet->setCellValue('J' . $rowBody, isset($brandData['Lonati']['totalRunning']) ? $brandData['Lonati']['totalRunning'] : 0)
+            $sheet->setCellValue('J' . $rowBody, isset($data['brandData']['Lonati']['totalRunning']) ? $data['brandData']['Lonati']['totalRunning'] : 0)
                 ->getStyle('J' . $rowBody)
                 ->applyFromArray($styleBody);
-            $sheet->setCellValue('L' . $rowBody, 0)
-                ->getStyle('L' . $rowBody)
-                ->applyFromArray($styleBody);
-            $sheet->setCellValue('K' . $rowBody, isset($data['totals']['totalRunning']) ? $data['totals']['totalRunning'] : 0)
+            $sheet->setCellValue('K' . $rowBody, isset($data['totals']['totalSample']) ? $data['totals']['totalSample'] : 0)
                 ->getStyle('K' . $rowBody)
                 ->applyFromArray($styleBody);
+            $sheet->setCellValue('L' . $rowBody, isset($data['totals']['totalRunning']) && isset($data['totals']['totalSample']) ? $data['totals']['totalRunning'] + $data['totals']['totalSample'] : 0)
+                ->getStyle('L' . $rowBody)
+                ->applyFromArray($styleBody);
             // mc break down
-            $sheet->setCellValue('M' . $rowBody, 0)
+            $sheet->setCellValue('M' . $rowBody, isset($data['totals']['totalBreakdown']) ? $data['totals']['totalBreakdown'] : 0)
                 ->getStyle('M' . $rowBody)
                 ->applyFromArray($styleBody);
             // mc in wh
-            $sheet->setCellValue('N' . $rowBody, 0)
+            $sheet->setCellValue('N' . $rowBody, isset($data['totals']['totalWarehouse']) ? $data['totals']['totalWarehouse'] : 0)
                 ->getStyle('N' . $rowBody)
                 ->applyFromArray($styleBody);
             // stock cylinder
@@ -1550,7 +1565,7 @@ class SalesController extends BaseController
                 ->getStyle('Q' . $rowBody)
                 ->applyFromArray($styleBody);
             // running mc actual
-            $sheet->setCellValue('R' . $rowBody, 0)
+            $sheet->setCellValue('R' . $rowBody, isset($data['totals']['totalRunningAct']) ? $data['totals']['totalRunningAct'] : 0)
                 ->getStyle('R' . $rowBody)
                 ->applyFromArray($styleBody);
             $sheet->setCellValue('S' . $rowBody, 0)
