@@ -243,8 +243,18 @@ class DataMesinModel extends Model
     }
     public function getTotalMcPerBrand($brand, $aliasjarum)
     {
-        // return 
-        $query = $this->select('jarum, SUM(total_mc) as total_mc, SUM(CASE WHEN pu = "CJ" THEN mesin_jalan ELSE 0 END) as running, SUM(CASE WHEN pu = "CJ" THEN total_mc ELSE 0 END) AS cj, SUM(CASE WHEN pu = "MJ" THEN total_mc ELSE 0 END) AS mj, target')
+        $query = $this->select('
+        aliasjarum, 
+        jarum, 
+        brand,
+        SUM(total_mc) AS total_mc, 
+        SUM(CASE WHEN pu = "CJ" THEN total_mc ELSE 0 END) AS cj, 
+        SUM(CASE WHEN pu = "CJ" AND area!="WAREHOUSE" AND area!="SAMPLE" THEN total_mc ELSE 0 END) AS running, 
+        SUM(CASE WHEN pu = "CJ" AND area!="WAREHOUSE" AND area!="SAMPLE" THEN mesin_jalan ELSE 0 END) AS running_act,
+        SUM(CASE WHEN pu = "MJ" THEN total_mc ELSE 0 END) AS mj, 
+        SUM(CASE WHEN pu = "MJ" AND area!="WAREHOUSE" AND area!="SAMPLE" THEN total_mc ELSE 0 END) AS running_mj, 
+        SUM(CASE WHEN pu = "MJ" AND area!="WAREHOUSE" AND area!="SAMPLE" THEN mesin_jalan ELSE 0 END) AS running_actmj,
+        target')
             ->where('aliasjarum', $aliasjarum) // Kondisi where untuk aliasjarum
             ->where('brand LIKE', '%' . $brand . '%') // Kondisi where untuk brand
             ->orderBy('brand') // Urutkan berdasarkan "brand"
@@ -255,12 +265,22 @@ class DataMesinModel extends Model
         // Jika hasil query kosong, kembalikan array kosong
         return !empty($result) ? $result : [];
     }
-    public function getTotalMcAllAlias($brand)
+    public function getRunningMcSplAllAlias($aliasjarum)
     {
         // return 
-        $query = $this->select('aliasjarum, jarum, SUM(total_mc) as total_mc, SUM(CASE WHEN pu = "CJ" THEN mesin_jalan ELSE 0 END) as running, SUM(CASE WHEN pu = "CJ" THEN total_mc ELSE 0 END) AS cj, SUM(CASE WHEN pu = "MJ" THEN total_mc ELSE 0 END) AS mj, target')
-            ->where('brand LIKE', '%' . $brand . '%') // Kondisi where untuk brand
-            ->orderBy('aliasjarum, brand') // Urutkan berdasarkan "brand"
+        $query = $this->select('
+        aliasjarum, 
+        jarum, 
+        SUM(CASE WHEN pu = "CJ" AND area = "SAMPLE" THEN total_mc ELSE 0 END) AS running_spl,
+        SUM(CASE WHEN pu = "CJ" AND area = "WAREHOUSE" AND brand NOT LIKE "%rusak%" THEN total_mc ELSE 0 END) AS warehouse, 
+        SUM(CASE WHEN pu = "CJ" AND area = "WAREHOUSE" AND brand LIKE "%rusak%" THEN total_mc ELSE 0 END) AS breakdown, 
+        SUM(CASE WHEN pu = "MJ" AND area = "SAMPLE" THEN total_mc ELSE 0 END) AS running_splmj,
+        SUM(CASE WHEN pu = "MJ" AND area = "WAREHOUSE" AND brand NOT LIKE "%rusak%" THEN total_mc ELSE 0 END) AS warehouse_mj, 
+        SUM(CASE WHEN pu = "MJ" AND area = "WAREHOUSE" AND brand LIKE "%rusak%" THEN total_mc ELSE 0 END) AS breakdown_mj')
+            ->where('aliasjarum', $aliasjarum) // Kondisi where untuk aliasjarum
+            // ->where('brand LIKE', '%' . $brand . '%') // Kondisi where untuk brand
+            ->groupBy('aliasjarum') // Urutkan berdasarkan "brand"
+            ->orderBy('brand') // Urutkan berdasarkan "brand"
             ->get();
 
         $result = $query->getResultArray(); // Mengambil hasil sebagai array
@@ -490,10 +510,12 @@ class DataMesinModel extends Model
             'Baby 10G (144N)',
             'Child/Ladies 10G (106N)',
             'Ladies/Mens 10G (116N)',
+            'Ladies/Mens 10G (144N)',
             'Head Band 10inch (320N)',
             'Mc Topi 10inch (240N)',
             'Mc Fluff Ball',
             'Ladies/Mens 10G (126N)',
+            'Ladies/Mens 13G',
         ];
 
         // Menghasilkan SQL CASE statement untuk urutan kustom
