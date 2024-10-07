@@ -504,7 +504,9 @@ class PlanningController extends BaseController
         $akhirBulan = date('Y-m-t', strtotime('+2 months'));
         $filteredArea = $this->jarumModel->getArea();
         $area = array_filter($filteredArea, function ($item) {
-            return strpos($item, 'Gedung') === false;
+            return strpos($item, 'Gedung') === false &&
+                strpos($item, 'SAMPLE') === false &&
+                strpos($item, 'WAREHOUSE') === false;
         });
         $area = array_values($area);
         $monthlyData = [];
