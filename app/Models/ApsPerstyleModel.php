@@ -204,34 +204,17 @@ class ApsPerstyleModel extends Model
     }
     public function getProgressperArea($area)
     {
-        $today = date('Y-m-d', strtotime('Today'));
-        $res = $this->select('mastermodel, SUM(qty) as target, SUM(sisa) as remain, factory, MIN(delivery) as delivery')
+
+        // Ambil data dari database, termasuk semua delivery dates yang relevan
+        $res = $this->select('mastermodel, delivery, SUM(qty/24) as target, SUM(sisa/24) as remain, factory')
             ->where('factory', $area)
-            ->groupBy('mastermodel')
+            ->groupBy(['delivery', 'mastermodel']) // Group by mastermodel dan delivery
             ->get()
             ->getResultArray();
 
-        $reset = [];
-        foreach ($res as $data) {
-            $produksi = ($data['target'] - $data['remain']) / 24;
-            $target = $data['target'] / 24;
-
-            $persen = ($produksi / $target) * 100;
-            $formated = round($persen);
-
-            // Cek apakah persen < 100 dan delivery >= hari ini
-            if ($formated < 100 && $data['delivery'] >= $today) {
-                $reset[] = [
-                    'area' => $data['factory'],
-                    'mastermodel' => $data['mastermodel'],
-                    'target' => round($target),
-                    'persen' => $formated,
-                    'produksi' => round($produksi)
-                ];
-            }
-        }
-        return $reset;
+        return $res;
     }
+
 
     public function getIdMinus($validate)
     {
