@@ -202,6 +202,34 @@ class ApsPerstyleModel extends Model
         }
         return $reset;
     }
+    public function getProgressperArea($area)
+    {
+        $today = date('Y-m-d', strtotime('Today'));
+        $res = $this->select('mastermodel, SUM(qty) as target, SUM(sisa) as remain, factory')
+            ->where('factory', $area)
+            ->where('delivery >', $today)
+            ->groupBy('mastermodel')
+            ->get()
+            ->getResultArray();
+
+        $reset = [];
+        foreach ($res as $data) {
+            $produksi = ($data['target'] - $data['remain']) / 24;
+            $target = $data['target'] / 24;
+
+            $persen = ($produksi / $target) * 100;
+            $formated = round($persen);
+            $data['persen'] = $formated;
+            $reset[] = [
+                'area' => $data['factory'],
+                'mastermodel' => $data['mastermodel'],
+                'target' => round($target),
+                'persen' => $formated,
+                'produksi' => round($produksi)
+            ];
+        }
+        return $reset;
+    }
     public function getIdMinus($validate)
     {
         return $this->select('idapsperstyle, delivery, sisa')

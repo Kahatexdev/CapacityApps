@@ -71,60 +71,19 @@ class ApsController extends BaseController
     }
     public function index()
     {
-
+        $idUser = session()->get('id_user');
+        $aksesArea = $this->aksesModel->aksesData($idUser);
+        $pdk = [];
+        foreach ($aksesArea as $ar) {
+            $pdk[$ar] = $this->ApsPerstyleModel->getProgressperArea($ar);
+        }
         $orderJalan = $this->bookingModel->getOrderJalan();
         $terimaBooking = $this->bookingModel->getBookingMasuk();
         $mcJalan = $this->jarumModel->mcJalan();
         $totalMc = $this->jarumModel->totalMc();
         $bulan = date('m');
 
-        $startDate = new \DateTime('first day of this month');
-        $LiburModel = new LiburModel();
-        $holidays = $LiburModel->findAll();
-        $currentMonth = $startDate->format('F');
-        $weekCount = 1; // Initialize week count for the first week of the month
-        $monthlyData = [];
 
-        for ($i = 0; $i < 52; $i++) {
-            $startOfWeek = clone $startDate;
-            $startOfWeek->modify("+$i week");
-            $startOfWeek->modify('Monday this week');
-
-            $endOfWeek = clone $startOfWeek;
-            $endOfWeek->modify('Sunday this week');
-            $numberOfDays = $startOfWeek->diff($endOfWeek)->days + 1;
-
-            $weekHolidays = [];
-            foreach ($holidays as $holiday) {
-                $holidayDate = new \DateTime($holiday['tanggal']);
-                if ($holidayDate >= $startOfWeek && $holidayDate <= $endOfWeek) {
-                    $weekHolidays[] = [
-                        'nama' => $holiday['nama'],
-                        'tanggal' => $holidayDate->format('d-F'),
-                    ];
-                    $numberOfDays--;
-                }
-            }
-            $currentMonthOfYear = $startOfWeek->format('F');
-            if ($currentMonth !== $currentMonthOfYear) {
-                $currentMonth = $currentMonthOfYear;
-                $weekCount = 1; // Reset week count
-                $monthlyData[$currentMonth] = [];
-            }
-
-            $startOfWeekFormatted = $startOfWeek->format('d/m');
-            $endOfWeekFormatted = $endOfWeek->format('d/m');
-
-            $monthlyData[$currentMonth][] = [
-                'week' => $weekCount,
-                'start_date' => $startOfWeekFormatted,
-                'end_date' => $endOfWeekFormatted,
-                'number_of_days' => $numberOfDays,
-                'holidays' => $weekHolidays,
-            ];
-
-            $weekCount++;
-        }
         $area = session()->get('username');
         $data = [
             'role' => session()->get('role'),
@@ -141,10 +100,8 @@ class ApsController extends BaseController
             'mcJalan' => $mcJalan,
             'totalMc' => $totalMc,
             'order' => $this->ApsPerstyleModel->getTurunOrder($bulan),
-            'weeklyRanges' => $monthlyData,
-            'DaftarLibur' => $holidays,
-            'area' => $area
-
+            'area' => $area,
+            'progress' => $pdk
 
         ];
         return view(session()->get('role') . '/index', $data);
@@ -561,10 +518,10 @@ class ApsController extends BaseController
         $area = $this->request->getGet('area');
         $jarum = $this->request->getGet('jarum');
         $id_pln_mc = $this->request->getGet('id_pln_mc');
-        
+
 
         $data = $this->ApsPerstyleModel->getDetailPlanning($area, $jarum);
-       
+
         foreach ($data as $row) {
             $row['id_pln_mc'] = $id_pln_mc;
             $this->DetailPlanningModel->insert($row);
