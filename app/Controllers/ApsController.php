@@ -114,6 +114,9 @@ class ApsController extends BaseController
             $filtered = array_filter($grouped, function ($item) use ($today) {
                 return $item['delivery'] <= $today;
             });
+            usort($filtered, function ($a, $b) {
+                return $a['percentage'] <=> $b['percentage'];
+            });
 
             // Simpan hasil per area
             $pdk[$ar] = $filtered;
