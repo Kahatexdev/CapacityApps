@@ -69,7 +69,7 @@
                                     <div class="col-lg-2">
                                         <h6 class="card-title"><?= $key['mastermodel'] ?></h6>
                                     </div>
-                                    <div class="col-lg-10">
+                                    <div class="col-lg-8">
                                         <div class="progress-wrapper">
                                             <div class="progress-info">
                                                 <div class="progress-percentage">
@@ -96,6 +96,10 @@
                                             </div>
 
                                         </div>
+
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <a class="btn btn-sm btn-info" href="<?= base_url($role . '/progressdetail/' . $key['mastermodel'] . '/' . $area) ?>">Details</a>
                                     </div>
                                 </div>
                             <?php endforeach ?>

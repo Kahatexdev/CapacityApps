@@ -561,4 +561,43 @@ class ApsPerstyleModel extends Model
             ->orderBy('delivery', 'ASC')
             ->findAll();
     }
+    public function getProgressDetail($model, $area)
+    {
+        $res = $this->select('mastermodel, delivery, SUM(qty/24) as target, SUM(sisa/24) as remain, factory,machinetypeid')
+            ->where('mastermodel', $model)
+            ->where('factory', $area)
+            ->groupBy(['delivery', 'machinetypeid'])
+            ->get()
+            ->getResultArray();
+
+        return $res;
+    }
+    public function getProgresPerdeliv($model, $area, $jarum)
+    {
+        $res = $this->select('mastermodel, delivery, SUM(qty/24) as target, SUM(sisa/24) as remain, factory,machinetypeid')
+            ->where('mastermodel', $model)
+            ->where('factory', $area)
+            ->where('machinetypeid', $jarum)
+            ->groupBy(['delivery'])
+            ->get()
+            ->getResultArray();
+        $result = [];
+        foreach ($res as $val) {
+            $produksi = $val['target'] - $val['remain'];
+            $percent = 0;
+            if ($produksi > 0) {
+                $percent = round(($produksi / $val['target']) * 100);
+            }
+            $result[$val['delivery']] = [
+                'mastermodel' => $model,
+                'jarum' => $val['machinetypeid'],
+                'target' => $val['target'],
+                'remain' => $val['remain'],
+                'delivery' => $val['delivery'],
+                'percentage' => $percent,
+            ];
+        }
+
+        return $result;
+    }
 }

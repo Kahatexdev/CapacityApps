@@ -217,7 +217,7 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
-                    <form action="<?= base_url($role . '/resetbsarea/'); ?>" method="post">
+                    <form action="<?= base_url($role . '/resetbsarea'); ?>" method="post">
                         <div class="modal-body align-items-center">
                             <div class="form-group">
                                 <label for="awal">Area</label>
@@ -256,7 +256,7 @@
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
-            <form action="<?= base_url($role . '/resetbsarea/'); ?>" method="post">
+            <form action="<?= base_url($role . '/resetbsarea'); ?>" method="post">
                 <div class="modal-body align-items-center">
                     <div class="form-group">
                         <label for="awal">Area</label>
