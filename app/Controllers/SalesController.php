@@ -25,6 +25,7 @@ class SalesController extends BaseController
 {
     protected $filters;
     protected $jarumModel;
+    protected $cylinderModel;
     protected $productModel;
     protected $produksiModel;
     protected $bookingModel;
@@ -35,6 +36,7 @@ class SalesController extends BaseController
     public function __construct()
     {
         $this->jarumModel = new DataMesinModel();
+        $this->cylinderModel = new cylinderModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
         $this->produksiModel = new ProduksiModel();
@@ -389,7 +391,7 @@ class SalesController extends BaseController
                         'totalConfirmOrder' => 0,
                         'totalSisaConfirmOrder' => 0,
                         'totalExess' => 0,
-                        'totalExessPercentage' => 0,
+                        'totalExessPercentage' => 0
                     ],
                     'weeks' => []
                 ];
@@ -923,8 +925,12 @@ class SalesController extends BaseController
         $brands = ['Dakong', 'Rosso', 'Mechanic', 'Lonati'];
 
         $allData = [];
+        $totalExportPerBulan = [];
+        $totalLokalPerBulan = [];
+        $ttlConfirmPerBulan = [];
         foreach ($dataJarum as $alias) {
             $aliasjarum = $alias['aliasjarum'];
+            $jarum = $alias['jarum'];
             $brandData = [];
             $totals = [
                 'totalMc' => 0,
@@ -934,12 +940,16 @@ class SalesController extends BaseController
                 'totalWarehouse' => 0,
                 'totalBreakdown' => 0,
                 'totalRunningAct' => 0,
-                'totalProd' => 0 // Untuk menyimpan total $prod
+                'totalProd' => 0,
+                'totalCylinderDk' => 0,
+                'totalCylinderThs' => 0,
+                'totalCylinderRs' => 0
             ];
             $dataRunningSplWh = $this->jarumModel->getRunningMcSplAllAlias($aliasjarum); // get data running sample per aliasjarum
             // Ambil data kapasitas per brand dan hitung total
             foreach ($brands as $brand) {
                 $data = $this->jarumModel->getTotalMcPerBrand($brand, $aliasjarum); // total mc per brand + sample & total mc running tanpa sample
+                $dataCylinder = $this->cylinderModel->getCylinder($jarum); // ambil dara cylinder berdasarkan jarum & brand
 
                 // Inisialisasi total per brand
                 $brandTotals = [
@@ -948,9 +958,8 @@ class SalesController extends BaseController
                     'totalRunning' => 0,
                     'totalRunningAct' => 0,
                     'target' => 0,
-                    'totalProd' => 0
+                    'totalProd' => 0,
                 ];
-
                 // Hitung total untuk setiap brand
                 foreach ($data as $item) {
                     // Pastikan $item adalah array dan memiliki kunci yang dibutuhkan
@@ -967,7 +976,6 @@ class SalesController extends BaseController
                     }
                 }
 
-
                 // Simpan total per brand ke dalam $brandData
                 $brandData[$brand] = $brandTotals;
 
@@ -978,6 +986,7 @@ class SalesController extends BaseController
                 $totals['totalRunningAct'] += $brandTotals['totalRunningAct'] ?? 0;
                 $totals['totalProd'] += $brandTotals['totalProd'] ?? 0;
             }
+
             foreach ($dataRunningSplWh as $splWh) {
                 if (is_array($splWh)) {
                     $totals['totalSample'] += $splWh['running_spl'] ?? 0;
@@ -986,16 +995,19 @@ class SalesController extends BaseController
                 }
             }
 
-            $startDate = new \DateTime(); // Tanggal hari ini
+            foreach ($dataCylinder as $cylinder) {
+                $totals['totalCylinderDk'] = $cylinder['qty_dakong'];
+                $totals['totalCylinderThs'] = $cylinder['qty_ths'];
+                $totals['totalCylinderRs'] = $cylinder['qty_rosso'];
+            }
+
+            $startDate = new \DateTime('first day of this month'); // Tanggal hari ini
             $endDate = new \DateTime('+1 years'); // Tanggal satu tahun ke depan
 
             $LiburModel = new LiburModel();
             $holidays = $LiburModel->findAll();
 
-            // Ambil total kapasitas dan jenis jarum per alias
-            $jarum = $alias['jarum']; // get jenis jarum per aliasjarum
             $monthlyData = [];
-
             // Penentuan week
             $currentYear = (new \DateTime())->format('Y'); // Ambil tahun dari tanggal hari ini
             $startWeek = new \DateTime("$currentYear-01-01"); // Buat tanggal untuk hari pertama bulan Januari tahun ini
@@ -1171,6 +1183,33 @@ class SalesController extends BaseController
                 $monthlyData[$currentMonthOfYear]['monthlySummary']['totalSisaConfirmOrder'] += $sisaConfirmOrder;
                 $monthlyData[$currentMonthOfYear]['monthlySummary']['totalExess'] += $exess;
 
+                $thisMonth = [
+                    'start' => $startDate->format('Y-m-') . '01',
+                    'end' => $startDate->format('Y-m-') . '25',
+                ];
+                // data export, inspect & lokal per bulan
+                $dataExport = $this->ApsPerstyleModel->getTotalConfirmByMonth($thisMonth);
+                foreach ($dataExport as $dExport) {
+                    $export = ($dExport > 0) ? ceil($dExport / 24) : 0;
+
+                    // Tambahkan export ke total per bulan
+                    if (!isset($totalExportPerBulan[$currentMonthOfYear])) {
+                        $totalExportPerBulan[$currentMonthOfYear] = 0; // Inisialisasi jika belum ada
+                    }
+                    $totalExportPerBulan[$currentMonthOfYear] = $export; // Tambahkan export
+                }
+                $dataLokal = $this->ApsPerstyleModel->getTotalConfirmByMontLokal($thisMonth);
+                foreach ($dataLokal as $dLokal) {
+                    $lokal = ($dLokal > 0) ? ceil($dLokal / 24) : 0;
+
+                    // Tambahkan lokal ke total per bulan
+                    $currentMonthOfYear = $startDate->format('F-Y');
+                    if (!isset($totalLokalPerBulan[$currentMonthOfYear])) {
+                        $totalLokalPerBulan[$currentMonthOfYear] = 0; // Inisialisasi jika belum ada
+                    }
+                    $totalLokalPerBulan[$currentMonthOfYear] = $lokal; // Tambahkan lokal
+                }
+
                 // Ambil total max kapasitas dan exess setelah penjumlahan
                 $totalMaxCapacity = $monthlyData[$currentMonthOfYear]['monthlySummary']['totalMaxCapacity'];
                 $totalExess = $monthlyData[$currentMonthOfYear]['monthlySummary']['totalExess'];
@@ -1187,6 +1226,7 @@ class SalesController extends BaseController
                     $startDate = (clone $endOfWeek)->modify('+1 day');
                 }
             }
+
             // Setelah semua data mingguan diproses, tampilkan hasil per aliasjarum
             $allData[$aliasjarum] = [
                 'jarum' => $jarum,
@@ -1195,6 +1235,13 @@ class SalesController extends BaseController
                 'monthlyData' => $monthlyData,
             ];
         }
+        $allData['total'] = [
+            'totalExport' => $totalExportPerBulan,
+            'totalLokal' => $totalLokalPerBulan,
+        ];
+
+        // dd($allData);
+
         // Buat spreadsheet
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -1555,13 +1602,13 @@ class SalesController extends BaseController
                 ->getStyle('N' . $rowBody)
                 ->applyFromArray($styleBody);
             // stock cylinder
-            $sheet->setCellValue('O' . $rowBody, 0)
+            $sheet->setCellValue('O' . $rowBody, isset($data['totals']['totalCylinderDk']) ? $data['totals']['totalCylinderDk'] : 0)
                 ->getStyle('O' . $rowBody)
                 ->applyFromArray($styleBody);
-            $sheet->setCellValue('P' . $rowBody, 0)
+            $sheet->setCellValue('P' . $rowBody, isset($data['totals']['totalCylinderThs']) ? $data['totals']['totalCylinderThs'] : 0)
                 ->getStyle('P' . $rowBody)
                 ->applyFromArray($styleBody);
-            $sheet->setCellValue('Q' . $rowBody, 0)
+            $sheet->setCellValue('Q' . $rowBody, isset($data['totals']['totalCylinderRs']) ? $data['totals']['totalCylinderRs'] : 0)
                 ->getStyle('Q' . $rowBody)
                 ->applyFromArray($styleBody);
             // running mc actual
@@ -1571,7 +1618,7 @@ class SalesController extends BaseController
             $sheet->setCellValue('S' . $rowBody, 0)
                 ->getStyle('S' . $rowBody)
                 ->applyFromArray($styleBody);
-            $sheet->setCellValue('T' . $rowBody, 0)
+            $sheet->setCellValue('T' . $rowBody, isset($data['totals']['totalRunningAct']) ? $data['totals']['totalRunningAct'] : 0)
                 ->getStyle('T' . $rowBody)
                 ->applyFromArray($styleBody);
             $sheet->setCellValue('U' . $rowBody, isset($data['totals']['totalProd']) ? $data['totals']['totalProd'] : 0)
@@ -1584,7 +1631,6 @@ class SalesController extends BaseController
                 foreach ($data['monthlyData'] as $month => $currentMonth) :
                     $startColumnBody = $columnBody; // Kolom awal 
                     foreach ($currentMonth['weeks'] as $week) :
-                        // dd($week);
                         $sheet->setCellValue($startColumnBody . $rowBody, isset($week['maxCapacity']) ? $week['maxCapacity'] : 0)
                             ->getStyle($startColumnBody . $rowBody)
                             ->applyFromArray($styleBody);
@@ -1787,6 +1833,7 @@ class SalesController extends BaseController
         $colGrandTotalSisaBooking = Coordinate::columnIndexFromString($columnGrandTotal) + 3; // Konversi huruf kolom ke nomor indeks kolom
         $colGrandTotalExess = Coordinate::columnIndexFromString($columnGrandTotal) + 4; // Konversi huruf kolom ke nomor indeks kolom
         $colGrandTotalPersentaseExess = Coordinate::columnIndexFromString($columnGrandTotal) + 5; // Konversi huruf kolom ke nomor indeks kolom
+
         foreach ($monthlyData as $month => $data) :
             // month
             $weekCount = count($data['weeks']); // Hitung jumlah minggu dalam bulan
@@ -1795,8 +1842,20 @@ class SalesController extends BaseController
             $endColumn = Coordinate::stringFromColumnIndex($endCol_index); // Konversi kembali dari nomor indeks kolom ke huruf kolom
             $endColTitle_index = $col_index + 1; // untuk title grandTotal
             $endColumnTitle = Coordinate::stringFromColumnIndex($endColTitle_index); // Konversi kembali dari nomor indeks kolom ke huruf kolom
+
             $startColGrandtotal_index = $endColTitle_index + 1; // Konversi kembali dari nomor indeks kolom ke huruf kolom
-            $startColumnGrandtotal = Coordinate::stringFromColumnIndex($startColGrandtotal_index); // untuk isi grandTotal
+            $startColumnGrandtotal = Coordinate::stringFromColumnIndex($startColGrandtotal_index); // untuk start isi grandTotal
+            $endColGrandtotal_index = $startColGrandtotal_index + 1; // Konversi kembali dari nomor indeks kolom ke huruf kolom
+            $endColumnGrandtotal = Coordinate::stringFromColumnIndex($endColGrandtotal_index); // untuk end isi grandTotal
+
+            $startTitleGrandExport_index = $endColGrandtotal_index + 1; // Konversi kembali dari nomor indeks kolom ke huruf kolom
+            $startTitleGrandExport = Coordinate::stringFromColumnIndex($startTitleGrandExport_index); // untuk start title grandExport
+            $endTitleGrandExport_index = $startTitleGrandExport_index + 1; // Konversi kembali dari nomor indeks kolom ke huruf kolom
+            $endTitleGrandExport = Coordinate::stringFromColumnIndex($endTitleGrandExport_index); // untuk end title grandExport
+
+            $startColTitleGrandExport_index = $endTitleGrandExport_index + 1; // Konversi kembali dari nomor indeks kolom ke huruf kolom
+            $startColumnTitleGrandExport = Coordinate::stringFromColumnIndex($startColTitleGrandExport_index); // untuk start isi grandExport
+
             $totalWeeks = 0; // Inisialisasi total minggu
             // untuk menghitung total minggu
             if (isset($data['weeks']) && is_array($data['weeks'])) {
@@ -1878,8 +1937,18 @@ class SalesController extends BaseController
             $colGrandTotalConfirm = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
 
             $sheet->setCellValue($startColumnGrandtotal . $rowGrandtotal, $grandTotalConfirm);
-            $sheet->mergeCells($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
-                ->getStyle($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+            $sheet->mergeCells($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumnGrandtotal . $rowGrandtotal)
+                ->getStyle($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumnGrandtotal . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+
+            $sheet->setCellValue($startTitleGrandExport . $rowGrandtotal, "Total Export");
+            $sheet->mergeCells($startTitleGrandExport . $rowGrandtotal . ':' . $endTitleGrandExport . $rowGrandtotal)
+                ->getStyle($startTitleGrandExport . $rowGrandtotal . ':' . $endTitleGrandExport . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+
+            $sheet->setCellValue($startColumnTitleGrandExport . $rowGrandtotal, $allData['total']['totalExport'][$month]);
+            $sheet->mergeCells($startColumnTitleGrandExport . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+                ->getStyle($startColumnTitleGrandExport . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
                 ->applyFromArray($styleGrandTotal);
 
             $startColGrandtotal_index = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
@@ -1912,8 +1981,22 @@ class SalesController extends BaseController
             $colGrandTotalSisaOrder = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
 
             $sheet->setCellValue($startColumnGrandtotal . $rowGrandtotal, $grandTotalSisaOrder);
-            $sheet->mergeCells($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
-                ->getStyle($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+            $sheet->mergeCells($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumnGrandtotal . $rowGrandtotal)
+                ->getStyle($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumnGrandtotal . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+
+            $sheet->setCellValue($startTitleGrandExport . $rowGrandtotal, "Total Inspect");
+            $sheet->mergeCells($startTitleGrandExport . $rowGrandtotal . ':' . $endTitleGrandExport . $rowGrandtotal)
+                ->getStyle($startTitleGrandExport . $rowGrandtotal . ':' . $endTitleGrandExport . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+
+            $colConfirm_index = $startColTitleGrandExport_index - 4;
+            $colConfirm = Coordinate::stringFromColumnIndex($colConfirm_index);
+            $rowConfirm_Export = $rowGrandtotal - 1;
+            $rowLokal = $rowGrandtotal + 1;
+            $sheet->setCellValue($startColumnTitleGrandExport . $rowGrandtotal, "=" . $colConfirm . $rowConfirm_Export . "-" . $startColumnTitleGrandExport . $rowConfirm_Export . "-" . $startColumnTitleGrandExport . $rowLokal); // Confirm Order - Export -Lokal
+            $sheet->mergeCells($startColumnTitleGrandExport . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+                ->getStyle($startColumnTitleGrandExport . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
                 ->applyFromArray($styleGrandTotal);
 
             $startColGrandtotal_index = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
@@ -1946,9 +2029,20 @@ class SalesController extends BaseController
             $colGrandTotalSisaBooking = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
 
             $sheet->setCellValue($startColumnGrandtotal . $rowGrandtotal, $grandTotalSisaBooking);
-            $sheet->mergeCells($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
-                ->getStyle($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+            $sheet->mergeCells($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumnGrandtotal . $rowGrandtotal)
+                ->getStyle($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumnGrandtotal . $rowGrandtotal)
                 ->applyFromArray($styleGrandTotal);
+
+            $sheet->setCellValue($startTitleGrandExport . $rowGrandtotal, "Total Lokal");
+            $sheet->mergeCells($startTitleGrandExport . $rowGrandtotal . ':' . $endTitleGrandExport . $rowGrandtotal)
+                ->getStyle($startTitleGrandExport . $rowGrandtotal . ':' . $endTitleGrandExport . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+
+            $sheet->setCellValue($startColumnTitleGrandExport . $rowGrandtotal, $allData['total']['totalLokal'][$month]);
+            $sheet->mergeCells($startColumnTitleGrandExport . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+                ->getStyle($startColumnTitleGrandExport . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+
 
             $startColGrandtotal_index = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
 
