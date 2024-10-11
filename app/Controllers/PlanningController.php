@@ -117,12 +117,13 @@ class PlanningController extends BaseController
         $pdk = $this->request->getPost("no_model");
         $jarum = $this->request->getPost("jarum");
         $area = $this->request->getPost("area");
-        if (strpos($area, 'kk' !== 'false')) {
+        if (strpos($area, 'KK' !== 'false')) {
             $pu = 'CJ';
         } else {
-            $pu = 'MJ';
+            $pu = 'CJ';
         }
         foreach ($deliv as $del) {
+
             $data = [
                 'role' => session()->get('role'),
                 'mastermodel' => $pdk,
@@ -131,6 +132,7 @@ class PlanningController extends BaseController
                 'delivery' => $del,
                 'pu' => $pu
             ];
+
             $assign = $this->ApsPerstyleModel->asignAreal($data);
             if (!$assign) {
                 return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $pdk . '/' . $jarum))->withInput()->with('error', 'Gagal Assign Area');

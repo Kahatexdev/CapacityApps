@@ -78,12 +78,12 @@
                                         <div class="progress" style="height: 8px;">
                                             <div id="<?= $key['mastermodel'] ?>-progress-bar"
                                                 class="progress-bar <?php if ($key['percentage'] < 100): ?>
-                                                        bg-gradient-info
-                                                    <?php elseif ($key['percentage'] == 100): ?>
-                                                        bg-gradient-success
-                                                    <?php else: ?>
-                                                        bg-gradient-danger
-                                                    <?php endif; ?>"
+                                    bg-gradient-info
+                                <?php elseif ($key['percentage'] == 100): ?>
+                                    bg-gradient-success
+                                <?php else: ?>
+                                    bg-gradient-danger
+                                <?php endif; ?>"
                                                 role="progressbar"
                                                 style="width: <?= $key['percentage'] ?>%; height: 8px;">
                                             </div>
@@ -97,7 +97,7 @@
                                 </div>
                             </div>
 
-                            <!-- Section for collapsible details -->
+                            <!-- Section for collapsible delivery details -->
                             <div class="collapse" id="collapse-<?= $key['jarum'] ?>" style="padding-left: 20px;">
                                 <?php foreach ($key['detail'] as $deliveryDate => $row): ?>
                                     <div class="row mt-2">
@@ -108,29 +108,69 @@
                                             <div class="progress-wrapper">
                                                 <div class="progress-info">
                                                     <span class="text-sm font-weight-bold" style="color: #777;">
-                                                        <?= $row['percentage'] ?>% (<?= $row['target'] - $row['remain'] ?> dz / <?= $row['target'] ?> dz)
+                                                        <?= $row['percentage'] ?>% (<?= round($row['target'] - $row['remain']) ?> dz / <?= round($row['target']) ?> dz)
                                                     </span>
                                                 </div>
                                                 <div class="progress" style="height: 6px;">
                                                     <div id="<?= $row['mastermodel'] ?>-progress-bar"
                                                         class="progress-bar <?php if ($row['percentage'] < 100): ?>
-                                                        bg-gradient-info
-                                                    <?php elseif ($row['percentage'] == 100): ?>
-                                                        bg-gradient-success
-                                                    <?php else: ?>
-                                                        bg-gradient-danger
-                                                    <?php endif; ?>"
+                                    bg-gradient-info
+                                <?php elseif ($row['percentage'] == 100): ?>
+                                    bg-gradient-success
+                                <?php else: ?>
+                                    bg-gradient-danger
+                                <?php endif; ?>"
                                                         role="progressbar"
                                                         style="width: <?= $row['percentage'] ?>%; height: 6px;">
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="col-lg-2">
+                                            <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#collapse-<?= $row['delivery'] ?>-<?= $jarum ?>" aria-expanded="false">
+                                                Sizes
+                                            </button>
+                                        </div>
                                     </div>
+
+                                    <!-- Section for collapsible size details -->
+                                    <div class="collapse" id="collapse-<?= $row['delivery'] ?>-<?= $jarum ?>" style="padding-left: 40px;">
+                                        <?php foreach ($row['size'] as $size => $sizeDetail): ?>
+                                            <div class="row mt-2">
+                                                <div class="col-lg-3">
+                                                    <h6 class="text-muted"> <?= $size ?></h6>
+                                                </div>
+                                                <div class="col-lg-8">
+                                                    <div class="progress-wrapper">
+                                                        <div class="progress-info">
+                                                            <span class="text-sm" style="color: #999;">
+                                                                <?= $sizeDetail['percentage'] ?>% (<?= round($sizeDetail['target'] - $sizeDetail['remain']) ?> dz / <?= round($sizeDetail['target']) ?> dz)
+                                                            </span>
+                                                        </div>
+                                                        <div class="progress" style="height: 4px;">
+                                                            <div id="<?= $sizeDetail['mastermodel'] ?>-progress-bar"
+                                                                class="progress-bar <?php if ($sizeDetail['percentage'] < 100): ?>
+                                            bg-gradient-info
+                                        <?php elseif ($sizeDetail['percentage'] == 100): ?>
+                                            bg-gradient-success
+                                        <?php else: ?>
+                                            bg-gradient-danger
+                                        <?php endif; ?>"
+                                                                role="progressbar"
+                                                                style="width: <?= $sizeDetail['percentage'] ?>%; height: 4px;">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+
                                 <?php endforeach; ?>
                             </div>
                         <?php endforeach; ?>
                     </div>
+
 
 
                 </div>

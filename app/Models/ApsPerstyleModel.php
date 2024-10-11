@@ -139,12 +139,15 @@ class ApsPerstyleModel extends Model
     public function asignareal($data)
     {
         $this->set('factory', $data['area'])
+            ->set('production_unit', $data['pu'])
+            ->where('delivery', $data['delivery'])
             ->where('mastermodel', $data['mastermodel'])
             ->where('machinetypeid', $data['jarum'])
             ->update();
 
         return $this->affectedRows();
     }
+
     public function asignarealall($data)
     {
         $this->set('factory', $data['area'])
@@ -591,6 +594,36 @@ class ApsPerstyleModel extends Model
             $result[$val['delivery']] = [
                 'mastermodel' => $model,
                 'jarum' => $val['machinetypeid'],
+                'target' => $val['target'],
+                'remain' => $val['remain'],
+                'delivery' => $val['delivery'],
+                'percentage' => $percent,
+            ];
+        }
+
+        return $result;
+    }
+    public function progressdetail($data)
+    {
+        $res = $this->select('mastermodel,size, delivery, SUM(qty/24) as target, SUM(sisa/24) as remain, factory,machinetypeid')
+            ->where('mastermodel', $data['model'])
+            ->where('factory', $data['area'])
+            ->where('machinetypeid', $data['jarum'])
+            ->where('delivery', $data['delivery'])
+            ->groupBy(['size'])
+            ->get()
+            ->getResultArray();
+        $result = [];
+        foreach ($res as $val) {
+            $produksi = $val['target'] - $val['remain'];
+            $percent = 0;
+            if ($produksi > 0) {
+                $percent = round(($produksi / $val['target']) * 100);
+            }
+            $result[$val['size']] = [
+                'mastermodel' => $data['model'],
+                'jarum' => $val['machinetypeid'],
+                'size' => $val['size'],
                 'target' => $val['target'],
                 'remain' => $val['remain'],
                 'delivery' => $val['delivery'],
