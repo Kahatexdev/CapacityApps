@@ -272,11 +272,11 @@ class DataMesinModel extends Model
         aliasjarum, 
         jarum, 
         SUM(CASE WHEN pu = "CJ" AND area = "SAMPLE" THEN total_mc ELSE 0 END) AS running_spl,
-        SUM(CASE WHEN pu = "CJ" AND area = "WAREHOUSE" AND brand NOT LIKE "%rusak%" THEN total_mc ELSE 0 END) AS warehouse, 
-        SUM(CASE WHEN pu = "CJ" AND area = "WAREHOUSE" AND brand LIKE "%rusak%" THEN total_mc ELSE 0 END) AS breakdown, 
+        SUM(CASE WHEN pu = "CJ" AND area = "WAREHOUSE" AND brand NOT LIKE "%(RUSAK)%" THEN total_mc ELSE 0 END) AS warehouse, 
+        SUM(CASE WHEN pu = "CJ" AND area = "WAREHOUSE" AND brand LIKE "%(RUSAK)%" THEN total_mc ELSE 0 END) AS breakdown, 
         SUM(CASE WHEN pu = "MJ" AND area = "SAMPLE" THEN total_mc ELSE 0 END) AS running_splmj,
-        SUM(CASE WHEN pu = "MJ" AND area = "WAREHOUSE" AND brand NOT LIKE "%rusak%" THEN total_mc ELSE 0 END) AS warehouse_mj, 
-        SUM(CASE WHEN pu = "MJ" AND area = "WAREHOUSE" AND brand LIKE "%rusak%" THEN total_mc ELSE 0 END) AS breakdown_mj')
+        SUM(CASE WHEN pu = "MJ" AND area = "WAREHOUSE" AND brand NOT LIKE "%(RUSAK)%" THEN total_mc ELSE 0 END) AS warehouse_mj, 
+        SUM(CASE WHEN pu = "MJ" AND area = "WAREHOUSE" AND brand LIKE "%(RUSAK)%" THEN total_mc ELSE 0 END) AS breakdown_mj')
             ->where('aliasjarum', $aliasjarum) // Kondisi where untuk aliasjarum
             // ->where('brand LIKE', '%' . $brand . '%') // Kondisi where untuk brand
             ->groupBy('aliasjarum') // Urutkan berdasarkan "brand"
