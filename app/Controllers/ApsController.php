@@ -74,16 +74,58 @@ class ApsController extends BaseController
         $idUser = session()->get('id_user');
         $aksesArea = $this->aksesModel->aksesData($idUser);
         $pdk = [];
+
         foreach ($aksesArea as $ar) {
-            $pdk[$ar] = $this->ApsPerstyleModel->getProgressperArea($ar);
+            // Dapatkan data progress per area
+            $areaProgress = $this->ApsPerstyleModel->getProgressperArea($ar);
+            $lastmonth = date('Y-m-d', strtotime('- 1 month'));
+
+            // Grup by mastermodel
+            $grouped = [];
+            foreach ($areaProgress as $item) {
+                $model = $item['mastermodel'];
+                if (!isset($grouped[$model])) {
+                    $grouped[$model] = [
+                        'mastermodel' => $model,
+                        'target' => 0,
+                        'remain' => 0,
+                        'delivery' => $item['delivery'],
+                        'percentage' => 0,
+                    ];
+                }
+
+                // Jumlahkan target dan remain
+                $grouped[$model]['target'] += (int)$item['target'];
+                $grouped[$model]['remain'] += (int)$item['remain'];
+                $produksi = $grouped[$model]['target'] - $grouped[$model]['remain'];
+
+                // Hitung percentage hanya jika produksi > 0
+                if ($produksi > 0) {
+                    $grouped[$model]['percentage'] = round(($produksi / $grouped[$model]['target']) * 100);
+                }
+
+                // Ambil delivery paling akhir
+                if ($grouped[$model]['delivery'] < $item['delivery']) {
+                    $grouped[$model]['delivery'] = $item['delivery'];
+                }
+            }
+
+            // Filter yang delivery >= hari ini
+            $filtered = array_filter($grouped, function ($item) use ($lastmonth) {
+                return $item['delivery'] >= $lastmonth;
+            });
+            usort($filtered, function ($a, $b) {
+                return $a['percentage'] <=> $b['percentage'];
+            });
+
+            // Simpan hasil per area
+            $pdk[$ar] = $filtered;
         }
         $orderJalan = $this->bookingModel->getOrderJalan();
         $terimaBooking = $this->bookingModel->getBookingMasuk();
         $mcJalan = $this->jarumModel->mcJalan();
         $totalMc = $this->jarumModel->totalMc();
         $bulan = date('m');
-
-
         $area = session()->get('username');
         $data = [
             'role' => session()->get('role'),
@@ -106,6 +148,93 @@ class ApsController extends BaseController
         ];
         return view(session()->get('role') . '/index', $data);
     }
+    public function progressdetail($model, $area)
+    {
+        $pdk = [];
+        $pdkProg = $this->ApsPerstyleModel->getProgressDetail($model, $area);
+        $today = date('Y-m-d');
+
+        // Grup by mastermodel dan machinetypeid (jarum)
+        $groupedDetail = [];
+        foreach ($pdkProg as $item) {
+            $model = $item['mastermodel'];
+            $jarum = $item['machinetypeid'];  // Mengelompokkan juga berdasarkan jarum
+            // Gabungkan mastermodel dan jarum sebagai kunci
+            $key = $jarum;
+
+            if (!isset($groupedDetail[$key])) {
+                $groupedDetail[$key] = [
+                    'mastermodel' => $model,
+                    'jarum' => $jarum,
+                    'target' => 0,
+                    'remain' => 0,
+                    'delivery' => $item['delivery'],
+                    'percentage' => 0,
+                    'detail' => [] // Tambahin array buat detail
+                ];
+            }
+
+            // Jumlahkan target dan remain dengan tipe float untuk mengakomodasi desimal
+            $groupedDetail[$key]['target'] += (float)$item['target'];
+            $groupedDetail[$key]['remain'] += (float)$item['remain'];
+            $produksi = $groupedDetail[$key]['target'] - $groupedDetail[$key]['remain'];
+
+            // Hitung percentage hanya jika produksi > 0
+            if ($produksi > 0) {
+                $groupedDetail[$key]['percentage'] = round(($produksi / $groupedDetail[$key]['target']) * 100);
+            }
+
+            // Ambil data progress per delivery
+            $progresPerDeliv = $this->ApsPerstyleModel->getProgresPerdeliv($model, $area, $jarum);
+            foreach ($progresPerDeliv as $dlv) {
+                $cek = [
+                    'model' => $model,
+                    'area' => $area,
+                    'jarum' => $jarum,
+                    'delivery' => $dlv['delivery']
+                ];
+
+                // Ambil detail progress per ukuran (size)
+                $sizes = $this->ApsPerstyleModel->progressdetail($cek);
+
+                // Assign size ke dalam detail delivery yang sesuai
+                $groupedDetail[$key]['detail'][$dlv['delivery']] = [
+                    'mastermodel' => $model,
+                    'jarum' => $jarum,
+                    'target' => (float)$dlv['target'],
+                    'remain' => (float)$dlv['remain'],
+                    'delivery' => $dlv['delivery'],
+                    'percentage' => round((($dlv['target'] - $dlv['remain']) / $dlv['target']) * 100),
+                    'size' => $sizes // Assign detail size ke dalam delivery
+                ];
+            }
+        }
+
+
+        usort($groupedDetail, function ($a, $b) {
+            return $a['percentage'] <=> $b['percentage'];
+        });
+
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Capacity System',
+            'active1' => 'active',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'area' => $area,
+            'model' => $model,
+            'perjarum' => $groupedDetail,
+
+        ];
+        return view(session()->get('role') . '/progressdetail', $data);
+    }
+
+
+
     public function booking()
     {
         $dataJarum = $this->jarumModel->getJarum();
@@ -650,8 +779,5 @@ class ApsController extends BaseController
         } else {
             return redirect()->to(base_url(session()->get('role') . '/planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm . '&judul=' . $judul))->withInput()->with('error', 'Data Gagal Disimpan');
         }
-
-
-        dd($dataestqty);
     }
 }

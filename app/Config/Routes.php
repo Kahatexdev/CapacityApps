@@ -238,6 +238,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('databookingbulantampil/(:any)/(:any)/(:any)', 'ApsController::bookingPerBulanJarumTampil/$1/$2/$3');
     $routes->get('detailbooking/(:any)', 'ApsController::detailbooking/$1');
 
+    $routes->get('progressdetail/(:any)/(:any)', 'ApsController::progressdetail/$1/$2');
     //order
     $routes->get('', 'ApsController::index');
     $routes->get('dataorder', 'ApsController::orderPerArea');

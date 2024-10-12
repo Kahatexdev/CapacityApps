@@ -69,18 +69,37 @@
                                     <div class="col-lg-2">
                                         <h6 class="card-title"><?= $key['mastermodel'] ?></h6>
                                     </div>
-                                    <div class="col-lg-10">
+                                    <div class="col-lg-8">
                                         <div class="progress-wrapper">
                                             <div class="progress-info">
                                                 <div class="progress-percentage">
-                                                    <span class="text-sm font-weight-bold " id="<?= $key['mastermodel'] ?>-progressText"> <?= $key['persen'] ?>% (<?= $key['target'] - $key['produksi'] ?> dz / <?= $key['produksi'] ?> dz)</span>
+                                                    <span class="text-sm font-weight-bold " id="<?= $key['mastermodel'] ?>-progressText"> <?= $key['percentage'] ?>% (<?= $key['target'] - $key['remain'] ?> dz / <?= $key['target'] ?> dz)</span>
                                                 </div>
                                             </div>
                                             <!-- Tambahkan ID ke elemen progress bar -->
                                             <div class="progress">
-                                                <div id="<?= $key['mastermodel'] ?>-progress-bar" class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="<?= $key['persen'] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $key['persen'] ?>%; height: 10px;"></div>
+                                                <div id="<?= $key['mastermodel'] ?>-progress-bar"
+                                                    class="progress-bar 
+                                                    <?php if ($key['percentage'] < 100): ?>
+                                                        bg-gradient-info
+                                                    <?php elseif ($key['percentage'] == 100): ?>
+                                                        bg-gradient-success
+                                                    <?php else: ?>
+                                                        bg-gradient-danger
+                                                    <?php endif; ?>"
+                                                    role="progressbar"
+                                                    aria-valuenow="<?= $key['percentage'] ?>"
+                                                    aria-valuemin="0"
+                                                    aria-valuemax="100"
+                                                    style="width: <?= $key['percentage'] ?>%; height: 10px;">
+                                                </div>
                                             </div>
+
                                         </div>
+
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <a class="btn btn-sm btn-info" href="<?= base_url($role . '/progressdetail/' . $key['mastermodel'] . '/' . $area) ?>">Details</a>
                                     </div>
                                 </div>
                             <?php endforeach ?>

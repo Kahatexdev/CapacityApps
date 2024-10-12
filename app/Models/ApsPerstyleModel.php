@@ -139,12 +139,15 @@ class ApsPerstyleModel extends Model
     public function asignareal($data)
     {
         $this->set('factory', $data['area'])
+            ->set('production_unit', $data['pu'])
+            ->where('delivery', $data['delivery'])
             ->where('mastermodel', $data['mastermodel'])
             ->where('machinetypeid', $data['jarum'])
             ->update();
 
         return $this->affectedRows();
     }
+
     public function asignarealall($data)
     {
         $this->set('factory', $data['area'])
@@ -204,32 +207,18 @@ class ApsPerstyleModel extends Model
     }
     public function getProgressperArea($area)
     {
-        $today = date('Y-m-d', strtotime('Today'));
-        $res = $this->select('mastermodel, SUM(qty) as target, SUM(sisa) as remain, factory')
+
+        // Ambil data dari database, termasuk semua delivery dates yang relevan
+        $res = $this->select('mastermodel, delivery, SUM(qty/24) as target, SUM(sisa/24) as remain, factory')
             ->where('factory', $area)
-            ->where('delivery >', $today)
-            ->groupBy('mastermodel')
+            ->groupBy(['delivery', 'mastermodel']) // Group by mastermodel dan delivery
             ->get()
             ->getResultArray();
 
-        $reset = [];
-        foreach ($res as $data) {
-            $produksi = ($data['target'] - $data['remain']) / 24;
-            $target = $data['target'] / 24;
-
-            $persen = ($produksi / $target) * 100;
-            $formated = round($persen);
-            $data['persen'] = $formated;
-            $reset[] = [
-                'area' => $data['factory'],
-                'mastermodel' => $data['mastermodel'],
-                'target' => round($target),
-                'persen' => $formated,
-                'produksi' => round($produksi)
-            ];
-        }
-        return $reset;
+        return $res;
     }
+
+
     public function getIdMinus($validate)
     {
         return $this->select('idapsperstyle, delivery, sisa')
@@ -573,6 +562,75 @@ class ApsPerstyleModel extends Model
             ->groupBy('MONTH(delivery)')
             ->orderBy('delivery', 'ASC')
             ->findAll();
+    }
+    public function getProgressDetail($model, $area)
+    {
+        $res = $this->select('mastermodel, delivery, SUM(qty/24) as target, SUM(sisa/24) as remain, factory,machinetypeid')
+            ->where('mastermodel', $model)
+            ->where('factory', $area)
+            ->groupBy(['delivery', 'machinetypeid'])
+            ->get()
+            ->getResultArray();
+
+        return $res;
+    }
+    public function getProgresPerdeliv($model, $area, $jarum)
+    {
+        $res = $this->select('mastermodel, delivery, SUM(qty/24) as target, SUM(sisa/24) as remain, factory,machinetypeid')
+            ->where('mastermodel', $model)
+            ->where('factory', $area)
+            ->where('machinetypeid', $jarum)
+            ->groupBy(['delivery'])
+            ->get()
+            ->getResultArray();
+        $result = [];
+        foreach ($res as $val) {
+            $produksi = $val['target'] - $val['remain'];
+            $percent = 0;
+            if ($produksi > 0) {
+                $percent = round(($produksi / $val['target']) * 100);
+            }
+            $result[$val['delivery']] = [
+                'mastermodel' => $model,
+                'jarum' => $val['machinetypeid'],
+                'target' => $val['target'],
+                'remain' => $val['remain'],
+                'delivery' => $val['delivery'],
+                'percentage' => $percent,
+            ];
+        }
+
+        return $result;
+    }
+    public function progressdetail($data)
+    {
+        $res = $this->select('mastermodel,size, delivery, SUM(qty/24) as target, SUM(sisa/24) as remain, factory,machinetypeid')
+            ->where('mastermodel', $data['model'])
+            ->where('factory', $data['area'])
+            ->where('machinetypeid', $data['jarum'])
+            ->where('delivery', $data['delivery'])
+            ->groupBy(['size'])
+            ->get()
+            ->getResultArray();
+        $result = [];
+        foreach ($res as $val) {
+            $produksi = $val['target'] - $val['remain'];
+            $percent = 0;
+            if ($produksi > 0) {
+                $percent = round(($produksi / $val['target']) * 100);
+            }
+            $result[$val['size']] = [
+                'mastermodel' => $data['model'],
+                'jarum' => $val['machinetypeid'],
+                'size' => $val['size'],
+                'target' => $val['target'],
+                'remain' => $val['remain'],
+                'delivery' => $val['delivery'],
+                'percentage' => $percent,
+            ];
+        }
+
+        return $result;
     }
     public function getTotalConfirmByMonth($thisMonth)
     {
