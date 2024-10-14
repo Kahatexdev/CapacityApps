@@ -487,8 +487,7 @@ class ApsPerstyleModel extends Model
     public function getTotalOrderWeek($cek)
     {
         return $this->select('machinetypeid, SUM(qty) AS qty, SUM(sisa) AS sisa, delivery')
-            ->where('factory!=', ['MJ'])
-            ->where('sisa>', '0')
+            ->where('production_unit', 'CJ')
             ->where('machinetypeid', $cek['jarum'])
             ->where('delivery>=', $cek['start'])
             ->where('delivery<=', $cek['end'])
@@ -632,5 +631,23 @@ class ApsPerstyleModel extends Model
         }
 
         return $result;
+    }
+    public function getTotalConfirmByMonth($thisMonth)
+    {
+        return $this->select('SUM(qty) as qty_export')
+            ->where('delivery >=', $thisMonth['start'])
+            ->where('delivery <=', $thisMonth['end'])
+            ->where('production_unit', 'CJ')
+            ->first();
+    }
+    public function getTotalConfirmByMontLokal($thisMonth)
+    {
+        return $this->select('SUM(apsperstyle.qty) as qty_export')
+            ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
+            ->where('apsperstyle.delivery >=', $thisMonth['start'])
+            ->where('apsperstyle.delivery <=', $thisMonth['end'])
+            ->where('data_model.kd_buyer_order', 'LOKAL')
+            ->where('apsperstyle.production_unit', 'CJ')
+            ->first();
     }
 }
