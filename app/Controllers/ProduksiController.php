@@ -969,9 +969,10 @@ class ProduksiController extends BaseController
                 $idAps = $this->ApsPerstyleModel->getIdForBs($validate);
                 if (!$idAps) {
                     if ($data[0] == null) {
-                        continue; // Skip empty rows
+                        break; // Skip empty rows
                     } else {
                         $failedRows[] = "style tidak ditemukan " . $rowIndex;
+                        dd($validate);
                         dd($validate);
                         continue;
                     }
@@ -1009,7 +1010,8 @@ class ProduksiController extends BaseController
                             continue;
                         }
                     } else {
-                        $failedRows[] = "baris" . $rowIndex . "gagal Insert data";
+                        dd($datainsert);
+                        $failedRows[] = "baris " . $rowIndex . "gagal Insert data, ada kolom yang kosong";
                         continue;
                     }
                 }

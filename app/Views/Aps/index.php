@@ -48,112 +48,71 @@
 
         </div>
     </div>
-    <div class="row">
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Booking </p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    <span class=" text-sm font-weight-bolder">This Month</span>
-                                    <?= $TerimaBooking ?>
 
-                                </h5>
-                            </div>
-                        </div>
-                        <div class="col-4 text-end">
-                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="fas fa-book text-lg opacity-10" aria-hidden="true"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Active Order </p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    <?= $jalan ?>
-                                </h5>
-                            </div>
-                        </div>
-                        <div class="col-4 text-end">
-                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="fas fa-tasks text-lg opacity-10" aria-hidden="true"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Machine Running</p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    <?= $mcJalan ?>
-                                    <span class=" text-sm font-weight-bolder">/ <?= $totalMc ?> </span>
+    <?php foreach ($progress as $area => $models) : ?>
 
-                                </h5>
-                            </div>
-                        </div>
-                        <div class="col-4 text-end">
-                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-settings text-lg opacity-10" aria-hidden="true"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-sm-6">
+        <div class="row my-3">
             <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Order Finished</p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    8
-                                    <span class=" text-sm font-weight-bolder">This Month</span>
-                                </h5>
-                            </div>
-                        </div>
-                        <div class="col-4 text-end">
-                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-check-bold text-lg opacity-10" aria-hidden="true"></i>
-                            </div>
+                <div class="col-lg-12">
+                    <div class="card-header">
+
+                        <h5>
+                            Order status <?= $area ?>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+
+                        <div id="progress-container">
+                            <?php foreach ($models as $key): // Ganti $area dengan $models 
+                            ?>
+                                <div class="row mt-2">
+                                    <div class="col-lg-2">
+                                        <h6 class="card-title"><?= $key['mastermodel'] ?></h6>
+                                    </div>
+                                    <div class="col-lg-8">
+                                        <div class="progress-wrapper">
+                                            <div class="progress-info">
+                                                <div class="progress-percentage">
+                                                    <span class="text-sm font-weight-bold " id="<?= $key['mastermodel'] ?>-progressText"> <?= $key['percentage'] ?>% (<?= $key['target'] - $key['remain'] ?> dz / <?= $key['target'] ?> dz)</span>
+                                                </div>
+                                            </div>
+                                            <!-- Tambahkan ID ke elemen progress bar -->
+                                            <div class="progress">
+                                                <div id="<?= $key['mastermodel'] ?>-progress-bar"
+                                                    class="progress-bar 
+                                                    <?php if ($key['percentage'] < 100): ?>
+                                                        bg-gradient-info
+                                                    <?php elseif ($key['percentage'] == 100): ?>
+                                                        bg-gradient-success
+                                                    <?php else: ?>
+                                                        bg-gradient-danger
+                                                    <?php endif; ?>"
+                                                    role="progressbar"
+                                                    aria-valuenow="<?= $key['percentage'] ?>"
+                                                    aria-valuemin="0"
+                                                    aria-valuemax="100"
+                                                    style="width: <?= $key['percentage'] ?>%; height: 10px;">
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <a class="btn btn-sm btn-info" href="<?= base_url($role . '/progressdetail/' . $key['mastermodel'] . '/' . $area) ?>">Details</a>
+                                    </div>
+                                </div>
+                            <?php endforeach ?>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row my-3">
-        <div class="col-lg-12">
-            <div class="card z-index-2">
-                <div class="card-header pb-0">
-                    <h6>Daily Placed Order</h6>
 
                 </div>
-                <div class="card-body p-3">
-                    <div class="chart">
-                        <canvas id="mixed-chart" class="chart-canvas" height="300"></canvas>
-                    </div>
-                </div>
             </div>
         </div>
-    </div>
+
+    <?php endforeach ?>
+
+</div>
 
 
 </div>
@@ -163,20 +122,35 @@
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#example').DataTable({});
+                $('#dataTable').DataTable({
+                    "pageLength": 35,
+                    "footerCallback": function(row, data, start, end, display) {
+                        var api = this.api();
 
-        // Trigger import modal when import button is clicked
-        $('.import-btn').click(function() {
-            console.log("a");
-            var idModel = $(this).data('id');
-            var noModel = $(this).data('no-model');
+                        // Calculate the total of the 4th column (Qty in dozens) - index 3
+                        var totalQty = api.column(3, {
+                            page: 'current'
+                        }).data().reduce(function(a, b) {
+                            return parseInt(a) + parseInt(b);
+                        }, 0);
 
-            $('#importModal').find('input[name="id_model"]').val(idModel);
-            $('#importModal').find('input[name="no_model"]').val(noModel);
+                        // Calculate the total of the 5th column (Remaining Qty in dozens) - index 4
+                        var totalRemainingQty = api.column(4, {
+                            page: 'current'
+                        }).data().reduce(function(a, b) {
+                            return parseInt(a) + parseInt(b);
+                        }, 0);
 
-            $('#importModal').modal('show'); // Show the modal
-        });
-    });
+                        var totalqty = numberWithDots(totalQty) + " Dz";
+                        var totalsisa = numberWithDots(totalRemainingQty) + " Dz";
+
+                        // Update the footer cell for the total Qty
+                        $(api.column(3).footer()).html(totalqty);
+
+                        // Update the footer cell for the total Remaining Qty
+                        $(api.column(4).footer()).html(totalsisa);
+                    }
+                });
 </script>
 <script>
     let data = <?php echo json_encode($order); ?>;

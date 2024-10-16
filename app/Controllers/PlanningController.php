@@ -117,12 +117,13 @@ class PlanningController extends BaseController
         $pdk = $this->request->getPost("no_model");
         $jarum = $this->request->getPost("jarum");
         $area = $this->request->getPost("area");
-        if (strpos($area, 'kk' !== 'false')) {
+        if (strpos($area, 'KK' !== 'false')) {
             $pu = 'CJ';
         } else {
-            $pu = 'MJ';
+            $pu = 'CJ';
         }
         foreach ($deliv as $del) {
+
             $data = [
                 'role' => session()->get('role'),
                 'mastermodel' => $pdk,
@@ -131,6 +132,7 @@ class PlanningController extends BaseController
                 'delivery' => $del,
                 'pu' => $pu
             ];
+
             $assign = $this->ApsPerstyleModel->asignAreal($data);
             if (!$assign) {
                 return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $pdk . '/' . $jarum))->withInput()->with('error', 'Gagal Assign Area');
@@ -425,7 +427,6 @@ class PlanningController extends BaseController
             // Tentukan akhir bulan dari tanggal awal saat ini
             $endOfMonth = new \DateTime($startDate->format('Y-m-t')); // Akhir bulan saat ini
 
-            // Jika akhir minggu melebihi akhir bulan, batasi hingga akhir bulan
             if ($endOfWeek > $endOfMonth) {
                 $endOfWeek = clone $endOfMonth; // Akhiri minggu di akhir bulan
             }
@@ -504,7 +505,9 @@ class PlanningController extends BaseController
         $akhirBulan = date('Y-m-t', strtotime('+2 months'));
         $filteredArea = $this->jarumModel->getArea();
         $area = array_filter($filteredArea, function ($item) {
-            return strpos($item, 'Gedung') === false;
+            return strpos($item, 'Gedung') === false &&
+                strpos($item, 'SAMPLE') === false &&
+                strpos($item, 'WAREHOUSE') === false;
         });
         $area = array_values($area);
         $monthlyData = [];

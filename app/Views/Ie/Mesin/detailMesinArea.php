@@ -80,13 +80,13 @@
 
                                             </td>
                                             <td class="text-sm">
-                                                <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['id_data_mesin']; ?>" data-area="<?= $order['area']; ?>" data-total="<?= $order['total_mc']; ?>" data-jarum="<?= $order['jarum']; ?>" data-mc-jalan="<?= $order['mesin_jalan']; ?>" data-brand="<?= $order['brand']; ?>" data-pu="<?= $order['pu']; ?>">
+                                                <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['id_data_mesin']; ?>" data-area="<?= $order['area']; ?>" data-total="<?= $order['total_mc']; ?>" data-jarum="<?= $order['jarum']; ?>" data-mc-jalan="<?= $order['mesin_jalan']; ?>" data-brand="<?= $order['brand']; ?>" data-pu="<?= $order['pu']; ?>" data-tg="<?= $order['target']; ?>">
                                                     Edit
                                                 </button>
                                             </td>
 
                                             <td>
-                                                <button type="button" class="btn btn-danger btn-sm delete-btn" data-toggle="modal" data-target="#ModalDelete" data-id="<?= $order['id_data_mesin']; ?>">
+                                                <button type=" button" class="btn btn-danger btn-sm delete-btn" data-toggle="modal" data-target="#ModalDelete" data-id="<?= $order['id_data_mesin']; ?>">
                                                     Delete
                                                 </button>
                                             </td>
@@ -148,7 +148,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="buyer" class="col-form-label">Target</label>
-                                        <input type="number" name="targer" class="form-control" required>
+                                        <input type="number" name="target" class="form-control" required>
                                     </div>
 
                                 </div>
@@ -371,6 +371,7 @@
                     var jarum = $(this).data('jarum');
                     var total_mc = $(this).data('total');
                     var brand = $(this).data('brand');
+                    var target = $(this).data('tg');
                     var mesin_jalan = $(this).data('mc-jalan');
                     var pu = $(this).data('pu');
                     var mesin_mati = total_mc - mesin_jalan;
@@ -381,6 +382,7 @@
                     $('#ModalEdit').find('input[name="jarum"]').val(jarum);
                     $('#ModalEdit').find('input[name="total_mc"]').val(total_mc);
                     $('#ModalEdit').find('input[name="brand"]').val(brand);
+                    $('#ModalEdit').find('input[name="target"]').val(target);
                     $('#ModalEdit').find('input[name="mesin_jalan"]').val(mesin_jalan);
                     $('#ModalEdit').find('input[name="mesin_mati"]').val(mesin_mati);
                     if (pu === "CJ") {

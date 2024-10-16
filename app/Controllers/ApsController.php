@@ -20,6 +20,7 @@ use App\Models\DetailPlanningModel;
 use App\Models\TanggalPlanningModel;
 use App\Models\EstimatedPlanningModel;
 use App\Models\AksesModel;/*  */
+use App\Services\orderServices;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
 
@@ -41,6 +42,7 @@ class ApsController extends BaseController
     protected $DetailPlanningModel;
     protected $TanggalPlanningModel;
     protected $EstimatedPlanningModel;
+    protected $orderServices;
 
     public function __construct()
     {
@@ -58,6 +60,7 @@ class ApsController extends BaseController
         $this->DetailPlanningModel = new DetailPlanningModel();
         $this->TanggalPlanningModel = new TanggalPlanningModel();
         $this->EstimatedPlanningModel = new EstimatedPlanningModel();
+        $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -71,60 +74,61 @@ class ApsController extends BaseController
     }
     public function index()
     {
+        $idUser = session()->get('id_user');
+        $aksesArea = $this->aksesModel->aksesData($idUser);
+        $pdk = [];
 
+        foreach ($aksesArea as $ar) {
+            // Dapatkan data progress per area
+            $areaProgress = $this->ApsPerstyleModel->getProgressperArea($ar);
+            $lastmonth = date('Y-m-d', strtotime('- 1 month'));
+
+            // Grup by mastermodel
+            $grouped = [];
+            foreach ($areaProgress as $item) {
+                $model = $item['mastermodel'];
+                if (!isset($grouped[$model])) {
+                    $grouped[$model] = [
+                        'mastermodel' => $model,
+                        'target' => 0,
+                        'remain' => 0,
+                        'delivery' => $item['delivery'],
+                        'percentage' => 0,
+                    ];
+                }
+
+                // Jumlahkan target dan remain
+                $grouped[$model]['target'] += (int)$item['target'];
+                $grouped[$model]['remain'] += (int)$item['remain'];
+                $produksi = $grouped[$model]['target'] - $grouped[$model]['remain'];
+
+                // Hitung percentage hanya jika produksi > 0
+                if ($produksi > 0) {
+                    $grouped[$model]['percentage'] = round(($produksi / $grouped[$model]['target']) * 100);
+                }
+
+                // Ambil delivery paling akhir
+                if ($grouped[$model]['delivery'] < $item['delivery']) {
+                    $grouped[$model]['delivery'] = $item['delivery'];
+                }
+            }
+
+            // Filter yang delivery >= hari ini
+            $filtered = array_filter($grouped, function ($item) use ($lastmonth) {
+                return $item['delivery'] >= $lastmonth;
+            });
+            usort($filtered, function ($a, $b) {
+                return $a['percentage'] <=> $b['percentage'];
+            });
+
+            // Simpan hasil per area
+            $pdk[$ar] = $filtered;
+        }
         $orderJalan = $this->bookingModel->getOrderJalan();
         $terimaBooking = $this->bookingModel->getBookingMasuk();
         $mcJalan = $this->jarumModel->mcJalan();
         $totalMc = $this->jarumModel->totalMc();
         $bulan = date('m');
-
-        $startDate = new \DateTime('first day of this month');
-        $LiburModel = new LiburModel();
-        $holidays = $LiburModel->findAll();
-        $currentMonth = $startDate->format('F');
-        $weekCount = 1; // Initialize week count for the first week of the month
-        $monthlyData = [];
-
-        for ($i = 0; $i < 52; $i++) {
-            $startOfWeek = clone $startDate;
-            $startOfWeek->modify("+$i week");
-            $startOfWeek->modify('Monday this week');
-
-            $endOfWeek = clone $startOfWeek;
-            $endOfWeek->modify('Sunday this week');
-            $numberOfDays = $startOfWeek->diff($endOfWeek)->days + 1;
-
-            $weekHolidays = [];
-            foreach ($holidays as $holiday) {
-                $holidayDate = new \DateTime($holiday['tanggal']);
-                if ($holidayDate >= $startOfWeek && $holidayDate <= $endOfWeek) {
-                    $weekHolidays[] = [
-                        'nama' => $holiday['nama'],
-                        'tanggal' => $holidayDate->format('d-F'),
-                    ];
-                    $numberOfDays--;
-                }
-            }
-            $currentMonthOfYear = $startOfWeek->format('F');
-            if ($currentMonth !== $currentMonthOfYear) {
-                $currentMonth = $currentMonthOfYear;
-                $weekCount = 1; // Reset week count
-                $monthlyData[$currentMonth] = [];
-            }
-
-            $startOfWeekFormatted = $startOfWeek->format('d/m');
-            $endOfWeekFormatted = $endOfWeek->format('d/m');
-
-            $monthlyData[$currentMonth][] = [
-                'week' => $weekCount,
-                'start_date' => $startOfWeekFormatted,
-                'end_date' => $endOfWeekFormatted,
-                'number_of_days' => $numberOfDays,
-                'holidays' => $weekHolidays,
-            ];
-
-            $weekCount++;
-        }
         $area = session()->get('username');
         $data = [
             'role' => session()->get('role'),
@@ -141,14 +145,99 @@ class ApsController extends BaseController
             'mcJalan' => $mcJalan,
             'totalMc' => $totalMc,
             'order' => $this->ApsPerstyleModel->getTurunOrder($bulan),
-            'weeklyRanges' => $monthlyData,
-            'DaftarLibur' => $holidays,
-            'area' => $area
-
+            'area' => $area,
+            'progress' => $pdk
 
         ];
         return view(session()->get('role') . '/index', $data);
     }
+    public function progressdetail($model, $area)
+    {
+        $pdk = [];
+        $pdkProg = $this->ApsPerstyleModel->getProgressDetail($model, $area);
+        $today = date('Y-m-d');
+
+        // Grup by mastermodel dan machinetypeid (jarum)
+        $groupedDetail = [];
+        foreach ($pdkProg as $item) {
+            $model = $item['mastermodel'];
+            $jarum = $item['machinetypeid'];  // Mengelompokkan juga berdasarkan jarum
+            // Gabungkan mastermodel dan jarum sebagai kunci
+            $key = $jarum;
+
+            if (!isset($groupedDetail[$key])) {
+                $groupedDetail[$key] = [
+                    'mastermodel' => $model,
+                    'jarum' => $jarum,
+                    'target' => 0,
+                    'remain' => 0,
+                    'delivery' => $item['delivery'],
+                    'percentage' => 0,
+                    'detail' => [] // Tambahin array buat detail
+                ];
+            }
+
+            // Jumlahkan target dan remain dengan tipe float untuk mengakomodasi desimal
+            $groupedDetail[$key]['target'] += (float)$item['target'];
+            $groupedDetail[$key]['remain'] += (float)$item['remain'];
+            $produksi = $groupedDetail[$key]['target'] - $groupedDetail[$key]['remain'];
+
+            // Hitung percentage hanya jika produksi > 0
+            if ($produksi > 0) {
+                $groupedDetail[$key]['percentage'] = round(($produksi / $groupedDetail[$key]['target']) * 100);
+            }
+
+            // Ambil data progress per delivery
+            $progresPerDeliv = $this->ApsPerstyleModel->getProgresPerdeliv($model, $area, $jarum);
+            foreach ($progresPerDeliv as $dlv) {
+                $cek = [
+                    'model' => $model,
+                    'area' => $area,
+                    'jarum' => $jarum,
+                    'delivery' => $dlv['delivery']
+                ];
+
+                // Ambil detail progress per ukuran (size)
+                $sizes = $this->ApsPerstyleModel->progressdetail($cek);
+
+                // Assign size ke dalam detail delivery yang sesuai
+                $groupedDetail[$key]['detail'][$dlv['delivery']] = [
+                    'mastermodel' => $model,
+                    'jarum' => $jarum,
+                    'target' => (float)$dlv['target'],
+                    'remain' => (float)$dlv['remain'],
+                    'delivery' => $dlv['delivery'],
+                    'percentage' => round((($dlv['target'] - $dlv['remain']) / $dlv['target']) * 100),
+                    'size' => $sizes // Assign detail size ke dalam delivery
+                ];
+            }
+        }
+
+
+        usort($groupedDetail, function ($a, $b) {
+            return $a['percentage'] <=> $b['percentage'];
+        });
+
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Capacity System',
+            'active1' => 'active',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'area' => $area,
+            'model' => $model,
+            'perjarum' => $groupedDetail,
+
+        ];
+        return view(session()->get('role') . '/progressdetail', $data);
+    }
+
+
+
     public function booking()
     {
         $dataJarum = $this->jarumModel->getJarum();
@@ -561,10 +650,10 @@ class ApsController extends BaseController
         $area = $this->request->getGet('area');
         $jarum = $this->request->getGet('jarum');
         $id_pln_mc = $this->request->getGet('id_pln_mc');
-        
+
 
         $data = $this->ApsPerstyleModel->getDetailPlanning($area, $jarum);
-       
+
         foreach ($data as $row) {
             $row['id_pln_mc'] = $id_pln_mc;
             $this->DetailPlanningModel->insert($row);
@@ -693,8 +782,5 @@ class ApsController extends BaseController
         } else {
             return redirect()->to(base_url(session()->get('role') . '/planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm . '&judul=' . $judul))->withInput()->with('error', 'Data Gagal Disimpan');
         }
-
-
-        dd($dataestqty);
     }
 }
