@@ -44,10 +44,10 @@
                             <td><?= $st['size'] ?></td>
                             <td><?= ceil($st['qty'] / 24) ?> dz</td>
                             <td>
-                                <input type="number" class="PoDz" name="PoDz[]" onchange="toPcs(this)" value="<?= ceil($st['pluspacking'] / 24) ?>" <?= $st['pluspacking'] > 0 ? 'readonly' : '' ?>> dz
+                                <input type="number" class="PoDz" name="PoDz[]" onchange="toPcs(this)" value="<?= ceil($st['pluspacking'] / 24) ?>"> dz
                             </td>
                             <td>
-                                <input type="number" class="form po" name="po[]" value="<?= $st['pluspacking'] ?>" <?= $st['pluspacking'] > 0 ? 'readonly' : '' ?>> pcs
+                                <input type="number" class="form po" name="po[]" value="<?= $st['pluspacking'] ?>"> pcs
                                 <input type="hidden" class="form" name="id[]" value="<?= $st['idapsperstyle'] ?>">
                             </td>
                         </tr>

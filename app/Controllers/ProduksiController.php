@@ -969,9 +969,10 @@ class ProduksiController extends BaseController
                 $idAps = $this->ApsPerstyleModel->getIdForBs($validate);
                 if (!$idAps) {
                     if ($data[0] == null) {
-                        continue; // Skip empty rows
+                        break; // Skip empty rows
                     } else {
                         $failedRows[] = "style tidak ditemukan " . $rowIndex;
+                        dd($validate);
                         continue;
                     }
                 } else {
@@ -1031,7 +1032,8 @@ class ProduksiController extends BaseController
                             continue;
                         }
                     } else {
-                        $failedRows[] = "baris" . $rowIndex . "gagal Insert data";
+                        dd($datainsert);
+                        $failedRows[] = "baris " . $rowIndex . "gagal Insert data, ada kolom yang kosong";
                         continue;
                     }
                 }
@@ -1144,7 +1146,7 @@ class ProduksiController extends BaseController
                 }
 
                 // Update kolom sisa pada tabel order
-                $updateOrderResult = $this->ApsPerstyleModel->set('sisa', 'sisa + ' . $po, false)
+                $updateOrderResult = $this->ApsPerstyleModel->set('sisa',  $po)
                     ->where('idapsperstyle', $id)
                     ->update();
 
