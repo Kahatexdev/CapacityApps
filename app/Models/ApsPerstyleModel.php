@@ -15,7 +15,7 @@ class ApsPerstyleModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['idapsperstyle', 'machinetypeid', 'mastermodel', 'size', 'delivery', 'qty', 'sisa', 'seam', 'factory', 'production_unit', 'smv', 'no_order', 'country', 'color'];
+    protected $allowedFields    = ['idapsperstyle', 'machinetypeid', 'mastermodel', 'size', 'delivery', 'qty', 'sisa', 'seam', 'factory', 'production_unit', 'smv', 'no_order', 'country', 'color', 'po_plus'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -421,7 +421,7 @@ class ApsPerstyleModel extends Model
     }
     public function getStyle($pdk)
     {
-        return $this->select('idapsperstyle, mastermodel, size,sum(qty) as qty')
+        return $this->select('idapsperstyle, mastermodel, size,sum(qty) as qty, sum(po_plus) as po_plus')
             ->where('mastermodel', $pdk)
             ->groupBy('size')
             ->findAll();
