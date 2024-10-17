@@ -973,6 +973,7 @@ class ProduksiController extends BaseController
                     } else {
                         $failedRows[] = "style tidak ditemukan " . $rowIndex;
                         dd($validate);
+                        dd($validate);
                         continue;
                     }
                 } else {
@@ -989,24 +990,7 @@ class ProduksiController extends BaseController
 
                     // $strReplace = str_replace('.', '-', $tglprod);
                     // $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
-                    $idProduksi = $this->produksiModel
-                        ->where('idapsperstyle', $id)
-                        ->where('area', $area)
-                        ->where('bs_prod <=', $qtyOrder)
-                        ->orderBy('qty_produksi', 'desc')
-                        ->orderBy('bs_prod', 'asc')
-                        ->findAll();
-                    if (!$idProduksi) {
-                        $failedRows[] = "style: " . $style . "baris:" . $rowIndex . "idaps:" . $id . "tidak ada di database produksi";
-                        continue;
-                    }
-                    $minBsProd = min(array_column($idProduksi, 'bs_prod'));
-                    $idprod = array_filter($idProduksi, function ($prod) use ($minBsProd) {
-                        return $prod['bs_prod'] == $minBsProd;
-                    });
-                    $idprod = reset($idprod);
-                    $idprd = $idprod['id_produksi'];
-                    $bs = $idprod['bs_prod'] + $qty;
+
 
                     $datainsert = [
                         'tgl_instocklot' => $tglprod,
@@ -1016,16 +1000,10 @@ class ProduksiController extends BaseController
                         'no_box' => $data[23],
                         'qty' => $qty,
                         'kode_deffect' => $kodeDeffect,
-                        'id_produksi' => $idprd
 
                     ];
                     $insert = $this->BsModel->insert($datainsert);
                     if ($insert) {
-                        $updateproduksi = $this->produksiModel->update($idprod['id_produksi'], ['bs_prod' => $bs]);
-                        if (!$updateproduksi) {
-                            $failedRows[] = "baris " . $rowIndex . "Gagal Update Data Produksi";
-                            continue;
-                        }
                         $updateBs = $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
                         if (!$updateBs) {
                             $failedRows[] = "baris" . $rowIndex . "gagal Update Data BS";
@@ -1061,13 +1039,12 @@ class ProduksiController extends BaseController
     }
     public function viewModelPlusPacking($pdk)
     {
-
         $styleData = $this->ApsPerstyleModel->getStyle($pdk);
         foreach ($styleData as &$sd) {
             $id = $sd['idapsperstyle'];
-            $pluspacking = $this->produksiModel->getPlusPacking($id);
-            $sd['pluspacking'] = $pluspacking;
+            $poPlus = $sd['po_plus'];
         }
+        // dd($styleData);
         $role = session()->get('role');
         $data = [
             'role' => $role,
@@ -1090,63 +1067,34 @@ class ProduksiController extends BaseController
         $ids = $this->request->getPost('id');
         $pos = $this->request->getPost('po');
         $role = session()->get('role');
+        // dd($ids, $pos);
 
-        if (count($ids) !== count($pos)) {
-            return redirect()->back()->with('error', 'Jumlah ID dan PO tidak sesuai.');
-        }
+        // if (count($ids) !== count($pos)) {
+        //     return redirect()->back()->with('error', 'Jumlah ID dan PO tidak sesuai.');
+        // }
 
         // Mulai transaction untuk memastikan integritas data
         $this->db->transStart();
 
         try {
             foreach ($ids as $key => $id) {
-                $po = $pos[$key];
+                $po = isset($pos[$key]) ? $pos[$key] : 0;
 
                 // Pastikan nilai PO valid
                 if (!is_numeric($po) || $po < 0) {
                     throw new \Exception('Nilai PO tidak valid.');
                 }
 
-                // Temukan produksi yang terkait dengan idapsperstyle
-                $produksiList = $this->produksiModel
+                // Update kolom po_plus pada tabel apsperstyle
+                $updatePoPlus = $this->ApsPerstyleModel->set('po_plus', $po, false)
                     ->where('idapsperstyle', $id)
-                    ->orderBy('qty_produksi', 'desc')
-                    ->orderBy('bs_prod', 'asc')
-                    ->findAll();
-
-                // Cek apakah produksi ditemukan
-                if (empty($produksiList)) {
-                    throw new \Exception('Data produksi tidak ditemukan untuk ID: ' . $id);
+                    ->update();
+                if (!$updatePoPlus) {
+                    throw new \Exception('Gagal mengupdate po tambahan untuk ID: ' . $id);
                 }
 
-                // Temukan produksi dengan nilai plus_packing terendah
-                $minBsProd = min(array_column($produksiList, 'plus_packing'));
-                $produksiToUpdate = array_filter($produksiList, function ($prod) use ($minBsProd) {
-                    return $prod['plus_packing'] == $minBsProd;
-                });
-                if (empty($produksiToUpdate)) {
-                    throw new \Exception('Tidak dapat menemukan produksi yang cocok untuk ID: ' . $id);
-                }
-
-                $produksiToUpdate = reset($produksiToUpdate); // Ambil elemen pertama
-
-                // Pastikan id ada di array
-                if (!isset($produksiToUpdate['id_produksi'])) {
-                    throw new \Exception('ID tidak ditemukan dalam produksi yang dipilih untuk ID: ' . $id);
-                }
-
-                // Update kolom plus_packing pada produksi yang dipilih
-                $updateResult = $this->produksiModel->update($produksiToUpdate['id_produksi'], [
-                    'plus_packing' => $po
-                ]);
-
-                // Cek apakah update berhasil
-                if (!$updateResult) {
-                    throw new \Exception('Gagal mengupdate data produksi untuk ID: ' . $id);
-                }
-
-                // Update kolom sisa pada tabel order
-                $updateOrderResult = $this->ApsPerstyleModel->set('sisa',  $po)
+                // Update kolom sisa pada tabel apsperstyle
+                $updateOrderResult = $this->ApsPerstyleModel->set('sisa', 'sisa + ' . $po, false)
                     ->where('idapsperstyle', $id)
                     ->update();
 

@@ -134,6 +134,78 @@
             </div>
         <?php endforeach; ?>
     </div>
+    <div class="row mt-3">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead class="bg-dark text-sm">
+                                <tr class="text-center">
+                                    <th class="text-white" rowspan="2">STATUS ORDER</th>
+                                    <?php foreach ($statusOrder as $month => $data): ?>
+                                        <?php if (is_array($data)): ?>
+                                            <th class="text-white" colspan="2"><?= $month ?></th>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                    <th class="text-white" colspan="2">TOTAL</th>
+                                </tr>
+                                <tr>
+                                    <?php foreach ($statusOrder as $month => $data): ?>
+                                        <?php if (is_array($data)): ?>
+                                            <th class="text-white text-sm">QTY ORDER</th>
+                                            <th class="text-white text-sm">SISA ORDER</th>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                    <th class="text-white text-sm">QTY ORDER</th>
+                                    <th class="text-white text-sm">SISA ORDER</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center text-sm">
+                                <tr>
+                                    <td>KAOSKAKI</td>
+                                    <?php foreach ($statusOrder as $month => $data): ?>
+                                        <?php if (is_array($data)): ?>
+                                            <td><?= number_format($data['socks']['qty'],) ?></td>
+                                            <td><?= number_format($data['socks']['sisa'],) ?></td>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                    <td><?= number_format($statusOrder['totalOrderSocks'],) ?></td>
+                                    <td><?= number_format($statusOrder['totalSisaSocks'],) ?></td>
+                                </tr>
+
+                                <!-- SARUNG TANGAN row -->
+                                <tr>
+                                    <td>SARUNG TANGAN</td>
+                                    <?php foreach ($statusOrder as $month => $data): ?>
+                                        <?php if (is_array($data)): ?>
+                                            <td><?= number_format($data['gloves']['qty'],) ?></td>
+                                            <td><?= number_format($data['gloves']['sisa'],) ?></td>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                    <td><?= number_format($statusOrder['totalOrderGloves'],) ?></td>
+                                    <td><?= number_format($statusOrder['totalSisaGloves'],) ?></td>
+                                </tr>
+
+                                <!-- TOTAL row -->
+                                <tr class="text-bold">
+                                    <td>TOTAL</td>
+                                    <?php foreach ($statusOrder as $month => $data): ?>
+                                        <?php if (is_array($data)): ?>
+                                            <td><?= number_format($data['qty'],) ?></td>
+                                            <td><?= number_format($data['sisa'],) ?></td>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                    <td><?= number_format($statusOrder['grandTotalOrder'],) ?></td>
+                                    <td><?= number_format($statusOrder['grandTotalSisa'],) ?></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 </div>
