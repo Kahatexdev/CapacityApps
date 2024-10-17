@@ -1119,4 +1119,43 @@ class OrderController extends BaseController
     {
         return view(session()->get('role') . '/smvimport');
     }
+    public function sisaOrder()
+    {
+        $role = session()->get('role');
+        $buyer = $this->orderModel->getBuyer();
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'buyer' => $buyer,
+            'role' => $role
+        ];
+        return view($role . '/Order/sisaOrder', $data);
+    }
+    public function sisaOrderBuyer($buyer)
+    {
+        $bulan = date('Y-m-01', strtotime('this month'));
+        $role = session()->get('role');
+        $data = $this->ApsPerstyleModel->getBuyer();
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'buyer' => $buyer,
+            'role' => $role
+        ];
+        return view($role . '/Order/sisaOrder', $data);
+    }
 }
