@@ -957,6 +957,23 @@ class OrderController extends BaseController
         ];
         return view(session()->get('role') . '/Order/orderarea', $data);
     }
+    public function statusOrder()
+    {
+        $totalMesin = $this->jarumModel->getArea();
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'TotalMesin' => $totalMesin,
+        ];
+        return view(session()->get('role') . '/Order/statusorder', $data);
+    }
     public function getTurunOrder()
     {
         $resultTurunOrder = $this->orderModel->getTurunOrder();

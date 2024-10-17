@@ -149,6 +149,8 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('blmAdaArea', 'OrderController::orderBlmAdaAreal');
     $routes->get('orderPerjarum', 'OrderController::OrderPerJarumPlan');
     $routes->get('orderPerArea', 'OrderController::orderPerAreaPlan');
+    $routes->get('statusOrder', 'OrderController::statusOrder');
+    $routes->get('statusOrder/(:any)', 'OrderController::statusOrder/$1');
     $routes->get('detailPdk/(:any)/(:any)', 'OrderController::detailPdk/$1/$2');
     $routes->get('detailModelPlanning/(:any)/(:any)', 'OrderController::detailModelPlanning/$1/$2');
     $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'OrderController::detailmodeljarumPlan/$1/$2/$3');
