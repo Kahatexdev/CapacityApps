@@ -20,6 +20,7 @@ use App\Models\DetailPlanningModel;
 use App\Models\TanggalPlanningModel;
 use App\Models\EstimatedPlanningModel;
 use App\Models\AksesModel;/*  */
+use App\Services\orderServices;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
 
@@ -41,6 +42,7 @@ class ApsController extends BaseController
     protected $DetailPlanningModel;
     protected $TanggalPlanningModel;
     protected $EstimatedPlanningModel;
+    protected $orderServices;
 
     public function __construct()
     {
@@ -58,6 +60,7 @@ class ApsController extends BaseController
         $this->DetailPlanningModel = new DetailPlanningModel();
         $this->TanggalPlanningModel = new TanggalPlanningModel();
         $this->EstimatedPlanningModel = new EstimatedPlanningModel();
+        $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -230,7 +233,7 @@ class ApsController extends BaseController
             'perjarum' => $groupedDetail,
 
         ];
-        return view(session()->get('role') . '/progressdetail', $data);
+        return view(session()->get('role') . '/Order/progressdetail', $data);
     }
 
 

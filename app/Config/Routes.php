@@ -151,6 +151,9 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('blmAdaArea', 'OrderController::orderBlmAdaAreal');
     $routes->get('orderPerjarum', 'OrderController::OrderPerJarumPlan');
     $routes->get('orderPerArea', 'OrderController::orderPerAreaPlan');
+    $routes->get('statusOrder', 'OrderController::statusOrder');
+    $routes->get('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
+    $routes->get('progressdetail/(:any)/(:any)', 'ApsController::progressdetail/$1/$2');
     $routes->get('detailPdk/(:any)/(:any)', 'OrderController::detailPdk/$1/$2');
     $routes->get('detailModelPlanning/(:any)/(:any)', 'OrderController::detailModelPlanning/$1/$2');
     $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'OrderController::detailmodeljarumPlan/$1/$2/$3');
@@ -391,9 +394,11 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('sisa', 'OrderController::smvimport');
     $routes->post('updateSisa', 'GodController::updateSisa');
     $routes->get('detailPdk/(:any)/(:any)', 'OrderController::detailPdk/$1/$2');
-
-
-
+    $routes->get('sisaOrder', 'OrderController::sisaOrder');
+    $routes->get('sisaOrder/(:any)', 'OrderController::sisaOrderBuyer/$1');
+    $routes->get('statusOrder', 'OrderController::statusOrder');
+    $routes->get('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
+    $routes->get('progressdetail/(:any)/(:any)', 'ApsController::progressdetail/$1/$2');
 
 
     // produksi

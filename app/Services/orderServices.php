@@ -49,7 +49,8 @@ class orderServices
         $date = DateTime::createFromFormat('F-Y', $bulan);
         $bulanIni = $date->format('F-Y');
         $awalBulan = $date->format('Y-m-01');
-        $akhirBulan = date('Y-m-t', strtotime('+2 months'));
+        $date->modify('+2 months');
+        $akhirBulan = $date->format('Y-m-t');
         // Inisialisasi total order dan sisa
         $statusOrder = [];
 

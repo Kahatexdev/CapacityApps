@@ -15,7 +15,7 @@ class ApsPerstyleModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['idapsperstyle', 'machinetypeid', 'mastermodel', 'size', 'delivery', 'qty', 'sisa', 'seam', 'factory', 'production_unit', 'smv', 'no_order', 'country', 'color'];
+    protected $allowedFields    = ['idapsperstyle', 'machinetypeid', 'mastermodel', 'size', 'delivery', 'qty', 'sisa', 'seam', 'factory', 'production_unit', 'smv', 'no_order', 'country', 'color', 'po_plus'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -438,7 +438,7 @@ class ApsPerstyleModel extends Model
     }
     public function getStyle($pdk)
     {
-        return $this->select('idapsperstyle, mastermodel, size,sum(qty) as qty')
+        return $this->select('idapsperstyle, mastermodel, size,sum(qty) as qty, sum(po_plus) as po_plus')
             ->where('mastermodel', $pdk)
             ->groupBy('size')
             ->findAll();
@@ -649,5 +649,20 @@ class ApsPerstyleModel extends Model
             ->where('data_model.kd_buyer_order', 'LOKAL')
             ->where('apsperstyle.production_unit', 'CJ')
             ->first();
+    }
+    public function getBuyerOrder($buyer, $bulan)
+    {
+        return $this->select('machinetypeid,mastermodel, delivery,factory,production_unit, round(sum(qty)/24) as qty, round(sum(sisa)/24) as sisa, data_model.kd_buyer_order')
+            ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
+            ->where('data_model.kd_buyer_order', $buyer)
+            ->where('apsperstyle.production_unit !=', 'MJ')
+            ->where('MONTH(apsperstyle.delivery)', date('m', strtotime($bulan))) // Filter bulan
+            ->where('YEAR(apsperstyle.delivery)', date('Y', strtotime($bulan))) // Filter tahun
+            ->groupBy('apsperstyle.mastermodel')
+            ->groupBy('apsperstyle.machinetypeid')
+            ->groupBy('apsperstyle.delivery')
+            ->orderBy('apsperstyle.mastermodel')
+            ->orderBy('apsperstyle.delivery')
+            ->findAll();
     }
 }

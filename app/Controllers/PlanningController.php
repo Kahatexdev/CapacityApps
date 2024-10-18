@@ -117,11 +117,12 @@ class PlanningController extends BaseController
         $pdk = $this->request->getPost("no_model");
         $jarum = $this->request->getPost("jarum");
         $area = $this->request->getPost("area");
-        if (strpos($area, 'KK' !== 'false')) {
-            $pu = 'CJ';
+        if ($area == 'Gedung 1' || $area == 'Gedung 2') {
+            $pu = 'MJ';
         } else {
             $pu = 'CJ';
         }
+
         foreach ($deliv as $del) {
 
             $data = [
