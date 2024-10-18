@@ -233,7 +233,7 @@ class ApsController extends BaseController
             'perjarum' => $groupedDetail,
 
         ];
-        return view(session()->get('role') . '/progressdetail', $data);
+        return view(session()->get('role') . '/Order/progressdetail', $data);
     }
 
 

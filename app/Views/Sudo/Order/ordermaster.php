@@ -139,7 +139,7 @@
 
                             <div class="col-8">
                                 <div class="numbers">
-                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Order Status PerBuyer</p>
+                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Order Status</p>
                                     <h5 class="font-weight-bolder mb-0">
                                     </h5>
                                 </div>

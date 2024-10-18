@@ -974,6 +974,64 @@ class OrderController extends BaseController
         ];
         return view(session()->get('role') . '/Order/statusorder', $data);
     }
+    public function statusOrderArea($area)
+    {
+        $areaProgress =  $this->ApsPerstyleModel->getProgressperArea($area);
+        $lastmonth = date('Y-m-d', strtotime('- 1 month'));
+
+        // Grup by mastermodel
+        $grouped = [];
+        foreach ($areaProgress as $item) {
+            $model = $item['mastermodel'];
+            if (!isset($grouped[$model])) {
+                $grouped[$model] = [
+                    'mastermodel' => $model,
+                    'target' => 0,
+                    'remain' => 0,
+                    'delivery' => $item['delivery'],
+                    'percentage' => 0,
+                ];
+            }
+
+            // Jumlahkan target dan remain
+            $grouped[$model]['target'] += (int)$item['target'];
+            $grouped[$model]['remain'] += (int)$item['remain'];
+            $produksi = $grouped[$model]['target'] - $grouped[$model]['remain'];
+
+            // Hitung percentage hanya jika produksi > 0
+            if ($produksi > 0) {
+                $grouped[$model]['percentage'] = round(($produksi / $grouped[$model]['target']) * 100);
+            }
+
+            // Ambil delivery paling akhir
+            if ($grouped[$model]['delivery'] < $item['delivery']) {
+                $grouped[$model]['delivery'] = $item['delivery'];
+            }
+        }
+
+        // Filter yang delivery >= hari ini
+        $filtered = array_filter($grouped, function ($item) use ($lastmonth) {
+            return $item['delivery'] >= $lastmonth;
+        });
+        usort($filtered, function ($a, $b) {
+            return $a['percentage'] <=> $b['percentage'];
+        });
+
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'progress' => $filtered,
+            'area' => $area
+        ];
+        return view(session()->get('role') . '/Order/statusorderarea', $data);
+    }
     public function getTurunOrder()
     {
         $resultTurunOrder = $this->orderModel->getTurunOrder();
@@ -1159,7 +1217,8 @@ class OrderController extends BaseController
     {
         $bulan = date('Y-m-01', strtotime('this month'));
         $role = session()->get('role');
-        $data = $this->ApsPerstyleModel->getBuyer();
+        $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
+        dd($data);
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Order',

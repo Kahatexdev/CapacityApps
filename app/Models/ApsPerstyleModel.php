@@ -650,4 +650,19 @@ class ApsPerstyleModel extends Model
             ->where('apsperstyle.production_unit', 'CJ')
             ->first();
     }
+    public function getBuyerOrder($buyer, $bulan)
+    {
+        return $this->select('machinetypeid,mastermodel, delivery,factory,production_unit, round(sum(qty)/24) as qty, round(sum(sisa)/24) as sisa, data_model.kd_buyer_order')
+            ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
+            ->where('data_model.kd_buyer_order', $buyer)
+            ->where('apsperstyle.production_unit !=', 'MJ')
+            ->where('MONTH(apsperstyle.delivery)', date('m', strtotime($bulan))) // Filter bulan
+            ->where('YEAR(apsperstyle.delivery)', date('Y', strtotime($bulan))) // Filter tahun
+            ->groupBy('apsperstyle.mastermodel')
+            ->groupBy('apsperstyle.machinetypeid')
+            ->groupBy('apsperstyle.delivery')
+            ->orderBy('apsperstyle.mastermodel')
+            ->orderBy('apsperstyle.delivery')
+            ->findAll();
+    }
 }
