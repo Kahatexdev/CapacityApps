@@ -257,4 +257,27 @@ class BookingModel extends Model
 
         return $results;
     }
+
+    public function getTotalBookingByJarum2($cek)
+    {
+        $groupingProductType = 'CASE
+                WHEN master_product_type.product_type LIKE \'SS-%\' THEN \'SS\'
+                WHEN master_product_type.product_type LIKE \'S-%\' THEN \'S\'
+                WHEN master_product_type.product_type LIKE \'F-%\' THEN \'F\'
+                WHEN master_product_type.product_type LIKE \'NS-%\' THEN \'NS\'
+                WHEN master_product_type.product_type LIKE \'KH-%\' THEN \'KH\'
+                WHEN master_product_type.product_type LIKE \'TG-%\' THEN \'TG\'
+                ELSE \'OTHER\'
+            END AS product_group';
+        $results = $this->select('data_booking.needle, data_booking.delivery, SUM(data_booking.qty_booking) as total_booking, SUM(data_booking.sisa_booking) AS sisa_booking, data_booking.id_product_type,' . $groupingProductType)
+            ->join('master_product_type', 'master_product_type.id_product_type=data_booking.id_product_type', 'LEFT')
+            ->where('data_booking.status!=', 'Cancel Booking')
+            ->where('data_booking.needle', $cek['jarum'])
+            ->where('data_booking.delivery >=', $cek['start'])
+            ->where('data_booking.delivery <=', $cek['end'])
+            ->groupBy('product_group')
+            ->get()
+            ->getResultArray();
+        return $results;
+    }
 }
