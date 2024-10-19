@@ -118,7 +118,9 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
     $routes->post('getTypebyJarum', 'BookingController::getTypebyJarum');
 
-    $routes->get('sales', 'SalesController::index');
+    $routes->get('sales', 'SalesController::index2');
+    // $routes->get('sales2', 'SalesController::index2');
+    $routes->post('updateQtyExport', 'SalesController::updateQtyActualExport');
     $routes->post('sales/position', 'SalesController::index');
     // $routes->get('exportsales', 'ExcelController::export');
     $routes->post('exportsales', 'SalesController::exportExcelByJarum');
