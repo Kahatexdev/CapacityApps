@@ -474,8 +474,11 @@ class ApsController extends BaseController
     public function planningmesin()
     {
         $id = session()->get('id_user');
-        $planarea = $this->KebutuhanAreaModel->findAll();
         $area = $this->aksesModel->getArea($id);
+        $planarea = [];
+        foreach ($area as $ar) {
+            $planarea[] = $this->KebutuhanAreaModel->getDatabyArea($ar);
+        }
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Planning Area',
