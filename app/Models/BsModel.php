@@ -124,7 +124,7 @@ class BsModel extends Model
     }
     public function getDataForReset($area, $awal, $akhir)
     {
-        return $this->select('idbs,idapsperstyle,qty,area,id_produksi')
+        return $this->select('idbs,idapsperstyle,qty,area')
             ->where('area', $area)
             ->where('tgl_instocklot >=', $awal)
             ->where('tgl_instocklot <=', $akhir)

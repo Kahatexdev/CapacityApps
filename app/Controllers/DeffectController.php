@@ -147,8 +147,6 @@ class DeffectController extends BaseController
         if (!empty($idaps)) {
             $qtyBs = $this->BsModel->getTotalBs($idaps);
 
-            $this->produksiModel->resetQtyBs($idaps);
-
             foreach ($qtyBs as $idap) {
                 $bs = $idap['qty'];
                 $sisa = $this->ApsPerstyleModel->getSisaOrder($idap['idapsperstyle']);
@@ -179,32 +177,13 @@ class DeffectController extends BaseController
 
             foreach ($idaps as $data) {
                 $qtyBs = intval($data['qty']);
-                $idProduksi = $data['id_produksi'];
                 $idbs = $data['idbs'];
                 $id = $data['idapsperstyle'];
-                $area = $data['area'];
-
-                // Update tabel produksi
-                $dataProduksi = $this->produksiModel->getBsProd($idProduksi);
-                // Mengecek jika dataProduksi tidak ada
-                if (empty($dataProduksi)) {
-                    $failedIds[] = 'Tidak ada Data Produksi : ' . $idbs . ' Qty BS = ' . $qtyBs . 'idaps = ' . $id . 'Area =' . $area;
-                    continue;
-                }
-
                 $dataOrder = $this->ApsPerstyleModel->getSisaOrder($id);
                 $newOrder = $dataOrder - $qtyBs;
-                $newBs = $dataProduksi['bs_prod'] - $qtyBs;
 
-                $updateProduksi = $this->produksiModel->update($idProduksi, ['bs_prod' => $newBs]);
-
-                if ($updateProduksi) {
-                    $updateOrder = $this->ApsPerstyleModel->update($id, ['sisa' => $newOrder]);
-                    $this->BsModel->delete($idbs);
-                } else {
-                    $failedIds[] = 'Gagal update Data produksi' . $idbs;
-                    continue;
-                }
+                $updateOrder = $this->ApsPerstyleModel->update($id, ['sisa' => $newOrder]);
+                $this->BsModel->delete($idbs);
             }
 
             if ($this->db->transStatus() === FALSE || !empty($failedIds)) {
