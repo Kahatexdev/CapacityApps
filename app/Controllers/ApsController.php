@@ -657,6 +657,7 @@ class ApsController extends BaseController
 
         $data = $this->ApsPerstyleModel->getDetailPlanning($area, $jarum);
 
+
         foreach ($data as $row) {
             $row['id_pln_mc'] = $id_pln_mc;
             $this->DetailPlanningModel->insert($row);
