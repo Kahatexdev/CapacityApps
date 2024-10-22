@@ -414,7 +414,8 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
 
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
-
+    $routes->get('bssetting', 'UserController::bssetting');
+    $routes->post('importbssetting', 'ProduksiController::importbssetting');
 
     //summary
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
