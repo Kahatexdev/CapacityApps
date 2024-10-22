@@ -4,20 +4,20 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class KebutuhanAreaModel extends Model
+class TargetExportModel extends Model
 {
-    protected $table            = 'kebutuhan_area';
+    protected $table            = 'target_export';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_pln_mc', 'judul', 'jarum', 'area', 'created_at', 'updated_at'];
+    protected $allowedFields    = ['id', 'month', 'qty_target', 'created_at', 'update_at'];
 
     protected bool $allowEmptyInserts = false;
 
     // Dates
-    protected $useTimestamps = true;
+    protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -40,10 +40,15 @@ class KebutuhanAreaModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getDatabyArea($ar)
+    public function getData($thisMonth)
     {
-        return $this->select('*')
-            ->where('area', $ar)
-            ->findAll();
+        $results = $this->select('month, qty_target')
+            ->where('month', $thisMonth['month'])
+            ->first();
+        if ($results) {
+            return $results;
+        } else {
+            return null; // Atau bisa mengembalikan nilai default lain sesuai kebutuhan
+        }
     }
 }

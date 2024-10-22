@@ -118,7 +118,9 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
 
     $routes->post('getTypebyJarum', 'BookingController::getTypebyJarum');
 
-    $routes->get('sales', 'SalesController::index');
+    $routes->get('sales', 'SalesController::index2');
+    // $routes->get('sales2', 'SalesController::index2');
+    $routes->post('updateQtyExport', 'SalesController::updateQtyActualExport');
     $routes->post('sales/position', 'SalesController::index');
     // $routes->get('exportsales', 'ExcelController::export');
     $routes->post('exportsales', 'SalesController::exportExcelByJarum');
@@ -150,7 +152,8 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('orderPerjarum', 'OrderController::OrderPerJarumPlan');
     $routes->get('orderPerArea', 'OrderController::orderPerAreaPlan');
     $routes->get('statusOrder', 'OrderController::statusOrder');
-    $routes->get('statusOrder/(:any)', 'OrderController::statusOrder/$1');
+    $routes->get('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
+    $routes->get('progressdetail/(:any)/(:any)', 'ApsController::progressdetail/$1/$2');
     $routes->get('detailPdk/(:any)/(:any)', 'OrderController::detailPdk/$1/$2');
     $routes->get('detailModelPlanning/(:any)/(:any)', 'OrderController::detailModelPlanning/$1/$2');
     $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'OrderController::detailmodeljarumPlan/$1/$2/$3');
@@ -391,9 +394,11 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('sisa', 'OrderController::smvimport');
     $routes->post('updateSisa', 'GodController::updateSisa');
     $routes->get('detailPdk/(:any)/(:any)', 'OrderController::detailPdk/$1/$2');
-
-
-
+    $routes->get('sisaOrder', 'OrderController::sisaOrder');
+    $routes->get('sisaOrder/(:any)', 'OrderController::sisaOrderBuyer/$1');
+    $routes->get('statusOrder', 'OrderController::statusOrder');
+    $routes->get('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
+    $routes->get('progressdetail/(:any)/(:any)', 'ApsController::progressdetail/$1/$2');
 
 
     // produksi

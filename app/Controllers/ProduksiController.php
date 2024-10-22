@@ -972,8 +972,6 @@ class ProduksiController extends BaseController
                         break; // Skip empty rows
                     } else {
                         $failedRows[] = "style tidak ditemukan " . $rowIndex;
-                        dd($validate);
-                        dd($validate);
                         continue;
                     }
                 } else {

@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Database\Migrations\TargetExport;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\DataMesinModel;
 use App\Models\OrderModel;
@@ -12,6 +13,7 @@ use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use App\Models\LiburModel;
 use App\Models\CylinderModel;
+use App\Models\TargetExportModel;
 // 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -32,6 +34,7 @@ class SalesController extends BaseController
     protected $orderModel;
     protected $ApsPerstyleModel;
     protected $liburModel;
+    protected $targetExportModel;
 
     public function __construct()
     {
@@ -43,6 +46,8 @@ class SalesController extends BaseController
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         $this->liburModel = new LiburModel();
+        $this->targetExportModel = new TargetExportModel();
+
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -54,6 +59,7 @@ class SalesController extends BaseController
             return redirect()->to(base_url('/login'));
         }
     }
+
     public function index()
     {
         $dataJarum = $this->jarumModel->getAliasJrm(); // data all jarum
@@ -926,6 +932,7 @@ class SalesController extends BaseController
 
         $allData = [];
         $totalExportPerBulan = [];
+        $targetExportPerbulan = [];
         $totalLokalPerBulan = [];
         $ttlConfirmPerBulan = [];
         foreach ($dataJarum as $alias) {
@@ -1106,7 +1113,7 @@ class SalesController extends BaseController
                     'end' => $endOfWeek->format('Y-m-d'),
                 ];
 
-                $dataBookingByJarum = $this->bookingModel->getTotalBookingByJarum($cek); // Data booking per jarum
+                $dataBookingByJarum = $this->bookingModel->getTotalBookingByJarum2($cek); // Data booking per jarum
                 $dataOrderWeekByJarum = $this->ApsPerstyleModel->getTotalOrderWeek($cek); // Data order per jarum
 
                 $ConfirmOrder = array_reduce($dataOrderWeekByJarum, function ($carry, $order) {
@@ -1127,9 +1134,34 @@ class SalesController extends BaseController
                     return $carry;
                 }, 0);
 
+                // $sisaBooking = array_reduce($dataBookingByJarum, function ($carry, $booking) {
+                //     $sisa = !empty($booking['sisa_booking']) ? ceil($booking['sisa_booking'] / 24) : 0;
+                //     $carry += $sisa;
+                //     return $carry;
+                // }, 0);
                 $sisaBooking = array_reduce($dataBookingByJarum, function ($carry, $booking) {
-                    $sisa = !empty($booking['sisa_booking']) ? ceil($booking['sisa_booking'] / 24) : 0;
-                    $carry += $sisa;
+                    $sisa_booking = $booking['sisa_booking'];
+                    switch ($booking['product_group']) {
+                        case "SS":
+                            $total = !empty($sisa_booking) ? ceil(($sisa_booking - ($sisa_booking * (25 / 100))) / 24) : 0;
+                            break;
+                        case "S":
+                            $total = !empty($sisa_booking) ? ceil(($sisa_booking - ($sisa_booking * (25 / 100))) / 24) : 0;
+                            break;
+                        case "F":
+                            $total = !empty($sisa_booking) ? ceil(($sisa_booking - ($sisa_booking * (30 / 100))) / 24) : 0;
+                            break;
+                        case "KH":
+                            $total = !empty($sisa_booking) ? ceil(($sisa_booking * 1.5 / 24)) : 0;
+                            break;
+                        case "TG":
+                            $total = !empty($sisa_booking) ? ceil(($sisa_booking * 2 / 24)) : 0;
+                            break;
+                        default:
+                            $total = !empty($sisa_booking) ? ceil($sisa_booking / 24) : 0;
+                            break;
+                    }
+                    $carry += $total;
                     return $carry;
                 }, 0);
 
@@ -1186,7 +1218,15 @@ class SalesController extends BaseController
                 $thisMonth = [
                     'start' => $startDate->format('Y-m-') . '01',
                     'end' => $startDate->format('Y-m-') . '25',
+                    'month' => $startDate->format('F-Y'),
                 ];
+
+                // data target export actual yg di inuput
+                $dataTargetExport = $this->targetExportModel->getData($thisMonth);
+                if (!isset($targetExportPerbulan[$currentMonthOfYear])) {
+                    $targetExportPerbulan[$currentMonthOfYear] = 0; // Inisialisasi jika belum ada
+                }
+                $targetExportPerbulan[$currentMonthOfYear] = !empty($dataTargetExport['qty_target']) ? ceil($dataTargetExport['qty_target'] / 24) : 0;
                 // data export, inspect & lokal per bulan
                 $dataExport = $this->ApsPerstyleModel->getTotalConfirmByMonth($thisMonth);
                 foreach ($dataExport as $dExport) {
@@ -1238,6 +1278,7 @@ class SalesController extends BaseController
         $allData['total'] = [
             'totalExport' => $totalExportPerBulan,
             'totalLokal' => $totalLokalPerBulan,
+            'targetExport' => $targetExportPerbulan,
         ];
 
         // dd($allData);
@@ -1833,6 +1874,8 @@ class SalesController extends BaseController
         $colGrandTotalSisaBooking = Coordinate::columnIndexFromString($columnGrandTotal) + 3; // Konversi huruf kolom ke nomor indeks kolom
         $colGrandTotalExess = Coordinate::columnIndexFromString($columnGrandTotal) + 4; // Konversi huruf kolom ke nomor indeks kolom
         $colGrandTotalPersentaseExess = Coordinate::columnIndexFromString($columnGrandTotal) + 5; // Konversi huruf kolom ke nomor indeks kolom
+        $thisMonthExport = (new \DateTime())->format('F-Y');
+        $nextMonthExport = (new \DateTime('first day of next month'))->format('F-Y');
 
         foreach ($monthlyData as $month => $data) :
             // month
@@ -1945,8 +1988,14 @@ class SalesController extends BaseController
             $sheet->mergeCells($startTitleGrandExport . $rowGrandtotal . ':' . $endTitleGrandExport . $rowGrandtotal)
                 ->getStyle($startTitleGrandExport . $rowGrandtotal . ':' . $endTitleGrandExport . $rowGrandtotal)
                 ->applyFromArray($styleGrandTotal);
-
-            $sheet->setCellValue($startColumnTitleGrandExport . $rowGrandtotal, $allData['total']['totalExport'][$month]);
+            // Cek apakah ini bulan pertama atau kedua
+            if ($month == $thisMonthExport || $month == $nextMonthExport) {
+                // Kosongkan nilai untuk bulan pertama dan kedua
+                $sheet->setCellValue($startColumnTitleGrandExport . $rowGrandtotal, $allData['total']['targetExport'][$month]); // Mengosongkan nilai
+            } else {
+                // Untuk bulan ketiga dan seterusnya
+                $sheet->setCellValue($startColumnTitleGrandExport . $rowGrandtotal, $allData['total']['totalExport'][$month]);
+            }
             $sheet->mergeCells($startColumnTitleGrandExport . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
                 ->getStyle($startColumnTitleGrandExport . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
                 ->applyFromArray($styleGrandTotal);
@@ -2117,5 +2166,132 @@ class SalesController extends BaseController
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
+    }
+
+    public function index2()
+    {
+        $role = session()->get('role');
+        $dataJarum = $this->jarumModel->getAliasJrm(); // data all jarum
+        $currentMonth = new \DateTime(); // Membuat objek DateTime untuk tanggal saat ini
+        $thisMonth = $currentMonth->format('F-Y'); // Mengambil nama bulan dan tahun saat ini
+        // $next = clone $currentMonth; // Mengkloning objek DateTime untuk menghindari perubahan pada objek asli
+        // $next->modify('+1 month'); // Menambahkan satu bulan
+        // $nextMonth = $next->format('F-Y');
+
+        // foreach ($dataJarum as $key => $id) {
+        //     $jarum = $id['jarum'];
+        //     $start = date('2024-11-01');
+        //     $end = date('2024-11-31');
+        //     $cek = [
+        //         // 'jarum' => $jarum,
+        //         'jarum' => 'JC144',
+        //         'start' => $start,
+        //         'end' => $end,
+        //     ];
+        //     $dataBookingByJarum = $this->bookingModel->getTotalBookingByJarum2($cek); // Data booking per jarum
+        //     // dd($dataBookingByJarum);
+        //     $bookingSS = $ttlBookingSS = 0;
+        //     $bookingS = $ttlBookingS = 0;
+        //     $bookingF = $ttlBookingF = 0;
+        //     $bookingKH = $ttlBookingKH = 0;
+        //     $bookingTG = $ttlBookingTG = 0;
+        //     $booking = $ttlBooking = 0;
+        //     $allBooking = 0;
+        //     foreach ($dataBookingByJarum as $booking) {
+        //         if ($booking['product_group'] == "SS") {
+        //             $sisa_bookingSS = $booking['sisa_booking'];
+        //             $bookingSS = !empty($sisa_bookingSS) ? $sisa_bookingSS - ($sisa_bookingSS * (25 / 100)) : 0;
+        //             $ttlBookingSS += ceil($bookingSS);
+        //         } elseif ($booking['product_group'] == "S") {
+        //             $sisa_bookingS = $booking['sisa_booking'];
+        //             $bookingS = !empty($sisa_bookingS) ? $sisa_bookingS - ($sisa_bookingS * (25 / 100)) : 0;
+        //             $ttlBookingS += ceil($bookingS);
+        //         } elseif ($booking['product_group'] == "F") {
+        //             $sisa_bookingF = $booking['sisa_booking'];
+        //             $bookingF = !empty($sisa_bookingF) ? $sisa_bookingF - ($sisa_bookingF * (30 / 100)) : 0;
+        //             $ttlBookingF += ceil($bookingF);
+        //         } elseif ($booking['product_group'] == "KH") {
+        //             $sisa_bookingKH = $booking['sisa_booking'];
+        //             $bookingKH = !empty($sisa_bookingKH) ? $sisa_bookingKH  * 1.5 : 0;
+        //             $ttlBookingKH += ceil($bookingKH);
+        //         } elseif ($booking['product_group'] == "TG") {
+        //             $sisa_bookingTG = $booking['sisa_booking'];
+        //             $bookingTG = !empty($sisa_bookingTG) ? $sisa_bookingTG  * 2 : 0;
+        //             $ttlBookingTG += ceil($bookingTG);
+        //         } else {
+        //             $sisa_booking = $booking['sisa_booking'];
+        //             $booking = !empty($sisa_booking) ? $sisa_booking : 0;
+        //             $ttlBooking += ceil($booking);
+        //         }
+        //     }
+        //     $allBooking = $ttlBookingSS + $ttlBookingS + $ttlBookingF + $ttlBookingKH + $ttlBookingTG + $ttlBooking;
+        //     dd($allBooking);
+        // }
+
+        $data = [
+            'role' => $role,
+            'title' => 'Sales Position',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'dataJarum' => $dataJarum,
+            'thisMonth' => $thisMonth,
+            // 'nextMonth' => $nextMonth,
+        ];
+
+        return view($role . '/Sales/index2', $data);
+    }
+
+    public function updateQtyActualExport()
+    {
+        $role = session()->get('role');
+        // Mengambil data dari input
+        $bulan = $this->request->getPost('month');
+        $qtyExport = $this->request->getPost('qty_export');
+
+        // Inisialisasi status sukses
+        $success = false;
+
+        foreach ($bulan as $key => $month) {
+            // Mengambil nilai qtyExport berdasarkan key
+            $qtyExportValue = isset($qtyExport[$key]) ? ceil($qtyExport[$key]) : 0;
+            var_dump($qtyExportValue);
+
+            if ($qtyExportValue > 0) {
+                // Mencari data berdasarkan bulan & tahun
+                $existingData = $this->targetExportModel->where('month', $month)->first();
+                if ($existingData) {
+                    $update = [
+                        'qty_target' => $qtyExportValue,
+                        'update_at' => date('Y-m-d H:i:s') // Menyisipkan waktu saat ini
+                    ];
+                    // Jika data sudah ada, lakukan update
+                    $this->targetExportModel->where('month', $month)->set($update)->update();
+                } else {
+                    $data = [
+                        'month' => $month,
+                        'qty_target' => $qtyExportValue,
+                        'created_at' => date('Y-m-d H:i:s') // Menyisipkan waktu saat ini
+                    ];
+                    // Jika data belum ada, lakukan insert
+                    $this->targetExportModel->insert($data);
+                }
+                // Set status sukses
+                $success = true;
+            }
+        }
+        // dd($qtyExport);
+        // Mengatur session flash data jika operasi sukses
+        if ($success) {
+            // Redirect ke halaman yang diinginkan setelah operasi
+            return redirect()->to(base_url(session()->get('role') . '/sales'))->with('success', 'Data berhasil disimpan!');
+        } else {
+            // Redirect ke halaman yang diinginkan setelah operasi
+            return redirect()->to(base_url(session()->get('role') . '/sales'))->with('error', 'Data gagal disimpan!');
+        }
     }
 }

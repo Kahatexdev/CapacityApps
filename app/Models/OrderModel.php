@@ -349,6 +349,7 @@ class OrderModel extends Model
     public function getBuyer()
     {
         return $this->select('kd_buyer_order')->DISTINCT()
+            ->where('kd_buyer_order !=', null)
             ->orderBy('kd_buyer_order', 'ASC')
             ->findAll();
     }
