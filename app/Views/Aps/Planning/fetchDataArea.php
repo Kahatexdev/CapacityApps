@@ -52,6 +52,7 @@ error_reporting(E_ALL); ?>
                             </h6>
                         </div>
                         <div class="col-auto">
+                            <button id="fetch-data-button" class="btn btn-info">Fetch Data</button>
                             <a href="<?= base_url($role . '/planningmesin') ?>" class="btn btn-secondary">Back</a>
                         </div>
                     </div>
@@ -158,7 +159,8 @@ error_reporting(E_ALL); ?>
                             id_pln_mc: id_pln_mc
                         },
                         success: function(response) {
-                            // Handle success response
+                            // Handle success response\
+                            console.log(response)
                             Swal.fire({
                                 title: 'Success!',
                                 text: 'Data inserted successfully!',

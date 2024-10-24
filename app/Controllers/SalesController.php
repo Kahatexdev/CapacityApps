@@ -1008,7 +1008,7 @@ class SalesController extends BaseController
                 $totals['totalCylinderRs'] = $cylinder['qty_rosso'];
             }
 
-            $startDate = new \DateTime('first day of this month'); // Tanggal hari ini
+            $startDate = new \DateTime('first day of this month'); // Awal bulan ini
             $endDate = new \DateTime('+1 years'); // Tanggal satu tahun ke depan
 
             $LiburModel = new LiburModel();
@@ -1281,7 +1281,7 @@ class SalesController extends BaseController
             'targetExport' => $targetExportPerbulan,
         ];
 
-        // dd($allData);
+        dd($allData);
 
         // Buat spreadsheet
         $spreadsheet = new Spreadsheet();
