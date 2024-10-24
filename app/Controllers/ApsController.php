@@ -660,7 +660,21 @@ class ApsController extends BaseController
 
         foreach ($data as $row) {
             $row['id_pln_mc'] = $id_pln_mc;
-            $this->DetailPlanningModel->insert($row);
+            $model = $row['model'];
+            $sisa = $row['sisa'];
+            $deliv = $row['delivery'];
+            $validate = [
+                'id' =>  $row['id_pln_mc'],
+                'model' => $model,
+                'deliv' => $deliv,
+            ];
+            $cek = $this->DetailPlanningModel->cekPlanning($validate);
+            if ($cek) {
+                $id = $cek['id_detail_pln'];
+                $this->DetailPlanningModel->update($id, ['sisa' => $sisa]);
+            } else {
+                $this->DetailPlanningModel->insert($row);
+            }
         }
     }
     public function planningpage($id)

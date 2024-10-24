@@ -921,7 +921,7 @@ class OrderController extends BaseController
 
 
         ];
-        return view(session()->get('role') . '/Order/semuaorder', $data);
+        return view(session()->get('role') . '/Order/semuaorder2', $data);
     }
     public function orderPerJarumPlan()
     {

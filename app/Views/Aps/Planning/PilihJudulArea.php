@@ -111,7 +111,7 @@
                                                 <input type="hidden" name="judul" value="<?= $val['judul'] ?>">
                                                 <input type="hidden" name="area" value="<?= $val['area'] ?>">
                                                 <input type="hidden" name="jarum" value="<?= $val['jarum'] ?>">
-                                                <button type="submit">View Details</button>
+                                                <button type="submit" class="btn btn-info">View Details</button>
                                             </form>
                                         </td>
                                     </tr>

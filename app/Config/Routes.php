@@ -157,7 +157,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('detailPdk/(:any)/(:any)', 'OrderController::detailPdk/$1/$2');
     $routes->get('detailModelPlanning/(:any)/(:any)', 'OrderController::detailModelPlanning/$1/$2');
     $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'OrderController::detailmodeljarumPlan/$1/$2/$3');
-    $routes->get('semuaOrder', 'OrderController::semuaOrderPlan');
+    $routes->get('semuaOrder', 'OrderController::semuaOrder');
     $routes->get('dataorderperjarum/(:any)', 'OrderController::DetailOrderPerJarumPlan/$1');
     $routes->get('dataorderperarea/(:any)', 'OrderController::DetailOrderPerAreaPlan/$1');
     $routes->post('updatedetailorder/(:any)', 'OrderController::updateorder/$1');
@@ -170,6 +170,8 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('editarea', 'PlanningController::editarea');
     $routes->post('assignarealall', 'PlanningController::assignarealall');
     $routes->post('recomendationarea', 'MesinController::recomendationarea');
+    $routes->post('tampilPerdelivery', 'OrderController::tampilPerdelivery');
+
 
     // mesin
     $routes->get('datamesin', 'MesinController::indexPlan');
