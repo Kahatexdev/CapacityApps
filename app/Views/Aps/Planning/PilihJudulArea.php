@@ -96,6 +96,7 @@
                             <th>Area</th>
                             <th>Last Update</th>
                             <th>Details</th>
+                            <th>Report</th>
                         </thead>
                         <tbody>
                             <?php foreach ($planarea as $order) : ?>
@@ -112,6 +113,14 @@
                                                 <input type="hidden" name="area" value="<?= $val['area'] ?>">
                                                 <input type="hidden" name="jarum" value="<?= $val['jarum'] ?>">
                                                 <button type="submit">View Details</button>
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <form action="<?= base_url($role . '/excelplnmc/' . $val['id_pln_mc']) ?>" method="post">
+                                                <input type="hidden" name="judul" value="<?= $val['judul'] ?>">
+                                                <input type="hidden" name="area" value="<?= $val['area'] ?>">
+                                                <input type="hidden" name="jarum" value="<?= $val['jarum'] ?>">
+                                                <button type="submit">Excel</button>
                                             </form>
                                         </td>
                                     </tr>

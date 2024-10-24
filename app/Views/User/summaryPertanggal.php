@@ -24,7 +24,7 @@
                                 <input type="hidden" class="form-control" name="akhir" value="<?= $dataFilter['akhir'] ?>">
                                 <button type="submit" class="btn btn-info"><i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Report Excel</button>
 
-                                <a href="<?= base_url($role . '/dataproduksi') ?>" class="btn bg-gradient-dark">
+                                <a href="<?= base_url($role . '/produksi') ?>" class="btn bg-gradient-dark">
                                     <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
                                     Back</a>
                             </form>
@@ -105,14 +105,14 @@
                                         $ttl_prod += $id['ttl_prod'];
                                         $ttl_jlmc += $id['ttl_jlmc'];
                                         // Pastikan $id['running'] tidak bernilai nol sebelum dibagi
-                                        $rata2 = ($id['running'] != 0) ? number_format($id['ttl_jlmc'] / $id['running'], 0) : 0;
+                                        $rata2 = (is_numeric($id['ttl_jlmc']) && is_numeric($id['running']) && $id['running'] != 0) ? number_format($id['ttl_jlmc'] / $id['running'], 0) : 0;
                                         $target_normal_socks = 14;
-                                        $sisa = $id['qty'] - $id['qty_produksi'];
+                                        $sisa = (is_numeric($id['qty']) && is_numeric($id['qty_produksi'])) ? $id['qty'] - $id['qty_produksi'] : 0;
                                         $ttl_sisa += $sisa;
-                                        $hitung_day_stop = ($rata2 != 0) ? ($sisa / 24) / ($rata2 * $target_normal_socks) : 0;
+                                        $hitung_day_stop = (is_numeric($rata2) && $rata2 != 0) ? ($sisa / 24) / ($rata2 * $target_normal_socks) : 0;
                                         $day_stop = ($id['max_delivery'] > $today && $sisa > 0 && $rata2 != 0) ? date('Y-m-d', strtotime($today . ' + ' . round($hitung_day_stop) . ' days')) : '';
 
-                                        $ttl_rata2 += $rata2;
+                                        $ttl_rata2 += is_numeric($rata2) ? $rata2 : 0;
                                     ?>
                                         <tr>
                                             <td class="text-sm"><?= strtoupper($id['area']); ?></td>
@@ -122,7 +122,7 @@
                                             <td class="text-sm" style="text-align: center;"><?= number_format($id['qty'] / 24, 2); ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= number_format($id['qty_produksi'] / 24, 2); ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= number_format($sisa / 24, 2); ?></td>
-                                            <td class="text-sm" style="text-align: center;"><?= number_format($rata2, 0); ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= is_numeric($rata2) ? number_format((float)$rata2, 0) : '0'; ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= $id['running']; ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= $day_stop ?></td>
                                             <?php foreach ($tglProdUnik as $tgl_produksi2) : ?>

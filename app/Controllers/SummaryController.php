@@ -239,14 +239,14 @@ class SummaryController extends BaseController
             $ttl_prod += $id['ttl_prod'];
             $ttl_jlmc += $id['ttl_jlmc'];
             // Pastikan $id['running'] tidak bernilai nol sebelum dibagi
-            $rata2 = ($id['running'] != 0) ? number_format($id['ttl_jlmc'] / $id['running'], 0) : 0;
+            $rata2 = (is_numeric($id['ttl_jlmc']) && is_numeric($id['running']) && $id['running'] != 0) ? number_format($id['ttl_jlmc'] / $id['running'], 0) : 0;
             $target_normal_socks = 14;
-            $sisa = $id['qty'] - $id['qty_produksi'];
+            $sisa = (is_numeric($id['qty']) && is_numeric($id['qty_produksi'])) ? $id['qty'] - $id['qty_produksi'] : 0;
             $ttl_sisa += $sisa;
-            $hitung_day_stop = ($rata2 != 0) ? ($sisa / 24) / ($rata2 * $target_normal_socks) : 0;
+            $hitung_day_stop = (is_numeric($rata2) && $rata2 != 0) ? ($sisa / 24) / ($rata2 * $target_normal_socks) : 0;
             $day_stop = ($id['max_delivery'] > $today && $sisa > 0 && $rata2 != 0) ? date('Y-m-d', strtotime($today . ' + ' . round($hitung_day_stop) . ' days')) : '';
 
-            $ttl_rata2 += $rata2;
+            $ttl_rata2 += is_numeric($rata2) ? $rata2 : 0;
 
             $sheet->setCellValue('A' . $row, $id['area']);
             $sheet->setCellValue('B' . $row, $id['machinetypeid']);
@@ -255,7 +255,7 @@ class SummaryController extends BaseController
             $sheet->setCellValue('E' . $row, number_format($id['qty'] / 24, 2));
             $sheet->setCellValue('F' . $row, number_format($id['qty_produksi'] / 24, 2));
             $sheet->setCellValue('G' . $row, number_format($sisa / 24, 2));
-            $sheet->setCellValue('H' . $row, number_format($rata2, 0));
+            $sheet->setCellValue('H' . $row, is_numeric($rata2) ? number_format((float)$rata2, 0) : '0');
             $sheet->setCellValue('I' . $row, $id['running']);
             $sheet->setCellValue('J' . $row, $day_stop);
             // 

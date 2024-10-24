@@ -740,6 +740,7 @@ class ProduksiController extends BaseController
         ];
 
         $dataSummary = $this->orderModel->getProdSummary($data);
+
         $totalShip = $this->orderModel->getTotalShipment($data);
         $totalProd = $this->orderModel->getdataSummaryPertgl($data);
         // Debugging to check if $totalShip is an array

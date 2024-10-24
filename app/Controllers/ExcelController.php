@@ -11,6 +11,15 @@ use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use App\Models\LiburModel;
+use App\Models\KebutuhanMesinModel;
+use App\Models\KebutuhanAreaModel;
+use App\Models\MesinPlanningModel;
+use App\Models\DetailPlanningModel;
+use App\Models\TanggalPlanningModel;
+use App\Models\EstimatedPlanningModel;
+use App\Models\AksesModel;/*  */
+use App\Services\orderServices;
+use CodeIgniter\HTTP\RequestInterface;
 use LengthException;
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Week;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -30,6 +39,14 @@ class ExcelController extends BaseController
     protected $orderModel;
     protected $ApsPerstyleModel;
     protected $liburModel;
+    protected $KebutuhanMesinModel;
+    protected $KebutuhanAreaModel;
+    protected $MesinPlanningModel;
+    protected $aksesModel;
+    protected $DetailPlanningModel;
+    protected $TanggalPlanningModel;
+    protected $EstimatedPlanningModel;
+    protected $orderServices;
 
     public function __construct()
     {
@@ -40,7 +57,15 @@ class ExcelController extends BaseController
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         $this->liburModel = new LiburModel();
-        if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
+        $this->KebutuhanMesinModel = new KebutuhanMesinModel();
+        $this->KebutuhanAreaModel = new KebutuhanAreaModel();
+        $this->MesinPlanningModel = new MesinPlanningModel();
+        $this->aksesModel = new AksesModel();
+        $this->DetailPlanningModel = new DetailPlanningModel();
+        $this->TanggalPlanningModel = new TanggalPlanningModel();
+        $this->EstimatedPlanningModel = new EstimatedPlanningModel();
+        $this->orderServices = new orderServices();
+        if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
         $this->isLogedin();
@@ -1927,5 +1952,126 @@ class ExcelController extends BaseController
 
         // Unduh file
         return $this->response->download($file_path, null)->setFileName('data.xlsx');
+    }
+
+    public function excelPlnMc($id)
+    {
+        $detailplan = $this->DetailPlanningModel->getDataPlanning($id);
+        // dd($detailplan);
+        $judul = $this->request->getGet('judul');
+        $area = $this->request->getGet('area');
+        $jarum = $this->request->getGet('jarum');
+        $mesinarea = $this->jarumModel->getMesinByArea($area, $jarum);
+
+        // Generate Excel
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // border
+        $styleHeader = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FFFFFFFF']
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID, // Jenis pengisian solid
+                'startColor' => ['argb' => 'FF67748e'], // Warna latar belakang biru tua (HEX)
+            ],
+        ];
+        $styleBody = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+        $styleTotal = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+
+        // Tambahkan header
+        $sheet->setCellValue('A3', 'Model');
+        $sheet->setCellValue('B3', 'Delivery');
+        $sheet->setCellValue('C3', 'Qty');
+        $sheet->setCellValue('D3', 'Remaining Qty');
+        $sheet->setCellValue('E3', 'Qty Planned');
+        $sheet->setCellValue('F3', 'Target 100%');
+        $sheet->setCellValue('G3', 'Start');
+        $sheet->setCellValue('H3', 'Stop');
+        $sheet->setCellValue('I3', 'Machine');
+        $sheet->setCellValue('J3', 'Days');
+        $sheet->getStyle('A3')->applyFromArray($styleHeader);
+        $sheet->getStyle('B3')->applyFromArray($styleHeader);
+        $sheet->getStyle('C3')->applyFromArray($styleHeader);
+        $sheet->getStyle('D3')->applyFromArray($styleHeader);
+        $sheet->getStyle('E3')->applyFromArray($styleHeader);
+        $sheet->getStyle('F3')->applyFromArray($styleHeader);
+        $sheet->getStyle('G3')->applyFromArray($styleHeader);
+        $sheet->getStyle('H3')->applyFromArray($styleHeader);
+        $sheet->getStyle('I3')->applyFromArray($styleHeader);
+        $sheet->getStyle('J3')->applyFromArray($styleHeader);
+
+        $row = 4;
+        foreach ($detailplan as $order) :
+            //Mengisi sheet excel
+            $sheet->setCellValue("A$row", $order['model']);
+            $sheet->setCellValue("B$row", date('d-M-Y', strtotime($order['delivery'])));
+            $sheet->setCellValue("C$row", number_format($order['qty'], 0, '.', ','));
+            $sheet->setCellValue("D$row", number_format($order['sisa'], 0, '.', ','));
+            $sheet->setCellValue("E$row", number_format($order['est_qty'], 0, '.', ','));
+            $sheet->setCellValue("F$row", number_format(3600 / $order['smv'], 2, '.', ','));
+            $sheet->setCellValue("G$row", !empty($order['start_date']) ? date('d-M-Y', strtotime($order['start_date'])) : 'No Start Date');
+            $sheet->setCellValue("H$row", !empty($order['stop_date']) ? date('d-M-Y', strtotime($order['stop_date'])) : 'No Stop Date');
+            $sheet->setCellValue("I$row", $order['mesin'] ? htmlspecialchars($order['mesin']) . ' Mc' : '');
+            $sheet->setCellValue("J$row", $order['hari']);
+            $sheet->getStyle("A$row")->applyFromArray($styleBody);
+            $sheet->getStyle("B$row")->applyFromArray($styleBody);
+            $sheet->getStyle("C$row")->applyFromArray($styleBody);
+            $sheet->getStyle("D$row")->applyFromArray($styleBody);
+            $sheet->getStyle("E$row")->applyFromArray($styleBody);
+            $sheet->getStyle("F$row")->applyFromArray($styleBody);
+            $sheet->getStyle("G$row")->applyFromArray($styleBody);
+            $sheet->getStyle("H$row")->applyFromArray($styleBody);
+            $sheet->getStyle("I$row")->applyFromArray($styleBody);
+            $sheet->getStyle("J$row")->applyFromArray($styleBody);
+            $row++;
+        endforeach;
+
+        // Set sheet pertama sebagai active sheet
+        $spreadsheet->setActiveSheetIndex(0);
+
+        // Export file ke Excel
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Planning MC ' . $judul . '.xlsx';
+
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        $writer->save('php://output');
+        exit;
     }
 }

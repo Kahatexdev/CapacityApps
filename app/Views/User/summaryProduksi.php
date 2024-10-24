@@ -22,7 +22,7 @@
                                 <input type="hidden" class="form-control" name="pdk" value="<?= $dataFilter['pdk'] ?>">
                                 <button type="submit" class="btn btn-info"><i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Report Excel</button>
 
-                                <a href="<?= base_url($role . '/dataproduksi') ?>" class="btn bg-gradient-dark">
+                                <a href="<?= base_url($role . '/produksi') ?>" class="btn bg-gradient-dark">
                                     <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
                                     Back</a>
                             </form>
@@ -190,7 +190,7 @@
                                                     <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($sisa / 24, 2) : ''; ?></td>
                                                     <td class="text-sm" style="text-align: center;"><?= ($sisa_ship > 0 ? number_format($sisa_ship / 24, 2) : '0.00'); ?></td>
                                                     <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($persentase, 2) . '%' : ''; ?></td>
-                                                    <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($bs_st, 2) : ''; ?></td>
+                                                    <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($bs_st / 24, 2) : ''; ?></td>
                                                     <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($pr['plus_packing'], 2) : ''; ?></td>
                                                 <?php
                                                     break;
