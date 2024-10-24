@@ -317,6 +317,9 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('getDataLibur', 'ApsController::getDataLibur');
     $routes->post('saveplanning', 'ApsController::saveplanning');
     $routes->get('getMesinByDate/(:any)', 'ApsController::getMesinByDate/$1');
+    $routes->get('kalenderMesin/(:any)', 'ApsController::kalenderMesin/$1');
+    $routes->post('updateplanmesin', 'ApsController::updateplanmesin');
+
 
     // deffect
     $routes->get('datadeffect', 'DeffectController::datadeffect');

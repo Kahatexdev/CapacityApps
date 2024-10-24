@@ -801,4 +801,32 @@ class ApsController extends BaseController
             return redirect()->to(base_url(session()->get('role') . '/planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm . '&judul=' . $judul))->withInput()->with('error', 'Data Gagal Disimpan');
         }
     }
+    public function kalenderMesin()
+    {
+        $role = session()->get('role');
+
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Jalan Mesin',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+
+        ];
+        return view($role . '/Planning/kalenderMesin', $data);
+    }
+    public function updateplanmesin()
+    {
+        $id = $this->request->getPost('id');
+        $start = $this->request->getPost('start');
+        $stop = $this->request->getPost('stop');
+        $mesin = $this->request->getPost('mesin');
+
+        $update = $this->DetailPlanningModel->update($id, ['start' => $start, 'stop' => $stop, 'mesin' => $mesin]);
+        dd($id);
+    }
 }

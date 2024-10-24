@@ -40,7 +40,7 @@ error_reporting(E_ALL); ?>
                         <div class="col-auto">
 
                             <a href="#" class="btn btn-danger btn-delete-all" Data-bs-toggle="modal" data-bs-target="ModalDeleteAll" data-no-model="<?= $noModel ?>">Delete All</a>
-                            <a href="<?= base_url($role . '/blmAdaArea/') ?>" class="btn bg-gradient-info">Kembali</a>
+                            <a href="<?= base_url($role . '/dataorder/') ?>" class="btn bg-gradient-info">Kembali</a>
                         </div>
                     </div>
 
