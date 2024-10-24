@@ -12,7 +12,7 @@ class KebutuhanAreaModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_pln_mc','judul','jarum','area','created_at','updated_at'];
+    protected $allowedFields    = ['id_pln_mc', 'judul', 'jarum', 'area', 'created_at', 'updated_at'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -39,4 +39,11 @@ class KebutuhanAreaModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getDatabyArea($ar)
+    {
+        return $this->select('*')
+            ->where('area', $ar)
+            ->findAll();
+    }
 }

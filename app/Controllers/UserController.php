@@ -90,8 +90,12 @@ class UserController extends BaseController
             'role' => session()->get('role'),
             'title' => 'Dashboard',
             'active1' => '',
-            'active3' => 'active',
+            'active3' => '',
             'active2' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
             'targetProd' => 0,
 
 

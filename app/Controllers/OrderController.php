@@ -1030,7 +1030,7 @@ class OrderController extends BaseController
             'progress' => $filtered,
             'area' => $area
         ];
-        return view(session()->get('role') . '/Order/statusorderarea', $data);
+        return view(session()->get('role') . '/Order/statusorderArea', $data);
     }
     public function getTurunOrder()
     {

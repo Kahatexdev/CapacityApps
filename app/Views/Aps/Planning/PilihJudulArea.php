@@ -99,20 +99,23 @@
                         </thead>
                         <tbody>
                             <?php foreach ($planarea as $order) : ?>
-                                <tr>
-                                    <td><?= $order['judul'] ?></td>
-                                    <td><?= $order['jarum'] ?></td>
-                                    <td><?= $order['area'] ?></td>
-                                    <td><?= date('F j, Y \a\t g:i A', strtotime($order['updated_at'])) ?></td>
-                                    <td>
-                                        <form action="<?= base_url($role . '/detailplnmc/' . $order['id_pln_mc']) ?>" method="get">
-                                            <input type="hidden" name="judul" value="<?= $order['judul'] ?>">
-                                            <input type="hidden" name="area" value="<?= $order['area'] ?>">
-                                            <input type="hidden" name="jarum" value="<?= $order['jarum'] ?>">
-                                            <button type="submit">View Details</button>
-                                        </form>
-                                    </td>
-                                </tr>
+                                <?php foreach ($order as $key => $val) : ?>
+
+                                    <tr>
+                                        <td><?= $val['judul'] ?></td>
+                                        <td><?= $val['jarum'] ?></td>
+                                        <td><?= $val['area'] ?></td>
+                                        <td><?= date('F j, Y \a\t g:i A', strtotime($val['updated_at'])) ?></td>
+                                        <td>
+                                            <form action="<?= base_url($role . '/detailplnmc/' . $val['id_pln_mc']) ?>" method="get">
+                                                <input type="hidden" name="judul" value="<?= $val['judul'] ?>">
+                                                <input type="hidden" name="area" value="<?= $val['area'] ?>">
+                                                <input type="hidden" name="jarum" value="<?= $val['jarum'] ?>">
+                                                <button type="submit">View Details</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach ?>
                             <?php endforeach ?>
                         </tbody>
                     </table>

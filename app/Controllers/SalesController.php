@@ -1143,19 +1143,19 @@ class SalesController extends BaseController
                     $sisa_booking = $booking['sisa_booking'];
                     switch ($booking['product_group']) {
                         case "SS":
-                            $total = !empty($sisa_booking) ? ceil($sisa_booking - ($sisa_booking * (25 / 100)) / 24) : 0;
+                            $total = !empty($sisa_booking) ? ceil(($sisa_booking - ($sisa_booking * (25 / 100))) / 24) : 0;
                             break;
                         case "S":
-                            $total = !empty($sisa_booking) ? ceil($sisa_booking - ($sisa_booking * (25 / 100)) / 24) : 0;
+                            $total = !empty($sisa_booking) ? ceil(($sisa_booking - ($sisa_booking * (25 / 100))) / 24) : 0;
                             break;
                         case "F":
-                            $total = !empty($sisa_booking) ? ceil($sisa_booking - ($sisa_booking * (30 / 100)) / 24) : 0;
+                            $total = !empty($sisa_booking) ? ceil(($sisa_booking - ($sisa_booking * (30 / 100))) / 24) : 0;
                             break;
                         case "KH":
-                            $total = !empty($sisa_booking) ? ceil($sisa_booking * 1.5 / 24) : 0;
+                            $total = !empty($sisa_booking) ? ceil(($sisa_booking * 1.5 / 24)) : 0;
                             break;
                         case "TG":
-                            $total = !empty($sisa_booking) ? ceil($sisa_booking * 2 / 24) : 0;
+                            $total = !empty($sisa_booking) ? ceil(($sisa_booking * 2 / 24)) : 0;
                             break;
                         default:
                             $total = !empty($sisa_booking) ? ceil($sisa_booking / 24) : 0;

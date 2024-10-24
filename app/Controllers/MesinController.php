@@ -618,6 +618,7 @@ class MesinController extends BaseController
         $weeklyMachines = array_fill($startWeek, 12, 0);
         foreach ($capacity as $row) {
             $pdk = $row['mastermodel'];
+            $delivery = $row['delivery'];
             $smv = $row['smv'];
             $targetPerMesin = round((86400 / (intval($smv))) * 0.85 / 24);
             $sisa = $row['sisa'] / 24;
@@ -658,6 +659,7 @@ class MesinController extends BaseController
                 'PDK' => $pdk,
                 'sisa' => $sisa,
                 'leadtime' => $leadtime,
+                'delivery' => $delivery,
                 'targetPerMesin' => $targetPerMesin,
                 'produksi' => $produksi,
                 'kebMesin' => $kebMesin,
