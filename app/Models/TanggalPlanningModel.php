@@ -12,7 +12,7 @@ class TanggalPlanningModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id','id_detail_pln','id_est_qty','date','mesin'];
+    protected $allowedFields    = ['id', 'id_detail_pln', 'id_est_qty', 'date', 'mesin', 'start_mesin', 'stop_mesin'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -40,7 +40,8 @@ class TanggalPlanningModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getMesinByDate($id, $date) {
+    public function getMesinByDate($id, $date)
+    {
         return $this->select('tanggal_planning.DATE as date, SUM(tanggal_planning.mesin) AS mesin')
             ->join('detail_planning', 'tanggal_planning.id_detail_pln = detail_planning.id_detail_pln', 'left')
             ->where('tanggal_planning.DATE', $date)
@@ -48,5 +49,11 @@ class TanggalPlanningModel extends Model
             ->groupBy('tanggal_planning.DATE')
             ->get()
             ->getResultArray();
-    }   
+    }
+    public function hapusData($idest, $iddetail)
+    {
+        return $this->where('id_est_qty', $idest)
+            ->where('id_detail_pln', $iddetail)
+            ->delete();
+    }
 }

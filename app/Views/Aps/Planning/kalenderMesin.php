@@ -34,16 +34,18 @@ error_reporting(E_ALL); ?>
                     <div class="row">
                         <div class="col">
                             <h5>
-                                Available Machine
+                                Available Machine Calendar
                             </h5>
                             <div class="row">
                                 <div class="col">
                                     <h6>
-
+                                        Area : <?= $area ?><br>
+                                        Jarum : <?= $jarum ?><br>
+                                        Mesin : <?= $mesin ?><br>
                                     </h6>
                                 </div>
                                 <div class="col-auto">
-                                    <a href="<?= base_url($role . '/detailplnmc/') ?>" class="btn btn-secondary">Back</a>
+                                    <a href="<?= base_url($role . '/detailplnmc/' . $id) ?>" class="btn btn-secondary">Back</a>
                                 </div>
                             </div>
                         </div>
@@ -53,7 +55,7 @@ error_reporting(E_ALL); ?>
 
                 <div class="card-body p-3">
                     <div class="row">
-                        <div class="col-lg-12">
+                        <div class="col-lg-12 ">
                             <div class="content">
                                 <div id='calendar'></div>
                             </div>
@@ -76,12 +78,36 @@ error_reporting(E_ALL); ?>
 
                 var calendar = new FullCalendar.Calendar(calendarEl, {
                     plugins: ['interaction', 'dayGrid'],
-                    defaultDate: '2024-10-01',
-                    editable: true,
+                    defaultDate: '<?= $today ?>',
+                    editable: false,
                     eventLimit: true, // allow "more" link when too many events
                     events: [{
-                            title: 'All Day Event',
-                            start: '2024-10-01'
+                            title: '61 used \n 7 available',
+                            start: '2024-10-27'
+                        },
+                        {
+                            title: '62 used \n 6 available',
+                            start: '2024-10-28'
+                        },
+                        {
+                            title: '60 used \n 8 available',
+                            start: '2024-10-29'
+                        },
+                        {
+                            title: '60 used \n 8 available',
+                            start: '2024-10-30'
+                        },
+                        {
+                            title: '60 used \n 8 available',
+                            start: '2024-10-31'
+                        },
+                        {
+                            title: '60 used \n 8 available',
+                            start: '2024-11-01'
+                        },
+                        {
+                            title: '60 used \n 8 available',
+                            start: '2024-11-02'
                         },
 
 

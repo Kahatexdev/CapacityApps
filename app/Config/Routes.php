@@ -313,12 +313,12 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('SimpanJudul', 'ApsController::saveplanningmesin');
     $routes->get('detailplnmc/(:any)', 'ApsController::detailplanmc/$1');
     $routes->get('fetchdetailorderarea', 'ApsController::fetchdetailorderarea');
-    $routes->get('planningpage/(:any)', 'ApsController::planningpage/$1');
+    $routes->get('planningpage/(:any)/(:any)', 'ApsController::planningpage/$1/$2');
     $routes->post('getDataLibur', 'ApsController::getDataLibur');
     $routes->post('saveplanning', 'ApsController::saveplanning');
     $routes->get('getMesinByDate/(:any)', 'ApsController::getMesinByDate/$1');
     $routes->get('kalenderMesin/(:any)', 'ApsController::kalenderMesin/$1');
-    $routes->post('updateplanmesin', 'ApsController::updateplanmesin');
+    $routes->post('deleteplanmesin', 'ApsController::deleteplanmesin');
 
 
     // deffect

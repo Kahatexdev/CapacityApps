@@ -7,7 +7,7 @@ use CodeIgniter\Model;
 class KebutuhanAreaModel extends Model
 {
     protected $table            = 'kebutuhan_area';
-    protected $primaryKey       = 'id';
+    protected $primaryKey       = 'id_pln_mc';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;

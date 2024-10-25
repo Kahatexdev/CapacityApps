@@ -8,7 +8,7 @@ class AddStartMesin extends Migration
 {
     public function up()
     {
-        $this->forge->addColumn('estimated_planning', [
+        $this->forge->addColumn('tanggal_planning', [
             'start_mesin' => [
                 'type' => 'date',
 
@@ -22,6 +22,7 @@ class AddStartMesin extends Migration
 
     public function down()
     {
-        $this->forge->dropColumn('estimated_planning', ['start_mesin,stop_mesin']);
+        $this->forge->dropColumn('tanggal_planning', 'start_mesin');
+        $this->forge->dropColumn('tanggal_planning', 'stop_mesin');
     }
 }

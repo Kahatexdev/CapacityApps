@@ -99,25 +99,11 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm"><?= htmlspecialchars($order['hari']); ?> Days</td>
                                             <td class="text-sm">
                                                 <?php if ($order['est_qty'] < $order['sisa']) : ?>
-                                                    <form action="<?= base_url($role . '/planningpage/' . $order['id_detail_pln']); ?>" method="get">
-                                                        <input type="hidden" name="id_utama" value="<?= $id_pln_mc; ?>">
-                                                        <input type="hidden" name="mesin" value="<?= $mesin; ?>">
-                                                        <input type="hidden" name="area" value="<?= $area; ?>">
-                                                        <input type="hidden" name="jarum" value="<?= $jarum; ?>">
-                                                        <input type="hidden" name="judul" value="<?= $judul; ?>">
+                                                    <a href="<?= base_url($role . '/planningpage/' . $order['id_detail_pln']) . '/' . $id_pln_mc ?>" class="btn btn-primary">Detail</a>
 
-                                                        <button type="submit" class="btn btn-primary">Planning</button>
-                                                    </form>
                                                 <?php else : ?>
-                                                    <form action="<?= base_url($role . '/planningpage/' . $order['id_detail_pln']); ?>" method="get">
-                                                        <input type="hidden" name="id_utama" value="<?= $id_pln_mc; ?>">
-                                                        <input type="hidden" name="mesin" value="<?= $mesin; ?>">
-                                                        <input type="hidden" name="area" value="<?= $area; ?>">
-                                                        <input type="hidden" name="judul" value="<?= $judul; ?>">
-                                                        <input type="hidden" name="jarum" value="<?= $jarum; ?>">
+                                                    <a href="<?= base_url($role . '/planningpage/' . $order['id_detail_pln']) . '/' . $id_pln_mc ?>" class="btn btn-secondary">Detail</a>
 
-                                                        <button type="submit" class="btn btn-secondary">Detail</button>
-                                                    </form>
                                                 <?php endif; ?>
                                             </td>
                                         </tr>

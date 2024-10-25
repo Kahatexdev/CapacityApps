@@ -33,7 +33,7 @@
                         <h5>
                             Planning Order for area <?= $area ?> needle <?= $jarum ?> Total <?= $mesin ?> Machine
                         </h5>
-                        <a href="<?= base_url($role . '/detailplnmc/' . $id_pln . '?judul=' . $judul . '&area=' . $area . '&jarum=' . $jarum) ?>" class="btn btn-secondary ml-auto">Back</a>
+                        <a href="<?= base_url($role . '/detailplnmc/' . $id_pln) ?>" class="btn btn-secondary ml-auto">Back</a>
                     </div>
 
                 </div>
@@ -219,11 +219,11 @@
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= htmlspecialchars($order['mesin']); ?> Mc</td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= number_format($order['Est_qty'], 0, '.', ','); ?> Dz</td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;">
-                                            <button class="btn btn-warning btn-update" data-toggle="modal" data-target="#modalUpdate" data-start="<?= $order['start_date'] ?>"
+                                            <button class="btn btn-danger btn-update" data-toggle="modal" data-target="#modalUpdate" data-start="<?= $order['start_date'] ?>"
                                                 data-idplan="<?= $order['id_detail_pln'] ?>"
-                                                data-mesin="<?= $order['mesin'] ?>"
+                                                data-idpl="<?= $id_pln ?>"
                                                 data-stop="<?= $order['stop_date'] ?>">
-                                                Update
+                                                Hapus
                                             </button>
                                         </td>
                                     </tr>
@@ -245,7 +245,7 @@
         <div class="modal-dialog   role=" document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Update Plan Mesin</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Delete Plan Mesin</h5>
                     <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -255,18 +255,12 @@
                         <div class="row">
                             <div class="col-lg-12 col-sm-6">
                                 <div class="form-group">
-                                    <label for="tgl-bk" class="col-form-label">Start Mesin</label>
-                                    <input type="date" class="form-control" name="start">
-                                    <input type="hidden" name="id">
+
+                                    <input type="text" name="id">
+                                    <input type="text" name="idpl">
+                                    Anda yakin ingin menghapus?
                                 </div>
-                                <div class="form-group">
-                                    <label for="tgl-bk" class="col-form-label">Stop Mesin</label>
-                                    <input type="date" class="form-control" name="stop">
-                                </div>
-                                <div class="form-group">
-                                    <label for="buyer" class="col-form-label">Mesin</label>
-                                    <input type="number" name="mesin" class="form-control">
-                                </div>
+
 
                             </div>
 
@@ -275,8 +269,8 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn bg-gradient-info">Update Data</button>
+                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn bg-gradient-danger">Hapus Data</button>
                 </div>
                 </form>
             </div>
@@ -325,14 +319,12 @@
     }
     $(document).on('click', '.btn-update', function() {
         var idplan = $(this).data('idplan');
-        var start = $(this).data('start');
-        var stop = $(this).data('stop');
-        var mesin = $(this).data('mesin');
-        $('#modalUpdate').find('form').attr('action', '<?= base_url($role . '/updateplanmesin') ?>');
+
+        var idpl = $(this).data('idpl');
+        $('#modalUpdate').find('form').attr('action', '<?= base_url($role . '/deleteplanmesin') ?>');
         $('#modalUpdate').find('input[name="id"]').val(idplan);
-        $('#modalUpdate').find('input[name="start"]').val(start);
-        $('#modalUpdate').find('input[name="stop"]').val(stop);
-        $('#modalUpdate').find('input[name="mesin"]').val(mesin);
+        $('#modalUpdate').find('input[name="idpl"]').val(idpl);
+
 
 
 

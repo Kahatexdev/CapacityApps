@@ -17,7 +17,7 @@ body .fc {
 --------------------------------------------------------------------------------------------------*/
 .fc-highlight {
   /* when user is selecting cells */
-  background: #00b2c9;
+  background: #faff69;
   opacity: 0.3;
 }
 
@@ -580,7 +580,7 @@ TODO: more distinction between this file and common.css
 }
 
 .fc-unthemed td.fc-today {
-  background: #40e0d0;
+  background: #f0ca56;
 }
 
 .fc-unthemed .fc-disabled-day {
@@ -717,14 +717,14 @@ Lots taken from Flatly (MIT): https://bootswatch.com/4/flatly/bootstrap.css
 /* "primary" coloring */
 .fc-button-primary {
   color: #fff;
-  background-color: #f67280;
-  border-color: #f67280;
+  background-color: #018be7;
+  border-color: #72c1f6;
 }
 
 .fc-button-primary:hover {
   color: #fff;
-  background-color: #f67280;
-  border-color: #f67280;
+  background-color: #018be7;
+  border-color: #72c1f6;
 }
 
 
@@ -736,15 +736,15 @@ Lots taken from Flatly (MIT): https://bootswatch.com/4/flatly/bootstrap.css
 
 .fc-button-primary:disabled {
   color: #fff;
-  background-color: #f67280;
-  border-color: #f67280;
+  background-color: #72c6f6;
+  border-color: #72e7f6;
 }
 
 .fc-button-primary:not(:disabled):active,
 .fc-button-primary:not(:disabled).fc-button-active {
   color: #fff;
-  background-color: #f67280;
-  border-color: #f67280;
+  background-color: #0093d7;
+  border-color: #72c1f6;
 }
 
 .fc-button-primary:not(:disabled):active:focus,
