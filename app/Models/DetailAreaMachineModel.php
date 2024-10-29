@@ -9,7 +9,7 @@ class DetailAreaMachineModel extends Model
     protected $table      = 'detail_area_machine';
     protected $primaryKey = 'id_detail_area_machine';
 
-    protected $allowedFields = ['id_area_machine', 'jarum', 'planning_mc'];
+    protected $allowedFields = ['id_area_machine', 'jarum', 'planning_mc', 'target', 'output'];
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;

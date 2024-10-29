@@ -80,18 +80,19 @@
                                         <div class="col-lg-6 col-sm-12">
                                             <label for="" class="form-control-label">Percentage</label>
                                             <div class="input-group">
-                                                <input class="form-control" type="number" name="persen_target" value="80" min="50" max="100" id="percentage-<?= $key ?>" oninput="calculateTarget(<?= $key ?>)" required>
+                                                <input class="form-control" type="number" name="persen_target" value="80" readonly id="percentage-<?= $key ?>" required>
                                                 <div class="input-group-append">
                                                     <span class="input-group-text">%</span>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-lg-6 col-sm-12">
-                                            <label for="" class="form-control-label"><span style="color: orange">Target</span></label>
-                                            <input class="form-control" type="text" name="target_akhir" value="" readonly id="calculated-target-<?= $key ?>">
+                                            <label for="" class="form-control-label"><span style="color: orange">Target Aktual</span></label>
+                                            <input class="form-control" type="text" name="target_akhir" value="" id="calculated-target-<?= $key ?>" oninput="updatePercentage(<?= $key ?>)">
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="col-lg-6 col-sm-12">
                                     <div class="form-group row">
                                         <div class="col-lg-6 col-sm-12">
@@ -129,7 +130,7 @@
                                         <div class="col-lg-6 col-sm-12">
                                             <label for="" class="form-control-label">Holiday Count</label>
                                             <div class="input-group">
-                                                <input class="form-control holiday-count" type="number" name="holiday_count" readonly id="holiday-count-<?= $key ?>">
+                                                <input class="form-control holiday-count" type="number" name="holiday_count" oninput="updateLibur()" id="holiday-count-<?= $key ?>">
                                             </div>
                                         </div>
                                     </div>
@@ -302,21 +303,41 @@
 
     function calculateTarget(key) {
         var percentageInput = document.getElementById('percentage-' + key);
-        var percentage = parseFloat(percentageInput.value);
-
-        // Check if the value is not a number or if it's less than or equal to 0 or greater than 100
-        if (percentage <= 4 || percentage > 100) {
-            // Handle the invalid input (e.g., display an error message)
-            percentageInput.value = 80; // Clear the input
-            return; // Exit the function
-        }
-
         var target100Input = document.getElementById('target-100-' + key);
         var target100 = parseFloat(target100Input.value);
+        var percentage = parseFloat(percentageInput.value) || 80; // Default 80% jika kosong atau tidak valid
+
+        // Validasi persentase antara 50 dan 100, jika tidak, set ke 80%
+        if (isNaN(percentage) || percentage < 50 || percentage > 100) {
+            percentage = 80;
+            percentageInput.value = percentage; // Set persentase ke 80% sebagai default
+        }
+
+        // Hitung target akhir
         var calculatedTarget = (target100 * (percentage / 100)).toFixed(2);
-        document.getElementById('calculated-target-' + key).value = calculatedTarget + " (" + percentage + "%)";
+        document.getElementById('calculated-target-' + key).value = calculatedTarget;
+
         fillMachineSuggestion();
     }
+
+    // Tambahkan event listener untuk perubahan target_akhir
+    function updatePercentage(key) {
+        var target100Input = document.getElementById('target-100-' + key);
+        var target100 = parseFloat(target100Input.value);
+        var calculatedTargetInput = document.getElementById('calculated-target-' + key);
+        var calculatedTarget = parseFloat(calculatedTargetInput.value);
+
+        if (!isNaN(target100) && target100 > 0 && !isNaN(calculatedTarget)) {
+            var newPercentage = ((calculatedTarget / target100) * 100).toFixed(2);
+
+            // Update persentase di input persentase
+            document.getElementById('percentage-' + key).value = newPercentage;
+        }
+    }
+
+
+
+
     $(document).on('click', '.btn-update', function() {
         var idplan = $(this).data('idplan');
 

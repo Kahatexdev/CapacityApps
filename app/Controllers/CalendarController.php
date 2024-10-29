@@ -673,4 +673,10 @@ class CalendarController extends BaseController
         ];
         return view(session()->get('role') . '/Calendar/detailbook', $data);
     }
+    public function hapuslibur($id)
+    {
+        $role = session()->get('role');
+        $this->liburModel->delete($id);
+        return redirect()->to(base_url(session()->get('role') . '/planningbooking'))->withInput()->with('success', 'Tanggal Berhasil Di hapus');
+    }
 }

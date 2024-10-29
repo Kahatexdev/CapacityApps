@@ -62,14 +62,35 @@
                         <div class="col-lg-4">
                             <h6>Global</h6>
                             <input type="text" id="judulPlan" value="<?= $title ?>" hidden>
-                            <li>Total Mesin : <?= $summary['total_mc'] ?> Mesin
-                            </li>
-                            <li>Total Planning : <?= $summary['planning_mc'] ?> Mesin
-                            </li>
-                            <li>Persentase : <?= round(($summary['planning_mc'] / $summary['total_mc']) * 100) ?>%
-                            </li>
-                            <li>Total Output : <?= $summary['total_output'] ?> dz
-                            </li>
+
+                            <div class=" form-group">
+                                <label for="">
+                                    Total Mesin :
+                                </label>
+                                <input type="text" id="globalmc" value=" <?= $summary['total_mc'] ?> Mesin " class="form-control" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="">
+                                    Total Planning :
+                                </label>
+                                <input type="text" id="globalplanning" value="<?= $summary['planning_mc'] ?> Mesin" class="form-control" readonly>
+
+                            </div>
+                            <div class="form-group">
+                                <label for="">
+                                    Persentase :
+                                </label>
+                                <input type="text" id="globalpersen" value="<?= round(($summary['planning_mc'] / $summary['total_mc']) * 100) ?> %" class="form-control" readonly>
+
+                            </div>
+                            <div class="form-group">
+                                <label for="">
+
+                                    Total Output :
+                                </label>
+                                <input type="text" id="globaloutput" value=" <?= $summary['total_output'] ?> dz" class="form-control" readonly>
+
+                            </div>
 
                         </div>
                         <div class="col-lg-4">
@@ -97,7 +118,10 @@
         </div>
     </div>
     <div class="row" id="card-container">
-        <?php foreach ($data as $area => $detailArea): ?>
+
+        <?php
+        $no = 1;
+        foreach ($data as $area => $detailArea): ?>
             <div class="col-xl-6 col-sm-12 mb-xl-0 mb-4 mt-2">
                 <div class="card equal-height">
                     <div class="card-header" id="area_mc">
@@ -105,9 +129,15 @@
                             <h6><?= $area ?></h6>
                         </div>
                         <div class="row text-bold">
-                            <div class="col-lg-4"> Total Mesin: <?= $detailArea['totalMesin']; ?> </div>
-                            <div class="col-lg-4"> Planning Mesin: <?= $detailArea['planningMc']; ?> </div>
-                            <div class="col-lg-4"> Output (dz): <?= $detailArea['outputDz']; ?> dz </div>
+                            <div class="col-lg-4"> Total Mesin: <?= $detailArea['totalMesin']; ?>
+                                <input type="text" id="ttlmc<?= $no ?>" value=" <?= $detailArea['totalMesin']; ?>" hidden>
+                            </div>
+                            <div class="col-lg-4"> Planning Mesin:
+                                <input type="number" class="form-control" id="planmc<?= $no ?>" value="<?= $detailArea['planningMc']; ?>" readonly style="width: 70%">
+                            </div>
+                            <div class="col-lg-4"> Output (dz):
+                                <input type="text" class="form-control" id="outputdz<?= $no ?>" value="  <?= $detailArea['outputDz']; ?>" readonly style="width: 70%">
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
@@ -120,10 +150,22 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($detailArea['jarum'] as $jarumDetail): ?>
+                                    <?php
+                                    $row = 1;
+                                    foreach ($detailArea['jarum'] as $jarumDetail): ?>
                                         <tr id="detail_area">
-                                            <td><?= $jarumDetail['jarum'] ?></td>
-                                            <td><?= $jarumDetail['planning_mc'] ?></td>
+                                            <td>
+                                                <?= $jarumDetail['jarum'] ?>
+                                                <input type="text" id="jarum<?= $row ?>" value="<?= $jarumDetail['jarum'] ?>" hidden>
+
+
+                                            </td>
+                                            <td>
+                                                <div class="form-group">
+                                                    <input type="number" class="form-control" id="kebmesin<?= $row ?>" value="<?= $jarumDetail['planning_mc'] ?>" style="width:40%">
+
+                                                </div>
+                                            </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -211,6 +253,85 @@
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script>
+    $(document).ready(function() {
+        function updateGlobalValues() {
+            let globalPlanning = 0;
+            let globalOutput = 0;
+            let ttlPlanningGloves = 0;
+
+            const globalMc = parseInt($("#globalmc").val()) || 0;
+            const ttlMcGloves = parseInt($("#ttlmcgloves").val()) || 0;
+            const ttlMcSocks = parseInt($("#ttlmcsocks").val()) || 0;
+
+            // Loop untuk semua planmc dan outputdz
+            $("[id^='planmc']").each(function() {
+                globalPlanning += parseInt($(this).val()) || 0;
+            });
+
+            $("[id^='outputdz']").each(function() {
+                globalOutput += parseInt($(this).val()) || 0;
+            });
+
+            // Ambil nilai planmc terakhir untuk Gloves
+            ttlPlanningGloves = parseInt($("#planmc" + ($("[id^='planmc']").length)).val()) || 0;
+
+            // Update global planning
+            $("#globalplanning").val(globalPlanning + " Mesin");
+
+            // Update global output
+            $("#globaloutput").val(globalOutput + " dz");
+
+            // Update global percentage
+            let globalPercentage = (globalPlanning / globalMc) * 100;
+            $("#globalpersen").val(globalPercentage.toFixed(2) + " %");
+
+            // Update Gloves Planning
+            $("#ttlplanninggloves").val(ttlPlanningGloves + " Mesin");
+
+            // Update Gloves Percentage
+            let glovesPercentage = (ttlPlanningGloves / ttlMcGloves) * 100;
+            $("#ttlpersengloves").val(glovesPercentage.toFixed(2) + " %");
+
+            // Update Socks Planning
+            let ttlPlanningSocks = globalPlanning - ttlPlanningGloves;
+            $("#ttlplanningsocks").val(ttlPlanningSocks + " Mesin");
+
+            // Update Socks Percentage
+            let socksPercentage = (ttlPlanningSocks / ttlMcSocks) * 100;
+            $("#ttlpersensocks").val(socksPercentage.toFixed(2) + " %");
+        }
+
+        // Event listener untuk 'kebmesin'
+        $("[id^='kebmesin']").on('input', function() {
+            var totalMesin = 0;
+            var totalOutput = 0;
+            var no = $(this).closest(".card").find("input[id^='ttlmc']").attr("id").replace("ttlmc", ""); // Get the current card number
+
+            // Loop setiap row dalam card untuk hitung total mesin dan output
+            $(this).closest("tbody").find("[id^='kebmesin']").each(function() {
+                var row = $(this).attr("id").replace("kebmesin", ""); // Ambil row number
+                var kebutuhanMesin = parseInt($(this).val()) || 0;
+                var target = parseInt($("#target" + row).val()) || 0;
+
+                // Hitung output untuk row ini
+                var output = kebutuhanMesin * target;
+                $("#output" + row).val(output); // Update output hidden field
+                totalOutput += output; // Akumulasi output untuk outputdz
+
+                totalMesin += kebutuhanMesin; // Total kebutuhan mesin
+            });
+
+            // Update nilai 'planmc' berdasarkan total kebutuhan mesin
+            $("#planmc" + no).val(totalMesin);
+
+            // Update nilai 'outputdz' berdasarkan total output akumulasi
+            $("#outputdz" + no).val(totalOutput);
+
+            // Setelah setiap update kebmesin, kita update global values
+            updateGlobalValues();
+        });
+    });
+
     document.addEventListener("DOMContentLoaded", function() {
         let cards = document.querySelectorAll('.equal-height');
         let maxHeight = 0;
@@ -229,6 +350,8 @@
         });
     });
 
+
+
     function saveAll() {
         // GLOBAL
         let global = {
@@ -243,6 +366,9 @@
             ttlPlanGloves: document.querySelector("#ttlplanninggloves") ? document.querySelector("#ttlplanninggloves").value : null,
             ttlPersenGloves: document.querySelector("#ttlpersengloves") ? document.querySelector("#ttlpersengloves").value : null
         };
+
+        // Debugging global
+        console.log("Global Data:", global);
 
         // AREA
         let areaPlan = [];
@@ -268,6 +394,9 @@
                 });
             }
         });
+
+        // Debugging areaPlan
+        console.log("Area Plan:", areaPlan);
 
         // DETAIL
         let detailPlan = [];
@@ -312,10 +441,40 @@
             .then(response => response.json())
             .then(result => {
                 console.log('Sukses:', result);
+
+                if (result.status === 'success') {
+                    // Tampilkan SweetAlert untuk pesan sukses
+                    Swal.fire({
+                        title: 'Sukses!',
+                        text: result.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        // Redirect setelah SweetAlert ditutup
+                        window.location.href = 'http://localhost:8080/planning/viewPlan/' + document.querySelector("#judulPlan").value;
+                    });
+                } else {
+                    // Tampilkan SweetAlert untuk pesan error
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: result.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
+
+                // Tampilkan SweetAlert jika ada error dalam proses fetch
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Terjadi kesalahan saat menyimpan data!',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
             });
+
     }
 </script>
 <?php $this->endSection(); ?>
