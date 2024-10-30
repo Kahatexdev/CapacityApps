@@ -108,12 +108,8 @@
                                         <td><?= $val['area'] ?></td>
                                         <td><?= date('F j, Y \a\t g:i A', strtotime($val['updated_at'])) ?></td>
                                         <td>
-                                            <form action="<?= base_url($role . '/detailplnmc/' . $val['id_pln_mc']) ?>" method="get">
-                                                <input type="hidden" name="judul" value="<?= $val['judul'] ?>">
-                                                <input type="hidden" name="area" value="<?= $val['area'] ?>">
-                                                <input type="hidden" name="jarum" value="<?= $val['jarum'] ?>">
-                                                <button type="submit" class="btn btn-info">View Details</button>
-                                            </form>
+                                            <a href=" <?= base_url($role . '/detailplnmc/' . $val['id_pln_mc']) ?>" class="btn btn-info">View Details</a>
+
                                         </td>
                                         <td>
                                             <form action="<?= base_url($role . '/excelplnmc/' . $val['id_pln_mc']) ?>" method="post">

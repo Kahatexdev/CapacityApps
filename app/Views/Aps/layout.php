@@ -31,6 +31,16 @@
     <link href="<?= base_url('assets/css/select2.min.css') ?>" rel="stylesheet" />
     <link href="<?= base_url('assets/node_modules/sweetalert2/dist/sweetalert2.min.css') ?>" rel="stylesheet">
 
+    <!-- kalender -->
+
+
+    <link rel="stylesheet" href="<?= base_url('assets/calendar/fonts/icomoon/style.css') ?>">
+
+    <link href='<?= base_url('assets/calendar/fullcalendar/packages/core/main.css') ?>' rel='stylesheet' />
+    <link href='<?= base_url('assets/calendar/fullcalendar/packages/daygrid/main.css') ?>' rel='stylesheet' />
+
+    <!-- Bootstrap CSS -->
+
 
 </head>
 

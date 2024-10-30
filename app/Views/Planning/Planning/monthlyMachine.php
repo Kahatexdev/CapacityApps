@@ -449,18 +449,25 @@
             let jarum = detailRow.querySelector("[id^='jarum']");
             let kebMesin = detailRow.querySelector("[id^='kebmesin']");
             let areaDetail = detailRow.querySelector("[id^='areaDetail']");
+            let target = detailRow.querySelector("[id^='target']");
+            let output = detailRow.querySelector("[id^='output']");
 
             // Check if elements exist before accessing textContent
             jarum = jarum ? jarum.value : null;
             kebMesin = kebMesin ? kebMesin.value : null;
             areaDetail = areaDetail ? areaDetail.value : null;
+            target = target ? target.value : null;
+            output = output ? output.value : null;
+
 
             // Add to detailPlan only if jarum and kebMesin are not null
             if (jarum && kebMesin) {
                 detailPlan.push({
                     jarum: jarum,
                     kebMesin: kebMesin,
-                    areaDetail: areaDetail
+                    areaDetail: areaDetail,
+                    target: target,
+                    output: output,
                 });
             }
         });

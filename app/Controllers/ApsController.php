@@ -546,10 +546,10 @@ class ApsController extends BaseController
     public function detailplanmc($id)
     {
         $detailplan = $this->DetailPlanningModel->getDataPlanning($id);
-        // dd($detailplan);
-        $judul = $this->request->getGet('judul');
-        $area = $this->request->getGet('area');
-        $jarum = $this->request->getGet('jarum');
+        $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();
+        $judul = $kebutuhanArea['judul'];
+        $area = $kebutuhanArea['area'];
+        $jarum =  $kebutuhanArea['jarum'];
         $mesinarea = $this->jarumModel->getMesinByArea($area, $jarum); //mesin yang dipakai semua mesin tanpa melibatkan head planning
         // $mesinplanning = $this->MesinPlanningModel->getMesinByArea($area,$jarum); //mesin yang dipilih oleh head planning di teruskan ke bagian aps
         $data = [
@@ -677,16 +677,16 @@ class ApsController extends BaseController
             }
         }
     }
-    public function planningpage($id)
+    public function planningpage($id, $idutama)
     {
-        $area = $this->request->getGet('area');
-        $jarum = $this->request->getGet('jarum');
-        $mesin = $this->request->getGet('mesin');
-        $judul = $this->request->getGet('judul');
-        $idutama = $this->request->getGet('id_utama');
+        $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $idutama)->first();
+        $judul = $kebutuhanArea['judul'];
+        $area = $kebutuhanArea['area'];
+        $jarum =  $kebutuhanArea['jarum'];
         $detailplan = $this->DetailPlanningModel->getDetailPlanning($id); //get data model with detail quantity,model etc.
         $listPlanning = $this->EstimatedPlanningModel->listPlanning($id); //get data planning per page and fetch it into datatable at bottom datatables
         // $mesinpertgl = $this->TanggalPlanningModel->getMesinByDate($idutama);//get data machine per date and return into array
+        $mesin = $this->jarumModel->getMesinByArea($area, $jarum);
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Order',
@@ -699,9 +699,9 @@ class ApsController extends BaseController
             'active7' => '',
             'area' => $area,
             'jarum' => $jarum,
-            'mesin' => $mesin,
             'planning' => $detailplan,
             'listPlanning' => $listPlanning,
+            'mesin' => $mesin,
             'id_pln' => $idutama,
             'id_save' => $id,
             'judul' => $judul
@@ -789,6 +789,8 @@ class ApsController extends BaseController
                 'id_est_qty' => $idOrder,
                 'date' => $date->format('Y-m-d'), // Insert the current date in the range
                 'mesin' => $mesin,
+                'start_mesin' => $start,
+                'stop_mesin' => $stop,
             ];
             $this->TanggalPlanningModel->insert($data);
         }
@@ -796,9 +798,65 @@ class ApsController extends BaseController
 
 
         if ($saveest) {
-            return redirect()->to(base_url(session()->get('role') . '/planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm . '&judul=' . $judul))->withInput()->with('success', 'Data Berhasil Disimpan');
+            return redirect()->to(base_url(session()->get('role') . '/planningpage/' . $id_save . '/' . $id_pln))->withInput()->with('success', 'Data Berhasil Disimpan');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/planningpage/' . $id_save . '?id_utama=' . $id_pln . '?mesin=' . $mc . '&area=' . $area . '&jarum=' . $jrm . '&judul=' . $judul))->withInput()->with('error', 'Data Gagal Disimpan');
+            return redirect()->to(base_url(session()->get('role') . '/planningpage/' . $id_save . '/' . $id_pln))->withInput()->with('error', 'Data Gagal Disimpan');
+        }
+    }
+    public function kalenderMesin($id)
+    {
+        $role = session()->get('role');
+        $today = date('Y-m-d', strtotime('today'));
+        $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();
+        $judul = $kebutuhanArea['judul'];
+        $area = $kebutuhanArea['area'];
+        $jarum =  $kebutuhanArea['jarum'];
+        $mesin = $this->jarumModel->getMesinByArea($area, $jarum);
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Jalan Mesin',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'area' => $area,
+            'jarum' => $jarum,
+            'mesin' => $mesin,
+            'id' => $id,
+            'today' => $today
+
+        ];
+        return view($role . '/Planning/kalenderMesin', $data);
+    }
+    public function deleteplanmesin()
+    {
+        $id = $this->request->getPost('id');
+        $idpln = $this->request->getPost('idpl');
+
+        // Fetch estimated planning data
+        $est = $this->EstimatedPlanningModel->where('id_detail_pln', $id)->first();
+        if (!$est) {
+            return redirect()->back()->withInput()->with('error', 'Data Planning tidak ditemukan');
+        }
+
+        $idest = $est['id_est_qty'];
+
+        // Delete from TanggalPlanningModel
+        $deleteTanggal = $this->TanggalPlanningModel->hapusData($idest, $id);
+        if ($deleteTanggal) {
+            // Delete from DetailPlanningModel
+            $deleteDetail = $this->EstimatedPlanningModel->delete($idest);
+
+            if ($deleteDetail) {
+                return redirect()->to(base_url(session()->get('role') . '/planningpage/' . $id . '/' . $idpln))->withInput()->with('success', 'Data Berhasil Dihapus');
+            } else {
+                return redirect()->to(base_url(session()->get('role') . '/planningpage/' . $id . '/' . $idpln))->withInput()->with('error', 'Data Gagal Dihapus di DetailPlanningModel');
+            }
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/planningpage/' . $id . '/' . $idpln))->withInput()->with('error', 'Data Gagal Dihapus di TanggalPlanningModel');
         }
     }
 }

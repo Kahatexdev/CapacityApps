@@ -9,7 +9,7 @@ class DetailAreaMachineModel extends Model
     protected $table      = 'detail_area_machine';
     protected $primaryKey = 'id_detail_area_machine';
 
-    protected $allowedFields = ['id_area_machine', 'jarum', 'planning_mc'];
+    protected $allowedFields = ['id_area_machine', 'jarum', 'planning_mc', 'target', 'output'];
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
@@ -47,6 +47,6 @@ class DetailAreaMachineModel extends Model
     }
     public function getData($id)
     {
-        return $this->select('jarum,planning_mc')->where('id_area_machine', $id)->findAll();
+        return $this->select('jarum,planning_mc,target,output')->where('id_area_machine', $id)->findAll();
     }
 }

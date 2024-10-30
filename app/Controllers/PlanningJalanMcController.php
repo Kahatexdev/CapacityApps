@@ -973,8 +973,12 @@ class PlanningJalanMcController extends BaseController
                 'planning_mc' => $area['planMc'],
                 'output' => $area['outputDz']
             ];
+            $validate = [
+                'id_monthly_mc' => $idGlobal,
+                'area' => $area['area'],
+            ];
 
-            $cekDataArea = $this->areaMcModel->existData($areaInsert);
+            $cekDataArea = $this->areaMcModel->existData($validate);
             if (!$cekDataArea) {
                 $this->areaMcModel->insert($areaInsert);
                 $idArea = $this->areaMcModel->existData($areaInsert)['id_area_machine'];
@@ -989,9 +993,15 @@ class PlanningJalanMcController extends BaseController
                     $detailInsert = [
                         'id_area_machine' => $idArea,
                         'jarum' => $detail['jarum'],
-                        'planning_mc' => $detail['kebMesin']
+                        'planning_mc' => $detail['kebMesin'],
+                        'target' => $detail['target'],
+                        'output' => $detail['output']
                     ];
-                    $cekDataDetail = $this->detailAreaMc->cekData($detailInsert);
+                    $cekvalid = [
+                        'id_area_machine' => $idArea,
+                        'jarum' => $detail['jarum'],
+                    ];
+                    $cekDataDetail = $this->detailAreaMc->cekData($cekvalid);
                     if (!$cekDataDetail) {
                         $this->detailAreaMc->insert($detailInsert);
                         $idDetail = $this->detailAreaMc->cekData($detailInsert)['id_detail_area_machine'];
