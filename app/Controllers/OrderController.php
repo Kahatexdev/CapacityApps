@@ -1215,13 +1215,13 @@ class OrderController extends BaseController
     }
     public function sisaOrderBuyer($buyer)
     {
-        $bulan = date('Y-m-01', strtotime('this month'));
+        $bulan = date('Y-m-01', strtotime('next month'));
         $role = session()->get('role');
         $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
 
         // Ambil tanggal awal dan akhir bulan
-        $startDate = new \DateTime('first day of this month'); // Awal bulan ini
-        $endDate = new \DateTime('last day of this month');    // Akhir bulan ini
+        $startDate = new \DateTime('first day of next month'); // Awal bulan ini
+        $endDate = new \DateTime('last day of next month');    // Akhir bulan ini
 
         $allData = [];
         $totalProdPerWeek = []; // Untuk menyimpan total produksi per minggu

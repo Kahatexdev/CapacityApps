@@ -2078,13 +2078,14 @@ class ExcelController extends BaseController
 
     public function excelSisaOrderBuyer($buyer)
     {
-        $bulan = date('Y-m-01', strtotime('this month'));
+        $bulan = date('Y-m-01', strtotime('next month'));
         $role = session()->get('role');
         $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
+        $month = date('F', strtotime('next month'));
 
         // Ambil tanggal awal dan akhir bulan
-        $startDate = new \DateTime('first day of this month'); // Awal bulan ini
-        $endDate = new \DateTime('last day of this month');    // Akhir bulan ini
+        $startDate = new \DateTime('first day of next month'); // Awal bulan ini
+        $endDate = new \DateTime('last day of next month');    // Akhir bulan ini
 
         $allData = [];
         $totalProdPerWeek = []; // Untuk menyimpan total produksi per minggu
@@ -2256,7 +2257,7 @@ class ExcelController extends BaseController
         ];
 
         // Judul
-        $sheet->setCellValue('A1', 'SISA PRODUKSI ' . $buyer . ' ' . $bulan);
+        $sheet->setCellValue('A1', 'SISA PRODUKSI ' . $buyer . ' ' . $month);
 
         $row_header = 3;
         $row_header2 = 4;
@@ -2563,7 +2564,7 @@ class ExcelController extends BaseController
 
         // Export file ke Excel
         $writer = new Xlsx($spreadsheet);
-        $filename = 'Sisa Produksi ' . $buyer . ' Bulan ' . $bulan . '.xlsx';
+        $filename = 'Sisa Produksi ' . $buyer . ' Bulan ' . $month . '.xlsx';
 
         header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
