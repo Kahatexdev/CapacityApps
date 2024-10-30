@@ -1306,7 +1306,7 @@ class OrderController extends BaseController
 
                 // Periksa apakah tanggal pengiriman berada dalam minggu ini
                 if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
-                    $allDataPerjaurum[$machinetypeid][$weekCount] = [
+                    $allDataPerjarum[$machinetypeid][$weekCount] = [
                         'delJrm' => $id2['delivery'],
                         'qtyJrm' => $qty,
                         'prodJrm' => $produksi,
@@ -1348,7 +1348,7 @@ class OrderController extends BaseController
             'totalPerWeek' => $totalPerWeek,
             'totalProdPerWeek' => $totalProdPerWeek,
             'totalSisaPerWeek' => $totalSisaPerWeek,
-            'allDataJrm' => $allDataPerjaurum,
+            'allDataJrm' => $allDataPerjarum,
             'totalPerWeekJrm' => $totalPerWeekJrm,
             'totalProdPerWeekJrm' => $totalProdPerWeekJrm,
             'totalSisaPerWeekJrm' => $totalSisaPerWeekJrm,

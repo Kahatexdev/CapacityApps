@@ -14,10 +14,16 @@
                                 </h5>
                             </div>
                         </div>
+
                         <div class="col-4 text-end">
-                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-chart-bar-32 text-lg opacity-10" aria-hidden="true"></i>
-                            </div>
+                            <form action="<?= base_url($role . '/excelSisaOrder/' . $buyer) ?>" method="post" ?>
+                                <input type="hidden" class="form-control" name="buyer" value="<?= $buyer ?>">
+                                <button type="submit" class="btn btn-info"><i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Report Excel</button>
+
+                                <a href="<?= base_url($role . '/dataproduksi') ?>" class="btn bg-gradient-dark">
+                                    <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
+                                    Back</a>
+                            </form>
                         </div>
                     </div>
                 </div>
