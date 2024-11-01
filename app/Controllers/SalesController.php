@@ -1281,7 +1281,7 @@ class SalesController extends BaseController
             'targetExport' => $targetExportPerbulan,
         ];
 
-        dd($allData);
+        // dd($allData);
 
         // Buat spreadsheet
         $spreadsheet = new Spreadsheet();
