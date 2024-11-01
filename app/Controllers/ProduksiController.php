@@ -315,8 +315,8 @@ class ProduksiController extends BaseController
     public function viewProduksi()
     {
         $role = session()->get('role');
-        $bulan = date('m');
-        $month = date('F');
+        $bulan = date('m', strtotime('-1 month'));
+        $month = date('F',  strtotime('-1 month'));
         $totalMesin = $this->jarumModel->getArea();
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
 
@@ -371,8 +371,8 @@ class ProduksiController extends BaseController
     }
     public function viewProduksiPlan()
     {
-        $bulan = date('m');
-        $month = date('F');
+        $bulan = date('m', strtotime('-1 month'));
+        $month = date('F', strtotime('-1 month'));
         $totalMesin = $this->jarumModel->getArea();
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
         // $pdkProgress = $this->ApsPerstyleModel->getProgress($noModel);

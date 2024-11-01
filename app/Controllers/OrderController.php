@@ -1215,21 +1215,25 @@ class OrderController extends BaseController
     }
     public function sisaOrderBuyer($buyer)
     {
-        $bulan = date('Y-m-01', strtotime('this month'));
+        $bulan = date('Y-m-01', strtotime('next month'));
         $role = session()->get('role');
         $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
         $jlMcResults = $this->produksiModel->getJlMc($buyer);
 
         // Ambil tanggal awal dan akhir bulan
-        $startDate = new \DateTime('first day of this month'); // Awal bulan ini
-        $endDate = new \DateTime('last day of this month');    // Akhir bulan ini
+        $startDate = new \DateTime('first day of next month'); // Awal bulan ini
+        $endDate = new \DateTime('last day of next month');    // Akhir bulan ini
 
         $allData = [];
         $totalProdPerWeek = []; // Untuk menyimpan total produksi per minggu
         $totalSisaPerWeek = []; // Untuk menyimpan total sisa per mingguinggu
         $totalPerWeek = []; // Untuk menyimpan total qty per minggu
+<<<<<<< HEAD
         $totalJlMcPerWeek = []; // Untuk menyimpan total qty per minggu
         $allDataPerjarum = []; // Untuk menyimpan total jl mc per minggu
+=======
+        $allDataPerjarum = [];
+>>>>>>> 47604695ae715c0f6df4844561f447bef9c1f329
         $totalProdPerWeekJrm = []; // Untuk menyimpan total produksi per minggu
         $totalSisaPerWeekJrm = []; // Untuk menyimpan total sisa per mingguinggu
         $totalPerWeekJrm = []; // Untuk menyimpan total qty per minggu
