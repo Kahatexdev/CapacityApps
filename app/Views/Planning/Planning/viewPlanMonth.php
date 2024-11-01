@@ -102,12 +102,35 @@
                         </div>
                         <div class="col-lg-4">
                             <h6> Socks </h6>
-                            <li>Total Mesin : <?= $summary['mc_socks'] ?> Mesin
-                            </li>
-                            <li>Total Planning : <?= $summary['plan_mc_socks'] ?> Mesin
-                            </li>
-                            <li>Persentase : <?= round(($summary['plan_mc_socks'] / $summary['mc_socks']) * 100) ?>%
-                            </li>
+                            <div class="form-group">
+                                <label for="">
+
+                                    Total Mesin :
+                                </label>
+                                <input type="text" id="ttlmcsocks" value="<?= $summary['mc_socks'] ?> Mesin"
+                                    class="form-control" readonly>
+
+                            </div>
+                            <div class="form-group">
+                                <label for="">
+
+                                    Total Planning :
+                                </label>
+                                <input type="text" id="ttlplanningsocks" value="<?= $summary['plan_mc_socks'] ?> Mesin"
+                                    class="form-control" readonly>
+
+                            </div>
+                            <div class="form-group">
+                                <label for="">
+
+                                    Persentase :
+                                </label>
+                                <input type="text" id="ttlpersensocks"
+                                    value="<?= round(($summary['plan_mc_socks'] / $summary['mc_socks']) * 100) ?> %"
+                                    class="form-control" readonly>
+
+                            </div>
+
                         </div>
                         <div class="col-lg-4">
                             <h6> Gloves </h6>
@@ -138,7 +161,6 @@
                     <div class="row text-bold">
                         <div class="col-lg-4"> Total Mesin: <?= $detailArea['totalMesin']; ?>
                             <input type="text" id="ttlmc<?= $no ?>" value=" <?= $detailArea['totalMesin']; ?>" hidden>
-                            <?= $no ?>
                         </div>
                         <div class="col-lg-4"> Planning Mesin:
                             <input type="number" class="form-control" id="planmc<?= $no ?>"
@@ -165,7 +187,7 @@
                                     foreach ($detailArea['jarum'] as $jarumDetail): ?>
                                 <tr id="detail_area">
                                     <td>
-                                        <?= $jarumDetail['jarum'] ?><?= $row ?>
+                                        <?= $jarumDetail['jarum'] ?>
                                         <input type="text" id="jarum<?= $row ?>" value="<?= $jarumDetail['jarum'] ?>"
                                             hidden>
 
