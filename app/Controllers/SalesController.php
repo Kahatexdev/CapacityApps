@@ -1226,7 +1226,7 @@ class SalesController extends BaseController
                 if (!isset($targetExportPerbulan[$currentMonthOfYear])) {
                     $targetExportPerbulan[$currentMonthOfYear] = 0; // Inisialisasi jika belum ada
                 }
-                $targetExportPerbulan[$currentMonthOfYear] = !empty($dataTargetExport['qty_target']) ? ceil($dataTargetExport['qty_target'] / 24) : 0;
+                $targetExportPerbulan[$currentMonthOfYear] = !empty($dataTargetExport['qty_target']) ? ceil($dataTargetExport['qty_target']) : 0;
                 // data export, inspect & lokal per bulan
                 $dataExport = $this->ApsPerstyleModel->getTotalConfirmByMonth($thisMonth);
                 foreach ($dataExport as $dExport) {

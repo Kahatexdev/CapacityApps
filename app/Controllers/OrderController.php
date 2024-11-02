@@ -1228,12 +1228,7 @@ class OrderController extends BaseController
         $totalProdPerWeek = []; // Untuk menyimpan total produksi per minggu
         $totalSisaPerWeek = []; // Untuk menyimpan total sisa per mingguinggu
         $totalPerWeek = []; // Untuk menyimpan total qty per minggu
-<<<<<<< HEAD
-        $totalJlMcPerWeek = []; // Untuk menyimpan total qty per minggu
-        $allDataPerjarum = []; // Untuk menyimpan total jl mc per minggu
-=======
         $allDataPerjarum = [];
->>>>>>> 47604695ae715c0f6df4844561f447bef9c1f329
         $totalProdPerWeekJrm = []; // Untuk menyimpan total produksi per minggu
         $totalSisaPerWeekJrm = []; // Untuk menyimpan total sisa per mingguinggu
         $totalPerWeekJrm = []; // Untuk menyimpan total qty per minggu

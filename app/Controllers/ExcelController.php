@@ -2081,11 +2081,7 @@ class ExcelController extends BaseController
         $bulan = date('Y-m-01', strtotime('next month'));
         $role = session()->get('role');
         $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
-<<<<<<< HEAD
         $jlMcResults = $this->produksiModel->getJlMc($buyer);
-=======
-        $month = date('F', strtotime('next month'));
->>>>>>> 47604695ae715c0f6df4844561f447bef9c1f329
 
         // Ambil tanggal awal dan akhir bulan
         $startDate = new \DateTime('first day of next month'); // Awal bulan ini
@@ -2289,11 +2285,7 @@ class ExcelController extends BaseController
         ];
 
         // Judul
-<<<<<<< HEAD
         $sheet->setCellValue('A1', 'SISA PRODUKSI ' . $buyer . ' Bulan ' . date('F', strtotime($bulan)));
-=======
-        $sheet->setCellValue('A1', 'SISA PRODUKSI ' . $buyer . ' ' . $month);
->>>>>>> 47604695ae715c0f6df4844561f447bef9c1f329
 
         $row_header = 3;
         $row_header2 = 4;
@@ -2602,11 +2594,7 @@ class ExcelController extends BaseController
 
         // Export file ke Excel
         $writer = new Xlsx($spreadsheet);
-<<<<<<< HEAD
         $filename = 'Sisa Produksi ' . $buyer . ' Bulan ' . date('F', strtotime($bulan)) . '.xlsx';
-=======
-        $filename = 'Sisa Produksi ' . $buyer . ' Bulan ' . $month . '.xlsx';
->>>>>>> 47604695ae715c0f6df4844561f447bef9c1f329
 
         header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
