@@ -1281,7 +1281,7 @@ class SalesController extends BaseController
             'targetExport' => $targetExportPerbulan,
         ];
 
-        dd($allData);
+        // dd($allData);
 
         // Buat spreadsheet
         $spreadsheet = new Spreadsheet();
@@ -1881,8 +1881,14 @@ class SalesController extends BaseController
             // month
             $weekCount = count($data['weeks']); // Hitung jumlah minggu dalam bulan
             $startColumn = $column;
-            $endCol_index = $col_index + ($weekCount * 6) - 1; // Dikurangi 1 karena kolom awal tidak terhitung
-            $endColumn = Coordinate::stringFromColumnIndex($endCol_index); // Konversi kembali dari nomor indeks kolom ke huruf kolom
+            // jika 1 bulan lebih dari 1 week
+            if ($weekCount > 1) {
+                $endCol_index = $col_index + ($weekCount * 6) - 1; // Dikurangi 1 karena kolom awal tidak terhitung
+                $endColumn = Coordinate::stringFromColumnIndex($endCol_index); // Konversi kembali dari nomor indeks kolom ke huruf kolom
+            } else {
+                $endCol_index = $col_index + ($weekCount * 6);
+                $endColumn = Coordinate::stringFromColumnIndex($endCol_index); // Konversi kembali dari nomor indeks kolom ke huruf kolom
+            }
             $endColTitle_index = $col_index + 1; // untuk title grandTotal
             $endColumnTitle = Coordinate::stringFromColumnIndex($endColTitle_index); // Konversi kembali dari nomor indeks kolom ke huruf kolom
 
