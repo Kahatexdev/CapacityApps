@@ -2081,7 +2081,11 @@ class ExcelController extends BaseController
         $bulan = date('Y-m-01', strtotime('next month'));
         $role = session()->get('role');
         $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
+<<<<<<< HEAD
+        $jlMcResults = $this->produksiModel->getJlMc($buyer);
+=======
         $month = date('F', strtotime('next month'));
+>>>>>>> 47604695ae715c0f6df4844561f447bef9c1f329
 
         // Ambil tanggal awal dan akhir bulan
         $startDate = new \DateTime('first day of next month'); // Awal bulan ini
@@ -2091,10 +2095,12 @@ class ExcelController extends BaseController
         $totalProdPerWeek = []; // Untuk menyimpan total produksi per minggu
         $totalSisaPerWeek = []; // Untuk menyimpan total sisa per mingguinggu
         $totalPerWeek = []; // Untuk menyimpan total qty per minggu
+        $totalJlMcPerWeek = []; // Untuk menyimpan total qty per minggu
         $allDataPerjaurum = [];
         $totalProdPerWeekJrm = []; // Untuk menyimpan total produksi per minggu
         $totalSisaPerWeekJrm = []; // Untuk menyimpan total sisa per mingguinggu
         $totalPerWeekJrm = []; // Untuk menyimpan total qty per minggu
+        $totalJlMcPerWeekJrm = []; // Untuk menyimpan total qty per minggu
 
         foreach ($data as $id) {
             $mastermodel = $id['mastermodel'];
@@ -2122,21 +2128,35 @@ class ExcelController extends BaseController
 
                 // Periksa apakah tanggal pengiriman berada dalam minggu ini
                 if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
+                    $jlMc = 0; // Default jika tidak ada hasil yang cocok
+                    foreach ($jlMcResults as $result) {
+                        if (
+                            $result['mastermodel'] == $mastermodel &&
+                            $result['machinetypeid'] == $machinetypeid &&
+                            $result['factory'] == $factory
+                        ) {
+                            $jlMc = $result['jl_mc'];
+                            break;
+                        }
+                    }
                     $allData[$mastermodel][$machinetypeid][$factory][$weekCount] = [
                         'del' => $id['delivery'],
                         'qty' => $qty,
                         'prod' => $produksi,
                         'sisa' => $sisa,
+                        'jlMc' => $jlMc,
                     ];
                     // Tambahkan qty, produksi, dan sisa ke total mingguan
                     if (!isset($totalPerWeek[$weekCount])) {
                         $totalPerWeek[$weekCount] = 0;
                         $totalProdPerWeek[$weekCount] = 0;
                         $totalSisaPerWeek[$weekCount] = 0;
+                        $totalJlMcPerWeek[$weekCount] = 0;
                     }
                     $totalPerWeek[$weekCount] += $qty;
                     $totalProdPerWeek[$weekCount] += $produksi;
                     $totalSisaPerWeek[$weekCount] += $sisa;
+                    $totalJlMcPerWeek[$weekCount] += $jlMc;
                 }
 
                 // Pindahkan ke minggu berikutnya
@@ -2170,21 +2190,33 @@ class ExcelController extends BaseController
 
                 // Periksa apakah tanggal pengiriman berada dalam minggu ini
                 if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
+                    $jlMc = 0; // Default jika tidak ada hasil yang cocok
+                    foreach ($jlMcResults as $result) {
+                        if (
+                            $result['machinetypeid'] == $machinetypeid
+                        ) {
+                            $jlMc = $result['jl_mc'];
+                            break;
+                        }
+                    }
                     $allDataPerjarum[$machinetypeid][$weekCount] = [
                         'delJrm' => $id2['delivery'],
                         'qtyJrm' => $qty,
                         'prodJrm' => $produksi,
                         'sisaJrm' => $sisa,
+                        'jlMcJrm' => $jlMc,
                     ];
                     // Tambahkan qty, produksi, dan sisa ke total mingguan
                     if (!isset($totalPerWeekJrm[$weekCount])) {
                         $totalPerWeekJrm[$weekCount] = 0;
                         $totalProdPerWeekJrm[$weekCount] = 0;
                         $totalSisaPerWeekJrm[$weekCount] = 0;
+                        $totalJlMcPerWeekJrm[$weekCount] = 0;
                     }
                     $totalPerWeekJrm[$weekCount] += $qty;
                     $totalProdPerWeekJrm[$weekCount] += $produksi;
                     $totalSisaPerWeekJrm[$weekCount] += $sisa;
+                    $totalJlMcPerWeekJrm[$weekCount] += $jlMc;
                 }
 
                 // Pindahkan ke minggu berikutnya
@@ -2257,7 +2289,11 @@ class ExcelController extends BaseController
         ];
 
         // Judul
+<<<<<<< HEAD
+        $sheet->setCellValue('A1', 'SISA PRODUKSI ' . $buyer . ' Bulan ' . date('F', strtotime($bulan)));
+=======
         $sheet->setCellValue('A1', 'SISA PRODUKSI ' . $buyer . ' ' . $month);
+>>>>>>> 47604695ae715c0f6df4844561f447bef9c1f329
 
         $row_header = 3;
         $row_header2 = 4;
@@ -2369,6 +2405,7 @@ class ExcelController extends BaseController
                             $qty = $id3[$i]['qty'] ?? '';
                             $prod = $id3[$i]['prod'] ?? '';
                             $sisa = $id3[$i]['sisa'] ?? '';
+                            $jlMc = $id3[$i]['jlMc'] ?? '';
 
                             $sheet->setCellValue($col5 . $row, $del);
                             $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
@@ -2382,7 +2419,7 @@ class ExcelController extends BaseController
                             $sheet->setCellValue($col5 . $row, $sisa);
                             $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
                             $col5++;
-                            $sheet->setCellValue($col5 . $row, '');
+                            $sheet->setCellValue($col5 . $row, $jlMc);
                             $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
                             $col5++;
                         } else {
@@ -2412,7 +2449,7 @@ class ExcelController extends BaseController
             }
             $row = $mergeModel + 1;
         }
-        // $rowTotal = $row;
+        // TOTAL
 
         $sheet->setCellValue('A' . $row, 'TOTAL');
         $sheet->setCellValue('B' . $row, '');
@@ -2436,7 +2473,7 @@ class ExcelController extends BaseController
             $sheet->setCellValue($col6 . $row, isset($totalSisaPerWeek[$i]) ? $totalSisaPerWeek[$i] : 0);
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
             $col6++;
-            $sheet->setCellValue($col6 . $row, '');
+            $sheet->setCellValue($col6 . $row, isset($totalJlMcPerWeek[$i]) ? $totalJlMcPerWeek[$i] : 0);
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
             $col6++;
         }
@@ -2508,6 +2545,7 @@ class ExcelController extends BaseController
                     $qtyJrm = $idJrm[$i]['qtyJrm'];
                     $prodJrm = $idJrm[$i]['prodJrm'];
                     $sisaJrm = $idJrm[$i]['sisaJrm'];
+                    $jlMcJrm = $idJrm[$i]['jlMcJrm'];
 
                     $sheet->setCellValue($col5 . $row, $qtyJrm);
                     $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
@@ -2518,7 +2556,7 @@ class ExcelController extends BaseController
                     $sheet->setCellValue($col5 . $row, $sisaJrm);
                     $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
                     $col5++;
-                    $sheet->setCellValue($col5 . $row, '');
+                    $sheet->setCellValue($col5 . $row, $jlMcJrm);
                     $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
                     $col5++;
                 } else {
@@ -2538,7 +2576,7 @@ class ExcelController extends BaseController
             }
             $row++;
         }
-        // $rowTotal = $row;
+        // TOTAL
 
         $sheet->setCellValue('A' . $row, 'TOTAL');
         $sheet->getStyle('A' . $row)->applyFromArray($styleHeader);
@@ -2554,7 +2592,7 @@ class ExcelController extends BaseController
             $sheet->setCellValue($col6 . $row, isset($totalSisaPerWeekJrm[$i]) ? $totalSisaPerWeekJrm[$i] : 0);
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
             $col6++;
-            $sheet->setCellValue($col6 . $row, '');
+            $sheet->setCellValue($col6 . $row, isset($totalJlMcPerWeekJrm[$i]) ? $totalJlMcPerWeekJrm[$i] : 0);
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
             $col6++;
         }
@@ -2564,7 +2602,11 @@ class ExcelController extends BaseController
 
         // Export file ke Excel
         $writer = new Xlsx($spreadsheet);
+<<<<<<< HEAD
+        $filename = 'Sisa Produksi ' . $buyer . ' Bulan ' . date('F', strtotime($bulan)) . '.xlsx';
+=======
         $filename = 'Sisa Produksi ' . $buyer . ' Bulan ' . $month . '.xlsx';
+>>>>>>> 47604695ae715c0f6df4844561f447bef9c1f329
 
         header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment;filename="' . $filename . '"');

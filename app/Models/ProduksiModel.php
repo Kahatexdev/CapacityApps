@@ -170,4 +170,19 @@ class ProduksiModel extends Model
             ->where('no_mesin', $validate['no_mesin'])
             ->first();
     }
+
+    public function getJlMc($buyer)
+    {
+        $result = $this->select('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.factory, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
+            ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
+            ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'left')
+            ->where('data_model.kd_buyer_order', $buyer)
+            ->where('produksi.tgl_produksi', function ($builder) {
+                $builder->selectMax('tgl_produksi');
+            })
+            ->groupBy('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.factory')
+            ->orderBy('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.factory', 'ASC')
+            ->findAll();
+        return $result;
+    }
 }
