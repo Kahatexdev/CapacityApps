@@ -204,6 +204,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
 
     $routes->post('exportPlanningJlMc/(:any)', 'PlanningJalanMcController::excelPlanningJlMc/$1');
     $routes->post('saveMonthlyMc', 'PlanningJalanMcController::saveMonthlyMc');
+    $routes->post('updateMonthlyMc', 'PlanningJalanMcController::updateMonthlyMc');
 
 
     // produksi

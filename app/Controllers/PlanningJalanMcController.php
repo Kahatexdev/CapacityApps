@@ -1027,6 +1027,7 @@ class PlanningJalanMcController extends BaseController
         $monthlyData = [];
         foreach ($areaMachine as $area) {
             $idAreaMc = $area['id_area_machine'];
+            $monthlyData[$area['area']]['idarea'] = $area['id_area_machine'];
             $monthlyData[$area['area']]['totalMesin'] = $area['total_mc'];
             $monthlyData[$area['area']]['planningMc'] = $area['planning_mc'];
             $monthlyData[$area['area']]['outputDz'] = $area['output'];
@@ -1048,7 +1049,103 @@ class PlanningJalanMcController extends BaseController
             'data' => $monthlyData,
             'statusOrder' => $statusOrder
         ];
-
         return view($role . '/Planning/viewPlanMonth', $data);
+    }
+
+    public function updateMonthlyMc()
+    {
+        // Set CORS Headers untuk mengizinkan request dari origin lain
+        $this->response->setHeader('Access-Control-Allow-Origin', '*');
+        $this->response->setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        $this->response->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+        // Tangani preflight request (OPTIONS) untuk CORS
+        if ($this->request->getMethod() === 'options') {
+            return $this->response->setStatusCode(200); // Tidak perlu lanjut jika preflight request
+        }
+
+        // Ambil data JSON dari fetch
+        $jsonData = $this->request->getJSON(true);
+
+        // Cek jika JSON tidak valid atau kosong
+        if (!$jsonData) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid JSON data'])->setStatusCode(400);
+        }
+
+        // Ambil data global, area, dan detail dari JSON
+        $global = $jsonData['global'] ?? null;
+        $areaData = $jsonData['area'] ?? [];
+        $detailData = $jsonData['detail'] ?? [];
+
+        if (!$global || empty($areaData) || empty($detailData)) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Incomplete data'])->setStatusCode(400);
+        }
+
+        // Insert ke tabel global
+        $idGlobal = $global['idglobal'];
+        $globalData = [
+            'total_mc' => $global['globalMc'],
+            'planning_mc' => $global['globalPlan'],
+            'total_output' => $global['globalOutput'],
+            'mc_socks' => $global['ttlMcSocks'],
+            'plan_mc_socks' => $global['ttlPlanSocks'],
+            'mc_gloves' => $global['ttlMcGloves'],
+            'plan_mc_gloves' => $global['ttlPlanGloves'],
+        ];
+
+        // Cek apakah sudah ada data global dengan judul yang sama
+        $this->globalModel->update($idGlobal, $globalData);
+
+
+        // Loop untuk insert area ke tabel area_mc
+        foreach ($areaData as $key => $area) {
+            $areaInsert = [
+                'id_monthly_mc' => $idGlobal,
+                'area' => $area['area'],
+                'total_mc' => $area['ttlMc'],
+                'planning_mc' => $area['planMc'],
+                'output' => $area['outputDz']
+            ];
+            $validate = [
+                'id_monthly_mc' => $idGlobal,
+                'area' => $area['area'],
+            ];
+
+            $cekDataArea = $this->areaMcModel->existData($validate);
+            if (!$cekDataArea) {
+                $this->areaMcModel->insert($areaInsert);
+                $idArea = $this->areaMcModel->existData($areaInsert)['id_area_machine'];
+            } else {
+                $idArea = $cekDataArea['id_area_machine'];
+                $this->areaMcModel->update($idArea, $areaInsert);
+            }
+
+            // Loop untuk insert detail area (jarum dan kebutuhan mesin)
+            foreach ($detailData as $detail) {
+                if ($detail['areaDetail'] == $area['area']) {  // Cocokkan area
+                    $detailInsert = [
+                        'id_area_machine' => $idArea,
+                        'jarum' => $detail['jarum'],
+                        'planning_mc' => $detail['kebMesin'],
+                        'target' => $detail['target'],
+                        'output' => $detail['output']
+                    ];
+                    $cekvalid = [
+                        'id_area_machine' => $idArea,
+                        'jarum' => $detail['jarum'],
+                    ];
+                    $cekDataDetail = $this->detailAreaMc->cekData($cekvalid);
+                    if (!$cekDataDetail) {
+                        $this->detailAreaMc->insert($detailInsert);
+                        $idDetail = $this->detailAreaMc->cekData($detailInsert)['id_detail_area_machine'];
+                    } else {
+                        $idDetail = $cekDataDetail['id_detail_area_machine'];
+                        $this->detailAreaMc->update($idDetail, $detailInsert);
+                    }
+                }
+            }
+        }
+
+        return $this->response->setJSON(['status' => 'success', 'message' => 'Data saved successfully'])->setStatusCode(200);
     }
 }

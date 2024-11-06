@@ -64,6 +64,7 @@
                         <div class="col-lg-4">
                             <h6>Global</h6>
                             <input type="text" id="judulPlan" value="<?= $title ?>" hidden>
+                            <input type="text" id="idglobal" value="<?= $summary['id_monthly_mc'] ?> " hidden>
 
                             <div class=" form-group">
                                 <label for="">
@@ -179,6 +180,8 @@
                     <div class="card-header" id="area_mc">
                         <div class="row">
                             <h6><?= $area ?></h6>
+                            <input type="text" id="area<?= $no ?>" value="<?= $area ?>" hidden>
+                            <input type="text" id="idarea<?= $no ?>" value=" <?= $detailArea['idarea']; ?>" hidden>
                         </div>
                         <div class="row text-bold">
                             <div class="col-lg-4"> Total Mesin: <?= $detailArea['totalMesin']; ?>
@@ -210,8 +213,8 @@
                                         <tr id="detail_area">
                                             <td>
                                                 <?= $jarumDetail['jarum'] ?>
-                                                <input type="text" id="jarum<?= $row ?>" value="<?= $jarumDetail['jarum'] ?>"
-                                                    hidden>
+                                                <input type="text" id="jarum<?= $row ?>" value="<?= $jarumDetail['jarum'] ?>" hidden>
+                                                <input type="text" id="idjarum<?= $row ?>" value="<?= $jarumDetail['id_detail_area_machine'] ?>" hidden>
 
 
                                             </td>
@@ -419,6 +422,7 @@
     function saveAll() {
         // GLOBAL
         let global = {
+            idglobal: document.querySelector("#idglobal") ? document.querySelector("#idglobal").value : null,
             judulPlan: document.querySelector("#judulPlan") ? document.querySelector("#judulPlan").value : null,
             globalMc: document.querySelector("#globalmc") ? document.querySelector("#globalmc").value : null,
             globalPlan: document.querySelector("#globalplanning") ? document.querySelector("#globalplanning").value : null,
@@ -441,12 +445,14 @@
         // AREA
         let areaPlan = [];
         document.querySelectorAll("[id^='area']").forEach((areaElement, index) => {
+            let idarea = document.querySelector(`#idarea${index + 1}`)
             let areaEl = document.querySelector(`#area${index + 1}`)
             let ttlMc = document.querySelector(`#ttlmc${index + 1}`);
             let planMc = document.querySelector(`#planmc${index + 1}`);
             let outputDz = document.querySelector(`#outputdz${index + 1}`);
 
             // Check if elements exist before accessing textContent
+            idarea = idarea ? idarea.value : null;
             areaEl = areaEl ? areaEl.value : null;
             ttlMc = ttlMc ? ttlMc.value : null;
             planMc = planMc ? planMc.value : null;
@@ -455,6 +461,7 @@
             // Add to areaPlan only if ttlMc, planMc, and outputDz are not null
             if (ttlMc && planMc && outputDz) {
                 areaPlan.push({
+                    idarea: idarea, // Trim to clean up unwanted spaces
                     area: areaEl, // Trim to clean up unwanted spaces
                     ttlMc: ttlMc,
                     planMc: planMc,
@@ -469,11 +476,13 @@
         // DETAIL
         let detailPlan = [];
         document.querySelectorAll("[id^='detail_area']").forEach((detailRow, index) => {
+            let idjarum = detailRow.querySelector("[id^='idjarum']");
             let jarum = detailRow.querySelector("[id^='jarum']");
             let kebMesin = detailRow.querySelector("[id^='kebmesin']");
             let areaDetail = detailRow.querySelector("[id^='areaDetail']");
 
             // Check if elements exist before accessing textContent
+            idjarum = idjarum ? idjarum.value : null;
             jarum = jarum ? jarum.value : null;
             kebMesin = kebMesin ? kebMesin.value : null;
             areaDetail = areaDetail ? areaDetail.value : null;
@@ -481,6 +490,7 @@
             // Add to detailPlan only if jarum and kebMesin are not null
             if (jarum && kebMesin) {
                 detailPlan.push({
+                    idjarum: idjarum,
                     jarum: jarum,
                     kebMesin: kebMesin,
                     areaDetail: areaDetail

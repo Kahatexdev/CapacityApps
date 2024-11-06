@@ -315,8 +315,8 @@ class ProduksiController extends BaseController
     public function viewProduksi()
     {
         $role = session()->get('role');
-        $bulan = date('m', strtotime('-1 month'));
-        $month = date('F',  strtotime('-1 month'));
+        $bulan = date('m');
+        $month = date('F');
         $totalMesin = $this->jarumModel->getArea();
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
 
@@ -360,8 +360,8 @@ class ProduksiController extends BaseController
     }
     public function produksiAreaChart()
     {
-        $bulan = date('m', strtotime('-1 month'));
-        $month = date('F', strtotime('-1 month'));
+        $bulan = date('m');
+        $month = date('F');
         $totalMesin = $this->jarumModel->getArea();
         $produksiPerArea = [];
         foreach ($totalMesin as $area) {

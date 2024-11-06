@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-
+use Datetime;
 
 use App\Models\DataMesinModel;
 use App\Models\OrderModel;
@@ -546,6 +546,15 @@ class ApsController extends BaseController
     public function detailplanmc($id)
     {
         $detailplan = $this->DetailPlanningModel->getDataPlanning($id);
+        foreach ($detailplan as &$dp) {
+            $iddetail = $dp['id_detail_pln'];
+            $mesin = $this->TanggalPlanningModel->totalMc($iddetail);
+            $jum = 0;
+            foreach ($mesin as $mc) {
+                $jum += $mc['mesin'];
+            }
+            $dp['mesin'] = $jum;
+        }
         $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();
         $judul = $kebutuhanArea['judul'];
         $area = $kebutuhanArea['area'];
@@ -807,11 +816,15 @@ class ApsController extends BaseController
     {
         $role = session()->get('role');
         $today = date('Y-m-d', strtotime('today'));
+        $hariIni = new DateTime($today);
         $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();
         $judul = $kebutuhanArea['judul'];
         $area = $kebutuhanArea['area'];
         $jarum =  $kebutuhanArea['jarum'];
         $mesin = $this->jarumModel->getMesinByArea($area, $jarum);
+        $hariTerjauh = $this->DetailPlanningModel->hariTerjauh($id);
+
+
         $data = [
             'role' => session()->get('role'),
             'title' => 'Jalan Mesin',
