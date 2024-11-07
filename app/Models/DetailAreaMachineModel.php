@@ -47,6 +47,6 @@ class DetailAreaMachineModel extends Model
     }
     public function getData($id)
     {
-        return $this->select('jarum,planning_mc,target,output')->where('id_area_machine', $id)->findAll();
+        return $this->select('id_detail_area_machine,jarum,planning_mc,target,output')->where('id_area_machine', $id)->findAll();
     }
 }

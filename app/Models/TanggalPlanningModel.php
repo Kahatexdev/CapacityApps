@@ -56,4 +56,16 @@ class TanggalPlanningModel extends Model
             ->where('id_detail_pln', $iddetail)
             ->delete();
     }
+    public function totalMc($iddetail)
+    {
+        return $this->select('id_est_qty,mesin')->distinct('id_est_qty')->where('id_detail_pln', $iddetail)->findAll();
+    }
+    public function dailyMachine($id)
+    {
+        return $this->select('date')
+            ->selectSum('mesin')
+            ->where('id_detail_pln', $id)
+            ->groupBy('date')
+            ->findAll();
+    }
 }

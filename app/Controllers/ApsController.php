@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-
+use Datetime;
 
 use App\Models\DataMesinModel;
 use App\Models\OrderModel;
@@ -546,6 +546,15 @@ class ApsController extends BaseController
     public function detailplanmc($id)
     {
         $detailplan = $this->DetailPlanningModel->getDataPlanning($id);
+        foreach ($detailplan as &$dp) {
+            $iddetail = $dp['id_detail_pln'];
+            $mesin = $this->TanggalPlanningModel->totalMc($iddetail);
+            $jum = 0;
+            foreach ($mesin as $mc) {
+                $jum += $mc['mesin'];
+            }
+            $dp['mesin'] = $jum;
+        }
         $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();
         $judul = $kebutuhanArea['judul'];
         $area = $kebutuhanArea['area'];
@@ -807,11 +816,27 @@ class ApsController extends BaseController
     {
         $role = session()->get('role');
         $today = date('Y-m-d', strtotime('today'));
+        $hariIni = new DateTime($today);
         $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();
         $judul = $kebutuhanArea['judul'];
         $area = $kebutuhanArea['area'];
         $jarum =  $kebutuhanArea['jarum'];
         $mesin = $this->jarumModel->getMesinByArea($area, $jarum);
+        $pdkList = $this->DetailPlanningModel->pdkList($id);
+        $mesinPerDay = [];
+        foreach ($pdkList as $pdk) {
+            $idPdk = $pdk['id_detail_pln'];
+            $mesinPerDay[] = $this->TanggalPlanningModel->dailyMachine($idPdk);
+        }
+        $jadwal = $this->getJadwalMesin($mesinPerDay, $mesin);
+        $events = [];
+        foreach ($jadwal as $item) {
+            $events[] = [
+                'title' => "Used: " . $item['mesin'] . "\n Available :" . $item['avail'],
+                'start' => $item['date'], // format date harus sesuai dengan format FullCalendar
+            ];
+        }
+
         $data = [
             'role' => session()->get('role'),
             'title' => 'Jalan Mesin',
@@ -826,11 +851,39 @@ class ApsController extends BaseController
             'jarum' => $jarum,
             'mesin' => $mesin,
             'id' => $id,
-            'today' => $today
+            'today' => $today,
+            'events' => json_encode($events)
 
         ];
         return view($role . '/Planning/kalenderMesin', $data);
     }
+    function getJadwalMesin($mesinPerDay, $mesin)
+    {
+        $jadwal = [];
+
+        foreach ($mesinPerDay as $mesinInfo) {
+            foreach ($mesinInfo as $entry) {
+                $date = $entry['date'];
+
+                // Jika tanggal sudah ada di array jadwal, tambahkan jumlah mesin
+                if (isset($jadwal[$date])) {
+                    $jadwal[$date]['mesin'] += $entry['mesin'];
+                    $jadwal[$date]['avail'] -= $entry['mesin'];
+                } else {
+                    // Jika tanggal belum ada, tambahkan entry baru
+                    $jadwal[$date] = [
+                        'date' => $date,
+                        'mesin' => $entry['mesin'],
+                        'avail' => $mesin - $entry['mesin']
+                    ];
+                }
+            }
+        }
+
+        // Mengubah associative array menjadi indexed array
+        return array_values($jadwal);
+    }
+
     public function deleteplanmesin()
     {
         $id = $this->request->getPost('id');

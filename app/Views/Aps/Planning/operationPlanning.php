@@ -248,7 +248,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Delete Plan Mesin</h5>
                     <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
+                        <span aria-hidden="true">Ã—</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -423,6 +423,24 @@
         });
     }
 
+    function updateLibur() {
+        var startDateString = document.querySelector('input[name="start_date"]').value;
+        var stopDateString = document.querySelector('.stop-date').value;
+        var startDate = new Date(startDateString);
+        var stopDate = new Date(stopDateString);
+        var isoStartDate = startDate.toISOString().split('T')[0];
+        var isoStopDate = stopDate.toISOString().split('T')[0];
+        var totalDays = ((stopDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+        var holidays = document.querySelector('.holiday-count').value
+        var daysWithoutHolidays = totalDays - holidays;
+
+        document.querySelector('.days-count').value = daysWithoutHolidays;
+        document.querySelector('.holiday-count').value = holidays;
+        fillUnplannedQty()
+        fillMachineSuggestion();
+
+    }
+
     function calculateEstimatedQty() {
         var daysCount = parseFloat(document.querySelector('.days-count').value);
         var machineCount = parseFloat(document.getElementById('machine_count').value);
@@ -446,6 +464,7 @@
             machineSuggestion = 0; // Set machineSuggestion to 0
         }
         document.getElementById('machine_suggestion').innerText = "(Suggested: " + machineSuggestion.toFixed(2) + " Mc)";
+
     }
 
     function fillUnplannedQty() {
@@ -462,6 +481,7 @@
             saveButton.disabled = false;
             saveButton.textContent = 'Save Planning';
         }
+
     }
 
     function updateAvailableMachines(date) {

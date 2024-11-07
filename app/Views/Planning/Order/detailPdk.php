@@ -130,9 +130,9 @@ error_reporting(E_ALL); ?>
                                                     <td><?= $list['factory'] ?></td>
                                                     <td><?= $list['production_unit'] ?></td>x
                                                     <td>
-                                                        <!-- <button type="button" class="btn btn-warning btn-sm split-btn" data-toggle="modal" data-target="#splitModal" data-id="<?= $list['idapsperstyle']; ?>" data-no-model="<?= $list['mastermodel']; ?>" data-delivery="<?= $list['delivery']; ?>" data-jarum="<?= $jarum ?>" data-style="<?= $list['size']; ?>" data-qty="<?= $list['qty']; ?>" data-sisa="<?= $list['sisa']; ?>" data-seam="<?= $list['seam']; ?>" data-factory="<?= $list['factory']; ?>" data-smv=" <?= $list['smv']; ?> " data-order=" <?= $list['no_order']; ?> " data-country=" <?= $list['country']; ?> ">
+                                                        <button type="button" class="btn btn-warning btn-sm split-btn" data-toggle="modal" data-target="#splitModal" data-id="<?= $list['idapsperstyle']; ?>" data-no-model="<?= $list['mastermodel']; ?>" data-delivery="<?= $list['delivery']; ?>" data-jarum="<?= $jarum ?>" data-style="<?= $list['size']; ?>" data-qty="<?= $list['qty']; ?>" data-sisa="<?= $list['sisa']; ?>" data-seam="<?= $list['seam']; ?>" data-factory="<?= $list['factory']; ?>" data-smv=" <?= $list['smv']; ?> " data-order=" <?= $list['no_order']; ?> " data-country=" <?= $list['country']; ?> ">
                                                             Split
-                                                        </button> -->
+                                                        </button>
                                                         <button type=" button" class="btn btn-info btn-sm edit-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $list['idapsperstyle']; ?>" data-area="<?= $list['factory']; ?>" data-pdk="<?= $list['mastermodel']; ?>" data-deliv="<?= $list['delivery']; ?> " data-size="<?= $list['size']; ?>" data-jarum="<?= $jarum ?>">
                                                             Edit Area
                                                         </button>
