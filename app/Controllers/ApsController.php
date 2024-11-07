@@ -822,8 +822,20 @@ class ApsController extends BaseController
         $area = $kebutuhanArea['area'];
         $jarum =  $kebutuhanArea['jarum'];
         $mesin = $this->jarumModel->getMesinByArea($area, $jarum);
-        $hariTerjauh = $this->DetailPlanningModel->hariTerjauh($id);
-
+        $pdkList = $this->DetailPlanningModel->pdkList($id);
+        $mesinPerDay = [];
+        foreach ($pdkList as $pdk) {
+            $idPdk = $pdk['id_detail_pln'];
+            $mesinPerDay[] = $this->TanggalPlanningModel->dailyMachine($idPdk);
+        }
+        $jadwal = $this->getJadwalMesin($mesinPerDay, $mesin);
+        $events = [];
+        foreach ($jadwal as $item) {
+            $events[] = [
+                'title' => "Used: " . $item['mesin'] . "\n Available :" . $item['avail'],
+                'start' => $item['date'], // format date harus sesuai dengan format FullCalendar
+            ];
+        }
 
         $data = [
             'role' => session()->get('role'),
@@ -839,11 +851,39 @@ class ApsController extends BaseController
             'jarum' => $jarum,
             'mesin' => $mesin,
             'id' => $id,
-            'today' => $today
+            'today' => $today,
+            'events' => json_encode($events)
 
         ];
         return view($role . '/Planning/kalenderMesin', $data);
     }
+    function getJadwalMesin($mesinPerDay, $mesin)
+    {
+        $jadwal = [];
+
+        foreach ($mesinPerDay as $mesinInfo) {
+            foreach ($mesinInfo as $entry) {
+                $date = $entry['date'];
+
+                // Jika tanggal sudah ada di array jadwal, tambahkan jumlah mesin
+                if (isset($jadwal[$date])) {
+                    $jadwal[$date]['mesin'] += $entry['mesin'];
+                    $jadwal[$date]['avail'] -= $entry['mesin'];
+                } else {
+                    // Jika tanggal belum ada, tambahkan entry baru
+                    $jadwal[$date] = [
+                        'date' => $date,
+                        'mesin' => $entry['mesin'],
+                        'avail' => $mesin - $entry['mesin']
+                    ];
+                }
+            }
+        }
+
+        // Mengubah associative array menjadi indexed array
+        return array_values($jadwal);
+    }
+
     public function deleteplanmesin()
     {
         $id = $this->request->getPost('id');

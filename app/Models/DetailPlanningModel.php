@@ -66,4 +66,8 @@ class DetailPlanningModel extends Model
             ->where('delivery', $validate['deliv'])
             ->first();
     }
+    public function pdkList($id)
+    {
+        return $this->select('id_detail_pln')->where('id_pln_mc', $id)->findAll();
+    }
 }

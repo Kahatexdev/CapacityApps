@@ -81,37 +81,7 @@ error_reporting(E_ALL); ?>
                     defaultDate: '<?= $today ?>',
                     editable: false,
                     eventLimit: true, // allow "more" link when too many events
-                    events: [{
-                            title: '61 used \n 7 available',
-                            start: '2024-10-27'
-                        },
-                        {
-                            title: '62 used \n 6 available',
-                            start: '2024-10-28'
-                        },
-                        {
-                            title: '60 used \n 8 available',
-                            start: '2024-10-29'
-                        },
-                        {
-                            title: '60 used \n 8 available',
-                            start: '2024-10-30'
-                        },
-                        {
-                            title: '60 used \n 8 available',
-                            start: '2024-10-31'
-                        },
-                        {
-                            title: '60 used \n 8 available',
-                            start: '2024-11-01'
-                        },
-                        {
-                            title: '60 used \n 8 available',
-                            start: '2024-11-02'
-                        },
-
-
-                    ]
+                    events: <?= $events ?>
                 });
 
                 calendar.render();
