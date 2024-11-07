@@ -39,4 +39,9 @@ class AreaModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getArea()
+    {
+        return $this->findAll();
+    }
 }

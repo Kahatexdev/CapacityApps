@@ -251,10 +251,13 @@ class PlanningJalanMcController extends BaseController
             if ($area != 'KK8J') {
                 $totalMcSocks += $data['total_mc'];
                 $planMcSocks += $data['planning_mc'];
+                $planMcSocks == 0 ?? '';
                 $outputDzSocks += $data['outputDz'];
             } else if ($area == 'KK8J') {
                 $totalMcGloves = $data['total_mc'];
                 $planMcGloves = $data['planning_mc'];
+                $planMcGloves
+                    == 0 ?? '';
                 $outputDzGloves += $data['outputDz'];
             }
 
@@ -264,8 +267,8 @@ class PlanningJalanMcController extends BaseController
 
             //Mengisi sheet excel
             $sheet->setCellValue("A$row", $area);
-            $sheet->setCellValue("B$row", $data['total_mc'] ?? 0);
-            $sheet->setCellValue("C$row", $data['planning_mc'] ?? 0);
+            $sheet->setCellValue("B$row", $data['total_mc'] ?? ' ');
+            $sheet->setCellValue("C$row", $data['planning_mc'] ?? ' ');
             $sheet->getStyle("A$row")->applyFromArray($styleBody);
             $sheet->getStyle("B$row")->applyFromArray($styleBody);
             $sheet->getStyle("C$row")->applyFromArray($styleBody);
@@ -291,10 +294,15 @@ class PlanningJalanMcController extends BaseController
                 }
                 if ($area != 'KK8J') {
                     $totalPlanMcJrmSocks[$jarum] += $planningMc;
+                    $totalPlanMcJrmSocks[$jarum] == 0 ?? '';
                 } else {
                     $totalPlanMcJrmGloves[$jarum] += $planningMc;
+                    $totalPlanMcJrmGloves[$jarum]
+                        == 0 ?? '';
                 }
-
+                if ($planningMc == 0) {
+                    $planningMc = ' ';
+                }
                 $sheet->setCellValue($col . $row, $planningMc);
                 $sheet->getStyle($col . $row)->applyFromArray($styleBody);
                 $col++;
@@ -317,7 +325,7 @@ class PlanningJalanMcController extends BaseController
         //Total perjarum
         $col = 'D';
         foreach ($jarums as $jrm) {
-            $sheet->setCellValue($col . $row, $totalPlanMcJrmSocks[$jrm] ?? 0);
+            $sheet->setCellValue($col . $row, $totalPlanMcJrmSocks[$jrm] ?? ' ');
             $sheet->getStyle("{$col}{$row}:{$col}{$row}")->applyFromArray($styleTotal);
             $col++;
         }
@@ -349,7 +357,7 @@ class PlanningJalanMcController extends BaseController
         $sheet->getStyle("C$row")->applyFromArray($styleTotal);
         $col = 'D';
         foreach ($jarums as $jrm) {
-            $sheet->setCellValue($col . $row, $totalPlanMcJrmGloves[$jrm] ?? 0);
+            $sheet->setCellValue($col . $row, $totalPlanMcJrmGloves[$jrm] ?? ' ');
             $sheet->getStyle("{$col}{$row}:{$col}{$row}")->applyFromArray($styleTotal);
             $col++;
         }
@@ -381,7 +389,7 @@ class PlanningJalanMcController extends BaseController
         $sheet->getStyle("C$row")->applyFromArray($styleTotal);
         $col = 'D';
         foreach ($jarums as $jrm) {
-            $sheet->setCellValue($col . $row, $totalPlanMcJrmSocks[$jrm] + $totalPlanMcJrmGloves[$jrm] ?? 0);
+            $sheet->setCellValue($col . $row, $totalPlanMcJrmSocks[$jrm] + $totalPlanMcJrmGloves[$jrm] ?? ' ');
             $sheet->getStyle("{$col}{$row}:{$col}{$row}")->applyFromArray($styleTotal);
             $col++;
         }
