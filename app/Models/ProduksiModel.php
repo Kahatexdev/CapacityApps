@@ -173,6 +173,12 @@ class ProduksiModel extends Model
 
     public function getJlMc($buyer, $bulan)
     {
+        $maxTglProduksi = $this->db->table('produksi')
+            ->selectMax('tgl_produksi')
+            ->get()
+            ->getRow()
+            ->tgl_produksi;
+
         $result = $this->select('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
             ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'left')
@@ -180,9 +186,7 @@ class ProduksiModel extends Model
             ->where('apsperstyle.production_unit !=', 'MJ')
             ->where('MONTH(apsperstyle.delivery)', date('m', strtotime($bulan))) // Filter bulan
             ->where('YEAR(apsperstyle.delivery)', date('Y', strtotime($bulan)))
-            ->where('produksi.tgl_produksi', function ($builder) {
-                $builder->selectMax('tgl_produksi');
-            })
+            ->where('produksi.tgl_produksi', $maxTglProduksi)
             ->groupBy('apsperstyle.mastermodel')
             ->groupBy('apsperstyle.machinetypeid')
             ->groupBy('apsperstyle.factory')
@@ -197,20 +201,24 @@ class ProduksiModel extends Model
 
     public function getJlMcJrm($buyer, $bulan)
     {
-        $result = $this->select('apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
+        $maxTglProduksi = $this->db->table('produksi')
+            ->selectMax('tgl_produksi')
+            ->get()
+            ->getRow()
+            ->tgl_produksi;
+
+        $result = $this->select('produksi.tgl_produksi, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, WEEK(apsperstyle.delivery, 1) as delivery_week, MONTH(apsperstyle.delivery) as delivery_month, YEAR(apsperstyle.delivery) as delivery_year, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
             ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'left')
             ->where('data_model.kd_buyer_order', $buyer)
             ->where('apsperstyle.production_unit !=', 'MJ')
             ->where('MONTH(apsperstyle.delivery)', date('m', strtotime($bulan))) // Filter bulan
             ->where('YEAR(apsperstyle.delivery)', date('Y', strtotime($bulan)))
-            ->where('produksi.tgl_produksi', function ($builder) {
-                $builder->selectMax('tgl_produksi');
-            })
+            ->where('produksi.tgl_produksi', $maxTglProduksi)
             ->groupBy('apsperstyle.machinetypeid')
-            ->groupBy('apsperstyle.delivery')
+            ->groupBy('delivery_week')
             ->orderBy('apsperstyle.machinetypeid')
-            ->orderBy('apsperstyle.delivery')
+            ->orderBy('delivery_week')
             ->findAll();
         return $result;
     }
@@ -248,6 +256,21 @@ class ProduksiModel extends Model
             ->groupBy('apsperstyle.delivery, apsperstyle.machinetypeid')
             ->orderBy('apsperstyle.machinetypeid', 'ASC')
             ->findAll();
+        return $result;
+    }
+    public function getActualMcByModel($data)
+    {
+        $result = $this->select('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
+            ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
+            ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'left')
+            ->where('apsperstyle.production_unit !=', 'MJ')
+            ->where('apsperstyle.factory', $data['area'])
+            ->where('apsperstyle.mastermodel', $data['model'])
+            ->where('apsperstyle.machinetypeid', $data['jarum'])
+            ->where('apsperstyle.delivery', $data['delivery'])
+            ->groupBy('apsperstyle.mastermodel,apsperstyle.delivery')
+            ->orderBy('apsperstyle.mastermodel', 'ASC')
+            ->first();
         return $result;
     }
 }

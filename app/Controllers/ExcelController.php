@@ -2192,7 +2192,7 @@ class ExcelController extends BaseController
                     foreach ($jlMcJrmResults as $result) {
                         if (
                             $result['machinetypeid'] == $machinetypeid &&
-                            $result['delivery'] == $id2['delivery']
+                            $result['delivery_week'] == $id2['delivery_week']
                         ) {
                             $jlMc = $result['jl_mc'];
                             break;

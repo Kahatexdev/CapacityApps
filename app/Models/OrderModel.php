@@ -484,4 +484,11 @@ class OrderModel extends Model
             ->orderBy('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, produksi.no_mesin', 'ASC')
             ->findAll();
     }
+    public function getProductTypeByModel($noModel)
+    {
+        return $this->select('data_model.kd_buyer_order, master_product_type.product_type')
+            ->join('master_product_type', 'master_product_type.id_product_type=data_model.id_product_type')
+            ->where('data_model.no_model', $noModel)
+            ->first();
+    }
 }

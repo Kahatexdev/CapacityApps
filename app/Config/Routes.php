@@ -327,6 +327,8 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('datadeffect', 'DeffectController::datadeffect');
     $routes->post('inputKode', 'DeffectController::inputKode');
     $routes->post('viewDataBs', 'DeffectController::viewDataBs');
+
+    $routes->get('summaryPlanner/(:any)', 'SummaryController::summaryPlanner/$1');
 });
 
 // user

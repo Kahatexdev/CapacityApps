@@ -665,23 +665,21 @@ class ApsPerstyleModel extends Model
             ->orderBy('apsperstyle.mastermodel')
             ->orderBy('apsperstyle.machinetypeid')
             ->orderBy('apsperstyle.factory')
-            ->orderBy('apsperstyle.delivery')
+            ->orderBy('apsperstyle.delivery', 'ASC')
             ->findAll();
     }
     public function getBuyerOrderPejarum($buyer, $bulan)
     {
-        return $this->select('data_model.kd_buyer_order, machinetypeid, delivery, production_unit, round(sum(qty)/24) as qty, round(sum(sisa)/24) as sisa, data_model.kd_buyer_order')
+        return $this->select('data_model.kd_buyer_order, machinetypeid, apsperstyle.delivery, WEEK(apsperstyle.delivery, 1) as delivery_week, MONTH(apsperstyle.delivery) as delivery_month, YEAR(apsperstyle.delivery) as delivery_year, production_unit, round(sum(qty)/24) as qty, round(sum(sisa)/24) as sisa, data_model.kd_buyer_order')
             ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
             ->where('data_model.kd_buyer_order', $buyer)
             ->where('apsperstyle.production_unit !=', 'MJ')
             ->where('MONTH(apsperstyle.delivery)', date('m', strtotime($bulan))) // Filter bulan
             ->where('YEAR(apsperstyle.delivery)', date('Y', strtotime($bulan))) // Filter tahun
             ->groupBy('apsperstyle.machinetypeid')
-            ->groupBy('apsperstyle.factory')
-            ->groupBy('apsperstyle.delivery')
+            ->groupBy('delivery_week')
             ->orderBy('apsperstyle.machinetypeid')
-            ->orderBy('apsperstyle.factory')
-            ->orderBy('apsperstyle.delivery')
+            ->orderBy('delivery_week')
 
             ->findAll();
     }
@@ -712,10 +710,8 @@ class ApsPerstyleModel extends Model
             ->where('MONTH(apsperstyle.delivery)', date('m', strtotime($bulan))) // Filter bulan
             ->where('YEAR(apsperstyle.delivery)', date('Y', strtotime($bulan))) // Filter tahun
             ->groupBy('apsperstyle.machinetypeid')
-            ->groupBy('apsperstyle.factory')
             ->groupBy('apsperstyle.delivery')
             ->orderBy('apsperstyle.machinetypeid')
-            ->orderBy('apsperstyle.factory')
             ->orderBy('apsperstyle.delivery')
 
             ->findAll();

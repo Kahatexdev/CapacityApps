@@ -1222,11 +1222,21 @@ class OrderController extends BaseController
         $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
         $jlMcResults = $this->produksiModel->getJlMc($buyer, $bulan);
         $jlMcJrmResults = $this->produksiModel->getJlMcJrm($buyer, $bulan);
-        // dd($jlMcJrmResults);
 
         // Ambil tanggal awal dan akhir bulan
         $startDate = new \DateTime('first day of this month'); // Awal bulan ini
+        $startDate->setTime(0, 0, 0);
         $endDate = new \DateTime('last day of this month');    // Akhir bulan ini
+
+        // Cari hari pertama bulan ini
+        $startDayOfWeek = $startDate->format('l');
+
+        // Jika hari pertama bulan ini bukan Senin, minggu pertama dimulai dari hari pertama bulan tersebut
+        if ($startDayOfWeek != 'Monday') {
+            $firstWeekEndDate = (clone $startDate)->modify('Sunday this week');
+        } else {
+            $firstWeekEndDate = (clone $startDate)->modify('Sunday this week');
+        }
 
         $allData = [];
         $totalProdPerWeek = []; // Untuk menyimpan total produksi per minggu
@@ -1304,7 +1314,9 @@ class OrderController extends BaseController
             }
         }
 
+
         $dataPerjarum = $this->ApsPerstyleModel->getBuyerOrderPejarum($buyer, $bulan);
+        // dd($dataPerjarum);
         foreach ($dataPerjarum as $id2) {
             $machinetypeid = $id2['machinetypeid'];
 
@@ -1332,14 +1344,12 @@ class OrderController extends BaseController
                     foreach ($jlMcJrmResults as $result) {
                         if (
                             $result['machinetypeid'] == $machinetypeid &&
-                            $result['delivery'] == $id2['delivery']
+                            $result['delivery_week'] == $id2['delivery_week']
                         ) {
                             $jlMc = $result['jl_mc'];
                             break;
                         }
                     }
-
-
                     $allDataPerjarum[$machinetypeid][$weekCount] = [
                         'delJrm' => $id2['delivery'],
                         'qtyJrm' => $qty,
@@ -1365,8 +1375,7 @@ class OrderController extends BaseController
                 $weekCount++;
             }
         }
-        // dd($totalJlMcPerWeekJrm);
-
+        // dd($allDataPerjaurum);
         $maxWeekCount = $weekCount - 1;
 
         $data = [
@@ -1425,6 +1434,7 @@ class OrderController extends BaseController
 
         // Ambil tanggal awal dan akhir bulan
         $startDate = new \DateTime('first day of this month'); // Awal bulan ini
+        $startDate->setTime(0, 0, 0);
         $endDate = new \DateTime('last day of this month');    // Akhir bulan ini
 
         $allData = [];

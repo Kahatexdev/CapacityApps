@@ -251,13 +251,12 @@ class PlanningJalanMcController extends BaseController
             if ($area != 'KK8J') {
                 $totalMcSocks += $data['total_mc'];
                 $planMcSocks += $data['planning_mc'];
-                $planMcSocks == 0 ?? '';
+                $planMcSocks == ($planMcSocks == 0) ? '' : $planMcSocks;
                 $outputDzSocks += $data['outputDz'];
             } else if ($area == 'KK8J') {
                 $totalMcGloves = $data['total_mc'];
                 $planMcGloves = $data['planning_mc'];
-                $planMcGloves
-                    == 0 ?? '';
+                $planMcGloves == ($planMcGloves == 0) ? '' : $planMcGloves;
                 $outputDzGloves += $data['outputDz'];
             }
 
@@ -267,8 +266,8 @@ class PlanningJalanMcController extends BaseController
 
             //Mengisi sheet excel
             $sheet->setCellValue("A$row", $area);
-            $sheet->setCellValue("B$row", $data['total_mc'] ?? ' ');
-            $sheet->setCellValue("C$row", $data['planning_mc'] ?? ' ');
+            $sheet->setCellValue("B$row", $data['total_mc']);
+            $sheet->setCellValue("C$row", $data['planning_mc']);
             $sheet->getStyle("A$row")->applyFromArray($styleBody);
             $sheet->getStyle("B$row")->applyFromArray($styleBody);
             $sheet->getStyle("C$row")->applyFromArray($styleBody);
@@ -301,7 +300,7 @@ class PlanningJalanMcController extends BaseController
                         == 0 ?? '';
                 }
                 if ($planningMc == 0) {
-                    $planningMc = ' ';
+                    $planningMc = '';
                 }
                 $sheet->setCellValue($col . $row, $planningMc);
                 $sheet->getStyle($col . $row)->applyFromArray($styleBody);

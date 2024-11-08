@@ -52,6 +52,10 @@ error_reporting(E_ALL); ?>
                             </h6>
                         </div>
                         <div class="col-auto">
+                            <a href="<?= base_url($role . '/summaryPlanner/' . $id_pln_mc) ?>"
+                                class="btn btn-add bg-gradient-info d-inline-flex align-items-center">
+                                Summary Planner
+                            </a>
                             <a href="<?= base_url($role . '/kalenderMesin/' . $id_pln_mc) ?>" class="btn btn-success"> Jadwal Mesin <i class="fas fa-calendar-plus text-lg opacity-10" aria-hidden="true"></i> </a>
                             <button id="fetch-data-button" class="btn btn-info">Fetch Data</button>
                             <a href="<?= base_url($role . '/planningmesin') ?>" class="btn btn-secondary">Back</a>
