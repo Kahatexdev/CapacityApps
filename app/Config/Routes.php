@@ -407,6 +407,9 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('statusOrder', 'OrderController::statusOrder');
     $routes->get('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
     $routes->get('progressdetail/(:any)/(:any)', 'ApsController::progressdetail/$1/$2');
+    $routes->get('sisaOrderArea', 'OrderController::sisaOrderArea');
+    $routes->get('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
+    $routes->post('excelSisaOrderArea/(:any)', 'ExcelController::excelSisaOrderArea/$1');
 
 
     // produksi

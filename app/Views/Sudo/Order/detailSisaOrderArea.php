@@ -10,14 +10,13 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    Sisa Produksi <?= $buyer ?> Bulan <?= date('F', strtotime($bulan)) ?>
+                                    Sisa Produksi <?= $area ?> Bulan <?= date('F', strtotime($bulan)) ?>
                                 </h5>
                             </div>
                         </div>
-
                         <div class="col-4 text-end">
-                            <form action="<?= base_url($role . '/excelSisaOrder/' . $buyer) ?>" method="post" ?>
-                                <input type="hidden" class="form-control" name="buyer" value="<?= $buyer ?>">
+                            <form action="<?= base_url($role . '/excelSisaOrderArea/' . $area) ?>" method="post" ?>
+                                <input type="hidden" class="form-control" name="buyer" value="<?= $area ?>">
                                 <button type="submit" class="btn btn-info"><i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Report Excel</button>
 
                                 <a href="<?= base_url($role . '/dataproduksi') ?>" class="btn bg-gradient-dark">
@@ -70,57 +69,57 @@
                                                 }
                                             }
                                         ?>
-                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsModel ?>"><?= $noModel ?></td>
-                                        <?php foreach ($id as $jarum => $id2) {
-                                            $rowsJarum = count($id2); ?>
-                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsJarum ?>"><?= $jarum ?></td>
-                                            <?php foreach ($id2 as $area => $id3) { ?>
-                                                <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $area ?></td>
-                                                <?php for ($i = 1; $i <= $maxWeek; $i++) {
-                                                    // Mengecek apakah week ada di data
-                                                    if (isset($id3[$i])) {
-                                                        // Ambil data per week
-                                                        $del = $id3[$i]['del'];
-                                                        $qty = $id3[$i]['qty'] ?? 0;
-                                                        $prod = $id3[$i]['prod'] ?? 0;
-                                                        $sisa = $id3[$i]['sisa'] ?? 0;
-                                                        $jlMc = $id3[$i]['jlMc'] ?? 0;
+                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsModel ?>"><?= $noModel ?></td>
+                                            <?php foreach ($id as $jarum => $id2) {
+                                                $rowsJarum = count($id2); ?>
+                                                <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsJarum ?>"><?= $jarum ?></td>
+                                                <?php foreach ($id2 as $area => $id3) { ?>
+                                                    <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $area ?></td>
+                                                    <?php for ($i = 1; $i <= $maxWeek; $i++) {
+                                                        // Mengecek apakah week ada di data
+                                                        if (isset($id3[$i])) {
+                                                            // Ambil data per week
+                                                            $del = $id3[$i]['del'];
+                                                            $qty = $id3[$i]['qty'] ?? 0;
+                                                            $prod = $id3[$i]['prod'] ?? 0;
+                                                            $sisa = $id3[$i]['sisa'] ?? 0;
+                                                            $jlMc = $id3[$i]['jlMc'] ?? 0;
 
-                                                        // Menampilkan data dari week yang ditemukan
-                                                ?>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $del ?></td>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $qty ?></td>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;">
-                                                            <?= $prod ?></td>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;">
-                                                            <?= $sisa ?></td>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;">
-                                                            <?= $jlMc ?></td>
-                                                    <?php
-                                                    } else {
-                                                        // Jika data week tidak ditemukan, tampilkan kolom kosong
+                                                            // Menampilkan data dari week yang ditemukan
+                                                    ?>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $del ?></td>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $qty ?></td>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $prod ?></td>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $sisa ?></td>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"> <?= $jlMc ?></td>
+                                                        <?php
+                                                        } else {
+                                                            // Jika data week tidak ditemukan, tampilkan kolom kosong
                                                         ?>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
                                                     <?php
+                                                        }
+                                                    }
+                                                    ?>
+
+                                    </tr>
+                        <?php
+                                                    // sinii
+
                                                 }
                                             }
-                                        ?>
-                                    </tr>
-                                    <?php
-                                        }
-                                    }
-                                } ?>
+                                        } ?>
                                 </tbody>
                                 <tfoot>
                                     <tr>
                                         <td colspan="3" class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Total</td>
                                         <?php for ($i = 1; $i <= $maxWeek; $i++) { ?>
                                             <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"></td>
-                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalPerWeek[$i])? $totalPerWeek[$i] : 0 ?></td>
+                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalPerWeek[$i]) ? $totalPerWeek[$i] : 0 ?></td>
                                             <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalProdPerWeek[$i]) ? $totalProdPerWeek[$i] : 0 ?></td>
                                             <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalSisaPerWeek[$i]) ? $totalSisaPerWeek[$i] : 0 ?></td>
                                             <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalJlMcPerWeek[$i]) ? $totalJlMcPerWeek[$i] : 0 ?></td>
@@ -161,7 +160,6 @@
                                         <?php } ?>
                                     </tr>
                                 </thead>
-                                
                                 <tbody>
                                     <tr>
                                         <?php foreach ($allDataJrm as $jarum => $idJrm) { ?>
@@ -172,10 +170,10 @@
                                                 // Mengecek apakah week ada di data
                                                 if (isset($idJrm[$i])) {
                                                     // Ambil data per week
-                                                    $qtyJrm = $idJrm[$i]['qtyJrm'];
-                                                    $prodJrm = $idJrm[$i]['prodJrm'];
-                                                    $sisaJrm = $idJrm[$i]['sisaJrm'];
-                                                    $jlMcJrm = $idJrm[$i]['jlMcJrm'];
+                                                    $qtyJrm = $idJrm[$i]['qtyJrm'] ?? 0;
+                                                    $prodJrm = $idJrm[$i]['prodJrm'] ?? 0;
+                                                    $sisaJrm = $idJrm[$i]['sisaJrm'] ?? 0;
+                                                    $jlMcJrm = $idJrm[$i]['jlMcJrm'] ?? 0;
 
                                                     // Menampilkan data dari week yang ditemukan
                                             ?>
