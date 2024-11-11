@@ -260,7 +260,7 @@ class ProduksiModel extends Model
     }
     public function getActualMcByModel($data)
     {
-        $result = $this->select('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
+        $result = $this->select('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, COUNT(DISTINCT produksi.no_mesin) AS jl_mc, produksi.tgl_produksi, produksi.idapsperstyle')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
             ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'left')
             ->where('apsperstyle.production_unit !=', 'MJ')
@@ -268,7 +268,9 @@ class ProduksiModel extends Model
             ->where('apsperstyle.mastermodel', $data['model'])
             ->where('apsperstyle.machinetypeid', $data['jarum'])
             ->where('apsperstyle.delivery', $data['delivery'])
+            ->groupBy('produksi.tgl_produksi,produksi.tgl_produksi')
             ->groupBy('apsperstyle.mastermodel,apsperstyle.delivery')
+            ->orderBy('produksi.tgl_produksi', 'DESC')
             ->orderBy('apsperstyle.mastermodel', 'ASC')
             ->first();
         return $result;

@@ -658,6 +658,7 @@ class SummaryController extends BaseController
                 'delivery' => $dp['delivery'],
             ];
             $actMesin = $this->produksiModel->getActualMcByModel($data);
+            dd($actMesin);
             // dd($actMesin);
 
             $iddetail = $dp['id_detail_pln'];
