@@ -519,6 +519,7 @@ class ApsPerstyleModel extends Model
     {
         $sisa = 0;
         $this->set('sisa', $sisa)
+            ->where('factory', $update['factory'])
             ->where('mastermodel', $update['mastermodel'])
             ->where('delivery', $update['delivery'])
             ->where('size', $update['size'])
@@ -528,6 +529,7 @@ class ApsPerstyleModel extends Model
     public function getIdPerDeliv($update)
     {
         return $this->select('idapsperstyle')
+            ->where('factory', $update['factory'])
             ->where('mastermodel', $update['mastermodel'])
             ->where('delivery', $update['delivery'])
             ->where('size', $update['size'])
