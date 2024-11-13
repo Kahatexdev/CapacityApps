@@ -1033,6 +1033,7 @@ class GodController extends BaseController
                 $delivery = date('Y-m-d', strtotime($tgl));
                 $sisa = intval($data[5]);
                 $update = [
+                    'factory' => $area,
                     'mastermodel' => $no_model,
                     'size' => $style,
                     'delivery' => $delivery,

@@ -47,6 +47,7 @@ class DetailPlanningModel extends Model
             ->join('(SELECT id_detail_pln, SUM(est_qty) AS total_est_qty, MAX(hari) AS max_hari, precentage_target FROM estimated_planning GROUP BY id_detail_pln) ep', 'detail_planning.id_detail_pln = ep.id_detail_pln', 'left')
             ->where('detail_planning.id_pln_mc', $id)
             ->groupBy('detail_planning.id_detail_pln, detail_planning.delivery, detail_planning.model')
+            ->orderBy('detail_planning.model, detail_planning.delivery')
             ->findAll();
     }
     public function getDetailPlanning($id)
