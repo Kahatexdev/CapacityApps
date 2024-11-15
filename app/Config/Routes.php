@@ -405,6 +405,7 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('detailPdk/(:any)/(:any)', 'OrderController::detailPdk/$1/$2');
     $routes->get('sisaOrder', 'OrderController::sisaOrder');
     $routes->get('sisaOrder/(:any)', 'OrderController::sisaOrderBuyer/$1');
+    $routes->post('sisaOrder/(:any)', 'OrderController::sisaOrderBuyer/$1');
     $routes->post('filterByMonth', 'OrderController::filterByMonth');
     $routes->post('excelSisaOrderBuyer/(:any)', 'ExcelController::excelSisaOrderBuyer/$1');
     $routes->get('statusOrder', 'OrderController::statusOrder');

@@ -654,7 +654,7 @@ class ApsPerstyleModel extends Model
     }
     public function getBuyerOrder($buyer, $bulan)
     {
-        return $this->select('data_model.kd_buyer_order, machinetypeid, mastermodel, delivery, factory, production_unit, round(sum(qty)/24) as qty, round(sum(sisa)/24) as sisa, data_model.kd_buyer_order')
+        return $this->select('data_model.kd_buyer_order, idapsperstyle, machinetypeid, mastermodel, delivery, factory, production_unit, round(sum(qty)/24) as qty, round(sum(sisa)/24) as sisa, data_model.kd_buyer_order')
             ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
             ->where('data_model.kd_buyer_order', $buyer)
             ->where('apsperstyle.production_unit !=', 'MJ')
@@ -672,7 +672,7 @@ class ApsPerstyleModel extends Model
     }
     public function getBuyerOrderPejarum($buyer, $bulan)
     {
-        return $this->select('data_model.kd_buyer_order, machinetypeid, apsperstyle.delivery, WEEK(apsperstyle.delivery, 1) as delivery_week, MONTH(apsperstyle.delivery) as delivery_month, YEAR(apsperstyle.delivery) as delivery_year, production_unit, round(sum(qty)/24) as qty, round(sum(sisa)/24) as sisa, data_model.kd_buyer_order')
+        return $this->select('data_model.kd_buyer_order, idapsperstyle, machinetypeid, apsperstyle.delivery, WEEK(apsperstyle.delivery, 1) as delivery_week, MONTH(apsperstyle.delivery) as delivery_month, YEAR(apsperstyle.delivery) as delivery_year, production_unit, round(sum(qty)/24) as qty, round(sum(sisa)/24) as sisa, data_model.kd_buyer_order')
             ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
             ->where('data_model.kd_buyer_order', $buyer)
             ->where('apsperstyle.production_unit !=', 'MJ')

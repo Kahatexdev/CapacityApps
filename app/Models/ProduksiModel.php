@@ -173,25 +173,21 @@ class ProduksiModel extends Model
 
     public function getJlMc($buyer, $bulan)
     {
-        $maxTglProduksi = $this->db->table('produksi')
-            ->selectMax('tgl_produksi')
-            ->get()
-            ->getRow()
-            ->tgl_produksi;
+        $yesterday = date('Y-m-d', strtotime('-13 day'));
 
-        $result = $this->select('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
+        $result = $this->select('produksi.tgl_produksi, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, WEEK(apsperstyle.delivery, 1) as delivery_week, MONTH(apsperstyle.delivery) as delivery_month, YEAR(apsperstyle.delivery) as delivery_year, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
             ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'left')
             ->where('data_model.kd_buyer_order', $buyer)
             ->where('apsperstyle.production_unit !=', 'MJ')
             ->where('MONTH(apsperstyle.delivery)', date('m', strtotime($bulan))) // Filter bulan
             ->where('YEAR(apsperstyle.delivery)', date('Y', strtotime($bulan)))
-            ->where('produksi.tgl_produksi', $maxTglProduksi)
+            ->where('produksi.tgl_produksi', $yesterday)
             ->groupBy('apsperstyle.mastermodel')
             ->groupBy('apsperstyle.machinetypeid')
             ->groupBy('apsperstyle.factory')
             ->groupBy('apsperstyle.delivery')
-            ->orderBy('apsperstyle.mastermodel')
+            ->orderBy('apsperstyle.mastermodel', 'ASC')
             ->orderBy('apsperstyle.machinetypeid')
             ->orderBy('apsperstyle.factory')
             ->orderBy('apsperstyle.delivery')
@@ -201,11 +197,7 @@ class ProduksiModel extends Model
 
     public function getJlMcJrm($buyer, $bulan)
     {
-        $maxTglProduksi = $this->db->table('produksi')
-            ->selectMax('tgl_produksi')
-            ->get()
-            ->getRow()
-            ->tgl_produksi;
+        $yesterday = date('Y-m-d', strtotime('-13 day'));
 
         $result = $this->select('produksi.tgl_produksi, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, WEEK(apsperstyle.delivery, 1) as delivery_week, MONTH(apsperstyle.delivery) as delivery_month, YEAR(apsperstyle.delivery) as delivery_year, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
@@ -214,7 +206,7 @@ class ProduksiModel extends Model
             ->where('apsperstyle.production_unit !=', 'MJ')
             ->where('MONTH(apsperstyle.delivery)', date('m', strtotime($bulan))) // Filter bulan
             ->where('YEAR(apsperstyle.delivery)', date('Y', strtotime($bulan)))
-            ->where('produksi.tgl_produksi', $maxTglProduksi)
+            ->where('produksi.tgl_produksi', $yesterday)
             ->groupBy('apsperstyle.machinetypeid')
             ->groupBy('delivery_week')
             ->orderBy('apsperstyle.machinetypeid')
@@ -225,19 +217,15 @@ class ProduksiModel extends Model
 
     public function getJlMcArea($ar, $bulan)
     {
-        $maxTglProduksi = $this->db->table('produksi')
-            ->selectMax('tgl_produksi')
-            ->get()
-            ->getRow()
-            ->tgl_produksi;
+        $yesterday = date('Y-m-d', strtotime('-13 day'));
 
-        $result = $this->select('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
+        $result = $this->select('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, WEEK(apsperstyle.delivery, 1) as delivery_week, MONTH(apsperstyle.delivery) as delivery_month, YEAR(apsperstyle.delivery) as delivery_year, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
             ->where('apsperstyle.factory', $ar)
             ->where('apsperstyle.production_unit !=', 'MJ')
             ->where('MONTH(apsperstyle.delivery)', date('m', strtotime($bulan))) // Filter bulan
             ->where('YEAR(apsperstyle.delivery)', date('Y', strtotime($bulan)))
-            ->where('produksi.tgl_produksi', $maxTglProduksi)
+            ->where('produksi.tgl_produksi', $yesterday)
             ->groupBy('apsperstyle.mastermodel')
             ->groupBy('apsperstyle.machinetypeid')
             ->groupBy('apsperstyle.factory')
@@ -252,11 +240,7 @@ class ProduksiModel extends Model
 
     public function getJlMcJrmArea($ar, $bulan)
     {
-        $maxTglProduksi = $this->db->table('produksi')
-            ->selectMax('tgl_produksi')
-            ->get()
-            ->getRow()
-            ->tgl_produksi;
+        $yesterday = date('Y-m-d', strtotime('-13 day'));
 
         $result = $this->select('produksi.tgl_produksi, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, WEEK(apsperstyle.delivery, 1) as delivery_week, MONTH(apsperstyle.delivery) as delivery_month, YEAR(apsperstyle.delivery) as delivery_year, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
@@ -264,7 +248,7 @@ class ProduksiModel extends Model
             ->where('apsperstyle.production_unit !=', 'MJ')
             ->where('MONTH(apsperstyle.delivery)', date('m', strtotime($bulan))) // Filter bulan
             ->where('YEAR(apsperstyle.delivery)', date('Y', strtotime($bulan)))
-            ->where('produksi.tgl_produksi', $maxTglProduksi)
+            ->where('produksi.tgl_produksi', $yesterday)
             ->groupBy('apsperstyle.machinetypeid')
             ->groupBy('delivery_week')
             ->orderBy('apsperstyle.machinetypeid')
@@ -275,6 +259,7 @@ class ProduksiModel extends Model
 
     public function getActualMcByModel($data)
     {
+        $yesterday = date('Y-m-d', strtotime('-13 day'));
         $result = $this->select('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, COUNT(DISTINCT produksi.no_mesin) AS jl_mc, produksi.tgl_produksi, produksi.idapsperstyle')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
             ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'left')
@@ -283,6 +268,7 @@ class ProduksiModel extends Model
             ->where('apsperstyle.mastermodel', $data['model'])
             ->where('apsperstyle.machinetypeid', $data['jarum'])
             ->where('apsperstyle.delivery', $data['delivery'])
+            ->where('produksi.tgl_produksi', $yesterday)
             ->groupBy('produksi.tgl_produksi,produksi.tgl_produksi')
             ->groupBy('apsperstyle.mastermodel,apsperstyle.delivery')
             ->orderBy('produksi.tgl_produksi', 'DESC')

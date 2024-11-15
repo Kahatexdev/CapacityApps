@@ -15,7 +15,7 @@
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <form method="post" action="<?= base_url(session()->get('role') . '/filterByMonth'); ?>">
+                            <form method="post" action="<?= base_url(session()->get('role') . '/sisaOrder/' . $buyer); ?>">
                                 <div class="row">
                                     <div class="col-lg-5">
                                         <input type="hidden" value="<?= $buyer ?>" name="buyer">

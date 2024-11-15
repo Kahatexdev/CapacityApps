@@ -37,7 +37,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <form id="planningForm" method="POST">
+                    <!-- <form id="planningForm" method="POST">
                         <div class="row">
                             <div class="col-lg-12 col-md-12">
 
@@ -50,9 +50,9 @@
                                     <select class="form-control" id="area" name="area">
                                         <option value="">Pilih Area</option>
                                         <?php
-                                        foreach ($area as $area) {
-                                            echo "<option value=\"$area\">$area</option>";
-                                        }
+                                        // // foreach ($area as $area) {
+                                        //     echo "<option value=\"$area\">$area</option>";
+                                        // }
                                         ?>
                                     </select>
                                 </div>
@@ -78,48 +78,60 @@
                                 </button>
                             </div>
                         </div>
-                    </form>
-
+                    </form> -->
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12">
+                            <div class="row">
+                                <?php foreach ($area as $ar) { ?>
+                                    <div class="col-3">
+                                        <a href="<?= base_url($role . '/summaryPlanner/' . $ar) ?>" class="btn btn-info w-100">Summary Planner <?= $ar ?></a>
+                                    </div>
+                                <?php } ?>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
+</div>
 
-    <div class="row mt-3">
-        <div class="col-xl-12">
-            <div class="card">
-                <div class="card-body">
-                    <table id="dataTable" class="display">
-                        <thead>
-                            <th>Judul</th>
-                            <th>Jarum</th>
-                            <th>Area</th>
-                            <th>Last Update</th>
-                            <th>Details</th>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($planarea as $order) : ?>
-                                <?php foreach ($order as $key => $val) : ?>
+<div class="row mt-3">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="dataTable" class="display">
+                    <thead>
+                        <th>Judul</th>
+                        <th>Jarum</th>
+                        <th>Area</th>
+                        <th>Last Update</th>
+                        <th>Details</th>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($planarea as $order) : ?>
+                            <?php foreach ($order as $key => $val) : ?>
 
-                                    <tr>
-                                        <td><?= $val['judul'] ?></td>
-                                        <td><?= $val['jarum'] ?></td>
-                                        <td><?= $val['area'] ?></td>
-                                        <td><?= date('F j, Y \a\t g:i A', strtotime($val['updated_at'])) ?></td>
-                                        <td>
-                                            <a href=" <?= base_url($role . '/detailplnmc/' . $val['id_pln_mc']) ?>" class="btn btn-info">View Details</a>
+                                <tr>
+                                    <td><?= $val['judul'] ?></td>
+                                    <td><?= $val['jarum'] ?></td>
+                                    <td><?= $val['area'] ?></td>
+                                    <td><?= date('F j, Y \a\t g:i A', strtotime($val['updated_at'])) ?></td>
+                                    <td>
+                                        <a href=" <?= base_url($role . '/detailplnmc/' . $val['id_pln_mc']) ?>" class="btn btn-info">View Details</a>
 
-                                        </td>
+                                    </td>
 
-                                    </tr>
-                                <?php endforeach ?>
+                                </tr>
                             <?php endforeach ?>
-                        </tbody>
-                    </table>
-                </div>
+                        <?php endforeach ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+</div>
 
 </div>
 

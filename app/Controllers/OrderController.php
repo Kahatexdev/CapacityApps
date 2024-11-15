@@ -1217,6 +1217,17 @@ class OrderController extends BaseController
     }
     public function sisaOrderBuyer($buyer)
     {
+        $month = $this->request->getPost('month');
+        $year = $this->request->getPost('year');
+
+        // Jika bulan atau tahun tidak diisi, gunakan bulan dan tahun ini
+        if (empty($month) || empty($year)) {
+            $bulan = date('Y-m-01', strtotime('this month')); // Bulan ini
+        } else {
+            // Atur tanggal berdasarkan input bulan dan tahun dari POST
+            $bulan = date('Y-m-01', strtotime("$year-$month-01"));
+        }
+
         $years = [];
         $currentYear = date('Y');
         $endYear = $currentYear + 10;
@@ -1242,11 +1253,9 @@ class OrderController extends BaseController
         }
         $months = array_unique($months);
 
-        $bulan = date('Y-m-01', strtotime('this month'));
         $role = session()->get('role');
         $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
-        $jlMcResults = $this->produksiModel->getJlMc($buyer, $bulan);
-        $jlMcJrmResults = $this->produksiModel->getJlMcJrm($buyer, $bulan);
+
 
         // Ambil tanggal awal dan akhir bulan
         $startDate = new \DateTime('first day of this month'); // Awal bulan ini
@@ -1285,12 +1294,12 @@ class OrderController extends BaseController
             $produksi = $qty - $sisa;
             $deliveryDate = new \DateTime($id['delivery']); // Asumsikan ada field delivery
 
-
             // Loop untuk membagi data ke dalam minggu
             $weekCount = 1;
             $currentStartDate = clone $startDate;
 
             while ($currentStartDate <= $endDate) {
+                $jlMcData = $this->produksiModel->getJlMc($buyer, $bulan);
                 // Hitung akhir minggu
                 $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
 
@@ -1302,8 +1311,9 @@ class OrderController extends BaseController
                 // Periksa apakah tanggal pengiriman berada dalam minggu ini
                 if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
                     $jlMc = 0; // Default jika tidak ada hasil yang cocok
-                    foreach ($jlMcResults as $result) {
+                    foreach ($jlMcData as $result) {
                         if (
+                            isset($result['mastermodel'], $result['machinetypeid'], $result['factory'], $result['delivery']) &&
                             $result['mastermodel'] == $mastermodel &&
                             $result['machinetypeid'] == $machinetypeid &&
                             $result['factory'] == $factory &&
@@ -1313,6 +1323,7 @@ class OrderController extends BaseController
                             break;
                         }
                     }
+                    // Tambahkan data ke $allData
                     $allData[$mastermodel][$machinetypeid][$factory][$weekCount] = [
                         'del' => $id['delivery'],
                         'qty' => $qty,
@@ -1339,9 +1350,8 @@ class OrderController extends BaseController
             }
         }
 
-
         $dataPerjarum = $this->ApsPerstyleModel->getBuyerOrderPejarum($buyer, $bulan);
-        // dd($dataPerjarum);
+
         foreach ($dataPerjarum as $id2) {
             $machinetypeid = $id2['machinetypeid'];
 
@@ -1354,7 +1364,9 @@ class OrderController extends BaseController
             // Loop untuk membagi data ke dalam minggu
             $weekCount = 1;
             $currentStartDate = clone $startDate;
+
             while ($currentStartDate <= $endDate) {
+                $jlMcJrmData = $this->produksiModel->getJlMcJrm($buyer, $bulan);
                 // Hitung akhir minggu
                 $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
 
@@ -1365,22 +1377,23 @@ class OrderController extends BaseController
 
                 // Periksa apakah tanggal pengiriman berada dalam minggu ini
                 if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
-                    $jlMc = 0; // Default jika tidak ada hasil yang cocok
-                    foreach ($jlMcJrmResults as $result) {
+                    $jlMcJrm = 0; // Default jika tidak ada hasil yang cocok
+                    foreach ($jlMcJrmData as $result) {
                         if (
                             $result['machinetypeid'] == $machinetypeid &&
                             $result['delivery_week'] == $id2['delivery_week']
                         ) {
-                            $jlMc = $result['jl_mc'];
+                            $jlMcJrm = $result['jl_mc'];
                             break;
                         }
                     }
+
                     $allDataPerjarum[$machinetypeid][$weekCount] = [
                         'delJrm' => $id2['delivery'],
                         'qtyJrm' => $qty,
                         'prodJrm' => $produksi,
                         'sisaJrm' => $sisa,
-                        'jlMcJrm' => $jlMc,
+                        'jlMcJrm' => $jlMcJrm,
                     ];
                     // Tambahkan qty, produksi, dan sisa ke total mingguan
                     if (!isset($totalPerWeekJrm[$weekCount])) {
@@ -1392,7 +1405,7 @@ class OrderController extends BaseController
                     $totalPerWeekJrm[$weekCount] += $qty;
                     $totalProdPerWeekJrm[$weekCount] += $produksi;
                     $totalSisaPerWeekJrm[$weekCount] += $sisa;
-                    $totalJlMcPerWeekJrm[$weekCount] += $jlMc;
+                    $totalJlMcPerWeekJrm[$weekCount] += $jlMcJrm;
                 }
 
                 // Pindahkan ke minggu berikutnya
@@ -1400,7 +1413,6 @@ class OrderController extends BaseController
                 $weekCount++;
             }
         }
-        // dd($allDataPerjaurum);
         $maxWeekCount = $weekCount - 1;
 
         $data = [
@@ -1473,7 +1485,10 @@ class OrderController extends BaseController
 
         $role = session()->get('role');
         $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
-        $jlMcResults = $this->produksiModel->getJlMc($buyer, $bulan);
+        $jlMcResults = [];
+        foreach ($data as $pdk) {
+            $jlMcResults[] = $this->produksiModel->getJlMc($pdk['idapsperstyle'], $bulan);
+        }
         $jlMcJrmResults = $this->produksiModel->getJlMcJrm($buyer, $bulan);
         // dd($jlMcResults, $jlMcJrmResults);
 
@@ -1536,6 +1551,7 @@ class OrderController extends BaseController
                     $jlMc = 0; // Default jika tidak ada hasil yang cocok
                     foreach ($jlMcResults as $result) {
                         if (
+                            isset($result['mastermodel'], $result['machinetypeid'], $result['factory'], $result['delivery']) &&
                             $result['mastermodel'] == $mastermodel &&
                             $result['machinetypeid'] == $machinetypeid &&
                             $result['factory'] == $factory &&

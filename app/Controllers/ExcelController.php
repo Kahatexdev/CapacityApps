@@ -2079,8 +2079,10 @@ class ExcelController extends BaseController
     public function excelSisaOrderBuyer($buyer)
     {
         $month = $this->request->getPost('month');
+        $year = $this->request->getPost('year');
+
         if ($month != 0) {
-            $bulan = date('Y-m-01', strtotime($month));
+            $bulan = date('Y-m-01', strtotime($year . '-' . $month));
         } else {
             $bulan = date('Y-m-01', strtotime('this month'));
         }

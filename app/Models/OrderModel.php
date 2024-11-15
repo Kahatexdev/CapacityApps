@@ -287,8 +287,11 @@ class OrderModel extends Model
         // Subquery untuk data_bs
         $builderBs = $this->db->table('data_bs');
         $subqueryBs = $builderBs
-            ->select('idapsperstyle, SUM(qty) AS bs_prod')
-            ->groupBy('idapsperstyle')
+            ->select('apsperstyle.idapsperstyle, SUM(data_bs.qty) AS bs_prod')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle', 'left')
+            ->groupBy('apsperstyle.machinetypeid')
+            ->groupBy('apsperstyle.mastermodel')
+            ->groupBy('apsperstyle.size')
             ->getCompiledSelect();
 
         // Subquery untuk produksi dan apsperstyle
