@@ -459,6 +459,7 @@ class ProduksiController extends BaseController
     }
     private function processBatchnew($batchData, $db, &$failedRows, $area)
     {
+
         $db->transStart();
         foreach ($batchData as $batchItem) {
             $rowIndex = $batchItem['rowIndex'];
@@ -518,7 +519,7 @@ class ProduksiController extends BaseController
                         }
 
                         log_message('debug', 'Updating id: ' . $id . ' | Size: ' . $size . ' | New qty: ' . $newQty . ' | Remaining after update: ' . $remainingQty);
-                        $this->ApsPerstyleModel->update($id, ['sisa' => $newQty, 'factory' => $area]);
+                        $this->ApsPerstyleModel->update($id, ['sisa' => $newQty]);
                         log_message('debug', 'Updated id: ' . $id . ' with new sisa: ' . $newQty);
                         $lastId = $id;
                     }
@@ -526,7 +527,7 @@ class ProduksiController extends BaseController
                     // If there's remaining qty after processing all deliveries
                     if ($remainingQty > 0 && $lastId !== null) {
                         log_message('debug', 'Final remaining qty after processing all rows: ' . $remainingQty);
-                        $this->ApsPerstyleModel->update($lastId, ['sisa' => -1 * $remainingQty, 'factory' => $area]);
+                        $this->ApsPerstyleModel->update($lastId, ['sisa' => -1 * $remainingQty]);
                         log_message('debug', 'Final update for lastId: ' . $lastId . ' | Remaining qty: ' . $remainingQty);
                     }
 
@@ -1118,5 +1119,54 @@ class ProduksiController extends BaseController
             // Redirect dengan pesan error
             return redirect()->to($role . '/viewModelPlusPacking/' . $pdk)->with('error', 'Error: ' . $e->getMessage());
         }
+    }
+    public function updateproduksi()
+    {
+        $role = session()->get('role');
+        $data = $this->produksiModel->updateProduksi();
+        $gagal = [];
+        foreach ($data as $dt) {
+            $id = $dt['id_produksi'];
+            $model = $dt['mastermodel'];
+            $size = $dt['size'];
+
+            // Lakukan update dan simpan error jika gagal
+            $update = $this->produksiModel->update($id, ['no_model' => $model, 'size' => $size]);
+            if (!$update) {
+                $gagal[] = "Gagal update model: $model, size: $size (ID: $id)";
+            }
+        }
+
+        // Redirect dengan pesan sukses atau error
+        if (!empty($gagal)) {
+            return redirect()->to('/sudo')->with('error', 'Beberapa data gagal diupdate: ' . implode(', ', $gagal));
+        }
+
+        return redirect()->to('/sudo')->with('success', 'Data berhasil diupdate');
+    }
+    public function updatebs()
+    {
+        $role = session()->get('role');
+        $data = $this->BsModel->updateBs();
+        $gagal = [];
+        foreach ($data as $dt) {
+            $id = $dt['idbs'];
+            $model = $dt['mastermodel'];
+            $size = $dt['size'];
+            $deliv = $dt['delivery'];
+
+            // Lakukan update dan simpan error jika gagal
+            $update = $this->BsModel->update($id, ['no_model' => $model, 'size' => $size, 'delivery' => $deliv]);
+            if (!$update) {
+                $gagal[] = "Gagal update model: $model, size: $size (ID: $id)";
+            }
+        }
+
+        // Redirect dengan pesan sukses atau error
+        if (!empty($gagal)) {
+            return redirect()->to('/sudo')->with('error', 'Beberapa data gagal diupdate: ' . implode(', ', $gagal));
+        }
+
+        return redirect()->to('/sudo')->with('success', 'Data berhasil diupdate');
     }
 }

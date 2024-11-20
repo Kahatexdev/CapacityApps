@@ -46,7 +46,6 @@
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">PDK</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Style</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Delivery</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Order</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Produksi</th>
                                     </tr>
                                 </thead>
@@ -57,7 +56,6 @@
                                             <td class="text-sm"><?= $order['mastermodel']; ?></td>
                                             <td class="text-sm"><?= $order['size']; ?></td>
                                             <td class="text-sm"><?= $order['delivery']; ?></td>
-                                            <td class="text-sm"><?= $order['qty']; ?></td>
                                             <td class="text-sm"><?= $order['qty_produksi']; ?></td>
                                         </tr>
                                     <?php endforeach; ?>

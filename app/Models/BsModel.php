@@ -12,7 +12,7 @@ class BsModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['idapsperstyle', 'no_label', 'area', 'tgl_instocklot', 'no_box', 'qty', 'kode_deffect', 'created_at', 'updated_at', 'id_produksi'];
+    protected $allowedFields    = ['idapsperstyle', 'no_label', 'area', 'tgl_instocklot', 'no_box', 'qty', 'kode_deffect', 'created_at', 'updated_at', 'id_produksi', 'no_model', 'size', 'delivery'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -136,5 +136,14 @@ class BsModel extends Model
             ->where('tgl_instocklot >=', $awal)
             ->where('tgl_instocklot <=', $akhir)
             ->delete();
+    }
+    public function updatebs()
+    {
+        $builder = $this->select('data_bs.idbs, data_bs.idapsperstyle, apsperstyle.mastermodel as mastermodel, apsperstyle.size as size,apsperstyle.delivery as delivery')
+            ->join('apsperstyle', 'data_bs.idapsperstyle = apsperstyle.idapsperstyle', 'left')
+            ->where('data_bs.no_model IS NULL')
+            ->where('data_bs.size IS NULL');
+
+        return $builder->get(10000)->getResultArray();
     }
 }
