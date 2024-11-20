@@ -14,13 +14,49 @@
                                 </h5>
                             </div>
                         </div>
-
+                        <div class="col-lg-4">
+                            <form method="post" action="<?= base_url(session()->get('role') . '/sisaOrder/' . $buyer); ?>">
+                                <div class="row">
+                                    <div class="col-lg-5">
+                                        <input type="hidden" value="<?= $buyer ?>" name="buyer">
+                                        <div class="form-group">
+                                            <select class="form-control" id="planSelect" name="month">
+                                                <option value="">Pilih Bulan</option>
+                                                <?php foreach ($months as $month): ?>
+                                                    <option value="<?= $month; ?>"><?= $month; ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <div class="form-group">
+                                            <select class="form-control" id="planSelect" name="year">
+                                                <option value="">Pilih Tahun</option>
+                                                <?php foreach (array_keys($years) as $year): ?>
+                                                    <option value="<?= $year; ?>"><?= $year; ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-info">OK</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-8">
+                        </div>
                         <div class="col-4 text-end">
-                            <form action="<?= base_url($role . '/excelSisaOrder/' . $buyer) ?>" method="post" ?>
+                            <form action="<?= base_url($role . '/excelSisaOrderBuyer/' . $buyer) ?>" method="post" ?>
                                 <input type="hidden" class="form-control" name="buyer" value="<?= $buyer ?>">
+                                <input type="hidden" class="form-control" name="month" value="<?= $bulan; ?>">
                                 <button type="submit" class="btn btn-info"><i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Report Excel</button>
 
-                                <a href="<?= base_url($role . '/dataproduksi') ?>" class="btn bg-gradient-dark">
+                                <a href="<?= base_url($role . '/sisaOrder') ?>" class="btn bg-gradient-dark">
                                     <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
                                     Back</a>
                             </form>
@@ -37,7 +73,7 @@
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="table-responsive">
-                            <table id="example" class="table table-border" style="width:100%">
+                            <table id="table1" class="table table-border" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">NO MODEL</th>
@@ -70,57 +106,57 @@
                                                 }
                                             }
                                         ?>
-                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsModel ?>"><?= $noModel ?></td>
-                                        <?php foreach ($id as $jarum => $id2) {
-                                            $rowsJarum = count($id2); ?>
-                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsJarum ?>"><?= $jarum ?></td>
-                                            <?php foreach ($id2 as $area => $id3) { ?>
-                                                <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $area ?></td>
-                                                <?php for ($i = 1; $i <= $maxWeek; $i++) {
-                                                    // Mengecek apakah week ada di data
-                                                    if (isset($id3[$i])) {
-                                                        // Ambil data per week
-                                                        $del = $id3[$i]['del'];
-                                                        $qty = $id3[$i]['qty'] ?? 0;
-                                                        $prod = $id3[$i]['prod'] ?? 0;
-                                                        $sisa = $id3[$i]['sisa'] ?? 0;
-                                                        $jlMc = $id3[$i]['jlMc'] ?? 0;
+                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsModel ?>"><?= $noModel ?></td>
+                                            <?php foreach ($id as $jarum => $id2) {
+                                                $rowsJarum = count($id2); ?>
+                                                <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsJarum ?>"><?= $jarum ?></td>
+                                                <?php foreach ($id2 as $area => $id3) { ?>
+                                                    <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $area ?></td>
+                                                    <?php for ($i = 1; $i <= $maxWeek; $i++) {
+                                                        // Mengecek apakah week ada di data
+                                                        if (isset($id3[$i])) {
+                                                            // Ambil data per week
+                                                            $del = $id3[$i]['del'];
+                                                            $qty = $id3[$i]['qty'] ?? 0;
+                                                            $prod = $id3[$i]['prod'] ?? 0;
+                                                            $sisa = $id3[$i]['sisa'] ?? 0;
+                                                            $jlMc = $id3[$i]['jlMc'] ?? 0;
 
-                                                        // Menampilkan data dari week yang ditemukan
-                                                ?>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $del ?></td>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $qty ?></td>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;">
-                                                            <?= $prod ?></td>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;">
-                                                            <?= $sisa ?></td>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;">
-                                                            <?= $jlMc ?></td>
-                                                    <?php
-                                                    } else {
-                                                        // Jika data week tidak ditemukan, tampilkan kolom kosong
+                                                            // Menampilkan data dari week yang ditemukan
+                                                    ?>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $del ?></td>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $qty ?></td>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;">
+                                                                <?= $prod ?></td>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;">
+                                                                <?= $sisa ?></td>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;">
+                                                                <?= $jlMc ?></td>
+                                                        <?php
+                                                        } else {
+                                                            // Jika data week tidak ditemukan, tampilkan kolom kosong
                                                         ?>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
-                                                        <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
+                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
                                                     <?php
+                                                        }
+                                                    }
+                                                    ?>
+                                    </tr>
+                        <?php
                                                 }
                                             }
-                                        ?>
-                                    </tr>
-                                    <?php
-                                        }
-                                    }
-                                } ?>
+                                        } ?>
                                 </tbody>
                                 <tfoot>
                                     <tr>
                                         <td colspan="3" class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Total</td>
                                         <?php for ($i = 1; $i <= $maxWeek; $i++) { ?>
                                             <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"></td>
-                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalPerWeek[$i])? $totalPerWeek[$i] : 0 ?></td>
+                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalPerWeek[$i]) ? $totalPerWeek[$i] : 0 ?></td>
                                             <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalProdPerWeek[$i]) ? $totalProdPerWeek[$i] : 0 ?></td>
                                             <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalSisaPerWeek[$i]) ? $totalSisaPerWeek[$i] : 0 ?></td>
                                             <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalJlMcPerWeek[$i]) ? $totalJlMcPerWeek[$i] : 0 ?></td>
@@ -143,14 +179,14 @@
                             Sisa Produksi Perjarum
                         </h5>
                         <div class="table-responsive">
-                            <table id="example" class="table table-border" style="width:100%">
+                            <table id="table2" class="table table-border" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">NEEDLE</th>
                                         <!-- untuk menampilkan banyak week -->
                                         <?php for ($i = 1; $i <= $maxWeek; $i++) { ?>
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="4">WEEK <?= $i ?></th>
-                                        <?php } ?>                                        
+                                        <?php } ?>
                                     </tr>
                                     <tr>
                                         <?php for ($i = 1; $i <= $maxWeek; $i++) { ?>
@@ -161,7 +197,7 @@
                                         <?php } ?>
                                     </tr>
                                 </thead>
-                                
+
                                 <tbody>
                                     <tr>
                                         <?php foreach ($allDataJrm as $jarum => $idJrm) { ?>

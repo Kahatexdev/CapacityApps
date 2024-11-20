@@ -14,12 +14,49 @@
                                 </h5>
                             </div>
                         </div>
+                        <div class="col-lg-4">
+                            <form method="post" action="<?= base_url(session()->get('role') . '/filterByArea'); ?>">
+                                <div class="row">
+                                    <div class="col-lg-5">
+                                        <input type="hidden" value="<?= $area ?>" name="area">
+                                        <div class="form-group">
+                                            <select class="form-control" id="planSelect" name="month">
+                                                <option value="">Pilih Bulan</option>
+                                                <?php foreach ($months as $month): ?>
+                                                    <option value="<?= $month; ?>"><?= $month; ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <div class="form-group">
+                                            <select class="form-control" id="planSelect" name="year">
+                                                <option value="">Pilih Tahun</option>
+                                                <?php foreach (array_keys($years) as $year): ?>
+                                                    <option value="<?= $year; ?>"><?= $year; ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-info">OK</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-8">
+                        </div>
                         <div class="col-4 text-end">
                             <form action="<?= base_url($role . '/excelSisaOrderArea/' . $area) ?>" method="post" ?>
                                 <input type="hidden" class="form-control" name="buyer" value="<?= $area ?>">
+                                <input type="hidden" class="form-control" name="month" value="<?= $bulan; ?>">
                                 <button type="submit" class="btn btn-info"><i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Report Excel</button>
 
-                                <a href="<?= base_url($role . '/dataproduksi') ?>" class="btn bg-gradient-dark">
+                                <a href="<?= base_url($role . '/sisaOrderArea') ?>" class="btn bg-gradient-dark">
                                     <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
                                     Back</a>
                             </form>
@@ -149,7 +186,7 @@
                                         <!-- untuk menampilkan banyak week -->
                                         <?php for ($i = 1; $i <= $maxWeek; $i++) { ?>
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="4">WEEK <?= $i ?></th>
-                                        <?php } ?>                                        
+                                        <?php } ?>
                                     </tr>
                                     <tr>
                                         <?php for ($i = 1; $i <= $maxWeek; $i++) { ?>

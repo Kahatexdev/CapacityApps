@@ -18,6 +18,7 @@ use LengthException;
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Week;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\{Border, Alignment, Fill};
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
@@ -640,166 +641,297 @@ class SummaryController extends BaseController
         $writer->save('php://output');
         exit;
     }
-    public function summaryPlanner($id)
+    public function summaryPlanner($area)
     {
-        $detailplan = $this->detailPlanningModel->getDataPlanning($id);
-        $kebutuhanArea = $this->kebutuhanAreaModel->where('id_pln_mc', $id)->first();
-        $judul = $kebutuhanArea['judul'];
-        $area = $kebutuhanArea['area'];
-        $jarum =  $kebutuhanArea['jarum'];
-        foreach ($detailplan as &$dp) {
-            $noModel = $dp['model'];
-            $dataOrder = $this->orderModel->getProductTypeByModel($noModel); // get product type by model
+        $dataPlan = $this->kebutuhanAreaModel->getDataByAreaGroupJrm($area);
+        $allDetailPlans = [];
 
-            $data = [
-                'area' => $area,
-                'model' => $noModel,
-                'jarum' => $jarum,
-                'delivery' => $dp['delivery'],
-            ];
-            $actMesin = $this->produksiModel->getActualMcByModel($data);
-            // dd($actMesin);
+        foreach ($dataPlan as $jarum) {
+            $judulPlan = $this->kebutuhanAreaModel->getDataByAreaJrm($area, $jarum);
+            foreach ($judulPlan as $id) {
+                $detailplan = $this->detailPlanningModel->getDataPlanning($id['id_pln_mc']);
+                $kebutuhanArea = $this->kebutuhanAreaModel->where('id_pln_mc', $id['id_pln_mc'])->first();
 
-            $iddetail = $dp['id_detail_pln'];
-            $mesin = $this->tanggalPlanningModel->totalMc($iddetail);
-            $jum = 0;
-            foreach ($mesin as $mc) {
-                $jum += $mc['mesin'];
+                if (!isset($kebutuhanArea['jarum'])) {
+                    continue;
+                }
+
+                $judul = $kebutuhanArea['judul'];
+                $area = $kebutuhanArea['area'];
+                $jarum = $kebutuhanArea['jarum'];
+
+                foreach ($detailplan as &$dp) {
+                    $noModel = $dp['model'];
+                    $dataOrder = $this->orderModel->getProductTypeByModel($noModel);
+
+                    $data = [
+                        'area' => $area,
+                        'model' => $noModel,
+                        'jarum' => $jarum,
+                        'delivery' => $dp['delivery'],
+                    ];
+                    $actMesin = $this->produksiModel->getActualMcByModel($data);
+
+                    $iddetail = $dp['id_detail_pln'];
+                    $mesin = $this->tanggalPlanningModel->totalMc($iddetail);
+                    $jum = 0;
+                    foreach ($mesin as $mc) {
+                        $jum += $mc['mesin'];
+                    }
+                    $dp['mesin'] = $jum;
+                    $dp['product_type'] = $dataOrder['product_type'] ?? '';
+                    $dp['buyer'] = $dataOrder['kd_buyer_order'] ?? '';
+                    $dp['produksi'] = $dp['qty'] - $dp['sisa'];
+                    $dp['plan'] = number_format((3600 / $dp['smv']) * ($dp['precentage_target'] / 100), 2);
+                    $dp['actMesin'] = $actMesin['jl_mc'] ?? 0;
+                    $dp['jarum'] = $jarum; // Pastikan jarum di-set
+                }
+
+                // Tambahkan detail plan ke dalam array berdasarkan kunci jarum
+                if (!isset($allDetailPlans[$jarum])) {
+                    $allDetailPlans[$jarum] = [];
+                }
+                $allDetailPlans[$jarum] = array_merge($allDetailPlans[$jarum], $detailplan);
             }
-            $dp['mesin'] = $jum;
-            $dp['product_type'] = $dataOrder['product_type'];
-            $dp['buyer'] = $dataOrder['kd_buyer_order'];
-            $dp['produksi'] = $dp['qty'] - $dp['sisa'];
-            $dp['plan'] = round((3600 / $dp['smv']) * $dp['precentage_target']);
-            $dp['actMesin'] = isset($actMesin['jl_mc']) ? $actMesin['jl_mc'] : 0;
         }
-        // Mengurutkan data berdasarkan model secara ascending
-        usort($detailplan, function ($a, $b) {
-            return $a['model'] <=> $b['model'];
-        });
+
+        // Mengurutkan data di dalam setiap grup jarum berdasarkan model
+        foreach ($allDetailPlans as $jarum => &$plans) {
+            usort($plans, function ($a, $b) {
+                $modelA = (string) ($a['model'] ?? '');
+                $modelB = (string) ($b['model'] ?? '');
+
+                return $modelA <=> $modelB;
+            });
+        }
+
+        // dd($allDetailPlans);
 
         $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
+        $sheets = 0;
+        foreach ($allDetailPlans as $key => $detailplan) {
+            // Buat sheet baru jika bukan sheet pertama
+            if ($key > 0) {
+                $sheet = new Worksheet($spreadsheet, $key); // Nama default jika belum ada nama khusus
+                $spreadsheet->addSheet($sheet, $sheets);
+            } else {
+                $sheet = $spreadsheet->getActiveSheet(); // Sheet pertama
+            }
 
-        $styleHeader = [
-            'font' => [
-                'bold' => true,
-            ],
-            'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER,
-            ],
-            'borders' => [
-                'outline' => [
-                    'borderStyle' => Border::BORDER_THIN,
-                    'color' => ['argb' => 'FF000000'],
+            $styleHeader = [
+                'font' => [
+                    'bold' => true,
                 ],
-            ],
-        ];
-
-        $styleBody = [
-            'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER,
-            ],
-            'borders' => [
-                'outline' => [
-                    'borderStyle' => Border::BORDER_THIN,
-                    'color' => ['argb' => 'FF000000'],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
                 ],
-            ],
-        ];
+                'borders' => [
+                    'outline' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
+                    ],
+                ],
+            ];
 
-        $sheet->setCellValue('A1', 'SCHEDULE AREAL  ' . $area . ' ' . $jarum);
-        $sheet->mergeCells('A1:C1');
-        $sheet->getStyle('A1:C1')->applyFromArray($styleHeader);
+            $styleBody = [
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                ],
+                'borders' => [
+                    'outline' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
+                    ],
+                ],
+            ];
 
-        $rowHeader = 3;
-        $sheet->setCellValue('A' . $rowHeader, 'PRODUCTION CONTROL');
-        $sheet->mergeCells('A' . $rowHeader . ':I' . $rowHeader);
-        $sheet->getStyle('A' . $rowHeader . ':I' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->setCellValue('A1', 'SCHEDULE AREAL  ' . $area . ' ' . $jarum);
+            $sheet->mergeCells('A1:C1');
+            $sheet->getStyle('A1:C1')->applyFromArray($styleHeader);
 
-        $sheet->setCellValue('J' . $rowHeader, 'PRODUKSI');
-        $sheet->mergeCells('J' . $rowHeader . ':J' . ($rowHeader + 1));
-        $sheet->getStyle('J' . $rowHeader . ':J' . ($rowHeader + 1))->applyFromArray($styleHeader);
-        $sheet->getStyle('J' . $rowHeader . ':J' . ($rowHeader + 1))->getAlignment()->setWrapText(true);
+            $rowHeader = 3;
+            $sheet->setCellValue('A' . $rowHeader, 'PRODUCTION CONTROL');
+            $sheet->mergeCells('A' . $rowHeader . ':I' . $rowHeader);
+            $sheet->getStyle('A' . $rowHeader . ':I' . $rowHeader)->applyFromArray($styleHeader);
+
+            $sheet->setCellValue('J' . $rowHeader, 'PRODUKSI');
+            $sheet->mergeCells('J' . $rowHeader . ':J' . ($rowHeader + 1));
+            $sheet->getStyle('J' . $rowHeader . ':J' . ($rowHeader + 1))->applyFromArray($styleHeader);
+            $sheet->getStyle('J' . $rowHeader . ':J' . ($rowHeader + 1))->getAlignment()->setWrapText(true);
 
 
-        $sheet->setCellValue('K' . $rowHeader, 'PLAN');
-        $sheet->mergeCells('K' . $rowHeader . ':M' . $rowHeader);
-        $sheet->getStyle('K' . $rowHeader . ':M' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->setCellValue('K' . $rowHeader, 'PLAN');
+            $sheet->mergeCells('K' . $rowHeader . ':M' . $rowHeader);
+            $sheet->getStyle('K' . $rowHeader . ':M' . $rowHeader)->applyFromArray($styleHeader);
 
-        $sheet->setCellValue('N' . $rowHeader, 'ACTUAL JL MC');
-        $sheet->mergeCells('N' . $rowHeader . ':N' . ($rowHeader + 1));
-        $sheet->getStyle('N' . $rowHeader . ':N' . ($rowHeader + 1))->applyFromArray($styleHeader);
-        $sheet->getStyle('N' . $rowHeader . ':N' . ($rowHeader + 1))->getAlignment()->setWrapText(true);
+            $sheet->setCellValue('N' . $rowHeader, 'ACTUAL JL MC');
+            $sheet->mergeCells('N' . $rowHeader . ':N' . ($rowHeader + 1));
+            $sheet->getStyle('N' . $rowHeader . ':N' . ($rowHeader + 1))->applyFromArray($styleHeader);
+            $sheet->getStyle('N' . $rowHeader . ':N' . ($rowHeader + 1))->getAlignment()->setWrapText(true);
 
-        $sheet->setCellValue('O' . $rowHeader, 'KETERANGAN');
-        $sheet->mergeCells('O' . $rowHeader . ':O' . ($rowHeader + 1));
-        $sheet->getStyle('O' . $rowHeader . ':O' . ($rowHeader + 1))->applyFromArray($styleHeader);
-        $sheet->getStyle('O' . $rowHeader . ':O' . ($rowHeader + 1))->getAlignment()->setWrapText(true);
+            $sheet->setCellValue('O' . $rowHeader, 'KETERANGAN');
+            $sheet->mergeCells('O' . $rowHeader . ':O' . ($rowHeader + 1));
+            $sheet->getStyle('O' . $rowHeader . ':O' . ($rowHeader + 1))->applyFromArray($styleHeader);
+            $sheet->getStyle('O' . $rowHeader . ':O' . ($rowHeader + 1))->getAlignment()->setWrapText(true);
 
-        $sheet->setCellValue('P' . $rowHeader, 'BAHAN BAKU');
-        $sheet->mergeCells('P' . $rowHeader . ':U' . $rowHeader);
-        $sheet->getStyle('P' . $rowHeader . ':U' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->setCellValue('P' . $rowHeader, 'BAHAN BAKU');
+            $sheet->mergeCells('P' . $rowHeader . ':U' . $rowHeader);
+            $sheet->getStyle('P' . $rowHeader . ':U' . $rowHeader)->applyFromArray($styleHeader);
 
-        $rowHeader++;
-        $sheet->setCellValue('A' . $rowHeader, 'DELIVERY');
-        $sheet->setCellValue('B' . $rowHeader, 'BUYER');
-        $sheet->setCellValue('C' . $rowHeader, 'MODEL');
-        $sheet->setCellValue('D' . $rowHeader, 'TYPE');
-        $sheet->setCellValue('E' . $rowHeader, 'SMV');
-        $sheet->setCellValue('F' . $rowHeader, '%');
-        $sheet->setCellValue('G' . $rowHeader, 'PLAN');
-        $sheet->setCellValue('H' . $rowHeader, 'QUANTITY');
-        $sheet->setCellValue('I' . $rowHeader, 'SISA QTY');
-        $sheet->setCellValue('J' . $rowHeader, 'PRDUKSI');
-        $sheet->setCellValue('K' . $rowHeader, 'MC');
-        $sheet->setCellValue('L' . $rowHeader, 'START');
-        $sheet->setCellValue('M' . $rowHeader, 'STOP');
-        $sheet->setCellValue('P' . $rowHeader, 'WARNA');
-        $sheet->setCellValue('Q' . $rowHeader, 'JENIS BENANG');
-        $sheet->setCellValue('R' . $rowHeader, 'KODE BENANG');
-        $sheet->setCellValue('S' . $rowHeader, 'PEMESANAN');
-        $sheet->setCellValue('T' . $rowHeader, 'LOT');
-        $sheet->setCellValue('U' . $rowHeader, 'QTY');
+            $rowHeader++;
+            $sheet->setCellValue('A' . $rowHeader, 'DELIVERY');
+            $sheet->setCellValue('B' . $rowHeader, 'BUYER');
+            $sheet->setCellValue('C' . $rowHeader, 'MODEL');
+            $sheet->setCellValue('D' . $rowHeader, 'TYPE');
+            $sheet->setCellValue('E' . $rowHeader, 'SMV');
+            $sheet->setCellValue('F' . $rowHeader, '%');
+            $sheet->setCellValue('G' . $rowHeader, 'PLAN');
+            $sheet->setCellValue('H' . $rowHeader, 'QUANTITY');
+            $sheet->setCellValue('I' . $rowHeader, 'SISA QTY');
+            $sheet->setCellValue('J' . $rowHeader, 'PRDUKSI');
+            $sheet->setCellValue('K' . $rowHeader, 'MC');
+            $sheet->setCellValue('L' . $rowHeader, 'START');
+            $sheet->setCellValue('M' . $rowHeader, 'STOP');
+            $sheet->setCellValue('P' . $rowHeader, 'WARNA');
+            $sheet->setCellValue('Q' . $rowHeader, 'JENIS BENANG');
+            $sheet->setCellValue('R' . $rowHeader, 'KODE BENANG');
+            $sheet->setCellValue('S' . $rowHeader, 'PEMESANAN');
+            $sheet->setCellValue('T' . $rowHeader, 'LOT');
+            $sheet->setCellValue('U' . $rowHeader, 'QTY');
 
-        // style header
-        $sheet->getStyle('A' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('B' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('C' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('D' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('E' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('F' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('G' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('H' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('I' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('J' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('K' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('L' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('M' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('N' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('O' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('P' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('Q' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('R' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('S' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('T' . $rowHeader)->applyFromArray($styleHeader);
-        $sheet->getStyle('U' . $rowHeader)->applyFromArray($styleHeader);
+            // style header
+            $sheet->getStyle('A' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('B' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('C' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('D' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('E' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('F' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('G' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('H' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('I' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('J' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('K' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('L' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('M' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('N' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('O' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('P' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('Q' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('R' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('S' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('T' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('U' . $rowHeader)->applyFromArray($styleHeader);
 
-        $rowBody = $rowHeader + 1;
-        $subtotalQty = $subtotalSisa = $subtotalProduksi = $subtotalActMesin = 0; // variabel subtotal untuk kolom yang ingin dihitung
-        $prevModel = null;
+            $rowBody = $rowHeader + 1;
+            $subtotalQty = $subtotalSisa = $subtotalProduksi = $subtotalActMesin = 0; // variabel subtotal untuk kolom yang ingin dihitung
+            $prevModel = null;
 
-        foreach ($detailplan as $plan => $id) {
-            // Jika model berubah, tambahkan baris subtotal terlebih dahulu
-            if ($prevModel !== null && $prevModel !== $id['model']) {
+            foreach ($detailplan as $plan => $id) {
+                // Jika model berubah, tambahkan baris subtotal terlebih dahulu
+                if ($prevModel !== null && $prevModel !== $id['model']) {
 
+                    $sheet->setCellValue('A' . $rowBody, 'SUBTOTAL');
+                    $sheet->setCellValue('G' . $rowBody, $subPlan);
+                    $sheet->setCellValue('H' . $rowBody, $subtotalQty);
+                    $sheet->setCellValue('I' . $rowBody, $subtotalSisa);
+                    $sheet->setCellValue('J' . $rowBody, $subtotalProduksi);
+                    $sheet->setCellValue('N' . $rowBody, $subtotalActMesin);
+                    // style subtotal
+                    $sheet->getStyle('A' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('B' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('C' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('D' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('E' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('F' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('G' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('H' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('I' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('J' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('K' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('L' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('M' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('N' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('O' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('P' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('Q' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('R' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('S' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('T' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('U' . $rowBody)->applyFromArray($styleHeader);
+                    // Pindah ke baris berikutnya setelah subtotal
+                    $rowBody++;
+
+                    // Reset subtotal
+                    $subtotalQty = $subtotalSisa = $subtotalProduksi = $subtotalActMesin = 0;
+                }
+
+                // Isi data
+                $sheet->setCellValue('A' . $rowBody, $id['delivery']);
+                $sheet->setCellValue('B' . $rowBody, $id['buyer']);
+                $sheet->setCellValue('C' . $rowBody, $id['model']);
+                $sheet->setCellValue('D' . $rowBody, $id['product_type']);
+                $sheet->setCellValue('E' . $rowBody, $id['smv']);
+                $sheet->setCellValue('F' . $rowBody, $id['precentage_target']);
+                $sheet->setCellValue('G' . $rowBody, $id['plan']);
+                $sheet->setCellValue('H' . $rowBody, $id['qty']);
+                $sheet->setCellValue('I' . $rowBody, $id['sisa']);
+                $sheet->setCellValue('J' . $rowBody, $id['produksi']);
+                $sheet->setCellValue('K' . $rowBody, $id['mesin']);
+                $sheet->setCellValue('L' . $rowBody, $id['start_date']);
+                $sheet->setCellValue('M' . $rowBody, $id['stop_date']);
+                $sheet->setCellValue('N' . $rowBody, $id['actMesin']); // aktual jl mc
+                $sheet->setCellValue('O' . $rowBody, ''); // ket
+                $sheet->setCellValue('P' . $rowBody, ''); // warna
+                $sheet->setCellValue('Q' . $rowBody, ''); // jenis benang
+                $sheet->setCellValue('R' . $rowBody, ''); // kode benang
+                $sheet->setCellValue('S' . $rowBody, ''); // pesanan
+                $sheet->setCellValue('T' . $rowBody, ''); // lot
+                $sheet->setCellValue('U' . $rowBody, ''); // qty
+
+                // style body
+                $sheet->getStyle('A' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('B' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('C' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('D' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('E' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('F' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('G' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('H' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('I' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('J' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('K' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('L' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('M' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('N' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('O' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('P' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('Q' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('R' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('S' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('T' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('U' . $rowBody)->applyFromArray($styleBody);
+
+                // Tambahkan nilai ke subtotal
+                $subtotalQty += $id['qty'];
+                $subtotalSisa += $id['sisa'];
+                $subtotalProduksi += $id['produksi'];
+                $subtotalActMesin += $id['actMesin'];
+                $subPlan = ($subtotalProduksi != 0 && $subtotalActMesin != 0) ? number_format($subtotalProduksi / $subtotalActMesin, 1) : 0;
+
+                // Simpan model saat ini sebagai prevModel untuk iterasi berikutnya
+                $prevModel = $id['model'];
+                $rowBody++;
+            }
+
+            // Tambahkan subtotal terakhir jika ada data tersisa
+            if ($prevModel !== null) {
                 $sheet->setCellValue('A' . $rowBody, 'SUBTOTAL');
                 $sheet->setCellValue('G' . $rowBody, $subPlan);
                 $sheet->setCellValue('H' . $rowBody, $subtotalQty);
                 $sheet->setCellValue('I' . $rowBody, $subtotalSisa);
                 $sheet->setCellValue('J' . $rowBody, $subtotalProduksi);
                 $sheet->setCellValue('N' . $rowBody, $subtotalActMesin);
-                // style subtotal
+                // 
                 $sheet->getStyle('A' . $rowBody)->applyFromArray($styleHeader);
                 $sheet->getStyle('B' . $rowBody)->applyFromArray($styleHeader);
                 $sheet->getStyle('C' . $rowBody)->applyFromArray($styleHeader);
@@ -821,102 +953,10 @@ class SummaryController extends BaseController
                 $sheet->getStyle('S' . $rowBody)->applyFromArray($styleHeader);
                 $sheet->getStyle('T' . $rowBody)->applyFromArray($styleHeader);
                 $sheet->getStyle('U' . $rowBody)->applyFromArray($styleHeader);
-                // Pindah ke baris berikutnya setelah subtotal
-                $rowBody++;
-
-                // Reset subtotal
-                $subtotalQty = $subtotalSisa = $subtotalProduksi = $subtotalActMesin = 0;
             }
-
-            // Isi data
-            $sheet->setCellValue('A' . $rowBody, $id['delivery']);
-            $sheet->setCellValue('B' . $rowBody, $id['buyer']);
-            $sheet->setCellValue('C' . $rowBody, $id['model']);
-            $sheet->setCellValue('D' . $rowBody, $id['product_type']);
-            $sheet->setCellValue('E' . $rowBody, $id['smv']);
-            $sheet->setCellValue('F' . $rowBody, $id['precentage_target']);
-            $sheet->setCellValue('G' . $rowBody, $id['plan']);
-            $sheet->setCellValue('H' . $rowBody, $id['qty']);
-            $sheet->setCellValue('I' . $rowBody, $id['sisa']);
-            $sheet->setCellValue('J' . $rowBody, $id['produksi']);
-            $sheet->setCellValue('K' . $rowBody, $id['mesin']);
-            $sheet->setCellValue('L' . $rowBody, $id['start_date']);
-            $sheet->setCellValue('M' . $rowBody, $id['stop_date']);
-            $sheet->setCellValue('N' . $rowBody, $id['actMesin']); // aktual jl mc
-            $sheet->setCellValue('O' . $rowBody, ''); // ket
-            $sheet->setCellValue('P' . $rowBody, ''); // warna
-            $sheet->setCellValue('Q' . $rowBody, ''); // jenis benang
-            $sheet->setCellValue('R' . $rowBody, ''); // kode benang
-            $sheet->setCellValue('S' . $rowBody, ''); // pesanan
-            $sheet->setCellValue('T' . $rowBody, ''); // lot
-            $sheet->setCellValue('U' . $rowBody, ''); // qty
-
-            // style body
-            $sheet->getStyle('A' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('B' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('C' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('D' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('E' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('F' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('G' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('H' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('I' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('J' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('K' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('L' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('M' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('N' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('O' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('P' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('Q' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('R' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('S' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('T' . $rowBody)->applyFromArray($styleBody);
-            $sheet->getStyle('U' . $rowBody)->applyFromArray($styleBody);
-
-            // Tambahkan nilai ke subtotal
-            $subtotalQty += $id['qty'];
-            $subtotalSisa += $id['sisa'];
-            $subtotalProduksi += $id['produksi'];
-            $subtotalActMesin += $id['actMesin'];
-            $subPlan = ($subtotalProduksi != 0 && $subtotalActMesin != 0) ? number_format($subtotalProduksi / $subtotalActMesin, 1) : 0;
-
-            // Simpan model saat ini sebagai prevModel untuk iterasi berikutnya
-            $prevModel = $id['model'];
-            $rowBody++;
+            $sheets++;
         }
 
-        // Tambahkan subtotal terakhir jika ada data tersisa
-        if ($prevModel !== null) {
-            $sheet->setCellValue('A' . $rowBody, 'SUBTOTAL');
-            $sheet->setCellValue('G' . $rowBody, $subPlan);
-            $sheet->setCellValue('H' . $rowBody, $subtotalQty);
-            $sheet->setCellValue('I' . $rowBody, $subtotalSisa);
-            $sheet->setCellValue('J' . $rowBody, $subtotalProduksi);
-            $sheet->setCellValue('N' . $rowBody, $subtotalActMesin);
-            // 
-            $sheet->getStyle('A' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('B' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('C' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('D' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('E' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('F' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('G' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('H' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('I' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('J' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('K' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('L' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('M' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('N' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('O' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('P' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('Q' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('R' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('S' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('T' . $rowBody)->applyFromArray($styleHeader);
-            $sheet->getStyle('U' . $rowBody)->applyFromArray($styleHeader);
-        }
 
 
         $filename = 'SUMMARY PLENNER AREAL ' . $area . ' JARUM ' . $jarum . '.xlsx';

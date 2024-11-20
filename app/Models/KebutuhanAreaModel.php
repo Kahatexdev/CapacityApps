@@ -46,4 +46,18 @@ class KebutuhanAreaModel extends Model
             ->where('area', $ar)
             ->findAll();
     }
+    public function getDataByAreaGroupJrm($area)
+    {
+        return $this->select('jarum')
+            ->where('area', $area)
+            ->groupBy('jarum')
+            ->findAll();
+    }
+    public function getDataByAreaJrm($area, $jarum)
+    {
+        return $this->select('*')
+            ->where('area', $area)
+            ->where('jarum', $jarum)
+            ->findAll();
+    }
 }

@@ -2078,26 +2078,47 @@ class ExcelController extends BaseController
 
     public function excelSisaOrderBuyer($buyer)
     {
-        $bulan = date('Y-m-01', strtotime('this month'));
+        $month = $this->request->getPost('month');
+        $year = $this->request->getPost('year');
+
+        if ($month != 0) {
+            $bulan = date('Y-m-01', strtotime($year . '-' . $month));
+        } else {
+            $bulan = date('Y-m-01', strtotime('this month'));
+        }
         $role = session()->get('role');
         $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
         $jlMcResults = $this->produksiModel->getJlMc($buyer, $bulan);
         $jlMcJrmResults = $this->produksiModel->getJlMcJrm($buyer, $bulan);
 
         // Ambil tanggal awal dan akhir bulan
-        $startDate = new \DateTime('first day of this month'); // Awal bulan ini
-        $endDate = new \DateTime('last day of this month');    // Akhir bulan ini
+        $startDate = new \DateTime($bulan); // Awal bulan ini
+        $startDate->setTime(0, 0, 0);
+        // Mengatur endDate menjadi hari terakhir dari bulan yang sama
+        $endDate = new \DateTime($bulan);
+        $endDate->modify('last day of this month'); // Akhir bulan ini
+        $endDate->setTime(23, 59, 59);
+
+        // Cari hari pertama bulan ini
+        $startDayOfWeek = $startDate->format('l');
+
+        // Jika hari pertama bulan ini bukan Senin, minggu pertama dimulai dari hari pertama bulan tersebut
+        if ($startDayOfWeek != 'Monday') {
+            $firstWeekEndDate = (clone $startDate)->modify('Sunday this week');
+        } else {
+            $firstWeekEndDate = (clone $startDate)->modify('Sunday this week');
+        } // Akhir bulan ini
 
         $allData = [];
         $totalProdPerWeek = []; // Untuk menyimpan total produksi per minggu
         $totalSisaPerWeek = []; // Untuk menyimpan total sisa per mingguinggu
         $totalPerWeek = []; // Untuk menyimpan total qty per minggu
         $totalJlMcPerWeek = []; // Untuk menyimpan total qty per minggu
-        $allDataPerjaurum = [];
+        $allDataPerjarum = []; // Untuk menyimpan total jl mc per minggu
         $totalProdPerWeekJrm = []; // Untuk menyimpan total produksi per minggu
         $totalSisaPerWeekJrm = []; // Untuk menyimpan total sisa per mingguinggu
         $totalPerWeekJrm = []; // Untuk menyimpan total qty per minggu
-        $totalJlMcPerWeekJrm = []; // Untuk menyimpan total qty per minggu
+        $totalJlMcPerWeekJrm = []; // Untuk menyimpan total jl mc per minggu
 
         foreach ($data as $id) {
             $mastermodel = $id['mastermodel'];
@@ -2109,6 +2130,7 @@ class ExcelController extends BaseController
             $sisa = $id['sisa'];
             $produksi = $qty - $sisa;
             $deliveryDate = new \DateTime($id['delivery']); // Asumsikan ada field delivery
+
 
             // Loop untuk membagi data ke dalam minggu
             $weekCount = 1;
@@ -2223,7 +2245,7 @@ class ExcelController extends BaseController
                 $weekCount++;
             }
         }
-        // dd($allDataPerjaurum);
+
         $maxWeek = $weekCount - 1;
 
         // Generate Excel
@@ -2609,25 +2631,45 @@ class ExcelController extends BaseController
 
     public function excelSisaOrderArea($ar)
     {
-        $bulan = date('Y-m-01', strtotime('this month'));
+        $month = $this->request->getPost('month');
+        if ($month != 0) {
+            $bulan = date('Y-m-01', strtotime($month));
+        } else {
+            $bulan = date('Y-m-01', strtotime('this month'));
+        }
         $role = session()->get('role');
         $data = $this->ApsPerstyleModel->getAreaOrder($ar, $bulan);
-        $jlMcResults = $this->produksiModel->getJlMc($ar);
+        $jlMcResults = $this->produksiModel->getJlMcArea($ar, $bulan);
+        $jlMcJrmResults = $this->produksiModel->getJlMcJrmArea($ar, $bulan);
 
         // Ambil tanggal awal dan akhir bulan
-        $startDate = new \DateTime('first day of this month'); // Awal bulan ini
-        $endDate = new \DateTime('last day of this month');    // Akhir bulan ini
+        $startDate = new \DateTime($bulan); // Awal bulan ini
+        $startDate->setTime(0, 0, 0);
+        // Mengatur endDate menjadi hari terakhir dari bulan yang sama
+        $endDate = new \DateTime($bulan);
+        $endDate->modify('last day of this month'); // Akhir bulan ini
+        $endDate->setTime(23, 59, 59);   // Akhir bulan ini
+
+        // Cari hari pertama bulan ini
+        $startDayOfWeek = $startDate->format('l');
+
+        // Jika hari pertama bulan ini bukan Senin, minggu pertama dimulai dari hari pertama bulan tersebut
+        if ($startDayOfWeek != 'Monday') {
+            $firstWeekEndDate = (clone $startDate)->modify('Sunday this week');
+        } else {
+            $firstWeekEndDate = (clone $startDate)->modify('Sunday this week');
+        }
 
         $allData = [];
         $totalProdPerWeek = []; // Untuk menyimpan total produksi per minggu
         $totalSisaPerWeek = []; // Untuk menyimpan total sisa per mingguinggu
         $totalPerWeek = []; // Untuk menyimpan total qty per minggu
         $totalJlMcPerWeek = []; // Untuk menyimpan total qty per minggu
-        $allDataPerjaurum = [];
+        $allDataPerjarum = []; // Untuk menyimpan total jl mc per minggu
         $totalProdPerWeekJrm = []; // Untuk menyimpan total produksi per minggu
         $totalSisaPerWeekJrm = []; // Untuk menyimpan total sisa per mingguinggu
         $totalPerWeekJrm = []; // Untuk menyimpan total qty per minggu
-        $totalJlMcPerWeekJrm = []; // Untuk menyimpan total qty per minggu
+        $totalJlMcPerWeekJrm = []; // Untuk menyimpan total jl mc per minggu
 
         foreach ($data as $id) {
             $mastermodel = $id['mastermodel'];
@@ -2639,6 +2681,7 @@ class ExcelController extends BaseController
             $sisa = $id['sisa'];
             $produksi = $qty - $sisa;
             $deliveryDate = new \DateTime($id['delivery']); // Asumsikan ada field delivery
+
 
             // Loop untuk membagi data ke dalam minggu
             $weekCount = 1;
@@ -2660,7 +2703,8 @@ class ExcelController extends BaseController
                         if (
                             $result['mastermodel'] == $mastermodel &&
                             $result['machinetypeid'] == $machinetypeid &&
-                            $result['factory'] == $factory
+                            $result['factory'] == $factory &&
+                            $result['delivery'] == $id['delivery']
                         ) {
                             $jlMc = $result['jl_mc'];
                             break;
@@ -2692,7 +2736,7 @@ class ExcelController extends BaseController
             }
         }
 
-        $dataPerjarum = $this->ApsPerstyleModel->getBuyerOrderPejarum($buyer, $bulan);
+        $dataPerjarum = $this->ApsPerstyleModel->getAreaOrderPejarum($ar, $bulan);
 
         foreach ($dataPerjarum as $id2) {
             $machinetypeid = $id2['machinetypeid'];
@@ -2718,9 +2762,10 @@ class ExcelController extends BaseController
                 // Periksa apakah tanggal pengiriman berada dalam minggu ini
                 if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
                     $jlMc = 0; // Default jika tidak ada hasil yang cocok
-                    foreach ($jlMcResults as $result) {
+                    foreach ($jlMcJrmResults as $result) {
                         if (
-                            $result['machinetypeid'] == $machinetypeid
+                            $result['machinetypeid'] == $machinetypeid &&
+                            $result['delivery_week'] == $id2['delivery_week']
                         ) {
                             $jlMc = $result['jl_mc'];
                             break;
@@ -2751,7 +2796,7 @@ class ExcelController extends BaseController
                 $weekCount++;
             }
         }
-        // dd($allDataPerjaurum);
+
         $maxWeek = $weekCount - 1;
 
         // Generate Excel
@@ -2816,7 +2861,7 @@ class ExcelController extends BaseController
         ];
 
         // Judul
-        $sheet->setCellValue('A1', 'SISA PRODUKSI ' . $buyer . ' Bulan ' . date('F', strtotime($bulan)));
+        $sheet->setCellValue('A1', 'SISA PRODUKSI ' . $ar . ' Bulan ' . date('F', strtotime($bulan)));
 
         $row_header = 3;
         $row_header2 = 4;
@@ -2902,7 +2947,7 @@ class ExcelController extends BaseController
                 }
             }
             $mergeModel = $row + $rowsModel - 1;
-            $sheet->setCellValue('A' . $row, $buyer);
+            $sheet->setCellValue('A' . $row, $ar);
             $sheet->setCellValue('B' . $row, $noModel);
             $sheet->mergeCells('A' . $row . ':A' . $mergeModel);
             $sheet->getStyle('A' . $row . ':A' . $mergeModel)->applyFromArray($styleBody);
@@ -3126,7 +3171,7 @@ class ExcelController extends BaseController
 
         // Export file ke Excel
         $writer = new Xlsx($spreadsheet);
-        $filename = 'Sisa Produksi ' . $buyer . ' Bulan ' . date('F', strtotime($bulan)) . '.xlsx';
+        $filename = 'Sisa Produksi ' . $ar . ' Bulan ' . date('F', strtotime($bulan)) . '.xlsx';
 
         header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
