@@ -14,6 +14,10 @@ class BsMesin extends Migration
                 'unsigned' => true,
                 'auto_increment' => true,
             ],
+            'id_karyawan' => [
+                'type' => 'int',
+                'constraint' => '7',
+            ],
             'nama_karyawan' => [
                 'type' => 'VARCHAR',
                 'constraint' => '25',
@@ -33,6 +37,14 @@ class BsMesin extends Migration
             'size' => [
                 'type' => 'VARCHAR',
                 'constraint' => '22',
+            ],
+            'inisial' => [
+                'type' => 'VARCHAR',
+                'constraint' => '22',
+            ],
+            'no_mesin' => [
+                'type' => 'int',
+                'constraint' => '8',
             ],
             'qty_pcs' => [
                 'type' => 'DOUBLE',

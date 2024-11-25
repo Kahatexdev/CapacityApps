@@ -30,17 +30,99 @@
             <div class="col-lg-12">
                 <div class="card pb-0">
                     <div class="card-header d-flex justify-content-between">
-                        <h5>
-                            Input BS Mesin
-                        </h5>
+                        <h5>Input BS Mesin</h5>
                     </div>
                     <div class="card-body">
+                        <form id="bsMesinForm">
+                            <div class="row">
+                                <div class="col-lg-3 col-sm-12">
+                                    <div class="form-group">
+                                        <label for="nama" class="form-control-label">Nama</label>
+                                        <select name="nama" id="nama" class="form-control" onchange="getInfo()">
+                                            <option value=""></option>
+                                            <?php foreach ($karyawan as $kar): ?>
+                                                <option value="<?= $kar['id_karyawan']; ?>"><?= $kar['nama_karyawan']; ?></option>
+                                            <?php endforeach ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-sm-12">
+                                    <div class="form-group">
+                                        <label for="kode_kartu" class="form-control-label">Kode Kartu</label>
+                                        <input class="form-control" type="text" hidden id="nama_kar" name="namakar" value="<?= $kar['nama_karyawan']; ?>">
+                                        <input class="form-control" type="text" id="kode_kartu" name="kode_kartu">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-sm-12">
+                                    <div class="form-group">
+                                        <label for="shift" class="form-control-label">Shift</label>
+                                        <input class="form-control" type="text" id="shift" name="shift">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-sm-12">
+                                    <div class="form-group">
+                                        <label for="tgl_prod" class="form-control-label">Tanggal Produksi</label>
+                                        <input class="form-control" type="date" id="tgl_prod" name="tgl_prod" required>
+                                    </div>
+                                </div>
+                            </div>
 
+                            <div id="dynamicRowContainer">
+                                <div class="row" id="row_0">
+                                    <div class="col-lg-1 col-sm-12">
+                                        <div class="form-group">
+                                            <label for="no_mesin_0" class="form-control-label">No MC</label>
+                                            <input class="form-control" type="text" id="no_mesin_0" name="no_mesin[]" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-sm-12">
+                                        <div class="form-group">
+                                            <label for="inisial_0" class="form-control-label">In</label>
+                                            <input class="form-control" type="text" id="inisial_0" name="inisial[]" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-sm-12">
+                                        <div class="form-group">
+                                            <label for="no_model_0" class="form-control-label">PDK</label>
+                                            <input class="form-control" type="text" id="no_model_0" name="no_model[]" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-sm-12">
+                                        <div class="form-group">
+                                            <label for="size_0" class="form-control-label">Size</label>
+                                            <input class="form-control" type="text" id="size_0" name="size[]" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-sm-12">
+                                        <div class="form-group">
+                                            <label for="gram_0" class="form-control-label">Qty (Gram)</label>
+                                            <input class="form-control" type="number" id="gram_0" name="gram[]" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-sm-12">
+                                        <div class="form-group">
+                                            <label for="pcs_0" class="form-control-label">Qty (pcs)</label>
+                                            <input class="form-control" type="number" id="pcs_0" name="pcs[]" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-1 col-sm-12">
+                                        <div class="form-group">
+                                            <label for="" class="form-control-label"></label>
+                                            <button type="button" class="btn btn-info" onclick="addRow()">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <button type="button" class="btn btn-info" id="submitForm">Simpan</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-
             </div>
         </div>
+
 
     </div>
 
@@ -49,134 +131,134 @@
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script type="text/javascript">
-    $(document).ready(function() {
-        $('#dataTable0').DataTable({
-            "order": [
-                [0, "desc"]
-            ]
-        });
-        $('#dataTable').DataTable({});
+    let rowIndex = 1;
 
-        // Trigger import modal when import button is clicked
-        $('.import-btn').click(function() {
-            console.log("a");
-            var idModel = $(this).data('id');
-            var noModel = $(this).data('no-model');
+    // Add new row dynamically
+    function addRow() {
+        const container = document.getElementById('dynamicRowContainer');
+        const newRow = document.createElement('div');
+        newRow.className = 'row';
+        newRow.id = `row_${rowIndex}`;
+        newRow.innerHTML = `
+        <div class="col-lg-1 col-sm-12">
+            <div class="form-group">
+                <label for="no_mesin_${rowIndex}" class="form-control-label">No MC</label>
+                <input class="form-control" type="text" id="no_mesin_${rowIndex}" name="no_mesin[]" required>
+            </div>
+        </div>
+        <div class="col-lg-1 col-sm-12">
+            <div class="form-group">
+                <label for="inisial_${rowIndex}" class="form-control-label">In</label>
+                <input class="form-control" type="text" id="inisial_${rowIndex}" name="inisial[]" required>
+            </div>
+        </div>
+        <div class="col-lg-2 col-sm-12">
+            <div class="form-group">
+                <label for="no_model_${rowIndex}" class="form-control-label">PDK</label>
+                <input class="form-control" type="text" id="no_model_${rowIndex}" name="no_model[]" required>
+            </div>
+        </div>
+        <div class="col-lg-2 col-sm-12">
+            <div class="form-group">
+                <label for="size_${rowIndex}" class="form-control-label">Size</label>
+                <input class="form-control" type="text" id="size_${rowIndex}" name="size[]" required>
+            </div>
+        </div>
+        <div class="col-lg-2 col-sm-12">
+            <div class="form-group">
+                <label for="gram_${rowIndex}" class="form-control-label">Qty (Gram)</label>
+                <input class="form-control" type="number" id="gram_${rowIndex}" name="gram[]" required>
+            </div>
+        </div>
+        <div class="col-lg-2 col-sm-12">
+            <div class="form-group">
+                <label for="pcs_${rowIndex}" class="form-control-label">Qty (pcs)</label>
+                <input class="form-control" type="number" id="pcs_${rowIndex}" name="pcs[]" required>
+            </div>
+        </div>
+        <div class="col-lg-2 col-sm-12">
+            <div class="form-group">
+                <button type="button" class="btn btn-info" onclick="addRow()">+</button>
+                <button type="button" class="btn btn-danger" onclick="removeRow(${rowIndex})">-</button>
+            </div>
+        </div>`;
+        container.appendChild(newRow);
+        rowIndex++;
+    }
 
-            $('#importModal').find('input[name="id_model"]').val(idModel);
-            $('#importModal').find('input[name="no_model"]').val(noModel);
+    // Remove a row
+    function removeRow(index) {
+        const row = document.getElementById(`row_${index}`);
+        if (row) row.remove();
+    }
 
-            $('#importModal').modal('show'); // Show the modal
-        });
-    });
-</script>
-<!-- <script>
-    let data =;
-    console.log(data)
-    // Ekstraksi tanggal dan jumlah produksi dari data
-    let labels = data.map(item => item.created_at);
-    let values = data.map(item => item.total_produksi);
+    // AJAX form submission
+    document.getElementById('submitForm').addEventListener('click', function() {
+        const formData = new FormData(document.getElementById('bsMesinForm'));
 
-
-    var ctx2 = document.getElementById("mixed-chart").getContext("2d");
-
-    var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
-    gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-    gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)'); //purple colors
-
-    var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
-    gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-    gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)'); //purple colors
-
-    new Chart(ctx2, {
-
-        data: {
-            labels: labels,
-            datasets: [{
-                    type: "bar",
-                    label: "Data Turun Order",
-                    borderWidth: 0,
-                    pointRadius: 30,
-
-                    backgroundColor: "#3A416F",
-                    fill: true,
-                    data: values,
-                    maxBarThickness: 20
-
-                },
-                {
-                    type: "line",
-
-                    tension: 0.1,
-                    borderWidth: 0,
-                    pointRadius: 0,
-                    borderColor: "#3A416F",
-                    borderWidth: 2,
-                    backgroundColor: gradientStroke1,
-                    fill: true,
-                    data: values,
-                },
-            ],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false,
+        fetch('<?= base_url("user/saveBsMesin") ?>', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Data berhasil disimpan.',
+                        timer: 3000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload(); // Reload setelah SweetAlert selesai
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Gagal menyimpan data: ' + data.message,
+                    });
                 }
-            },
-            interaction: {
-                intersect: false,
-                mode: 'index',
-            },
-            scales: {
-                y: {
-                    grid: {
-                        drawBorder: false,
-                        display: true,
-                        drawOnChartArea: true,
-                        drawTicks: false,
-                        borderDash: [5, 5]
-                    },
-                    ticks: {
-                        display: true,
-                        padding: 10,
-                        color: '#b2b9bf',
-                        font: {
-                            size: 11,
-                            family: "Open Sans",
-                            style: 'normal',
-                            lineHeight: 2
-                        },
-                    }
-                },
-                x: {
-                    grid: {
-                        drawBorder: false,
-                        display: false,
-                        drawOnChartArea: false,
-                        drawTicks: false,
-                        borderDash: [5, 5]
-                    },
-                    ticks: {
-                        display: true,
-                        color: '#b2b9bf',
-                        padding: 20,
-                        font: {
-                            size: 11,
-                            family: "Open Sans",
-                            style: 'normal',
-                            lineHeight: 2
-                        },
-                    }
-                },
-            },
-        },
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Terjadi kesalahan saat mengirim data.',
+                });
+                console.error('Error:', error);
+            });
     });
-</script> -->
+
+
+    function getInfo() {
+        let id = document.getElementById('nama').value;
+
+        if (id) {
+            // Panggil API menggunakan fetch
+            fetch(`http://172.23.44.14/SkillMapping/public/api/karyawan/${id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json(); // Parsing hasil ke JSON
+                })
+                .then(data => {
+                    // Update input field dengan data dari API
+                    document.getElementById('nama_kar').value = data.nama_karyawan || '';
+                    document.getElementById('kode_kartu').value = data.kode_kartu || '';
+                    document.getElementById('shift').value = data.shift || '';
+                })
+                .catch(error => {
+                    console.error('Terjadi kesalahan:', error);
+                    alert('Gagal mengambil data dari server.');
+                });
+        } else {
+            // Jika id kosong, kosongkan input
+            document.getElementById('kode_kartu').value = '';
+            document.getElementById('shift').value = '';
+        }
+    }
+</script>
+
 <?php $this->endSection(); ?>

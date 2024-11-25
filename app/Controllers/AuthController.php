@@ -9,8 +9,10 @@ use App\Models\UserModel;
 
 class AuthController extends BaseController
 {
+
     public function index()
     {
+
         return view('Auth/index');
     }
     public function login()
