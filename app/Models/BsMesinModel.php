@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Sum;
 
 class BsMesinModel extends Model
 {
@@ -12,7 +13,7 @@ class BsMesinModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_karyawan', 'nama_karyawan', 'shift', 'area', 'no_model', 'size', 'inisial', 'no_mesin', 'qty_pcs', 'qty_gram', 'created_at', 'update_at'];
+    protected $allowedFields    = ['id_karyawan', 'nama_karyawan', 'shift', 'area', 'no_model', 'size', 'inisial', 'no_mesin', 'qty_pcs', 'qty_gram', 'tanggal_produksi', 'created_at', 'update_at'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -39,4 +40,20 @@ class BsMesinModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+
+    public function bsDataKaryawan($id)
+    {
+        return $this->select('id_karyawan, nama_karyawan, sum(qty_gram), sum(qty_pcs)')
+            ->where('id_karyawan', $id)
+            ->groupBy('id_karyawan')
+            ->findAll();
+    }
+    public function bsPeriode($start, $stop)
+    {
+        return $this->select('id_karyawan, nama_karyawan, sum(qty_gram), sum(qty_pcs)')
+            ->where('tg', $id)
+            ->groupBy('id_karyawan')
+            ->findAll();
+    }
 }

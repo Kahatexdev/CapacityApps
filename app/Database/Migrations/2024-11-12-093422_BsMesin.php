@@ -52,6 +52,9 @@ class BsMesin extends Migration
             'qty_gram' => [
                 'type' => 'DOUBLE',
             ],
+            'tanggal_produksi' => [
+                'type' => 'DATE',
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,
