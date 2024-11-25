@@ -2148,4 +2148,119 @@ class OrderController extends BaseController
 
         return view($role . '/Order/detailSisaOrderArea', $data);
     }
+
+    public function reviseorder()
+    {
+        $file = $this->request->getFile('excel_file');
+        if ($file->isValid() && !$file->hasMoved()) {
+            $spreadsheet = IOFactory::load($file);
+            $row = $spreadsheet->getActiveSheet();
+            $nomodel = $this->request->getVar('no_model');
+            $idModel = $this->orderModel->getId($nomodel);
+            $this->ApsPerstyleModel->setZero($nomodel);
+            $startRow = 4; // Ganti dengan nomor baris mulai
+            foreach ($spreadsheet->getActiveSheet()->getRowIterator($startRow) as $row) {
+                $rowIndex = $row->getRowIndex();
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+                $row = [];
+                foreach ($cellIterator as $cell) {
+                    $row[] = $cell->getValue();
+                }
+                if (!empty($row)) {
+                    $no_models = $row[29];
+                    $firstSpacePosition = strpos($no_models, ' '); // Cari posisi spasi pertama
+                    $no_model = substr($no_models, 0, $firstSpacePosition);
+                    $machinetypeid = $row[22];
+                    if ($machinetypeid == "DC168L") {
+                        $machinetypeid = $machinetypeid . "SF";
+                    }
+                    if ($row[5] == null) {
+                        return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $machinetypeid))->withInput()->with('success', 'Data Berhasil di revise');
+                    } else {
+                        if ($no_model != $nomodel) {
+                            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $machinetypeid))->with('error', 'Nomor Model Tidak Sama. Silahkan periksa kembali' . $rowIndex);
+                        } else {
+                            $recordID = $row[0];
+                            $articleNo = $row[30];
+                            $producttype = $row[5];
+                            $custCode = $row[7];
+                            $description = $row[10];
+                            $delivery = $row[11];
+                            $rdelivery = str_replace('/', '-', (substr($delivery, -10)));
+                            $delivery2 = date('Y-m-d', strtotime($rdelivery));
+                            $qty = $row[12];
+                            $country = $row[17];
+                            $color = $row[18];
+                            $size = $row[19];
+                            $sam = $row[20];
+                            if ($sam == null) {
+                                $sam = 185;
+                            }
+
+                            $prodtype = [
+                                'jarum' => $machinetypeid,
+                                'prodtype' => $producttype
+                            ];
+                            $idProduct = $this->productModel->getId($prodtype);
+
+                            $leadtime = $row[24];
+                            $processRoute = $row[25];
+                            $lcoDate = $row[26];
+                            $rlcoDate = str_replace('/', '-', (substr($lcoDate, -10)));
+                            $lcoDate2 = date('Y-m-d', strtotime($rlcoDate));
+
+
+                            $simpandata = [
+                                'machinetypeid' => $machinetypeid,
+                                'size' => $size,
+                                'mastermodel' => $nomodel,
+                                'no_order' => $articleNo,
+                                'delivery' => $delivery2,
+                                'qty' => $qty,
+                                'sisa' => $qty,
+                                'country' => $country,
+                                'color' => $color,
+                                'seam' => $processRoute,
+                                'smv' => $sam,
+                                'production_unit' => 'PU Belum Dipilih',
+                                'factory' => 'Belum Ada Area'
+                            ];
+
+                            $updateData = [
+                                'kd_buyer_order' => $custCode,
+                                'id_product_type' => $idProduct,
+                                'seam' => $processRoute,
+                                'leadtime' => $leadtime,
+                                'description' => $description
+                            ];
+                            $validate = [
+                                'size' => $size,
+                                'delivery' => $delivery2,
+                                'mastermodel' => $nomodel,
+                                'qty' => $qty,
+                                'country' => $country,
+                            ];
+
+                            $existingAps = $this->ApsPerstyleModel->checkAps($validate);
+                            if (!$existingAps) {
+                                $this->ApsPerstyleModel->insert($simpandata);
+                            } else {
+                                $id = $existingAps['idapsperstyle'];
+                                $qtyLama = $existingAps['qty'];
+                                $qtyBaru = $qty + $qtyLama;
+                                $this->ApsPerstyleModel->update($id, ['qty' => $qtyBaru]);
+                            }
+                            $this->orderModel->update($idModel, $updateData);
+
+                            // }
+                        }
+                    }
+                }
+            }
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $machinetypeid))->withInput()->with('success', 'Data Berhasil di revise');
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $machinetypeid))->with('error', 'No data found in the Excel file');
+        }
+    }
 }

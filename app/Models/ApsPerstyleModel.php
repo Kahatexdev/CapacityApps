@@ -718,4 +718,10 @@ class ApsPerstyleModel extends Model
 
             ->findAll();
     }
+    public function setZero($nomodel)
+    {
+        return $this->where('mastermodel', $nomodel)
+            ->set('qty', 0)
+            ->update();
+    }
 }

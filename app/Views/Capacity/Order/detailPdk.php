@@ -39,8 +39,15 @@ error_reporting(E_ALL); ?>
                         </div>
                         <div class="col-auto">
 
+                            <a href="#" class="btn btn-warning btn-revise" Data-bs-toggle="modal" data-bs-target="modalRevisi" ?>Upload Revisi</a>
+
+                            <button type="button" class="btn bg-gradient-warning btn-assign" data-toggle="modal" data-target="#ModalAssign">
+                                Arahkan Ke Areal
+                            </button>
                             <a href="#" class="btn btn-danger btn-delete-all" Data-bs-toggle="modal" data-bs-target="ModalDeleteAll" data-no-model="<?= $noModel ?>">Delete All</a>
-                            <a href="<?= base_url($role . '/blmAdaArea/') ?>" class="btn bg-gradient-info">Kembali</a>
+
+
+                            <a href="<?= base_url($role . '/semuaOrder/') ?>" class="btn bg-gradient-info">Kembali</a>
                         </div>
                     </div>
 
@@ -130,7 +137,7 @@ error_reporting(E_ALL); ?>
                                                     <td><?= $list['production_unit'] ?></td>x
                                                     <td>
 
-                                                        <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#editModal" data-id="<?= $list['idapsperstyle']; ?>" data-no-model="<?= $list['mastermodel']; ?>" data-delivery="<?= $list['delivery']; ?>" data-jarum="<?= $jarum; ?>" data-style="<?= $list['size']; ?>" data-qty="<?= $list['qty']; ?>" data-sisa="<?= $list['sisa']; ?>" data-factory="<?= $list['factory']; ?>" data-production_unit="<?= $list['production_unit']; ?>">
+                                                        <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#editModal" data-id="<?= $list['idapsperstyle']; ?>" data-no-model="<?= $list['mastermodel']; ?>" data-delivery="<?= $list['delivery']; ?>" data-jarum="<?= $jarum; ?>" data-style="<?= $list['size']; ?>" data-qty="<?= $list['qty']; ?>" data-sisa="<?= $list['sisa']; ?>" data-factory="<?= $list['factory']; ?>" data-production_unit="<?= $list['production_unit']; ?>" data-smv="<?= $list['smv'] ?>">
                                                             Edit
                                                         </button>
                                                     </td>
@@ -189,6 +196,44 @@ error_reporting(E_ALL); ?>
                 </div>
             </div>
         </div>
+        <div class="modal fade  bd-example-modal-lg" id="modalRevisi" tabindex="-1" role="dialog" aria-labelledby="modalRevisi" aria-hidden="true">
+            <div class="modal-dialog  modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Revisi Order</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body mx-3">
+                        <div class="row">
+                            <div class="col">
+                                <div id="drop-area" class="border rounded d-flex justify-content-center align-item-center " style="height:200px; width: 100%; cursor:pointer;">
+                                    <div class="text-center mt-5">
+                                        <i class="fas fa-upload" style="font-size: 48px;"></i>
+
+                                        <p class=" mt-3" style="font-size: 28px;">
+                                            Upload file here
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-12 pl-0">
+
+                                <form action="" method="post" enctype="multipart/form-data">
+                                    <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control ">
+                                    <input type="text" name="no_model" value=<?= $noModel ?> hidden class="form-control ">
+                                    <button type="submit" class="btn btn-info btn-block w-100 "> Simpan</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="modal fade bd-example-modal-lg" id="ModalAssign" tabindex="-1" role="dialog" aria-labelledby="ModalAssign" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -200,19 +245,27 @@ error_reporting(E_ALL); ?>
                     </div>
                     <div class="modal-body">
                         <form action="<?= base_url($role . '/assignareal') ?>" method="post">
-                            <input type="text" name="no_model" id="" hidden value="<?= $noModel ?>">
+                            <input type="text" name="no_model" hidden value="<?= $noModel ?>">
                             <div id="confirmationMessage"></div>
                             <input class="form-check-input" type="text" value="<?= $jarum ?>" name="jarum" id="jarum">
 
                             <div class="form-group">
                                 <label for="selectMachineType">Pilih Delivery:</label>
+
+                                <!-- Checkbox untuk Select All -->
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="selectAll" />
+                                    <label class="custom-control-label" for="selectAll">Select All</label>
+                                </div>
+
                                 <?php foreach ($headerRow as $row): ?>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="<?= $row['delivery'] ?>" name="delivery[]" id="ceklist">
+                                        <input class="form-check-input delivery-checkbox" type="checkbox" value="<?= $row['delivery'] ?>" name="delivery[]" id="ceklist">
                                         <label class="custom-control-label" for="customCheck1"> <?= date('d-F-y', strtotime($row['delivery'])) ?></label>
                                     </div>
                                 <?php endforeach ?>
                             </div>
+
                             <div class="form-group">
                                 <label for="selectArea">Pilih Area:</label>
                                 <select class="form-control" id="selectArea" name="area">
@@ -233,66 +286,7 @@ error_reporting(E_ALL); ?>
                 </div>
             </div>
         </div>
-        <div class="modal fade bd-example-modal-lg" id="splitModal" tabindex="-1" role="dialog" aria-labelledby="splitModal" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Split Area</h5>
-                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="<?= base_url($role . '/splitarea') ?>" method="post">
-                            <input type="text" name="noModel" id="noModel" hidden value="">
-                            <input type="text" name="idaps" id="idaps" hidden value="">
-                            <input type="text" name="smv" id="smv" hidden value="">
-                            <input type="text" name="delivery" id="delivery" hidden value="">
-                            <input type="text" name="seam" id="seam" hidden value="">
-                            <input type="text" name="jarum" id="jarum" hidden value="">
-                            <input type="text" name="style" id="style" hidden value="">
-                            <input type="text" name="order" id="order" hidden value="">
-                            <input type="text" name="country" id="country" hidden value="">
-                            <div id="confirmationMessage"></div>
-                            <div class="form-group">
-                                <label for="selectArea">Area 1:</label>
-                                <select class="form-control" id="selectArea" name="area1">
-                                    <?php
-                                    $uniqueAreas = array_unique(array_column($dataMc, 'area'));
-                                    foreach ($uniqueAreas as $area) :
-                                    ?>
-                                        <option value="<?= $area; ?>"><?= $area; ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="qty">Qty Area 1:</label>
-                                <input type="number" name="qty1" class="form-control" id="">
-                            </div>
-                            <div class="form-group">
-                                <label for="selectArea">Area 2:</label>
-                                <select class="form-control" id="selectArea" name="area2">
-                                    <?php
-                                    $uniqueAreas = array_unique(array_column($dataMc, 'area'));
-                                    foreach ($uniqueAreas as $area) :
-                                    ?>
-                                        <option value="<?= $area; ?>"><?= $area; ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="qty">Qty Area 2:</label>
-                                <input type="number" name="qty2" class="form-control" id="">
-                            </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn bg-gradient-danger">Simpan</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+
 
         <div class="modal fade bd-example-modal-lg" id="ModalAssignAll" tabindex="-1" role="dialog" aria-labelledby="ModalAssignAll" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
@@ -333,7 +327,7 @@ error_reporting(E_ALL); ?>
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Edit <Area:d></Area:d>
+                        <h5 class="modal-title" id="exampleModalLabel">Edit
                         </h5>
                         <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
@@ -550,7 +544,6 @@ error_reporting(E_ALL); ?>
                     var smv = $(this).data('smv');
                     var production_unit = $(this).data('production_unit');
                     var factory = $(this).data('factory');
-
                     var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
                     $('#editModal').find('form').attr('action', '<?= base_url($role . '/updatedetailorder/') ?>' + apsperstyle);
                     $('#editModal').find('input[name="idapsperstyle"]').val(apsperstyle);
@@ -581,8 +574,19 @@ error_reporting(E_ALL); ?>
                     $('#ModalDeleteAll').find('input[name="idapsperstyle"]').val(noModel);
                     $('#ModalDeleteAll').modal('show'); // Show the modal
                 });
+                $('.btn-revise').click(function() {
+                    var noModel = $(this).data('no-model');
+                    $('#modalRevisi').find('form').attr('action', '<?= base_url($role . '/reviseorder') ?>');
+                    $('#modalRevisi').modal('show'); // Show the modal
+                });
 
 
+            });
+            document.getElementById('selectAll').addEventListener('click', function(e) {
+                var checkboxes = document.querySelectorAll('.delivery-checkbox');
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.checked = e.target.checked;
+                });
             });
         </script>
         <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>

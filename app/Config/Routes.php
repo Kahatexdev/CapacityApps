@@ -57,6 +57,9 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('detailturunorder/(:any)/(:any)', 'OrderController::detailturunorder/$1/$2');
     $routes->post('tampilPerdelivery', 'OrderController::tampilPerdelivery');
     $routes->get('detailPdk/(:any)/(:any)', 'OrderController::detailPdk/$1/$2');
+    $routes->post('reviseorder', 'OrderController::reviseorder');
+    $routes->post('assignareal', 'PlanningController::assignareal');
+
 
 
     // produksi
@@ -336,6 +339,8 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('', 'UserController::produksi');
     $routes->get('produksi', 'UserController::produksi');
     $routes->get('bssetting', 'UserController::bssetting');
+    $routes->get('bsmesin', 'UserController::bsmesin');
+    $routes->post('saveBsMesin', 'UserController::saveBsMesin');
     // $routes->post('importproduksi', 'ProduksiController::importproduksi');
     $routes->post('importproduksi', 'ProduksiController::importproduksinew');
     $routes->post('importbssetting', 'ProduksiController::importbssetting');
@@ -427,7 +432,9 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->post('resetproduksi', 'ProduksiController::resetproduksi');
     $routes->post('resetproduksiarea', 'ProduksiController::resetproduksiarea');
     $routes->post('editproduksi', 'ProduksiController::editproduksi');
+    $routes->get('updateproduksi', 'ProduksiController::updateproduksi');
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->get('updatebs', 'ProduksiController::updatebs');
 
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
     $routes->get('bssetting', 'UserController::bssetting');

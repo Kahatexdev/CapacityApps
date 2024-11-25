@@ -12,7 +12,7 @@ class ProduksiModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_produksi', 'idapsperstyle', 'tgl_produksi', 'qty_produksi', 'bagian', 'storage_awal', 'storage_akhir', 'no_box', 'no_label', 'no_mesin', 'created_at', 'updated_at', 'admin', 'kode_shipment', 'delivery', 'shift', 'area', 'shift_a', 'shift_b', 'shift_c',];
+    protected $allowedFields    = ['id_produksi', 'idapsperstyle', 'tgl_produksi', 'qty_produksi', 'bagian', 'storage_awal', 'storage_akhir', 'no_box', 'no_label', 'no_mesin', 'created_at', 'updated_at', 'admin', 'kode_shipment', 'delivery', 'shift', 'area', 'shift_a', 'shift_b', 'shift_c'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -45,7 +45,7 @@ class ProduksiModel extends Model
         $today = date('Y-m-d');
         $threeDaysAgo = date('Y-m-d', strtotime('-20 days'));
         return $this
-            ->select('tgl_produksi,mastermodel,size,produksi.*, sisa')
+            ->select('tgl_produksi,produksi.*, sisa')
             ->join('apsperstyle', 'apsperstyle.idapsperstyle= produksi.idapsperstyle')
             ->where('produksi.area', $area)
             ->where('tgl_produksi >=', $threeDaysAgo)
@@ -268,5 +268,14 @@ class ProduksiModel extends Model
             ->orderBy('apsperstyle.mastermodel', 'ASC')
             ->first();
         return $result;
+    }
+    public function updateProduksi()
+    {
+        $builder = $this->select('produksi.id_produksi,produksi.idapsperstyle, apsperstyle.mastermodel as mastermodel, apsperstyle.size as size')
+            ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
+            ->where('produksi.no_model IS NULL')
+            ->where('produksi.size IS NULL');
+
+        return $builder->get(10000)->getResultArray();
     }
 }
