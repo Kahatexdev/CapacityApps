@@ -359,6 +359,10 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     //timter produksi
     $routes->post('timterProduksi', 'ProduksiController::timterProduksi');
     $routes->post('exportTimter', 'TimterController::excelTimter');
+
+    //summary bs mc
+    $routes->post('summaryBs', 'ProduksiController::summaryBs');
+    $routes->post('exportSummaryBs', 'TimterController::excelSummaryBs');
 });
 
 // sudo
