@@ -11,6 +11,13 @@ $routes->get('/login', 'AuthController::index');
 $routes->post('/logout', 'AuthController::logout');
 $routes->post('authverify', 'AuthController::login');
 
+// API ROUTES
+$routes->group(
+    '/api',
+    function ($routes) {
+        $routes->get('bsKaryawan/(:any)', 'ApiController::bsKaryawan/$1');
+    }
+);
 
 
 $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
