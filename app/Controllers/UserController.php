@@ -166,7 +166,7 @@ class UserController extends BaseController
                 'nama_karyawan' => $namaKaryawan,
                 'shift'         => $shift,
                 'area'          => $area,
-                'tgl_prod'      => $tglProd,
+                'tanggal_produksi'   => $tglProd,
                 'no_mesin'      => $noMesin[$index],
                 'inisial'       => $inisial[$index],
                 'no_model'      => $noModel[$index],
