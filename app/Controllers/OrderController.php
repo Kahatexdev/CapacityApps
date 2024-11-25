@@ -1256,7 +1256,6 @@ class OrderController extends BaseController
         $role = session()->get('role');
         $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
 
-
         // Ambil tanggal awal dan akhir bulan
         $startDate = new \DateTime('first day of this month'); // Awal bulan ini
         $startDate->setTime(0, 0, 0);
@@ -1298,8 +1297,22 @@ class OrderController extends BaseController
             $weekCount = 1;
             $currentStartDate = clone $startDate;
 
+            $dataOrder = [
+                'model' => $mastermodel,
+                'jarum' => $machinetypeid,
+                'area' => $factory,
+                'delivery' => $id['delivery'],
+            ];
+
+            // ambil jl mc berdasrkan $dataOrder
+            $jlMcData = $this->produksiModel->getJlMc($dataOrder);
+
+            $jlMc = 0; // Default value sebelum loop
+            foreach ($jlMcData as $mc) {
+                $jlMc = $mc['jl_mc'];
+            }
+
             while ($currentStartDate <= $endDate) {
-                $jlMcData = $this->produksiModel->getJlMc($buyer, $bulan);
                 // Hitung akhir minggu
                 $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
 
@@ -1308,21 +1321,7 @@ class OrderController extends BaseController
                     $endOfWeek = $endDate;
                 }
 
-                // Periksa apakah tanggal pengiriman berada dalam minggu ini
                 if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
-                    $jlMc = 0; // Default jika tidak ada hasil yang cocok
-                    foreach ($jlMcData as $result) {
-                        if (
-                            isset($result['mastermodel'], $result['machinetypeid'], $result['factory'], $result['delivery']) &&
-                            $result['mastermodel'] == $mastermodel &&
-                            $result['machinetypeid'] == $machinetypeid &&
-                            $result['factory'] == $factory &&
-                            $result['delivery'] == $id['delivery']
-                        ) {
-                            $jlMc = $result['jl_mc'];
-                            break;
-                        }
-                    }
                     // Tambahkan data ke $allData
                     $allData[$mastermodel][$machinetypeid][$factory][$weekCount] = [
                         'del' => $id['delivery'],
@@ -1356,8 +1355,8 @@ class OrderController extends BaseController
             $machinetypeid = $id2['machinetypeid'];
 
             // Ambil data qty, sisa, dan produksi
-            $qty = $id2['qty'];
-            $sisa = $id2['sisa'];
+            $qty = $id['qty'];
+            $sisa = $id['sisa'];
             $produksi = $qty - $sisa;
             $deliveryDate = new \DateTime($id2['delivery']); // Asumsikan ada field delivery
 
@@ -1365,8 +1364,13 @@ class OrderController extends BaseController
             $weekCount = 1;
             $currentStartDate = clone $startDate;
 
+            $dataOrder = [
+                'jarum' => $machinetypeid,
+                'delivery' => $id2['delivery'],
+            ];
+
             while ($currentStartDate <= $endDate) {
-                $jlMcJrmData = $this->produksiModel->getJlMcJrm($buyer, $bulan);
+                $jlMcJrmData = $this->produksiModel->getJlMcJrm($dataOrder);
                 // Hitung akhir minggu
                 $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
 
@@ -1441,7 +1445,7 @@ class OrderController extends BaseController
             'years' => $years,
             'months' => $months,
         ];
-
+        // dd($data);
         return view($role . '/Order/detailSisaOrder', $data);
     }
     public function filterByMonth()
