@@ -16,6 +16,8 @@ $routes->group(
     '/api',
     function ($routes) {
         $routes->get('bsKaryawan/(:any)', 'ApiController::bsKaryawan/$1');
+        $routes->get('bsPeriode/(:any)', 'ApiController::bsPeriode/$1');
+        $routes->get('bsDaily/(:any)', 'ApiController::bsDaily/$1');
     }
 );
 

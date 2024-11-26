@@ -45,7 +45,7 @@ class ProduksiModel extends Model
         $today = date('Y-m-d');
         $threeDaysAgo = date('Y-m-d', strtotime('-20 days'));
         return $this
-            ->select('tgl_produksi,produksi.*, sisa')
+            ->select('tgl_produksi,produksi.*,apsperstyle.mastermodel, apsperstyle.size, sisa')
             ->join('apsperstyle', 'apsperstyle.idapsperstyle= produksi.idapsperstyle')
             ->where('produksi.area', $area)
             ->where('tgl_produksi >=', $threeDaysAgo)

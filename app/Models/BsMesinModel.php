@@ -44,16 +44,25 @@ class BsMesinModel extends Model
 
     public function bsDataKaryawan($id)
     {
-        return $this->select('id_karyawan, nama_karyawan, sum(qty_gram), sum(qty_pcs)')
+        return $this->select('id_karyawan, nama_karyawan, sum(qty_gram) as gram, sum(qty_pcs) as pcs')
             ->where('id_karyawan', $id)
             ->groupBy('id_karyawan')
             ->findAll();
     }
     public function bsPeriode($start, $stop)
     {
-        return $this->select('id_karyawan, nama_karyawan, sum(qty_gram), sum(qty_pcs)')
-            ->where('tg', $id)
+        return $this->select('id_karyawan, nama_karyawan, sum(qty_gram) as gram, sum(qty_pcs) as pcs')
+            ->where('tanggal_produksi >=', $start)
+            ->where('tanggal_produksi <=', $stop)
             ->groupBy('id_karyawan')
+            ->findAll();
+    }
+    public function bsDaily($start, $stop)
+    {
+        return $this->select('tanggal_produksi, id_karyawan, nama_karyawan, sum(qty_gram) as gram, sum(qty_pcs) as pcs')
+            ->where('tanggal_produksi >=', $start)
+            ->where('tanggal_produksi <=', $stop)
+            ->groupBy('tanggal_produksi,id_karyawan,')
             ->findAll();
     }
 }

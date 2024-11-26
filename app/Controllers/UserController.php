@@ -110,23 +110,48 @@ class UserController extends BaseController
     {
         $area = session()->get('username');
 
-        $api = 'http://172.23.44.14/SkillMapping/public/api/area/' . $area;
-        $json = file_get_contents($api);
-        $karyawan = json_decode($json, true);
+        $apiUrl = 'http://172.23.44.14/SkillMapping/public/api/area/' . $area;
+
+        try {
+            // Attempt to fetch the API response
+            $json = @file_get_contents($apiUrl);
+
+            // Check if the response is valid
+            if ($json === false) {
+                throw new \Exception('API request failed.');
+            }
+
+            // Decode the JSON response
+            $karyawan = json_decode($json, true);
+
+            // Validate if decoding was successful
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception('Invalid JSON response.');
+            }
+        } catch (\Exception $e) {
+            // Set default values in case of an error
+            $karyawan[] = [
+                'id_karyawan' => '-',
+                'nama_karyawan' => 'No Karyawan Data Found',
+            ];
+
+            // Log the error for debugging purposes (optional)
+            log_message('error', 'Error fetching API data: ' . $e->getMessage());
+        }
+
+        // Prepare data for the view
         $data = [
             'role' => session()->get('role'),
             'title' => 'BS Mesin',
             'active1' => '',
-            'active3' => '',
             'active2' => '',
+            'active3' => '',
             'active4' => '',
             'active5' => '',
             'active6' => '',
             'active7' => '',
             'targetProd' => 0,
             'karyawan' => $karyawan,
-
-
         ];
         return view(session()->get('role') . '/bsmesin', $data);
     }
