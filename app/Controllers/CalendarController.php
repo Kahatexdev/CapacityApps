@@ -484,17 +484,19 @@ class CalendarController extends BaseController
             $target = ((86400 / (intval($data['smv']))) * 0.8 / 24);
 
             $mastermodel = $data['mastermodel'];
+            if ($hari1 > 1) {
 
-            $value[] = [
-                'kebutuhanMc' => ceil(intval($qty1 / 24) / $target / $hari1),
-                'smv' => $data['smv'],
-                'qty' => ceil($qty1 / 24),
-                'target' => ceil($target),
-                'JumlahHari' => $hari1,
-                'delivery' => $deliv,
-                'mastermodel' => $mastermodel,
-                'style' => $data['size']
-            ];
+                $value[] = [
+                    'kebutuhanMc' => ceil(intval($qty1 / 24) / $target / $hari1),
+                    'smv' => $data['smv'],
+                    'qty' => ceil($qty1 / 24),
+                    'target' => ceil($target),
+                    'JumlahHari' => $hari1,
+                    'delivery' => $deliv,
+                    'mastermodel' => $mastermodel,
+                    'style' => $data['size']
+                ];
+            }
         }
         if (!$value) {
             $value =  ['kebutuhanMc' => 0, 'JumlahHari' => 0, 'delivery' => 0, 'mastermodel' => $mastermodel, 'stopmc' => 0];
