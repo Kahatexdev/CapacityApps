@@ -1256,11 +1256,10 @@ class OrderController extends BaseController
         $role = session()->get('role');
         $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
 
-
         // Ambil tanggal awal dan akhir bulan
-        $startDate = new \DateTime('first day of this month'); // Awal bulan ini
+        $startDate = new \DateTime($bulan); // Awal bulan ini
         $startDate->setTime(0, 0, 0);
-        $endDate = new \DateTime('last day of this month');    // Akhir bulan ini
+        $endDate = (clone $startDate)->modify('last day of this month');   // Akhir bulan ini
 
         // Cari hari pertama bulan ini
         $startDayOfWeek = $startDate->format('l');
@@ -1298,8 +1297,21 @@ class OrderController extends BaseController
             $weekCount = 1;
             $currentStartDate = clone $startDate;
 
+            $dataOrder = [
+                'model' => $mastermodel,
+                'jarum' => $machinetypeid,
+                'area' => $factory,
+                'delivery' => $id['delivery'],
+            ];
+
+            // ambil jl mc berdasrkan $dataOrder
+            $jlMcData = $this->produksiModel->getJlMc($dataOrder);
+
+            $jlMc = 0; // Default value sebelum loop
+            foreach ($jlMcData as $mc) {
+                $jlMc = $mc['jl_mc'];
+            }
             while ($currentStartDate <= $endDate) {
-                $jlMcData = $this->produksiModel->getJlMc($buyer, $bulan);
                 // Hitung akhir minggu
                 $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
 
@@ -1307,22 +1319,8 @@ class OrderController extends BaseController
                 if ($endOfWeek > $endDate) {
                     $endOfWeek = $endDate;
                 }
-
                 // Periksa apakah tanggal pengiriman berada dalam minggu ini
                 if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
-                    $jlMc = 0; // Default jika tidak ada hasil yang cocok
-                    foreach ($jlMcData as $result) {
-                        if (
-                            isset($result['mastermodel'], $result['machinetypeid'], $result['factory'], $result['delivery']) &&
-                            $result['mastermodel'] == $mastermodel &&
-                            $result['machinetypeid'] == $machinetypeid &&
-                            $result['factory'] == $factory &&
-                            $result['delivery'] == $id['delivery']
-                        ) {
-                            $jlMc = $result['jl_mc'];
-                            break;
-                        }
-                    }
                     // Tambahkan data ke $allData
                     $allData[$mastermodel][$machinetypeid][$factory][$weekCount] = [
                         'del' => $id['delivery'],
@@ -1351,6 +1349,7 @@ class OrderController extends BaseController
         }
 
         $dataPerjarum = $this->ApsPerstyleModel->getBuyerOrderPejarum($buyer, $bulan);
+        // dd($dataPerjarum);
 
         foreach ($dataPerjarum as $id2) {
             $machinetypeid = $id2['machinetypeid'];
@@ -1365,8 +1364,19 @@ class OrderController extends BaseController
             $weekCount = 1;
             $currentStartDate = clone $startDate;
 
+            $dataOrder2 = [
+                'buyer' => $buyer,
+                'jarum' => $machinetypeid,
+                'delivery' => $id2['delivery'],
+            ];
+
+            $jlMcJrmData = $this->produksiModel->getJlMcJrm($dataOrder2);
+            dd($jlMcJrmData);
+            $jlMcJrm = 0; // Default value sebelum loop
+            foreach ($jlMcJrmData as $mcJrm) {
+                $jlMcJrm = $mcJrm['jl_mc'];
+            }
             while ($currentStartDate <= $endDate) {
-                $jlMcJrmData = $this->produksiModel->getJlMcJrm($buyer, $bulan);
                 // Hitung akhir minggu
                 $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
 
@@ -1377,17 +1387,6 @@ class OrderController extends BaseController
 
                 // Periksa apakah tanggal pengiriman berada dalam minggu ini
                 if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
-                    $jlMcJrm = 0; // Default jika tidak ada hasil yang cocok
-                    foreach ($jlMcJrmData as $result) {
-                        if (
-                            $result['machinetypeid'] == $machinetypeid &&
-                            $result['delivery_week'] == $id2['delivery_week']
-                        ) {
-                            $jlMcJrm = $result['jl_mc'];
-                            break;
-                        }
-                    }
-
                     $allDataPerjarum[$machinetypeid][$weekCount] = [
                         'delJrm' => $id2['delivery'],
                         'qtyJrm' => $qty,
@@ -1441,7 +1440,7 @@ class OrderController extends BaseController
             'years' => $years,
             'months' => $months,
         ];
-
+        dd($data);
         return view($role . '/Order/detailSisaOrder', $data);
     }
     public function filterByMonth()
@@ -1679,6 +1678,7 @@ class OrderController extends BaseController
 
         return view($role . '/Order/detailSisaOrder', $data);
     }
+
     public function sisaOrderArea()
     {
         $role = session()->get('role');

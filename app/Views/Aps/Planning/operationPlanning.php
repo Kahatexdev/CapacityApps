@@ -257,7 +257,8 @@
                             <div class="col-lg-12 col-sm-6">
                                 <div class="form-group">
 
-
+                                    <input type="text" name="id" hidden>
+                                    <input type="text" name="idpl" hidden>
                                     Anda yakin ingin menghapus?
                                 </div>
 
