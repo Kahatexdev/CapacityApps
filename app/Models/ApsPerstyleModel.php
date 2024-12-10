@@ -250,7 +250,7 @@ class ApsPerstyleModel extends Model
         return $this->select('mastermodel AS model, delivery, SUM(qty)/24 AS qty, SUM(sisa)/24 AS sisa, AVG(smv) AS smv')
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
-            ->where('sisa >', 0)
+            ->where('sisa >=', 0)
             ->where('delivery > NOW()', null, false) // Add 7 days to current date
             // ->where('delivery > DATE_ADD(NOW(), INTERVAL 7 DAY)', null, false) // Add 7 days to current date
             ->groupBy(['delivery', 'mastermodel'])
@@ -672,16 +672,14 @@ class ApsPerstyleModel extends Model
     }
     public function getBuyerOrderPejarum($buyer, $bulan)
     {
-        return $this->select('data_model.kd_buyer_order, idapsperstyle, machinetypeid, apsperstyle.delivery, WEEK(apsperstyle.delivery, 1) as delivery_week, MONTH(apsperstyle.delivery) as delivery_month, YEAR(apsperstyle.delivery) as delivery_year, production_unit, round(sum(qty)/24) as qty, round(sum(sisa)/24) as sisa, data_model.kd_buyer_order')
+        return $this->select('data_model.kd_buyer_order, idapsperstyle, machinetypeid, apsperstyle.delivery, production_unit, round(sum(qty)/24) as qty, round(sum(sisa)/24) as sisa, data_model.kd_buyer_order')
             ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
             ->where('data_model.kd_buyer_order', $buyer)
             ->where('apsperstyle.production_unit !=', 'MJ')
             ->where('MONTH(apsperstyle.delivery)', date('m', strtotime($bulan))) // Filter bulan
             ->where('YEAR(apsperstyle.delivery)', date('Y', strtotime($bulan))) // Filter tahun
-            ->groupBy('apsperstyle.machinetypeid')
-            ->groupBy('delivery_week')
+            ->groupBy('apsperstyle.machinetypeid, delivery')
             ->orderBy('apsperstyle.machinetypeid')
-            ->orderBy('delivery_week')
 
             ->findAll();
     }

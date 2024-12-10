@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\RESTful\ResourceController;
+use CodeIgniter\API\ResponseTrait;
 use App\Models\DataMesinModel;
 use App\Models\OrderModel;
 use App\Models\BookingModel;
@@ -13,7 +15,7 @@ use App\Models\ProduksiModel;
 use App\Models\BsMesinModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-class ApiController extends BaseController
+class ApiController extends ResourceController
 {
     protected $filters;
     protected $jarumModel;
@@ -24,7 +26,7 @@ class ApiController extends BaseController
     protected $ApsPerstyleModel;
     protected $liburModel;
     protected $BsMesinModel;
-
+    protected $format = 'json';
     public function __construct()
     {
         $this->jarumModel = new DataMesinModel();
@@ -34,6 +36,7 @@ class ApiController extends BaseController
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         $this->BsMesinModel = new BsMesinModel();
+        $this->validation = \Config\Services::validation();
     }
     public function index()
     {
@@ -42,11 +45,16 @@ class ApiController extends BaseController
     public function bsKaryawan($id)
     {
         $bsData = $this->BsMesinModel->bsDataKaryawan($id);
-        return json_encode($bsData);
+        return $this->respond($bsData, 200);
     }
     public function bsPeriode($start, $stop)
     {
         $bsData = $this->BsMesinModel->bsPeriode($start, $stop);
-        return json_encode($bsData);
+        return $this->respond($bsData, 200);
+    }
+    public function bsDaily($start, $stop)
+    {
+        $bsData = $this->BsMesinModel->bsDaily($start, $stop);
+        return $this->respond($bsData, 200);
     }
 }

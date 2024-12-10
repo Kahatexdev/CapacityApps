@@ -163,19 +163,7 @@
 
                 </div>
 
-                <div class="card-footer">
-                    <div class="row">
-                        <div class="col-12">
-                            <input type="hidden" name="id_save" value=<?= $id_save ?>>
-                            <input type="hidden" name="id_pln" value=<?= $id_pln ?>>
-                            <input type="hidden" name="mesin" value=<?= $mesin ?>>
-                            <input type="hidden" name="area" value=<?= $area ?>>
-                            <input type="hidden" name="jarum" value=<?= $jarum ?>>
-                            <input type="hidden" name="judul" value=<?= $judul ?>>
-                            <button type="submit" class="btn btn-info btn-block" style="width: 100%;">Save Planning</button>
-                        </div>
-                    </div>
-                </div>
+
                 </form>
 
             </div>
@@ -257,8 +245,7 @@
                             <div class="col-lg-12 col-sm-6">
                                 <div class="form-group">
 
-                                    <input type="text" name="id" hidden>
-                                    <input type="text" name="idpl" hidden>
+
                                     Anda yakin ingin menghapus?
                                 </div>
 

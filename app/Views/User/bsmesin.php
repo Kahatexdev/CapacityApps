@@ -40,9 +40,13 @@
                                         <label for="nama" class="form-control-label">Nama</label>
                                         <select name="nama" id="nama" class="form-control" onchange="getInfo()">
                                             <option value=""></option>
-                                            <?php foreach ($karyawan as $kar): ?>
-                                                <option value="<?= $kar['id_karyawan']; ?>"><?= $kar['nama_karyawan']; ?></option>
-                                            <?php endforeach ?>
+                                            <?php if (!empty($karyawan) && is_array($karyawan)): ?>
+                                                <?php foreach ($karyawan as $kar): ?>
+                                                    <option value="<?= $kar['id_karyawan']; ?>"><?= $kar['nama_karyawan']; ?></option>
+                                                <?php endforeach; ?>
+                                            <?php else: ?>
+                                                <option value="">No employees found</option>
+                                            <?php endif; ?>
                                         </select>
                                     </div>
                                 </div>

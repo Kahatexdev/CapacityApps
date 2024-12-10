@@ -16,6 +16,8 @@ $routes->group(
     '/api',
     function ($routes) {
         $routes->get('bsKaryawan/(:any)', 'ApiController::bsKaryawan/$1');
+        $routes->get('bsPeriode/(:any)', 'ApiController::bsPeriode/$1');
+        $routes->get('bsDaily/(:any)', 'ApiController::bsDaily/$1');
     }
 );
 
@@ -215,6 +217,13 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('exportPlanningJlMc/(:any)', 'PlanningJalanMcController::excelPlanningJlMc/$1');
     $routes->post('saveMonthlyMc', 'PlanningJalanMcController::saveMonthlyMc');
     $routes->post('updateMonthlyMc', 'PlanningJalanMcController::updateMonthlyMc');
+    $routes->get('planningmesin', 'ApsController::planningmesin');
+    $routes->get('detailplnmc/(:any)', 'ApsController::detailplanmc/$1');
+    $routes->get('kalenderMesin/(:any)', 'ApsController::kalenderMesin/$1');
+    $routes->get('planningpage/(:any)/(:any)', 'ApsController::planningpage/$1/$2');
+
+
+
 
 
     // produksi

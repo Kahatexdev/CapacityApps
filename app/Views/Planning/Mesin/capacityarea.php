@@ -115,7 +115,7 @@
                                 <th>PDK</th>
                                 <th>Sisa</th>
                                 <th>Delivery</th>
-                                <th>Leadtime</th>
+
                                 <th>Target Mesin</th>
                                 <th>Kebutuhan Mesin</th>
                                 <th>Produksi Perhari</th>
@@ -127,7 +127,7 @@
                                     <td><?= $order['PDK'] ?></td>
                                     <td><?= $order['sisa'] ?> dz</td>
                                     <td><?= $order['delivery'] ?></td>
-                                    <td><?= $order['leadtime'] ?> days</td>
+
                                     <td><?= $order['targetPerMesin'] ?> dz/machine</td>
                                     <td><?= round($order['kebMesin']) ?> Machine</td>
                                     <td><?= $order['produksi'] ?> dz</td>
