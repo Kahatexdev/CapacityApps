@@ -173,7 +173,7 @@ class ProduksiModel extends Model
 
     public function getJlMc($data)
     {
-        $yesterday = date('Y-m-d', strtotime('-24 day'));
+        $yesterday = date('Y-m-d', strtotime('-34 day'));
 
         $result = $this->select('produksi.tgl_produksi, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')

@@ -187,7 +187,7 @@
                                                 ?>
                                                     <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($bruto / 24, 2) : ''; ?></td>
                                                     <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($netto / 24, 2) : ''; ?></td>
-                                                    <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($sisa / 24, 2) : ''; ?></td>
+                                                    <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($id['sisa'] / 24, 2) : ''; ?></td>
                                                     <td class="text-sm" style="text-align: center;"><?= ($sisa_ship > 0 ? number_format($sisa_ship / 24, 2) : '0.00'); ?></td>
                                                     <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($persentase, 2) . '%' : ''; ?></td>
                                                     <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($bs_st / 24, 2) : ''; ?></td>

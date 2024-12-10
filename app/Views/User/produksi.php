@@ -373,11 +373,20 @@
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
-            <form action="<?= base_url($role . '/summaryBs'); ?>" method="POST">
+            <form action="<?= base_url($role . '/exportSummaryBs'); ?>" method="POST">
                 <div class="modal-body align-items-center">
                     <div class="form-group">
+                        <label for="buyer" class="col-form-label">Buyer</label>
+                        <select class="form-control" id="buyer" name="buyer">
+                            <option></option>
+                            <?php foreach ($buyer as $buy) : ?>
+                                <option><?= $buy['kd_buyer_order'] ?></option>
+                            <?php endforeach ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="area" class="col-form-label">Area</label>
-                        <select class="form-control" id="area" name="area" required>
+                        <select class="form-control" id="area" name="area">
                             <option></option>
                             <?php foreach ($area as $ar) : ?>
                                 <option><?= $ar ?></option>
@@ -386,7 +395,7 @@
                     </div>
                     <div class="form-group">
                         <label for="jarum" class="col-form-label">Jarum</label>
-                        <select class="form-control" id="jarum" name="jarum" required>
+                        <select class="form-control" id="jarum" name="jarum">
                             <option></option>
                             <option value="13">13</option>
                             <option value="84">84</option>
@@ -409,8 +418,12 @@
                         <input type="text" class="form-control" name="pdk">
                     </div>
                     <div class="form-group">
-                        <label for="awal" class="col-form-label">Tanggal Produksi</label>
-                        <input type="date" class="form-control" name="awal" required>
+                        <label for="awal" class="col-form-label">Dari</label>
+                        <input type="date" class="form-control" name="awal">
+                    </div>
+                    <div class="form-group">
+                        <label for="akhir" class="col-form-label">Sampai</label>
+                        <input type="date" class="form-control" name="akhir">
                     </div>
                 </div>
                 <div class="modal-footer">

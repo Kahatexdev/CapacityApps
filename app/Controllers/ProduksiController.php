@@ -688,16 +688,19 @@ class ProduksiController extends BaseController
                     'size' => $item['size'],
                     'qty_produksi' => $item['qty_produksi'],
                     'max_delivery' => $item['max_delivery'],
+                    'sisa' => $item['sisa'],
                     'qty' => 0,
                     'running' => 0,
                     'ttl_prod' => 0,
                     'ttl_jlmc' => 0,
+                    'ttl_sisa' => 0,
                 ];
             }
             $uniqueData[$key]['qty'] += $item['qty'];
             $uniqueData[$key]['running'] += $item['running'];
             $uniqueData[$key]['ttl_prod'] += $item['qty_produksi'];
             $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
+            $uniqueData[$key]['ttl_sisa'] += $item['sisa'];
         }
         // Sort ASC
         sort($uniqueData);
@@ -765,16 +768,19 @@ class ProduksiController extends BaseController
                     'size' => $item['size'],
                     'color' => $item['color'],
                     'delivery' => $item['delivery'],
+                    'sisa' => $item['sisa'],
                     'qty_deliv' => 0,
                     'running' => 0,
                     'bruto' => 0,
                     'ttl_jlmc' => 0,
+                    'ttl_sisa' => 0,
                 ];
             }
             $uniqueData[$key]['qty_deliv'] += $item['qty_deliv'];
             $uniqueData[$key]['running'] += $item['running'];
             $uniqueData[$key]['bruto'] += $item['bruto'];
             $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
+            $uniqueData[$key]['ttl_sisa'] += $item['sisa'];
         }
 
         $data2 = [
@@ -833,10 +839,12 @@ class ProduksiController extends BaseController
                     'color' => $item['color'],
                     'smv' => $item['smv'],
                     'delivery' => $item['delivery'],
+                    'sisa' => $item['sisa'],
                     'qty' => 0,
                     'running' => 0,
                     'ttl_prod' => 0,
                     'ttl_jlmc' => 0,
+                    'ttl_sisa' => 0,
                     'no_mesin' => $item['no_mesin'],
                 ];
             }
@@ -844,6 +852,7 @@ class ProduksiController extends BaseController
             $uniqueData[$key]['running'] += $item['running'];
             $uniqueData[$key]['ttl_prod'] += $item['qty_produksi'];
             $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
+            $uniqueData[$key]['ttl_sisa'] += $item['sisa'];
         }
         $data3 = [
             'active1' => '',
