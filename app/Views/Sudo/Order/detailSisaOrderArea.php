@@ -10,12 +10,12 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    Sisa Produksi <?= $area ?> Bulan <?= date('F', strtotime($bulan)) ?>
+                                    Sisa Produksi <?= $area ?> Bulan <?= date('F', strtotime($bulan)) ?> - <?= date('Y', strtotime($bulan)) ?>
                                 </h5>
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <form method="post" action="<?= base_url(session()->get('role') . '/filterByArea'); ?>">
+                            <form method="post" action="<?= base_url(session()->get('role') . '/sisaOrderArea/' . $area); ?>">
                                 <div class="row">
                                     <div class="col-lg-5">
                                         <input type="hidden" value="<?= $area ?>" name="area">

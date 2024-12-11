@@ -210,7 +210,7 @@ class ProduksiModel extends Model
 
     public function getJlMcArea($data)
     {
-        dd($data);
+
         $yesterday = date('Y-m-d', strtotime('-1 day'));
 
         $result = $this->select('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, WEEK(apsperstyle.delivery, 1) as delivery_week, MONTH(apsperstyle.delivery) as delivery_month, YEAR(apsperstyle.delivery) as delivery_year, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')

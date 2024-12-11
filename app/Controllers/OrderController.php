@@ -1682,6 +1682,18 @@ class OrderController extends BaseController
     }
     public function detailSisaOrderArea($ar)
     {
+        $role = session()->get('role');
+        $month = $this->request->getPost('month');
+        $yearss = $this->request->getPost('year');
+
+        // Jika bulan atau tahun tidak diisi, gunakan bulan dan tahun ini
+        if (empty($month) || empty($yearss)) {
+            $bulan = date('Y-m-01', strtotime('this month')); // Bulan ini
+        } else {
+            // Atur tanggal berdasarkan input bulan dan tahun dari POST
+            $bulan = date('Y-m-01', strtotime("$yearss-$month-01"));
+        }
+
         $years = [];
         $currentYear = date('Y');
         $endYear = $currentYear + 10;
@@ -1706,27 +1718,15 @@ class OrderController extends BaseController
             $months[] = $monthName;
         }
         $months = array_unique($months);
+        // dd($bulan);
 
-        $bulan = date('Y-m-01', strtotime('this month'));
         $role = session()->get('role');
         $data = $this->ApsPerstyleModel->getAreaOrder($ar, $bulan);
-        // dd($data);
-        // $jlMcJrmResults = $this->produksiModel->getJlMcJrmArea($ar, $bulan);
 
         // Ambil tanggal awal dan akhir bulan
-        $startDate = new \DateTime('first day of this month'); // Awal bulan ini
+        $startDate = new \DateTime($bulan); // Awal bulan
         $startDate->setTime(0, 0, 0);
-        $endDate = new \DateTime('last day of this month');    // Akhir bulan ini
-
-        // Cari hari pertama bulan ini
-        $startDayOfWeek = $startDate->format('l');
-
-        // Jika hari pertama bulan ini bukan Senin, minggu pertama dimulai dari hari pertama bulan tersebut
-        if ($startDayOfWeek != 'Monday') {
-            $firstWeekEndDate = (clone $startDate)->modify('Sunday this week');
-        } else {
-            $firstWeekEndDate = (clone $startDate)->modify('Sunday this week');
-        }    // Akhir bulan ini
+        $endDate = (clone $startDate)->modify('last day of this month');   // Akhir bulan
 
         $allData = [];
         $totalProdPerWeek = []; // Untuk menyimpan total produksi per minggu
@@ -1744,7 +1744,6 @@ class OrderController extends BaseController
             $sisa = $id['sisa'];
             $produksi = $qty - $sisa;
             $deliveryDate = new \DateTime($id['delivery']); // Asumsikan ada field delivery
-            // $jlMcResults = $this->produksiModel->getJlMcArea($ar, $bulan);
 
             // Loop untuk membagi data ke dalam minggu
             $weekCount = 1;
@@ -1781,6 +1780,7 @@ class OrderController extends BaseController
                         'sisa' => $sisa,
                         'jlMc' => $jlMc,
                     ]);
+
                     // Tambahkan qty, produksi, dan sisa ke total mingguan
                     if (!isset($totalPerWeek[$weekCount])) {
                         $totalPerWeek[$weekCount] = 0;

@@ -11,6 +11,7 @@ use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use App\Models\BsMesinModel;
+use App\Models\PenggunaanJarum;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpParser\Node\Stmt\Return_;
 
@@ -25,6 +26,7 @@ class UserController extends BaseController
     protected $ApsPerstyleModel;
     protected $liburModel;
     protected $BsMesinModel;
+    protected $PenggunaanJarumModel;
     public function __construct()
     {
 
@@ -36,6 +38,7 @@ class UserController extends BaseController
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         $this->BsMesinModel = new BsMesinModel();
+        $this->PenggunaanJarumModel = new PenggunaanJarum();
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -217,6 +220,10 @@ class UserController extends BaseController
     public function penggunaanJarum()
     {
         $area = session()->get('username');
+        $month = [];
+        for ($i = -1; $i <= 12; $i++) {
+            $month[] = date('F-Y', strtotime("first day of $i month"));
+        }
 
         $apiUrl = 'http://172.23.44.14/SkillMapping/public/api/area/' . $area;
 
@@ -250,6 +257,7 @@ class UserController extends BaseController
         // Prepare data for the view
         $data = [
             'role' => session()->get('role'),
+            'area' => session()->get('username'),
             'title' => 'Penggunaan Jarum',
             'active1' => '',
             'active2' => '',
@@ -260,8 +268,25 @@ class UserController extends BaseController
             'active7' => '',
             'targetProd' => 0,
             'karyawan' => $karyawan,
+            'month' => $month,
         ];
         return view(session()->get('role') . '/jarum', $data);
     }
-    public function savePenggunaanJarum() {}
+    public function savePenggunaanJarum()
+    {
+        $role = session()->get('role');
+        $data = [
+            'id_karyawan' => $this->request->getPost('idkary'),
+            'nama_karyawan' => $this->request->getPost('namakar'),
+            'kodeKartu' => $this->request->getPost('kode_kartu'),
+            'tanggal' => $this->request->getPost('tgl'),
+            'qty_jarum' => $this->request->getPost('pcs')
+        ];
+        $insert = $this->PenggunaanJarumModel->insert($data);
+        if (!$insert) {
+            return redirect()->to(base_url($role . '/penggunaanJarum'))->with('error', 'Data Gagal Disimpan');
+        } else {
+            return redirect()->to(base_url($role . '/penggunaanJarum'))->with('success', 'Data Berhasil Disimpan');
+        }
+    }
 }

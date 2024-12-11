@@ -699,6 +699,7 @@ class ApsPerstyleModel extends Model
             ->orderBy('apsperstyle.factory')
             ->orderBy('apsperstyle.delivery')
             ->findAll();
+        // dd($ar, $bulan);
     }
     public function getAreaOrderPejarum($ar, $bulan)
     {

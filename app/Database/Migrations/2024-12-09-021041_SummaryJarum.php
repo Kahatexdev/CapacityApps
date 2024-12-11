@@ -32,7 +32,7 @@ class SummaryJarum extends Migration
                 'type' => 'DATETIME',
                 'null' => true,
             ],
-            'update_at' => [
+            'updated_at' => [
                 'type' => 'DATETIME',
                 'null' => true,
             ],
