@@ -277,7 +277,7 @@ class OrderModel extends Model
         // ambil data qty po
         $builder = $this->db->table('data_model');
         $subquery1 = $builder
-            ->select('data_model.kd_buyer_order, apsperstyle.no_order, apsperstyle.smv, apsperstyle.idapsperstyle, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, SUM(apsperstyle.qty) as qty, SUM(apsperstyle.po_plus) AS plus_packing, MAX(apsperstyle.delivery) AS max_delivery')
+            ->select('data_model.kd_buyer_order, apsperstyle.no_order, apsperstyle.smv, apsperstyle.idapsperstyle, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, SUM(apsperstyle.qty) as qty, SUM(apsperstyle.po_plus) AS plus_packing, MAX(apsperstyle.delivery) AS max_delivery, SUM(apsperstyle.sisa) AS sisa')
             ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel');
         if (!empty($data['area'])) {
             $builder->where('apsperstyle.factory', $data['area']);
@@ -307,7 +307,7 @@ class OrderModel extends Model
 
         // Main query
         $mainQuery = $this->db->table('(' . $subquery1 . ') AS subquery')
-            ->select('subquery.kd_buyer_order, subquery.no_order, subquery.smv, subquery.idapsperstyle, subquery.machinetypeid, subquery.mastermodel, subquery.size, subquery.qty,  COALESCE(subquery.plus_packing, 0) AS plus_packing, COALESCE(produksi_subquery.running, 0) AS running, produksi_subquery.start_mc, subquery.max_delivery, COALESCE(produksi_subquery.qty_produksi, 0) AS qty_produksi, COALESCE(bs_prod_subquery.bs_prod, 0) AS bs_prod, COALESCE(produksi_subquery.jl_mc, 0) AS jl_mc, produksi_subquery.area')
+            ->select('subquery.kd_buyer_order, subquery.no_order, subquery.smv, subquery.idapsperstyle, subquery.machinetypeid, subquery.mastermodel, subquery.size, subquery.qty, subquery.sisa,  COALESCE(subquery.plus_packing, 0) AS plus_packing, COALESCE(produksi_subquery.running, 0) AS running, produksi_subquery.start_mc, subquery.max_delivery, COALESCE(produksi_subquery.qty_produksi, 0) AS qty_produksi, COALESCE(bs_prod_subquery.bs_prod, 0) AS bs_prod, COALESCE(produksi_subquery.jl_mc, 0) AS jl_mc, produksi_subquery.area')
             ->join('(' . $subquery2 . ') AS produksi_subquery', 'subquery.machinetypeid = produksi_subquery.machinetypeid AND subquery.mastermodel = produksi_subquery.mastermodel AND subquery.size = produksi_subquery.size', 'left')
             ->join('(' . $subqueryBs . ') AS bs_prod_subquery', 'subquery.idapsperstyle = bs_prod_subquery.idapsperstyle', 'left');
         if (!empty($data['buyer'])) {
@@ -368,7 +368,7 @@ class OrderModel extends Model
     {
         $builder = $this->db->table('data_model');
         $subquery1 = $builder
-            ->select('data_model.seam, apsperstyle.delivery, data_model.kd_buyer_order, apsperstyle.no_order, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, apsperstyle.color, SUM(apsperstyle.qty) AS qty_deliv')
+            ->select('data_model.seam, apsperstyle.delivery, data_model.kd_buyer_order, apsperstyle.no_order, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, apsperstyle.color, SUM(apsperstyle.qty) AS qty_deliv, SUM(apsperstyle.sisa) AS sisa')
             ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel');
         if (!empty($data['area'])) {
             $builder->where('apsperstyle.factory', $data['area']);
@@ -387,7 +387,7 @@ class OrderModel extends Model
 
         // Main query
         $mainQuery = $this->db->table('(' . $subquery1 . ') AS subquery')
-            ->select('subquery.seam, subquery.delivery, subquery.kd_buyer_order, subquery.no_order, subquery.machinetypeid, subquery.mastermodel, subquery.size, subquery.color, subquery.qty_deliv, produksi_subquery.running, produksi_subquery.bruto, produksi_subquery.jl_mc, produksi_subquery.area')
+            ->select('subquery.seam, subquery.delivery, subquery.kd_buyer_order, subquery.no_order, subquery.machinetypeid, subquery.mastermodel, subquery.size, subquery.color, subquery.qty_deliv, subquery.sisa, produksi_subquery.running, produksi_subquery.bruto, produksi_subquery.jl_mc, produksi_subquery.area')
             ->join('(' . $subquery2 . ') AS produksi_subquery', 'subquery.machinetypeid = produksi_subquery.machinetypeid AND subquery.mastermodel = produksi_subquery.mastermodel AND subquery.size = produksi_subquery.size AND subquery.delivery = produksi_subquery.delivery', 'left');
         if (!empty($data['buyer'])) {
             $mainQuery->where('subquery.kd_buyer_order', $data['buyer']);
@@ -405,7 +405,7 @@ class OrderModel extends Model
 
     public function getTotalShipment($data)
     {
-        $this->select('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, SUM(apsperstyle.qty) AS ttl_ship')
+        $this->select('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, SUM(apsperstyle.qty) AS ttl_ship, SUM(apsperstyle.sisa) AS sisa')
             ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT');
 
         if (!empty($data['buyer'])) {
@@ -465,7 +465,7 @@ class OrderModel extends Model
 
     public function getDetailProdTimter($data)
     {
-        $this->select('apsperstyle.idapsperstyle, apsperstyle.seam, data_model.kd_buyer_order, apsperstyle.no_order, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size,  apsperstyle.color, apsperstyle.smv, apsperstyle.delivery, SUM(apsperstyle.qty) AS qty, produksi.area, SUM(produksi.qty_produksi) AS qty_produksi, COUNT(DISTINCT produksi.tgl_produksi) AS running, COUNT(DISTINCT produksi.no_mesin) AS jl_mc, produksi.tgl_produksi, produksi.no_mesin, SUM(CASE WHEN produksi.no_label > 3000 THEN produksi.qty_produksi ELSE 0 END) AS pa, SUM(CASE WHEN produksi.no_label < 3000 THEN produksi.shift_a ELSE 0 END) AS shift_a, SUM(CASE WHEN produksi.no_label < 3000 THEN produksi.shift_b ELSE 0 END) AS shift_b, SUM(CASE WHEN produksi.no_label < 3000 THEN produksi.shift_c ELSE 0 END) AS shift_c')
+        $this->select('apsperstyle.idapsperstyle, apsperstyle.seam, data_model.kd_buyer_order, apsperstyle.no_order, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size,  apsperstyle.color, apsperstyle.smv, apsperstyle.delivery, SUM(apsperstyle.qty) AS qty, SUM(apsperstyle.sisa) AS sisa, produksi.area, SUM(produksi.qty_produksi) AS qty_produksi, COUNT(DISTINCT produksi.tgl_produksi) AS running, COUNT(DISTINCT produksi.no_mesin) AS jl_mc, produksi.tgl_produksi, produksi.no_mesin, SUM(CASE WHEN produksi.no_label > 3000 THEN produksi.qty_produksi ELSE 0 END) AS pa, SUM(CASE WHEN produksi.no_label < 3000 THEN produksi.shift_a ELSE 0 END) AS shift_a, SUM(CASE WHEN produksi.no_label < 3000 THEN produksi.shift_b ELSE 0 END) AS shift_b, SUM(CASE WHEN produksi.no_label < 3000 THEN produksi.shift_c ELSE 0 END) AS shift_c')
             ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT')
             ->join('produksi', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'LEFT')
             ->where('produksi.tgl_produksi IS NOT NULL');
@@ -493,5 +493,35 @@ class OrderModel extends Model
             ->join('master_product_type', 'master_product_type.id_product_type=data_model.id_product_type')
             ->where('data_model.no_model', $noModel)
             ->first();
+    }
+    public function getSummaryBsPertgl($data)
+    {
+        $this->select('apsperstyle.idapsperstyle, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, SUM(bs_mesin.qty_pcs) as qty_pcs, SUM(bs_mesin.qty_gram) as qty_gram, COUNT(DISTINCT bs_mesin.no_mesin) AS jl_mc, bs_mesin.tanggal_produksi, bs_mesin.area, bs_mesin.inisial, bs_mesin.no_mesin, shift')
+            ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT')
+            ->join('bs_mesin', 'bs_mesin.no_model = apsperstyle.mastermodel AND bs_mesin.size = apsperstyle.size', 'LEFT')
+            ->where('bs_mesin.tanggal_produksi IS NOT NULL');
+
+        if (!empty($data['buyer'])) {
+            $this->where('data_model.kd_buyer_order', $data['buyer']);
+        }
+        if (!empty($data['area'])) {
+            $this->where('bs_mesin.area', $data['area']);
+        }
+        if (!empty($data['jarum'])) {
+            $this->like('apsperstyle.machinetypeid', $data['jarum']);
+        }
+        if (!empty($data['pdk'])) {
+            $this->where('data_model.no_model', $data['pdk']);
+        }
+        if (!empty($data['awal'])) {
+            $this->where('bs_mesin.tanggal_produksi >=', $data['awal']);
+        }
+        if (!empty($data['akhir'])) {
+            $this->where('bs_mesin.tanggal_produksi <=', $data['akhir']);
+        }
+
+        return $this->groupBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size, bs_mesin.tanggal_produksi')
+            ->orderBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size, bs_mesin.tanggal_produksi', 'ASC')
+            ->findAll();
     }
 }

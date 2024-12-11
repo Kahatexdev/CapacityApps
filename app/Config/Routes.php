@@ -379,6 +379,9 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     // Jarum
     $routes->get('penggunaanJarum', 'UserController::penggunaanJarum');
     $routes->post('savePenggunaanJarum', 'UserController::savePenggunaanJarum');
+
+    //summary bs mc
+    $routes->post('exportSummaryBs', 'SummaryController::excelSummaryBs');
 });
 
 // sudo

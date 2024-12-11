@@ -64,7 +64,6 @@ class SummaryController extends BaseController
             return redirect()->to(base_url('/login'));
         }
     }
-
     public function excelSummaryPerTgl()
     {
         $buyer = $this->request->getPost('buyer');
@@ -384,7 +383,6 @@ class SummaryController extends BaseController
         $writer->save('php://output');
         exit;
     }
-
     public function excelSummaryPerTod()
     {
         $buyer = $this->request->getPost('buyer');
@@ -1302,6 +1300,289 @@ class SummaryController extends BaseController
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
 
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+    public function excelSummaryBs()
+    {
+        $buyer = $this->request->getPost('buyer');
+        $area = $this->request->getPost('area');
+        $jarum = $this->request->getPost('jarum');
+        $pdk = $this->request->getPost('pdk');
+        $awal = $this->request->getPost('awal');
+        $akhir = $this->request->getPost('akhir');
+
+        $data = [
+            'buyer' => $buyer,
+            'area' => $area,
+            'jarum' => $jarum,
+            'pdk' => $pdk,
+            'awal' => $awal,
+            'akhir' => $akhir,
+        ];
+
+        // $dataSummaryPertgl = $this->orderModel->getdataSummaryPertgl($data);
+        $summaryBsPertgl = $this->orderModel->getSummaryBsPertgl($data);
+        // $totalProd = $this->orderModel->getDataTimter($data);
+
+        // agar data tgl produksi menjadi unik
+        $tgl_produksi = [];
+        foreach ($summaryBsPertgl as $item) {
+            $tgl_produksi[$item['tanggal_produksi']] = $item['tanggal_produksi'];
+        }
+        $tgl_produksi = array_values($tgl_produksi);
+        // Sort ASC
+        sort($tgl_produksi);
+
+        $uniqueData = [];
+        foreach ($summaryBsPertgl as $item) {
+            $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'];
+            if (!isset($uniqueData[$key])) {
+                $uniqueData[$key] = [
+                    'area' => $item['area'],
+                    'machinetypeid' => $item['machinetypeid'],
+                    'mastermodel' => $item['mastermodel'],
+                    'inisial' => $item['inisial'],
+                    'size' => $item['size'],
+                    'qty_gram' => $item['qty_gram'],
+                    'qty_pcs' => $item['qty_pcs'],
+                    'ttl_gram' => 0,
+                    'ttl_pcs' => 0,
+                ];
+            }
+            $uniqueData[$key]['ttl_gram'] += $item['qty_gram'];
+            $uniqueData[$key]['ttl_pcs'] += $item['qty_pcs'];
+        }
+        // Sort ASC
+        sort($uniqueData);
+
+        // Buat spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('SUMMARY BS');
+
+        // border
+        $styleHeader = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+        $styleBody = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+        $styleSubTotal = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_RIGHT, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+        $styleTotal = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+
+
+        // Judul
+        $sheet->setCellValue('A1', 'SUMMARY BS MESIN ' . $area);
+        $sheet->mergeCells('A1:G1');
+        // Mengatur teks menjadi rata tengah dan huruf tebal
+        $sheet->getStyle('A1')->getFont()->setBold(true);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $row_header = 3;
+        $row_header2 = 4;
+        // Isi header
+        // $sheet->setCellValue('A' . $row_header, 'Tanggal');
+        // $sheet->mergeCells('A' . $row_header . ':G' . $row_header);
+        // $sheet->getStyle('A' . $row_header . ':G' . $row_header)->applyFromArray($styleHeader);
+
+        // looping tgl produksi
+        $col = 'H'; // Kolom awal tanggal produksi
+        $col2 = 'I'; // Kolom kedua untuk mergeCells
+
+        // Konversi huruf kolom ke nomor indeks kolom
+        $col_index = Coordinate::columnIndexFromString($col);
+        $col2_index = Coordinate::columnIndexFromString($col2);
+
+        foreach ($tgl_produksi as $tgl_prod) {
+            $sheet->setCellValue($col . $row_header, $tgl_prod);
+            $sheet->mergeCells($col . $row_header . ':' . $col2 . $row_header); // Merge sel antara kolom $col dan $col2
+            $sheet->getStyle($col . $row_header . ':' . $col2 . $row_header)->applyFromArray($styleHeader);
+
+
+            // Tambahkan 2 pada indeks kolom
+            $col_index += 2;
+            $col2_index = $col_index + 1; // Tambahkan 1 pada indeks kedua kolom
+
+            // Konversi kembali dari nomor indeks kolom ke huruf kolom
+            $col = Coordinate::stringFromColumnIndex($col_index);
+            $col2 = Coordinate::stringFromColumnIndex($col2_index);
+        }
+        $sheet->setCellValue('A' . $row_header, 'Area');
+        $sheet->setCellValue('B' . $row_header, 'Needle');
+        $sheet->setCellValue('C' . $row_header, 'No Model');
+        $sheet->setCellValue('D' . $row_header, 'Inisial');
+        $sheet->setCellValue('E' . $row_header, 'Style Size');
+        $sheet->setCellValue('F' . $row_header, 'Total (Gram)');
+        $sheet->setCellValue('G' . $row_header, 'Total (Pcs)');
+
+        //merge cells
+        $sheet->mergeCells('A' . $row_header . ':A' . $row_header2);
+        $sheet->mergeCells('B' . $row_header . ':B' . $row_header2);
+        $sheet->mergeCells('C' . $row_header . ':C' . $row_header2);
+        $sheet->mergeCells('D' . $row_header . ':D' . $row_header2);
+        $sheet->mergeCells('E' . $row_header . ':E' . $row_header2);
+        $sheet->mergeCells('F' . $row_header . ':F' . $row_header2);
+        $sheet->mergeCells('G' . $row_header . ':G' . $row_header2);
+
+        // style untuk header
+        $sheet->getStyle('A' . $row_header . ':A' . $row_header2)->applyFromArray($styleHeader);
+        $sheet->getStyle('B' . $row_header . ':B' . $row_header2)->applyFromArray($styleHeader);
+        $sheet->getStyle('C' . $row_header . ':C' . $row_header2)->applyFromArray($styleHeader);
+        $sheet->getStyle('D' . $row_header . ':D' . $row_header2)->applyFromArray($styleHeader);
+        $sheet->getStyle('E' . $row_header . ':E' . $row_header2)->applyFromArray($styleHeader);
+        $sheet->getStyle('F' . $row_header . ':F' . $row_header2)->applyFromArray($styleHeader);
+        $sheet->getStyle('G' . $row_header . ':G' . $row_header2)->applyFromArray($styleHeader);
+
+        // Tambahkan header dinamis untuk tanggal produksi
+        $col3 = 'H';
+        foreach ($tgl_produksi as $tgl_prod) {
+            $sheet->setCellValue($col3 . $row_header2, 'Gram');
+            $sheet->getStyle($col3 . $row_header2)->applyFromArray($styleHeader);
+            $col3++;
+            $sheet->setCellValue($col3 . $row_header2, 'Pcs');
+            $sheet->getStyle($col3 . $row_header2)->applyFromArray($styleHeader);
+            $col3++;
+        }
+
+        // Isi data
+        $row = 5;
+        // 
+        $ttl_gram = 0;
+        $ttl_pcs = 0;
+        $totalGramPerModel = array_fill_keys($tgl_produksi, 0);
+        $totalPcsPerModel = array_fill_keys($tgl_produksi, 0);
+        foreach ($uniqueData as $key => $id) {
+            $today = date('Y-m-d');
+            // 
+            $ttl_gram += $id['ttl_gram'];
+            $ttl_pcs += $id['ttl_pcs'];
+            // Pastikan $id['running'] tidak bernilai nol sebelum dibagi
+
+            $sheet->setCellValue('A' . $row, $id['area']);
+            $sheet->setCellValue('B' . $row, $id['machinetypeid']);
+            $sheet->setCellValue('C' . $row, $id['mastermodel']);
+            $sheet->setCellValue('D' . $row, $id['inisial']);
+            $sheet->setCellValue('E' . $row, $id['size']);
+            $sheet->setCellValue('F' . $row, number_format($id['ttl_gram'], 2));
+            $sheet->setCellValue('G' . $row, number_format($id['ttl_pcs'], 2));
+            // 
+            $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('C' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('D' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('E' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('F' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('G' . $row)->applyFromArray($styleBody);
+
+            // looping kolom qty produksi & jl mc pertanggal
+            $col4 = "H";
+            foreach ($tgl_produksi as $tgl_prod2) {
+                $qty_produksi = 0;
+                $jl_mc = 0;
+                foreach ($summaryBsPertgl as $prod) {
+                    if (
+                        $id['machinetypeid'] == $prod['machinetypeid'] && $id['mastermodel'] == $prod['mastermodel']
+                        && $id['size'] == $prod['size'] && $tgl_prod2 == $prod['tanggal_produksi']
+                    ) {
+                        $qty_gram = $prod['qty_gram'];
+                        $qty_pcs = $prod['qty_pcs'];
+                        break;
+                    }
+                }
+                // Update total production and machine count per model
+                $totalGramPerModel[$tgl_prod2] += $qty_gram;
+                $totalPcsPerModel[$tgl_prod2] += $qty_pcs;
+
+                $sheet->setCellValue($col4 . $row, number_format($qty_gram, 2));
+                $sheet->getStyle($col4 . $row)->applyFromArray($styleBody);
+                $col4++;
+
+                $sheet->setCellValue($col4 . $row, $qty_pcs);
+                $sheet->getStyle($col4 . $row)->applyFromArray($styleBody);
+                $col4++;
+            }
+            $row++;
+        }
+
+        // kolom total
+        $sheet->setCellValue('A' . $row, 'TOTAL'); // Tuliskan "TOTAL" di kolom A
+        $sheet->mergeCells('A' . $row . ':E' . $row); // Gabungkan kolom A hingga E untuk teks "TOTAL"
+        $sheet->setCellValue('F' . $row, number_format($ttl_gram, 2)); // Total gram
+        $sheet->setCellValue('G' . $row, number_format($ttl_pcs, 2)); // Total pcs
+
+        // Tambahkan style untuk baris total
+        $sheet->getStyle('A' . $row . ':E' . $row)->applyFromArray($styleTotal);
+        $sheet->getStyle('F' . $row)->applyFromArray($styleTotal);
+        $sheet->getStyle('G' . $row)->applyFromArray($styleTotal);
+
+        // Style untuk range kolom H dan seterusnya jika ada
+        $col4 = "H";
+        foreach ($tgl_produksi as $tgl_prod2) {
+            // Tambahkan total gram per tanggal
+            $sheet->setCellValue($col4 . $row, number_format($totalGramPerModel[$tgl_prod2], 2));
+            $sheet->getStyle($col4 . $row)->applyFromArray($styleTotal);
+            $col4++;
+
+            // Tambahkan total pcs per tanggal
+            $sheet->setCellValue($col4 . $row, $totalPcsPerModel[$tgl_prod2]);
+            $sheet->getStyle($col4 . $row)->applyFromArray($styleTotal);
+            $col4++;
+        }
+
+        // Set judul file dan header untuk download
+        $filename = 'SUMMARY BS MESIN ' . $buyer . ' ' . $area . ' ' . $jarum . ' ' . $pdk . ' ' . $awal . '-' . $akhir . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        // Tulis file excel ke output
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;

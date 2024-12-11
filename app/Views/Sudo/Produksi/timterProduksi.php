@@ -207,7 +207,7 @@
                                                     <?php
                                                     foreach ($dataTimter as $data) {
                                                         if ($data['machinetypeid'] == $id['machinetypeid'] && $data['mastermodel'] == $id['mastermodel'] && $data['size'] == $id['size']) {
-                                                            $sisa = $po['qty'] - $data['qty_produksi'];
+                                                            $sisa = $id['sisa'];
                                                     ?>
                                                             <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($data['qty_produksi'] / 24) : ''; ?></td>
                                                             <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($data['qty_produksi'] % 24) : ''; ?></td>
