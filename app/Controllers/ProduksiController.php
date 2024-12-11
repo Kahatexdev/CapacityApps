@@ -1010,7 +1010,7 @@ class ProduksiController extends BaseController
                             continue;
                         }
                     } else {
-                        dd($datainsert);
+
                         $failedRows[] = "baris " . $rowIndex . "gagal Insert data, ada kolom yang kosong";
                         continue;
                     }

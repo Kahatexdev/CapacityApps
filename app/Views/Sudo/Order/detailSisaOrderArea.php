@@ -99,40 +99,63 @@
                                         $rowsModel = 0;
                                         foreach ($allData as $noModel => $id) {
                                             $rowsModel = count($id);
+                                            $rowsJarum = 0;
                                             foreach ($id as $jarum => $rowJarum) {
-                                                $rowsArea = count($rowJarum);
-                                                if ($rowsArea > 1) {
-                                                    $rowsModel += $rowsArea - 1;
+                                                $rowsJarum = count($rowJarum);
+                                                if ($rowsJarum > 1) {
+                                                    $rowsModel += $rowsJarum - 1;
+                                                }
+                                                $rowsArea = 0;
+                                                foreach ($rowJarum as $area => $rowArea) {
+                                                    for ($i = 1; $i <= $maxWeek; $i++) {
+                                                        if (isset($rowArea[$i])) {
+                                                            $rowsArea = count($rowArea[$i]);
+                                                            $rowDelivery = count($rowArea[$i]);
+                                                            if ($rowDelivery > 1) {
+                                                                $rowsModel += $rowDelivery - 1;
+                                                                $rowsJarum += $rowDelivery - 1;
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             }
                                         ?>
                                             <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsModel ?>"><?= $noModel ?></td>
-                                            <?php foreach ($id as $jarum => $id2) {
-                                                $rowsJarum = count($id2); ?>
+                                            <?php foreach ($id as $jarum => $id2) { ?>
                                                 <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsJarum ?>"><?= $jarum ?></td>
                                                 <?php foreach ($id2 as $area => $id3) { ?>
-                                                    <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $area ?></td>
+                                                    <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsArea ?>"><?= $area ?></td>
                                                     <?php for ($i = 1; $i <= $maxWeek; $i++) {
-                                                        // Mengecek apakah week ada di data
                                                         if (isset($id3[$i])) {
-                                                            // Ambil data per week
-                                                            $del = $id3[$i]['del'];
-                                                            $qty = $id3[$i]['qty'] ?? 0;
-                                                            $prod = $id3[$i]['prod'] ?? 0;
-                                                            $sisa = $id3[$i]['sisa'] ?? 0;
-                                                            $jlMc = $id3[$i]['jlMc'] ?? 0;
-
-                                                            // Menampilkan data dari week yang ditemukan
+                                                            $numRows = count($id3[$i]);
+                                                            $numRows2 = 1;
+                                                            foreach ($id3[$i] as $index => $data) {
+                                                                $parsedData = json_decode($data, true);
+                                                                if ($parsedData) {
+                                                                    // Menampilkan data yang sudah di-parse
                                                     ?>
-                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $del ?></td>
-                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $qty ?></td>
-                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $prod ?></td>
-                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $sisa ?></td>
-                                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"> <?= $jlMc ?></td>
-                                                        <?php
+                                                                    <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $parsedData['del'] ?? '-' ?></td>
+                                                                    <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $parsedData['qty'] ?? 0 ?></td>
+                                                                    <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $parsedData['prod'] ?? 0 ?></td>
+                                                                    <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $parsedData['sisa'] ?? 0 ?></td>
+                                                                    <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $parsedData['jlMc'] ?? 0 ?></td>
+                                                            <?php
+                                                                } else {
+                                                                    // Jika week tidak ditemukan
+                                                                    echo str_repeat("<td class='text-uppercase text-dark text-xxs font-weight opacity-7 ps-2' style='text-align: center;'>-</td>", 5);
+                                                                }
+                                                                $colsEnd = 5 * ($maxWeek - $i);
+                                                                $colsStart = 5 * ($i - 1);
+                                                                if ($numRows > 1 && $numRows2 < $numRows) {
+                                                                    echo "<td colspan=$colsEnd></td>";
+                                                                    echo "</tr>";
+                                                                    echo "<td colspan=$colsStart></td>";
+                                                                }
+                                                                $numRows2++;
+                                                            }
                                                         } else {
                                                             // Jika data week tidak ditemukan, tampilkan kolom kosong
-                                                        ?>
+                                                            ?>
                                                             <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
                                                             <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
                                                             <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"></td>
@@ -142,11 +165,8 @@
                                                         }
                                                     }
                                                     ?>
-
                                     </tr>
                         <?php
-                                                    // sinii
-
                                                 }
                                             }
                                         } ?>

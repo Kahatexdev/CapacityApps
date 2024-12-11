@@ -39,10 +39,12 @@
                                     <div class="form-group">
                                         <label for="nama" class="form-control-label">Nama</label>
                                         <select name="nama" id="nama" class="form-control" onchange="getInfo()">
-                                            <option value=""></option>
+                                            <option value="" selected>Pilih Nama</option>
                                             <?php if (!empty($karyawan) && is_array($karyawan)): ?>
                                                 <?php foreach ($karyawan as $kar): ?>
-                                                    <option value="<?= $kar['id_karyawan']; ?>"><?= $kar['nama_karyawan']; ?></option>
+                                                    <option value="<?= htmlspecialchars($kar['id_karyawan']); ?>">
+                                                        <?= htmlspecialchars($kar['nama_karyawan']); ?>
+                                                    </option>
                                                 <?php endforeach; ?>
                                             <?php else: ?>
                                                 <option value="">No employees found</option>
@@ -53,10 +55,11 @@
                                 <div class="col-lg-3 col-sm-12">
                                     <div class="form-group">
                                         <label for="kode_kartu" class="form-control-label">Kode Kartu</label>
-                                        <input class="form-control" type="text" hidden id="nama_kar" name="namakar" value="<?= $kar['nama_karyawan']; ?>">
-                                        <input class="form-control" type="text" id="kode_kartu" name="kode_kartu">
+                                        <input type="hidden" class="form-control" id="nama_kar" name="namakar" value="">
+                                        <input type="text" class="form-control" id="kode_kartu" name="kode_kartu" placeholder="Masukkan Kode Kartu">
                                     </div>
                                 </div>
+
                                 <div class="col-lg-3 col-sm-12">
                                     <div class="form-group">
                                         <label for="shift" class="form-control-label">Shift</label>

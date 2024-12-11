@@ -672,6 +672,7 @@ class ApsController extends BaseController
             $model = $row['model'];
             $sisa = $row['sisa'];
             $deliv = $row['delivery'];
+            $qty = $row['qty'];
             $validate = [
                 'id' =>  $row['id_pln_mc'],
                 'model' => $model,
@@ -680,7 +681,7 @@ class ApsController extends BaseController
             $cek = $this->DetailPlanningModel->cekPlanning($validate);
             if ($cek) {
                 $id = $cek['id_detail_pln'];
-                $this->DetailPlanningModel->update($id, ['sisa' => $sisa]);
+                $this->DetailPlanningModel->update($id, ['qty' => $qty, 'sisa' => $sisa]);
             } else {
                 $this->DetailPlanningModel->insert($row);
             }
