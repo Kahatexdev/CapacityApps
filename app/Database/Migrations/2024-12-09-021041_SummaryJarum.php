@@ -28,6 +28,10 @@ class SummaryJarum extends Migration
             'tanggal' => [
                 'type' => 'DATE',
             ],
+            'area' => [
+                'type' => 'VARCHAR',
+                'constraint' => '12',
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,

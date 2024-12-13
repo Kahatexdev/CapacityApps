@@ -1729,10 +1729,7 @@ class OrderController extends BaseController
         $endDate = (clone $startDate)->modify('last day of this month');   // Akhir bulan
 
         $allData = [];
-        $totalProdPerWeek = []; // Untuk menyimpan total produksi per minggu
-        $totalSisaPerWeek = []; // Untuk menyimpan total sisa per minggu
-        $totalPerWeek = []; // Untuk menyimpan total qty per minggu
-        $totalJlMcPerWeek = []; // Untuk menyimpan total qty per minggu
+        $totalPerWeek = []; // Untuk menyimpan total produksi per minggu
 
         foreach ($data as $id) {
             $mastermodel = $id['mastermodel'];
@@ -1781,17 +1778,19 @@ class OrderController extends BaseController
                         'jlMc' => $jlMc,
                     ]);
 
-                    // Tambahkan qty, produksi, dan sisa ke total mingguan
+                    // Hitung total per minggu
                     if (!isset($totalPerWeek[$weekCount])) {
-                        $totalPerWeek[$weekCount] = 0;
-                        $totalProdPerWeek[$weekCount] = 0;
-                        $totalSisaPerWeek[$weekCount] = 0;
-                        $totalJlMcPerWeek[$weekCount] = 0;
+                        $totalPerWeek[$weekCount] = [
+                            'totalQty' => 0,
+                            'totalProd' => 0,
+                            'totalSisa' => 0,
+                            'totalJlMc' => 0,
+                        ];
                     }
-                    $totalPerWeek[$weekCount] += $qty;
-                    $totalProdPerWeek[$weekCount] += $produksi;
-                    $totalSisaPerWeek[$weekCount] += $sisa;
-                    $totalJlMcPerWeek[$weekCount] += $jlMc;
+                    $totalPerWeek[$weekCount]['totalQty'] += $qty;
+                    $totalPerWeek[$weekCount]['totalProd'] += $produksi;
+                    $totalPerWeek[$weekCount]['totalSisa'] += $sisa;
+                    $totalPerWeek[$weekCount]['totalJlMc'] += $jlMc;
                 }
 
                 // Pindahkan ke minggu berikutnya
@@ -1799,23 +1798,18 @@ class OrderController extends BaseController
             }
         }
 
-        $allDataPerjarum = []; // Untuk menyimpan total jl mc per minggu
-        $totalProdPerWeekJrm = []; // Untuk menyimpan total produksi per minggu
-        $totalSisaPerWeekJrm = []; // Untuk menyimpan total sisa per mingguinggu
-        $totalPerWeekJrm = []; // Untuk menyimpan total qty per minggu
-        $totalJlMcPerWeekJrm = []; // Untuk menyimpan total jl mc per minggu
+        $allDataPerjarum = [];
+        $totalPerWeekJrm = []; // Total per minggu
         $dataPerjarum = $this->ApsPerstyleModel->getAreaOrderPejarum($ar, $bulan);
 
         foreach ($dataPerjarum as $id2) {
             $machinetypeid = $id2['machinetypeid'];
-
-            // Ambil data qty, sisa, dan produksi
+            $delivery = $id2['delivery'];
             $qty = $id2['qty'];
             $sisa = $id2['sisa'];
             $produksi = $qty - $sisa;
-            $deliveryDate = new \DateTime($id2['delivery']); // Asumsikan ada field delivery
+            $deliveryDate = new \DateTime($delivery); // Tanggal pengiriman
 
-            // Loop untuk membagi data ke dalam minggu
             $weekCount = 1;
             $currentStartDate = clone $startDate;
             for ($weekCount = 1; $currentStartDate <= $endDate; $weekCount++) {
@@ -1824,38 +1818,52 @@ class OrderController extends BaseController
 
                 // Periksa apakah tanggal pengiriman berada dalam minggu ini
                 if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
+                    $jlMcJrm = 0;
                     $dataOrder2 = [
                         'area' => $ar,
                         'jarum' => $machinetypeid,
-                        'delivery' => $id2['delivery'],
+                        'delivery' => $delivery,
                     ];
                     $jlMcJrmData = $this->produksiModel->getJlMcJrmArea($dataOrder2);
-                    $jlMc = 0;
                     if ($jlMcJrmData) {
                         foreach ($jlMcJrmData as $mcJrm) {
-                            $jlMc += $mcJrm['jl_mc'];
+                            $jlMcJrm += $mcJrm['jl_mc'];
                         }
                     }
-                    // $jlMc = array_sum(array_column($jlMcJrmData, 'jl_mc'));
 
-                    $allDataPerjarum[$machinetypeid][$weekCount] = [
-                        'delJrm' => $id2['delivery'],
-                        'qtyJrm' => $qty,
-                        'prodJrm' => $produksi,
-                        'sisaJrm' => $sisa,
-                        'jlMcJrm' => $jlMc,
-                    ];
-                    // Tambahkan qty, produksi, dan sisa ke total mingguan
-                    if (!isset($totalPerWeekJrm[$weekCount])) {
-                        $totalPerWeekJrm[$weekCount] = 0;
-                        $totalProdPerWeekJrm[$weekCount] = 0;
-                        $totalSisaPerWeekJrm[$weekCount] = 0;
-                        $totalJlMcPerWeekJrm[$weekCount] = 0;
+                    // Pastikan array utama memiliki key jarum
+                    if (!isset($allDataPerjarum[$machinetypeid])) {
+                        $allDataPerjarum[$machinetypeid] = [];
                     }
-                    $totalPerWeekJrm[$weekCount] += $qty;
-                    $totalProdPerWeekJrm[$weekCount] += $produksi;
-                    $totalSisaPerWeekJrm[$weekCount] += $sisa;
-                    $totalJlMcPerWeekJrm[$weekCount] += $jlMc;
+                    // Pastikan minggu tersedia
+                    if (!isset($allDataPerjarum[$machinetypeid][$weekCount])) {
+                        $allDataPerjarum[$machinetypeid][$weekCount] = [
+                            'qtyJrm' => 0,
+                            'prodJrm' => 0,
+                            'sisaJrm' => 0,
+                            'jlMcJrm' => 0,
+                        ];
+                    }
+
+                    // Tambahkan data minggu
+                    $allDataPerjarum[$machinetypeid][$weekCount]['qtyJrm'] += $qty;
+                    $allDataPerjarum[$machinetypeid][$weekCount]['prodJrm'] += $produksi;
+                    $allDataPerjarum[$machinetypeid][$weekCount]['sisaJrm'] += $sisa;
+                    $allDataPerjarum[$machinetypeid][$weekCount]['jlMcJrm'] += $jlMcJrm;
+
+                    // Hitung total per minggu
+                    if (!isset($totalPerWeekJrm[$weekCount])) {
+                        $totalPerWeekJrm[$weekCount] = [
+                            'totalQty' => 0,
+                            'totalProd' => 0,
+                            'totalSisa' => 0,
+                            'totalJlMc' => 0,
+                        ];
+                    }
+                    $totalPerWeekJrm[$weekCount]['totalQty'] += $qty;
+                    $totalPerWeekJrm[$weekCount]['totalProd'] += $produksi;
+                    $totalPerWeekJrm[$weekCount]['totalSisa'] += $sisa;
+                    $totalPerWeekJrm[$weekCount]['totalJlMc'] += $jlMcJrm;
                 }
 
                 // Pindahkan ke minggu berikutnya
@@ -1879,19 +1887,13 @@ class OrderController extends BaseController
             'bulan' => $bulan,
             'maxWeek' => $maxWeekCount,
             'allData' => $allData,
-            'totalPerWeek' => $totalPerWeek,
-            'totalProdPerWeek' => $totalProdPerWeek,
-            'totalSisaPerWeek' => $totalSisaPerWeek,
-            'totalJlMcPerWeek' => $totalJlMcPerWeek,
+            'totalData' => $totalPerWeek,
             'allDataJrm' => $allDataPerjarum,
-            'totalPerWeekJrm' => $totalPerWeekJrm,
-            'totalProdPerWeekJrm' => $totalProdPerWeekJrm,
-            'totalSisaPerWeekJrm' => $totalSisaPerWeekJrm,
-            'totalJlMcPerWeekJrm' => $totalJlMcPerWeekJrm,
+            'totalDataJrm' => $totalPerWeekJrm,
             'years' => $years,
             'months' => $months
         ];
-        // dd($data);
+        dd($data);
         return view($role . '/Order/detailSisaOrderArea', $data);
     }
     public function filterByArea()

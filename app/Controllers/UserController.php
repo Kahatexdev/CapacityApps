@@ -275,12 +275,14 @@ class UserController extends BaseController
     public function savePenggunaanJarum()
     {
         $role = session()->get('role');
+        $area = session()->get('username');
         $data = [
             'id_karyawan' => $this->request->getPost('idkary'),
             'nama_karyawan' => $this->request->getPost('namakar'),
             'kodeKartu' => $this->request->getPost('kode_kartu'),
             'tanggal' => $this->request->getPost('tgl'),
-            'qty_jarum' => $this->request->getPost('pcs')
+            'qty_jarum' => $this->request->getPost('pcs'),
+            'area' => $area,
         ];
         $insert = $this->PenggunaanJarumModel->insert($data);
         if (!$insert) {
@@ -288,5 +290,25 @@ class UserController extends BaseController
         } else {
             return redirect()->to(base_url($role . '/penggunaanJarum'))->with('success', 'Data Berhasil Disimpan');
         }
+    }
+    public function penggunaanPerbulan($area, $bulan)
+    {
+        $jarumArea = $this->PenggunaanJarumModel->jarumPerbulan($area, $bulan);
+        $data = [
+            'role' => session()->get('role'),
+            'area' => session()->get('username'),
+            'title' => 'Penggunaan Jarum',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'jarum' => $jarumArea,
+            'month' => $bulan,
+        ];
+
+        return view(session()->get('role') . '/jarumPerbulan', $data);
     }
 }

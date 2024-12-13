@@ -173,13 +173,13 @@
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <td colspan="3" class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Total</td>
+                                        <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="3">Total</td>
                                         <?php for ($i = 1; $i <= $maxWeek; $i++) { ?>
                                             <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"></td>
-                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalPerWeek[$i]) ? $totalPerWeek[$i] : 0 ?></td>
-                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalProdPerWeek[$i]) ? $totalProdPerWeek[$i] : 0 ?></td>
-                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalSisaPerWeek[$i]) ? $totalSisaPerWeek[$i] : 0 ?></td>
-                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalJlMcPerWeek[$i]) ? $totalJlMcPerWeek[$i] : 0 ?></td>
+                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalData[$i]['totalQty']) ? $totalData[$i]['totalQty'] : 0 ?></td>
+                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalData[$i]['totalProd']) ? $totalData[$i]['totalProd'] : 0 ?></td>
+                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalData[$i]['totalSisa']) ? $totalData[$i]['totalSisa'] : 0 ?></td>
+                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalData[$i]['totalJlMc']) ? $totalData[$i]['totalJlMc'] : 0 ?></td>
                                         <?php } ?>
                                     </tr>
                                 </tfoot>
@@ -257,12 +257,14 @@
                                 <tfoot>
                                     <tr>
                                         <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Total</td>
-                                        <?php for ($i = 1; $i <= $maxWeek; $i++) { ?>
-                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalPerWeekJrm[$i]) ? $totalPerWeekJrm[$i] : 0 ?></td>
-                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalProdPerWeekJrm[$i]) ? $totalProdPerWeekJrm[$i] : 0 ?></td>
-                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalSisaPerWeekJrm[$i]) ? $totalSisaPerWeekJrm[$i] : 0 ?></td>
-                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalJlMcPerWeekJrm[$i]) ? $totalJlMcPerWeekJrm[$i] : 0 ?></td>
-                                        <?php } ?>
+                                        <?php
+                                        for ($i = 1; $i <= $maxWeek; $i++) { ?>
+                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalDataJrm[$i]['totalQty']) ? $totalDataJrm[$i]['totalQty'] : 0 ?></td>
+                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalDataJrm[$i]['totalProd']) ? $totalDataJrm[$i]['totalProd'] : 0 ?></td>
+                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalDataJrm[$i]['totalSisa']) ? $totalDataJrm[$i]['totalSisa'] : 0 ?></td>
+                                            <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalDataJrm[$i]['totalJlMc']) ? $totalDataJrm[$i]['totalJlMc'] : 0 ?></td>
+                                        <?php
+                                        } ?>
                                     </tr>
                                 </tfoot>
                             </table>

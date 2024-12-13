@@ -379,7 +379,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     // Jarum
     $routes->get('penggunaanJarum', 'UserController::penggunaanJarum');
     $routes->post('savePenggunaanJarum', 'UserController::savePenggunaanJarum');
-    $routes->get('penggunaanPerbulan/(:any)/(:any)', 'UserController::savePenggunaanJarum/$1/$2');
+    $routes->get('penggunaanPerbulan/(:any)/(:any)', 'UserController::penggunaanPerbulan/$1/$2');
 
     //summary bs mc
     $routes->post('exportSummaryBs', 'SummaryController::excelSummaryBs');
