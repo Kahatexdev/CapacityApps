@@ -1932,11 +1932,23 @@ class OrderController extends BaseController
             $months[] = $monthName;
         }
         $months = array_unique($months);
-
+        $filter = [
+            'area' => $ar,
+            'bulan' => $bulan
+        ];
         $role = session()->get('role');
         $data = $this->ApsPerstyleModel->getAreaOrder($ar, $bulan);
-        $jlMcResults = $this->produksiModel->getJlMcArea($ar, $bulan);
-        $jlMcJrmResults = $this->produksiModel->getJlMcJrmArea($ar, $bulan);
+
+        $filter = [
+            'area' => $ar,
+            'bulan' => $bulan
+        ];
+        foreach ($data as &$jrm) {
+            $filter['jarum'] = $jrm['machinetypeid'];
+            $filter['delivery'] = $jrm['delivery'];
+        }
+        $jlMcResults = $this->produksiModel->getJlMcArea($filter);
+        $jlMcJrmResults = $this->produksiModel->getJlMcJrmArea($filter);
 
         // Ambil tanggal awal dan akhir bulan
         $startDate = new \DateTime($bulan); // Awal bulan ini
