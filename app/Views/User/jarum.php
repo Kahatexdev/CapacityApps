@@ -33,9 +33,9 @@
                         <h5>Input Penggunaan Jarum</h5>
                     </div>
                     <div class="card-body">
-                        <form id="penggunaanJarum" action="<?= base_url($role . '/savePenggunaanJarum'); ?>">
+                        <form id="penggunaanJarum" action="<?= base_url($role . '/savePenggunaanJarum'); ?>" method="post">
                             <div class="row">
-                                <div class="col-lg-3 col-sm-12">
+                                <div class="col-lg-6 col-sm-12">
                                     <div class="form-group">
                                         <label for="nama" class="form-control-label">Nama</label>
                                         <select name="nama" id="nama" class="form-control" onchange="getInfo()">
@@ -52,21 +52,22 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-lg-3 col-sm-12">
+                                <div class="col-lg-6 col-sm-12">
                                     <div class="form-group">
                                         <label for="kode_kartu" class="form-control-label">Kode Kartu</label>
-                                        <input type="hidden" class="form-control" id="nama_kar" name="namakar" value="">
+                                        <input type="text" class="form-control" id="nama_kar" name="namakar" value="" hidden>
+                                        <input type="text" class="form-control" id="id_kar" name="idkary" value="" hidden>
                                         <input type="text" class="form-control" id="kode_kartu" name="kode_kartu" placeholder="Masukkan Kode Kartu">
                                     </div>
                                 </div>
 
-                                <div class="col-lg-3 col-sm-12">
+                                <div class="col-lg-6 col-sm-12">
                                     <div class="form-group">
                                         <label for="tgl_prod" class="form-control-label">Tanggal</label>
                                         <input class="form-control" type="date" id="tgl_prod" name="tgl" required>
                                     </div>
                                 </div>
-                                <div class="col-lg-2 col-sm-12">
+                                <div class="col-lg-6 col-sm-12">
                                     <div class="form-group">
                                         <label for="pcs" class="form-control-label">Qty (pcs)</label>
                                         <input class="form-control" type="number" id="pcs" name="pcs" required>
@@ -78,12 +79,44 @@
 
 
                             <div class="row mt-3">
-                                <button type="button" class="btn btn-info" id="submitForm">Simpan</button>
+                                <button type="submit" class="btn btn-info" id="submitForm">Simpan</button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+
+                        <h4>
+                            Penggunaan Jarum Perbulan <?= $area ?>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-1">
+            <?php foreach ($month as $bln): ?>
+                <div class="col-lg-3 mt-2">
+                    <a href="<?= base_url($role . '/penggunaanPerbulan/' . $area . '/' . $bln) ?>">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="col-lg-12">
+                                    <h5 class="card-title">
+
+                                        <i class="fas fa-calendar-alt text-lg opacity-10" aria-hidden="true"></i> <?= $bln ?>
+                                    </h5>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            <?php endforeach ?>
         </div>
 
 
@@ -113,8 +146,8 @@
                 .then(data => {
                     // Update input field dengan data dari API
                     document.getElementById('nama_kar').value = data.nama_karyawan || '';
+                    document.getElementById('id_kar').value = id || '';
                     document.getElementById('kode_kartu').value = data.kode_kartu || '';
-                    document.getElementById('shift').value = data.shift || '';
                 })
                 .catch(error => {
                     console.error('Terjadi kesalahan:', error);
@@ -123,7 +156,8 @@
         } else {
             // Jika id kosong, kosongkan input
             document.getElementById('kode_kartu').value = '';
-            document.getElementById('shift').value = '';
+            document.getElementById('id_kar').value = '';
+            document.getElementById('nama_kar').value = '';
         }
     }
 </script>
