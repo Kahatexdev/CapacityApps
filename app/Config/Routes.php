@@ -356,7 +356,10 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('produksi', 'UserController::produksi');
     $routes->get('bssetting', 'UserController::bssetting');
     $routes->get('bsmesin', 'UserController::bsmesin');
+    $routes->get('bsMesinPerbulan/(:any)/(:any)', 'UserController::bsMesinPerbulan/$1/$2');
     $routes->post('saveBsMesin', 'UserController::saveBsMesin');
+
+
     // $routes->post('importproduksi', 'ProduksiController::importproduksi');
     $routes->post('importproduksi', 'ProduksiController::importproduksinew');
     $routes->post('importbssetting', 'ProduksiController::importbssetting');

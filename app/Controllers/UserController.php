@@ -111,7 +111,16 @@ class UserController extends BaseController
     }
     public function bsmesin()
     {
+        $dataPdk = $this->ApsPerstyleModel->getPdkProduksi();
+        $produksi = $this->produksiModel->getProduksiHarianArea();
+        $dataBuyer = $this->orderModel->getBuyer();
+        $dataArea = $this->jarumModel->getArea();
+        $dataJarum = $this->jarumModel->getJarum();
         $area = session()->get('username');
+        $month = [];
+        for ($i = -1; $i <= 12; $i++) {
+            $month[] = date('F-Y', strtotime("first day of $i month"));
+        }
 
         $apiUrl = 'http://172.23.44.14/SkillMapping/public/api/area/' . $area;
 
@@ -155,6 +164,13 @@ class UserController extends BaseController
             'active7' => '',
             'targetProd' => 0,
             'karyawan' => $karyawan,
+            'month' => $month,
+            'areas' => $area,
+            'pdk' => $dataPdk,
+            'produksi' => $produksi,
+            'buyer' => $dataBuyer,
+            'area' => $dataArea,
+            'jarum' => $dataJarum,
         ];
         return view(session()->get('role') . '/bsmesin', $data);
     }
@@ -310,5 +326,30 @@ class UserController extends BaseController
         ];
 
         return view(session()->get('role') . '/jarumPerbulan', $data);
+    }
+    public function bsMesinPerbulan($area, $bulan)
+    {
+        $bsPerbulan = $this->BsMesinModel->bsMesinPerbulan($area, $bulan);
+        $totalBsGram = $this->BsMesinModel->totalGramPerbulan($area, $bulan);
+        $totalBsPcs = $this->BsMesinModel->totalPcsPerbulan($area, $bulan);
+        $chartData = $this->BsMesinModel->ChartPdk($area, $bulan);
+        $data = [
+            'role' => session()->get('role'),
+            'area' => session()->get('username'),
+            'title' => 'BS Mesin',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'dataBs' => $bsPerbulan,
+            'month' => $bulan,
+            'totalbsgram' => $totalBsGram,
+            'totalbspcs' => $totalBsPcs,
+            'chart' => $chartData
+        ];
+        return view(session()->get('role') . '/bsMesinPerbulan', $data);
     }
 }
