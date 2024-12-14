@@ -1219,14 +1219,14 @@ class OrderController extends BaseController
     {
         $role = session()->get('role');
         $month = $this->request->getPost('month');
-        $year = $this->request->getPost('year');
+        $yearss = $this->request->getPost('year');
 
         // Jika bulan atau tahun tidak diisi, gunakan bulan dan tahun ini
-        if (empty($month) || empty($year)) {
+        if (empty($month) || empty($yearss)) {
             $bulan = date('Y-m-01', strtotime('this month')); // Bulan ini
         } else {
             // Atur tanggal berdasarkan input bulan dan tahun dari POST
-            $bulan = date('Y-m-01', strtotime("$year-$month-01"));
+            $bulan = date('Y-m-01', strtotime("$yearss-$month-01"));
         }
 
         $years = [];
@@ -1255,17 +1255,14 @@ class OrderController extends BaseController
         $months = array_unique($months);
 
         // Ambil data dari model
-        $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
         $startDate = new \DateTime($bulan); // Awal bulan
         $startDate->setTime(0, 0, 0);
         $endDate = (clone $startDate)->modify('last day of this month');   // Akhir bulan
 
         // Loop data
+        $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
         $allData = [];
         $totalPerWeek = [];
-        $totalProdPerWeek = [];
-        $totalSisaPerWeek = [];
-        $totalJlMcPerWeek = [];
 
         foreach ($data as $id) {
             $mastermodel = $id['mastermodel'];
@@ -1282,114 +1279,127 @@ class OrderController extends BaseController
             $weekCount = 1;
             $currentStartDate = clone $startDate;
 
-            $dataOrder = [
-                'model' => $mastermodel,
-                'jarum' => $machinetypeid,
-                'area' => $factory,
-                'delivery' => $id['delivery'],
-            ];
-
-            // ambil jl mc berdasarkan $dataOrder
-            $jlMcData = $this->produksiModel->getJlMc($dataOrder);
-            // dd($jlMcData);
-
-            $jlMc = 0; // Nilai default sebelum loop
-            foreach ($jlMcData as $mc) {
-                $jlMc = $mc['jl_mc'];
-            }
-
-            while ($currentStartDate <= $endDate) {
-                // Hitung akhir minggu
+            for ($weekCount = 1; $currentStartDate <= $endDate; $weekCount++) {
                 $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
-
-                // Pastikan akhir minggu tidak melebihi akhir bulan
-                if ($endOfWeek > $endDate) {
-                    $endOfWeek = $endDate;
-                }
+                $endOfWeek = min($endOfWeek, $endDate);
 
                 // Periksa apakah tanggal pengiriman berada dalam minggu ini
                 if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
-                    // Pastikan array untuk minggu ini sudah ada, jika belum buat array baru
-                    if (!isset($totalPerWeek[$weekCount])) {
-                        $totalPerWeek[$weekCount] = 0;
-                        $totalProdPerWeek[$weekCount] = 0;
-                        $totalSisaPerWeek[$weekCount] = 0;
-                        $totalJlMcPerWeek[$weekCount] = 0;
+                    // Ambil total jl_mc untuk minggu ini dan jumlahkan jika sudah ada data sebelumnya
+                    $dataOrder = [
+                        'model' => $mastermodel,
+                        'jarum' => $machinetypeid,
+                        'area' => $factory,
+                        'delivery' => $id['delivery'],
+                    ];
+                    $jlMc = 0;
+                    $jlMcData = $this->produksiModel->getJlMc($dataOrder);
+
+                    // Pastikan data jl_mc ada
+                    if ($jlMcData) {
+                        // Loop untuk menjumlahkan jl_mc
+                        foreach ($jlMcData as $mc) {
+                            $jlMc += $mc['jl_mc'];
+                        }
                     }
-
-                    // Tambahkan data ke array
-                    $totalPerWeek[$weekCount] += $qty;
-                    $totalProdPerWeek[$weekCount] += $produksi;
-                    $totalSisaPerWeek[$weekCount] += $sisa;
-                    $totalJlMcPerWeek[$weekCount] += $jlMc;
-
-                    // Tambahkan data ke $allData
-                    if (!isset($allData[$mastermodel][$machinetypeid][$factory][$weekCount])) {
-                        $allData[$mastermodel][$machinetypeid][$factory][$weekCount] = [];
-                    }
-
-                    $allData[$mastermodel][$machinetypeid][$factory][$weekCount] = [
+                    $allData[$mastermodel][$machinetypeid][$factory][$weekCount][] = json_encode([
                         'del' => $id['delivery'],
                         'qty' => $qty,
                         'prod' => $produksi,
                         'sisa' => $sisa,
                         'jlMc' => $jlMc,
-                    ];
+                    ]);
+
+                    // Hitung total per minggu
+                    if (!isset($totalPerWeek[$weekCount])) {
+                        $totalPerWeek[$weekCount] = [
+                            'totalQty' => 0,
+                            'totalProd' => 0,
+                            'totalSisa' => 0,
+                            'totalJlMc' => 0,
+                        ];
+                    }
+                    $totalPerWeek[$weekCount]['totalQty'] += $qty;
+                    $totalPerWeek[$weekCount]['totalProd'] += $produksi;
+                    $totalPerWeek[$weekCount]['totalSisa'] += $sisa;
+                    $totalPerWeek[$weekCount]['totalJlMc'] += $jlMc;
                 }
 
                 // Pindahkan ke minggu berikutnya
                 $currentStartDate = (clone $endOfWeek)->modify('+1 day');
-                $weekCount++;
             }
         }
 
         // Proses data per jarum
         $dataPerjarum = $this->ApsPerstyleModel->getBuyerOrderPejarum($buyer, $bulan);
         $allDataPerjarum = [];
-        $totalPerWeekJrm = $totalProdPerWeekJrm = $totalSisaPerWeekJrm = $totalJlMcPerWeekJrm = [];
+        $totalPerWeekJrm = [];
 
         foreach ($dataPerjarum as $id2) {
             $machinetypeid = $id2['machinetypeid'];
+            $delivery = $id2['delivery'];
             $qty = $id2['qty'];
             $sisa = $id2['sisa'];
             $produksi = $qty - $sisa;
-            $deliveryDate = new \DateTime($id2['delivery']);
-            $currentStartDate = clone $startDate; // Reset ke awal bulan
+            $deliveryDate = new \DateTime($delivery); // Tanggal pengiriman
 
+            $weekCount = 1;
+            $currentStartDate = clone $startDate;
             for ($weekCount = 1; $currentStartDate <= $endDate; $weekCount++) {
                 $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
                 $endOfWeek = min($endOfWeek, $endDate);
 
+                // Periksa apakah tanggal pengiriman berada dalam minggu ini
                 if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
-                    // Ambil total jl_mc untuk minggu ini dan jumlahkan jika sudah ada data sebelumnya
-                    $jlMcJrmData = $this->produksiModel->getJlMcJrm([
+                    $jlMcJrm = 0;
+                    $dataOrder2 = [
                         'buyer' => $buyer,
                         'jarum' => $machinetypeid,
-                        'delivery' => $deliveryDate->format('Y-m-d'),
-                    ]);
-                    $jlMcJrm = array_sum(array_column($jlMcJrmData, 'jl_mc'));
-
-                    // Pastikan data minggu ini diupdate dengan penambahan jl_mc jika sudah ada
-                    if (!isset($allDataPerjarum[$machinetypeid][$weekCount])) {
-                        $allDataPerjarum[$machinetypeid][$weekCount] = [
-                            'delJrm' => $id2['delivery'],
-                            'qtyJrm' => $qty,
-                            'prodJrm' => $produksi,
-                            'sisaJrm' => $sisa,
-                            'jlMcJrm' => $jlMcJrm,
-                        ];
-                    } else {
-                        // Jika sudah ada, jumlahkan jl_mc untuk minggu yang sama
-                        $allDataPerjarum[$machinetypeid][$weekCount]['jlMcJrm'] += $jlMcJrm;
+                        'delivery' => $delivery,
+                    ];
+                    $jlMcJrmData = $this->produksiModel->getJlMcJrm($dataOrder2);
+                    if ($jlMcJrmData) {
+                        foreach ($jlMcJrmData as $mcJrm) {
+                            $jlMcJrm += $mcJrm['jl_mc'];
+                        }
                     }
 
-                    // Update total per minggu
-                    $totalPerWeekJrm[$weekCount] = ($totalPerWeekJrm[$weekCount] ?? 0) + $qty;
-                    $totalProdPerWeekJrm[$weekCount] = ($totalProdPerWeekJrm[$weekCount] ?? 0) + $produksi;
-                    $totalSisaPerWeekJrm[$weekCount] = ($totalSisaPerWeekJrm[$weekCount] ?? 0) + $sisa;
-                    $totalJlMcPerWeekJrm[$weekCount] = ($totalJlMcPerWeekJrm[$weekCount] ?? 0) + $jlMcJrm;
+                    // Pastikan array utama memiliki key jarum
+                    if (!isset($allDataPerjarum[$machinetypeid])) {
+                        $allDataPerjarum[$machinetypeid] = [];
+                    }
+                    // Pastikan minggu tersedia
+                    if (!isset($allDataPerjarum[$machinetypeid][$weekCount])) {
+                        $allDataPerjarum[$machinetypeid][$weekCount] = [
+                            'qtyJrm' => 0,
+                            'prodJrm' => 0,
+                            'sisaJrm' => 0,
+                            'jlMcJrm' => 0,
+                        ];
+                    }
+
+                    // Tambahkan data minggu
+                    $allDataPerjarum[$machinetypeid][$weekCount]['qtyJrm'] += $qty;
+                    $allDataPerjarum[$machinetypeid][$weekCount]['prodJrm'] += $produksi;
+                    $allDataPerjarum[$machinetypeid][$weekCount]['sisaJrm'] += $sisa;
+                    $allDataPerjarum[$machinetypeid][$weekCount]['jlMcJrm'] += $jlMcJrm;
+
+                    // Hitung total per minggu
+                    if (!isset($totalPerWeekJrm[$weekCount])) {
+                        $totalPerWeekJrm[$weekCount] = [
+                            'totalQty' => 0,
+                            'totalProd' => 0,
+                            'totalSisa' => 0,
+                            'totalJlMc' => 0,
+                        ];
+                    }
+                    $totalPerWeekJrm[$weekCount]['totalQty'] += $qty;
+                    $totalPerWeekJrm[$weekCount]['totalProd'] += $produksi;
+                    $totalPerWeekJrm[$weekCount]['totalSisa'] += $sisa;
+                    $totalPerWeekJrm[$weekCount]['totalJlMc'] += $jlMcJrm;
                 }
 
+                // Pindahkan ke minggu berikutnya
                 $currentStartDate = (clone $endOfWeek)->modify('+1 day');
             }
         }
@@ -1397,7 +1407,7 @@ class OrderController extends BaseController
 
         $data = [
             'role' => $role,
-            'title' => 'Data Sisa Order',
+            'title' => 'Data Sisa Order ' . $buyer,
             'active1' => '',
             'active2' => '',
             'active3' => 'active',
@@ -1409,258 +1419,15 @@ class OrderController extends BaseController
             'bulan' => $bulan,
             'maxWeek' => $maxWeekCount,
             'allData' => $allData,
-            'totalPerWeek' => $totalPerWeek,
-            'totalProdPerWeek' => $totalProdPerWeek,
-            'totalSisaPerWeek' => $totalSisaPerWeek,
-            'totalJlMcPerWeek' => $totalJlMcPerWeek,
+            'totalData' => $totalPerWeek,
             'allDataJrm' => $allDataPerjarum,
-            'totalPerWeekJrm' => $totalPerWeekJrm,
-            'totalProdPerWeekJrm' => $totalProdPerWeekJrm,
-            'totalSisaPerWeekJrm' => $totalSisaPerWeekJrm,
-            'totalJlMcPerWeekJrm' => $totalJlMcPerWeekJrm,
+            'totalDataJrm' => $totalPerWeekJrm,
             'years' => $years,
             'months' => $months,
         ];
         // dd($data);
-
         return view(session()->get('role') . '/Order/detailSisaOrder', $data);
     }
-    public function filterByMonth()
-    {
-        $month = $this->request->getPost('month');
-        $year = $this->request->getPost('year');
-        $buyer = $this->request->getPost('buyer');
-
-        if (empty($month) || empty($year)) {
-            // Jika bulan atau tahun kosong, kembalikan ke halaman awal atau beri pesan kesalahan
-            return redirect()->back()->with('error', 'Pilih bulan dan tahun terlebih dahulu.');
-        }
-
-        // Menggabungkan bulan dan tahun untuk mendapatkan format Y-m-01
-        $bulan = date('Y-m-01', strtotime($year . '-' . $month));
-
-        $years = [];
-        $currentYear = date('Y');
-        $endYear = $currentYear + 10;
-
-        // Loop dari tahun ini sampai 10 tahun ke depan
-        for ($year = $currentYear; $year <= $endYear; $year++) {
-            $months = [];
-
-            // Loop untuk setiap bulan dalam setahun
-            for ($i = 1; $i <= 12; $i++) {
-                $monthName = date('F', mktime(0, 0, 0, $i, 1)); // Nama bulan
-                $months[] = $monthName;
-            }
-
-            // Simpan data tahun dengan bulan-bulannya
-            $years[$year] = array_unique($months); // array_unique memastikan bulan unik meskipun tidak perlu dalam kasus ini
-        }
-
-        $months = [];
-        for ($i = 1; $i <= 12; $i++) {
-            $monthName = date('F', mktime(0, 0, 0, $i, 1)); // Nama bulan
-            $months[] = $monthName;
-        }
-        $months = array_unique($months);
-
-        $role = session()->get('role');
-        $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
-        $jlMcResults = [];
-        foreach ($data as $pdk) {
-            $jlMcResults[] = $this->produksiModel->getJlMc($pdk['idapsperstyle'], $bulan);
-        }
-        $jlMcJrmResults = $this->produksiModel->getJlMcJrm($buyer, $bulan);
-        // dd($jlMcResults, $jlMcJrmResults);
-
-        // Ambil tanggal awal dan akhir bulan
-        $startDate = new \DateTime($bulan); // Awal bulan ini
-        $startDate->setTime(0, 0, 0);
-        // Mengatur endDate menjadi hari terakhir dari bulan yang sama
-        $endDate = new \DateTime($bulan);
-        $endDate->modify('last day of this month'); // Akhir bulan ini
-        $endDate->setTime(23, 59, 59);    // Akhir bulan ini
-
-        // Cari hari pertama bulan ini
-        $startDayOfWeek = $startDate->format('l');
-
-        // Jika hari pertama bulan ini bukan Senin, minggu pertama dimulai dari hari pertama bulan tersebut
-        if ($startDayOfWeek != 'Monday') {
-            $firstWeekEndDate = (clone $startDate)->modify('Sunday this week');
-        } else {
-            $firstWeekEndDate = (clone $startDate)->modify('Sunday this week');
-        }
-
-        $allData = [];
-        $totalProdPerWeek = []; // Untuk menyimpan total produksi per minggu
-        $totalSisaPerWeek = []; // Untuk menyimpan total sisa per mingguinggu
-        $totalPerWeek = []; // Untuk menyimpan total qty per minggu
-        $totalJlMcPerWeek = []; // Untuk menyimpan total qty per minggu
-        $allDataPerjarum = []; // Untuk menyimpan total jl mc per minggu
-        $totalProdPerWeekJrm = []; // Untuk menyimpan total produksi per minggu
-        $totalSisaPerWeekJrm = []; // Untuk menyimpan total sisa per mingguinggu
-        $totalPerWeekJrm = []; // Untuk menyimpan total qty per minggu
-        $totalJlMcPerWeekJrm = []; // Untuk menyimpan total jl mc per minggu
-
-        foreach ($data as $id) {
-            $mastermodel = $id['mastermodel'];
-            $machinetypeid = $id['machinetypeid'];
-            $factory = $id['factory'];
-
-            // Ambil data qty, sisa, dan produksi
-            $qty = $id['qty'];
-            $sisa = $id['sisa'];
-            $produksi = $qty - $sisa;
-            $deliveryDate = new \DateTime($id['delivery']); // Asumsikan ada field delivery
-
-
-            // Loop untuk membagi data ke dalam minggu
-            $weekCount = 1;
-            $currentStartDate = clone $startDate;
-
-            while ($currentStartDate <= $endDate) {
-                // Hitung akhir minggu
-                $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
-
-                // Pastikan akhir minggu tidak melebihi akhir bulan
-                if ($endOfWeek > $endDate) {
-                    $endOfWeek = $endDate;
-                }
-
-                // Periksa apakah tanggal pengiriman berada dalam minggu ini
-                if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
-                    $jlMc = 0; // Default jika tidak ada hasil yang cocok
-                    foreach ($jlMcResults as $result) {
-                        if (
-                            isset($result['mastermodel'], $result['machinetypeid'], $result['factory'], $result['delivery']) &&
-                            $result['mastermodel'] == $mastermodel &&
-                            $result['machinetypeid'] == $machinetypeid &&
-                            $result['factory'] == $factory &&
-                            $result['delivery'] == $id['delivery']
-                        ) {
-                            $jlMc = $result['jl_mc'];
-                            break;
-                        }
-                    }
-                    $allData[$mastermodel][$machinetypeid][$factory][$weekCount] = [
-                        'del' => $id['delivery'],
-                        'qty' => $qty,
-                        'prod' => $produksi,
-                        'sisa' => $sisa,
-                        'jlMc' => $jlMc,
-                    ];
-                    // Tambahkan qty, produksi, dan sisa ke total mingguan
-                    if (!isset($totalPerWeek[$weekCount])) {
-                        $totalPerWeek[$weekCount] = 0;
-                        $totalProdPerWeek[$weekCount] = 0;
-                        $totalSisaPerWeek[$weekCount] = 0;
-                        $totalJlMcPerWeek[$weekCount] = 0;
-                    }
-                    $totalPerWeek[$weekCount] += $qty;
-                    $totalProdPerWeek[$weekCount] += $produksi;
-                    $totalSisaPerWeek[$weekCount] += $sisa;
-                    $totalJlMcPerWeek[$weekCount] += $jlMc;
-                }
-
-                // Pindahkan ke minggu berikutnya
-                $currentStartDate = (clone $endOfWeek)->modify('+1 day');
-                $weekCount++;
-            }
-        }
-
-        $dataPerjarum = $this->ApsPerstyleModel->getBuyerOrderPejarum($buyer, $bulan);
-
-        foreach ($dataPerjarum as $id2) {
-            $machinetypeid = $id2['machinetypeid'];
-
-            // Ambil data qty, sisa, dan produksi
-            $qty = $id2['qty'];
-            $sisa = $id2['sisa'];
-            $produksi = $qty - $sisa;
-            $deliveryDate = new \DateTime($id2['delivery']); // Asumsikan ada field delivery
-
-            // Loop untuk membagi data ke dalam minggu
-            $weekCount = 1;
-            $currentStartDate = clone $startDate;
-            while ($currentStartDate <= $endDate) {
-                // Hitung akhir minggu
-                $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
-
-                // Pastikan akhir minggu tidak melebihi akhir bulan
-                if ($endOfWeek > $endDate) {
-                    $endOfWeek = $endDate;
-                }
-
-                // Periksa apakah tanggal pengiriman berada dalam minggu ini
-                if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
-                    $jlMc = 0; // Default jika tidak ada hasil yang cocok
-                    foreach ($jlMcJrmResults as $result) {
-                        if (
-                            $result['machinetypeid'] == $machinetypeid &&
-                            $result['delivery_week'] == $id2['delivery_week']
-                        ) {
-                            $jlMc = $result['jl_mc'];
-                            break;
-                        }
-                    }
-                    $allDataPerjarum[$machinetypeid][$weekCount] = [
-                        'delJrm' => $id2['delivery'],
-                        'qtyJrm' => $qty,
-                        'prodJrm' => $produksi,
-                        'sisaJrm' => $sisa,
-                        'jlMcJrm' => $jlMc,
-                    ];
-                    // Tambahkan qty, produksi, dan sisa ke total mingguan
-                    if (!isset($totalPerWeekJrm[$weekCount])) {
-                        $totalPerWeekJrm[$weekCount] = 0;
-                        $totalProdPerWeekJrm[$weekCount] = 0;
-                        $totalSisaPerWeekJrm[$weekCount] = 0;
-                        $totalJlMcPerWeekJrm[$weekCount] = 0;
-                    }
-                    $totalPerWeekJrm[$weekCount] += $qty;
-                    $totalProdPerWeekJrm[$weekCount] += $produksi;
-                    $totalSisaPerWeekJrm[$weekCount] += $sisa;
-                    $totalJlMcPerWeekJrm[$weekCount] += $jlMc;
-                }
-
-                // Pindahkan ke minggu berikutnya
-                $currentStartDate = (clone $endOfWeek)->modify('+1 day');
-                $weekCount++;
-            }
-        }
-
-        $maxWeekCount = $weekCount - 1;
-
-        $data = [
-            'role' => $role,
-            'title' => 'Data Sisa Order',
-            'active1' => '',
-            'active2' => '',
-            'active3' => 'active',
-            'active4' => '',
-            'active5' => '',
-            'active6' => '',
-            'active7' => '',
-            'buyer' => $buyer,
-            'bulan' => $bulan,
-            'maxWeek' => $maxWeekCount,
-            'allData' => $allData,
-            'totalPerWeek' => $totalPerWeek,
-            'totalProdPerWeek' => $totalProdPerWeek,
-            'totalSisaPerWeek' => $totalSisaPerWeek,
-            'totalJlMcPerWeek' => $totalJlMcPerWeek,
-            'allDataJrm' => $allDataPerjarum,
-            'totalPerWeekJrm' => $totalPerWeekJrm,
-            'totalProdPerWeekJrm' => $totalProdPerWeekJrm,
-            'totalSisaPerWeekJrm' => $totalSisaPerWeekJrm,
-            'totalJlMcPerWeekJrm' => $totalJlMcPerWeekJrm,
-            'years' => $years,
-            'months' => $months
-        ];
-
-        return view($role . '/Order/detailSisaOrder', $data);
-    }
-
     public function sisaOrderArea()
     {
         $role = session()->get('role');
@@ -1720,14 +1487,12 @@ class OrderController extends BaseController
         $months = array_unique($months);
         // dd($bulan);
 
-        $role = session()->get('role');
-        $data = $this->ApsPerstyleModel->getAreaOrder($ar, $bulan);
-
         // Ambil tanggal awal dan akhir bulan
         $startDate = new \DateTime($bulan); // Awal bulan
         $startDate->setTime(0, 0, 0);
         $endDate = (clone $startDate)->modify('last day of this month');   // Akhir bulan
 
+        $data = $this->ApsPerstyleModel->getAreaOrder($ar, $bulan);
         $allData = [];
         $totalPerWeek = []; // Untuk menyimpan total produksi per minggu
 
@@ -1893,240 +1658,9 @@ class OrderController extends BaseController
             'years' => $years,
             'months' => $months
         ];
-        dd($data);
+        // dd($data);
         return view($role . '/Order/detailSisaOrderArea', $data);
     }
-    public function filterByArea()
-    {
-        $month = $this->request->getPost('month');
-        $year = $this->request->getPost('year');
-        $ar = $this->request->getPost('area');
-
-        if (empty($month) || empty($year)) {
-            // Jika bulan atau tahun kosong, kembalikan ke halaman awal atau beri pesan kesalahan
-            return redirect()->back()->with('error', 'Pilih bulan dan tahun terlebih dahulu.');
-        }
-
-        // Menggabungkan bulan dan tahun untuk mendapatkan format Y-m-01
-        $bulan = date('Y-m-01', strtotime($year . '-' . $month));
-
-        $years = [];
-        $currentYear = date('Y');
-        $endYear = $currentYear + 10;
-
-        // Loop dari tahun ini sampai 10 tahun ke depan
-        for ($year = $currentYear; $year <= $endYear; $year++) {
-            $months = [];
-
-            // Loop untuk setiap bulan dalam setahun
-            for ($i = 1; $i <= 12; $i++) {
-                $monthName = date('F', mktime(0, 0, 0, $i, 1)); // Nama bulan
-                $months[] = $monthName;
-            }
-
-            // Simpan data tahun dengan bulan-bulannya
-            $years[$year] = array_unique($months); // array_unique memastikan bulan unik meskipun tidak perlu dalam kasus ini
-        }
-
-        $months = [];
-        for ($i = 1; $i <= 12; $i++) {
-            $monthName = date('F', mktime(0, 0, 0, $i, 1)); // Nama bulan
-            $months[] = $monthName;
-        }
-        $months = array_unique($months);
-
-        $role = session()->get('role');
-        $data = $this->ApsPerstyleModel->getAreaOrder($ar, $bulan);
-        $jlMcResults = $this->produksiModel->getJlMcArea($ar, $bulan);
-        $jlMcJrmResults = $this->produksiModel->getJlMcJrmArea($ar, $bulan);
-
-        // Ambil tanggal awal dan akhir bulan
-        $startDate = new \DateTime($bulan); // Awal bulan ini
-        $startDate->setTime(0, 0, 0);
-        // Mengatur endDate menjadi hari terakhir dari bulan yang sama
-        $endDate = new \DateTime($bulan);
-        $endDate->modify('last day of this month'); // Akhir bulan ini
-        $endDate->setTime(23, 59, 59);    // Akhir bulan ini
-
-        // Cari hari pertama bulan ini
-        $startDayOfWeek = $startDate->format('l');
-
-        // Jika hari pertama bulan ini bukan Senin, minggu pertama dimulai dari hari pertama bulan tersebut
-        if ($startDayOfWeek != 'Monday') {
-            $firstWeekEndDate = (clone $startDate)->modify('Sunday this week');
-        } else {
-            $firstWeekEndDate = (clone $startDate)->modify('Sunday this week');
-        }
-
-        $allData = [];
-        $totalProdPerWeek = []; // Untuk menyimpan total produksi per minggu
-        $totalSisaPerWeek = []; // Untuk menyimpan total sisa per mingguinggu
-        $totalPerWeek = []; // Untuk menyimpan total qty per minggu
-        $totalJlMcPerWeek = []; // Untuk menyimpan total qty per minggu
-        $allDataPerjarum = []; // Untuk menyimpan total jl mc per minggu
-        $totalProdPerWeekJrm = []; // Untuk menyimpan total produksi per minggu
-        $totalSisaPerWeekJrm = []; // Untuk menyimpan total sisa per mingguinggu
-        $totalPerWeekJrm = []; // Untuk menyimpan total qty per minggu
-        $totalJlMcPerWeekJrm = []; // Untuk menyimpan total jl mc per minggu
-
-        foreach ($data as $id) {
-            $mastermodel = $id['mastermodel'];
-            $machinetypeid = $id['machinetypeid'];
-            $factory = $id['factory'];
-
-            // Ambil data qty, sisa, dan produksi
-            $qty = $id['qty'];
-            $sisa = $id['sisa'];
-            $produksi = $qty - $sisa;
-            $deliveryDate = new \DateTime($id['delivery']); // Asumsikan ada field delivery
-
-
-            // Loop untuk membagi data ke dalam minggu
-            $weekCount = 1;
-            $currentStartDate = clone $startDate;
-
-            while ($currentStartDate <= $endDate) {
-                // Hitung akhir minggu
-                $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
-
-                // Pastikan akhir minggu tidak melebihi akhir bulan
-                if ($endOfWeek > $endDate) {
-                    $endOfWeek = $endDate;
-                }
-
-                // Periksa apakah tanggal pengiriman berada dalam minggu ini
-                if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
-                    $jlMc = 0; // Default jika tidak ada hasil yang cocok
-                    foreach ($jlMcResults as $result) {
-                        if (
-                            $result['mastermodel'] == $mastermodel &&
-                            $result['machinetypeid'] == $machinetypeid &&
-                            $result['factory'] == $factory &&
-                            $result['delivery'] == $id['delivery']
-                        ) {
-                            $jlMc = $result['jl_mc'];
-                            break;
-                        }
-                    }
-                    $allData[$mastermodel][$machinetypeid][$factory][$weekCount] = [
-                        'del' => $id['delivery'],
-                        'qty' => $qty,
-                        'prod' => $produksi,
-                        'sisa' => $sisa,
-                        'jlMc' => $jlMc,
-                    ];
-                    // Tambahkan qty, produksi, dan sisa ke total mingguan
-                    if (!isset($totalPerWeek[$weekCount])) {
-                        $totalPerWeek[$weekCount] = 0;
-                        $totalProdPerWeek[$weekCount] = 0;
-                        $totalSisaPerWeek[$weekCount] = 0;
-                        $totalJlMcPerWeek[$weekCount] = 0;
-                    }
-                    $totalPerWeek[$weekCount] += $qty;
-                    $totalProdPerWeek[$weekCount] += $produksi;
-                    $totalSisaPerWeek[$weekCount] += $sisa;
-                    $totalJlMcPerWeek[$weekCount] += $jlMc;
-                }
-
-                // Pindahkan ke minggu berikutnya
-                $currentStartDate = (clone $endOfWeek)->modify('+1 day');
-                $weekCount++;
-            }
-        }
-
-        $dataPerjarum = $this->ApsPerstyleModel->getAreaOrderPejarum($ar, $bulan);
-
-        foreach ($dataPerjarum as $id2) {
-            $machinetypeid = $id2['machinetypeid'];
-
-            // Ambil data qty, sisa, dan produksi
-            $qty = $id2['qty'];
-            $sisa = $id2['sisa'];
-            $produksi = $qty - $sisa;
-            $deliveryDate = new \DateTime($id2['delivery']); // Asumsikan ada field delivery
-
-            // Loop untuk membagi data ke dalam minggu
-            $weekCount = 1;
-            $currentStartDate = clone $startDate;
-            while ($currentStartDate <= $endDate) {
-                // Hitung akhir minggu
-                $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
-
-                // Pastikan akhir minggu tidak melebihi akhir bulan
-                if ($endOfWeek > $endDate) {
-                    $endOfWeek = $endDate;
-                }
-
-                // Periksa apakah tanggal pengiriman berada dalam minggu ini
-                if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
-                    $jlMc = 0; // Default jika tidak ada hasil yang cocok
-                    foreach ($jlMcJrmResults as $result) {
-                        if (
-                            $result['machinetypeid'] == $machinetypeid &&
-                            $result['delivery_week'] == $id2['delivery_week']
-                        ) {
-                            $jlMc = $result['jl_mc'];
-                            break;
-                        }
-                    }
-                    $allDataPerjarum[$machinetypeid][$weekCount] = [
-                        'delJrm' => $id2['delivery'],
-                        'qtyJrm' => $qty,
-                        'prodJrm' => $produksi,
-                        'sisaJrm' => $sisa,
-                        'jlMcJrm' => $jlMc,
-                    ];
-                    // Tambahkan qty, produksi, dan sisa ke total mingguan
-                    if (!isset($totalPerWeekJrm[$weekCount])) {
-                        $totalPerWeekJrm[$weekCount] = 0;
-                        $totalProdPerWeekJrm[$weekCount] = 0;
-                        $totalSisaPerWeekJrm[$weekCount] = 0;
-                        $totalJlMcPerWeekJrm[$weekCount] = 0;
-                    }
-                    $totalPerWeekJrm[$weekCount] += $qty;
-                    $totalProdPerWeekJrm[$weekCount] += $produksi;
-                    $totalSisaPerWeekJrm[$weekCount] += $sisa;
-                    $totalJlMcPerWeekJrm[$weekCount] += $jlMc;
-                }
-
-                // Pindahkan ke minggu berikutnya
-                $currentStartDate = (clone $endOfWeek)->modify('+1 day');
-                $weekCount++;
-            }
-        }
-
-        $maxWeekCount = $weekCount - 1;
-
-        $data = [
-            'role' => $role,
-            'title' => 'Data Sisa Order',
-            'active1' => '',
-            'active2' => '',
-            'active3' => 'active',
-            'active4' => '',
-            'active5' => '',
-            'active6' => '',
-            'active7' => '',
-            'area' => $ar,
-            'bulan' => $bulan,
-            'maxWeek' => $maxWeekCount,
-            'allData' => $allData,
-            'totalPerWeek' => $totalPerWeek,
-            'totalProdPerWeek' => $totalProdPerWeek,
-            'totalSisaPerWeek' => $totalSisaPerWeek,
-            'totalJlMcPerWeek' => $totalJlMcPerWeek,
-            'allDataJrm' => $allDataPerjarum,
-            'totalPerWeekJrm' => $totalPerWeekJrm,
-            'totalProdPerWeekJrm' => $totalProdPerWeekJrm,
-            'totalSisaPerWeekJrm' => $totalSisaPerWeekJrm,
-            'totalJlMcPerWeekJrm' => $totalJlMcPerWeekJrm,
-            'years' => $years,
-            'months' => $months
-        ];
-
-        return view($role . '/Order/detailSisaOrderArea', $data);
-    }
-
     public function reviseorder()
     {
         $file = $this->request->getFile('excel_file');

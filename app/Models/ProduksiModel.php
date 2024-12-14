@@ -208,29 +208,6 @@ class ProduksiModel extends Model
         return $result;
     }
 
-    public function getJlMcArea($data)
-    {
-        $yesterday = date('Y-m-d', strtotime('-10 day'));
-
-        $result = $this->select('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, WEEK(apsperstyle.delivery, 1) as delivery_week, MONTH(apsperstyle.delivery) as delivery_month, YEAR(apsperstyle.delivery) as delivery_year, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
-            ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
-            ->where('apsperstyle.factory', $data['area'])
-            ->where('apsperstyle.production_unit !=', 'MJ')
-            ->where('MONTH(apsperstyle.delivery)', date('m', strtotime($data['bulan']))) // Filter bulan
-            ->where('YEAR(apsperstyle.delivery)', date('Y', strtotime($data['bulan'])))
-            ->where('produksi.tgl_produksi', $yesterday)
-            ->groupBy('apsperstyle.mastermodel')
-            ->groupBy('apsperstyle.machinetypeid')
-            ->groupBy('apsperstyle.factory')
-            ->groupBy('apsperstyle.delivery')
-            ->orderBy('apsperstyle.mastermodel')
-            ->orderBy('apsperstyle.machinetypeid')
-            ->orderBy('apsperstyle.factory')
-            ->orderBy('apsperstyle.delivery')
-            ->findAll();
-        return $result;
-    }
-
     public function getJlMcJrmArea($data)
     {
         $yesterday = date('Y-m-d', strtotime('-12 day'));
