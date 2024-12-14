@@ -1661,6 +1661,8 @@ class OrderController extends BaseController
         // dd($data);
         return view($role . '/Order/detailSisaOrderArea', $data);
     }
+
+
     public function reviseorder()
     {
         $file = $this->request->getFile('excel_file');

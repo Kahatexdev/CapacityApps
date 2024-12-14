@@ -133,8 +133,115 @@
 
     </div>
 
+    <div class="row mt-3">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class=" d-flex justify-content-between">
 
+                        <h4>
+                            BS Mesin Perbulan <?= $areas ?>
 
+                        </h4>
+                        <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#summaryBS">
+                            <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary BS MC
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-1">
+        <?php foreach ($month as $bln): ?>
+            <div class="col-lg-3 mt-2">
+                <a href="<?= base_url($role . '/bsMesinPerbulan/' . $areas . '/' . $bln) ?>">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="col-lg-12">
+                                <h5 class="card-title">
+
+                                    <i class="fas fa-calendar-alt text-lg opacity-10" aria-hidden="true"></i> <?= $bln ?>
+                                </h5>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </a>
+            </div>
+        <?php endforeach ?>
+    </div>
+
+</div>
+<div class="modal fade" id="summaryBS" tabindex="-1" role="dialog" aria-labelledby="summaryBS" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Summary BS MC</h5>
+                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form action="<?= base_url($role . '/exportSummaryBs'); ?>" method="POST">
+                <div class="modal-body align-items-center">
+                    <div class="form-group">
+                        <label for="buyer" class="col-form-label">Buyer</label>
+                        <select class="form-control" id="buyer" name="buyer">
+                            <option></option>
+                            <?php foreach ($buyer as $buy) : ?>
+                                <option><?= $buy['kd_buyer_order'] ?></option>
+                            <?php endforeach ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="area" class="col-form-label">Area</label>
+                        <select class="form-control" id="area" name="area">
+                            <option></option>
+                            <?php foreach ($area as $ar) : ?>
+                                <option><?= $ar ?></option>
+                            <?php endforeach ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="jarum" class="col-form-label">Jarum</label>
+                        <select class="form-control" id="jarum" name="jarum">
+                            <option></option>
+                            <option value="13">13</option>
+                            <option value="84">84</option>
+                            <option value="92">92</option>
+                            <option value="96">96</option>
+                            <option value="106">106</option>
+                            <option value="108">108</option>
+                            <option value="116">116</option>
+                            <option value="120">120</option>
+                            <option value="124">124</option>
+                            <option value="126">126</option>
+                            <option value="144">144</option>
+                            <option value="168">168</option>
+                            <option value="240">240</option>
+                            <option value="POM-POM">POM-POM</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pdk" class="col-form-label">No Model</label>
+                        <input type="text" class="form-control" name="pdk">
+                    </div>
+                    <div class="form-group">
+                        <label for="awal" class="col-form-label">Dari</label>
+                        <input type="date" class="form-control" name="awal">
+                    </div>
+                    <div class="form-group">
+                        <label for="akhir" class="col-form-label">Sampai</label>
+                        <input type="date" class="form-control" name="akhir">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-gradient-info">Generate</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script type="text/javascript">
