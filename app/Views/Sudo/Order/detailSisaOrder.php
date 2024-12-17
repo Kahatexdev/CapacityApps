@@ -100,12 +100,35 @@
                                         foreach ($allData as $noModel => $id) {
                                             $rowsModel = count($id);
                                             foreach ($id as $jarum => $rowJarum) {
-                                                $rowsJarum = count($rowJarum);
+                                                $rowsJarums = count($rowJarum);
+                                                if ($rowsJarums > 1) {
+                                                    $rowsModel += $rowsJarums - 1;
+                                                }
+                                                $rowsArea = 0;
+                                                foreach ($rowJarum as $area2 => $rowArea) {
+                                                    for ($i = 1; $i <= $maxWeek; $i++) {
+                                                        if (isset($rowArea[$i])) {
+                                                            $rowsArea = count($rowArea[$i]);
+                                                            $rowDelivery = count($rowArea[$i]);
+                                                            if ($rowDelivery > 1) {
+                                                                $rowsModel += $rowDelivery - 1;
+                                                                $rowsJarums += $rowDelivery - 1;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ?>
+                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsModel ?>"><?= $noModel ?></td>
+                                            <?php
+                                            $rowJarum = 0;
+                                            foreach ($id as $jarum => $id2) {
+                                                $rowsJarum = count($id2);
                                                 if ($rowsJarum > 1) {
                                                     $rowsModel += $rowsJarum - 1;
                                                 }
                                                 $rowsArea = 0;
-                                                foreach ($rowJarum as $area => $rowArea) {
+                                                foreach ($id2 as $area2 => $rowArea) {
                                                     for ($i = 1; $i <= $maxWeek; $i++) {
                                                         if (isset($rowArea[$i])) {
                                                             $rowsArea = count($rowArea[$i]);
@@ -116,14 +139,10 @@
                                                             }
                                                         }
                                                     }
-                                                }
-                                            }
-                                        ?>
-                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsModel ?>"><?= $noModel ?></td>
-                                            <?php foreach ($id as $jarum => $id2) { ?>
+                                                } ?>
                                                 <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsJarum ?>"><?= $jarum ?></td>
                                                 <?php foreach ($id2 as $area => $id3) { ?>
-                                                    <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $area ?></td>
+                                                    <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsArea ?>"><?= $area ?></td>
                                                     <?php for ($i = 1; $i <= $maxWeek; $i++) {
                                                         if (isset($id3[$i])) {
                                                             $numRows = count($id3[$i]);
@@ -133,7 +152,7 @@
                                                                 if ($parsedData) {
                                                                     // Menampilkan data yang sudah di-parse
                                                     ?>
-                                                                    <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $parsedData['del'] ?? '-' ?></td>
+                                                                    <td class=" text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $parsedData['del'] ?? '-' ?></td>
                                                                     <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $parsedData['qty'] ?? 0 ?></td>
                                                                     <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $parsedData['prod'] ?? 0 ?></td>
                                                                     <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $parsedData['sisa'] ?? 0 ?></td>

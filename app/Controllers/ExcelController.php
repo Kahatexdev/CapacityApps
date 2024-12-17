@@ -2080,14 +2080,14 @@ class ExcelController extends BaseController
     {
         $role = session()->get('role');
         $month = $this->request->getPost('month');
-        $year = $this->request->getPost('year');
+        $yearss = $this->request->getPost('year');
 
         // Jika bulan atau tahun tidak diisi, gunakan bulan dan tahun ini
-        if (empty($month) || empty($year)) {
+        if (empty($month) || empty($yearss)) {
             $bulan = date('Y-m-01', strtotime('this month')); // Bulan ini
         } else {
             // Atur tanggal berdasarkan input bulan dan tahun dari POST
-            $bulan = date('Y-m-01', strtotime("$year-$month-01"));
+            $bulan = date('Y-m-01', strtotime("$yearss-$month-01"));
         }
 
         $years = [];
@@ -2116,17 +2116,14 @@ class ExcelController extends BaseController
         $months = array_unique($months);
 
         // Ambil data dari model
-        $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
         $startDate = new \DateTime($bulan); // Awal bulan
         $startDate->setTime(0, 0, 0);
         $endDate = (clone $startDate)->modify('last day of this month');   // Akhir bulan
 
         // Loop data
+        $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
         $allData = [];
         $totalPerWeek = [];
-        $totalProdPerWeek = [];
-        $totalSisaPerWeek = [];
-        $totalJlMcPerWeek = [];
 
         foreach ($data as $id) {
             $mastermodel = $id['mastermodel'];
@@ -2143,116 +2140,132 @@ class ExcelController extends BaseController
             $weekCount = 1;
             $currentStartDate = clone $startDate;
 
-            $dataOrder = [
-                'model' => $mastermodel,
-                'jarum' => $machinetypeid,
-                'area' => $factory,
-                'delivery' => $id['delivery'],
-            ];
-
-            // ambil jl mc berdasarkan $dataOrder
-            $jlMcData = $this->produksiModel->getJlMc($dataOrder);
-
-            $jlMc = 0; // Nilai default sebelum loop
-            foreach ($jlMcData as $mc) {
-                $jlMc = $mc['jl_mc'];
-            }
-
-            while ($currentStartDate <= $endDate) {
-                // Hitung akhir minggu
+            for ($weekCount = 1; $currentStartDate <= $endDate; $weekCount++) {
                 $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
-
-                // Pastikan akhir minggu tidak melebihi akhir bulan
-                if ($endOfWeek > $endDate) {
-                    $endOfWeek = $endDate;
-                }
+                $endOfWeek = min($endOfWeek, $endDate);
 
                 // Periksa apakah tanggal pengiriman berada dalam minggu ini
                 if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
-                    // Pastikan array untuk minggu ini sudah ada, jika belum buat array baru
-                    if (!isset($totalPerWeek[$weekCount])) {
-                        $totalPerWeek[$weekCount] = 0;
-                        $totalProdPerWeek[$weekCount] = 0;
-                        $totalSisaPerWeek[$weekCount] = 0;
-                        $totalJlMcPerWeek[$weekCount] = 0;
+                    // Ambil total jl_mc untuk minggu ini dan jumlahkan jika sudah ada data sebelumnya
+                    $dataOrder = [
+                        'model' => $mastermodel,
+                        'jarum' => $machinetypeid,
+                        'area' => $factory,
+                        'delivery' => $id['delivery'],
+                    ];
+                    $jlMc = 0;
+                    $jlMcData = $this->produksiModel->getJlMc($dataOrder);
+
+                    // Pastikan data jl_mc ada
+                    if ($jlMcData) {
+                        // Loop untuk menjumlahkan jl_mc
+                        foreach ($jlMcData as $mc) {
+                            $jlMc += $mc['jl_mc'];
+                        }
                     }
-
-                    // Tambahkan data ke array
-                    $totalPerWeek[$weekCount] += $qty;
-                    $totalProdPerWeek[$weekCount] += $produksi;
-                    $totalSisaPerWeek[$weekCount] += $sisa;
-                    $totalJlMcPerWeek[$weekCount] += $jlMc;
-
-                    // Tambahkan data ke $allData
-                    if (!isset($allData[$mastermodel][$machinetypeid][$factory][$weekCount])) {
-                        $allData[$mastermodel][$machinetypeid][$factory][$weekCount] = [];
-                    }
-
-                    $allData[$mastermodel][$machinetypeid][$factory][$weekCount] = [
+                    $allData[$mastermodel][$machinetypeid][$factory][$weekCount][] = json_encode([
                         'del' => $id['delivery'],
                         'qty' => $qty,
                         'prod' => $produksi,
                         'sisa' => $sisa,
                         'jlMc' => $jlMc,
-                    ];
+                    ]);
+
+                    // Hitung total per minggu
+                    if (!isset($totalPerWeek[$weekCount])) {
+                        $totalPerWeek[$weekCount] = [
+                            'totalQty' => 0,
+                            'totalProd' => 0,
+                            'totalSisa' => 0,
+                            'totalJlMc' => 0,
+                        ];
+                    }
+                    $totalPerWeek[$weekCount]['totalQty'] += $qty;
+                    $totalPerWeek[$weekCount]['totalProd'] += $produksi;
+                    $totalPerWeek[$weekCount]['totalSisa'] += $sisa;
+                    $totalPerWeek[$weekCount]['totalJlMc'] += $jlMc;
                 }
 
                 // Pindahkan ke minggu berikutnya
                 $currentStartDate = (clone $endOfWeek)->modify('+1 day');
-                $weekCount++;
             }
         }
 
         // Proses data per jarum
         $dataPerjarum = $this->ApsPerstyleModel->getBuyerOrderPejarum($buyer, $bulan);
         $allDataPerjarum = [];
-        $totalPerWeekJrm = $totalProdPerWeekJrm = $totalSisaPerWeekJrm = $totalJlMcPerWeekJrm = [];
+        $totalPerWeekJrm = [];
 
         foreach ($dataPerjarum as $id2) {
             $machinetypeid = $id2['machinetypeid'];
+            $delivery = $id2['delivery'];
             $qty = $id2['qty'];
             $sisa = $id2['sisa'];
             $produksi = $qty - $sisa;
-            $deliveryDate = new \DateTime($id2['delivery']);
-            $currentStartDate = clone $startDate; // Reset ke awal bulan
+            $deliveryDate = new \DateTime($delivery); // Tanggal pengiriman
 
+            $weekCount = 1;
+            $currentStartDate = clone $startDate;
             for ($weekCount = 1; $currentStartDate <= $endDate; $weekCount++) {
                 $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
                 $endOfWeek = min($endOfWeek, $endDate);
 
+                // Periksa apakah tanggal pengiriman berada dalam minggu ini
                 if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
-                    // Ambil total jl_mc untuk minggu ini dan jumlahkan jika sudah ada data sebelumnya
-                    $jlMcJrmData = $this->produksiModel->getJlMcJrm([
+                    $jlMcJrm = 0;
+                    $dataOrder2 = [
                         'buyer' => $buyer,
                         'jarum' => $machinetypeid,
-                        'delivery' => $deliveryDate->format('Y-m-d'),
-                    ]);
-                    $jlMcJrm = array_sum(array_column($jlMcJrmData, 'jl_mc'));
-
-                    // Pastikan data minggu ini diupdate dengan penambahan jl_mc jika sudah ada
-                    if (!isset($allDataPerjarum[$machinetypeid][$weekCount])) {
-                        $allDataPerjarum[$machinetypeid][$weekCount] = [
-                            'delJrm' => $id2['delivery'],
-                            'qtyJrm' => $qty,
-                            'prodJrm' => $produksi,
-                            'sisaJrm' => $sisa,
-                            'jlMcJrm' => $jlMcJrm,
-                        ];
-                    } else {
-                        // Jika sudah ada, jumlahkan jl_mc untuk minggu yang sama
-                        $allDataPerjarum[$machinetypeid][$weekCount]['jlMcJrm'] += $jlMcJrm;
+                        'delivery' => $delivery,
+                    ];
+                    $jlMcJrmData = $this->produksiModel->getJlMcJrm($dataOrder2);
+                    if ($jlMcJrmData) {
+                        foreach ($jlMcJrmData as $mcJrm) {
+                            $jlMcJrm += $mcJrm['jl_mc'];
+                        }
                     }
 
-                    // Update total per minggu
-                    $totalPerWeekJrm[$weekCount] = ($totalPerWeekJrm[$weekCount] ?? 0) + $qty;
-                    $totalProdPerWeekJrm[$weekCount] = ($totalProdPerWeekJrm[$weekCount] ?? 0) + $produksi;
-                    $totalSisaPerWeekJrm[$weekCount] = ($totalSisaPerWeekJrm[$weekCount] ?? 0) + $sisa;
-                    $totalJlMcPerWeekJrm[$weekCount] = ($totalJlMcPerWeekJrm[$weekCount] ?? 0) + $jlMcJrm;
+                    // Pastikan array utama memiliki key jarum
+                    if (!isset($allDataPerjarum[$machinetypeid])) {
+                        $allDataPerjarum[$machinetypeid] = [];
+                    }
+                    // Pastikan minggu tersedia
+                    if (!isset($allDataPerjarum[$machinetypeid][$weekCount])) {
+                        $allDataPerjarum[$machinetypeid][$weekCount] = [
+                            'qtyJrm' => 0,
+                            'prodJrm' => 0,
+                            'sisaJrm' => 0,
+                            'jlMcJrm' => 0,
+                        ];
+                    }
+
+                    // Tambahkan data minggu
+                    $allDataPerjarum[$machinetypeid][$weekCount]['qtyJrm'] += $qty;
+                    $allDataPerjarum[$machinetypeid][$weekCount]['prodJrm'] += $produksi;
+                    $allDataPerjarum[$machinetypeid][$weekCount]['sisaJrm'] += $sisa;
+                    $allDataPerjarum[$machinetypeid][$weekCount]['jlMcJrm'] += $jlMcJrm;
+
+                    // Hitung total per minggu
+                    if (!isset($totalPerWeekJrm[$weekCount])) {
+                        $totalPerWeekJrm[$weekCount] = [
+                            'totalQty' => 0,
+                            'totalProd' => 0,
+                            'totalSisa' => 0,
+                            'totalJlMc' => 0,
+                        ];
+                    }
+                    $totalPerWeekJrm[$weekCount]['totalQty'] += $qty;
+                    $totalPerWeekJrm[$weekCount]['totalProd'] += $produksi;
+                    $totalPerWeekJrm[$weekCount]['totalSisa'] += $sisa;
+                    $totalPerWeekJrm[$weekCount]['totalJlMc'] += $jlMcJrm;
                 }
 
+                // Pindahkan ke minggu berikutnya
                 $currentStartDate = (clone $endOfWeek)->modify('+1 day');
             }
         }
+        // dd($allDataPerjarum);
+
         $maxWeek = $weekCount - 1;
 
         // Generate Excel
@@ -2425,28 +2438,86 @@ class ExcelController extends BaseController
                     $col5 = 'E';
                     for ($i = 1; $i <= $maxWeek; $i++) {
                         if (isset($id3[$i])) {
-                            // Ambil data per week
-                            $del = $id3[$i]['del'] ?? 0;
-                            $qty = $id3[$i]['qty'] ?? 0;
-                            $prod = $id3[$i]['prod'] ?? 0;
-                            $sisa = $id3[$i]['sisa'] ?? 0;
-                            $jlMc = $id3[$i]['jlMc'] ?? 0;
+                            $numRows = count($id3[$i]);
+                            $numRows2 = 1;
+                            foreach ($id3[$i] as $index => $data) {
+                                $parsedData = json_decode($data, true);
+                                if ($parsedData) {
+                                    $del = $parsedData['del'] ?? 0;
+                                    $qty = $parsedData['qty'] ?? 0;
+                                    $prod = $parsedData['prod'] ?? 0;
+                                    $sisa = $parsedData['sisa'] ?? 0;
+                                    $jlMc = $parsedData['jlMc'] ?? 0;
 
-                            $sheet->setCellValue($col5 . $row, $del);
-                            $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
-                            $col5++;
-                            $sheet->setCellValue($col5 . $row, $qty);
-                            $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
-                            $col5++;
-                            $sheet->setCellValue($col5 . $row, $prod !== 0 ? $prod : '-');
-                            $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
-                            $col5++;
-                            $sheet->setCellValue($col5 . $row, $sisa !== 0 ? $sisa : '-');
-                            $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
-                            $col5++;
-                            $sheet->setCellValue($col5 . $row, $jlMc !== 0 ? $jlMc : '-');
-                            $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
-                            $col5++;
+
+                                    $sheet->setCellValue($col5 . $row, $del);
+                                    $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                                    $col5++;
+                                    $sheet->setCellValue($col5 . $row, $qty);
+                                    $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                                    $col5++;
+                                    $sheet->setCellValue($col5 . $row, $prod !== 0 ? $prod : '-');
+                                    $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                                    $col5++;
+                                    $sheet->setCellValue($col5 . $row, $sisa !== 0 ? $sisa : '-');
+                                    $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                                    $col5++;
+                                    $sheet->setCellValue($col5 . $row, $jlMc !== 0 ? $jlMc : '-');
+                                    $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                                    $col5++;
+                                    // 
+                                    $colsEnd = $maxWeek - $i;
+                                    $colsStart = $i - 1;
+                                    if ($numRows > 1 && $numRows2 < $numRows) {
+                                        // Konversi huruf kolom ke nomor indeks kolom
+                                        for ($i = 1; $i <= $colsEnd; $i++) {
+                                            $sheet->setCellValue($col5 . $row, '');
+                                            $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                                            $col5++;
+                                            $sheet->setCellValue($col5 . $row, '');
+                                            $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                                            $col5++;
+                                            $sheet->setCellValue($col5 . $row, '');
+                                            $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                                            $col5++;
+                                            $sheet->setCellValue($col5 . $row, '');
+                                            $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                                            $col5++;
+                                            $sheet->setCellValue($col5 . $row, '');
+                                            $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                                            $col5++;
+                                            if ($i == $colsEnd) {
+                                                $sheet->setCellValue($col5 . $row, '');
+                                                $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                                                $col5++;
+                                            }
+                                        }
+                                        $row++;
+                                        for ($i = 1; $i <= $colsStart; $i++) {
+                                            $col_index2 = Coordinate::columnIndexFromString($col5);
+                                            $colNext = $col_index2 - (5 * $maxWeek) + 1;
+                                            $col5 = Coordinate::stringFromColumnIndex($colNext);
+                                            $sheet->setCellValue($col5 . $row, '');
+                                            $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                                            $col5++;
+                                            $sheet->setCellValue($col5 . $row, '');
+                                            $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                                            $col5++;
+                                            $sheet->setCellValue($col5 . $row, '');
+                                            $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                                            $col5++;
+                                            $sheet->setCellValue($col5 . $row, '');
+                                            $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                                            $col5++;
+                                            $sheet->setCellValue($col5 . $row, '');
+                                            $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                                            $col5++;
+                                        }
+                                        // dd($col5);
+                                    }
+                                    $numRows2++;
+                                }
+                            }
                         } else {
                             $sheet->setCellValue($col5 . $row, '');
                             $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
@@ -2489,16 +2560,16 @@ class ExcelController extends BaseController
             $sheet->setCellValue($col6 . $row, '');
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
             $col6++;
-            $sheet->setCellValue($col6 . $row, isset($totalPerWeek[$i]) && $totalPerWeek[$i] != 0 ? $totalPerWeek[$i] : '-');
+            $sheet->setCellValue($col6 . $row, isset($totalPerWeek[$i]['totalQty']) && $totalPerWeek[$i]['totalQty'] != 0 ? $totalPerWeek[$i]['totalQty'] : '-');
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
             $col6++;
-            $sheet->setCellValue($col6 . $row, isset($totalProdPerWeek[$i]) && $totalProdPerWeek[$i] != 0 ? $totalProdPerWeek[$i] : '-');
+            $sheet->setCellValue($col6 . $row, isset($totalPerWeek[$i]['totalProd']) && $totalPerWeek[$i]['totalProd'] != 0 ? $totalPerWeek[$i]['totalProd'] : '-');
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
             $col6++;
-            $sheet->setCellValue($col6 . $row, isset($totalSisaPerWeek[$i]) && $totalSisaPerWeek[$i] != 0 ? $totalSisaPerWeek[$i] : '-');
+            $sheet->setCellValue($col6 . $row, isset($totalPerWeek[$i]['totalSisa']) && $totalPerWeek[$i]['totalSisa'] != 0 ? $totalPerWeek[$i]['totalSisa'] : '-');
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
             $col6++;
-            $sheet->setCellValue($col6 . $row, isset($totalJlMcPerWeek[$i]) && $totalJlMcPerWeek[$i] != 0 ? $totalJlMcPerWeek[$i] : '-');
+            $sheet->setCellValue($col6 . $row, isset($totalPerWeek[$i]['totalJlMc']) && $totalPerWeek[$i]['totalJlMc'] != 0 ? $totalPerWeek[$i]['totalJlMc'] : '-');
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
             $col6++;
         }
@@ -2608,16 +2679,16 @@ class ExcelController extends BaseController
 
         $col6 = 'B';
         for ($i = 1; $i <= $maxWeek; $i++) {
-            $sheet->setCellValue($col6 . $row, isset($totalPerWeekJrm[$i]) && $totalPerWeekJrm[$i] != 0 ? $totalPerWeekJrm[$i] : '-');
+            $sheet->setCellValue($col6 . $row, isset($totalPerWeekJrm[$i]['totalQty']) && $totalPerWeekJrm[$i]['totalQty'] != 0 ? $totalPerWeekJrm[$i]['totalQty'] : '-');
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
             $col6++;
-            $sheet->setCellValue($col6 . $row, isset($totalProdPerWeekJrm[$i]) && $totalProdPerWeekJrm[$i] != 0 ? $totalProdPerWeekJrm[$i] : '-');
+            $sheet->setCellValue($col6 . $row, isset($totalPerWeekJrm[$i]['totalProd']) && $totalPerWeekJrm[$i]['totalProd'] != 0 ? $totalPerWeekJrm[$i]['totalProd'] : '-');
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
             $col6++;
-            $sheet->setCellValue($col6 . $row, isset($totalSisaPerWeekJrm[$i]) && $totalSisaPerWeekJrm[$i] != 0 ? $totalSisaPerWeekJrm[$i] : '-');
+            $sheet->setCellValue($col6 . $row, isset($totalPerWeekJrm[$i]['totalSisa']) && $totalPerWeekJrm[$i]['totalSisa'] != 0 ? $totalPerWeekJrm[$i]['totalSisa'] : '-');
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
             $col6++;
-            $sheet->setCellValue($col6 . $row, isset($totalJlMcPerWeekJrm[$i]) && $totalJlMcPerWeekJrm[$i] != 0 ? $totalJlMcPerWeekJrm[$i] : '-');
+            $sheet->setCellValue($col6 . $row, isset($totalPerWeekJrm[$i]['totalJlMc']) && $totalPerWeekJrm[$i]['totalJlMc'] != 0 ? $totalPerWeekJrm[$i]['totalJlMc'] : '-');
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
             $col6++;
         }
@@ -2800,7 +2871,6 @@ class ExcelController extends BaseController
                 $currentStartDate = (clone $endOfWeek)->modify('+1 day');
             }
         }
-
         $maxWeek = $weekCount - 1;
 
         // Generate Excel
@@ -2973,6 +3043,7 @@ class ExcelController extends BaseController
             $sheet->getStyle('B' . $row . ':B' . $mergeModel)->applyFromArray($styleBody);
 
             foreach ($id as $jarum => $id2) {
+
                 $mergeJarum = $row + $rowsJarum - 1;
 
                 $sheet->setCellValue('C' . $row, $jarum);
@@ -2981,7 +3052,7 @@ class ExcelController extends BaseController
 
                 foreach ($id2 as $area => $id3) {
                     $mergeArea = $row + $rowsArea - 1;
-                    $sheet->setCellValue('D' . $row, $jarum);
+                    $sheet->setCellValue('D' . $row, $area);
                     $sheet->mergeCells('D' . $row . ':D' . $mergeJarum);
                     $sheet->getStyle('D' . $row . ':D' . $mergeJarum)->applyFromArray($styleBody);
 
