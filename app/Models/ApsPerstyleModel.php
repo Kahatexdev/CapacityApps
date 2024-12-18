@@ -15,7 +15,7 @@ class ApsPerstyleModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['idapsperstyle', 'machinetypeid', 'mastermodel', 'size', 'delivery', 'qty', 'sisa', 'seam', 'factory', 'production_unit', 'smv', 'no_order', 'country', 'color', 'po_plus'];
+    protected $allowedFields    = ['idapsperstyle', 'machinetypeid', 'mastermodel', 'size', 'delivery', 'qty', 'sisa', 'seam', 'factory', 'production_unit', 'smv', 'no_order', 'country', 'color', 'po_plus', 'inisial'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -721,5 +721,34 @@ class ApsPerstyleModel extends Model
         return $this->where('mastermodel', $nomodel)
             ->set('qty', 0)
             ->update();
+    }
+    public function StylePerDelive($model, $jarum)
+    {
+        return $this->select('sum(sisa) as sisa,sum(qty) as qty, delivery, mastermodel,smv')
+            ->where('machinetypeid', $jarum)
+            ->where('mastermodel', $model)
+            ->where('sisa >=', 0)
+            ->groupby('delivery')
+            ->findAll();
+    }
+    public function StylePerDlv($model, $jarum, $deliv)
+    {
+        $sisa = $this->select('idapsperstyle,mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,factory, production_unit, delivery,smv,seam,country,no_order,inisial')
+            ->where('machinetypeid', $jarum)
+            ->where('mastermodel', $model)
+            ->where('delivery', $deliv)
+            ->where('sisa >=', 0)
+            ->groupBy('size,factory')
+            ->findAll();
+        $final = reset($sisa);
+        return $sisa;
+    }
+    public function updateInisial($data)
+    {
+        $result = $this->set('inisial', $data['inisial'])
+            ->where('mastermodel', $data['pdk'])
+            ->where('size', $data['size'])
+            ->update();
+        return $result;
     }
 }

@@ -359,6 +359,11 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('bsMesinPerbulan/(:any)/(:any)', 'UserController::bsMesinPerbulan/$1/$2');
     $routes->post('saveBsMesin', 'UserController::saveBsMesin');
 
+    // data order
+    $routes->get('dataorderperarea/(:any)', 'OrderController::DetailOrderPerAreaPlan/$1');
+    $routes->get('detailPdk/(:any)/(:any)', 'OrderController::pdkDetail/$1/$2');
+    $routes->post('inputinisial', 'UserController::inputinisial');
+
 
     // $routes->post('importproduksi', 'ProduksiController::importproduksi');
     $routes->post('importproduksi', 'ProduksiController::importproduksinew');
@@ -383,6 +388,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('penggunaanJarum', 'UserController::penggunaanJarum');
     $routes->post('savePenggunaanJarum', 'UserController::savePenggunaanJarum');
     $routes->get('penggunaanPerbulan/(:any)/(:any)', 'UserController::penggunaanPerbulan/$1/$2');
+    $routes->get('excelPenggunaanPerbulan/(:any)/(:any)', 'UserController::exportPenggunaanPerbulan/$1/$2');
 
     //summary bs mc
     $routes->post('exportSummaryBs', 'SummaryController::excelSummaryBs');

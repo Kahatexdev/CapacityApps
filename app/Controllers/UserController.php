@@ -352,4 +352,100 @@ class UserController extends BaseController
         ];
         return view(session()->get('role') . '/bsMesinPerbulan', $data);
     }
+
+    public function exportPenggunaanPerbulan($area, $bulan)
+    {
+        $jarumArea = $this->PenggunaanJarumModel->jarumPerbulan($area, $bulan);
+
+        // Generate Excel
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet()->setTitle("Report Penggunaan Jarum");
+
+        $styleTitle = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FF000000'],
+                'size' => 14
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+        ];
+
+        $styleHeader = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FF000000'],
+                'size' => 12
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+        $styleBody = [
+            'font' => [
+                'color' => ['argb' => 'FF000000'],
+                'size' => 10
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+
+        // Judul
+        $sheet->setCellValue('A1', 'Penggunaan Jarum bulan ' . $bulan);
+        $sheet->getStyle('A1')->applyFromArray($styleTitle);
+
+        $row_header = 3;
+        $sheet->setCellValue('A' . $row_header, 'Tanggal');
+        $sheet->setCellValue('B' . $row_header, 'Nama');
+        $sheet->setCellValue('C' . $row_header, 'Qty');
+        $sheet->setCellValue('D' . $row_header, 'Area');
+        // style header
+        $sheet->getStyle('A' . $row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('B' . $row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('C' . $row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('D' . $row_header)->applyFromArray($styleHeader);
+
+        // foreach ($jarumArea as)
+    }
+
+    public function inputinisial()
+    {
+        $data = [
+            'inisial' => $this->request->getPost('inisial'),
+            'pdk' => $this->request->getPost('pdk'),
+            'size' => $this->request->getPost('size'),
+        ];
+
+        $role = session()->get('role');
+        $pdk = $data['pdk'];
+        $jarum = $this->request->getPost('jarum');
+        $redirectUrl = base_url("$role/detailPdk/$pdk/$jarum");
+
+        $update = $this->ApsPerstyleModel->updateInisial($data);
+
+        if ($update === false) {
+            log_message('error', "Update gagal untuk PDK: {$pdk}, Size: {$data['size']}");
+            return redirect()->to($redirectUrl)->with('error', 'Terjadi kesalahan saat mengupdate inisial');
+        }
+
+        if ($update === 0) {
+            return redirect()->to($redirectUrl)->with('warning', 'Tidak ada perubahan pada inisial');
+        }
+
+        return redirect()->to($redirectUrl)->with('success', 'Inisial berhasil diubah');
+    }
 }

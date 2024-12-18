@@ -1261,6 +1261,7 @@ class OrderController extends BaseController
 
         // Loop data
         $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
+        // dd($data);
         $allData = [];
         $totalPerWeek = [];
 
@@ -1776,5 +1777,56 @@ class OrderController extends BaseController
         } else {
             return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $machinetypeid))->with('error', 'No data found in the Excel file');
         }
+    }
+    public function pdkDetail($noModel, $jarum)
+    {
+        $pdk = $this->ApsPerstyleModel->StylePerDelive($noModel, $jarum);
+        $pdkPerdlv = [];
+        foreach ($pdk as $perdeliv) {
+            $deliv = $perdeliv['delivery'];
+            $pdkPerdlv[$deliv] = $this->ApsPerstyleModel->StylePerDlv($noModel, $jarum, $deliv);
+        }
+        foreach ($pdkPerdlv as $deliv => $list) {
+            $totalqty = 0;
+            $qty = 0;
+            if (is_array($list)) {
+                foreach ($list as $val) {
+                    if (isset($val['sisa'])) {
+                        $qty += $val['qty'];
+                        $totalqty = $qty;
+                    }
+                }
+            }
+            $pdkPerdlv[$deliv]['totalQty'] = $totalqty;
+        }
+        $totalPo = $this->ApsPerstyleModel->totalPo($noModel);
+        // ini ngambil jumlah qty
+        $sisaArray = array_column($pdk, 'sisa');
+        $maxValue = max($sisaArray);
+        $indexMax = array_search($maxValue, $sisaArray);
+        $totalQty = 0;
+        for ($i = 0; $i <= $indexMax; $i++) {
+            $totalQty += $sisaArray[$i];
+        }
+
+
+
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'order' => $pdkPerdlv,
+            'headerRow' => $pdk,
+            'noModel' => $noModel,
+            'jarum' => $jarum,
+            'totalPo' => $totalPo
+        ];
+        return view(session()->get('role') . '/Order/detailPdk', $data);
     }
 }

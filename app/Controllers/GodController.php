@@ -1032,6 +1032,7 @@ class GodController extends BaseController
                 $tgl = $data[4]; // Misal ini timestamp (jumlah detik sejak 1970-01-01)
                 $delivery = date('Y-m-d', strtotime($tgl));
                 $sisa = intval($data[5]);
+                $inisial = $data[6];
                 $update = [
                     'factory' => $area,
                     'mastermodel' => $no_model,
@@ -1044,7 +1045,7 @@ class GodController extends BaseController
 
                 $getId = $this->ApsPerstyleModel->getIdPerDeliv($update);
 
-                $update = $this->ApsPerstyleModel->update($getId['idapsperstyle'], ['sisa' => $sisa]);
+                $update = $this->ApsPerstyleModel->update($getId['idapsperstyle'], ['sisa' => $sisa, 'inisial' => $inisial]);
                 if (!$update) {
                     $failedRows[] = 'Error on row ' . $rowIndex . ': Gagal Update ';
                 }
