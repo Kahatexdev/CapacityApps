@@ -394,6 +394,7 @@ class OrderController extends BaseController
             'seam' => $this->request->getPost("seam"),
             'smv' => $this->request->getPost("smv"),
             'factory' => $this->request->getPost("factory"),
+            'inisial' => $this->request->getPost("inisial"),
         ];
         $jrm = $this->request->getPost("jarum");
         $id = $idOrder;
@@ -1263,6 +1264,7 @@ class OrderController extends BaseController
         $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
         // dd($data);
         $allData = [];
+        $week = [];
         $totalPerWeek = [];
 
         foreach ($data as $id) {
@@ -1283,9 +1285,12 @@ class OrderController extends BaseController
             for ($weekCount = 1; $currentStartDate <= $endDate; $weekCount++) {
                 $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
                 $endOfWeek = min($endOfWeek, $endDate);
-
+                $dateWeek = $currentStartDate->format('d') . " - " . $endOfWeek->format('d');
+                $week[$weekCount] = $dateWeek;
+                // dd($currentStartDate);
                 // Periksa apakah tanggal pengiriman berada dalam minggu ini
                 if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
+
                     // Ambil total jl_mc untuk minggu ini dan jumlahkan jika sudah ada data sebelumnya
                     $dataOrder = [
                         'model' => $mastermodel,
@@ -1425,6 +1430,7 @@ class OrderController extends BaseController
             'totalDataJrm' => $totalPerWeekJrm,
             'years' => $years,
             'months' => $months,
+            'week' => $week,
         ];
         // dd($data);
         return view(session()->get('role') . '/Order/detailSisaOrder', $data);

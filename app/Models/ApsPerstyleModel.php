@@ -403,7 +403,7 @@ class ApsPerstyleModel extends Model
     }
     public function getSisaPerDlv($model, $jarum, $deliv)
     {
-        $sisa = $this->select('idapsperstyle,mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,factory, production_unit, delivery,smv,seam,country,no_order')
+        $sisa = $this->select('idapsperstyle,inisial,mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,factory, production_unit, delivery,smv,seam,country,no_order')
             ->where('machinetypeid', $jarum)
             ->where('mastermodel', $model)
             ->where('delivery', $deliv)

@@ -14,6 +14,11 @@ use App\Models\BsMesinModel;
 use App\Models\PenggunaanJarum;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpParser\Node\Stmt\Return_;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\{Border, Alignment, Fill};
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+
 
 class UserController extends BaseController
 {
@@ -408,18 +413,39 @@ class UserController extends BaseController
         $sheet->setCellValue('A1', 'Penggunaan Jarum bulan ' . $bulan);
         $sheet->getStyle('A1')->applyFromArray($styleTitle);
 
-        $row_header = 3;
-        $sheet->setCellValue('A' . $row_header, 'Tanggal');
-        $sheet->setCellValue('B' . $row_header, 'Nama');
-        $sheet->setCellValue('C' . $row_header, 'Qty');
-        $sheet->setCellValue('D' . $row_header, 'Area');
+        $rowHeader = 3;
+        $sheet->setCellValue('A' . $rowHeader, 'Tanggal');
+        $sheet->setCellValue('B' . $rowHeader, 'Nama');
+        $sheet->setCellValue('C' . $rowHeader, 'Qty');
+        $sheet->setCellValue('D' . $rowHeader, 'Area');
         // style header
-        $sheet->getStyle('A' . $row_header)->applyFromArray($styleHeader);
-        $sheet->getStyle('B' . $row_header)->applyFromArray($styleHeader);
-        $sheet->getStyle('C' . $row_header)->applyFromArray($styleHeader);
-        $sheet->getStyle('D' . $row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('A' . $rowHeader)->applyFromArray($styleHeader);
+        $sheet->getStyle('B' . $rowHeader)->applyFromArray($styleHeader);
+        $sheet->getStyle('C' . $rowHeader)->applyFromArray($styleHeader);
+        $sheet->getStyle('D' . $rowHeader)->applyFromArray($styleHeader);
 
-        // foreach ($jarumArea as)
+        $rowBody = $rowHeader++;
+
+        foreach ($jarumArea as $data) {
+            $sheet->setCellValue('A' . $rowBody, $data['tanggal']);
+            $sheet->setCellValue('B' . $rowBody, $data['nama_karyawan']);
+            $sheet->setCellValue('C' . $rowBody, $data['total_jarum']);
+            $sheet->setCellValue('D' . $rowBody, $data['area']);
+            //  style body
+            $sheet->getStyle('A' . $rowBody)->applyFromArray($styleBody);
+            $sheet->getStyle('B' . $rowBody)->applyFromArray($styleBody);
+            $sheet->getStyle('C' . $rowBody)->applyFromArray($styleBody);
+            $sheet->getStyle('D' . $rowBody)->applyFromArray($styleBody);
+        }
+        // Export file ke Excel
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Penggunaan Jarum.xlsx';
+
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        $writer->save('php://output');
+        exit;
     }
 
     public function inputinisial()

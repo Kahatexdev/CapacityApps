@@ -108,6 +108,7 @@ error_reporting(E_ALL); ?>
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Inisial</th>
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Size</th>
                                             <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Qty</th>
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Sisa</th>
@@ -122,6 +123,7 @@ error_reporting(E_ALL); ?>
                                             <?php if (is_array($list)): // Pastikan $list adalah array 
                                             ?>
                                                 <tr>
+                                                    <td> <?= $list['inisial'] ?></td>
                                                     <td> <?= $list['size'] ?></td>
                                                     <td><?= round($list['qty'] / 24) ?> dz</td>
                                                     <td><?= round($list['sisa'] / 24) ?> dz</td>
@@ -130,7 +132,7 @@ error_reporting(E_ALL); ?>
                                                     <td><?= $list['production_unit'] ?></td>x
                                                     <td>
 
-                                                        <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#editModal" data-id="<?= $list['idapsperstyle']; ?>" data-no-model="<?= $list['mastermodel']; ?>" data-delivery="<?= $list['delivery']; ?>" data-jarum="<?= $jarum; ?>" data-style="<?= $list['size']; ?>" data-qty="<?= $list['qty']; ?>" data-sisa="<?= $list['sisa']; ?>" data-factory="<?= $list['factory']; ?>" data-production_unit="<?= $list['production_unit']; ?>">
+                                                        <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#editModal" data-id="<?= $list['idapsperstyle']; ?>" data-no-model="<?= $list['mastermodel']; ?>" data-delivery="<?= $list['delivery']; ?>" data-jarum="<?= $jarum; ?>" data-style="<?= $list['size']; ?>" data-qty="<?= $list['qty']; ?>" data-sisa="<?= $list['sisa']; ?>" data-factory="<?= $list['factory']; ?>" data-production_unit="<?= $list['production_unit']; ?>" data-inisial="<?= $list['inisial'] ?>" data-smv="<?= $list['smv'] ?>" data-seam="<?= $list['seam'] ?>">
                                                             Edit
                                                         </button>
                                                     </td>
@@ -353,6 +355,10 @@ error_reporting(E_ALL); ?>
                                         <input type="text" class="form-control" name="no_model" readonly>
                                     </div>
                                     <div class="form-group">
+                                        <label for="" class="col-form-label">Inisial</label>
+                                        <input type="text" class="form-control" name="inisial">
+                                    </div>
+                                    <div class="form-group">
                                         <label for="" class="col-form-label">Style</label>
                                         <input type="text" class="form-control" name="style">
                                     </div>
@@ -550,6 +556,7 @@ error_reporting(E_ALL); ?>
                     var smv = $(this).data('smv');
                     var production_unit = $(this).data('production_unit');
                     var factory = $(this).data('factory');
+                    var inisial = $(this).data('inisial');
 
                     var formattedDelivery = new Date(delivery).toISOString().split('T')[0];
                     $('#editModal').find('form').attr('action', '<?= base_url($role . '/updatedetailorder/') ?>' + apsperstyle);
@@ -563,6 +570,7 @@ error_reporting(E_ALL); ?>
                     $('#editModal').find('input[name="smv"]').val(smv);
                     $('#editModal').find('input[name="production_unit"]').val(production_unit);
                     $('#editModal').find('input[name="factory"]').val(factory);
+                    $('#editModal').find('input[name="inisial"]').val(inisial);
 
                     $('#editModal').modal('show'); // Show the modal
                 });
