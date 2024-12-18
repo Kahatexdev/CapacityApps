@@ -173,7 +173,7 @@ class ProduksiModel extends Model
 
     public function getJlMc($data)
     {
-        $yesterday = date('Y-m-d', strtotime('-16 day'));
+        $yesterday = date('Y-m-d', strtotime('-2 day'));
 
         $result = $this->select('produksi.tgl_produksi, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
@@ -192,7 +192,7 @@ class ProduksiModel extends Model
     public function getJlMcJrm($data)
     {
         // dd($data);
-        $yesterday = date('Y-m-d', strtotime('-16 day'));
+        $yesterday = date('Y-m-d', strtotime('-2 day'));
 
         $result = $this->select('produksi.tgl_produksi, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
@@ -210,7 +210,7 @@ class ProduksiModel extends Model
 
     public function getJlMcJrmArea($data)
     {
-        $yesterday = date('Y-m-d', strtotime('-16 day'));
+        $yesterday = date('Y-m-d', strtotime('-2 day'));
 
         $result = $this->select('produksi.tgl_produksi, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
