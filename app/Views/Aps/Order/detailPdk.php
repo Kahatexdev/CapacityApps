@@ -39,7 +39,7 @@ error_reporting(E_ALL); ?>
                         </div>
                         <div class="col-auto">
 
-                            <a href="<?= base_url($role . '/detailpdk/') ?>" class="btn bg-gradient-info">Kembali</a>
+                            <a href="<?= base_url($role . '/dataorder/') ?>" class="btn bg-gradient-info">Kembali</a>
                         </div>
                     </div>
 

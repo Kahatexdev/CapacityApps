@@ -41,7 +41,7 @@ error_reporting(E_ALL); ?>
                             <button type="button" class="btn bg-gradient-warning btn-assign" data-toggle="modal" data-target="#ModalAssign">
                                 Arahkan Ke Areal
                             </button>
-                            <a href="<?= base_url($role . '/detailpdk/') ?>" class="btn bg-gradient-info">Kembali</a>
+                            <a href="<?= base_url($role . '/dataorder/') ?>" class="btn bg-gradient-info">Kembali</a>
                         </div>
                     </div>
 

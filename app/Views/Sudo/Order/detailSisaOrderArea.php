@@ -80,7 +80,7 @@
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">NEEDLE</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">AREA</th>
                                         <?php for ($i = 1; $i <= $maxWeek; $i++) { ?>
-                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="5">WEEK <?= $i ?></th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="5">WEEK <?= $i ?> (<?= $week[$i] ?>)</th>
                                         <?php } ?>
                                     </tr>
                                     <tr>
@@ -205,7 +205,7 @@
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">NEEDLE</th>
                                         <!-- untuk menampilkan banyak week -->
                                         <?php for ($i = 1; $i <= $maxWeek; $i++) { ?>
-                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="4">WEEK <?= $i ?></th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="4">WEEK <?= $i ?> (<?= $week[$i] ?>)</th>
                                         <?php } ?>
                                     </tr>
                                     <tr>
