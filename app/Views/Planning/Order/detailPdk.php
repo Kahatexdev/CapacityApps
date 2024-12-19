@@ -109,6 +109,7 @@ error_reporting(E_ALL); ?>
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Inisial</th>
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Size</th>
                                             <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Qty</th>
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Sisa</th>
@@ -123,6 +124,7 @@ error_reporting(E_ALL); ?>
                                             <?php if (is_array($list)): // Pastikan $list adalah array 
                                             ?>
                                                 <tr>
+                                                    <td> <?= $list['inisial'] ?></td>
                                                     <td> <?= $list['size'] ?></td>
                                                     <td><?= round($list['qty'] / 24) ?> dz</td>
                                                     <td><?= round($list['sisa'] / 24) ?> dz</td>

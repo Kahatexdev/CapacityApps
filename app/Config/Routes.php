@@ -280,6 +280,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('updatedetailorder/(:any)', 'OrderController::updateorder/$1');
     $routes->post('updatedetailjarum/(:any)', 'OrderController::updateorderjarum/$1');
     $routes->get('orderPerjarumBln', 'ApsController::orderPerJarumBln');
+    $routes->get('detailPdk/(:any)/(:any)', 'OrderController::detailPdk/$1/$2');
 
 
 
