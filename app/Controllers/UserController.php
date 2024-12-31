@@ -179,6 +179,46 @@ class UserController extends BaseController
         ];
         return view(session()->get('role') . '/bsmesin', $data);
     }
+    public function getInisial($noModel)
+    {
+        $pdk = $this->ApsPerstyleModel->getInProduksi();
+
+        // Filter data berdasarkan no_model
+        $filteredData = array_filter($pdk, function ($item) use ($noModel) {
+            return $item['mastermodel'] === $noModel;
+        });
+
+        // Ambil semua data inisial dan idapsperstyle
+        $inisialList = array_map(function ($item) {
+            return [
+                'inisial' => $item['inisial'],
+                'idapsperstyle' => $item['idapsperstyle'],
+            ];
+        }, $filteredData);
+
+        // Kembalikan daftar inisial sebagai JSON
+        return $this->response->setJSON(['inisial' => $inisialList]);
+    }
+    public function getSize($idaps)
+    {
+        $size = $this->ApsPerstyleModel->getSizeProduksi();
+
+        // Cari data inisial berdasarkan no_model
+        $sizeData = array_filter($size, function ($item) use ($idaps) {
+            return $item['idapsperstyle'] === $idaps;
+        });
+
+        // Ambil data pertama yang sesuai
+        $sizeData = reset($sizeData);
+
+        // Jika data ditemukan, kembalikan inisial
+        if ($sizeData) {
+            return $this->response->setJSON(['size' => $sizeData['size'], 'inisial' => $sizeData['inisial'] ?? '']);
+        }
+
+        // Jika tidak ditemukan, kembalikan respons kosong
+        return $this->response->setJSON(['size' => '']);
+    }
     public function saveBsMesin()
     {
         $request = $this->request;
@@ -193,7 +233,7 @@ class UserController extends BaseController
 
         // Data detail
         $noMesin = $request->getPost('no_mesin');
-        $inisial = $request->getPost('inisial');
+        $inisial = $request->getPost('inisialName');
         $noModel = $request->getPost('no_model');
         $size    = $request->getPost('size');
         $gram    = $request->getPost('gram');
@@ -210,6 +250,8 @@ class UserController extends BaseController
         // Iterasi data detail dan siapkan untuk batch insert
         $details = [];
         foreach ($noMesin as $index => $value) {
+
+
             $details[] = [
                 'id_karyawan'   => $id, // atau field lain sebagai ID
                 'nama_karyawan' => $namaKaryawan,

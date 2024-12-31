@@ -81,6 +81,7 @@ class TimterController extends BaseController
                     'no_order' => $item['no_order'],
                     'machinetypeid' => $item['machinetypeid'],
                     'mastermodel' => $item['mastermodel'],
+                    'inisial' => $item['inisial'],
                     'size' => $item['size'],
                     'color' => $item['color'],
                     'smv' => $item['smv'],
@@ -682,7 +683,7 @@ class TimterController extends BaseController
             $sheet->setCellValue('C' . $row, ($id['mastermodel'] != $prevModel) ? $id['no_order'] : '');
             $sheet->setCellValue('D' . $row, ($id['mastermodel'] != $prevModel) ? $id['machinetypeid'] : '');
             $sheet->setCellValue('E' . $row, ($id['mastermodel'] != $prevModel) ? $id['mastermodel'] : '');
-            $sheet->setCellValue('F' . $row, '');
+            $sheet->setCellValue('F' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['inisial'] : '');
             $sheet->setCellValue('G' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['size'] : '');
             $sheet->setCellValue('H' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['color'] : '');
             $sheet->setCellValue('I' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['smv'] : '');

@@ -75,6 +75,7 @@
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Area</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Needle</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">No Model</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Inisial</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Style Size</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Qty PO (dz)</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Total Prod (dz)</th>
@@ -117,6 +118,7 @@
                                             <td class="text-sm"><?= strtoupper($id['area']); ?></td>
                                             <td class="text-sm"><?= $id['machinetypeid']; ?></td>
                                             <td class="text-sm"><?= $id['mastermodel']; ?></td>
+                                            <td class="text-sm"><?= $id['inisial']; ?></td>
                                             <td class="text-sm"><?= $id['size']; ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= number_format($id['qty'] / 24, 2); ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= number_format($id['qty_produksi'] / 24, 2); ?></td>

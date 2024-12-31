@@ -685,6 +685,7 @@ class ProduksiController extends BaseController
                     'area' => $item['area'],
                     'machinetypeid' => $item['machinetypeid'],
                     'mastermodel' => $item['mastermodel'],
+                    'inisial' => $item['inisial'],
                     'size' => $item['size'],
                     'qty_produksi' => $item['qty_produksi'],
                     'max_delivery' => $item['max_delivery'],
@@ -765,6 +766,7 @@ class ProduksiController extends BaseController
                     'no_order' => $item['no_order'],
                     'machinetypeid' => $item['machinetypeid'],
                     'mastermodel' => $item['mastermodel'],
+                    'inisial' => $item['inisial'],
                     'size' => $item['size'],
                     'color' => $item['color'],
                     'delivery' => $item['delivery'],
@@ -819,41 +821,69 @@ class ProduksiController extends BaseController
             'awal' => $awal,
         ];
 
-        $dataTimter = $this->orderModel->getDataTimter($data);
+        $dataTimter = $this->orderModel->getdataSummaryPertgl($data);
         $poTimter = $this->orderModel->getQtyPOTimter($data);
         $prodTimter = $this->orderModel->getDetailProdTimter($data);
         $jlMC = $this->orderModel->getprodSummaryPertgl($data);
         // dd($dataTimter);
-        $uniqueData = [];
-        foreach ($prodTimter as $item) {
-            $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'] . '-' . $item['no_mesin'];
-            if (!isset($uniqueData[$key])) {
-                $uniqueData[$key] = [
-                    'seam' => $item['seam'],
-                    'kd_buyer_order' => $item['kd_buyer_order'],
-                    'area' => $item['area'],
-                    'no_order' => $item['no_order'],
+        $dataUtama = [];
+        foreach ($dataTimter as $item) {
+            $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'];
+            if (!isset($dataUtama[$key])) {
+                $dataUtama[$key] = [
                     'machinetypeid' => $item['machinetypeid'],
                     'mastermodel' => $item['mastermodel'],
-                    'size' => $item['size'],
-                    'color' => $item['color'],
-                    'smv' => $item['smv'],
-                    'delivery' => $item['delivery'],
-                    'sisa' => $item['sisa'],
+                    'inisial' => $item['inisial'] ?? null,  // jika data tidak ada, set NULL atau default
+                    'size' => $item['size'] ?? null,  // jika data tidak ada, set NULL atau default
+                    'color' => $item['color'] ?? null,  // pastikan juga menangani nilai null
+                    'smv' => $item['smv'] ?? null,
+                    'delivery' => $item['delivery'] ?? null,
                     'qty' => 0,
                     'running' => 0,
                     'ttl_prod' => 0,
                     'ttl_jlmc' => 0,
                     'ttl_sisa' => 0,
-                    'no_mesin' => $item['no_mesin'],
+                    'no_mesin' => $item['no_mesin'] ?? '',
                 ];
             }
-            $uniqueData[$key]['qty'] += $item['qty'];
-            $uniqueData[$key]['running'] += $item['running'];
-            $uniqueData[$key]['ttl_prod'] += $item['qty_produksi'];
-            $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
-            $uniqueData[$key]['ttl_sisa'] += $item['sisa'];
+            $dataUtama[$key]['qty'] += $item['qty'] ?? 0;
+            $dataUtama[$key]['running'] += $item['running'] ?? 0;
+            $dataUtama[$key]['ttl_prod'] += $item['qty_produksi'] ?? 0;
+            $dataUtama[$key]['ttl_jlmc'] += $item['jl_mc'] ?? 0;
+            $dataUtama[$key]['ttl_sisa'] += $item['sisa'] ?? 0;
         }
+        $uniqueData = [];
+        foreach ($prodTimter as $item) {
+            $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'] . '-' . $item['no_mesin'] ?? '';
+            if (!isset($uniqueData[$key])) {
+                $uniqueData[$key] = [
+                    'seam' => $item['seam'],
+                    'kd_buyer_order' => $item['kd_buyer_order'],
+                    'area' => $item['area'] ?? null,
+                    'no_order' => $item['no_order'],
+                    'machinetypeid' => $item['machinetypeid'],
+                    'mastermodel' => $item['mastermodel'],
+                    'inisial' => $item['inisial'] ?? null,  // jika data tidak ada, set NULL atau default
+                    'size' => $item['size'] ?? null,  // jika data tidak ada, set NULL atau default
+                    'color' => $item['color'] ?? null,  // pastikan juga menangani nilai null
+                    'smv' => $item['smv'] ?? null,
+                    'delivery' => $item['delivery'] ?? null,
+                    'sisa' => $item['sisa'] ?? 0, // default jika null
+                    'qty' => 0,
+                    'running' => 0,
+                    'ttl_prod' => 0,
+                    'ttl_jlmc' => 0,
+                    'ttl_sisa' => 0,
+                    'no_mesin' => $item['no_mesin'] ?? '',
+                ];
+            }
+            $uniqueData[$key]['qty'] += $item['qty'] ?? 0;
+            $uniqueData[$key]['running'] += $item['running'] ?? 0;
+            $uniqueData[$key]['ttl_prod'] += $item['qty_produksi'] ?? 0;
+            $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'] ?? 0;
+            $uniqueData[$key]['ttl_sisa'] += $item['sisa'] ?? 0;
+        }
+        // dd($uniqueData);
         $data3 = [
             'active1' => '',
             'active2' => '',
@@ -862,6 +892,7 @@ class ProduksiController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
+            'dataUtama' => $dataUtama,
             'dataTimter' => $dataTimter,
             'poTimter' => $poTimter,
             'prodTimter' => $prodTimter,
@@ -878,7 +909,6 @@ class ProduksiController extends BaseController
             return view(session()->get('role') . '/Produksi/timterProduksi', $data3);
         }
     }
-
     public function editproduksi()
     {
         $id = $this->request->getPost('id');

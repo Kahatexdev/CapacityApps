@@ -275,8 +275,22 @@ class ApsPerstyleModel extends Model
 
     public function getPdkProduksi()
     {
-        return $this->select('mastermodel, sum(qty) as totalqty, sum(sisa) as totalsisa, sum(qty)-sum(sisa) as totalproduksi')
+        return $this->select('mastermodel, inisial, sum(qty) as totalqty, sum(sisa) as totalsisa, sum(qty)-sum(sisa) as totalproduksi')
             ->groupBy('mastermodel')
+            ->findAll();
+    }
+
+    public function getInProduksi()
+    {
+        return $this->select('mastermodel, inisial, idapsperstyle')
+            ->groupBy('mastermodel, inisial')
+            ->findAll();
+    }
+
+    public function getSizeProduksi()
+    {
+        return $this->select('idapsperstyle, size, inisial')
+            ->groupBy('mastermodel, size')
             ->findAll();
     }
 
