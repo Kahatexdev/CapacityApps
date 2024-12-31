@@ -2122,7 +2122,9 @@ class ExcelController extends BaseController
 
         // Loop data
         $data = $this->ApsPerstyleModel->getBuyerOrder($buyer, $bulan);
+        // dd($data);
         $allData = [];
+        $week = [];
         $totalPerWeek = [];
 
         foreach ($data as $id) {
@@ -2143,9 +2145,12 @@ class ExcelController extends BaseController
             for ($weekCount = 1; $currentStartDate <= $endDate; $weekCount++) {
                 $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
                 $endOfWeek = min($endOfWeek, $endDate);
-
+                $dateWeek = $currentStartDate->format('d') . " - " . $endOfWeek->format('d');
+                $week[$weekCount] = $dateWeek;
+                // dd($currentStartDate);
                 // Periksa apakah tanggal pengiriman berada dalam minggu ini
                 if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
+
                     // Ambil total jl_mc untuk minggu ini dan jumlahkan jika sudah ada data sebelumnya
                     $dataOrder = [
                         'model' => $mastermodel,
@@ -2358,7 +2363,7 @@ class ExcelController extends BaseController
         $col2_index = Coordinate::columnIndexFromString($col2);
 
         for ($i = 1; $i <= $maxWeek; $i++) {
-            $sheet->setCellValue($col . $row_header, 'WEEK ' . $i);
+            $sheet->setCellValue($col . $row_header, 'WEEK ' . $i . '(' . $week[$i] . ')');
             $sheet->mergeCells($col . $row_header . ':' . $col2 . $row_header); // Merge sel antara kolom $col dan $col2
             $sheet->getStyle($col . $row_header . ':' . $col2 . $row_header)->applyFromArray($styleHeader);
 
@@ -2406,16 +2411,30 @@ class ExcelController extends BaseController
         }
 
         $row = 5;
-
+        $rowsModel = 0;
         foreach ($allData as $noModel => $id) {
             $rowsModel = count($id);
             foreach ($id as $jarum => $rowJarum) {
-                $rowsArea = count($rowJarum);
-                if ($rowsArea > 1) {
-                    $rowsModel += $rowsArea - 1;
+                $rowsJarums = count($rowJarum);
+                if ($rowsJarums > 1) {
+                    $rowsModel += $rowsJarums - 1;
+                }
+                $rowsArea = 0;
+                foreach ($rowJarum as $area2 => $rowArea) {
+                    for ($i = 1; $i <= $maxWeek; $i++) {
+                        if (isset($rowArea[$i])) {
+                            $rowsArea = count($rowArea[$i]);
+                            $rowDelivery = count($rowArea[$i]);
+                            if ($rowDelivery > 1) {
+                                $rowsModel += $rowDelivery - 1;
+                                $rowsJarums += $rowDelivery - 1;
+                            }
+                        }
+                    }
                 }
             }
             $mergeModel = $row + $rowsModel - 1;
+
             $sheet->setCellValue('A' . $row, $buyer);
             $sheet->setCellValue('B' . $row, $noModel);
             $sheet->mergeCells('A' . $row . ':A' . $mergeModel);
@@ -2425,6 +2444,22 @@ class ExcelController extends BaseController
 
             foreach ($id as $jarum => $id2) {
                 $rowsJarum = count($id2);
+                if ($rowsJarum > 1) {
+                    $rowsModel += $rowsJarum - 1;
+                }
+                $rowsArea = 0;
+                foreach ($id2 as $area2 => $rowArea) {
+                    for ($i = 1; $i <= $maxWeek; $i++) {
+                        if (isset($rowArea[$i])) {
+                            $rowsArea = count($rowArea[$i]);
+                            $rowDelivery = count($rowArea[$i]);
+                            if ($rowDelivery > 1) {
+                                $rowsModel += $rowDelivery - 1;
+                                $rowsJarum += $rowDelivery - 1;
+                            }
+                        }
+                    }
+                }
                 $mergeJarum = $row + $rowsJarum - 1;
 
                 $sheet->setCellValue('C' . $row, $jarum);
@@ -2432,8 +2467,10 @@ class ExcelController extends BaseController
                 $sheet->getStyle('C' . $row . ':C' . $mergeJarum)->applyFromArray($styleBody);
 
                 foreach ($id2 as $area => $id3) {
+                    $mergeArea = $row + $rowsArea - 1;
                     $sheet->setCellValue('D' . $row, $area);
-                    $sheet->getStyle('D' . $row)->applyFromArray($styleBody);
+                    $sheet->mergeCells('D' . $row . ':D' . $mergeArea);
+                    $sheet->getStyle('D' . $row . ':D' . $mergeArea)->applyFromArray($styleBody);
 
                     $col5 = 'E';
                     for ($i = 1; $i <= $maxWeek; $i++) {
@@ -2469,7 +2506,7 @@ class ExcelController extends BaseController
                                     $colsEnd = $maxWeek - $i;
                                     $colsStart = $i - 1;
                                     if ($numRows > 1 && $numRows2 < $numRows) {
-                                        // Konversi huruf kolom ke nomor indeks kolom
+                                        // untuk kolom setelah week yg terisi
                                         for ($i = 1; $i <= $colsEnd; $i++) {
                                             $sheet->setCellValue($col5 . $row, '');
                                             $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
@@ -2493,10 +2530,13 @@ class ExcelController extends BaseController
                                             }
                                         }
                                         $row++;
+                                        // untuk kolom sebelum week yg terisi
+                                        $col_index2 = Coordinate::columnIndexFromString($col5);
+                                        $colNext = $col_index2 - (5 * $maxWeek) - 1;
+                                        // dd($maxWeek);    
+                                        $col5 = Coordinate::stringFromColumnIndex($colNext);
                                         for ($i = 1; $i <= $colsStart; $i++) {
-                                            $col_index2 = Coordinate::columnIndexFromString($col5);
-                                            $colNext = $col_index2 - (5 * $maxWeek) + 1;
-                                            $col5 = Coordinate::stringFromColumnIndex($colNext);
+                                            // 
                                             $sheet->setCellValue($col5 . $row, '');
                                             $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
                                             $col5++;
@@ -2513,6 +2553,7 @@ class ExcelController extends BaseController
                                             $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
                                             $col5++;
                                         }
+                                        // dd($col_index2, $colNext, $noModel, $col5);
                                         // dd($col5);
                                     }
                                     $numRows2++;
@@ -2750,6 +2791,8 @@ class ExcelController extends BaseController
             for ($weekCount = 1; $currentStartDate <= $endDate; $weekCount++) {
                 $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
                 $endOfWeek = min($endOfWeek, $endDate);
+                $dateWeek = $currentStartDate->format('d') . " - " . $endOfWeek->format('d');
+                $week[$weekCount] = $dateWeek;
 
                 // Periksa apakah tanggal pengiriman berada dalam minggu ini
                 if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
@@ -2963,7 +3006,7 @@ class ExcelController extends BaseController
         $col2_index = Coordinate::columnIndexFromString($col2);
 
         for ($i = 1; $i <= $maxWeek; $i++) {
-            $sheet->setCellValue($col . $row_header, 'WEEK ' . $i);
+            $sheet->setCellValue($col . $row_header, 'WEEK ' . $i . ' (' . $week[$i] . ')');
             $sheet->mergeCells($col . $row_header . ':' . $col2 . $row_header); // Merge sel antara kolom $col dan $col2
             $sheet->getStyle($col . $row_header . ':' . $col2 . $row_header)->applyFromArray($styleHeader);
 
@@ -3218,7 +3261,7 @@ class ExcelController extends BaseController
             $colJrm = Coordinate::stringFromColumnIndex($col_idx);
             $colJrm2 = Coordinate::stringFromColumnIndex($col2_idx);
 
-            $sheet->setCellValue($colJrm . $row_header3, 'WEEK ' . $i);
+            $sheet->setCellValue($colJrm . $row_header3, 'WEEK ' . $i . ' (' . $week[$i] . ')');
             $sheet->mergeCells($colJrm . $row_header3 . ':' . $colJrm2 . $row_header3); // Merge sel antara kolom $col dan $col2
             $sheet->getStyle($colJrm . $row_header3 . ':' . $colJrm2 . $row_header3)->applyFromArray($styleHeader);
 

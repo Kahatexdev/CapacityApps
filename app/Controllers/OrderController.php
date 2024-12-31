@@ -1521,6 +1521,8 @@ class OrderController extends BaseController
             for ($weekCount = 1; $currentStartDate <= $endDate; $weekCount++) {
                 $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
                 $endOfWeek = min($endOfWeek, $endDate);
+                $dateWeek = $currentStartDate->format('d') . " - " . $endOfWeek->format('d');
+                $week[$weekCount] = $dateWeek;
 
                 // Periksa apakah tanggal pengiriman berada dalam minggu ini
                 if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
@@ -1663,7 +1665,8 @@ class OrderController extends BaseController
             'allDataJrm' => $allDataPerjarum,
             'totalDataJrm' => $totalPerWeekJrm,
             'years' => $years,
-            'months' => $months
+            'months' => $months,
+            'week' => $week,
         ];
         // dd($data);
         return view($role . '/Order/detailSisaOrderArea', $data);
