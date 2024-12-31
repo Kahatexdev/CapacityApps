@@ -69,6 +69,7 @@
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">No Order</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">Jarum</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">No Model</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">In</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">Style</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">Color</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">Smv</th>
@@ -125,6 +126,7 @@
                                             <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] != $prevModel) ? $id['no_order'] : ''; ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] != $prevModel) ? $id['machinetypeid'] : ''; ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] != $prevModel) ? $id['mastermodel'] : ''; ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['inisial'] : ''; ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['size'] : ''; ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['color'] : ''; ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['smv'] : ''; ?></td>

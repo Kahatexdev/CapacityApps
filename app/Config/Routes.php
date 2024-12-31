@@ -358,6 +358,9 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('bsmesin', 'UserController::bsmesin');
     $routes->get('bsMesinPerbulan/(:any)/(:any)', 'UserController::bsMesinPerbulan/$1/$2');
     $routes->post('saveBsMesin', 'UserController::saveBsMesin');
+    $routes->get('userController/getInisial/(:any)', 'UserController::getInisial/$1');
+    $routes->get('userController/getSize/(:any)', 'UserController::getSize/$1');
+
 
     // data order
     $routes->get('dataorderperarea/(:any)', 'OrderController::DetailOrderPerAreaPlan/$1');

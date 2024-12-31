@@ -84,14 +84,29 @@
                                     </div>
                                     <div class="col-lg-2 col-sm-12">
                                         <div class="form-group">
-                                            <label for="inisial_0" class="form-control-label">In</label>
-                                            <input class="form-control" type="text" id="inisial_0" name="inisial[]" required>
+                                            <label for="no_model_0" class="form-control-label">PDK</label>
+                                            <!-- <input class="form-control" type="text" id="no_model_0" name="no_model[]" required> -->
+                                            <select name="no_model[]" id="no_model_0" class="form-control" onchange="getIn(0)" required>
+                                                <option value="" selected>Pilih No Model</option>
+                                                <?php if (!empty($pdk) && is_array($pdk)): ?>
+                                                    <?php foreach ($pdk as $pd): ?>
+                                                        <option value="<?= htmlspecialchars($pd['mastermodel']); ?>">
+                                                            <?= htmlspecialchars($pd['mastermodel']); ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                <?php else: ?>
+                                                    <option value="">No employees found</option>
+                                                <?php endif; ?>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-lg-2 col-sm-12">
                                         <div class="form-group">
-                                            <label for="no_model_0" class="form-control-label">PDK</label>
-                                            <input class="form-control" type="text" id="no_model_0" name="no_model[]" required>
+                                            <label for="inisial_0" class="form-control-label">In</label>
+                                            <input type="hidden" class="form-control" name="inisialName[]" id="inisialName_0">
+                                            <select class="form-control" id="inisial_0" name="inisial[]" onchange="getSize(0)" required>
+                                                <option value="" selected>Pilih inisial</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-lg-2 col-sm-12">
@@ -260,16 +275,30 @@
                 <input class="form-control" type="text" id="no_mesin_${rowIndex}" name="no_mesin[]" required>
             </div>
         </div>
-        <div class="col-lg-1 col-sm-12">
-            <div class="form-group">
-                <label for="inisial_${rowIndex}" class="form-control-label">In</label>
-                <input class="form-control" type="text" id="inisial_${rowIndex}" name="inisial[]" required>
-            </div>
-        </div>
         <div class="col-lg-2 col-sm-12">
             <div class="form-group">
                 <label for="no_model_${rowIndex}" class="form-control-label">PDK</label>
-                <input class="form-control" type="text" id="no_model_${rowIndex}" name="no_model[]" required>
+                <select name="no_model[]" id="no_model_${rowIndex}" class="form-control" onchange="getIn(${rowIndex})" required>
+                    <option value="" selected>Pilih No Model</option>
+                    <?php if (!empty($pdk) && is_array($pdk)): ?>
+                        <?php foreach ($pdk as $pd): ?>
+                            <option value="<?= $pd['mastermodel']; ?>">
+                                <?= $pd['mastermodel']; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <option value="">No employees found</option>
+                    <?php endif; ?>
+                </select>
+            </div>
+        </div>
+        <div class="col-lg-1 col-sm-12">
+            <div class="form-group">
+                <label for="inisial_${rowIndex}" class="form-control-label">In</label>
+                <input type="hidden" class="form-control" name="inisialName[]" id="inisialName_${rowIndex}">
+                <select class="form-select" id="inisial_${rowIndex}" name="inisial[]" onchange="getSize(${rowIndex})" required>
+                    <option value="">Pilih inisial</option>
+                </select>
             </div>
         </div>
         <div class="col-lg-2 col-sm-12">
@@ -344,7 +373,6 @@
             });
     });
 
-
     function getInfo() {
         let id = document.getElementById('nama').value;
 
@@ -371,6 +399,74 @@
             // Jika id kosong, kosongkan input
             document.getElementById('kode_kartu').value = '';
             document.getElementById('shift').value = '';
+        }
+    }
+
+    function getIn(rowIndex) {
+        let id = document.getElementById(`no_model_${rowIndex}`).value;
+        const inisialSelect = document.getElementById(`inisial_${rowIndex}`);
+        inisialSelect.innerHTML = '<option value="">Pilih Inisial</option>';
+        // let inisial = document.getElementById('inisialName');
+        if (id) {
+            const url = `<?= base_url('/user/userController/getInisial/') ?>${id}`;
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Gagal mengambil data inisial');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.inisial && typeof data.inisial === 'object') {
+                        Object.values(data.inisial).forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item.idapsperstyle;
+                            option.text = item.inisial;
+                            // inisial.value = item.inisial;
+                            inisialSelect.appendChild(option);
+                        });
+                    } else {
+                        alert('Data inisial tidak ditemukan atau format tidak sesuai.');
+                    }
+                })
+                .catch(error => {
+                    alert('Gagal mengambil data dari server.');
+                });
+        } else {
+            inisialSelect.innerHTML = '<option value="">Pilih Inisial</option>';
+        }
+    }
+
+    function getSize(rowIndex) {
+        let idaps = document.getElementById(`inisial_${rowIndex}`).value;
+        const sizeInput = document.getElementById(`size_${rowIndex}`);
+        const inisial = document.getElementById(`inisialName_${rowIndex}`);
+
+        if (idaps) {
+            const url = `<?= base_url('/user/userController/getSize/') ?>${idaps}`;
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Gagal mengambil data size');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.size) {
+                        sizeInput.value = data.size;
+                        inisial.value = data.inisial;
+
+                    } else {
+                        sizeInput.value = '';
+                        alert('Data size tidak ditemukan.');
+                    }
+                })
+                .catch(error => {
+                    sizeInput.value = '';
+                    alert('Gagal mengambil data dari server.');
+                });
+        } else {
+            sizeInput.value = '';
         }
     }
 </script>
