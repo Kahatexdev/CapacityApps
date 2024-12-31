@@ -666,24 +666,28 @@ class ApsController extends BaseController
 
         $data = $this->ApsPerstyleModel->getDetailPlanning($area, $jarum);
 
-
         foreach ($data as $row) {
             $row['id_pln_mc'] = $id_pln_mc;
             $model = $row['model'];
             $sisa = $row['sisa'];
-            $deliv = $row['delivery'];
             $qty = $row['qty'];
             $validate = [
                 'id' =>  $row['id_pln_mc'],
                 'model' => $model,
-                'deliv' => $deliv,
+            ];
+            $insert = [
+                'id_pln_mc' => $row['id_pln_mc'],
+                'model' => $model,
+                'qty' => $qty,
+                'sisa' => $sisa,
+                'smv' => $row['smv']
             ];
             $cek = $this->DetailPlanningModel->cekPlanning($validate);
             if ($cek) {
                 $id = $cek['id_detail_pln'];
                 $this->DetailPlanningModel->update($id, ['qty' => $qty, 'sisa' => $sisa]);
             } else {
-                $this->DetailPlanningModel->insert($row);
+                $this->DetailPlanningModel->insert($insert);
             }
         }
     }

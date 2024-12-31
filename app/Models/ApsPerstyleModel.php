@@ -247,13 +247,13 @@ class ApsPerstyleModel extends Model
     }
     public function getDetailPlanning($area, $jarum) // funtion ieu kudu diganti where na kade ulah poho
     {
-        return $this->select('mastermodel AS model, delivery, SUM(qty)/24 AS qty, SUM(sisa)/24 AS sisa, AVG(smv) AS smv')
+        return $this->select('mastermodel AS model, SUM(qty)/24 AS qty, SUM(sisa)/24 AS sisa, AVG(smv) AS smv')
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
             ->where('sisa >=', 0)
             ->where('delivery > NOW()', null, false) // Add 7 days to current date
             // ->where('delivery > DATE_ADD(NOW(), INTERVAL 7 DAY)', null, false) // Add 7 days to current date
-            ->groupBy(['delivery', 'mastermodel'])
+            ->groupBy('mastermodel')
             ->findAll();
     }
     public function getAllForModelStyleAndSize($validate)

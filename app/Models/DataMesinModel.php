@@ -347,7 +347,7 @@ class DataMesinModel extends Model
     }
     public function getMesinByArea($area, $jarum)
     {
-        $a = $this->select('sum(mesin_jalan) as mesin')
+        $a = $this->select('sum(total_mc) as mesin')
             ->where('area', $area)
             ->where('jarum', $jarum)
             ->first();

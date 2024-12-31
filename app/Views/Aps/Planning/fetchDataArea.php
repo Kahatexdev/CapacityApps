@@ -66,7 +66,6 @@ error_reporting(E_ALL); ?>
                                 <thead>
                                     <tr>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Model</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Delivery</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Remaining Qty</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Planned</th>
@@ -82,7 +81,6 @@ error_reporting(E_ALL); ?>
                                     <?php foreach ($detailplan as $order) : ?>
                                         <tr>
                                             <td class="text-sm"><?= htmlspecialchars($order['model']); ?></td>
-                                            <td class="text-sm"><?= date('d-M-Y', strtotime($order['delivery'])); ?></td>
                                             <td class="text-sm"><?= number_format($order['qty'], 0, '.', ','); ?> Dz</td>
                                             <td class="text-sm"><?= number_format($order['sisa'], 0, '.', ','); ?> Dz</td>
                                             <td class="text-sm"><?= number_format($order['est_qty'], 0, '.', ','); ?> Dz</td>

@@ -247,6 +247,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     //timter produksi
     $routes->post('timterProduksi', 'ProduksiController::timterProduksi');
     $routes->post('exportTimter', 'TimterController::excelTimter');
+    $routes->get('summaryPlanner/(:any)', 'SummaryController::summaryPlanner/$1');
 
     // deffect
     $routes->get('datadeffect', 'DeffectController::datadeffect');
@@ -445,7 +446,6 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('sisaOrder', 'OrderController::sisaOrder');
     $routes->get('sisaOrder/(:any)', 'OrderController::sisaOrderBuyer/$1');
     $routes->post('sisaOrder/(:any)', 'OrderController::sisaOrderBuyer/$1');
-    $routes->post('filterByMonth', 'OrderController::filterByMonth');
     $routes->post('excelSisaOrderBuyer/(:any)', 'ExcelController::excelSisaOrderBuyer/$1');
     $routes->get('statusOrder', 'OrderController::statusOrder');
     $routes->get('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
@@ -453,7 +453,6 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('sisaOrderArea', 'OrderController::sisaOrderArea');
     $routes->get('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
     $routes->post('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
-    $routes->post('filterByArea', 'OrderController::filterByArea');
     $routes->post('excelSisaOrderArea/(:any)', 'ExcelController::excelSisaOrderArea/$1');
 
 

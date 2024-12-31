@@ -354,7 +354,8 @@
             <path class="cls-5" d="M101.81,61a6.68,6.68,0,0,0,8.51,0Z"></path>
             <polygon class="cls-5" points="90.92 30.25 77.46 29.69 77.46 28.64 90.92 29.22 90.92 30.25"></polygon>
 
-            <text id="title" transform="matrix(1 0 0 1 11.7249 78)" style="fill: #ffffff;">Mohon maaf Sedang Ada Maintenance</text>
+            <text id="title" transform="matrix(1 0 0 1 11.7249 78)" style="fill: #ffffff;">Mohon maaf Sedang Ada Perbaikan</text>
+            <a href="<?= base_url('/' . session()->get('role')) ?>"><text id="text" transform="matrix(0.3 0 0 0.3 7.7249 10)" style="fill: #ffffff;"> Kembali</a></text>
         </svg>
     <?php endif; ?>
     <script>
