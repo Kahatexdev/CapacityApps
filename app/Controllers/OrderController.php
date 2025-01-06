@@ -1232,10 +1232,11 @@ class OrderController extends BaseController
 
         $years = [];
         $currentYear = date('Y');
-        $endYear = $currentYear + 10;
+        $startYear = $currentYear - 2; // Mulai dari 2 tahun kebelakang
+        $endYear = $currentYear + 7; // Sampai 7 tahun ke depan
 
-        // Loop dari tahun ini sampai 10 tahun ke depan
-        for ($year = $currentYear; $year <= $endYear; $year++) {
+        // Loop dari tahun mulai sampai tahun akhir
+        for ($year = $startYear; $year <= $endYear; $year++) {
             $months = [];
 
             // Loop untuk setiap bulan dalam setahun
@@ -1470,10 +1471,11 @@ class OrderController extends BaseController
 
         $years = [];
         $currentYear = date('Y');
-        $endYear = $currentYear + 10;
+        $startYear = $currentYear - 2; // Mulai dari 2 tahun kebelakang
+        $endYear = $currentYear + 7; // Sampai 7 tahun ke depan
 
-        // Loop dari tahun ini sampai 10 tahun ke depan
-        for ($year = $currentYear; $year <= $endYear; $year++) {
+        // Loop dari tahun mulai sampai tahun akhir
+        for ($year = $startYear; $year <= $endYear; $year++) {
             $months = [];
 
             // Loop untuk setiap bulan dalam setahun
