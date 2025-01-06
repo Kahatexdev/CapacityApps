@@ -43,14 +43,14 @@ class ProduksiModel extends Model
     public function getProduksi($area, $bulan)
     {
         $today = date('Y-m-d');
-        $threeDaysAgo = date('Y-m-d', strtotime('-20 days'));
+        $threeDaysAgo = date('Y-m-d', strtotime('-30 days'));
         return $this
             ->select('tgl_produksi,produksi.*,apsperstyle.mastermodel, apsperstyle.size, sisa')
             ->join('apsperstyle', 'apsperstyle.idapsperstyle= produksi.idapsperstyle')
             ->where('produksi.area', $area)
             ->where('tgl_produksi >=', $threeDaysAgo)
             ->where('tgl_produksi <=', $today)
-            ->where('Month(tgl_produksi)', $bulan)
+            //->where('Month(tgl_produksi)', $bulan)
             ->orderBy('produksi.tgl_produksi')
             ->findAll();
     }
@@ -66,10 +66,11 @@ class ProduksiModel extends Model
             ->where('no_mesin', $insert['no_mesin'])
             ->first();
     }
-    public function getProduksiPerhari($bulan)
+    public function getProduksiPerhari($bulan, $year)
     {
         $results = $this->select('DATE(tgl_produksi) as tgl_produksi, SUM(qty_produksi) as qty_produksi')
             ->where('MONTH(tgl_produksi)', $bulan)
+            ->where('YEAR(tgl_produksi)', $year)
             ->like('storage_akhir', '-')
             ->groupBy('DATE(tgl_produksi)')
             ->orderBy('tgl_produksi')
@@ -81,10 +82,11 @@ class ProduksiModel extends Model
             return $result;
         }, $results);
     }
-    public function getProduksiPerArea($bulan, $area)
+    public function getProduksiPerArea($area, $bulan, $year)
     {
         $result = $this->select('DATE(tgl_produksi) as tgl_produksi, SUM(qty_produksi) as qty_produksi')
             ->where('MONTH(tgl_produksi)', $bulan)
+            ->where('YEAR(tgl_produksi)', $year)
             ->where('area', $area)
             ->like('storage_akhir', '-')
             ->groupBy('DATE(tgl_produksi)')
@@ -136,7 +138,7 @@ class ProduksiModel extends Model
 
     public function getdataSummaryPertgl($data)
     {
-        $this->select('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, SUM(apsperstyle.qty) AS qty, COUNT(DISTINCT produksi.tgl_produksi) AS running, SUM(produksi.qty_produksi) AS qty_produksi, COUNT(DISTINCT produksi.no_mesin) AS jl_mc, produksi.tgl_produksi')
+        $this->select('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, SUM(apsperstyle.qty) AS qty, COUNT(DISTINCT produksi.tgl_produksi) AS running, SUM(produksi.qty_produksi) AS qty_produksi, COUNT(DISTINCT produksi.no_mesin) AS jl_mc, produksi.tgl_produksi, ')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle')
             ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model');
 
@@ -173,7 +175,7 @@ class ProduksiModel extends Model
 
     public function getJlMc($data)
     {
-        $yesterday = date('Y-m-d', strtotime('-17 day'));
+        $yesterday = date('Y-m-d', strtotime('-2 day'));
 
         $result = $this->select('produksi.tgl_produksi, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
@@ -192,7 +194,7 @@ class ProduksiModel extends Model
     public function getJlMcJrm($data)
     {
         // dd($data);
-        $yesterday = date('Y-m-d', strtotime('-17 day'));
+        $yesterday = date('Y-m-d', strtotime('-2 day'));
 
         $result = $this->select('produksi.tgl_produksi, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
@@ -210,7 +212,7 @@ class ProduksiModel extends Model
 
     public function getJlMcJrmArea($data)
     {
-        $yesterday = date('Y-m-d', strtotime('-17 day'));
+        $yesterday = date('Y-m-d', strtotime('-2 day'));
 
         $result = $this->select('produksi.tgl_produksi, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')

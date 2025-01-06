@@ -61,8 +61,9 @@ class ProduksiController extends BaseController
     {
         $bulan = date('m');
         $month = date('F');
+        $year = date('Y');
         $totalMesin = $this->jarumModel->getArea();
-        $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
+        $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan, $year);
         $dataPdk = $this->ApsPerstyleModel->getPdkProduksi();
         $produksi = $this->produksiModel->getProduksiHarianArea();
         $data = [
@@ -317,8 +318,9 @@ class ProduksiController extends BaseController
         $role = session()->get('role');
         $bulan = date('m');
         $month = date('F');
+        $year = date('Y');
         $totalMesin = $this->jarumModel->getArea();
-        $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
+        $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan, $year);
 
         $dataBuyer = $this->orderModel->getBuyer();
         $dataArea = $this->jarumModel->getArea();
@@ -326,7 +328,7 @@ class ProduksiController extends BaseController
 
         $produksiPerArea = [];
         foreach ($totalMesin as $area) {
-            $produksiPerArea[$area] = $this->produksiModel->getProduksiPerArea($bulan, $area);
+            $produksiPerArea[$area] = $this->produksiModel->getProduksiPerArea($area, $bulan, $year);
         }
 
         $data = [
@@ -362,10 +364,11 @@ class ProduksiController extends BaseController
     {
         $bulan = date('m');
         $month = date('F');
+        $year = date('Y');
         $totalMesin = $this->jarumModel->getArea();
         $produksiPerArea = [];
         foreach ($totalMesin as $area) {
-            $produksiPerArea[$area] = $this->produksiModel->getProduksiPerArea($bulan, $area);
+            $produksiPerArea[$area] = $this->produksiModel->getProduksiPerArea($area, $bulan, $year);
         }
         return json_encode($produksiPerArea);
     }
@@ -374,11 +377,12 @@ class ProduksiController extends BaseController
         $bulan = date('m');
         $month = date('F');
         $totalMesin = $this->jarumModel->getArea();
-        $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan);
+        $year = date('Y');
+        $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan, $year);
         // $pdkProgress = $this->ApsPerstyleModel->getProgress($noModel);
         $produksiPerArea = [];
         foreach ($totalMesin as $area) {
-            $produksiPerArea[$area] = $this->produksiModel->getProduksiPerArea($bulan, $area);
+            $produksiPerArea[$area] = $this->produksiModel->getProduksiPerArea($area, $bulan, $year);
         }
 
         $data = [

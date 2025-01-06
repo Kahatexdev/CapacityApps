@@ -12,7 +12,7 @@ class DetailPlanningModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_detail_pln', 'id_pln_mc', 'model', 'qty', 'sisa', 'smv'];
+    protected $allowedFields    = ['id_detail_pln', 'id_pln_mc', 'model', 'qty', 'sisa', 'smv', 'jarum'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -52,11 +52,11 @@ class DetailPlanningModel extends Model
     }
     public function getDetailPlanning($id)
     {
-        return $this->select('detail_planning.id_detail_pln,model,delivery,qty,sisa,smv,MIN(date) as start_date,MAX(date) as stop_date,MAX(mesin) as mesin,sum(est_qty) as est_qty,max(hari) as hari')
+        return $this->select('detail_planning.id_detail_pln,model,qty,sisa,smv,MIN(date) as start_date,MAX(date) as stop_date,MAX(mesin) as mesin,sum(est_qty) as est_qty,max(hari) as hari')
             ->join('tanggal_planning', 'detail_planning.id_detail_pln = tanggal_planning.id_detail_pln', 'LEFT')
             ->join('estimated_planning', 'estimated_planning.id_detail_pln = detail_planning.id_detail_pln', 'LEFT')
             ->where('detail_planning.id_detail_pln', $id)
-            ->groupby('delivery', 'model')
+            ->groupby('model')
             ->findAll();
     }
     public function cekPlanning($validate)
@@ -64,11 +64,16 @@ class DetailPlanningModel extends Model
         return $this->select('id_detail_pln, sisa')
             ->where('id_pln_mc', $validate['id'])
             ->where('model', $validate['model'])
-            ->where('delivery', $validate['deliv'])
             ->first();
     }
     public function pdkList($id)
     {
         return $this->select('id_detail_pln')->where('id_pln_mc', $id)->findAll();
+    }
+    public function detailPdk($id)
+    {
+        return $this->select('model,jarum')
+            ->where('id_detail_pln', $id)
+            ->first();
     }
 }

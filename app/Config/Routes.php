@@ -307,6 +307,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('pickmachine/(:any)', 'PlanningController::pickmachine/$1');
     $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetailAps/$1');
+    $routes->get('getModelData', 'PlanningController::getModelData');
 
 
     // produksi

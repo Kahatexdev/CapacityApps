@@ -765,4 +765,20 @@ class ApsPerstyleModel extends Model
             ->update();
         return $result;
     }
+    public function
+    getDetailPerDeliv($pdk)
+    {
+        return $this->select('mastermodel, delivery')
+            ->where('mastermodel', $pdk['model'])
+            ->where('machinetypeid', $pdk['jarum'])
+            ->groupBy('delivery')
+            ->findAll();
+    }
+    public function getSisaForPlanning($model, $delivery)
+    {
+        return $this->select('round(sum(qty/24)) as qty, round(sum(sisa/24)) as sisa, AVG(smv) as smv ')
+            ->where('mastermodel', $model)
+            ->where('delivery', $delivery)
+            ->findAll();
+    }
 }

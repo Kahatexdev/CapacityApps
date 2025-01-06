@@ -680,7 +680,8 @@ class ApsController extends BaseController
                 'model' => $model,
                 'qty' => $qty,
                 'sisa' => $sisa,
-                'smv' => $row['smv']
+                'smv' => $row['smv'],
+                'jarum' => $jarum
             ];
             $cek = $this->DetailPlanningModel->cekPlanning($validate);
             if ($cek) {
@@ -697,7 +698,9 @@ class ApsController extends BaseController
         $judul = $kebutuhanArea['judul'];
         $area = $kebutuhanArea['area'];
         $jarum =  $kebutuhanArea['jarum'];
-        $detailplan = $this->DetailPlanningModel->getDetailPlanning($id); //get data model with detail quantity,model etc.
+        //$detailplan = $this->DetailPlanningModel->getDetailPlanning($id); //get data model with detail quantity,model etc.
+        $pdk = $this->DetailPlanningModel->detailPdk($id);
+        $listDeliv = $this->ApsPerstyleModel->getDetailPerDeliv($pdk);
         $listPlanning = $this->EstimatedPlanningModel->listPlanning($id); //get data planning per page and fetch it into datatable at bottom datatables
         // $mesinpertgl = $this->TanggalPlanningModel->getMesinByDate($idutama);//get data machine per date and return into array
         $mesin = $this->jarumModel->getMesinByArea($area, $jarum);
@@ -713,7 +716,9 @@ class ApsController extends BaseController
             'active7' => '',
             'area' => $area,
             'jarum' => $jarum,
-            'planning' => $detailplan,
+            'pdk' => $pdk['model'],
+            'listDeliv' => $listDeliv,
+            //'planning' => $detailplan,
             'listPlanning' => $listPlanning,
             'mesin' => $mesin,
             'id_pln' => $idutama,
@@ -788,7 +793,9 @@ class ApsController extends BaseController
             'hari' => $hari,
             'target' => $numericalTarget,
             'precentage_target' => $persentarget,
+            'delivery' => $delivery,
         ];
+
         $saveest = $this->EstimatedPlanningModel->insert($dataestqty);
         $idOrder = $this->EstimatedPlanningModel->getId($id_save);
 
