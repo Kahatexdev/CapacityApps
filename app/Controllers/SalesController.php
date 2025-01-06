@@ -1134,11 +1134,6 @@ class SalesController extends BaseController
                     return $carry;
                 }, 0);
 
-                // $sisaBooking = array_reduce($dataBookingByJarum, function ($carry, $booking) {
-                //     $sisa = !empty($booking['sisa_booking']) ? ceil($booking['sisa_booking'] / 24) : 0;
-                //     $carry += $sisa;
-                //     return $carry;
-                // }, 0);
                 $sisaBooking = array_reduce($dataBookingByJarum, function ($carry, $booking) {
                     $sisa_booking = $booking['sisa_booking'];
                     switch ($booking['product_group']) {
@@ -1498,6 +1493,22 @@ class SalesController extends BaseController
         $col_index = Coordinate::columnIndexFromString($column); // Konversi huruf kolom ke nomor indeks kolom
         $column2 = 'V';
         $col_index2 = Coordinate::columnIndexFromString($column2);
+        $colors = [
+            'FFFACD', // Lemon Yellow
+            'D9F1FF', // Sky Blue Light
+            'DFFFD6', // Mint Green
+            'FFE4B5', // Pastel Orange
+            'E6E6FA', // Lavender
+            'FFEBE5', // Pale Pink
+            'FFFDD0', // Cream
+            'EAF2E0', // Pale Green
+            'E0FFFF', // Ice Blue
+            'FDEFD0', // Caramel Orange
+            'FAFAD2', // Light Golden Yellow
+            'FF00FFFF', // Light cyan
+        ];
+        $colorIndex = 0;
+
         foreach ($monthlyData as $month => $data) :
             // month
             $weekCount = count($data['weeks']); // Hitung jumlah minggu dalam bulan
@@ -1505,19 +1516,36 @@ class SalesController extends BaseController
             $endCol_index = $col_index + ($weekCount * 6) - 1; // Dikurangi 1 karena kolom awal tidak terhitung
             $endColumn = Coordinate::stringFromColumnIndex($endCol_index); // Konversi kembali dari nomor indeks kolom ke huruf kolom
 
+            // kolom warna
+            $currentColor = $colors[$colorIndex]; // Ambil warna dari array
+            $colorIndex = ($colorIndex + 1) % count($colors); // Perbarui indeks warna (looping kembali ke awal jika habis)
+
             // Merge cells untuk bulan ini sesuai dengan jumlah minggu
             $sheet->setCellValue($startColumn . $rowHeader, $month);
             if ($startColumn !== $endColumn) {
                 $sheet->mergeCells($startColumn . $rowHeader . ':' . $endColumn . $rowHeader)
                     ->getStyle($startColumn . $rowHeader . ':' . $endColumn . $rowHeader)
-                    ->applyFromArray($styleHeader);
+                    // ->applyFromArray($styleHeader);
+                    ->applyFromArray(array_merge($styleHeader, [
+                        'fill' => [
+                            'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                            'startColor' => ['rgb' => $currentColor],
+                        ],
+                    ]));
             } else {
                 $sheet->getStyle($startColumn . $rowHeader)
-                    ->applyFromArray($styleHeader);
+                    // ->applyFromArray($styleHeader);
+                    ->applyFromArray(array_merge($styleHeader, [
+                        'fill' => [
+                            'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                            'startColor' => ['rgb' => $currentColor],
+                        ],
+                    ]));
             }
 
             // Pastikan $column2 dan $col_index2 berada di luar loop bulan
             $rowWeek = $rowHeader + 1; // Baris awal untuk week
+            // dd($data['weeks']['countWeek']);
             foreach ($data['weeks'] as $week) :
                 $startDate = $week['start_date'];
                 $endDate = $week['end_date'];
@@ -1863,8 +1891,62 @@ class SalesController extends BaseController
         }
         $rowSubtotal++;
 
+        $rowTitleGrandtotal = $rowSubtotal;
         $rowGrandtotal = $rowSubtotal;
-        // baris grand total per bulan
+        $sheet->setCellValue('T' . $rowTitleGrandtotal, "Max Capacity")
+            ->mergeCells('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+            ->getStyle('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+            ->applyFromArray($styleGrandTotal);
+        $rowTitleGrandtotal++;
+
+        $sheet->setCellValue('T' . $rowTitleGrandtotal, "Confirm Order")
+            ->mergeCells('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+            ->getStyle('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+            ->applyFromArray($styleGrandTotal);
+        $rowTitleGrandtotal++;
+
+        $sheet->setCellValue('T' . $rowTitleGrandtotal, "Sisa Order")
+            ->mergeCells('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+            ->getStyle('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+            ->applyFromArray($styleGrandTotal);
+        $rowTitleGrandtotal++;
+
+        $sheet->setCellValue('T' . $rowTitleGrandtotal, "Sisa Booking")
+            ->mergeCells('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+            ->getStyle('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+            ->applyFromArray($styleGrandTotal);
+        $rowTitleGrandtotal++;
+
+        $sheet->setCellValue('T' . $rowTitleGrandtotal, "(+)Exess")
+            ->mergeCells('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+            ->getStyle('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+            ->applyFromArray($styleGrandTotal);
+        $rowTitleGrandtotal++;
+
+        $sheet->setCellValue('T' . $rowTitleGrandtotal, "%")
+            ->mergeCells('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+            ->getStyle('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+            ->applyFromArray($styleGrandTotal);
+        $rowTitleGrandtotal++;
+
+        $sheet->setCellValue('T' . $rowTitleGrandtotal, "Total Export")
+            ->mergeCells('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+            ->getStyle('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+            ->applyFromArray($styleGrandTotal);
+        $rowTitleGrandtotal++;
+
+        $sheet->setCellValue('T' . $rowTitleGrandtotal, "Total Inspect")
+            ->mergeCells('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+            ->getStyle('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+            ->applyFromArray($styleGrandTotal);
+        $rowTitleGrandtotal++;
+
+        $sheet->setCellValue('T' . $rowTitleGrandtotal, "Total Lokal")
+            ->mergeCells('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+            ->getStyle('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+            ->applyFromArray($styleGrandTotal);
+
+        // // baris grand total per bulan
         $column = 'V'; // Kolom awal untuk bulan
         $col_index = Coordinate::columnIndexFromString($column); // Konversi huruf kolom ke nomor indeks kolom
         $columnGrandTotal = 'V'; // Kolom awal untuk bulan
@@ -1880,30 +1962,15 @@ class SalesController extends BaseController
         foreach ($monthlyData as $month => $data) :
             // month
             $weekCount = count($data['weeks']); // Hitung jumlah minggu dalam bulan
+            // dd($weekCount);
             $startColumn = $column;
             // jika 1 bulan lebih dari 1 week
             if ($weekCount > 1) {
                 $endCol_index = $col_index + ($weekCount * 6) - 1; // Dikurangi 1 karena kolom awal tidak terhitung
-                $endColumn = Coordinate::stringFromColumnIndex($endCol_index); // Konversi kembali dari nomor indeks kolom ke huruf kolom
             } else {
                 $endCol_index = $col_index + ($weekCount * 6);
-                $endColumn = Coordinate::stringFromColumnIndex($endCol_index); // Konversi kembali dari nomor indeks kolom ke huruf kolom
             }
-            $endColTitle_index = $col_index + 1; // untuk title grandTotal
-            $endColumnTitle = Coordinate::stringFromColumnIndex($endColTitle_index); // Konversi kembali dari nomor indeks kolom ke huruf kolom
-
-            $startColGrandtotal_index = $endColTitle_index + 1; // Konversi kembali dari nomor indeks kolom ke huruf kolom
-            $startColumnGrandtotal = Coordinate::stringFromColumnIndex($startColGrandtotal_index); // untuk start isi grandTotal
-            $endColGrandtotal_index = $startColGrandtotal_index + 1; // Konversi kembali dari nomor indeks kolom ke huruf kolom
-            $endColumnGrandtotal = Coordinate::stringFromColumnIndex($endColGrandtotal_index); // untuk end isi grandTotal
-
-            $startTitleGrandExport_index = $endColGrandtotal_index + 1; // Konversi kembali dari nomor indeks kolom ke huruf kolom
-            $startTitleGrandExport = Coordinate::stringFromColumnIndex($startTitleGrandExport_index); // untuk start title grandExport
-            $endTitleGrandExport_index = $startTitleGrandExport_index + 1; // Konversi kembali dari nomor indeks kolom ke huruf kolom
-            $endTitleGrandExport = Coordinate::stringFromColumnIndex($endTitleGrandExport_index); // untuk end title grandExport
-
-            $startColTitleGrandExport_index = $endTitleGrandExport_index + 1; // Konversi kembali dari nomor indeks kolom ke huruf kolom
-            $startColumnTitleGrandExport = Coordinate::stringFromColumnIndex($startColTitleGrandExport_index); // untuk start isi grandExport
+            $endColumn = Coordinate::stringFromColumnIndex($endCol_index); // Konversi kembali dari nomor indeks kolom ke huruf kolom
 
             $totalWeeks = 0; // Inisialisasi total minggu
             // untuk menghitung total minggu
@@ -1913,26 +1980,7 @@ class SalesController extends BaseController
             }
             $rowTotal = $rowGrandtotal - 1;
 
-            // Merge cells untuk bulan ini sesuai dengan jumlah minggu
-            $sheet->setCellValue($startColumn . $rowGrandtotal, "Total " . $month);
-            if ($startColumn !== $endColumn) {
-                $sheet->mergeCells($startColumn . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
-                    ->getStyle($startColumn . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
-                    ->applyFromArray($styleGrandTotal);
-            } else {
-                $sheet->getStyle($startColumn . $rowHeader)
-                    ->applyFromArray($styleGrandTotal);
-            }
-            $rowGrandtotal++;
-
-            // Grand total Max Capacity Per bulan
-            $sheet->setCellValue($startColumn . $rowGrandtotal, "Max Capacity")
-                ->mergeCells($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
-                ->getStyle($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
-                ->applyFromArray($styleGrandTotal);
-
-
-            // Buat formula berdasarkan total minggu
+            // Buat formula berdasarkan total minggu Max Capacity
             $grandTotalMaxCap = "=SUM(";
             $grandTotalPartsMaxCap = []; // Untuk menyimpan tiap bagian formula SUM
 
@@ -1948,25 +1996,16 @@ class SalesController extends BaseController
             // Gabungkan bagian formula dengan koma
             $grandTotalMaxCap .= implode(', ', $grandTotalPartsMaxCap) . ")";
 
-            // Update kolom untuk bulan berikutnya
             $colGrandTotalMaxCap = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
 
-            $sheet->setCellValue($startColumnGrandtotal . $rowGrandtotal, $grandTotalMaxCap);
-            $sheet->mergeCells($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
-                ->getStyle($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+            $sheet->setCellValue($endColumn . $rowGrandtotal, $grandTotalMaxCap)
+                ->getStyle($endColumn . $rowGrandtotal)
                 ->applyFromArray($styleGrandTotal);
-
-            $startColGrandtotal_index = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
-
             $rowGrandtotal++; // Pindah ke baris berikutnya jika ingin menyusun hasil di baris yang berbeda
 
-            // Grand total Confirm Order Per bulan
-            $sheet->setCellValue($startColumn . $rowGrandtotal, "Confirm Order")
-                ->mergeCells($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
-                ->getStyle($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
-                ->applyFromArray($styleGrandTotal);
 
-            // Buat formula berdasarkan total minggu
+            // Buat formula berdasarkan total minggu Confirm Order
+            $rowTotal = $rowGrandtotal - 2;
             $grandTotalConfirm = "=SUM(";
             $grandTotalPartsConfirm = []; // Untuk menyimpan tiap bagian formula SUM
 
@@ -1982,41 +2021,16 @@ class SalesController extends BaseController
             // Gabungkan bagian formula dengan koma
             $grandTotalConfirm .= implode(', ', $grandTotalPartsConfirm) . ")";
 
-            // Update kolom untuk bulan berikutnya
             $colGrandTotalConfirm = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
 
-            $sheet->setCellValue($startColumnGrandtotal . $rowGrandtotal, $grandTotalConfirm);
-            $sheet->mergeCells($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumnGrandtotal . $rowGrandtotal)
-                ->getStyle($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumnGrandtotal . $rowGrandtotal)
+            $sheet->setCellValue($endColumn . $rowGrandtotal, $grandTotalConfirm)
+                ->getStyle($endColumn . $rowGrandtotal)
                 ->applyFromArray($styleGrandTotal);
+            $rowGrandtotal++; // Pindah ke baris berikutnya jika ingin menyusun hasil di baris yang berbeda
 
-            $sheet->setCellValue($startTitleGrandExport . $rowGrandtotal, "Total Export");
-            $sheet->mergeCells($startTitleGrandExport . $rowGrandtotal . ':' . $endTitleGrandExport . $rowGrandtotal)
-                ->getStyle($startTitleGrandExport . $rowGrandtotal . ':' . $endTitleGrandExport . $rowGrandtotal)
-                ->applyFromArray($styleGrandTotal);
-            // Cek apakah ini bulan pertama atau kedua
-            if ($month == $thisMonthExport || $month == $nextMonthExport) {
-                // Kosongkan nilai untuk bulan pertama dan kedua
-                $sheet->setCellValue($startColumnTitleGrandExport . $rowGrandtotal, $allData['total']['targetExport'][$month]); // Mengosongkan nilai
-            } else {
-                // Untuk bulan ketiga dan seterusnya
-                $sheet->setCellValue($startColumnTitleGrandExport . $rowGrandtotal, $allData['total']['totalExport'][$month]);
-            }
-            $sheet->mergeCells($startColumnTitleGrandExport . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
-                ->getStyle($startColumnTitleGrandExport . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
-                ->applyFromArray($styleGrandTotal);
 
-            $startColGrandtotal_index = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
-
-            $rowGrandtotal++;
-
-            // Grand total Sisa Order perbulan
-            $sheet->setCellValue($startColumn . $rowGrandtotal, "Sisa Order")
-                ->mergeCells($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
-                ->getStyle($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
-                ->applyFromArray($styleGrandTotal);
-
-            // Buat formula berdasarkan total minggu
+            // Buat formula berdasarkan total minggu Sisa Order
+            $rowTotal = $rowGrandtotal - 3;
             $grandTotalSisaOrder = "=SUM(";
             $grandTotalPartsSisaOrder = []; // Untuk menyimpan tiap bagian formula SUM
 
@@ -2035,36 +2049,14 @@ class SalesController extends BaseController
             // Update kolom untuk bulan berikutnya
             $colGrandTotalSisaOrder = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
 
-            $sheet->setCellValue($startColumnGrandtotal . $rowGrandtotal, $grandTotalSisaOrder);
-            $sheet->mergeCells($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumnGrandtotal . $rowGrandtotal)
-                ->getStyle($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumnGrandtotal . $rowGrandtotal)
+            $sheet->setCellValue($endColumn . $rowGrandtotal, $grandTotalSisaOrder)
+                ->getStyle($endColumn . $rowGrandtotal)
                 ->applyFromArray($styleGrandTotal);
+            $rowGrandtotal++; // Pindah ke baris berikutnya jika ingin menyusun hasil di baris yang berbeda
 
-            $sheet->setCellValue($startTitleGrandExport . $rowGrandtotal, "Total Inspect");
-            $sheet->mergeCells($startTitleGrandExport . $rowGrandtotal . ':' . $endTitleGrandExport . $rowGrandtotal)
-                ->getStyle($startTitleGrandExport . $rowGrandtotal . ':' . $endTitleGrandExport . $rowGrandtotal)
-                ->applyFromArray($styleGrandTotal);
 
-            $colConfirm_index = $startColTitleGrandExport_index - 4;
-            $colConfirm = Coordinate::stringFromColumnIndex($colConfirm_index);
-            $rowConfirm_Export = $rowGrandtotal - 1;
-            $rowLokal = $rowGrandtotal + 1;
-            $sheet->setCellValue($startColumnTitleGrandExport . $rowGrandtotal, "=" . $colConfirm . $rowConfirm_Export . "-" . $startColumnTitleGrandExport . $rowConfirm_Export . "-" . $startColumnTitleGrandExport . $rowLokal); // Confirm Order - Export -Lokal
-            $sheet->mergeCells($startColumnTitleGrandExport . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
-                ->getStyle($startColumnTitleGrandExport . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
-                ->applyFromArray($styleGrandTotal);
-
-            $startColGrandtotal_index = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
-
-            $rowGrandtotal++;
-
-            // Grand Total Sisa Booking perbulan
-            $sheet->setCellValue($startColumn . $rowGrandtotal, "Sisa Booking")
-                ->mergeCells($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
-                ->getStyle($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
-                ->applyFromArray($styleGrandTotal);
-
-            // Buat formula berdasarkan total minggu
+            // Buat formula berdasarkan total minggu Sisa Booking
+            $rowTotal = $rowGrandtotal - 4;
             $grandTotalSisaBooking = "=SUM(";
             $grandTotalPartsSisaBooking = []; // Untuk menyimpan tiap bagian formula SUM
 
@@ -2083,33 +2075,14 @@ class SalesController extends BaseController
             // Update kolom untuk bulan berikutnya
             $colGrandTotalSisaBooking = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
 
-            $sheet->setCellValue($startColumnGrandtotal . $rowGrandtotal, $grandTotalSisaBooking);
-            $sheet->mergeCells($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumnGrandtotal . $rowGrandtotal)
-                ->getStyle($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumnGrandtotal . $rowGrandtotal)
+            $sheet->setCellValue($endColumn . $rowGrandtotal, $grandTotalSisaBooking)
+                ->getStyle($endColumn . $rowGrandtotal)
                 ->applyFromArray($styleGrandTotal);
-
-            $sheet->setCellValue($startTitleGrandExport . $rowGrandtotal, "Total Lokal");
-            $sheet->mergeCells($startTitleGrandExport . $rowGrandtotal . ':' . $endTitleGrandExport . $rowGrandtotal)
-                ->getStyle($startTitleGrandExport . $rowGrandtotal . ':' . $endTitleGrandExport . $rowGrandtotal)
-                ->applyFromArray($styleGrandTotal);
-
-            $sheet->setCellValue($startColumnTitleGrandExport . $rowGrandtotal, $allData['total']['totalLokal'][$month]);
-            $sheet->mergeCells($startColumnTitleGrandExport . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
-                ->getStyle($startColumnTitleGrandExport . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
-                ->applyFromArray($styleGrandTotal);
+            $rowGrandtotal++; // Pindah ke baris berikutnya jika ingin menyusun hasil di baris yang berbeda
 
 
-            $startColGrandtotal_index = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
-
-            $rowGrandtotal++;
-
-            // Grand Total Exess perbulan
-            $sheet->setCellValue($startColumn . $rowGrandtotal, "(+)Exess")
-                ->mergeCells($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
-                ->getStyle($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
-                ->applyFromArray($styleGrandTotal);
-
-            // Buat formula berdasarkan total minggu
+            // Buat formula berdasarkan total minggu (+)Exess
+            $rowTotal = $rowGrandtotal - 5;
             $grandTotalExess = "=SUM(";
             $grandTotalPartsExess = []; // Untuk menyimpan tiap bagian formula SUM
 
@@ -2128,39 +2101,59 @@ class SalesController extends BaseController
             // Update kolom untuk bulan berikutnya
             $colGrandTotalExess = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
 
-            $sheet->setCellValue($startColumnGrandtotal . $rowGrandtotal, $grandTotalExess);
-            $sheet->mergeCells($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
-                ->getStyle($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+            $sheet->setCellValue($endColumn . $rowGrandtotal, $grandTotalExess)
+                ->getStyle($endColumn . $rowGrandtotal)
                 ->applyFromArray($styleGrandTotal);
-
-            $startColGrandtotal_index = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
-
             $rowGrandtotal++;
 
-            // Grand Total Exess perbulan
-            $sheet->setCellValue($startColumn . $rowGrandtotal, "%")
-                ->mergeCells($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
-                ->getStyle($startColumn . $rowGrandtotal . ':' . $endColumnTitle . $rowGrandtotal)
-                ->applyFromArray($styleGrandTotal);
 
             $rowGtMaxCap = $rowGrandtotal - 5;
             $rowGtExess = $rowGrandtotal - 1;
-            $sheet->setCellValue($startColumnGrandtotal . $rowGrandtotal, "=(" . $startColumnGrandtotal . $rowGtExess . "/" . $startColumnGrandtotal . $rowGtMaxCap . ")");
-            $sheet->mergeCells($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
-                ->getStyle($startColumnGrandtotal . $rowGrandtotal . ':' . $endColumn . $rowGrandtotal)
+            $sheet->setCellValue($endColumn . $rowGrandtotal, "=(" . $endColumn . $rowGtExess . "/" . $endColumn . $rowGtMaxCap . ")")
+                ->getStyle($endColumn . $rowGrandtotal)
                 ->applyFromArray($styleGrandTotal);
             // Set format kolom menjadi persentase 
-            $sheet->getStyle($startColumnGrandtotal . $rowGrandtotal)
+            $sheet->getStyle($endColumn . $rowGrandtotal)
                 ->getNumberFormat()
                 ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_PERCENTAGE);
+            $rowGrandtotal++;
 
-            // Pindah ke kolom berikutnya setelah melakukan merge
-            $col_index = $endCol_index + 1; // Update ke indeks kolom berikutnya
-            $column = Coordinate::stringFromColumnIndex($col_index); // Konversi kembali ke huruf kolom
 
+            // total Export 
+            // / Cek apakah ini bulan pertama atau kedua
+            if ($month == $thisMonthExport || $month == $nextMonthExport) {
+                // Kosongkan nilai untuk bulan pertama dan kedua
+                $sheet->setCellValue($endColumn . $rowGrandtotal, $allData['total']['targetExport'][$month]); // Mengosongkan nilai
+            } else {
+                // Untuk bulan ketiga dan seterusnya
+                $sheet->setCellValue($endColumn . $rowGrandtotal, $allData['total']['totalExport'][$month]);
+            }
+            $sheet->getStyle($endColumn . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+            $rowGrandtotal++;
+
+
+            // total inspect
+            $rowConfirm = $rowGrandtotal - 6;
+            $rowExport = $rowGrandtotal - 1;
+            $rowLokal = $rowGrandtotal + 1;
+            $sheet->setCellValue($endColumn . $rowGrandtotal, "=" . $endColumn . $rowConfirm . "-" . $endColumn . $rowExport . "-" . $endColumn . $rowLokal) // Confirm Order - Export -Lokal
+                ->getStyle($endColumn . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+            $rowGrandtotal++;
+
+
+            //  total lokal
+            $sheet->setCellValue($endColumn . $rowGrandtotal, $allData['total']['totalLokal'][$month])
+                ->getStyle($endColumn . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+
+            $endColumn++;
+            $col_index = Coordinate::columnIndexFromString($endColumn);
             // agar baris kembali ke baris pertama grandtotal
-            $rowGrandtotal -= 6;
+            $rowGrandtotal -= 8;
         endforeach;
+
 
         // Set judul file dan header untuk download
         $filename = 'Sales Position.xlsx';
