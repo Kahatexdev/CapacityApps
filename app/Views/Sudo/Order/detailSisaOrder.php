@@ -51,9 +51,10 @@
                         <div class="col-8">
                         </div>
                         <div class="col-4 text-end">
-                            <form action="<?= base_url($role . '/excelSisaOrderBuyer/' . $buyer) ?>" method="post" ?>
+                            <form action="<?= base_url($role . '/excelSisaOrderBuyer/' . $buyer) ?>" method="post">
                                 <input type="hidden" class="form-control" name="buyer" value="<?= $buyer ?>">
-                                <input type="hidden" class="form-control" name="month" value="<?= $bulan; ?>">
+                                <input type="hidden" class="form-control" name="months" value="<?= date('F', strtotime($bulan)) ?>">
+                                <input type="hidden" class="form-control" name="years" value="<?= date('Y', strtotime($bulan)) ?>">
                                 <button type="submit" class="btn btn-info"><i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Report Excel</button>
 
                                 <a href="<?= base_url($role . '/sisaOrder') ?>" class="btn bg-gradient-dark">

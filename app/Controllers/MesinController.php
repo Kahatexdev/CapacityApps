@@ -541,31 +541,11 @@ class MesinController extends BaseController
             return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('error', 'Data Gagal Di Input');
         }
     }
-    public function DetailMesinPerJarumPlan($jarum, $pu)
-    {
-        $tampilperarea = $this->jarumModel->getMesinPerJarum($jarum, $pu);
-        $data = [
-            'role' => session()->get('role'),
-            'title' => 'Data Mesin',
-            'active1' => '',
-            'active2' => '',
-            'active3' => '',
-            'active4' => '',
-            'active5' => 'active',
-            'active6' => '',
-            'active7' => '',
-            'pu' => $pu,
-            'jarum' => $jarum,
-            'tampildata' => $tampilperarea,
-        ];
-
-        return view(session()->get('role') . '/Mesin/detailMesinJarum', $data);
-    }
     public function capacityperarea($area)
     {
         $targetInput = $this->request->getPost('target');
         $today = new DateTime();
-        $today->setTime(0, 0);  // Ensuring the time is set to midnight
+        $today->setTime(0, 0); // Ensuring the time is set to midnight
         $jarum = $this->request->getPost('jarum');
         $listjarum = $this->jarumModel->getJarumByArea($area);
         $maxCapacity = $this->jarumModel->maxCapacity($area, $jarum);
@@ -575,6 +555,7 @@ class MesinController extends BaseController
             $pdk = $order['mastermodel'];
             $capacity[] = $this->ApsPerstyleModel->CapacityArea($pdk, $area, $jarum);
         }
+
         $orderWeek = [];
         $totalProduksi = 0;
         $totalKebMesin = 0;
@@ -606,7 +587,7 @@ class MesinController extends BaseController
             // Check if month has changed
             if ($currentDate->format('m') !== $currentMonth) {
                 $currentMonth = $currentDate->format('m');
-                $weekInMonth = 1;  // Reset week counter for the new month
+                $weekInMonth = 1; // Reset week counter for the new month
             }
 
             $calendar[$week] = $weekDays;
@@ -616,16 +597,16 @@ class MesinController extends BaseController
         // Initialize weekly production and machines array
         $weeklyProduction = array_fill($startWeek, 12, 0);
         $weeklyMachines = array_fill($startWeek, 12, 0);
+
         foreach ($capacity as $row) {
             $pdk = $row['mastermodel'];
             $delivery = $row['delivery'];
             $smv = $row['smv'];
             $targetPerMesin = round((86400 / (intval($smv))) * 0.85 / 24);
-            $sisa = $row['sisa'] / 24;
+            $sisa = $row['sisa'];
             $deliveryDate = new DateTime($row['delivery']);
             $time = $today->diff($deliveryDate);
             $leadtime = $row['targetHari'];
-            // Calculate weekly production and machine needs
             if ($leadtime < 1) {
                 $leadtime = 1;
             }
@@ -649,8 +630,15 @@ class MesinController extends BaseController
                     'kebMesin' => $kebMesin
                 ];
 
-                // Menghitung produksi mingguan
+                // Calculating weekly production
                 $currentWeek = floor($i / 7) + $startWeek;
+                if (!isset($weeklyProduction[$currentWeek])) {
+                    $weeklyProduction[$currentWeek] = 0; // Initialize if undefined
+                }
+                if (!isset($weeklyMachines[$currentWeek])) {
+                    $weeklyMachines[$currentWeek] = 0; // Initialize if undefined
+                }
+
                 $weeklyProduction[$currentWeek] += $produksiHariIni;
                 $weeklyMachines[$currentWeek] += $kebMesin;
             }
@@ -667,21 +655,18 @@ class MesinController extends BaseController
             ];
         }
 
-        // Calculate max capacity per week
         $maxCapacityPerWeek = $maxCapacity['maxCapacity'];
         $availableCapacity = [];
         foreach ($weeklyProduction as $week => $production) {
             $availableCapacity[$week] = $maxCapacityPerWeek - $production;
         }
 
-        // Calculate available machines per week
         $availableMachines = [];
         foreach ($weeklyMachines as $week => $machines) {
             $averageMachinesUsed = $machines / 7;
             $availableMachines[$week] = $maxCapacity['totalmesin'] - $averageMachinesUsed;
         }
 
-        // Menambahkan format minggu dengan bulan
         $formattedCalendar = [];
         $weekCounter = 1;
         $lastMonth = '';

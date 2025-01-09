@@ -590,4 +590,40 @@ class PlanningController extends BaseController
 
         return view($role . '/Planning/monthlyMachine', $data);
     }
+    public function getModelData()
+    {
+        if ($this->request->isAJAX()) { // Pastikan ini adalah permintaan AJAX
+            $delivery = $this->request->getGet('delivery'); // Ambil data dari parameter 'delivery'
+            $model = $this->request->getGet('model'); // Ambil data dari parameter 'model'
+
+            // Validasi input
+            if (empty($delivery) || empty($model)) {
+                return $this->response->setJSON([
+                    'error' => 'Invalid input data.',
+                ])->setStatusCode(400); // 400: Bad Request
+            }
+
+            // Ambil data dari database (sesuaikan dengan logika bisnis Anda)
+            $result = $this->ApsPerstyleModel->getSisaForPlanning($model, $delivery);
+
+            if (!empty($result) && isset($result[0])) {
+                $data = $result[0]; // Ambil elemen pertama dari array hasil
+                $target = round(3600 / $data['smv']);
+                $response = [
+                    'qty' => (float) $data['qty'], // Pastikan tipe data sesuai
+                    'sisa' => (float) $data['sisa'],
+                    'smv' => (float) $target
+                ];
+                return $this->response->setJSON($response);
+            } else {
+                // Jika data tidak ditemukan
+                return $this->response->setJSON([
+                    'error' => 'Data not found.',
+                ])->setStatusCode(404); // 404: Not Found
+            }
+        }
+
+        // Jika bukan permintaan AJAX, tampilkan 403 Forbidden
+        return $this->response->setStatusCode(403)->setBody('Forbidden');
+    }
 }

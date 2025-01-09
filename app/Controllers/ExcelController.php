@@ -2079,16 +2079,11 @@ class ExcelController extends BaseController
     public function excelSisaOrderBuyer($buyer)
     {
         $role = session()->get('role');
-        $month = $this->request->getPost('month');
-        $yearss = $this->request->getPost('year');
+        $month = $this->request->getPost('months');
+        $yearss = $this->request->getPost('years');
 
-        // Jika bulan atau tahun tidak diisi, gunakan bulan dan tahun ini
-        if (empty($month) || empty($yearss)) {
-            $bulan = date('Y-m-01', strtotime('this month')); // Bulan ini
-        } else {
-            // Atur tanggal berdasarkan input bulan dan tahun dari POST
-            $bulan = date('Y-m-01', strtotime("$yearss-$month-01"));
-        }
+        // Atur tanggal berdasarkan input bulan dan tahun dari POST
+        $bulan = date('Y-m-01', strtotime("$yearss-$month-01"));
 
         $years = [];
         $currentYear = date('Y');
@@ -2335,7 +2330,7 @@ class ExcelController extends BaseController
         ];
 
         // Judul
-        $sheet->setCellValue('A1', 'SISA PRODUKSI ' . $buyer . ' Bulan ' . date('F', strtotime($bulan)));
+        $sheet->setCellValue('A1', 'SISA PRODUKSI ' . $buyer . ' Bulan ' . date('F-Y', strtotime($bulan)));
 
         $row_header = 3;
         $row_header2 = 4;
@@ -2739,7 +2734,7 @@ class ExcelController extends BaseController
 
         // Export file ke Excel
         $writer = new Xlsx($spreadsheet);
-        $filename = 'Sisa Produksi ' . $buyer . ' Bulan ' . date('F', strtotime($bulan)) . '.xlsx';
+        $filename = 'Sisa Produksi ' . $buyer . ' Bulan ' . date('F-Y', strtotime($bulan)) . '.xlsx';
 
         header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
@@ -2751,8 +2746,8 @@ class ExcelController extends BaseController
     public function excelSisaOrderArea($ar)
     {
         $role = session()->get('role');
-        $month = $this->request->getPost('month');
-        $yearss = $this->request->getPost('year');
+        $month = $this->request->getPost('months');
+        $yearss = $this->request->getPost('years');
 
         // Jika bulan atau tahun tidak diisi, gunakan bulan dan tahun ini
         if (empty($month) || empty($yearss)) {
