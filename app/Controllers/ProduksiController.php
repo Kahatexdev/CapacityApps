@@ -825,69 +825,75 @@ class ProduksiController extends BaseController
             'awal' => $awal,
         ];
 
-        $dataTimter = $this->orderModel->getdataSummaryPertgl($data);
+        $dataTimter = $this->orderModel->getDataTimter($data);
         $poTimter = $this->orderModel->getQtyPOTimter($data);
         $prodTimter = $this->orderModel->getDetailProdTimter($data);
         $jlMC = $this->orderModel->getprodSummaryPertgl($data);
-        // dd($dataTimter);
-        $dataUtama = [];
-        foreach ($dataTimter as $item) {
-            $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'];
-            if (!isset($dataUtama[$key])) {
-                $dataUtama[$key] = [
-                    'machinetypeid' => $item['machinetypeid'],
-                    'mastermodel' => $item['mastermodel'],
-                    'inisial' => $item['inisial'] ?? null,  // jika data tidak ada, set NULL atau default
-                    'size' => $item['size'] ?? null,  // jika data tidak ada, set NULL atau default
-                    'color' => $item['color'] ?? null,  // pastikan juga menangani nilai null
-                    'smv' => $item['smv'] ?? null,
-                    'delivery' => $item['delivery'] ?? null,
-                    'qty' => 0,
-                    'running' => 0,
-                    'ttl_prod' => 0,
-                    'ttl_jlmc' => 0,
-                    'ttl_sisa' => 0,
-                    'no_mesin' => $item['no_mesin'] ?? '',
-                ];
-            }
-            $dataUtama[$key]['qty'] += $item['qty'] ?? 0;
-            $dataUtama[$key]['running'] += $item['running'] ?? 0;
-            $dataUtama[$key]['ttl_prod'] += $item['qty_produksi'] ?? 0;
-            $dataUtama[$key]['ttl_jlmc'] += $item['jl_mc'] ?? 0;
-            $dataUtama[$key]['ttl_sisa'] += $item['sisa'] ?? 0;
-        }
+
         $uniqueData = [];
-        foreach ($prodTimter as $item) {
-            $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'] . '-' . $item['no_mesin'] ?? '';
-            if (!isset($uniqueData[$key])) {
-                $uniqueData[$key] = [
-                    'seam' => $item['seam'],
-                    'kd_buyer_order' => $item['kd_buyer_order'],
-                    'area' => $item['area'] ?? null,
-                    'no_order' => $item['no_order'],
-                    'machinetypeid' => $item['machinetypeid'],
-                    'mastermodel' => $item['mastermodel'],
-                    'inisial' => $item['inisial'] ?? null,  // jika data tidak ada, set NULL atau default
-                    'size' => $item['size'] ?? null,  // jika data tidak ada, set NULL atau default
-                    'color' => $item['color'] ?? null,  // pastikan juga menangani nilai null
-                    'smv' => $item['smv'] ?? null,
-                    'delivery' => $item['delivery'] ?? null,
-                    'sisa' => $item['sisa'] ?? 0, // default jika null
-                    'qty' => 0,
-                    'running' => 0,
-                    'ttl_prod' => 0,
-                    'ttl_jlmc' => 0,
-                    'ttl_sisa' => 0,
-                    'no_mesin' => $item['no_mesin'] ?? '',
-                ];
+
+        // Iterasi untuk mendapatkan data yang relevan
+        foreach ($dataTimter as $sizeItem) {
+            foreach ($prodTimter as $item) {
+                // Membuat key berdasarkan kombinasi informasi dari produksi dan size
+                $key = $sizeItem['machinetypeid'] . '-' . $sizeItem['mastermodel'] . '-' . $sizeItem['size'];
+
+                // Pastikan key belum ada, jika belum maka tambahkan data
+                if (!isset($uniqueData[$key])) {
+                    // Menambahkan data ke $uniqueData
+                    $uniqueData[$key] = [
+                        'seam' => $sizeItem['seam'],
+                        'kd_buyer_order' => $sizeItem['kd_buyer_order'],
+                        'area' => $sizeItem['area'],
+                        'no_order' => $sizeItem['no_order'],
+                        'machinetypeid' => $sizeItem['machinetypeid'],
+                        'mastermodel' => $sizeItem['mastermodel'],
+                        'inisial' => $sizeItem['inisial'],  // Mengambil data inisial dari $sizeItem
+                        'size' => $sizeItem['size'],        // Mengambil size dari $sizeItem
+                        'color' => $sizeItem['color'],
+                        'smv' => $sizeItem['smv'],
+                        'delivery' => $item['delivery'],
+                        'sisa' => $item['sisa'],
+                        'qty' => 0,
+                        'running' => 0,
+                        'ttl_prod' => 0,
+                        'ttl_jlmc' => 0,
+                        'ttl_sisa' => 0,
+                        'no_mesin' => [],  // Menyimpan array untuk no_mesin
+                    ];
+                }
+
+                // Menambahkan 'no_mesin' jika machinetypeid, mastermodel, dan size cocok
+                if (
+                    $sizeItem['machinetypeid'] === $item['machinetypeid'] &&
+                    $sizeItem['mastermodel'] === $item['mastermodel'] &&
+                    $sizeItem['size'] === $item['size']
+                ) {
+                    // Tambahkan no_mesin ke array (pastikan ini hanya untuk cocoknya size dan item)
+                    if (!in_array($item['no_mesin'], $uniqueData[$key]['no_mesin'])) {
+                        $uniqueData[$key]['no_mesin'][] = $item['no_mesin'];  // Menambahkan no_mesin ke array jika belum ada
+                    }
+                }
+
+                // Menambahkan data yang relevan dari $prodTimter
+                $uniqueData[$key]['qty'] += $item['qty'];
+                $uniqueData[$key]['running'] += $item['running'];
+                $uniqueData[$key]['ttl_prod'] += $item['qty_produksi'];
+                $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
+                $uniqueData[$key]['ttl_sisa'] += $item['sisa'];
             }
-            $uniqueData[$key]['qty'] += $item['qty'] ?? 0;
-            $uniqueData[$key]['running'] += $item['running'] ?? 0;
-            $uniqueData[$key]['ttl_prod'] += $item['qty_produksi'] ?? 0;
-            $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'] ?? 0;
-            $uniqueData[$key]['ttl_sisa'] += $item['sisa'] ?? 0;
         }
-        // dd($uniqueData);
+
+        // Menduplikasi data untuk setiap no_mesin
+        $expandedData = [];
+        foreach ($uniqueData as $dataItem) {
+            foreach ($dataItem['no_mesin'] as $mesin) {
+                $temp = $dataItem;
+                $temp['no_mesin'] = $mesin; // Set no_mesin sebagai string, bukan array
+                $expandedData[] = $temp;
+            }
+        }
+
         $data3 = [
             'active1' => '',
             'active2' => '',
@@ -896,12 +902,12 @@ class ProduksiController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-            'dataUtama' => $dataUtama,
             'dataTimter' => $dataTimter,
             'poTimter' => $poTimter,
             'prodTimter' => $prodTimter,
             'jlMC' => $jlMC,
             'uniqueData' => $uniqueData,
+            'expandedData' => $expandedData,
             'role' => $role,
             'title' => 'Timter Produksi ' . $area . ' ' . $pdk . ' Tanggal ' . $awal,
             'dataFilter' => $data,
@@ -913,6 +919,7 @@ class ProduksiController extends BaseController
             return view(session()->get('role') . '/Produksi/timterProduksi', $data3);
         }
     }
+
     public function editproduksi()
     {
         $id = $this->request->getPost('id');

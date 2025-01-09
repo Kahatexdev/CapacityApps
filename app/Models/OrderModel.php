@@ -429,7 +429,7 @@ class OrderModel extends Model
 
     public function getDataTimter($data)
     {
-        $this->select('apsperstyle.idapsperstyle, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.inisial, apsperstyle.size, apsperstyle.color, apsperstyle.smv, apsperstyle.delivery, SUM(apsperstyle.qty) AS qty, SUM(produksi.qty_produksi) AS qty_produksi')
+        $this->select('data_model.seam, apsperstyle.delivery, data_model.kd_buyer_order, apsperstyle.idapsperstyle, apsperstyle.no_order, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.inisial, apsperstyle.size, apsperstyle.color, apsperstyle.smv, apsperstyle.delivery, SUM(apsperstyle.qty) AS qty, SUM(produksi.qty_produksi) AS qty_produksi, produksi.area')
             ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT')
             ->join('produksi', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'LEFT');
         if (!empty($data['area'])) {
@@ -469,7 +469,6 @@ class OrderModel extends Model
             ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT')
             ->join('produksi', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'LEFT')
             ->where('apsperstyle.mastermodel IS NOT NULL');
-        // ->where('produksi.tgl_produksi IS NOT NULL');
 
         if (!empty($data['area'])) {
             $this->where('produksi.area', $data['area']);
@@ -488,6 +487,7 @@ class OrderModel extends Model
             ->orderBy('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, produksi.no_mesin', 'ASC')
             ->findAll();
     }
+
     public function getProductTypeByModel($noModel)
     {
         return $this->select('data_model.kd_buyer_order, master_product_type.product_type')

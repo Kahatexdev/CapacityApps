@@ -781,4 +781,15 @@ class ApsPerstyleModel extends Model
             ->where('delivery', $delivery)
             ->findAll();
     }
+    public function getAllSizes($area, $jarum, $pdk)
+    {
+        return $this->db->table('apsperstyle')
+            ->select('size')
+            ->where('factory', $area)
+            ->where('machinetypeid', $jarum)
+            ->where('mastermodel', $pdk)
+            ->groupBy('size')
+            ->get()
+            ->getResultArray();
+    }
 }
