@@ -53,6 +53,7 @@ class TimterController extends BaseController
     }
     public function excelTimter()
     {
+        $role = session()->get('role');
         $area = $this->request->getPost('area');
         $jarum = $this->request->getPost('jarum');
         $pdk = $this->request->getPost('pdk');
@@ -66,37 +67,83 @@ class TimterController extends BaseController
         ];
 
         $dataTimter = $this->orderModel->getDataTimter($data);
-        $poTimter = $this->orderModel->getQtyPOTimter($data);
         $prodTimter = $this->orderModel->getDetailProdTimter($data);
         $jlMC = $this->orderModel->getprodSummaryPertgl($data);
-        // dd($dataTimter);
+
         $uniqueData = [];
-        foreach ($prodTimter as $item) {
-            $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'] . '-' . $item['no_mesin'];
-            if (!isset($uniqueData[$key])) {
-                $uniqueData[$key] = [
-                    'seam' => $item['seam'],
-                    'kd_buyer_order' => $item['kd_buyer_order'],
-                    'area' => $item['area'],
-                    'no_order' => $item['no_order'],
-                    'machinetypeid' => $item['machinetypeid'],
-                    'mastermodel' => $item['mastermodel'],
-                    'inisial' => $item['inisial'],
-                    'size' => $item['size'],
-                    'color' => $item['color'],
-                    'smv' => $item['smv'],
-                    'delivery' => $item['delivery'],
-                    'qty' => 0,
-                    'running' => 0,
-                    'ttl_prod' => 0,
-                    'ttl_jlmc' => 0,
-                    'no_mesin' => $item['no_mesin'],
-                ];
+
+        // Iterasi untuk mendapatkan data yang relevan
+        foreach ($dataTimter as $sizeItem) {
+            foreach ($prodTimter as $item) {
+                // Membuat key berdasarkan kombinasi informasi dari produksi dan size
+                $key = $sizeItem['machinetypeid'] . '-' . $sizeItem['mastermodel'] . '-' . $sizeItem['size'];
+
+                // Pastikan key belum ada, jika belum maka tambahkan data
+                if (!isset($uniqueData[$key])) {
+                    // Menambahkan data ke $uniqueData
+                    $uniqueData[$key] = [
+                        'seam' => $sizeItem['seam'],
+                        'kd_buyer_order' => $sizeItem['kd_buyer_order'],
+                        'area' => $sizeItem['factory'],
+                        'no_order' => $sizeItem['no_order'],
+                        'machinetypeid' => $sizeItem['machinetypeid'],
+                        'mastermodel' => $sizeItem['mastermodel'],
+                        'inisial' => $sizeItem['inisial'],  // Mengambil data inisial dari $sizeItem
+                        'size' => $sizeItem['size'],        // Mengambil size dari $sizeItem
+                        'color' => $sizeItem['color'],
+                        'smv' => $sizeItem['smv'],
+                        'delivery' => $item['delivery'],
+                        'sisa' => $sizeItem['sisa'],
+                        'qty_prod' => $sizeItem['qty_produksi'],
+                        'qty' => $sizeItem['qty'],
+                        'ttl_dz' => 0,
+                        'no_mesin' => [],  // Menyimpan array untuk no_mesin 
+                    ];
+                }
+
+                // Menambahkan 'no_mesin' jika machinetypeid, mastermodel, dan size cocok
+                if (
+                    $sizeItem['machinetypeid'] === $item['machinetypeid'] &&
+                    $sizeItem['mastermodel'] === $item['mastermodel'] &&
+                    $sizeItem['size'] === $item['size']
+                ) {
+                    // Pastikan 'no_mesin' sudah ada di array 'no_mesin' sebelum mengaksesnya
+                    if (!array_key_exists($item['no_mesin'], $uniqueData[$key]['no_mesin'])) {
+                        // Inisialisasi jika 'no_mesin' belum ada
+                        $uniqueData[$key]['no_mesin'][$item['no_mesin']] = [
+                            'shift_a' => 0,
+                            'shift_b' => 0,
+                            'shift_c' => 0,
+                            'total_shift' => 0,
+                            'pa' => 0,
+                        ];
+                    }
+
+                    // Update qty dan running untuk no_mesin
+                    $uniqueData[$key]['no_mesin'][$item['no_mesin']]['shift_a'] += $item['shift_a'];
+                    $uniqueData[$key]['no_mesin'][$item['no_mesin']]['shift_b'] += $item['shift_b'];
+                    $uniqueData[$key]['no_mesin'][$item['no_mesin']]['shift_c'] += $item['shift_c'];
+                    $uniqueData[$key]['no_mesin'][$item['no_mesin']]['pa'] += $item['pa'];
+
+                    // Hitung total shift
+                    $total_shift = $uniqueData[$key]['no_mesin'][$item['no_mesin']]['shift_a'] +
+                        $uniqueData[$key]['no_mesin'][$item['no_mesin']]['shift_b'] +
+                        $uniqueData[$key]['no_mesin'][$item['no_mesin']]['shift_c'] +
+                        $uniqueData[$key]['no_mesin'][$item['no_mesin']]['pa'];
+
+                    // Update total_shift
+                    $uniqueData[$key]['no_mesin'][$item['no_mesin']]['total_shift'] = $total_shift;
+                }
+
+                // **Menjumlahkan total_shift untuk semua no_mesin dalam $key**
+                $uniqueData[$key]['ttl_dz'] = 0; // Reset ttl_dz sebelum menjumlahkan
+
+                // Loop untuk menjumlahkan total_shift untuk semua no_mesin dalam kombinasi $key
+                foreach ($uniqueData[$key]['no_mesin'] as $noMesinData) {
+                    // Menjumlahkan total shift dari setiap no_mesin
+                    $uniqueData[$key]['ttl_dz'] += $noMesinData['total_shift'];
+                }
             }
-            $uniqueData[$key]['qty'] += $item['qty'];
-            $uniqueData[$key]['running'] += $item['running'];
-            $uniqueData[$key]['ttl_prod'] += $item['qty_produksi'];
-            $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
         }
 
         // Buat spreadsheet
@@ -668,65 +715,133 @@ class TimterController extends BaseController
         // end Header Timter
 
         // body start
-        $row = 8; //baris awal isi tabel
-        $prevModel = null;
-        $prevSize = null;
+        $row = 8; // baris awal isi tabel
+
         foreach ($uniqueData as $key => $id) :
+            if (count($id['no_mesin']) > 0) {
+                $rowspan = count($id['no_mesin']);
+            } else {
+                $rowspan = 0;
+            }
+
             $smv = $id['smv'];
+            $target = 0;
             if (!empty($smv)) {
                 $target = 86400 / floatval($smv) * 0.8 / 24;
-            } else {
-                $target = 0;
             }
-            $sheet->setCellValue('A' . $row, ($id['mastermodel'] != $prevModel) ? $id['seam'] : '');
-            $sheet->setCellValue('B' . $row, ($id['mastermodel'] != $prevModel) ? $id['kd_buyer_order'] : '');
-            $sheet->setCellValue('C' . $row, ($id['mastermodel'] != $prevModel) ? $id['no_order'] : '');
-            $sheet->setCellValue('D' . $row, ($id['mastermodel'] != $prevModel) ? $id['machinetypeid'] : '');
-            $sheet->setCellValue('E' . $row, ($id['mastermodel'] != $prevModel) ? $id['mastermodel'] : '');
-            $sheet->setCellValue('F' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['inisial'] : '');
-            $sheet->setCellValue('G' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['size'] : '');
-            $sheet->setCellValue('H' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['color'] : '');
-            $sheet->setCellValue('I' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['smv'] : '');
-            foreach ($poTimter as $po) {
-                if ($po['machinetypeid'] == $id['machinetypeid'] && $po['mastermodel'] == $id['mastermodel'] && $po['size'] == $id['size']) {
-                    $sheet->setCellValue('J' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $po['delivery'] : '');
-                    break;
-                }
-            }
-            $sheet->setCellValue('K' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($target, 0) : '');
+
+            // Ambil countjlMc untuk ukuran dan model tertentu
+            $countjlMc = 0;
             foreach ($jlMC as $jl) {
                 if ($jl['mastermodel'] == $id['mastermodel'] && $jl['size'] == $id['size']) {
-                    $sheet->setCellValue('L' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $jl['jl_mc'] : '');
-                    break;
+                    $countjlMc = $jl['jl_mc'];
+                    break; // Hentikan loop setelah menemukan count
+                }
+            }
+            // Jika tidak ada countjlMc, set ke 1 untuk menampilkan setidaknya satu baris
+            $countjlMc = $countjlMc ?: 0;
+
+            // Gabungkan sel untuk rowspan
+            if ($rowspan > 1) {
+                $sheet->mergeCells('A' . $row . ':A' . ($row + $rowspan - 1));
+                $sheet->mergeCells('B' . $row . ':B' . ($row + $rowspan - 1));
+                $sheet->mergeCells('C' . $row . ':C' . ($row + $rowspan - 1));
+                $sheet->mergeCells('D' . $row . ':D' . ($row + $rowspan - 1));
+                $sheet->mergeCells('E' . $row . ':E' . ($row + $rowspan - 1));
+                $sheet->mergeCells('F' . $row . ':F' . ($row + $rowspan - 1));
+                $sheet->mergeCells('G' . $row . ':G' . ($row + $rowspan - 1));
+                $sheet->mergeCells('H' . $row . ':H' . ($row + $rowspan - 1));
+                $sheet->mergeCells('I' . $row . ':I' . ($row + $rowspan - 1));
+                $sheet->mergeCells('J' . $row . ':J' . ($row + $rowspan - 1));
+                $sheet->mergeCells('K' . $row . ':K' . ($row + $rowspan - 1));
+                $sheet->mergeCells('L' . $row . ':L' . ($row + $rowspan - 1));
+            }
+
+            // Isi data untuk baris pertama (merged cells)
+            $sheet->setCellValue('A' . $row, $id['seam']);
+            $sheet->setCellValue('B' . $row, $id['kd_buyer_order']);
+            $sheet->setCellValue('C' . $row, $id['no_order']);
+            $sheet->setCellValue('D' . $row, $id['machinetypeid']);
+            $sheet->setCellValue('E' . $row, $id['mastermodel']);
+            $sheet->setCellValue('F' . $row, $id['inisial']);
+            $sheet->setCellValue('G' . $row, $id['size']);
+            $sheet->setCellValue('H' . $row, $id['color']);
+            $sheet->setCellValue('I' . $row, $id['smv']);
+            $sheet->setCellValue('J' . $row, $id['delivery']);
+            $sheet->setCellValue('K' . $row, number_format($target, 0));
+            $sheet->setCellValue('L' . $row, $countjlMc);
+
+            // style body
+            $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
+
+            foreach ($columns as $column) {
+                if ($rowspan > 1) {
+                    $sheet->getStyle($column . $row)->applyFromArray($styleBody);
+                } else {
+                    $sheet->getStyle($column . $row)->applyFromArray($styleBody);
                 }
             }
 
-            // Inisialisasi variabel 
-            $shift_a = $shift_b = $shift_c = $pa = 0;
-            $pcs_a = $pcs_b = $pcs_c = $pcs_pa = 0;
-            foreach ($prodTimter as $prod) {
-                // Menggunakan null coalescing untuk mengatur nilai default 0 jika null
-                $no_mesin = $prod['no_mesin'] ?? 0;
-                // Hitung dz
-                $shift_a = $prod['shift_a'] ?? 0;
-                $shift_b = $prod['shift_b'] ?? 0;
-                $shift_c = $prod['shift_c'] ?? 0;
-                $pa = $prod['pa'] ?? 0;
+            // Pengisian untuk baris yang sudah di-merge
+            if (empty($id['no_mesin'])) {
+                $sheet->setCellValue('X' . $row, floor($id['ttl_dz'] / 24));
+                $sheet->setCellValue('Y' . $row, floor($id['ttl_dz'] % 24));
+                $sheet->setCellValue('Z' . $row, floor($id['qty'] / 24));
+                $sheet->setCellValue('AA' . $row, floor($id['qty'] % 24));
+                $sheet->setCellValue('AB' . $row, floor($id['qty_prod'] / 24));
+                $sheet->setCellValue('AC' . $row, floor($id['qty_prod'] % 24));
+                $sheet->setCellValue('AD' . $row, floor($id['sisa'] / 24));
+                $sheet->setCellValue('AE' . $row, floor($id['sisa'] % 24));
+                $sheet->setCellValue('AF' . $row, '');
 
-                // Hitung pcs
-                $pcs_a = $shift_a % 24;
-                $pcs_b = $shift_b % 24;
-                $pcs_c = $shift_c % 24;
-                $pcs_pa = $pa % 24;
+                // style body
+                $sheet->getStyle('M' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('N' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('O' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('P' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('Q' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('R' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('S' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('T' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('U' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('V' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('W' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('X' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('Y' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('Z' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('AA' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('AB' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('AC' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('AD' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('AE' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('AF' . $row)->applyFromArray($styleBody);
+                $row++;
+            } else {
+                // Proses untuk 'no_mesin' ada
+                $loopIndex = 0;
+                foreach ($id['no_mesin'] as $noMc => $rows) {
+                    // Inisialisasi variabel 
+                    $shift_a = $shift_b = $shift_c = $pa = 0;
+                    $pcs_a = $pcs_b = $pcs_c = $pcs_pa = 0;
 
-                // Hitung total dz & pcs
-                $total_dz = $shift_a + $shift_b + $shift_c + $pa;
-                $total_pcs = $pcs_a + $pcs_b + $pcs_c + $pcs_pa;
+                    // Menggunakan null coalescing untuk mengatur nilai default 0 jika null
+                    $no_mesin = $rows['no_mesin'] ?? 0;
+                    $shift_a = $rows['shift_a'] ?? 0;
+                    $shift_b = $rows['shift_b'] ?? 0;
+                    $shift_c = $rows['shift_c'] ?? 0;
+                    $pa = $rows['pa'] ?? 0;
 
+                    // Hitung pcs
+                    $pcs_a = $shift_a % 24;
+                    $pcs_b = $shift_b % 24;
+                    $pcs_c = $shift_c % 24;
+                    $pcs_pa = $pa % 24;
 
-                // Memeriksa kondisi
-                if ($prod['mastermodel'] == $id['mastermodel'] && $prod['size'] == $id['size'] && $prod['no_mesin'] == $id['no_mesin']) {
-                    $sheet->setCellValue('M' . $row, $prod['no_mesin']);
+                    // Hitung total dz & pcs
+                    $total_dz = $rows['total_shift'];
+                    $total_pcs = $rows['total_shift'] % 24;
+
+                    $sheet->setCellValue('M' . $row, $noMc);
                     $sheet->setCellValue('N' . $row, floor($shift_a / 24));
                     $sheet->setCellValue('O' . $row, $pcs_a);
                     $sheet->setCellValue('P' . $row, floor($shift_b / 24));
@@ -737,125 +852,56 @@ class TimterController extends BaseController
                     $sheet->setCellValue('U' . $row, $pcs_pa);
                     $sheet->setCellValue('V' . $row, floor($total_dz / 24));
                     $sheet->setCellValue('W' . $row, $total_pcs);
-                    break;
-                }
-            }
-            foreach ($jlMC as $prod) {
-                if ($prod['mastermodel'] == $id['mastermodel'] && $prod['size'] == $id['size']) {
-                    $sheet->setCellValue('X' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($prod['qty_produksi'] / 24) : '');
-                    $sheet->setCellValue('Y' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($prod['qty_produksi'] % 24) : '');
-                    break;
-                }
-            }
-            foreach ($poTimter as $po) {
-                if ($po['machinetypeid'] == $id['machinetypeid'] && $po['mastermodel'] == $id['mastermodel'] && $po['size'] == $id['size']) {
-                    $sheet->setCellValue('Z' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($po['qty'] / 24) : '');
-                    $sheet->setCellValue('AA' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($po['qty'] % 24) : '');
-                    foreach ($dataTimter as $data) {
-                        if ($data['machinetypeid'] == $id['machinetypeid'] && $data['mastermodel'] == $id['mastermodel'] && $data['size'] == $id['size']) {
-                            $sisa = $po['qty'] - $data['qty_produksi'];
-                            $sheet->setCellValue('AB' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($data['qty_produksi'] / 24) : '');
-                            $sheet->setCellValue('AC' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($data['qty_produksi'] % 24) : '');
-                            $sheet->setCellValue('AD' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($sisa / 24) : '');
-                            $sheet->setCellValue('AE' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($sisa % 24) : '');
-                            break;
-                        }
-                    }
-                    break;
-                }
-            }
-            $sheet->setCellValue('AF' . $row, '');
-            $prevModel = $id['mastermodel'];
-            $prevSize = $id['mastermodel'] . $id['size'];
 
-            // style body
-            $sheet->getStyle('A' . $row)->applyFromArray([
-                'font' => [
-                    'size' => 11,
-                    'name' => 'Arial',
-                ],
-                'alignment' => [
-                    'horizontal' => Alignment::HORIZONTAL_CENTER,
-                    'vertical' => Alignment::VERTICAL_CENTER,
-                ],
-                'borders' => [
-                    'top' => [
-                        'borderStyle' => Border::BORDER_THIN,
-                        'color' => ['rgb' => '000000'],
-                    ],
-                    'bottom' => [
-                        'borderStyle' => Border::BORDER_THIN,
-                        'color' => ['rgb' => '000000'],
-                    ],
-                    'left' => [
-                        'borderStyle' => Border::BORDER_DOUBLE,
-                        'color' => ['rgb' => '000000'],
-                    ],
-                    'right' => [
-                        'borderStyle' => Border::BORDER_THIN,
-                        'color' => ['rgb' => '000000'],
-                    ],
-                ],
-            ]);
-            $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('C' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('D' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('E' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('F' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('G' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('H' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('I' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('J' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('K' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('L' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('M' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('N' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('O' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('P' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('Q' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('R' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('S' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('T' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('U' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('V' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('W' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('X' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('Y' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('Z' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('AA' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('AB' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('AC' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('AD' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('AE' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('AF' . $row)->applyFromArray([
-                'font' => [
-                    'size' => 11,
-                    'name' => 'Arial',
-                ],
-                'alignment' => [
-                    'horizontal' => Alignment::HORIZONTAL_CENTER,
-                    'vertical' => Alignment::VERTICAL_CENTER,
-                ],
-                'borders' => [
-                    'top' => [
-                        'borderStyle' => Border::BORDER_THIN,
-                        'color' => ['rgb' => '000000'],
-                    ],
-                    'bottom' => [
-                        'borderStyle' => Border::BORDER_THIN,
-                        'color' => ['rgb' => '000000'],
-                    ],
-                    'left' => [
-                        'borderStyle' => Border::BORDER_THIN,
-                        'color' => ['rgb' => '000000'],
-                    ],
-                    'right' => [
-                        'borderStyle' => Border::BORDER_DOUBLE,
-                        'color' => ['rgb' => '000000'],
-                    ],
-                ],
-            ]);
-            $row++;
+                    // style body
+                    $sheet->getStyle('M' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('N' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('O' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('P' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('Q' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('R' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('S' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('T' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('U' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('V' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('W' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('X' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('Y' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('Z' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('AA' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('AB' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('AC' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('AD' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('AE' . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle('AF' . $row)->applyFromArray($styleBody);
+
+
+                    if ($loopIndex == 0) {
+                        $sheet->setCellValue('X' . $row, floor($id['ttl_dz'] / 24));
+                        $sheet->setCellValue('Y' . $row, floor($id['ttl_dz'] % 24));
+                        $sheet->setCellValue('Z' . $row, floor($id['qty'] / 24));
+                        $sheet->setCellValue('AA' . $row, floor($id['qty'] % 24));
+                        $sheet->setCellValue('AB' . $row, floor($id['qty_prod'] / 24));
+                        $sheet->setCellValue('AC' . $row, floor($id['qty_prod'] % 24));
+                        $sheet->setCellValue('AD' . $row, floor($id['sisa'] / 24));
+                        $sheet->setCellValue('AE' . $row, floor($id['sisa'] % 24));
+                        $sheet->setCellValue('AF' . $row, '');
+
+                        $sheet->getStyle('X' . $row)->applyFromArray($styleBody);
+                        $sheet->getStyle('Y' . $row)->applyFromArray($styleBody);
+                        $sheet->getStyle('Z' . $row)->applyFromArray($styleBody);
+                        $sheet->getStyle('AA' . $row)->applyFromArray($styleBody);
+                        $sheet->getStyle('AB' . $row)->applyFromArray($styleBody);
+                        $sheet->getStyle('AC' . $row)->applyFromArray($styleBody);
+                        $sheet->getStyle('AD' . $row)->applyFromArray($styleBody);
+                        $sheet->getStyle('AE' . $row)->applyFromArray($styleBody);
+                        $sheet->getStyle('AF' . $row)->applyFromArray($styleBody);
+                    }
+                    $row++;
+                    $loopIndex++;
+                }
+            }
+
         endforeach;
 
 
