@@ -913,6 +913,7 @@ class ProduksiController extends BaseController
             'dataFilter' => $data,
             'header' => $area,
         ];
+        dd($data3);
         if ($role == 'user') {
             return view(session()->get('role') . '/timterProduksi', $data3);
         } else {
