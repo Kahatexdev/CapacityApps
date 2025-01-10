@@ -1503,7 +1503,7 @@ class OrderController extends BaseController
 
         $data = $this->ApsPerstyleModel->getAreaOrder($ar, $bulan);
         $allData = [];
-        $totalPerWeek = []; // Untuk menyimpan total produksi per minggu
+        $totalPerWeek = [];
 
         foreach ($data as $id) {
             $mastermodel = $id['mastermodel'];

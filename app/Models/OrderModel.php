@@ -426,14 +426,13 @@ class OrderModel extends Model
             ->findAll();
     }
 
-
     public function getDataTimter($data)
     {
-        $this->select('data_model.seam, apsperstyle.delivery, data_model.kd_buyer_order, apsperstyle.idapsperstyle, apsperstyle.no_order, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.inisial, apsperstyle.size, apsperstyle.color, apsperstyle.smv, apsperstyle.delivery, SUM(apsperstyle.qty) AS qty, SUM(produksi.qty_produksi) AS qty_produksi, produksi.area')
+        $this->select('data_model.seam, apsperstyle.delivery, data_model.kd_buyer_order, apsperstyle.idapsperstyle, apsperstyle.no_order, apsperstyle.factory, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.inisial, apsperstyle.size, apsperstyle.color, apsperstyle.smv, apsperstyle.delivery, SUM(DISTINCT apsperstyle.qty) AS qty, SUM(DISTINCT apsperstyle.sisa) AS sisa, SUM(produksi.qty_produksi) AS qty_produksi, produksi.area')
             ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT')
             ->join('produksi', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'LEFT');
         if (!empty($data['area'])) {
-            $this->where('produksi.area', $data['area']);
+            $this->where('apsperstyle.factory', $data['area']);
         }
         if (!empty($data['jarum'])) {
             $this->like('apsperstyle.machinetypeid', $data['jarum']);
@@ -442,8 +441,8 @@ class OrderModel extends Model
             $this->where('data_model.no_model', $data['pdk']);
         }
 
-        return $this->groupBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size')
-            ->orderBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size', 'ASC')
+        return $this->groupBy('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size')
+            ->orderBy('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size', 'ASC')
             ->findAll();
     }
 
@@ -465,7 +464,7 @@ class OrderModel extends Model
 
     public function getDetailProdTimter($data)
     {
-        $this->select('apsperstyle.idapsperstyle, apsperstyle.seam, data_model.kd_buyer_order, apsperstyle.no_order, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.inisial, apsperstyle.size, apsperstyle.color, apsperstyle.smv, apsperstyle.delivery, SUM(apsperstyle.qty) AS qty, SUM(apsperstyle.sisa) AS sisa, produksi.area, SUM(COALESCE(produksi.qty_produksi, 0)) AS qty_produksi, COUNT(DISTINCT produksi.tgl_produksi) AS running, COUNT(DISTINCT produksi.no_mesin) AS jl_mc, produksi.tgl_produksi, produksi.no_mesin, SUM(CASE WHEN produksi.no_label > 3000 THEN produksi.qty_produksi ELSE 0 END) AS pa, SUM(CASE WHEN produksi.no_label < 3000 THEN produksi.shift_a ELSE 0 END) AS shift_a, SUM(CASE WHEN produksi.no_label < 3000 THEN produksi.shift_b ELSE 0 END) AS shift_b, SUM(CASE WHEN produksi.no_label < 3000 THEN produksi.shift_c ELSE 0 END) AS shift_c')
+        $this->select('apsperstyle.idapsperstyle, apsperstyle.seam, data_model.kd_buyer_order, apsperstyle.no_order, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.inisial, apsperstyle.size, apsperstyle.color, apsperstyle.smv, apsperstyle.delivery, SUM(DISTINCT apsperstyle.qty) AS qty, SUM(DISTINCT apsperstyle.sisa) AS sisa, produksi.area, SUM(COALESCE(produksi.qty_produksi, 0)) AS qty_produksi, COUNT(DISTINCT produksi.tgl_produksi) AS running, COUNT(DISTINCT produksi.no_mesin) AS jl_mc, produksi.tgl_produksi, produksi.no_mesin, SUM(CASE WHEN produksi.no_label > 3000 THEN produksi.qty_produksi ELSE 0 END) AS pa, SUM(CASE WHEN produksi.no_label < 3000 THEN produksi.shift_a ELSE 0 END) AS shift_a, SUM(CASE WHEN produksi.no_label < 3000 THEN produksi.shift_b ELSE 0 END) AS shift_b, SUM(CASE WHEN produksi.no_label < 3000 THEN produksi.shift_c ELSE 0 END) AS shift_c')
             ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT')
             ->join('produksi', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'LEFT')
             ->where('apsperstyle.mastermodel IS NOT NULL');

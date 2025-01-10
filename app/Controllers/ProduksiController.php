@@ -826,7 +826,6 @@ class ProduksiController extends BaseController
         ];
 
         $dataTimter = $this->orderModel->getDataTimter($data);
-        $poTimter = $this->orderModel->getQtyPOTimter($data);
         $prodTimter = $this->orderModel->getDetailProdTimter($data);
         $jlMC = $this->orderModel->getprodSummaryPertgl($data);
 
@@ -844,7 +843,7 @@ class ProduksiController extends BaseController
                     $uniqueData[$key] = [
                         'seam' => $sizeItem['seam'],
                         'kd_buyer_order' => $sizeItem['kd_buyer_order'],
-                        'area' => $sizeItem['area'],
+                        'area' => $sizeItem['factory'],
                         'no_order' => $sizeItem['no_order'],
                         'machinetypeid' => $sizeItem['machinetypeid'],
                         'mastermodel' => $sizeItem['mastermodel'],
@@ -853,13 +852,11 @@ class ProduksiController extends BaseController
                         'color' => $sizeItem['color'],
                         'smv' => $sizeItem['smv'],
                         'delivery' => $item['delivery'],
-                        'sisa' => $item['sisa'],
-                        'qty' => 0,
-                        'running' => 0,
-                        'ttl_prod' => 0,
-                        'ttl_jlmc' => 0,
-                        'ttl_sisa' => 0,
-                        'no_mesin' => [],  // Menyimpan array untuk no_mesin
+                        'sisa' => $sizeItem['sisa'],
+                        'qty_prod' => $sizeItem['qty_produksi'],
+                        'qty' => $sizeItem['qty'],
+                        'ttl_dz' => 0,
+                        'no_mesin' => [],  // Menyimpan array untuk no_mesin 
                     ];
                 }
 
@@ -869,28 +866,42 @@ class ProduksiController extends BaseController
                     $sizeItem['mastermodel'] === $item['mastermodel'] &&
                     $sizeItem['size'] === $item['size']
                 ) {
-                    // Tambahkan no_mesin ke array (pastikan ini hanya untuk cocoknya size dan item)
-                    if (!in_array($item['no_mesin'], $uniqueData[$key]['no_mesin'])) {
-                        $uniqueData[$key]['no_mesin'][] = $item['no_mesin'];  // Menambahkan no_mesin ke array jika belum ada
+                    // Pastikan 'no_mesin' sudah ada di array 'no_mesin' sebelum mengaksesnya
+                    if (!array_key_exists($item['no_mesin'], $uniqueData[$key]['no_mesin'])) {
+                        // Inisialisasi jika 'no_mesin' belum ada
+                        $uniqueData[$key]['no_mesin'][$item['no_mesin']] = [
+                            'shift_a' => 0,
+                            'shift_b' => 0,
+                            'shift_c' => 0,
+                            'total_shift' => 0,
+                            'pa' => 0,
+                        ];
                     }
+
+                    // Update qty dan running untuk no_mesin
+                    $uniqueData[$key]['no_mesin'][$item['no_mesin']]['shift_a'] += $item['shift_a'];
+                    $uniqueData[$key]['no_mesin'][$item['no_mesin']]['shift_b'] += $item['shift_b'];
+                    $uniqueData[$key]['no_mesin'][$item['no_mesin']]['shift_c'] += $item['shift_c'];
+                    $uniqueData[$key]['no_mesin'][$item['no_mesin']]['pa'] += $item['pa'];
+
+                    // Hitung total shift
+                    $total_shift = $uniqueData[$key]['no_mesin'][$item['no_mesin']]['shift_a'] +
+                        $uniqueData[$key]['no_mesin'][$item['no_mesin']]['shift_b'] +
+                        $uniqueData[$key]['no_mesin'][$item['no_mesin']]['shift_c'] +
+                        $uniqueData[$key]['no_mesin'][$item['no_mesin']]['pa'];
+
+                    // Update total_shift
+                    $uniqueData[$key]['no_mesin'][$item['no_mesin']]['total_shift'] = $total_shift;
                 }
 
-                // Menambahkan data yang relevan dari $prodTimter
-                $uniqueData[$key]['qty'] += $item['qty'];
-                $uniqueData[$key]['running'] += $item['running'];
-                $uniqueData[$key]['ttl_prod'] += $item['qty_produksi'];
-                $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
-                $uniqueData[$key]['ttl_sisa'] += $item['sisa'];
-            }
-        }
+                // **Menjumlahkan total_shift untuk semua no_mesin dalam $key**
+                $uniqueData[$key]['ttl_dz'] = 0; // Reset ttl_dz sebelum menjumlahkan
 
-        // Menduplikasi data untuk setiap no_mesin
-        $expandedData = [];
-        foreach ($uniqueData as $dataItem) {
-            foreach ($dataItem['no_mesin'] as $mesin) {
-                $temp = $dataItem;
-                $temp['no_mesin'] = $mesin; // Set no_mesin sebagai string, bukan array
-                $expandedData[] = $temp;
+                // Loop untuk menjumlahkan total_shift untuk semua no_mesin dalam kombinasi $key
+                foreach ($uniqueData[$key]['no_mesin'] as $noMesinData) {
+                    // Menjumlahkan total shift dari setiap no_mesin
+                    $uniqueData[$key]['ttl_dz'] += $noMesinData['total_shift'];
+                }
             }
         }
 
@@ -903,16 +914,15 @@ class ProduksiController extends BaseController
             'active6' => '',
             'active7' => '',
             'dataTimter' => $dataTimter,
-            'poTimter' => $poTimter,
             'prodTimter' => $prodTimter,
             'jlMC' => $jlMC,
             'uniqueData' => $uniqueData,
-            'expandedData' => $expandedData,
             'role' => $role,
             'title' => 'Timter Produksi ' . $area . ' ' . $pdk . ' Tanggal ' . $awal,
             'dataFilter' => $data,
             'header' => $area,
         ];
+
         if ($role == 'user') {
             return view(session()->get('role') . '/timterProduksi', $data3);
         } else {
