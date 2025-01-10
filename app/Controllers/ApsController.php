@@ -802,7 +802,6 @@ class ApsController extends BaseController
 
         foreach ($datePeriod as $date) {
             $formattedDate = $date->format('Y-m-d');
-            dd($formattedDate);
             if (in_array($formattedDate, $holidayDates)) {
                 continue; // Skip this date
             }
