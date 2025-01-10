@@ -316,18 +316,24 @@
 
 
         document.getElementById('delivery').addEventListener('change', function() {
+            const unplan = document.getElementById('unplanned-qty')
+            unplan.value = ''
+            const start = document.getElementById('start-date')
             const deliv = this.value; // Ambil nilai yang dipilih dari select
             const model = document.getElementById('model-data').value; // Ambil nilai dari input model
             console.log('Delivery:', deliv, 'Model:', model);
 
             // Konversi delivery menjadi objek Date
             const deliveryDate = new Date(deliv);
+            var saveButton = document.querySelector('button[type="submit"]');
+            saveButton.disabled = false
+            saveButton.textContent = 'Save Planning';
 
             // Tentukan tanggal minimum (hari ini + 3 hari)
             const today = new Date();
             const minDate = new Date(today); // Salin tanggal hari ini
             minDate.setDate(today.getDate() + 3); // Tambahkan 3 hari ke tanggal hari ini
-
+            start.value = today
             // Validasi apakah delivery kurang dari tanggal minimum
             if (deliveryDate < minDate) {
                 alert(`Delivery yang dipilih tidak valid. Silakan pilih tanggal delivery lebih dari tanggal ${minDate.toISOString().split('T')[0]}.`);
@@ -543,7 +549,6 @@
             let deliv = document.getElementById('delivery').value.replace(/\s+/g, '-'); // Ganti spasi dengan '-'
             console.log("Delivery Value:", deliv);
 
-            // Ambil nilai list-planning-empty untuk cek apakah listPlanning kosong
             let listPlanningEmpty = document.getElementById('list-planning-empty').value === 'true';
 
             // Ambil nilai remainingQty dari input dengan ID 'remaining-qty'
@@ -562,6 +567,7 @@
             var totalEstQtyElem = document.getElementById('total-est-qty-' + deliv);
 
             if (!totalEstQtyElem) {
+                document.getElementById('unplanned-qty').value = remainingQty.toFixed(2);
                 console.error('Element with ID total-est-qty-' + deliv + ' not found.');
                 return; // Keluar dari fungsi jika elemen tidak ditemukan
             }
@@ -584,7 +590,6 @@
                 saveButton.textContent = 'Save Planning';
             }
         }
-
 
 
         function updateAvailableMachines(date) {
@@ -614,10 +619,19 @@
 
         document.querySelector(' input[name="start_date" ]').addEventListener('change', function() {
             var startDate = this.value;
+            var unplan = document.getElementById('unplanned-qyt')
+            var saveButton = document.querySelector('button[type="submit"]');
             updateAvailableMachines(startDate);
             calculateDaysCount(function() {
                 fillMachineSuggestion();
                 fillUnplannedQty();
+                if (unplan.value > 0) {
+                    saveButton.disabled = false;
+                    saveButton.textContent = 'Save Planning';
+                } else {
+                    saveButton.disabled = true;
+                    saveButton.textContent = 'Qty Has Been Planned Successfully';
+                }
             });
         });
 

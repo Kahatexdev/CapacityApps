@@ -701,7 +701,8 @@ class ApsController extends BaseController
         //$detailplan = $this->DetailPlanningModel->getDetailPlanning($id); //get data model with detail quantity,model etc.
         $pdk = $this->DetailPlanningModel->detailPdk($id);
         $listDeliv = $this->ApsPerstyleModel->getDetailPerDeliv($pdk);
-        $listPlanning = $this->EstimatedPlanningModel->listPlanning($id); //get data planning per page and fetch it into datatable at bottom datatables
+        $listPlanning = $this->EstimatedPlanningModel->listPlanning($id);
+        // dd($listPlanning);
         // $mesinpertgl = $this->TanggalPlanningModel->getMesinByDate($idutama);//get data machine per date and return into array
         $mesin = $this->jarumModel->getMesinByArea($area, $jarum);
         $data = [
@@ -801,6 +802,7 @@ class ApsController extends BaseController
 
         foreach ($datePeriod as $date) {
             $formattedDate = $date->format('Y-m-d');
+            dd($formattedDate);
             if (in_array($formattedDate, $holidayDates)) {
                 continue; // Skip this date
             }
@@ -924,4 +926,6 @@ class ApsController extends BaseController
             return redirect()->to(base_url(session()->get('role') . '/planningpage/' . $id . '/' . $idpln))->withInput()->with('error', 'Data Gagal Dihapus di TanggalPlanningModel');
         }
     }
+
+    public function editPlan($id_est) {}
 }
