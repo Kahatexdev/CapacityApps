@@ -8,7 +8,7 @@ class RemoveDelivDetailPlan extends Migration
 {
     public function up()
     {
-        $this->forge->dropColumn('detail_planning', 'delviery');
+        $this->forge->dropColumn('detail_planning', 'delivery');
 
         $this->forge->addColumn('detail_planning', [
             'jarum' => [
