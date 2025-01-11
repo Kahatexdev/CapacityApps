@@ -230,6 +230,13 @@
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= htmlspecialchars($order['mesin']); ?> Mc</td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= number_format($estQty, 0, '.', ','); ?> Dz</td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;">
+                                            <button class="btn btn-info btn-edit" data-toggle="modal" data-target="#modalEdit"
+                                                data-start="<?= $order['start_date'] ?>"
+                                                data-idplan="<?= $order['id_detail_pln'] ?>"
+                                                data-idpl="<?= $id_pln ?>"
+                                                data-stop="<?= $order['stop_date'] ?>">
+                                                Edit
+                                            </button>
                                             <button class="btn btn-danger btn-update" data-toggle="modal" data-target="#modalUpdate"
                                                 data-start="<?= $order['start_date'] ?>"
                                                 data-idplan="<?= $order['id_detail_pln'] ?>"

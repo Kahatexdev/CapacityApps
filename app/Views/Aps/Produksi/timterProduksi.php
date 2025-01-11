@@ -110,123 +110,119 @@
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $prevModel = null;
-                                    $prevSize = null;
                                     foreach ($uniqueData as $key => $id) :
+                                        if (count($id['no_mesin']) > 0) {
+                                            $rows = count($id['no_mesin']);
+                                        } else {
+                                            $rows = 1;
+                                        }
+                                        // dd($rows);
                                         $smv = $id['smv'];
                                         if (!empty($smv)) {
                                             $target = 86400 / floatval($smv) * 0.8 / 24;
                                         } else {
                                             $target = 0;
                                         }
+                                        // Ambil countjlMc untuk ukuran dan model tertentu
+                                        $countjlMc = 0;
+                                        foreach ($jlMC as $jl) {
+                                            if ($jl['mastermodel'] == $id['mastermodel'] && $jl['size'] == $id['size']) {
+                                                $countjlMc = $jl['jl_mc'];
+                                                break; // Hentikan loop setelah menemukan count
+                                            }
+                                        }
+
+                                        // Jika tidak ada countjlMc, set ke 1 untuk menampilkan setidaknya satu baris
+                                        $countjlMc = $countjlMc ?: 0;
+
                                     ?>
                                         <tr>
-                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] != $prevModel) ? $id['seam'] : ''; ?></td>
-                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] != $prevModel) ? $id['kd_buyer_order'] : ''; ?></td>
-                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] != $prevModel) ? $id['no_order'] : ''; ?></td>
-                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] != $prevModel) ? $id['machinetypeid'] : ''; ?></td>
-                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] != $prevModel) ? $id['mastermodel'] : ''; ?></td>
-                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['inisial'] : ''; ?></td>
-                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['size'] : ''; ?></td>
-                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['color'] : ''; ?></td>
-                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['smv'] : ''; ?></td>
-                                            <?php foreach ($poTimter as $po) {
-                                                if ($po['machinetypeid'] == $id['machinetypeid'] && $po['mastermodel'] == $id['mastermodel'] && $po['size'] == $id['size']) {
-                                            ?>
-                                                    <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $po['delivery'] : ''; ?></td>
+                                            <td class="text-sm" style="text-align: center;" rowspan="<?= $rows ?>"><?= $id['seam']; ?></td>
+                                            <td class="text-sm" style="text-align: center;" rowspan="<?= $rows ?>"><?= $id['kd_buyer_order']; ?></td>
+                                            <td class="text-sm" style="text-align: center;" rowspan="<?= $rows ?>"><?= $id['no_order']; ?></td>
+                                            <td class="text-sm" style="text-align: center;" rowspan="<?= $rows ?>"><?= $id['machinetypeid']; ?></td>
+                                            <td class="text-sm" style="text-align: center;" rowspan="<?= $rows ?>"><?= $id['mastermodel']; ?></td>
+                                            <td class="text-sm" style="text-align: center;" rowspan="<?= $rows ?>"><?= $id['inisial']; ?></td>
+                                            <td class="text-sm" style="text-align: center;" rowspan="<?= $rows ?>"><?= $id['size']; ?></td>
+                                            <td class="text-sm" style="text-align: center;" rowspan="<?= $rows ?>"><?= $id['color']; ?></td>
+                                            <td class="text-sm" style="text-align: center;" rowspan="<?= $rows ?>"><?= $id['smv']; ?></td>
+                                            <td class="text-sm" style="text-align: center;" rowspan="<?= $rows ?>"><?= $id['delivery']; ?></td>
+                                            <td class="text-sm" style="text-align: center;" rowspan="<?= $rows ?>"><?= number_format($target, 0); ?></td>
+                                            <td class="text-sm" style="text-align: center;" rowspan="<?= $rows ?>"><?= $countjlMc; ?></td>
                                             <?php
-                                                    break;
-                                                }
-                                            }
+                                            if (empty($id['no_mesin'])) {
                                             ?>
-                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($target, 0) : ''; ?></td>
-                                            <?php
-                                            foreach ($jlMC as $jl) {
-                                                if ($jl['mastermodel'] == $id['mastermodel'] && $jl['size'] == $id['size']) {
-                                            ?>
-                                                    <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $jl['jl_mc'] : ''; ?></td>
-                                                <?php
-                                                    break;
-                                                }
-                                            }
-
-                                            // Inisialisasi variabel 
-                                            $shift_a = $shift_b = $shift_c = $pa = 0;
-                                            $pcs_a = $pcs_b = $pcs_c = $pcs_pa = 0;
-                                            foreach ($prodTimter as $row) {
-                                                // Menggunakan null coalescing untuk mengatur nilai default 0 jika null
-                                                $no_mesin = $row['no_mesin'] ?? 0;
-                                                // Hitung dz
-                                                $shift_a = $row['shift_a'] ?? 0;
-                                                $shift_b = $row['shift_b'] ?? 0;
-                                                $shift_c = $row['shift_c'] ?? 0;
-                                                $pa = $row['pa'] ?? 0;
-
-                                                // Hitung pcs
-                                                $pcs_a = $shift_a % 24;
-                                                $pcs_b = $shift_b % 24;
-                                                $pcs_c = $shift_c % 24;
-                                                $pcs_pa = $pa % 24;
-
-                                                // Hitung total dz & pcs
-                                                $total_dz = $shift_a + $shift_b + $shift_c + $pa;
-                                                $total_pcs = $pcs_a + $pcs_b + $pcs_c + $pcs_pa;
-
-
-                                                // Memeriksa kondisi
-                                                if ($row['mastermodel'] == $id['mastermodel'] && $row['size'] == $id['size'] && $row['no_mesin'] == $id['no_mesin']) {
-                                                    $found = true;
-                                                ?>
-                                                    <td class="text-sm"><?= $row['no_mesin']; ?></td>
-                                                    <td class="text-sm"><?= floor($shift_a / 24); ?></td>
-                                                    <td class="text-sm"><?= $pcs_a; ?></td>
-                                                    <td class="text-sm"><?= floor($shift_b / 24); ?></td>
-                                                    <td class="text-sm"><?= $pcs_b; ?></td>
-                                                    <td class="text-sm"><?= floor($shift_c / 24); ?></td>
-                                                    <td class="text-sm"><?= $pcs_c; ?></td>
-                                                    <td class="text-sm"><?= floor($pa / 24); ?></td>
-                                                    <td class="text-sm"><?= $pcs_pa; ?></td>
-                                                    <td class="text-sm"><?= floor($total_dz / 24); ?></td>
-                                                    <td class="text-sm"><?= $total_pcs; ?></td>
-                                                <?php
-                                                    break; // Keluar dari loop setelah menemukan kecocokan
-                                                }
-                                            }
-                                            foreach ($jlMC as $prod) {
-                                                if ($prod['mastermodel'] == $id['mastermodel'] && $prod['size'] == $id['size']) {
-                                                ?>
-                                                    <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($prod['qty_produksi'] / 24) : ''; ?></td>
-                                                    <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($prod['qty_produksi'] % 24) : ''; ?></td>
-                                                <?php
-                                                    break;
-                                                }
-                                            }
-                                            foreach ($poTimter as $po) {
-                                                if ($po['machinetypeid'] == $id['machinetypeid'] && $po['mastermodel'] == $id['mastermodel'] && $po['size'] == $id['size']) {
-                                                ?>
-                                                    <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($po['qty'] / 24) : ''; ?></td>
-                                                    <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($po['qty'] % 24) : ''; ?></td>
-                                                    <?php
-                                                    foreach ($dataTimter as $data) {
-                                                        if ($data['machinetypeid'] == $id['machinetypeid'] && $data['mastermodel'] == $id['mastermodel'] && $data['size'] == $id['size']) {
-                                                            $sisa = $po['qty'] - $data['qty_produksi'];
-                                                    ?>
-                                                            <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($data['qty_produksi'] / 24) : ''; ?></td>
-                                                            <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($data['qty_produksi'] % 24) : ''; ?></td>
-                                                            <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($sisa / 24) : ''; ?></td>
-                                                            <td class="text-sm"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? floor($sisa % 24) : ''; ?></td>
-                                            <?php
-                                                            break;
-                                                        }
-                                                    }
-                                                    break;
-                                                }
-                                            }
-                                            ?>
+                                                <td class="text-sm" style="text-align: center;" colspan="11"></td>
+                                                <td class="text-sm"><?= floor($id['ttl_dz'] / 24); ?></td>
+                                                <td class="text-sm"><?= ($id['ttl_dz'] % 24); ?></td>
+                                                <td class="text-sm"><?= floor($id['qty'] / 24) ?></td>
+                                                <td class="text-sm"><?= ($id['qty'] % 24) ?></td>
+                                                <td class="text-sm"><?= floor($id['qty_prod'] / 24) ?></td>
+                                                <td class="text-sm"><?= ($id['qty_prod'] % 24) ?></td>
+                                                <td class="text-sm"><?= floor($id['sisa'] / 24) ?></td>
+                                                <td class="text-sm"><?= ($id['sisa'] % 24) ?></td>
                                         </tr>
+                                        <?php
+                                            } else {
+
+                                                $loopIndex = 0;
+                                                foreach ($id['no_mesin'] as $noMc => $row) {
+                                                    // Inisialisasi variabel 
+                                                    $shift_a = $shift_b = $shift_c = $pa = 0;
+                                                    $pcs_a = $pcs_b = $pcs_c = $pcs_pa = 0;
+
+                                                    // Menggunakan null coalescing untuk mengatur nilai default 0 jika null
+                                                    $no_mesin = $row['no_mesin'] ?? 0;
+                                                    // Hitung dz
+                                                    $shift_a = $row['shift_a'] ?? 0;
+                                                    $shift_b = $row['shift_b'] ?? 0;
+                                                    $shift_c = $row['shift_c'] ?? 0;
+                                                    $pa = $row['pa'] ?? 0;
+
+                                                    // Hitung pcs
+                                                    $pcs_a = $shift_a % 24;
+                                                    $pcs_b = $shift_b % 24;
+                                                    $pcs_c = $shift_c % 24;
+                                                    $pcs_pa = $pa % 24;
+
+                                                    // Hitung total dz & pcs
+                                                    $total_dz = $row['total_shift'];
+                                                    $total_pcs = $row['total_shift'] % 24;
+
+                                        ?>
+                                            <td class="text-sm"><?= $noMc ?></td>
+                                            <td class="text-sm"><?= floor($shift_a / 24); ?></td>
+                                            <td class="text-sm"><?= $pcs_a; ?></td>
+                                            <td class="text-sm"><?= floor($shift_b / 24); ?></td>
+                                            <td class="text-sm"><?= $pcs_b; ?></td>
+                                            <td class="text-sm"><?= floor($shift_c / 24); ?></td>
+                                            <td class="text-sm"><?= $pcs_c; ?></td>
+                                            <td class="text-sm"><?= floor($pa / 24); ?></td>
+                                            <td class="text-sm"><?= $pcs_pa; ?></td>
+                                            <td class="text-sm"><?= floor($total_dz / 24); ?></td>
+                                            <td class="text-sm"><?= $total_pcs; ?></td>
+                                            <?php
+                                                    if ($loopIndex == 0) {
+                                            ?>
+                                                <td class="text-sm"><?= floor($id['ttl_dz'] / 24) ?></td>
+                                                <td class="text-sm"><?= ($id['ttl_dz'] % 24) ?></td>
+                                                <td class="text-sm"><?= floor($id['qty'] / 24) ?></td>
+                                                <td class="text-sm"><?= ($id['qty'] % 24) ?></td>
+                                                <td class="text-sm"><?= floor($id['qty_prod'] / 24) ?></td>
+                                                <td class="text-sm"><?= ($id['qty_prod'] % 24) ?></td>
+                                                <td class="text-sm"><?= floor($id['sisa'] / 24) ?></td>
+                                                <td class="text-sm"><?= ($id['sisa'] % 24) ?></td>
+                                            <?php
+                                                    }
+                                            ?>
+                                            </tr>
                                     <?php
-                                        $prevModel = $id['mastermodel'];
-                                        $prevSize = $id['mastermodel'] . $id['size'];
+                                                    $loopIndex++;
+                                                }
+                                            }
+                                    ?>
+
+                                <?php
                                     endforeach; ?>
                                 </tbody>
                             </table>
