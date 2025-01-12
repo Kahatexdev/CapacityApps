@@ -428,9 +428,8 @@ class OrderModel extends Model
 
     public function getDataTimter($data)
     {
-        $this->select('data_model.seam, apsperstyle.delivery, data_model.kd_buyer_order, apsperstyle.idapsperstyle, apsperstyle.no_order, apsperstyle.factory, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.inisial, apsperstyle.size, apsperstyle.color, apsperstyle.smv, apsperstyle.delivery, SUM(DISTINCT apsperstyle.qty) AS qty, SUM(DISTINCT apsperstyle.sisa) AS sisa, SUM(produksi.qty_produksi) AS qty_produksi, produksi.area')
-            ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT')
-            ->join('produksi', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'LEFT');
+        $this->select('data_model.seam, apsperstyle.delivery, data_model.kd_buyer_order, apsperstyle.idapsperstyle, apsperstyle.no_order, apsperstyle.factory, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.inisial, apsperstyle.size, apsperstyle.color, apsperstyle.smv, apsperstyle.delivery, SUM(apsperstyle.qty) AS qty, SUM(apsperstyle.sisa) AS sisa')
+            ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT');
         if (!empty($data['area'])) {
             $this->where('apsperstyle.factory', $data['area']);
         }
