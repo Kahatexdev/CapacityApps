@@ -94,7 +94,7 @@ class TimterController extends BaseController
                         'smv' => $sizeItem['smv'],
                         'delivery' => $item['delivery'],
                         'sisa' => $sizeItem['sisa'],
-                        'qty_prod' => $sizeItem['qty_produksi'],
+                        'qty_prod' => $sizeItem['qty'] - $sizeItem['sisa'],
                         'qty' => $sizeItem['qty'],
                         'ttl_dz' => 0,
                         'no_mesin' => [],  // Menyimpan array untuk no_mesin 

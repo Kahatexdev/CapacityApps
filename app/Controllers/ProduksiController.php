@@ -86,8 +86,17 @@ class ProduksiController extends BaseController
     }
     public function produksiPerArea($area)
     {
-        $bulan = date('m');
-        $produksi = $this->produksiModel->getProduksi($area, $bulan);
+        $bulan = $this->request->getGet('bulan');
+        $tglProduksi = $this->request->getGet('tgl_produksi');
+        $noModel = $this->request->getGet('no_model');
+        $size = $this->request->getGet('size');
+
+        $produksi = [];
+
+        if ($bulan || $tglProduksi || $noModel || $size) {
+            $produksi = $this->produksiModel->getProduksi($area, $bulan, $tglProduksi, $noModel, $size);
+        }
+
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Produksi',
