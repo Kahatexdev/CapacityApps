@@ -48,7 +48,7 @@
                                         <p>Tanggal Produksi</p>
                                     </div>
                                     <div class="col-md-3 mb-2">
-                                        <input type="date" class="form-control text-secondary" name="tgl_produksi" id="tgl_produksi" placeholder="Tanggal Produksi">
+                                        <input type="date" class="form-control text-secondary" name="tgl_produksi" id="tgl_produksi" required>
                                     </div>
                                     <div class="col-md-3 mb-2">
                                         <input type="text" class="form-control" name="no_model" id="no_model" placeholder="No Model">

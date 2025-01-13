@@ -93,6 +93,18 @@ class ProduksiController extends BaseController
 
         $produksi = [];
 
+        // Hitung tanggal 90 hari yang lalu
+        $dateLimit = date('Y-m-d', strtotime('-90 days'));
+
+        // Cek apakah tanggal produksi yang dipilih lebih kecil dari tanggal batas (90 hari yang lalu)
+        if ($tglProduksi) {
+            // Jika lebih dari 90 hari yang lalu, tampilkan pesan error atau lakukan tindakan lain
+            if ($tglProduksi < $dateLimit) {
+                session()->setFlashdata('error', 'Tanggal produksi harus dalam 90 hari terakhir.');
+                return redirect()->back();
+            }
+        }
+
         if ($bulan || $tglProduksi || $noModel || $size) {
             $produksi = $this->produksiModel->getProduksi($area, $bulan, $tglProduksi, $noModel, $size);
         }

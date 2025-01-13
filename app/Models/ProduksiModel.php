@@ -42,15 +42,10 @@ class ProduksiModel extends Model
 
     public function getProduksi($area, $bulan, $tglProduksi = null, $noModel = null, $size = null)
     {
-        $today = date('Y-m-d');
-        $threeDaysAgo = date('Y-m-d', strtotime('-30 days'));
-
         // Mulai query
         $query = $this->select('tgl_produksi, produksi.*, apsperstyle.mastermodel, apsperstyle.size, sisa')
             ->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle')
-            ->where('produksi.area', $area)
-            ->where('tgl_produksi >=', $threeDaysAgo)
-            ->where('tgl_produksi <=', $today);
+            ->where('produksi.area', $area);
 
         // Tambahkan filter hanya jika parameter tidak null
         if ($tglProduksi) {
