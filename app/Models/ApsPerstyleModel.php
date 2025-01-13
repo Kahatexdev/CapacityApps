@@ -792,4 +792,41 @@ class ApsPerstyleModel extends Model
             ->get()
             ->getResultArray();
     }
+    public function orderMaterial($nomodel, $size)
+    {
+        $qry = $this->select('mastermodel, size, factory, inisial, delivery')
+            ->where('mastermodel', $nomodel)
+            ->where('size', $size)
+            ->groupBy('delivery')
+            ->findAll();
+
+        if (!$qry) {
+            return ['error' => 'Data not found'];  // Return an error message if no data found
+        }
+
+        if ($qry[0]['inisial'] === null && $qry[0]['factory'] === null) {
+            return ['error' => 'Data not found'];  // Return error if both inisial and factory are null
+        }
+
+        // Check if there's only one delivery
+        if (count($qry) === 1) {
+            $minDeliv = $maxDeliv = $qry[0]['delivery'];
+        } else {
+            // Extract all 'delivery' values if there are multiple
+            $deliveries = array_column($qry, 'delivery');
+            $maxDeliv = max($deliveries);
+            $minDeliv = min($deliveries);
+        }
+
+        $result = [
+            'no_model' => $qry[0]['mastermodel'],
+            'size' => $qry[0]['size'],
+            'inisial' => $qry[0]['inisial'],
+            'area' => $qry[0]['factory'],
+            'delivery_awal' => $minDeliv,
+            'delivery_akhir' => $maxDeliv
+        ];
+
+        return $result;
+    }
 }

@@ -662,6 +662,7 @@ class SummaryController extends BaseController
             foreach ($judulPlan as $id) {
                 $detailplan = $this->detailPlanningModel->getDataPlanning($id['id_pln_mc']);
                 $kebutuhanArea = $this->kebutuhanAreaModel->where('id_pln_mc', $id['id_pln_mc'])->first();
+                // dd($kebutuhanArea);
 
                 if (!isset($kebutuhanArea['jarum'])) {
                     continue;

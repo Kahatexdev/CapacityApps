@@ -18,6 +18,9 @@ $routes->group(
         $routes->get('bsKaryawan/(:any)', 'ApiController::bsKaryawan/$1');
         $routes->get('bsPeriode/(:any)', 'ApiController::bsPeriode/$1');
         $routes->get('bsDaily/(:any)', 'ApiController::bsDaily/$1');
+
+        // material
+        $routes->get('orderMaterial/(:any)/(:any)', 'ApiController::orderMaterial/$1/$2');
     }
 );
 
