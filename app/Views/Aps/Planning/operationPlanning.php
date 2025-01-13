@@ -173,6 +173,7 @@
                             <input type="hidden" name="jarum" value=<?= $jarum ?>>
                             <input type="hidden" name="judul" value=<?= $judul ?>>
                             <button type="submit" class="btn btn-info btn-block" style="width: 100%;">Save Planning</button>
+                            <button type="submit" id="saveEditPlan" class="btn btn-primary btn-block d-none" style="width: 100%;">Edit Planning</button>
                         </div>
                     </div>
                 </div>
@@ -356,13 +357,18 @@
             });
             targetField[0].dispatchEvent(event); // Pastikan targetField adalah elemen DOM, bukan objek jQuery
 
-            saveButton.textContent = "Edit Planning";
+            saveButton.style.display = 'none';
+
+            // Remove existing "Simpan Edit Planning" button if it exists
+
         }
 
 
 
 
         $(document).on('change', '#delivery', function() {
+            $('#planningField').find('form').attr('action', '<?= base_url($role . '/saveplanning'); ?>');
+
             const unplan = document.getElementById('unplanned-qty')
             unplan.value = ''
             const start = document.getElementById('start-date')
@@ -374,7 +380,9 @@
             var saveButton = document.querySelector('button[type="submit"]');
             saveButton.disabled = false
             saveButton.textContent = 'Save Planning';
-
+            saveButton.style.display = 'block';
+            let editButton = document.getElementById('saveEditPlan')
+            editButton.style.display = 'none';
             // Tentukan tanggal minimum (hari ini + 3 hari)
             const today = new Date();
             const minDate = new Date(today); // Salin tanggal hari ini
