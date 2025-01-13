@@ -475,6 +475,7 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->post('editproduksi', 'ProduksiController::editproduksi');
     $routes->get('updateproduksi', 'ProduksiController::updateproduksi');
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->post('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->get('updatebs', 'ProduksiController::updatebs');
 
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
