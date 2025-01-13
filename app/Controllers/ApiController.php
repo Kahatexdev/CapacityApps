@@ -57,4 +57,19 @@ class ApiController extends ResourceController
         $bsData = $this->BsMesinModel->bsDaily($start, $stop);
         return $this->respond($bsData, 200);
     }
+
+    public function orderMaterial($model, $size)
+    {
+        // Call the model method and get the result
+        $dataOrder = $this->ApsPerstyleModel->orderMaterial($model, $size);
+
+        // Check if there's an error in the result (e.g., 'error' key)
+        if (isset($dataOrder['error'])) {
+            // Return 404 if error exists
+            return $this->respond(['message' => $dataOrder['error']], 404);
+        }
+
+        // Return the result with a 200 status if everything is okay
+        return $this->respond($dataOrder, 200);
+    }
 }
