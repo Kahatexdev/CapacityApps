@@ -40,19 +40,28 @@ class ProduksiModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getProduksi($area, $bulan)
+    public function getProduksi($area, $bulan, $tglProduksi = null, $noModel = null, $size = null)
     {
-        $today = date('Y-m-d');
-        $threeDaysAgo = date('Y-m-d', strtotime('-30 days'));
-        return $this
-            ->select('tgl_produksi,produksi.*,apsperstyle.mastermodel, apsperstyle.size, sisa')
-            ->join('apsperstyle', 'apsperstyle.idapsperstyle= produksi.idapsperstyle')
-            ->where('produksi.area', $area)
-            ->where('tgl_produksi >=', $threeDaysAgo)
-            ->where('tgl_produksi <=', $today)
-            //->where('Month(tgl_produksi)', $bulan)
-            ->orderBy('produksi.tgl_produksi')
-            ->findAll();
+        // Mulai query
+        $query = $this->select('tgl_produksi, produksi.*, apsperstyle.mastermodel, apsperstyle.size, sisa')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle')
+            ->where('produksi.area', $area);
+
+        // Tambahkan filter hanya jika parameter tidak null
+        if ($tglProduksi) {
+            $query->where('produksi.tgl_produksi', $tglProduksi);
+        }
+
+        if ($noModel) {
+            $query->where('apsperstyle.mastermodel', $noModel);
+        }
+
+        if ($size) {
+            $query->where('apsperstyle.size', $size);
+        }
+
+        // Eksekusi dan kembalikan hasil
+        return $query->orderBy('produksi.tgl_produksi')->findAll();
     }
     public function existingData($insert)
     {
