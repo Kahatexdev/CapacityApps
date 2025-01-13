@@ -851,10 +851,10 @@ class ProduksiController extends BaseController
                         'size' => $sizeItem['size'],        // Mengambil size dari $sizeItem
                         'color' => $sizeItem['color'],
                         'smv' => $sizeItem['smv'],
-                        'delivery' => $item['delivery'],
-                        'sisa' => $sizeItem['sisa'],
-                        'qty_prod' => $sizeItem['qty_produksi'],
+                        'delivery' => $sizeItem['delivery'],
                         'qty' => $sizeItem['qty'],
+                        'sisa' => $sizeItem['sisa'],
+                        'qty_prod' => $sizeItem['qty'] - $sizeItem['sisa'],
                         'ttl_dz' => 0,
                         'no_mesin' => [],  // Menyimpan array untuk no_mesin 
                     ];

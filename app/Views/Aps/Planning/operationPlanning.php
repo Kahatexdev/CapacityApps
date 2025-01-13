@@ -37,8 +37,8 @@
                     </div>
 
                 </div>
-                <div class="card-body p-3">
-                    <form action="<?= base_url($role . '/saveplanning'); ?>" method="post">
+                <div class="card-body p-3" id="planningField">
+                    <form action="<?= base_url($role . '/saveplanning'); ?>" id="formPlanning" method="post">
 
                         <div class="row">
                             <div class="col-lg-6 col-sm-12">
@@ -91,7 +91,7 @@
                                     </div>
                                     <div class="col-lg-6 col-sm-12">
                                         <label for="" class="form-control-label"><span style="color: orange">Target Aktual</span></label>
-                                        <input class="form-control" type="text" name="target_akhir" value="" id="calculated-target" oninput="updatePercentage()">
+                                        <input class="form-control" type="text" name="target_akhir" value="0" id="calculated-target" oninput="updatePercentage()">
                                     </div>
                                 </div>
                             </div>
@@ -221,6 +221,8 @@
                                 ?>
                                     <tr>
                                         <td style="text-align: center; vertical-align: middle;"><?= $no++; ?></td>
+                                        <input type="text" name="" id="estId-<?= $no ?>" value="<?= $order['id_est_qty'] ?>" hidden>
+                                        <input type="text" name="" id="detailId-<?= $no ?>" value="<?= $order['id_detail_pln'] ?>" hidden>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= date('d-M-Y', strtotime($order['delivery'])); ?></td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= date('d-M-Y', strtotime($order['start_date'])); ?></td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= date('d-M-Y', strtotime($order['stop_date'])); ?></td>
@@ -230,11 +232,13 @@
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= htmlspecialchars($order['mesin']); ?> Mc</td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= number_format($estQty, 0, '.', ','); ?> Dz</td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;">
-                                            <button class="btn btn-info btn-edit" data-toggle="modal" data-target="#modalEdit"
+                                            <button class="btn btn-info btn-edit" id="editPlan-<?= $no ?>" onclick="editPlan(<?= $no ?>)"
                                                 data-start="<?= $order['start_date'] ?>"
-                                                data-idplan="<?= $order['id_detail_pln'] ?>"
-                                                data-idpl="<?= $id_pln ?>"
-                                                data-stop="<?= $order['stop_date'] ?>">
+                                                data-stop="<?= $order['stop_date'] ?>"
+                                                data-delivery="<?= $order['delivery'] ?>"
+                                                data-targetActual="<?= $order['target'] ?>"
+                                                data-mc="<?= $order['mesin'] ?>"
+                                                data-days="<?= $order['hari']; ?>">
                                                 Edit
                                             </button>
                                             <button class="btn btn-danger btn-update" data-toggle="modal" data-target="#modalUpdate"
@@ -319,16 +323,51 @@
                     }) + ' Dz');
                 }
             });
+
         });
 
+        function editPlan(no) {
+            let button = document.getElementById('editPlan-' + no);
 
-        document.getElementById('delivery').addEventListener('change', function() {
+            var estId = document.getElementById('estId-' + no).value;
+            let startMc = button.getAttribute('data-start');
+            let stopMc = button.getAttribute('data-stop');
+            let target = button.getAttribute('data-targetActual');
+            let deliv = button.getAttribute('data-delivery');
+            let days = button.getAttribute('data-day');
+            let mc = button.getAttribute('data-mc');
+            let saveButton = document.querySelector('button[type="submit"]');
+
+            $('#planningField').find('form').attr('action', '<?= base_url($role . '/updatePlanning/') ?>' + estId);
+            const deliverySelect = $('#planningField').find('select[name="delivery"]');
+            deliverySelect.val(deliv); // Set nilai delivery
+            deliverySelect.trigger('change'); // Panggil event change secara manual
+            $('#planningField').find('input[name="start_date"]').val(startMc);
+            $('#planningField').find('input[name="stop_date"]').val(stopMc);
+            $('#planningField').find('input[name="days_count"]').val(days);
+            $('#planningField').find('input[name="machine_usage"]').val(mc);
+
+            const targetField = $('#planningField').find('input[name="target_akhir"]');
+            targetField.val(target);
+
+            // Trigger input event to update percentage
+            const event = new Event('input', {
+                bubbles: true
+            });
+            targetField[0].dispatchEvent(event); // Pastikan targetField adalah elemen DOM, bukan objek jQuery
+
+            saveButton.textContent = "Edit Planning";
+        }
+
+
+
+
+        $(document).on('change', '#delivery', function() {
             const unplan = document.getElementById('unplanned-qty')
             unplan.value = ''
             const start = document.getElementById('start-date')
             const deliv = this.value; // Ambil nilai yang dipilih dari select
             const model = document.getElementById('model-data').value; // Ambil nilai dari input model
-            console.log('Delivery:', deliv, 'Model:', model);
 
             // Konversi delivery menjadi objek Date
             const deliveryDate = new Date(deliv);
@@ -362,7 +401,6 @@
                             const target100 = document.getElementById('target-100');
                             const qty = document.getElementById('qty');
                             const remainingQty = document.getElementById('remaining-qty');
-                            console.log(response);
 
                             if (stopDate && target100 && qty && remainingQty) {
                                 const formattedDate = new Date(deliv);
@@ -388,6 +426,8 @@
             }
         });
 
+
+
         function calculateTarget() {
             var percentageInput = document.getElementById('percentage');
             var target100Input = document.getElementById('target-100');
@@ -408,6 +448,7 @@
         }
 
         // Tambahkan event listener untuk perubahan target_akhir
+
         function updatePercentage() {
             var target100Input = document.getElementById('target-100');
             var target100 = parseFloat(target100Input.value);
@@ -419,6 +460,8 @@
 
                 // Update persentase di input persentase
                 document.getElementById('percentage').value = newPercentage;
+            } else {
+                console.log('Invalid values for calculation');
             }
         }
 
