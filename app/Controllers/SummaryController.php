@@ -660,7 +660,7 @@ class SummaryController extends BaseController
         foreach ($dataPlan as $jarum) {
             $judulPlan = $this->kebutuhanAreaModel->getDataByAreaJrm($area, $jarum);
             foreach ($judulPlan as $id) {
-                $detailplan = $this->detailPlanningModel->getDataPlanning($id['id_pln_mc']);
+                $detailplan = $this->ApsPerstyleModel->getDataPlanning($id['id_pln_mc']);
                 $kebutuhanArea = $this->kebutuhanAreaModel->where('id_pln_mc', $id['id_pln_mc'])->first();
                 // dd($kebutuhanArea);
 

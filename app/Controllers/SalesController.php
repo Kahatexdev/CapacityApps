@@ -1403,6 +1403,11 @@ class SalesController extends BaseController
         $sheet->setCellValue('F' . $endMergHeader, 'Total')
             ->getStyle('F' . $endMergHeader)
             ->applyFromArray($styleHeader2);
+        // Mengatur warna latar belakang menjadi orange
+        $sheet->getStyle('F' . $endMergHeader)
+            ->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()->setRGB('FFA500'); // Kode warna orange
         // mesin running
         $sheet->setCellValue('G' . $rowHeader3, 'Running')
             ->mergeCells('G' . $rowHeader3 . ':K' . $rowHeader3)
@@ -1432,6 +1437,11 @@ class SalesController extends BaseController
         $sheet->setCellValue('L' . $endMergHeader, 'Total')
             ->getStyle('L' . $endMergHeader)
             ->applyFromArray($styleHeader2);
+        // Mengatur warna latar belakang menjadi orange
+        $sheet->getStyle('L' . $endMergHeader)
+            ->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()->setRGB('FFA500'); // Kode warna orange
 
         // mesin running
         $sheet->setCellValue('M' . $rowHeader3, 'Mc Break Down')
@@ -1643,6 +1653,11 @@ class SalesController extends BaseController
             $sheet->setCellValue('F' . $rowBody, isset($data['totals']['totalCj']) ? $data['totals']['totalCj'] : 0)
                 ->getStyle('F' . $rowBody)
                 ->applyFromArray($styleBody);
+            // Mengatur warna latar belakang menjadi orange
+            $sheet->getStyle('F' . $rowBody)
+                ->getFill()
+                ->setFillType(Fill::FILL_SOLID)
+                ->getStartColor()->setRGB('FFA500'); // Kode warna orange
             // running mc by system
             $sheet->setCellValue('G' . $rowBody, isset($data['brandData']['Dakong']['totalRunning']) ? $data['brandData']['Dakong']['totalRunning'] : 0)
                 ->getStyle('G' . $rowBody)
@@ -1662,6 +1677,11 @@ class SalesController extends BaseController
             $sheet->setCellValue('L' . $rowBody, isset($data['totals']['totalRunning']) && isset($data['totals']['totalSample']) ? $data['totals']['totalRunning'] + $data['totals']['totalSample'] : 0)
                 ->getStyle('L' . $rowBody)
                 ->applyFromArray($styleBody);
+            // Mengatur warna latar belakang menjadi orange
+            $sheet->getStyle('L' . $rowBody)
+                ->getFill()
+                ->setFillType(Fill::FILL_SOLID)
+                ->getStartColor()->setRGB('FFA500'); // Kode warna orange
             // mc break down
             $sheet->setCellValue('M' . $rowBody, isset($data['totals']['totalBreakdown']) ? $data['totals']['totalBreakdown'] : 0)
                 ->getStyle('M' . $rowBody)
@@ -1893,57 +1913,57 @@ class SalesController extends BaseController
 
         $rowTitleGrandtotal = $rowSubtotal;
         $rowGrandtotal = $rowSubtotal;
-        $sheet->setCellValue('T' . $rowTitleGrandtotal, "Max Capacity")
-            ->mergeCells('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
-            ->getStyle('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+        $sheet->setCellValue('A' . $rowTitleGrandtotal, "Max Capacity")
+            ->mergeCells('A' . $rowTitleGrandtotal)
+            ->getStyle('A' . $rowTitleGrandtotal)
             ->applyFromArray($styleGrandTotal);
         $rowTitleGrandtotal++;
 
-        $sheet->setCellValue('T' . $rowTitleGrandtotal, "Confirm Order")
-            ->mergeCells('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
-            ->getStyle('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+        $sheet->setCellValue('A' . $rowTitleGrandtotal, "Confirm Order")
+            ->mergeCells('A' . $rowTitleGrandtotal)
+            ->getStyle('A' . $rowTitleGrandtotal)
             ->applyFromArray($styleGrandTotal);
         $rowTitleGrandtotal++;
 
-        $sheet->setCellValue('T' . $rowTitleGrandtotal, "Sisa Order")
-            ->mergeCells('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
-            ->getStyle('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+        $sheet->setCellValue('A' . $rowTitleGrandtotal, "Sisa Order")
+            ->mergeCells('A' . $rowTitleGrandtotal)
+            ->getStyle('A' . $rowTitleGrandtotal)
             ->applyFromArray($styleGrandTotal);
         $rowTitleGrandtotal++;
 
-        $sheet->setCellValue('T' . $rowTitleGrandtotal, "Sisa Booking")
-            ->mergeCells('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
-            ->getStyle('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+        $sheet->setCellValue('A' . $rowTitleGrandtotal, "Sisa Booking")
+            ->mergeCells('A' . $rowTitleGrandtotal)
+            ->getStyle('A' . $rowTitleGrandtotal)
             ->applyFromArray($styleGrandTotal);
         $rowTitleGrandtotal++;
 
-        $sheet->setCellValue('T' . $rowTitleGrandtotal, "(+)Exess")
-            ->mergeCells('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
-            ->getStyle('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+        $sheet->setCellValue('A' . $rowTitleGrandtotal, "(+)Exess")
+            ->mergeCells('A' . $rowTitleGrandtotal)
+            ->getStyle('A' . $rowTitleGrandtotal)
             ->applyFromArray($styleGrandTotal);
         $rowTitleGrandtotal++;
 
-        $sheet->setCellValue('T' . $rowTitleGrandtotal, "%")
-            ->mergeCells('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
-            ->getStyle('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+        $sheet->setCellValue('A' . $rowTitleGrandtotal, "%")
+            ->mergeCells('A' . $rowTitleGrandtotal)
+            ->getStyle('A' . $rowTitleGrandtotal)
             ->applyFromArray($styleGrandTotal);
         $rowTitleGrandtotal++;
 
-        $sheet->setCellValue('T' . $rowTitleGrandtotal, "Total Export")
-            ->mergeCells('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
-            ->getStyle('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+        $sheet->setCellValue('A' . $rowTitleGrandtotal, "Total Export")
+            ->mergeCells('A' . $rowTitleGrandtotal)
+            ->getStyle('A' . $rowTitleGrandtotal)
             ->applyFromArray($styleGrandTotal);
         $rowTitleGrandtotal++;
 
-        $sheet->setCellValue('T' . $rowTitleGrandtotal, "Total Inspect")
-            ->mergeCells('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
-            ->getStyle('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+        $sheet->setCellValue('A' . $rowTitleGrandtotal, "Total Inspect")
+            ->mergeCells('A' . $rowTitleGrandtotal)
+            ->getStyle('A' . $rowTitleGrandtotal)
             ->applyFromArray($styleGrandTotal);
         $rowTitleGrandtotal++;
 
-        $sheet->setCellValue('T' . $rowTitleGrandtotal, "Total Lokal")
-            ->mergeCells('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
-            ->getStyle('T' . $rowTitleGrandtotal . ':' . 'U' . $rowTitleGrandtotal)
+        $sheet->setCellValue('A' . $rowTitleGrandtotal, "Total Lokal")
+            ->mergeCells('A' . $rowTitleGrandtotal)
+            ->getStyle('A' . $rowTitleGrandtotal)
             ->applyFromArray($styleGrandTotal);
 
         // // baris grand total per bulan

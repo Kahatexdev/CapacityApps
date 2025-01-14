@@ -829,4 +829,15 @@ class ApsPerstyleModel extends Model
 
         return $result;
     }
+    public function getDataPlanning($id)
+    {
+        return $this->select('apsperstyle.delivery, dp.id_pln_mc, dp.id_detail_pln, dp.model, dp.qty, dp.sisa, dp.smv, MIN(tp.date) AS start_date, MAX(tp.date) AS stop_date, ep.total_est_qty AS est_qty, ep.max_hari AS hari, ep.precentage_target')
+            ->join('detail_planning dp', 'dp.model = apsperstyle.mastermodel', 'left')
+            ->join('tanggal_planning tp', 'dp.id_detail_pln = tp.id_detail_pln', 'left')
+            ->join('(SELECT id_detail_pln, SUM(est_qty) AS total_est_qty, MAX(hari) AS max_hari, precentage_target FROM estimated_planning GROUP BY id_detail_pln) ep', 'dp.id_detail_pln = ep.id_detail_pln', 'left')
+            ->where('dp.id_pln_mc', $id)
+            ->groupBy('dp.id_detail_pln, dp.model')
+            ->orderBy('dp.model')
+            ->findAll();
+    }
 }
