@@ -172,8 +172,8 @@
                             <input type="hidden" name="area" value=<?= $area ?>>
                             <input type="hidden" name="jarum" value=<?= $jarum ?>>
                             <input type="hidden" name="judul" value=<?= $judul ?>>
-                            <button type="submit" class="btn btn-info btn-block" style="width: 100%;">Save Planning</button>
                             <button type="submit" id="saveEditPlan" class="btn btn-primary btn-block d-none" style="width: 100%;">Edit Planning</button>
+                            <button type="submit" id="savePlan" class="btn btn-info btn-block" style="width: 100%;">Save Planning</button>
                         </div>
                     </div>
                 </div>
@@ -337,7 +337,8 @@
             let deliv = button.getAttribute('data-delivery');
             let days = button.getAttribute('data-day');
             let mc = button.getAttribute('data-mc');
-            let saveButton = document.querySelector('button[type="submit"]');
+            let saveButton = document.getElementById('savePlan');
+            let editButton = document.getElementById('saveEditPlan')
 
             $('#planningField').find('form').attr('action', '<?= base_url($role . '/updatePlanning/') ?>' + estId);
             const deliverySelect = $('#planningField').find('select[name="delivery"]');
@@ -357,12 +358,11 @@
             });
             targetField[0].dispatchEvent(event); // Pastikan targetField adalah elemen DOM, bukan objek jQuery
 
-            saveButton.style.display = 'none';
+            saveButton.classList.add('d-none');
+            editButton.classList.remove('d-none');
 
-            // Remove existing "Simpan Edit Planning" button if it exists
 
         }
-
 
 
 
@@ -377,12 +377,11 @@
 
             // Konversi delivery menjadi objek Date
             const deliveryDate = new Date(deliv);
-            var saveButton = document.querySelector('button[type="submit"]');
+            var saveButton = document.getElementById('savePlan');
             saveButton.disabled = false
             saveButton.textContent = 'Save Planning';
-            saveButton.style.display = 'block';
-            let editButton = document.getElementById('saveEditPlan')
-            editButton.style.display = 'none';
+            saveButton.classList.remove('d-none');
+
             // Tentukan tanggal minimum (hari ini + 3 hari)
             const today = new Date();
             const minDate = new Date(today); // Salin tanggal hari ini
@@ -615,7 +614,7 @@
             // Jika listPlanning kosong, set unplanned-qty langsung dengan remainingQty
             if (listPlanningEmpty) {
                 document.getElementById('unplanned-qty').value = remainingQty.toFixed(2);
-                var saveButton = document.querySelector('button[type="submit"]');
+                var saveButton = document.getElementById('savePlan');
                 saveButton.disabled = false;
                 saveButton.textContent = 'Save Planning';
                 return; // Keluar dari fungsi jika listPlanning kosong
@@ -638,7 +637,7 @@
             document.getElementById('unplanned-qty').value = unplannedQty.toFixed(2);
 
             // Ubah status tombol 'Save'
-            var saveButton = document.querySelector('button[type="submit"]');
+            var saveButton = document.getElementById('savePlan');
             if (unplannedQty <= 0) {
                 console.log(unplannedQty)
                 saveButton.disabled = true;
@@ -678,7 +677,7 @@
         document.querySelector(' input[name="start_date" ]').addEventListener('change', function() {
             var startDate = this.value;
             var unplan = document.getElementById('unplanned-qyt')
-            var saveButton = document.querySelector('button[type="submit"]');
+            var saveButton = document.getElementById('savePlan');
             updateAvailableMachines(startDate);
             calculateDaysCount(function() {
                 fillMachineSuggestion();
