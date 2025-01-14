@@ -40,6 +40,7 @@
                 <div class="card-body p-3" id="planningField">
                     <form action="<?= base_url($role . '/saveplanning'); ?>" id="formPlanning" method="post">
 
+                        <input class="form-control" type="text" name="id_est" value="" readonly id="id-est" hidden>
                         <div class="row">
                             <div class="col-lg-6 col-sm-12">
                                 <div class="form-group">
@@ -239,7 +240,8 @@
                                                 data-delivery="<?= $order['delivery'] ?>"
                                                 data-targetActual="<?= $order['target'] ?>"
                                                 data-mc="<?= $order['mesin'] ?>"
-                                                data-days="<?= $order['hari']; ?>">
+                                                data-days="<?= $order['hari']; ?>"
+                                                data-idEst="<?= $order['id_est_qty']; ?>">
                                                 Edit
                                             </button>
                                             <button class="btn btn-danger btn-update" data-toggle="modal" data-target="#modalUpdate"
@@ -330,7 +332,8 @@
         function editPlan(no) {
             let button = document.getElementById('editPlan-' + no);
 
-            var estId = document.getElementById('estId-' + no).value;
+            // var estId = document.getElementById('estId-' + no).value;
+            let estId = button.getAttribute('data-idEst');
             let startMc = button.getAttribute('data-start');
             let stopMc = button.getAttribute('data-stop');
             let target = button.getAttribute('data-targetActual');
@@ -344,6 +347,7 @@
             const deliverySelect = $('#planningField').find('select[name="delivery"]');
             deliverySelect.val(deliv); // Set nilai delivery
             deliverySelect.trigger('change'); // Panggil event change secara manual
+            $('#planningField').find('input[name="id_est"]').val(estId);
             $('#planningField').find('input[name="start_date"]').val(startMc);
             $('#planningField').find('input[name="stop_date"]').val(stopMc);
             $('#planningField').find('input[name="days_count"]').val(days);

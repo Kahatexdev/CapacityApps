@@ -698,7 +698,7 @@ class ApsController extends BaseController
         $judul = $kebutuhanArea['judul'];
         $area = $kebutuhanArea['area'];
         $jarum =  $kebutuhanArea['jarum'];
-        //$detailplan = $this->DetailPlanningModel->getDetailPlanning($id); //get data model with detail quantity,model etc.
+        // $detailplan = $this->DetailPlanningModel->getDetailPlanning($id); //get data model with detail quantity,model etc.
         $pdk = $this->DetailPlanningModel->detailPdk($id);
         $listDeliv = $this->ApsPerstyleModel->getDetailPerDeliv($pdk);
         $listPlanning = $this->EstimatedPlanningModel->listPlanning($id);
@@ -758,6 +758,7 @@ class ApsController extends BaseController
 
     public function saveplanning()
     {
+        $id_est = $this->request->getPost('id_est');
         $model = $this->request->getPost('model');
         $delivery = $this->request->getPost('delivery');
         $qty = $this->request->getPost('qty');
@@ -778,7 +779,6 @@ class ApsController extends BaseController
         $jrm = $this->request->getPost('jarum');
         $judul = $this->request->getPost('judul');
 
-
         $startDateTime = new \DateTime($start);
         $stopDateTime = new \DateTime($stop);
 
@@ -797,29 +797,73 @@ class ApsController extends BaseController
             'delivery' => $delivery,
         ];
 
-        $saveest = $this->EstimatedPlanningModel->insert($dataestqty);
-        $idOrder = $this->EstimatedPlanningModel->getId($id_save);
-
-        foreach ($datePeriod as $date) {
-            $formattedDate = $date->format('Y-m-d');
-            if (in_array($formattedDate, $holidayDates)) {
-                continue; // Skip this date
-            }
-            $data = [
-                'role' => session()->get('role'),
-                'id_detail_pln' => $id_save,
-                'id_est_qty' => $idOrder,
-                'date' => $date->format('Y-m-d'), // Insert the current date in the range
-                'mesin' => $mesin,
-                'start_mesin' => $start,
-                'stop_mesin' => $stop,
-            ];
-            $this->TanggalPlanningModel->insert($data);
+        // Cek apakah ID ada (proses edit atau save baru)
+        if ($id_est) {
+            // Update data
+            $saveest = $this->EstimatedPlanningModel->update($id_est, $dataestqty);
+            $idOrder = $id_est; // ID tetap sama untuk update
+        } else {
+            // Insert data baru
+            $saveest = $this->EstimatedPlanningModel->insert($dataestqty);
+            $idOrder = $this->EstimatedPlanningModel->getInsertID(); // Ambil ID setelah insert
         }
 
+        // Query data dari model
+        $select = $this->TanggalPlanningModel
+            ->where('id_est_qty', $id_est)
+            ->where('id_detail_pln', $id_save)
+            ->findAll();
 
+        // Cek apakah data ditemukan
+        if (!empty($select)) {
+            // Jika data ditemukan, hapus data lama
+            $delete = $this->TanggalPlanningModel
+                ->where('id_est_qty', $id_est)
+                ->where('id_detail_pln', $id_save)
+                ->delete();
 
-        if ($saveest) {
+            if ($delete) {
+                // Insert ulang data berdasarkan periode tanggal
+                foreach ($datePeriod as $date) {
+                    $formattedDate = $date->format('Y-m-d');
+                    if (in_array($formattedDate, $holidayDates)) {
+                        continue; // Lewati tanggal libur
+                    }
+
+                    $data = [
+                        'role' => session()->get('role'),
+                        'id_detail_pln' => $id_save,
+                        'id_est_qty' => $idOrder,
+                        'date' => $formattedDate, // Masukkan tanggal
+                        'mesin' => $mesin,
+                        'start_mesin' => $start,
+                        'stop_mesin' => $stop,
+                    ];
+                    $this->TanggalPlanningModel->insert($data);
+                }
+            }
+        } else {
+            // Jika data tidak ditemukan, langsung insert data baru
+            foreach ($datePeriod as $date) {
+                $formattedDate = $date->format('Y-m-d');
+                if (in_array($formattedDate, $holidayDates)) {
+                    continue; // Lewati tanggal libur
+                }
+
+                $data = [
+                    'role' => session()->get('role'),
+                    'id_detail_pln' => $id_save,
+                    'id_est_qty' => $idOrder,
+                    'date' => $formattedDate, // Masukkan tanggal
+                    'mesin' => $mesin,
+                    'start_mesin' => $start,
+                    'stop_mesin' => $stop,
+                ];
+                $this->TanggalPlanningModel->insert($data);
+            }
+        }
+
+        if ($formattedDate) {
             return redirect()->to(base_url(session()->get('role') . '/planningpage/' . $id_save . '/' . $id_pln))->withInput()->with('success', 'Data Berhasil Disimpan');
         } else {
             return redirect()->to(base_url(session()->get('role') . '/planningpage/' . $id_save . '/' . $id_pln))->withInput()->with('error', 'Data Gagal Disimpan');
