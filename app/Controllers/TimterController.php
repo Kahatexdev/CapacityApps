@@ -92,7 +92,7 @@ class TimterController extends BaseController
                         'size' => $sizeItem['size'],        // Mengambil size dari $sizeItem
                         'color' => $sizeItem['color'],
                         'smv' => $sizeItem['smv'],
-                        'delivery' => $item['delivery'],
+                        'delivery' => $sizeItem['delivery'],
                         'sisa' => $sizeItem['sisa'],
                         'qty_prod' => $sizeItem['qty'] - $sizeItem['sisa'],
                         'qty' => $sizeItem['qty'],
@@ -741,22 +741,6 @@ class TimterController extends BaseController
             // Jika tidak ada countjlMc, set ke 1 untuk menampilkan setidaknya satu baris
             $countjlMc = $countjlMc ?: 0;
 
-            // Gabungkan sel untuk rowspan
-            if ($rowspan > 1) {
-                $sheet->mergeCells('A' . $row . ':A' . ($row + $rowspan - 1));
-                $sheet->mergeCells('B' . $row . ':B' . ($row + $rowspan - 1));
-                $sheet->mergeCells('C' . $row . ':C' . ($row + $rowspan - 1));
-                $sheet->mergeCells('D' . $row . ':D' . ($row + $rowspan - 1));
-                $sheet->mergeCells('E' . $row . ':E' . ($row + $rowspan - 1));
-                $sheet->mergeCells('F' . $row . ':F' . ($row + $rowspan - 1));
-                $sheet->mergeCells('G' . $row . ':G' . ($row + $rowspan - 1));
-                $sheet->mergeCells('H' . $row . ':H' . ($row + $rowspan - 1));
-                $sheet->mergeCells('I' . $row . ':I' . ($row + $rowspan - 1));
-                $sheet->mergeCells('J' . $row . ':J' . ($row + $rowspan - 1));
-                $sheet->mergeCells('K' . $row . ':K' . ($row + $rowspan - 1));
-                $sheet->mergeCells('L' . $row . ':L' . ($row + $rowspan - 1));
-            }
-
             // Isi data untuk baris pertama (merged cells)
             $sheet->setCellValue('A' . $row, $id['seam']);
             $sheet->setCellValue('B' . $row, $id['kd_buyer_order']);
@@ -775,11 +759,7 @@ class TimterController extends BaseController
             $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
 
             foreach ($columns as $column) {
-                if ($rowspan > 1) {
-                    $sheet->getStyle($column . $row)->applyFromArray($styleBody);
-                } else {
-                    $sheet->getStyle($column . $row)->applyFromArray($styleBody);
-                }
+                $sheet->getStyle($column . $row)->applyFromArray($styleBody);
             }
 
             // Pengisian untuk baris yang sudah di-merge
@@ -795,26 +775,32 @@ class TimterController extends BaseController
                 $sheet->setCellValue('AF' . $row, '');
 
                 // style body
-                $sheet->getStyle('M' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('N' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('O' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('P' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('Q' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('R' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('S' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('T' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('U' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('V' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('W' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('X' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('Y' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('Z' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('AA' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('AB' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('AC' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('AD' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('AE' . $row)->applyFromArray($styleBody);
-                $sheet->getStyle('AF' . $row)->applyFromArray($styleBody);
+                $columns = [
+                    'M',
+                    'N',
+                    'O',
+                    'P',
+                    'Q',
+                    'R',
+                    'S',
+                    'T',
+                    'U',
+                    'V',
+                    'W',
+                    'X',
+                    'Y',
+                    'Z',
+                    'AA',
+                    'AB',
+                    'AC',
+                    'AD',
+                    'AE',
+                    'AF'
+                ];
+
+                foreach ($columns as $column) {
+                    $sheet->getStyle($column . $row)->applyFromArray($styleBody);
+                }
                 $row++;
             } else {
                 // Proses untuk 'no_mesin' ada
@@ -854,27 +840,44 @@ class TimterController extends BaseController
                     $sheet->setCellValue('W' . $row, $total_pcs);
 
                     // style body
-                    $sheet->getStyle('M' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('N' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('O' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('P' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('Q' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('R' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('S' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('T' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('U' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('V' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('W' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('X' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('Y' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('Z' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('AA' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('AB' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('AC' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('AD' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('AE' . $row)->applyFromArray($styleBody);
-                    $sheet->getStyle('AF' . $row)->applyFromArray($styleBody);
+                    $columns = [
+                        'A',
+                        'B',
+                        'C',
+                        'D',
+                        'E',
+                        'F',
+                        'G',
+                        'H',
+                        'I',
+                        'J',
+                        'K',
+                        'L',
+                        'M',
+                        'N',
+                        'O',
+                        'P',
+                        'Q',
+                        'R',
+                        'S',
+                        'T',
+                        'U',
+                        'V',
+                        'W',
+                        'X',
+                        'Y',
+                        'Z',
+                        'AA',
+                        'AB',
+                        'AC',
+                        'AD',
+                        'AE',
+                        'AF'
+                    ];
 
+                    foreach ($columns as $column) {
+                        $sheet->getStyle($column . $row)->applyFromArray($styleBody);
+                    }
 
                     if ($loopIndex == 0) {
                         $sheet->setCellValue('X' . $row, floor($id['ttl_dz'] / 24));
@@ -887,15 +890,22 @@ class TimterController extends BaseController
                         $sheet->setCellValue('AE' . $row, floor($id['sisa'] % 24));
                         $sheet->setCellValue('AF' . $row, '');
 
-                        $sheet->getStyle('X' . $row)->applyFromArray($styleBody);
-                        $sheet->getStyle('Y' . $row)->applyFromArray($styleBody);
-                        $sheet->getStyle('Z' . $row)->applyFromArray($styleBody);
-                        $sheet->getStyle('AA' . $row)->applyFromArray($styleBody);
-                        $sheet->getStyle('AB' . $row)->applyFromArray($styleBody);
-                        $sheet->getStyle('AC' . $row)->applyFromArray($styleBody);
-                        $sheet->getStyle('AD' . $row)->applyFromArray($styleBody);
-                        $sheet->getStyle('AE' . $row)->applyFromArray($styleBody);
-                        $sheet->getStyle('AF' . $row)->applyFromArray($styleBody);
+                        // style body
+                        $columns = [
+                            'X',
+                            'Y',
+                            'Z',
+                            'AA',
+                            'AB',
+                            'AC',
+                            'AD',
+                            'AE',
+                            'AF'
+                        ];
+
+                        foreach ($columns as $column) {
+                            $sheet->getStyle($column . $row)->applyFromArray($styleBody);
+                        }
                     }
                     $row++;
                     $loopIndex++;

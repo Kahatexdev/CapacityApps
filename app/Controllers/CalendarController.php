@@ -209,6 +209,7 @@ class CalendarController extends BaseController
 
             $weekCount++;
         }
+        dd($planMc);
         $get = [
             'jarum' => $jarum,
             'start' => $awal,
