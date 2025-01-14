@@ -378,9 +378,12 @@
             // Konversi delivery menjadi objek Date
             const deliveryDate = new Date(deliv);
             var saveButton = document.getElementById('savePlan');
+            var saveButton = document.getElementById('savePlan');
+            var editButton = document.getElementById('saveEditPlan');
             saveButton.disabled = false
             saveButton.textContent = 'Save Planning';
             saveButton.classList.remove('d-none');
+            editButton.classList.add('d-none');
 
             // Tentukan tanggal minimum (hari ini + 3 hari)
             const today = new Date();
