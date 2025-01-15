@@ -1843,38 +1843,59 @@ class OrderController extends BaseController
     public function estimasispk($area)
     {
         $lastmonth = date('Y-m-01', strtotime('-1 month'));
+        $data = $this->ApsPerstyleModel->dataEstimasi($area);
         $pdk = $this->ApsPerstyleModel->estimasispk($area, $lastmonth);
         $perStyle = [];
+        foreach ($data as $id) {
+            foreach ($pdk as $item) {
+                // Pastikan data memiliki relasi yang sesuai
+                if ($id['mastermodel'] === $item['mastermodel'] && $id['size'] === $item['size']) {
+                    $key = $id['mastermodel'] . '-' . $id['size'];
+                    if (!isset($perStyle[$key])) {
+                        // Hitung nilai akumulasi awal
+                        $bs = (int)$item['bs'];
+                        $qty = (int)$id['qty'];
+                        $sisa = (int)$id['sisa'];
+                        $produksi = $qty - $sisa;
 
-        foreach ($pdk as $item) {
-            $style = $item['size'];
-
-            // Hitung nilai akumulasi awal
-            $bs = (int)$item['bs'];
-            $qty = (int)$item['qty'];
-            $sisa = (int)$item['sisa'];
-            $produksi = $qty - $sisa;
-
-            // Periksa apakah produksi valid dan memenuhi kondisi
-            if ($produksi > 0) {
-                $percentage = round(($produksi / $qty) * 100);
-                $estimasi = ($bs / $produksi / 100) * $qty;
-                if ($percentage > 60 && $percentage < 90) {
-                    $perStyle[$style] = [
-                        'model' => $item['mastermodel'],
-                        'inisial' => $item['inisial'],
-                        'size' => $style,
-                        'sisa' => $sisa,
-                        'qty' => $qty,
-                        'percentage' => $percentage,
-                        'bs' => $bs,
-                        'estimasi' => round(($estimasi * 100), 2),
-                    ];
+                        // Periksa apakah produksi valid dan memenuhi kondisi
+                        if ($produksi > 0) {
+                            $percentage = round(($produksi / $qty) * 100);
+                            $estimasi = ($bs / $produksi / 100) * $qty;
+                            if ($percentage > 60 && $percentage < 90) {
+                                $perStyle[$key] = [
+                                    'model' => $item['mastermodel'],
+                                    'inisial' => $item['inisial'],
+                                    'size' => $item['size'],
+                                    'sisa' => $sisa,
+                                    'qty' => $qty,
+                                    'percentage' => $percentage,
+                                    'bs' => $bs,
+                                    'jarum' => $item['machinetypeid'],
+                                    'estimasi' => round(($estimasi * 100), 1),
+                                ];
+                            }
+                        }
+                    }
                 }
             }
         }
 
-        // Debugging hasil akhir
-        dd($perStyle);
+        $data2 = [
+            'role' => session()->get('role'),
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'data' => $data,
+            'pdk' => $pdk,
+            'area' => $area,
+            'perStyle' => $perStyle
+        ];
+        return view(session()->get('role') . '/Order/estimasispk', $data2);
     }
 }

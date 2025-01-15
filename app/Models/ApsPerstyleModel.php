@@ -829,43 +829,22 @@ class ApsPerstyleModel extends Model
 
         return $result;
     }
-    public function estimasispk($area, $lastmonth)
+    public function dataEstimasi($area)
     {
-        $res = $this->select('mastermodel, inisial, size, SUM(apsperstyle.sisa) AS sisa, sum(apsperstyle.qty) as qty, delivery,sum(data_bs.qty) as bs')
-            ->join('data_bs', 'data_bs.idapsperstyle =apsperstyle.idapsperstyle')
-            ->where('sisa >', 0)
+        return $this->select('mastermodel, inisial, size, SUM(sisa) AS sisa, sum(qty) as qty, delivery,machinetypeid')
             ->where('factory', $area)
-            ->groupBy('size,delivery')
+            ->groupBy('size')
             ->orderBy('delivery', 'DESC')
             ->findAll();
-        // dd($res);
-        // $groupedPerstyle = [];
-
-        // $result = [];
-        // foreach ($res as $data) {
-        //     $prod = (int)$data['prod'];
-        //     $qty = (int)$data['qty'];
-        //     $bs = (int)$data['bs'];
-
-        //     $presentase = ceil(($prod / $qty) * 100);
-
-        //     if ($presentase > 60 && $presentase < 90) {
-        //         $estimasi = ($bs / $prod / 100) * $qty;
-        //         $hasil = $estimasi * 100;
-        //         $result[] = [
-        //             'model' => $data['mastermodel'],
-        //             'inisial' => $data['inisial'],
-        //             'size' => $data['size'],
-        //             'presentase' => $presentase,
-        //             'qty' => $data['qty'],
-        //             'bs' => $data['bs'],
-        //             'prod' => $data['prod'],
-        //             'estimasi' => $hasil, // Koreksi perhitungan estimasi
-        //             'delivery' => $data['delivery']
-        //         ];
-        //     }
-        // }
-        // dd($result);
+    }
+    public function estimasispk($area, $lastmonth)
+    {
+        $res = $this->select('mastermodel, inisial, size, SUM(apsperstyle.sisa) AS sisa, sum(apsperstyle.qty) as qty, delivery,sum(data_bs.qty) as bs,machinetypeid')
+            ->join('data_bs', 'data_bs.idapsperstyle = apsperstyle.idapsperstyle')
+            ->where('factory', $area)
+            ->groupBy('size')
+            ->orderBy('delivery', 'DESC')
+            ->findAll();
         return $res;
     }
 }

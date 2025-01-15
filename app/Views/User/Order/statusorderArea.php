@@ -37,10 +37,6 @@
                                 </h5>
                             </div>
                         </div>
-                        <div>
-                            <a href="<?= base_url($role . '/estimasispk/' . $area) ?>" class="btn btn-info">Estimasi SPK</a>
-                        </div>
-
                     </div>
                 </div>
             </div>
