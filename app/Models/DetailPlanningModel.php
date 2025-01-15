@@ -40,16 +40,16 @@ class DetailPlanningModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    // public function getDataPlanning($id)
-    // {
-    //     return $this->select('detail_planning.id_detail_pln, detail_planning.model, detail_planning.qty, detail_planning.sisa, detail_planning.smv, MIN(tp.date) AS start_date, MAX(tp.date) AS stop_date, ep.total_est_qty AS est_qty, ep.max_hari AS hari, ep.precentage_target, ep.delivery')
-    //         ->join('tanggal_planning tp', 'detail_planning.id_detail_pln = tp.id_detail_pln', 'left')
-    //         ->join('(SELECT id_detail_pln, SUM(est_qty) AS total_est_qty, MAX(hari) AS max_hari, precentage_target, delivery FROM estimated_planning GROUP BY id_detail_pln) ep', 'detail_planning.id_detail_pln = ep.id_detail_pln', 'left')
-    //         ->where('detail_planning.id_pln_mc', $id)
-    //         ->groupBy('detail_planning.id_detail_pln, detail_planning.model')
-    //         ->orderBy('detail_planning.model')
-    //         ->findAll();
-    // }
+    public function getDataPlanning($id)
+    {
+        return $this->select('detail_planning.id_detail_pln, detail_planning.model, detail_planning.qty, detail_planning.sisa, detail_planning.smv, MIN(tp.date) AS start_date, MAX(tp.date) AS stop_date, ep.total_est_qty AS est_qty, ep.max_hari AS hari, ep.precentage_target, ep.delivery')
+            ->join('tanggal_planning tp', 'detail_planning.id_detail_pln = tp.id_detail_pln', 'left')
+            ->join('(SELECT id_detail_pln, SUM(est_qty) AS total_est_qty, MAX(hari) AS max_hari, precentage_target, delivery FROM estimated_planning GROUP BY id_detail_pln) ep', 'detail_planning.id_detail_pln = ep.id_detail_pln', 'left')
+            ->where('detail_planning.id_pln_mc', $id)
+            ->groupBy('detail_planning.id_detail_pln, detail_planning.model')
+            ->orderBy('detail_planning.model')
+            ->findAll();
+    }
     public function getDetailPlanning($id)
     {
         return $this->select('detail_planning.id_detail_pln,model,qty,sisa,smv,MIN(date) as start_date,MAX(date) as stop_date,MAX(mesin) as mesin,sum(est_qty) as est_qty,max(hari) as hari')
