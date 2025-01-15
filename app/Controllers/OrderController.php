@@ -1840,4 +1840,41 @@ class OrderController extends BaseController
         ];
         return view(session()->get('role') . '/Order/detailPdk', $data);
     }
+    public function estimasispk($area)
+    {
+        $lastmonth = date('Y-m-01', strtotime('-1 month'));
+        $pdk = $this->ApsPerstyleModel->estimasispk($area, $lastmonth);
+        $perStyle = [];
+
+        foreach ($pdk as $item) {
+            $style = $item['size'];
+
+            // Hitung nilai akumulasi awal
+            $bs = (int)$item['bs'];
+            $qty = (int)$item['qty'];
+            $sisa = (int)$item['sisa'];
+            $produksi = $qty - $sisa;
+
+            // Periksa apakah produksi valid dan memenuhi kondisi
+            if ($produksi > 0) {
+                $percentage = round(($produksi / $qty) * 100);
+                $estimasi = ($bs / $produksi / 100) * qty;
+                if ($percentage > 60 && $percentage < 90) {
+                    $perStyle[$style] = [
+                        'model' => $item['mastermodel'],
+                        'inisial' => $item['inisial'],
+                        'size' => $style,
+                        'sisa' => $sisa,
+                        'qty' => $qty,
+                        'percentage' => $percentage,
+                        'bs' => $bs,
+                        'estimasi' => round(($estimasi * 100), 2),
+                    ];
+                }
+            }
+        }
+
+        // Debugging hasil akhir
+        dd($perStyle);
+    }
 }
