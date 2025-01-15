@@ -829,15 +829,43 @@ class ApsPerstyleModel extends Model
 
         return $result;
     }
-    public function getDataPlanning($id)
+    public function estimasispk($area, $lastmonth)
     {
-        return $this->select('apsperstyle.delivery, dp.id_pln_mc, dp.id_detail_pln, dp.model, dp.qty, dp.sisa, dp.smv, MIN(tp.date) AS start_date, MAX(tp.date) AS stop_date, ep.total_est_qty AS est_qty, ep.max_hari AS hari, ep.precentage_target')
-            ->join('detail_planning dp', 'dp.model = apsperstyle.mastermodel', 'left')
-            ->join('tanggal_planning tp', 'dp.id_detail_pln = tp.id_detail_pln', 'left')
-            ->join('(SELECT id_detail_pln, SUM(est_qty) AS total_est_qty, MAX(hari) AS max_hari, precentage_target FROM estimated_planning GROUP BY id_detail_pln) ep', 'dp.id_detail_pln = ep.id_detail_pln', 'left')
-            ->where('dp.id_pln_mc', $id)
-            ->groupBy('dp.id_detail_pln, dp.model')
-            ->orderBy('dp.model')
+        $res = $this->select('mastermodel, inisial, size, SUM(apsperstyle.sisa) AS sisa, sum(apsperstyle.qty) as qty, delivery,sum(data_bs.qty) as bs')
+            ->join('data_bs', 'data_bs.idapsperstyle =apsperstyle.idapsperstyle')
+            ->where('sisa >', 0)
+            ->where('factory', $area)
+            ->groupBy('size,delivery')
+            ->orderBy('delivery', 'DESC')
             ->findAll();
+        // dd($res);
+        // $groupedPerstyle = [];
+
+        // $result = [];
+        // foreach ($res as $data) {
+        //     $prod = (int)$data['prod'];
+        //     $qty = (int)$data['qty'];
+        //     $bs = (int)$data['bs'];
+
+        //     $presentase = ceil(($prod / $qty) * 100);
+
+        //     if ($presentase > 60 && $presentase < 90) {
+        //         $estimasi = ($bs / $prod / 100) * $qty;
+        //         $hasil = $estimasi * 100;
+        //         $result[] = [
+        //             'model' => $data['mastermodel'],
+        //             'inisial' => $data['inisial'],
+        //             'size' => $data['size'],
+        //             'presentase' => $presentase,
+        //             'qty' => $data['qty'],
+        //             'bs' => $data['bs'],
+        //             'prod' => $data['prod'],
+        //             'estimasi' => $hasil, // Koreksi perhitungan estimasi
+        //             'delivery' => $data['delivery']
+        //         ];
+        //     }
+        // }
+        // dd($result);
+        return $res;
     }
 }

@@ -15,8 +15,9 @@
                             </div>
                         </div>
                         <div>
-
+                            <a href="<?= base_url($role . '/statusorder/' . $area) ?>" class="btn btn-info">Status Order</a>
                         </div>
+
                     </div>
                 </div>
             </div>
