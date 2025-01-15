@@ -774,11 +774,14 @@ class ApsPerstyleModel extends Model
             ->groupBy('delivery')
             ->findAll();
     }
-    public function getSisaForPlanning($model, $delivery)
+    public function getSisaForPlanning($getData)
     {
         return $this->select('round(sum(qty/24)) as qty, round(sum(sisa/24)) as sisa, AVG(smv) as smv ')
-            ->where('mastermodel', $model)
-            ->where('delivery', $delivery)
+            ->where('mastermodel', $getData['model'])
+            ->where('delivery', $getData['delivery'])
+            ->where('factory', $getData['area'])
+            ->where('machinetypeid', $getData['jarum'])
+            ->groupBy('machinetypeid')
             ->findAll();
     }
     public function getAllSizes($area, $jarum, $pdk)
@@ -829,7 +832,7 @@ class ApsPerstyleModel extends Model
 
         return $result;
     }
-    public function getDataPlanning($id)
+    public function dataEstimasi($area)
     {
         return $this->select('apsperstyle.delivery, dp.id_pln_mc, dp.id_detail_pln, dp.model, dp.qty, dp.sisa, dp.smv, MIN(tp.date) AS start_date, MAX(tp.date) AS stop_date, ep.total_est_qty AS est_qty, ep.max_hari AS hari, ep.precentage_target, ep.delivery2, ep.id_est_qty')
             ->join('detail_planning dp', 'dp.model = apsperstyle.mastermodel', 'left')
@@ -847,5 +850,20 @@ class ApsPerstyleModel extends Model
             ->where('machinetypeid', $jarum)
             ->groupBy('machinetypeid')
             ->first();
+        return $this->select('mastermodel, inisial, size, SUM(sisa) AS sisa, sum(qty) as qty, delivery,machinetypeid')
+            ->where('factory', $area)
+            ->groupBy('size')
+            ->orderBy('delivery', 'DESC')
+            ->findAll();
+    }
+    public function estimasispk($area, $lastmonth)
+    {
+        $res = $this->select('mastermodel, inisial, size, SUM(apsperstyle.sisa) AS sisa, sum(apsperstyle.qty) as qty, delivery,sum(data_bs.qty) as bs,machinetypeid')
+            ->join('data_bs', 'data_bs.idapsperstyle = apsperstyle.idapsperstyle')
+            ->where('factory', $area)
+            ->groupBy('size')
+            ->orderBy('delivery', 'DESC')
+            ->findAll();
+        return $res;
     }
 }

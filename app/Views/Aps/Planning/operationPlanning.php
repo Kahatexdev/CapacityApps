@@ -372,7 +372,8 @@
 
         $(document).on('change', '#delivery', function() {
             $('#planningField').find('form').attr('action', '<?= base_url($role . '/saveplanning'); ?>');
-
+            const jarum = <?= json_encode($jarum); ?>;
+            const area = <?= json_encode($area); ?>;
             const unplan = document.getElementById('unplanned-qty')
             unplan.value = ''
             const start = document.getElementById('start-date')
@@ -407,7 +408,9 @@
                     dataType: 'json',
                     data: {
                         model: model,
-                        delivery: deliv
+                        delivery: deliv,
+                        jarum: jarum,
+                        area: area
                     },
                     success: function(response) {
                         if (response) {

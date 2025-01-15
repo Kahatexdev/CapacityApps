@@ -15,8 +15,10 @@
                             </div>
                         </div>
                         <div>
-
+                            <a href="<?= base_url($role . '/estimasispk/' . $area) ?>" class="btn btn-info">Estimasi SPK</a>
+                            <a href="<?= base_url($role . '/statusorder/' . $area) ?>" class="btn btn-info">Status Order</a>
                         </div>
+
                     </div>
                 </div>
             </div>

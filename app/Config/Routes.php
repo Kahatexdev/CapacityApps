@@ -372,6 +372,8 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('dataorderperarea/(:any)', 'OrderController::DetailOrderPerAreaPlan/$1');
     $routes->get('detailPdk/(:any)/(:any)', 'OrderController::pdkDetail/$1/$2');
     $routes->post('inputinisial', 'UserController::inputinisial');
+    $routes->get('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
+    $routes->get('estimasispk/(:any)', 'OrderController::estimasispk/$1');
 
 
     // $routes->post('importproduksi', 'ProduksiController::importproduksi');
