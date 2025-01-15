@@ -548,12 +548,16 @@ class ApsController extends BaseController
         $detailplan = $this->DetailPlanningModel->getDataPlanning($id);
         foreach ($detailplan as &$dp) {
             $iddetail = $dp['id_detail_pln'];
+            $qtysisa = $this->ApsPerstyleModel->getSisaPerModel($dp['model'], $dp['jarum']);
             $mesin = $this->TanggalPlanningModel->totalMc($iddetail);
             $jum = 0;
             foreach ($mesin as $mc) {
                 $jum += $mc['mesin'];
             }
             $dp['mesin'] = $jum;
+            $dp['qty'] = round($qtysisa['qty']);
+            $dp['sisa'] =
+                round($qtysisa['sisa']);
         }
         $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();
         $judul = $kebutuhanArea['judul'];
@@ -678,16 +682,11 @@ class ApsController extends BaseController
             $insert = [
                 'id_pln_mc' => $row['id_pln_mc'],
                 'model' => $model,
-                'qty' => $qty,
-                'sisa' => $sisa,
                 'smv' => $row['smv'],
                 'jarum' => $jarum
             ];
             $cek = $this->DetailPlanningModel->cekPlanning($validate);
-            if ($cek) {
-                $id = $cek['id_detail_pln'];
-                $this->DetailPlanningModel->update($id, ['qty' => $qty, 'sisa' => $sisa]);
-            } else {
+            if (!$cek) {
                 $this->DetailPlanningModel->insert($insert);
             }
         }

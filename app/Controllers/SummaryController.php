@@ -658,9 +658,10 @@ class SummaryController extends BaseController
         $allDetailPlans = [];
 
         foreach ($dataPlan as $jarum) {
-            $judulPlan = $this->kebutuhanAreaModel->getDataByAreaJrm($area, $jarum);
+            $judulPlan = $this->kebutuhanAreaModel->getDataByAreaJrm('KK8D', 'DC144LSF');
             foreach ($judulPlan as $id) {
                 $detailplan = $this->ApsPerstyleModel->getDataPlanning($id['id_pln_mc']);
+                // dd($detailplan);
                 $kebutuhanArea = $this->kebutuhanAreaModel->where('id_pln_mc', $id['id_pln_mc'])->first();
                 // dd($kebutuhanArea);
 
