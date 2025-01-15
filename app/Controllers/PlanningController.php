@@ -595,6 +595,8 @@ class PlanningController extends BaseController
         if ($this->request->isAJAX()) { // Pastikan ini adalah permintaan AJAX
             $delivery = $this->request->getGet('delivery'); // Ambil data dari parameter 'delivery'
             $model = $this->request->getGet('model'); // Ambil data dari parameter 'model'
+            $jarum = $this->request->getGet('jarum'); // Ambil data dari parameter 'model'
+            $area = $this->request->getGet('area'); // Ambil data dari parameter 'model'
 
             // Validasi input
             if (empty($delivery) || empty($model)) {
@@ -602,9 +604,14 @@ class PlanningController extends BaseController
                     'error' => 'Invalid input data.',
                 ])->setStatusCode(400); // 400: Bad Request
             }
-
+            $getData = [
+                'delivery' => $delivery,
+                'model' => $model,
+                'jarum' => $jarum,
+                'area' => $area,
+            ];
             // Ambil data dari database (sesuaikan dengan logika bisnis Anda)
-            $result = $this->ApsPerstyleModel->getSisaForPlanning($model, $delivery);
+            $result = $this->ApsPerstyleModel->getSisaForPlanning($getData);
 
             if (!empty($result) && isset($result[0])) {
                 $data = $result[0]; // Ambil elemen pertama dari array hasil
