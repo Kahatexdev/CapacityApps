@@ -1858,7 +1858,7 @@ class OrderController extends BaseController
             // Periksa apakah produksi valid dan memenuhi kondisi
             if ($produksi > 0) {
                 $percentage = round(($produksi / $qty) * 100);
-                $estimasi = ($bs / $produksi / 100) * qty;
+                $estimasi = ($bs / $produksi / 100) * $qty;
                 if ($percentage > 60 && $percentage < 90) {
                     $perStyle[$style] = [
                         'model' => $item['mastermodel'],
