@@ -797,7 +797,7 @@ class ApsPerstyleModel extends Model
     }
     public function orderMaterial($nomodel, $size)
     {
-        $qry = $this->select('mastermodel, size, factory, inisial, delivery')
+        $qry = $this->select('mastermodel, size, factory, inisial, delivery,production_unit')
             ->where('mastermodel', $nomodel)
             ->where('size', $size)
             ->groupBy('delivery')
@@ -834,23 +834,7 @@ class ApsPerstyleModel extends Model
     }
     public function dataEstimasi($area)
     {
-        return $this->select('apsperstyle.delivery, dp.id_pln_mc, dp.id_detail_pln, dp.model, dp.qty, dp.sisa, dp.smv, MIN(tp.date) AS start_date, MAX(tp.date) AS stop_date, ep.total_est_qty AS est_qty, ep.max_hari AS hari, ep.precentage_target, ep.delivery2, ep.id_est_qty')
-            ->join('detail_planning dp', 'dp.model = apsperstyle.mastermodel', 'left')
-            ->join('(SELECT id_est_qty, id_detail_pln, SUM(est_qty) AS total_est_qty, MAX(hari) AS max_hari, precentage_target, delivery as delivery2 FROM estimated_planning GROUP BY id_est_qty) ep', 'dp.id_detail_pln = ep.id_detail_pln AND apsperstyle.delivery=ep.delivery2', 'left')
-            ->join('tanggal_planning tp', 'ep.id_est_qty = tp.id_est_qty', 'left')
-            ->where('dp.id_pln_mc', $id)
-            ->groupBy('apsperstyle.mastermodel, apsperstyle.delivery, ep.id_est_qty')
-            ->orderBy('apsperstyle.mastermodel, apsperstyle.delivery')
-            ->findAll();
-    }
-    public function getSisaPerModel($model, $jarum)
-    {
-        return $this->select('sum(qty/24) as qty, sum(sisa/24) as sisa')
-            ->where('mastermodel', $model)
-            ->where('machinetypeid', $jarum)
-            ->groupBy('machinetypeid')
-            ->first();
-        return $this->select('mastermodel, inisial, size, SUM(sisa) AS sisa, sum(qty) as qty, delivery,machinetypeid')
+        return $this->select('mastermodel, inisial, size, SUM(sisa) AS sisa, sum(qty) as qty,sum(po_plus) as poplus, delivery,machinetypeid')
             ->where('factory', $area)
             ->groupBy('size')
             ->orderBy('delivery', 'DESC')
@@ -865,5 +849,13 @@ class ApsPerstyleModel extends Model
             ->orderBy('delivery', 'DESC')
             ->findAll();
         return $res;
+    }
+    public function getSisaPerModel($model, $jarum)
+    {
+        return $this->select('sum(qty/24) as qty, sum(sisa/24) as sisa')
+            ->where('mastermodel', $model)
+            ->where('machinetypeid', $jarum)
+            ->groupBy('machinetypeid')
+            ->first();
     }
 }

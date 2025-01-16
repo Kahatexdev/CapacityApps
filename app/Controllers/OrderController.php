@@ -1856,12 +1856,14 @@ class OrderController extends BaseController
                         $bs = (int)$item['bs'];
                         $qty = (int)$id['qty'];
                         $sisa = (int)$id['sisa'];
+                        $poplus = (int)$id['poplus'];
                         $produksi = $qty - $sisa;
 
                         // Periksa apakah produksi valid dan memenuhi kondisi
                         if ($produksi > 0) {
                             $percentage = round(($produksi / $qty) * 100);
-                            $estimasi = ($bs / $produksi / 100) * $qty;
+                            $ganti = $bs + $poplus;
+                            $estimasi = ($ganti / $produksi / 100) * $qty;
                             if ($percentage > 60 && $percentage < 90) {
                                 $perStyle[$key] = [
                                     'model' => $item['mastermodel'],
@@ -1871,6 +1873,7 @@ class OrderController extends BaseController
                                     'qty' => $qty,
                                     'percentage' => $percentage,
                                     'bs' => $bs,
+                                    'poplus' => $poplus,
                                     'jarum' => $item['machinetypeid'],
                                     'estimasi' => round(($estimasi * 100), 1),
                                 ];

@@ -39,6 +39,7 @@
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Presentase Produksi</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">BS Stocklot</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">PO+</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Estimasi SPK 2</th>
 
                                 </tr>
@@ -54,6 +55,7 @@
                                         <td class="text-xs"><?= round($item['sisa'] / 24); ?>dz</td>
                                         <td class="text-xs"><span class="badge bg-info"><?= $item['percentage']; ?>% </span></td>
                                         <td class="text-xs"><?= $item['bs']; ?>pcs</td>
+                                        <td class="text-xs"><?= $item['poplus']; ?>pcs</td>
                                         <td class="text-xs"><?= $item['estimasi']; ?>pcs</td>
                                     <?php endforeach ?>
                                     </tr>

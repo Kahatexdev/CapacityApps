@@ -1148,13 +1148,7 @@ class ProduksiController extends BaseController
         $ids = $this->request->getPost('id');
         $pos = $this->request->getPost('po');
         $role = session()->get('role');
-        // dd($ids, $pos);
 
-        // if (count($ids) !== count($pos)) {
-        //     return redirect()->back()->with('error', 'Jumlah ID dan PO tidak sesuai.');
-        // }
-
-        // Mulai transaction untuk memastikan integritas data
         $this->db->transStart();
 
         try {
