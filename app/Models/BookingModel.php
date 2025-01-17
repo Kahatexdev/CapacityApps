@@ -141,12 +141,11 @@ class BookingModel extends Model
     public function getCancelBooking()
     {
         $query = $this->select('data_booking.*, SUM(data_cancel.qty_cancel) AS qty')
-            ->select("CONCAT(YEAR(data_booking.updated_at), WEEK(data_booking.updated_at, 3)) AS week_number", false)
+            ->select("CONCAT(YEAR(data_booking.updated_at), LPAD(WEEK(data_booking.updated_at, 3), 2, '0')) AS week_number", false)
             ->join('data_cancel', 'data_booking.id_booking = data_cancel.id_booking')
             ->groupBy(['data_booking.kd_buyer_booking', 'week_number'])
             ->orderBy('week_number', 'DESC')
             ->findAll();
-
         return $query;
     }
 
