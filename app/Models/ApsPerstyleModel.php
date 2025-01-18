@@ -166,7 +166,7 @@ class ApsPerstyleModel extends Model
 
     public function hitungMesin($cek)
     {
-        $this->select('mastermodel,size, delivery,smv, SUM(sisa) AS sisa,size, 
+        $this->select('mastermodel,size, delivery, SUM(sisa) AS sisa,size, round(AVG(smv)) as smv, 
        DATEDIFF(delivery, CURDATE()) - 
        (SELECT COUNT(tanggal) FROM data_libur WHERE tanggal BETWEEN CURDATE() AND apsperstyle.delivery)-3 AS totalhari,');
         $this->where('machinetypeid', $cek['jarum'])
@@ -174,7 +174,6 @@ class ApsPerstyleModel extends Model
             ->where('delivery <=', $cek['end'])
             ->where('production_unit !=', 'MAJALAYA');
         $this->where('sisa >', 0);
-        $this->groupBy('smv,mastermodel, delivery');
         $this->orderBy('delivery');
 
         return $this->get()->getResultArray();

@@ -67,7 +67,8 @@
                                             <?= $plan['jarum'] ?>
                                         </td>
                                         <td>
-                                            <?= $plan['sisa'] ?> dz
+                                            <?= number_format($plan['sisa'], 0, ',', '.') ?> dz
+
                                         </td>
                                         <td>
                                             <?= $plan['mesin'] ?>
@@ -79,7 +80,7 @@
                             <tfoot>
                                 <tr class="text-center">
                                     <th>Total</th>
-                                    <th><?= $totalSisaBooking ?> dz</th>
+                                    <th><?= number_format($totalSisaBooking, 0, ',', '.') ?> dz</th>
                                     <th><?= $jumlahMcBooking ?></th>
                                 </tr>
                             </tfoot>
@@ -107,7 +108,7 @@
                                             <?= $plan['jarum'] ?>
                                         </td>
                                         <td>
-                                            <?= $plan['sisa'] ?> dz
+                                            <?= number_format($plan['sisa'], 0, ',', '.') ?> dz
                                         </td>
                                         <td>
                                             <?= $plan['mesin'] ?>
@@ -119,7 +120,7 @@
                             <tfoot>
                                 <tr class="text-center">
                                     <th>Total</th>
-                                    <th><?= $totalSisaOrder ?> dz</th>
+                                    <th><?= number_format($totalSisaOrder, 0, ',', '.') ?> dz</th>
                                     <th><?= $jumlahMcOrder ?></th>
                                 </tr>
                             </tfoot>

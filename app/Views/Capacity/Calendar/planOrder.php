@@ -56,7 +56,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="jarum" class="form-control-label">Sisa Order</label>
-                                    <input class="form-control" type="text" value="<?= ceil($grandSisa) ?>" id="sisa" name="sisa" readonly>
+                                    <input class="form-control" type="text" value="<?= number_format(ceil($grandSisa), 0, ',', '.')  ?> dz" id="sisa" name="sisa" readonly>
                                 </div>
 
                                 <input type="date" value="<?= $start ?>" hidden name="startMc">
@@ -133,7 +133,8 @@
                                                 <td>Week - <?= $value['week'] ?> </td>
                                                 <td><?= $value['start_date'] ?> - <?= $value['end_date'] ?> </td>
                                                 <td><?= $value['number_of_days'] ?> hari </td>
-                                                <td><?= ceil($value['sisa']) ?> dz</td>
+                                                <td><?= number_format(ceil($value['sisa']), 0, ',', '.') ?> dz</td>
+
                                                 <td><?= $value['totalMc'] ?> mesin</td>
                                             </tr>
                                         <?php endif; ?>
@@ -144,7 +145,8 @@
                                         <th colspan="3" class="text-end"> Kebutuhan Bulan <?= $month ?> :</th>
 
                                         <th>
-                                            <?= ceil($ranges['totalSisa']) ?> dz
+                                            <?= number_format(ceil($ranges['totalSisa']), 0, ',', '.') ?> dz
+
                                         </th>
                                         <th>
                                             <?= $ranges['kebutuhanMcPerbulan'] ?> Mesin
