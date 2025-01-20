@@ -62,9 +62,10 @@ class TanggalPlanningModel extends Model
     }
     public function dailyMachine($id)
     {
-        return $this->select('date')
+        return $this->select('date,detail_planning.model')
+            ->join('detail_planning', 'detail_planning.id_detail_pln= tanggal_planning.id_detail_pln')
             ->selectSum('mesin')
-            ->where('id_detail_pln', $id)
+            ->where('tanggal_planning.id_detail_pln', $id)
             ->groupBy('date')
             ->findAll();
     }

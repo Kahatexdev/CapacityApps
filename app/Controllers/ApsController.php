@@ -890,9 +890,20 @@ class ApsController extends BaseController
             $events[] = [
                 'title' => "Used: " . $item['mesin'] . "\n Available :" . $item['avail'],
                 'start' => $item['date'], // format date harus sesuai dengan format FullCalendar
+                'desk' => json_encode($item['deskripsi']),
+                'className' => 'event-normal',
             ];
         }
 
+        $libur = $this->liburModel->findAll();
+        $merah = [];
+        foreach ($libur as $list) {
+            $merah[] = [
+                'title' => $list['nama'],
+                'start' => $list['tanggal'],
+                'className' => 'event-holiday'
+            ];
+        }
         $data = [
             'role' => session()->get('role'),
             'title' => 'Jalan Mesin',
@@ -908,7 +919,8 @@ class ApsController extends BaseController
             'mesin' => $mesin,
             'id' => $id,
             'today' => $today,
-            'events' => json_encode($events)
+            'events' => json_encode($events),
+            'libur' => json_encode($merah)
 
         ];
         return view($role . '/Planning/kalenderMesin', $data);
@@ -920,17 +932,30 @@ class ApsController extends BaseController
         foreach ($mesinPerDay as $mesinInfo) {
             foreach ($mesinInfo as $entry) {
                 $date = $entry['date'];
+                $model = $entry['model']; // Ambil model dari entry
+                $jumlahMesin = $entry['mesin']; // Ambil jumlah mesin dari entry
 
-                // Jika tanggal sudah ada di array jadwal, tambahkan jumlah mesin
+                // Jika tanggal sudah ada di array jadwal
                 if (isset($jadwal[$date])) {
-                    $jadwal[$date]['mesin'] += $entry['mesin'];
-                    $jadwal[$date]['avail'] -= $entry['mesin'];
+                    $jadwal[$date]['mesin'] += $jumlahMesin;
+                    $jadwal[$date]['avail'] -= $jumlahMesin;
+
+                    // Jika model sudah ada di deskripsi, tambahkan jumlah mesinnya
+                    if (isset($jadwal[$date]['deskripsi'][$model])) {
+                        $jadwal[$date]['deskripsi'][$model] += $jumlahMesin;
+                    } else {
+                        // Jika model belum ada, tambahkan entry baru
+                        $jadwal[$date]['deskripsi'][$model] = $jumlahMesin;
+                    }
                 } else {
                     // Jika tanggal belum ada, tambahkan entry baru
                     $jadwal[$date] = [
                         'date' => $date,
-                        'mesin' => $entry['mesin'],
-                        'avail' => $mesin - $entry['mesin']
+                        'mesin' => $jumlahMesin,
+                        'avail' => $mesin - $jumlahMesin,
+                        'deskripsi' => [
+                            $model => $jumlahMesin, // Tambahkan model pertama dengan jumlah mesinnya
+                        ],
                     ];
                 }
             }
