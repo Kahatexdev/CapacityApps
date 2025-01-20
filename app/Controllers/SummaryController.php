@@ -658,53 +658,54 @@ class SummaryController extends BaseController
         $allDetailPlans = [];
 
         foreach ($dataPlan as $jarum) {
-            $judulPlan = $this->kebutuhanAreaModel->getDataByAreaJrm('KK8D', 'DC144LSF');
+            // Mengambil data berdasarkan area dan jarum tertentu
+            $judulPlan = $this->kebutuhanAreaModel->getDataByAreaJrm($area, $jarum);
+
             foreach ($judulPlan as $id) {
-                $detailplan = $this->ApsPerstyleModel->getDataPlanning($id['id_pln_mc']);
-                // dd($detailplan);
+                // Mendapatkan kebutuhan area berdasarkan ID
                 $kebutuhanArea = $this->kebutuhanAreaModel->where('id_pln_mc', $id['id_pln_mc'])->first();
-                // dd($kebutuhanArea);
 
-                if (!isset($kebutuhanArea['jarum'])) {
-                    continue;
-                }
+                // Jika 'jarum' kosong, lanjutkan ke iterasi berikutnya
+                if (empty($kebutuhanArea['jarum'])) continue;
 
-                $judul = $kebutuhanArea['judul'];
+                // Mengambil detail planning berdasarkan ID
                 $area = $kebutuhanArea['area'];
                 $jarum = $kebutuhanArea['jarum'];
+                $detailPlan = $this->detailPlanningModel->getDataPlanning2($id['id_pln_mc']);
 
-                foreach ($detailplan as &$dp) {
+                foreach ($detailPlan as $key => $dp) {
+                    // Ambil data terkait model dan mesin
                     $noModel = $dp['model'];
                     $dataOrder = $this->orderModel->getProductTypeByModel($noModel);
-
-                    $data = [
+                    $actMesin = $this->produksiModel->getActualMcByModel([
                         'area' => $area,
                         'model' => $noModel,
                         'jarum' => $jarum,
-                        'delivery' => $dp['delivery'],
-                    ];
-                    $actMesin = $this->produksiModel->getActualMcByModel($data);
+                        'delivery' => $dp['delivery']
+                    ]);
 
-                    $iddetail = $dp['id_detail_pln'];
-                    $mesin = $this->tanggalPlanningModel->totalMc($iddetail);
-                    $jum = 0;
-                    foreach ($mesin as $mc) {
-                        $jum += $mc['mesin'];
-                    }
-                    $dp['mesin'] = $jum;
-                    $dp['product_type'] = $dataOrder['product_type'] ?? '';
-                    $dp['buyer'] = $dataOrder['kd_buyer_order'] ?? '';
-                    $dp['produksi'] = $dp['qty'] - $dp['sisa'];
-                    $dp['plan'] = number_format((3600 / $dp['smv']) * ($dp['precentage_target'] / 100), 2);
-                    $dp['actMesin'] = $actMesin['jl_mc'] ?? 0;
-                    $dp['jarum'] = $jarum; // Pastikan jarum di-set
+                    // Menghitung total mesin
+                    $mesinTotal = array_sum(array_column($this->tanggalPlanningModel->totalMc($dp['id_detail_pln']), 'mesin'));
+
+                    // Memodifikasi data dalam array secara langsung
+                    $detailPlan[$key]['mesin'] = $mesinTotal;
+                    $detailPlan[$key]['product_type'] = $dataOrder['product_type'] ?? '';
+                    $detailPlan[$key]['buyer'] = $dataOrder['kd_buyer_order'] ?? '';
+                    $detailPlan[$key]['produksi'] = $dp['qty'] - $dp['sisa'];
+                    $detailPlan[$key]['plan'] = (!empty($dp['smv']) && !empty($dp['precentage_target']))
+                        ? number_format((3600 / $dp['smv']) * ($dp['precentage_target'] / 100), 2)
+                        : 0;
+                    $detailPlan[$key]['actMesin'] = $actMesin['jl_mc'] ?? 0;
+                    $detailPlan[$key]['jarum'] = $jarum; // Pastikan jarum di-set
                 }
 
-                // Tambahkan detail plan ke dalam array berdasarkan kunci jarum
+                // Gabungkan detailPlan berdasarkan jarum tanpa duplikasi
                 if (!isset($allDetailPlans[$jarum])) {
                     $allDetailPlans[$jarum] = [];
                 }
-                $allDetailPlans[$jarum] = array_merge($allDetailPlans[$jarum], $detailplan);
+
+                // Pastikan hanya menambahkan data baru, menghindari duplikasi
+                $allDetailPlans[$jarum] = array_merge($allDetailPlans[$jarum], $detailPlan);
             }
         }
 
@@ -713,12 +714,9 @@ class SummaryController extends BaseController
             usort($plans, function ($a, $b) {
                 $modelA = (string) ($a['model'] ?? '');
                 $modelB = (string) ($b['model'] ?? '');
-
                 return $modelA <=> $modelB;
             });
         }
-
-        // dd($allDetailPlans);
 
         $spreadsheet = new Spreadsheet();
         $sheets = 0;
@@ -1304,8 +1302,6 @@ class SummaryController extends BaseController
             }
             $sheets++;
         }
-
-
 
         $filename = 'SUMMARY PLANNER AREAL ' . $area . '.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
