@@ -174,7 +174,7 @@ class CalendarController extends BaseController
             $mesin = array_column($allData, 'kebutuhanMc');
             $sisa =  array_column($allData, 'qty');
             $totalMc = array_sum($mesin);
-            $sisaOrder = array_sum($sisa) / 24;
+            $sisaOrder = array_sum($sisa);
             $planMc[$currentMonth][$weekCount]['week'] = $weekCount;
             $planMc[$currentMonth][$weekCount]['totalMc'] = $totalMc;
             $planMc[$currentMonth][$weekCount]['start_date'] = $startOfWeekFormatted;
@@ -209,7 +209,6 @@ class CalendarController extends BaseController
 
             $weekCount++;
         }
-        dd($planMc);
         $get = [
             'jarum' => $jarum,
             'start' => $awal,
@@ -482,28 +481,29 @@ class CalendarController extends BaseController
             $qty1 = $data['sisa'];
             $hari1 = intval($data['totalhari']);
             $deliv = $data['delivery'];
-            $target = ((86400 / (intval($data['smv']))) * 0.8 / 24);
+            if (intval($data['smv'] > 0)) {
+                $target = ((86400 / (intval($data['smv']))) * 0.8 / 24);
 
-            $mastermodel = $data['mastermodel'];
-            if ($hari1 > 1) {
+                $mastermodel = $data['mastermodel'];
+                if ($hari1 > 1) {
 
-                $value[] = [
-                    'kebutuhanMc' => ceil(intval($qty1 / 24) / $target / $hari1),
-                    'smv' => $data['smv'],
-                    'qty' => ceil($qty1 / 24),
-                    'target' => ceil($target),
-                    'JumlahHari' => $hari1,
-                    'delivery' => $deliv,
-                    'mastermodel' => $mastermodel,
-                    'style' => $data['size']
-                ];
+                    $value[] = [
+                        'kebutuhanMc' => ceil(intval($qty1 / 24) / $target / $hari1),
+                        'smv' => $data['smv'],
+                        'qty' => ceil($qty1 / 24),
+                        'target' => ceil($target),
+                        'JumlahHari' => $hari1,
+                        'delivery' => $deliv,
+                        'mastermodel' => $mastermodel,
+                        'style' => $data['size']
+                    ];
+                }
             }
         }
         if (!$value) {
             $value =  ['kebutuhanMc' => 0, 'JumlahHari' => 0, 'delivery' => 0, 'mastermodel' => $mastermodel, 'stopmc' => 0];
             return $value;
         } else {
-
             return $value;
         }
     }
