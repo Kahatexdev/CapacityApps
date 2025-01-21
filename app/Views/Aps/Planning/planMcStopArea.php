@@ -34,7 +34,7 @@ error_reporting(E_ALL); ?>
                     <div class="row">
                         <div class="col">
                             <h5>
-                                Pick Data for Planning for Area <strong style="color: green;"><?= $area; ?></strong> by Needle <strong style="color: orange;"><?= $jarum; ?></strong>
+                                Planning Mc Stop Area <strong style="color: green;"><?= $area; ?></strong> by Needle <strong style="color: orange;"><?= $jarum; ?></strong>
                             </h5>
                         </div>
                     </div>
@@ -51,11 +51,11 @@ error_reporting(E_ALL); ?>
                                 Judul : <?= $judul; ?>
                             </h6>
                         </div>
+                        <div class="col-3">
+                            <a href="<?= base_url($role . '/summaryStopPlanner/' . $area) ?>" class="btn btn-info w-100">Summary Stop Planner <?= $area ?></a>
+                        </div>
                         <div class="col-auto">
-                            <a href="<?= base_url($role . '/kalenderMesin/' . $id_pln_mc) ?>" class="btn btn-success"> Jadwal Mesin <i class="fas fa-calendar-plus text-lg opacity-10" aria-hidden="true"></i> </a>
-                            <button id="fetch-data-button" class="btn btn-info">Fetch Data</button>
-                            <a href="<?= base_url($role . '/planningmesin') ?>" class="btn btn-secondary">Back</a>
-                            <a href="<?= base_url($role . '/detailplanstop/' . $id_pln_mc) ?>" class="btn btn-warning">PDK Stop</a>
+                            <a href="<?= base_url($role . '/detailplnmc/' . $id_pln_mc) ?>" class="btn btn-secondary">Back</a>
                         </div>
                     </div>
                 </div>
@@ -105,11 +105,11 @@ error_reporting(E_ALL); ?>
                                                     <a href="<?= base_url($role . '/planningpage/' . $order['id_detail_pln']) . '/' . $id_pln_mc ?>" class="btn btn-secondary">Detail</a>
 
                                                 <?php endif; ?>
-                                                <button class="btn btn-danger stop-btn"
+                                                <button class="btn btn-success active-btn"
                                                     data-id="<?= $order['id_detail_pln']; ?>"
                                                     data-bs-toggle="modal"
-                                                    data-bs-target="#confirmStopModal">
-                                                    Stop
+                                                    data-bs-target="#confirmActiveModal">
+                                                    Active
                                                 </button>
                                             </td>
                                         </tr>
@@ -132,20 +132,20 @@ error_reporting(E_ALL); ?>
                 <?php endif; ?>
             </div>
         </div>
-        <div class="modal fade" id="confirmStopModal" tabindex="-1" aria-labelledby="confirmStopModalLabel" aria-hidden="true">
+        <div class="modal fade" id="confirmActiveModal" tabindex="-1" aria-labelledby="confirmActiveModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="confirmStopModalLabel">Confirm Stop</h5>
+                        <h5 class="modal-title" id="confirmActiveModalLabel">Confirm Active</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p>Are you sure you want to stop this plan?</p>
+                        <p>Are you sure you want to active this plan?</p>
                         <input type="hidden" id="stopPlanId">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" id="confirmStopButton" class="btn btn-danger">Yes, Stop</button>
+                        <button type="button" id="confirmActiveButton" class="btn btn-danger">Yes, Active</button>
                     </div>
                 </div>
             </div>
@@ -200,22 +200,22 @@ error_reporting(E_ALL); ?>
 
 
             document.addEventListener('DOMContentLoaded', function() {
-                const stopButtons = document.querySelectorAll('.stop-btn');
-                const confirmStopButton = document.getElementById('confirmStopButton');
+                const activeButtons = document.querySelectorAll('.active-btn');
+                const confirmActiveButton = document.getElementById('confirmActiveButton');
                 const stopPlanIdInput = document.getElementById('stopPlanId');
 
-                stopButtons.forEach(button => {
+                activeButtons.forEach(button => {
                     button.addEventListener('click', function() {
                         const planId = this.getAttribute('data-id');
                         stopPlanIdInput.value = planId; // Set ID ke input hidden
                     });
                 });
 
-                confirmStopButton.addEventListener('click', function() {
+                confirmActiveButton.addEventListener('click', function() {
                     const planId = stopPlanIdInput.value;
 
                     // Lakukan aksi stop (misalnya, AJAX call atau redirect)
-                    fetch(`<?= base_url($role . '/stopPlanning'); ?>/${planId}`, {
+                    fetch(`<?= base_url($role . '/activePlanning'); ?>/${planId}`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -226,10 +226,10 @@ error_reporting(E_ALL); ?>
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                alert('Plan stopped successfully.');
+                                alert('Plan actived successfully.');
                                 location.reload(); // Refresh halaman
                             } else {
-                                alert('Failed to stop plan.');
+                                alert('Failed to active plan.');
                             }
                         })
                         .catch(error => console.error('Error:', error));

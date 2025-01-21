@@ -1595,4 +1595,665 @@ class SummaryController extends BaseController
         $writer->save('php://output');
         exit;
     }
+    public function summaryStopPlanner($area)
+    {
+        $yesterday = date('Y-m-d', strtotime('-1 day'));
+        $dataPlan = $this->kebutuhanAreaModel->getDataByAreaGroupJrm($area);
+        $allDetailPlans = [];
+
+        foreach ($dataPlan as $jarum) {
+            // Mengambil data berdasarkan area dan jarum tertentu
+            $judulPlan = $this->kebutuhanAreaModel->getDataByAreaJrm($area, $jarum);
+
+            foreach ($judulPlan as $id) {
+                // Mendapatkan kebutuhan area berdasarkan ID
+                $kebutuhanArea = $this->kebutuhanAreaModel->where('id_pln_mc', $id['id_pln_mc'])->first();
+
+                // Jika 'jarum' kosong, lanjutkan ke iterasi berikutnya
+                if (empty($kebutuhanArea['jarum'])) continue;
+
+                // Mengambil detail planning berdasarkan ID
+                $area = $kebutuhanArea['area'];
+                $jarum = $kebutuhanArea['jarum'];
+                $detailPlan = $this->detailPlanningModel->getDetailPlanningStop($id['id_pln_mc']);
+
+                foreach ($detailPlan as $key => $dp) {
+                    // Ambil data terkait model dan mesin
+                    $noModel = $dp['model'];
+                    $dataOrder = $this->orderModel->getProductTypeByModel($noModel);
+                    $actMesin = $this->produksiModel->getActualMcByModel([
+                        'area' => $area,
+                        'model' => $noModel,
+                        'jarum' => $jarum,
+                        'delivery' => $dp['delivery']
+                    ]);
+
+                    // Menghitung total mesin
+                    $mesinTotal = array_sum(array_column($this->tanggalPlanningModel->totalMc($dp['id_detail_pln']), 'mesin'));
+
+                    // Memodifikasi data dalam array secara langsung
+                    $detailPlan[$key]['mesin'] = $mesinTotal;
+                    $detailPlan[$key]['product_type'] = $dataOrder['product_type'] ?? '';
+                    $detailPlan[$key]['buyer'] = $dataOrder['kd_buyer_order'] ?? '';
+                    $detailPlan[$key]['produksi'] = $dp['qty'] - $dp['sisa'];
+                    $detailPlan[$key]['plan'] = (!empty($dp['smv']) && !empty($dp['precentage_target']))
+                        ? number_format((3600 / $dp['smv']) * ($dp['precentage_target'] / 100), 2)
+                        : 0;
+                    $detailPlan[$key]['actMesin'] = $actMesin['jl_mc'] ?? 0;
+                    $detailPlan[$key]['jarum'] = $jarum; // Pastikan jarum di-set
+                }
+
+                // Gabungkan detailPlan berdasarkan jarum tanpa duplikasi
+                if (!isset($allDetailPlans[$jarum])) {
+                    $allDetailPlans[$jarum] = [];
+                }
+
+                // Pastikan hanya menambahkan data baru, menghindari duplikasi
+                $allDetailPlans[$jarum] = array_merge($allDetailPlans[$jarum], $detailPlan);
+            }
+        }
+
+        // Mengurutkan data di dalam setiap grup jarum berdasarkan model
+        foreach ($allDetailPlans as $jarum => &$plans) {
+            usort($plans, function ($a, $b) {
+                $modelA = (string) ($a['model'] ?? '');
+                $modelB = (string) ($b['model'] ?? '');
+                return $modelA <=> $modelB;
+            });
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheets = 0;
+        foreach ($allDetailPlans as $key => $detailplan) {
+            // Buat sheet baru jika bukan sheet pertama
+            if ($key > 0) {
+                $sheet = new Worksheet($spreadsheet, $key); // Nama default jika belum ada nama khusus
+                $spreadsheet->addSheet($sheet, $sheets);
+            } else {
+                $sheet = $spreadsheet->getActiveSheet(); // Sheet pertama
+            }
+
+            $styleHeader = [
+                'font' => [
+                    'bold' => true,
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                ],
+                'borders' => [
+                    'outline' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
+                    ],
+                ],
+            ];
+
+            $styleBody = [
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                ],
+                'borders' => [
+                    'outline' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
+                    ],
+                ],
+            ];
+
+            // Header ISO
+            $drawing =  new Drawing();
+            $drawing->setName('Sample Image');
+            $drawing->setDescription('Sample Image');
+            $pathToImage = FCPATH . 'assets/img/logo-kahatex.png';
+
+            $drawing->setPath($pathToImage);
+            $drawing->setCoordinates('A1');
+            // Set ukuran gambar
+            $sizeInCm = 1.25;
+            $sizeInPixels = $sizeInCm * 37.7952755906;
+            $drawing->setHeight($sizeInPixels);
+            $drawing->setWidth($sizeInPixels);
+            $drawing->setOffsetY(10);
+            $drawing->setOffsetX(30);
+
+            $drawing->setWorksheet($sheet);
+
+            $sheet->mergeCells('A1:A3')->getStyle('A1:A3')->applyFromArray([
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_TOP
+                ],
+                'borders' => [
+                    'top' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'bottom' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'left' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'right' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                ],
+            ]);
+
+            // mengatur lebar kolom A
+            $sheet->getColumnDimension('A')->setWidth(16);
+            // mengatur tinggi baris 1
+            $heightInCm = 0.98;
+            $heightInPoints = $heightInCm / 0.0352778;
+            $sheet->getRowDimension('1')->setRowHeight($heightInPoints);
+
+            $sheet->setCellValue('A1', 'PT. KAHATEX');
+            $sheet->getStyle('A1')->applyFromArray([
+                'font' => [
+                    'bold' => true,
+                    'size' => 11,
+                    'name' => 'Arial',
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_BOTTOM,
+                ],
+            ]);
+
+            $sheet->setCellValue('B1', 'FORMULIR');
+            $sheet->mergeCells('B1:U1')->getStyle('B1:U1')->applyFromArray([
+                'font' => [
+                    'bold' => true,
+                    'size' => 16,
+                    'name' => 'Arial',
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'top' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'left' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'right' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                ],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => [
+                        'rgb' => '99FFFF', // Warna dengan red 153, green 255, dan blue 255 dalam format RGB
+                    ],
+                ],
+            ]);
+
+            // mengatur tinggi baris 2 & 3
+            $heightInCm2 = 0.56;
+            $heightInPoints2 = $heightInCm2 / 0.0352778;
+            $sheet->getRowDimension('2')->setRowHeight($heightInPoints2);
+            $sheet->getRowDimension('3')->setRowHeight($heightInPoints2);
+
+            $sheet->setCellValue('B2', 'DEPARTEMEN PLANNING PRODUCTION CONTROL');
+            $sheet->mergeCells('B2:U2')->getStyle('B2:U2')->applyFromArray([
+                'font' => [
+                    'bold' => true,
+                    'size' => 12,
+                    'name' => 'Arial',
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'left' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'right' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                ],
+            ]);
+
+            $sheet->setCellValue('B3', 'SCHEDULE AREA');
+            $sheet->mergeCells('B3:U3')->getStyle('B3:U3')->applyFromArray([
+                'font' => [
+                    'bold' => true,
+                    'size' => 12,
+                    'name' => 'Arial',
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'bottom' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'left' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'right' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                ],
+            ]);
+
+            $sheet->setCellValue('A4', 'No. Dokumen');
+            $sheet->getStyle('A4')->applyFromArray([
+                'font' => [
+                    'bold' => true,
+                    'size' => 11,
+                    'name' => 'Arial',
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_LEFT,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'top' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'bottom' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'left' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'right' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                ],
+            ]);
+
+            $sheet->setCellValue('B4', ' FOR-PPC-096/REV-00/HAL_1/1');
+            $sheet->mergeCells('B4:N4')->getStyle('B4:N4')->applyFromArray([
+                'font' => [
+                    'size' => 11,
+                    'bold' => true,
+                    'name' => 'Arial',
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_LEFT,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'top' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'bottom' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'left' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'right' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                ],
+            ]);
+
+            $sheet->setCellValue('O4', 'Tanggal Revisi ');
+            $sheet->mergeCells('O4:P4')->getStyle('O4:P4')->applyFromArray([
+                'font' => [
+                    'size' => 11,
+                    'bold' => true,
+                    'name' => 'Arial',
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_LEFT,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'top' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'bottom' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'left' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'right' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                ],
+            ]);
+
+            $sheet->setCellValue('Q4', ' 14 Januari 2019');
+            $sheet->mergeCells('Q4:U4')->getStyle('Q4:U4')->applyFromArray([
+                'font' => [
+                    'size' => 11,
+                    'bold' => true,
+                    'name' => 'Arial',
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'top' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'bottom' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'left' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'right' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                ],
+            ]);
+
+            $sheet->setCellValue('A5', ' SCHEDULE AREAL : ' . $area . ' (' . $key . ')');
+            $sheet->mergeCells('A5:N5')->getStyle('A5:N5')->applyFromArray([
+                'font' => [
+                    'size' => 12,
+                    'bold' => true,
+                    'name' => 'Arial',
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_LEFT,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'top' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'bottom' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'left' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'right' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                ],
+            ]);
+
+            $sheet->setCellValue('O5', 'Tanggal : ' . $yesterday);
+            $sheet->mergeCells('O5:U5')->getStyle('O5:U5')->applyFromArray([
+                'font' => [
+                    'size' => 12,
+                    'bold' => true,
+                    'name' => 'Arial',
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_LEFT,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'top' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'bottom' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'left' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                    'right' => [
+                        'borderStyle' => Border::BORDER_DOUBLE,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                ],
+            ]);
+            // header ISO end
+
+            $rowHeader = 6;
+            $sheet->setCellValue('A' . $rowHeader, 'PRODUCTION CONTROL');
+            $sheet->mergeCells('A' . $rowHeader . ':I' . $rowHeader);
+            $sheet->getStyle('A' . $rowHeader . ':I' . $rowHeader)->applyFromArray($styleHeader);
+
+            $sheet->setCellValue('J' . $rowHeader, 'PRODUKSI');
+            $sheet->mergeCells('J' . $rowHeader . ':J' . ($rowHeader + 1));
+            $sheet->getStyle('J' . $rowHeader . ':J' . ($rowHeader + 1))->applyFromArray($styleHeader);
+            $sheet->getStyle('J' . $rowHeader . ':J' . ($rowHeader + 1))->getAlignment()->setWrapText(true);
+
+
+            $sheet->setCellValue('K' . $rowHeader, 'PLAN');
+            $sheet->mergeCells('K' . $rowHeader . ':M' . $rowHeader);
+            $sheet->getStyle('K' . $rowHeader . ':M' . $rowHeader)->applyFromArray($styleHeader);
+
+            $sheet->setCellValue('N' . $rowHeader, 'ACTUAL JL MC');
+            $sheet->mergeCells('N' . $rowHeader . ':N' . ($rowHeader + 1));
+            $sheet->getStyle('N' . $rowHeader . ':N' . ($rowHeader + 1))->applyFromArray($styleHeader);
+            $sheet->getStyle('N' . $rowHeader . ':N' . ($rowHeader + 1))->getAlignment()->setWrapText(true);
+
+            $sheet->setCellValue('O' . $rowHeader, 'KETERANGAN');
+            $sheet->mergeCells('O' . $rowHeader . ':O' . ($rowHeader + 1));
+            $sheet->getStyle('O' . $rowHeader . ':O' . ($rowHeader + 1))->applyFromArray($styleHeader);
+            $sheet->getStyle('O' . $rowHeader . ':O' . ($rowHeader + 1))->getAlignment()->setWrapText(true);
+
+            $sheet->setCellValue('P' . $rowHeader, 'BAHAN BAKU');
+            $sheet->mergeCells('P' . $rowHeader . ':U' . $rowHeader);
+            $sheet->getStyle('P' . $rowHeader . ':U' . $rowHeader)->applyFromArray($styleHeader);
+
+            $rowHeader++;
+            $sheet->setCellValue('A' . $rowHeader, 'DELIVERY');
+            $sheet->setCellValue('B' . $rowHeader, 'BUYER');
+            $sheet->setCellValue('C' . $rowHeader, 'MODEL');
+            $sheet->setCellValue('D' . $rowHeader, 'TYPE');
+            $sheet->setCellValue('E' . $rowHeader, 'SMV');
+            $sheet->setCellValue('F' . $rowHeader, '%');
+            $sheet->setCellValue('G' . $rowHeader, 'PLAN');
+            $sheet->setCellValue('H' . $rowHeader, 'QUANTITY');
+            $sheet->setCellValue('I' . $rowHeader, 'SISA QTY');
+            $sheet->setCellValue('J' . $rowHeader, 'PRDUKSI');
+            $sheet->setCellValue('K' . $rowHeader, 'MC');
+            $sheet->setCellValue('L' . $rowHeader, 'START');
+            $sheet->setCellValue('M' . $rowHeader, 'STOP');
+            $sheet->setCellValue('P' . $rowHeader, 'WARNA');
+            $sheet->setCellValue('Q' . $rowHeader, 'JENIS BENANG');
+            $sheet->setCellValue('R' . $rowHeader, 'KODE BENANG');
+            $sheet->setCellValue('S' . $rowHeader, 'PEMESANAN');
+            $sheet->setCellValue('T' . $rowHeader, 'LOT');
+            $sheet->setCellValue('U' . $rowHeader, 'QTY');
+
+            // style header
+            $sheet->getStyle('A' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('B' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('C' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('D' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('E' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('F' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('G' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('H' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('I' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('J' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('K' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('L' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('M' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('N' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('O' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('P' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('Q' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('R' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('S' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('T' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('U' . $rowHeader)->applyFromArray($styleHeader);
+
+            $rowBody = $rowHeader + 1;
+            $subtotalQty = $subtotalSisa = $subtotalProduksi = $subtotalActMesin = 0; // variabel subtotal untuk kolom yang ingin dihitung
+            $prevModel = null;
+
+            foreach ($detailplan as $plan => $id) {
+                // Jika model berubah, tambahkan baris subtotal terlebih dahulu
+                if ($prevModel !== null && $prevModel !== $id['model']) {
+
+                    $sheet->setCellValue('A' . $rowBody, 'SUBTOTAL');
+                    $sheet->setCellValue('G' . $rowBody, $subPlan);
+                    $sheet->setCellValue('H' . $rowBody, $subtotalQty);
+                    $sheet->setCellValue('I' . $rowBody, $subtotalSisa);
+                    $sheet->setCellValue('J' . $rowBody, $subtotalProduksi);
+                    $sheet->setCellValue('N' . $rowBody, $subtotalActMesin);
+                    // style subtotal
+                    $sheet->getStyle('A' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('B' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('C' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('D' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('E' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('F' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('G' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('H' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('I' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('J' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('K' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('L' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('M' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('N' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('O' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('P' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('Q' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('R' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('S' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('T' . $rowBody)->applyFromArray($styleHeader);
+                    $sheet->getStyle('U' . $rowBody)->applyFromArray($styleHeader);
+                    // Pindah ke baris berikutnya setelah subtotal
+                    $rowBody++;
+
+                    // Reset subtotal
+                    $subtotalQty = $subtotalSisa = $subtotalProduksi = $subtotalActMesin = 0;
+                }
+
+                // Isi data
+                $sheet->setCellValue('A' . $rowBody, $id['delivery']);
+                $sheet->setCellValue('B' . $rowBody, $id['buyer']);
+                $sheet->setCellValue('C' . $rowBody, $id['model']);
+                $sheet->setCellValue('D' . $rowBody, $id['product_type']);
+                $sheet->setCellValue('E' . $rowBody, $id['smv']);
+                $sheet->setCellValue('F' . $rowBody, $id['precentage_target']);
+                $sheet->setCellValue('G' . $rowBody, $id['plan']);
+                $sheet->setCellValue('H' . $rowBody, $id['qty']);
+                $sheet->setCellValue('I' . $rowBody, $id['sisa']);
+                $sheet->setCellValue('J' . $rowBody, $id['produksi']);
+                $sheet->setCellValue('K' . $rowBody, $id['mesin']);
+                $sheet->setCellValue('L' . $rowBody, $id['start_date']);
+                $sheet->setCellValue('M' . $rowBody, $id['stop_date']);
+                $sheet->setCellValue('N' . $rowBody, $id['actMesin']); // aktual jl mc
+                $sheet->setCellValue('O' . $rowBody, ''); // ket
+                $sheet->setCellValue('P' . $rowBody, ''); // warna
+                $sheet->setCellValue('Q' . $rowBody, ''); // jenis benang
+                $sheet->setCellValue('R' . $rowBody, ''); // kode benang
+                $sheet->setCellValue('S' . $rowBody, ''); // pesanan
+                $sheet->setCellValue('T' . $rowBody, ''); // lot
+                $sheet->setCellValue('U' . $rowBody, ''); // qty
+
+                // style body
+                $sheet->getStyle('A' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('B' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('C' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('D' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('E' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('F' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('G' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('H' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('I' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('J' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('K' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('L' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('M' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('N' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('O' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('P' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('Q' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('R' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('S' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('T' . $rowBody)->applyFromArray($styleBody);
+                $sheet->getStyle('U' . $rowBody)->applyFromArray($styleBody);
+
+                // Tambahkan nilai ke subtotal
+                $subtotalQty += $id['qty'];
+                $subtotalSisa += $id['sisa'];
+                $subtotalProduksi += $id['produksi'];
+                $subtotalActMesin += $id['actMesin'];
+                $subPlan = ($subtotalProduksi != 0 && $subtotalActMesin != 0) ? number_format($subtotalProduksi / $subtotalActMesin, 1) : 0;
+
+                // Simpan model saat ini sebagai prevModel untuk iterasi berikutnya
+                $prevModel = $id['model'];
+                $rowBody++;
+            }
+
+            // Tambahkan subtotal terakhir jika ada data tersisa
+            if ($prevModel !== null) {
+                $sheet->setCellValue('A' . $rowBody, 'SUBTOTAL');
+                $sheet->setCellValue('G' . $rowBody, $subPlan);
+                $sheet->setCellValue('H' . $rowBody, $subtotalQty);
+                $sheet->setCellValue('I' . $rowBody, $subtotalSisa);
+                $sheet->setCellValue('J' . $rowBody, $subtotalProduksi);
+                $sheet->setCellValue('N' . $rowBody, $subtotalActMesin);
+                // 
+                $sheet->getStyle('A' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('B' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('C' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('D' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('E' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('F' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('G' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('H' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('I' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('J' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('K' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('L' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('M' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('N' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('O' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('P' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('Q' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('R' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('S' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('T' . $rowBody)->applyFromArray($styleHeader);
+                $sheet->getStyle('U' . $rowBody)->applyFromArray($styleHeader);
+            }
+            $sheets++;
+        }
+
+        $filename = 'SUMMARY STOP PLANNER AREAL ' . $area . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
 }
