@@ -857,4 +857,19 @@ class ApsPerstyleModel extends Model
             ->groupBy('machinetypeid')
             ->first();
     }
+    public function getDataPlanning($id, $jarum)
+    {
+        $firstDel = date('Y-m-d', strtotime('first day of this month'));
+        $lastDel = date('Y-m-d', strtotime('first day of +3 months'));
+        //     ->findAll();
+        return $this->select('apsperstyle.mastermodel, apsperstyle.delivery, SUM(apsperstyle.qty) AS qty, SUM(apsperstyle.sisa) AS sisa, apsperstyle.machinetypeid, dp.id_detail_pln, dp.id_pln_mc, dp.smv, ep.id_est_qty, ep.hari, ep.precentage_target, ep.delivery2, tp.start_date, tp.stop_date')
+            ->join('detail_planning dp', 'dp.model=apsperstyle.mastermodel AND dp.id_detail_pln = ' . $id, 'left')
+            ->join('(SELECT id_detail_pln, id_est_qty, hari, precentage_target, delivery AS delivery2 FROM estimated_planning GROUP BY id_est_qty) ep', 'ep.id_detail_pln=dp.id_detail_pln AND ep.delivery2=apsperstyle.delivery', 'left')
+            ->join('(SELECT MIN(date) AS start_date, MAX(date) AS stop_date FROM tanggal_planning GROUP BY id_est_qty) tp', 'tp.id_est_qty=ep.id_est_qty', 'left')
+            ->where("apsperstyle.delivery BETWEEN '$firstDel' AND '$lastDel'")
+            ->where('apsperstyle.machinetypeid', $jarum)
+            ->groupBy('apsperstyle.mastermodel, apsperstyle.delivery')
+            ->orderBy('apsperstyle.mastermodel')
+            ->findAll();
+    }
 }
