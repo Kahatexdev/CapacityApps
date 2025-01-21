@@ -934,6 +934,8 @@ class SalesController extends BaseController
         $today = new \DateTime(); // Mendapatkan tanggal hari ini
         $endOfMonth = new \DateTime('last day of this month'); // Mendapatkan tanggal terakhir dalam bulan ini
         $interval = $today->diff($endOfMonth); // Menghitung selisih hari antara tanggal hari ini dan tanggal terakhir bulan ini
+        // Menambahkan 1 untuk menghitung hari ini
+        $daysRemaining = $interval->days + 1;
 
 
         $allData = [];
@@ -980,7 +982,7 @@ class SalesController extends BaseController
                     // Pastikan $item adalah array dan memiliki kunci yang dibutuhkan
                     if (is_array($item)) {
                         $prod = $item['running'] * $item['target'] * 28;
-                        $prodAct = $item['running_act'] * $item['target'] * $interval->days;
+                        $prodAct = $item['running_act'] * $item['target'] * $daysRemaining;
 
                         // Tambahkan hasil perhitungan ke total per brand
                         $brandTotals['totalMc'] += $item['total_mc'] ?? 0;
@@ -1519,7 +1521,7 @@ class SalesController extends BaseController
             ->getStyle('X' . $endMergHeader)
             ->applyFromArray($styleHeader2);
 
-        $sheet->setCellValue('Y' . $rowHeader, 'Capacity Actual -' . $interval->days)
+        $sheet->setCellValue('Y' . $rowHeader, 'Capacity Actual -' . $daysRemaining)
             ->mergeCells('Y' . $rowHeader . ':Y' . $endMergHeader)
             ->getStyle('Y' . $rowHeader . ':Y' . $endMergHeader)
             ->applyFromArray($styleHeader)
