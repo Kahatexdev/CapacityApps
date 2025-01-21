@@ -346,6 +346,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('getMesinByDate/(:any)', 'ApsController::getMesinByDate/$1');
     $routes->get('kalenderMesin/(:any)', 'ApsController::kalenderMesin/$1');
     $routes->post('deleteplanmesin', 'ApsController::deleteplanmesin');
+    $routes->post('stopPlanning/(:any)', 'ApsController::stopPlanning/$1');
 
 
     // deffect

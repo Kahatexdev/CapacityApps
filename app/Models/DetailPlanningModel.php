@@ -12,7 +12,7 @@ class DetailPlanningModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_detail_pln', 'id_pln_mc', 'model', 'smv', 'jarum'];
+    protected $allowedFields    = ['id_detail_pln', 'id_pln_mc', 'model', 'smv', 'jarum', 'status'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -46,6 +46,7 @@ class DetailPlanningModel extends Model
             ->join('tanggal_planning tp', 'detail_planning.id_detail_pln = tp.id_detail_pln', 'left')
             ->join('(SELECT id_detail_pln, SUM(est_qty) AS total_est_qty, MAX(hari) AS max_hari, precentage_target, delivery FROM estimated_planning GROUP BY id_detail_pln) ep', 'detail_planning.id_detail_pln = ep.id_detail_pln', 'left')
             ->where('detail_planning.id_pln_mc', $id)
+            ->where('detail_planning.status', 'aktif')
             ->groupBy('detail_planning.id_detail_pln, detail_planning.model')
             ->orderBy('detail_planning.model')
             ->findAll();
@@ -68,7 +69,9 @@ class DetailPlanningModel extends Model
     }
     public function pdkList($id)
     {
-        return $this->select('id_detail_pln')->where('id_pln_mc', $id)->findAll();
+        return $this->select('id_detail_pln')->where('id_pln_mc', $id)
+            ->where('status', 'aktif')
+            ->findAll();
     }
     public function detailPdk($id)
     {
