@@ -256,7 +256,7 @@ class DataMesinModel extends Model
         SUM(CASE WHEN pu = "MJ" AND area!="WAREHOUSE" AND area!="SAMPLE" THEN mesin_jalan ELSE 0 END) AS running_actmj,
         MAX(CASE WHEN pu = "CJ" AND area!="WAREHOUSE" AND area!="SAMPLE" THEN target ELSE 0 END) AS target
         ')
-            ->where('aliasjarum', 'Baby Comp N96') // Kondisi where untuk aliasjarum
+            ->where('aliasjarum', $aliasjarum) // Kondisi where untuk aliasjarum
             ->where('brand LIKE', '%' . $brand . '%') // Kondisi where untuk brand
             ->orderBy('brand') // Urutkan berdasarkan "brand"
             ->get();
