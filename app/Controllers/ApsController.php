@@ -683,7 +683,8 @@ class ApsController extends BaseController
                 'id_pln_mc' => $row['id_pln_mc'],
                 'model' => $model,
                 'smv' => $row['smv'],
-                'jarum' => $jarum
+                'jarum' => $jarum,
+                'status' => 'aktif'
             ];
             $cek = $this->DetailPlanningModel->cekPlanning($validate);
             if (!$cek) {
@@ -884,6 +885,15 @@ class ApsController extends BaseController
             $idPdk = $pdk['id_detail_pln'];
             $mesinPerDay[] = $this->TanggalPlanningModel->dailyMachine($idPdk);
         }
+        $libur = $this->liburModel->findAll();
+        $merah = [];
+        foreach ($libur as $list) {
+            $merah[] = [
+                'title' => $list['nama'],
+                'start' => $list['tanggal'],
+                'className' => 'event-holiday'
+            ];
+        }
         $jadwal = $this->getJadwalMesin($mesinPerDay, $mesin);
         $events = [];
         foreach ($jadwal as $item) {
@@ -895,15 +905,7 @@ class ApsController extends BaseController
             ];
         }
 
-        $libur = $this->liburModel->findAll();
-        $merah = [];
-        foreach ($libur as $list) {
-            $merah[] = [
-                'title' => $list['nama'],
-                'start' => $list['tanggal'],
-                'className' => 'event-holiday'
-            ];
-        }
+
         $data = [
             'role' => session()->get('role'),
             'title' => 'Jalan Mesin',
@@ -994,5 +996,38 @@ class ApsController extends BaseController
         }
     }
 
-    public function editPlan($id_est) {}
+    public function stopPlanning($id)
+    {
+        if ($this->request->isAJAX()) {
+
+            try {
+                // Cek apakah data dengan ID tersebut ada
+                $planning = $this->DetailPlanningModel->find($id);
+
+                if (!$planning) {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'message' => 'Plan not found.'
+                    ]);
+                }
+
+                // Update status menjadi 'stop'
+                $this->DetailPlanningModel->update($id, ['status' => 'stop']);
+
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Plan stopped successfully.'
+                ]);
+            } catch (\Exception $e) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Failed to stop the plan.',
+                    'error' => $e->getMessage()
+                ]);
+            }
+        }
+
+        // Jika bukan permintaan AJAX, kembalikan halaman 404
+        throw new \CodeIgniter\Exceptions\PageNotFoundException();
+    }
 }
