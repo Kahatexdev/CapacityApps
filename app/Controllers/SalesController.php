@@ -92,6 +92,8 @@ class SalesController extends BaseController
 
             // Hitung total untuk setiap brand
             foreach ($data as $item) {
+
+
                 // Pastikan $item adalah array dan memiliki kunci yang dibutuhkan
                 if (is_array($item)) {
                     $prod = $item['running'] * $item['target'] * 28;
@@ -592,8 +594,8 @@ class SalesController extends BaseController
             ->applyFromArray($styleHeader);
 
         $sheet->setCellValue('B' . $rowHeader, 'No Of Mc')
-            ->mergeCells('B' . $rowHeader . ':N' . $rowHeader2)
-            ->getStyle('B' . $rowHeader . ':N' . $rowHeader2)
+            ->mergeCells('B' . $rowHeader . ':U' . $rowHeader2)
+            ->getStyle('B' . $rowHeader . ':U' . $rowHeader2)
             ->applyFromArray($styleHeader);
         // jumlah mesin
         $sheet->setCellValue('B' . $rowHeader3, 'Machine')
@@ -929,6 +931,12 @@ class SalesController extends BaseController
     {
         $dataJarum = $this->jarumModel->getAliasJrm(); // data all jarum
         $brands = ['Dakong', 'Rosso', 'Mechanic', 'Lonati'];
+        $today = new \DateTime(); // Mendapatkan tanggal hari ini
+        $endOfMonth = new \DateTime('last day of this month'); // Mendapatkan tanggal terakhir dalam bulan ini
+        $interval = $today->diff($endOfMonth); // Menghitung selisih hari antara tanggal hari ini dan tanggal terakhir bulan ini
+        // Menambahkan 1 untuk menghitung hari ini
+        $daysRemaining = $interval->days + 1;
+
 
         $allData = [];
         $totalExportPerBulan = [];
@@ -948,6 +956,7 @@ class SalesController extends BaseController
                 'totalBreakdown' => 0,
                 'totalRunningAct' => 0,
                 'totalProd' => 0,
+                'totalProdAct' => 0,
                 'totalCylinderDk' => 0,
                 'totalCylinderThs' => 0,
                 'totalCylinderRs' => 0
@@ -966,12 +975,14 @@ class SalesController extends BaseController
                     'totalRunningAct' => 0,
                     'target' => 0,
                     'totalProd' => 0,
+                    'totalProdAct' => 0,
                 ];
                 // Hitung total untuk setiap brand
                 foreach ($data as $item) {
                     // Pastikan $item adalah array dan memiliki kunci yang dibutuhkan
                     if (is_array($item)) {
                         $prod = $item['running'] * $item['target'] * 28;
+                        $prodAct = $item['running_act'] * $item['target'] * $daysRemaining;
 
                         // Tambahkan hasil perhitungan ke total per brand
                         $brandTotals['totalMc'] += $item['total_mc'] ?? 0;
@@ -980,6 +991,7 @@ class SalesController extends BaseController
                         $brandTotals['target'] = $item['target'] ?? 0;
                         $brandTotals['totalRunningAct'] += $item['running_act'] ?? 0;
                         $brandTotals['totalProd'] += ceil($prod);
+                        $brandTotals['totalProdAct'] += ceil($prodAct);
                     }
                 }
 
@@ -992,6 +1004,7 @@ class SalesController extends BaseController
                 $totals['totalRunning'] += $brandTotals['totalRunning'] ?? 0;
                 $totals['totalRunningAct'] += $brandTotals['totalRunningAct'] ?? 0;
                 $totals['totalProd'] += $brandTotals['totalProd'] ?? 0;
+                $totals['totalProdAct'] += $brandTotals['totalProdAct'] ?? 0;
             }
 
             foreach ($dataRunningSplWh as $splWh) {
@@ -1375,8 +1388,8 @@ class SalesController extends BaseController
             ->applyFromArray($styleHeader);
 
         $sheet->setCellValue('B' . $rowHeader, 'No Of Mc')
-            ->mergeCells('B' . $rowHeader . ':Q' . $rowHeader2)
-            ->getStyle('B' . $rowHeader . ':Q' . $rowHeader2)
+            ->mergeCells('B' . $rowHeader . ':U' . $rowHeader2)
+            ->getStyle('B' . $rowHeader . ':U' . $rowHeader2)
             ->applyFromArray($styleHeader);
         // jumlah mesin
         $sheet->setCellValue('B' . $rowHeader3, 'Machine')
@@ -1410,98 +1423,120 @@ class SalesController extends BaseController
             ->getStartColor()->setRGB('FFA500'); // Kode warna orange
         // mesin running
         $sheet->setCellValue('G' . $rowHeader3, 'Running')
-            ->mergeCells('G' . $rowHeader3 . ':K' . $rowHeader3)
-            ->getStyle('G' . $rowHeader3 . ':K' . $rowHeader3)
+            ->mergeCells('G' . $rowHeader3 . ':P' . $rowHeader3)
+            ->getStyle('G' . $rowHeader3 . ':P' . $rowHeader3)
             ->applyFromArray($styleHeader2);
 
         $sheet->setCellValue('G' . $endMergHeader, 'Dakong')
             ->getStyle('G' . $endMergHeader)
             ->applyFromArray($styleHeader2);
 
-        $sheet->setCellValue('H' . $endMergHeader, 'Rosso')
+        $sheet->setCellValue('H' . $endMergHeader, 'Target')
             ->getStyle('H' . $endMergHeader)
             ->applyFromArray($styleHeader2);
 
-        $sheet->setCellValue('I' . $endMergHeader, 'Ths')
+        $sheet->setCellValue('I' . $endMergHeader, 'Rosso')
             ->getStyle('I' . $endMergHeader)
             ->applyFromArray($styleHeader2);
 
-        $sheet->setCellValue('J' . $endMergHeader, 'Lonati')
+        $sheet->setCellValue('J' . $endMergHeader, 'Target')
             ->getStyle('J' . $endMergHeader)
             ->applyFromArray($styleHeader2);
 
-        $sheet->setCellValue('K' . $endMergHeader, 'Spl')
+        $sheet->setCellValue('K' . $endMergHeader, 'Ths')
             ->getStyle('K' . $endMergHeader)
             ->applyFromArray($styleHeader2);
 
-        $sheet->setCellValue('L' . $endMergHeader, 'Total')
+        $sheet->setCellValue('L' . $endMergHeader, 'Target')
             ->getStyle('L' . $endMergHeader)
             ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('M' . $endMergHeader, 'Lonati')
+            ->getStyle('M' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('N' . $endMergHeader, 'Target')
+            ->getStyle('N' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('O' . $endMergHeader, 'Spl')
+            ->getStyle('O' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('P' . $endMergHeader, 'Total')
+            ->getStyle('P' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
         // Mengatur warna latar belakang menjadi orange
-        $sheet->getStyle('L' . $endMergHeader)
+        $sheet->getStyle('P' . $endMergHeader)
             ->getFill()
             ->setFillType(Fill::FILL_SOLID)
             ->getStartColor()->setRGB('FFA500'); // Kode warna orange
 
         // mesin running
-        $sheet->setCellValue('M' . $rowHeader3, 'Mc Break Down')
-            ->mergeCells('M' . $rowHeader3 . ':M' . $endMergHeader)
-            ->getStyle('M' . $rowHeader3 . ':M' . $endMergHeader)
+        $sheet->setCellValue('Q' . $rowHeader3, 'Mc Break Down')
+            ->mergeCells('Q' . $rowHeader3 . ':Q' . $endMergHeader)
+            ->getStyle('Q' . $rowHeader3 . ':Q' . $endMergHeader)
             ->applyFromArray($styleHeader2)
             ->getAlignment()->setWrapText(true); // Menambahkan pengaturan wrap text
 
         // mesin running
-        $sheet->setCellValue('N' . $rowHeader3, 'Mc in Wh')
-            ->mergeCells('N' . $rowHeader3 . ':N' . $endMergHeader)
-            ->getStyle('N' . $rowHeader3 . ':N' . $endMergHeader)
+        $sheet->setCellValue('R' . $rowHeader3, 'Mc in Wh')
+            ->mergeCells('R' . $rowHeader3 . ':R' . $endMergHeader)
+            ->getStyle('R' . $rowHeader3 . ':R' . $endMergHeader)
             ->applyFromArray($styleHeader2)
             ->getAlignment()->setWrapText(true); // Menambahkan pengaturan wrap text
         // stock cylinder
-        $sheet->setCellValue('O' . $rowHeader3, 'Stock Cylinder')
-            ->mergeCells('O' . $rowHeader3 . ':Q' . $rowHeader3)
-            ->getStyle('O' . $rowHeader3 . ':Q' . $rowHeader3)
+        $sheet->setCellValue('S' . $rowHeader3, 'Stock Cylinder')
+            ->mergeCells('S' . $rowHeader3 . ':U' . $rowHeader3)
+            ->getStyle('S' . $rowHeader3 . ':U' . $rowHeader3)
             ->applyFromArray($styleHeader2);
 
-        $sheet->setCellValue('O' . $endMergHeader, 'Dakong')
-            ->getStyle('O' . $endMergHeader)
-            ->applyFromArray($styleHeader2);
-
-        $sheet->setCellValue('P' . $endMergHeader, 'Rosso')
-            ->getStyle('P' . $endMergHeader)
-            ->applyFromArray($styleHeader2);
-
-        $sheet->setCellValue('Q' . $endMergHeader, 'Ths')
-            ->getStyle('Q' . $endMergHeader)
-            ->applyFromArray($styleHeader2);
-        // actual running mc
-        $sheet->setCellValue('R' . $rowHeader, 'Running Mc Actual')
-            ->mergeCells('R' . $rowHeader . ':T' . $rowHeader3)
-            ->getStyle('R' . $rowHeader . ':T' . $rowHeader3)
-            ->applyFromArray($styleHeader)
-            ->getAlignment()->setWrapText(true); // Menambahkan pengaturan wrap text
-
-        $sheet->setCellValue('R' . $endMergHeader, 'CJ')
-            ->getStyle('R' . $endMergHeader)
-            ->applyFromArray($styleHeader2);
-
-        $sheet->setCellValue('S' . $endMergHeader, 'MJ')
+        $sheet->setCellValue('S' . $endMergHeader, 'Dakong')
             ->getStyle('S' . $endMergHeader)
             ->applyFromArray($styleHeader2);
 
-        $sheet->setCellValue('T' . $endMergHeader, 'Total')
+        $sheet->setCellValue('T' . $endMergHeader, 'Rosso')
             ->getStyle('T' . $endMergHeader)
             ->applyFromArray($styleHeader2);
 
-        $sheet->setCellValue('U' . $rowHeader, 'Prod 28days')
-            ->mergeCells('U' . $rowHeader . ':U' . $endMergHeader)
-            ->getStyle('U' . $rowHeader . ':U' . $endMergHeader)
+        $sheet->setCellValue('U' . $endMergHeader, 'Ths')
+            ->getStyle('U' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+        // actual running mc
+        $sheet->setCellValue('V' . $rowHeader, 'Running Mc Actual')
+            ->mergeCells('V' . $rowHeader . ':X' . $rowHeader3)
+            ->getStyle('V' . $rowHeader . ':X' . $rowHeader3)
+            ->applyFromArray($styleHeader)
+            ->getAlignment()->setWrapText(true); // Menambahkan pengaturan wrap text
+
+        $sheet->setCellValue('V' . $endMergHeader, 'CJ')
+            ->getStyle('V' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('W' . $endMergHeader, 'MJ')
+            ->getStyle('W' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('X' . $endMergHeader, 'Total')
+            ->getStyle('X' . $endMergHeader)
+            ->applyFromArray($styleHeader2);
+
+        $sheet->setCellValue('Y' . $rowHeader, 'Capacity Actual -' . $daysRemaining)
+            ->mergeCells('Y' . $rowHeader . ':Y' . $endMergHeader)
+            ->getStyle('Y' . $rowHeader . ':Y' . $endMergHeader)
+            ->applyFromArray($styleHeader)
+            ->getAlignment()->setWrapText(true); // Menambahkan pengaturan wrap text
+
+        $sheet->setCellValue('Z' . $rowHeader, 'Capacity 28days')
+            ->mergeCells('Z' . $rowHeader . ':Z' . $endMergHeader)
+            ->getStyle('Z' . $rowHeader . ':Z' . $endMergHeader)
             ->applyFromArray($styleHeader)
             ->getAlignment()->setWrapText(true); // Menambahkan pengaturan wrap text
 
 
-        $column = 'V'; // Kolom awal untuk bulan
+        $column = 'AA'; // Kolom awal untuk bulan
         $col_index = Coordinate::columnIndexFromString($column); // Konversi huruf kolom ke nomor indeks kolom
-        $column2 = 'V';
+        $column2 = 'AA';
         $col_index2 = Coordinate::columnIndexFromString($column2);
         $colors = [
             'FFFACD', // Lemon Yellow
@@ -1635,6 +1670,7 @@ class SalesController extends BaseController
 
         // Body
         $rowBody = 7;
+        // dd($allData);
         foreach ($allData as $aliasjarum => $data) {
             $sheet->setCellValue('A' . $rowBody, $aliasjarum)
                 ->getStyle('A' . $rowBody);
@@ -1662,59 +1698,74 @@ class SalesController extends BaseController
             $sheet->setCellValue('G' . $rowBody, isset($data['brandData']['Dakong']['totalRunning']) ? $data['brandData']['Dakong']['totalRunning'] : 0)
                 ->getStyle('G' . $rowBody)
                 ->applyFromArray($styleBody);
-            $sheet->setCellValue('H' . $rowBody, isset($data['brandData']['Rosso']['totalRunning']) ? $data['brandData']['Rosso']['totalRunning'] : 0)
+            $sheet->setCellValue('H' . $rowBody, isset($data['brandData']['Dakong']['target']) ? $data['brandData']['Dakong']['target'] : 0)
                 ->getStyle('H' . $rowBody)
                 ->applyFromArray($styleBody);
-            $sheet->setCellValue('I' . $rowBody, isset($data['brandData']['Mechanic']['totalRunning']) ? $data['brandData']['Mechanic']['totalRunning'] : 0)
+            $sheet->setCellValue('I' . $rowBody, isset($data['brandData']['Rosso']['totalRunning']) ? $data['brandData']['Rosso']['totalRunning'] : 0)
                 ->getStyle('I' . $rowBody)
                 ->applyFromArray($styleBody);
-            $sheet->setCellValue('J' . $rowBody, isset($data['brandData']['Lonati']['totalRunning']) ? $data['brandData']['Lonati']['totalRunning'] : 0)
+            $sheet->setCellValue('J' . $rowBody, isset($data['brandData']['Rosso']['target']) ? $data['brandData']['Rosso']['target'] : 0)
                 ->getStyle('J' . $rowBody)
                 ->applyFromArray($styleBody);
-            $sheet->setCellValue('K' . $rowBody, isset($data['totals']['totalSample']) ? $data['totals']['totalSample'] : 0)
+            $sheet->setCellValue('K' . $rowBody, isset($data['brandData']['Mechanic']['totalRunning']) ? $data['brandData']['Mechanic']['totalRunning'] : 0)
                 ->getStyle('K' . $rowBody)
                 ->applyFromArray($styleBody);
-            $sheet->setCellValue('L' . $rowBody, isset($data['totals']['totalRunning']) && isset($data['totals']['totalSample']) ? $data['totals']['totalRunning'] + $data['totals']['totalSample'] : 0)
+            $sheet->setCellValue('L' . $rowBody, isset($data['brandData']['Mechanic']['target']) ? $data['brandData']['Mechanic']['target'] : 0)
                 ->getStyle('L' . $rowBody)
                 ->applyFromArray($styleBody);
+            $sheet->setCellValue('M' . $rowBody, isset($data['brandData']['Lonati']['totalRunning']) ? $data['brandData']['Lonati']['totalRunning'] : 0)
+                ->getStyle('M' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('N' . $rowBody, isset($data['brandData']['Lonati']['target']) ? $data['brandData']['Lonati']['target'] : 0)
+                ->getStyle('N' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('O' . $rowBody, isset($data['totals']['totalSample']) ? $data['totals']['totalSample'] : 0)
+                ->getStyle('O' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('P' . $rowBody, isset($data['totals']['totalRunning']) && isset($data['totals']['totalSample']) ? $data['totals']['totalRunning'] + $data['totals']['totalSample'] : 0)
+                ->getStyle('P' . $rowBody)
+                ->applyFromArray($styleBody);
             // Mengatur warna latar belakang menjadi orange
-            $sheet->getStyle('L' . $rowBody)
+            $sheet->getStyle('P' . $rowBody)
                 ->getFill()
                 ->setFillType(Fill::FILL_SOLID)
                 ->getStartColor()->setRGB('FFA500'); // Kode warna orange
             // mc break down
-            $sheet->setCellValue('M' . $rowBody, isset($data['totals']['totalBreakdown']) ? $data['totals']['totalBreakdown'] : 0)
-                ->getStyle('M' . $rowBody)
-                ->applyFromArray($styleBody);
-            // mc in wh
-            $sheet->setCellValue('N' . $rowBody, isset($data['totals']['totalWarehouse']) ? $data['totals']['totalWarehouse'] : 0)
-                ->getStyle('N' . $rowBody)
-                ->applyFromArray($styleBody);
-            // stock cylinder
-            $sheet->setCellValue('O' . $rowBody, isset($data['totals']['totalCylinderDk']) ? $data['totals']['totalCylinderDk'] : 0)
-                ->getStyle('O' . $rowBody)
-                ->applyFromArray($styleBody);
-            $sheet->setCellValue('P' . $rowBody, isset($data['totals']['totalCylinderThs']) ? $data['totals']['totalCylinderThs'] : 0)
-                ->getStyle('P' . $rowBody)
-                ->applyFromArray($styleBody);
-            $sheet->setCellValue('Q' . $rowBody, isset($data['totals']['totalCylinderRs']) ? $data['totals']['totalCylinderRs'] : 0)
+            $sheet->setCellValue('Q' . $rowBody, isset($data['totals']['totalBreakdown']) ? $data['totals']['totalBreakdown'] : 0)
                 ->getStyle('Q' . $rowBody)
                 ->applyFromArray($styleBody);
-            // running mc actual
-            $sheet->setCellValue('R' . $rowBody, isset($data['totals']['totalRunningAct']) ? $data['totals']['totalRunningAct'] : 0)
+            // mc in wh
+            $sheet->setCellValue('R' . $rowBody, isset($data['totals']['totalWarehouse']) ? $data['totals']['totalWarehouse'] : 0)
                 ->getStyle('R' . $rowBody)
                 ->applyFromArray($styleBody);
-            $sheet->setCellValue('S' . $rowBody, 0)
+            // stock cylinder
+            $sheet->setCellValue('S' . $rowBody, isset($data['totals']['totalCylinderDk']) ? $data['totals']['totalCylinderDk'] : 0)
                 ->getStyle('S' . $rowBody)
                 ->applyFromArray($styleBody);
-            $sheet->setCellValue('T' . $rowBody, isset($data['totals']['totalRunningAct']) ? $data['totals']['totalRunningAct'] : 0)
+            $sheet->setCellValue('T' . $rowBody, isset($data['totals']['totalCylinderThs']) ? $data['totals']['totalCylinderThs'] : 0)
                 ->getStyle('T' . $rowBody)
                 ->applyFromArray($styleBody);
-            $sheet->setCellValue('U' . $rowBody, isset($data['totals']['totalProd']) ? $data['totals']['totalProd'] : 0)
+            $sheet->setCellValue('U' . $rowBody, isset($data['totals']['totalCylinderRs']) ? $data['totals']['totalCylinderRs'] : 0)
                 ->getStyle('U' . $rowBody)
                 ->applyFromArray($styleBody);
+            // running mc actual
+            $sheet->setCellValue('V' . $rowBody, isset($data['totals']['totalRunningAct']) ? $data['totals']['totalRunningAct'] : 0)
+                ->getStyle('V' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('W' . $rowBody, 0)
+                ->getStyle('W' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('X' . $rowBody, isset($data['totals']['totalRunningAct']) ? $data['totals']['totalRunningAct'] : 0)
+                ->getStyle('X' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('Y' . $rowBody, isset($data['totals']['totalProdAct']) ? $data['totals']['totalProdAct'] : 0)
+                ->getStyle('Y' . $rowBody)
+                ->applyFromArray($styleBody);
+            $sheet->setCellValue('Z' . $rowBody, isset($data['totals']['totalProd']) ? $data['totals']['totalProd'] : 0)
+                ->getStyle('Z' . $rowBody)
+                ->applyFromArray($styleBody);
 
-            $columnBody = 'V'; // Kolom awal 
+            $columnBody = 'AA'; // Kolom awal 
             $colBody_index = Coordinate::columnIndexFromString($columnBody); // Konversi huruf kolom ke nomor indeks kolom
             if (isset($data['monthlyData']) && is_array($data['monthlyData'])) {
                 foreach ($data['monthlyData'] as $month => $currentMonth) :
@@ -1798,59 +1849,84 @@ class SalesController extends BaseController
         $sheet->setCellValue('F' . $rowSubtotal, "=SUM(F" . $sumRowAwal . ":F" . $sumRowAkhir . ")")
             ->getStyle('F' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
+        // Mengatur warna latar belakang menjadi orange
+        $sheet->getStyle('F' . $rowSubtotal)
+            ->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()->setRGB('FFA500'); // Kode warna orange
         // Kolom subtotal running
         $sheet->setCellValue('G' . $rowSubtotal, "=SUM(G" . $sumRowAwal . ":G" . $sumRowAkhir . ")")
             ->getStyle('G' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
-        $sheet->setCellValue('H' . $rowSubtotal, "=SUM(H" . $sumRowAwal . ":H" . $sumRowAkhir . ")")
+        $sheet->setCellValue('H' . $rowSubtotal, "")
             ->getStyle('H' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
         $sheet->setCellValue('I' . $rowSubtotal, "=SUM(I" . $sumRowAwal . ":I" . $sumRowAkhir . ")")
             ->getStyle('I' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
-        $sheet->setCellValue('J' . $rowSubtotal, "=SUM(J" . $sumRowAwal . ":J" . $sumRowAkhir . ")")
+        $sheet->setCellValue('J' . $rowSubtotal, "")
             ->getStyle('J' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
         $sheet->setCellValue('K' . $rowSubtotal, "=SUM(K" . $sumRowAwal . ":K" . $sumRowAkhir . ")")
             ->getStyle('K' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
-        $sheet->setCellValue('L' . $rowSubtotal, "=SUM(L" . $sumRowAwal . ":L" . $sumRowAkhir . ")")
+        $sheet->setCellValue('L' . $rowSubtotal, "")
             ->getStyle('L' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
-        // Kolom subtotal Mc Breakdown
         $sheet->setCellValue('M' . $rowSubtotal, "=SUM(M" . $sumRowAwal . ":M" . $sumRowAkhir . ")")
             ->getStyle('M' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
-        $sheet->setCellValue('N' . $rowSubtotal, "=SUM(N" . $sumRowAwal . ":N" . $sumRowAkhir . ")")
+        $sheet->setCellValue('N' . $rowSubtotal, "")
             ->getStyle('N' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
-        // Kolom subtotal Stock Cylinder
         $sheet->setCellValue('O' . $rowSubtotal, "=SUM(O" . $sumRowAwal . ":O" . $sumRowAkhir . ")")
             ->getStyle('O' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
         $sheet->setCellValue('P' . $rowSubtotal, "=SUM(P" . $sumRowAwal . ":P" . $sumRowAkhir . ")")
             ->getStyle('P' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
+        // Mengatur warna latar belakang menjadi orange
+        $sheet->getStyle('P' . $rowSubtotal)
+            ->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()->setRGB('FFA500'); // Kode warna orange
+        // Kolom subtotal Mc Breakdown
         $sheet->setCellValue('Q' . $rowSubtotal, "=SUM(Q" . $sumRowAwal . ":Q" . $sumRowAkhir . ")")
             ->getStyle('Q' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
-        // Kolom subtotal Running actual mc
         $sheet->setCellValue('R' . $rowSubtotal, "=SUM(R" . $sumRowAwal . ":R" . $sumRowAkhir . ")")
             ->getStyle('R' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
+        // Kolom subtotal Stock Cylinder
         $sheet->setCellValue('S' . $rowSubtotal, "=SUM(S" . $sumRowAwal . ":S" . $sumRowAkhir . ")")
             ->getStyle('S' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
-        $sheet->setCellValue('T' . $rowSubtotal, "=SUM(T" . $sumRowAwal . ":T" . $sumRowAkhir . ")")
+        $sheet->setCellValue('T' . $rowSubtotal, "=SUM(T" . $sumRowAwal . ":P" . $sumRowAkhir . ")")
             ->getStyle('T' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
-        // Kolom subtotal Prod 28days
         $sheet->setCellValue('U' . $rowSubtotal, "=SUM(U" . $sumRowAwal . ":U" . $sumRowAkhir . ")")
             ->getStyle('U' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
+        // Kolom subtotal Running actual mc
+        $sheet->setCellValue('V' . $rowSubtotal, "=SUM(V" . $sumRowAwal . ":V" . $sumRowAkhir . ")")
+            ->getStyle('V' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        $sheet->setCellValue('W' . $rowSubtotal, "=SUM(W" . $sumRowAwal . ":W" . $sumRowAkhir . ")")
+            ->getStyle('W' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        $sheet->setCellValue('X' . $rowSubtotal, "=SUM(X" . $sumRowAwal . ":X" . $sumRowAkhir . ")")
+            ->getStyle('X' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        // Kolom subtotal Prod actual & 28days
+        $sheet->setCellValue('Y' . $rowSubtotal, "=SUM(Y" . $sumRowAwal . ":Y" . $sumRowAkhir . ")")
+            ->getStyle('Y' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
+        $sheet->setCellValue('z' . $rowSubtotal, "=SUM(z" . $sumRowAwal . ":Y" . $sumRowAkhir . ")")
+            ->getStyle('z' . $rowSubtotal)
+            ->applyFromArray($styleSubTotal);
 
         foreach ($allData as $aliasjarum => $data) {
-            $columnBody = 'V'; // Kolom awal 
+            $columnBody = 'AA'; // Kolom awal 
             $colBody_index = Coordinate::columnIndexFromString($columnBody); // Konversi huruf kolom ke nomor indeks kolom
             if (isset($data['monthlyData']) && is_array($data['monthlyData'])) {
                 foreach ($data['monthlyData'] as $month => $currentMonth) :
@@ -1967,7 +2043,7 @@ class SalesController extends BaseController
             ->applyFromArray($styleGrandTotal);
 
         // // baris grand total per bulan
-        $column = 'V'; // Kolom awal untuk bulan
+        $column = 'AA'; // Kolom awal untuk bulan
         $col_index = Coordinate::columnIndexFromString($column); // Konversi huruf kolom ke nomor indeks kolom
         $columnGrandTotal = 'V'; // Kolom awal untuk bulan
         $colGrandTotalMaxCap = Coordinate::columnIndexFromString($columnGrandTotal); // Konversi huruf kolom ke nomor indeks kolom
