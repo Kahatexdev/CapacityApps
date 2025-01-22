@@ -347,6 +347,8 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('kalenderMesin/(:any)', 'ApsController::kalenderMesin/$1');
     $routes->post('deleteplanmesin', 'ApsController::deleteplanmesin');
     $routes->post('stopPlanning/(:any)', 'ApsController::stopPlanning/$1');
+    $routes->get('detailplanstop/(:any)', 'ApsController::detailplanstop/$1');
+    $routes->post('activePlanning/(:any)', 'ApsController::activePlanning/$1');
 
 
     // deffect
@@ -355,6 +357,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('viewDataBs', 'DeffectController::viewDataBs');
 
     $routes->get('summaryPlanner/(:any)', 'SummaryController::summaryPlanner/$1');
+    $routes->get('summaryStopPlanner/(:any)', 'SummaryController::summaryStopPlanner/$1');
 });
 
 // user
