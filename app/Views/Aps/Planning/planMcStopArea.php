@@ -34,25 +34,23 @@ error_reporting(E_ALL); ?>
                     <div class="row">
                         <div class="col">
                             <h5>
-                                Planning Mc Stop Area <strong style="color: green;"><?= $area; ?></strong> by Needle <strong style="color: orange;"><?= $jarum; ?></strong>
+                                PDK Stop Area <strong style="color: green;"><?= $area; ?></strong> by Needle <strong style="color: orange;"><?= $jarum; ?></strong>
                             </h5>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col">
-                            <h6>
-                                Machine Available is <strong style="color: green;"><?= $mesin; ?> Machine </strong>
-                            </h6>
+
                         </div>
                     </div>
                     <div class="row">
                         <div class="col">
                             <h6>
-                                Judul : <?= $judul; ?>
+
                             </h6>
                         </div>
                         <div class="col-3">
-                            <a href="<?= base_url($role . '/summaryStopPlanner/' . $area) ?>" class="btn btn-info w-100">Summary Stop Planner <?= $area ?></a>
+                            <a href="<?= base_url($role . '/summaryStopPlanner/' . $area) ?>" class="btn btn-info w-100">Summary PDK Stop <?= $area ?></a>
                         </div>
                         <div class="col-auto">
                             <a href="<?= base_url($role . '/detailplnmc/' . $id_pln_mc) ?>" class="btn btn-secondary">Back</a>
@@ -120,16 +118,7 @@ error_reporting(E_ALL); ?>
                         </div>
                     </div>
                 </div>
-                <?php if (empty($detailplan)) : ?>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col-lg-12 text-center">
-                                <p>No data available in the table.</p>
-                                <button id="fetch-data-button" class="btn btn-info">Fetch Data</button>
-                            </div>
-                        </div>
-                    </div>
-                <?php endif; ?>
+
             </div>
         </div>
         <div class="modal fade" id="confirmActiveModal" tabindex="-1" aria-labelledby="confirmActiveModalLabel" aria-hidden="true">

@@ -120,16 +120,7 @@ error_reporting(E_ALL); ?>
                         </div>
                     </div>
                 </div>
-                <?php if (empty($detailplan)) : ?>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col-lg-12 text-center">
-                                <p>No data available in the table.</p>
-                                <button id="fetch-data-button" class="btn btn-info">Fetch Data</button>
-                            </div>
-                        </div>
-                    </div>
-                <?php endif; ?>
+
             </div>
         </div>
         <div class="modal fade" id="confirmStopModal" tabindex="-1" aria-labelledby="confirmStopModalLabel" aria-hidden="true">
