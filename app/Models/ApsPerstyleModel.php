@@ -255,6 +255,38 @@ class ApsPerstyleModel extends Model
             ->groupBy('mastermodel')
             ->findAll();
     }
+    public function getDetailPlanningGloves($area, $jarum) // funtion ieu kudu diganti where na kade ulah poho
+    {
+        $rules = [
+            'POM-POM' => ['POM-POM'],
+            '240N' => ['240N', '240N-PL'],
+            '240N-PL' => ['240N-PL'],
+            '10G92N-PL' => ['10G92N-PL'],
+            '10G92N-MT' => ['10G92N-MT', '10G92N-MTPL'],
+            '10G92N-MTPL' => ['10G92N-MTPL'],
+            '10G84N-MT' => ['10G84N-MT', '10G84N-MTPL'],
+            '10G84N-MTPL' => ['10G84N-MTPL'],
+            '10G144N' => ['10G144N'],
+            '10G126N' => ['10G126N'],
+            '10G126N' => ['10G126N'],
+            '10G116N' => ['10G116N', '10G116N-PL'],
+            '10G116N-PL' => ['10G116N-PL'],
+            '10G116N-FL' => ['10G116N-FL', '10G116N-FLPL'],
+            '10G116N-FLPL' => ['10G116N-FLPL'],
+            '10G106N' => ['10G106N', '10G106N-PL'],
+            '10G106N-pl' => ['10G106N-PL'],
+            '10G106N-FL' => ['10G106N-FL', '10G106N-FLPL'],
+            '10G106N-FLPL' => ['10G106N-FLPL'],
+        ];
+
+        return $this->select('mastermodel AS model, SUM(qty)/24 AS qty, SUM(sisa)/24 AS sisa, AVG(smv) AS smv,machinetypeid')
+            ->where('factory', $area)
+            ->whereIn('machinetypeid', $rules[$jarum])
+            ->where('sisa >=', 0)
+            ->where('delivery > NOW()', null, false)
+            ->groupBy('mastermodel')
+            ->findAll();
+    }
     public function getAllForModelStyleAndSize($validate)
     {
         return $this->where('mastermodel', $validate['no_model'])

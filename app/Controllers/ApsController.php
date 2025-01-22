@@ -554,6 +554,7 @@ class ApsController extends BaseController
             foreach ($mesin as $mc) {
                 $jum += $mc['mesin'];
             }
+
             $dp['mesin'] = $jum;
             $dp['qty'] = round($qtysisa['qty']);
             $dp['sisa'] =
@@ -667,8 +668,11 @@ class ApsController extends BaseController
         $jarum = $this->request->getGet('jarum');
         $id_pln_mc = $this->request->getGet('id_pln_mc');
 
-
-        $data = $this->ApsPerstyleModel->getDetailPlanning($area, $jarum);
+        if ($area == 'KK8J') {
+            $data = $this->ApsPerstyleModel->getDetailPlanningGloves($area, $jarum);
+        } else {
+            $data = $this->ApsPerstyleModel->getDetailPlanning($area, $jarum);
+        }
 
         foreach ($data as $row) {
             $row['id_pln_mc'] = $id_pln_mc;
@@ -683,7 +687,7 @@ class ApsController extends BaseController
                 'id_pln_mc' => $row['id_pln_mc'],
                 'model' => $model,
                 'smv' => $row['smv'],
-                'jarum' => $jarum,
+                'jarum' => $row['machinetypeid'],
                 'status' => 'aktif'
             ];
             $cek = $this->DetailPlanningModel->cekPlanning($validate);
