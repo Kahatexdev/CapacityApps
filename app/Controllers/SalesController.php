@@ -2011,7 +2011,7 @@ class SalesController extends BaseController
                         //ambil kolom total exess dan max capacity
                         $colSubtotalExess_index = $colBody_index - 1;
                         $colSubtotalExess = Coordinate::stringFromColumnIndex($colSubtotalExess_index); // Konversi
-                        $colSubtotalMaxCapacity_index = $colBody_index - 5;
+                        $colSubtotalMaxCapacity_index = $colBody_index - 6;
                         $colSubtotalMaxCapacity = Coordinate::stringFromColumnIndex($colSubtotalMaxCapacity_index); // Konversi
                         // persentase exess
                         $sheet->setCellValue($nextColumnBody . $rowSubtotal, "=(" . $colSubtotalExess . $rowBody . "/" . $colSubtotalMaxCapacity . $rowBody . ")")
@@ -2095,7 +2095,7 @@ class SalesController extends BaseController
         // // baris grand total per bulan
         $column = 'AA'; // Kolom awal untuk bulan
         $col_index = Coordinate::columnIndexFromString($column); // Konversi huruf kolom ke nomor indeks kolom
-        $columnGrandTotal = 'V'; // Kolom awal untuk bulan
+        $columnGrandTotal = 'AA'; // Kolom awal untuk bulan
         $colGrandTotalMaxCap = Coordinate::columnIndexFromString($columnGrandTotal); // Konversi huruf kolom ke nomor indeks kolom
         $colGrandTotalConfirm = Coordinate::columnIndexFromString($columnGrandTotal) + 1; // Konversi huruf kolom ke nomor indeks kolom
         $colGrandTotalSisaOrder = Coordinate::columnIndexFromString($columnGrandTotal) + 2; // Konversi huruf kolom ke nomor indeks kolom
@@ -2143,7 +2143,7 @@ class SalesController extends BaseController
             // Gabungkan bagian formula dengan koma
             $grandTotalMaxCap .= implode(', ', $grandTotalPartsMaxCap) . ")";
 
-            $colGrandTotalMaxCap = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+            $colGrandTotalMaxCap = $currentColumnIndex + 7; // Kolom berikutnya untuk loop bulan berikutnya
 
             $sheet->setCellValue($endColumn . $rowGrandtotal, $grandTotalMaxCap)
                 ->getStyle($endColumn . $rowGrandtotal)
@@ -2168,7 +2168,7 @@ class SalesController extends BaseController
             // Gabungkan bagian formula dengan koma
             $grandTotalConfirm .= implode(', ', $grandTotalPartsConfirm) . ")";
 
-            $colGrandTotalConfirm = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+            $colGrandTotalConfirm = $currentColumnIndex + 7; // Kolom berikutnya untuk loop bulan berikutnya
 
             $sheet->setCellValue($endColumn . $rowGrandtotal, $grandTotalConfirm)
                 ->getStyle($endColumn . $rowGrandtotal)
@@ -2193,7 +2193,7 @@ class SalesController extends BaseController
             $grandTotalSisaOrder .= implode(', ', $grandTotalPartsSisaOrder) . ")";
 
             // Update kolom untuk bulan berikutnya
-            $colGrandTotalSisaOrder = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+            $colGrandTotalSisaOrder = $currentColumnIndex + 7; // Kolom berikutnya untuk loop bulan berikutnya
 
             $sheet->setCellValue($endColumn . $rowGrandtotal, $grandTotalSisaOrder)
                 ->getStyle($endColumn . $rowGrandtotal)
@@ -2218,7 +2218,7 @@ class SalesController extends BaseController
             $grandTotalConfirmBooking .= implode(', ', $grandTotalPartsSisaBooking) . ")";
 
             // Update kolom untuk bulan berikutnya
-            $colGrandTotalConfrimBooking = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+            $colGrandTotalConfrimBooking = $currentColumnIndex + 7; // Kolom berikutnya untuk loop bulan berikutnya
 
             $sheet->setCellValue($endColumn . $rowGrandtotal, $grandTotalConfirmBooking)
                 ->getStyle($endColumn . $rowGrandtotal)
@@ -2243,7 +2243,7 @@ class SalesController extends BaseController
             $grandTotalSisaBooking .= implode(', ', $grandTotalPartsSisaBooking) . ")";
 
             // Update kolom untuk bulan berikutnya
-            $colGrandTotalSisaBooking = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+            $colGrandTotalSisaBooking = $currentColumnIndex + 7; // Kolom berikutnya untuk loop bulan berikutnya
 
             $sheet->setCellValue($endColumn . $rowGrandtotal, $grandTotalSisaBooking)
                 ->getStyle($endColumn . $rowGrandtotal)
@@ -2269,7 +2269,7 @@ class SalesController extends BaseController
             $grandTotalExess .= implode(', ', $grandTotalPartsExess) . ")";
 
             // Update kolom untuk bulan berikutnya
-            $colGrandTotalExess = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+            $colGrandTotalExess = $currentColumnIndex + 7; // Kolom berikutnya untuk loop bulan berikutnya
 
             $sheet->setCellValue($endColumn . $rowGrandtotal, $grandTotalExess)
                 ->getStyle($endColumn . $rowGrandtotal)
@@ -2277,7 +2277,7 @@ class SalesController extends BaseController
             $rowGrandtotal++;
 
 
-            $rowGtMaxCap = $rowGrandtotal - 5;
+            $rowGtMaxCap = $rowGrandtotal - 6;
             $rowGtExess = $rowGrandtotal - 1;
             $sheet->setCellValue($endColumn . $rowGrandtotal, "=(" . $endColumn . $rowGtExess . "/" . $endColumn . $rowGtMaxCap . ")")
                 ->getStyle($endColumn . $rowGrandtotal)
