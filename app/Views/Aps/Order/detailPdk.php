@@ -86,6 +86,7 @@ error_reporting(E_ALL); ?>
                                             <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Inisial</th>
                                             <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Qty</th>
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Sisa</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">SMV</th>
                                             <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Area</th>
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Factory</th>
                                         </tr>
@@ -99,6 +100,7 @@ error_reporting(E_ALL); ?>
                                                     <td><?= $list['inisial'] ?></td>
                                                     <td><?= round($list['qty'] / 24) ?> dz</td>
                                                     <td><?= round($list['sisa'] / 24) ?> dz</td>
+                                                    <td><?= $list['smv'] ?></td>
                                                     <td><?= $list['factory'] ?></td>
                                                     <td><?= $list['production_unit'] ?></td>x
 
