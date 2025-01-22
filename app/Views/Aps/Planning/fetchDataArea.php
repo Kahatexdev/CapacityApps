@@ -55,6 +55,7 @@ error_reporting(E_ALL); ?>
                             <a href="<?= base_url($role . '/kalenderMesin/' . $id_pln_mc) ?>" class="btn btn-success"> Jadwal Mesin <i class="fas fa-calendar-plus text-lg opacity-10" aria-hidden="true"></i> </a>
                             <button id="fetch-data-button" class="btn btn-info">Fetch Data</button>
                             <a href="<?= base_url($role . '/planningmesin') ?>" class="btn btn-secondary">Back</a>
+                            <a href="<?= base_url($role . '/detailplanstop/' . $id_pln_mc) ?>" class="btn btn-warning">PDK Stop</a>
                         </div>
                     </div>
                 </div>
@@ -119,16 +120,7 @@ error_reporting(E_ALL); ?>
                         </div>
                     </div>
                 </div>
-                <?php if (empty($detailplan)) : ?>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col-lg-12 text-center">
-                                <p>No data available in the table.</p>
-                                <button id="fetch-data-button" class="btn btn-info">Fetch Data</button>
-                            </div>
-                        </div>
-                    </div>
-                <?php endif; ?>
+
             </div>
         </div>
         <div class="modal fade" id="confirmStopModal" tabindex="-1" aria-labelledby="confirmStopModalLabel" aria-hidden="true">

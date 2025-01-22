@@ -1030,4 +1030,81 @@ class ApsController extends BaseController
         // Jika bukan permintaan AJAX, kembalikan halaman 404
         throw new \CodeIgniter\Exceptions\PageNotFoundException();
     }
+
+    public function detailplanstop($id)
+    {
+        $detailplan = $this->DetailPlanningModel->getDataPlanningStop($id);
+        foreach ($detailplan as &$dp) {
+            $iddetail = $dp['id_detail_pln'];
+            $qtysisa = $this->ApsPerstyleModel->getSisaPerModel($dp['model'], $dp['jarum']);
+            $mesin = $this->TanggalPlanningModel->totalMc($iddetail);
+            $jum = 0;
+            foreach ($mesin as $mc) {
+                $jum += $mc['mesin'];
+            }
+            $dp['mesin'] = $jum;
+            $dp['qty'] = round($qtysisa['qty']);
+            $dp['sisa'] =
+                round($qtysisa['sisa']);
+        }
+        $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();
+        $judul = $kebutuhanArea['judul'];
+        $area = $kebutuhanArea['area'];
+        $jarum =  $kebutuhanArea['jarum'];
+        $mesinarea = $this->jarumModel->getMesinByArea($area, $jarum); //mesin yang dipakai semua mesin tanpa melibatkan head planning
+        // $mesinplanning = $this->MesinPlanningModel->getMesinByArea($area,$jarum); //mesin yang dipilih oleh head planning di teruskan ke bagian aps
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Planning',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => 'active',
+            'active7' => '',
+            'detailplan' => $detailplan,
+            'judul' => $judul,
+            'area' => $area,
+            'jarum' => $jarum,
+            'mesin' => $mesinarea,
+            'id_pln_mc' => $id,
+        ];
+        return view(session()->get('role') . '/Planning/planMcStopArea', $data);
+    }
+
+    public function activePlanning($id)
+    {
+        if ($this->request->isAJAX()) {
+
+            try {
+                // Cek apakah data dengan ID tersebut ada
+                $planning = $this->DetailPlanningModel->find($id);
+
+                if (!$planning) {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'message' => 'Plan not found.'
+                    ]);
+                }
+
+                // Update status menjadi 'stop'
+                $this->DetailPlanningModel->update($id, ['status' => 'aktif']);
+
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Plan actived successfully.'
+                ]);
+            } catch (\Exception $e) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Failed to active the plan.',
+                    'error' => $e->getMessage()
+                ]);
+            }
+        }
+
+        // Jika bukan permintaan AJAX, kembalikan halaman 404
+        throw new \CodeIgniter\Exceptions\PageNotFoundException();
+    }
 }
