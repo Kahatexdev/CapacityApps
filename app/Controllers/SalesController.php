@@ -1165,6 +1165,9 @@ class SalesController extends BaseController
                         case "TG":
                             $total = !empty($totalBooking) ? ceil(($totalBooking * 2 / 24)) : 0;
                             break;
+                        case "HT":
+                            $total = !empty($totalBooking) ? ceil(($totalBooking / 12)) : 0;
+                            break;
                         default:
                             $total = !empty($totalBooking) ? ceil($totalBooking / 24) : 0;
                             break;
@@ -1189,6 +1192,9 @@ class SalesController extends BaseController
                             break;
                         case "TG":
                             $total = !empty($sisa_booking) ? ceil(($sisa_booking * 2 / 24)) : 0;
+                            break;
+                        case "HT":
+                            $total = !empty($totalBooking) ? ceil(($totalBooking / 12)) : 0;
                             break;
                         default:
                             $total = !empty($sisa_booking) ? ceil($sisa_booking / 24) : 0;
