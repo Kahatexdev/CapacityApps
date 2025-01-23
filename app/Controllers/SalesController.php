@@ -1147,6 +1147,34 @@ class SalesController extends BaseController
                     return $carry;
                 }, 0);
 
+                $totalBooking = array_reduce($dataBookingByJarum, function ($carry, $ConfrimBooking) {
+                    $totalBooking = $ConfrimBooking['total_booking'];
+                    switch ($ConfrimBooking['product_group']) {
+                        case "SS":
+                            $total = !empty($totalBooking) ? ceil(($totalBooking - ($totalBooking * (25 / 100))) / 24) : 0;
+                            break;
+                        case "S":
+                            $total = !empty($totalBooking) ? ceil(($totalBooking - ($totalBooking * (25 / 100))) / 24) : 0;
+                            break;
+                        case "F":
+                            $total = !empty($totalBooking) ? ceil(($totalBooking - ($totalBooking * (30 / 100))) / 24) : 0;
+                            break;
+                        case "KH":
+                            $total = !empty($totalBooking) ? ceil(($totalBooking * 1.5 / 24)) : 0;
+                            break;
+                        case "TG":
+                            $total = !empty($totalBooking) ? ceil(($totalBooking * 2 / 24)) : 0;
+                            break;
+                        case "HT":
+                            $total = !empty($totalBooking) ? ceil(($totalBooking / 12)) : 0;
+                            break;
+                        default:
+                            $total = !empty($totalBooking) ? ceil($totalBooking / 24) : 0;
+                            break;
+                    }
+                    $carry += $total;
+                    return $carry;
+                }, 0);
                 $sisaBooking = array_reduce($dataBookingByJarum, function ($carry, $booking) {
                     $sisa_booking = $booking['sisa_booking'];
                     switch ($booking['product_group']) {
@@ -1164,6 +1192,9 @@ class SalesController extends BaseController
                             break;
                         case "TG":
                             $total = !empty($sisa_booking) ? ceil(($sisa_booking * 2 / 24)) : 0;
+                            break;
+                        case "HT":
+                            $total = !empty($totalBooking) ? ceil(($totalBooking / 12)) : 0;
                             break;
                         default:
                             $total = !empty($sisa_booking) ? ceil($sisa_booking / 24) : 0;
@@ -1558,7 +1589,7 @@ class SalesController extends BaseController
             // month
             $weekCount = count($data['weeks']); // Hitung jumlah minggu dalam bulan
             $startColumn = $column;
-            $endCol_index = $col_index + ($weekCount * 6) - 1; // Dikurangi 1 karena kolom awal tidak terhitung
+            $endCol_index = $col_index + ($weekCount * 7) - 1; // Dikurangi 1 karena kolom awal tidak terhitung
             $endColumn = Coordinate::stringFromColumnIndex($endCol_index); // Konversi kembali dari nomor indeks kolom ke huruf kolom
 
             // kolom warna
@@ -1599,7 +1630,7 @@ class SalesController extends BaseController
                 $rowWh = $rowWeek + 1;
 
                 $startColumn2 = $column2;
-                $endCol_index2 = $col_index2 + 5; // Misalnya, 4 kolom untuk setiap minggu
+                $endCol_index2 = $col_index2 + 6; // Misalnya, 6 kolom untuk setiap minggu
                 $endColumn2 = Coordinate::stringFromColumnIndex($endCol_index2);
 
                 // Set value dan merge cells untuk minggu
@@ -1637,11 +1668,18 @@ class SalesController extends BaseController
                     $order_index = $confirm_index + 1; // Next Column
                     $nextColumn = Coordinate::stringFromColumnIndex($order_index);
                     // 
+                    $sheet->setCellValue($nextColumn . $rowTitle, 'Confirm Booking')
+                        ->getStyle($nextColumn . $rowTitle)
+                        ->applyFromArray($styleHeader2);
+                    // 
+                    $confirmBooking_index = $order_index + 1; // Next Column
+                    $nextColumn = Coordinate::stringFromColumnIndex($confirmBooking_index);
+                    //
                     $sheet->setCellValue($nextColumn . $rowTitle, 'Sisa Booking')
                         ->getStyle($nextColumn . $rowTitle)
                         ->applyFromArray($styleHeader2);
                     // 
-                    $booking_index = $order_index + 1; // Next Column
+                    $booking_index = $confirmBooking_index + 1; // Next Column
                     $nextColumn = Coordinate::stringFromColumnIndex($booking_index);
                     // 
                     $sheet->setCellValue($nextColumn . $rowTitle, '(+)Exess')
@@ -1789,6 +1827,12 @@ class SalesController extends BaseController
                         $colBody_index++;
                         $nextColumnBody = Coordinate::stringFromColumnIndex($colBody_index); // Konversi 
 
+                        $sheet->setCellValue($nextColumnBody . $rowBody, isset($week['totalBooking']) ? $week['totalBooking'] : 0)
+                            ->getStyle($nextColumnBody . $rowBody)
+                            ->applyFromArray($styleBody);
+                        $colBody_index++;
+
+                        $nextColumnBody = Coordinate::stringFromColumnIndex($colBody_index); // Konversi 
                         $sheet->setCellValue($nextColumnBody . $rowBody, isset($week['sisaBooking']) ? $week['sisaBooking'] : 0)
                             ->getStyle($nextColumnBody . $rowBody)
                             ->applyFromArray($styleBody);
@@ -1921,7 +1965,7 @@ class SalesController extends BaseController
         $sheet->setCellValue('Y' . $rowSubtotal, "=SUM(Y" . $sumRowAwal . ":Y" . $sumRowAkhir . ")")
             ->getStyle('Y' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
-        $sheet->setCellValue('z' . $rowSubtotal, "=SUM(z" . $sumRowAwal . ":Y" . $sumRowAkhir . ")")
+        $sheet->setCellValue('z' . $rowSubtotal, "=SUM(Z" . $sumRowAwal . ":Z" . $sumRowAkhir . ")")
             ->getStyle('z' . $rowSubtotal)
             ->applyFromArray($styleSubTotal);
 
@@ -1951,6 +1995,12 @@ class SalesController extends BaseController
                             ->applyFromArray($styleSubTotal);
                         $colBody_index++;
                         $nextColumnBody = Coordinate::stringFromColumnIndex($colBody_index); // Konversi 
+                        // Kolom subtotal Confirm Booking
+                        $sheet->setCellValue($nextColumnBody . $rowSubtotal, "=SUM(" . $nextColumnBody . $sumRowAwal . ":" . $nextColumnBody . $sumRowAkhir . ")")
+                            ->getStyle($nextColumnBody . $rowSubtotal)
+                            ->applyFromArray($styleSubTotal);
+                        $colBody_index++;
+                        $nextColumnBody = Coordinate::stringFromColumnIndex($colBody_index); // Konversi 
                         // Kolom subtotal Sisa Booking
                         $sheet->setCellValue($nextColumnBody . $rowSubtotal, "=SUM(" . $nextColumnBody . $sumRowAwal . ":" . $nextColumnBody . $sumRowAkhir . ")")
                             ->getStyle($nextColumnBody . $rowSubtotal)
@@ -1967,7 +2017,7 @@ class SalesController extends BaseController
                         //ambil kolom total exess dan max capacity
                         $colSubtotalExess_index = $colBody_index - 1;
                         $colSubtotalExess = Coordinate::stringFromColumnIndex($colSubtotalExess_index); // Konversi
-                        $colSubtotalMaxCapacity_index = $colBody_index - 5;
+                        $colSubtotalMaxCapacity_index = $colBody_index - 6;
                         $colSubtotalMaxCapacity = Coordinate::stringFromColumnIndex($colSubtotalMaxCapacity_index); // Konversi
                         // persentase exess
                         $sheet->setCellValue($nextColumnBody . $rowSubtotal, "=(" . $colSubtotalExess . $rowBody . "/" . $colSubtotalMaxCapacity . $rowBody . ")")
@@ -2002,6 +2052,12 @@ class SalesController extends BaseController
         $rowTitleGrandtotal++;
 
         $sheet->setCellValue('A' . $rowTitleGrandtotal, "Sisa Order")
+            ->mergeCells('A' . $rowTitleGrandtotal)
+            ->getStyle('A' . $rowTitleGrandtotal)
+            ->applyFromArray($styleGrandTotal);
+        $rowTitleGrandtotal++;
+
+        $sheet->setCellValue('A' . $rowTitleGrandtotal, "Confirm Booking")
             ->mergeCells('A' . $rowTitleGrandtotal)
             ->getStyle('A' . $rowTitleGrandtotal)
             ->applyFromArray($styleGrandTotal);
@@ -2045,13 +2101,14 @@ class SalesController extends BaseController
         // // baris grand total per bulan
         $column = 'AA'; // Kolom awal untuk bulan
         $col_index = Coordinate::columnIndexFromString($column); // Konversi huruf kolom ke nomor indeks kolom
-        $columnGrandTotal = 'V'; // Kolom awal untuk bulan
+        $columnGrandTotal = 'AA'; // Kolom awal untuk bulan
         $colGrandTotalMaxCap = Coordinate::columnIndexFromString($columnGrandTotal); // Konversi huruf kolom ke nomor indeks kolom
         $colGrandTotalConfirm = Coordinate::columnIndexFromString($columnGrandTotal) + 1; // Konversi huruf kolom ke nomor indeks kolom
         $colGrandTotalSisaOrder = Coordinate::columnIndexFromString($columnGrandTotal) + 2; // Konversi huruf kolom ke nomor indeks kolom
-        $colGrandTotalSisaBooking = Coordinate::columnIndexFromString($columnGrandTotal) + 3; // Konversi huruf kolom ke nomor indeks kolom
-        $colGrandTotalExess = Coordinate::columnIndexFromString($columnGrandTotal) + 4; // Konversi huruf kolom ke nomor indeks kolom
-        $colGrandTotalPersentaseExess = Coordinate::columnIndexFromString($columnGrandTotal) + 5; // Konversi huruf kolom ke nomor indeks kolom
+        $colGrandTotalConfrimBooking = Coordinate::columnIndexFromString($columnGrandTotal) + 3; // Konversi huruf kolom ke nomor indeks kolom
+        $colGrandTotalSisaBooking = Coordinate::columnIndexFromString($columnGrandTotal) + 4; // Konversi huruf kolom ke nomor indeks kolom
+        $colGrandTotalExess = Coordinate::columnIndexFromString($columnGrandTotal) + 5; // Konversi huruf kolom ke nomor indeks kolom
+        $colGrandTotalPersentaseExess = Coordinate::columnIndexFromString($columnGrandTotal) + 6; // Konversi huruf kolom ke nomor indeks kolom
         $thisMonthExport = (new \DateTime())->format('F-Y');
         $nextMonthExport = (new \DateTime('first day of next month'))->format('F-Y');
 
@@ -2062,9 +2119,9 @@ class SalesController extends BaseController
             $startColumn = $column;
             // jika 1 bulan lebih dari 1 week
             if ($weekCount > 1) {
-                $endCol_index = $col_index + ($weekCount * 6) - 1; // Dikurangi 1 karena kolom awal tidak terhitung
+                $endCol_index = $col_index + ($weekCount * 7) - 1; // Dikurangi 1 karena kolom awal tidak terhitung
             } else {
-                $endCol_index = $col_index + ($weekCount * 6);
+                $endCol_index = $col_index + ($weekCount * 7);
             }
             $endColumn = Coordinate::stringFromColumnIndex($endCol_index); // Konversi kembali dari nomor indeks kolom ke huruf kolom
 
@@ -2082,7 +2139,7 @@ class SalesController extends BaseController
 
             for ($week = 0; $week < $totalWeeks; $week++) {
                 // Kolom awal setiap bulan dimulai dari index yang sesuai
-                $currentColumnIndex = $colGrandTotalMaxCap + ($week * 6); // Kolom pertama tiap minggu
+                $currentColumnIndex = $colGrandTotalMaxCap + ($week * 7); // Kolom pertama tiap minggu
                 $currentColumn = Coordinate::stringFromColumnIndex($currentColumnIndex); // Mengubah indeks kolom jadi string
 
                 // Tambahkan kolom ke formula hanya untuk minggu yang relevan
@@ -2092,7 +2149,7 @@ class SalesController extends BaseController
             // Gabungkan bagian formula dengan koma
             $grandTotalMaxCap .= implode(', ', $grandTotalPartsMaxCap) . ")";
 
-            $colGrandTotalMaxCap = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+            $colGrandTotalMaxCap = $currentColumnIndex + 7; // Kolom berikutnya untuk loop bulan berikutnya
 
             $sheet->setCellValue($endColumn . $rowGrandtotal, $grandTotalMaxCap)
                 ->getStyle($endColumn . $rowGrandtotal)
@@ -2107,7 +2164,7 @@ class SalesController extends BaseController
 
             for ($week = 0; $week < $totalWeeks; $week++) {
                 // Kolom awal setiap bulan dimulai dari index yang sesuai
-                $currentColumnIndex = $colGrandTotalConfirm + ($week * 6); // Kolom pertama tiap minggu +1 supaya di mulai dari kolom u
+                $currentColumnIndex = $colGrandTotalConfirm + ($week * 7); // Kolom pertama tiap minggu +1 supaya di mulai dari kolom u
                 $currentColumn = Coordinate::stringFromColumnIndex($currentColumnIndex); // Mengubah indeks kolom jadi string
 
                 // Tambahkan kolom ke formula hanya untuk minggu yang relevan
@@ -2117,13 +2174,12 @@ class SalesController extends BaseController
             // Gabungkan bagian formula dengan koma
             $grandTotalConfirm .= implode(', ', $grandTotalPartsConfirm) . ")";
 
-            $colGrandTotalConfirm = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+            $colGrandTotalConfirm = $currentColumnIndex + 7; // Kolom berikutnya untuk loop bulan berikutnya
 
             $sheet->setCellValue($endColumn . $rowGrandtotal, $grandTotalConfirm)
                 ->getStyle($endColumn . $rowGrandtotal)
                 ->applyFromArray($styleGrandTotal);
             $rowGrandtotal++; // Pindah ke baris berikutnya jika ingin menyusun hasil di baris yang berbeda
-
 
             // Buat formula berdasarkan total minggu Sisa Order
             $rowTotal = $rowGrandtotal - 3;
@@ -2132,7 +2188,7 @@ class SalesController extends BaseController
 
             for ($week = 0; $week < $totalWeeks; $week++) {
                 // Kolom awal setiap bulan dimulai dari index yang sesuai
-                $currentColumnIndex = $colGrandTotalSisaOrder + ($week * 6); // Kolom pertama tiap minggu +1 supaya di mulai dari kolom u
+                $currentColumnIndex = $colGrandTotalSisaOrder + ($week * 7); // Kolom pertama tiap minggu +1 supaya di mulai dari kolom u
                 $currentColumn = Coordinate::stringFromColumnIndex($currentColumnIndex); // Mengubah indeks kolom jadi string
 
                 // Tambahkan kolom ke formula hanya untuk minggu yang relevan
@@ -2143,22 +2199,46 @@ class SalesController extends BaseController
             $grandTotalSisaOrder .= implode(', ', $grandTotalPartsSisaOrder) . ")";
 
             // Update kolom untuk bulan berikutnya
-            $colGrandTotalSisaOrder = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+            $colGrandTotalSisaOrder = $currentColumnIndex + 7; // Kolom berikutnya untuk loop bulan berikutnya
 
             $sheet->setCellValue($endColumn . $rowGrandtotal, $grandTotalSisaOrder)
                 ->getStyle($endColumn . $rowGrandtotal)
                 ->applyFromArray($styleGrandTotal);
             $rowGrandtotal++; // Pindah ke baris berikutnya jika ingin menyusun hasil di baris yang berbeda
 
-
             // Buat formula berdasarkan total minggu Sisa Booking
             $rowTotal = $rowGrandtotal - 4;
+            $grandTotalConfirmBooking = "=SUM(";
+            $grandTotalPartsSisaBooking = []; // Untuk menyimpan tiap bagian formula SUM
+
+            for ($week = 0; $week < $totalWeeks; $week++) {
+                // Kolom awal setiap bulan dimulai dari index yang sesuai
+                $currentColumnIndex = $colGrandTotalConfrimBooking + ($week * 7); // Kolom pertama tiap minggu +1 supaya di mulai dari kolom u
+                $currentColumn = Coordinate::stringFromColumnIndex($currentColumnIndex); // Mengubah indeks kolom jadi string
+
+                // Tambahkan kolom ke formula hanya untuk minggu yang relevan
+                $grandTotalPartsSisaBooking[] = "{$currentColumn}{$rowTotal}";
+            }
+
+            // Gabungkan bagian formula dengan koma
+            $grandTotalConfirmBooking .= implode(', ', $grandTotalPartsSisaBooking) . ")";
+
+            // Update kolom untuk bulan berikutnya
+            $colGrandTotalConfrimBooking = $currentColumnIndex + 7; // Kolom berikutnya untuk loop bulan berikutnya
+
+            $sheet->setCellValue($endColumn . $rowGrandtotal, $grandTotalConfirmBooking)
+                ->getStyle($endColumn . $rowGrandtotal)
+                ->applyFromArray($styleGrandTotal);
+            $rowGrandtotal++; // Pindah ke baris berikutnya jika ingin menyusun hasil di baris yang berbeda
+
+            // Buat formula berdasarkan total minggu Sisa Booking
+            $rowTotal = $rowGrandtotal - 5;
             $grandTotalSisaBooking = "=SUM(";
             $grandTotalPartsSisaBooking = []; // Untuk menyimpan tiap bagian formula SUM
 
             for ($week = 0; $week < $totalWeeks; $week++) {
                 // Kolom awal setiap bulan dimulai dari index yang sesuai
-                $currentColumnIndex = $colGrandTotalSisaBooking + ($week * 6); // Kolom pertama tiap minggu +1 supaya di mulai dari kolom u
+                $currentColumnIndex = $colGrandTotalSisaBooking + ($week * 7); // Kolom pertama tiap minggu +1 supaya di mulai dari kolom u
                 $currentColumn = Coordinate::stringFromColumnIndex($currentColumnIndex); // Mengubah indeks kolom jadi string
 
                 // Tambahkan kolom ke formula hanya untuk minggu yang relevan
@@ -2169,7 +2249,7 @@ class SalesController extends BaseController
             $grandTotalSisaBooking .= implode(', ', $grandTotalPartsSisaBooking) . ")";
 
             // Update kolom untuk bulan berikutnya
-            $colGrandTotalSisaBooking = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+            $colGrandTotalSisaBooking = $currentColumnIndex + 7; // Kolom berikutnya untuk loop bulan berikutnya
 
             $sheet->setCellValue($endColumn . $rowGrandtotal, $grandTotalSisaBooking)
                 ->getStyle($endColumn . $rowGrandtotal)
@@ -2178,13 +2258,13 @@ class SalesController extends BaseController
 
 
             // Buat formula berdasarkan total minggu (+)Exess
-            $rowTotal = $rowGrandtotal - 5;
+            $rowTotal = $rowGrandtotal - 6;
             $grandTotalExess = "=SUM(";
             $grandTotalPartsExess = []; // Untuk menyimpan tiap bagian formula SUM
 
             for ($week = 0; $week < $totalWeeks; $week++) {
                 // Kolom awal setiap bulan dimulai dari index yang sesuai
-                $currentColumnIndex = $colGrandTotalExess + ($week * 6); // Kolom pertama tiap minggu +1 supaya di mulai dari kolom u
+                $currentColumnIndex = $colGrandTotalExess + ($week * 7); // Kolom pertama tiap minggu +1 supaya di mulai dari kolom u
                 $currentColumn = Coordinate::stringFromColumnIndex($currentColumnIndex); // Mengubah indeks kolom jadi string
 
                 // Tambahkan kolom ke formula hanya untuk minggu yang relevan
@@ -2195,7 +2275,7 @@ class SalesController extends BaseController
             $grandTotalExess .= implode(', ', $grandTotalPartsExess) . ")";
 
             // Update kolom untuk bulan berikutnya
-            $colGrandTotalExess = $currentColumnIndex + 6; // Kolom berikutnya untuk loop bulan berikutnya
+            $colGrandTotalExess = $currentColumnIndex + 7; // Kolom berikutnya untuk loop bulan berikutnya
 
             $sheet->setCellValue($endColumn . $rowGrandtotal, $grandTotalExess)
                 ->getStyle($endColumn . $rowGrandtotal)
@@ -2203,7 +2283,7 @@ class SalesController extends BaseController
             $rowGrandtotal++;
 
 
-            $rowGtMaxCap = $rowGrandtotal - 5;
+            $rowGtMaxCap = $rowGrandtotal - 6;
             $rowGtExess = $rowGrandtotal - 1;
             $sheet->setCellValue($endColumn . $rowGrandtotal, "=(" . $endColumn . $rowGtExess . "/" . $endColumn . $rowGtMaxCap . ")")
                 ->getStyle($endColumn . $rowGrandtotal)
@@ -2230,7 +2310,7 @@ class SalesController extends BaseController
 
 
             // total inspect
-            $rowConfirm = $rowGrandtotal - 6;
+            $rowConfirm = $rowGrandtotal - 7;
             $rowExport = $rowGrandtotal - 1;
             $rowLokal = $rowGrandtotal + 1;
             $sheet->setCellValue($endColumn . $rowGrandtotal, "=" . $endColumn . $rowConfirm . "-" . $endColumn . $rowExport . "-" . $endColumn . $rowLokal) // Confirm Order - Export -Lokal
@@ -2247,7 +2327,7 @@ class SalesController extends BaseController
             $endColumn++;
             $col_index = Coordinate::columnIndexFromString($endColumn);
             // agar baris kembali ke baris pertama grandtotal
-            $rowGrandtotal -= 8;
+            $rowGrandtotal -= 9;
         endforeach;
 
 

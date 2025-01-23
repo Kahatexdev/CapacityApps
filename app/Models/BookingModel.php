@@ -266,6 +266,7 @@ class BookingModel extends Model
                 WHEN master_product_type.product_type LIKE \'NS-%\' THEN \'NS\'
                 WHEN master_product_type.product_type LIKE \'KH-%\' THEN \'KH\'
                 WHEN master_product_type.product_type LIKE \'TG-%\' THEN \'TG\'
+                WHEN master_product_type.product_type LIKE \'HT-%\' THEN \'HT\'
                 ELSE \'OTHER\'
             END AS product_group';
         $results = $this->select('data_booking.needle, data_booking.delivery, SUM(data_booking.qty_booking) as total_booking, SUM(data_booking.sisa_booking) AS sisa_booking, data_booking.id_product_type,' . $groupingProductType)
