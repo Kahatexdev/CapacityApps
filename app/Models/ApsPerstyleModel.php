@@ -246,10 +246,10 @@ class ApsPerstyleModel extends Model
     }
     public function getDetailPlanning($area, $jarum) // funtion ieu kudu diganti where na kade ulah poho
     {
-        return $this->select('mastermodel AS model, SUM(qty)/24 AS qty, SUM(sisa)/24 AS sisa, AVG(smv) AS smv')
+        return $this->select('mastermodel AS model, SUM(qty)/24 AS qty, SUM(sisa)/24 AS sisa, AVG(smv) AS smv, machinetypeid')
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
-            ->where('sisa >=', 0)
+            ->where('sisa >', 0)
             ->where('delivery > NOW()', null, false) // Add 7 days to current date
             // ->where('delivery > DATE_ADD(NOW(), INTERVAL 7 DAY)', null, false) // Add 7 days to current date
             ->groupBy('mastermodel')
@@ -282,7 +282,7 @@ class ApsPerstyleModel extends Model
         return $this->select('mastermodel AS model, SUM(qty)/24 AS qty, SUM(sisa)/24 AS sisa, AVG(smv) AS smv,machinetypeid')
             ->where('factory', $area)
             ->whereIn('machinetypeid', $rules[$jarum])
-            ->where('sisa >=', 0)
+            ->where('sisa >', 0)
             ->where('delivery > NOW()', null, false)
             ->groupBy('mastermodel')
             ->findAll();

@@ -674,13 +674,21 @@ class ApsController extends BaseController
             $data = $this->ApsPerstyleModel->getDetailPlanning($area, $jarum);
         }
 
+        // Cek jika data kosong, langsung return atau berikan pesan
+        if (empty($data)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'No data found for the given area and needle type.' . $area,
+            ]);
+        }
+
         foreach ($data as $row) {
             $row['id_pln_mc'] = $id_pln_mc;
             $model = $row['model'];
             $sisa = $row['sisa'];
             $qty = $row['qty'];
             $validate = [
-                'id' =>  $row['id_pln_mc'],
+                'id' => $row['id_pln_mc'],
                 'model' => $model,
             ];
             $insert = [
@@ -688,7 +696,7 @@ class ApsController extends BaseController
                 'model' => $model,
                 'smv' => $row['smv'],
                 'jarum' => $row['machinetypeid'],
-                'status' => 'aktif'
+                'status' => 'aktif',
             ];
             $cek = $this->DetailPlanningModel->cekPlanning($validate);
             if (!$cek) {
