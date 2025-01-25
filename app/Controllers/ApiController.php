@@ -13,6 +13,7 @@ use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use App\Models\BsMesinModel;
+use App\Models\DetailPlanningModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ApiController extends ResourceController
@@ -26,6 +27,7 @@ class ApiController extends ResourceController
     protected $ApsPerstyleModel;
     protected $liburModel;
     protected $BsMesinModel;
+    protected $DetailPlanningModel;
     protected $format = 'json';
     public function __construct()
     {
@@ -35,6 +37,7 @@ class ApiController extends ResourceController
         $this->produksiModel = new ProduksiModel();
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
+        $this->DetailPlanningModel = new DetailPlanningModel();
         $this->BsMesinModel = new BsMesinModel();
         $this->validation = \Config\Services::validation();
     }
@@ -71,5 +74,14 @@ class ApiController extends ResourceController
 
         // Return the result with a 200 status if everything is okay
         return $this->respond($dataOrder, 200);
+    }
+    public function reqstartmc($model)
+    {
+        $startMc = $this->DetailPlanningModel->reqstartmc($model);
+        if (isset($startMc['error'])) {
+            return $this->respond(['message' => $startMc['error']], 404);
+        }
+
+        return $this->respond($startMc, 200);
     }
 }
