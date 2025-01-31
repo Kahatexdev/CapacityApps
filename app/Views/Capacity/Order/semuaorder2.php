@@ -60,18 +60,25 @@
                                     <td class="text-xs"><?= $order->seam; ?></td>
                                     <td class="text-xs"><?= $order->leadtime; ?> Days</td>
                                     <td class="text-xs"><?= date('d-M-y', strtotime($order->delivery)); ?></td>
-                                    <td class="text-xs"><?= number_format(round($order->qty / 24), 0, ',', '.'); ?> Dz</td>
-                                    <td class="text-xs"><?= number_format(round($order->sisa / 24), 0, ',', '.'); ?> Dz</td>
+
+                                    <?php
+                                    // Jika machinetypeid = 240n, bagi qty dan sisa dengan 12, selain itu bagi dengan 24
+                                    $divider = ($order->machinetypeid == '240n') ? 12 : 24;
+                                    ?>
+
+                                    <td class="text-xs"><?= number_format(round($order->qty / $divider), 0, ',', '.'); ?> Dz</td>
+                                    <td class="text-xs"><?= number_format(round($order->sisa / $divider), 0, ',', '.'); ?> Dz</td>
 
                                     <td class="text-xs">
                                         <?php if ($order->qty === null) : ?>
-                                            <!-- If qty is null, set action to Import -->
+                                            <!-- Jika qty null, tampilkan tombol Import -->
                                             <button type="button" class="btn import-btn btn-success text-xs" data-toggle="modal" data-target="#importModal" data-id="<?= $order->id_model; ?>" data-no-model="<?= $order->no_model; ?>">
                                                 Import
                                             </button>
                                         <?php else : ?>
-                                            <!-- If qty is not null, set action to Details -->
-                                            <a href="<?= base_url($role . '/detailmodel/' . $order->no_model . '/' . $order->delivery); ?>"><button type="button" class="btn btn-info btn-sm details-btn">
+                                            <!-- Jika qty tidak null, tampilkan tombol Details -->
+                                            <a href="<?= base_url($role . '/detailmodel/' . $order->no_model . '/' . $order->delivery); ?>">
+                                                <button type="button" class="btn btn-info btn-sm details-btn">
                                                     Details
                                                 </button>
                                             </a>
@@ -79,6 +86,7 @@
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
+
                         </tbody>
                     </table>
                 </div>
