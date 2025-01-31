@@ -65,7 +65,7 @@
                                             <td class="text-sm"><?= date('d-M-y', strtotime($order['delivery'])); ?></td>
                                             <?php
                                             // Jika machinetypeid = 240n, bagi qty dan sisa dengan 12, selain itu bagi dengan 24
-                                            $divider = ($order->machinetypeid == '240n') ? 12 : 24;
+                                            $divider = ($order->machinetypeid == '240N') ? 12 : 24;
                                             ?>
 
                                             <td class="text-xs"><?= number_format(round($order->qty / $divider), 0, ',', '.'); ?> Dz</td>
