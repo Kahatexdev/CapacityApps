@@ -312,6 +312,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetailAps/$1');
     $routes->get('getModelData', 'PlanningController::getModelData');
+    $routes->post('pindahjarum/(:any)', 'PlanningController::pindahjarum/$1');
 
 
     // produksi

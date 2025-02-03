@@ -2,6 +2,13 @@
 error_reporting(E_ALL); ?>
 <?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
+<style>
+    .badge {
+        cursor: pointer;
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+</style>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
         <script>
@@ -76,6 +83,7 @@ error_reporting(E_ALL); ?>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Machine</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Days</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -97,21 +105,33 @@ error_reporting(E_ALL); ?>
                                             </td>
                                             <td class="text-sm"><?= htmlspecialchars($order['hari']); ?> Days</td>
                                             <td class="text-sm">
-
                                                 <?php if ($order['est_qty'] < $order['sisa']) : ?>
-                                                    <a href="<?= base_url($role . '/planningpage/' . $order['id_detail_pln']) . '/' . $id_pln_mc ?>" class="btn btn-primary">Detail</a>
-
+                                                    <a href="<?= base_url($role . '/planningpage/' . $order['id_detail_pln']) . '/' . $id_pln_mc ?>" class="btn btn-primary btn-sm">Detail</a>
                                                 <?php else : ?>
-                                                    <a href="<?= base_url($role . '/planningpage/' . $order['id_detail_pln']) . '/' . $id_pln_mc ?>" class="btn btn-secondary">Detail</a>
-
+                                                    <a href="<?= base_url($role . '/planningpage/' . $order['id_detail_pln']) . '/' . $id_pln_mc ?>" class="btn btn-secondary btn-sm">Detail</a>
                                                 <?php endif; ?>
-                                                <button class="btn btn-danger stop-btn"
+                                                <button class="btn btn-sm text-white bg-danger stop-btn  mr-2"
                                                     data-id="<?= $order['id_detail_pln']; ?>"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#confirmStopModal">
                                                     Stop
                                                 </button>
                                             </td>
+                                            <td class="text-sm">
+
+
+                                                <span class="badge bg-warning text-dark move-btn "
+                                                    data-id="<?= $order['id_detail_pln']; ?>"
+                                                    data-area="<?= $area ?>"
+                                                    data-pdk="<?= $order['model'] ?>"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#moveJarum">
+                                                    <i class="fas fa-sign-out-alt"></i>
+                                                    Pindah
+                                                </span>
+                                            </td>
+
+
                                         </tr>
                                     <?php endforeach; ?>
 
@@ -138,6 +158,35 @@ error_reporting(E_ALL); ?>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="button" id="confirmStopButton" class="btn btn-danger">Yes, Stop</button>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="moveJarum" tabindex="-1" aria-labelledby="moveJarum" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="moveJarumText">Pindah Jarum</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="" method="post">
+
+                            <input type="hidden" name="id_detail" id="id_detail">
+                            <div class="form-group">
+                                <label for="pindahjarum" class="form-control">Pilih Jarum</label>
+                                <select name="jarumname" id="jarumname" class="form-control">
+                                    <option value="">----</option>
+                                    <?php foreach ($jarumList as $jrm): ?>
+                                        <option value="<?= $jrm['id_pln_mc'] ?>"><?= $jrm['jarum'] ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" id="" class="btn btn-info">Pindah</button>
+                    </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -186,6 +235,20 @@ error_reporting(E_ALL); ?>
                         }
                     });
                 });
+                $('.move-btn').click(function() {
+                    var id = $(this).data('id');
+                    var pdk = $(this).data('pdk');
+                    var area = $(this).data('area');
+                    var idpage = <?= $id_pln_mc ?>
+
+                    console.log(idpage);
+                    $('#moveJarum').find('input[name="id_detail"]').val(id);
+                    $('#moveJarum').find('#moveJarumText').text('Pindah Jarum ' + pdk);
+
+                    $('#moveJarum').modal('show');
+                    $('#moveJarum').find('form').attr('action', '<?= base_url($role . '/pindahjarum/') ?>' + idpage);
+
+                });
 
             });
 
@@ -225,6 +288,7 @@ error_reporting(E_ALL); ?>
                         })
                         .catch(error => console.error('Error:', error));
                 });
+
             });
         </script>
 

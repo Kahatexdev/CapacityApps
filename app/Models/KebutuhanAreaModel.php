@@ -48,7 +48,7 @@ class KebutuhanAreaModel extends Model
     }
     public function getDataByAreaGroupJrm($area)
     {
-        return $this->select('jarum')
+        return $this->select('id_pln_mc,jarum')
             ->where('area', $area)
             ->groupBy('jarum')
             ->findAll();

@@ -566,6 +566,7 @@ class ApsController extends BaseController
         $jarum =  $kebutuhanArea['jarum'];
         $mesinarea = $this->jarumModel->getMesinByArea($area, $jarum); //mesin yang dipakai semua mesin tanpa melibatkan head planning
         // $mesinplanning = $this->MesinPlanningModel->getMesinByArea($area,$jarum); //mesin yang dipilih oleh head planning di teruskan ke bagian aps
+        $jarumList = $this->KebutuhanAreaModel->getDataByAreaGroupJrm($area);
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Planning',
@@ -582,6 +583,7 @@ class ApsController extends BaseController
             'jarum' => $jarum,
             'mesin' => $mesinarea,
             'id_pln_mc' => $id,
+            'jarumList' => $jarumList
         ];
         return view(session()->get('role') . '/Planning/fetchDataArea', $data);
     }

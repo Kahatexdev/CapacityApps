@@ -16,6 +16,7 @@ use App\Models\KebutuhanMesinModel;
 use App\Models\MesinPlanningModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
+use App\Models\DetailPlanningModel;
 use App\Models\MonthlyMcModel;
 use App\Services\orderServices;
 
@@ -36,6 +37,8 @@ class PlanningController extends BaseController
     protected $MesinPlanningModel;
     protected $globalModel;
     protected $orderServices;
+    protected $DetailPlanningModel;
+
 
 
     public function __construct()
@@ -50,6 +53,8 @@ class PlanningController extends BaseController
         $this->liburModel = new LiburModel();
         $this->KebutuhanMesinModel = new KebutuhanMesinModel();
         $this->MesinPlanningModel = new MesinPlanningModel();
+        $this->DetailPlanningModel = new DetailPlanningModel();
+
         $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => ['planning']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -632,5 +637,18 @@ class PlanningController extends BaseController
 
         // Jika bukan permintaan AJAX, tampilkan 403 Forbidden
         return $this->response->setStatusCode(403)->setBody('Forbidden');
+    }
+    public function pindahjarum($pageid)
+    {
+        $role = session()->get('role');
+        $idPdk = $this->request->getPost('id_detail');
+        $idJarum = $this->request->getPost('jarumname');
+        $update = $this->DetailPlanningModel->update($idPdk, ['id_pln_mc' => $idJarum]);
+
+        if ($update) {
+            return redirect()->to(base_url($role . '/detailplnmc/' . $pageid))->with('success', 'Model berhasil Dipindahkan');
+        } else {
+            return redirect()->to(base_url($role . '/detailplnmc/' . $pageid))->with('error', 'Model Gagal Dipindahkan');
+        }
     }
 }

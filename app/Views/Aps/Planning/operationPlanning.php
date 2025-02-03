@@ -264,6 +264,12 @@
                                         </th>
                                     </tr>
                                 <?php endforeach; ?>
+                                <tr>
+                                    <th colspan="8" style="text-align: right;">Total Est Full Shipment :</th>
+                                    <th style="text-align: center; vertical-align: middle;" id="totalFull">
+                                        0 Dz
+                                    </th>
+                                </tr>
                             </tfoot>
 
                             <!-- Add a hidden input or data attribute to pass the empty state -->
@@ -312,22 +318,36 @@
             var table = $('#dataTable').DataTable({
                 "footerCallback": function(row, data, start, end, display) {
                     var api = this.api();
+
+                    // Menghitung total est_qty per shipment per halaman
                     var total = api.column(8, {
                         page: 'current'
                     }).data().reduce(function(acc, val) {
-                        var num = parseFloat(val.replace(/[^\d.-]/g, '')); // Extract numeric values
-                        return acc + (isNaN(num) ? 0 : num); // Add numeric values, treat NaN as 0
+                        var num = parseFloat(val.replace(/[^\d.-]/g, '')); // Ekstrak nilai numerik
+                        return acc + (isNaN(num) ? 0 : num); // Menambahkan nilai numerik, anggap NaN sebagai 0
                     }, 0);
 
-                    // Update the footer with the total sum
+                    // Update total per shipment di footer
                     $('#total-est-qty').text(total.toLocaleString('en', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }) + ' Dz');
+
+                    // Menghitung grand total dari seluruh halaman
+                    var grandTotal = api.column(8).data().reduce(function(acc, val) {
+                        var num = parseFloat(val.replace(/[^\d.-]/g, '')); // Ekstrak nilai numerik
+                        return acc + (isNaN(num) ? 0 : num); // Menambahkan nilai numerik
+                    }, 0);
+
+                    // Update grand total untuk seluruh shipment
+                    $('#totalFull').text(grandTotal.toLocaleString('en', {
                         minimumFractionDigits: 0,
                         maximumFractionDigits: 0
                     }) + ' Dz');
                 }
             });
-
         });
+
 
         function editPlan(no) {
             let button = document.getElementById('editPlan-' + no);
