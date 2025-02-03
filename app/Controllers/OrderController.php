@@ -1218,6 +1218,7 @@ class OrderController extends BaseController
     }
     public function sisaOrderBuyer($buyer)
     {
+        $weekCount = 1;
         $role = session()->get('role');
         $month = $this->request->getPost('month');
         $yearss = $this->request->getPost('year');

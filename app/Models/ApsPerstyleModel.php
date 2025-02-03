@@ -483,9 +483,10 @@ class ApsPerstyleModel extends Model
     }
     public function getStyle($pdk)
     {
-        return $this->select('idapsperstyle, mastermodel, size,sum(qty) as qty, sum(po_plus) as po_plus')
+        return $this->select('idapsperstyle, mastermodel, size,sum(qty) as qty, sum(po_plus) as po_plus, inisial')
             ->where('mastermodel', $pdk)
             ->groupBy('size')
+            ->orderBy('inisial')
             ->findAll();
     }
 

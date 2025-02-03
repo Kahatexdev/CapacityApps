@@ -215,8 +215,12 @@ class CalendarController extends BaseController
             'end' => $akhir,
         ];
         $KebMesin =  $this->hitungMcOrder($get);
+        $jumlahHariArray = array_column($KebMesin, 'JumlahHari');
+
+        $maxHari = !empty($jumlahHariArray) ? max($jumlahHariArray) : 0;
+
         $kategori = $this->productModel->getKategori();
-        $maxHari = max(array_column($KebMesin, 'JumlahHari'));
+
         $kebutuhanMcTotal = max(array_column($planMc, 'kebutuhanMcPerbulan'));
 
 

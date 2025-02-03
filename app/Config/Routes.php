@@ -536,6 +536,12 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->post('resetbspdk', 'DeffectController::resetbs');
     $routes->post('resetbsarea', 'DeffectController::resetbsarea');
 
+    //pluspacking
+    $routes->get('viewModelPlusPacking/(:any)', 'ProduksiController::viewModelPlusPacking/$1');
+    $routes->get('pluspacking', 'ProduksiController::pluspacking');
+    $routes->post('inputpo', 'ProduksiController::updatepo');
+
+
     // usermanageement
     $routes->get('account', 'GodController::account');
     $routes->post('addaccount', 'GodController::addaccount');
