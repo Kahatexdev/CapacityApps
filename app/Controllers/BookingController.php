@@ -95,8 +95,10 @@ class BookingController extends BaseController
         return view(session()->get('role') . '/Booking/jarum', $data);
     }
 
-    public function bookingPerBulanJarum($jarum)
+    public function bookingPerBulanJarum($needle)
     {
+        $pos = strpos($needle, '-');
+        $jarum = substr($needle, 0, $pos);
         $bulan = $this->bookingModel->getbulan($jarum);
         $data = [
             'role' => session()->get('role'),
