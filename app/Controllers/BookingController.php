@@ -98,7 +98,11 @@ class BookingController extends BaseController
     public function bookingPerBulanJarum($needle)
     {
         $pos = strpos($needle, '-');
-        $jarum = substr($needle, 0, $pos);
+        if ($pos) {
+            $jarum = substr($needle, 0, $pos);
+        } else {
+            $jarum = $needle;
+        }
         $bulan = $this->bookingModel->getbulan($jarum);
         $data = [
             'role' => session()->get('role'),
