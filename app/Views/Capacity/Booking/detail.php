@@ -403,12 +403,9 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="jarum" class="col-form-label">Needle</label>
-                                    <select class="form-control" id="jarum" name="jarum">
-                                        <option value="">Choose</option>
-                                        <?php foreach ($jenisJarum as $jj) : ?>
-                                            <option value="<?= $jj['jarum'] ?>"><?= $jj['jarum'] ?></option>
-                                        <?php endforeach ?>
-                                    </select>
+                                    <input type="text" name="jarum" id="" class="form-control" value="<?= $booking['needle']; ?>">
+
+
                                 </div>
 
                                 <div class="form-group">
@@ -596,12 +593,8 @@
                             </div>
                             <div class="form-group">
                                 <label for="jarum" class="col-form-label">Needle</label>
-                                <select class="form-control" id="jarum" name="jarum">
-                                    <option value="">Choose</option>
-                                    <?php foreach ($jenisJarum as $jj) : ?>
-                                        <option value="<?= $jj['jarum'] ?>"><?= $jj['jarum'] ?></option>
-                                    <?php endforeach ?>
-                                </select>
+                                <input type="text" name="jarum" id="" class="form-control">
+
                             </div>
 
                             <div class="form-group">
