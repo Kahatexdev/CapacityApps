@@ -555,11 +555,16 @@ class ApsController extends BaseController
                 $jum += $mc['mesin'];
             }
 
+            $dp['delivery'] = date('d-M-y', strtotime($qtysisa['delivery']));
             $dp['mesin'] = $jum;
             $dp['qty'] = round($qtysisa['qty']);
             $dp['sisa'] =
                 round($qtysisa['sisa']);
         }
+        usort($detailplan, function ($a, $b) {
+            return strtotime($a['delivery']) - strtotime($b['delivery']);
+        });
+
         $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();
         $judul = $kebutuhanArea['judul'];
         $area = $kebutuhanArea['area'];
@@ -699,6 +704,7 @@ class ApsController extends BaseController
                 'smv' => $row['smv'],
                 'jarum' => $row['machinetypeid'],
                 'status' => 'aktif',
+                'delivery' => 'delivery',
             ];
             $cek = $this->DetailPlanningModel->cekPlanning($validate);
             if (!$cek) {
@@ -778,6 +784,7 @@ class ApsController extends BaseController
         $qty = $this->request->getPost('qty');
         $sisa = $this->request->getPost('sisa');
         $target = $this->request->getPost('target_akhir');
+        $keterangan = $this->request->getPost('keterangan');
         preg_match('/^[\d\.]+/', $target, $matches);
         $numericalTarget = $matches[0];
         $persentarget = $this->request->getPost('persen_target');
@@ -809,6 +816,7 @@ class ApsController extends BaseController
             'target' => $numericalTarget,
             'precentage_target' => $persentarget,
             'delivery' => $delivery,
+            'keterangan' => $keterangan
         ];
 
         // Cek apakah ID ada (proses edit atau save baru)

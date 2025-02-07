@@ -884,10 +884,11 @@ class ApsPerstyleModel extends Model
     }
     public function getSisaPerModel($model, $jarum)
     {
-        return $this->select('sum(qty/24) as qty, sum(sisa/24) as sisa')
+        return $this->select('sum(qty/24) as qty, sum(sisa/24) as sisa, delivery')
             ->where('mastermodel', $model)
             ->where('machinetypeid', $jarum)
             ->groupBy('machinetypeid')
+            ->orderBy('delivery', 'asc')
             ->first();
     }
 }

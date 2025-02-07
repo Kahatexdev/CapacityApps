@@ -159,6 +159,12 @@
                                     <input class="form-control estimated-qty" type="number" value="" name="estimated_qty" id="estimated-qty" readonly>
                                 </div>
                             </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label for="" class="form-control-label">Keterangan </label>
+                                    <input class="form-control " type="text" value="" name="keterangan" id="keterangan">
+                                </div>
+                            </div>
                         </div>
 
 
@@ -203,6 +209,7 @@
                                     <th>Days</th>
                                     <th>Machine</th>
                                     <th>Estimated Production</th>
+                                    <th>Keterangan</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -233,6 +240,7 @@
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= htmlspecialchars($order['hari']); ?> Days</td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= htmlspecialchars($order['mesin']); ?> Mc</td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= number_format($estQty, 0, '.', ','); ?> Dz</td>
+                                        <td class="text-sm"> <?= $order['keterangan'] ?></td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;">
                                             <button class="btn btn-info btn-edit" id="editPlan-<?= $no ?>" onclick="editPlan(<?= $no ?>)"
                                                 data-start="<?= $order['start_date'] ?>"

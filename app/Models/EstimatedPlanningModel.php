@@ -12,7 +12,7 @@ class EstimatedPlanningModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_est_qty', 'id_detail_pln', 'Est_qty', 'hari', 'target', 'precentage_target', 'delivery'];
+    protected $allowedFields    = ['id_est_qty', 'id_detail_pln', 'Est_qty', 'hari', 'target', 'precentage_target', 'delivery', 'keterangan'];
 
     protected bool $allowEmptyInserts = false;
 

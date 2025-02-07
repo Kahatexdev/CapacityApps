@@ -74,6 +74,7 @@ error_reporting(E_ALL); ?>
                                 <tr>
                                     <th>Model</th>
                                     <th>Mesin</th>
+                                    <th>Ket</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -124,9 +125,11 @@ error_reporting(E_ALL); ?>
                             var row = tableBody.insertRow();
                             var modelCell = row.insertCell(0);
                             var mesinCell = row.insertCell(1);
+                            var ketCell = row.insertCell(2);
 
                             modelCell.textContent = model;
                             mesinCell.textContent = description[model] + ' Mc';
+                            ketCell.textContent = description[model] + ' Mc';
                         }
 
                         // Tampilkan modal
