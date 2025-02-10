@@ -2769,6 +2769,7 @@ class ExcelController extends BaseController
         $totalPerWeek = []; // Untuk menyimpan total produksi per minggu
 
         foreach ($data as $id) {
+            $buyer = $id['kd_buyer_order'];
             $mastermodel = $id['mastermodel'];
             $machinetypeid = $id['machinetypeid'];
             $factory = $id['factory'];
@@ -2815,6 +2816,7 @@ class ExcelController extends BaseController
                         'prod' => $produksi,
                         'sisa' => $sisa,
                         'jlMc' => $jlMc,
+                        'buyer' => $buyer,
                     ]);
 
                     // Hitung total per minggu
@@ -3048,6 +3050,7 @@ class ExcelController extends BaseController
             $col4++;
         }
 
+        // dd($allData);
         $row = 5;
         $rowsModel = 0;
         foreach ($allData as $noModel => $id) {
@@ -3068,12 +3071,21 @@ class ExcelController extends BaseController
                                 $rowsModel += $rowDelivery - 1;
                                 $rowsJarum += $rowDelivery - 1;
                             }
+                            // Extract buyer data from the rowArea
+                            foreach ($rowArea[$i] as $entry) {
+                                // Decode the JSON to get the original array
+                                $entryData = json_decode($entry, true);
+                                if (isset($entryData['buyer'])) {
+                                    $buyer = $entryData['buyer'];  // Get the buyer data
+                                    break; // If you only need the buyer from the first entry
+                                }
+                            }
                         }
                     }
                 }
             }
             $mergeModel = $row + $rowsModel - 1;
-            $sheet->setCellValue('A' . $row, $ar);
+            $sheet->setCellValue('A' . $row, $buyer);
             $sheet->setCellValue('B' . $row, $noModel);
             $sheet->mergeCells('A' . $row . ':A' . $mergeModel);
             $sheet->getStyle('A' . $row . ':A' . $mergeModel)->applyFromArray($styleBody);

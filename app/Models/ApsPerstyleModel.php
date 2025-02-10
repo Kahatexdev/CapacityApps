@@ -731,7 +731,8 @@ class ApsPerstyleModel extends Model
     }
     public function getAreaOrder($ar, $bulan)
     {
-        return $this->select('machinetypeid, mastermodel, delivery, factory, production_unit, round(sum(qty)/24) as qty, round(sum(sisa)/24) as sisa')
+        return $this->select('data_model.kd_buyer_order, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.delivery, apsperstyle.factory, apsperstyle.production_unit, round(sum(apsperstyle.qty)/24) as qty, round(sum(apsperstyle.sisa)/24) as sisa')
+            ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
             ->where('apsperstyle.factory', $ar)
             ->where('apsperstyle.production_unit !=', 'MJ')
             ->where('MONTH(apsperstyle.delivery)', date('m', strtotime($bulan))) // Filter bulan
