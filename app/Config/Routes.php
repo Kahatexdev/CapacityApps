@@ -409,6 +409,10 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
 
     //summary bs mc
     $routes->post('exportSummaryBs', 'SummaryController::excelSummaryBs');
+
+    // bahanbaku
+    $routes->get('bahanBaku', 'MaterialController::index');
+    $routes->get('statusbahanbaku/(:any)', 'MaterialController::statusbahanbaku/$1');
 });
 
 // sudo
