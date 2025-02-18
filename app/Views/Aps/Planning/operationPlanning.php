@@ -33,7 +33,10 @@
                         <h5>
                             Planning Order for area <?= $area ?> needle <?= $jarum ?> Total <?= $mesin ?> Machine
                         </h5>
-                        <a href="<?= base_url($role . '/detailplnmc/' . $id_pln) ?>" class="btn btn-secondary ml-auto">Back</a>
+                        <div class="div">
+                            <a href="<?= base_url($role . '/detailplnmc/' . $id_pln) ?>" class="btn btn-secondary ml-auto">Back</a>
+                            <a href="<?= base_url($role . '/cekBahanBaku/' . $id_save . '/' . $id_pln); ?>" class="btn btn-info">Cek Bahan Baku</a>
+                        </div>
                     </div>
 
                 </div>
@@ -208,8 +211,8 @@
                                     <th>Target</th>
                                     <th>Days</th>
                                     <th>Machine</th>
+                                    <th>keterangan</th>
                                     <th>Estimated Production</th>
-                                    <th>Keterangan</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -239,8 +242,8 @@
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= htmlspecialchars($order['target']); ?> Dz</td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= htmlspecialchars($order['hari']); ?> Days</td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= htmlspecialchars($order['mesin']); ?> Mc</td>
+                                        <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= $order['keterangan']; ?> </td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= number_format($estQty, 0, '.', ','); ?> Dz</td>
-                                        <td class="text-sm"> <?= $order['keterangan'] ?></td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;">
                                             <button class="btn btn-info btn-edit" id="editPlan-<?= $no ?>" onclick="editPlan(<?= $no ?>)"
                                                 data-start="<?= $order['start_date'] ?>"
@@ -251,6 +254,17 @@
                                                 data-days="<?= $order['hari']; ?>"
                                                 data-idEst="<?= $order['id_est_qty']; ?>">
                                                 Edit
+                                            </button>
+                                            <button class="btn btn-warning btn-plan" id="planStyle-<?= $no ?>" onclick="planStyle(<?= $no ?>)"
+                                                data-idEst="<?= $order['id_est_qty']; ?>"
+                                                data-detalID="<?= $order['id_detail_pln'] ?>"
+                                                data-mc="<?= $order['mesin'] ?>"
+                                                data-delivery="<?= $order['delivery'] ?>"
+                                                data-start="<?= $order['start_date'] ?>"
+                                                data-stop="<?= $order['stop_date'] ?>">
+                                                <span class="text-sm">
+                                                    Plan
+                                                </span>
                                             </button>
                                             <button class="btn btn-danger btn-update" data-toggle="modal" data-target="#modalUpdate"
                                                 data-start="<?= $order['start_date'] ?>"
@@ -266,14 +280,14 @@
                             <tfoot>
                                 <?php foreach ($totalEstQtyByDelivery as $delivery => $totalEstQty) : ?>
                                     <tr>
-                                        <th colspan="8" style="text-align: right;">Total Estimated Production <?= htmlspecialchars($delivery) ?>:</th>
-                                        <th style="text-align: center; vertical-align: middle;" id="total-est-qty-<?= htmlspecialchars(str_replace(' ', '-', $delivery)) ?>">
+                                        <th colspan="9" style="text-align: right;">Total Estimated Production <?= htmlspecialchars($delivery) ?>:</th>
+                                        <th style="text-align: center; vertical-align: middle;" id="total-est-qty-<?= htmlspecialchars($delivery) ?>">
                                             <?= number_format($totalEstQty ?? 0, 0, '.', ','); ?> Dz
                                         </th>
                                     </tr>
                                 <?php endforeach; ?>
                                 <tr>
-                                    <th colspan="8" style="text-align: right;">Total Est Full Shipment :</th>
+                                    <th colspan="9" style="text-align: right;">Total Est Full Shipment :</th>
                                     <th style="text-align: center; vertical-align: middle;" id="totalFull">
                                         0 Dz
                                     </th>
@@ -288,6 +302,31 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="row mt-4 planStyleCard d-none">
+        <div class="col-md-12">
+            <div class="card  ">
+                <div class="card-header">
+                    <h4 class="text-header headerPlan">
+                        Plan Machine
+                    </h4>
+                    <div class="row headerText">
+
+                    </div>
+                </div>
+                <form action="<?= base_url($role . '/savePlanStyle') ?>" method="post">
+                    <div class="card-body planDetail">
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+
+                            <button type="submit" class="btn btn-info "> Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </div>
 
     <!-- Modal for Deleting -->
@@ -322,32 +361,137 @@
     </div>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll(".btn-plan").forEach(button => {
+                button.addEventListener("click", function() {
+                    let planStyleCard = document.querySelector(".planStyleCard");
+                    let id = button.getAttribute("data-idEst");
+                    let detailId = button.getAttribute("data-detailId");
+                    let mesin = button.getAttribute("data-mc");
+                    let delivery = button.getAttribute("data-delivery");
+                    let start = button.getAttribute("data-start");
+                    let stop = button.getAttribute("data-stop");
+                    const model = document.getElementById('model-data').value;
+                    const jarum = <?= json_encode($jarum); ?>;
+                    $.ajax({
+                        url: '<?= base_url("aps/getPlanStyle") ?>',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {
+                            jarum: jarum,
+                            model: model,
+                            delivery: delivery,
+
+                        },
+                        success: function(response) {
+                            if (response) {
+                                console.log(response)
+                                document.querySelector(".headerPlan").textContent = 'Plan Mesin Delivery ' + delivery;
+                                document.querySelector(".headerText").innerHTML = `
+                                    <div class="col-md-12">
+                                         <strong>Mesin: </strong> ${mesin} <br> 
+                                         <strong>Start: </strong> ${start} <br> 
+                                        <strong> Stop:  </strong>${stop}
+                                    </div>
+                                `;
+                                let planHtml = `
+        <table id="planTable" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Inisial</th>
+                    <th>Style</th>
+                    <th>Qty</th>
+                    <th>Sisa</th>
+                    <th>Mesin</th>
+                    <th>Keterangan</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${response.data.map(item => `
+                    <tr>
+                        <td>${item.inisial}</td>
+                        <td>${item.style}
+                            <input type="hidden" value="${item.idAps}" name="idAps[]">
+                            <input type="hidden" value="${item.detailId}" name="detailId[]">
+                        </td>
+                           <td>${item.qty} dz</td>
+                           <td>${item.sisa} dz</td>
+                        <td>
+                            <input type="number" class="form-control" value="${item.mesin ?? '0'}" name="mesin[]">
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" value="${item.keterangan ?? ''}" name="keterangan[]">
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+          
+    `;
+
+                                document.querySelector(".planDetail").innerHTML = planHtml;
+                                document.querySelector(".planStyleCard").classList.toggle("d-none");
+
+                                // **Aktifkan DataTables setelah tabel dirender**
+                                $('#planTable').DataTable({
+                                    paging: true, // Pagination aktif
+                                    searching: true, // Bisa cari data
+                                    ordering: true, // Bisa sort kolom
+                                    lengthMenu: [
+                                        [5, 10, 25, -1],
+                                        [5, 10, 25, "All"]
+                                    ], // Dropdown jumlah data
+                                    language: {
+                                        search: "Cari:",
+                                        lengthMenu: "Tampilkan _MENU_ data",
+                                        info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+                                        paginate: {
+                                            previous: "Sebelumnya",
+                                            next: "Berikutnya"
+                                        }
+                                    }
+                                });
+                            } else {
+                                console.error('Error: Response format invalid.');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('AJAX Error:', error);
+                        }
+                    });
+
+                });
+            });
+        });
         $(document).ready(function() {
+            $("#dataTable").DataTable().destroy();
+
             var table = $('#dataTable').DataTable({
+
                 "footerCallback": function(row, data, start, end, display) {
                     var api = this.api();
 
-                    // Menghitung total est_qty per shipment per halaman
-                    var total = api.column(8, {
+                    // Menghitung total Estimated Production per halaman
+                    var total = api.column(9, {
                         page: 'current'
                     }).data().reduce(function(acc, val) {
-                        var num = parseFloat(val.replace(/[^\d.-]/g, '')); // Ekstrak nilai numerik
-                        return acc + (isNaN(num) ? 0 : num); // Menambahkan nilai numerik, anggap NaN sebagai 0
+                        var num = parseFloat(val.replace(/[^\d.-]/g, '')); // Ekstrak angka dari string
+                        return acc + (isNaN(num) ? 0 : num);
                     }, 0);
 
-                    // Update total per shipment di footer
-                    $('#total-est-qty').text(total.toLocaleString('en', {
+                    // Update Total Estimated Production di halaman saat ini
+                    $(api.column(9).footer()).text(total.toLocaleString('en', {
                         minimumFractionDigits: 0,
                         maximumFractionDigits: 0
                     }) + ' Dz');
 
-                    // Menghitung grand total dari seluruh halaman
-                    var grandTotal = api.column(8).data().reduce(function(acc, val) {
-                        var num = parseFloat(val.replace(/[^\d.-]/g, '')); // Ekstrak nilai numerik
-                        return acc + (isNaN(num) ? 0 : num); // Menambahkan nilai numerik
+                    // Menghitung Grand Total dari seluruh halaman
+                    var grandTotal = api.column(9).data().reduce(function(acc, val) {
+                        var num = parseFloat(val.replace(/[^\d.-]/g, ''));
+                        return acc + (isNaN(num) ? 0 : num);
                     }, 0);
 
-                    // Update grand total untuk seluruh shipment
+                    // Update Grand Total
                     $('#totalFull').text(grandTotal.toLocaleString('en', {
                         minimumFractionDigits: 0,
                         maximumFractionDigits: 0
@@ -355,6 +499,7 @@
                 }
             });
         });
+
 
 
         function editPlan(no) {

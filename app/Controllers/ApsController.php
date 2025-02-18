@@ -19,6 +19,7 @@ use App\Models\MesinPlanningModel;
 use App\Models\DetailPlanningModel;
 use App\Models\TanggalPlanningModel;
 use App\Models\EstimatedPlanningModel;
+use App\Models\MesinPerStyle;
 use App\Models\AksesModel;/*  */
 use App\Services\orderServices;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -43,6 +44,7 @@ class ApsController extends BaseController
     protected $TanggalPlanningModel;
     protected $EstimatedPlanningModel;
     protected $orderServices;
+    protected $MesinPerStyle;
 
     public function __construct()
     {
@@ -60,6 +62,7 @@ class ApsController extends BaseController
         $this->DetailPlanningModel = new DetailPlanningModel();
         $this->TanggalPlanningModel = new TanggalPlanningModel();
         $this->EstimatedPlanningModel = new EstimatedPlanningModel();
+        $this->MesinPerStyle = new MesinPerStyle();
         $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -1128,5 +1131,84 @@ class ApsController extends BaseController
 
         // Jika bukan permintaan AJAX, kembalikan halaman 404
         throw new \CodeIgniter\Exceptions\PageNotFoundException();
+    }
+
+    public function getPlanStyle()
+    {
+        if ($this->request->isAJAX()) {
+            try {
+                $jarum = $this->request->getGet('jarum');
+                $model = $this->request->getGet('model');
+                $delivery = $this->request->getGet('delivery');
+                $style = $this->ApsPerstyleModel->detailModelJarum($model, $delivery, $jarum);
+                $return = [];
+                foreach ($style as $jc) {
+                    $idAps = $jc['idapsperstyle'];
+                    $mesin = $this->MesinPerStyle->getMesin($idAps);
+                    $return[] = [
+                        'idAps' => $idAps,
+                        'inisial' => $jc['inisial'] ?? null,
+                        'style' => $jc['size'] ?? null,
+                        'qty' => round($jc['qty'] / 24) ?? null,
+                        'sisa' => round($jc['sisa'] / 24) ?? null,
+                        'mesin' => $mesin['mesin'] ?? null,
+                        'keterangan' => $mesin['keterangan'] ?? null,
+                    ];
+                }
+                usort($return, function ($a, $b) {
+                    return strcmp($a['inisial'], $b['inisial']);
+                });
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'data' => $return // Replace with your data
+                ]);
+            } catch (\Exception $e) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => $e->getMessage()
+                ]);
+            }
+        }
+    }
+    public function savePlanStyle()
+    {
+
+        $request = $this->request;
+
+        $idAps = $request->getPost('idAps');
+        $detailId = $request->getPost('detailId');
+        $mesin = $request->getPost('mesin');
+        $keterangan = $request->getPost('keterangan');
+
+        if (!empty($idAps) && is_array($idAps)) {
+            foreach ($idAps as $key => $id_apsperstyle) {
+                $id_est_qty = $detailId[$key] ?? null;
+                $jumlah_mesin = $mesin[$key] ?? 0;
+                $desc = $keterangan[$key] ?? '';
+
+                // Cek apakah data sudah ada di tabel
+                $existing = $this->MesinPerStyle->where('id_est_qty', $id_est_qty)
+                    ->where('idapsperstyle', $id_apsperstyle)
+                    ->first();
+
+                if ($existing) {
+                    // Jika data sudah ada, lakukan update
+                    $this->MesinPerStyle->update($existing['id_mesin_perinisial'], [
+                        'mesin' => $jumlah_mesin,
+                        'keterangan' => $desc
+                    ]);
+                } else {
+                    // Jika belum ada, lakukan insert
+                    $this->MesinPerStyle->insert([
+                        'id_est_qty' => $id_est_qty,
+                        'idapsperstyle' => $id_apsperstyle,
+                        'mesin' => $jumlah_mesin,
+                        'keterangan' => $desc
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->back()->with('success', 'Data berhasil disimpan.');
     }
 }
