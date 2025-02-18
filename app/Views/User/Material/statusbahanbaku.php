@@ -37,8 +37,10 @@
                                 </h5>
                             </div>
                         </div>
-                        <div class="col-4 d-flex align-items-center text-end">
-                            <input type="text" class="form-control" id="filter" value="" placeholder="No Model/Kode Warna/Lot/Tanggal Schedule(yyyy-mm-dd)">
+                        <div class="col-4 d-flex align-items-center text-end gap-2">
+                            <label for="">Tanggal Schedule</label>
+                            <input type="date" class="form-control" id="filter_date" value="">
+                            <input type="text" class="form-control" id="filter" value="" placeholder="No Model/Kode Warna/Lot">
                             <button id="filterButton" class="btn btn-info ms-2"><i class="fas fa-search"></i></button>
                         </div>
                         <div class="col-1 text-end">
@@ -67,10 +69,14 @@
 <script>
     document.getElementById('filterButton').addEventListener('click', function() {
         let keyword = document.getElementById('filter').value.trim();
+        let keyword2 = document.getElementById('filter_date').value.trim();
+
+        // Use a ternary operator to set 'cari'
+        const cari = isNaN(keyword) ? encodeURIComponent(keyword) : encodeURIComponent(keyword2);
         console.log("Keyword: ", keyword); // Debugging
 
         // Pastikan $role dan $area ada dan diterjemahkan dengan benar oleh PHP
-        let apiUrl = `/${'<?= $role ?>'}/filterstatusbahanbaku/<?= $area ?>?search=${encodeURIComponent(keyword)}`;
+        let apiUrl = `/${'<?= $role ?>'}/filterstatusbahanbaku/<?= $area ?>?search=${cari}`;
 
         // Mengirim data ke controller internal
         fetch(apiUrl)
