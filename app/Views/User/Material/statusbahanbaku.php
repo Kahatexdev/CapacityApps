@@ -28,8 +28,8 @@
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
             <div class="card">
                 <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-8">
+                    <div class="row d-flex align-items-center">
+                        <div class="col-7">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Material System</p>
                                 <h5 class="font-weight-bolder mb-0">
@@ -37,7 +37,11 @@
                                 </h5>
                             </div>
                         </div>
-                        <div class="col-4 text-end">
+                        <div class="col-4 d-flex align-items-center text-end">
+                            <input type="text" class="form-control" id="filter" value="" placeholder="No Model/Kode Warna/Lot/Tanggal Schedule(yyyy-mm-dd)">
+                            <button id="filterButton" class="btn btn-info ms-2"><i class="fas fa-search"></i></button>
+                        </div>
+                        <div class="col-1 text-end">
                             <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
                                 <i class="ni ni-chart-bar-32 text-lg opacity-10" aria-hidden="true"></i>
                             </div>
@@ -45,104 +49,10 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
-    <?php foreach ($material as $item): ?>
-        <?php
-        // Mapping status ke class badge yang sesuai
-        $statusClasses = [
-            'done' => 'bg-gradient-success',
-            'retur' => 'bg-gradient-warning',
-        ];
-        $statusClass = $statusClasses[$item['last_status']] ?? 'bg-gradient-info';
-        ?>
-
-        <div class="row my-3 mx-2">
-            <div class="card shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="text-header mb-0">
-                        Model: <?= esc($item['no_model']) ?>
-                    </h5>
-                    <span class="badge <?= $statusClass ?> text-sm">
-                        <?= esc($item['last_status']) ?>
-                    </span>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <span class=" d-block"><strong>Jenis:</strong> <?= esc($item['item_type']) ?></span>
-                            <span class=" d-block"><strong>Kode Warna:</strong> <?= esc($item['kode_warna']) ?></span>
-                            <span class=" d-block"><strong>Warna:</strong> <?= esc($item['color']) ?></span>
-                            <span class=" d-block"><strong>Lot Celup:</strong> <?= esc($item['lot_celup']) ?></span>
-                        </div>
-                        <div class="col-md-3">
-                            <span class="d-block"><strong>Qty PO:</strong> <?= number_format((float) $item['qty_po'], 2, ',', '.') ?></span>
-                            <span class="d-block"><strong>Qty Celup:</strong> <?= number_format((float) $item['kg_celup'], 2, ',', '.') ?></span>
-                            <span class=" d-block"><strong>Start MC:</strong>
-                                <?= !empty($item['start_mc']) ? date_create($item['start_mc'])->format('d M') : '-' ?>
-                            </span>
-                            <span class=" d-block"><strong>Tgl Schedule:</strong>
-                                <?= !empty($item['tanggal_schedule']) ? date_create($item['tanggal_schedule'])->format('d M') : '-' ?>
-                            </span>
-                        </div>
-                        <div class="col-md-3">
-                            <span class=" d-block"><strong>Tgl Bon:</strong>
-                                <?= !empty($item['tanggal_bon']) ? date_create($item['tanggal_bon'])->format('d M') : '-' ?>
-                            </span>
-                            <span class=" d-block"><strong>Tgl celup:</strong>
-                                <?= !empty($item['tanggal_celup']) ? date_create($item['tanggal_celup'])->format('d M') : '-' ?>
-                            </span>
-                            <span class=" d-block"><strong>Tgl bongkar:</strong>
-                                <?= !empty($item['tanggal_bongkar']) ? date_create($item['tanggal_bongkar'])->format('d M') : '-' ?>
-                            </span>
-                            <span class=" d-block"><strong>Tgl press:</strong>
-                                <?= !empty($item['tanggal_press']) ? date_create($item['tanggal_press'])->format('d M') : '-' ?>
-                            </span>
-                        </div>
-                        <div class="col-md-3">
-                            <span class=" d-block"><strong>Tgl oven:</strong>
-                                <?= !empty($item['tanggal_oven']) ? date_create($item['tanggal_oven'])->format('d M') : '-' ?>
-                            </span>
-                            <span class=" d-block"><strong>Tgl tl:</strong>
-                                <?= !empty($item['tanggal_tl']) ? date_create($item['tanggal_tl'])->format('d M') : '-' ?>
-                            </span>
-                            <span class=" d-block"><strong>Tgl rajut_pagi:</strong>
-                                <?= !empty($item['tanggal_rajut_pagi']) ? date_create($item['tanggal_rajut_pagi'])->format('d M') : '-' ?>
-                            </span>
-                            <span class=" d-block"><strong>Tgl acc:</strong>
-                                <?= !empty($item['tanggal_acc']) ? date_create($item['tanggal_acc'])->format('d M') : '-' ?>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <span class=" d-block"><strong>Tgl kelos:</strong>
-                                <?= !empty($item['tanggal_kelos']) ? date_create($item['tanggal_kelos'])->format('d M') : '-' ?>
-                            </span>
-                        </div>
-                        <div class="col-md-3">
-                            <span class=" d-block"><strong>Tgl reject:</strong>
-                                <?= !empty($item['tanggal_reject']) ? date_create($item['tanggal_reject'])->format('d M') : '-' ?>
-                            </span>
-                        </div>
-                        <div class="col-md-3">
-                            <span class=" d-block"><strong>Tgl perbaikan:</strong>
-                                <?= !empty($item['tanggal_perbaikan']) ? date_create($item['tanggal_perbaikan'])->format('d M') : '-' ?>
-                            </span>
-                        </div>
-                        <div class="col-md-3">
-                            <span class=" d-block"><strong>Ket:</strong> <?= esc($item['ket_daily_cek']) ?></span>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    <?php endforeach; ?>
-
+    <div id="resultContainer">
+    </div>
 </div>
 <div class="row my-3">
 
@@ -154,5 +64,114 @@
 
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+<script>
+    document.getElementById('filterButton').addEventListener('click', function() {
+        let keyword = document.getElementById('filter').value.trim();
+        console.log("Keyword: ", keyword); // Debugging
+
+        // Pastikan $role dan $area ada dan diterjemahkan dengan benar oleh PHP
+        let apiUrl = `/${'<?= $role ?>'}/filterstatusbahanbaku/<?= $area ?>?search=${encodeURIComponent(keyword)}`;
+
+        // Mengirim data ke controller internal
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                console.log("Filtered Data: ", data); // Debugging
+                displayData(data); // Tampilkan data yang sudah difilter
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    });
+
+    function displayData(data) {
+        let resultContainer = document.getElementById('resultContainer');
+        resultContainer.innerHTML = '';
+
+        if (!Array.isArray(data)) {
+            // Mengubah objek menjadi array
+            data = Object.values(data);
+        }
+
+        if (data.length === 0) {
+            resultContainer.innerHTML = '<p class="text-center text-muted">No data found</p>';
+            return;
+        }
+
+        data.forEach(item => {
+            let statusClasses = {
+                'done': 'bg-gradient-success',
+                'retur': 'bg-gradient-warning',
+            };
+
+            let statusClass = statusClasses[item.last_status] || 'bg-gradient-info';
+
+            let card = `
+            <div class="row my-3 mx-2">
+                <div class="card shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="text-header mb-0">Model: ${item.no_model}</h5>
+                        <span class="badge ${statusClass} text-sm">${item.last_status}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <span class="d-block"><strong>Jenis:</strong> ${item.item_type}</span>
+                                <span class="d-block"><strong>Kode Warna:</strong> ${item.kode_warna}</span>
+                                <span class="d-block"><strong>Warna:</strong> ${item.color}</span>
+                                <span class="d-block"><strong>Lot Celup:</strong> ${item.lot_celup}</span>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="d-block"><strong>Qty PO:</strong> ${parseFloat(item.qty_po).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</span>
+                                <span class="d-block"><strong>Qty Celup:</strong> ${parseFloat(item.kg_celup).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</span>
+                                <span class="d-block"><strong>Start MC:</strong> ${formatDate(item.start_mc)}</span>
+                                <span class="d-block"><strong>Tgl Schedule:</strong> ${formatDate(item.tanggal_schedule)}</span>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="d-block"><strong>Tgl Bon:</strong> ${formatDate(item.tanggal_bon)}</span>
+                                <span class="d-block"><strong>Tgl Celup:</strong> ${formatDate(item.tanggal_celup)}</span>
+                                <span class="d-block"><strong>Tgl Bongkar:</strong> ${formatDate(item.tanggal_bongkar)}</span>
+                                <span class="d-block"><strong>Tgl Press:</strong> ${formatDate(item.tanggal_press)}</span>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="d-block"><strong>Tgl Oven:</strong> ${formatDate(item.tanggal_oven)}</span>
+                                <span class="d-block"><strong>Tgl TL:</strong> ${formatDate(item.tanggal_tl)}</span>
+                                <span class="d-block"><strong>Tgl Rajut Pagi:</strong> ${formatDate(item.tanggal_rajut_pagi)}</span>
+                                <span class="d-block"><strong>Tgl ACC:</strong> ${formatDate(item.tanggal_acc)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <span class="d-block"><strong>Tgl Kelos:</strong> ${formatDate(item.tanggal_kelos)}</span>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="d-block"><strong>Tgl Reject:</strong> ${formatDate(item.tanggal_reject)}</span>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="d-block"><strong>Tgl Perbaikan:</strong> ${formatDate(item.tanggal_perbaikan)}</span>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="d-block"><strong>Ket:</strong> ${item.ket_daily_cek}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+            resultContainer.innerHTML += card;
+        });
+    }
+
+    // Fungsi untuk format tanggal agar tidak error
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        let date = new Date(dateString);
+        if (isNaN(date)) return '-';
+        return date.toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: 'short'
+        });
+    }
+</script>
 
 <?php $this->endSection(); ?>

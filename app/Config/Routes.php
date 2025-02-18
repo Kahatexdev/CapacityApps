@@ -413,6 +413,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     // bahanbaku
     $routes->get('bahanBaku', 'MaterialController::index');
     $routes->get('statusbahanbaku/(:any)', 'MaterialController::statusbahanbaku/$1');
+    $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
 });
 
 // sudo
