@@ -111,4 +111,31 @@ class MaterialController extends BaseController
 
         return view(session()->get('role') . '/Material/statusbahanbaku', $data);
     }
+
+    public function cekBahanBaku($id, $idpln)
+    {
+        $model = $this->DetailPlanningModel->detailPdk($id);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/cekBahanBaku/' . $model['model'];
+        // Ambil data dari API
+        $response = file_get_contents($apiUrl);
+        $status = json_decode($response, true);
+        // dd($status);
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'material' => $status,
+            'role' => session()->get('role'),
+            'idDetail' => $id,
+            'idPln' => $idpln
+        ];
+
+        return view(session()->get('role') . '/Material/cekBahanBaku', $data);
+    }
 }
