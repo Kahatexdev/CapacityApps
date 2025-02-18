@@ -90,11 +90,14 @@ class MaterialController extends BaseController
     }
     public function statusbahanbaku($area)
     {
+        // Ambil nilai search dari query string
         $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/' . $area;
+        // dd($search);
 
         // Ambil data dari API
         $response = file_get_contents($apiUrl);
         $status = json_decode($response, true);
+
         // dd($status);
         $data = [
             'role' => session()->get('role'),
@@ -105,11 +108,48 @@ class MaterialController extends BaseController
             'targetProd' => 0,
             'produksiBulan' => 0,
             'produksiHari' => 0,
-            'material' => $status
+            'material' => $status,
+            'area' => $area
 
         ];
 
         return view(session()->get('role') . '/Material/statusbahanbaku', $data);
+    }
+    public function filterstatusbahanbaku($area)
+    {
+        // Mengambil nilai 'search' yang dikirim oleh frontend
+        $search = $this->request->getGet('search');
+
+        // Jika search ada, panggil API eksternal dengan query parameter 'search'
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/' . $area . '?search=' . urlencode($search);
+
+        // Mengambil data dari API eksternal
+        $response = file_get_contents($apiUrl);
+        $status = json_decode($response, true);
+
+        // Filter data berdasarkan 'no_model' jika ada keyword 'search'
+        if ($search) {
+            $status = array_filter($status, function ($item) use ($search) {
+                // Cek apakah pencarian ada di no_model terlebih dahulu
+                if (isset($item['no_model']) && strpos(strtolower($item['no_model']), strtolower($search)) !== false) {
+                    return true;
+                }
+                // Lanjutkan pencarian ke kode_warna, lot_celup, dan tanggal_schedule jika no_model tidak cocok
+                if (isset($item['kode_warna']) && strpos(strtolower($item['kode_warna']), strtolower($search)) !== false) {
+                    return true;
+                }
+                if (isset($item['lot_celup']) && strpos(strtolower($item['lot_celup']), strtolower($search)) !== false) {
+                    return true;
+                }
+                if (isset($item['tanggal_schedule']) && strpos(strtolower($item['tanggal_schedule']), strtolower($search)) !== false) {
+                    return true;
+                }
+                return false;
+            });
+        }
+
+        // Kembalikan data yang sudah difilter ke frontend
+        return $this->response->setJSON($status);
     }
 
     public function cekBahanBaku($id, $idpln)
