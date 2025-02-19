@@ -33,18 +33,35 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Material System</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    Status Bahan Baku
+                                    Status Bahan Baku <?= $model ?>
                                 </h5>
                             </div>
                         </div>
                         <div class="col-4 text-end">
 
-                            <a href="<?= base_url($role . '/planningpage/' . $idDetail . '/' . $idPln) ?>" class="btn btn-secondary ml-auto">Back</a>
+                            <button class="btn btn-info ml-auto btn-stock">Cek Stok</button>
+                            <a href="<?= base_url($role . '/planningpage/' . $idDetail . '/' . $idPln) ?>" class="btn btn-secondary  ml-auto">Back</a>
                         </div>
                     </div>
                 </div>
             </div>
 
+        </div>
+    </div>
+    <div class="row mt-2 stockSection d-none">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="header">
+                        Actual Stock GBN
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row stockTable">
+
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <?php if (empty($material)): ?>
@@ -152,12 +169,43 @@
 <div class="row my-3">
 
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let tombol = document.querySelectorAll(".btn-stock");
+
+        tombol.forEach(btn => {
+            btn.addEventListener("click", function() {
+                let stockSection = document.querySelector(".stockSection");
+
+                stockSection.classList.toggle("d-none");
 
 
-</div>
+                let model = <?= $model ?>; // Ganti dengan nilai sebenarnya
 
-
-</div>
+                $.ajax({
+                    url: 'your-api-endpoint', // Ganti dengan URL API yang benar
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        jarum,
+                        model,
+                        delivery
+                    },
+                    success: function(response) {
+                        if (response) {
+                            console.log('Data berhasil diambil:', response);
+                        } else {
+                            console.error('Error: Response format invalid.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', error);
+                    }
+                });
+            });
+        });
+    });
+</script>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 
 <?php $this->endSection(); ?>

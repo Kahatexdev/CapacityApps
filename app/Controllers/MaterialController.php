@@ -173,7 +173,8 @@ class MaterialController extends BaseController
             'material' => $status,
             'role' => session()->get('role'),
             'idDetail' => $id,
-            'idPln' => $idpln
+            'idPln' => $idpln,
+            'model' => $model['model']
         ];
 
         return view(session()->get('role') . '/Material/cekBahanBaku', $data);
