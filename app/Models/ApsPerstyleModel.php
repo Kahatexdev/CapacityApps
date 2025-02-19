@@ -892,4 +892,10 @@ class ApsPerstyleModel extends Model
             ->orderBy('delivery', 'asc')
             ->first();
     }
+    public function getQtyCancel($idaps)
+    {
+        return $this->select('idapsperstyle, qty')
+            ->whereIn('idapsperstyle', (array) $idaps)
+            ->findAll();
+    }
 }

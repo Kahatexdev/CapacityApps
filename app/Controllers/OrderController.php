@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Database\Migrations\DataCancelOrder;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\DataMesinModel;
 use App\Models\OrderModel;
@@ -14,6 +15,7 @@ use App\Models\ProduksiModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use DateTime;
 use App\Models\HistorySmvModel;
+use App\Models\DataCancelOrderModel;
 
 class OrderController extends BaseController
 {
@@ -28,6 +30,7 @@ class OrderController extends BaseController
     protected $roleSession;
     protected $historysmv;
     protected $areaModel;
+    protected $cancelOrder;
 
 
     public function __construct()
@@ -41,6 +44,7 @@ class OrderController extends BaseController
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         $this->historysmv = new HistorySmvModel();
         $this->areaModel = new AreaModel();
+        $this->cancelOrder = new DataCancelOrderModel();
         if ($this->filters   = ['role' => ['capacity',  'planning', 'aps', 'god']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -1901,5 +1905,41 @@ class OrderController extends BaseController
             'perStyle' => $perStyle
         ];
         return view(session()->get('role') . '/Order/estimasispk', $data2);
+    }
+    public function cancelOrder($noModel)
+    {
+        $alasan = $this->request->getPost("alasan");
+        $idaps = $this->ApsPerstyleModel->getIdAps($noModel);
+        $qtyData  = $this->ApsPerstyleModel->getQtyCancel($idaps);
+        $qtyMap = [];
+        foreach ($qtyData as $row) {
+            $qtyMap[$row['idapsperstyle']] = $row['qty'];
+        }
+
+        // Siapkan data untuk insert
+        $dataInsert = [];
+        foreach ($idaps as $id) {
+            $dataInsert[] = [
+                "idapsperstyle" => $id,
+                "qty_cancel" => $qtyMap[$id] ?? 0, // Ambil qty sesuai idaps
+                "alasan" => $alasan,
+            ];
+        }
+
+        $insert = $this->cancelOrder->insertBatch($dataInsert);
+
+        if ($insert) {
+            $update = $this->ApsPerstyleModel
+                ->whereIn('idapsperstyle', $idaps)
+                ->set(['qty' => 0, 'sisa' => 0])
+                ->update();
+
+            if ($update) {
+                return redirect()->to(base_url(session()->get('role') . '/semuaOrder'))->withInput()->with('success', 'Order Berhasil Di Cancel');
+            } else {
+                return redirect()->to(base_url(session()->get('role') . '/semuaOrder'))->withInput()->with('error', 'Gagal Update Data');
+            }
+        }
+        return redirect()->to(base_url(session()->get('role') . '/semuaOrder'))->with('error', 'Gagal Cancel Order');
     }
 }
