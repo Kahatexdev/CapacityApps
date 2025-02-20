@@ -177,22 +177,67 @@
             btn.addEventListener("click", function() {
                 let stockSection = document.querySelector(".stockSection");
 
-                stockSection.classList.toggle("d-none");
-
-
-                let model = <?= $model ?>; // Ganti dengan nilai sebenarnya
+                let model = <?= json_encode($model); ?>; // Ganti dengan nilai sebenarnya
 
                 $.ajax({
-                    url: 'your-api-endpoint', // Ganti dengan URL API yang benar
+                    url: '<?= base_url($role . '/cekStok') ?>', // Ganti dengan URL API yang benar
                     type: 'GET',
                     dataType: 'json',
                     data: {
-                        jarum,
-                        model,
-                        delivery
+                        model: model
                     },
                     success: function(response) {
                         if (response) {
+                            let tableStock = `
+        <table id="planTable" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Kode Benang</th>
+                    <th>Kode Warna</th>
+                    <th>Warna</th>
+                    <th>In</th>
+                    <th>Out</th>
+                    <th>Stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${response.map(item => `
+                    <tr>
+                        <td>${item.item_type}</td>
+                                           <td>${item.kode_warna} </td>
+                           <td>${item.color} </td>
+                           <td>${item.masuk ?? '0'} kg</td>
+                           <td>${item.keluar ?? '0'} kg</td>
+                           <td>${item.stock} kg</td>
+                    
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+          
+    `;
+
+                            document.querySelector(".stockTable").innerHTML = tableStock;
+                            stockSection.classList.toggle("d-none");
+                            $('#planTable').DataTable({
+                                paging: true, // Pagination aktif
+                                searching: true, // Bisa cari data
+                                ordering: true, // Bisa sort kolom
+                                lengthMenu: [
+                                    [5, 10, 25, -1],
+                                    [5, 10, 25, "All"]
+                                ], // Dropdown jumlah data
+                                language: {
+                                    search: "Cari:",
+                                    lengthMenu: "Tampilkan _MENU_ data",
+                                    info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+                                    paginate: {
+                                        previous: "Sebelumnya",
+                                        next: "Berikutnya"
+                                    }
+                                }
+                            });
+
                             console.log('Data berhasil diambil:', response);
                         } else {
                             console.error('Error: Response format invalid.');

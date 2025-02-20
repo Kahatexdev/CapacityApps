@@ -179,4 +179,13 @@ class MaterialController extends BaseController
 
         return view(session()->get('role') . '/Material/cekBahanBaku', $data);
     }
+    public function cekStok()
+    {
+        $model = $this->request->getGet('model');
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/cekStok/' . $model;
+        $response = file_get_contents($apiUrl);
+        $stok = json_decode($response, true);
+
+        return $this->response->setJSON($stok);
+    }
 }
