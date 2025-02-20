@@ -72,7 +72,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('detailPdk/(:any)/(:any)', 'OrderController::detailPdk/$1/$2');
     $routes->post('reviseorder', 'OrderController::reviseorder');
     $routes->post('assignareal', 'PlanningController::assignareal');
-
+    $routes->post('cancelorder/(:any)', 'OrderController::cancelOrder/$1');
 
 
     // produksi

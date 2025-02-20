@@ -45,8 +45,7 @@ error_reporting(E_ALL); ?>
                                 Arahkan Ke Areal
                             </button>
                             <a href="#" class="btn btn-danger btn-delete-all" Data-bs-toggle="modal" data-bs-target="ModalDeleteAll" data-no-model="<?= $noModel ?>">Delete All</a>
-
-
+                            <a href="" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#ModalCancel">Cancel Order</a>
                             <a href="<?= base_url($role . '/semuaOrder/') ?>" class="btn bg-gradient-info">Kembali</a>
                         </div>
                     </div>
@@ -424,6 +423,32 @@ error_reporting(E_ALL); ?>
                         <button type="button" class="btn bg-gradient-info rekomenBtn" onclick="areaRecomendation()">Sumbit</button>
                         </form>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade  bd-example-modal-lg" id="ModalCancel" tabindex="-1" role="dialog" aria-labelledby="modalCancel" aria-hidden="true">
+            <div class="modal-dialog  modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Cancel Order <?= $noModel ?></h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <form action="<?= base_url($role . '/cancelorder/' . $noModel) ?>" method="post">
+                        <div class="modal-body">
+                            <input type="hidden" name="no_model" value="<?= $noModel ?>">
+                            <label for="alasan">Keterangan:</label>
+                            <input type="text" name="alasan" id="alasan" class="form-control" style="margin-bottom: 10px;" required>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-danger">Cancel Order</button>
+                        </div>
+                    </form>
+
+
                 </div>
             </div>
         </div>

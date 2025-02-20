@@ -76,7 +76,8 @@
         console.log("Keyword: ", keyword); // Debugging
 
         // Pastikan $role dan $area ada dan diterjemahkan dengan benar oleh PHP
-        let apiUrl = `/${'<?= $role ?>'}/filterstatusbahanbaku/<?= $area ?>?search=${cari}`;
+        let apiUrl = `<?= base_url() ?>/${'<?= $role ?>'}/filterstatusbahanbaku/<?= $area ?>?search=${cari}`;
+
 
         // Mengirim data ke controller internal
         fetch(apiUrl)
