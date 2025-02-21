@@ -74,17 +74,17 @@ class MaterialController extends BaseController
 
     public function index()
     {
-        $data = [
-            'role' => session()->get('role'),
-            'title' => 'Bahan Baku',
-            'active1' => '',
-            'active2' => '',
-            'active3' => '',
-            'targetProd' => 0,
-            'produksiBulan' => 0,
-            'produksiHari' => 0
+        $noModel = $this->$data = [
+                'role' => session()->get('role'),
+                'title' => 'Bahan Baku',
+                'active1' => '',
+                'active2' => '',
+                'active3' => '',
+                'targetProd' => 0,
+                'produksiBulan' => 0,
+                'produksiHari' => 0
 
-        ];
+            ];
 
         return view(session()->get('role') . '/Material/index', $data);
     }
