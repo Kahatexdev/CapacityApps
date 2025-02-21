@@ -144,36 +144,6 @@ class ProduksiModel extends Model
             ->where('tgl_produksi <=', $akhir)
             ->findAll();
     }
-
-    public function getdataSummaryPertgl($data)
-    {
-        $this->select('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, SUM(apsperstyle.qty) AS qty, COUNT(DISTINCT produksi.tgl_produksi) AS running, SUM(produksi.qty_produksi) AS qty_produksi, COUNT(DISTINCT produksi.no_mesin) AS jl_mc, produksi.tgl_produksi, ')
-            ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle')
-            ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model');
-
-        if (!empty($data['buyer'])) {
-            $this->where('data_model.kd_buyer_order', $data['buyer']);
-        }
-        if (!empty($data['area'])) {
-            $this->where('produksi.admin', $data['area']);
-        }
-        if (!empty($data['jarum'])) {
-            $this->where('apsperstyle.machinetypeid', $data['jarum']);
-        }
-        if (!empty($data['pdk'])) {
-            $this->where('apsperstyle.mastermodel', $data['pdk']);
-        }
-        if (!empty($data['awal'])) {
-            $this->where('produksi.tgl_produksi >=', $data['awal']);
-        }
-        if (!empty($data['akhir'])) {
-            $this->where('produksi.tgl_produksi <=', $data['akhir']);
-        }
-
-        return $this->groupBy('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, produksi.tgl_produksi')
-            ->orderBy('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, produksi.tgl_produksi', 'ASC')
-            ->findAll();
-    }
     public function getIdForBs($validate)
     {
         return $this->where('no_box', $validate['no_box'])
@@ -262,5 +232,30 @@ class ProduksiModel extends Model
             ->where('produksi.size IS NULL');
 
         return $builder->get(10000)->getResultArray();
+    }
+    public function getJlMcTimter($data)
+    {
+        $query = $this->select('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.size, produksi.tgl_produksi, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle', 'left')
+            ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel', 'left')
+            ->where('produksi.no_mesin !=', 'STOK PAKING')
+            ->where('produksi.tgl_produksi IS NOT NULL');
+
+        if (!empty($data['area'])) {
+            $this->where('produksi.area', $data['area']);
+        }
+        if (!empty($data['jarum'])) {
+            $this->like('apsperstyle.machinetypeid', $data['jarum']);
+        }
+        if (!empty($data['pdk'])) {
+            $this->where('data_model.no_model', $data['pdk']);
+        }
+        if (!empty($data['awal'])) {
+            $this->where('produksi.tgl_produksi =', $data['awal']);
+        }
+
+        return $query->groupBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size, produksi.tgl_produksi')
+            ->orderBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size, produksi.tgl_produksi', 'ASC')
+            ->findAll();
     }
 }

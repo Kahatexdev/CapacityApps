@@ -1942,4 +1942,47 @@ class OrderController extends BaseController
         }
         return redirect()->to(base_url(session()->get('role') . '/semuaOrder'))->with('error', 'Gagal Cancel Order');
     }
+    public function getCancelOrder()
+    {
+        $role = session()->get('role');
+        $cancel = $this->cancelOrder->getDataCancel();
+
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Cancel Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'cancel' => $cancel,
+            'role' => $role
+
+        ];
+        return view($role . '/Order/cancelorder', $data);
+    }
+    public function detailCancelOrder($pdk)
+    {
+        $role = session()->get('role');
+        $cancel = $this->cancelOrder->getDetailCancel($pdk);
+
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Cancel Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'cancel' => $cancel,
+            'role' => $role,
+            'pdk' => $pdk,
+
+        ];
+        return view($role . '/Order/detailcancelorder', $data);
+    }
 }

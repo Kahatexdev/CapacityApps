@@ -44,4 +44,22 @@ class DataCancelOrderModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getDataCancel()
+    {
+        return $this->select('SUM(data_cancel_order.qty_cancel) AS qty_cancel, data_cancel_order.alasan, apsperstyle.mastermodel, apsperstyle.no_order, apsperstyle.delivery, apsperstyle.machinetypeid, data_model.kd_buyer_order, data_model.seam, data_model.description')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle=data_cancel_order.idapsperstyle', 'left')
+            ->join('data_model', 'apsperstyle.mastermodel=data_model.no_model', 'left')
+            ->groupBy('apsperstyle.mastermodel, apsperstyle.machinetypeid')
+            ->findAll();
+    }
+    public function getDetailCancel($pdk)
+    {
+        return $this->select('SUM(data_cancel_order.qty_cancel) AS qty_cancel, data_cancel_order.alasan, apsperstyle.mastermodel, apsperstyle.size, apsperstyle.no_order, apsperstyle.delivery, apsperstyle.machinetypeid, data_model.kd_buyer_order, data_model.seam, data_model.description')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle=data_cancel_order.idapsperstyle', 'left')
+            ->join('data_model', 'apsperstyle.mastermodel=data_model.no_model', 'left')
+            ->where('apsperstyle.mastermodel', $pdk)
+            ->groupBy('apsperstyle.machinetypeid, apsperstyle.size')
+            ->findAll();
+    }
 }

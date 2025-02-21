@@ -428,8 +428,11 @@ class OrderModel extends Model
 
     public function getDataTimter($data)
     {
+        $batas = date('Y-m-d', strtotime($data['awal'] . ' -30 days'));
+
         $this->select('data_model.seam, apsperstyle.delivery, data_model.kd_buyer_order, apsperstyle.idapsperstyle, apsperstyle.no_order, apsperstyle.factory, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.inisial, apsperstyle.size, apsperstyle.color, apsperstyle.smv, apsperstyle.delivery, SUM(apsperstyle.qty) AS qty, SUM(apsperstyle.sisa) AS sisa')
-            ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT');
+            ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT')
+            ->having('MAX(apsperstyle.delivery) >', $batas);
         if (!empty($data['area'])) {
             $this->where('apsperstyle.factory', $data['area']);
         }
@@ -447,8 +450,11 @@ class OrderModel extends Model
 
     public function getQtyPOTimter($data)
     {
+        $batas = date('Y-m-d', strtotime($data['awal'] . ' -30 days'));
+
         $this->select('apsperstyle.idapsperstyle, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.inisial, apsperstyle.size, MAX(apsperstyle.delivery) AS delivery, SUM(apsperstyle.qty) AS qty')
-            ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT');
+            ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT')
+            ->having('MAX(apsperstyle.delivery) >', $batas);
         if (!empty($data['jarum'])) {
             $this->like('apsperstyle.machinetypeid', $data['jarum']);
         }
@@ -466,7 +472,8 @@ class OrderModel extends Model
         $this->select('apsperstyle.idapsperstyle, apsperstyle.seam, data_model.kd_buyer_order, apsperstyle.no_order, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.inisial, apsperstyle.size, apsperstyle.color, apsperstyle.smv, apsperstyle.delivery, SUM(DISTINCT apsperstyle.qty) AS qty, SUM(DISTINCT apsperstyle.sisa) AS sisa, produksi.area, SUM(COALESCE(produksi.qty_produksi, 0)) AS qty_produksi, COUNT(DISTINCT produksi.tgl_produksi) AS running, COUNT(DISTINCT produksi.no_mesin) AS jl_mc, produksi.tgl_produksi, produksi.no_mesin, SUM(CASE WHEN produksi.no_label > 3000 THEN produksi.qty_produksi ELSE 0 END) AS pa, SUM(CASE WHEN produksi.no_label < 3000 THEN produksi.shift_a ELSE 0 END) AS shift_a, SUM(CASE WHEN produksi.no_label < 3000 THEN produksi.shift_b ELSE 0 END) AS shift_b, SUM(CASE WHEN produksi.no_label < 3000 THEN produksi.shift_c ELSE 0 END) AS shift_c')
             ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT')
             ->join('produksi', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'LEFT')
-            ->where('apsperstyle.mastermodel IS NOT NULL');
+            ->where('produksi.no_mesin !=', 'STOK PAKING')
+        ;
 
         if (!empty($data['area'])) {
             $this->where('produksi.area', $data['area']);

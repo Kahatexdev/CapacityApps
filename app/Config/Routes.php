@@ -73,6 +73,8 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('reviseorder', 'OrderController::reviseorder');
     $routes->post('assignareal', 'PlanningController::assignareal');
     $routes->post('cancelorder/(:any)', 'OrderController::cancelOrder/$1');
+    $routes->get('cancelOrder', 'OrderController::getCancelOrder');
+    $routes->get('detailCancelOrder/(:any)', 'OrderController::detailCancelOrder/$1');
 
 
     // produksi

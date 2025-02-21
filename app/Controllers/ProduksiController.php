@@ -848,7 +848,7 @@ class ProduksiController extends BaseController
 
         $dataTimter = $this->orderModel->getDataTimter($data);
         $prodTimter = $this->orderModel->getDetailProdTimter($data);
-        $jlMC = $this->orderModel->getprodSummaryPertgl($data);
+        $jlMC = $this->produksiModel->getJlMcTimter($data);
 
         $uniqueData = [];
 
