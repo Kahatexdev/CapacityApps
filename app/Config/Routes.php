@@ -356,6 +356,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('getPlanStyle', 'ApsController::getPlanStyle');
     $routes->post('savePlanStyle', 'ApsController::savePlanStyle');
     $routes->get('cekBahanBaku/(:num)/(:num)', 'MaterialController::cekBahanBaku/$1/$2');
+    $routes->get('cekStok', 'MaterialController::cekStok');
 
 
     // deffect

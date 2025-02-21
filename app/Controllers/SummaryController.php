@@ -659,7 +659,7 @@ class SummaryController extends BaseController
 
         foreach ($dataPlan as $jarum) {
             // Mengambil data berdasarkan area dan jarum tertentu
-            $judulPlan = $this->kebutuhanAreaModel->getDataByAreaJrm($area, $jarum);
+            $judulPlan = $this->kebutuhanAreaModel->getDataByAreaJrm($area, $jarum['jarum']);
 
             foreach ($judulPlan as $id) {
                 // Mendapatkan kebutuhan area berdasarkan ID

@@ -74,17 +74,17 @@ class MaterialController extends BaseController
 
     public function index()
     {
-        $data = [
-            'role' => session()->get('role'),
-            'title' => 'Bahan Baku',
-            'active1' => '',
-            'active2' => '',
-            'active3' => '',
-            'targetProd' => 0,
-            'produksiBulan' => 0,
-            'produksiHari' => 0
+        $noModel = $this->$data = [
+                'role' => session()->get('role'),
+                'title' => 'Bahan Baku',
+                'active1' => '',
+                'active2' => '',
+                'active3' => '',
+                'targetProd' => 0,
+                'produksiBulan' => 0,
+                'produksiHari' => 0
 
-        ];
+            ];
 
         return view(session()->get('role') . '/Material/index', $data);
     }
@@ -173,9 +173,19 @@ class MaterialController extends BaseController
             'material' => $status,
             'role' => session()->get('role'),
             'idDetail' => $id,
-            'idPln' => $idpln
+            'idPln' => $idpln,
+            'model' => $model['model']
         ];
 
         return view(session()->get('role') . '/Material/cekBahanBaku', $data);
+    }
+    public function cekStok()
+    {
+        $model = $this->request->getGet('model');
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/cekStok/' . $model;
+        $response = file_get_contents($apiUrl);
+        $stok = json_decode($response, true);
+
+        return $this->response->setJSON($stok);
     }
 }
