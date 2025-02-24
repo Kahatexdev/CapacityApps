@@ -18,6 +18,7 @@ use App\Models\DetailPlanningModel;
 use App\Models\TanggalPlanningModel;
 use App\Models\EstimatedPlanningModel;
 use App\Models\AksesModel;/*  */
+use App\Models\MesinPerStyle;
 use App\Services\orderServices;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
@@ -40,6 +41,7 @@ class MaterialController extends BaseController
     protected $DetailPlanningModel;
     protected $TanggalPlanningModel;
     protected $EstimatedPlanningModel;
+    protected $MesinPerStyleModel;
     protected $orderServices;
 
     public function __construct()
@@ -58,6 +60,7 @@ class MaterialController extends BaseController
         $this->DetailPlanningModel = new DetailPlanningModel();
         $this->TanggalPlanningModel = new TanggalPlanningModel();
         $this->EstimatedPlanningModel = new EstimatedPlanningModel();
+        $this->MesinPerStyleModel = new MesinPerStyle();
         $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -74,17 +77,20 @@ class MaterialController extends BaseController
 
     public function index()
     {
-        $noModel = $this->$data = [
-                'role' => session()->get('role'),
-                'title' => 'Bahan Baku',
-                'active1' => '',
-                'active2' => '',
-                'active3' => '',
-                'targetProd' => 0,
-                'produksiBulan' => 0,
-                'produksiHari' => 0
+        $area = session()->get('username');
+        $noModel = $this->DetailPlanningModel->getNoModelAktif($area);
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Bahan Baku',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'targetProd' => 0,
+            'produksiBulan' => 0,
+            'produksiHari' => 0,
+            'noModel' => $noModel
 
-            ];
+        ];
 
         return view(session()->get('role') . '/Material/index', $data);
     }
@@ -187,5 +193,38 @@ class MaterialController extends BaseController
         $stok = json_decode($response, true);
 
         return $this->response->setJSON($stok);
+    }
+    public function getStyleSizeByNoModel()
+    {
+        // Ambil No Model dari permintaan AJAX
+        $noModel = $this->request->getPost('no_model');
+        // Query data style size berdasarkan No Model
+        $styleSize = $this->ApsPerstyleModel->getStyleSize($noModel); // Sesuaikan dengan model Anda
+        // var_dump($noModel);
+
+        // Kembalikan data dalam format JSON
+        return $this->response->setJSON($styleSize);
+    }
+    public function getJalanMcByModelSize()
+    {
+        // Ambil No Model dan Style Size dari permintaan AJAX
+        $noModel = $this->request->getPost('no_model');
+        $styleSize = $this->request->getPost('style_size');
+
+        // Query data Jalan MC berdasarkan No Model dan Style Size
+        $jalanMc = $this->MesinPerStyleModel->getJalanMc($noModel, $styleSize); // Sesuaikan dengan model Anda
+
+        // Kembalikan data dalam format JSON
+        return $this->response->setJSON($jalanMc);
+    }
+    public function getMU()
+    {
+        $model = $this->request->getGet('model');
+        $styleSize = $this->request->getGet('style_size');
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/MaterialUsage/' . $model . '/' . $styleSize;
+        $response = file_get_contents($apiUrl);
+        $mu = json_decode($response, true);
+
+        return $this->response->setJSON($mu);
     }
 }

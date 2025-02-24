@@ -171,8 +171,11 @@
                                             <div class="row g-3 mb-2">
                                                 <div class="col-md-12">
                                                     <label for="itemType">No Model</label>
-                                                    <select class="form-control add-item" id="add-item" name="add-item" required>
+                                                    <select class="form-control add-item" id="no_model" name="no_model" required>
                                                         <option value="">Pilih No Model</option>
+                                                        <?php foreach ($noModel as $model): ?>
+                                                            <option value="<?= $model['model'] ?>"><?= $model['model'] ?></option>
+                                                        <?php endforeach; ?>
                                                     </select>
                                                 </div>
                                             </div>
@@ -199,7 +202,9 @@
                                                                         <option value="">Pilih Style Size</option>
                                                                     </select>
                                                                 </td>
-                                                                <td><input type="number" class="form-control" name="jalan_mc" id="jalan_mc" readonly></td>
+                                                                <td>
+                                                                    <input type="number" class="form-control" name="jalan_mc" id="jalan_mc">
+                                                                </td>
                                                                 <td class="text-center">
                                                                     <button type="button" class="btn btn-info" id="addRow">
                                                                         <i class="fas fa-plus"></i>
@@ -236,27 +241,8 @@
                                                                 <th class="text-center">Total Berat Cones(Kg)</th>
                                                             </tr>
                                                         </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td><input type="text" class="form-control text-center" name="no" value="1" readonly></td>
-                                                                <td><input type="number" step="0.01" class="form-control" name="composition" required></td>
-                                                                <td><input type="number" step="0.01" class="form-control" name="loss" required></td>
-                                                                <td><input type="number" class="form-control" name="total_kebutuhan" required></td>
-                                                                <td><input type="text" class="form-control" name="item_type" required></td>
-                                                                <td><input type="text" class="form-control" name="note" required></td>
-                                                                <td><input type="text" class="form-control" name="kode_warna" required></td>
-                                                                <td><input type="text" class="form-control" name="warna" required></td>
-                                                                <td><input type="number" class="form-control" name="qty_cones" required></td>
-                                                                <td><input type="number" step="0.01" class="form-control" name="berat_cones" required></td>
-                                                                <td><input type="number" step="0.01" class="form-control" name="total" required></td>
-                                                                <td><input type="number" step="0.01" class="form-control" name="total_qty_cones" required></td>
-                                                                <td><input type="number" step="0.01" class="form-control" name="total_berat_cones" required></td>
-                                                                <!-- <td class="text-center">
-                                                                    <button type="button" class="btn btn-danger removeRow">
-                                                                        <i class="fas fa-trash"></i>
-                                                                    </button>
-                                                                </td> -->
-                                                            </tr>
+                                                        <tbody class="material-usage">
+
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -414,8 +400,8 @@
                                                     <label for="itemType">Done Celup</label>
                                                     <select class="form-control slc2" id="add_item_${tabIndex}" name="add_item" required>
                                                         <option value="">Pilih Item </option>
-                                                        <?php foreach ($no_model as $item): ?>
-                                                            <option value="<?= $item['id_celup'] ?>"><?= $item['no_model'] ?> | <?= $item['item_type'] ?> |<?= $item['kode_warna'] ?> | <?= $item['warna'] ?></option>
+                                                        <?php foreach ($noModel as $item): ?>
+                                                            <option value="<?= $item['model'] ?>"><?= $item['model'] ?></option>
                                                         <?php endforeach; ?>
                                                     </select>
                                                 </div>
@@ -787,4 +773,113 @@
         },
     });
 </script> -->
+<script>
+    $(document).ready(function() {
+        // Ketika No Model dipilih
+        $('#no_model').change(function() {
+            let noModel = $(this).val(); // Ambil nilai No Model
+
+            if (noModel) {
+                // AJAX untuk mengambil Style Size
+                $.ajax({
+                    url: '<?= base_url($role . '/getStyleSizeByNoModel') ?>', // Ganti dengan URL endpoint Anda
+                    type: 'POST',
+                    data: {
+                        no_model: noModel
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log(response);
+                        // Hapus opsi sebelumnya di dropdown Style Size
+                        $('#style_size').empty();
+                        $('#style_size').append('<option value="">Pilih Style Size</option>');
+
+                        // Tambahkan opsi baru berdasarkan data yang diterima
+                        response.forEach(function(style) {
+                            $('#style_size').append('<option value="' + style.size + '">' + style.size + '</option>');
+                        });
+                    },
+                    error: function() {
+                        alert('Gagal mengambil data Style Size.');
+                    }
+                });
+            } else {
+                // Reset dropdown Style Size jika No Model dikosongkan
+                $('#style_size').empty();
+                $('#style_size').append('<option value="">Pilih Style Size</option>');
+            }
+        });
+    });
+
+    $(document).ready(function() {
+        // Ketika Style Size dipilih
+        $('#style_size').change(function() {
+            let styleSize = $(this).val(); // Ambil nilai Style Size
+            let noModel = $('#no_model').val(); // Ambil nilai No Model
+
+            if (styleSize && noModel) {
+                // AJAX untuk mengambil Jalan MC
+                $.ajax({
+                    url: '<?= base_url($role . '/getJalanMc') ?>', // Ganti dengan URL endpoint Anda
+                    type: 'POST',
+                    data: {
+                        style_size: styleSize,
+                        no_model: noModel
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log(response);
+                        // Set the value of the #jalan_mc input field
+                        $('#jalan_mc').val(response.jalan_mc);
+
+                        // If you intend to append a new input element with the same value
+                        $('#jalan_mc').append('<input value="' + response.jalan_mc.jalan_mc + '">');
+                    },
+
+                    error: function() {
+                        alert('Gagal mengambil data Jalan MC');
+                    }
+                });
+                // Ambil data MU dari API
+                $.ajax({
+                    url: '<?= base_url($role . 'getMU') ?>/' + noModel + '/' + styleSize,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            console.log(response.data);
+
+                            // Lakukan sesuatu dengan data, contoh: tampilkan di tabel
+                            let table = $('#poTable tbody');
+                            table.empty(); // Hapus isi tabel sebelumnya
+
+                            response.data.forEach(function(item, index) {
+                                table.append(`
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${item.composition}</td>
+                                    <td>${item.loss}</td>
+                                    <td>${item.gw}</td>
+                                    <td>${item.item_type}</td>
+                                    <td>${item.kode_warna}</td>
+                                    <td>${item.warna}</td>
+                                </tr>
+                            `);
+                            });
+                        } else {
+                            alert('Data Material Usage tidak ditemukan.');
+                        }
+                    },
+                    error: function() {
+                        alert('Gagal mengambil data Material Usage.');
+                    }
+                });
+            } else {
+                // Reset input Jalan MC jika Style Size atau No Model kosong
+                $('#jalan_mc').val('');
+            }
+        });
+    });
+</script>
+
 <?php $this->endSection(); ?>

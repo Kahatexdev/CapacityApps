@@ -898,4 +898,12 @@ class ApsPerstyleModel extends Model
             ->whereIn('idapsperstyle', (array) $idaps)
             ->findAll();
     }
+    public function getStyleSize($noModel)
+    {
+        return $this->select('size')
+            ->where('mastermodel', $noModel)
+            ->groupBy('size')
+            ->orderBy('size', 'ASC')
+            ->findAll();
+    }
 }
