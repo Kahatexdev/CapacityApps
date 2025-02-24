@@ -323,6 +323,10 @@ class TimterController extends BaseController
                     'borderStyle' => Border::BORDER_DOUBLE,
                     'color' => ['rgb' => '000000'],
                 ],
+                'bottom' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
                 'left' => [
                     'borderStyle' => Border::BORDER_THIN,
                     'color' => ['rgb' => '000000'],
@@ -362,6 +366,14 @@ class TimterController extends BaseController
                 'vertical' => Alignment::VERTICAL_CENTER,
             ],
             'borders' => [
+                'top' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'bottom' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
                 'left' => [
                     'borderStyle' => Border::BORDER_THIN,
                     'color' => ['rgb' => '000000'],
@@ -385,6 +397,10 @@ class TimterController extends BaseController
                 'vertical' => Alignment::VERTICAL_CENTER,
             ],
             'borders' => [
+                'top' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
                 'bottom' => [
                     'borderStyle' => Border::BORDER_DOUBLE,
                     'color' => ['rgb' => '000000'],
@@ -809,6 +825,33 @@ class TimterController extends BaseController
                 $sheet->getStyle($column . $row)->applyFromArray($styleBody);
                 $sheet->getStyle($column . $row)->getAlignment()->setWrapText(true); // Wrap text
                 $sheet->getRowDimension($row)->setRowHeight($heightInPoints3);
+
+                // Jika kolom A, terapkan border khusus
+                if ($column == 'A') {
+                    // Terapkan border double hanya di sebelah kanan
+                    $sheet->getStyle($column . $row)->getBorders()->applyFromArray([
+                        'top' => [
+                            'borderStyle' => Border::BORDER_THIN,
+                            'color' => ['rgb' => '000000'],
+                        ],
+                        'bottom' => [
+                            'borderStyle' => Border::BORDER_THIN,
+                            'color' => ['rgb' => '000000'],
+                        ],
+                        'left' => [
+                            'borderStyle' => Border::BORDER_DOUBLE,
+                            'color' => ['rgb' => '000000'],
+                        ],
+                        'right' => [
+                            'borderStyle' => Border::BORDER_THIN, // Garis kanan double
+                            'color' => ['rgb' => '000000'],
+                        ],
+                    ]);
+
+                    // Set alignment secara terpisah
+                    $sheet->getStyle($column . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                    $sheet->getStyle($column . $row)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+                }
             }
 
             // Pengisian untuk baris yang sudah di-merge
@@ -851,6 +894,33 @@ class TimterController extends BaseController
                     $sheet->getStyle($column . $row)->applyFromArray($styleBody);
                     $sheet->getStyle($column . $row)->getAlignment()->setWrapText(true); // Wrap text
                     $sheet->getRowDimension($row)->setRowHeight($heightInPoints3);
+
+                    // Jika kolom AF, terapkan border khusus
+                    if ($column == 'AF') {
+                        // Terapkan border double hanya di sebelah kanan
+                        $sheet->getStyle($column . $row)->getBorders()->applyFromArray([
+                            'top' => [
+                                'borderStyle' => Border::BORDER_THIN,
+                                'color' => ['rgb' => '000000'],
+                            ],
+                            'bottom' => [
+                                'borderStyle' => Border::BORDER_THIN,
+                                'color' => ['rgb' => '000000'],
+                            ],
+                            'left' => [
+                                'borderStyle' => Border::BORDER_THIN,
+                                'color' => ['rgb' => '000000'],
+                            ],
+                            'right' => [
+                                'borderStyle' => Border::BORDER_DOUBLE, // Garis kanan double
+                                'color' => ['rgb' => '000000'],
+                            ],
+                        ]);
+
+                        // Set alignment secara terpisah
+                        $sheet->getStyle($column . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                        $sheet->getStyle($column . $row)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+                    }
                 }
                 $row++;
             } else {
@@ -930,6 +1000,57 @@ class TimterController extends BaseController
                         $sheet->getStyle($column . $row)->applyFromArray($styleBody);
                         $sheet->getStyle($column . $row)->getAlignment()->setWrapText(true); // Wrap text
                         $sheet->getRowDimension($row)->setRowHeight($heightInPoints3);
+
+                        // Jika kolom A AF, terapkan border khusus
+                        if ($column == 'A') {
+                            // Terapkan border double hanya di sebelah kanan
+                            $sheet->getStyle($column . $row)->getBorders()->applyFromArray([
+                                'top' => [
+                                    'borderStyle' => Border::BORDER_THIN,
+                                    'color' => ['rgb' => '000000'],
+                                ],
+                                'bottom' => [
+                                    'borderStyle' => Border::BORDER_THIN,
+                                    'color' => ['rgb' => '000000'],
+                                ],
+                                'left' => [
+                                    'borderStyle' => Border::BORDER_DOUBLE,
+                                    'color' => ['rgb' => '000000'],
+                                ],
+                                'right' => [
+                                    'borderStyle' => Border::BORDER_THIN, // Garis kanan double
+                                    'color' => ['rgb' => '000000'],
+                                ],
+                            ]);
+
+                            // Set alignment secara terpisah
+                            $sheet->getStyle($column . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                            $sheet->getStyle($column . $row)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+                        } else if ($column == 'AF') {
+                            // Terapkan border double hanya di sebelah kanan
+                            $sheet->getStyle($column . $row)->getBorders()->applyFromArray([
+                                'top' => [
+                                    'borderStyle' => Border::BORDER_THIN,
+                                    'color' => ['rgb' => '000000'],
+                                ],
+                                'bottom' => [
+                                    'borderStyle' => Border::BORDER_THIN,
+                                    'color' => ['rgb' => '000000'],
+                                ],
+                                'left' => [
+                                    'borderStyle' => Border::BORDER_THIN,
+                                    'color' => ['rgb' => '000000'],
+                                ],
+                                'right' => [
+                                    'borderStyle' => Border::BORDER_DOUBLE, // Garis kanan double
+                                    'color' => ['rgb' => '000000'],
+                                ],
+                            ]);
+
+                            // Set alignment secara terpisah
+                            $sheet->getStyle($column . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                            $sheet->getStyle($column . $row)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+                        }
                     }
 
                     if ($loopIndex == 0) {
@@ -960,6 +1081,32 @@ class TimterController extends BaseController
                             $sheet->getStyle($column . $row)->applyFromArray($styleBody);
                             $sheet->getStyle($column . $row)->getAlignment()->setWrapText(true); // Wrap text
                             $sheet->getRowDimension($row)->setRowHeight($heightInPoints3);
+
+                            if ($column == 'AF') {
+                                // Terapkan border double hanya di sebelah kanan
+                                $sheet->getStyle($column . $row)->getBorders()->applyFromArray([
+                                    'top' => [
+                                        'borderStyle' => Border::BORDER_THIN,
+                                        'color' => ['rgb' => '000000'],
+                                    ],
+                                    'bottom' => [
+                                        'borderStyle' => Border::BORDER_THIN,
+                                        'color' => ['rgb' => '000000'],
+                                    ],
+                                    'left' => [
+                                        'borderStyle' => Border::BORDER_THIN,
+                                        'color' => ['rgb' => '000000'],
+                                    ],
+                                    'right' => [
+                                        'borderStyle' => Border::BORDER_DOUBLE, // Garis kanan double
+                                        'color' => ['rgb' => '000000'],
+                                    ],
+                                ]);
+
+                                // Set alignment secara terpisah
+                                $sheet->getStyle($column . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                                $sheet->getStyle($column . $row)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+                            }
                         }
                     }
                     $row++;
@@ -968,6 +1115,49 @@ class TimterController extends BaseController
             }
 
         endforeach;
+
+        $lastRow = $row - 1;
+
+        // List semua kolom yang perlu diberi border double bawah
+        $columns = [
+            'A',
+            'B',
+            'C',
+            'D',
+            'E',
+            'F',
+            'G',
+            'H',
+            'I',
+            'J',
+            'K',
+            'L',
+            'M',
+            'N',
+            'O',
+            'P',
+            'Q',
+            'R',
+            'S',
+            'T',
+            'U',
+            'V',
+            'W',
+            'X',
+            'Y',
+            'Z',
+            'AA',
+            'AB',
+            'AC',
+            'AD',
+            'AE',
+            'AF'
+        ];
+
+        // Terapkan border double bawah pada setiap kolom di baris terakhir
+        foreach ($columns as $column) {
+            $sheet->getStyle($column . $lastRow)->getBorders()->getBottom()->setBorderStyle(Border::BORDER_DOUBLE);
+        }
 
 
         // Set judul file dan header untuk download
