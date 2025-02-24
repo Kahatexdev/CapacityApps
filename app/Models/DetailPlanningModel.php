@@ -135,4 +135,12 @@ class DetailPlanningModel extends Model
             ->where('detail_planning.status', 'aktif')
             ->first();
     }
+    public function getNoModelAktif($area)
+    {
+        return $this->select('detail_planning.model')
+            ->join('kebutuhan_area', 'detail_planning.id_pln_mc=kebutuhan_area.id_pln_mc')
+            ->where('detail_planning.status', 'aktif')
+            ->where('kebutuhan_area.area', $area)
+            ->findAll();
+    }
 }
