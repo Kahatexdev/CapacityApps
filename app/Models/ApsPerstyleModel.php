@@ -919,6 +919,7 @@ class ApsPerstyleModel extends Model
             FROM apsperstyle
             WHERE YEAR(delivery) = YEAR(CURDATE()) 
             AND sisa > 0
+            AND production_unit !='MJ'
             GROUP BY DATE_FORMAT(delivery, '%Y-%m')
             ORDER BY MIN(delivery) ASC
         ");
