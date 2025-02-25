@@ -207,9 +207,9 @@ class TimterController extends BaseController
         $columns = range('B', 'AF');
 
         // Mengatur autosize untuk setiap kolom dalam range B sampai AD
-        foreach ($columns as $columnID) {
-            $sheet->getColumnDimension($columnID)->setAutoSize(true);
-        }
+        // foreach ($columns as $columnID) {
+        //     $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        // }
 
         // Header ISO
         $drawing =  new Drawing();
@@ -224,8 +224,8 @@ class TimterController extends BaseController
         $sizeInPixels = $sizeInCm * 37.7952755906;
         $drawing->setHeight($sizeInPixels);
         $drawing->setWidth($sizeInPixels);
-        $drawing->setOffsetY(5);
-        $drawing->setOffsetX(70);
+        $drawing->setOffsetY(50);
+        $drawing->setOffsetX(45);
 
         $drawing->setWorksheet($sheet);
 
@@ -254,10 +254,43 @@ class TimterController extends BaseController
             ],
         ]);
 
-        // mengatur lebar kolom A
-        $sheet->getColumnDimension('A')->setWidth(221);
+        // mengatur lebar kolom
+        $sheet->getColumnDimension('A')->setWidth(19);
+        $sheet->getColumnDimension('B')->setWidth(11);
+        $sheet->getColumnDimension('C')->setWidth(14);
+        $sheet->getColumnDimension('D')->setWidth(7);
+        $sheet->getColumnDimension('E')->setWidth(9);
+        $sheet->getColumnDimension('F')->setWidth(6);
+        $sheet->getColumnDimension('G')->setWidth(12);
+        $sheet->getColumnDimension('H')->setWidth(30);
+        $sheet->getColumnDimension('I')->setWidth(8);
+        $sheet->getColumnDimension('J')->setWidth(12);
+        $sheet->getColumnDimension('K')->setWidth(9);
+        $sheet->getColumnDimension('L')->setWidth(8);
+        $sheet->getColumnDimension('M')->setWidth(8);
+        $sheet->getColumnDimension('N')->setWidth(8);
+        $sheet->getColumnDimension('O')->setWidth(8);
+        $sheet->getColumnDimension('P')->setWidth(8);
+        $sheet->getColumnDimension('Q')->setWidth(8);
+        $sheet->getColumnDimension('R')->setWidth(8);
+        $sheet->getColumnDimension('S')->setWidth(8);
+        $sheet->getColumnDimension('T')->setWidth(8);
+        $sheet->getColumnDimension('U')->setWidth(8);
+        $sheet->getColumnDimension('V')->setWidth(8);
+        $sheet->getColumnDimension('W')->setWidth(8);
+        $sheet->getColumnDimension('X')->setWidth(8);
+        $sheet->getColumnDimension('Y')->setWidth(8);
+        $sheet->getColumnDimension('Z')->setWidth(8);
+        $sheet->getColumnDimension('AA')->setWidth(8);
+        $sheet->getColumnDimension('AB')->setWidth(8);
+        $sheet->getColumnDimension('AC')->setWidth(8);
+        $sheet->getColumnDimension('AD')->setWidth(8);
+        $sheet->getColumnDimension('AE')->setWidth(8);
+        $sheet->getColumnDimension('AF')->setWidth(30);
+
+
         // mengatur tinggi baris 1
-        $heightInCm = 0.98;
+        $heightInCm = 1.25;
         $heightInPoints = $heightInCm / 0.0352778;
         $sheet->getRowDimension('1')->setRowHeight($heightInPoints);
 
@@ -290,6 +323,10 @@ class TimterController extends BaseController
                     'borderStyle' => Border::BORDER_DOUBLE,
                     'color' => ['rgb' => '000000'],
                 ],
+                'bottom' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
                 'left' => [
                     'borderStyle' => Border::BORDER_THIN,
                     'color' => ['rgb' => '000000'],
@@ -307,11 +344,15 @@ class TimterController extends BaseController
             ],
         ]);
 
-        // mengatur tinggi baris 2 & 3
-        $heightInCm2 = 0.56;
+        // mengatur tinggi baris 2 - 7
+        $heightInCm2 = 1.25;
         $heightInPoints2 = $heightInCm2 / 0.0352778;
         $sheet->getRowDimension('2')->setRowHeight($heightInPoints2);
         $sheet->getRowDimension('3')->setRowHeight($heightInPoints2);
+        $sheet->getRowDimension('4')->setRowHeight($heightInPoints2);
+        $sheet->getRowDimension('5')->setRowHeight($heightInPoints2);
+        $sheet->getRowDimension('6')->setRowHeight($heightInPoints2);
+        $sheet->getRowDimension('7')->setRowHeight($heightInPoints2);
 
         $sheet->setCellValue('B2', 'DEPARTEMEN KAOSKAKI');
         $sheet->mergeCells('B2:AF2')->getStyle('B2:AF2')->applyFromArray([
@@ -325,6 +366,14 @@ class TimterController extends BaseController
                 'vertical' => Alignment::VERTICAL_CENTER,
             ],
             'borders' => [
+                'top' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'bottom' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
                 'left' => [
                     'borderStyle' => Border::BORDER_THIN,
                     'color' => ['rgb' => '000000'],
@@ -348,6 +397,10 @@ class TimterController extends BaseController
                 'vertical' => Alignment::VERTICAL_CENTER,
             ],
             'borders' => [
+                'top' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
                 'bottom' => [
                     'borderStyle' => Border::BORDER_DOUBLE,
                     'color' => ['rgb' => '000000'],
@@ -684,7 +737,7 @@ class TimterController extends BaseController
         $sheet->setCellValue('AF6', 'KETERANGAN');
         $sheet->mergeCells('AF6:AF7')->getStyle('AF6:AF7')->applyFromArray([
             'font' => [
-                'size' => 12,
+                'size' => 11,
                 'bold' => true,
                 'name' => 'Arial',
             ],
@@ -711,12 +764,22 @@ class TimterController extends BaseController
                 ],
             ],
         ]);
-        $sheet->getColumnDimension('AF')->setAutoSize(true);
+        // $sheet->getColumnDimension('AF')->setAutoSize(true);
+
+        // WRAP TEXT
+        $columns = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE'];
+
+        foreach ($columns as $col) {
+            $sheet->getStyle($col . '6:' . $col . '7')->getAlignment()->setWrapText(true);
+        }
+
         // end Header Timter
 
         // body start
         $row = 8; // baris awal isi tabel
-
+        // mengatur tinggi baris 2 - 7
+        $heightInCm3 = 1.25;
+        $heightInPoints3 = $heightInCm2 / 0.0352778;
         foreach ($uniqueData as $key => $id) :
             if (count($id['no_mesin']) > 0) {
                 $rowspan = count($id['no_mesin']);
@@ -760,6 +823,35 @@ class TimterController extends BaseController
 
             foreach ($columns as $column) {
                 $sheet->getStyle($column . $row)->applyFromArray($styleBody);
+                $sheet->getStyle($column . $row)->getAlignment()->setWrapText(true); // Wrap text
+                $sheet->getRowDimension($row)->setRowHeight($heightInPoints3);
+
+                // Jika kolom A, terapkan border khusus
+                if ($column == 'A') {
+                    // Terapkan border double hanya di sebelah kanan
+                    $sheet->getStyle($column . $row)->getBorders()->applyFromArray([
+                        'top' => [
+                            'borderStyle' => Border::BORDER_THIN,
+                            'color' => ['rgb' => '000000'],
+                        ],
+                        'bottom' => [
+                            'borderStyle' => Border::BORDER_THIN,
+                            'color' => ['rgb' => '000000'],
+                        ],
+                        'left' => [
+                            'borderStyle' => Border::BORDER_DOUBLE,
+                            'color' => ['rgb' => '000000'],
+                        ],
+                        'right' => [
+                            'borderStyle' => Border::BORDER_THIN, // Garis kanan double
+                            'color' => ['rgb' => '000000'],
+                        ],
+                    ]);
+
+                    // Set alignment secara terpisah
+                    $sheet->getStyle($column . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                    $sheet->getStyle($column . $row)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+                }
             }
 
             // Pengisian untuk baris yang sudah di-merge
@@ -800,6 +892,35 @@ class TimterController extends BaseController
 
                 foreach ($columns as $column) {
                     $sheet->getStyle($column . $row)->applyFromArray($styleBody);
+                    $sheet->getStyle($column . $row)->getAlignment()->setWrapText(true); // Wrap text
+                    $sheet->getRowDimension($row)->setRowHeight($heightInPoints3);
+
+                    // Jika kolom AF, terapkan border khusus
+                    if ($column == 'AF') {
+                        // Terapkan border double hanya di sebelah kanan
+                        $sheet->getStyle($column . $row)->getBorders()->applyFromArray([
+                            'top' => [
+                                'borderStyle' => Border::BORDER_THIN,
+                                'color' => ['rgb' => '000000'],
+                            ],
+                            'bottom' => [
+                                'borderStyle' => Border::BORDER_THIN,
+                                'color' => ['rgb' => '000000'],
+                            ],
+                            'left' => [
+                                'borderStyle' => Border::BORDER_THIN,
+                                'color' => ['rgb' => '000000'],
+                            ],
+                            'right' => [
+                                'borderStyle' => Border::BORDER_DOUBLE, // Garis kanan double
+                                'color' => ['rgb' => '000000'],
+                            ],
+                        ]);
+
+                        // Set alignment secara terpisah
+                        $sheet->getStyle($column . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                        $sheet->getStyle($column . $row)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+                    }
                 }
                 $row++;
             } else {
@@ -877,6 +998,59 @@ class TimterController extends BaseController
 
                     foreach ($columns as $column) {
                         $sheet->getStyle($column . $row)->applyFromArray($styleBody);
+                        $sheet->getStyle($column . $row)->getAlignment()->setWrapText(true); // Wrap text
+                        $sheet->getRowDimension($row)->setRowHeight($heightInPoints3);
+
+                        // Jika kolom A AF, terapkan border khusus
+                        if ($column == 'A') {
+                            // Terapkan border double hanya di sebelah kanan
+                            $sheet->getStyle($column . $row)->getBorders()->applyFromArray([
+                                'top' => [
+                                    'borderStyle' => Border::BORDER_THIN,
+                                    'color' => ['rgb' => '000000'],
+                                ],
+                                'bottom' => [
+                                    'borderStyle' => Border::BORDER_THIN,
+                                    'color' => ['rgb' => '000000'],
+                                ],
+                                'left' => [
+                                    'borderStyle' => Border::BORDER_DOUBLE,
+                                    'color' => ['rgb' => '000000'],
+                                ],
+                                'right' => [
+                                    'borderStyle' => Border::BORDER_THIN, // Garis kanan double
+                                    'color' => ['rgb' => '000000'],
+                                ],
+                            ]);
+
+                            // Set alignment secara terpisah
+                            $sheet->getStyle($column . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                            $sheet->getStyle($column . $row)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+                        } else if ($column == 'AF') {
+                            // Terapkan border double hanya di sebelah kanan
+                            $sheet->getStyle($column . $row)->getBorders()->applyFromArray([
+                                'top' => [
+                                    'borderStyle' => Border::BORDER_THIN,
+                                    'color' => ['rgb' => '000000'],
+                                ],
+                                'bottom' => [
+                                    'borderStyle' => Border::BORDER_THIN,
+                                    'color' => ['rgb' => '000000'],
+                                ],
+                                'left' => [
+                                    'borderStyle' => Border::BORDER_THIN,
+                                    'color' => ['rgb' => '000000'],
+                                ],
+                                'right' => [
+                                    'borderStyle' => Border::BORDER_DOUBLE, // Garis kanan double
+                                    'color' => ['rgb' => '000000'],
+                                ],
+                            ]);
+
+                            // Set alignment secara terpisah
+                            $sheet->getStyle($column . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                            $sheet->getStyle($column . $row)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+                        }
                     }
 
                     if ($loopIndex == 0) {
@@ -905,6 +1079,34 @@ class TimterController extends BaseController
 
                         foreach ($columns as $column) {
                             $sheet->getStyle($column . $row)->applyFromArray($styleBody);
+                            $sheet->getStyle($column . $row)->getAlignment()->setWrapText(true); // Wrap text
+                            $sheet->getRowDimension($row)->setRowHeight($heightInPoints3);
+
+                            if ($column == 'AF') {
+                                // Terapkan border double hanya di sebelah kanan
+                                $sheet->getStyle($column . $row)->getBorders()->applyFromArray([
+                                    'top' => [
+                                        'borderStyle' => Border::BORDER_THIN,
+                                        'color' => ['rgb' => '000000'],
+                                    ],
+                                    'bottom' => [
+                                        'borderStyle' => Border::BORDER_THIN,
+                                        'color' => ['rgb' => '000000'],
+                                    ],
+                                    'left' => [
+                                        'borderStyle' => Border::BORDER_THIN,
+                                        'color' => ['rgb' => '000000'],
+                                    ],
+                                    'right' => [
+                                        'borderStyle' => Border::BORDER_DOUBLE, // Garis kanan double
+                                        'color' => ['rgb' => '000000'],
+                                    ],
+                                ]);
+
+                                // Set alignment secara terpisah
+                                $sheet->getStyle($column . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                                $sheet->getStyle($column . $row)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+                            }
                         }
                     }
                     $row++;
@@ -913,6 +1115,49 @@ class TimterController extends BaseController
             }
 
         endforeach;
+
+        $lastRow = $row - 1;
+
+        // List semua kolom yang perlu diberi border double bawah
+        $columns = [
+            'A',
+            'B',
+            'C',
+            'D',
+            'E',
+            'F',
+            'G',
+            'H',
+            'I',
+            'J',
+            'K',
+            'L',
+            'M',
+            'N',
+            'O',
+            'P',
+            'Q',
+            'R',
+            'S',
+            'T',
+            'U',
+            'V',
+            'W',
+            'X',
+            'Y',
+            'Z',
+            'AA',
+            'AB',
+            'AC',
+            'AD',
+            'AE',
+            'AF'
+        ];
+
+        // Terapkan border double bawah pada setiap kolom di baris terakhir
+        foreach ($columns as $column) {
+            $sheet->getStyle($column . $lastRow)->getBorders()->getBottom()->setBorderStyle(Border::BORDER_DOUBLE);
+        }
 
 
         // Set judul file dan header untuk download
