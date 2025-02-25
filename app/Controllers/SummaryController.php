@@ -673,6 +673,7 @@ class SummaryController extends BaseController
                 $jarum = $kebutuhanArea['jarum'];
                 $detailPlan = $this->detailPlanningModel->getDataPlanning2($id['id_pln_mc']);
 
+                $seenCombinations = [];
                 foreach ($detailPlan as $key => $dp) {
                     // Ambil data terkait model dan mesin
                     $noModel = $dp['model'];
@@ -683,9 +684,19 @@ class SummaryController extends BaseController
                         'jarum' => $jarum,
                         'delivery' => $dp['delivery']
                     ]);
+                    // Cek apakah kombinasi model dan delivery sudah pernah dilihat
+                    $combinationKey = $noModel . '|' . $dp['delivery'];
+                    if (isset($seenCombinations[$combinationKey])) {
+                        // Jika sudah ada, set actMesin menjadi 0 untuk duplikasi
+                        $actMesin['jl_mc'] = 0;
+                    } else {
+                        // Tandai kombinasi ini sudah diproses
+                        $seenCombinations[$combinationKey] = true;
+                    }
+
 
                     // Menghitung total mesin
-                    $mesinTotal = array_sum(array_column($this->tanggalPlanningModel->totalMc($dp['id_detail_pln']), 'mesin'));
+                    $mesinTotal = array_sum(array_column($this->tanggalPlanningModel->totalMc($dp['id_est_qty']), 'mesin'));
 
                     // Memodifikasi data dalam array secara langsung
                     $detailPlan[$key]['mesin'] = $mesinTotal;
