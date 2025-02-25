@@ -10,7 +10,7 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    Booking Data Based on Needles
+                                    Data Order
                                 </h5>
                             </div>
                         </div>
@@ -23,6 +23,28 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+    <div class="row my-3">
+        <div class="col-lg-12">
+            <div class="card z-index-2">
+                <div class="card-header pb-0 d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title"> Order Status Kahatex</h6>
+                    </div>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12">
+                            <div class="chart">
+                                <canvas id="mixed-chart" class="chart-canvas" height="300"></canvas>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
         </div>
     </div>
     <div class="row">
@@ -162,4 +184,96 @@
 
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+<script>
+    $(document).ready(function() {
+        var chartData = <?= json_encode($chartData, JSON_HEX_TAG) ?>;
+
+
+        var labels = [];
+        var qtyData = [];
+        var sisaData = [];
+
+        for (const key in chartData) {
+            labels.push(key); // Nama bulan + tahun (contoh: "January 2025")
+            qtyData.push(chartData[key].qty);
+            sisaData.push(chartData[key].sisa);
+        }
+
+        var canvasElement = document.getElementById("mixed-chart");
+
+        // Hancurkan chart lama kalau ada
+        if (canvasElement.chart) {
+            canvasElement.chart.destroy();
+        }
+
+        var ctx2 = canvasElement.getContext("2d");
+
+        canvasElement.chart = new Chart(ctx2, {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Total Qty",
+                    backgroundColor: "#3A416F",
+                    borderWidth: 1,
+                    data: qtyData
+                }, {
+                    label: "Total Sisa",
+                    backgroundColor: "#CB0C9F",
+                    borderWidth: 1,
+                    data: sisaData
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: "top"
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false,
+                            display: true,
+                            drawOnChartArea: true,
+                            drawTicks: false,
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            color: '#b2b9bf',
+                            font: {
+                                size: 11,
+                                family: "Open Sans",
+                                style: 'normal',
+                                lineHeight: 2
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            drawBorder: false,
+                            display: false,
+                            drawOnChartArea: false,
+                            drawTicks: false,
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            color: '#b2b9bf',
+                            font: {
+                                size: 11,
+                                family: "Open Sans",
+                                style: 'normal',
+                                lineHeight: 2
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
 <?php $this->endSection(); ?>

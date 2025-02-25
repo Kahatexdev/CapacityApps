@@ -227,22 +227,48 @@
                                                         <thead>
                                                             <tr>
                                                                 <th width=100 class="text-center">No</th>
-                                                                <th class="text-center">Komposisi(%)</th>
+                                                                <th class="text-center">Komp(%)</th>
                                                                 <th class="text-center">Loss(%)</th>
-                                                                <th class="text-center">Total Kebutuhan</th>
+                                                                <th class="text-center">Qty PO</th>
                                                                 <th class="text-center">Item Type</th>
-                                                                <th class="text-center">Note</th>
                                                                 <th class="text-center">Kode Warna</th>
                                                                 <th class="text-center">Warna</th>
-                                                                <th class="text-center">Qty Cones</th>
-                                                                <th class="text-center">Berat Cones</th>
-                                                                <th class="text-center">Total</th>
-                                                                <th class="text-center">Total Qty Cones</th>
-                                                                <th class="text-center">Total Berat Cones(Kg)</th>
+
                                                             </tr>
                                                         </thead>
                                                         <tbody class="material-usage">
-
+                                                            <tr>
+                                                                <td><input type="text" class="form-control text-center" name="no" id="no" value="1"></td>
+                                                                <td><input type="text" class="form-control text-center" name="komposisi" id="komposisi" value=""></td>
+                                                                <td><input type="text" class="form-control text-center" name="loss" id="loss" value=""></td>
+                                                                <td><input type="text" class="form-control text-center" name="ttl_keb" id="ttl_keb" value=""></td>
+                                                                <td><input type="text" class="form-control text-center" name="item_type" id="item_type" value=""></td>
+                                                                <td><input type="text" class="form-control text-center" name="kode_warna" id="kode_warna" value=""></td>
+                                                                <td><input type="text" class="form-control text-center" name="warna" id="warna" value=""></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td></td>
+                                                                <td>
+                                                                    Qty Cones:
+                                                                    <input type="text" class="form-control text-center" name="qty_cns" id="qty_cns" value="">
+                                                                </td>
+                                                                <td>
+                                                                    Berat Cones:
+                                                                    <input type="text" class="form-control text-center" name="berat_cns" id="berat_cns" value="">
+                                                                </td>
+                                                                <td>
+                                                                    Total :
+                                                                    <input type="text" class="form-control text-center" name="ttl" id="ttl" value="">
+                                                                </td>
+                                                                <td>
+                                                                    Total Qty Cones:
+                                                                    <input type="text" class="form-control text-center" name="ttl_cns" id="ttl_cns" value="">
+                                                                </td>
+                                                                <td>
+                                                                    Total Berat Cones:
+                                                                    <input type="text" class="form-control text-center" name="ttl_berat_cns" id="ttl_berat_cns" value="">
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -664,115 +690,7 @@
         updateTabNumbers();
     });
 </script>
-<!-- <script>
-    let data =;
-    console.log(data)
-    // Ekstraksi tanggal dan jumlah produksi dari data
-    let labels = data.map(item => item.created_at);
-    let values = data.map(item => item.total_produksi);
 
-
-    var ctx2 = document.getElementById("mixed-chart").getContext("2d");
-
-    var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
-    gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-    gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)'); //purple colors
-
-    var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
-    gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-    gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)'); //purple colors
-
-    new Chart(ctx2, {
-
-        data: {
-            labels: labels,
-            datasets: [{
-                    type: "bar",
-                    label: "Data Turun Order",
-                    borderWidth: 0,
-                    pointRadius: 30,
-
-                    backgroundColor: "#3A416F",
-                    fill: true,
-                    data: values,
-                    maxBarThickness: 20
-
-                },
-                {
-                    type: "line",
-
-                    tension: 0.1,
-                    borderWidth: 0,
-                    pointRadius: 0,
-                    borderColor: "#3A416F",
-                    borderWidth: 2,
-                    backgroundColor: gradientStroke1,
-                    fill: true,
-                    data: values,
-                },
-            ],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false,
-                }
-            },
-            interaction: {
-                intersect: false,
-                mode: 'index',
-            },
-            scales: {
-                y: {
-                    grid: {
-                        drawBorder: false,
-                        display: true,
-                        drawOnChartArea: true,
-                        drawTicks: false,
-                        borderDash: [5, 5]
-                    },
-                    ticks: {
-                        display: true,
-                        padding: 10,
-                        color: '#b2b9bf',
-                        font: {
-                            size: 11,
-                            family: "Open Sans",
-                            style: 'normal',
-                            lineHeight: 2
-                        },
-                    }
-                },
-                x: {
-                    grid: {
-                        drawBorder: false,
-                        display: false,
-                        drawOnChartArea: false,
-                        drawTicks: false,
-                        borderDash: [5, 5]
-                    },
-                    ticks: {
-                        display: true,
-                        color: '#b2b9bf',
-                        padding: 20,
-                        font: {
-                            size: 11,
-                            family: "Open Sans",
-                            style: 'normal',
-                            lineHeight: 2
-                        },
-                    }
-                },
-            },
-        },
-    });
-</script> -->
 <script>
     $(document).ready(function() {
         // Ketika No Model dipilih
@@ -842,33 +760,49 @@
                 });
                 // Ambil data MU dari API
                 $.ajax({
-                    url: '<?= base_url($role . 'getMU') ?>/' + noModel + '/' + styleSize,
+                    url: '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + styleSize,
                     type: 'GET',
                     dataType: 'json',
                     success: function(response) {
-                        if (response.status === 'success') {
-                            console.log(response.data);
+                        console.log(response);
+                        let table = $('#poTable tbody');
+                        table.empty(); // Hapus isi tabel sebelumnya
+                        // Iterasi data yang diterima dari API
+                        response.forEach(function(item, index) {
+                            table.append(`
+                    <tr>
+                        <td>${index + 1}</td>
+                          <td><input type="text" class="form-control text-center" name="komposisi" id="komposisi" value="${item.composition}" readonly></td>
+                          <td><input type="text" class="form-control text-center" name="loss" id="loss" value="${item.loss}" readonly></td>
+                             <td><input type="text" class="form-control text-center" name="ttl_keb" id="ttl_keb" value="${item.gw}" readonly></td>
+                             <td><input type="text" class="form-control text-center" name="item_type" id="item_type" value="${item.item_type}" readonly></td>
+                             <td><input type="text" class="form-control text-center" name="kode_warna" id="kode_warna" value="${item.kode_warna}" readonly></td>
+                             <td><input type="text" class="form-control text-center" name="warna" id="warna" value="${item.color}" readonly></td>
+                             </tr>
+                    <tr>
+                    <td></td>
+                             <td>
+                             Qty Cones:
+                             <input type="text" class="form-control text-center" name="qty_cns" id="qty_cns" value=""></td>
+                             <td>
+                             Berat Cones:
+                             <input type="text" class="form-control text-center" name="berat_cns" id="berat_cns" value=""></td>
+                             <td>
+                             Total:
+                             <input type="text" class="form-control text-center" name="ttl" id="ttl" value=""></td>
+                             <td>
+                             Total Cones:
+                             <input type="text" class="form-control text-center" name="ttl_cns" id="ttl_cns" value=""></td>
+                             <td>
+                             Total Berat Cones:
+                             <input type="text" class="form-control text-center" name="ttl_berat_cns" id="ttl_berat_cns" value="">
 
-                            // Lakukan sesuatu dengan data, contoh: tampilkan di tabel
-                            let table = $('#poTable tbody');
-                            table.empty(); // Hapus isi tabel sebelumnya
+                    </tr>
+                `);
+                        });
 
-                            response.data.forEach(function(item, index) {
-                                table.append(`
-                                <tr>
-                                    <td>${index + 1}</td>
-                                    <td>${item.composition}</td>
-                                    <td>${item.loss}</td>
-                                    <td>${item.gw}</td>
-                                    <td>${item.item_type}</td>
-                                    <td>${item.kode_warna}</td>
-                                    <td>${item.warna}</td>
-                                </tr>
-                            `);
-                            });
-                        } else {
-                            alert('Data Material Usage tidak ditemukan.');
-                        }
+
+
                     },
                     error: function() {
                         alert('Gagal mengambil data Material Usage.');

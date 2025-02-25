@@ -100,6 +100,7 @@ class PlanningController extends BaseController
     public function order()
     {
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+        $monthlyData = $this->ApsPerstyleModel->getMonthlyData();
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Order',
@@ -110,7 +111,7 @@ class PlanningController extends BaseController
             'active5' => '',
             'active6' => '',
             'acive7' => '',
-
+            'chartData' => $monthlyData,
             'TotalMesin' => $totalMesin,
         ];
         return view(session()->get('role') . '/Order/ordermaster', $data);
