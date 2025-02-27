@@ -183,94 +183,95 @@
                                             <div class="mt-5">
                                                 <h3>Bahan Baku Per Style</h3>
                                             </div>
-
-                                            <!-- Bahan Baku Section -->
-                                            <div class="row g-3 mt-3">
-                                                <div class="table-responsive">
-                                                    <table id="bbTable" class="table table-bordered table-striped">
-                                                        <thead>
-                                                            <tr>
-                                                                <th class="text-center">Style Size</th>
-                                                                <th class="text-center">Jalan MC</th>
-                                                                <th class="text-center">Aksi</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    <select class="form-control" name="style_size" id="style_size">
-                                                                        <option value="">Pilih Style Size</option>
-                                                                    </select>
-                                                                </td>
-                                                                <td>
-                                                                    <input type="number" class="form-control" name="jalan_mc" id="jalan_mc">
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    <button type="button" class="btn btn-info" id="addRow">
-                                                                        <i class="fas fa-plus"></i>
-                                                                    </button>
-                                                                </td>
-                                                                <!-- <td class="text-center">
+                                            <div id="tableSize">
+                                                <!-- Bahan Baku Section -->
+                                                <div class="row g-3 mt-3 ">
+                                                    <div class="table-responsive">
+                                                        <table id="bbTable" class="table table-bordered table-striped">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="text-center">Style Size</th>
+                                                                    <th class="text-center">Jalan MC</th>
+                                                                    <th class="text-center">Aksi</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <select class="form-control" name="style_size" id="style_size">
+                                                                            <option value="">Pilih Style Size</option>
+                                                                        </select>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="number" class="form-control" name="jalan_mc" id="jalan_mc">
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <button type="button" class="btn btn-info" id="addTable">
+                                                                            <i class="fas fa-plus"></i>
+                                                                        </button>
+                                                                    </td>
+                                                                    <!-- <td class="text-center">
                                                                     <button type="button" class="btn btn-danger removeRow">
                                                                         <i class="fas fa-trash"></i>
                                                                     </button>
                                                                 </td> -->
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <!-- Bahan Baku Section -->
-                                            <div class="row g-3 mt-3">
-                                                <div class="table-responsive">
-                                                    <table id="poTable" class="table table-bordered table-striped">
-                                                        <thead>
-                                                            <tr>
-                                                                <th width=100 class="text-center">No</th>
-                                                                <th class="text-center">Komp(%)</th>
-                                                                <th class="text-center">Loss(%)</th>
-                                                                <th class="text-center">Qty PO</th>
-                                                                <th class="text-center">Item Type</th>
-                                                                <th class="text-center">Kode Warna</th>
-                                                                <th class="text-center">Warna</th>
+                                                <!-- Bahan Baku Section -->
+                                                <div class="row g-3 mt-3">
+                                                    <div class="table-responsive">
+                                                        <table id="poTable" class="table table-bordered table-striped">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th width=100 class="text-center">No</th>
+                                                                    <th class="text-center">Komp(%)</th>
+                                                                    <th class="text-center">Loss(%)</th>
+                                                                    <th class="text-center">Qty PO</th>
+                                                                    <th class="text-center">Item Type</th>
+                                                                    <th class="text-center">Kode Warna</th>
+                                                                    <th class="text-center">Warna</th>
 
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody class="material-usage">
-                                                            <tr>
-                                                                <td><input type="text" class="form-control text-center" name="no" id="no" value="1"></td>
-                                                                <td><input type="text" class="form-control text-center" name="komposisi" id="komposisi" value=""></td>
-                                                                <td><input type="text" class="form-control text-center" name="loss" id="loss" value=""></td>
-                                                                <td><input type="text" class="form-control text-center" name="ttl_keb" id="ttl_keb" value=""></td>
-                                                                <td><input type="text" class="form-control text-center" name="item_type" id="item_type" value=""></td>
-                                                                <td><input type="text" class="form-control text-center" name="kode_warna" id="kode_warna" value=""></td>
-                                                                <td><input type="text" class="form-control text-center" name="warna" id="warna" value=""></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td></td>
-                                                                <td>
-                                                                    Qty Cones:
-                                                                    <input type="text" class="form-control text-center" name="qty_cns" id="qty_cns" value="">
-                                                                </td>
-                                                                <td>
-                                                                    Berat Cones:
-                                                                    <input type="text" class="form-control text-center" name="berat_cns" id="berat_cns" value="">
-                                                                </td>
-                                                                <td>
-                                                                    Total :
-                                                                    <input type="text" class="form-control text-center" name="ttl" id="ttl" value="">
-                                                                </td>
-                                                                <td>
-                                                                    Total Qty Cones:
-                                                                    <input type="text" class="form-control text-center" name="ttl_cns" id="ttl_cns" value="">
-                                                                </td>
-                                                                <td>
-                                                                    Total Berat Cones:
-                                                                    <input type="text" class="form-control text-center" name="ttl_berat_cns" id="ttl_berat_cns" value="">
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody class="material-usage">
+                                                                <tr>
+                                                                    <td><input type="text" class="form-control text-center" name="no" id="no" value="1"></td>
+                                                                    <td><input type="text" class="form-control text-center" name="komposisi" id="komposisi" value=""></td>
+                                                                    <td><input type="text" class="form-control text-center" name="loss" id="loss" value=""></td>
+                                                                    <td><input type="text" class="form-control text-center" name="ttl_keb" id="ttl_keb" value=""></td>
+                                                                    <td><input type="text" class="form-control text-center" name="item_type" id="item_type" value=""></td>
+                                                                    <td><input type="text" class="form-control text-center" name="kode_warna" id="kode_warna" value=""></td>
+                                                                    <td><input type="text" class="form-control text-center" name="warna" id="warna" value=""></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td></td>
+                                                                    <td>
+                                                                        Qty Cones:
+                                                                        <input type="text" class="form-control text-center" name="qty_cns" id="qty_cns" value="">
+                                                                    </td>
+                                                                    <td>
+                                                                        Berat Cones:
+                                                                        <input type="text" class="form-control text-center" name="berat_cns" id="berat_cns" value="">
+                                                                    </td>
+                                                                    <td>
+                                                                        Total :
+                                                                        <input type="text" class="form-control text-center" name="ttl" id="ttl" value="">
+                                                                    </td>
+                                                                    <td>
+                                                                        Total Qty Cones:
+                                                                        <input type="text" class="form-control text-center" name="ttl_cns" id="ttl_cns" value="">
+                                                                    </td>
+                                                                    <td>
+                                                                        Total Berat Cones:
+                                                                        <input type="text" class="form-control text-center" name="ttl_berat_cns" id="ttl_berat_cns" value="">
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <!-- Buttons -->
@@ -309,25 +310,118 @@
     $(document).ready(function() {
         $('.add-item').select2();
     });
-
-    $(document).ready(function() {
-        $('#example').DataTable({});
-
-        // Trigger import modal when import button is clicked
-        $('.import-btn').click(function() {
-            console.log("a");
-            var idModel = $(this).data('id');
-            var noModel = $(this).data('no-model');
-
-            $('#importModal').find('input[name="id_model"]').val(idModel);
-            $('#importModal').find('input[name="no_model"]').val(noModel);
-
-            $('#importModal').modal('show'); // Show the modal
-        });
-    });
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        const addbtn = document.getElementById("addTable");
+        const poTable = document.getElementById("tableSize");
+
+        addbtn.addEventListener("click", function() {
+            console.log("halow");
+
+            // Buat elemen div baru
+            let newLine = document.createElement("div");
+            newLine.classList.add("row", "g-3", "mt-3"); // Menambahkan class agar sesuai dengan layout
+
+            // Isi elemen baru dengan template tabel
+            newLine.innerHTML = `
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th class="text-center">Style Size</th>
+                        <th class="text-center">Jalan MC</th>
+                        <th class="text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <select class="form-control" name="style_size">
+                                <option value="">Pilih Style Size</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" class="form-control" name="jalan_mc">
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-danger removeRow">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+          <div class="row g-3 mt-3">
+                                                    <div class="table-responsive">
+                                                        <table id="poTable" class="table table-bordered table-striped">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th width=100 class="text-center">No</th>
+                                                                    <th class="text-center">Komp(%)</th>
+                                                                    <th class="text-center">Loss(%)</th>
+                                                                    <th class="text-center">Qty PO</th>
+                                                                    <th class="text-center">Item Type</th>
+                                                                    <th class="text-center">Kode Warna</th>
+                                                                    <th class="text-center">Warna</th>
+
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody class="material-usage">
+                                                                <tr>
+                                                                    <td><input type="text" class="form-control text-center" name="no" id="no" value="1"></td>
+                                                                    <td><input type="text" class="form-control text-center" name="komposisi" id="komposisi" value=""></td>
+                                                                    <td><input type="text" class="form-control text-center" name="loss" id="loss" value=""></td>
+                                                                    <td><input type="text" class="form-control text-center" name="ttl_keb" id="ttl_keb" value=""></td>
+                                                                    <td><input type="text" class="form-control text-center" name="item_type" id="item_type" value=""></td>
+                                                                    <td><input type="text" class="form-control text-center" name="kode_warna" id="kode_warna" value=""></td>
+                                                                    <td><input type="text" class="form-control text-center" name="warna" id="warna" value=""></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td></td>
+                                                                    <td>
+                                                                        Qty Cones:
+                                                                        <input type="text" class="form-control text-center" name="qty_cns" id="qty_cns" value="">
+                                                                    </td>
+                                                                    <td>
+                                                                        Berat Cones:
+                                                                        <input type="text" class="form-control text-center" name="berat_cns" id="berat_cns" value="">
+                                                                    </td>
+                                                                    <td>
+                                                                        Total :
+                                                                        <input type="text" class="form-control text-center" name="ttl" id="ttl" value="">
+                                                                    </td>
+                                                                    <td>
+                                                                        Total Qty Cones:
+                                                                        <input type="text" class="form-control text-center" name="ttl_cns" id="ttl_cns" value="">
+                                                                    </td>
+                                                                    <td>
+                                                                        Total Berat Cones:
+                                                                        <input type="text" class="form-control text-center" name="ttl_berat_cns" id="ttl_berat_cns" value="">
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+    `;
+
+            // Tambahkan elemen ke dalam `poTable`
+            if (poTable) {
+                poTable.appendChild(newLine);
+            } else {
+                console.error("Element with id 'tableSize' not found");
+            }
+
+            // Tambahkan event listener untuk tombol hapus
+            newLine.querySelector(".removeRow").addEventListener("click", function() {
+                newLine.remove();
+            });
+        });
+
+
+
         const navTab = document.getElementById("nav-tab");
         const navTabContent = document.getElementById("nav-tabContent");
         let tabIndex = 2;
@@ -615,6 +709,7 @@
             const makan = tabIndex - 1;
             console.log(makan);
             addRowButton.addEventListener("click", function() {
+                console.log('halow')
                 const rowCount = newPoTable.querySelectorAll("tbody tr").length + 1;
                 const newRow = document.createElement("tr");
 

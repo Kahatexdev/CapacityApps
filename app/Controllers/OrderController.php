@@ -223,6 +223,7 @@ class OrderController extends BaseController
         ];
         return view(session()->get('role') . '/Order/orderjarumbln', $data);
     }
+    public function orderPerbulan() {}
 
     public function detailmodeljarum($noModel, $delivery, $jarum)
     {
