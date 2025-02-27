@@ -61,6 +61,7 @@ class OrderModel extends Model
                         data_model.no_model, 
                         apsperstyle.no_order, 
                         apsperstyle.machinetypeid, 
+                        apsperstyle.factory, 
                         master_product_type.product_type, 
                         data_model.description, 
                         data_model.seam, 
@@ -87,6 +88,7 @@ class OrderModel extends Model
                 ->orLike('data_model.seam', $searchValue)
                 ->orLike('data_model.leadtime', $searchValue)
                 ->orLike('apsperstyle.delivery', $searchValue)
+                ->orLike('apsperstyle.factory', $searchValue)
                 ->groupEnd();
         }
 

@@ -906,4 +906,33 @@ class ApsPerstyleModel extends Model
             ->orderBy('size', 'ASC')
             ->findAll();
     }
+    public function
+    getMonthlyData()
+    {
+        $db = db_connect();
+        $query = $db->query("
+            SELECT 
+                DATE_FORMAT(delivery, '%M') AS month_name, 
+                YEAR(delivery) AS year,
+                round(SUM(qty/24)) AS total_qty, 
+                round(SUM(sisa/24)) AS total_sisa
+            FROM apsperstyle
+            WHERE YEAR(delivery) = YEAR(CURDATE()) 
+            AND production_unit !='MJ'
+            GROUP BY DATE_FORMAT(delivery, '%Y-%m')
+            ORDER BY MIN(delivery) ASC
+        ");
+
+        $result = $query->getResultArray();
+
+        $data = [];
+        foreach ($result as $row) {
+            $data[$row['month_name'] . ' ' . $row['year']] = [
+                'qty' => (int) $row['total_qty'],
+                'sisa' => (int) $row['total_sisa']
+            ];
+        }
+
+        return $data;
+    }
 }

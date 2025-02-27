@@ -16,5 +16,6 @@
     "intelephense.diagnostics.undefinedClassMethods": false,
     "intelephense.diagnostics.undefinedClassProperties": false,
     "intelephense.completion.suggestObjectOperatorStaticMethods": false,
+    "postman.settings.dotenv-detection-notification-visibility": false,
     
 }

@@ -190,6 +190,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('assignarealall', 'PlanningController::assignarealall');
     $routes->post('recomendationarea', 'MesinController::recomendationarea');
     $routes->post('tampilPerdelivery', 'OrderController::tampilPerdelivery');
+    $routes->post('orderPerbulan', 'OrderController::orderPerbulan');
 
 
     // mesin
@@ -423,7 +424,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
     $routes->post('getStyleSizeByNoModel', 'MaterialController::getStyleSizeByNoModel');
     $routes->post('getJalanMc', 'MaterialController::getJalanMcByModelSize');
-    $routes->post('getMU', 'MaterialController::getMU');
+    $routes->get('getMU/(:any)/(:any)', 'MaterialController::getMU/$1/$2');
 });
 
 // sudo

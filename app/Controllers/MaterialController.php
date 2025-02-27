@@ -217,14 +217,18 @@ class MaterialController extends BaseController
         // Kembalikan data dalam format JSON
         return $this->response->setJSON($jalanMc);
     }
-    public function getMU()
+    public function getMU($model, $styleSize)
     {
-        $model = $this->request->getGet('model');
-        $styleSize = $this->request->getGet('style_size');
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/MaterialUsage/' . $model . '/' . $styleSize;
-        $response = file_get_contents($apiUrl);
-        $mu = json_decode($response, true);
+        $styleSize = urlencode($styleSize);  // Encode styleSize
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getMU/' . $model . '/' . $styleSize;
+        $response = file_get_contents($apiUrl);  // Mendapatkan response dari API
+        if ($response === FALSE) {
+            die('Error occurred while fetching data.');
+        }
 
-        return $this->response->setJSON($mu);
+        $data = json_decode($response, true);  // Decode JSON response dari API
+
+
+        return $this->response->setJSON($data);
     }
 }
