@@ -196,6 +196,25 @@ class OrderModel extends Model
 
         return $builder->get()->getResult();
     }
+    public function tampilPerBulan($bulan, $tahun)
+    {
+        $builder = $this->db->table('data_model');
+
+        $builder->select('data_model.*, mastermodel,no_order, machinetypeid, ROUND(SUM(QTy), 0) AS qty, ROUND(SUM(sisa), 0) AS sisa, factory, delivery, product_type');
+        $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
+        $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
+        $builder->where('monthname(delivery)', $bulan);
+        $builder->where('year(delivery)', $tahun);
+        $builder->where('production_unit !=', 'MJ');
+        $builder->orderby('created_at', 'desc');
+        $builder->orderby('no_model', 'asc');
+        $builder->orderby('delivery', 'asc');
+        $builder->groupBy('delivery');
+        $builder->groupBy('data_model.no_model');
+        $builder->groupBy('machinetypeid');
+
+        return $builder->get()->getResultArray();
+    }
     public function tampilPerarea($area)
     {
         $twomonth = date('Y-m-d', strtotime('60 days ago'));

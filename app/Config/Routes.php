@@ -189,7 +189,8 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('assignarealall', 'PlanningController::assignarealall');
     $routes->post('recomendationarea', 'MesinController::recomendationarea');
     $routes->post('tampilPerdelivery', 'OrderController::tampilPerdelivery');
-    $routes->post('orderPerbulan', 'OrderController::orderPerbulan');
+    $routes->get('orderPerbulan', 'OrderController::orderPerbulan');
+    $routes->get('orderPerMonth/(:any)/(:any)', 'OrderController::orderPerMonth/$1/$2');
 
 
     // mesin

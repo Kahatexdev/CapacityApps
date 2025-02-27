@@ -935,4 +935,28 @@ class ApsPerstyleModel extends Model
 
         return $data;
     }
+    public function getMonthName()
+    {
+        $db = db_connect();
+        $query = $db->query("
+        SELECT 
+            DATE_FORMAT(delivery, '%M') AS month_name, 
+            YEAR(delivery) AS year
+        FROM apsperstyle
+        WHERE production_unit != 'MJ'
+        GROUP BY DATE_FORMAT(delivery, '%Y-%m')
+        ORDER BY MIN(delivery) ASC
+    ");
+
+        $result = $query->getResultArray();
+        $data = [];
+
+        foreach ($result as $row) {
+            $data[] = [
+                'bulan' => $row['month_name'],
+                'tahun' => $row['year']
+            ]; // Simpan nilai ke dalam array
+        }
+        return $data;
+    }
 }

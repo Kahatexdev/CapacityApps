@@ -223,7 +223,23 @@ class OrderController extends BaseController
         ];
         return view(session()->get('role') . '/Order/orderjarumbln', $data);
     }
-    public function orderPerbulan() {}
+    public function orderPerbulan()
+    {
+        $bulan = $this->ApsPerstyleModel->getMonthName();
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Order Perbulan',
+            'active1' => '',
+            'active2' => 'active',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'bulan' => $bulan,
+        ];
+        return view(session()->get('role') . '/Order/orderbulan', $data);
+    }
 
     public function detailmodeljarum($noModel, $delivery, $jarum)
     {
@@ -1985,5 +2001,34 @@ class OrderController extends BaseController
 
         ];
         return view($role . '/Order/detailcancelorder', $data);
+    }
+    public function orderPerMonth($month, $year)
+    {
+        $order = $this->orderModel->tampilPerBulan($month, $year);
+        $qty = 0;
+        $sisa = 0;
+        foreach ($order as $der) {
+            $qty += round($der['qty'] / 24);
+            $sisa += round($der['sisa'] / 24);
+        }
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'order' => $order,
+            'bulan' => $month,
+            'tahun' => $year,
+            'qty' => $qty,
+            'sisa' => $sisa
+
+
+        ];
+        return view(session()->get('role') . '/Order/orderMonthDetail', $data);
     }
 }
