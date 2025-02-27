@@ -171,6 +171,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('orderPerArea', 'OrderController::orderPerAreaPlan');
     $routes->get('statusOrder', 'OrderController::statusOrder');
     $routes->get('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
+    $routes->post('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
     $routes->get('progressdetail/(:any)/(:any)', 'ApsController::progressdetail/$1/$2');
     $routes->get('detailPdk/(:any)/(:any)', 'OrderController::detailPdk/$1/$2');
     $routes->get('detailModelPlanning/(:any)/(:any)', 'OrderController::detailModelPlanning/$1/$2');

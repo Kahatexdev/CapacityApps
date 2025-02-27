@@ -37,8 +37,9 @@
                                 </h5>
                             </div>
                         </div>
-                        <div class="col-4 text-end">
-                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                        <div class="col-4 d-flex align-items-center justify-content-end gap-2">
+                            <input type="text" class="form-control w-auto" id="filter-input" name="filter" placeholder="No Model">
+                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md p-2">
                                 <i class="ni ni-chart-bar-32 text-lg opacity-10" aria-hidden="true"></i>
                             </div>
                         </div>
@@ -63,7 +64,7 @@
                     <div id="progress-container">
                         <?php foreach ($progress as $key): // Ganti $area dengan $models 
                         ?>
-                            <div class="row mt-2">
+                            <div class="row mt-2 progress-item" data-model="<?= strtolower($key['mastermodel']) ?>">
                                 <div class="col-lg-2">
                                     <h6 class="card-title"><?= $key['mastermodel'] ?></h6>
                                 </div>
@@ -150,6 +151,19 @@
                 });
 </script>
 <script>
+    $(document).ready(function() {
+        $('#filter-input').on('keyup', function() {
+            var keyword = $(this).val().toLowerCase(); // Ambil nilai input filter
 
+            $('.progress-item').each(function() {
+                var modelName = $(this).data('model'); // Ambil data-model dari setiap item
+                if (modelName.includes(keyword) || keyword === '') {
+                    $(this).show(); // Tampilkan jika cocok
+                } else {
+                    $(this).hide(); // Sembunyikan jika tidak cocok
+                }
+            });
+        });
+    });
 </script>
 <?php $this->endSection(); ?>
