@@ -187,7 +187,7 @@ class TimterController extends BaseController
         ];
         $styleBody = [
             'font' => [
-                'size' => 11,
+                'size' => 12,
                 'name' => 'Arial',
             ],
             'alignment' => [
@@ -262,7 +262,7 @@ class TimterController extends BaseController
         $sheet->getColumnDimension('E')->setWidth(9);
         $sheet->getColumnDimension('F')->setWidth(6);
         $sheet->getColumnDimension('G')->setWidth(12);
-        $sheet->getColumnDimension('H')->setWidth(30);
+        $sheet->getColumnDimension('H')->setWidth(35);
         $sheet->getColumnDimension('I')->setWidth(8);
         $sheet->getColumnDimension('J')->setWidth(12);
         $sheet->getColumnDimension('K')->setWidth(9);
@@ -286,7 +286,7 @@ class TimterController extends BaseController
         $sheet->getColumnDimension('AC')->setWidth(8);
         $sheet->getColumnDimension('AD')->setWidth(8);
         $sheet->getColumnDimension('AE')->setWidth(8);
-        $sheet->getColumnDimension('AF')->setWidth(30);
+        $sheet->getColumnDimension('AF')->setWidth(35);
 
 
         // mengatur tinggi baris 1
@@ -737,7 +737,7 @@ class TimterController extends BaseController
         $sheet->setCellValue('AF6', 'KETERANGAN');
         $sheet->mergeCells('AF6:AF7')->getStyle('AF6:AF7')->applyFromArray([
             'font' => [
-                'size' => 11,
+                'size' => 12,
                 'bold' => true,
                 'name' => 'Arial',
             ],
@@ -778,8 +778,8 @@ class TimterController extends BaseController
         // body start
         $row = 8; // baris awal isi tabel
         // mengatur tinggi baris 2 - 7
-        $heightInCm3 = 1.25;
-        $heightInPoints3 = $heightInCm2 / 0.0352778;
+        $heightInCm3 = 2.25;
+        $heightInPoints3 = $heightInCm3 / 0.0352778;
         foreach ($uniqueData as $key => $id) :
             if (count($id['no_mesin']) > 0) {
                 $rowspan = count($id['no_mesin']);
@@ -816,7 +816,7 @@ class TimterController extends BaseController
             $sheet->setCellValue('I' . $row, $id['smv']);
             $sheet->setCellValue('J' . $row, $id['delivery']);
             $sheet->setCellValue('K' . $row, number_format($target, 0));
-            $sheet->setCellValue('L' . $row, $countjlMc);
+            $sheet->setCellValue('L' . $row, $countjlMc > 0 ? $countjlMc : '');
 
             // style body
             $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
@@ -856,14 +856,14 @@ class TimterController extends BaseController
 
             // Pengisian untuk baris yang sudah di-merge
             if (empty($id['no_mesin'])) {
-                $sheet->setCellValue('X' . $row, floor($id['ttl_dz'] / 24));
-                $sheet->setCellValue('Y' . $row, floor($id['ttl_dz'] % 24));
-                $sheet->setCellValue('Z' . $row, floor($id['qty'] / 24));
-                $sheet->setCellValue('AA' . $row, floor($id['qty'] % 24));
-                $sheet->setCellValue('AB' . $row, floor($id['qty_prod'] / 24));
-                $sheet->setCellValue('AC' . $row, floor($id['qty_prod'] % 24));
-                $sheet->setCellValue('AD' . $row, floor($id['sisa'] / 24));
-                $sheet->setCellValue('AE' . $row, floor($id['sisa'] % 24));
+                $sheet->setCellValue('X' . $row, floor($id['ttl_dz'] / 24) > 0 ? floor($id['ttl_dz'] / 24) : '');
+                $sheet->setCellValue('Y' . $row, floor($id['ttl_dz'] % 24) > 0 ? floor($id['ttl_dz'] % 24) : '');
+                $sheet->setCellValue('Z' . $row, floor($id['qty'] / 24) > 0 ? floor($id['qty'] / 24) : '');
+                $sheet->setCellValue('AA' . $row, floor($id['qty'] % 24) > 0 ? floor($id['qty'] % 24) : '');
+                $sheet->setCellValue('AB' . $row, floor($id['qty_prod'] / 24) > 0 ? floor($id['qty_prod'] / 24) : '');
+                $sheet->setCellValue('AC' . $row, floor($id['qty_prod'] % 24) > 0 ? floor($id['qty_prod'] % 24) : '');
+                $sheet->setCellValue('AD' . $row, floor($id['sisa'] / 24) > 0 ? floor($id['sisa'] / 24) : '');
+                $sheet->setCellValue('AE' . $row, floor($id['sisa'] % 24) > 0 ? floor($id['sisa'] % 24) : '');
                 $sheet->setCellValue('AF' . $row, '');
 
                 // style body
@@ -949,16 +949,16 @@ class TimterController extends BaseController
                     $total_pcs = $rows['total_shift'] % 24;
 
                     $sheet->setCellValue('M' . $row, $noMc);
-                    $sheet->setCellValue('N' . $row, floor($shift_a / 24));
-                    $sheet->setCellValue('O' . $row, $pcs_a);
-                    $sheet->setCellValue('P' . $row, floor($shift_b / 24));
-                    $sheet->setCellValue('Q' . $row, $pcs_b);
-                    $sheet->setCellValue('R' . $row, floor($shift_c / 24));
-                    $sheet->setCellValue('S' . $row, $pcs_c);
-                    $sheet->setCellValue('T' . $row, floor($pa / 24));
-                    $sheet->setCellValue('U' . $row, $pcs_pa);
-                    $sheet->setCellValue('V' . $row, floor($total_dz / 24));
-                    $sheet->setCellValue('W' . $row, $total_pcs);
+                    $sheet->setCellValue('N' . $row, floor($shift_a / 24) > 0 ? floor($shift_a / 24) : '');
+                    $sheet->setCellValue('O' . $row, $pcs_a > 0 ? $pcs_a : '');
+                    $sheet->setCellValue('P' . $row, floor($shift_b / 24) > 0 ? floor($shift_b / 24) : '');
+                    $sheet->setCellValue('Q' . $row, $pcs_b > 0 ? $pcs_b : '');
+                    $sheet->setCellValue('R' . $row, floor($shift_c / 24) > 0 ? floor($shift_c / 24) : '');
+                    $sheet->setCellValue('S' . $row, $pcs_c > 0 ? $pcs_c : '');
+                    $sheet->setCellValue('T' . $row, floor($pa / 24) > 0 ? floor($pa / 24) : '');
+                    $sheet->setCellValue('U' . $row, $pcs_pa > 0 ? $pcs_pa : '');
+                    $sheet->setCellValue('V' . $row, floor($total_dz / 24) > 0 ? floor($total_dz / 24) : '');
+                    $sheet->setCellValue('W' . $row, $total_pcs > 0 ? $total_pcs : '');
 
                     // style body
                     $columns = [
@@ -1054,14 +1054,14 @@ class TimterController extends BaseController
                     }
 
                     if ($loopIndex == 0) {
-                        $sheet->setCellValue('X' . $row, floor($id['ttl_dz'] / 24));
-                        $sheet->setCellValue('Y' . $row, floor($id['ttl_dz'] % 24));
-                        $sheet->setCellValue('Z' . $row, floor($id['qty'] / 24));
-                        $sheet->setCellValue('AA' . $row, floor($id['qty'] % 24));
-                        $sheet->setCellValue('AB' . $row, floor($id['qty_prod'] / 24));
-                        $sheet->setCellValue('AC' . $row, floor($id['qty_prod'] % 24));
-                        $sheet->setCellValue('AD' . $row, floor($id['sisa'] / 24));
-                        $sheet->setCellValue('AE' . $row, floor($id['sisa'] % 24));
+                        $sheet->setCellValue('X' . $row, floor($id['ttl_dz'] / 24) > 0 ? floor($id['ttl_dz'] / 24) : '');
+                        $sheet->setCellValue('Y' . $row, floor($id['ttl_dz'] % 24) > 0 ? floor($id['ttl_dz'] % 24) : '');
+                        $sheet->setCellValue('Z' . $row, floor($id['qty'] / 24) > 0 ? floor($id['qty'] / 24) : '');
+                        $sheet->setCellValue('AA' . $row, floor($id['qty'] % 24) > 0 ? floor($id['qty'] % 24) : '');
+                        $sheet->setCellValue('AB' . $row, floor($id['qty_prod'] / 24) > 0 ? floor($id['qty_prod'] / 24) : '');
+                        $sheet->setCellValue('AC' . $row, floor($id['qty_prod'] % 24) > 0 ? floor($id['qty_prod'] % 24) : '');
+                        $sheet->setCellValue('AD' . $row, floor($id['sisa'] / 24) > 0 ? floor($id['sisa'] / 24) : '');
+                        $sheet->setCellValue('AE' . $row, floor($id['sisa'] % 24) > 0 ? floor($id['sisa'] % 24) : '');
                         $sheet->setCellValue('AF' . $row, '');
 
                         // style body
