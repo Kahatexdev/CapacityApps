@@ -3377,4 +3377,152 @@ class ExcelController extends BaseController
         $writer->save('php://output');
         exit;
     }
+    public function exportEstimasispk()
+    {
+        $selectedData = $this->request->getPost('data');
+
+        if (!empty($selectedData)) {
+            $allData = []; // Inisialisasi array hasil di luar loop
+
+            foreach ($selectedData as $dataString) {
+                // Pecah data string menjadi tiga bagian: model, size, dan area
+                list($model, $size, $area) = explode('|', $dataString);
+
+                // Buat parameter untuk query
+                $param = [
+                    'model' => $model,
+                    'size'  => $size,
+                    'area'  => $area,
+                ];
+
+                // Panggil model. Misalnya, model mengharapkan parameter dalam bentuk array dengan satu elemen.
+                $result = $this->ApsPerstyleModel->exportDataEstimasi([$param]);
+
+                // Pastikan ada hasil dari query
+                if ($result) {
+                    $bs     = (int)$result['bs'];
+                    $qty    = (int)$result['qty'];
+                    $sisa   = (int)$result['sisa'];
+                    $poplus = (int)$result['poplus'];
+
+                    // Misalnya, produksi dihitung sebagai selisih antara qty dan sisa
+                    $produksi = $qty - $sisa;
+                    // Gunakan nilai produksi sebagai ttlProd (sesuaikan logika jika diperlukan)
+                    $ttlProd = $produksi;
+
+                    // Lanjutkan hanya jika ttlProd valid
+                    if ($ttlProd > 0) {
+                        $percentage = round(($ttlProd / $qty) * 100);
+                        $ganti      = $bs + $poplus;
+                        $estimasi   = ($ganti / $ttlProd / 100) * $qty;
+
+                        // Hanya masukkan ke array hasil jika persentasenya di antara 60 dan 90
+                        if ($percentage > 60 && $percentage < 90) {
+                            // Buat key unik misalnya dari mastermodel dan size
+                            $key = $result['mastermodel'] . '-' . $result['size'];
+                            // Tambahkan hasil ke array $allData
+                            $allData[$key] = [
+                                'model'      => $result['mastermodel'],
+                                'inisial'    => $result['inisial'],
+                                'size'       => $result['size'],
+                                'sisa'       => $sisa,
+                                'qty'        => $qty,
+                                'ttlProd'    => $ttlProd,
+                                'percentage' => $percentage,
+                                'bs'         => $bs,
+                                'poplus'     => $poplus,
+                                'jarum'      => $result['machinetypeid'],
+                                'estimasi'   => round(($estimasi * 100), 1),
+                            ];
+                        }
+                    }
+                }
+            }
+            // Sekarang $allData berisi data yang telah diproses dari setiap data terpilih.
+            dd($allData); // atau proses sesuai kebutuhan, misalnya export ke Excel.
+
+            // Export Excel
+            // Buat file Excel
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+
+            $styleTitle = [
+                'font' => [
+                    'bold' => true, // Tebalkan teks
+                    'color' => ['argb' => 'FF000000'],
+                    'size' => 20
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+                ],
+            ];
+
+            // border
+            $styleHeader = [
+                'font' => [
+                    'bold' => true, // Tebalkan teks
+                    'color' => ['argb' => 'FFFFFFFF']
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+                ],
+                'borders' => [
+                    'outline' => [
+                        'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                        'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                    ],
+                ],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID, // Jenis pengisian solid
+                    'startColor' => ['argb' => 'FF67748e'], // Warna latar belakang biru tua (HEX)
+                ],
+            ];
+            $styleBody = [
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+                ],
+                'borders' => [
+                    'outline' => [
+                        'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                        'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                    ],
+                ],
+            ];
+
+            $sheet->setCellValue('A1', 'ESTIMASI QTY SPK 2');
+            $sheet->getStyle('A1')->applyFromArray($styleTitle);
+            // Tulis header
+            $sheet->setCellValue('A3', 'NO MODEL');
+            $sheet->setCellValue('B3', 'STYLE');
+            $sheet->setCellValue('C3', 'QTY SPK 2');
+            $sheet->getStyle('A3')->applyFromArray($styleHeader);
+            $sheet->getStyle('B3')->applyFromArray($styleHeader);
+            $sheet->getStyle('C3')->applyFromArray($styleHeader);
+
+            // Tulis data mulai dari baris 2
+            $row = 4;
+            foreach ($perStyle as $item) {
+                $sheet->setCellValue('A' . $row, $item['model']);
+                $sheet->setCellValue('B' . $row, $item['size']);
+                $sheet->setCellValue('C' . $row, $item['estimasi']);
+                $sheet->getStyle('A3')->applyFromArray($styleBody);
+                $sheet->getStyle('B3')->applyFromArray($styleBody);
+                $sheet->getStyle('C3')->applyFromArray($styleBody);
+                $row++;
+            }
+
+            // Buat writer dan output file Excel
+            $writer = new Xlsx($spreadsheet);
+            $fileName = 'Export Estimasi SPK.xlsx';
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename="' . $fileName . '"');
+            header('Cache-Control: max-age=0');
+
+            $writer->save('php://output');
+            exit;
+        } else {
+            return redirect()->back()->with('error', 'Tidak ada data yang dipilih.');
+        }
+    }
 }

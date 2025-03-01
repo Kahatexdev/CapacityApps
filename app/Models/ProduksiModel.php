@@ -258,4 +258,14 @@ class ProduksiModel extends Model
             ->orderBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size, produksi.tgl_produksi', 'ASC')
             ->findAll();
     }
+    public function getProdByPdkSize($model, $size)
+    {
+        $prod = $this->select('SUM(produksi.qty_produksi) AS ttl_prod')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle')
+            ->where('apsperstyle.mastermodel', $model)
+            ->where('apsperstyle.size', $size)
+            ->first();
+
+        return $prod['ttl_prod'] ?? 0;
+    }
 }
