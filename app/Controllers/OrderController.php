@@ -1021,6 +1021,7 @@ class OrderController extends BaseController
         $filtered = array_filter($grouped, function ($item) use ($lastmonth) {
             return $item['delivery'] >= $lastmonth;
         });
+
         usort($filtered, function ($a, $b) {
             return $a['percentage'] <=> $b['percentage'];
         });
