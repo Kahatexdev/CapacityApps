@@ -81,6 +81,7 @@ class MaterialController extends BaseController
         $noModel = $this->DetailPlanningModel->getNoModelAktif($area);
         $data = [
             'role' => session()->get('role'),
+            'area' => $area,
             'title' => 'Bahan Baku',
             'active1' => '',
             'active2' => '',
