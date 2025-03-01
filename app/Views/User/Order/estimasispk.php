@@ -119,10 +119,16 @@
         $('#export-btn').on('click', function(e) {
             e.preventDefault();
 
-            // Kumpulkan nilai dari checkbox yang tercentang
+            var table = $('#example').DataTable();
             var selected = [];
-            $('input[name="row[]"]:checked').each(function() {
-                selected.push($(this).val());
+            // Mengambil semua baris dari seluruh halaman yang sesuai dengan pencarian (applied search)
+            var rows = table.rows({
+                search: 'applied'
+            }).nodes();
+            $('input[name="row[]"]', rows).each(function() {
+                if ($(this).prop('checked')) {
+                    selected.push($(this).val());
+                }
             });
 
             if (selected.length === 0) {

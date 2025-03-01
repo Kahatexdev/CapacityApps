@@ -962,30 +962,33 @@ class ApsPerstyleModel extends Model
     public function exportDataEstimasi($data)
     {
         $db = db_connect();
-        // Subquery untuk mengakumulasi data qty di data_bs berdasarkan idapsperstyle
-        $subQuery = '(SELECT idapsperstyle, SUM(qty) AS bs FROM data_bs GROUP BY idapsperstyle)';
+
+        // Subquery dengan kondisi berdasarkan mastermodel dan size
+        $subQuery = '(SELECT aps.mastermodel, aps.size, SUM(data_bs.qty) AS bs 
+              FROM data_bs 
+              LEFT JOIN apsperstyle aps ON data_bs.idapsperstyle = aps.idapsperstyle 
+              GROUP BY aps.mastermodel, aps.size)';
 
         $builder = $db->table('apsperstyle a');
         $builder->select('
-        a.mastermodel, 
-        a.inisial, 
-        a.size, 
-        a.delivery, 
-        a.machinetypeid, 
-        IFNULL(SUM(a.sisa), 0) AS sisa, 
-        IFNULL(SUM(a.qty), 0) AS qty, 
-        IFNULL(SUM(a.po_plus), 0) AS poplus, 
-        IFNULL(bs.bs, 0) AS bs
-    ');
-        $builder->join($subQuery . ' bs', 'bs.idapsperstyle = a.idapsperstyle', 'left');
-        $builder->where('a.factory', $data[0]['area']);
-        $builder->where('a.mastermodel', $data[0]['model']);
-        $builder->where('a.size', $data[0]['size']);
+            a.mastermodel, 
+            a.inisial, 
+            a.size, 
+            a.delivery, 
+            a.machinetypeid, 
+            IFNULL(SUM(a.sisa), 0) AS sisa, 
+            IFNULL(SUM(a.qty), 0) AS qty, 
+            IFNULL(SUM(a.po_plus), 0) AS poplus, 
+            IFNULL(SUM(bs.bs), 0) AS bs
+        ');
+        $builder->join($subQuery . ' bs', 'bs.mastermodel = a.mastermodel AND bs.size = a.size', 'left');
+        $builder->where('a.factory', $data['area']);
+        $builder->where('a.mastermodel', $data['model']);
+        $builder->where('a.size', $data['size']);
+        $builder->groupBy('a.mastermodel, a.size');
         $builder->orderBy('a.delivery', 'DESC');
 
-        // Jika Anda hanya mengharapkan satu hasil, gunakan first()
         $query = $builder->get()->getFirstRow('array');
-        // dd($query);
         return $query;
     }
 }

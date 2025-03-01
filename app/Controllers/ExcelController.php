@@ -3389,58 +3389,53 @@ class ExcelController extends BaseController
                 list($model, $size, $area) = explode('|', $dataString);
 
                 // Buat parameter untuk query
-                $param = [
+                $data = [
                     'model' => $model,
                     'size'  => $size,
                     'area'  => $area,
                 ];
 
-                // Panggil model. Misalnya, model mengharapkan parameter dalam bentuk array dengan satu elemen.
-                $result = $this->ApsPerstyleModel->exportDataEstimasi([$param]);
+                // Panggil model. Pastikan method exportDataEstimasi() tidak mengandung dd() di dalamnya.
+                $result = $this->ApsPerstyleModel->exportDataEstimasi($data);
 
                 // Pastikan ada hasil dari query
-                if ($result) {
-                    $bs     = (int)$result['bs'];
-                    $qty    = (int)$result['qty'];
-                    $sisa   = (int)$result['sisa'];
-                    $poplus = (int)$result['poplus'];
+                // if ($result) {
+                $bs     = (int)$result['bs'];
+                $qty    = (int)$result['qty'];
+                $sisa   = (int)$result['sisa'];
+                $poplus = (int)$result['poplus'];
 
-                    // Misalnya, produksi dihitung sebagai selisih antara qty dan sisa
-                    $produksi = $qty - $sisa;
-                    // Gunakan nilai produksi sebagai ttlProd (sesuaikan logika jika diperlukan)
-                    $ttlProd = $produksi;
+                // Dapatkan nilai produksi dari model produksi
+                $dataProd = $this->produksiModel->getProdByPdkSize($result['mastermodel'], $result['size']);
 
-                    // Lanjutkan hanya jika ttlProd valid
-                    if ($ttlProd > 0) {
-                        $percentage = round(($ttlProd / $qty) * 100);
-                        $ganti      = $bs + $poplus;
-                        $estimasi   = ($ganti / $ttlProd / 100) * $qty;
+                // Gunakan nilai produksi sebagai ttlProd (sesuaikan logika jika diperlukan)
+                $ttlProd = $dataProd;
 
-                        // Hanya masukkan ke array hasil jika persentasenya di antara 60 dan 90
-                        if ($percentage > 60 && $percentage < 90) {
-                            // Buat key unik misalnya dari mastermodel dan size
-                            $key = $result['mastermodel'] . '-' . $result['size'];
-                            // Tambahkan hasil ke array $allData
-                            $allData[$key] = [
-                                'model'      => $result['mastermodel'],
-                                'inisial'    => $result['inisial'],
-                                'size'       => $result['size'],
-                                'sisa'       => $sisa,
-                                'qty'        => $qty,
-                                'ttlProd'    => $ttlProd,
-                                'percentage' => $percentage,
-                                'bs'         => $bs,
-                                'poplus'     => $poplus,
-                                'jarum'      => $result['machinetypeid'],
-                                'estimasi'   => round(($estimasi * 100), 1),
-                            ];
-                        }
-                    }
+                // Lanjutkan hanya jika ttlProd valid
+                if ($ttlProd > 0) {
+                    $percentage = round(($ttlProd / $qty) * 100);
+                    $ganti      = $bs + $poplus;
+                    $estimasi   = ($ganti / $ttlProd / 100) * $qty;
+
+                    // Tambahkan hasil ke array $allData
+                    $allData[] = [
+                        'model'      => $result['mastermodel'],
+                        'inisial'    => $result['inisial'],
+                        'size'       => $result['size'],
+                        'sisa'       => $sisa,
+                        'qty'        => $qty,
+                        'ttlProd'    => $ttlProd,
+                        'percentage' => $percentage,
+                        'bs'         => $bs,
+                        'poplus'     => $poplus,
+                        'jarum'      => $result['machinetypeid'],
+                        'estimasi'   => round(($estimasi * 100), 1),
+                    ];
+                    // }
                 }
             }
-            // Sekarang $allData berisi data yang telah diproses dari setiap data terpilih.
-            dd($allData); // atau proses sesuai kebutuhan, misalnya export ke Excel.
-
+            // var_dump($allData);
+            // dd($allData);
             // Export Excel
             // Buat file Excel
             $spreadsheet = new Spreadsheet();
@@ -3450,7 +3445,7 @@ class ExcelController extends BaseController
                 'font' => [
                     'bold' => true, // Tebalkan teks
                     'color' => ['argb' => 'FF000000'],
-                    'size' => 20
+                    'size' => 15
                 ],
                 'alignment' => [
                     'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
@@ -3490,7 +3485,8 @@ class ExcelController extends BaseController
             ];
 
             $sheet->setCellValue('A1', 'ESTIMASI QTY SPK 2');
-            $sheet->getStyle('A1')->applyFromArray($styleTitle);
+            $sheet->mergeCells('A1:C1');
+            $sheet->getStyle('A1:C1')->applyFromArray($styleTitle);
             // Tulis header
             $sheet->setCellValue('A3', 'NO MODEL');
             $sheet->setCellValue('B3', 'STYLE');
@@ -3501,13 +3497,13 @@ class ExcelController extends BaseController
 
             // Tulis data mulai dari baris 2
             $row = 4;
-            foreach ($perStyle as $item) {
+            foreach ($allData as $item) {
                 $sheet->setCellValue('A' . $row, $item['model']);
                 $sheet->setCellValue('B' . $row, $item['size']);
                 $sheet->setCellValue('C' . $row, $item['estimasi']);
-                $sheet->getStyle('A3')->applyFromArray($styleBody);
-                $sheet->getStyle('B3')->applyFromArray($styleBody);
-                $sheet->getStyle('C3')->applyFromArray($styleBody);
+                $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('C' . $row)->applyFromArray($styleBody);
                 $row++;
             }
 
