@@ -873,16 +873,8 @@ class ApsPerstyleModel extends Model
             ->orderBy('delivery', 'DESC')
             ->findAll();
     }
-    public function estimasispk($area, $lastmonth)
-    {
-        $res = $this->select('mastermodel, inisial, size, SUM(apsperstyle.sisa) AS sisa, sum(apsperstyle.qty) as qty, delivery,sum(data_bs.qty) as bs,machinetypeid')
-            ->join('data_bs', 'data_bs.idapsperstyle = apsperstyle.idapsperstyle')
-            ->where('factory', $area)
-            ->groupBy('size')
-            ->orderBy('delivery', 'DESC')
-            ->findAll();
-        return $res;
-    }
+
+
     public function getSisaPerModel($model, $jarum)
     {
         return $this->select('sum(qty/24) as qty, sum(sisa/24) as sisa, delivery')
@@ -961,34 +953,14 @@ class ApsPerstyleModel extends Model
     }
     public function exportDataEstimasi($data)
     {
-        $db = db_connect();
+        $data = $this->select('mastermodel, inisial, size, SUM(sisa) AS sisa, sum(qty) as qty,sum(po_plus) as poplus, delivery,machinetypeid')
+            ->where('factory', $data['area'])
+            ->where('mastermodel', $data['model'])
+            ->where('size', $data['size'])
+            ->groupBy('mastermodel, size')
+            ->orderBy('delivery', 'DESC');
 
-        // Subquery dengan kondisi berdasarkan mastermodel dan size
-        $subQuery = '(SELECT aps.mastermodel, aps.size, SUM(data_bs.qty) AS bs 
-              FROM data_bs 
-              LEFT JOIN apsperstyle aps ON data_bs.idapsperstyle = aps.idapsperstyle 
-              GROUP BY aps.mastermodel, aps.size)';
-
-        $builder = $db->table('apsperstyle a');
-        $builder->select('
-            a.mastermodel, 
-            a.inisial, 
-            a.size, 
-            a.delivery, 
-            a.machinetypeid, 
-            IFNULL(SUM(a.sisa), 0) AS sisa, 
-            IFNULL(SUM(a.qty), 0) AS qty, 
-            IFNULL(SUM(a.po_plus), 0) AS poplus, 
-            IFNULL(SUM(bs.bs), 0) AS bs
-        ');
-        $builder->join($subQuery . ' bs', 'bs.mastermodel = a.mastermodel AND bs.size = a.size', 'left');
-        $builder->where('a.factory', $data['area']);
-        $builder->where('a.mastermodel', $data['model']);
-        $builder->where('a.size', $data['size']);
-        $builder->groupBy('a.mastermodel, a.size');
-        $builder->orderBy('a.delivery', 'DESC');
-
-        $query = $builder->get()->getFirstRow('array');
+        $query = $data->get()->getFirstRow('array');
         return $query;
     }
 }

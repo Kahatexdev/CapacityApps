@@ -3397,19 +3397,18 @@ class ExcelController extends BaseController
 
                 // Panggil model. Pastikan method exportDataEstimasi() tidak mengandung dd() di dalamnya.
                 $result = $this->ApsPerstyleModel->exportDataEstimasi($data);
-
                 // Pastikan ada hasil dari query
                 // if ($result) {
-                $bs     = (int)$result['bs'];
+                $dataProd = $this->produksiModel->getProdByPdkSize($result['mastermodel'], $result['size']);
+                $bs     = (int)$dataProd['bs'];
                 $qty    = (int)$result['qty'];
                 $sisa   = (int)$result['sisa'];
                 $poplus = (int)$result['poplus'];
 
                 // Dapatkan nilai produksi dari model produksi
-                $dataProd = $this->produksiModel->getProdByPdkSize($result['mastermodel'], $result['size']);
 
                 // Gunakan nilai produksi sebagai ttlProd (sesuaikan logika jika diperlukan)
-                $ttlProd = $dataProd;
+                $ttlProd = $dataProd['prod'];
 
                 // Lanjutkan hanya jika ttlProd valid
                 if ($ttlProd > 0) {

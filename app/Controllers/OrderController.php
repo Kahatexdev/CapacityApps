@@ -1867,49 +1867,48 @@ class OrderController extends BaseController
     {
         $lastmonth = date('Y-m-01', strtotime('-1 month'));
         $data = $this->ApsPerstyleModel->dataEstimasi($area);
-        $pdk = $this->ApsPerstyleModel->estimasispk($area, $lastmonth);
-        $perStyle = [];
-        foreach ($data as $id) {
-            foreach ($pdk as $item) {
-                // Pastikan data memiliki relasi yang sesuai
-                if ($id['mastermodel'] === $item['mastermodel'] && $id['size'] === $item['size']) {
-                    $key = $id['mastermodel'] . '-' . $id['size'];
-                    if (!isset($perStyle[$key])) {
-                        // get data produksi
-                        $dataProd = $this->produksiModel->getProdByPdkSize($item['mastermodel'], $item['size']);
-                        // Hitung nilai akumulasi awal
-                        $bs = (int)$item['bs'];
-                        $qty = (int)$id['qty'];
-                        $sisa = (int)$id['sisa'];
-                        $poplus = (int)$id['poplus'];
-                        $produksi = $qty - $sisa;
-                        $ttlProd = (int)$dataProd;
 
-                        // Periksa apakah produksi valid dan memenuhi kondisi
-                        if ($ttlProd > 0) {
-                            $percentage = round(($ttlProd / $qty) * 100);
-                            $ganti = $bs + $poplus;
-                            $estimasi = ($ganti / $ttlProd / 100) * $qty;
-                            if ($percentage > 60 && $percentage < 90) {
-                                $perStyle[$key] = [
-                                    'model' => $item['mastermodel'],
-                                    'inisial' => $item['inisial'],
-                                    'size' => $item['size'],
-                                    'sisa' => $sisa,
-                                    'qty' => $qty,
-                                    'ttlProd' => $ttlProd,
-                                    'percentage' => $percentage,
-                                    'bs' => $bs,
-                                    'poplus' => $poplus,
-                                    'jarum' => $item['machinetypeid'],
-                                    'estimasi' => round(($estimasi * 100), 1),
-                                ];
-                            }
-                        }
+        $newestData = array_filter($data, function ($item) use ($lastmonth) {
+            return isset($item['delivery']) && $item['delivery'] > $lastmonth;
+        });
+        $perStyle = [];
+        foreach ($newestData as $id) {
+            $key = $id['mastermodel'] . '-' . $id['size'];
+            if (!isset($perStyle[$key])) {
+                // get data produksi
+                $dataProd = $this->produksiModel->getProdByPdkSize($id['mastermodel'], $id['size']);
+                // Hitung nilai akumulasi awal
+                $bs =  (int)$dataProd['bs'];
+                $qty = (int)$id['qty'];
+                $sisa = (int)$id['sisa'];
+                $poplus = (int)$id['poplus'];
+                $produksi = $qty - $sisa;
+                $ttlProd = (int)$dataProd['prod'];
+
+                // Periksa apakah produksi valid dan memenuhi kondisi
+                if ($ttlProd > 0) {
+                    $percentage = round(($ttlProd / $qty) * 100);
+                    $ganti = $bs + $poplus;
+                    $estimasi = ($ganti / $ttlProd / 100) * $qty;
+                    if ($percentage > 60 && $percentage < 90) {
+                        $perStyle[$key] = [
+                            'model' => $id['mastermodel'],
+                            'inisial' => $id['inisial'],
+                            'size' => $id['size'],
+                            'sisa' => $sisa,
+                            'qty' => $qty,
+                            'ttlProd' => $ttlProd,
+                            'percentage' => $percentage,
+                            'bs' => $bs,
+                            'poplus' => $poplus,
+                            'jarum' => $id['machinetypeid'],
+                            'estimasi' => round(($estimasi * 100), 1),
+                        ];
                     }
                 }
             }
         }
+
 
         $data2 = [
             'role' => session()->get('role'),
@@ -1922,7 +1921,6 @@ class OrderController extends BaseController
             'active6' => '',
             'active7' => '',
             'data' => $data,
-            'pdk' => $pdk,
             'area' => $area,
             'perStyle' => $perStyle
         ];
