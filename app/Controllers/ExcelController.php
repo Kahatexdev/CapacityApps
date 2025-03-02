@@ -3397,6 +3397,7 @@ class ExcelController extends BaseController
 
                 // Panggil model. Pastikan method exportDataEstimasi() tidak mengandung dd() di dalamnya.
                 $result = $this->ApsPerstyleModel->exportDataEstimasi($data);
+
                 // Pastikan ada hasil dari query
                 // if ($result) {
                 $dataProd = $this->produksiModel->getProdByPdkSize($result['mastermodel'], $result['size']);
