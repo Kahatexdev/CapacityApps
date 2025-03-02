@@ -1873,39 +1873,38 @@ class OrderController extends BaseController
         });
         $perStyle = [];
         foreach ($newestData as $id) {
-            $key = $id['mastermodel'] . '-' . $id['size'];
-            if (!isset($perStyle[$key])) {
-                // get data produksi
-                $dataProd = $this->produksiModel->getProdByPdkSize($id['mastermodel'], $id['size']);
-                // Hitung nilai akumulasi awal
-                $bs =  (int)$dataProd['bs'];
-                $qty = (int)$id['qty'];
-                $sisa = (int)$id['sisa'];
-                $poplus = (int)$id['poplus'];
-                $produksi = $qty - $sisa;
-                $ttlProd = (int)$dataProd['prod'];
 
-                // Periksa apakah produksi valid dan memenuhi kondisi
-                if ($ttlProd > 0) {
-                    $percentage = round(($ttlProd / $qty) * 100);
-                    $ganti = $bs + $poplus;
-                    $estimasi = ($ganti / $ttlProd / 100) * $qty;
-                    if ($percentage > 60 && $percentage < 90) {
-                        $perStyle[$key] = [
-                            'model' => $id['mastermodel'],
-                            'inisial' => $id['inisial'],
-                            'size' => $id['size'],
-                            'sisa' => $sisa,
-                            'qty' => $qty,
-                            'ttlProd' => $ttlProd,
-                            'percentage' => $percentage,
-                            'bs' => $bs,
-                            'poplus' => $poplus,
-                            'jarum' => $id['machinetypeid'],
-                            'estimasi' => round(($estimasi * 100), 1),
-                        ];
-                    }
-                }
+
+            // get data produksi
+            $dataProd = $this->produksiModel->getProdByPdkSize($id['mastermodel'], $id['size']);
+            // Hitung nilai akumulasi awal
+            $bs =  (int)$dataProd['bs'];
+            $qty = (int)$id['qty'];
+            $sisa = (int)$id['sisa'];
+            $poplus = (int)$id['poplus'];
+            $produksi = $qty - $sisa;
+            $ttlProd = (int)$dataProd['prod'];
+
+            // Periksa apakah produksi valid dan memenuhi kondisi
+            if ($ttlProd > 0) {
+                $percentage = round(($ttlProd / $qty) * 100);
+                $ganti = $bs + $poplus;
+                $estimasi = ($ganti / $ttlProd / 100) * $qty;
+                // if ($percentage > 60 && $percentage < 90) {
+                $perStyle[] = [
+                    'model' => $id['mastermodel'],
+                    'inisial' => $id['inisial'],
+                    'size' => $id['size'],
+                    'sisa' => $sisa,
+                    'qty' => $qty,
+                    'ttlProd' => $ttlProd,
+                    'percentage' => $percentage,
+                    'bs' => $bs,
+                    'poplus' => $poplus,
+                    'jarum' => $id['machinetypeid'],
+                    'estimasi' => round(($estimasi * 100), 1),
+                ];
+                // }
             }
         }
 
