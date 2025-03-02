@@ -1874,7 +1874,6 @@ class OrderController extends BaseController
         $perStyle = [];
         foreach ($newestData as $id) {
 
-
             // get data produksi
             $dataProd = $this->produksiModel->getProdByPdkSize($id['mastermodel'], $id['size']);
             // Hitung nilai akumulasi awal
@@ -1884,6 +1883,7 @@ class OrderController extends BaseController
             $poplus = (int)$id['poplus'];
             $produksi = $qty - $sisa;
             $ttlProd = (int)$dataProd['prod'];
+
 
             // Periksa apakah produksi valid dan memenuhi kondisi
             if ($ttlProd > 0) {
