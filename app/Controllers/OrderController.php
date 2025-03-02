@@ -1890,21 +1890,21 @@ class OrderController extends BaseController
                 $percentage = round(($ttlProd / $qty) * 100);
                 $ganti = $bs + $poplus;
                 $estimasi = ($ganti / $ttlProd / 100) * $qty;
-                // if ($percentage > 60 && $percentage < 90) {
-                $perStyle[] = [
-                    'model' => $id['mastermodel'],
-                    'inisial' => $id['inisial'],
-                    'size' => $id['size'],
-                    'sisa' => $sisa,
-                    'qty' => $qty,
-                    'ttlProd' => $ttlProd,
-                    'percentage' => $percentage,
-                    'bs' => $bs,
-                    'poplus' => $poplus,
-                    'jarum' => $id['machinetypeid'],
-                    'estimasi' => round(($estimasi * 100), 1),
-                ];
-                // }
+                if ($percentage > 60 && $percentage < 90) {
+                    $perStyle[] = [
+                        'model' => $id['mastermodel'],
+                        'inisial' => $id['inisial'],
+                        'size' => $id['size'],
+                        'sisa' => $sisa,
+                        'qty' => $qty,
+                        'ttlProd' => $ttlProd,
+                        'percentage' => $percentage,
+                        'bs' => $bs,
+                        'poplus' => $poplus,
+                        'jarum' => $id['machinetypeid'],
+                        'estimasi' => round(($estimasi * 100), 1),
+                    ];
+                }
             }
         }
 
