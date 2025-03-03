@@ -677,13 +677,14 @@ class SummaryController extends BaseController
                 foreach ($detailPlan as $key => $dp) {
                     // Ambil data terkait model dan mesin
                     $noModel = $dp['model'];
-                    $dataOrder = $this->orderModel->getProductTypeByModel($noModel);
-                    $actMesin = $this->produksiModel->getActualMcByModel([
+                    $data = [
                         'area' => $area,
                         'model' => $noModel,
                         'jarum' => $jarum,
                         'delivery' => $dp['delivery']
-                    ]);
+                    ];
+                    $dataOrder = $this->orderModel->getProductTypeByModel($noModel);
+                    $actMesin = $this->produksiModel->getActualMcByModel($data);
                     // Cek apakah kombinasi model dan delivery sudah pernah dilihat
                     $combinationKey = $noModel . '|' . $dp['delivery'];
                     if (isset($seenCombinations[$combinationKey])) {
@@ -694,6 +695,7 @@ class SummaryController extends BaseController
                         $seenCombinations[$combinationKey] = true;
                     }
 
+                    $prod = $this->produksiModel->getProduksiByModelDelivery($data); // Ambil data produksi
 
                     // Menghitung total mesin
                     $mesinTotal = array_sum(array_column($this->tanggalPlanningModel->totalMc($dp['id_est_qty']), 'mesin'));
@@ -702,7 +704,7 @@ class SummaryController extends BaseController
                     $detailPlan[$key]['mesin'] = $mesinTotal;
                     $detailPlan[$key]['product_type'] = $dataOrder['product_type'] ?? '';
                     $detailPlan[$key]['buyer'] = $dataOrder['kd_buyer_order'] ?? '';
-                    $detailPlan[$key]['produksi'] = $dp['qty'] - $dp['sisa'];
+                    $detailPlan[$key]['produksi'] = $prod;
                     $detailPlan[$key]['plan'] = (!empty($dp['smv']) && !empty($dp['precentage_target']))
                         ? number_format((3600 / $dp['smv']) * ($dp['precentage_target'] / 100), 2)
                         : 0;
