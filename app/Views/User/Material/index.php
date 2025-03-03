@@ -154,8 +154,8 @@
                             <div id="kebutuhan-container">
                                 <div class="row mb-4">
                                     <div class="col-md-12">
-                                        <label>Tanggal Kirim</label>
-                                        <input type="date" class="form-control" id="tgl_datang" name="tgl_datang" required>
+                                        <label>Tanggal Pakai</label>
+                                        <input type="date" class="form-control" id="tgl_pakai" name="tgl_pakai" required>
                                     </div>
                                 </div>
                                 <!--  -->
@@ -170,8 +170,9 @@
                                         <div class="kebutuhan-item">
                                             <div class="row g-3 mb-2">
                                                 <div class="col-md-12">
+                                                    <input type="hidden" value="<?= $area ?>">
                                                     <label for="itemType">No Model</label>
-                                                    <select class="form-control add-item" id="no_model" name="no_model" required>
+                                                    <select class="form-control add-item" id="no_model" name="items[0][no_model]" required>
                                                         <option value="">Pilih No Model</option>
                                                         <?php foreach ($noModel as $model): ?>
                                                             <option value="<?= $model['model'] ?>"><?= $model['model'] ?></option>
@@ -185,7 +186,7 @@
                                             </div>
                                             <div id="tableSize">
                                                 <!-- Bahan Baku Section -->
-                                                <div class="row g-3 mt-3 ">
+                                                <div class="row g-3 mt-3">
                                                     <div class="table-responsive">
                                                         <table id="bbTable" class="table table-bordered table-striped">
                                                             <thead>
@@ -198,12 +199,12 @@
                                                             <tbody>
                                                                 <tr>
                                                                     <td>
-                                                                        <select class="form-control" name="style_size" id="style_size">
-                                                                            <option value="">Pilih Style Size</option>
+                                                                        <select class="form-control style-size" name="items[0][style_size]">
+                                                                            <option value=""></option>
                                                                         </select>
                                                                     </td>
                                                                     <td>
-                                                                        <input type="number" class="form-control" name="jalan_mc" id="jalan_mc">
+                                                                        <input type="number" class="form-control" name="items[0][jalan_mc]" id="jalan_mc" readonly>
                                                                     </td>
                                                                     <td class="text-center">
                                                                         <button type="button" class="btn btn-info" id="addTable">
@@ -226,49 +227,17 @@
                                                         <table id="poTable" class="table table-bordered table-striped">
                                                             <thead>
                                                                 <tr>
-                                                                    <th width=100 class="text-center">No</th>
-                                                                    <th class="text-center">Komp(%)</th>
-                                                                    <th class="text-center">Loss(%)</th>
-                                                                    <th class="text-center">Qty PO</th>
-                                                                    <th class="text-center">Item Type</th>
-                                                                    <th class="text-center">Kode Warna</th>
-                                                                    <th class="text-center">Warna</th>
+                                                                    <th width=50 class="text-center">No</th>
+                                                                    <th width=75 class="text-center">Komp(%)</th>
+                                                                    <th width=75 class="text-center">Loss(%)</th>
+                                                                    <th width=75 class="text-center">Qty PO</th>
+                                                                    <th width=75 class="text-center">Item Type</th>
+                                                                    <th width=75 class="text-center">Kode Warna</th>
+                                                                    <th width=75 class="text-center">Warna</th>
 
                                                                 </tr>
                                                             </thead>
                                                             <tbody class="material-usage">
-                                                                <tr>
-                                                                    <td><input type="text" class="form-control text-center" name="no" id="no" value="1"></td>
-                                                                    <td><input type="text" class="form-control text-center" name="komposisi" id="komposisi" value=""></td>
-                                                                    <td><input type="text" class="form-control text-center" name="loss" id="loss" value=""></td>
-                                                                    <td><input type="text" class="form-control text-center" name="ttl_keb" id="ttl_keb" value=""></td>
-                                                                    <td><input type="text" class="form-control text-center" name="item_type" id="item_type" value=""></td>
-                                                                    <td><input type="text" class="form-control text-center" name="kode_warna" id="kode_warna" value=""></td>
-                                                                    <td><input type="text" class="form-control text-center" name="warna" id="warna" value=""></td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td></td>
-                                                                    <td>
-                                                                        Qty Cones:
-                                                                        <input type="text" class="form-control text-center" name="qty_cns" id="qty_cns" value="">
-                                                                    </td>
-                                                                    <td>
-                                                                        Berat Cones:
-                                                                        <input type="text" class="form-control text-center" name="berat_cns" id="berat_cns" value="">
-                                                                    </td>
-                                                                    <td>
-                                                                        Total :
-                                                                        <input type="text" class="form-control text-center" name="ttl" id="ttl" value="">
-                                                                    </td>
-                                                                    <td>
-                                                                        Total Qty Cones:
-                                                                        <input type="text" class="form-control text-center" name="ttl_cns" id="ttl_cns" value="">
-                                                                    </td>
-                                                                    <td>
-                                                                        Total Berat Cones:
-                                                                        <input type="text" class="form-control text-center" name="ttl_berat_cns" id="ttl_berat_cns" value="">
-                                                                    </td>
-                                                                </tr>
                                                             </tbody>
                                                         </table>
                                                     </div>
@@ -306,9 +275,142 @@
 
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
-<script type="text/javascript">
+<script>
     $(document).ready(function() {
         $('.add-item').select2();
+    });
+    $(document).ready(function() {
+        // Event ketika No Model dipilih
+        $('#no_model').on("select2:select", function() {
+            // Pastikan #no_model berada di dalam sebuah <tr>
+            let row = $(this).closest('tr');
+            let noModel = $(this).val();
+
+            // Cari dropdown style size di baris yang sama
+            let styleSizeDropdown = row.find('[name^="items[][name$="[style_size]"]');
+
+            // Bersihkan dropdown dan tambahkan opsi default
+            styleSizeDropdown.empty();
+            styleSizeDropdown.append('<option value="">Pilih Style Size</option>');
+
+            // Jika noModel ada, ambil data style size lewat AJAX
+            if (noModel) {
+                $.ajax({
+                    url: '<?= base_url($role . '/getStyleSizeByNoModel') ?>',
+                    type: 'POST',
+                    data: {
+                        no_model: noModel
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        // Kosongkan ulang dropdown dan tambahkan opsi default
+                        styleSizeDropdown.empty();
+                        styleSizeDropdown.append('<option value="">Pilih Style Size</option>');
+                        // Tambahkan opsi berdasarkan response
+                        response.forEach(function(style) {
+                            console.log(style);
+                            console.log(styleSizeDropdown);
+                            styleSizeDropdown.append('<option value="' + style.size + '">' + style.size + '</option>');
+                        });
+                    },
+                    error: function() {
+                        alert('Gagal mengambil data Style Size.');
+                    }
+                });
+            }
+        });
+    });
+
+    $(document).ready(function() {
+        // Ketika Style Size dipilih
+        $('#style_size').change(function() {
+            let styleSize = $(this).val(); // Ambil nilai Style Size
+            let noModel = $('#no_model').val(); // Ambil nilai No Model
+            let area = $('#area').val(); // Ambil nilai No Model
+
+            if (styleSize && noModel) {
+                // AJAX untuk mengambil Jalan MC
+                $.ajax({
+                    url: '<?= base_url($role . '/getJalanMc') ?>', // Ganti dengan URL endpoint Anda
+                    type: 'POST',
+                    data: {
+                        style_size: styleSize,
+                        no_model: noModel,
+                        area: area
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log(response);
+                        // Set the value of the #jalan_mc input field
+                        $('#jalan_mc').val(response.jalan_mc);
+
+                        // If you intend to append a new input element with the same value
+                        $('#jalan_mc').append('<input value="' + response.jalan_mc.jalan_mc + '">');
+                    },
+
+                    error: function() {
+                        alert('Gagal mengambil data Jalan MC');
+                    }
+                });
+                // Ambil data MU dari API
+                $.ajax({
+                    url: '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + styleSize,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log(response);
+                        let table = $('#poTable tbody');
+                        table.empty(); // Hapus isi tabel sebelumnya
+                        // Iterasi data yang diterima dari API
+                        response.forEach(function(item, index) {
+                            table.append(`
+                                <tr>
+                                    <td width=50><input type="text" class="form-control text-center" name="items[${index}][no]" id="no" value="${index + 1}" readonly></td>
+                                    <td width=75><input type="text" class="form-control text-center" name="items[${index}][komposisi]" id="komposisi" value="${item.composition}" readonly readonly></td>
+                                    <td width=75><input type="text" class="form-control text-center" name="items[${index}][loss]" id="loss" value="${item.loss}" readonly readonly></td>
+                                    <td width=75><input type="text" class="form-control text-center" name="items[${index}][ttl_keb]" id="ttl_keb" value="${item.gw}" readonly readonly></td>
+                                    <td width=75><input type="text" class="form-control text-center" name="items[${index}][item_type]" id="item_type" value="${item.item_type}" readonly readonly></td>
+                                    <td width=75><input type="text" class="form-control text-center" name="items[${index}][kode_warna]" id="kode_warna" value="${item.kode_warna}" readonly readonly></td>
+                                    <td width=75><input type="text" class="form-control text-center" name="items[${index}][warna]" id="warna" value="${item.color}" readonly readonly></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="text-center">
+                                        Qty Cones:
+                                        <input type="text" class="form-control text-center" name="items[${index}][qty_cns]" id="qty_cns" value="">    
+                                    </td>
+                                    <td class="text-center">
+                                        Berat Cones:
+                                        <input type="text" class="form-control text-center" name="items[${index}][berat_cns]" id="berat_cns" value="">
+                                    </td>
+                                    <td class="text-center">
+                                        Total:
+                                        <input type="text" class="form-control text-center" name="items[${index}][ttl]" id="ttl" value="">
+                                    </td>
+                                    <td class="text-center">
+                                        Total Cones:
+                                        <input type="text" class="form-control text-center" name="items[${index}][ttl_cns]" id="ttl_cns" value="">
+                                    </td>
+                                    <td class="text-center">
+                                        Total Berat Cones:
+                                        <input type="text" class="form-control text-center" name="items[${index}][ttl_berat_cns]" id="ttl_berat_cns" value="">
+                                    </td>
+                                </tr>
+                            `);
+                        });
+
+
+
+                    },
+                    error: function() {
+                        alert('Gagal mengambil data Material Usage.');
+                    }
+                });
+            } else {
+                // Reset input Jalan MC jika Style Size atau No Model kosong
+                $('#jalan_mc').val('');
+            }
+        });
     });
 </script>
 <script>
@@ -316,8 +418,12 @@
         const addbtn = document.getElementById("addTable");
         const poTable = document.getElementById("tableSize");
 
+        let rowIndex = 0;
+
         addbtn.addEventListener("click", function() {
+            rowIndex++;
             console.log("halow");
+            console.log(rowIndex);
 
             // Buat elemen div baru
             let newLine = document.createElement("div");
@@ -325,87 +431,94 @@
 
             // Isi elemen baru dengan template tabel
             newLine.innerHTML = `
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th class="text-center">Style Size</th>
-                        <th class="text-center">Jalan MC</th>
-                        <th class="text-center">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <select class="form-control" name="style_size">
-                                <option value="">Pilih Style Size</option>
-                            </select>
-                        </td>
-                        <td>
-                            <input type="number" class="form-control" name="jalan_mc">
-                        </td>
-                        <td class="text-center">
-                            <button type="button" class="btn btn-danger removeRow">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-          <div class="row g-3 mt-3">
-                                                    <div class="table-responsive">
-                                                        <table id="poTable" class="table table-bordered table-striped">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th width=100 class="text-center">No</th>
-                                                                    <th class="text-center">Komp(%)</th>
-                                                                    <th class="text-center">Loss(%)</th>
-                                                                    <th class="text-center">Qty PO</th>
-                                                                    <th class="text-center">Item Type</th>
-                                                                    <th class="text-center">Kode Warna</th>
-                                                                    <th class="text-center">Warna</th>
+                <div class="row g-3 mt-3">
+                    <div class="table-responsive">
+                        <table id="bbTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr class="id-row">
+                                    <th class="text-center">Style Size</th>
+                                    <th class="text-center">Jalan MC</th>
+                                    <th class="text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <select class="form-control style-size" name="items[${rowIndex}][style_size]">
+                                            <option value=""></option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control" name="items[${rowIndex}][jalan_mc]" id="jalan_mc" readonly>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-info" id="addTable">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </td>
+                                    <!-- <td class="text-center">
+                                    <button type="button" class="btn btn-danger removeRow">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td> -->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row g-3 mt-3">
+                    <div class="table-responsive">
+                        <table id="poTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th width=100 class="text-center">No</th>
+                                    <th class="text-center">Komp(%)</th>
+                                    <th class="text-center">Loss(%)</th>
+                                    <th class="text-center">Qty PO</th>
+                                    <th class="text-center">Item Type</th>
+                                    <th class="text-center">Kode Warna</th>
+                                    <th class="text-center">Warna</th>
 
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody class="material-usage">
-                                                                <tr>
-                                                                    <td><input type="text" class="form-control text-center" name="no" id="no" value="1"></td>
-                                                                    <td><input type="text" class="form-control text-center" name="komposisi" id="komposisi" value=""></td>
-                                                                    <td><input type="text" class="form-control text-center" name="loss" id="loss" value=""></td>
-                                                                    <td><input type="text" class="form-control text-center" name="ttl_keb" id="ttl_keb" value=""></td>
-                                                                    <td><input type="text" class="form-control text-center" name="item_type" id="item_type" value=""></td>
-                                                                    <td><input type="text" class="form-control text-center" name="kode_warna" id="kode_warna" value=""></td>
-                                                                    <td><input type="text" class="form-control text-center" name="warna" id="warna" value=""></td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td></td>
-                                                                    <td>
-                                                                        Qty Cones:
-                                                                        <input type="text" class="form-control text-center" name="qty_cns" id="qty_cns" value="">
-                                                                    </td>
-                                                                    <td>
-                                                                        Berat Cones:
-                                                                        <input type="text" class="form-control text-center" name="berat_cns" id="berat_cns" value="">
-                                                                    </td>
-                                                                    <td>
-                                                                        Total :
-                                                                        <input type="text" class="form-control text-center" name="ttl" id="ttl" value="">
-                                                                    </td>
-                                                                    <td>
-                                                                        Total Qty Cones:
-                                                                        <input type="text" class="form-control text-center" name="ttl_cns" id="ttl_cns" value="">
-                                                                    </td>
-                                                                    <td>
-                                                                        Total Berat Cones:
-                                                                        <input type="text" class="form-control text-center" name="ttl_berat_cns" id="ttl_berat_cns" value="">
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-    `;
+                                </tr>
+                            </thead>
+                            <tbody class="material-usage">
+                                <tr>
+                                    <td><input type="text" class="form-control text-center" name="items[${rowIndex}][no]" id="no" value="1" readonly></td>
+                                    <td><input type="text" class="form-control text-center" name="items[${rowIndex}][komposisi]" id="komposisi" value="" readonly></td>
+                                    <td><input type="text" class="form-control text-center" name="items[${rowIndex}][loss]" id="loss" value="" readonly></td>
+                                    <td><input type="text" class="form-control text-center" name="items[${rowIndex}][ttl_keb]" id="ttl_keb" value="" readonly></td>
+                                    <td><input type="text" class="form-control text-center" name="items[${rowIndex}][item_type]" id="item_type" value="" readonly></td>
+                                    <td><input type="text" class="form-control text-center" name="items[${rowIndex}][kode_warna]" id="kode_warna" value="" readonly></td>
+                                    <td><input type="text" class="form-control text-center" name="items[${rowIndex}][warna]" id="warna" value="" readonly></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="text-center">
+                                        Qty Cones:
+                                        <input type="text" class="form-control text-center" name="items[${index}][qty_cns]" id="qty_cns" value="">    
+                                    </td>
+                                    <td class="text-center">
+                                        Berat Cones:
+                                        <input type="text" class="form-control text-center" name="items[${index}][berat_cns]" id="berat_cns" value="">
+                                    </td>
+                                    <td class="text-center">
+                                        Total:
+                                        <input type="text" class="form-control text-center" name="items[${index}][ttl]" id="ttl" value="">
+                                    </td>
+                                    <td class="text-center">
+                                        Total Cones:
+                                        <input type="text" class="form-control text-center" name="items[${index}][ttl_cns]" id="ttl_cns" value="">
+                                    </td>
+                                    <td class="text-center">
+                                        Total Berat Cones:
+                                        <input type="text" class="form-control text-center" name="items[${index}][ttl_berat_cns]" id="ttl_berat_cns" value="">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
 
             // Tambahkan elemen ke dalam `poTable`
             if (poTable) {
@@ -417,6 +530,7 @@
             // Tambahkan event listener untuk tombol hapus
             newLine.querySelector(".removeRow").addEventListener("click", function() {
                 newLine.remove();
+                rowIndex--; // Kurangi indeks ketika baris dihapus
             });
         });
 
@@ -514,145 +628,131 @@
 
             // Tambahkan elemen `input-group` ke tab baru
             newTabPane.innerHTML = `
-            <div class="kebutuhan-item">
-                                        <div class="row g-3 mb-2">
-                                                <div class="col-md-12">
-                                                    <label for="itemType">Done Celup</label>
-                                                    <select class="form-control slc2" id="add_item_${tabIndex}" name="add_item" required>
-                                                        <option value="">Pilih Item </option>
-                                                        <?php foreach ($noModel as $item): ?>
-                                                            <option value="<?= $item['model'] ?>"><?= $item['model'] ?></option>
-                                                        <?php endforeach; ?>
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                    <!-- Form Items -->
+                    <div class="kebutuhan-item">
+                        <div class="row g-3 mb-2">
+                            <div class="col-md-12">
+                                <input type="hidden" value="<?= $area ?>">
+                                <label for="itemType">No Model</label>
+                                <select class="form-control add-item" id="no_model" name="items[0][no_model]" required>
+                                    <option value="">Pilih No Model</option>
+                                    <?php foreach ($noModel as $model): ?>
+                                        <option value="<?= $model['model'] ?>"><?= $model['model'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-5">
+                            <h3>Bahan Baku Per Style</h3>
+                        </div>
+                        <div id="tableSize">
+                            <!-- Bahan Baku Section -->
+                            <div class="row g-3 mt-3">
+                                <div class="table-responsive">
+                                    <table id="bbTable" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr class="id-row">
+                                                <th class="text-center">Style Size</th>
+                                                <th class="text-center">Jalan MC</th>
+                                                <th class="text-center">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <select class="form-control style-size" name="items[0][style_size]">
+                                                        <option value=""></option>
                                                     </select>
-                                                </div>
-                                            </div>
-                                           <div class="row g-3">
-                                            <div class="col-md-4">
-                                                <label>No Model</label>
-                                                <input type="text" class="form-control no-model" name="items[${tabIndex - 1}][id_celup]" id="${id_celup}" required placeholder="Pilih No Model" hidden>
-                                                <input type="text" class="form-control no-model" name="items[${tabIndex - 1}][no_model]" id="${newInputId}" required placeholder="Pilih No Model">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label>Item Type</label>
-                                                <select class="form-control item-type" name="items[${tabIndex - 1}][item_type]" id="${itemTypeId}" required>
-                                                    <option value="">Pilih Item Type</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label>Kode Warna</label>
-                                                <select class="form-control kode-warna" name="items[${tabIndex - 1}][kode_warna]" id="${kodeWarnaId}" required>
-                                                    <option value="">Pilih Kode Warna</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <!-- Surat Jalan Section -->
-                                        <div class="row g-3 mt-3">
-                                            <div class="col-md-4">
-                                                <label>Warna</label>
-                                                   <select class="form-control kode-warna" name="items[${tabIndex - 1}][kode_warna]" id="${warnaId}" required>
-                                                    <option value="">Pilih Kode Warna</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label>LMD</label>
-                                                <select class="form-control" name="l_m_d[${tabIndex - 1}]" id="l_m_d" required>
-                                                    <option value="">Pilih LMD</option>
-                                                    <option value="L">L</option>
-                                                    <option value="M">M</option>
-                                                    <option value="D">D</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <label>Harga</label>
-                                                <input type="float" class="form-control" name="harga[${tabIndex - 1}]" id="harga" required>
-                                            </div>
-                                            <div class="col-md-1">
-                                                <label for="ganti-retur" class="text-center">Ganti Retur</label>
-                                                <div class="row">
-                                                    <div class="col-md-3">
-                                                        <label>
-                                                            <input type="hidden" name="ganti_retur[${tabIndex - 1}]" value="0">
-                                                            <input type="checkbox" name="ganti_retur[${tabIndex - 1}]" value="1">
-                                                        </label>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <label for="">Ya</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="mt-5">
-                                            <h3>Form Input Data Karung</h3>
-                                        </div>
-
-                                        <!-- Out Celup Section -->
-                                        <div class="row g-3 mt-3">
-                                            <div class="table-responsive">
-                                                <table id="${newPoTableId}" class="table table-bordered table-striped">
-                                                    <thead>
-                                                        <tr>
-                                                            <th width=100 class="text-center">No</th>
-                                                            <th class="text-center">GW Kirim</th>
-                                                            <th class="text-center">Kgs Kirim</th>
-                                                            <th class="text-center">Cones Kirim</th>
-                                                            <th class="text-center">Lot Kirim</th>
-                                                            <th class="text-center">
-                                                                <button type="button" class="btn btn-info" id="addRow">
-                                                                    <i class="fas fa-plus"></i>
-                                                                </button>
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td><input type="text" class="form-control text-center" name="no_karung[${tabIndex - 1}][0]" value="1" readonly></td>
-                                                            <td><input type="float" class="form-control gw_kirim_input" name="gw_kirim[${tabIndex - 1}][0]" required></td>
-                                                            <td><input type="float" class="form-control kgs_kirim_input" name="kgs_kirim[${tabIndex - 1}][0]" required></td>
-                                                            <td><input type="float" class="form-control cones_kirim_input" name="cones_kirim[${tabIndex - 1}][0]" required></td>
-                                                            <td><input type="text" class="form-control lot_celup_input" name="items[${tabIndex - 1}][lot_celup]" id="${lotCelupId}" required></td>
-
-                                                            <td class="text-center">
-                                                                <!-- <button type="button" class="btn btn-danger removeRow">
-                                                                        <i class="fas fa-trash"></i>
-                                                                    </button> -->
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                    <!-- Baris Total -->
-                                                    <tfoot>
-                                                        <tr>
-                                                            <th class="text-center">Total Karung</th>
-                                                            <th class="text-center">Total GW</th>
-                                                            <th class="text-center">Total NW</th>
-                                                            <th class="text-center">Total Cones</th>
-                                                            <th class="text-center">Total Lot</th>
-                                                            <th></th>
-                                                        </tr>
-                                                         <tr>
-                                                            <td><input type="number" class="form-control" id="${totalKarungId}" readonly></td>
-                                                            <td><input type="float" class="form-control" id="${totalGwId}" readonly></td>
-                                                            <td><input type="float" class="form-control" id="${totalKgsId}" readonly></td>
-                                                            <td><input type="float" class="form-control" id="${totalConesId}" readonly></td>
-                                                            <td><input type="text" class="form-control" id="${totalLotId}" readonly></td>
-                                                            <td></td>
-                                                        </tr>
-                                                    </tfoot>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <!-- Buttons -->
-                                        <div class="row mt-3">
-                                            <div class="col-12 text-center mt-2">
-                                                <button class="btn btn-icon btn-3 btn-outline-info add-more" type="button">
-                                                    <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control" name="items[0][jalan_mc]" id="jalan_mc" readonly>
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-info" id="addTable">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </td>
+                                                <!-- <td class="text-center">
+                                                <button type="button" class="btn btn-danger removeRow">
+                                                    <i class="fas fa-trash"></i>
                                                 </button>
-                                                <button class="btn btn-icon btn-3 btn-outline-danger remove-tab" type="button">
-                                                    <span class="btn-inner--icon"><i class="fas fa-trash"></i></span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                            </td> -->
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- Bahan Baku Section -->
+                            <div class="row g-3 mt-3">
+                                <div class="table-responsive">
+                                    <table id="poTable" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th width=50 class="text-center">No</th>
+                                                <th width=75 class="text-center">Komp(%)</th>
+                                                <th width=75 class="text-center">Loss(%)</th>
+                                                <th width=75 class="text-center">Qty PO</th>
+                                                <th width=75 class="text-center">Item Type</th>
+                                                <th width=75 class="text-center">Kode Warna</th>
+                                                <th width=75 class="text-center">Warna</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody class="material-usage">
+                                            <!-- <tr>
+                                                <td><input type="text" class="form-control text-center" name="no" id="no" value="1" readonly></td>
+                                                <td><input type="text" class="form-control text-center" name="komposisi" id="komposisi" value="" readonly></td>
+                                                <td><input type="text" class="form-control text-center" name="loss" id="loss" value="" readonly></td>
+                                                <td><input type="text" class="form-control text-center" name="ttl_keb" id="ttl_keb" value="" readonly></td>
+                                                <td><input type="text" class="form-control text-center" name="item_type" id="item_type" value="" readonly></td>
+                                                <td><input type="text" class="form-control text-center" name="kode_warna" id="kode_warna" value="" readonly></td>
+                                                <td><input type="text" class="form-control text-center" name="warna" id="warna" value="" readonly></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    Qty Cones:
+                                                    <input type="text" class="form-control text-center" name="qty_cns" id="qty_cns" value="">
+                                                </td>
+                                                <td>
+                                                    Berat Cones:
+                                                    <input type="text" class="form-control text-center" name="berat_cns" id="berat_cns" value="">
+                                                </td>
+                                                <td>
+                                                    Total :
+                                                    <input type="text" class="form-control text-center" name="ttl" id="ttl" value="">
+                                                </td>
+                                                <td>
+                                                    Total Qty Cones:
+                                                    <input type="text" class="form-control text-center" name="ttl_cns" id="ttl_cns" value="">
+                                                </td>
+                                                <td>
+                                                    Total Berat Cones:
+                                                    <input type="text" class="form-control text-center" name="ttl_berat_cns" id="ttl_berat_cns" value="">
+                                                </td>
+                                            </tr> -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Buttons -->
+                        <div class="row mt-3">
+                            <div class="col-12 text-center mt-2">
+                                <button class="btn btn-icon btn-3 btn-outline-info add-more" type="button">
+                                    <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
+                                </button>
+                                <button class="btn btn-icon btn-3 btn-outline-danger remove-tab" type="button">
+                                    <span class="btn-inner--icon"><i class="fas fa-trash"></i></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             `;
 
             navTabContent.appendChild(newTabPane);
@@ -786,129 +886,6 @@
     });
 </script>
 
-<script>
-    $(document).ready(function() {
-        // Ketika No Model dipilih
-        $('#no_model').change(function() {
-            let noModel = $(this).val(); // Ambil nilai No Model
 
-            if (noModel) {
-                // AJAX untuk mengambil Style Size
-                $.ajax({
-                    url: '<?= base_url($role . '/getStyleSizeByNoModel') ?>', // Ganti dengan URL endpoint Anda
-                    type: 'POST',
-                    data: {
-                        no_model: noModel
-                    },
-                    dataType: 'json',
-                    success: function(response) {
-                        console.log(response);
-                        // Hapus opsi sebelumnya di dropdown Style Size
-                        $('#style_size').empty();
-                        $('#style_size').append('<option value="">Pilih Style Size</option>');
-
-                        // Tambahkan opsi baru berdasarkan data yang diterima
-                        response.forEach(function(style) {
-                            $('#style_size').append('<option value="' + style.size + '">' + style.size + '</option>');
-                        });
-                    },
-                    error: function() {
-                        alert('Gagal mengambil data Style Size.');
-                    }
-                });
-            } else {
-                // Reset dropdown Style Size jika No Model dikosongkan
-                $('#style_size').empty();
-                $('#style_size').append('<option value="">Pilih Style Size</option>');
-            }
-        });
-    });
-
-    $(document).ready(function() {
-        // Ketika Style Size dipilih
-        $('#style_size').change(function() {
-            let styleSize = $(this).val(); // Ambil nilai Style Size
-            let noModel = $('#no_model').val(); // Ambil nilai No Model
-
-            if (styleSize && noModel) {
-                // AJAX untuk mengambil Jalan MC
-                $.ajax({
-                    url: '<?= base_url($role . '/getJalanMc') ?>', // Ganti dengan URL endpoint Anda
-                    type: 'POST',
-                    data: {
-                        style_size: styleSize,
-                        no_model: noModel
-                    },
-                    dataType: 'json',
-                    success: function(response) {
-                        console.log(response);
-                        // Set the value of the #jalan_mc input field
-                        $('#jalan_mc').val(response.jalan_mc);
-
-                        // If you intend to append a new input element with the same value
-                        $('#jalan_mc').append('<input value="' + response.jalan_mc.jalan_mc + '">');
-                    },
-
-                    error: function() {
-                        alert('Gagal mengambil data Jalan MC');
-                    }
-                });
-                // Ambil data MU dari API
-                $.ajax({
-                    url: '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + styleSize,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(response) {
-                        console.log(response);
-                        let table = $('#poTable tbody');
-                        table.empty(); // Hapus isi tabel sebelumnya
-                        // Iterasi data yang diterima dari API
-                        response.forEach(function(item, index) {
-                            table.append(`
-                    <tr>
-                        <td>${index + 1}</td>
-                          <td><input type="text" class="form-control text-center" name="komposisi" id="komposisi" value="${item.composition}" readonly></td>
-                          <td><input type="text" class="form-control text-center" name="loss" id="loss" value="${item.loss}" readonly></td>
-                             <td><input type="text" class="form-control text-center" name="ttl_keb" id="ttl_keb" value="${item.gw}" readonly></td>
-                             <td><input type="text" class="form-control text-center" name="item_type" id="item_type" value="${item.item_type}" readonly></td>
-                             <td><input type="text" class="form-control text-center" name="kode_warna" id="kode_warna" value="${item.kode_warna}" readonly></td>
-                             <td><input type="text" class="form-control text-center" name="warna" id="warna" value="${item.color}" readonly></td>
-                             </tr>
-                    <tr>
-                    <td></td>
-                             <td>
-                             Qty Cones:
-                             <input type="text" class="form-control text-center" name="qty_cns" id="qty_cns" value=""></td>
-                             <td>
-                             Berat Cones:
-                             <input type="text" class="form-control text-center" name="berat_cns" id="berat_cns" value=""></td>
-                             <td>
-                             Total:
-                             <input type="text" class="form-control text-center" name="ttl" id="ttl" value=""></td>
-                             <td>
-                             Total Cones:
-                             <input type="text" class="form-control text-center" name="ttl_cns" id="ttl_cns" value=""></td>
-                             <td>
-                             Total Berat Cones:
-                             <input type="text" class="form-control text-center" name="ttl_berat_cns" id="ttl_berat_cns" value="">
-
-                    </tr>
-                `);
-                        });
-
-
-
-                    },
-                    error: function() {
-                        alert('Gagal mengambil data Material Usage.');
-                    }
-                });
-            } else {
-                // Reset input Jalan MC jika Style Size atau No Model kosong
-                $('#jalan_mc').val('');
-            }
-        });
-    });
-</script>
 
 <?php $this->endSection(); ?>
