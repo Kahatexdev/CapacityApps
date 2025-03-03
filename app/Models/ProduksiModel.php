@@ -97,7 +97,6 @@ class ProduksiModel extends Model
             ->where('MONTH(tgl_produksi)', $bulan)
             ->where('YEAR(tgl_produksi)', $year)
             ->where('area', $area)
-            ->like('storage_akhir', '-')
             ->groupBy('DATE(tgl_produksi)')
             ->orderBy('tgl_produksi')
             ->findAll();
@@ -108,7 +107,6 @@ class ProduksiModel extends Model
                 'qty_produksi' => 0,
             ];
         } else {
-            // Format tanggal ke d/m
             return array_map(function ($item) {
                 $item['tgl_produksi'] = date('d/m', strtotime($item['tgl_produksi']));
                 return $item;
