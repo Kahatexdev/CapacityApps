@@ -1253,7 +1253,7 @@ class ProduksiController extends BaseController
         }
 
         try {
-            $query = $this->produksiModel->select("DATE_FORMAT(tgl_produksi, '%d-%b') as tgl_produksi, SUM(qty_produksi/24) as qty_produksi")
+            $query = $this->produksiModel->select("DATE_FORMAT(tgl_produksi, '%d-%b') as tgl_produksi, SUM(qty_produksi) as qty_produksi")
                 ->groupBy('tgl_produksi')
                 ->orderBy('tgl_produksi', 'ASC')
                 ->where('MONTH(tgl_produksi)', $bulan)
