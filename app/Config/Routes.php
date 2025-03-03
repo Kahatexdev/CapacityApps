@@ -11,6 +11,9 @@ $routes->get('/login', 'AuthController::index');
 $routes->post('/logout', 'AuthController::logout');
 $routes->post('authverify', 'AuthController::login');
 
+// chart
+$routes->get('chart/getProductionData', 'ProduksiController::getProductionData');
+
 // API ROUTES
 $routes->group(
     '/api',
