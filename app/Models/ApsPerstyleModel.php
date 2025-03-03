@@ -869,20 +869,12 @@ class ApsPerstyleModel extends Model
     {
         return $this->select('mastermodel, inisial, size, SUM(sisa) AS sisa, sum(qty) as qty,sum(po_plus) as poplus, delivery,machinetypeid')
             ->where('factory', $area)
-            ->groupBy('size')
+            ->groupBy('mastermodel,size')
             ->orderBy('delivery', 'DESC')
             ->findAll();
     }
-    public function estimasispk($area, $lastmonth)
-    {
-        $res = $this->select('mastermodel, inisial, size, SUM(apsperstyle.sisa) AS sisa, sum(apsperstyle.qty) as qty, delivery,sum(data_bs.qty) as bs,machinetypeid')
-            ->join('data_bs', 'data_bs.idapsperstyle = apsperstyle.idapsperstyle')
-            ->where('factory', $area)
-            ->groupBy('size')
-            ->orderBy('delivery', 'DESC')
-            ->findAll();
-        return $res;
-    }
+
+
     public function getSisaPerModel($model, $jarum)
     {
         return $this->select('sum(qty/24) as qty, sum(sisa/24) as sisa, delivery')
@@ -934,5 +926,41 @@ class ApsPerstyleModel extends Model
         }
 
         return $data;
+    }
+    public function getMonthName()
+    {
+        $db = db_connect();
+        $query = $db->query("
+        SELECT 
+            DATE_FORMAT(delivery, '%M') AS month_name, 
+            YEAR(delivery) AS year
+        FROM apsperstyle
+        WHERE production_unit != 'MJ'
+        GROUP BY DATE_FORMAT(delivery, '%Y-%m')
+        ORDER BY MIN(delivery) ASC
+    ");
+
+        $result = $query->getResultArray();
+        $data = [];
+
+        foreach ($result as $row) {
+            $data[] = [
+                'bulan' => $row['month_name'],
+                'tahun' => $row['year']
+            ]; // Simpan nilai ke dalam array
+        }
+        return $data;
+    }
+    public function exportDataEstimasi($data)
+    {
+        $data = $this->select('mastermodel, inisial, size, SUM(sisa) AS sisa, sum(qty) as qty,sum(po_plus) as poplus, delivery,machinetypeid')
+            ->where('factory', $data['area'])
+            ->where('mastermodel', $data['model'])
+            ->where('size', $data['size'])
+            ->groupBy('mastermodel, size')
+            ->orderBy('delivery', 'DESC');
+
+        $query = $data->get()->getFirstRow('array');
+        return $query;
     }
 }

@@ -190,7 +190,8 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('assignarealall', 'PlanningController::assignarealall');
     $routes->post('recomendationarea', 'MesinController::recomendationarea');
     $routes->post('tampilPerdelivery', 'OrderController::tampilPerdelivery');
-    $routes->post('orderPerbulan', 'OrderController::orderPerbulan');
+    $routes->get('orderPerbulan', 'OrderController::orderPerbulan');
+    $routes->get('orderPerMonth/(:any)/(:any)', 'OrderController::orderPerMonth/$1/$2');
 
 
     // mesin
@@ -388,6 +389,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('inputinisial', 'UserController::inputinisial');
     $routes->get('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
     $routes->get('estimasispk/(:any)', 'OrderController::estimasispk/$1');
+    $routes->post('exportEstimasispk', 'ExcelController::exportEstimasispk');
 
 
     // $routes->post('importproduksi', 'ProduksiController::importproduksi');
