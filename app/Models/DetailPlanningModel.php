@@ -53,9 +53,9 @@ class DetailPlanningModel extends Model
     }
     public function getDataPlanning2($id)
     {
-        return $this->select('detail_planning.model, ap.delivery, ap.qty, ap.sisa, detail_planning.id_detail_pln, detail_planning.id_pln_mc, detail_planning.smv, ep.id_est_qty, ep.hari, ep.precentage_target, ep.delivery2, tp.start_date, tp.stop_date')
+        return $this->select('detail_planning.model, ap.delivery, ap.qty, ap.sisa, ap.machinetypeid, detail_planning.id_detail_pln, detail_planning.id_pln_mc, detail_planning.smv, ep.id_est_qty, ep.hari, ep.precentage_target, ep.delivery2, tp.start_date, tp.stop_date')
             // Subquery untuk apsperstyle, dengan SUM untuk qty dan sisa
-            ->join('(SELECT mastermodel, delivery, SUM(qty) AS qty, SUM(sisa) AS sisa FROM apsperstyle GROUP BY mastermodel, delivery) ap', 'ap.mastermodel = detail_planning.model', 'right')
+            ->join('(SELECT mastermodel, delivery, SUM(qty) AS qty, SUM(sisa) AS sisa, machinetypeid FROM apsperstyle GROUP BY mastermodel, machinetypeid, delivery) ap', 'ap.mastermodel = detail_planning.model', 'right')
             // Subquery untuk estimated_planning
             ->join('(SELECT id_detail_pln, id_est_qty, hari, precentage_target, delivery AS delivery2 FROM estimated_planning GROUP BY id_est_qty) ep', 'ep.id_detail_pln = detail_planning.id_detail_pln AND ep.delivery2 = ap.delivery', 'left')
             // Join dengan tanggal_planning

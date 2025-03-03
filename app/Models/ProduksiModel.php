@@ -300,7 +300,7 @@ class ProduksiModel extends Model
             ->where('apsperstyle.mastermodel', $data['model'])
             ->where('apsperstyle.machinetypeid', $data['jarum'])
             ->where('apsperstyle.delivery', $data['delivery'])
-            ->groupBy('apsperstyle.mastermodel, apsperstyle.delivery')
+            ->groupBy('apsperstyle.mastermodel, apsperstyle.delivery, machinetypeid')
             ->first();
         if (empty($prod)) {
             $qty = 0;
