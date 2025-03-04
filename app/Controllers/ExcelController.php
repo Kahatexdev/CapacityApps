@@ -3377,4 +3377,148 @@ class ExcelController extends BaseController
         $writer->save('php://output');
         exit;
     }
+    public function exportEstimasispk()
+    {
+        $selectedData = $this->request->getPost('data');
+
+        if (!empty($selectedData)) {
+            $allData = []; // Inisialisasi array hasil di luar loop
+
+            foreach ($selectedData as $dataString) {
+                // Pecah data string menjadi tiga bagian: model, size, dan area
+                list($model, $size, $area) = explode('|', $dataString);
+
+                // Buat parameter untuk query
+                $data = [
+                    'model' => $model,
+                    'size'  => $size,
+                    'area'  => $area,
+                ];
+
+                // Panggil model. Pastikan method exportDataEstimasi() tidak mengandung dd() di dalamnya.
+                $result = $this->ApsPerstyleModel->exportDataEstimasi($data);
+
+                // Pastikan ada hasil dari query
+                // if ($result) {
+                $dataProd = $this->produksiModel->getProdByPdkSize($result['mastermodel'], $result['size']);
+                $bs     = (int)$dataProd['bs'];
+                $qty    = (int)$result['qty'];
+                $sisa   = (int)$result['sisa'];
+                $poplus = (int)$result['poplus'];
+
+                // Dapatkan nilai produksi dari model produksi
+
+                // Gunakan nilai produksi sebagai ttlProd (sesuaikan logika jika diperlukan)
+                $ttlProd = $dataProd['prod'];
+
+                // Lanjutkan hanya jika ttlProd valid
+                if ($ttlProd > 0) {
+                    $percentage = round(($ttlProd / $qty) * 100);
+                    $ganti      = $bs + $poplus;
+                    $estimasi   = ($ganti / $ttlProd / 100) * $qty;
+
+                    // Tambahkan hasil ke array $allData
+                    $allData[] = [
+                        'model'      => $result['mastermodel'],
+                        'inisial'    => $result['inisial'],
+                        'size'       => $result['size'],
+                        'sisa'       => $sisa,
+                        'qty'        => $qty,
+                        'ttlProd'    => $ttlProd,
+                        'percentage' => $percentage,
+                        'bs'         => $bs,
+                        'poplus'     => $poplus,
+                        'jarum'      => $result['machinetypeid'],
+                        'estimasi'   => round(($estimasi * 100), 1),
+                    ];
+                    // }
+                }
+            }
+            // var_dump($allData);
+            // dd($allData);
+            // Export Excel
+            // Buat file Excel
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+
+            $styleTitle = [
+                'font' => [
+                    'bold' => true, // Tebalkan teks
+                    'color' => ['argb' => 'FF000000'],
+                    'size' => 15
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+                ],
+            ];
+
+            // border
+            $styleHeader = [
+                'font' => [
+                    'bold' => true, // Tebalkan teks
+                    'color' => ['argb' => 'FFFFFFFF']
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+                ],
+                'borders' => [
+                    'outline' => [
+                        'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                        'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                    ],
+                ],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID, // Jenis pengisian solid
+                    'startColor' => ['argb' => 'FF67748e'], // Warna latar belakang biru tua (HEX)
+                ],
+            ];
+            $styleBody = [
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+                ],
+                'borders' => [
+                    'outline' => [
+                        'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                        'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                    ],
+                ],
+            ];
+
+            $sheet->setCellValue('A1', 'ESTIMASI QTY SPK 2');
+            $sheet->mergeCells('A1:C1');
+            $sheet->getStyle('A1:C1')->applyFromArray($styleTitle);
+            // Tulis header
+            $sheet->setCellValue('A3', 'NO MODEL');
+            $sheet->setCellValue('B3', 'STYLE');
+            $sheet->setCellValue('C3', 'QTY SPK 2');
+            $sheet->getStyle('A3')->applyFromArray($styleHeader);
+            $sheet->getStyle('B3')->applyFromArray($styleHeader);
+            $sheet->getStyle('C3')->applyFromArray($styleHeader);
+
+            // Tulis data mulai dari baris 2
+            $row = 4;
+            foreach ($allData as $item) {
+                $sheet->setCellValue('A' . $row, $item['model']);
+                $sheet->setCellValue('B' . $row, $item['size']);
+                $sheet->setCellValue('C' . $row, $item['estimasi']);
+                $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('C' . $row)->applyFromArray($styleBody);
+                $row++;
+            }
+
+            // Buat writer dan output file Excel
+            $writer = new Xlsx($spreadsheet);
+            $fileName = 'Export Estimasi SPK.xlsx';
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename="' . $fileName . '"');
+            header('Cache-Control: max-age=0');
+
+            $writer->save('php://output');
+            exit;
+        } else {
+            return redirect()->back()->with('error', 'Tidak ada data yang dipilih.');
+        }
+    }
 }

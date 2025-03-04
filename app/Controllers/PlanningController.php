@@ -361,7 +361,7 @@ class PlanningController extends BaseController
         if (strpos($area, 'kk' !== 'false')) {
             $pu = 'CJ';
         } else {
-            $pu = 'MJ';
+            $pu = 'CJ';
         }
         $pdk = $this->request->getPost('pdk');
         $size = $this->request->getPost('size');

@@ -383,13 +383,12 @@ class ProduksiController extends BaseController
     }
     public function produksiAreaChart()
     {
-        $bulan = date('m');
-        $month = date('F');
-        $year = date('Y');
+        $bulan = $this->request->getGet('bulan') ? $this->request->getGet('bulan') : date('m');
+        $tahun = $this->request->getGet('tahun') ? $this->request->getGet('tahun') : date('Y');
         $totalMesin = $this->jarumModel->getArea();
         $produksiPerArea = [];
         foreach ($totalMesin as $area) {
-            $produksiPerArea[$area] = $this->produksiModel->getProduksiPerArea($area, $bulan, $year);
+            $produksiPerArea[$area] = $this->produksiModel->getProduksiPerArea($area, $bulan, $tahun);
         }
         return json_encode($produksiPerArea);
     }
@@ -1239,5 +1238,28 @@ class ProduksiController extends BaseController
         }
 
         return redirect()->to('/sudo')->with('success', 'Data berhasil diupdate');
+    }
+    public function getProductionData()
+    {
+        $bulan = $this->request->getGet('bulan');
+        $tahun = $this->request->getGet('tahun');
+
+        if (!$bulan || !$tahun) {
+            return $this->response->setJSON(['error' => 'Bulan dan Tahun wajib diisi']);
+        }
+
+        try {
+            $query = $this->produksiModel->select("DATE_FORMAT(tgl_produksi, '%d-%b') as tgl_produksi, SUM(qty_produksi) as qty_produksi")
+                ->groupBy('tgl_produksi')
+                ->orderBy('tgl_produksi', 'ASC')
+                ->where('MONTH(tgl_produksi)', $bulan)
+                ->where('YEAR(tgl_produksi)', $tahun);
+
+            $data = $query->findAll();
+
+            return $this->response->setJSON($data);
+        } catch (\Exception $e) {
+            return $this->response->setJSON(['error' => $e->getMessage()]);
+        }
     }
 }

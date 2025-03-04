@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use LDAP\Result;
 
 class ProduksiModel extends Model
 {
@@ -97,7 +98,6 @@ class ProduksiModel extends Model
             ->where('MONTH(tgl_produksi)', $bulan)
             ->where('YEAR(tgl_produksi)', $year)
             ->where('area', $area)
-            ->like('storage_akhir', '-')
             ->groupBy('DATE(tgl_produksi)')
             ->orderBy('tgl_produksi')
             ->findAll();
@@ -108,7 +108,6 @@ class ProduksiModel extends Model
                 'qty_produksi' => 0,
             ];
         } else {
-            // Format tanggal ke d/m
             return array_map(function ($item) {
                 $item['tgl_produksi'] = date('d/m', strtotime($item['tgl_produksi']));
                 return $item;
@@ -257,5 +256,57 @@ class ProduksiModel extends Model
         return $query->groupBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size, produksi.tgl_produksi')
             ->orderBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size, produksi.tgl_produksi', 'ASC')
             ->findAll();
+    }
+    public function getProdByPdkSize($model, $size)
+    {
+        $tabel = 'apsperstyle'; // Perbaikan: Harus dalam string
+        $idaps = $this->db->table($tabel) // Perbaikan: Gunakan query builder dari DB
+            ->select('idapsperstyle')
+            ->where('mastermodel', $model)
+            ->where('size', $size) // Perbaikan: Harusnya `size`, bukan `sizee`
+            ->get()
+            ->getResultArray(); // Perbaikan: Ambil sebagai array
+
+        // Jika tidak ada hasil, langsung return 0 untuk menghindari error
+        if (empty($idaps)) {
+            return 0;
+        }
+
+        // Ambil nilai idapsperstyle sebagai array untuk whereIn
+        $idapsArray = array_column($idaps, 'idapsperstyle');
+
+        $prod = $this->db->table('produksi') // Perbaikan: Tambahkan table produksi
+            ->select('SUM(qty_produksi) AS ttl_prod')
+            ->whereIn('idapsperstyle', $idapsArray)
+            ->get()
+            ->getRowArray(); // Perbaikan: Ambil satu baris
+        $bs = $this->db->table('data_bs') // Perbaikan: Tambahkan table produksi
+            ->select('SUM(qty) AS bs')
+            ->whereIn('idapsperstyle', $idapsArray)
+            ->get()
+            ->getRowArray(); // Perbaikan: Ambil satu baris 
+        $result = [
+            'prod' => $prod['ttl_prod'] ?? 0,
+            'bs' => $bs['bs'] ?? 0
+        ];
+        return $result;
+    }
+    public function getProduksiByModelDelivery($data)
+    {
+        $prod = $this->select('SUM(produksi.qty_produksi) AS produksi')
+            ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
+            ->where('apsperstyle.production_unit !=', 'MJ')
+            ->where('apsperstyle.factory', $data['area'])
+            ->where('apsperstyle.mastermodel', $data['model'])
+            ->where('apsperstyle.machinetypeid', $data['jarum'])
+            ->where('apsperstyle.delivery', $data['delivery'])
+            ->groupBy('apsperstyle.mastermodel, apsperstyle.delivery, machinetypeid')
+            ->first();
+        if (empty($prod)) {
+            $qty = 0;
+        } else {
+            $qty = $prod['produksi'];
+        }
+        return $qty;
     }
 }
