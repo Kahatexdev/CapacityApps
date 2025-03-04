@@ -107,6 +107,7 @@ class SummaryController extends BaseController
                     'size' => $item['size'],
                     'qty_produksi' => $item['qty_produksi'],
                     'max_delivery' => $item['max_delivery'],
+                    'sisa' => $item['sisa'],
                     'qty' => 0,
                     'running' => 0,
                     'ttl_prod' => 0,
@@ -240,7 +241,6 @@ class SummaryController extends BaseController
         // // Isi data
         $row = 5;
         // 
-        $sisa = 0;
         $ttl_qty = 0;
         $ttl_prod = 0;
         $ttl_jlmc = 0;
@@ -254,13 +254,12 @@ class SummaryController extends BaseController
             $ttl_qty += $id['qty'];
             $ttl_prod += $id['ttl_prod'];
             $ttl_jlmc += $id['ttl_jlmc'];
+            $ttl_sisa += $id['sisa'];
             // Pastikan $id['running'] tidak bernilai nol sebelum dibagi
             $rata2 = (is_numeric($id['ttl_jlmc']) && is_numeric($id['running']) && $id['running'] != 0) ? number_format($id['ttl_jlmc'] / $id['running'], 0) : 0;
             $target_normal_socks = 14;
-            $sisa = (is_numeric($id['qty']) && is_numeric($id['qty_produksi'])) ? $id['qty'] - $id['qty_produksi'] : 0;
-            $ttl_sisa += $sisa;
-            $hitung_day_stop = (is_numeric($rata2) && $rata2 != 0) ? ($sisa / 24) / ($rata2 * $target_normal_socks) : 0;
-            $day_stop = ($id['max_delivery'] > $today && $sisa > 0 && $rata2 != 0) ? date('Y-m-d', strtotime($today . ' + ' . round($hitung_day_stop) . ' days')) : '';
+            $hitung_day_stop = (is_numeric($rata2) && $rata2 != 0) ? ($id['sisa'] / 24) / ($rata2 * $target_normal_socks) : 0;
+            $day_stop = ($id['max_delivery'] > $today && $id['sisa'] > 0 && $rata2 != 0) ? date('Y-m-d', strtotime($today . ' + ' . round($hitung_day_stop) . ' days')) : '';
 
             $ttl_rata2 += is_numeric($rata2) ? $rata2 : 0;
 
@@ -271,7 +270,7 @@ class SummaryController extends BaseController
             $sheet->setCellValue('E' . $row, $id['size']);
             $sheet->setCellValue('F' . $row, number_format($id['qty'] / 24, 2));
             $sheet->setCellValue('G' . $row, number_format($id['qty_produksi'] / 24, 2));
-            $sheet->setCellValue('H' . $row, number_format($sisa / 24, 2));
+            $sheet->setCellValue('H' . $row, number_format($id['sisa'] / 24, 2));
             $sheet->setCellValue('I' . $row, is_numeric($rata2) ? number_format((float)$rata2, 0) : '0');
             $sheet->setCellValue('J' . $row, $id['running']);
             $sheet->setCellValue('K' . $row, $day_stop);
@@ -426,6 +425,7 @@ class SummaryController extends BaseController
                     'size' => $item['size'],
                     'color' => $item['color'],
                     'delivery' => $item['delivery'],
+                    'sisa' => $item['sisa'],
                     'qty_deliv' => 0,
                     'running' => 0,
                     'bruto' => 0,
@@ -536,7 +536,6 @@ class SummaryController extends BaseController
 
         $row = 4;
         $prevSize = null;
-        $sisa_ship_prev = [];
 
         foreach ($uniqueData as $key => $id) {
             $today = date('Y-m-d');
@@ -544,9 +543,6 @@ class SummaryController extends BaseController
             $sisa_hari = (strtotime($delivery_date) - strtotime($today)) / (60 * 60 * 24);
             $group_key = $id['machinetypeid'] . '_' . $id['mastermodel'] . '_' . $id['size'];
 
-            if (!isset($sisa_ship_prev[$group_key])) {
-                $sisa_ship_prev[$group_key] = null;
-            }
             $total_ship_found = false;
 
             foreach ($totalShip as $ts) {
@@ -554,6 +550,7 @@ class SummaryController extends BaseController
                     $total_ship_found = true;
                     $sheet->setCellValue('K' . $row, number_format($ts['ttl_ship'] / 24, 2));
                     $sheet->setCellValue('N' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($ts['ttl_ship'] / 24, 2) : '');
+                    $sheet->setCellValue('Q' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($ts['sisa'] / 24, 2) : '');
                     break;
                 }
             }
@@ -566,36 +563,14 @@ class SummaryController extends BaseController
                     $bs_st = $pr['bs_prod'] ?? 0;
                     $netto = $bruto - $bs_st ?? 0;
 
-                    //sisa per inisial
-                    $sisa = $ts['ttl_ship'] - $netto ?? 0;
-                    if ($sisa > 0) {
-                        $sisa;
-                    } else {
-                        $sisa = 0;
-                    }
-
-                    // Initialize sisa_ship for the first calculation
-                    if ($sisa_ship_prev[$group_key] === null) {
-                        $sisa_ship = $id['qty_deliv'] - $netto;
-                    } else {
-                        // Calculate sisa for each shipment based on previous sisa_ship
-                        if ($sisa_ship_prev[$group_key] < 0) {
-                            $sisa_ship = $id['qty_deliv'] + $sisa_ship_prev[$group_key];
-                        } else {
-                            $sisa_ship = $id['qty_deliv'];
-                        }
-                    }
-
-                    // Calculate percentage
+                    // Perhitungan persentase
                     $persentase = ($ts['ttl_ship'] != 0) ? ($netto / $ts['ttl_ship']) * 100 : 0;
 
-                    // Update sisa_ship_prev for the next iteration
-                    $sisa_ship_prev[$group_key] = $sisa_ship;
+
                     $sheet->setCellValue('D' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $pr['start_mc'] : '');
                     $sheet->setCellValue('O' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($bruto / 24, 2) : '');
                     $sheet->setCellValue('P' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($netto / 24, 2) : '');
-                    $sheet->setCellValue('Q' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $sisa > 0 ? number_format($sisa / 24, 2) : '0.00' : '');
-                    $sheet->setCellValue('R' . $row, $sisa_ship > 0 ? number_format($sisa_ship / 24, 2) : '0.00');
+                    $sheet->setCellValue('R' . $row, number_format($id['sisa'] / 24, 2));
                     $sheet->setCellValue('S' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($persentase, 2) . '%' : '');
                     $sheet->setCellValue('T' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($bs_st / 24, 2) : '');
                     $sheet->setCellValue('U' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $pr['plus_packing'] : '');

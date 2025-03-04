@@ -91,7 +91,6 @@
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $sisa = 0;
                                     $ttl_qty = 0;
                                     $ttl_prod = 0;
                                     $ttl_jlmc = 0;
@@ -105,12 +104,12 @@
                                         $ttl_qty += $id['qty'];
                                         $ttl_prod += $id['ttl_prod'];
                                         $ttl_jlmc += $id['ttl_jlmc'];
-                                        $ttl_sisa += $id['ttl_sisa'];
+                                        $ttl_sisa += $id['sisa'];
                                         // Pastikan $id['running'] tidak bernilai nol sebelum dibagi
                                         $rata2 = (is_numeric($id['ttl_jlmc']) && is_numeric($id['running']) && $id['running'] != 0) ? number_format($id['ttl_jlmc'] / $id['running'], 0) : 0;
                                         $target_normal_socks = 14;
-                                        $hitung_day_stop = (is_numeric($rata2) && $rata2 != 0) ? ($sisa / 24) / ($rata2 * $target_normal_socks) : 0;
-                                        $day_stop = ($id['max_delivery'] > $today && $sisa > 0 && $rata2 != 0) ? date('Y-m-d', strtotime($today . ' + ' . round($hitung_day_stop) . ' days')) : '';
+                                        $hitung_day_stop = (is_numeric($rata2) && $rata2 != 0) ? ($id['sisa'] / 24) / ($rata2 * $target_normal_socks) : 0;
+                                        $day_stop = ($id['max_delivery'] > $today && $id['sisa'] > 0 && $rata2 != 0) ? date('Y-m-d', strtotime($today . ' + ' . round($hitung_day_stop) . ' days')) : '';
 
                                         $ttl_rata2 += is_numeric($rata2) ? $rata2 : 0;
                                     ?>
@@ -149,7 +148,7 @@
                                         </tr>
                                         <?php if (!isset($uniqueData[$key + 1]) || (isset($uniqueData[$key + 1]) && $uniqueData[$key + 1]['mastermodel'] != $id['mastermodel'])) : ?>
                                             <tr>
-                                                <th colspan="3" style="text-align: center;">Total <?= $id['mastermodel'] ?></th>
+                                                <th colspan="4" style="text-align: center;">Total <?= $id['mastermodel'] ?></th>
                                                 <th style="text-align: right;">:</th>
                                                 <th style="text-align: center;"><?= number_format($ttl_qty / 24, 2); ?></th>
                                                 <th style="text-align: center;"><?= number_format($ttl_prod / 24, 2); ?></th>
