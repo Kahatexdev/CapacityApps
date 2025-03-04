@@ -16,13 +16,39 @@
                             </div>
                         </div>
                         <div>
+                            <button type="button" class="btn btn-warning btn-petunjuk" ata-toggle="modal" data-target="#petunjuk">Petunjuk</button>
                             <button id="export-btn" class="btn btn-success">Export Excel</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="modal fade bd-example-modal-lg" id="petunjuk" tabindex="-1" role="dialog" aria-labelledby="petunjuk" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Petunjuk Permintaan SPK <Area:d></Area:d>
+                        </h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <ol>
+                            <li>Pilih PDK serta Style yang akan diminta</li>
+                            <li>Klik Tombol Export</li>
+                            <li>Sesuaikan QTY dengan kebutuhan</li>
+                            <li>Jika ada pdk yang tidak muncul di sistem, anda dapat mengisi secara manual pada excel</li>
+                            <li>Simpan File lalu kirimkan melalui email ke : me.sock@bd.kaha.com</li>
+                        </ol>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
 
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row mt-3">
             <div class="card">
                 <div class="card-body">
@@ -105,7 +131,9 @@
                 [0, 'desc'] // Urutkan kolom pertama secara descending
             ]
         });
-
+        $('.btn-petunjuk').click(function() {
+            $('#petunjuk').modal('show'); // Show the modal
+        });
         // Saat klik "select all", pilih semua checkbox pada baris yang tampil (mengikuti order & filter)
         $('#select-all').on('click', function() {
             var rows = table.rows({
