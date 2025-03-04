@@ -91,7 +91,6 @@
                                 <tbody>
                                     <?php
                                     $prevSize = null;
-                                    $sisa_ship_prev = [];
 
                                     foreach ($uniqueData as $key => $id) :
                                         $today = date('Y-m-d'); // Get current date in yyyy-mm-dd format
@@ -100,13 +99,6 @@
                                         // Calculate remaining days
                                         $sisa_hari = (strtotime($delivery_date) - strtotime($today)) / (60 * 60 * 24);
 
-                                        // Group key
-                                        $group_key = $id['machinetypeid'] . '_' . $id['mastermodel'] . '_' . $id['size'];
-
-                                        // Initialize sisa_ship_prev for new groups
-                                        if (!isset($sisa_ship_prev[$group_key])) {
-                                            $sisa_ship_prev[$group_key] = null;
-                                        }
                                     ?>
                                         <tr>
                                             <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? $id['area'] : ''; ?></td>
@@ -161,36 +153,22 @@
                                                     $netto = $bruto - $bs_st ?? 0;
                                                     $production_found = true;
 
-                                                    //sisa per inisial
-                                                    $sisa = $row['ttl_ship'] - $netto ?? 0;
-                                                    if ($sisa > 0) {
-                                                        $sisa;
-                                                    } else {
-                                                        $sisa = 0;
-                                                    }
-
-                                                    // Initialize sisa_ship for the first calculation
-                                                    if ($sisa_ship_prev[$group_key] === null) {
-                                                        $sisa_ship = $id['qty_deliv'] - $netto;
-                                                    } else {
-                                                        // Calculate sisa for each shipment based on previous sisa_ship
-                                                        if ($sisa_ship_prev[$group_key] < 0) {
-                                                            $sisa_ship = $id['qty_deliv'] + $sisa_ship_prev[$group_key];
-                                                        } else {
-                                                            $sisa_ship = $id['qty_deliv'];
-                                                        }
-                                                    }
-
                                                     // Calculate percentage
                                                     $persentase = ($row['ttl_ship'] != 0) ? ($netto / $row['ttl_ship']) * 100 : 0;
 
-                                                    // Update sisa_ship_prev for the next iteration
-                                                    $sisa_ship_prev[$group_key] = $sisa_ship;
                                                 ?>
                                                     <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($bruto / 24, 2) : ''; ?></td>
                                                     <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($netto / 24, 2) : ''; ?></td>
-                                                    <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($sisa / 24, 2) : ''; ?></td>
-                                                    <td class="text-sm" style="text-align: center;"><?= ($sisa_ship > 0 ? number_format($sisa_ship / 24, 2) : '0.00'); ?></td>
+                                                    <?php
+                                                    foreach ($total_ship as $row) {
+                                                        if ($row['mastermodel'] == $id['mastermodel'] && $row['size'] == $id['size']) {
+                                                    ?>
+                                                            <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($row['sisa'] / 24, 2) : ''; ?></td>
+                                                    <?php
+                                                        }
+                                                    }
+                                                    ?>
+                                                    <td class="text-sm" style="text-align: center;"><?=number_format($id['sisa'] / 24, 2); ?></td>
                                                     <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($persentase, 2) . '%' : ''; ?></td>
                                                     <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($bs_st / 24, 2) : ''; ?></td>
                                                     <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($pr['plus_packing'], 2) : ''; ?></td>
