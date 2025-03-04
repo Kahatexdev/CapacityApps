@@ -15,8 +15,10 @@
                             </div>
                         </div>
                         <div>
-
+                            <a href="<?= base_url($role . '/estimasispk/' . $area) ?>" class="btn btn-info">Estimasi SPK</a>
+                            <a href="<?= base_url($role . '/statusorder/' . $area) ?>" class="btn btn-info">Status Order</a>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -115,7 +117,7 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Input Aps Report</h5>
                         <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
+                            <span aria-hidden="true">Ã—</span>
                         </button>
                     </div>
                     <div class="modal-body align-items-center">
