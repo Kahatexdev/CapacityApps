@@ -358,8 +358,8 @@ class PlanningController extends BaseController
     public function editarea()
     {
         $area = $this->request->getPost('area');
-        if (strpos($area, 'kk' !== 'false')) {
-            $pu = 'CJ';
+        if ($area == 'Gedung 1' || $area == 'Gedung 2') {
+            $pu = 'MJ';
         } else {
             $pu = 'CJ';
         }
