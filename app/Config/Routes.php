@@ -90,7 +90,29 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
+    // planning
 
+    $routes->get('planningmesin', 'ApsController::planningmesin');
+    $routes->post('fetch_jarum', 'ApsController::fetch_jarum');
+    $routes->post('SimpanJudul', 'ApsController::saveplanningmesin');
+    $routes->get('detailplnmc/(:any)', 'ApsController::detailplanmc/$1');
+    $routes->post('excelplnmc/(:any)', 'ExcelController::excelPlnMc/$1');
+    $routes->get('fetchdetailorderarea', 'ApsController::fetchdetailorderarea');
+    $routes->get('planningpage/(:any)/(:any)', 'ApsController::planningpage/$1/$2');
+    $routes->post('getDataLibur', 'ApsController::getDataLibur');
+    $routes->post('saveplanning', 'ApsController::saveplanning');
+    $routes->get('getMesinByDate/(:any)', 'ApsController::getMesinByDate/$1');
+    $routes->get('kalenderMesin/(:any)', 'ApsController::kalenderMesin/$1');
+    $routes->post('deleteplanmesin', 'ApsController::deleteplanmesin');
+    $routes->post('stopPlanning/(:any)', 'ApsController::stopPlanning/$1');
+    $routes->get('detailplanstop/(:any)', 'ApsController::detailplanstop/$1');
+    $routes->post('activePlanning/(:any)', 'ApsController::activePlanning/$1');
+    $routes->get('getPlanStyle', 'ApsController::getPlanStyle');
+    $routes->post('savePlanStyle', 'ApsController::savePlanStyle');
+    $routes->get('cekBahanBaku/(:num)/(:num)', 'MaterialController::cekBahanBaku/$1/$2');
+    $routes->get('cekStok', 'MaterialController::cekStok');
+    $routes->get('summaryPlanner/(:any)', 'SummaryController::summaryPlanner/$1');
+    $routes->get('summaryStopPlanner/(:any)', 'SummaryController::summaryStopPlanner/$1');
 
     //summary
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
@@ -368,15 +390,13 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('savePlanStyle', 'ApsController::savePlanStyle');
     $routes->get('cekBahanBaku/(:num)/(:num)', 'MaterialController::cekBahanBaku/$1/$2');
     $routes->get('cekStok', 'MaterialController::cekStok');
-
+    $routes->get('summaryPlanner/(:any)', 'SummaryController::summaryPlanner/$1');
+    $routes->get('summaryStopPlanner/(:any)', 'SummaryController::summaryStopPlanner/$1');
 
     // deffect
     $routes->get('datadeffect', 'DeffectController::datadeffect');
     $routes->post('inputKode', 'DeffectController::inputKode');
     $routes->post('viewDataBs', 'DeffectController::viewDataBs');
-
-    $routes->get('summaryPlanner/(:any)', 'SummaryController::summaryPlanner/$1');
-    $routes->get('summaryStopPlanner/(:any)', 'SummaryController::summaryStopPlanner/$1');
 });
 
 // user
