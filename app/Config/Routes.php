@@ -78,7 +78,10 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('cancelorder/(:any)', 'OrderController::cancelOrder/$1');
     $routes->get('cancelOrder', 'OrderController::getCancelOrder');
     $routes->get('detailCancelOrder/(:any)', 'OrderController::detailCancelOrder/$1');
-
+    $routes->get('sisaOrderArea', 'OrderController::sisaOrderArea');
+    $routes->get('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
+    $routes->post('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
+    $routes->post('excelSisaOrderArea/(:any)', 'ExcelController::excelSisaOrderArea/$1');
 
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
