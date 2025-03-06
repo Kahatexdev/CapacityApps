@@ -221,7 +221,7 @@ class MaterialController extends BaseController
     public function getMU($model, $styleSize)
     {
         $styleSize = urlencode($styleSize);  // Encode styleSize
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getMU/' . $model . '/' . $styleSize;
+        $apiUrl = 'http://172.23.39.118/MaterialSystem/public/api/getMU/' . $model . '/' . $styleSize;
         $response = file_get_contents($apiUrl);  // Mendapatkan response dari API
         if ($response === FALSE) {
             die('Error occurred while fetching data.');
@@ -232,4 +232,21 @@ class MaterialController extends BaseController
 
         return $this->response->setJSON($data);
     }
+    // public function savePemesananSession()
+    // {
+    //     // ambil data dari post
+    //     $items = $this->request->getPost('items');
+
+    //     // ambil data lama dari session jika ada
+    //     $exitingData = session()->get('pemesananBb') ?? [];
+
+    //     // gabungkan data lama dengan data baru
+    //     $updateData = array_merge($exitingData, $items);
+
+    //     // simpan ke session
+    //     session()->set('pemesananBb', $updateData);
+
+    //     // beri responsatau redirect
+    //     return redirect()->back()->with('success', 'Data berhasil di simpan ke session');
+    // }
 }
