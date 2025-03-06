@@ -89,26 +89,27 @@ class ApiController extends ResourceController
     }
     public function getDataForPPH()
     {
-        // Ambil parameter dari request
         $area = $this->request->getGet('area');
-        $masterModel = $this->request->getGet('pdk'); // No model
-        $size = $this->request->getGet('style_size');
+        $masterModel = $this->request->getGet('pdk');
+        $size = $this->request->getGet('size'); // Perbaiki key `size`
 
-        // Pastikan semua parameter ada sebelum query
         if (!$area || !$masterModel || !$size) {
             return $this->response->setJSON([
-                "error" => "Parameter tidak lengkap"
+                "error" => "Parameter tidak lengkap",
+                "received" => [
+                    "area" => $area,
+                    "pdk" => $masterModel,
+                    "size" => $size
+                ]
             ])->setStatusCode(400);
         }
 
-        // Ambil data dari model berdasarkan parameter yang dikirim
         $result = $this->orderModel->getdataSummaryPertgl([
             'area' => $area,
             'mastermodel' => $masterModel,
             'size' => $size,
         ]);
 
-        // Jika tidak ada data, tetap kembalikan response kosong
         return $this->response->setJSON($result ?? []);
     }
 }
