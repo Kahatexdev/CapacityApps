@@ -84,4 +84,5 @@ class ApiController extends ResourceController
 
         return $this->respond($startMc, 200);
     }
+    public function getDataPph($area) {}
 }
