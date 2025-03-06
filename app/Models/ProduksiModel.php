@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use LDAP\Result;
 
 class ProduksiModel extends Model
 {
@@ -289,5 +290,23 @@ class ProduksiModel extends Model
             'bs' => $bs['bs'] ?? 0
         ];
         return $result;
+    }
+    public function getProduksiByModelDelivery($data)
+    {
+        $prod = $this->select('SUM(produksi.qty_produksi) AS produksi')
+            ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
+            ->where('apsperstyle.production_unit !=', 'MJ')
+            ->where('apsperstyle.factory', $data['area'])
+            ->where('apsperstyle.mastermodel', $data['model'])
+            ->where('apsperstyle.machinetypeid', $data['jarum'])
+            ->where('apsperstyle.delivery', $data['delivery'])
+            ->groupBy('apsperstyle.mastermodel, apsperstyle.delivery, machinetypeid')
+            ->first();
+        if (empty($prod)) {
+            $qty = 0;
+        } else {
+            $qty = $prod['produksi'];
+        }
+        return $qty;
     }
 }

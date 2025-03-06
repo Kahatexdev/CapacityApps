@@ -718,14 +718,12 @@ class ProduksiController extends BaseController
                     'running' => 0,
                     'ttl_prod' => 0,
                     'ttl_jlmc' => 0,
-                    'ttl_sisa' => 0,
                 ];
             }
             $uniqueData[$key]['qty'] += $item['qty'];
             $uniqueData[$key]['running'] += $item['running'];
             $uniqueData[$key]['ttl_prod'] += $item['qty_produksi'];
             $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
-            $uniqueData[$key]['ttl_sisa'] += $item['sisa'];
         }
         // Sort ASC
         sort($uniqueData);
@@ -799,14 +797,12 @@ class ProduksiController extends BaseController
                     'running' => 0,
                     'bruto' => 0,
                     'ttl_jlmc' => 0,
-                    'ttl_sisa' => 0,
                 ];
             }
             $uniqueData[$key]['qty_deliv'] += $item['qty_deliv'];
             $uniqueData[$key]['running'] += $item['running'];
             $uniqueData[$key]['bruto'] += $item['bruto'];
             $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
-            $uniqueData[$key]['ttl_sisa'] += $item['sisa'];
         }
 
         $data2 = [

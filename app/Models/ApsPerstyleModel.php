@@ -545,6 +545,7 @@ class ApsPerstyleModel extends Model
         return $this->select('idapsperstyle')
             ->where('mastermodel', $pdk)
             ->where('size', $size)
+            ->where('delivery', $deliv)
             ->findAll();
     }
     public function rekomenarea($noModel, $jarum)
