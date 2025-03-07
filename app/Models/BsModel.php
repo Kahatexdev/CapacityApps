@@ -154,4 +154,11 @@ class BsModel extends Model
             ->groupBy('apsperstyle.size')
             ->findAll(); // Ambil satu hasil
     }
+    public function bsYesTerday($yesterday)
+    {
+        return $this->select('sum(qty) as bs')
+            ->where('tgl_instocklot', $yesterday)
+            ->groupBy('tgl_instocklot')
+            ->first();
+    }
 }

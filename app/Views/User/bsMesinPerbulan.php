@@ -63,7 +63,7 @@
                                     ?>
                                         <tr>
                                             <td> <i class="ni ni-button-play" style="color: <?= $color ?>;"></i><?= $ch['no_model'] ?></td>
-                                            <td><?= $ch['totalGram'] ?> Pcs</td>
+                                            <td><?= $ch['totalGram'] ?> gr</td>
                                         </tr>
                                     <?php endforeach ?>
                                 </tbody>

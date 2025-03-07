@@ -75,7 +75,7 @@ class BsMesinModel extends Model
             ->where('MONTH(tanggal_produksi)', $bulanNumber) // Filter bulan
             ->where('YEAR(tanggal_produksi)', $tahun) // Filter bulan
             ->where('area', $area) // Filter area
-            ->groupBy('tanggal_produksi') // Kelompokkan berdasarkan karyawan dan tanggal
+            ->groupBy('no_model, size, tanggal_produksi') // Kelompokkan berdasarkan karyawan dan tanggal
             ->findAll();
     }
     public function totalGramPerbulan($area, $bulan)

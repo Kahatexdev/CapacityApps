@@ -455,7 +455,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('getStyleSizeByNoModel', 'MaterialController::getStyleSizeByNoModel');
     $routes->post('getJalanMc', 'MaterialController::getJalanMcByModelSize');
     $routes->get('getMU/(:any)/(:any)', 'MaterialController::getMU/$1/$2');
-    // $routes->get('bahanBaku/simpanKeSession', 'MaterialController::saveSession');
+    $routes->post('bahanBaku/simpanKeSession', 'MaterialController::saveSession');
 });
 
 // sudo
