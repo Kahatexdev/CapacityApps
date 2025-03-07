@@ -14,6 +14,7 @@ use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use App\Models\BsMesinModel;
 use App\Models\DetailPlanningModel;
+use App\Models\AreaModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ApiController extends ResourceController
@@ -28,6 +29,7 @@ class ApiController extends ResourceController
     protected $liburModel;
     protected $BsMesinModel;
     protected $DetailPlanningModel;
+    protected $areaModel;
     protected $format = 'json';
     public function __construct()
     {
@@ -39,6 +41,7 @@ class ApiController extends ResourceController
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         $this->DetailPlanningModel = new DetailPlanningModel();
         $this->BsMesinModel = new BsMesinModel();
+        $this->areaModel = new AreaModel();
         $this->validation = \Config\Services::validation();
     }
     public function index()
@@ -84,5 +87,29 @@ class ApiController extends ResourceController
 
         return $this->respond($startMc, 200);
     }
-    public function getDataPph($area) {}
+    public function getDataForPPH()
+    {
+        $area = $this->request->getGet('area');
+        $masterModel = $this->request->getGet('pdk');
+        $size = $this->request->getGet('size'); // Perbaiki key `size`
+
+        if (!$area || !$masterModel || !$size) {
+            return $this->response->setJSON([
+                "error" => "Parameter tidak lengkap",
+                "received" => [
+                    "area" => $area,
+                    "pdk" => $masterModel,
+                    "size" => $size
+                ]
+            ])->setStatusCode(400);
+        }
+
+        $result = $this->orderModel->getdataSummaryPertgl([
+            'area' => $area,
+            'mastermodel' => $masterModel,
+            'size' => $size,
+        ]);
+
+        return $this->response->setJSON($result ?? []);
+    }
 }
