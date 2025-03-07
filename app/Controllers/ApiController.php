@@ -97,7 +97,7 @@ class ApiController extends ResourceController
                 "error" => "Parameter tidak lengkap",
                 "received" => [
                     "area" => $area,
-                    "pdk" => $masterModel
+                    "nomodel" => $nomodel
                 ]
             ])->setStatusCode(400);
         }
