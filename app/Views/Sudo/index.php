@@ -31,9 +31,9 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Socks System</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    Analytical Dashboard
+                                    Key Performance Indicator Daily
                                 </h5>
                             </div>
                         </div>
@@ -55,38 +55,18 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Booking </p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold"> OEE </p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    <span class=" text-sm font-weight-bolder">This Month</span>
-                                    <?= $TerimaBooking ?>
+                                    %
 
-                                </h5>
-                            </div>
-                        </div>
-                        <div class="col-4 text-end">
-                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="fas fa-book text-lg opacity-10" aria-hidden="true"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Active Order </p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    <?= $jalan ?>
+                                    <span class=" text-sm font-weight-bolder"></span>
                                 </h5>
                             </div>
                         </div>
                         <div class="col-4 text-end">
                             <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
                                 <i class="fas fa-tasks text-lg opacity-10" aria-hidden="true"></i>
+
                             </div>
                         </div>
                     </div>
@@ -99,17 +79,39 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Machine Running</p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Deffect Rate </p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    <?= $mcJalan ?>
-                                    <span class=" text-sm font-weight-bolder">/ <?= $totalMc ?> </span>
+                                    %
+                                    <span class=" text-sm font-weight-bolder"></span>
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                <i class="fas fa-percent text-lg opacity-10" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Output</p>
+                                <h5 class="font-weight-bolder mb-0">
+
+                                    <span class=" text-sm font-weight-bolder">pairs </span>
 
                                 </h5>
                             </div>
                         </div>
                         <div class="col-4 text-end">
                             <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-settings text-lg opacity-10" aria-hidden="true"></i>
+                                <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i>
                             </div>
                         </div>
                     </div>

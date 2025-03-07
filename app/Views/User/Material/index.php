@@ -160,13 +160,13 @@
                                 <table class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
-                                            <th width=50 class="text-center">No</th>
-                                            <th width=75 class="text-center">Komp(%)</th>
-                                            <th width=75 class="text-center">Loss(%)</th>
-                                            <th width=75 class="text-center">Qty PO</th>
-                                            <th width=75 class="text-center">Item Type</th>
-                                            <th width=75 class="text-center">Kode Warna</th>
-                                            <th width=75 class="text-center">Warna</th>
+                                            <th width=20 class="text-center">No</th>
+                                            <th width=50 class="text-center">Komp(%)</th>
+                                            <th width=50 class="text-center">Loss(%)</th>
+                                            <th width=120 class="text-center">Qty PO</th>
+                                            <th class="text-center">Item Type</th>
+                                            <th class="text-center">Kode Warna</th>
+                                            <th class="text-center">Warna</th>
 
                                         </tr>
                                     </thead>
@@ -219,13 +219,13 @@
                     <table class="table table-bordered table-striped">
                         <thead>
                             <tr>
-                                <th width=50 class="text-center">No</th>
-                                <th width=75 class="text-center">Komp(%)</th>
-                                <th width=75 class="text-center">Loss(%)</th>
-                                <th width=75 class="text-center">Qty PO</th>
-                                <th width=75 class="text-center">Item Type</th>
-                                <th width=75 class="text-center">Kode Warna</th>
-                                <th width=75 class="text-center">Warna</th>
+                                <th width=20 class="text-center">No</th>
+                                <th width=50 class="text-center">Komp(%)</th>
+                                <th width=50 class="text-center">Loss(%)</th>
+                                <th width=120 class="text-center">Qty PO</th>
+                                <th class="text-center">Item Type</th>
+                                <th class="text-center">Kode Warna</th>
+                                <th class="text-center">Warna</th>
 
                             </tr>
                         </thead>
@@ -272,7 +272,9 @@
                 return; // Hentikan proses jika duplikat ditemukan
             }
 
-            if (selectedStyleSize && noModel && area) {
+            if (selectedStyleSize !== "" && selectedStyleSize !== null &&
+                noModel !== "" && noModel !== null &&
+                area !== "" && area !== null) {
                 // AJAX untuk mengambil Jalan MC
                 $.ajax({
                     url: '<?= base_url($role . '/getJalanMc') ?>', // Ganti dengan URL endpoint Anda
@@ -291,37 +293,35 @@
                         alert('Gagal mengambil data Jalan MC! Silakan coba lagi.');
                     }
                 });
-            } else {
-                jalanMcInput.val(''); // Kosongkan input "Jalan MC" jika tidak ada yang dipilih
-            }
 
-            // Lakukan permintaan AJAX
-            $.ajax({
-                url: '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + selectedStyleSize, // Ganti URL sesuai kebutuhan
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    console.log(response); // Debug data yang diterima
 
-                    table.empty(); // Hapus isi tabel sebelumnya
+                // Lakukan permintaan AJAX
+                $.ajax({
+                    url: '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + selectedStyleSize, // Ganti URL sesuai kebutuhan
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log(response); // Debug data yang diterima
 
-                    // Iterasi data yang diterima dari API dan tambahkan ke tabel
-                    response.forEach(function(item, index) {
-                        const total = (item.qty_cns * item.berat_cns).toFixed(2);
-                        const jalanMc = parseFloat(jalanMcInput.val()) || 0; // Ganti dengan input jalanMc yang sesuai
-                        const totalCones = (item.qty_cns * jalanMc).toFixed(2);
-                        const totalBeratCones = (total * jalanMc).toFixed(2);
+                        table.empty(); // Hapus isi tabel sebelumnya
 
-                        table.append(`
+                        // Iterasi data yang diterima dari API dan tambahkan ke tabel
+                        response.forEach(function(item, index) {
+                            const total = (item.qty_cns * item.berat_cns).toFixed(2);
+                            const jalanMc = parseFloat(jalanMcInput.val()) || 0; // Ganti dengan input jalanMc yang sesuai
+                            const totalCones = (item.qty_cns * jalanMc).toFixed(2);
+                            const totalBeratCones = (total * jalanMc).toFixed(2);
+
+                            table.append(`
                             <tr>
                             <input type="hidden" class="form-control text-center" name="items[${index}][no]" id="id_material" value="${item.id_material}" readonly>
-                                <td width=50><input type="text" class="form-control text-center" name="items[${index}][no]" id="no" value="${index + 1}" readonly></td>
-                                <td width=75><input type="text" class="form-control text-center" name="items[${index}][komposisi]" id="komposisi" value="${item.composition}" readonly></td>
-                                <td width=75><input type="text" class="form-control text-center" name="items[${index}][loss]" id="loss" value="${item.loss}" readonly></td>
-                                <td width=75><input type="text" class="form-control text-center" name="items[${index}][ttl_keb]" id="ttl_keb" value="${item.gw}" readonly></td>
-                                <td width=75><input type="text" class="form-control text-center" name="items[${index}][item_type]" id="item_type" value="${item.item_type}" readonly></td>
-                                <td width=75><input type="text" class="form-control text-center" name="items[${index}][kode_warna]" id="kode_warna" value="${item.kode_warna}" readonly></td>
-                                <td width=75><input type="text" class="form-control text-center" name="items[${index}][warna]" id="warna" value="${item.color}" readonly></td>
+                                <td width=20><input type="text" class="form-control text-center" name="items[${index}][no]" id="no" value="${index + 1}" readonly></td>
+                                <td width=50><input type="text" class="form-control text-center" name="items[${index}][komposisi]" id="komposisi" value="${item.composition}" readonly></td>
+                                <td width=50><input type="text" class="form-control text-center" name="items[${index}][loss]" id="loss" value="${item.loss}" readonly></td>
+                                <td width=120><input type="text" class="form-control text-center" name="items[${index}][ttl_keb]" id="ttl_keb" value="${item.gw}" readonly></td>
+                                <td><input type="text" class="form-control text-center" name="items[${index}][item_type]" id="item_type" value="${item.item_type}" readonly></td>
+                                <td><input type="text" class="form-control text-center" name="items[${index}][kode_warna]" id="kode_warna" value="${item.kode_warna}" readonly></td>
+                                <td><input type="text" class="form-control text-center" name="items[${index}][warna]" id="warna" value="${item.color}" readonly></td>
                             </tr>
                             <tr>
                                 <td></td>
@@ -348,51 +348,67 @@
                                 <td></td>
                             </tr>
                         `);
+                        });
+                        // Tambahkan event listener untuk perhitungan otomatis
+                        table.on('input', '.qty_cns, .berat_cns, .ttl_berat_cns', function() {
+                            const row = $(this).closest('tr');
+                            const qty = parseFloat(row.find('.qty_cns').val());
+                            const berat = parseFloat(row.find('.berat_cns').val());
+                            const total = qty * berat;
+                            row.find('.ttl').val(total.toFixed(2));
+
+                            //Total Cones
+                            const jalanMc = parseFloat(jalanMcInput.val());
+                            const ttlCns = qty * jalanMc;
+                            row.find('.ttl_cns').val(ttlCns);
+
+                            //Total Berat Cones
+                            const totalBeratCns = total * jalanMc;
+                            row.find('.ttl_berat_cns').val(totalBeratCns.toFixed(2));
+                        });
+                    },
+                    error: function() {
+                        alert('Gagal mengambil data Material Usage.');
+                    }
+                });
+            } else {
+                jalanMcInput.val(''); // Kosongkan input "Jalan MC" jika tidak ada yang dipilih
+                table.empty(); // Hapus isi tabel sebelumnya
+            }
+        });
+        // Submit form untuk menyimpan ke session
+        $('#pemesananBbForm').submit(function(e) {
+            e.preventDefault();
+            var formData = $(this).serializeArray();
+
+            $.ajax({
+                url: "<?= base_url($role . '/bahanBaku/simpanKeSession') ?>",
+                method: "POST",
+                data: formData,
+                success: function(response) {
+                    console.log(response);
+                    Swal.fire({
+                        title: "Sukses!",
+                        text: response.message,
+                        icon: "success",
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        location.reload(); // Refresh halaman setelah alert selesai
                     });
-                    // Tambahkan event listener untuk perhitungan otomatis
-                    table.on('input', '.qty_cns, .berat_cns, .ttl_berat_cns', function() {
-                        const row = $(this).closest('tr');
-                        const qty = parseFloat(row.find('.qty_cns').val());
-                        const berat = parseFloat(row.find('.berat_cns').val());
-                        const total = qty * berat;
-                        row.find('.ttl').val(total.toFixed(2));
-
-                        //Total Cones
-                        const jalanMc = parseFloat(jalanMcInput.val());
-                        const ttlCns = qty * jalanMc;
-                        row.find('.ttl_cns').val(ttlCns);
-
-                        //Total Berat Cones
-                        const totalBeratCns = total * jalanMc;
-                        row.find('.ttl_berat_cns').val(totalBeratCns.toFixed(2));
-                    });
-                    // response.forEach(function(item, index) {
-                    //     const row = $(`
-                    //         <tr>
-                    //             <input type="hidden" class="form-control text-center" name="items[${index}][id_material]" id="id_material" value="${item.id_material}" readonly>
-                    //             <td><input type="number" step="0.01" class="form-control text-center qty_cns" name="items[${index}][qty_cns]" id="qty_cns" value="${item.qty_cns}"></td>
-                    //             <td><input type="number" step="0.01" class="form-control text-center berat_cns" name="items[${index}][berat_cns]" id="berat_cns" value="${item.berat_cns}"></td>
-                    //             <td><input type="number" step="0.01" class="form-control text-center ttl" name="items[${index}][ttl]" id="ttl" value="" readonly></td>
-                    //         </tr>
-                    //     `);
-
-                    //     table.append(row);
-
-                    //     // Perhitungan langsung berdasarkan nilai awal
-                    //     const qtyCns = parseFloat(item.qty_cns) || 0;
-                    //     const beratCns = parseFloat(item.berat_cns) || 0;
-                    //     const total = qtyCns * beratCns;
-
-                    //     row.find('.ttl').val(total.toFixed(2)); // Masukkan hasil awal ke input ttl
-                    // });
                 },
-                error: function() {
-                    alert('Gagal mengambil data Material Usage.');
+                error: function(xhr, status, error) {
+                    console.error("AJAX Error: " + status + error);
+                    console.error("<?= $role ?>");
+                    Swal.fire({
+                        title: "Gagal!",
+                        text: "Gagal menyimpan data",
+                        icon: "error",
+                        confirmButtonText: "OK"
+                    });
                 }
             });
         });
-
-
     });
 </script>
 

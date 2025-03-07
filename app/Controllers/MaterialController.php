@@ -78,10 +78,12 @@ class MaterialController extends BaseController
     public function index()
     {
         $area = session()->get('username');
+        $role = session()->get('role');
         $noModel = $this->DetailPlanningModel->getNoModelAktif($area);
         $data = [
             'role' => session()->get('role'),
             'area' => $area,
+            'role' => $role,
             'title' => 'Bahan Baku',
             'active1' => '',
             'active2' => '',
@@ -232,21 +234,23 @@ class MaterialController extends BaseController
 
         return $this->response->setJSON($data);
     }
-    // public function savePemesananSession()
-    // {
-    //     // ambil data dari post
-    //     $items = $this->request->getPost('items');
+    public function savePemesananSession()
+    {
+        // ambil data dari post
+        $items = $this->request->getPost('items');
 
-    //     // ambil data lama dari session jika ada
-    //     $exitingData = session()->get('pemesananBb') ?? [];
+        // ambil data lama dari session jika ada
+        $exitingData = session()->get('pemesananBb') ?? [];
 
-    //     // gabungkan data lama dengan data baru
-    //     $updateData = array_merge($exitingData, $items);
+        // gabungkan data lama dengan data baru
+        $updateData = array_merge($exitingData, $items);
 
-    //     // simpan ke session
-    //     session()->set('pemesananBb', $updateData);
+        // simpan ke session
+        session()->set('pemesananBb', $updateData);
 
-    //     // beri responsatau redirect
-    //     return redirect()->back()->with('success', 'Data berhasil di simpan ke session');
-    // }
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Data berhasil disimpan ke session'
+        ]);
+    }
 }
