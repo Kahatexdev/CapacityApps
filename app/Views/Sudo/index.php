@@ -57,7 +57,7 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold"> OEE </p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    %
+                                    78 %
 
                                     <span class=" text-sm font-weight-bolder"></span>
                                 </h5>
@@ -81,7 +81,7 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Deffect Rate </p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    %
+                                    <?= number_format($deffect, 2) ?>%
                                     <span class=" text-sm font-weight-bolder"></span>
                                 </h5>
                             </div>
@@ -103,7 +103,7 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Output</p>
                                 <h5 class="font-weight-bolder mb-0">
-
+                                    <?= $output / 2 ?>
                                     <span class=" text-sm font-weight-bolder">pairs </span>
 
                                 </h5>
@@ -124,10 +124,10 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Order Finished</p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">PPH</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    8
-                                    <span class=" text-sm font-weight-bolder">This Month</span>
+                                    <?= $pph ?>
+                                    <span class=" text-sm font-weight-bolder">pairs/hour</span>
                                 </h5>
                             </div>
                         </div>
@@ -144,13 +144,30 @@
     <div class="row my-3">
         <div class="col-lg-12">
             <div class="card z-index-2">
-                <div class="card-header pb-0">
-                    <h6>Daily Placed Order</h6>
-
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h6 class="card-title">Data Produksi Harian</h6>
+                    <div>
+                        <select id="filter-bulan" class="form-control d-inline w-auto">
+                            <option value="">Semua Bulan</option>
+                            <?php for ($i = 1; $i <= 12; $i++): ?>
+                                <option value="<?= str_pad($i, 2, '0', STR_PAD_LEFT) ?>"><?= date("F", mktime(0, 0, 0, $i, 1)) ?></option>
+                            <?php endfor; ?>
+                        </select>
+                        <select id="filter-tahun" class="form-control d-inline w-auto">
+                            <option value="">Semua Tahun</option>
+                            <?php for ($i = date("Y") - 5; $i <= date("Y"); $i++): ?>
+                                <option value="<?= $i ?>"><?= $i ?></option>
+                            <?php endfor; ?>
+                        </select>
+                    </div>
                 </div>
                 <div class="card-body p-3">
-                    <div class="chart">
-                        <canvas id="mixed-chart" class="chart-canvas" height="300"></canvas>
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12">
+                            <div class="chart">
+                                <canvas id="mixed-chart" class="chart-canvas" height="300"></canvas>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -180,113 +197,96 @@
         });
     });
 </script>
+
 <script>
-    let data = <?php echo json_encode($order); ?>;
-    console.log(data)
-    // Ekstraksi tanggal dan jumlah produksi dari data
-    let labels = data.map(item => item.created_at);
-    let values = data.map(item => item.total_produksi);
+    let chartInstance = null;
 
+    function fetchData(bulan, tahun) {
+        $.ajax({
+            url: "<?= base_url('chart/getProductionData') ?>",
+            type: "GET",
+            data: {
+                bulan: bulan,
+                tahun: tahun
+            },
+            dataType: "json",
+            success: function(response) {
+                updateChart(response);
+            }
+        });
+    }
 
-    var ctx2 = document.getElementById("mixed-chart").getContext("2d");
+    function updateChart(data) {
+        let labels = data.map(item => item.tgl_produksi);
+        let values = data.map(item => (item.qty_produksi / 24).toFixed(0));
 
-    var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
 
-    gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
-    gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-    gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)'); //purple colors
-
-    var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
-    gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-    gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)'); //purple colors
-
-    new Chart(ctx2, {
-
-        data: {
-            labels: labels,
-            datasets: [{
-                    type: "bar",
-                    label: "Data Turun Order",
-                    borderWidth: 0,
-                    pointRadius: 30,
-
+        var ctx2 = document.getElementById("mixed-chart").getContext("2d");
+        chartInstance = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Jumlah Produksi",
                     backgroundColor: "#3A416F",
-                    fill: true,
                     data: values,
                     maxBarThickness: 20
-
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
                 },
-                {
-                    type: "line",
-
-                    tension: 0.1,
-                    borderWidth: 0,
-                    pointRadius: 0,
-                    borderColor: "#3A416F",
-                    borderWidth: 2,
-                    backgroundColor: gradientStroke1,
-                    fill: true,
-                    data: values,
-                },
-            ],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false,
+                scales: {
+                    y: {
+                        grid: {
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            padding: 10
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            padding: 10
+                        }
+                    }
                 }
-            },
-            interaction: {
-                intersect: false,
-                mode: 'index',
-            },
-            scales: {
-                y: {
-                    grid: {
-                        drawBorder: false,
-                        display: true,
-                        drawOnChartArea: true,
-                        drawTicks: false,
-                        borderDash: [5, 5]
-                    },
-                    ticks: {
-                        display: true,
-                        padding: 10,
-                        color: '#b2b9bf',
-                        font: {
-                            size: 11,
-                            family: "Open Sans",
-                            style: 'normal',
-                            lineHeight: 2
-                        },
-                    }
-                },
-                x: {
-                    grid: {
-                        drawBorder: false,
-                        display: false,
-                        drawOnChartArea: false,
-                        drawTicks: false,
-                        borderDash: [5, 5]
-                    },
-                    ticks: {
-                        display: true,
-                        color: '#b2b9bf',
-                        padding: 20,
-                        font: {
-                            size: 11,
-                            family: "Open Sans",
-                            style: 'normal',
-                            lineHeight: 2
-                        },
-                    }
-                },
-            },
-        },
+            }
+        });
+    }
+
+    // Event listener filter bulan & tahun
+    document.getElementById("filter-bulan").addEventListener("change", function() {
+        let bulan = this.value.padStart(2, "0"); // Pastikan selalu dua digit
+        let tahun = document.getElementById("filter-tahun").value;
+        fetchData(bulan, tahun);
     });
+
+    document.getElementById("filter-tahun").addEventListener("change", function() {
+        let bulan = document.getElementById("filter-bulan").value.padStart(2, "0");
+        let tahun = this.value;
+        fetchData(bulan, tahun);
+    });
+
+    // Load awal dengan bulan & tahun sekarang
+    let currentDate = new Date();
+    let defaultBulan = String(currentDate.getMonth() + 1).padStart(2, "0");
+    let defaultTahun = currentDate.getFullYear();
+
+    document.getElementById("filter-bulan").value = defaultBulan;
+    document.getElementById("filter-tahun").value = defaultTahun;
+
+    fetchData(defaultBulan, defaultTahun);
 </script>
 <?php $this->endSection(); ?>

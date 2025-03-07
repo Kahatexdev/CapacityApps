@@ -309,4 +309,25 @@ class ProduksiModel extends Model
         }
         return $qty;
     }
+    public function prodYesterday($yesterday)
+    {
+        return $this->select('sum(qty_produksi) as prod')
+            ->where('tgl_produksi', $yesterday)
+            ->groupBy('tgl_produksi')
+            ->first();
+    }
+    public function direcYesterday($yesterday)
+    {
+        $mesin = $this->select('area, COUNT(DISTINCT no_mesin) as jumlah_mesin')
+            ->where('tgl_produksi', $yesterday)
+            ->groupBy('area')
+            ->findAll();
+        $totalMesin = 0;
+        foreach ($mesin as $mc) {
+            $totalMesin += $mc['jumlah_mesin'];
+        }
+
+
+        return $totalMesin;
+    }
 }

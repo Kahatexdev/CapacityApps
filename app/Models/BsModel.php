@@ -146,4 +146,11 @@ class BsModel extends Model
 
         return $builder->get(10000)->getResultArray();
     }
+    public function bsYesTerday($yesterday)
+    {
+        return $this->select('sum(qty) as bs')
+            ->where('tgl_instocklot', $yesterday)
+            ->groupBy('tgl_instocklot')
+            ->first();
+    }
 }

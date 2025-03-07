@@ -340,17 +340,17 @@ class ProduksiController extends BaseController
         $bulan = date('m');
         $month = date('F');
         $year = date('Y');
-        $totalMesin = $this->jarumModel->getArea();
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan, $year);
+        $totalMesin = $this->jarumModel->getArea();
 
-        $dataBuyer = $this->orderModel->getBuyer();
-        $dataArea = $this->jarumModel->getArea();
-        $dataJarum = $this->jarumModel->getJarum();
 
         $produksiPerArea = [];
         foreach ($totalMesin as $area) {
             $produksiPerArea[$area] = $this->produksiModel->getProduksiPerArea($area, $bulan, $year);
         }
+        $dataBuyer = $this->orderModel->getBuyer();
+        $dataArea = $this->jarumModel->getArea();
+        $dataJarum = $this->jarumModel->getJarum();
 
         $data = [
             'role' => session()->get('role'),

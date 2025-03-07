@@ -14,6 +14,7 @@ use App\Models\CancelModel;
 use App\Models\LiburModel;
 use App\Models\AksesModel;
 use App\Models\AreaModel;
+use App\Models\BsModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\UserModel;
 use DateTime;
@@ -32,6 +33,8 @@ class GodController extends BaseController
     protected $aksesModel;
     protected $userModel;
     protected $areaModel;
+    protected $BsModel;
+
     public function __construct()
     {
 
@@ -45,6 +48,8 @@ class GodController extends BaseController
         $this->aksesModel = new AksesModel();
         $this->userModel = new UserModel();
         $this->areaModel = new AreaModel();
+        $this->BsModel = new BsModel();
+
         if ($this->filters   = ['role' => ['capacity', 'planning', 'god', session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -63,8 +68,20 @@ class GodController extends BaseController
         $mcJalan = $this->jarumModel->mcJalan();
         $totalMc = $this->jarumModel->totalMc();
         $bulan = date('m');
+        $yesterday = date('Y-m-d', strtotime('5 days ago'));
+        $month = date('F');
+        $year = date('Y');
+        $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan, $year);
+        $totalMesin = $this->jarumModel->getArea();
 
 
+
+        $prodYesterday = $this->produksiModel->prodYesterday($yesterday);
+        $bs = $this->BsModel->bsYesTerday($yesterday);
+        $direct = $this->produksiModel->direcYesterday($yesterday);
+
+        $deffectRate = ($bs['bs'] / $prodYesterday['prod']) * 100;
+        $pph = round(($prodYesterday['prod'] / 2) / ($direct / 24 / 60));
         $data = [
             'role' => session()->get('role'),
             'title' => 'Capacity System',
@@ -79,7 +96,12 @@ class GodController extends BaseController
             'TerimaBooking' => $terimaBooking,
             'mcJalan' => $mcJalan,
             'totalMc' => $totalMc,
+            'output' => $prodYesterday['prod'],
+            'deffect' => $deffectRate,
+            'pph' => $pph,
             'order' => $this->ApsPerstyleModel->getTurunOrder($bulan),
+            'Produksi' => $dataProduksi,
+
 
 
         ];
