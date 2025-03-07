@@ -129,6 +129,7 @@ class ApiController extends ResourceController
                 $result[$key] = [
                     'area' => $item['factory'],
                     'no_model' => $item['no_model'],
+                    'size' => $item['size'],
                     'qty' => $item['qty'],
                     'sisa' => $item['sisa'],
                     'bruto' => $item['bruto'],
