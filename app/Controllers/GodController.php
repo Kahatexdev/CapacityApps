@@ -68,7 +68,7 @@ class GodController extends BaseController
         $mcJalan = $this->jarumModel->mcJalan();
         $totalMc = $this->jarumModel->totalMc();
         $bulan = date('m');
-        $yesterday = date('Y-m-d', strtotime('5 days ago'));
+        $yesterday = date('Y-m-d', strtotime('2 days ago'));
         $month = date('F');
         $year = date('Y');
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan, $year);
