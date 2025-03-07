@@ -118,4 +118,17 @@ class BsMesinModel extends Model
             ->findAll();
         return $bs;
     }
+    public function getBsMesinPph($area, $nomodel)
+    {
+        return $this->select('apsperstyle.factory, apsperstyle.mastermodel, apsperstyle.size, (SELECT SUM(qty_pcs) FROM bs_mesin AS b WHERE b.no_model = apsperstyle.mastermodel AND b.area = apsperstyle.factory AND b.size = apsperstyle.size) AS bs_pcs,')
+            ->join(
+                'apsperstyle', 
+                'apsperstyle.factory = bs_mesin.area AND apsperstyle.mastermodel = bs_mesin.no_model AND apsperstyle.size = bs_mesin.size', 
+                'left'
+            )
+            ->where('apsperstyle.factory', $area)
+            ->where('apsperstyle.mastermodel', $nomodel)
+            ->groupBy('apsperstyle.size')
+            ->findAll(); // Ambil satu hasil
+    }
 }

@@ -15,6 +15,7 @@ use App\Models\ProduksiModel;
 use App\Models\BsMesinModel;
 use App\Models\DetailPlanningModel;
 use App\Models\AreaModel;
+use App\Models\BsModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ApiController extends ResourceController
@@ -30,6 +31,7 @@ class ApiController extends ResourceController
     protected $BsMesinModel;
     protected $DetailPlanningModel;
     protected $areaModel;
+    protected $bsModel;
     protected $format = 'json';
     public function __construct()
     {
@@ -42,6 +44,7 @@ class ApiController extends ResourceController
         $this->DetailPlanningModel = new DetailPlanningModel();
         $this->BsMesinModel = new BsMesinModel();
         $this->areaModel = new AreaModel();
+        $this->bsModel = new BsModel();
         $this->validation = \Config\Services::validation();
     }
     public function index()
@@ -87,28 +90,54 @@ class ApiController extends ResourceController
 
         return $this->respond($startMc, 200);
     }
-    public function getDataForPPH()
+    public function getDataForPPH($area, $nomodel)
     {
-        $area = $this->request->getGet('area');
-        $masterModel = $this->request->getGet('pdk');
-        $size = $this->request->getGet('size'); // Perbaiki key `size`
-
-        if (!$area || !$masterModel || !$size) {
+        if (!$area || !$nomodel) {
             return $this->response->setJSON([
                 "error" => "Parameter tidak lengkap",
                 "received" => [
                     "area" => $area,
-                    "pdk" => $masterModel,
-                    "size" => $size
+                    "pdk" => $masterModel
                 ]
             ])->setStatusCode(400);
         }
 
-        $result = $this->orderModel->getdataSummaryPertgl([
-            'area' => $area,
-            'mastermodel' => $masterModel,
-            'size' => $size,
-        ]);
+        $prod = $this->orderModel->getDataPph($area, $nomodel);
+        $idaps = $this->ApsPerstyleModel->getIdApsForPph($area, $nomodel);
+        $idapsList = array_column($idaps, 'idapsperstyle');
+        $bsSettingData = $this->bsModel->getBsPph($idapsList);
+        $bsMesinData = $this->BsMesinModel->getBsMesinPph($area, $nomodel);
+
+        // Konversi bsMesin menjadi array asosiatif berdasarkan key
+        $bsMesin = [];
+        foreach ($bsMesinData as $bs) {
+            $key = $bs['factory'] . '-' . $bs['mastermodel'] . '-' . $bs['size'];
+            $bsMesin[$key] = $bs['bs_pcs'] ?? 0; // Jika tidak ada, default ke 0
+        }
+
+        // Konversi bsSetting menjadi array asosiatif berdasarkan key
+        $bsSetting = [];
+        foreach ($bsSettingData as $bs) {
+            $key = $bs['factory'] . '-' . $bs['mastermodel'] . '-' . $bs['size'];
+            $bsSetting[$key] = $bs['bs_setting'] ?? 0; // Jika tidak ada, default ke 0
+        }
+
+        $result = [];
+        foreach ($prod as $item) {
+            $key = $item['factory'] . '-' . $item['no_model'] . '-' . $item['size'];
+            if (!isset($result[$key])) {
+                $result[$key] = [
+                    'area' => $item['factory'],
+                    'no_model' => $item['no_model'],
+                    'qty' => $item['qty'],
+                    'sisa' => $item['sisa'],
+                    'bruto' => $item['bruto'],
+                    'bs_pcs' => $bsMesin[$key] ?? 0,    
+                    'bs_setting' => $bsSetting[$key] ?? 0
+                ];
+            }
+
+        }
 
         return $this->response->setJSON($result ?? []);
     }

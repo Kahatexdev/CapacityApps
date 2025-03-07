@@ -964,4 +964,13 @@ class ApsPerstyleModel extends Model
         $query = $data->get()->getFirstRow('array');
         return $query;
     }
+    public function getIdApsForPph($area, $no_model)
+    {
+        return $this->select('idapsperstyle')
+        ->where('factory', $area)
+        ->where('mastermodel', $no_model)
+        ->groupBy('idapsperstyle')
+        ->findAll();
+    }
+
 }

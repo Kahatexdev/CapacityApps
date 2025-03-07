@@ -551,4 +551,22 @@ class OrderModel extends Model
             ->orderBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size, bs_mesin.tanggal_produksi', 'ASC')
             ->findAll();
     }
+
+    public function getDataPph($area, $nomodel)
+    {
+        return $this->select('apsperstyle.machinetypeid, apsperstyle.factory, data_model.no_model, apsperstyle.size, apsperstyle.inisial, (SELECT SUM(qty) FROM apsperstyle AS a WHERE a.mastermodel = data_model.no_model AND a.factory = apsperstyle.factory AND a.size = apsperstyle.size) AS qty, 
+        (SELECT SUM(sisa) FROM apsperstyle AS a WHERE a.mastermodel = data_model.no_model AND a.factory = apsperstyle.factory AND a.size = apsperstyle.size) AS sisa, (SELECT SUM(po_plus) FROM apsperstyle AS a WHERE a.mastermodel = data_model.no_model AND a.factory = apsperstyle.factory AND a.size = apsperstyle.size) AS po_plus, COALESCE(SUM(produksi.qty_produksi), 0) AS bruto')
+        ->join('apsperstyle', 'apsperstyle.mastermodel=data_model.no_model', 'left')
+        ->join('produksi', 'apsperstyle.idapsperstyle=produksi.idapsperstyle', 'left')
+        ->where('apsperstyle.factory', $area)
+        ->where('data_model.no_model', $nomodel)
+        ->groupBy('apsperstyle.size')
+        ->orderBy('apsperstyle.inisial', 'ASC')
+        ->findAll();
+    }
+
+    public function getDataBsSetting()
+    {
+        
+    }
 }
