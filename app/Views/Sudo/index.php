@@ -136,10 +136,10 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">PPH</p>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">pairs/hour</p>
                                 <h5 class="font-weight-bolder mb-0" id="pph">
                                 </h5>
-                                <span class=" text-sm font-weight-bolder">pairs/hour</span>
+                                <span class=" text-sm font-weight-bolder"></span>
                             </div>
                         </div>
                         <div class="col-4 text-end">

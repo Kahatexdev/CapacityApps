@@ -71,7 +71,7 @@ class GodController extends BaseController
         $yesterday = date('Y-m-d', strtotime('14 days ago'));
         $month = date('F');
         $year = date('Y');
-        $mesin = $this->produksiModel->directMonthly($bulan, $year);
+
 
         $data = [
             'role' => session()->get('role'),
