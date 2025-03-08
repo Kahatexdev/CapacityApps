@@ -967,10 +967,16 @@ class ApsPerstyleModel extends Model
     public function getIdApsForPph($area, $no_model)
     {
         return $this->select('idapsperstyle')
-        ->where('factory', $area)
-        ->where('mastermodel', $no_model)
-        ->groupBy('idapsperstyle')
-        ->findAll();
+            ->where('factory', $area)
+            ->where('mastermodel', $no_model)
+            ->groupBy('idapsperstyle')
+            ->findAll();
     }
-
+    public function monthlyTarget($month, $year)
+    {
+        return $this->select('sum(qty) as qty, sum(sisa) as sisa')
+            ->where('Month(delivery)', $month)
+            ->where('YEAR(delivery)', $year)
+            ->first();
+    }
 }

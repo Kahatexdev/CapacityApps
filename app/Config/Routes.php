@@ -13,6 +13,9 @@ $routes->post('authverify', 'AuthController::login');
 
 // chart
 $routes->get('chart/getProductionData', 'ProduksiController::getProductionData');
+$routes->get('chart/getBsData', 'ProduksiController::getBsData');
+$routes->get('chart/dashboardData', 'GodController::dashboardData');
+$routes->get('chart/bsArea', 'ProduksiController::BsArea');
 
 // API ROUTES
 $routes->group(
