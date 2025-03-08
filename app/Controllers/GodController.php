@@ -71,7 +71,7 @@ class GodController extends BaseController
         $yesterday = date('Y-m-d', strtotime('14 days ago'));
         $month = date('F');
         $year = date('Y');
-
+        $mesin = $this->produksiModel->directMonthly($bulan, $year);
 
         $data = [
             'role' => session()->get('role'),
@@ -1043,7 +1043,8 @@ class GodController extends BaseController
                 $pph = round(($prodYesterday['prod'] / 2) / ($direct / 24));
                 $good =  $prodYesterday['prod'] - $bs['bs'];
                 $quality = ($good / $prodYesterday['prod']) * 100;
-                $percentage = ($target['sisa'] / $target['qty']) * 100;
+                $prod = $target['qty'] - $target['sisa'];
+                $percentage =  ($prod / $target['qty']) * 100;
             }
             $data = [
                 'deffect' => $deffectRate,

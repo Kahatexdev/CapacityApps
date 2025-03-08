@@ -138,8 +138,8 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">PPH</p>
                                 <h5 class="font-weight-bolder mb-0" id="pph">
-                                    <span class=" text-sm font-weight-bolder">pairs/hour</span>
                                 </h5>
+                                <span class=" text-sm font-weight-bolder">pairs/hour</span>
                             </div>
                         </div>
                         <div class="col-4 text-end">
@@ -313,7 +313,7 @@
 
     function dashboard(data) {
         let deffect = parseFloat(data.deffect).toFixed(2); // Format 2 desimal
-        let output = parseInt(data.output / 2).toLocaleString(); // Bagi 2, format angka
+        let output = parseInt(data.output / 24).toLocaleString(); // Bagi 2, format angka
         let pph = parseInt(data.pph).toLocaleString(); // Format angka
         let qty = parseInt(data.qty).toLocaleString(); // Format angka
         let sisa = parseInt(data.sisa).toLocaleString(); // Format angka
@@ -322,8 +322,8 @@
         let qtyDz = parseInt(data.qty / 24).toLocaleString()
 
         document.getElementById('deffectRate').textContent = `${deffect}%`;
-        document.getElementById('output').textContent = `${output} pairs`;
-        document.getElementById('pph').textContent = `${pph} pairs/hour`;
+        document.getElementById('output').textContent = `${output} dz`;
+        document.getElementById('pph').textContent = `${pph} `;
 
         let progres = document.getElementById("progresTarget"); // Gunakan string jika ini ID elemen
 
