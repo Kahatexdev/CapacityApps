@@ -59,7 +59,7 @@
                                 <div class="col-md-12">
                                     <input type="hidden" name="area" id="area" value="<?= $area ?>">
                                     <label>Tanggal Pakai</label>
-                                    <input type="date" class="form-control" id="tgl_pakai" name="tgl_pakai" required>
+                                    <input type="date" class="form-control" id="tgl_pakai" name="tgl_pakai" min="<?= date('Y-m-d') ?>" required>
                                 </div>
                             </div>
                             <div class="row g-3 mb-2">
@@ -88,8 +88,95 @@
                                 <div class="row" id="detailBbCardsContainer">
                                     <!-- data ditampilkan disini -->
                                 </div>
+                                <button type="submit" class="btn btn-info w-100">Simpan Ke Tabel</button>
                             </div>
-                            <button type="submit" class="btn btn-info w-100">Simpan Ke Tabel</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row my-4">
+        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <h5 class="font-weight-bolder mb-0">
+                        List Pemesanan Bahan Baku
+                    </h5>
+                    <div class="card-body">
+                        <form action="<?= base_url($role.'/saveListPemesanan')?>" method="post">
+                            <div class="table-responsive">
+                                <table id="header" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">No</th>
+                                            <th class="text-center">Tgl Pakai</th>
+                                            <th class="text-center">No Model</th>
+                                            <th class="text-center">Style Size</th>
+                                            <th class="text-center">Item Type</th>
+                                            <th class="text-center">Kode Warna</th>
+                                            <th class="text-center">Warna</th>
+                                            <th class="text-center">Jalan Mc</th>
+                                            <th class="text-center">Total Cns</th>
+                                            <th class="text-center">Total Berat Cns</th>
+                                            <th class="text-center">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php 
+                                        $no = 1;
+                                        foreach ($groupedData as $groupKey => $group) {
+                                            // Inisialisasi total untuk grup ini
+                                            $total_jalan_mc = 0;
+                                            $total_ttl_cns = 0;
+                                            $total_ttl_berat_cns = 0;
+                                            // Tampilkan tiap record dalam grup
+                                            foreach ($group as $index => $record) {
+                                                $total_jalan_mc += number_format((float)$record['jalan_mc'], 2);
+                                                $total_ttl_cns += number_format((float)$record['ttl_cns'], 2);
+                                                $total_ttl_berat_cns += number_format((float)$record['ttl_berat_cns'], 2);
+                                                ?>
+                                                <tr>
+                                                    <input type="hidden" name="id_material[]" value="<?= $record['id_material']; ?>">
+                                                    <td class="text-center"><?= $no++; ?></td>
+                                                    <td class="text-center"><?= $record['tgl_pakai']; ?></td>
+                                                    <td class="text-center"><?= $record['no_model']; ?></td>
+                                                    <td class="text-center"><?= $record['style_size']; ?></td>
+                                                    <td class="text-center"><?= $record['item_type']; ?></td>
+                                                    <td class="text-center"><?= $record['kode_warna']; ?></td>
+                                                    <td class="text-center"><?= $record['warna']; ?></td>
+                                                    <td class="text-center"><?= $record['jalan_mc']; ?></td>
+                                                    <td class="text-center"><?= $record['ttl_cns']; ?></td>
+                                                    <td class="text-center"><?= $record['ttl_berat_cns']; ?></td>
+                                                    <td class="text-center"><a href="<?= base_url($role . '/bahanBaku/hapusSession/'.$record['id_material'])?>" class="btn btn-danger"><i class="fas fa-trash" style="height:5px;"></i></a></td>
+                                                </tr>
+                                                <?php
+                                            }
+                                            // Dapatkan data grouping dari record pertama grup
+                                            $first = $group[0];
+                                            ?>
+                                            <!-- Baris subtotal dengan informasi grouping ditampilkan di kolom yang sesuai -->
+                                            <tr class="subtotal">
+                                                <!-- Kolom No dan Tanggal Pakai bisa dikosongkan atau diberi label Total -->
+                                                <td colspan="7" class="font-weight-bolder" style="text-align: right;">TOTAL <?= $first['no_model'] . ' / ' . $first['item_type'] . ' / ' . $first['kode_warna'] . ' / ' . $first['warna']; ?></td>
+                                                <td class="text-center font-weight-bolder"><?= $total_jalan_mc; ?></td>
+                                                <td class="text-center font-weight-bolder"><?= $total_ttl_cns; ?></td>
+                                                <td class="text-center font-weight-bolder"><?= $total_ttl_berat_cns; ?></td>
+                                            </tr>
+                                            
+                                            <?php
+                                        }
+                                    ?>
+                                            <tr>
+                                                <td colspan="10" class="text-center font-weight-bolder align-middle">Hapus Semua List Pemesanan</td>
+                                                <td class="text-center"><a href="<?= base_url($role . '/bahanBaku/hapusSession') ?>" class="btn btn-danger"><i class="fas fa-trash"></i></a></td>
+
+                                            </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="submit" class="btn btn-info w-100">Buat List Pemesanan</button>
                         </form>
                     </div>
                 </div>
@@ -102,6 +189,25 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const tglPakaiInput = document.getElementById('tgl_pakai');
+    const noModelSelect = document.getElementById('no_model');
+
+    // Fungsi untuk mengubah status select berdasarkan nilai input tgl_pakai
+    function toggleNoModel() {
+        if (tglPakaiInput.value.trim() === "") {
+            noModelSelect.disabled = true;
+        } else {
+            noModelSelect.disabled = false;
+        }
+    }
+    
+    // Panggil fungsi saat halaman pertama kali dimuat
+    toggleNoModel();
+
+    // Panggil fungsi setiap kali input tgl_pakai berubah
+    tglPakaiInput.addEventListener('change', toggleNoModel);
+});
     $(document).ready(function() {
         // Inisialisasi Select2 di kolom no model
         $('#no_model').select2({
@@ -141,7 +247,7 @@
                                     <tbody>
                                         <tr>
                                             <td>
-                                                <select class="form-control style-size" name="items[${row}][style_size]">
+                                                <select class="form-control style-size" name="items[${row}][style_size]" required>
                                                     <option value="">Pilih Style Size</option>
                                                     ${data.map(item => `<option value="${item.size}">${item.size}</option>`).join('')}
                                                 </select>
@@ -200,7 +306,7 @@
                         <tbody>
                             <tr>
                                 <td>
-                                    <select class="form-control style-size" name="items[${row}][style_size]">
+                                    <select class="form-control style-size" name="items[${row}][style_size]" required>
                                         <option value="">Pilih Style Size</option>
                                         ${globalData.map(item => `<option value="${item.size}">${item.size}</option>`).join('')}
                                     </select>
@@ -247,6 +353,7 @@
         $('#detailBbCardsContainer').on('change', '.style-size', function() {
             let selectedStyleSize = $(this).val(); // Ambil nilai Style Size yang dipilih
             let jalanMcInput = $(this).closest('tr').find('.jalan-mc'); // Cari input "Jalan MC" di baris yang sama
+            let tgl_pakai = $('#tgl_pakai').val(); // Ambil nilai No Model
             let noModel = $('#no_model').val(); // Ambil nilai No Model
             let area = $('#area').val(); // Ambil nilai No Model
             // Cari elemen <tbody> "material-usage" yang terkait dengan baris ini
@@ -307,6 +414,7 @@
 
                         // Iterasi data yang diterima dari API dan tambahkan ke tabel
                         response.forEach(function(item, index) {
+                            const uniqueKey = `${row}_${index}`;
                             const total = (item.qty_cns * item.berat_cns).toFixed(2);
                             const jalanMc = parseFloat(jalanMcInput.val()) || 0; // Ganti dengan input jalanMc yang sesuai
                             const totalCones = (item.qty_cns * jalanMc).toFixed(2);
@@ -314,36 +422,42 @@
 
                             table.append(`
                             <tr>
-                            <input type="hidden" class="form-control text-center" name="items[${index}][no]" id="id_material" value="${item.id_material}" readonly>
-                                <td width=20><input type="text" class="form-control text-center" name="items[${index}][no]" id="no" value="${index + 1}" readonly></td>
-                                <td width=50><input type="text" class="form-control text-center" name="items[${index}][komposisi]" id="komposisi" value="${item.composition}" readonly></td>
-                                <td width=50><input type="text" class="form-control text-center" name="items[${index}][loss]" id="loss" value="${item.loss}" readonly></td>
-                                <td width=120><input type="text" class="form-control text-center" name="items[${index}][ttl_keb]" id="ttl_keb" value="${item.gw}" readonly></td>
-                                <td><input type="text" class="form-control text-center" name="items[${index}][item_type]" id="item_type" value="${item.item_type}" readonly></td>
-                                <td><input type="text" class="form-control text-center" name="items[${index}][kode_warna]" id="kode_warna" value="${item.kode_warna}" readonly></td>
-                                <td><input type="text" class="form-control text-center" name="items[${index}][warna]" id="warna" value="${item.color}" readonly></td>
+                                // kolom hide
+                                <input type="hidden" class="form-control text-center" name="items[${uniqueKey}][tgl_pakai]" id="tgl_pakai" value="${tgl_pakai}" readonly>
+                                <input type="hidden" class="form-control text-center" name="items[${uniqueKey}][no_model]" id="no_model" value="${noModel}" readonly>
+                                <input type="hidden" class="form-control text-center" name="items[${uniqueKey}][style_size]" id="style_size" value="${selectedStyleSize}" readonly>
+                                <input type="hidden" class="form-control text-center" name="items[${uniqueKey}][jalan_mc]" id="jalan_mc" value="${jalanMc}" readonly>
+                                <input type="hidden" class="form-control text-center" name="items[${uniqueKey}][id_material]" id="id_material" value="${item.id_material}" readonly>
+                                // 
+                                <td width=20><input type="text" class="form-control text-center" name="items[${uniqueKey}][no]" id="no" value="${index + 1}" readonly></td>
+                                <td width=50><input type="text" class="form-control text-center" name="items[${uniqueKey}][komposisi]" id="komposisi" value="${item.composition}" readonly></td>
+                                <td width=50><input type="text" class="form-control text-center" name="items[${uniqueKey}][loss]" id="loss" value="${item.loss}" readonly></td>
+                                <td width=120><input type="text" class="form-control text-center" name="items[${uniqueKey}][ttl_keb]" id="ttl_keb" value="${item.gw}" readonly></td>
+                                <td><input type="text" class="form-control text-center" name="items[${uniqueKey}][item_type]" id="item_type" value="${item.item_type}" readonly></td>
+                                <td><input type="text" class="form-control text-center" name="items[${uniqueKey}][kode_warna]" id="kode_warna" value="${item.kode_warna}" readonly></td>
+                                <td><input type="text" class="form-control text-center" name="items[${uniqueKey}][warna]" id="warna" value="${item.color}" readonly></td>
                             </tr>
                             <tr>
                                 <td></td>
                                 <td class="text-center">
                                     Qty Cones:
-                                    <input type="number" step="0.01" class="form-control text-center qty_cns" name="items[${index}][qty_cns]" id="qty_cns" value="${item.qty_cns}">    
+                                    <input type="number" step="0.01" class="form-control text-center qty_cns" name="items[${uniqueKey}][qty_cns]" id="qty_cns" value="${item.qty_cns}">    
                                 </td>
                                 <td class="text-center">
                                     Berat Cones:
-                                    <input type="number" step="0.01" class="form-control text-center berat_cns" name="items[${index}][berat_cns]" id="berat_cns" value="${item.berat_cns}">
+                                    <input type="number" step="0.01" class="form-control text-center berat_cns" name="items[${uniqueKey}][berat_cns]" id="berat_cns" value="${item.berat_cns}">
                                 </td>
                                 <td class="text-center">
                                     Total:
-                                    <input type="number" step="0.01" class="form-control text-center ttl" name="items[${index}][ttl]" id="ttl" value="${total}" readonly>
+                                    <input type="number" step="0.01" class="form-control text-center ttl" name="items[${uniqueKey}][ttl]" id="ttl" value="${total}" readonly>
                                 </td>
                                 <td class="text-center">
                                     Total Cones:
-                                    <input type="number" step="0.01" class="form-control text-center ttl_cns" name="items[${index}][ttl_cns]" id="ttl_cns" value="${totalCones}" readonly>
+                                    <input type="number" step="0.01" class="form-control text-center ttl_cns" name="items[${uniqueKey}][ttl_cns]" id="ttl_cns" value="${totalCones}" readonly>
                                 </td>
                                 <td class="text-center">
                                     Total Berat Cones:
-                                    <input type="number" step="0.01" class="form-control text-center ttl_berat_cns" name="items[${index}][ttl_berat_cns]" id="ttl_berat_cns" value="${totalBeratCones}" readonly>
+                                    <input type="number" step="0.01" class="form-control text-center ttl_berat_cns" name="items[${uniqueKey}][ttl_berat_cns]" id="ttl_berat_cns" value="${totalBeratCones}" readonly>
                                 </td>
                                 <td></td>
                             </tr>
@@ -379,6 +493,28 @@
         // Submit form untuk menyimpan ke session
         $('#pemesananBbForm').submit(function(e) {
             e.preventDefault();
+            $('.style-size').removeAttr('name');
+            $('.jalan-mc').removeAttr('name');
+            // Periksa apakah tabel Material Usage kosong
+            let isMaterialUsageEmpty = true;
+            $('.material-usage').each(function() {
+                if ($(this).find('tr').length > 0) {
+                    isMaterialUsageEmpty = false;
+                    return false; // Hentikan iterasi jika ada data
+                }
+            });
+
+            if (isMaterialUsageEmpty) {
+                Swal.fire({
+                    title: "Peringatan!",
+                    text: "Data Material Usage kosong. Tidak dapat menyimpan ke session.",
+                    icon: "warning",
+                    confirmButtonText: "OK"
+                });
+                return; // Hentikan proses submit jika tabel kosong
+            }
+
+            // Jika tabel tidak kosong, lanjutkan proses submit
             var formData = $(this).serializeArray();
 
             $.ajax({
@@ -388,9 +524,9 @@
                 success: function(response) {
                     console.log(response);
                     Swal.fire({
-                        title: "Sukses!",
+                        title: response.title,
                         text: response.message,
-                        icon: "success",
+                        icon: response.status,
                         showConfirmButton: false,
                         timer: 1500
                     }).then(() => {

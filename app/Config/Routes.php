@@ -455,7 +455,10 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('getStyleSizeByNoModel', 'MaterialController::getStyleSizeByNoModel');
     $routes->post('getJalanMc', 'MaterialController::getJalanMcByModelSize');
     $routes->get('getMU/(:any)/(:any)', 'MaterialController::getMU/$1/$2');
-    $routes->post('bahanBaku/simpanKeSession', 'MaterialController::saveSession');
+    $routes->post('bahanBaku/simpanKeSession', 'MaterialController::savePemesananSession');
+    $routes->get('bahanBaku/hapusSession', 'MaterialController::deleteAllPemesananSession');
+    $routes->get('bahanBaku/hapusSession/(:any)', 'MaterialController::deletePemesananSession/$1');
+    $routes->post('saveListPemesanan', 'MaterialController::saveListPemesanan');
 });
 
 // sudo
