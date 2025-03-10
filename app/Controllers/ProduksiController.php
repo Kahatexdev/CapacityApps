@@ -340,17 +340,17 @@ class ProduksiController extends BaseController
         $bulan = date('m');
         $month = date('F');
         $year = date('Y');
-        $totalMesin = $this->jarumModel->getArea();
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan, $year);
+        $totalMesin = $this->jarumModel->getArea();
 
-        $dataBuyer = $this->orderModel->getBuyer();
-        $dataArea = $this->jarumModel->getArea();
-        $dataJarum = $this->jarumModel->getJarum();
 
         $produksiPerArea = [];
         foreach ($totalMesin as $area) {
             $produksiPerArea[$area] = $this->produksiModel->getProduksiPerArea($area, $bulan, $year);
         }
+        $dataBuyer = $this->orderModel->getBuyer();
+        $dataArea = $this->jarumModel->getArea();
+        $dataJarum = $this->jarumModel->getJarum();
 
         $data = [
             'role' => session()->get('role'),
@@ -1256,6 +1256,44 @@ class ProduksiController extends BaseController
                 ->where('YEAR(tgl_produksi)', $tahun);
 
             $data = $query->findAll();
+
+            return $this->response->setJSON($data);
+        } catch (\Exception $e) {
+            return $this->response->setJSON(['error' => $e->getMessage()]);
+        }
+    }
+    public function getBsData()
+    {
+        $bulan = $this->request->getGet('bulan');
+        $tahun = $this->request->getGet('tahun');
+
+
+        if (!$bulan || !$tahun) {
+            return $this->response->setJSON(['error' => 'Bulan dan Tahun wajib diisi']);
+        }
+
+        try {
+
+            $data = $this->BsModel->getBsPerhari($bulan, $tahun);
+
+            return $this->response->setJSON($data);
+        } catch (\Exception $e) {
+            return $this->response->setJSON(['error' => $e->getMessage()]);
+        }
+    }
+    public function BsArea()
+    {
+        $bulan = $this->request->getGet('bulan');
+        $tahun = $this->request->getGet('tahun');
+
+
+        if (!$bulan || !$tahun) {
+            return $this->response->setJSON(['error' => 'Bulan dan Tahun wajib diisi']);
+        }
+
+        try {
+
+            $data = $this->BsModel->getBsPerArea($bulan, $tahun);
 
             return $this->response->setJSON($data);
         } catch (\Exception $e) {

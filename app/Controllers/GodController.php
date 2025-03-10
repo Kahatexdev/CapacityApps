@@ -14,6 +14,7 @@ use App\Models\CancelModel;
 use App\Models\LiburModel;
 use App\Models\AksesModel;
 use App\Models\AreaModel;
+use App\Models\BsModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\UserModel;
 use DateTime;
@@ -32,6 +33,8 @@ class GodController extends BaseController
     protected $aksesModel;
     protected $userModel;
     protected $areaModel;
+    protected $BsModel;
+
     public function __construct()
     {
 
@@ -45,6 +48,8 @@ class GodController extends BaseController
         $this->aksesModel = new AksesModel();
         $this->userModel = new UserModel();
         $this->areaModel = new AreaModel();
+        $this->BsModel = new BsModel();
+
         if ($this->filters   = ['role' => ['capacity', 'planning', 'god', session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -63,6 +68,9 @@ class GodController extends BaseController
         $mcJalan = $this->jarumModel->mcJalan();
         $totalMc = $this->jarumModel->totalMc();
         $bulan = date('m');
+        $yesterday = date('Y-m-d', strtotime('14 days ago'));
+        $month = date('F');
+        $year = date('Y');
 
 
         $data = [
@@ -78,8 +86,8 @@ class GodController extends BaseController
             'jalan' => $orderJalan,
             'TerimaBooking' => $terimaBooking,
             'mcJalan' => $mcJalan,
-            'totalMc' => $totalMc,
-            'order' => $this->ApsPerstyleModel->getTurunOrder($bulan),
+
+
 
 
         ];
@@ -1007,5 +1015,52 @@ class GodController extends BaseController
             }
         }
         $db->transComplete();
+    }
+    public function dashboardData()
+    {
+        $bulan = $this->request->getGet('bulan');
+        $tahun = $this->request->getGet('tahun');
+
+
+        if (!$bulan || !$tahun) {
+            return $this->response->setJSON(['error' => 'Bulan dan Tahun wajib diisi']);
+        }
+
+        try {
+            $prodYesterday = $this->produksiModel->monthlyProd($bulan, $tahun);
+            $bs = $this->BsModel->bsMonthly($bulan, $tahun);
+            $direct = $this->produksiModel->directMonthly($bulan, $tahun);
+            $target = $this->ApsPerstyleModel->monthlyTarget($bulan, $tahun);
+
+            if (empty($prodYesterday)) {
+                $deffectRate = 0;
+                $pph = 0;
+                $quality = 0;
+                $percentage = 0;
+            } else {
+
+                $deffectRate = ($bs['bs'] / $prodYesterday['prod']) * 100;
+                $pph = round(($prodYesterday['prod'] / 2) / ($direct / 24));
+                $good =  $prodYesterday['prod'] - $bs['bs'];
+                $quality = ($good / $prodYesterday['prod']) * 100;
+                $prod = $target['qty'] - $target['sisa'];
+                $percentage =  ($prod / $target['qty']) * 100;
+            }
+            $data = [
+                'deffect' => $deffectRate,
+                'bs' => $bs['bs'] ?? 0,
+                'output' => $prodYesterday['prod'] ?? 0,
+                'pph' => $pph,
+                'qty' => $target['qty'] ?? 0,
+                'sisa' => $target['sisa'] ?? 0,
+                'quality' => $quality,
+                'percentage' => $percentage,
+
+            ];
+
+            return $this->response->setJSON($data);
+        } catch (\Exception $e) {
+            return $this->response->setJSON(['error' => $e->getMessage()]);
+        }
     }
 }

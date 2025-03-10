@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Month;
 
 class BsModel extends Model
 {
@@ -145,5 +146,40 @@ class BsModel extends Model
             ->where('data_bs.size IS NULL');
 
         return $builder->get(10000)->getResultArray();
+    }
+    public function getBsPph($idaps)
+    {
+        return $this->select('apsperstyle.factory, apsperstyle.mastermodel, apsperstyle.size, SUM(data_bs.qty) AS bs_setting')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle=data_bs.idapsperstyle', 'left')
+            ->whereIn('data_bs.idapsperstyle', $idaps)
+            ->groupBy('apsperstyle.size')
+            ->findAll(); // Ambil satu hasil
+    }
+    public function bsMonthly($bulan, $tahun)
+    {
+        return $this->select('sum(qty) as bs')
+            ->where('MONTH(tgl_instocklot)', $bulan)
+            ->where('YEAR(tgl_instocklot)', $tahun)
+            ->first();
+    }
+    public function getBsPerhari($bulan, $year)
+    {
+        return $this->select('master_deffect.Keterangan, SUM(data_bs.qty) as qty')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle')
+            ->join('master_deffect', 'master_deffect.kode_deffect = data_bs.kode_deffect')
+            ->where('MONTH(tgl_instocklot)', $bulan)
+            ->where('YEAR(tgl_instocklot)', $year)
+            ->groupBy('master_deffect.Keterangan')
+            ->orderBy('qty', 'DESC')
+            ->findAll();
+    }
+    public function getBsPerArea($bulan, $tahun)
+    {
+        return $this->select('area,sum(qty) as bs')
+            ->where('MONTH(tgl_instocklot)', $bulan)
+            ->where('YEAR(tgl_instocklot)', $tahun)
+            ->groupBy('area')
+            ->orderBy('bs', 'DESC')
+            ->findAll();
     }
 }
