@@ -108,6 +108,7 @@ class ApiController extends ResourceController
         $idapsList = array_column($idaps, 'idapsperstyle');
         $bsSettingData = $this->bsModel->getBsPph($idapsList) ?? 0;
         $bsMesinData = $this->BsMesinModel->getBsMesinPph($area, $model, $size) ?? 0;
+        $bsMesin = $bsMesinData['bs_gram'];
         $result = [
             "machinetypeid" => $prod["machinetypeid"],
             "area" => $area,
@@ -119,7 +120,7 @@ class ApiController extends ResourceController
             "po_plus" => $prod["po_plus"],
             "bruto" => $prod["bruto"],
             "bs_setting" => $bsSettingData['bs_setting'],
-            "bs_mesin" => $bsMesinData,
+            "bs_mesin" => $bsMesin,
         ];
         return $this->response->setJSON($result);
     }
