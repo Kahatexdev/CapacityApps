@@ -113,7 +113,7 @@ class ApiController extends ResourceController
             "area" => $area,
             "no_model" => $model,
             "size" => $size,
-            "inisial" =>  $prod["inisial"],
+            "inisial" =>  $prod["inisial"] ?? null,
             "qty" => $prod["qty"],
             "sisa" =>    $prod["sisa"],
             "po_plus" => $prod["po_plus"],
