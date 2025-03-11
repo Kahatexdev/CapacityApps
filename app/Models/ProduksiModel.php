@@ -309,23 +309,26 @@ class ProduksiModel extends Model
         }
         return $qty;
     }
-    public function prodYesterday($yesterday)
+    public function monthlyProd($bulan, $tahun)
     {
         return $this->select('sum(qty_produksi) as prod')
-            ->where('tgl_produksi', $yesterday)
-            ->groupBy('tgl_produksi')
+            ->where('MONTH(tgl_produksi)', $bulan)
+            ->where('YEAR(tgl_produksi)', $tahun)
+            ->groupBy("DATE_FORMAT(tgl_produksi, '%Y-%m')")
             ->first();
     }
-    public function direcYesterday($yesterday)
+    public function directMonthly($bulan, $tahun)
     {
         $mesin = $this->select('area, COUNT(DISTINCT no_mesin) as jumlah_mesin')
-            ->where('tgl_produksi', $yesterday)
+            ->where('MONTH(tgl_produksi)', 02)
+            ->where('YEAR(tgl_produksi)', 2025)
             ->groupBy('area')
             ->findAll();
         $totalMesin = 0;
         foreach ($mesin as $mc) {
             $totalMesin += $mc['jumlah_mesin'];
         }
+
 
 
         return $totalMesin;

@@ -90,58 +90,39 @@ class ApiController extends ResourceController
 
         return $this->respond($startMc, 200);
     }
-    public function getDataForPPH($area, $nomodel)
+
+    public function getDataPerinisial($area, $model, $size)
     {
-        if (!$area || !$nomodel) {
+        if (!$area || !$model || !$size) {
             return $this->response->setJSON([
                 "error" => "Parameter tidak lengkap",
                 "received" => [
                     "area" => $area,
-                    "nomodel" => $nomodel
+                    "nomodel" => $model,
+                    "size" => $size,
                 ]
             ])->setStatusCode(400);
         }
-
-        $prod = $this->orderModel->getDataPph($area, $nomodel);
-        $idaps = $this->ApsPerstyleModel->getIdApsForPph($area, $nomodel);
+        $prod = $this->orderModel->getDataPph($area, $model, $size);
+        $idaps = $this->ApsPerstyleModel->getIdApsForPph($area, $model, $size);
         $idapsList = array_column($idaps, 'idapsperstyle');
-        $bsSettingData = $this->bsModel->getBsPph($idapsList);
-        $bsMesinData = $this->BsMesinModel->getBsMesinPph($area, $nomodel);
-
-        // Konversi bsMesin menjadi array asosiatif berdasarkan key
-        $bsMesin = [];
-        foreach ($bsMesinData as $bs) {
-            $key = $bs['factory'] . '-' . $bs['mastermodel'] . '-' . $bs['size'];
-            $bsMesin[$key] = $bs['bs_pcs'] ?? 0; // Jika tidak ada, default ke 0
-        }
-
-        // Konversi bsSetting menjadi array asosiatif berdasarkan key
-        $bsSetting = [];
-        foreach ($bsSettingData as $bs) {
-            $key = $bs['factory'] . '-' . $bs['mastermodel'] . '-' . $bs['size'];
-            $bsSetting[$key] = $bs['bs_setting'] ?? 0; // Jika tidak ada, default ke 0
-        }
-
-        $result = [];
-        foreach ($prod as $item) {
-            $key = $item['factory'] . '-' . $item['no_model'] . '-' . $item['size'];
-            if (!isset($result[$key])) {
-                $result[$key] = [
-                    'area' => $item['factory'],
-                    'machinetypeid' => $item['machinetypeid'],
-                    'no_model' => $item['no_model'],
-                    'size' => $item['size'],
-                    'qty' => $item['qty'],
-                    'sisa' => $item['sisa'],
-                    'bruto' => $item['bruto'],
-                    'bs_pcs' => $bsMesin[$key] ?? 0,    
-                    'bs_setting' => $bsSetting[$key] ?? 0
-                ];
-            }
-
-        }
-
-        return $this->response->setJSON($result ?? []);
+        $bsSettingData = $this->bsModel->getBsPph($idapsList) ?? 0;
+        $bsMesinData = $this->BsMesinModel->getBsMesinPph($area, $model, $size);
+        $bsMesin = $bsMesinData['bs_gram'] ?? 0;
+        $result = [
+            "machinetypeid" => $prod["machinetypeid"],
+            "area" => $area,
+            "no_model" => $model,
+            "size" => $size,
+            "inisial" =>  $prod["inisial"] ?? null,
+            "qty" => $prod["qty"],
+            "sisa" =>    $prod["sisa"],
+            "po_plus" => $prod["po_plus"],
+            "bruto" => $prod["bruto"],
+            "bs_setting" => $bsSettingData['bs_setting'],
+            "bs_mesin" => $bsMesin,
+        ];
+        return $this->response->setJSON($result);
     }
 
     public function getArea()
