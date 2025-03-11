@@ -128,6 +128,7 @@ class ApiController extends ResourceController
             if (!isset($result[$key])) {
                 $result[$key] = [
                     'area' => $item['factory'],
+                    'machinetypeid' => $item['machinetypeid'],
                     'no_model' => $item['no_model'],
                     'size' => $item['size'],
                     'qty' => $item['qty'],
@@ -141,5 +142,19 @@ class ApiController extends ResourceController
         }
 
         return $this->response->setJSON($result ?? []);
+    }
+
+    public function getArea()
+    {
+        $area = $this->areaModel->getArea();
+        
+        // Filter agar 'name' yang mengandung 'Gedung' tidak ikut
+        $filteredArea = array_filter($area, function ($item) {
+            return stripos($item['name'], 'Gedung') === false; // Cek jika 'Gedung' tidak ada di 'name'
+        });
+
+        // Ambil hanya field 'name'
+        $result = array_column($filteredArea, 'name');
+        return $this->response->setJSON($result);
     }
 }

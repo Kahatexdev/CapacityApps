@@ -26,6 +26,7 @@ $routes->group(
         $routes->get('orderMaterial/(:any)/(:any)', 'ApiController::orderMaterial/$1/$2');
         $routes->get('reqstartmc/(:any)', 'ApiController::reqstartmc/$1');
         $routes->get('getDataForPPH/(:any)/(:any)', 'ApiController::getDataForPPH/$1/$2');
+        $routes->get('getDataArea', 'ApiController::getArea');
     }
 );
 
