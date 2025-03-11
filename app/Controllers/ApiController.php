@@ -107,8 +107,8 @@ class ApiController extends ResourceController
         $idaps = $this->ApsPerstyleModel->getIdApsForPph($area, $model, $size);
         $idapsList = array_column($idaps, 'idapsperstyle');
         $bsSettingData = $this->bsModel->getBsPph($idapsList) ?? 0;
-        $bsMesinData = $this->BsMesinModel->getBsMesinPph($area, $model, $size) ?? 0;
-        $bsMesin = $bsMesinData['bs_gram'];
+        $bsMesinData = $this->BsMesinModel->getBsMesinPph($area, $model, $size);
+        $bsMesin = $bsMesinData['bs_gram'] ?? 0;
         $result = [
             "machinetypeid" => $prod["machinetypeid"],
             "area" => $area,
