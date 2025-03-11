@@ -149,11 +149,11 @@ class BsModel extends Model
     }
     public function getBsPph($idaps)
     {
-        return $this->select('apsperstyle.factory, apsperstyle.mastermodel, apsperstyle.size, SUM(data_bs.qty) AS bs_setting')
+        return $this->select('SUM(data_bs.qty) AS bs_setting')
             ->join('apsperstyle', 'apsperstyle.idapsperstyle=data_bs.idapsperstyle', 'left')
             ->whereIn('data_bs.idapsperstyle', $idaps)
             ->groupBy('apsperstyle.size')
-            ->findAll(); // Ambil satu hasil
+            ->first(); // Ambil satu hasil
     }
     public function bsMonthly($bulan, $tahun)
     {
