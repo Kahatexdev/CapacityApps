@@ -314,20 +314,21 @@ class ProduksiModel extends Model
         return $this->select('sum(qty_produksi) as prod')
             ->where('MONTH(tgl_produksi)', $bulan)
             ->where('YEAR(tgl_produksi)', $tahun)
-            ->groupBy('tgl_produksi')
+            ->groupBy("DATE_FORMAT(tgl_produksi, '%Y-%m')")
             ->first();
     }
     public function directMonthly($bulan, $tahun)
     {
         $mesin = $this->select('area, COUNT(DISTINCT no_mesin) as jumlah_mesin')
-            ->where('MONTH(tgl_produksi)', $bulan)
-            ->where('YEAR(tgl_produksi)', $tahun)
+            ->where('MONTH(tgl_produksi)', 02)
+            ->where('YEAR(tgl_produksi)', 2025)
             ->groupBy('area')
             ->findAll();
         $totalMesin = 0;
         foreach ($mesin as $mc) {
             $totalMesin += $mc['jumlah_mesin'];
         }
+
 
 
         return $totalMesin;
