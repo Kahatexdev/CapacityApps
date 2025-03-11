@@ -103,7 +103,7 @@ class ApiController extends ResourceController
                 ]
             ])->setStatusCode(400);
         }
-        $prod = $this->orderModel->getDataPph('kk1a', 'mf4599', 'J401514-17 18X6');
+        $prod = $this->orderModel->getDataPph($area, $model, $size);
         $idaps = $this->ApsPerstyleModel->getIdApsForPph($area, $model, $size);
         $idapsList = array_column($idaps, 'idapsperstyle');
         $bsSettingData = $this->bsModel->getBsPph($idapsList) ?? 0;
