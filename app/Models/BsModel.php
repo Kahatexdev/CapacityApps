@@ -5,6 +5,8 @@ namespace App\Models;
 use CodeIgniter\Model;
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Month;
 
+use function PHPUnit\Framework\isEmpty;
+
 class BsModel extends Model
 {
     protected $table            = 'data_bs';
@@ -149,11 +151,17 @@ class BsModel extends Model
     }
     public function getBsPph($idaps)
     {
-        return $this->select('SUM(data_bs.qty) AS bs_setting')
-            ->join('apsperstyle', 'apsperstyle.idapsperstyle=data_bs.idapsperstyle', 'left')
+        $return = $this->select('SUM(data_bs.qty) AS bs_setting')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle', 'left')
             ->whereIn('data_bs.idapsperstyle', $idaps)
-            ->groupBy('apsperstyle.size')
             ->first(); // Ambil satu hasil
+
+        // Pastikan hasil tidak null sebelum dikembalikan
+        if (!$return || empty($return->bs_setting)) {
+            $return = (object) ['bs_setting' => 0];
+        }
+
+        return $return;
     }
     public function bsMonthly($bulan, $tahun)
     {
