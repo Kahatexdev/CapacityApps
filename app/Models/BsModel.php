@@ -158,7 +158,7 @@ class BsModel extends Model
 
         // Pastikan hasil tidak null sebelum dikembalikan
         if (!$return || empty($return->bs_setting)) {
-            $return = (object) ['bs_setting' => 0];
+            $return = ['bs_setting' => 0];
         }
 
         return $return;

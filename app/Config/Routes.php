@@ -31,6 +31,7 @@ $routes->group(
         $routes->get('getDataForPPH/(:any)/(:any)', 'ApiController::getDataForPPH/$1/$2');
         $routes->get('getDataPerinisial/(:any)/(:any)/(:any)', 'ApiController::getDataPerinisial/$1/$2/$3');
         $routes->get('getDataArea', 'ApiController::getArea');
+        $routes->get('getPPhPerhari/(:any)/(:any)', 'ApiController::getPPhPerhari/$1/$2');
     }
 );
 

@@ -138,4 +138,32 @@ class ApiController extends ResourceController
         $result = array_column($filteredArea, 'name');
         return $this->response->setJSON($result);
     }
+    public function getPPhPerhari($area, $tanggal)
+    {
+        $produksi = $this->produksiModel->getProduksiPerStyle($area, $tanggal);
+
+        if (!empty($produksi)) {
+            // Extract all mastermodel and size values for batch query
+            $mastermodels = array_column($produksi, 'mastermodel');
+            $sizes = array_column($produksi, 'size');
+
+            // Fetch all bs_mesin data in one query
+            $bsMesinData = $this->BsMesinModel->getBsMesinHarian($mastermodels, $sizes, $tanggal);
+
+            // Create a lookup table for fast matching
+            $bsMesinMap = [];
+            foreach ($bsMesinData as $bs) {
+                $key = $bs['mastermodel'] . '_' . $bs['size'];
+                $bsMesinMap[$key] = $bs['bs_mesin'];
+            }
+
+            // Assign bs_mesin to production data
+            foreach ($produksi as &$prod) {
+                $key = $prod['mastermodel'] . '_' . $prod['size'];
+                $prod['bs_mesin'] = $bsMesinMap[$key] ?? 0; // Default to null if not found
+            }
+        }
+
+        return $this->response->setJSON($produksi);
+    }
 }
