@@ -153,7 +153,7 @@ class ApiController extends ResourceController
             // Create a lookup table for fast matching
             $bsMesinMap = [];
             foreach ($bsMesinData as $bs) {
-                $key = $bs['mastermodel'] . '_' . $bs['size'];
+                $key = $bs['no_model'] . '_' . $bs['size'];
                 $bsMesinMap[$key] = $bs['bs_mesin'];
             }
 
