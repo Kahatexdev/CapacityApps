@@ -106,7 +106,7 @@ class ApiController extends ResourceController
         $prod = $this->orderModel->getDataPph($area, $model, $size);
         $idaps = $this->ApsPerstyleModel->getIdApsForPph($area, $model, $size);
         $idapsList = array_column($idaps, 'idapsperstyle');
-        $bsSettingData = $this->bsModel->getBsPph($idapsList) ?? 0;
+        $bsSettingData = $this->bsModel->getBsPph($idapsList);
         $bsMesinData = $this->BsMesinModel->getBsMesinPph($area, $model, $size);
         $bsMesin = $bsMesinData['bs_gram'] ?? 0;
         $result = [
@@ -128,7 +128,7 @@ class ApiController extends ResourceController
     public function getArea()
     {
         $area = $this->areaModel->getArea();
-        
+
         // Filter agar 'name' yang mengandung 'Gedung' tidak ikut
         $filteredArea = array_filter($area, function ($item) {
             return stripos($item['name'], 'Gedung') === false; // Cek jika 'Gedung' tidak ada di 'name'
