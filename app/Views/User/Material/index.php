@@ -105,7 +105,7 @@
                         List Pemesanan Bahan Baku
                     </h5>
                     <div class="card-body">
-                        <form action="<?= base_url($role.'/saveListPemesanan')?>" method="post">
+                        <form id="formPemesanan">
                             <div class="table-responsive">
                                 <table id="header" class="table table-bordered table-striped">
                                     <thead>
@@ -118,8 +118,8 @@
                                             <th class="text-center">Kode Warna</th>
                                             <th class="text-center">Warna</th>
                                             <th class="text-center">Jalan Mc</th>
-                                            <th class="text-center">Total Cns</th>
-                                            <th class="text-center">Total Berat Cns</th>
+                                            <th class="text-center">Ttl Cns</th>
+                                            <th class="text-center">Ttl Berat Cns (Kg)</th>
                                             <th class="text-center">Aksi</th>
                                         </tr>
                                     </thead>
@@ -138,18 +138,22 @@
                                                 $total_ttl_berat_cns += number_format((float)$record['ttl_berat_cns'], 2);
                                                 ?>
                                                 <tr>
+                                                    <!-- kolom hide -->
+                                                    <input type="hidden" name="role" value="<?= $role; ?>">
                                                     <input type="hidden" name="id_material[]" value="<?= $record['id_material']; ?>">
+                                                    <input type="hidden" name="area[]" value="<?= $area; ?>">
+                                                    <!-- kolom hide end -->
                                                     <td class="text-center"><?= $no++; ?></td>
-                                                    <td class="text-center"><?= $record['tgl_pakai']; ?></td>
-                                                    <td class="text-center"><?= $record['no_model']; ?></td>
-                                                    <td class="text-center"><?= $record['style_size']; ?></td>
-                                                    <td class="text-center"><?= $record['item_type']; ?></td>
-                                                    <td class="text-center"><?= $record['kode_warna']; ?></td>
-                                                    <td class="text-center"><?= $record['warna']; ?></td>
-                                                    <td class="text-center"><?= $record['jalan_mc']; ?></td>
-                                                    <td class="text-center"><?= $record['ttl_cns']; ?></td>
-                                                    <td class="text-center"><?= $record['ttl_berat_cns']; ?></td>
-                                                    <td class="text-center"><a href="<?= base_url($role . '/bahanBaku/hapusSession/'.$record['id_material'])?>" class="btn btn-danger"><i class="fas fa-trash" style="height:5px;"></i></a></td>
+                                                    <td class="text-center"><input type="text" class="form-control text-center w-100" name="tgl_pakai[]" value="<?= $record['tgl_pakai']; ?>" readonly></td>
+                                                    <td class="text-center"><input type="text" class="form-control text-center w-100" name="no_model[]" value="<?= $record['no_model']; ?>" readonly></td>
+                                                    <td class="text-center"><input type="text" class="form-control text-center w-100" name="style_size[]" value="<?= $record['style_size']; ?>" readonly></td>
+                                                    <td class="text-center"><input type="text" class="form-control text-center w-100" name="item_type[]" value="<?= $record['item_type']; ?>" readonly></td>
+                                                    <td class="text-center"><input type="text" class="form-control text-center w-100" name="kode_warna[]" value="<?= $record['kode_warna']; ?>" readonly></td>
+                                                    <td class="text-center"><input type="text" class="form-control text-center w-100" name="warna[]" value="<?= $record['warna']; ?>" readonly></td>
+                                                    <td class="text-center"><input type="text" class="form-control text-center w-100" name="jalan_mc[]" value="<?= $record['jalan_mc']; ?>" readonly></td>
+                                                    <td class="text-center"><input type="text" class="form-control text-center w-100" name="ttl_cns[]" value="<?= $record['ttl_cns']; ?>" readonly></td>
+                                                    <td class="text-center"><input type="text" class="form-control text-center w-100" name="ttl_berat_cns[]" value="<?= $record['ttl_berat_cns']; ?>" readonly></td>
+                                                    <td class="text-center"><a href="<?= base_url($role . '/bahanBaku/hapusSession/'.$record['id_material'].'/'.$record['tgl_pakai'])?>" class="btn btn-danger"><i class="fas fa-trash" style="height:5px;"></i></a></td>
                                                 </tr>
                                                 <?php
                                             }
@@ -190,24 +194,24 @@
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-    const tglPakaiInput = document.getElementById('tgl_pakai');
-    const noModelSelect = document.getElementById('no_model');
+        const tglPakaiInput = document.getElementById('tgl_pakai');
+        const noModelSelect = document.getElementById('no_model');
 
-    // Fungsi untuk mengubah status select berdasarkan nilai input tgl_pakai
-    function toggleNoModel() {
-        if (tglPakaiInput.value.trim() === "") {
-            noModelSelect.disabled = true;
-        } else {
-            noModelSelect.disabled = false;
+        // Fungsi untuk mengubah status select berdasarkan nilai input tgl_pakai
+        function toggleNoModel() {
+            if (tglPakaiInput.value.trim() === "") {
+                noModelSelect.disabled = true;
+            } else {
+                noModelSelect.disabled = false;
+            }
         }
-    }
-    
-    // Panggil fungsi saat halaman pertama kali dimuat
-    toggleNoModel();
+        
+        // Panggil fungsi saat halaman pertama kali dimuat
+        toggleNoModel();
 
-    // Panggil fungsi setiap kali input tgl_pakai berubah
-    tglPakaiInput.addEventListener('change', toggleNoModel);
-});
+        // Panggil fungsi setiap kali input tgl_pakai berubah
+        tglPakaiInput.addEventListener('change', toggleNoModel);
+    });
     $(document).ready(function() {
         // Inisialisasi Select2 di kolom no model
         $('#no_model').select2({
@@ -404,7 +408,7 @@
 
                 // Lakukan permintaan AJAX
                 $.ajax({
-                    url: '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + selectedStyleSize, // Ganti URL sesuai kebutuhan
+                    url: '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + selectedStyleSize + '/' + area, // Ganti URL sesuai kebutuhan
                     type: 'GET',
                     dataType: 'json',
                     success: function(response) {
@@ -414,8 +418,8 @@
 
                         // Iterasi data yang diterima dari API dan tambahkan ke tabel
                         response.forEach(function(item, index) {
-                            const uniqueKey = `${row}_${index}`;
-                            const total = (item.qty_cns * item.berat_cns).toFixed(2);
+                            const uniqueKey = `[${row}][${index}]`;
+                            const total = (item.qty_cns * item.qty_berat_cns).toFixed(2);
                             const jalanMc = parseFloat(jalanMcInput.val()) || 0; // Ganti dengan input jalanMc yang sesuai
                             const totalCones = (item.qty_cns * jalanMc).toFixed(2);
                             const totalBeratCones = (total * jalanMc).toFixed(2);
@@ -423,51 +427,51 @@
                             table.append(`
                             <tr>
                                 // kolom hide
-                                <input type="hidden" class="form-control text-center" name="items[${uniqueKey}][tgl_pakai]" id="tgl_pakai" value="${tgl_pakai}" readonly>
-                                <input type="hidden" class="form-control text-center" name="items[${uniqueKey}][no_model]" id="no_model" value="${noModel}" readonly>
-                                <input type="hidden" class="form-control text-center" name="items[${uniqueKey}][style_size]" id="style_size" value="${selectedStyleSize}" readonly>
-                                <input type="hidden" class="form-control text-center" name="items[${uniqueKey}][jalan_mc]" id="jalan_mc" value="${jalanMc}" readonly>
-                                <input type="hidden" class="form-control text-center" name="items[${uniqueKey}][id_material]" id="id_material" value="${item.id_material}" readonly>
+                                <input type="hidden" class="form-control text-center" name="items[${row}][${index}][tgl_pakai]" id="tgl_pakai" value="${tgl_pakai}" readonly>
+                                <input type="hidden" class="form-control text-center" name="items[${row}][${index}][no_model]" id="no_model" value="${noModel}" readonly>
+                                <input type="hidden" class="form-control text-center" name="items[${row}][${index}][style_size]" id="style_size" value="${selectedStyleSize}" readonly>
+                                <input type="hidden" class="form-control text-center" name="items[${row}][${index}][jalan_mc]" id="jalan_mc" value="${jalanMc}" readonly>
+                                <input type="hidden" class="form-control text-center" name="items[${row}][${index}][id_material]" id="id_material" value="${item.id_material}" readonly>
                                 // 
-                                <td width=20><input type="text" class="form-control text-center" name="items[${uniqueKey}][no]" id="no" value="${index + 1}" readonly></td>
-                                <td width=50><input type="text" class="form-control text-center" name="items[${uniqueKey}][komposisi]" id="komposisi" value="${item.composition}" readonly></td>
-                                <td width=50><input type="text" class="form-control text-center" name="items[${uniqueKey}][loss]" id="loss" value="${item.loss}" readonly></td>
-                                <td width=120><input type="text" class="form-control text-center" name="items[${uniqueKey}][ttl_keb]" id="ttl_keb" value="${item.gw}" readonly></td>
-                                <td><input type="text" class="form-control text-center" name="items[${uniqueKey}][item_type]" id="item_type" value="${item.item_type}" readonly></td>
-                                <td><input type="text" class="form-control text-center" name="items[${uniqueKey}][kode_warna]" id="kode_warna" value="${item.kode_warna}" readonly></td>
-                                <td><input type="text" class="form-control text-center" name="items[${uniqueKey}][warna]" id="warna" value="${item.color}" readonly></td>
+                                <td width=20><input type="text" class="form-control text-center" name="items[${row}][${index}][no]" id="no" value="${index + 1}" readonly></td>
+                                <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][komposisi]" id="komposisi" value="${item.composition}" readonly></td>
+                                <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][loss]" id="loss" value="${item.loss}" readonly></td>
+                                <td width=120><input type="text" class="form-control text-center" name="items[${row}][${index}][ttl_keb]" id="ttl_keb" value="${item.gw}" readonly></td>
+                                <td><input type="text" class="form-control text-center" name="items[${row}][${index}][item_type]" id="item_type" value="${item.item_type}" readonly></td>
+                                <td><input type="text" class="form-control text-center" name="items[${row}][${index}][kode_warna]" id="kode_warna" value="${item.kode_warna}" readonly></td>
+                                <td><input type="text" class="form-control text-center" name="items[${row}][${index}][warna]" id="warna" value="${item.color}" readonly></td>
                             </tr>
                             <tr>
                                 <td></td>
                                 <td class="text-center">
                                     Qty Cones:
-                                    <input type="number" step="0.01" class="form-control text-center qty_cns" name="items[${uniqueKey}][qty_cns]" id="qty_cns" value="${item.qty_cns}">    
+                                    <input type="number" class="form-control text-center qty_cns" name="items[${row}][${index}][qty_cns]" id="qty_cns" value="${item.qty_cns}" required>    
                                 </td>
                                 <td class="text-center">
                                     Berat Cones:
-                                    <input type="number" step="0.01" class="form-control text-center berat_cns" name="items[${uniqueKey}][berat_cns]" id="berat_cns" value="${item.berat_cns}">
+                                    <input type="number" step="0.01" class="form-control text-center qty_berat_cns" name="items[${row}][${index}][qty_berat_cns]" id="qty_berat_cns" value="${item.qty_berat_cns}" required>
                                 </td>
                                 <td class="text-center">
                                     Total:
-                                    <input type="number" step="0.01" class="form-control text-center ttl" name="items[${uniqueKey}][ttl]" id="ttl" value="${total}" readonly>
+                                    <input type="number" step="0.01" class="form-control text-center ttl" name="items[${row}][${index}][ttl]" id="ttl" value="${total}" readonly>
                                 </td>
                                 <td class="text-center">
                                     Total Cones:
-                                    <input type="number" step="0.01" class="form-control text-center ttl_cns" name="items[${uniqueKey}][ttl_cns]" id="ttl_cns" value="${totalCones}" readonly>
+                                    <input type="number" step="0.01" class="form-control text-center ttl_cns" name="items[${row}][${index}][ttl_cns]" id="ttl_cns" value="${totalCones}" readonly>
                                 </td>
                                 <td class="text-center">
                                     Total Berat Cones:
-                                    <input type="number" step="0.01" class="form-control text-center ttl_berat_cns" name="items[${uniqueKey}][ttl_berat_cns]" id="ttl_berat_cns" value="${totalBeratCones}" readonly>
+                                    <input type="number" step="0.01" class="form-control text-center ttl_berat_cns" name="items[${row}][${index}][ttl_berat_cns]" id="ttl_berat_cns" value="${totalBeratCones}" readonly>
                                 </td>
                                 <td></td>
                             </tr>
                         `);
                         });
                         // Tambahkan event listener untuk perhitungan otomatis
-                        table.on('input', '.qty_cns, .berat_cns, .ttl_berat_cns', function() {
+                        table.on('input', '.qty_cns, .qty_berat_cns, .ttl_berat_cns', function() {
                             const row = $(this).closest('tr');
                             const qty = parseFloat(row.find('.qty_cns').val());
-                            const berat = parseFloat(row.find('.berat_cns').val());
+                            const berat = parseFloat(row.find('.qty_berat_cns').val());
                             const total = qty * berat;
                             row.find('.ttl').val(total.toFixed(2));
 
@@ -523,15 +527,67 @@
                 data: formData,
                 success: function(response) {
                     console.log(response);
-                    Swal.fire({
-                        title: response.title,
-                        text: response.message,
-                        icon: response.status,
-                        showConfirmButton: false,
-                        timer: 1500
-                    }).then(() => {
-                        location.reload(); // Refresh halaman setelah alert selesai
-                    });
+                     // Cek status dari Proses 1
+                    if (response.status === "success") {
+                    // Proses 2: Mengirim ke URL kedua
+                        $.ajax({
+                            url: "http://172.23.44.14/MaterialSystem/public/api/insertQtyCns",
+                            method: "POST",
+                            data: formData,
+                            success: function(secondResponse) {
+                                // Log respons server
+                                console.log("Response dari Proses 2:", secondResponse);
+
+                                // Periksa status respons dari Proses update qty cns & berat cns
+                                if (secondResponse.status === "success") {
+                                    // Kedua proses berhasil
+                                    Swal.fire({
+                                        title: "Berhasil",
+                                        text: "Data berhasil diupdate & disimpan ke list pemesanan.",
+                                        icon: "success",
+                                        // showConfirmButton: true,
+                                    }).then(() => {
+                                        location.reload(); // Refresh halaman setelah alert selesai
+                                    });
+                                } else if (secondResponse.status === "warning"){
+                                    // Proses 2 gagal
+                                    Swal.fire({
+                                        title: secondResponse.title,
+                                        text: secondResponse.message,
+                                        icon: secondResponse.status,
+                                        showConfirmButton: true,
+                                    });
+                                }
+                                else {
+                                    // Proses 2 gagal
+                                    Swal.fire({
+                                        title: "Error",
+                                        text: secondResponse.message || "Gagal update qty cns.",
+                                        icon: "error",
+                                        showConfirmButton: true,
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error(`AJAX Error: ${xhr.status} ${xhr.statusText}`);
+                                console.error("<?= $role ?>");
+                                Swal.fire({
+                                    title: "Gagal!",
+                                    text: "Gagal menyimpan data",
+                                    icon: "error",
+                                    confirmButtonText: "OK"
+                                });
+                            }
+                        });
+                    } else {
+                        // Proses 1 gagal
+                        Swal.fire({
+                            title: response.title,
+                            text: response.message || "Gagal menyimpan list pemesanan.",
+                            icon: "error",
+                            showConfirmButton: true,
+                        });
+                    }
                 },
                 error: function(xhr, status, error) {
                     console.error("AJAX Error: " + status + error);
@@ -546,6 +602,60 @@
             });
         });
     });
+
+    document.getElementById('formPemesanan').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const form = event.target;
+        const formData = new FormData(form);
+
+        // Konversi FormData ke JSON tanpa "[]"
+        const payload = {};
+        formData.forEach((value, key) => {
+            const cleanKey = key.replace(/\[\]$/, ""); // Hapus "[]"
+            if (!payload[cleanKey]) payload[cleanKey] = [];
+            payload[cleanKey].push(value);
+        });
+
+        fetch('http://172.23.44.14/MaterialSystem/public/api/saveListPemesanan', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+            // credentials: 'include', // Menyertakan cookie/session ID
+        })
+        .then(async (response) => {
+            const resData = await response.json();
+            if (response.ok) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: resData.message,
+                }).then(() => {
+                    window.history.back(); // Kembali ke halaman sebelumnya
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: resData.message || 'Gagal menyimpan data',
+                });
+                console.error('Response Data:', resData);
+            }
+        })
+        .catch((error) => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Terjadi kesalahan saat mengirim data',
+            });
+            console.error('Fetch Error:', error);
+        });
+    });
+
+
+
 </script>
 
 

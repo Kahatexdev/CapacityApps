@@ -458,11 +458,10 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
     $routes->post('getStyleSizeByNoModel', 'MaterialController::getStyleSizeByNoModel');
     $routes->post('getJalanMc', 'MaterialController::getJalanMcByModelSize');
-    $routes->get('getMU/(:any)/(:any)', 'MaterialController::getMU/$1/$2');
+    $routes->get('getMU/(:any)/(:any)/(:any)', 'MaterialController::getMU/$1/$2/$3');
     $routes->post('bahanBaku/simpanKeSession', 'MaterialController::savePemesananSession');
     $routes->get('bahanBaku/hapusSession', 'MaterialController::deleteAllPemesananSession');
-    $routes->get('bahanBaku/hapusSession/(:any)', 'MaterialController::deletePemesananSession/$1');
-    $routes->post('saveListPemesanan', 'MaterialController::saveListPemesanan');
+    $routes->get('bahanBaku/hapusSession/(:any)/(:any)', 'MaterialController::deletePemesananSession/$1/$2');
 });
 
 // sudo

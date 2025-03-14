@@ -79,6 +79,7 @@ class MaterialController extends BaseController
     {
         $area = session()->get('username');
         $role = session()->get('role');
+        $logged_in = true;
         $noModel = $this->DetailPlanningModel->getNoModelAktif($area);
         $pemesananBb = session()->get('pemesananBb');
         // Kita "flatten" data sehingga tiap baris tersimpan sebagai record tunggal
@@ -86,26 +87,19 @@ class MaterialController extends BaseController
 
         if (!empty($pemesananBb)) {
             foreach ($pemesananBb as $group) {
-                // Pastikan group adalah array multidimensi (setiap field berupa array)
-                if (is_array($group) && isset($group['tgl_pakai']) && is_array($group['tgl_pakai'])) {
-                    $jumlahBaris = count($group['tgl_pakai']);
-                    for ($i = 0; $i < $jumlahBaris; $i++) {
+                foreach ($group as $rowKey => $row) {
                         $flattenData[] = [
-                            'tgl_pakai'    => $group['tgl_pakai'][$i] ?? '',
-                            'no_model'     => $group['no_model'][$i] ?? '',
-                            'style_size'   => $group['style_size'][$i] ?? '',
-                            'item_type'    => $group['item_type'][$i] ?? '',
-                            'kode_warna'   => $group['kode_warna'][$i] ?? '',
-                            'warna'        => $group['warna'][$i] ?? '',
-                            'jalan_mc'     => $group['jalan_mc'][$i] ?? '',
-                            'ttl_cns'      => $group['ttl_cns'][$i] ?? '',
-                            'ttl_berat_cns'=> $group['ttl_berat_cns'][$i] ?? '',
-                            'id_material'  => $group['id_material'][$i] ?? ''
+                            'tgl_pakai'      => $row['tgl_pakai'] ?? '',
+                            'no_model'       => $row['no_model'] ?? '',
+                            'style_size'     => $row['style_size'] ?? '',
+                            'item_type'      => $row['item_type'] ?? '',
+                            'kode_warna'     => $row['kode_warna'] ?? '',
+                            'warna'          => $row['warna'] ?? '',
+                            'jalan_mc'       => $row['jalan_mc'] ?? '',
+                            'ttl_cns'        => $row['ttl_cns'] ?? '',
+                            'ttl_berat_cns'  => $row['ttl_berat_cns'] ?? '',
+                            'id_material'    => $row['id_material'] ?? '',
                         ];
-                    }
-                } else {
-                    // Jika data sudah tersimpan sebagai record tunggal
-                    $flattenData[] = $group;
                 }
             }
         }
@@ -270,10 +264,10 @@ class MaterialController extends BaseController
         // Kembalikan data dalam format JSON
         return $this->response->setJSON($jalanMc);
     }
-    public function getMU($model, $styleSize)
+    public function getMU($model, $styleSize, $area)
     {
         $styleSize = urlencode($styleSize);  // Encode styleSize
-        $apiUrl = 'http://172.23.39.118/MaterialSystem/public/api/getMU/' . $model . '/' . $styleSize;
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getMU/' . $model . '/' . $styleSize . '/' . $area;
         $response = file_get_contents($apiUrl);  // Mendapatkan response dari API
         if ($response === FALSE) {
             die('Error occurred while fetching data.');
@@ -286,68 +280,99 @@ class MaterialController extends BaseController
     }
     public function savePemesananSession()
     {
-        // Ambil data yang sudah ada atau buat array kosong
         $existingData = session()->get('pemesananBb') ?? [];
 
         // Ambil data baru dari request POST dengan key 'items'
         $newData = $this->request->getPost('items');
 
-        // Cek apakah ada duplikasi berdasarkan id_material dan tgl_pakai
-        foreach ($newData as $record) {
-            foreach ($existingData as $existingRecord) {
-                if (
-                    isset($record['id_material'], $record['tgl_pakai'], $existingRecord['id_material'], $existingRecord['tgl_pakai']) &&
-                    $record['id_material'] == $existingRecord['id_material'] &&
-                    $record['tgl_pakai'] == $existingRecord['tgl_pakai']
-                ) {
-                    // Jika duplikasi ditemukan, batalkan penyimpanan dan kembalikan error JSON
-                    return $this->response->setJSON([
-                        'message' => 'Data dengan id_material dan tgl_pakai yang sama sudah ada.',
-                        'title'  => 'Error!',
-                        'status'  => 'warning'
-                    ]);
+        if (!is_array($newData)) {
+            return; // Pastikan $newData adalah array sebelum diproses
+        }
+
+        // Variabel untuk menyimpan data valid
+        $validData = [];
+
+        // Loop melalui data baru
+        foreach ($newData as $group) {
+            if (!is_array($group)) {
+                continue; // Pastikan $group adalah array sebelum diproses
+            }
+
+            foreach ($group as $record) {
+                $isDuplicate = false;
+
+                // Cek ke existingData untuk duplikasi
+                foreach ($existingData as $existingGroup) {
+                    foreach ($existingGroup as $existingRecord) {
+                        if (
+                            isset($record['id_material'], $record['tgl_pakai'], $existingRecord['id_material'], $existingRecord['tgl_pakai']) &&
+                            $record['id_material'] === $existingRecord['id_material'] &&
+                            $record['tgl_pakai'] === $existingRecord['tgl_pakai']
+                        ) {
+                            // Tandai data sebagai duplikat
+                            $isDuplicate = true;
+
+                            // Log pesan error atau berikan respon status warning
+                            log_message('error', 'Duplikasi ditemukan: ' . json_encode($record));
+                            break 2; // Keluar dari loop jika duplikat ditemukan
+                        }
+                    }
+                }
+
+                // Jika tidak ada duplikasi, tambahkan ke data valid
+                if (!$isDuplicate) {
+                    $validData[] = $record;
                 }
             }
         }
 
-        // Jika tidak ada duplikasi, gabungkan data baru dengan data yang sudah ada
-        foreach ($newData as $record) {
-            $existingData[] = $record;
+        // Update session dengan data valid baru
+        if (!empty($validData)) {
+            session()->set('pemesananBb', array_merge($existingData, [$validData]));
+        } else {
+            // Tampilkan respon warning
+            return $this->response->setJSON([
+                'status' => 'warning',
+                'message' => 'Beberapa data tidak disimpan karena duplikasi ditemukan.'
+            ]);
         }
-
-        // Simpan kembali ke session
-        session()->set('pemesananBb', $existingData);
-
+        
         return $this->response->setJSON([
-            'message' => 'Data berhasil disimpan ke session',
+            'message' => 'Data berhasil diupdate & disimpan ke session',
             'data'    => $existingData,
             'status'  => 'success',
             'title'  => 'Sukses!',
 
         ]);
     }
-    public function deletePemesananSession($id_material) {
+    public function deletePemesananSession($id_material, $tgl_pakai)
+    {
         // Ambil data session yang asli (data flattened)
         $pemesananBb = session()->get('pemesananBb') ?? [];
+        $found = false; // Variabel untuk melacak apakah data ditemukan
+        // dd($id_material);
+        // Loop melalui data untuk menemukan dan menghapus elemen
+        foreach ($pemesananBb as $groupKey => $group) {
+            foreach ($group as $itemKey => $item) {
 
-        $found = false;
-        foreach ($pemesananBb as $key => $record) {
-            // Pastikan record memiliki id_material dan cocok dengan parameter yang diterima
-            if (isset($record['id_material']) && $record['id_material'] == $id_material) {
-                unset($pemesananBb[$key]);
-                $found = true;
-                break;
+                // Cek apakah id_material cocok
+                if ($item['id_material'] === $id_material && $item['tgl_pakai'] === $tgl_pakai) {
+                    unset($pemesananBb[$groupKey][$itemKey]); // Hapus elemen
+                    $pemesananBb[$groupKey] = array_values($pemesananBb[$groupKey]); // Rapi indeks
+                    $found = true;
+                    break 2; // Hentikan loop setelah menemukan dan menghapus
+                }
             }
         }
-        
+    
+        // Perbarui session jika ada perubahan
         if ($found) {
-            // Re-index array agar indeks kembali berurutan
-            $pemesananBb = array_values($pemesananBb);
-            session()->set('pemesananBb', $pemesananBb);
+            session()->set('pemesananBb', $pemesananBb); // Gunakan set() untuk menyimpan data ke session
             return redirect()->back()->with('success', 'Data berhasil dihapus');
-        } else {
-            return redirect()->back()->with('error', 'Data tidak ditemukan');
         }
+    
+        // Jika data tidak ditemukan
+        return redirect()->back()->with('error', 'Data tidak ditemukan');
     }
     public function deleteAllPemesananSession() {
         // Menghapus data session 'pemesananBb'
@@ -355,26 +380,5 @@ class MaterialController extends BaseController
         
         // Redirect dengan pesan sukses
         return redirect()->back()->with('success', 'Data berhasil dihapus dari session');
-    }
-    public function saveListPemesanan() {
-        $admin = session()->get('username');
-
-        $pemesananBb = session()->get('pemesananBb') ?? [];
-        if (empty($pemesananBb)) {
-            return redirect()->back()->with('error', 'Tidak ada data list pemesanan');
-        }
-        dd($pemesananBb);
-        foreach ($pemesananBb as $key => $data) {
-            $insertData = [
-                'id_material' => $data['id_material'],
-                'tgl_list' => '',
-                'tgl_pakai' => $data['tgl_pakai'],
-                'jl_mc' => $data['jalan_mc'],
-                'ttl_qty_cones' => $data['ttl_cns'],
-                'ttl_berat_cones' => $data['ttl_berat_cns'],
-                'admin' => $admin,
-                'created_at' => '',
-            ];
-        }
     }
 }
