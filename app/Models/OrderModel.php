@@ -523,9 +523,11 @@ class OrderModel extends Model
     }
     public function getSummaryBsPertgl($data)
     {
-        $this->select('apsperstyle.idapsperstyle, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, SUM(bs_mesin.qty_pcs) as qty_pcs, SUM(bs_mesin.qty_gram) as qty_gram, COUNT(DISTINCT bs_mesin.no_mesin) AS jl_mc, bs_mesin.tanggal_produksi, bs_mesin.area, bs_mesin.inisial, bs_mesin.no_mesin, shift')
+        $this->select('apsperstyle.idapsperstyle, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, (SELECT SUM(qty_pcs) FROM bs_mesin AS b WHERE b.no_model = apsperstyle.mastermodel AND b.area = apsperstyle.factory AND b.size = apsperstyle.size) AS qty_pcs, (SELECT SUM(qty_gram) FROM bs_mesin AS b WHERE b.no_model = apsperstyle.mastermodel AND b.area = apsperstyle.factory AND b.size = apsperstyle.size) AS qty_gram, COUNT(DISTINCT bs_mesin.no_mesin) AS jl_mc, bs_mesin.tanggal_produksi, bs_mesin.area, bs_mesin.inisial, bs_mesin.no_mesin, shift')
             ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT')
-            ->join('bs_mesin', 'bs_mesin.no_model = apsperstyle.mastermodel AND bs_mesin.size = apsperstyle.size', 'LEFT')
+            ->join('bs_mesin',
+                'apsperstyle.factory = bs_mesin.area AND apsperstyle.mastermodel = bs_mesin.no_model AND apsperstyle.size = bs_mesin.size',
+                'left')
             ->where('bs_mesin.tanggal_produksi IS NOT NULL');
 
         if (!empty($data['buyer'])) {

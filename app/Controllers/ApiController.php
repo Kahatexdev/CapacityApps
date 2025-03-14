@@ -106,7 +106,7 @@ class ApiController extends ResourceController
         $prod = $this->orderModel->getDataPph($area, $model, $size);
         $idaps = $this->ApsPerstyleModel->getIdApsForPph($area, $model, $size);
         $idapsList = array_column($idaps, 'idapsperstyle');
-        $bsSettingData = $this->bsModel->getBsPph($idapsList) ?? 0;
+        $bsSettingData = $this->bsModel->getBsPph($idapsList);
         $bsMesinData = $this->BsMesinModel->getBsMesinPph($area, $model, $size);
         $bsMesin = $bsMesinData['bs_gram'] ?? 0;
         $result = [
@@ -123,5 +123,47 @@ class ApiController extends ResourceController
             "bs_mesin" => $bsMesin,
         ];
         return $this->response->setJSON($result);
+    }
+
+    public function getArea()
+    {
+        $area = $this->areaModel->getArea();
+
+        // Filter agar 'name' yang mengandung 'Gedung' tidak ikut
+        $filteredArea = array_filter($area, function ($item) {
+            return stripos($item['name'], 'Gedung') === false; // Cek jika 'Gedung' tidak ada di 'name'
+        });
+
+        // Ambil hanya field 'name'
+        $result = array_column($filteredArea, 'name');
+        return $this->response->setJSON($result);
+    }
+    public function getPPhPerhari($area, $tanggal)
+    {
+        $produksi = $this->produksiModel->getProduksiPerStyle($area, $tanggal);
+
+        if (!empty($produksi)) {
+            // Extract all mastermodel and size values for batch query
+            $mastermodels = array_column($produksi, 'mastermodel');
+            $sizes = array_column($produksi, 'size');
+
+            // Fetch all bs_mesin data in one query
+            $bsMesinData = $this->BsMesinModel->getBsMesinHarian($mastermodels, $sizes, $tanggal);
+
+            // Create a lookup table for fast matching
+            $bsMesinMap = [];
+            foreach ($bsMesinData as $bs) {
+                $key = $bs['no_model'] . '_' . $bs['size'];
+                $bsMesinMap[$key] = $bs['bs_mesin'];
+            }
+
+            // Assign bs_mesin to production data
+            foreach ($produksi as &$prod) {
+                $key = $prod['mastermodel'] . '_' . $prod['size'];
+                $prod['bs_mesin'] = $bsMesinMap[$key] ?? 0; // Default to null if not found
+            }
+        }
+
+        return $this->response->setJSON($produksi);
     }
 }
