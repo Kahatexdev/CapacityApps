@@ -124,7 +124,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    <?php 
+                                        <?php
                                         $no = 1;
                                         foreach ($groupedData as $groupKey => $group) {
                                             // Inisialisasi total untuk grup ini
@@ -136,7 +136,7 @@
                                                 $total_jalan_mc += number_format((float)$record['jalan_mc'], 2);
                                                 $total_ttl_cns += number_format((float)$record['ttl_cns'], 2);
                                                 $total_ttl_berat_cns += number_format((float)$record['ttl_berat_cns'], 2);
-                                                ?>
+                                        ?>
                                                 <tr>
                                                     <!-- kolom hide -->
                                                     <input type="hidden" name="role" value="<?= $role; ?>">
@@ -153,9 +153,9 @@
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="jalan_mc[]" value="<?= $record['jalan_mc']; ?>" readonly></td>
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="ttl_cns[]" value="<?= $record['ttl_cns']; ?>" readonly></td>
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="ttl_berat_cns[]" value="<?= $record['ttl_berat_cns']; ?>" readonly></td>
-                                                    <td class="text-center"><a href="<?= base_url($role . '/bahanBaku/hapusSession/'.$record['id_material'].'/'.$record['tgl_pakai'])?>" class="btn btn-danger"><i class="fas fa-trash" style="height:5px;"></i></a></td>
+                                                    <td class="text-center"><a href="<?= base_url($role . '/bahanBaku/hapusSession/' . $record['id_material'] . '/' . $record['tgl_pakai']) ?>" class="btn btn-danger"><i class="fas fa-trash" style="height:5px;"></i></a></td>
                                                 </tr>
-                                                <?php
+                                            <?php
                                             }
                                             // Dapatkan data grouping dari record pertama grup
                                             $first = $group[0];
@@ -168,15 +168,15 @@
                                                 <td class="text-center font-weight-bolder"><?= $total_ttl_cns; ?></td>
                                                 <td class="text-center font-weight-bolder"><?= $total_ttl_berat_cns; ?></td>
                                             </tr>
-                                            
-                                            <?php
-                                        }
-                                    ?>
-                                            <tr>
-                                                <td colspan="10" class="text-center font-weight-bolder align-middle">Hapus Semua List Pemesanan</td>
-                                                <td class="text-center"><a href="<?= base_url($role . '/bahanBaku/hapusSession') ?>" class="btn btn-danger"><i class="fas fa-trash"></i></a></td>
 
-                                            </tr>
+                                        <?php
+                                        }
+                                        ?>
+                                        <tr>
+                                            <td colspan="10" class="text-center font-weight-bolder align-middle">Hapus Semua List Pemesanan</td>
+                                            <td class="text-center"><a href="<?= base_url($role . '/bahanBaku/hapusSession') ?>" class="btn btn-danger"><i class="fas fa-trash"></i></a></td>
+
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -205,7 +205,7 @@
                 noModelSelect.disabled = false;
             }
         }
-        
+
         // Panggil fungsi saat halaman pertama kali dimuat
         toggleNoModel();
 
@@ -527,9 +527,9 @@
                 data: formData,
                 success: function(response) {
                     console.log(response);
-                     // Cek status dari Proses 1
+                    // Cek status dari Proses 1
                     if (response.status === "success") {
-                    // Proses 2: Mengirim ke URL kedua
+                        // Proses 2: Mengirim ke URL kedua
                         $.ajax({
                             url: "http://172.23.44.14/MaterialSystem/public/api/insertQtyCns",
                             method: "POST",
@@ -549,7 +549,7 @@
                                     }).then(() => {
                                         location.reload(); // Refresh halaman setelah alert selesai
                                     });
-                                } else if (secondResponse.status === "warning"){
+                                } else if (secondResponse.status === "warning") {
                                     // Proses 2 gagal
                                     Swal.fire({
                                         title: secondResponse.title,
@@ -557,8 +557,7 @@
                                         icon: secondResponse.status,
                                         showConfirmButton: true,
                                     });
-                                }
-                                else {
+                                } else {
                                     // Proses 2 gagal
                                     Swal.fire({
                                         title: "Error",
@@ -603,7 +602,7 @@
         });
     });
 
-    document.getElementById('formPemesanan').addEventListener('submit', function (event) {
+    document.getElementById('formPemesanan').addEventListener('submit', function(event) {
         event.preventDefault();
 
         const form = event.target;
@@ -618,46 +617,60 @@
         });
 
         fetch('http://172.23.44.14/MaterialSystem/public/api/saveListPemesanan', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-            // credentials: 'include', // Menyertakan cookie/session ID
-        })
-        .then(async (response) => {
-            const resData = await response.json();
-            if (response.ok) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: resData.message,
-                }).then(() => {
-                    window.history.back(); // Kembali ke halaman sebelumnya
-                });
-            } else {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+                // credentials: 'include', // Menyertakan cookie/session ID
+            })
+            .then(async (response) => {
+                const resData = await response.json();
+                if (response.ok) {
+                    // Hapus session dengan request GET
+                    fetch('bahanBaku/hapusSession', {
+                            method: 'GET',
+                        })
+                        .then(() => {
+                            // Tampilkan SweetAlert setelah session berhasil dihapus
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: resData.message,
+                            }).then(() => {
+                                // Redirect ke halaman yang diinginkan
+                                window.location.href = '/user/bahanBaku'; // Halaman tujuan setelah sukses
+                            });
+                        })
+                        .catch((error) => {
+                            console.error('Error saat menghapus session:', error);
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Warning!',
+                                text: 'Data berhasil disimpan, tetapi session gagal dihapus.',
+                            }).then(() => {
+                                // Tetap redirect meskipun ada error saat menghapus session
+                                window.location.href = '/user/bahanBaku';
+                            });
+                        });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: resData.message || 'Gagal menyimpan data',
+                    });
+                    console.error('Response Data:', resData);
+                }
+            })
+            .catch((error) => {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: resData.message || 'Gagal menyimpan data',
+                    text: 'Terjadi kesalahan saat mengirim data',
                 });
-                console.error('Response Data:', resData);
-            }
-        })
-        .catch((error) => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: 'Terjadi kesalahan saat mengirim data',
+                console.error('Fetch Error:', error);
             });
-            console.error('Fetch Error:', error);
-        });
     });
-
-
-
 </script>
-
-
 
 <?php $this->endSection(); ?>
