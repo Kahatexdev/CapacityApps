@@ -29,21 +29,22 @@
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
             <div class="card">
                 <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    Pemesanan Bahan Baku <?= $area ?>
-                                </h5>
-                            </div>
+                    <div class="d-flex justify-content-between">
+                        <div class="numbers">
+                            <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
+                            <h5 class="font-weight-bolder mb-0">
+                                Form Pemesanan Bahan Baku <?= $area ?>
+                            </h5>
                         </div>
-                        <div class="col-4 text-end">
+                        <div>
+                            <a href="<?= base_url($role . '/listPemesanan/' . $area) ?>" class="btn btn-info">List Pemesanan</a>
+                        </div>
+                    </div>
+                    <!-- <div class="col-4 text-end">
                             <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
                                 <i class="ni ni-chart-bar-32 text-lg opacity-10" aria-hidden="true"></i>
                             </div>
-                        </div>
-                    </div>
+                        </div> -->
                 </div>
             </div>
         </div>
@@ -124,7 +125,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    <?php 
+                                        <?php
                                         $no = 1;
                                         foreach ($groupedData as $groupKey => $group) {
                                             // Inisialisasi total untuk grup ini
@@ -136,7 +137,7 @@
                                                 $total_jalan_mc += number_format((float)$record['jalan_mc'], 2);
                                                 $total_ttl_cns += number_format((float)$record['ttl_cns'], 2);
                                                 $total_ttl_berat_cns += number_format((float)$record['ttl_berat_cns'], 2);
-                                                ?>
+                                        ?>
                                                 <tr>
                                                     <!-- kolom hide -->
                                                     <input type="hidden" name="role" value="<?= $role; ?>">
@@ -153,9 +154,9 @@
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="jalan_mc[]" value="<?= $record['jalan_mc']; ?>" readonly></td>
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="ttl_cns[]" value="<?= $record['ttl_cns']; ?>" readonly></td>
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="ttl_berat_cns[]" value="<?= $record['ttl_berat_cns']; ?>" readonly></td>
-                                                    <td class="text-center"><a href="<?= base_url($role . '/bahanBaku/hapusSession/'.$record['id_material'].'/'.$record['tgl_pakai'])?>" class="btn btn-danger"><i class="fas fa-trash" style="height:5px;"></i></a></td>
+                                                    <td class="text-center"><a href="<?= base_url($role . '/bahanBaku/hapusSession/' . $record['id_material'] . '/' . $record['tgl_pakai']) ?>" class="btn btn-danger"><i class="fas fa-trash" style="height:5px;"></i></a></td>
                                                 </tr>
-                                                <?php
+                                            <?php
                                             }
                                             // Dapatkan data grouping dari record pertama grup
                                             $first = $group[0];
@@ -168,15 +169,15 @@
                                                 <td class="text-center font-weight-bolder"><?= $total_ttl_cns; ?></td>
                                                 <td class="text-center font-weight-bolder"><?= $total_ttl_berat_cns; ?></td>
                                             </tr>
-                                            
-                                            <?php
-                                        }
-                                    ?>
-                                            <tr>
-                                                <td colspan="10" class="text-center font-weight-bolder align-middle">Hapus Semua List Pemesanan</td>
-                                                <td class="text-center"><a href="<?= base_url($role . '/bahanBaku/hapusSession') ?>" class="btn btn-danger"><i class="fas fa-trash"></i></a></td>
 
-                                            </tr>
+                                        <?php
+                                        }
+                                        ?>
+                                        <tr>
+                                            <td colspan="10" class="text-center font-weight-bolder align-middle">Hapus Semua List Pemesanan</td>
+                                            <td class="text-center"><a href="<?= base_url($role . '/bahanBaku/hapusSession') ?>" class="btn btn-danger"><i class="fas fa-trash"></i></a></td>
+
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -205,7 +206,7 @@
                 noModelSelect.disabled = false;
             }
         }
-        
+
         // Panggil fungsi saat halaman pertama kali dimuat
         toggleNoModel();
 
@@ -257,7 +258,7 @@
                                                 </select>
                                             </td>
                                             <td>
-                                                <input type="number" class="form-control jalan-mc" name="items[${row}][jalan_mc]" readonly>
+                                                <input type="number" class="form-control jalan-mc" name="items[${row}][jalan_mc]">
                                             </td>
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-info add-row" id="addTable">
@@ -527,9 +528,9 @@
                 data: formData,
                 success: function(response) {
                     console.log(response);
-                     // Cek status dari Proses 1
+                    // Cek status dari Proses 1
                     if (response.status === "success") {
-                    // Proses 2: Mengirim ke URL kedua
+                        // Proses 2: Mengirim ke URL kedua
                         $.ajax({
                             url: "http://172.23.44.14/MaterialSystem/public/api/insertQtyCns",
                             method: "POST",
@@ -549,7 +550,7 @@
                                     }).then(() => {
                                         location.reload(); // Refresh halaman setelah alert selesai
                                     });
-                                } else if (secondResponse.status === "warning"){
+                                } else if (secondResponse.status === "warning") {
                                     // Proses 2 gagal
                                     Swal.fire({
                                         title: secondResponse.title,
@@ -557,8 +558,7 @@
                                         icon: secondResponse.status,
                                         showConfirmButton: true,
                                     });
-                                }
-                                else {
+                                } else {
                                     // Proses 2 gagal
                                     Swal.fire({
                                         title: "Error",
@@ -603,11 +603,12 @@
         });
     });
 
-    document.getElementById('formPemesanan').addEventListener('submit', function (event) {
+    document.getElementById('formPemesanan').addEventListener('submit', function(event) {
         event.preventDefault();
 
         const form = event.target;
         const formData = new FormData(form);
+        const BASE_URL = "<?= base_url(); ?>";
 
         // Konversi FormData ke JSON tanpa "[]"
         const payload = {};
@@ -618,46 +619,60 @@
         });
 
         fetch('http://172.23.44.14/MaterialSystem/public/api/saveListPemesanan', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-            // credentials: 'include', // Menyertakan cookie/session ID
-        })
-        .then(async (response) => {
-            const resData = await response.json();
-            if (response.ok) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: resData.message,
-                }).then(() => {
-                    window.history.back(); // Kembali ke halaman sebelumnya
-                });
-            } else {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+                // credentials: 'include', // Menyertakan cookie/session ID
+            })
+            .then(async (response) => {
+                const resData = await response.json();
+                if (response.ok) {
+                    // Hapus session dengan request GET
+                    fetch('bahanBaku/hapusSession', {
+                            method: 'GET',
+                        })
+                        .then(() => {
+                            // Tampilkan SweetAlert setelah session berhasil dihapus
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: resData.message,
+                            }).then(() => {
+                                // Redirect ke halaman yang diinginkan
+                                window.location.href = `${BASE_URL}user/bahanBaku`; // Halaman tujuan setelah sukses
+                            });
+                        })
+                        .catch((error) => {
+                            console.error('Error saat menghapus session:', error);
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Warning!',
+                                text: 'Data berhasil disimpan, tetapi session gagal dihapus.',
+                            }).then(() => {
+                                // Tetap redirect meskipun ada error saat menghapus session
+                                window.location.href = `${BASE_URL}user/bahanBaku`;
+                            });
+                        });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: resData.message || 'Gagal menyimpan data',
+                    });
+                    console.error('Response Data:', resData);
+                }
+            })
+            .catch((error) => {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: resData.message || 'Gagal menyimpan data',
+                    text: 'Terjadi kesalahan saat mengirim data',
                 });
-                console.error('Response Data:', resData);
-            }
-        })
-        .catch((error) => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: 'Terjadi kesalahan saat mengirim data',
+                console.error('Fetch Error:', error);
             });
-            console.error('Fetch Error:', error);
-        });
     });
-
-
-
 </script>
-
-
 
 <?php $this->endSection(); ?>
