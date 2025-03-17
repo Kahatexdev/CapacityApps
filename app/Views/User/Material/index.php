@@ -258,7 +258,7 @@
                                                 </select>
                                             </td>
                                             <td>
-                                                <input type="number" class="form-control jalan-mc" name="items[${row}][jalan_mc]" readonly>
+                                                <input type="number" class="form-control jalan-mc" name="items[${row}][jalan_mc]">
                                             </td>
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-info add-row" id="addTable">
