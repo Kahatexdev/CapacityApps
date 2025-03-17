@@ -872,7 +872,7 @@ class OrderController extends BaseController
             return $b['avail'] <=> $a['avail'];
         });
         $top3Rekomendasi = array_slice($rekomendasi, 0, 3);
-        $dataMc = $this->jarumModel->getAreaModel($noModel);
+        $dataMc = $this->jarumModel->getAreabyJarum($jarum);
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Order',
@@ -1701,6 +1701,7 @@ class OrderController extends BaseController
     public function reviseorder()
     {
         $file = $this->request->getFile('excel_file');
+        $nomodel = $this->request->getVar('no_model');
         if ($file->isValid() && !$file->hasMoved()) {
             $spreadsheet = IOFactory::load($file);
             $row = $spreadsheet->getActiveSheet();

@@ -78,6 +78,18 @@ class DataMesinModel extends Model
         $uniqueJarum = array_column($query, 'jarum');
         return $uniqueJarum;
     }
+    public function getAreabyJarum($jarum)
+    {
+        $query = $this->distinct()
+            ->select('area')
+            ->orderBy('id_data_mesin', 'ASC')
+            ->where('jarum', $jarum)
+            ->findAll();
+
+        // Extract only the 'jarum' field from the data
+        $uniqueJarum = array_column($query, 'area');
+        return $uniqueJarum;
+    }
 
     public function getArea2($pu)
     {
