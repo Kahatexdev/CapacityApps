@@ -873,6 +873,7 @@ class OrderController extends BaseController
         });
         $top3Rekomendasi = array_slice($rekomendasi, 0, 3);
         $dataMc = $this->jarumModel->getAreabyJarum($jarum);
+
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Order',

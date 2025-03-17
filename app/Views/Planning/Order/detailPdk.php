@@ -209,10 +209,9 @@ error_reporting(E_ALL); ?>
                                 <label for="selectArea">Pilih Area:</label>
                                 <select class="form-control" id="selectArea" name="area">
                                     <?php
-                                    $uniqueAreas = array_unique(array_column($dataMc, 'area'));
-                                    foreach ($uniqueAreas as $area) :
+                                    foreach ($dataMc as $area) :
                                     ?>
-                                        <option value="<?= $area; ?>"><?= $area; ?></option>
+                                        <option value="<?= $area; ?>"> <?= $area; ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
@@ -267,10 +266,9 @@ error_reporting(E_ALL); ?>
                                     <option value=""> Pilih Area</option>
 
                                     <?php
-                                    $uniqueAreas = array_unique(array_column($dataMc, 'area'));
-                                    foreach ($uniqueAreas as $area) :
+                                    foreach ($dataMc as $area) :
                                     ?>
-                                        <option value="<?= $area; ?>"><?= $area; ?></option>
+                                        <option value="<?= $area; ?>"> <?= $area; ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
@@ -308,10 +306,9 @@ error_reporting(E_ALL); ?>
                                 <select class="form-control" id="selectArea" name="area">
                                     <option value="">Pilih Area</option>
                                     <?php
-                                    $uniqueAreas = array_unique(array_column($dataMc, 'area'));
-                                    foreach ($uniqueAreas as $area) :
+                                    foreach ($dataMc as $area) :
                                     ?>
-                                        <option value="<?= $area; ?>"><?= $area; ?></option>
+                                        <option value="<?= $area; ?>"> <?= $area; ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
