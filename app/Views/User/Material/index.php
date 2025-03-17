@@ -29,21 +29,22 @@
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
             <div class="card">
                 <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    Pemesanan Bahan Baku <?= $area ?>
-                                </h5>
-                            </div>
+                    <div class="d-flex justify-content-between">
+                        <div class="numbers">
+                            <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
+                            <h5 class="font-weight-bolder mb-0">
+                                Form Pemesanan Bahan Baku <?= $area ?>
+                            </h5>
                         </div>
-                        <div class="col-4 text-end">
+                        <div>
+                            <a href="<?= base_url($role . '/listPemesanan/' . $area) ?>" class="btn btn-info">List Pemesanan</a>
+                        </div>
+                    </div>
+                    <!-- <div class="col-4 text-end">
                             <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
                                 <i class="ni ni-chart-bar-32 text-lg opacity-10" aria-hidden="true"></i>
                             </div>
-                        </div>
-                    </div>
+                        </div> -->
                 </div>
             </div>
         </div>
@@ -607,6 +608,7 @@
 
         const form = event.target;
         const formData = new FormData(form);
+        const BASE_URL = "<?= base_url(); ?>";
 
         // Konversi FormData ke JSON tanpa "[]"
         const payload = {};
@@ -639,7 +641,7 @@
                                 text: resData.message,
                             }).then(() => {
                                 // Redirect ke halaman yang diinginkan
-                                window.location.href = '/user/bahanBaku'; // Halaman tujuan setelah sukses
+                                window.location.href = `${BASE_URL}user/bahanBaku`; // Halaman tujuan setelah sukses
                             });
                         })
                         .catch((error) => {
@@ -650,7 +652,7 @@
                                 text: 'Data berhasil disimpan, tetapi session gagal dihapus.',
                             }).then(() => {
                                 // Tetap redirect meskipun ada error saat menghapus session
-                                window.location.href = '/user/bahanBaku';
+                                window.location.href = `${BASE_URL}user/bahanBaku`;
                             });
                         });
                 } else {

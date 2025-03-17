@@ -88,23 +88,23 @@ class MaterialController extends BaseController
         if (!empty($pemesananBb)) {
             foreach ($pemesananBb as $group) {
                 foreach ($group as $rowKey => $row) {
-                        $flattenData[] = [
-                            'tgl_pakai'      => $row['tgl_pakai'] ?? '',
-                            'no_model'       => $row['no_model'] ?? '',
-                            'style_size'     => $row['style_size'] ?? '',
-                            'item_type'      => $row['item_type'] ?? '',
-                            'kode_warna'     => $row['kode_warna'] ?? '',
-                            'warna'          => $row['warna'] ?? '',
-                            'jalan_mc'       => $row['jalan_mc'] ?? '',
-                            'ttl_cns'        => $row['ttl_cns'] ?? '',
-                            'ttl_berat_cns'  => $row['ttl_berat_cns'] ?? '',
-                            'id_material'    => $row['id_material'] ?? '',
-                        ];
+                    $flattenData[] = [
+                        'tgl_pakai'      => $row['tgl_pakai'] ?? '',
+                        'no_model'       => $row['no_model'] ?? '',
+                        'style_size'     => $row['style_size'] ?? '',
+                        'item_type'      => $row['item_type'] ?? '',
+                        'kode_warna'     => $row['kode_warna'] ?? '',
+                        'warna'          => $row['warna'] ?? '',
+                        'jalan_mc'       => $row['jalan_mc'] ?? '',
+                        'ttl_cns'        => $row['ttl_cns'] ?? '',
+                        'ttl_berat_cns'  => $row['ttl_berat_cns'] ?? '',
+                        'id_material'    => $row['id_material'] ?? '',
+                    ];
                 }
             }
         }
         // Lakukan sorting berdasarkan urutan kolom: tgl_pakai, no_model, style_size, item_type, kode_warna, dan warna
-        usort($flattenData, function($a, $b) {
+        usort($flattenData, function ($a, $b) {
             // Urutan field yang ingin dijadikan acuan sorting
             $order = ['tgl_pakai', 'no_model', 'item_type', 'kode_warna', 'warna', 'style_size',];
             foreach ($order as $field) {
@@ -119,7 +119,7 @@ class MaterialController extends BaseController
         $groupedData = [];
         foreach ($flattenData as $data) {
             // Gunakan separator untuk membentuk key unik
-            $groupKey = $data['tgl_pakai'] . '|' .$data['no_model'] . '|' . $data['item_type'] . '|' . $data['kode_warna'] . '|' . $data['warna'];
+            $groupKey = $data['tgl_pakai'] . '|' . $data['no_model'] . '|' . $data['item_type'] . '|' . $data['kode_warna'] . '|' . $data['warna'];
             $groupedData[$groupKey][] = $data;
         }
 
@@ -336,7 +336,7 @@ class MaterialController extends BaseController
                 'message' => 'Beberapa data tidak disimpan karena duplikasi ditemukan.'
             ]);
         }
-        
+
         return $this->response->setJSON([
             'message' => 'Data berhasil diupdate & disimpan ke session',
             'data'    => $existingData,
@@ -364,21 +364,49 @@ class MaterialController extends BaseController
                 }
             }
         }
-    
+
         // Perbarui session jika ada perubahan
         if ($found) {
             session()->set('pemesananBb', $pemesananBb); // Gunakan set() untuk menyimpan data ke session
             return redirect()->back()->with('success', 'Data berhasil dihapus');
         }
-    
+
         // Jika data tidak ditemukan
         return redirect()->back()->with('error', 'Data tidak ditemukan');
     }
-    public function deleteAllPemesananSession() {
+    public function deleteAllPemesananSession()
+    {
         // Menghapus data session 'pemesananBb'
         session()->remove('pemesananBb');
-        
+
         // Redirect dengan pesan sukses
         return redirect()->back()->with('success', 'Data berhasil dihapus dari session');
+    }
+    public function listPemesanan($area)
+    {
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/listPemesanan/' . $area;
+        $response = file_get_contents($apiUrl);  // Mendapatkan response dari API
+        if ($response === FALSE) {
+            die('Error occurred while fetching data.');
+        }
+        $dataList = json_decode($response, true);  // Decode JSON response dari API
+
+        $data = [
+            'role' => session()->get('role'),
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => 'active',
+            'active7' => '',
+            'area' => $area,
+            'title' => "List Pemesanan",
+            'dataList' => $dataList,
+        ];
+        // $dataList = $this->response->setJSON($data);
+
+
+        return view(session()->get('role') . '/Material/listPemesanan', $data);
     }
 }

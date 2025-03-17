@@ -464,6 +464,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('bahanBaku/simpanKeSession', 'MaterialController::savePemesananSession');
     $routes->get('bahanBaku/hapusSession', 'MaterialController::deleteAllPemesananSession');
     $routes->get('bahanBaku/hapusSession/(:any)/(:any)', 'MaterialController::deletePemesananSession/$1/$2');
+    $routes->get('listPemesanan/(:any)', 'MaterialController::listPemesanan/$1');
 });
 
 // sudo
