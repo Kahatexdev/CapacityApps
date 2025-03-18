@@ -982,4 +982,19 @@ class ApsPerstyleModel extends Model
             ->groupBy("DATE_FORMAT(delivery, '%Y-%m')")
             ->first();
     }
+    public function getAreasByNoModel($nomodel)
+    {
+        return $this->select('factory')
+                    ->where('mastermodel', $nomodel)
+                    ->groupBy('factory')
+                    ->findAll();
+    }
+    public function getSizesByNoModelAndArea($nomodel, $area)
+    {
+        return $this->select('size')
+                    ->where('mastermodel', $nomodel)
+                    ->where('factory', $area)
+                    ->groupBy('size')
+                    ->findAll();
+    }
 }
