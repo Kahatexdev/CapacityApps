@@ -342,7 +342,7 @@ class ProduksiController extends BaseController
         $year = date('Y');
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan, $year);
         $totalMesin = $this->jarumModel->getArea();
-        $model= $this->ApsPerstyleModel->getPdkProduksi();
+        $model = $this->ApsPerstyleModel->getPdkProduksi();
 
         $produksiPerArea = [];
         foreach ($totalMesin as $area) {
@@ -1335,8 +1335,8 @@ class ProduksiController extends BaseController
         ];
 
         $idAps = $this->ApsPerstyleModel->getIdProd($validate);
-        
-        if (!$idAps) {    
+
+        if (!$idAps) {
             $idMinus = $this->ApsPerstyleModel->getIdMinus($validate);
             if ($idMinus) {
                 $idnext = $idMinus['idapsperstyle'];
@@ -1352,7 +1352,7 @@ class ProduksiController extends BaseController
                     'qty_produksi' => $qtyProduksi,
                     'no_box' => $noBox,
                     'no_label' => $noLabel,
-                    'no_mesin' => $no_mesin,
+                    'no_mesin' => $noMesin,
                     'delivery' => $deliv,
                     'area' => $area,
                     'admin' => $admin,
@@ -1365,8 +1365,7 @@ class ProduksiController extends BaseController
                     $this->produksiModel->insert($dataInsert);
                 } else {
                     return redirect()->to('/sudo')->with('error', 'Data gagal diinput');
-                }                 
-
+                }
             } else {
                 return redirect()->to('/sudo')->with('error', 'Id tidak ditemukan');
             }
@@ -1376,7 +1375,7 @@ class ProduksiController extends BaseController
             $delivery = $idAps['delivery'];
 
             $sisaQty = $sisaOrder - $qtyProduksi;
-           
+
             if ($sisaQty < 0) {
                 $minus = $sisaQty;
                 $second = [
@@ -1429,7 +1428,6 @@ class ProduksiController extends BaseController
 
                 return redirect()->to('/sudo')->with('error', 'Berhasil input data');
             }
-            
-        }                
+        }
     }
 }
