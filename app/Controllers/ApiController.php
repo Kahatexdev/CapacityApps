@@ -32,6 +32,7 @@ class ApiController extends ResourceController
     protected $DetailPlanningModel;
     protected $areaModel;
     protected $bsModel;
+    protected $validation;
     protected $format = 'json';
     public function __construct()
     {
