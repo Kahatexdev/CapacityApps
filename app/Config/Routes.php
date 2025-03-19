@@ -432,6 +432,9 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('viewModelPlusPacking/(:any)', 'ProduksiController::viewModelPlusPacking/$1');
     $routes->get('pluspacking', 'ProduksiController::pluspacking');
     $routes->post('inputpo', 'ProduksiController::updatepo');
+    $routes->post('get-area', 'ProduksiController::getArea');
+    $routes->post('get-size', 'ProduksiController::getSize');
+    $routes->post('prosesInputProdManual', 'ProduksiController::inputProduksiManual');
 
     //summary
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
@@ -465,6 +468,8 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('bahanBaku/hapusSession', 'MaterialController::deleteAllPemesananSession');
     $routes->get('bahanBaku/hapusSession/(:any)/(:any)', 'MaterialController::deletePemesananSession/$1/$2');
     $routes->get('listPemesanan/(:any)', 'MaterialController::listPemesanan/$1');
+
+    //pph
 });
 
 // sudo
@@ -541,6 +546,7 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->get('updatebs', 'ProduksiController::updatebs');
+    $routes->get('hapus-produksi/(:any)', 'ProduksiController::deleteProduksi/$1');
 
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
     $routes->get('bssetting', 'UserController::bssetting');

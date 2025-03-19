@@ -1364,10 +1364,10 @@ class ProduksiController extends BaseController
                 if (!$existingProduction) {
                     $this->produksiModel->insert($dataInsert);
                 } else {
-                    return redirect()->to('/sudo')->with('error', 'Data gagal diinput');
+                    return redirect()->to('/' . session()->get('role'))->with('error', 'Data gagal diinput');
                 }
             } else {
-                return redirect()->to('/sudo')->with('error', 'Id tidak ditemukan');
+                return redirect()->to('/' . session()->get('role'))->with('error', 'Id tidak ditemukan');
             }
         } else {
             $id = $idAps['idapsperstyle'];
@@ -1415,10 +1415,10 @@ class ProduksiController extends BaseController
                 if ($insert) {
                     $update = $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
                     if ($update) {
-                        return redirect()->to('/sudo')->with('success', 'Berhasil input data');
+                        return redirect()->to('/' . session()->get('role'))->with('success', 'Berhasil input data');
                     }
                 } else {
-                    return redirect()->to('/sudo')->with('error', 'Data gagal diinput');
+                    return redirect()->to('/' . session()->get('role'))->with('error', 'Data gagal diinput');
                 }
             } else {
                 $idexist = $existingProduction['id_produksi'];
@@ -1426,8 +1426,26 @@ class ProduksiController extends BaseController
                 $this->produksiModel->update($idexist, ['qty_produksi' => $sumqty]);
                 $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
 
-                return redirect()->to('/sudo')->with('error', 'Berhasil input data');
+                return redirect()->to('/' . session()->get('role'))->with('error', 'Berhasil input data');
             }
+        }
+    }
+    public function deleteProduksi($id)
+    {
+        $idaps = $this->request->getGet('idaps');
+        $qty = $this->request->getGet('qty');
+        $sisa = $this->request->getGet('sisa');
+        $area = $this->request->getGet('area');
+        // dd($idaps, $area, $sisa, $qty);
+        $delete = $this->produksiModel->where('id_produksi', $id)->delete();
+        if ($delete) {
+            $sisaQty = $sisa + $qty;
+            $update = $this->ApsPerstyleModel->update($idaps, ['sisa' => $sisaQty]);
+            if ($update) {
+                return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('success', 'Data Berhasil di hapus');
+            }
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Data Gagal di hapus ❗');
         }
     }
 }

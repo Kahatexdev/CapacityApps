@@ -80,31 +80,34 @@
                                 <table id="dataTable" class="display  striped" style="width:100%">
                                     <thead>
                                         <tr>
-                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tgl Produksi</th>
-                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">PDK</th>
-                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Style</th>
-                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Delivery</th>
-                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No MC</th>
-                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Box</th>
-                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Label</th>
-                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Produksi</th>
-                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Tgl Produksi</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">PDK</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Style</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Delivery</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">No MC</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">No Box</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">No Label</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Qty Produksi</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php foreach ($produksi as $order) : ?>
                                             <tr>
-                                                <td class="text-sm"><?= $order['tgl_produksi']; ?></td>
-                                                <td class="text-sm"><?= $order['mastermodel']; ?></td>
-                                                <td class="text-sm"><?= $order['size']; ?></td>
-                                                <td class="text-sm"><?= $order['delivery']; ?></td>
-                                                <td class="text-sm"><?= $order['no_mesin']; ?></td>
-                                                <td class="text-sm"><?= $order['no_box']; ?></td>
-                                                <td class="text-sm"><?= $order['no_label']; ?></td>
-                                                <td class="text-sm"><?= $order['qty_produksi']; ?></td>
-                                                <td class="text-sm">
+                                                <td class="text-sm text-center"><?= $order['tgl_produksi']; ?></td>
+                                                <td class="text-sm text-center"><?= $order['mastermodel']; ?></td>
+                                                <td class="text-sm text-center"><?= $order['size']; ?></td>
+                                                <td class="text-sm text-center"><?= $order['delivery']; ?></td>
+                                                <td class="text-sm text-center"><?= $order['no_mesin']; ?></td>
+                                                <td class="text-sm text-center"><?= $order['no_box']; ?></td>
+                                                <td class="text-sm text-center"><?= $order['no_label']; ?></td>
+                                                <td class="text-sm text-center"><?= $order['qty_produksi']; ?></td>
+                                                <td class="text-sm text-center">
                                                     <button class="btn btn-warning edit-btn" data-id="<?= $order['id_produksi']; ?>" data-pdk="<?= $order['mastermodel']; ?>" data-style="<?= $order['size']; ?>" data-nomc="<?= $order['no_mesin']; ?>" data-nobox="<?= $order['no_box']; ?>" data-nolabel="<?= $order['no_label']; ?>" data-qty="<?= $order['qty_produksi']; ?>" data-tgl="<?= $order['tgl_produksi']; ?>" data-sisa="<?= $order['sisa']; ?>" data-idaps="<?= $order['idapsperstyle']; ?>">
                                                         Edit</button>
+                                                    <!-- Button Delete -->
+                                                    <button class="btn btn-danger delete-btn" data-id="<?= $order['id_produksi']; ?>" data-pdk="<?= $order['mastermodel']; ?>" data-style="<?= $order['size']; ?>" data-nomc="<?= $order['no_mesin']; ?>" data-nobox="<?= $order['no_box']; ?>" data-nolabel="<?= $order['no_label']; ?>" data-qty="<?= $order['qty_produksi']; ?>" data-tgl="<?= $order['tgl_produksi']; ?>" data-sisa="<?= $order['sisa']; ?>" data-idaps="<?= $order['idapsperstyle']; ?>">
+                                                        Delete</button>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -113,9 +116,6 @@
                             <?php endif; ?>
                         </div>
                     </div>
-
-
-
                 </div>
             </div>
 
@@ -184,7 +184,7 @@
         </div>
     </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
         $('#dataTable').DataTable({
@@ -223,5 +223,38 @@
         document.getElementById('confirmationMessage').innerHTML = "Apakah anda yakin memecah" + noModel + " dengan jarum " + selectedMachineTypeId + " ke " + selectedArea;
     });
 </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const deleteButtons = document.querySelectorAll(".delete-btn");
+
+        deleteButtons.forEach(button => {
+            button.addEventListener("click", function(event) {
+                event.preventDefault(); // Hindari submit langsung
+
+                const id = this.getAttribute("data-id");
+                const idaps = this.getAttribute("data-idaps");
+                const qty = this.getAttribute("data-qty");
+                const sisa = this.getAttribute("data-sisa");
+                const area = "<?= $area ?>";
+
+                Swal.fire({
+                    title: "Yakin ingin menghapus data ini?",
+                    text: "Data akan dihapus secara permanen!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Ya!",
+                    cancelButtonText: "Batal"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "<?= base_url($role . '/hapus-produksi/'); ?>" + id + "?idaps=" + idaps + "&area=" + area + "&qty=" + qty + "&sisa=" + sisa;
+                    }
+                });
+            });
+        });
+    });
+</script>
+
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <?php $this->endSection(); ?>

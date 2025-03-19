@@ -77,6 +77,7 @@ class UserController extends BaseController
         $dataBuyer = $this->orderModel->getBuyer();
         $dataArea = $this->jarumModel->getArea();
         $dataJarum = $this->jarumModel->getJarum();
+        $model= $this->ApsPerstyleModel->getPdkProduksi();
         $data = [
             'role' => session()->get('role'),
             'title' => 'Dashboard',
@@ -91,7 +92,7 @@ class UserController extends BaseController
             'buyer' => $dataBuyer,
             'area' => $dataArea,
             'jarum' => $dataJarum,
-
+            'models' => $model,
         ];
         return view(session()->get('role') . '/produksi', $data);
     }

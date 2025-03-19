@@ -1811,7 +1811,7 @@ class OrderController extends BaseController
             }
             return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $machinetypeid))->withInput()->with('success', 'Data Berhasil di revise');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $machinetypeid))->with('error', 'No data found in the Excel file');
+            return redirect()->back()->with('error', 'No data found in the Excel file');
         }
     }
     public function pdkDetail($noModel, $jarum)
