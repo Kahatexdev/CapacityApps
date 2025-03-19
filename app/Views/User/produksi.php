@@ -477,7 +477,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="nomodel" class="col-form-label">No Model</label>
-                                    <select class="form-control select2" id="nomodel" name="nomodel" required>
+                                    <select class="select2 form-select" id="nomodel" name="nomodel" required>
                                     <option value="">Pilih No Model</option>
                                     <?php foreach ($models as $model) : ?>
                                         <option value="<?= $model['mastermodel']; ?>"><?= $model['mastermodel']; ?></option>
@@ -516,6 +516,11 @@
     </div>
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+<!-- jQuery (Diperlukan oleh Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
         $('#dataTable0').DataTable({
@@ -648,65 +653,79 @@
     });
 </script> -->
 <script>
-$(document).ready(function() {
-    // Saat No Model diinputkan, fetch Area
-    $('#nomodel').on('change', function() {
-        let nomodel = $(this).val();
-        if (nomodel !== '') {
-            $.ajax({
-                url: "<?= base_url($role . '/get-area') ?>", 
-                type: "POST",
-                data: { nomodel: nomodel },
-                dataType: "json",
-                success: function(response) {
-                    console.log(response);
-                    $('#area-prod').empty().append('<option></option>'); // Reset area dropdown
+    $(document).ready(function() {
+        // Saat No Model diinputkan, fetch Area
+        $('#nomodel').on('change', function() {
+            let nomodel = $(this).val();
+            if (nomodel !== '') {
+                $.ajax({
+                    url: "<?= base_url($role . '/get-area') ?>", 
+                    type: "POST",
+                    data: { nomodel: nomodel },
+                    dataType: "json",
+                    success: function(response) {
+                        console.log(response);
+                        $('#area-prod').empty().append('<option></option>'); // Reset area dropdown
 
-                    $.each(response, function(index, value) {
-                        $('#area-prod').append('<option value="' + value.factory + '">' + value.factory + '</option>');
-                    });
-                }
-            });
-        } else {
-            $('#area-prod').empty().append('<option></option>'); // Kosongkan dropdown jika No Model dikosongkan
+                        $.each(response, function(index, value) {
+                            $('#area-prod').append('<option value="' + value.factory + '">' + value.factory + '</option>');
+                        });
+                    }
+                });
+            } else {
+                $('#area-prod').empty().append('<option></option>'); // Kosongkan dropdown jika No Model dikosongkan
+            }
+        });
+
+        // Saat Area dipilih, fetch Size berdasarkan No Model dan Area
+        $('#area-prod').on('change', function() {
+            let nomodel = $('#nomodel').val();
+            let area = $(this).val();
+            if (nomodel !== '' && area !== '') {
+                $.ajax({
+                    url: "<?= base_url($role . '/get-size') ?>", // Ganti dengan endpoint untuk mengambil Size
+                    type: "POST",
+                    data: { nomodel: nomodel, area: area },
+                    dataType: "json",
+                    success: function(response) {
+                        $('#size').empty().append('<option value="">Pilih Size</option>');
+
+                        $.each(response, function(index, value) {
+                            $('#size').append('<option value="' + value.size + '">' + value.size + '</option>');
+                        });
+                    }
+                });
+            } else {
+                $('#size').empty().append('<option></option>');
+            }
+        });
+
+        //Hitung qty_produksi
+        function hitungTotal() {
+            let shiftA = parseInt($('input[name="shift_a"]').val()) || 0;
+            let shiftB = parseInt($('input[name="shift_b"]').val()) || 0;
+            let shiftC = parseInt($('input[name="shift_c"]').val()) || 0;
+            let total = shiftA + shiftB + shiftC;
+
+            $('#qty_produksi').val(total);
         }
-    });
 
-    // Saat Area dipilih, fetch Size berdasarkan No Model dan Area
-    $('#area-prod').on('change', function() {
-        let nomodel = $('#nomodel').val();
-        let area = $(this).val();
-        if (nomodel !== '' && area !== '') {
-            $.ajax({
-                url: "<?= base_url($role . '/get-size') ?>", // Ganti dengan endpoint untuk mengambil Size
-                type: "POST",
-                data: { nomodel: nomodel, area: area },
-                dataType: "json",
-                success: function(response) {
-                     $('#size').empty().append('<option value="">Pilih Size</option>');
+        // Panggil fungsi saat input berubah
+        $('input[name="shift_a"], input[name="shift_b"], input[name="shift_c"]').on('input', hitungTotal);
 
-                    $.each(response, function(index, value) {
-                        $('#size').append('<option value="' + value.size + '">' + value.size + '</option>');
-                    });
-                }
+        $(document).ready(function() {
+        // Inisialisasi Select2 saat modal pertama kali dibuka
+        $('#inputProduksi').on('shown.bs.modal', function () {
+            $('#nomodel').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                dropdownParent: $('#inputProduksi'), // Agar dropdown muncul di dalam modal
+                placeholder: "Pilih No Model",
+                allowClear: true
             });
-        } else {
-            $('#size').empty().append('<option></option>');
-        }
+        });
     });
-
-    //Hitung qty_produksi
-    function hitungTotal() {
-        let shiftA = parseInt($('input[name="shift_a"]').val()) || 0;
-        let shiftB = parseInt($('input[name="shift_b"]').val()) || 0;
-        let shiftC = parseInt($('input[name="shift_c"]').val()) || 0;
-        let total = shiftA + shiftB + shiftC;
-
-        $('#qty_produksi').val(total);
-    }
-
-    // Panggil fungsi saat input berubah
-    $('input[name="shift_a"], input[name="shift_b"], input[name="shift_c"]').on('input', hitungTotal);
-});
+    });
+    
 </script>
 <?php $this->endSection(); ?>
