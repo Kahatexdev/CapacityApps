@@ -469,6 +469,8 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('bahanBaku/hapusSession', 'MaterialController::deleteAllPemesananSession');
     $routes->get('bahanBaku/hapusSession/(:any)/(:any)', 'MaterialController::deletePemesananSession/$1/$2');
     $routes->get('listPemesanan/(:any)', 'MaterialController::listPemesanan/$1');
+    $routes->get('stockbahanbaku/(:any)', 'MaterialController::stockBahanBaku/$1');
+    $routes->get('filterstockbahanbaku/(:any)', 'MaterialController::filterStockBahanBaku/$1');
 });
 
 // sudo

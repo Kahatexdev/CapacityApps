@@ -86,7 +86,7 @@
                                         <div class="form-group">
                                             <label for="no_model_0" class="form-control-label">PDK</label>
                                             <!-- <input class="form-control" type="text" id="no_model_0" name="no_model[]" required> -->
-                                            <select name="no_model[]" id="no_model_0" class="form-control" onchange="getIn(0)" required>
+                                            <select name="no_model[]" id="no_model_0" class="select2 form-select" onchange="getIn(0)" required>
                                                 <option value="" selected>Pilih No Model</option>
                                                 <?php if (!empty($pdk) && is_array($pdk)): ?>
                                                     <?php foreach ($pdk as $pd): ?>
@@ -258,7 +258,14 @@
         </div>
     </div>
 </div>
+
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+<!-- jQuery (Diperlukan oleh Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
 <script type="text/javascript">
     let rowIndex = 1;
 
@@ -469,6 +476,15 @@
             sizeInput.value = '';
         }
     }
+
+    $(document).ready(function() {
+        $('.select2').select2({
+            theme: 'bootstrap-5', // Gunakan tema Bootstrap 5
+            width: '100%',
+            placeholder: "Pilih No Model",
+            allowClear: true
+        });
+    });
 </script>
 
 <?php $this->endSection(); ?>
