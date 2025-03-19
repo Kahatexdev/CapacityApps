@@ -29,7 +29,7 @@
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row d-flex align-items-center">
-                        <div class="col-7">
+                        <div class="col-6">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Material System</p>
                                 <h5 class="font-weight-bolder mb-0">
@@ -37,17 +37,13 @@
                                 </h5>
                             </div>
                         </div>
-                        <div class="col-4 d-flex align-items-center text-end gap-2">
+                        <div class="col-6 d-flex align-items-center text-end gap-2">
                             <label for="">Tanggal Schedule</label>
                             <input type="date" class="form-control" id="filter_date" value="">
                             <input type="text" class="form-control" id="filter" value="" placeholder="No Model/Kode Warna/Lot">
                             <button id="filterButton" class="btn btn-info ms-2"><i class="fas fa-search"></i></button>
                         </div>
-                        <div class="col-1 text-end">
-                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-chart-bar-32 text-lg opacity-10" aria-hidden="true"></i>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
             </div>
