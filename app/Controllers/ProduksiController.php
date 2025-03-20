@@ -371,11 +371,8 @@ class ProduksiController extends BaseController
             'jarum' => $dataJarum,
             'models' => $model,
         ];
-        if ($role == 'user') {
-            return view(session()->get('role') . '/produksi', $data);
-        } else {
-            return view(session()->get('role') . '/Produksi/produksi', $data);
-        }
+
+        return view(session()->get('role') . '/Produksi/produksi', $data);
     }
     public function progressData($noModel)
     {

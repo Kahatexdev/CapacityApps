@@ -407,7 +407,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
 
 // user
 $routes->group('/user', ['filter' => 'user'], function ($routes) {
-    $routes->get('', 'UserController::produksi');
+    $routes->get('', 'ProduksiController::viewProduksi');
     $routes->get('produksi', 'UserController::produksi');
     $routes->get('bssetting', 'UserController::bssetting');
     $routes->get('bsmesin', 'UserController::bsmesin');
@@ -415,7 +415,19 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('saveBsMesin', 'UserController::saveBsMesin');
     $routes->get('userController/getInisial/(:any)', 'UserController::getInisial/$1');
     $routes->get('userController/getSize/(:any)', 'UserController::getSize/$1');
-
+    $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
+    $routes->get('produksi', 'ProduksiController::produksi');
+    $routes->get('dataprogress', 'ProduksiController::progressData');
+    $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
+    $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->post('importproduksi', 'ProduksiController::importproduksinew');
+    $routes->post('resetproduksi', 'ProduksiController::resetproduksi');
+    $routes->post('resetproduksiarea', 'ProduksiController::resetproduksiarea');
+    $routes->post('editproduksi', 'ProduksiController::editproduksi');
+    $routes->get('updateproduksi', 'ProduksiController::updateproduksi');
+    $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->post('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->get('updatebs', 'ProduksiController::updatebs');
 
     // data order
     $routes->get('dataorderperarea/(:any)', 'OrderController::DetailOrderPerAreaPlan/$1');
