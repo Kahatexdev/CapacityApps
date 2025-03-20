@@ -384,12 +384,42 @@ class MaterialController extends BaseController
     }
     public function listPemesanan($area)
     {
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/listPemesanan/' . $area;
+        $apiUrl = 'http://172.23.39.118/MaterialSystem/public/api/listPemesanan/' . $area;
         $response = file_get_contents($apiUrl);  // Mendapatkan response dari API
         if ($response === FALSE) {
             die('Error occurred while fetching data.');
         }
         $dataList = json_decode($response, true);  // Decode JSON response dari API
+
+        // ambil data libur hari kedepan untuk menentukan jadwal pemesanan
+        $today = date('Y-m-d'); // ambil data hari ini
+        $dataLibur = $this->liburModel->getDataLiburForPemesanan($today);
+        // Ambil data tanggal libur menjadi array sederhana
+        $liburDates = array_column($dataLibur, 'tanggal'); // Ambil hanya kolom 'tanggal'
+
+        $day = date('l'); // ambil data hari ini
+        function getNextNonHoliday($date, $liburDates)
+        {
+            while (in_array($date, $liburDates)) {
+                // Jika tanggal ada di daftar libur, tambahkan 1 hari
+                $date = date('Y-m-d', strtotime($date . ' +1 day'));
+            }
+            return $date;
+        }
+
+        $initialTomorrow = date('Y-m-d', strtotime('+1 day')); // Mulai dari hari besok
+        $tomorrow = getNextNonHoliday($initialTomorrow, $liburDates); // Dapatkan tanggal "tomorrow" yang valid (bukan libur)
+
+        // Untuk tanggal berikutnya, kita ambil 1 hari setelah tanggal "tomorrow" dan cek ulang
+        $initialTwoDays = date('Y-m-d', strtotime($tomorrow . ' +1 day'));
+        $twoDays = getNextNonHoliday($initialTwoDays, $liburDates);
+
+        // Untuk tanggal ketiga, ambil 1 hari setelah tanggal "twoDays" dan cek ulang
+        $initialthreeDay = date('Y-m-d', strtotime($twoDays . ' +1 day'));
+        $threeDay = getNextNonHoliday($initialthreeDay, $liburDates);
+
+        // Debug hasil
+        // dd($tomorrow, $twoDays, $threeDay);
 
         $data = [
             'role' => session()->get('role'),
@@ -403,9 +433,11 @@ class MaterialController extends BaseController
             'area' => $area,
             'title' => "List Pemesanan",
             'dataList' => $dataList,
+            'day' => $day,
+            'tomorrow' => $tomorrow,
+            'twoDays' => $twoDays,
+            'threeDay' => $threeDay,
         ];
-        // $dataList = $this->response->setJSON($data);
-
 
         return view(session()->get('role') . '/Material/listPemesanan', $data);
     }
