@@ -713,12 +713,14 @@ class ProduksiController extends BaseController
                     'max_delivery' => $item['max_delivery'],
                     'sisa' => $item['sisa'],
                     'qty' => 0,
+                    'plus_packing' => 0,
                     'running' => 0,
                     'ttl_prod' => 0,
                     'ttl_jlmc' => 0,
                 ];
             }
             $uniqueData[$key]['qty'] += $item['qty'];
+            $uniqueData[$key]['plus_packing'] += $item['plus_packing'];
             $uniqueData[$key]['running'] += $item['running'];
             $uniqueData[$key]['ttl_prod'] += $item['qty_produksi'];
             $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];

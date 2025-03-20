@@ -78,6 +78,7 @@
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Inisial</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Style Size</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Qty PO (dz)</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Qty PO+ (dz)</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Total Prod (dz)</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Sisa (dz)</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Rata-rata Jl Mc</th>
@@ -92,6 +93,7 @@
                                 <tbody>
                                     <?php
                                     $ttl_qty = 0;
+                                    $ttl_qty_plus = 0;
                                     $ttl_prod = 0;
                                     $ttl_jlmc = 0;
                                     $ttl_sisa = 0;
@@ -102,6 +104,7 @@
                                         $today = date('Y-m-d');
                                         // 
                                         $ttl_qty += $id['qty'];
+                                        $ttl_qty_plus += $id['plus_packing'];
                                         $ttl_prod += $id['ttl_prod'];
                                         $ttl_jlmc += $id['ttl_jlmc'];
                                         $ttl_sisa += $id['sisa'];
@@ -120,6 +123,7 @@
                                             <td class="text-sm"><?= $id['inisial']; ?></td>
                                             <td class="text-sm"><?= $id['size']; ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= number_format($id['qty'] / 24, 2); ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= number_format($id['plus_packing'] / 24, 2); ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= number_format($id['qty_produksi'] / 24, 2); ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= number_format($id['sisa'] / 24, 2); ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= is_numeric($rata2) ? number_format((float)$rata2, 0) : '0'; ?></td>
@@ -151,6 +155,7 @@
                                                 <th colspan="4" style="text-align: center;">Total <?= $id['mastermodel'] ?></th>
                                                 <th style="text-align: right;">:</th>
                                                 <th style="text-align: center;"><?= number_format($ttl_qty / 24, 2); ?></th>
+                                                <th style="text-align: center;"><?= number_format($ttl_qty_plus / 24, 2); ?></th>
                                                 <th style="text-align: center;"><?= number_format($ttl_prod / 24, 2); ?></th>
                                                 <th style="text-align: center;"><?= number_format($ttl_sisa / 24, 2); ?></th>
                                                 <th style="text-align: center;"><?= number_format($ttl_rata2, 0); ?></th>
