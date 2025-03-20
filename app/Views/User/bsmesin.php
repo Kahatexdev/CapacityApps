@@ -86,7 +86,7 @@
                                         <div class="form-group">
                                             <label for="no_model_0" class="form-control-label">PDK</label>
                                             <!-- <input class="form-control" type="text" id="no_model_0" name="no_model[]" required> -->
-                                            <select name="no_model[]" id="no_model_0" class="select2 form-select" onchange="getIn(0)" required>
+                                            <select name="no_model[]" id="no_model_0" class="select2 form-select" onchange="getSize(0)" required>
                                                 <option value="" selected>Pilih No Model</option>
                                                 <?php if (!empty($pdk) && is_array($pdk)): ?>
                                                     <?php foreach ($pdk as $pd): ?>
@@ -102,17 +102,16 @@
                                     </div>
                                     <div class="col-lg-2 col-sm-12">
                                         <div class="form-group">
-                                            <label for="inisial_0" class="form-control-label">In</label>
-                                            <input type="hidden" class="form-control" name="inisialName[]" id="inisialName_0">
-                                            <select class="form-control" id="inisial_0" name="inisial[]" onchange="getSize(0)" required>
+                                            <label for="size_0" class="form-control-label">Size</label>
+                                            <select class="form-control" id="size_0" name="size[]" onchange="getIn(0)" required>
                                                 <option value="" selected>Pilih inisial</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-lg-2 col-sm-12">
                                         <div class="form-group">
-                                            <label for="size_0" class="form-control-label">Size</label>
-                                            <input class="form-control" type="text" id="size_0" name="size[]" required>
+                                            <label for="inisial_0" class="form-control-label">In</label>
+                                            <input class="form-control" type="text" id="inisial_0" name="inisial[]" required>
                                         </div>
                                     </div>
                                     <div class="col-lg-2 col-sm-12">
@@ -285,7 +284,7 @@
         <div class="col-lg-2 col-sm-12">
             <div class="form-group">
                 <label for="no_model_${rowIndex}" class="form-control-label">PDK</label>
-                <select name="no_model[]" id="no_model_${rowIndex}" class="form-control" onchange="getIn(${rowIndex})" required>
+                <select name="no_model[]" id="no_model_${rowIndex}" class="select2 form-select" onchange="getSize(${rowIndex})" required>
                     <option value="" selected>Pilih No Model</option>
                     <?php if (!empty($pdk) && is_array($pdk)): ?>
                         <?php foreach ($pdk as $pd): ?>
@@ -301,17 +300,16 @@
         </div>
         <div class="col-lg-1 col-sm-12">
             <div class="form-group">
-                <label for="inisial_${rowIndex}" class="form-control-label">In</label>
-                <input type="hidden" class="form-control" name="inisialName[]" id="inisialName_${rowIndex}">
-                <select class="form-select" id="inisial_${rowIndex}" name="inisial[]" onchange="getSize(${rowIndex})" required>
-                    <option value="">Pilih inisial</option>
+                <label for="size_${rowIndex}" class="form-control-label">Size</label>
+                <select class="form-select" id="size_${rowIndex}" name="size[]" onchange="getIn(${rowIndex})" required>
+                    <option value="">Pilih Size</option>
                 </select>
             </div>
         </div>
         <div class="col-lg-2 col-sm-12">
             <div class="form-group">
-                <label for="size_${rowIndex}" class="form-control-label">Size</label>
-                <input class="form-control" type="text" id="size_${rowIndex}" name="size[]" required>
+                <label for="inisial_${rowIndex}" class="form-control-label">In</label>
+                <input class="form-control" type="text" id="inisial_${rowIndex}" name="inisial[]" required>
             </div>
         </div>
         <div class="col-lg-2 col-sm-12">
@@ -333,6 +331,15 @@
             </div>
         </div>`;
         container.appendChild(newRow);
+
+        // Reinitialize Select2 for newly added row
+        $(`#no_model_${rowIndex}`).select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: "Pilih No Model",
+            allowClear: true
+        });
+        
         rowIndex++;
     }
 
@@ -409,48 +416,13 @@
         }
     }
 
-    function getIn(rowIndex) {
+    function getSize(rowIndex) {
         let id = document.getElementById(`no_model_${rowIndex}`).value;
-        const inisialSelect = document.getElementById(`inisial_${rowIndex}`);
-        inisialSelect.innerHTML = '<option value="">Pilih Inisial</option>';
+        const sizeSelect = document.getElementById(`size_${rowIndex}`);
+        sizeSelect.innerHTML = '<option value="">Pilih Size</option>';
         // let inisial = document.getElementById('inisialName');
         if (id) {
-            const url = `<?= base_url('/user/userController/getInisial/') ?>${id}`;
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Gagal mengambil data inisial');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.inisial && typeof data.inisial === 'object') {
-                        Object.values(data.inisial).forEach(item => {
-                            const option = document.createElement('option');
-                            option.value = item.idapsperstyle;
-                            option.text = item.inisial;
-                            // inisial.value = item.inisial;
-                            inisialSelect.appendChild(option);
-                        });
-                    } else {
-                        alert('Data inisial tidak ditemukan atau format tidak sesuai.');
-                    }
-                })
-                .catch(error => {
-                    alert('Gagal mengambil data dari server.');
-                });
-        } else {
-            inisialSelect.innerHTML = '<option value="">Pilih Inisial</option>';
-        }
-    }
-
-    function getSize(rowIndex) {
-        let idaps = document.getElementById(`inisial_${rowIndex}`).value;
-        const sizeInput = document.getElementById(`size_${rowIndex}`);
-        const inisial = document.getElementById(`inisialName_${rowIndex}`);
-
-        if (idaps) {
-            const url = `<?= base_url('/user/userController/getSize/') ?>${idaps}`;
+            const url = `<?= base_url('/user/userController/getSize/') ?>${id}`;
             fetch(url)
                 .then(response => {
                     if (!response.ok) {
@@ -459,21 +431,58 @@
                     return response.json();
                 })
                 .then(data => {
-                    if (data.size) {
-                        sizeInput.value = data.size;
-                        inisial.value = data.inisial;
-
+                    if (data.size && typeof data.size === 'object') {
+                        Object.values(data.size).forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item.size;
+                            option.text = item.size;
+                            // inisial.value = item.inisial;
+                            sizeSelect.appendChild(option);
+                        });
                     } else {
-                        sizeInput.value = '';
-                        alert('Data size tidak ditemukan.');
+                        alert('Data size tidak ditemukan atau format tidak sesuai.');
                     }
                 })
                 .catch(error => {
-                    sizeInput.value = '';
                     alert('Gagal mengambil data dari server.');
                 });
         } else {
-            sizeInput.value = '';
+            sizeSelect.innerHTML = '<option value="">Pilih Size</option>';
+        }
+    }
+
+    function getIn(rowIndex) {
+        let size = document.getElementById(`size_${rowIndex}`).value;
+        const inisialInput = document.getElementById(`inisial_${rowIndex}`);
+        // const idaps = document.getElementById(`idaps_${rowIndex}`);
+
+        console.log(size);
+
+        if (size) {
+            const url = `<?= base_url('/user/userController/getInisial/') ?>${size}`;
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Gagal mengambil data inisial');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data); // Debugging response dari server
+                    if (data.inisial) {
+                        inisialInput.value = data.inisial;
+                    } else {
+                        inisialInput.value = '';
+                        alert('Data inisial tidak ditemukan.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    inisialInput.value = '';
+                    alert('Gagal mengambil data dari server.');
+                });
+        } else {
+            inisialInput.value = '';
         }
     }
 

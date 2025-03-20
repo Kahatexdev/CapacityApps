@@ -313,14 +313,14 @@ class ApsPerstyleModel extends Model
 
     public function getInProduksi()
     {
-        return $this->select('mastermodel, inisial, idapsperstyle')
+        return $this->select('mastermodel, inisial, size, idapsperstyle')
             ->groupBy('mastermodel, inisial')
             ->findAll();
     }
 
     public function getSizeProduksi()
     {
-        return $this->select('idapsperstyle, size, inisial')
+        return $this->select('idapsperstyle, mastermodel, size, inisial')
             ->groupBy('mastermodel, size')
             ->findAll();
     }
