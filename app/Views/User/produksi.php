@@ -477,7 +477,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="nomodel" class="col-form-label">No Model</label>
-                                    <select class="select2 form-select" id="nomodel" name="nomodel" required>
+                                <select class="select2 form-select" id="nomodel" name="nomodel" required>
                                     <option value="">Pilih No Model</option>
                                     <?php foreach ($models as $model) : ?>
                                         <option value="<?= $model['mastermodel']; ?>"><?= $model['mastermodel']; ?></option>

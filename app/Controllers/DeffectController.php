@@ -101,16 +101,20 @@ class DeffectController extends BaseController
     public function viewDataBs()
     {
         $master = $this->deffectModel->findAll();
+        $dataBuyer = $this->orderModel->getBuyer();
 
         $awal = $this->request->getPost('awal');
         $akhir = $this->request->getPost('akhir');
         $pdk = $this->request->getPost('pdk');
         $area = $this->request->getPost('area');
+        $buyer = $this->request->getPost('buyer');
+        // dd($buyer);
         $theData = [
             'awal' => $awal,
             'akhir' => $akhir,
             'pdk' => $pdk,
-            'area' => $area
+            'area' => $area,
+            'buyer' => $buyer,
         ];
         $getData = $this->BsModel->getDataBsFilter($theData);
         $total = $this->BsModel->totalBs($theData);
@@ -132,7 +136,8 @@ class DeffectController extends BaseController
             'pdk' => $pdk,
             'area' => $area,
             'totalbs' => $total,
-            'chart' => $chartData
+            'chart' => $chartData,
+            'dataBuyer' => $dataBuyer,
         ];
 
         return view(session()->get('role') . '/Deffect/bstabel', $data);
