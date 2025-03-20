@@ -171,7 +171,7 @@
                                                     <td class="text-sm" style="text-align: center;"><?= number_format($id['sisa'] / 24, 2); ?></td>
                                                     <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($persentase, 2) . '%' : ''; ?></td>
                                                     <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($bs_st / 24, 2) : ''; ?></td>
-                                                    <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($pr['plus_packing'], 2) : ''; ?></td>
+                                                    <td class="text-sm" style="text-align: center;"><?= ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($pr['plus_packing'] / 24, 2) : ''; ?></td>
                                                 <?php
                                                     break;
                                                 }

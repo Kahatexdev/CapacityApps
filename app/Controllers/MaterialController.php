@@ -441,4 +441,37 @@ class MaterialController extends BaseController
 
         return view(session()->get('role') . '/Material/listPemesanan', $data);
     }
+    public function stockBahanBaku($area)
+    {
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Status Bahan Baku',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'targetProd' => 0,
+            'produksiBulan' => 0,
+            'produksiHari' => 0,
+            'area' => $area
+
+        ];
+
+        return view(session()->get('role') . '/Material/stockbahanbaku', $data);
+    }
+    public function filterStockBahanBaku($area)
+    {
+        // Mengambil nilai 'search' yang dikirim oleh frontend
+        $noModel = $this->request->getGet('noModel');
+        $warna = $this->request->getGet('warna');
+
+        // Jika search ada, panggil API eksternal dengan query parameter 'search'
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/stockbahanbaku/' . $area . '?noModel=' . urlencode($noModel) . '&warna=' . urlencode($warna);
+
+        // Mengambil data dari API eksternal
+        $response = file_get_contents($apiUrl);
+        $stock = json_decode($response, true);
+
+        // Kembalikan data yang sudah difilter ke frontend
+        return $this->response->setJSON($stock);
+    }
 }

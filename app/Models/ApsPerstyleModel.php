@@ -313,14 +313,14 @@ class ApsPerstyleModel extends Model
 
     public function getInProduksi()
     {
-        return $this->select('mastermodel, inisial, idapsperstyle')
+        return $this->select('mastermodel, inisial, size, idapsperstyle')
             ->groupBy('mastermodel, inisial')
             ->findAll();
     }
 
     public function getSizeProduksi()
     {
-        return $this->select('idapsperstyle, size, inisial')
+        return $this->select('idapsperstyle, mastermodel, size, inisial')
             ->groupBy('mastermodel, size')
             ->findAll();
     }
@@ -981,5 +981,20 @@ class ApsPerstyleModel extends Model
             ->where('production_unit !=', 'MJ')
             ->groupBy("DATE_FORMAT(delivery, '%Y-%m')")
             ->first();
+    }
+    public function getAreasByNoModel($nomodel)
+    {
+        return $this->select('factory')
+                    ->where('mastermodel', $nomodel)
+                    ->groupBy('factory')
+                    ->findAll();
+    }
+    public function getSizesByNoModelAndArea($nomodel, $area)
+    {
+        return $this->select('size')
+                    ->where('mastermodel', $nomodel)
+                    ->where('factory', $area)
+                    ->groupBy('size')
+                    ->findAll();
     }
 }

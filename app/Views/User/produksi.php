@@ -48,6 +48,9 @@
                             <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#timter">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Timter Produksi
                             </button>
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#inputProduksi">
+                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Input Produksi
+                            </button>
                         </div>
                     </div>
                     <div class="card-body">
@@ -434,7 +437,90 @@
         </div>
     </div>
 </div>
+<!-- modal input produksi -->
+<div class="modal fade" id="inputProduksi" tabindex="-1" role="dialog" aria-labelledby="inputProduksi" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Input Produksi</h5>
+                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form action="<?= base_url($role . '/prosesInputProdManual'); ?>" method="POST">
+                <div class="modal-body align-items-center">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="tgl_produksi" class="col-form-label">Tanggal Produksi</label>
+                                <input type="date" class="form-control" name="tgl_produksi" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="area" class="col-form-label">Area</label>
+                                <select class="form-control" id="area-prod" name="area" required>
+                                    <option></option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="box" class="col-form-label">No Box</label>
+                                <input type="text" class="form-control" name="box" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="no_mesin" class="col-form-label">No Mesin</label>
+                                <input type="text" class="form-control" name="no_mesin" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="shift_b" class="col-form-label">Shift B</label>
+                                <input type="text" class="form-control" name="shift_b" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="nomodel" class="col-form-label">No Model</label>
+                                <select class="select2 form-select" id="nomodel" name="nomodel" required>
+                                    <option value="">Pilih No Model</option>
+                                    <?php foreach ($models as $model) : ?>
+                                        <option value="<?= $model['mastermodel']; ?>"><?= $model['mastermodel']; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="size" class="col-form-label">Style Size</label>
+                                <select class="form-control" id="size" name="size" required>
+                                    <option></option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="label" class="col-form-label">No Label</label>
+                                <input type="text" class="form-control" name="label" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="shift_a" class="col-form-label">Shift A</label>
+                                <input type="text" class="form-control" name="shift_a" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="shift_c" class="col-form-label">Shift C</label>
+                                <input type="text" class="form-control" name="shift_c" required>
+                            </div>
+                            <input type="hidden" id="qty_produksi" name="qty_produksi">
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-gradient-info">Generate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+<!-- jQuery (Diperlukan oleh Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
         $('#dataTable0').DataTable({
@@ -566,4 +652,80 @@
         },
     });
 </script> -->
+<script>
+    $(document).ready(function() {
+        // Saat No Model diinputkan, fetch Area
+        $('#nomodel').on('change', function() {
+            let nomodel = $(this).val();
+            if (nomodel !== '') {
+                $.ajax({
+                    url: "<?= base_url($role . '/get-area') ?>", 
+                    type: "POST",
+                    data: { nomodel: nomodel },
+                    dataType: "json",
+                    success: function(response) {
+                        console.log(response);
+                        $('#area-prod').empty().append('<option></option>'); // Reset area dropdown
+
+                        $.each(response, function(index, value) {
+                            $('#area-prod').append('<option value="' + value.factory + '">' + value.factory + '</option>');
+                        });
+                    }
+                });
+            } else {
+                $('#area-prod').empty().append('<option></option>'); // Kosongkan dropdown jika No Model dikosongkan
+            }
+        });
+
+        // Saat Area dipilih, fetch Size berdasarkan No Model dan Area
+        $('#area-prod').on('change', function() {
+            let nomodel = $('#nomodel').val();
+            let area = $(this).val();
+            if (nomodel !== '' && area !== '') {
+                $.ajax({
+                    url: "<?= base_url($role . '/get-size') ?>", // Ganti dengan endpoint untuk mengambil Size
+                    type: "POST",
+                    data: { nomodel: nomodel, area: area },
+                    dataType: "json",
+                    success: function(response) {
+                        $('#size').empty().append('<option value="">Pilih Size</option>');
+
+                        $.each(response, function(index, value) {
+                            $('#size').append('<option value="' + value.size + '">' + value.size + '</option>');
+                        });
+                    }
+                });
+            } else {
+                $('#size').empty().append('<option></option>');
+            }
+        });
+
+        //Hitung qty_produksi
+        function hitungTotal() {
+            let shiftA = parseInt($('input[name="shift_a"]').val()) || 0;
+            let shiftB = parseInt($('input[name="shift_b"]').val()) || 0;
+            let shiftC = parseInt($('input[name="shift_c"]').val()) || 0;
+            let total = shiftA + shiftB + shiftC;
+
+            $('#qty_produksi').val(total);
+        }
+
+        // Panggil fungsi saat input berubah
+        $('input[name="shift_a"], input[name="shift_b"], input[name="shift_c"]').on('input', hitungTotal);
+
+        $(document).ready(function() {
+        // Inisialisasi Select2 saat modal pertama kali dibuka
+        $('#inputProduksi').on('shown.bs.modal', function () {
+            $('#nomodel').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                dropdownParent: $('#inputProduksi'), // Agar dropdown muncul di dalam modal
+                placeholder: "Pilih No Model",
+                allowClear: true
+            });
+        });
+    });
+    });
+    
+</script>
 <?php $this->endSection(); ?>

@@ -342,7 +342,7 @@ class ProduksiController extends BaseController
         $year = date('Y');
         $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan, $year);
         $totalMesin = $this->jarumModel->getArea();
-
+        $model = $this->ApsPerstyleModel->getPdkProduksi();
 
         $produksiPerArea = [];
         foreach ($totalMesin as $area) {
@@ -369,6 +369,7 @@ class ProduksiController extends BaseController
             'buyer' => $dataBuyer,
             'area' => $dataArea,
             'jarum' => $dataJarum,
+            'models' => $model,
         ];
         if ($role == 'user') {
             return view(session()->get('role') . '/produksi', $data);
@@ -715,12 +716,14 @@ class ProduksiController extends BaseController
                     'max_delivery' => $item['max_delivery'],
                     'sisa' => $item['sisa'],
                     'qty' => 0,
+                    'plus_packing' => 0,
                     'running' => 0,
                     'ttl_prod' => 0,
                     'ttl_jlmc' => 0,
                 ];
             }
             $uniqueData[$key]['qty'] += $item['qty'];
+            $uniqueData[$key]['plus_packing'] += $item['plus_packing'];
             $uniqueData[$key]['running'] += $item['running'];
             $uniqueData[$key]['ttl_prod'] += $item['qty_produksi'];
             $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
@@ -1298,6 +1301,153 @@ class ProduksiController extends BaseController
             return $this->response->setJSON($data);
         } catch (\Exception $e) {
             return $this->response->setJSON(['error' => $e->getMessage()]);
+        }
+    }
+    public function getArea()
+    {
+        $nomodel = $this->request->getPost('nomodel');
+        $data = $this->ApsPerstyleModel->getAreasByNoModel($nomodel);
+        return $this->response->setJSON($data);
+    }
+    public function getSize()
+    {
+        $nomodel = $this->request->getPost('nomodel');
+        $area = $this->request->getPost('area');
+        $data = $this->ApsPerstyleModel->getSizesByNoModelAndArea($nomodel, $area);
+        return $this->response->setJSON($data);
+    }
+    public function inputProduksiManual()
+    {
+        $tglProduksi = $this->request->getPost('tgl_produksi');
+        $noModel = $this->request->getPost('nomodel');
+        $area = $this->request->getPost('area');
+        $size = $this->request->getPost('size');
+        $noBox = $this->request->getPost('box');
+        $noLabel = $this->request->getPost('label');
+        $noMesin = $this->request->getPost('no_mesin');
+        $shiftA = $this->request->getPost('shift_a');
+        $shiftB = $this->request->getPost('shift_b');
+        $shiftC = $this->request->getPost('shift_c');
+        $qtyProduksi = $this->request->getPost('qty_produksi');
+        $admin = session()->get('username');
+
+        $validate = [
+            'no_model' => $noModel,
+            'style' => $size
+        ];
+
+        $idAps = $this->ApsPerstyleModel->getIdProd($validate);
+
+        if (!$idAps) {
+            $idMinus = $this->ApsPerstyleModel->getIdMinus($validate);
+            if ($idMinus) {
+                $idnext = $idMinus['idapsperstyle'];
+                $qtysisa = $idMinus['sisa'];
+                $deliv = $idMinus['delivery'];
+                $sisa = $qtysisa - $qtyProduksi;
+
+                $this->ApsPerstyleModel->update($idnext, ['sisa' => $sisa]);
+
+                $dataInsert = [
+                    'tgl_produksi' => $tglProduksi,
+                    'idapsperstyle' => $idnext,
+                    'qty_produksi' => $qtyProduksi,
+                    'no_box' => $noBox,
+                    'no_label' => $noLabel,
+                    'no_mesin' => $noMesin,
+                    'delivery' => $deliv,
+                    'area' => $area,
+                    'admin' => $admin,
+                    'shift_a' => $shiftA,
+                    'shift_b' => $shiftB,
+                    'shift_c' => $shiftC,
+                ];
+                $existingProduction = $this->produksiModel->existingData($dataInsert);
+                if (!$existingProduction) {
+                    $this->produksiModel->insert($dataInsert);
+                } else {
+                    return redirect()->to('/' . session()->get('role'))->with('error', 'Data gagal diinput');
+                }
+            } else {
+                return redirect()->to('/' . session()->get('role'))->with('error', 'Id tidak ditemukan');
+            }
+        } else {
+            $id = $idAps['idapsperstyle'];
+            $sisaOrder = $idAps['sisa'];
+            $delivery = $idAps['delivery'];
+
+            $sisaQty = $sisaOrder - $qtyProduksi;
+
+            if ($sisaQty < 0) {
+                $minus = $sisaQty;
+                $second = [
+                    'no_model' => $noModel,
+                    'style' => $size,
+                    'sisa' => $sisaOrder
+                ];
+                $nextid = $this->ApsPerstyleModel->getIdBawahnya($second);
+                if ($nextid) {
+                    $idnext = $nextid['idapsperstyle'];
+                    $qtysisa = $nextid['sisa'];
+                    $sisa = $qtysisa + $minus;
+                    $this->ApsPerstyleModel->update($idnext, ['sisa' => $sisa]);
+
+                    $sisaQty = 0;
+                } else {
+                    $sisaQty = $minus;
+                }
+            }
+            $dataInsert = [
+                'tgl_produksi' => $tglProduksi,
+                'idapsperstyle' => $id,
+                'qty_produksi' => $qtyProduksi,
+                'no_box' => $noBox,
+                'no_label' => $noLabel,
+                'no_mesin' => $noMesin,
+                'delivery' => $delivery,
+                'area' => $area,
+                'admin' => $admin,
+                'shift_a' => $shiftA,
+                'shift_b' => $shiftB,
+                'shift_c' => $shiftC,
+            ];
+            $existingProduction = $this->produksiModel->existingData($dataInsert);
+            if (!$existingProduction) {
+                $insert =  $this->produksiModel->insert($dataInsert);
+                if ($insert) {
+                    $update = $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
+                    if ($update) {
+                        return redirect()->to('/' . session()->get('role'))->with('success', 'Berhasil input data');
+                    }
+                } else {
+                    return redirect()->to('/' . session()->get('role'))->with('error', 'Data gagal diinput');
+                }
+            } else {
+                $idexist = $existingProduction['id_produksi'];
+                $sumqty = $existingProduction['qty_produksi'] + $qtyProduksi;
+                $this->produksiModel->update($idexist, ['qty_produksi' => $sumqty]);
+                $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
+
+                return redirect()->to('/' . session()->get('role'))->with('error', 'Berhasil input data');
+            }
+        }
+    }
+    public function deleteProduksi($id)
+    {
+        $idaps = $this->request->getGet('idaps');
+        $qty = $this->request->getGet('qty');
+        $sisa = $this->request->getGet('sisa');
+        $area = $this->request->getGet('area');
+        // dd($idaps, $area, $sisa, $qty);
+        $delete = $this->produksiModel->where('id_produksi', $id)->delete();
+        if ($delete) {
+            $sisaQty = $sisa + $qty;
+            $update = $this->ApsPerstyleModel->update($idaps, ['sisa' => $sisaQty]);
+            if ($update) {
+                return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('success', 'Data Berhasil di hapus');
+            }
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Data Gagal di hapus ❗');
         }
     }
 }
