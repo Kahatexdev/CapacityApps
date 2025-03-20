@@ -523,7 +523,7 @@
                 const currentMinute = now.getMinutes();
 
                 // Validasi waktu
-                if (currentHour > 15 || (currentHour === 15 && currentMinute > 40)) {
+                if (currentHour > 8 || (currentHour === 8 && currentMinute > 30)) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error!',
