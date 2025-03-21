@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
 
 class LiburModel extends Model
 {
@@ -41,15 +42,20 @@ class LiburModel extends Model
     protected $afterDelete    = [];
 
     public function getTotalLiburBetweenDates($startDate, $endDate)
-{
-    $query = $this->select('COUNT(*) as total_libur')
-                    ->where('tanggal >=', $startDate)
-                    ->where('tanggal <=', $endDate)
-                    ->get();
+    {
+        $query = $this->select('COUNT(*) as total_libur')
+            ->where('tanggal >=', $startDate)
+            ->where('tanggal <=', $endDate)
+            ->get();
 
-    $row = $query->getRow();
+        $row = $query->getRow();
 
-    return $row->total_libur;
-}
-
+        return $row->total_libur;
+    }
+    public function getDataLiburForPemesanan($today)
+    {
+        return $this->select('*')
+            ->where('tanggal >=', $today)
+            ->findAll();
+    }
 }

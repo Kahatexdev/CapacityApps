@@ -195,8 +195,16 @@
     <div class="row mt-4">
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header  d-flex  justify-content-between">
                     <h5>Detail Planning for Model <?= $pdk ?></h5>
+                    <button class="btn btn-warning btn-plan" id="planStyle" onclick="planStyle()"
+                        data-pdk="<?= $pdk ?>"
+                        data-jarum="<?= $jarum ?>"
+                        data-area="<?= $area ?>">
+                        <span class="text-sm">
+                            Plan
+                        </span>
+                    </button>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -255,17 +263,7 @@
                                                 data-idEst="<?= $order['id_est_qty']; ?>">
                                                 Edit
                                             </button>
-                                            <button class="btn btn-warning btn-plan" id="planStyle-<?= $no ?>" onclick="planStyle(<?= $no ?>)"
-                                                data-idEst="<?= $order['id_est_qty']; ?>"
-                                                data-detalID="<?= $order['id_detail_pln'] ?>"
-                                                data-mc="<?= $order['mesin'] ?>"
-                                                data-delivery="<?= $order['delivery'] ?>"
-                                                data-start="<?= $order['start_date'] ?>"
-                                                data-stop="<?= $order['stop_date'] ?>">
-                                                <span class="text-sm">
-                                                    Plan
-                                                </span>
-                                            </button>
+
                                             <button class="btn btn-danger btn-update" data-toggle="modal" data-target="#modalUpdate"
                                                 data-start="<?= $order['start_date'] ?>"
                                                 data-idplan="<?= $order['id_detail_pln'] ?>"
@@ -365,33 +363,26 @@
             document.querySelectorAll(".btn-plan").forEach(button => {
                 button.addEventListener("click", function() {
                     let planStyleCard = document.querySelector(".planStyleCard");
-                    let id = button.getAttribute("data-idEst");
-                    let detailId = button.getAttribute("data-detailId");
-                    let mesin = button.getAttribute("data-mc");
-                    let delivery = button.getAttribute("data-delivery");
-                    let start = button.getAttribute("data-start");
-                    let stop = button.getAttribute("data-stop");
-                    const model = document.getElementById('model-data').value;
                     const jarum = <?= json_encode($jarum); ?>;
+                    const area = <?= json_encode($area); ?>;
+                    const pdk = <?= json_encode($pdk); ?>;
                     $.ajax({
                         url: '<?= base_url("aps/getPlanStyle") ?>',
                         type: 'GET',
                         dataType: 'json',
                         data: {
                             jarum: jarum,
-                            model: model,
-                            delivery: delivery,
+                            area: area,
+                            pdk: pdk,
 
                         },
                         success: function(response) {
                             if (response) {
                                 console.log(response)
-                                document.querySelector(".headerPlan").textContent = 'Plan Mesin Delivery ' + delivery;
+                                document.querySelector(".headerPlan").textContent = 'Plan Mesin perStyle ' + pdk;
                                 document.querySelector(".headerText").innerHTML = `
                                     <div class="col-md-12">
-                                         <strong>Mesin: </strong> ${mesin} <br> 
-                                         <strong>Start: </strong> ${start} <br> 
-                                        <strong> Stop:  </strong>${stop}
+                                      
                                     </div>
                                 `;
                                 let planHtml = `
@@ -412,7 +403,6 @@
                         <td>${item.inisial}</td>
                         <td>${item.style}
                             <input type="hidden" value="${item.idAps}" name="idAps[]">
-                            <input type="hidden" value="${item.detailId}" name="detailId[]">
                         </td>
                            <td>${item.qty} dz</td>
                            <td>${item.sisa} dz</td>

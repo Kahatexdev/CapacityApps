@@ -1138,9 +1138,9 @@ class ApsController extends BaseController
         if ($this->request->isAJAX()) {
             try {
                 $jarum = $this->request->getGet('jarum');
-                $model = $this->request->getGet('model');
-                $delivery = $this->request->getGet('delivery');
-                $style = $this->ApsPerstyleModel->detailModelJarum($model, $delivery, $jarum);
+                $area = $this->request->getGet('area');
+                $pdk = $this->request->getGet('pdk');
+                $style = $this->ApsPerstyleModel->getPlanStyle($area, $pdk, $jarum);
                 $return = [];
                 foreach ($style as $jc) {
                     $idAps = $jc['idapsperstyle'];
@@ -1176,19 +1176,17 @@ class ApsController extends BaseController
         $request = $this->request;
 
         $idAps = $request->getPost('idAps');
-        $detailId = $request->getPost('detailId');
         $mesin = $request->getPost('mesin');
         $keterangan = $request->getPost('keterangan');
 
         if (!empty($idAps) && is_array($idAps)) {
             foreach ($idAps as $key => $id_apsperstyle) {
-                $id_est_qty = $detailId[$key] ?? null;
+
                 $jumlah_mesin = $mesin[$key] ?? 0;
                 $desc = $keterangan[$key] ?? '';
 
                 // Cek apakah data sudah ada di tabel
-                $existing = $this->MesinPerStyle->where('id_est_qty', $id_est_qty)
-                    ->where('idapsperstyle', $id_apsperstyle)
+                $existing = $this->MesinPerStyle->where('idapsperstyle', $id_apsperstyle)
                     ->first();
 
                 if ($existing) {
@@ -1200,7 +1198,6 @@ class ApsController extends BaseController
                 } else {
                     // Jika belum ada, lakukan insert
                     $this->MesinPerStyle->insert([
-                        'id_est_qty' => $id_est_qty,
                         'idapsperstyle' => $id_apsperstyle,
                         'mesin' => $jumlah_mesin,
                         'keterangan' => $desc

@@ -250,8 +250,8 @@ error_reporting(E_ALL); ?>
                                 <select class="form-control" id="selectArea" name="area1">
                                     <option value=""> Pilih Area</option>
                                     <?php
-                                    $uniqueAreas = array_unique(array_column($dataMc, 'area'));
-                                    foreach ($uniqueAreas as $area) :  ?>
+                                    foreach ($dataMc as $area) :
+                                    ?>
                                         <option value="<?= $area; ?>"> <?= $area; ?></option>
                                     <?php endforeach; ?>
                                 </select>

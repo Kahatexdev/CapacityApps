@@ -35,23 +35,7 @@
                                 Import Data Produksi
                             </h5>
                         </div>
-                        <div class="col-8 text-end">
-                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#summaryPertgl">
-                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary Produksi Pertanggal
-                            </button>
-                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#summaryTOD">
-                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary Produksi
-                            </button>
-                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#summaryBS">
-                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary BS MC
-                            </button>
-                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#timter">
-                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Timter Produksi
-                            </button>
-                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#inputProduksi">
-                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Input Produksi
-                            </button>
-                        </div>
+
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -85,92 +69,8 @@
         </div>
 
     </div>
-    <div class="row">
-        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
-
-            <div class="card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between">
-                        <h5>
-                            Data Produksi Harian
-                        </h5>
-                    </div>
-                </div>
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="table-responsive">
-                            <table id="dataTable0" class="display  striped" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal Produksi</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">QTY Upload</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Area</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($produksi as $prd) : ?>
-                                        <tr>
-                                            <td class="text-sm"><?= $prd['tgl_produksi']; ?></td>
-                                            <td class="text-sm"><?= $prd['qty']; ?></td>
-                                            <td class="text-sm"><?= $prd['admin']; ?></td>
-
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- <div class="row">
-        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
-
-            <div class="card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between">
-                        <h5>
-                            Data Pdk
-                        </h5>
-                    </div>
-                </div>
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="table-responsive">
-                            <table id="dataTable" class="display  striped" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">PDK</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Produksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($pdk as $order) : ?>
-                                        <tr>
-                                            <td class="text-sm"><?= $order['mastermodel']; ?></td>
-                                            <td class="text-sm"><?= $order['totalqty']; ?></td>
-                                            <td class="text-sm"><?= $order['totalsisa']; ?></td>
-                                            <td class="text-sm"><?= $order['totalproduksi']; ?></td>
-
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-
-                        </div>
-                    </div>
 
 
-
-                </div>
-
-
-            </div>
-        </div>
-    </div> -->
 
 
 </div>
@@ -504,7 +404,7 @@
                             </div>
                             <input type="hidden" id="qty_produksi" name="qty_produksi">
                         </div>
-                        
+
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -659,9 +559,11 @@
             let nomodel = $(this).val();
             if (nomodel !== '') {
                 $.ajax({
-                    url: "<?= base_url($role . '/get-area') ?>", 
+                    url: "<?= base_url($role . '/get-area') ?>",
                     type: "POST",
-                    data: { nomodel: nomodel },
+                    data: {
+                        nomodel: nomodel
+                    },
                     dataType: "json",
                     success: function(response) {
                         console.log(response);
@@ -685,7 +587,10 @@
                 $.ajax({
                     url: "<?= base_url($role . '/get-size') ?>", // Ganti dengan endpoint untuk mengambil Size
                     type: "POST",
-                    data: { nomodel: nomodel, area: area },
+                    data: {
+                        nomodel: nomodel,
+                        area: area
+                    },
                     dataType: "json",
                     success: function(response) {
                         $('#size').empty().append('<option value="">Pilih Size</option>');
@@ -714,18 +619,17 @@
         $('input[name="shift_a"], input[name="shift_b"], input[name="shift_c"]').on('input', hitungTotal);
 
         $(document).ready(function() {
-        // Inisialisasi Select2 saat modal pertama kali dibuka
-        $('#inputProduksi').on('shown.bs.modal', function () {
-            $('#nomodel').select2({
-                theme: 'bootstrap-5',
-                width: '100%',
-                dropdownParent: $('#inputProduksi'), // Agar dropdown muncul di dalam modal
-                placeholder: "Pilih No Model",
-                allowClear: true
+            // Inisialisasi Select2 saat modal pertama kali dibuka
+            $('#inputProduksi').on('shown.bs.modal', function() {
+                $('#nomodel').select2({
+                    theme: 'bootstrap-5',
+                    width: '100%',
+                    dropdownParent: $('#inputProduksi'), // Agar dropdown muncul di dalam modal
+                    placeholder: "Pilih No Model",
+                    allowClear: true
+                });
             });
         });
     });
-    });
-    
 </script>
 <?php $this->endSection(); ?>

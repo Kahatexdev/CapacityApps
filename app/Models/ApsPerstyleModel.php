@@ -985,16 +985,25 @@ class ApsPerstyleModel extends Model
     public function getAreasByNoModel($nomodel)
     {
         return $this->select('factory')
-                    ->where('mastermodel', $nomodel)
-                    ->groupBy('factory')
-                    ->findAll();
+            ->where('mastermodel', $nomodel)
+            ->groupBy('factory')
+            ->findAll();
     }
     public function getSizesByNoModelAndArea($nomodel, $area)
     {
         return $this->select('size')
-                    ->where('mastermodel', $nomodel)
-                    ->where('factory', $area)
-                    ->groupBy('size')
-                    ->findAll();
+            ->where('mastermodel', $nomodel)
+            ->where('factory', $area)
+            ->groupBy('size')
+            ->findAll();
+    }
+    public function getPlanStyle($area, $pdk, $jarum)
+    {
+        return $this->select('idapsperstyle,inisial, size, sum(qty) as qty, sum(sisa) as sisa')
+            ->where('mastermodel', $pdk)
+            ->where('factory', $area)
+            ->where('machinetypeid', $jarum)
+            ->groupBy('size')
+            ->findAll();
     }
 }
