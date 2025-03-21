@@ -39,7 +39,7 @@
                         </div>
                         <div class="col-4 d-flex align-items-center text-end gap-2">
                             <label for="">Filters:</label>
-                            <input type="text" class="form-control" id="model_cluster" value="" placeholder="No Model">
+                            <input type="text" class="form-control" id="model" value="" placeholder="No Model">
                             <input type="text" class="form-control" id="kode_warna" value="" placeholder="Kode Warna">
                             <button id="filterButton" class="btn btn-info ms-2"><i class="fas fa-search"></i></button>
                         </div>
@@ -69,8 +69,15 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('filterButton').addEventListener('click', function() {
-            let noModel = document.getElementById('model_cluster').value.trim();
+            let noModel = document.getElementById('model').value.trim();
             let warna = document.getElementById('kode_warna').value.trim();
+
+            // Cek apakah No Model kosong
+            if (noModel === "") {
+                alert("No Model wajib diisi untuk memfilter Kode Warna!");
+                document.getElementById('model').focus();
+                return; // Hentikan eksekusi jika No Model kosong
+            }
 
             let apiUrl = `<?= base_url() ?>/${'<?= $role ?>'}/filterstockbahanbaku/<?= $area ?>?noModel=${noModel}&warna=${warna}`;
 
