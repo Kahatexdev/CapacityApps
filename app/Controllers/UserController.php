@@ -201,7 +201,7 @@ class UserController extends BaseController
     }
     public function getInisial($size)
     {
-         $inisial = $this->ApsPerstyleModel->getInProduksi();
+        $inisial = $this->ApsPerstyleModel->getInProduksi();
 
         // Cari data inisial berdasarkan size
         $inisialData = array_filter($inisial, function ($item) use ($size) {
@@ -372,6 +372,7 @@ class UserController extends BaseController
     public function bsMesinPerbulan($area, $bulan)
     {
         $bsPerbulan = $this->BsMesinModel->bsMesinPerbulan($area, $bulan);
+        dd($bsPerbulan);
         $totalBsGram = $this->BsMesinModel->totalGramPerbulan($area, $bulan);
         $totalBsPcs = $this->BsMesinModel->totalPcsPerbulan($area, $bulan);
         $chartData = $this->BsMesinModel->ChartPdk($area, $bulan);
