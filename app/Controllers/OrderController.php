@@ -1727,7 +1727,7 @@ class OrderController extends BaseController
                         $machinetypeid = $machinetypeid . "SF";
                     }
                     if ($row[5] == null) {
-                        return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $machinetypeid))->withInput()->with('success', 'Data Berhasil di revise');
+                        return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $machinetypeid))->withInput()->with('error', 'Data Gagal di revise');
                     } else {
                         if ($no_model != $nomodel) {
                             return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $machinetypeid))->with('error', 'Nomor Model Tidak Sama. Silahkan periksa kembali' . $rowIndex);
