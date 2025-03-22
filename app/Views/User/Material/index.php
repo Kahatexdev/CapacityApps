@@ -244,18 +244,26 @@
                                 <table id="header" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
-                                            <th class="text-center">Style Size</th>
+                                            <th width="450" class="text-center">Style Size</th>
+                                            <th class="text-center">Gw</th>
+                                            <th class="text-center">Inisial</th>
                                             <th class="text-center">Jalan MC</th>
                                             <th class="text-center">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>
+                                            <td width="450">
                                                 <select class="form-control style-size" name="items[${row}][style_size]" required>
                                                     <option value="">Pilih Style Size</option>
                                                     ${data.map(item => `<option value="${item.size}">${item.size}</option>`).join('')}
                                                 </select>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control gw" name="items[${row}][gw]" readonly>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control inisial" name="items[${row}][inisial]" readonly>
                                             </td>
                                             <td>
                                                 <input type="number" class="form-control jalan-mc" name="items[${row}][jalan_mc]">
@@ -303,18 +311,26 @@
                     <table id="header" class="table table-bordered table-striped">
                         <thead>
                             <tr>
-                                <th class="text-center">Style Size</th>
+                                <th width="450" class="text-center">Style Size</th>
+                                <th class="text-center">Gw</th>
+                                <th class="text-center">Inisial</th>
                                 <th class="text-center">Jalan MC</th>
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>
+                                <td width="450">
                                     <select class="form-control style-size" name="items[${row}][style_size]" required>
                                         <option value="">Pilih Style Size</option>
                                         ${globalData.map(item => `<option value="${item.size}">${item.size}</option>`).join('')}
                                     </select>
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control gw" name="items[${row}][gw]">
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control inisial" name="items[${row}][inisial]">
                                 </td>
                                 <td>
                                     <input type="number" class="form-control jalan-mc" name="items[${row}][jalan_mc]">
@@ -381,6 +397,8 @@
         $('#detailBbCardsContainer').on('change', '.style-size', function() {
             let selectedStyleSize = $(this).val(); // Ambil nilai Style Size yang dipilih
             let jalanMcInput = $(this).closest('tr').find('.jalan-mc'); // Cari input "Jalan MC" di baris yang sama
+            let gw = $(this).closest('tr').find('.gw'); // Cari input "Jalan MC" di baris yang sama
+            let inisial = $(this).closest('tr').find('.inisial'); // Cari input "Jalan MC" di baris yang sama
             let tgl_pakai = $('#tgl_pakai').val(); // Ambil nilai No Model
             let noModel = $('#no_model').val(); // Ambil nilai No Model
             let area = $('#area').val(); // Ambil nilai No Model
@@ -403,6 +421,8 @@
                 alert('Style Size sudah ada');
                 $(this).val(''); // Kosongkan dropdown Style Size
                 jalanMcInput.val(''); // Kosongkan input Jalan MC
+                gw.val(''); // Kosongkan input Jalan MC
+                inisial.val(''); // Kosongkan input Jalan MC
                 table.empty(); // Kosongkan tabel Material Usage
                 return; // Hentikan proses jika duplikat ditemukan
             }
@@ -429,7 +449,6 @@
                     }
                 });
 
-
                 // Lakukan permintaan AJAX
                 $.ajax({
                     url: '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + selectedStyleSize + '/' + area, // Ganti URL sesuai kebutuhan
@@ -437,6 +456,14 @@
                     dataType: 'json',
                     success: function(response) {
                         console.log(response); // Debug data yang diterima
+
+                        // Jika response berupa array dan kita hanya ingin data dari elemen pertama
+                        if (response && response.length > 0) {
+                            // Ambil data inisial dan gw dari elemen pertama
+                            let firstData = response[0];
+                            inisial.val(firstData.inisial);
+                            gw.val(firstData.gw);
+                        }
 
                         table.empty(); // Hapus isi tabel sebelumnya
 
@@ -455,12 +482,12 @@
                                     <input type="hidden" class="form-control text-center" name="items[${row}][${index}][no_model]" id="no_model" value="${noModel}" readonly>
                                     <input type="hidden" class="form-control text-center" name="items[${row}][${index}][style_size]" id="style_size" value="${selectedStyleSize}" readonly>
                                     <input type="hidden" class="form-control text-center" name="items[${row}][${index}][id_material]" id="id_material" value="${item.id_material}" readonly>
+                                    <input type="hidden" class="form-control text-center jalan_mc" name="items[${row}][${index}][jalan_mc]" id="jalan_mc" value="${jalanMc}" readonly>
                                     // 
-                                    <td><input type="text" class="form-control text-center jalan_mc" name="items[${row}][${index}][jalan_mc]" id="jalan_mc" value="${jalanMc}" readonly></td>
                                     <td width=20><input type="text" class="form-control text-center" name="items[${row}][${index}][no]" id="no" value="${index + 1}" readonly></td>
                                     <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][komposisi]" id="komposisi" value="${item.composition}" readonly></td>
                                     <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][loss]" id="loss" value="${item.loss}" readonly></td>
-                                    <td width=120><input type="text" class="form-control text-center" name="items[${row}][${index}][ttl_keb]" id="ttl_keb" value="${item.gw}" readonly></td>
+                                    <td width=120><input type="text" class="form-control text-center" name="items[${row}][${index}][ttl_keb]" id="ttl_keb" value="${item.kgs}" readonly></td>
                                     <td><input type="text" class="form-control text-center" name="items[${row}][${index}][item_type]" id="item_type" value="${item.item_type}" readonly></td>
                                     <td><input type="text" class="form-control text-center" name="items[${row}][${index}][kode_warna]" id="kode_warna" value="${item.kode_warna}" readonly></td>
                                     <td><input type="text" class="form-control text-center" name="items[${row}][${index}][warna]" id="warna" value="${item.color}" readonly></td>
