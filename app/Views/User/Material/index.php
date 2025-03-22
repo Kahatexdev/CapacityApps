@@ -349,6 +349,29 @@
             $('#detailBbCardsContainer').append(newRow);
         });
 
+        // kalkulasi ketika jl mc berubah
+        $('#detailBbCardsContainer').on('input', '.jalan-mc', function() {
+            const jalanMc = parseFloat($(this).val()) || 0; // Ambil nilai jalan_mc
+            const table = $(this).closest('.table-responsive').find('.material-usage'); // Temukan tabel terkait
+
+            // Perbarui semua baris di tabel terkait
+            table.find('tr').each(function() {
+                const row = $(this); // Ambil baris saat ini
+                const jalan_mc = parseFloat(row.find('.jalan_mc').val()) || 0; // Nilai Qty Cones
+                const qty = parseFloat(row.find('.qty_cns').val()) || 0; // Nilai Qty Cones
+                const berat = parseFloat(row.find('.qty_berat_cns').val()) || 0; // Nilai Berat Cones
+
+                // Hitung ulang Total Cones dan Total Berat Cones
+                const ttlCns = qty * jalanMc;
+                const ttlBeratCns = qty * berat * jalanMc;
+
+                // Perbarui nilai Total Cones dan Total Berat Cones
+                row.find('.jalan_mc').val(jalanMc);
+                row.find('.ttl_cns').val(ttlCns.toFixed(2));
+                row.find('.ttl_berat_cns').val(ttlBeratCns.toFixed(2));
+            });
+        });
+
         // Event untuk menghapus baris
         $('#detailBbCardsContainer').on('click', '.remove-row', function() {
             $(this).closest('.table-responsive').remove(); // Cari elemen ".table-responsive" terdekat dan hapus
@@ -431,9 +454,9 @@
                                     <input type="hidden" class="form-control text-center" name="items[${row}][${index}][tgl_pakai]" id="tgl_pakai" value="${tgl_pakai}" readonly>
                                     <input type="hidden" class="form-control text-center" name="items[${row}][${index}][no_model]" id="no_model" value="${noModel}" readonly>
                                     <input type="hidden" class="form-control text-center" name="items[${row}][${index}][style_size]" id="style_size" value="${selectedStyleSize}" readonly>
-                                    <input type="hidden" class="form-control text-center" name="items[${row}][${index}][jalan_mc]" id="jalan_mc" value="${jalanMc}" readonly>
                                     <input type="hidden" class="form-control text-center" name="items[${row}][${index}][id_material]" id="id_material" value="${item.id_material}" readonly>
                                     // 
+                                    <td><input type="text" class="form-control text-center jalan_mc" name="items[${row}][${index}][jalan_mc]" id="jalan_mc" value="${jalanMc}" readonly></td>
                                     <td width=20><input type="text" class="form-control text-center" name="items[${row}][${index}][no]" id="no" value="${index + 1}" readonly></td>
                                     <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][komposisi]" id="komposisi" value="${item.composition}" readonly></td>
                                     <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][loss]" id="loss" value="${item.loss}" readonly></td>
@@ -519,8 +542,35 @@
                 return; // Hentikan proses submit jika tabel kosong
             }
 
+            // Validasi: Pastikan Jalan MC, Qty Cones, dan Qty Berat Cones tidak 0
+            let isInvalidData = false;
+            $('.material-usage').each(function() {
+                const jalanMc = parseFloat($(this).find('.jalan_mc').val()) || 0;
+                const qtyCones = parseFloat($(this).find('.qty_cns').val()) || 0;
+                const qtyBeratCones = parseFloat($(this).find('.qty_berat_cns').val()) || 0;
+
+                // Debug (opsional)
+                console.log("Jalan MC:", jalanMc, "Qty Cones:", qtyCones, "Qty Berat Cones:", qtyBeratCones);
+
+                if (jalanMc === 0 || qtyCones === 0 || qtyBeratCones === 0) {
+                    isInvalidData = true;
+                    return false; // Hentikan iterasi jika ada data tidak valid
+                }
+            });
+
+            console.log(isInvalidData)
+            if (isInvalidData) {
+                Swal.fire({
+                    title: "Peringatan!",
+                    text: "Nilai Jalan MC, Qty Cones, atau Qty Berat Cones tidak boleh 0.",
+                    icon: "warning",
+                    confirmButtonText: "OK"
+                });
+                return; // Hentikan proses submit jika ada data tidak valid
+            }
+
             // Jika tabel tidak kosong, lanjutkan proses submit
-            var formData = $(this).serializeArray();
+            const formData = $(this).serializeArray();
 
             $.ajax({
                 url: "<?= base_url($role . '/bahanBaku/simpanKeSession') ?>",

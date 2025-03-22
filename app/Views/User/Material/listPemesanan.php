@@ -83,7 +83,7 @@
                                     <td class="text-xs text-start"><?= $id['lot']; ?></td>
                                     <td class="text-xs text-start"><?= $id['keterangan']; ?></td>
                                     <td class="text-xs text-start"></td>
-                                    <td class="text-xs text-start"><?= number_format($id['sisa_jatah'], 2); ?></td>
+                                    <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>"><?= number_format($id['sisa_jatah'], 2); ?></td>
                                     <td class="text-xs text-start">
                                         <button type="button" class="btn btn-warning update-btn" data-toggle="modal" data-target="#updateListModal" data-area="<?= $area; ?>" data-tgl="<?= $id['tgl_pakai']; ?>" data-model="<?= $id['no_model']; ?>" data-item="<?= $id['item_type']; ?>" data-kode="<?= $id['kode_warna']; ?>" data-color="<?= $id['color']; ?>">
                                             <i class="fa fa-edit fa-lg"></i>
@@ -260,7 +260,7 @@
             ]
         });
         // Trigger import modal when import button is clicked
-        $('.update-btn').click(function() {
+        $(document).on('click', '.update-btn', function() {
             var area = $(this).data('area');
             var tglPakai = $(this).data('tgl');
             var noModel = $(this).data('model');
@@ -386,7 +386,7 @@
                                 <div class="col-lg-2">
                                 </div>
                                 <div class="col-lg-2">
-                                    <input type="text" class="form-control ttl_kg_pesan" name="ttl_kg_pesan" value="${ttl_kg_pesan}" readonly>
+                                    <input type="text" class="form-control ttl_kg_pesan" name="ttl_kg_pesan" value="${parseFloat(ttl_kg_pesan).toFixed(2)}" readonly>
                                 </div>
                             </div>
                         `;
