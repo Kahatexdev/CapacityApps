@@ -327,10 +327,10 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control gw" name="items[${row}][gw]">
+                                    <input type="text" class="form-control gw" name="items[${row}][gw]" readonly>
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control inisial" name="items[${row}][inisial]">
+                                    <input type="text" class="form-control inisial" name="items[${row}][inisial]" readonly>
                                 </td>
                                 <td>
                                     <input type="number" class="form-control jalan-mc" name="items[${row}][jalan_mc]">
@@ -550,6 +550,8 @@
             e.preventDefault();
             $('.style-size').removeAttr('name');
             $('.jalan-mc').removeAttr('name');
+            $('.gw').removeAttr('name');
+            $('.inisial').removeAttr('name');
             // Periksa apakah tabel Material Usage kosong
             let isMaterialUsageEmpty = true;
             $('.material-usage').each(function() {
