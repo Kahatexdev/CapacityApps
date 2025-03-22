@@ -1329,9 +1329,7 @@ class SummaryController extends BaseController
             'akhir' => $akhir,
         ];
 
-        // $dataSummaryPertgl = $this->orderModel->getdataSummaryPertgl($data);
         $summaryBsPertgl = $this->orderModel->getSummaryBsPertgl($data);
-        // $totalProd = $this->orderModel->getDataTimter($data);
 
         // agar data tgl produksi menjadi unik
         $tgl_produksi = [];
@@ -1531,8 +1529,8 @@ class SummaryController extends BaseController
             // looping kolom qty produksi & jl mc pertanggal
             $col4 = "H";
             foreach ($tgl_produksi as $tgl_prod2) {
-                $qty_produksi = 0;
-                $jl_mc = 0;
+                $qty_gram = 0;
+                $qty_pcs = 0;
                 foreach ($summaryBsPertgl as $prod) {
                     if (
                         $id['machinetypeid'] == $prod['machinetypeid'] && $id['mastermodel'] == $prod['mastermodel']

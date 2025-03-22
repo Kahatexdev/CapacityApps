@@ -77,7 +77,7 @@ class UserController extends BaseController
         $dataBuyer = $this->orderModel->getBuyer();
         $dataArea = $this->jarumModel->getArea();
         $dataJarum = $this->jarumModel->getJarum();
-        $model= $this->ApsPerstyleModel->getPdkProduksi();
+        $model = $this->ApsPerstyleModel->getPdkProduksi();
         $data = [
             'role' => session()->get('role'),
             'title' => 'Dashboard',
@@ -201,7 +201,7 @@ class UserController extends BaseController
     }
     public function getInisial($size)
     {
-         $inisial = $this->ApsPerstyleModel->getInProduksi();
+        $inisial = $this->ApsPerstyleModel->getInProduksi();
 
         // Cari data inisial berdasarkan size
         $inisialData = array_filter($inisial, function ($item) use ($size) {

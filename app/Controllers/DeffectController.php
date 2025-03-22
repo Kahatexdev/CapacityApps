@@ -61,6 +61,8 @@ class DeffectController extends BaseController
 
         $master = $this->deffectModel->findAll();
         //$databs = $this->BsModel->getDataBs();
+        $dataBuyer = $this->orderModel->getBuyer();
+
 
         $data = [
             'role' => session()->get('role'),
@@ -73,6 +75,8 @@ class DeffectController extends BaseController
             'active6' => '',
             'active7' => '',
             'kode' => $master,
+            'dataBuyer' => $dataBuyer,
+
             //'databs' => $databs
         ];
         return view(session()->get('role') . '/Deffect/databs', $data);
