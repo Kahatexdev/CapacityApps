@@ -752,6 +752,40 @@
                 console.error('Fetch Error:', error);
             });
     });
+
+    window.onload = function() {
+        // Hitung tanggal 2 hari ke belakang dari hari ini
+        let today = new Date();
+        let twoDaysAgo = new Date(today);
+        twoDaysAgo.setDate(today.getDate() - 2);
+        console.log('Two days ago:', twoDaysAgo);
+        // Format ke YYYY-MM-DD
+        let dd = String(twoDaysAgo.getDate()).padStart(2, '0');
+        let mm = String(twoDaysAgo.getMonth() + 1).padStart(2, '0'); // Januari = 0
+        let yyyy = twoDaysAgo.getFullYear();
+        let tgl_pakai = yyyy + '-' + mm + '-' + dd;
+        console.log('tgl_pakai:', tgl_pakai);
+
+        // ambil are
+        let area = document.getElementById('area').value; // Atau ambil dari variable lain
+        console.log(area, tgl_pakai);
+
+        $.ajax({
+            url: 'http://172.23.44.14/MaterialSystem/public/api/hapusOldPemesanan',
+            type: 'POST',
+            data: JSON.stringify({
+                area: area,
+                tgl_pakai: tgl_pakai
+            }),
+            dataType: 'json',
+            success: function(response) {
+                console.log('Response:', response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', xhr.responseText || error);
+            }
+        });
+    };
 </script>
 
 <?php $this->endSection(); ?>
