@@ -91,22 +91,22 @@
                                     </td>
                                     <td class="text-xs">
                                         <?php
-                                        // $show = "d-none";
+                                        $show = "d-none";
                                         $batasWaktu = '08:30:00';
                                         if ($id['sisa_jatah'] > 0) {
                                             //  hari kamis pemesanan spsandex 2 hari
                                             if ($day == "Thursday") {
                                                 if ($id['jenis'] == "BENANG" || $id['jenis'] == "NYLON") {
                                                     if ($id['tgl_pakai'] == $tomorrow) {
-                                                        // $show = "";
+                                                        $show = "";
                                                         $batasWaktu = '08:30:00';
                                                     }
                                                 } elseif ($id['jenis'] == "SPANDEX" || $id['jenis'] == "KARET") {
                                                     if ($id['tgl_pakai'] == $twoDays) {
-                                                        // $show = "";
+                                                        $show = "";
                                                         $batasWaktu = '08:30:00';
                                                     } elseif ($id['tgl_pakai'] == $threeDay) {
-                                                        // $show = "";
+                                                        $show = "";
                                                         $batasWaktu = '09:00:00';
                                                     }
                                                 }
@@ -115,20 +115,20 @@
                                             elseif ($day == "Friday") {
                                                 if ($id['jenis'] == "BENANG") {
                                                     if ($id['tgl_pakai'] == $tomorrow) {
-                                                        // $show = "";
+                                                        $show = "";
                                                         $batasWaktu = '08:30:00';
                                                     } elseif ($id['tgl_pakai'] == $twoDays) {
-                                                        // $show = "";
+                                                        $show = "";
                                                         $batasWaktu = '09:00:00';
                                                     }
                                                 } elseif ($id['jenis'] == "NYLON") {
                                                     if ($id['tgl_pakai'] == $tomorrow) {
-                                                        // $show = "";
+                                                        $show = "";
                                                         $batasWaktu = '08:30:00';
                                                     }
                                                 } elseif ($id['jenis'] == "SPANDEX" || $id['jenis'] == "KARET") {
                                                     if ($id['tgl_pakai'] == $threeDay) {
-                                                        // $show = "";
+                                                        $show = "";
                                                         $batasWaktu = '08:30:00';
                                                     }
                                                 }
@@ -137,26 +137,26 @@
                                             elseif ($day == "Saturday") {
                                                 if ($id['jenis'] == "BENANG") {
                                                     if ($id['tgl_pakai'] == $twoDays) {
-                                                        // $show = "";
+                                                        $show = "";
                                                         $batasWaktu = '08:30:00';
                                                     }
                                                 } elseif ($id['jenis'] == "NYLON") {
                                                     if ($id['tgl_pakai'] == $tomorrow) {
-                                                        // $show = "";
+                                                        $show = "";
                                                         $batasWaktu = '08:30:00';
                                                     } elseif ($id['tgl_pakai'] == $twoDays) {
-                                                        // $show = "";
+                                                        $show = "";
                                                         $batasWaktu = '09:00:00';
                                                     }
                                                 } elseif ($id['jenis'] == "SPANDEX" || $id['jenis'] == "KARET") {
                                                     if ($id['tgl_pakai'] == $threeDay) {
-                                                        // $show = "";
+                                                        $show = "";
                                                         $batasWaktu = '08:30:00';
                                                     }
                                                 }
                                             }
                                         ?>
-                                            <button type="button" class="btn btn-info text-xs send-btn" data-toggle="modal"
+                                            <button type="button" class="btn btn-info text-xs <?= $show ?> send-btn" data-toggle="modal"
                                                 data-area="<?= $area; ?>"
                                                 data-tgl="<?= $id['tgl_pakai']; ?>"
                                                 data-model="<?= $id['no_model']; ?>"
