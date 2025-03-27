@@ -36,6 +36,9 @@
                                 List Pemesanan Bahan Baku <?= $area ?>
                             </h5>
                         </div>
+                        <div>
+                            <a href="#" class="btn btn-info"><i class="far fa-clock"></i> + Waktu</a>
+                        </div>
                     </div>
                 </div>
             </div>
