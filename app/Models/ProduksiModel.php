@@ -333,4 +333,18 @@ class ProduksiModel extends Model
 
         return $totalMesin;
     }
+    public function getProduksiPerStyle($area, $tanggal)
+    {
+        // Mulai query
+        $query = $this->select(' tgl_produksi, apsperstyle.mastermodel, apsperstyle.size,apsperstyle.inisial,apsperstyle.qty, sisa,sum(qty_produksi) as prod,')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle')
+            ->where('produksi.area', $area)
+            ->where('produksi.tgl_produksi', $tanggal)
+            ->groupBy('produksi.idapsperstyle')
+            ->groupBy('apsperstyle.size');
+
+
+
+        return $query->orderBy('produksi.tgl_produksi')->findAll();
+    }
 }

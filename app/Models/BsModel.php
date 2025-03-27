@@ -5,6 +5,8 @@ namespace App\Models;
 use CodeIgniter\Model;
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Month;
 
+use function PHPUnit\Framework\isEmpty;
+
 class BsModel extends Model
 {
     protected $table            = 'data_bs';
@@ -51,9 +53,10 @@ class BsModel extends Model
     }
     public function getDataBsFilter($theData)
     {
-        $this->select('apsperstyle.idapsperstyle, apsperstyle.mastermodel, apsperstyle.size, data_bs.*,sum(data_bs.qty) as qty, master_deffect.Keterangan')
+        $this->select('apsperstyle.idapsperstyle, data_model.kd_buyer_order, apsperstyle.mastermodel, apsperstyle.size, data_bs.*,sum(data_bs.qty) as qty, master_deffect.Keterangan')
             ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle')
             ->join('master_deffect', 'master_deffect.kode_deffect = data_bs.kode_deffect')
+            ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
             ->where('tgl_instocklot >=', $theData['awal'])
             ->where('tgl_instocklot <=', $theData['akhir']);
 
@@ -62,6 +65,9 @@ class BsModel extends Model
         }
         if (!empty($theData['area'])) {
             $this->where('data_bs.area', $theData['area']);
+        }
+        if (!empty($theData['buyer'])) {
+            $this->where('data_model.kd_buyer_order', $theData['buyer']);
         }
 
         $data = $this->groupBy('tgl_instocklot, apsperstyle.size, data_bs.kode_deffect')->findAll();
@@ -74,6 +80,7 @@ class BsModel extends Model
         $this->select('sum(data_bs.qty) as qty')
             ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle')
             ->join('master_deffect', 'master_deffect.kode_deffect = data_bs.kode_deffect')
+            ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
             ->where('tgl_instocklot >=', $theData['awal'])
             ->where('tgl_instocklot <=', $theData['akhir']);
 
@@ -82,6 +89,9 @@ class BsModel extends Model
         }
         if (!empty($theData['area'])) {
             $this->where('area', $theData['area']);
+        }
+        if (!empty($theData['buyer'])) {
+            $this->where('data_model.kd_buyer_order', $theData['buyer']);
         }
 
         $result = $this->first();
@@ -92,6 +102,7 @@ class BsModel extends Model
         $this->select('master_deffect.Keterangan, sum(data_bs.qty) as qty, ')
             ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle')
             ->join('master_deffect', 'master_deffect.kode_deffect = data_bs.kode_deffect')
+            ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
             ->where('tgl_instocklot >=', $theData['awal'])
             ->where('tgl_instocklot <=', $theData['akhir']);
 
@@ -100,6 +111,9 @@ class BsModel extends Model
         }
         if (!empty($theData['area'])) {
             $this->where('area', $theData['area']);
+        }
+        if (!empty($theData['buyer'])) {
+            $this->where('data_model.kd_buyer_order', $theData['buyer']);
         }
 
         return $this->groupBy('Keterangan')
@@ -149,11 +163,17 @@ class BsModel extends Model
     }
     public function getBsPph($idaps)
     {
-        return $this->select('SUM(data_bs.qty) AS bs_setting')
-            ->join('apsperstyle', 'apsperstyle.idapsperstyle=data_bs.idapsperstyle', 'left')
+        $return = $this->select('SUM(data_bs.qty) AS bs_setting')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle', 'left')
             ->whereIn('data_bs.idapsperstyle', $idaps)
-            ->groupBy('apsperstyle.size')
             ->first(); // Ambil satu hasil
+
+        // Pastikan hasil tidak null sebelum dikembalikan
+        if (!$return || empty($return->bs_setting)) {
+            $return = ['bs_setting' => 0];
+        }
+
+        return $return;
     }
     public function bsMonthly($bulan, $tahun)
     {

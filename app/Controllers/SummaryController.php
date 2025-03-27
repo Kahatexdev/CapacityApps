@@ -109,12 +109,14 @@ class SummaryController extends BaseController
                     'max_delivery' => $item['max_delivery'],
                     'sisa' => $item['sisa'],
                     'qty' => 0,
+                    'plus_packing' => 0,
                     'running' => 0,
                     'ttl_prod' => 0,
                     'ttl_jlmc' => 0,
                 ];
             }
             $uniqueData[$key]['qty'] += $item['qty'];
+            $uniqueData[$key]['plus_packing'] += $item['plus_packing'];
             $uniqueData[$key]['running'] += $item['running'];
             $uniqueData[$key]['ttl_prod'] += $item['qty_produksi'];
             $uniqueData[$key]['ttl_jlmc'] += $item['jl_mc'];
@@ -169,7 +171,7 @@ class SummaryController extends BaseController
 
         // Judul
         $sheet->setCellValue('A1', 'SUMMARY PRODUKSI ' . $area);
-        $sheet->mergeCells('A1:K1');
+        $sheet->mergeCells('A1:L1');
         // Mengatur teks menjadi rata tengah dan huruf tebal
         $sheet->getStyle('A1')->getFont()->setBold(true);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
@@ -178,12 +180,12 @@ class SummaryController extends BaseController
         $row_header2 = 4;
         // Isi header
         $sheet->setCellValue('A' . $row_header, 'Tanggal');
-        $sheet->mergeCells('A' . $row_header . ':K' . $row_header);
-        $sheet->getStyle('A' . $row_header . ':K' . $row_header)->applyFromArray($styleHeader);
+        $sheet->mergeCells('A' . $row_header . ':L' . $row_header);
+        $sheet->getStyle('A' . $row_header . ':L' . $row_header)->applyFromArray($styleHeader);
 
         // looping tgl produksi
-        $col = 'L'; // Kolom awal tanggal produksi
-        $col2 = 'M'; // Kolom kedua untuk mergeCells
+        $col = 'M'; // Kolom awal tanggal produksi
+        $col2 = 'N'; // Kolom kedua untuk mergeCells
 
         // Konversi huruf kolom ke nomor indeks kolom
         $col_index = Coordinate::columnIndexFromString($col);
@@ -209,11 +211,12 @@ class SummaryController extends BaseController
         $sheet->setCellValue('D' . $row_header2, 'Inisial');
         $sheet->setCellValue('E' . $row_header2, 'Style Size');
         $sheet->setCellValue('F' . $row_header2, 'Qty PO (dz)');
-        $sheet->setCellValue('G' . $row_header2, 'Total Prod');
-        $sheet->setCellValue('H' . $row_header2, 'Sisa (dz)');
-        $sheet->setCellValue('I' . $row_header2, 'Rata-Rata Jl Mc');
-        $sheet->setCellValue('J' . $row_header2, 'Running (days)');
-        $sheet->setCellValue('K' . $row_header2, 'Day Stop');
+        $sheet->setCellValue('G' . $row_header2, 'Qty PO+ (dz)');
+        $sheet->setCellValue('H' . $row_header2, 'Total Prod');
+        $sheet->setCellValue('I' . $row_header2, 'Sisa (dz)');
+        $sheet->setCellValue('J' . $row_header2, 'Rata-Rata Jl Mc');
+        $sheet->setCellValue('K' . $row_header2, 'Running (days)');
+        $sheet->setCellValue('L' . $row_header2, 'Day Stop');
         // style untuk header
         $sheet->getStyle('A' . $row_header2)->applyFromArray($styleHeader);
         $sheet->getStyle('B' . $row_header2)->applyFromArray($styleHeader);
@@ -226,9 +229,10 @@ class SummaryController extends BaseController
         $sheet->getStyle('I' . $row_header2)->applyFromArray($styleHeader);
         $sheet->getStyle('J' . $row_header2)->applyFromArray($styleHeader);
         $sheet->getStyle('K' . $row_header2)->applyFromArray($styleHeader);
+        $sheet->getStyle('L' . $row_header2)->applyFromArray($styleHeader);
 
         // Tambahkan header dinamis untuk tanggal produksi
-        $col3 = 'L';
+        $col3 = 'M';
         foreach ($tgl_produksi as $tgl_prod) {
             $sheet->setCellValue($col3 . $row_header2, 'Prod (dz)');
             $sheet->getStyle($col3 . $row_header2)->applyFromArray($styleHeader);
@@ -242,6 +246,7 @@ class SummaryController extends BaseController
         $row = 5;
         // 
         $ttl_qty = 0;
+        $ttl_qty_plus = 0;
         $ttl_prod = 0;
         $ttl_jlmc = 0;
         $ttl_sisa = 0;
@@ -252,6 +257,7 @@ class SummaryController extends BaseController
             $today = date('Y-m-d');
             // 
             $ttl_qty += $id['qty'];
+            $ttl_qty_plus += $id['plus_packing'];
             $ttl_prod += $id['ttl_prod'];
             $ttl_jlmc += $id['ttl_jlmc'];
             $ttl_sisa += $id['sisa'];
@@ -269,11 +275,12 @@ class SummaryController extends BaseController
             $sheet->setCellValue('D' . $row, $id['inisial']);
             $sheet->setCellValue('E' . $row, $id['size']);
             $sheet->setCellValue('F' . $row, number_format($id['qty'] / 24, 2));
-            $sheet->setCellValue('G' . $row, number_format($id['qty_produksi'] / 24, 2));
-            $sheet->setCellValue('H' . $row, number_format($id['sisa'] / 24, 2));
-            $sheet->setCellValue('I' . $row, is_numeric($rata2) ? number_format((float)$rata2, 0) : '0');
-            $sheet->setCellValue('J' . $row, $id['running']);
-            $sheet->setCellValue('K' . $row, $day_stop);
+            $sheet->setCellValue('G' . $row, number_format($id['plus_packing'] / 24, 2));
+            $sheet->setCellValue('H' . $row, number_format($id['qty_produksi'] / 24, 2));
+            $sheet->setCellValue('I' . $row, number_format($id['sisa'] / 24, 2));
+            $sheet->setCellValue('J' . $row, is_numeric($rata2) ? number_format((float)$rata2, 0) : '0');
+            $sheet->setCellValue('K' . $row, $id['running']);
+            $sheet->setCellValue('L' . $row, $day_stop);
             // 
             $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
@@ -286,9 +293,10 @@ class SummaryController extends BaseController
             $sheet->getStyle('I' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('J' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('K' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('L' . $row)->applyFromArray($styleBody);
 
             // looping kolom qty produksi & jl mc pertanggal
-            $col4 = "L";
+            $col4 = "M";
             foreach ($tgl_produksi as $tgl_prod2) {
                 $qty_produksi = 0;
                 $jl_mc = 0;
@@ -325,23 +333,26 @@ class SummaryController extends BaseController
                 $sheet->setCellValue('F' . $rowTotal, number_format($ttl_qty / 24, 2));
                 $sheet->getStyle('F' . $rowTotal)->applyFromArray($styleHeader);
 
-                $sheet->setCellValue('G' . $rowTotal, number_format($ttl_prod / 24, 2));
+                $sheet->setCellValue('G' . $rowTotal, number_format($ttl_qty_plus / 24, 2));
                 $sheet->getStyle('G' . $rowTotal)->applyFromArray($styleHeader);
 
-                $sheet->setCellValue('H' . $rowTotal, number_format($ttl_sisa / 24, 2));
+                $sheet->setCellValue('H' . $rowTotal, number_format($ttl_prod / 24, 2));
                 $sheet->getStyle('H' . $rowTotal)->applyFromArray($styleHeader);
 
-                $sheet->setCellValue('I' . $rowTotal, number_format($ttl_rata2, 0));
+                $sheet->setCellValue('I' . $rowTotal, number_format($ttl_sisa / 24, 2));
                 $sheet->getStyle('I' . $rowTotal)->applyFromArray($styleHeader);
 
-                $sheet->setCellValue('J' . $rowTotal, '');
+                $sheet->setCellValue('J' . $rowTotal, number_format($ttl_rata2, 0));
                 $sheet->getStyle('J' . $rowTotal)->applyFromArray($styleHeader);
 
                 $sheet->setCellValue('K' . $rowTotal, '');
                 $sheet->getStyle('K' . $rowTotal)->applyFromArray($styleHeader);
 
-                $colTotal = 'L'; // Kolom awal tanggal produksi
-                $colTotal2 = 'M'; // Kolom kedua untuk mergeCells
+                $sheet->setCellValue('L' . $rowTotal, '');
+                $sheet->getStyle('L' . $rowTotal)->applyFromArray($styleHeader);
+
+                $colTotal = 'M'; // Kolom awal tanggal produksi
+                $colTotal2 = 'N'; // Kolom kedua untuk mergeCells
 
                 // Konversi huruf kolom ke nomor indeks kolom
                 $colTotal_index = Coordinate::columnIndexFromString($colTotal);
@@ -573,7 +584,7 @@ class SummaryController extends BaseController
                     $sheet->setCellValue('R' . $row, number_format($id['sisa'] / 24, 2));
                     $sheet->setCellValue('S' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($persentase, 2) . '%' : '');
                     $sheet->setCellValue('T' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($bs_st / 24, 2) : '');
-                    $sheet->setCellValue('U' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? $pr['plus_packing'] : '');
+                    $sheet->setCellValue('U' . $row, ($id['mastermodel'] . $id['size'] != $prevSize) ? number_format($pr['plus_packing'] / 24, 2) : '');
                     break;
                 }
             }
@@ -1318,9 +1329,7 @@ class SummaryController extends BaseController
             'akhir' => $akhir,
         ];
 
-        // $dataSummaryPertgl = $this->orderModel->getdataSummaryPertgl($data);
         $summaryBsPertgl = $this->orderModel->getSummaryBsPertgl($data);
-        // $totalProd = $this->orderModel->getDataTimter($data);
 
         // agar data tgl produksi menjadi unik
         $tgl_produksi = [];
@@ -1520,8 +1529,8 @@ class SummaryController extends BaseController
             // looping kolom qty produksi & jl mc pertanggal
             $col4 = "H";
             foreach ($tgl_produksi as $tgl_prod2) {
-                $qty_produksi = 0;
-                $jl_mc = 0;
+                $qty_gram = 0;
+                $qty_pcs = 0;
                 foreach ($summaryBsPertgl as $prod) {
                     if (
                         $id['machinetypeid'] == $prod['machinetypeid'] && $id['mastermodel'] == $prod['mastermodel']

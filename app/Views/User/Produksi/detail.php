@@ -88,7 +88,6 @@
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">No Box</th>
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">No Label</th>
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Qty Produksi</th>
-                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -102,13 +101,7 @@
                                                 <td class="text-sm text-center"><?= $order['no_box']; ?></td>
                                                 <td class="text-sm text-center"><?= $order['no_label']; ?></td>
                                                 <td class="text-sm text-center"><?= $order['qty_produksi']; ?></td>
-                                                <td class="text-sm text-center">
-                                                    <button class="btn btn-warning edit-btn" data-id="<?= $order['id_produksi']; ?>" data-pdk="<?= $order['mastermodel']; ?>" data-style="<?= $order['size']; ?>" data-nomc="<?= $order['no_mesin']; ?>" data-nobox="<?= $order['no_box']; ?>" data-nolabel="<?= $order['no_label']; ?>" data-qty="<?= $order['qty_produksi']; ?>" data-tgl="<?= $order['tgl_produksi']; ?>" data-sisa="<?= $order['sisa']; ?>" data-idaps="<?= $order['idapsperstyle']; ?>">
-                                                        Edit</button>
-                                                    <!-- Button Delete -->
-                                                    <button class="btn btn-danger delete-btn" data-id="<?= $order['id_produksi']; ?>" data-pdk="<?= $order['mastermodel']; ?>" data-style="<?= $order['size']; ?>" data-nomc="<?= $order['no_mesin']; ?>" data-nobox="<?= $order['no_box']; ?>" data-nolabel="<?= $order['no_label']; ?>" data-qty="<?= $order['qty_produksi']; ?>" data-tgl="<?= $order['tgl_produksi']; ?>" data-sisa="<?= $order['sisa']; ?>" data-idaps="<?= $order['idapsperstyle']; ?>">
-                                                        Delete</button>
-                                                </td>
+
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>

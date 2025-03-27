@@ -30,6 +30,8 @@ $routes->group(
         $routes->get('reqstartmc/(:any)', 'ApiController::reqstartmc/$1');
         $routes->get('getDataForPPH/(:any)/(:any)', 'ApiController::getDataForPPH/$1/$2');
         $routes->get('getDataPerinisial/(:any)/(:any)/(:any)', 'ApiController::getDataPerinisial/$1/$2/$3');
+        $routes->get('getDataArea', 'ApiController::getArea');
+        $routes->get('getPPhPerhari/(:any)/(:any)', 'ApiController::getPPhPerhari/$1/$2');
     }
 );
 
@@ -130,6 +132,9 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     //timter produksi
     $routes->post('timterProduksi', 'ProduksiController::timterProduksi');
     $routes->post('exportTimter', 'TimterController::excelTimter');
+
+    //summary bs mc
+    $routes->post('exportSummaryBs', 'SummaryController::excelSummaryBs');
 
     // deffect
     $routes->get('datadeffect', 'DeffectController::datadeffect');
@@ -291,6 +296,9 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('exportTimter', 'TimterController::excelTimter');
     $routes->get('summaryPlanner/(:any)', 'SummaryController::summaryPlanner/$1');
 
+    //summary bs mc
+    $routes->post('exportSummaryBs', 'SummaryController::excelSummaryBs');
+
     // deffect
     $routes->get('datadeffect', 'DeffectController::datadeffect');
     $routes->post('inputKode', 'DeffectController::inputKode');
@@ -375,6 +383,9 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('timterProduksi', 'ProduksiController::timterProduksi');
     $routes->post('exportTimter', 'TimterController::excelTimter');
 
+    //summary bs mc
+    $routes->post('exportSummaryBs', 'SummaryController::excelSummaryBs');
+
     $routes->get('planningmesin', 'ApsController::planningmesin');
     $routes->post('fetch_jarum', 'ApsController::fetch_jarum');
     $routes->post('SimpanJudul', 'ApsController::saveplanningmesin');
@@ -405,7 +416,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
 
 // user
 $routes->group('/user', ['filter' => 'user'], function ($routes) {
-    $routes->get('', 'UserController::produksi');
+    $routes->get('', 'ProduksiController::viewProduksi');
     $routes->get('produksi', 'UserController::produksi');
     $routes->get('bssetting', 'UserController::bssetting');
     $routes->get('bsmesin', 'UserController::bsmesin');
@@ -413,8 +424,22 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('saveBsMesin', 'UserController::saveBsMesin');
     $routes->get('userController/getInisial/(:any)', 'UserController::getInisial/$1');
     $routes->get('userController/getSize/(:any)', 'UserController::getSize/$1');
-
-
+    $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
+    $routes->get('produksi', 'ProduksiController::produksi');
+    $routes->get('dataprogress', 'ProduksiController::progressData');
+    $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
+    $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->post('importproduksi', 'ProduksiController::importproduksinew');
+    $routes->post('resetproduksi', 'ProduksiController::resetproduksi');
+    $routes->post('resetproduksiarea', 'ProduksiController::resetproduksiarea');
+    $routes->post('editproduksi', 'ProduksiController::editproduksi');
+    $routes->get('updateproduksi', 'ProduksiController::updateproduksi');
+    $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->post('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->get('updatebs', 'ProduksiController::updatebs');
+    $routes->post('get-area', 'ProduksiController::getArea');
+    $routes->post('get-size', 'ProduksiController::getSize');
+    $routes->post('prosesInputProdManual', 'ProduksiController::inputProduksiManual');
     // data order
     $routes->get('dataorderperarea/(:any)', 'OrderController::DetailOrderPerAreaPlan/$1');
     $routes->get('detailPdk/(:any)/(:any)', 'OrderController::pdkDetail/$1/$2');
@@ -439,6 +464,10 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('summaryProdPerTanggal', 'ProduksiController::summaryProdPerTanggal');
     $routes->post('exportSummaryPerTgl', 'SummaryController::excelSummaryPerTgl');
 
+    $routes->get('datadeffect', 'DeffectController::datadeffect');
+    $routes->post('inputKode', 'DeffectController::inputKode');
+    $routes->post('viewDataBs', 'DeffectController::viewDataBs');
+
     //timter produksi
     $routes->post('timterProduksi', 'ProduksiController::timterProduksi');
     $routes->post('exportTimter', 'TimterController::excelTimter');
@@ -458,11 +487,13 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
     $routes->post('getStyleSizeByNoModel', 'MaterialController::getStyleSizeByNoModel');
     $routes->post('getJalanMc', 'MaterialController::getJalanMcByModelSize');
-    $routes->get('getMU/(:any)/(:any)', 'MaterialController::getMU/$1/$2');
+    $routes->get('getMU/(:any)/(:any)/(:any)', 'MaterialController::getMU/$1/$2/$3');
     $routes->post('bahanBaku/simpanKeSession', 'MaterialController::savePemesananSession');
     $routes->get('bahanBaku/hapusSession', 'MaterialController::deleteAllPemesananSession');
-    $routes->get('bahanBaku/hapusSession/(:any)', 'MaterialController::deletePemesananSession/$1');
-    $routes->post('saveListPemesanan', 'MaterialController::saveListPemesanan');
+    $routes->get('bahanBaku/hapusSession/(:any)/(:any)', 'MaterialController::deletePemesananSession/$1/$2');
+    $routes->get('listPemesanan/(:any)', 'MaterialController::listPemesanan/$1');
+    $routes->get('stockbahanbaku/(:any)', 'MaterialController::stockBahanBaku/$1');
+    $routes->get('filterstockbahanbaku/(:any)', 'MaterialController::filterStockBahanBaku/$1');
 });
 
 // sudo
@@ -539,10 +570,14 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->get('updatebs', 'ProduksiController::updatebs');
+    $routes->get('hapus-produksi/(:any)', 'ProduksiController::deleteProduksi/$1');
 
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
     $routes->get('bssetting', 'UserController::bssetting');
     $routes->post('importbssetting', 'ProduksiController::importbssetting');
+    $routes->post('get-area', 'ProduksiController::getArea');
+    $routes->post('get-size', 'ProduksiController::getSize');
+    $routes->post('prosesInputProdManual', 'ProduksiController::inputProduksiManual');
 
     //summary
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
@@ -556,6 +591,8 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->post('timterProduksi', 'ProduksiController::timterProduksi');
     $routes->post('exportTimter', 'TimterController::excelTimter');
 
+    //summary bs mc
+    $routes->post('exportSummaryBs', 'SummaryController::excelSummaryBs');
 
     // mesin
     $routes->get('datamesin', 'MesinController::index');

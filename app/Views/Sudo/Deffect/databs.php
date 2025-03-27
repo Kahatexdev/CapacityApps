@@ -147,35 +147,43 @@
                     <div class="card-body p-3">
                         <form action="<?= base_url($role . '/viewDataBs') ?>" method="POST">
                             <div class="row">
-                                <div class="col-lg-3">
+                                <div class="col-lg-2">
                                     <div class="form-group">
                                         <label for="area" class="col-form-label">Dari</label>
                                         <input type="date" name="awal" class="form-control" required>
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-lg-2">
                                     <div class="form-group">
                                         <label for="area" class="col-form-label">sampai</label>
                                         <input type="date" name="akhir" class="form-control" required>
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                        <label for="buyer" class="col-form-label">Buyer</label>
+                                        <select class="select2 form-select" id="buyer" name="buyer">
+                                            <option value="">Pilih Buyer</option>
+                                            <?php foreach ($dataBuyer as $buyer) : ?>
+                                                <option value="<?= $buyer['kd_buyer_order']; ?>"><?= $buyer['kd_buyer_order']; ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
                                     <div class="form-group">
                                         <label for="area" class="col-form-label">Area</label>
                                         <input type="text" name="area" class="form-control">
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-lg-2">
                                     <div class="form-group">
                                         <label for="area" class="col-form-label">No Model</label>
                                         <input type="text" name="pdk" class="form-control">
                                     </div>
                                 </div>
-
-                            </div>
-                            <div class="row justify-content-end">
-                                <div class="col-lg-2 justify-content-end text-end">
-                                    <button type="submit" class="btn btn-info"> Display</button>
+                                <div class="col-lg-2 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-info w-100">Display</button>
                                 </div>
                             </div>
                         </form>
@@ -296,6 +304,15 @@
             ]
         });
 
+    });
+
+    $(document).ready(function() {
+        $('.select2').select2({
+            theme: 'bootstrap-5', // Gunakan tema Bootstrap 5
+            width: '100%',
+            placeholder: "",
+            allowClear: true
+        });
     });
 </script>
 

@@ -1,52 +1,61 @@
 <?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
+<style>
+    .card-fixed-height {
+        min-height: 80px;
+        /* Biar gak terlalu kecil */
+        height: 80px;
+        /* Tetapkan tinggi */
+    }
+
+    .dropdown-menu {
+        max-height: 200px;
+        /* Biar dropdown ga bikin card makin tinggi */
+        overflow-y: auto;
+        /* Scroll otomatis kalau dropdown panjang */
+    }
+</style>
 <div class="container-fluid py-4">
     <div class="row my-4">
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row d-flex justify-content-between">
-                        <div class="col-4">
+            <div class="card card-fixed-height">
+                <div class="card-header p-2"> <!-- Kurangi padding -->
+                    <div class="row d-flex align-items-center justify-content-between">
+                        <!-- Bagian Title -->
+                        <div class="col-auto">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    Data Produksi Per Area
-                                </h5>
+                                <h5 class="font-weight-bolder mb-0">Data Produksi Per Area</h5>
                             </div>
                         </div>
-                        <div class="col-8 text-end">
-                            <ul class="navbar-nav d-flex flex-row justify-content-end">
-                                <li class="nav-item dropdown me-3"> <!-- Tambahkan margin kanan untuk jarak -->
-                                    <a href="#" class="nav-link dropdown-toggle text-body font-weight-bold px-2" id="navbarDropdownReports" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fas fa-file-alt"></i>
-                                        <span class="d-lg-inline-block d-none ms-1">Summary</span>
-                                    </a>
-                                    <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4" aria-labelledby="navbarDropdownReports">
-                                        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#summaryPertgl">Produksi Pertanggal</a></li>
-                                        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#summaryTOD">Produksi Global</a></li>
-                                        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#summaryBS">Bs Mesin</a></li>
-                                        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#timter">Timter</a></li>
-                                    </ul>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a href="#" class="nav-link dropdown-toggle text-body font-weight-bold px-2" id="navbarDropdownReports" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fas fa-file-alt"></i>
-                                        <span class="d-lg-inline-block d-none ms-1">Produksi</span>
-                                    </a>
-                                    <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4" aria-labelledby="navbarDropdownReports">
-                                        <li><a class="dropdown-item" href="<?= base_url($role . '/produksi') ?>">Import</a></li>
-                                        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#inputProduksi">Input Manual</a></li>
-                                        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#reset">Reset PDK</a></li>
-                                        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#resetarea">Reset Produksi Area</a></li>
-                                    </ul>
-                                </li>
-                            </ul>
+
+                        <!-- Bagian Tombol -->
+                        <div class="col-auto d-flex align-items-center">
+
+                            <div class="btn-group me-2">
+                                <a class="btn btn-info btn-sm mx-2" href="<?= base_url($role . '/produksi') ?>">Import</a>
+                                <a class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#inputProduksi">Input Manual</a>
+                            </div>
+
+                            <!-- Dropdown Summary -->
+                            <div class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle text-body font-weight-bold" id="navbarDropdownReports" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+
+                                    <span class="d-lg-inline-block d-none ms-1 btn btn-info"> <i class="fas fa-file-alt"></i> Summary</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#summaryPertgl">Produksi Pertanggal</a></li>
+                                    <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#summaryTOD">Produksi Global</a></li>
+                                    <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#timter">Timter</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
+
                 </div>
             </div>
-
         </div>
+
     </div>
 
     <div class="row">
@@ -391,77 +400,6 @@
                                     <input type="hidden" id="qty_produksi" name="qty_produksi">
                                 </div>
 
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn bg-gradient-info">Generate</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <!-- modal summary bs mc -->
-        <div class="modal fade" id="summaryBS" tabindex="-1" role="dialog" aria-labelledby="summaryBS" aria-hidden="true">
-            <div class="modal-dialog " role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Summary BS MC</h5>
-                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <form action="<?= base_url($role . '/exportSummaryBs'); ?>" method="POST">
-                        <div class="modal-body align-items-center">
-                            <div class="form-group">
-                                <label for="buyer" class="col-form-label">Buyer</label>
-                                <select class="form-control" id="buyer" name="buyer">
-                                    <option></option>
-                                    <?php foreach ($buyer as $buy) : ?>
-                                        <option><?= $buy['kd_buyer_order'] ?></option>
-                                    <?php endforeach ?>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="area" class="col-form-label">Area</label>
-                                <select class="form-control" id="area" name="area">
-                                    <option></option>
-                                    <?php foreach ($area as $ar) : ?>
-                                        <option><?= $ar ?></option>
-                                    <?php endforeach ?>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="jarum" class="col-form-label">Jarum</label>
-                                <select class="form-control" id="jarum" name="jarum">
-                                    <option></option>
-                                    <option value="13">13</option>
-                                    <option value="84">84</option>
-                                    <option value="92">92</option>
-                                    <option value="96">96</option>
-                                    <option value="106">106</option>
-                                    <option value="108">108</option>
-                                    <option value="116">116</option>
-                                    <option value="120">120</option>
-                                    <option value="124">124</option>
-                                    <option value="126">126</option>
-                                    <option value="144">144</option>
-                                    <option value="168">168</option>
-                                    <option value="240">240</option>
-                                    <option value="POM-POM">POM-POM</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="pdk" class="col-form-label">No Model</label>
-                                <input type="text" class="form-control" name="pdk">
-                            </div>
-                            <div class="form-group">
-                                <label for="awal" class="col-form-label">Dari</label>
-                                <input type="date" class="form-control" name="awal">
-                            </div>
-                            <div class="form-group">
-                                <label for="akhir" class="col-form-label">Sampai</label>
-                                <input type="date" class="form-control" name="akhir">
                             </div>
                         </div>
                         <div class="modal-footer">

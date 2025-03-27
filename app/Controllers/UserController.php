@@ -77,6 +77,7 @@ class UserController extends BaseController
         $dataBuyer = $this->orderModel->getBuyer();
         $dataArea = $this->jarumModel->getArea();
         $dataJarum = $this->jarumModel->getJarum();
+        $model = $this->ApsPerstyleModel->getPdkProduksi();
         $data = [
             'role' => session()->get('role'),
             'title' => 'Dashboard',
@@ -91,7 +92,7 @@ class UserController extends BaseController
             'buyer' => $dataBuyer,
             'area' => $dataArea,
             'jarum' => $dataJarum,
-
+            'models' => $model,
         ];
         return view(session()->get('role') . '/produksi', $data);
     }
@@ -179,9 +180,9 @@ class UserController extends BaseController
         ];
         return view(session()->get('role') . '/bsmesin', $data);
     }
-    public function getInisial($noModel)
+    public function getSize($noModel)
     {
-        $pdk = $this->ApsPerstyleModel->getInProduksi();
+        $pdk = $this->ApsPerstyleModel->getSizeProduksi();
 
         // Filter data berdasarkan no_model
         $filteredData = array_filter($pdk, function ($item) use ($noModel) {
@@ -189,35 +190,29 @@ class UserController extends BaseController
         });
 
         // Ambil semua data inisial dan idapsperstyle
-        $inisialList = array_map(function ($item) {
+        $sizeList = array_map(function ($item) {
             return [
-                'inisial' => $item['inisial'],
-                'idapsperstyle' => $item['idapsperstyle'],
+                'size' => $item['size'],
             ];
         }, $filteredData);
 
         // Kembalikan daftar inisial sebagai JSON
-        return $this->response->setJSON(['inisial' => $inisialList]);
+        return $this->response->setJSON(['size' => $sizeList]);
     }
-    public function getSize($idaps)
+    public function getInisial($size)
     {
-        $size = $this->ApsPerstyleModel->getSizeProduksi();
+        $inisial = $this->ApsPerstyleModel->getInProduksi();
 
-        // Cari data inisial berdasarkan no_model
-        $sizeData = array_filter($size, function ($item) use ($idaps) {
-            return $item['idapsperstyle'] === $idaps;
+        // Cari data inisial berdasarkan size
+        $inisialData = array_filter($inisial, function ($item) use ($size) {
+            return $item['size'] === $size;
         });
 
         // Ambil data pertama yang sesuai
-        $sizeData = reset($sizeData);
+        $inisialData = reset($inisialData);
 
         // Jika data ditemukan, kembalikan inisial
-        if ($sizeData) {
-            return $this->response->setJSON(['size' => $sizeData['size'], 'inisial' => $sizeData['inisial'] ?? '']);
-        }
-
-        // Jika tidak ditemukan, kembalikan respons kosong
-        return $this->response->setJSON(['size' => '']);
+        return $this->response->setJSON(['inisial' => $inisialData['inisial'] ?? '']);
     }
     public function saveBsMesin()
     {
@@ -233,7 +228,7 @@ class UserController extends BaseController
 
         // Data detail
         $noMesin = $request->getPost('no_mesin');
-        $inisial = $request->getPost('inisialName');
+        $inisial = $request->getPost('inisial');
         $noModel = $request->getPost('no_model');
         $size    = $request->getPost('size');
         $gram    = $request->getPost('gram');

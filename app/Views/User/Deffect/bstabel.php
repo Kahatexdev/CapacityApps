@@ -95,7 +95,6 @@
                             <tr>
                                 <th>Tgl In Stocklot</th>
                                 <th>Area</th>
-                                <th>Buyer</th>
                                 <th>No Model</th>
                                 <th>Style</th>
                                 <th>No Label</th>
@@ -111,7 +110,6 @@
                                 <tr>
                                     <td><?= $bs['tgl_instocklot'] ?></td>
                                     <td><?= $bs['area'] ?></td>
-                                    <td><?= $bs['kd_buyer_order'] ?></td>
                                     <td><?= $bs['mastermodel'] ?></td>
                                     <td><?= $bs['size'] ?></td>
                                     <td><?= $bs['no_label'] ?></td>
