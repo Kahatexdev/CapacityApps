@@ -540,7 +540,7 @@
         console.log(data);
 
         // Send data using fetch
-        fetch('http://localhost:8080/planning/updateMonthlyMc', {
+        fetch(`<?= base_url('/planning/updateMonthlyMc') ?>`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -560,7 +560,7 @@
                         confirmButtonText: 'OK'
                     }).then(() => {
                         // Redirect setelah SweetAlert ditutup
-                        window.location.href = 'http://localhost:8080/planning/viewPlan/' + document
+                        window.location.href = '<?= base_url('/planning/viewPlan/') ?>' + document
                             .querySelector("#judulPlan").value;
                     });
                 } else {
