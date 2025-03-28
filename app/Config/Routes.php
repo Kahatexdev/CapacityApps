@@ -455,6 +455,9 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('viewModelPlusPacking/(:any)', 'ProduksiController::viewModelPlusPacking/$1');
     $routes->get('pluspacking', 'ProduksiController::pluspacking');
     $routes->post('inputpo', 'ProduksiController::updatepo');
+    $routes->post('get-area', 'ProduksiController::getArea');
+    $routes->post('get-size', 'ProduksiController::getSize');
+    $routes->post('prosesInputProdManual', 'ProduksiController::inputProduksiManual');
 
     //summary
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
@@ -494,6 +497,8 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('listPemesanan/(:any)', 'MaterialController::listPemesanan/$1');
     $routes->get('stockbahanbaku/(:any)', 'MaterialController::stockBahanBaku/$1');
     $routes->get('filterstockbahanbaku/(:any)', 'MaterialController::filterStockBahanBaku/$1');
+    $routes->get('pph/(:any)', 'MaterialController::pph/$1');
+    $routes->get('filterpph/(:any)', 'MaterialController::filterPph/$1');
 });
 
 // sudo
@@ -632,8 +637,7 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('viewModelPlusPacking/(:any)', 'ProduksiController::viewModelPlusPacking/$1');
     $routes->get('pluspacking', 'ProduksiController::pluspacking');
     $routes->post('inputpo', 'ProduksiController::updatepo');
-
-
+    
     // usermanageement
     $routes->get('account', 'GodController::account');
     $routes->post('addaccount', 'GodController::addaccount');
