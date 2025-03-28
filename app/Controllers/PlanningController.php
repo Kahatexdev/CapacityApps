@@ -523,6 +523,8 @@ class PlanningController extends BaseController
             $totalMesin = 0;
             $planningMc = 0;
             $outputDz = 0;
+            $operator = 0;
+            $montir = 0;
             foreach ($mesin as $jarum) {
                 $sisaOrder = $this->ApsPerstyleModel->ambilSisaOrder($ar, $awalBulan, $jarum['jarum']);
                 $monthlyData[$ar][$jarum['jarum']]['kebutuhanMesin'] = $sisaOrder['totalKebMesin'];
@@ -533,9 +535,15 @@ class PlanningController extends BaseController
                 $planningMc += $sisaOrder['totalKebMesin'];
                 $outputDz +=   $monthlyData[$ar][$jarum['jarum']]['output'];
             }
+            // Perhitungan operator dan montir
+            $operator = (($planningMc / 20) + ($planningMc / 20) / 7) * 3;
+            $montir = (($planningMc / 50) + ($planningMc / 50) / 7) * 3;
+
             $monthlyData[$ar]['totalMesin'] = $totalMesin;
             $monthlyData[$ar]['planningMc'] = $planningMc;
             $monthlyData[$ar]['outputDz'] = $outputDz;
+            $monthlyData[$ar]['operator'] = round($operator); // Dibulatkan agar lebih masuk akal
+            $monthlyData[$ar]['montir'] = round($montir);
         }
         $totalAllMesin = 0;
 

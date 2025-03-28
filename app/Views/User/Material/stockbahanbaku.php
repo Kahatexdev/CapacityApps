@@ -117,24 +117,19 @@
             output += `
             <div class="result-card">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="badge bg-info">Cluster: ${item.nama_cluster} | No Model: ${item.no_model}</h5>
+                    <h5 class="badge bg-info">No Model: ${item.no_model}</h5>
                     <span class="badge bg-secondary">Jenis: ${item.item_type}</span>
                 </div>
                 <div class="row g-3">
-                    <div class="col-md-4">
-                        <p><strong>Lot Jalur:</strong> ${item.lot_stock || item.lot_awal}</p>
-                        <p><strong>Space:</strong> ${item.kapasitas || 0} KG</p>
-                        <p><strong>Sisa Space:</strong> ${item.sisa_space || 0} KG</p>
-                    </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <p><strong>Kode Warna:</strong> ${item.kode_warna}</p>
-                        <p><strong>Warna:</strong> ${item.warna}</p>
-                        <p><strong>Total KGs:</strong> ${totalKgs} KG | ${item.cns_stock_awal && item.cns_stock_awal > 0 ? item.cns_stock_awal : item.cns_in_out} Cones | ${totalKrg} KRG </p>
+                        <p><strong>Lot Jalur:</strong> ${item.lot_stock || item.lot_awal}</p>
+                        <p><strong>Total Cones:</strong> ${item.cns_stock_awal && item.cns_stock_awal > 0 ? item.cns_stock_awal : item.cns_in_out} CNS</p>
                     </div>
-                    <div class="col-md-4 d-flex flex-column gap-2">
-                        <button class="btn btn-outline-info btn-sm">In/Out</button>
-                        <button class="btn btn-outline-info btn-sm pindahPalet" data-id="${item.id_stock}" data-cluster="${item.nama_cluster}" data-lot="${item.lot_stock}" data-kgs="${totalKgs}" data-cones="${item.cns_stock_awal && item.cns_stock_awal > 0 ? item.cns_stock_awal : item.cns_in_out}" data-krg="${totalKrg}">Pindah Palet</button>
-                        <button class="btn btn-outline-info btn-sm pindahOrder" data-id="${item.id_stock}" data-noModel="${item.no_model}" data-cluster="${item.nama_cluster}" data-lot="${item.lot_stock}" data-kgs="${totalKgs}" data-cones="${item.cns_stock_awal && item.cns_stock_awal > 0 ? item.cns_stock_awal : item.cns_in_out}" data-krg="${totalKrg}">Pindah Order</button>
+                    <div class="col-md-6">
+                        <p><strong>Warna:</strong> ${item.warna}</p>
+                        <p><strong>Total KGs:</strong> ${totalKgs} KG</p>
+                        <p><strong>Total Karung:</strong> ${totalKrg} KRG</p>
                     </div>
                 </div>
             </div>`;

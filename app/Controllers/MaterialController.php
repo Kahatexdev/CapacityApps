@@ -18,6 +18,8 @@ use App\Models\DetailPlanningModel;
 use App\Models\TanggalPlanningModel;
 use App\Models\EstimatedPlanningModel;
 use App\Models\AksesModel;/*  */
+use App\Models\BsModel;
+use App\Models\BsMesinModel;
 use App\Models\MesinPerStyle;
 use App\Services\orderServices;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -43,6 +45,8 @@ class MaterialController extends BaseController
     protected $EstimatedPlanningModel;
     protected $MesinPerStyleModel;
     protected $orderServices;
+    protected $bsModel;
+    protected $BsMesinModel;
 
     public function __construct()
     {
@@ -62,6 +66,8 @@ class MaterialController extends BaseController
         $this->EstimatedPlanningModel = new EstimatedPlanningModel();
         $this->MesinPerStyleModel = new MesinPerStyle();
         $this->orderServices = new orderServices();
+        $this->bsModel = new BsModel();
+        $this->BsMesinModel = new BsMesinModel();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -73,8 +79,6 @@ class MaterialController extends BaseController
             return redirect()->to(base_url('/login'));
         }
     }
-
-
     public function index()
     {
         $area = session()->get('username');
@@ -445,7 +449,7 @@ class MaterialController extends BaseController
     {
         $data = [
             'role' => session()->get('role'),
-            'title' => 'Status Bahan Baku',
+            'title' => 'Stock Bahan Baku',
             'active1' => '',
             'active2' => '',
             'active3' => '',
@@ -453,7 +457,6 @@ class MaterialController extends BaseController
             'produksiBulan' => 0,
             'produksiHari' => 0,
             'area' => $area
-
         ];
 
         return view(session()->get('role') . '/Material/stockbahanbaku', $data);
@@ -473,5 +476,141 @@ class MaterialController extends BaseController
 
         // Kembalikan data yang sudah difilter ke frontend
         return $this->response->setJSON($stock);
+    }
+    public function pph($area)
+    {
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'PPH',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'targetProd' => 0,
+            'produksiBulan' => 0,
+            'produksiHari' => 0,
+            'area' => $area
+        ];
+
+        return view(session()->get('role') . '/Material/pph', $data);
+    }
+    public function filterPPH($area)
+    {
+        // Mengambil nilai 'search' yang dikirim oleh frontend
+        $noModel = $this->request->getGet('noModel');
+
+        // Jika search ada, panggil API eksternal dengan query parameter 'search'
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pph/' . $area . '?noModel=' . urlencode($noModel);
+
+        // Mengambil data dari API eksternal
+        $response = file_get_contents($apiUrl);
+        if ($response === FALSE) {
+            log_message('error', "API tidak bisa diakses: $apiUrl");
+            return $this->response->setJSON(["error" => "Gagal mengambil data dari API"]);
+        } else {
+            $models = json_decode($response, true);
+
+            $pphInisial = [];
+            foreach ($models as $items) {
+                $styleSize = $items['style_size'];
+                $gw = $items['gw'];
+                $comp = $items['composition'];
+                $gwpcs = ($gw * $comp) / 100;
+                $prod = $this->orderModel->getDataPph($area, $noModel, $styleSize);
+                $idaps = $this->ApsPerstyleModel->getIdApsForPph($area, $noModel, $styleSize);
+                $idapsList = array_column($idaps, 'idapsperstyle');
+                $bsSettingData = $this->bsModel->getBsPph($idapsList);
+                $bsMesinData = $this->BsMesinModel->getBsMesinPph($area, $noModel, $styleSize);
+                $bsMesin = $bsMesinData['bs_gram'] ?? 0;
+                $bruto = $prod['bruto'] ?? 0;
+                if ($gw == 0) {
+                    $pph = 0;
+                } else {
+
+                    $pph = ((($bruto + ($bsMesin / $gw)) * $comp * $gw) / 100) / 1000;
+                }
+
+                $pphInisial[] = [
+                    'area'  => $items['area'],
+                    'style_size'  => $items['style_size'],
+                    'inisial'  => $prod['inisial'],
+                    'item_type'  => $items['item_type'],
+                    'kode_warna'      => $items['kode_warna'],
+                    'color'      => $items['color'],
+                    'gw'         => $items['gw'],
+                    'composition' => $items['composition'],
+                    'kgs'  => $items['ttl_kebutuhan'],
+                    'jarum'      => $prod['machinetypeid'] ?? null,
+                    'bruto'      => $bruto,
+                    'qty'        => $prod['qty'] ?? 0,
+                    'sisa'       => $prod['sisa'] ?? 0,
+                    'po_plus'    => $prod['po_plus'] ?? 0,
+                    'bs_setting' => $bsSettingData['bs_setting'] ?? 0,
+                    'bs_mesin'   => $bsMesin,
+                    'pph'        => $pph
+                ];
+            }
+        }
+        $result = [
+            'qty' => 0,
+            'sisa' => 0,
+            'bruto' => 0,
+            'bs_setting' => 0,
+            'bs_mesin' => 0
+        ];
+
+        $processedStyleSizes = []; // Untuk memastikan style_size tidak dihitung lebih dari sekali
+        $temporaryData = [];
+        foreach ($pphInisial as $item) {
+            $key = $item['item_type'] . '-' . $item['kode_warna'];
+            $styleSizeKey = $item['style_size'];
+
+            // Jika style_size sudah ada, jangan tambahkan lagi
+            if (!isset($processedStyleSizes[$styleSizeKey])) {
+                $temporaryData[] = [
+                    'qty' => $item['qty'],
+                    'sisa' => $item['sisa'],
+                    'bruto' => $item['bruto'],
+                    'bs_setting' => $item['bs_setting'],
+                    'bs_mesin' => $item['bs_mesin']
+                ];
+                $processedStyleSizes[$styleSizeKey] = true;
+            }
+
+            if (!isset($result[$key])) {
+                $result[$key] = [
+                    'item_type' => $item['item_type'],
+                    'kode_warna' => $item['kode_warna'],
+                    'warna' => $item['color'],
+                    'kgs' => 0,
+                    'pph' => 0,
+                    'jarum' => $item['jarum'],
+                    'area' => $item['area']
+                ];
+            }
+
+            // Akumulasi data berdasarkan item_type-kode_warna
+            $result[$key]['kgs'] += $item['kgs'];
+            $result[$key]['pph'] += $item['pph'];
+        }
+
+        // Menambahkan total dari style_size yang unik ke dalam result
+        foreach ($temporaryData as $res) {
+            $result['qty'] += $res['qty'];
+            $result['sisa'] += $res['sisa'];
+            $result['bruto'] += $res['bruto'];
+            $result['bs_setting'] += $res['bs_setting'];
+            $result['bs_mesin'] += $res['bs_mesin'];
+        }
+
+        // Hapus semua elemen dengan format style_size dari $result
+        foreach (array_keys($result) as $key) {
+            if (preg_match('/^\w+\s*\d+[Xx]\d+$/', $key)) {
+                unset($result[$key]);
+            }
+        }
+log_message('debug', "Final Result: " . json_encode($result));
+
+        // Kembalikan data yang sudah difilter ke frontend
+        return $this->response->setJSON($result);
     }
 }

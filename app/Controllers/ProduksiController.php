@@ -963,6 +963,7 @@ class ProduksiController extends BaseController
                 'no_label' => $this->request->getPost('no_label'),
                 'no_box' => $this->request->getPost('no_box'),
                 'qty_produksi' => $qtynow,
+                'tgl_produksi' => $this->request->getPost('tgl_prod'),
             ];
             $u = $this->produksiModel->update($id, $update);
             if ($u) {
