@@ -149,16 +149,50 @@ class PlanningController extends BaseController
     }
     public function assignarealall()
     {
+        $model = $this->request->getPost("no_model");
+        $area = $this->request->getPost("area");
+        $jarum = $this->request->getPost("jarum");
+
+        // Simpan ke sistem Capacity dulu
         $data = [
             'role' => session()->get('role'),
-            'mastermodel' => $this->request->getPost("no_model"),
-            'area' => $this->request->getPost("area"),
+            'mastermodel' => $model,
+            'area' => $area
         ];
-        $assign = $this->ApsPerstyleModel->asignArealall($data);
-        if ($assign) {
-            return redirect()->to(base_url(session()->get('role') . '/dataorder/'))->withInput()->with('success', 'Berhasil Assign Area');
+        $assign = $this->ApsPerstyleModel->asignarealall($data);
+
+        // Kirim ke API MaterialSystem dengan cURL
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/assignArea';
+        $postData = [
+            'model' => $model,
+            'area' => $area
+        ];
+
+        $ch = curl_init($apiUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postData));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/x-www-form-urlencoded'
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch); // Tangkap error jika ada
+        curl_close($ch);
+
+        $apiResult = json_decode($response, true);
+
+
+        if ($assign && $httpCode == 200) {
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $model . '/' . $jarum))
+                ->with('success', 'Berhasil Assign Area di Capacity dan Material');
+        } elseif ($assign && $httpCode == 404) {
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $model . '/' . $jarum))
+                ->with('warning', 'Berhasil Assign Area di Capacity, tapi Order belum ada di Material');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/dataorder/'))->withInput()->with('error', 'Gagal Assign Area');
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $model . '/' . $jarum))
+                ->with('error', 'Gagal Assign Area ' . $httpCode);
         }
     }
     public function listplanning()

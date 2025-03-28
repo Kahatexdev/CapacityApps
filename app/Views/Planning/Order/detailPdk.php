@@ -39,7 +39,10 @@ error_reporting(E_ALL); ?>
                         </div>
                         <div class="col-auto">
                             <button type="button" class="btn bg-gradient-warning btn-assign" data-toggle="modal" data-target="#ModalAssign">
-                                Arahkan Ke Areal
+                                Arahkan Ke Areal/dlv
+                            </button>
+                            <button type="button" class="btn bg-gradient-warning btn-assignall" data-toggle="modal" data-target="#ModalAssignAll">
+                                Arahkan Semua
                             </button>
                             <a href="<?= base_url($role . '/dataorder/') ?>" class="btn bg-gradient-info">Kembali</a>
                         </div>
@@ -298,6 +301,7 @@ error_reporting(E_ALL); ?>
                     <div class="modal-body">
                         <form action="<?= base_url($role . '/assignarealall') ?>" method="post">
                             <input type="text" name="no_model" id="" hidden value="<?= $noModel ?>">
+                            <input type="text" name="jarum" id="" hidden value="<?= $jarum ?>">
                             <div id="confirmationMessage"></div>
                             <div class="form-group">
                             </div>
