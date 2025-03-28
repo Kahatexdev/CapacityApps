@@ -437,7 +437,9 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->get('updatebs', 'ProduksiController::updatebs');
-
+    $routes->post('get-area', 'ProduksiController::getArea');
+    $routes->post('get-size', 'ProduksiController::getSize');
+    $routes->post('prosesInputProdManual', 'ProduksiController::inputProduksiManual');
     // data order
     $routes->get('dataorderperarea/(:any)', 'OrderController::DetailOrderPerAreaPlan/$1');
     $routes->get('detailPdk/(:any)/(:any)', 'OrderController::pdkDetail/$1/$2');
@@ -578,6 +580,9 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
     $routes->get('bssetting', 'UserController::bssetting');
     $routes->post('importbssetting', 'ProduksiController::importbssetting');
+    $routes->post('get-area', 'ProduksiController::getArea');
+    $routes->post('get-size', 'ProduksiController::getSize');
+    $routes->post('prosesInputProdManual', 'ProduksiController::inputProduksiManual');
 
     //summary
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');

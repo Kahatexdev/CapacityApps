@@ -388,7 +388,7 @@ class MaterialController extends BaseController
     }
     public function listPemesanan($area)
     {
-        $apiUrl = 'http://172.23.39.118/MaterialSystem/public/api/listPemesanan/' . $area;
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/listPemesanan/' . $area;
         $response = file_get_contents($apiUrl);  // Mendapatkan response dari API
         if ($response === FALSE) {
             die('Error occurred while fetching data.');
@@ -421,9 +421,6 @@ class MaterialController extends BaseController
         // Untuk tanggal ketiga, ambil 1 hari setelah tanggal "twoDays" dan cek ulang
         $initialthreeDay = date('Y-m-d', strtotime($twoDays . ' +1 day'));
         $threeDay = getNextNonHoliday($initialthreeDay, $liburDates);
-
-        // Debug hasil
-        // dd($tomorrow, $twoDays, $threeDay);
 
         $data = [
             'role' => session()->get('role'),

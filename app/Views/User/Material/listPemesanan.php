@@ -36,6 +36,9 @@
                                 List Pemesanan Bahan Baku <?= $area ?>
                             </h5>
                         </div>
+                        <div>
+                            <a href="#" class="btn btn-info"><i class="far fa-clock"></i> + Waktu</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -83,7 +86,7 @@
                                     <td class="text-xs text-start"><?= $id['lot']; ?></td>
                                     <td class="text-xs text-start"><?= $id['keterangan']; ?></td>
                                     <td class="text-xs text-start"></td>
-                                    <td class="text-xs text-start"><?= number_format($id['sisa_jatah'], 2); ?></td>
+                                    <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>"><?= number_format($id['sisa_jatah'], 2); ?></td>
                                     <td class="text-xs text-start">
                                         <button type="button" class="btn btn-warning update-btn" data-toggle="modal" data-target="#updateListModal" data-area="<?= $area; ?>" data-tgl="<?= $id['tgl_pakai']; ?>" data-model="<?= $id['no_model']; ?>" data-item="<?= $id['item_type']; ?>" data-kode="<?= $id['kode_warna']; ?>" data-color="<?= $id['color']; ?>">
                                             <i class="fa fa-edit fa-lg"></i>
@@ -92,54 +95,78 @@
                                     <td class="text-xs">
                                         <?php
                                         $show = "d-none";
+                                        $batasWaktu = '08:30:00';
                                         if ($id['sisa_jatah'] > 0) {
+                                            //  hari kamis pemesanan spsandex 2 hari
                                             if ($day == "Thursday") {
                                                 if ($id['jenis'] == "BENANG" || $id['jenis'] == "NYLON") {
                                                     if ($id['tgl_pakai'] == $tomorrow) {
                                                         $show = "";
+                                                        $batasWaktu = '08:30:00';
                                                     }
                                                 } elseif ($id['jenis'] == "SPANDEX" || $id['jenis'] == "KARET") {
-                                                    if ($id['tgl_pakai'] == $twoDays || $id['tgl_pakai'] == $threeDay) {
+                                                    if ($id['tgl_pakai'] == $twoDays) {
                                                         $show = "";
+                                                        $batasWaktu = '08:30:00';
+                                                    } elseif ($id['tgl_pakai'] == $threeDay) {
+                                                        $show = "";
+                                                        $batasWaktu = '09:00:00';
                                                     }
                                                 }
-                                            } elseif ($day == "Friday") {
+                                            }
+                                            // hari jumat pemesanan benang 2 hari
+                                            elseif ($day == "Friday") {
                                                 if ($id['jenis'] == "BENANG") {
-                                                    if ($id['tgl_pakai'] == $tomorrow || $id['tgl_pakai'] == $twoDays) {
+                                                    if ($id['tgl_pakai'] == $tomorrow) {
                                                         $show = "";
+                                                        $batasWaktu = '08:30:00';
+                                                    } elseif ($id['tgl_pakai'] == $twoDays) {
+                                                        $show = "";
+                                                        $batasWaktu = '09:00:00';
                                                     }
                                                 } elseif ($id['jenis'] == "NYLON") {
                                                     if ($id['tgl_pakai'] == $tomorrow) {
                                                         $show = "";
+                                                        $batasWaktu = '08:30:00';
                                                     }
                                                 } elseif ($id['jenis'] == "SPANDEX" || $id['jenis'] == "KARET") {
                                                     if ($id['tgl_pakai'] == $threeDay) {
                                                         $show = "";
+                                                        $batasWaktu = '08:30:00';
                                                     }
                                                 }
-                                            } elseif ($day == "Saturday") {
+                                            }
+                                            // hari sabtu pemesanan nylon 2 hari
+                                            elseif ($day == "Saturday") {
                                                 if ($id['jenis'] == "BENANG") {
                                                     if ($id['tgl_pakai'] == $twoDays) {
                                                         $show = "";
+                                                        $batasWaktu = '08:30:00';
                                                     }
                                                 } elseif ($id['jenis'] == "NYLON") {
-                                                    if ($id['tgl_pakai'] == $tomorrow || $id['tgl_pakai'] == $twoDays) {
+                                                    if ($id['tgl_pakai'] == $tomorrow) {
                                                         $show = "";
+                                                        $batasWaktu = '08:30:00';
+                                                    } elseif ($id['tgl_pakai'] == $twoDays) {
+                                                        $show = "";
+                                                        $batasWaktu = '09:00:00';
                                                     }
                                                 } elseif ($id['jenis'] == "SPANDEX" || $id['jenis'] == "KARET") {
                                                     if ($id['tgl_pakai'] == $threeDay) {
                                                         $show = "";
+                                                        $batasWaktu = '08:30:00';
                                                     }
                                                 }
                                             }
                                         ?>
-                                            <button type="button" class="btn btn-info text-xs <?= $show; ?> send-btn" data-toggle="modal"
+                                            <button type="button" class="btn btn-info text-xs <?= $show ?> send-btn" data-toggle="modal"
                                                 data-area="<?= $area; ?>"
                                                 data-tgl="<?= $id['tgl_pakai']; ?>"
                                                 data-model="<?= $id['no_model']; ?>"
                                                 data-item="<?= $id['item_type']; ?>"
                                                 data-kode="<?= $id['kode_warna']; ?>"
-                                                data-color="<?= $id['color']; ?>">
+                                                data-color="<?= $id['color']; ?>"
+                                                data-waktu="<?= $batasWaktu; ?>">
                                                 <i class="fa fa-paper-plane fa-lg"></i>
                                             </button>
                                         <?php } else { ?>
@@ -260,7 +287,7 @@
             ]
         });
         // Trigger import modal when import button is clicked
-        $('.update-btn').click(function() {
+        $(document).on('click', '.update-btn', function() {
             var area = $(this).data('area');
             var tglPakai = $(this).data('tgl');
             var noModel = $(this).data('model');
@@ -386,7 +413,7 @@
                                 <div class="col-lg-2">
                                 </div>
                                 <div class="col-lg-2">
-                                    <input type="text" class="form-control ttl_kg_pesan" name="ttl_kg_pesan" value="${ttl_kg_pesan}" readonly>
+                                    <input type="text" class="form-control ttl_kg_pesan" name="ttl_kg_pesan" value="${parseFloat(ttl_kg_pesan).toFixed(2)}" readonly>
                                 </div>
                             </div>
                         `;
@@ -512,25 +539,27 @@
                 });
 
         });
-        // Pilih semua elemen dengan class "check-time"
-        const buttonSend = document.querySelectorAll(".send-btn");
-
-        buttonSend.forEach((button) => {
-            button.addEventListener("click", function() {
+        document.addEventListener("click", function(e) {
+            if (e.target.matches(".send-btn") || e.target.closest(".send-btn")) {
+                const button = e.target.closest(".send-btn");
+                if (!button) return; // Jika bukan tombol, keluar
                 // Ambil waktu saat ini
                 const now = new Date();
                 const currentHour = now.getHours();
                 const currentMinute = now.getMinutes();
+                // Ambil batas waktu dari data attribute tombol
+                const batasWaktu = button.getAttribute("data-waktu"); // Contoh: "08:30:00"
 
-                // Validasi waktu
-                if (currentHour > 8 || (currentHour === 8 && currentMinute > 30)) {
+                // Ubah batasWaktu yang didapat dari PHP menjadi jam dan menit
+                let [batasHour, batasMinute, batasSecond] = batasWaktu.split(':').map(Number);
+
+                if (currentHour > batasHour || (currentHour === batasHour && currentMinute > batasMinute)) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error!',
-                        text: 'Melebihi batas waktu!',
+                        text: 'Melebihi batas waktu sesuai bahan baku! ',
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            // Refresh halaman setelah tombol OK ditekan
                             location.reload();
                         }
                     });
@@ -545,6 +574,7 @@
                     item_type: this.getAttribute("data-item"),
                     kode_warna: this.getAttribute("data-kode"),
                     color: this.getAttribute("data-color"),
+                    waktu: batasWaktu,
                 };
 
                 // Kirim data ke server menggunakan AJAX
@@ -585,7 +615,7 @@
                         console.error("Error:", error);
                         alert("Terjadi kesalahan saat mengirim data.");
                     });
-            });
+            }
         });
     });
 </script>

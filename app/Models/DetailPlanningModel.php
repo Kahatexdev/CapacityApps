@@ -141,6 +141,8 @@ class DetailPlanningModel extends Model
             ->join('kebutuhan_area', 'detail_planning.id_pln_mc=kebutuhan_area.id_pln_mc')
             ->where('detail_planning.status', 'aktif')
             ->where('kebutuhan_area.area', $area)
+            ->groupBy('detail_planning.model')
+            ->orderBy('detail_planning.model', 'ASC')
             ->findAll();
     }
 }
