@@ -514,9 +514,9 @@
 
         // Debugging to check data structure
         console.log(data);
-        const baseURL = "http://localhost:8080";
+
         // Send data using fetch
-        fetch(`${baseURL}/planning/saveMonthlyMc`, {
+        fetch(`<?= base_url('/planning/saveMonthlyMc') ?>`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
