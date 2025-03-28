@@ -31,6 +31,7 @@ class Filters extends BaseConfig
         'god' => \App\Filters\God::class,
         'sudo' => \App\Filters\Sudo::class,
         'ie' => \App\Filters\IEFilter::class,
+        'cors' => \App\Filters\CorsFilter::class,
 
     ];
 
@@ -42,6 +43,7 @@ class Filters extends BaseConfig
      */
     public array $globals = [
         'before' => [
+            'cors',
             // 'honeypot',
             // 'csrf',
             // 'invalidchars',

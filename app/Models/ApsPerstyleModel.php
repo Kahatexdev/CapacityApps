@@ -122,6 +122,7 @@ class ApsPerstyleModel extends Model
             ->where('delivery >=', $cek['start'])
             ->where('delivery <=', $cek['end'])
             ->where('sisa >', 0)
+            ->where('qty >', 0)
             ->groupBy('mastermodel,delivery')
             ->findAll();
 
@@ -250,6 +251,7 @@ class ApsPerstyleModel extends Model
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
             ->where('sisa >', 0)
+            ->where('qty >', 0)
             ->where('delivery > NOW()', null, false) // Add 7 days to current date
             // ->where('delivery > DATE_ADD(NOW(), INTERVAL 7 DAY)', null, false) // Add 7 days to current date
             ->groupBy('mastermodel')
@@ -434,6 +436,7 @@ class ApsPerstyleModel extends Model
             ->where('delivery', $tanggal)
             ->where('mastermodel', $model)
             ->where('sisa >', 0)
+            ->where('qty >', 0)
             ->groupby('machinetypeid')
             ->findAll();
     }
@@ -557,6 +560,7 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $noModel)
             ->where('production_unit !=', 'MAJALAYA');
         $this->where('sisa >', 0);
+        $this->where('qty >', 0);
         $this->groupBy('smv, mastermodel, delivery');
         $this->orderBy('delivery');
 
@@ -594,6 +598,7 @@ class ApsPerstyleModel extends Model
     {
         return $this->select('MONTHNAME(delivery) as month, sum(round(qty/24)) as qty, sum(round(sisa/24)) as sisa')
             ->where('sisa >', 0)
+            ->where('qty >', 0)
             ->where('factory !=', 'KK8J')
             ->where('delivery >=', $startDate)
             ->where('delivery <=', $endDate)
@@ -605,6 +610,7 @@ class ApsPerstyleModel extends Model
     {
         return $this->select('MONTHNAME(delivery) as month, sum(round(qty/24)) as qty, sum(round(sisa/24)) as sisa')
             ->where('sisa >', 0)
+            ->where('qty >', 0)
             ->where('factory =', 'KK8J')
             ->where('delivery >=', $startDate)
             ->where('delivery <=', $endDate)
