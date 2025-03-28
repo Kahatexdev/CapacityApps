@@ -876,6 +876,7 @@ class ApsPerstyleModel extends Model
     {
         return $this->select('mastermodel, inisial, size, SUM(sisa) AS sisa, sum(qty) as qty,sum(po_plus) as poplus, delivery,machinetypeid')
             ->where('factory', $area)
+            ->where('qty >', 0)
             ->groupBy('mastermodel,size')
             ->orderBy('delivery', 'DESC')
             ->findAll();
