@@ -514,9 +514,9 @@
 
         // Debugging to check data structure
         console.log(data);
-
+        const baseURL = "http://localhost:8080";
         // Send data using fetch
-        fetch('http://localhost:8080/planning/saveMonthlyMc', {
+        fetch(`${baseURL}/planning/saveMonthlyMc`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -536,7 +536,7 @@
                         confirmButtonText: 'OK'
                     }).then(() => {
                         // Redirect setelah SweetAlert ditutup
-                        window.location.href = 'http://localhost:8080/planning/viewPlan/' + document.querySelector("#judulPlan").value;
+                        window.location.href = `${baseUrl}/planning/viewPlan/` + document.querySelector("#judulPlan").value;
                     });
                 } else {
                     // Tampilkan SweetAlert untuk pesan error
