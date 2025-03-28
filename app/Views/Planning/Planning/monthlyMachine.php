@@ -537,7 +537,7 @@
                         confirmButtonText: 'OK'
                     }).then(() => {
                         // Redirect setelah SweetAlert ditutup
-                        window.location.href = `${baseUrl}/planning/viewPlan/` + document.querySelector("#judulPlan").value;
+                        window.location.href = `<?= base_url('/planning/viewPlan/') ?>` + document.querySelector("#judulPlan").value;
                     });
                 } else {
                     // Tampilkan SweetAlert untuk pesan error
