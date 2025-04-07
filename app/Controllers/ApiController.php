@@ -172,6 +172,6 @@ class ApiController extends ResourceController
     public function getHariLibur()
     {
         $data = $this->liburModel->findAll();
-        dd($data);
+        return $this->response->setJSON($data);
     }
 }
