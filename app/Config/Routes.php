@@ -32,6 +32,7 @@ $routes->group(
         $routes->get('getDataPerinisial/(:any)/(:any)/(:any)', 'ApiController::getDataPerinisial/$1/$2/$3');
         $routes->get('getDataArea', 'ApiController::getArea');
         $routes->get('getPPhPerhari/(:any)/(:any)', 'ApiController::getPPhPerhari/$1/$2');
+        $routes->get('getHariLibur', 'ApiController::getHariLibur');
     }
 );
 
@@ -637,7 +638,7 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('viewModelPlusPacking/(:any)', 'ProduksiController::viewModelPlusPacking/$1');
     $routes->get('pluspacking', 'ProduksiController::pluspacking');
     $routes->post('inputpo', 'ProduksiController::updatepo');
-    
+
     // usermanageement
     $routes->get('account', 'GodController::account');
     $routes->post('addaccount', 'GodController::addaccount');
