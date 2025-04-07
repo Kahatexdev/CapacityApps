@@ -293,6 +293,7 @@ class ApsPerstyleModel extends Model
     {
         return $this->where('mastermodel', $validate['no_model'])
             ->where('size', $validate['style'])
+            ->where('factory', $validate['area'])
             ->orderBy('delivery', 'ASC') // Optional: sort berdasarkan delivery date, bisa diubah sesuai kebutuhan
             ->findAll();
     }

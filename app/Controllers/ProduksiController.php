@@ -495,6 +495,7 @@ class ProduksiController extends BaseController
                 $validate = [
                     'no_model' => $no_model,
                     'style' => $style,
+                    'area' => $area
                 ];
 
                 // Fetch data based on model, style, and size
