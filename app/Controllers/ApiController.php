@@ -15,6 +15,7 @@ use App\Models\ProduksiModel;
 use App\Models\BsMesinModel;
 use App\Models\DetailPlanningModel;
 use App\Models\AreaModel;
+use App\Models\LiburModel;
 use App\Models\BsModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -46,6 +47,7 @@ class ApiController extends ResourceController
         $this->BsMesinModel = new BsMesinModel();
         $this->areaModel = new AreaModel();
         $this->bsModel = new BsModel();
+        $this->liburModel = new LiburModel();
         $this->validation = \Config\Services::validation();
     }
     public function index()
@@ -166,5 +168,10 @@ class ApiController extends ResourceController
         }
 
         return $this->response->setJSON($produksi);
+    }
+    public function getHariLibur()
+    {
+        $data = $this->liburModel->findAll();
+        return $this->response->setJSON($data);
     }
 }
