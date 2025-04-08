@@ -499,6 +499,14 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('filterstockbahanbaku/(:any)', 'MaterialController::filterStockBahanBaku/$1');
     $routes->get('pph/(:any)', 'MaterialController::pph/$1');
     $routes->get('filterpph/(:any)', 'MaterialController::filterPph/$1');
+    $routes->get('tampilPerStyle/(:any)', 'MaterialController::tampilPerStyle/$1');
+    $routes->get('pphinisial/(:any)', 'MaterialController::pphinisial/$1');
+    // $routes->get('tampilPerDays/(:any)', 'MaterialController::tampilPerDays/$1');
+    $routes->get('pphPerhari/(:any)', 'MaterialController::pphPerhari/$1');
+    $routes->get('getDataPerhari/(:any)', 'MaterialController::getDataPerhari/$1');
+    $routes->get('excelPPHNomodel/(:any)/(:any)', 'ExcelPPHController::excelPPHNomodel/$1/$2');
+    $routes->get('excelPPHInisial/(:any)/(:any)', 'ExcelPPHController::excelPPHInisial/$1/$2');
+    $routes->get('excelPPHDays/(:any)/(:any)', 'ExcelPPHController::excelPPHDays/$1/$2');
 });
 
 // sudo

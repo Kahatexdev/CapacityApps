@@ -92,9 +92,9 @@ class ApiController extends ResourceController
         return $this->respond($startMc, 200);
     }
 
-    public function getDataPerinisial($area, $model, $size)
+    public function getDataPerinisial($model, $size)
     {
-        if (!$area || !$model || !$size) {
+        if (!$model || !$size) {
             return $this->response->setJSON([
                 "error" => "Parameter tidak lengkap",
                 "received" => [
@@ -112,7 +112,7 @@ class ApiController extends ResourceController
         $bsMesin = $bsMesinData['bs_gram'] ?? 0;
         $result = [
             "machinetypeid" => $prod["machinetypeid"],
-            "area" => $area,
+            "area" => $prod['factory'],
             "no_model" => $model,
             "size" => $size,
             "inisial" =>  $prod["inisial"] ?? null,

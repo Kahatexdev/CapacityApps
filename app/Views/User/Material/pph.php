@@ -47,7 +47,7 @@
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row d-flex align-items-center">
-                        <div class="col-8">
+                        <div class="col-9">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Material System</p>
                                 <h5 class="font-weight-bolder mb-0">
@@ -56,15 +56,9 @@
                             </div>
                         </div>
                         <div class="col-3 d-flex align-items-center text-end gap-2">
-                            <label for="">Filters:</label>
                             <input type="hidden" class="form-control" id="area" value="<?= $area ?>">
-                            <input type="text" class="form-control" id="model" value="" placeholder="No Model">
-                            <button id="filterButton" class="btn btn-info ms-2"><i class="fas fa-search"></i></button>
-                        </div>
-                        <div class="col-1 text-end">
-                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-chart-bar-32 text-lg opacity-10" aria-hidden="true"></i>
-                            </div>
+                            <input type="text" class="form-control" id="no_model" value="" placeholder="No Model">
+                            <button id="searchModel" class="btn btn-info ms-2"><i class="fas fa-search"></i> Filter</button>
                         </div>
                     </div>
                 </div>
@@ -72,6 +66,21 @@
         </div>
     </div>
     <div id="resultContainer">
+        <!-- Tampilkan Tabel Hanya Jika Data Tersedia -->
+        <div class="row mt-3">
+            <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row" id="HeaderRow">
+
+                        </div>
+                    </div>
+                    <div class="card-body" id="bodyData">
+
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row mt-3">
             <div class="col-12">
                 <div class="alert alert-info text-center text-white" id="info" role="alert">
@@ -119,35 +128,42 @@
         </script>
     <?php endif; ?>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById('filterButton').addEventListener('click', function() {
-            let noModel = document.getElementById('model').value.trim();
-            let area = document.getElementById('area').value.trim();
-            let role = <?= json_encode($role) ?>;
-            let loading = document.getElementById('loading');
-            let info = document.getElementById('info');
-            loading.style.display = 'block'; // T
-            info.style.display = 'none'; // 
-            $.ajax({
-                let apiUrl = `<?= base_url() ?>${'<?= $role ?>'}/filterpph/<?= $area ?>?noModel=${noModel}`;
+<script type="text/javascript">
+    let btnSearch = document.getElementById('searchModel');
 
-                fetch(apiUrl)
-                .then(response => response.json())
-                .then(data => {
-                    console.log("Filtered Data: ", data);
-                    if (data.length > 0) {
-                        displayData(data[0], noModel, area); // Ambil elemen pertama dari array
-                    } else {
-                        alert("Data tidak ditemukan!");
-                    }
-                })
-                .catch(error => console.error('Error fetching data:', error));
-             });
+    btnSearch.onclick = function() {
+        let area = document.getElementById('area').value;
+        let model = document.getElementById('no_model').value;
+        let role = <?= json_encode($role) ?>;
+        let loading = document.getElementById('loading');
+        let info = document.getElementById('info');
+
+        console.log("Area: " + area);
+        console.log("Model: " +model);
+
+        loading.style.display = 'block'; // T
+        info.style.display = 'none'; // Sembunyikan loading setelah selesai
+
+        $.ajax({
+            url: "<?= base_url($role . '/filterpph/') ?>" + area,
+            type: "GET",
+            data: {
+                model: model
+            },
+            dataType: "json",
+            success: function(response) {
+                fethcData(response, model, area);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+            },
+            complete: function() {
+                loading.style.display = 'none'; // Sembunyikan loading setelah selesai
+            }
         });
-    });
+    };
 
-    function displayData(data, noModel, area) {
+    function fethcData(data, model, area) {
         let qty = parseFloat(data.qty / 24).toFixed(2);
         let sisa = parseFloat(data.sisa / 24).toFixed(2);
         let bruto = parseFloat(data.bruto / 24).toFixed(2);
@@ -160,8 +176,8 @@
 
         header.innerHTML = ` 
             <div class="d-flex align-items-center justify-content-between">
-                <h3 class="mb-0">${noModel}</h3>
-                <a href="${baseUrl}${area}/${noModel}" id="exportExcel" class="btn btn-success">
+                <h3 class="mb-0">${model}</h3>
+                <a href="${baseUrl}${area}/${model}" id="exportExcel" class="btn btn-success">
                     <i class="fas fa-file-excel"></i> Export Excel
                 </a>
             </div>
@@ -236,18 +252,6 @@
                 "autoWidth": false,
                 "responsive": true
             });
-        });
-    }
-
-
-    // Fungsi untuk format tanggal agar tidak error
-    function formatDate(dateString) {
-        if (!dateString) return '-';
-        let date = new Date(dateString);
-        if (isNaN(date)) return '-';
-        return date.toLocaleDateString('id-ID', {
-            day: '2-digit',
-            month: 'short'
         });
     }
 </script>
