@@ -18,6 +18,7 @@ use App\Models\AreaModel;
 use App\Models\LiburModel;
 use App\Models\BsModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use App\Models\MonthlyMcModel;
 
 class ApiController extends ResourceController
 {
@@ -33,6 +34,8 @@ class ApiController extends ResourceController
     protected $DetailPlanningModel;
     protected $areaModel;
     protected $bsModel;
+    protected $globalModel;
+
     protected $validation;
     protected $format = 'json';
     public function __construct()
@@ -47,6 +50,7 @@ class ApiController extends ResourceController
         $this->BsMesinModel = new BsMesinModel();
         $this->areaModel = new AreaModel();
         $this->bsModel = new BsModel();
+        $this->globalModel = new MonthlyMcModel();
         $this->liburModel = new LiburModel();
         $this->validation = \Config\Services::validation();
     }
@@ -173,5 +177,10 @@ class ApiController extends ResourceController
     {
         $data = $this->liburModel->findAll();
         return $this->response->setJSON($data);
+    }
+    public function getPlanMesin()
+    {
+        $dataPlan = $this->globalModel->getPlan();
+        return $this->response->setJSON($dataPlan);
     }
 }

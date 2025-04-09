@@ -33,6 +33,8 @@ $routes->group(
         $routes->get('getDataArea', 'ApiController::getArea');
         $routes->get('getPPhPerhari/(:any)/(:any)', 'ApiController::getPPhPerhari/$1/$2');
         $routes->get('getHariLibur', 'ApiController::getHariLibur');
+
+        $routes->get('getPlanMesin', 'ApiController::getPlanMesin');
     }
 );
 

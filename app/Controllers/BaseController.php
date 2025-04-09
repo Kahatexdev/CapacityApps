@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Database\Migrations\EstSpk;
 use CodeIgniter\Controller;
 use CodeIgniter\HTTP\CLIRequest;
 use CodeIgniter\HTTP\IncomingRequest;
@@ -10,6 +11,9 @@ use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
 use App\Models\DataMesinModel;
+use App\Models\EstSpkModel;
+use App\Models\MonthlyMcModel;
+
 
 
 
@@ -26,10 +30,14 @@ use App\Models\DataMesinModel;
 abstract class BaseController extends Controller
 {
     protected $jarumModel;
+    protected $estspk;
+    protected $globalModel;
 
     public function __construct()
     {
         $this->jarumModel = new DataMesinModel();
+        $this->estspk = new EstSpk();
+        $this->globalModel = new MonthlyMcModel();
     }
     /**
      * Instance of the main Request object.
