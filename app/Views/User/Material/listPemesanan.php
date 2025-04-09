@@ -167,7 +167,7 @@
                                                 ],
                                                 // Default: bila hari selain yang di atas (misalnya, Sunday, Monday, dsb)
                                                 'default' => [
-                                                    'BENANG'  => [$tomorrow => '08:30:00'],
+                                                    'BENANG'  => [$tomorrow => '17:30:00'],
                                                     'NYLON'   => [$tomorrow => '08:30:00'],
                                                     'SPANDEX' => [$twoDays  => '08:30:00'],
                                                     'KARET'   => [$twoDays  => '08:30:00']
@@ -703,12 +703,12 @@
 
                 // Ambil data dari tombol
                 const data = {
-                    area: this.getAttribute("data-area"),
-                    tgl_pakai: this.getAttribute("data-tgl"),
-                    no_model: this.getAttribute("data-model"),
-                    item_type: this.getAttribute("data-item"),
-                    kode_warna: this.getAttribute("data-kode"),
-                    color: this.getAttribute("data-color"),
+                    area: button.getAttribute("data-area"),
+                    tgl_pakai: button.getAttribute("data-tgl"),
+                    no_model: button.getAttribute("data-model"),
+                    item_type: button.getAttribute("data-item"),
+                    kode_warna: button.getAttribute("data-kode"),
+                    color: button.getAttribute("data-color"),
                     waktu: batasWaktu,
                 };
 

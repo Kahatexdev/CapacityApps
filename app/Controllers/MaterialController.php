@@ -401,7 +401,7 @@ class MaterialController extends BaseController
         // Ambil data tanggal libur menjadi array sederhana
         $liburDates = array_column($dataLibur, 'tanggal'); // Ambil hanya kolom 'tanggal'
 
-        $day = 'Friday'; // ambil data hari ini
+        $day = date('l'); // ambil data hari ini
         function getNextNonHoliday($date, $liburDates)
         {
             while (in_array($date, $liburDates)) {
