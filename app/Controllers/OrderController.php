@@ -16,6 +16,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use DateTime;
 use App\Models\HistorySmvModel;
 use App\Models\DataCancelOrderModel;
+use App\Models\EstSpkModel;
 
 class OrderController extends BaseController
 {
@@ -31,6 +32,7 @@ class OrderController extends BaseController
     protected $historysmv;
     protected $areaModel;
     protected $cancelOrder;
+    protected $estspk;
 
 
     public function __construct()
@@ -45,6 +47,8 @@ class OrderController extends BaseController
         $this->historysmv = new HistorySmvModel();
         $this->areaModel = new AreaModel();
         $this->cancelOrder = new DataCancelOrderModel();
+        $this->estspk = new EstSpkModel();
+
         if ($this->filters   = ['role' => ['capacity',  'planning', 'aps', 'god']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -1878,6 +1882,13 @@ class OrderController extends BaseController
 
             // get data produksi
             $dataProd = $this->produksiModel->getProdByPdkSize($id['mastermodel'], $id['size']);
+            $sudahMinta = $this->estspk->cekStatus($id['mastermodel'], $id['size'], $area);
+            $status = $sudahMinta['status'] ?? 'belum';
+            $kapan = isset($sudahMinta['created_at'])
+                ? date('d-m-Y', strtotime($sudahMinta['created_at']))
+                : '-';
+
+
             // Hitung nilai akumulasi awal
             $bs =  (int)$dataProd['bs'];
             $qty = (int)$id['qty'];
@@ -1905,6 +1916,8 @@ class OrderController extends BaseController
                         'poplus' => $poplus,
                         'jarum' => $id['machinetypeid'],
                         'estimasi' => round(($estimasi * 100), 1),
+                        'status' => $status,
+                        'waktu' => $kapan
                     ];
                 }
             }
