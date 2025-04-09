@@ -98,7 +98,7 @@ class ApiController extends ResourceController
         return $this->respond($startMc, 200);
     }
 
-    public function getDataPerinisial($model, $size)
+    public function getDataPerinisial($area, $model, $size)
     {
         if (!$model || !$size) {
             return $this->response->setJSON([
