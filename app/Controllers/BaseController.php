@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Database\Migrations\EstSpk;
+
 use CodeIgniter\Controller;
 use CodeIgniter\HTTP\CLIRequest;
 use CodeIgniter\HTTP\IncomingRequest;
@@ -36,7 +36,7 @@ abstract class BaseController extends Controller
     public function __construct()
     {
         $this->jarumModel = new DataMesinModel();
-        $this->estspk = new EstSpk();
+        $this->estspk = new EstSpkModel();
         $this->globalModel = new MonthlyMcModel();
     }
     /**
