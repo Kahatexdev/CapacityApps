@@ -17,7 +17,6 @@ use App\Models\MesinPlanningModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
 use App\Models\DetailPlanningModel;
-use App\Models\MonthlyMcModel;
 use App\Services\orderServices;
 
 
@@ -35,7 +34,6 @@ class PlanningController extends BaseController
     protected $liburModel;
     protected $KebutuhanMesinModel;
     protected $MesinPlanningModel;
-    protected $globalModel;
     protected $orderServices;
     protected $DetailPlanningModel;
 
@@ -43,7 +41,6 @@ class PlanningController extends BaseController
 
     public function __construct()
     {
-        $this->globalModel = new MonthlyMcModel();
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
