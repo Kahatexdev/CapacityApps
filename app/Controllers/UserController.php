@@ -180,39 +180,39 @@ class UserController extends BaseController
         ];
         return view(session()->get('role') . '/bsmesin', $data);
     }
-    public function getSize($noModel)
+    public function getSize($model, $inisial)
     {
-        $pdk = $this->ApsPerstyleModel->getSizeProduksi();
+        $size = $this->ApsPerstyleModel->getSizeProduksi();
 
-        // Filter data berdasarkan no_model
-        $filteredData = array_filter($pdk, function ($item) use ($noModel) {
-            return $item['mastermodel'] === $noModel;
-        });
-
-        // Ambil semua data inisial dan idapsperstyle
-        $sizeList = array_map(function ($item) {
-            return [
-                'size' => $item['size'],
-            ];
-        }, $filteredData);
-
-        // Kembalikan daftar inisial sebagai JSON
-        return $this->response->setJSON(['size' => $sizeList]);
-    }
-    public function getInisial($size)
-    {
-        $inisial = $this->ApsPerstyleModel->getInProduksi();
-
-        // Cari data inisial berdasarkan size
-        $inisialData = array_filter($inisial, function ($item) use ($size) {
-            return $item['size'] === $size;
+        // Cari data berdasarkan model dan inisial
+        $sizeData = array_filter($size, function ($item) use ($model, $inisial) {
+            return $item['mastermodel'] === $model && $item['inisial'] === $inisial;
         });
 
         // Ambil data pertama yang sesuai
-        $inisialData = reset($inisialData);
+        $sizeData = reset($sizeData);
 
         // Jika data ditemukan, kembalikan inisial
-        return $this->response->setJSON(['inisial' => $inisialData['inisial'] ?? '']);
+        return $this->response->setJSON(['size' => $sizeData['size'] ?? '']);
+    }
+    public function getInisial($noModel)
+    {
+        $inisial = $this->ApsPerstyleModel->getInProduksi();
+
+        // Cari data inisial berdasarkan no_model
+        $filteredData = array_filter($inisial, function ($item) use ($noModel) {
+            return $item['mastermodel'] === $noModel;
+        });
+
+        // Ambil data pertama yang sesuai
+        $inisialData = array_map(function ($item) {
+            return [
+                'inisial' => $item['inisial'],
+            ];
+        }, $filteredData);
+
+        // Jika data ditemukan, kembalikan inisial
+        return $this->response->setJSON(['inisial' => $inisialData]);
     }
     public function saveBsMesin()
     {

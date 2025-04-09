@@ -345,7 +345,6 @@ class ExcelPPHController extends BaseController
                 }
                 $ttl_kebutuhan = ($prod['qty'] * $comp * $gw /100 / 1000) + ($loss / 100 * ($prod['qty'] * $comp * $gw /100 / 1000));
 
-
                 $pphInisial[] = [
                     'area'  => $items['area'],
                     'style_size'  => $items['style_size'],

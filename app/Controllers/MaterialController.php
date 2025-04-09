@@ -532,7 +532,7 @@ class MaterialController extends BaseController
                     $pph = ((($bruto + ($bsMesin / $gw)) * $comp * $gw) / 100) / 1000;
                 }
 
-                $ttl_kebutuhan = ($prod['qty'] * $comp * $gw /100 / 1000) + ($loss / 100 * ($prod['qty'] * $comp * $gw /100 / 1000));
+                $ttl_kebutuhan = ($prod['qty'] * $comp * $gw / 100 / 1000) + ($loss / 100 * ($prod['qty'] * $comp * $gw / 100 / 1000));
 
                 $pphInisial[] = [
                     'area'  => $items['area'],
@@ -671,8 +671,7 @@ class MaterialController extends BaseController
                 } else {
                     $pph = ((($bruto + ($bsMesin / $gw)) * $comp * $gw) / 100) / 1000;
                 }
-                $ttl_kebutuhan = ($prod['qty'] * $comp * $gw /100 / 1000) + ($loss / 100 * ($prod['qty'] * $comp * $gw /100 / 1000));
-
+                $ttl_kebutuhan = ($prod['qty'] * $comp * $gw / 100 / 1000) + ($loss / 100 * ($prod['qty'] * $comp * $gw / 100 / 1000));
 
                 $pphInisial[] = [
                     'area'  => $items['area'],
