@@ -17,7 +17,6 @@ use App\Models\MesinPlanningModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
 use App\Models\DetailPlanningModel;
-use App\Models\MonthlyMcModel;
 use App\Services\orderServices;
 
 
@@ -35,7 +34,6 @@ class PlanningController extends BaseController
     protected $liburModel;
     protected $KebutuhanMesinModel;
     protected $MesinPlanningModel;
-    protected $globalModel;
     protected $orderServices;
     protected $DetailPlanningModel;
 
@@ -43,7 +41,6 @@ class PlanningController extends BaseController
 
     public function __construct()
     {
-        $this->globalModel = new MonthlyMcModel();
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
@@ -149,16 +146,50 @@ class PlanningController extends BaseController
     }
     public function assignarealall()
     {
+        $model = $this->request->getPost("no_model");
+        $area = $this->request->getPost("area");
+        $jarum = $this->request->getPost("jarum");
+
+        // Simpan ke sistem Capacity dulu
         $data = [
             'role' => session()->get('role'),
-            'mastermodel' => $this->request->getPost("no_model"),
-            'area' => $this->request->getPost("area"),
+            'mastermodel' => $model,
+            'area' => $area
         ];
-        $assign = $this->ApsPerstyleModel->asignArealall($data);
-        if ($assign) {
-            return redirect()->to(base_url(session()->get('role') . '/dataorder/'))->withInput()->with('success', 'Berhasil Assign Area');
+        $assign = $this->ApsPerstyleModel->asignarealall($data);
+
+        // Kirim ke API MaterialSystem dengan cURL
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/assignArea';
+        $postData = [
+            'model' => $model,
+            'area' => $area
+        ];
+
+        $ch = curl_init($apiUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postData));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/x-www-form-urlencoded'
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch); // Tangkap error jika ada
+        curl_close($ch);
+
+        $apiResult = json_decode($response, true);
+
+
+        if ($assign && $httpCode == 200) {
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $model . '/' . $jarum))
+                ->with('success', 'Berhasil Assign Area di Capacity dan Material');
+        } elseif ($assign && $httpCode == 404) {
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $model . '/' . $jarum))
+                ->with('warning', 'Berhasil Assign Area di Capacity, tapi Order belum ada di Material');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/dataorder/'))->withInput()->with('error', 'Gagal Assign Area');
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $model . '/' . $jarum))
+                ->with('error', 'Gagal Assign Area ' . $httpCode);
         }
     }
     public function listplanning()
@@ -523,6 +554,8 @@ class PlanningController extends BaseController
             $totalMesin = 0;
             $planningMc = 0;
             $outputDz = 0;
+            $operator = 0;
+            $montir = 0;
             foreach ($mesin as $jarum) {
                 $sisaOrder = $this->ApsPerstyleModel->ambilSisaOrder($ar, $awalBulan, $jarum['jarum']);
                 $monthlyData[$ar][$jarum['jarum']]['kebutuhanMesin'] = $sisaOrder['totalKebMesin'];
@@ -533,9 +566,15 @@ class PlanningController extends BaseController
                 $planningMc += $sisaOrder['totalKebMesin'];
                 $outputDz +=   $monthlyData[$ar][$jarum['jarum']]['output'];
             }
+            // Perhitungan operator dan montir
+            $operator = (($planningMc / 20) + ($planningMc / 20) / 7) * 3;
+            $montir = (($planningMc / 50) + ($planningMc / 50) / 7) * 3;
+
             $monthlyData[$ar]['totalMesin'] = $totalMesin;
             $monthlyData[$ar]['planningMc'] = $planningMc;
             $monthlyData[$ar]['outputDz'] = $outputDz;
+            $monthlyData[$ar]['operator'] = round($operator); // Dibulatkan agar lebih masuk akal
+            $monthlyData[$ar]['montir'] = round($montir);
         }
         $totalAllMesin = 0;
 

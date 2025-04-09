@@ -15,8 +15,10 @@ use App\Models\ProduksiModel;
 use App\Models\BsMesinModel;
 use App\Models\DetailPlanningModel;
 use App\Models\AreaModel;
+use App\Models\LiburModel;
 use App\Models\BsModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use App\Models\MonthlyMcModel;
 
 class ApiController extends ResourceController
 {
@@ -32,6 +34,8 @@ class ApiController extends ResourceController
     protected $DetailPlanningModel;
     protected $areaModel;
     protected $bsModel;
+    protected $globalModel;
+
     protected $validation;
     protected $format = 'json';
     public function __construct()
@@ -46,6 +50,8 @@ class ApiController extends ResourceController
         $this->BsMesinModel = new BsMesinModel();
         $this->areaModel = new AreaModel();
         $this->bsModel = new BsModel();
+        $this->globalModel = new MonthlyMcModel();
+        $this->liburModel = new LiburModel();
         $this->validation = \Config\Services::validation();
     }
     public function index()
@@ -92,9 +98,9 @@ class ApiController extends ResourceController
         return $this->respond($startMc, 200);
     }
 
-    public function getDataPerinisial($area, $model, $size)
+    public function getDataPerinisial($model, $size)
     {
-        if (!$area || !$model || !$size) {
+        if (!$model || !$size) {
             return $this->response->setJSON([
                 "error" => "Parameter tidak lengkap",
                 "received" => [
@@ -112,7 +118,7 @@ class ApiController extends ResourceController
         $bsMesin = $bsMesinData['bs_gram'] ?? 0;
         $result = [
             "machinetypeid" => $prod["machinetypeid"],
-            "area" => $area,
+            "area" => $prod['factory'],
             "no_model" => $model,
             "size" => $size,
             "inisial" =>  $prod["inisial"] ?? null,
@@ -166,5 +172,15 @@ class ApiController extends ResourceController
         }
 
         return $this->response->setJSON($produksi);
+    }
+    public function getHariLibur()
+    {
+        $data = $this->liburModel->findAll();
+        return $this->response->setJSON($data);
+    }
+    public function getPlanMesin()
+    {
+        $dataPlan = $this->globalModel->getPlan();
+        return $this->response->setJSON($dataPlan);
     }
 }

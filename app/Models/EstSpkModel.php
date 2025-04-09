@@ -4,15 +4,17 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class AreaMachineModel extends Model
+class EstSpkModel extends Model
 {
-    protected $table      = 'area_machine';
-    protected $primaryKey = 'id_area_machine';
+    protected $table            = 'estimasi_spk';
+    protected $primaryKey       =
+    'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields = ['id_monthly_mc', 'area', 'total_mc', 'planning_mc', 'output', 'operator', 'montir'];
+    protected $allowedFields    = ['model', 'style', 'qty', 'status'];
+
     protected bool $allowEmptyInserts = false;
 
     // Dates
@@ -38,13 +40,4 @@ class AreaMachineModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
-
-    public function existData($data)
-    {
-        return $this->select('id_area_machine')->where($data)->first();
-    }
-    public function getData($idGloblal)
-    {
-        return $this->where('id_monthly_mc', $idGloblal)->findAll();
-    }
 }
