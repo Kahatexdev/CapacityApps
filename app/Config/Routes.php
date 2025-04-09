@@ -35,6 +35,7 @@ $routes->group(
         $routes->get('getHariLibur', 'ApiController::getHariLibur');
 
         $routes->get('getPlanMesin', 'ApiController::getPlanMesin');
+        $routes->post('exportPlanningJlMc/(:any)', 'PlanningJalanMcController::excelPlanningJlMc/$1');
     }
 );
 
