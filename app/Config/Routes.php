@@ -494,6 +494,8 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('listPemesanan/(:any)', 'MaterialController::listPemesanan/$1');
     $routes->get('stockbahanbaku/(:any)', 'MaterialController::stockBahanBaku/$1');
     $routes->get('filterstockbahanbaku/(:any)', 'MaterialController::filterStockBahanBaku/$1');
+    $routes->post('requestAdditionalTime', 'MaterialController::requestAdditionalTime');
+    $routes->post('requestAdditionalTime/getTanggalPakai', 'MaterialController::getTanggalPakai');
 });
 
 // sudo
