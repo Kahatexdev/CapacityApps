@@ -401,7 +401,7 @@ class MaterialController extends BaseController
         // Ambil data tanggal libur menjadi array sederhana
         $liburDates = array_column($dataLibur, 'tanggal'); // Ambil hanya kolom 'tanggal'
 
-        $day = 'Friday'; // ambil data hari ini
+        $day = date('l'); // ambil data hari ini
         function getNextNonHoliday($date, $liburDates)
         {
             while (in_array($date, $liburDates)) {
@@ -420,7 +420,7 @@ class MaterialController extends BaseController
 
         // Untuk tanggal ketiga, ambil 1 hari setelah tanggal "twoDays" dan cek ulang
         $initialthreeDay = date('Y-m-d', strtotime($twoDays . ' +1 day'));
-        $threeDays = getNextNonHoliday($initialthreeDay, $liburDates);
+        $threeDay = getNextNonHoliday($initialthreeDay, $liburDates);
 
         $data = [
             'role' => session()->get('role'),
@@ -437,7 +437,7 @@ class MaterialController extends BaseController
             'day' => $day,
             'tomorrow' => $tomorrow,
             'twoDays' => $twoDays,
-            'threeDays' => $threeDays,
+            'threeDay' => $threeDay,
         ];
 
         return view(session()->get('role') . '/Material/listPemesanan', $data);
@@ -724,8 +724,8 @@ class MaterialController extends BaseController
     public function getDataPerhari($area)
     {
         $tanggal = $this->request->getGet('tanggal');
+        // $tanggal = '2025-03-10';
         $data = $this->produksiModel->getProduksiPerStyle($area, $tanggal);
-
         if (!empty($data)) {
             // Extract all mastermodel and size values for batch query
             $mastermodels = array_column($data, 'mastermodel');
@@ -742,7 +742,7 @@ class MaterialController extends BaseController
             }
 
             // Assign bs_mesin to production data
-            foreach ($data as &$prod) {
+            foreach ($data as $prod) {
                 $key = $prod['mastermodel'] . '_' . $prod['size'];
                 $prod['bs_mesin'] = $bsMesinMap[$key] ?? 0; // Default to null if not found
             }
@@ -778,7 +778,7 @@ class MaterialController extends BaseController
                     'warna' => null,
                     'pph' => 0,
                     'bruto' => $prod['prod'],
-                    'bs_mesin' => $prod['bs_mesin'],
+                    'bs_mesin' => $prod['bs_mesin'] ?? 0,
                 ];
             } else {
                 foreach ($material as $mtr) {
@@ -836,90 +836,5 @@ class MaterialController extends BaseController
             $result[$key]['pph'] += $item['pph'];
         }
         return $this->response->setJSON($result);
-    }
-    public function getTanggalPakai()
-    {
-        $jenis = $this->request->getPost('jenis');
-        $tomorrow = $this->request->getPost('tomorrow');
-        $twoDays = $this->request->getPost('twoDays');
-        $threeDays = $this->request->getPost('threeDays');
-        $day = $this->request->getPost('day');
-
-        $html = '<label for="tanggal">Tanggal Pakai:</label>';
-
-        switch ($day) {
-            case 'Thursday':
-                if (in_array($jenis, ['BENANG', 'NYLON'])) {
-                    $html .= '<input type="date" id="tanggal_pakai" name="tanggal_pakai" class="form-control" value="' . $tomorrow . '" required readonly>';
-                } elseif (in_array($jenis, ['SPANDEX', 'KARET'])) {
-                    $html .= '<select id="tanggal_pakai" name="tanggal_pakai" class="form-select" required>';
-                    $html .= '<option value="' . $twoDays . '">' . $twoDays . '</option>';
-                    $html .= '<option value="' . $threeDays . '">' . $threeDays . '</option>';
-                    $html .= '</select>';
-                }
-                break;
-
-            case 'Friday':
-                if ($jenis == 'BENANG') {
-                    $html .= '<select id="tanggal_pakai" name="tanggal_pakai" class="form-select" required>';
-                    $html .= '<option value="' . $tomorrow . '">' . $tomorrow . '</option>';
-                    $html .= '<option value="' . $twoDays . '">' . $twoDays . '</option>';
-                    $html .= '</select>';
-                } elseif ($jenis == 'NYLON') {
-                    $html .= '<input type="date" id="tanggal_pakai" name="tanggal_pakai" class="form-control" value="' . $tomorrow . '" required readonly>';
-                } elseif (in_array($jenis, ['SPANDEX', 'KARET'])) {
-                    $html .= '<input type="date" id="tanggal_pakai" name="tanggal_pakai" class="form-control" value="' . $threeDays . '" required readonly>';
-                }
-                break;
-
-            case 'Saturday':
-                if ($jenis == 'BENANG') {
-                    $html .= '<input type="date" id="tanggal_pakai" name="tanggal_pakai" class="form-control" value="' . $twoDays . '" required readonly>';
-                } elseif ($jenis == 'NYLON') {
-                    $html .= '<select id="tanggal_pakai" name="tanggal_pakai" class="form-select" required>';
-                    $html .= '<option value="' . $tomorrow . '">' . $tomorrow . '</option>';
-                    $html .= '<option value="' . $twoDays . '">' . $twoDays . '</option>';
-                    $html .= '</select>';
-                } elseif (in_array($jenis, ['SPANDEX', 'KARET'])) {
-                    $html .= '<input type="date" id="tanggal_pakai" name="tanggal_pakai" class="form-control" value="' . $threeDays . '" required readonly>';
-                }
-                break;
-
-            default:
-                if (in_array($jenis, ['BENANG', 'NYLON'])) {
-                    $html .= '<input type="date" id="tanggal_pakai" name="tanggal_pakai" class="form-control" value="' . $tomorrow . '" required readonly>';
-                } elseif (in_array($jenis, ['SPANDEX', 'KARET'])) {
-                    $html .= '<input type="date" id="tanggal_pakai" name="tanggal_pakai" class="form-control" value="' . $twoDays . '" required readonly>';
-                }
-                break;
-        }
-
-        echo $html;
-    }
-    public function requestAdditionalTime()
-    {
-        $area = $this->request->getPost('area');
-        $jenis = $this->request->getPost('jenis');
-        $tanggal_pakai = $this->request->getPost('tanggal_pakai');
-
-        // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/requestAdditionalTime/' . $area . '?jenis=' . urlencode($jenis) . '&tanggal_pakai=' . urlencode($tanggal_pakai);
-
-        try {
-            // Mengambil respon dari API eksternal
-            $response = file_get_contents($apiUrl);
-            $additionalTime = json_decode($response, true);
-
-            if (isset($additionalTime['status']) && $additionalTime['status']) {
-                session()->setFlashdata('success', $additionalTime['message'] ?? 'Update berhasil dilakukan.');
-            } else {
-                session()->setFlashdata('error', $additionalTime['message'] ?? 'Update gagal dilakukan');
-            }
-        } catch (\Exception $e) {
-            session()->setFlashdata('error', 'Gagal menghubungi API eksternal. Silakan coba lagi.');
-        }
-
-        // Redirect kembali ke halaman sebelumnya
-        return redirect()->to(previous_url());
     }
 }
