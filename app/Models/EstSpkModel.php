@@ -13,7 +13,7 @@ class EstSpkModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['model', 'style', 'qty', 'status'];
+    protected $allowedFields    = ['model', 'style', 'area', 'qty', 'status'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -40,4 +40,14 @@ class EstSpkModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+
+    public function cekStatus($model, $style, $area)
+    {
+        return $this->select('status,created_at')
+            ->where('model', $model)
+            ->where('style', $style)
+            ->where('area', $area)
+            ->first();
+    }
 }

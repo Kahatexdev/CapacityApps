@@ -37,7 +37,53 @@
                             </h5>
                         </div>
                         <div>
-                            <a href="#" class="btn btn-info"><i class="far fa-clock"></i> + Waktu</a>
+                            <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#requestTimeModal">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="15">
+                                    <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com -->
+                                    <path d="M432 304c0 114.9-93.1 208-208 208S16 418.9 16 304c0-104 76.3-190.2 176-205.5V64h-28c-6.6 0-12-5.4-12-12V12c0-6.6 5.4-12 12-12h120c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-28v34.5c37.5 5.8 71.7 21.6 99.7 44.6l27.5-27.5c4.7-4.7 12.3-4.7 17 0l28.3 28.3c4.7 4.7 4.7 12.3 0 17l-29.4 29.4-.6 .6C419.7 223.3 432 262.2 432 304z" fill="#ffffff" />
+
+                                    <!-- Tanda plus putih besar dan sedikit turun -->
+                                    <line x1="224" y1="244" x2="224" y2="364" stroke="#17c1e8" stroke-width="50" stroke-linecap="round" />
+                                    <line x1="164" y1="304" x2="284" y2="304" stroke="#17c1e8" stroke-width="50" stroke-linecap="round" />
+                                </svg> Waktu
+                            </button>
+                            <!-- Modal Additional Time -->
+                            <div class="modal fade" id="requestTimeModal" tabindex="-1" aria-labelledby="requestTimeModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="requestTimeModalLabel">Pilih Jenis Benang</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <!-- Konten modal, misalnya formulir -->
+                                            <form action="<?= base_url($role . '/requestAdditionalTime') ?>" method="post">
+                                                <input type="hidden" name="area" value="<?= $area ?>">
+                                                <input type="hidden" name="tomorrow" id="tomorrow" value="<?= $tomorrow ?>">
+                                                <input type="hidden" name="twoDays" id="twoDays" value="<?= $twoDays ?>">
+                                                <input type="hidden" name="threeDays" id="threeDays" value="<?= $threeDays ?>">
+                                                <input type="hidden" name="day" id="day" value="<?= $day ?>">
+                                                <div class="mb-3">
+                                                    <select name="jenis" id="jenisBenang" class="form-select" required>
+                                                        <option value="">Pilih Jenis Benang</option>
+                                                        <option value="BENANG">BENANG</option>
+                                                        <option value="NYLON">NYLON</option>
+                                                        <option value="KARET">KARET</option>
+                                                        <option value="SPANDEX">SPANDEX</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3" id="tglPakai">
+
+                                                </div>
+                                                <div class="d-grid">
+                                                    <button type="submit" class="btn btn-info">Pilih</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End Modal Additional Time -->
                         </div>
                     </div>
                 </div>
@@ -73,6 +119,8 @@
                                 <?php
                                 $no = 1;
                                 foreach ($dataList as $key => $id) {
+                                    $ttl_kg_pesan = number_format($id['qty_pesan'] - $id['qty_sisa'], 2);
+                                    $ttl_cns_pesan = $id['cns_pesan'] - $id['cns_sisa'];
                                 ?>
                                     <td class="text-xs text-start"><?= $no++; ?></td>
                                     <td class="text-xs text-start"><?= $id['tgl_pakai']; ?></td>
@@ -81,8 +129,8 @@
                                     <td class="text-xs text-start"><?= $id['kode_warna']; ?></td>
                                     <td class="text-xs text-start"><?= $id['color']; ?></td>
                                     <td class="text-xs text-start"><?= number_format($id['kg_keb'], 2); ?></td>
-                                    <td class="text-xs text-start"><?= number_format($id['qty_pesan'] - $id['qty_sisa'], 2); ?></td>
-                                    <td class="text-xs text-start"><?= $id['cns_pesan'] - $id['cns_sisa']; ?></td>
+                                    <td class="text-xs text-start"><?= $ttl_kg_pesan; ?></td>
+                                    <td class="text-xs text-start"><?= $ttl_cns_pesan; ?></td>
                                     <td class="text-xs text-start"><?= $id['lot']; ?></td>
                                     <td class="text-xs text-start"><?= $id['keterangan']; ?></td>
                                     <td class="text-xs text-start"></td>
@@ -96,70 +144,51 @@
                                         <?php
                                         $show = "d-none";
                                         $batasWaktu = '08:30:00';
-                                        if ($id['sisa_jatah'] > 0) {
-                                            //  hari kamis pemesanan spsandex 2 hari
-                                            if ($day == "Thursday") {
-                                                if ($id['jenis'] == "BENANG" || $id['jenis'] == "NYLON") {
-                                                    if ($id['tgl_pakai'] == $tomorrow) {
+                                        if ($id['sisa_jatah'] > 0 && $ttl_kg_pesan <= $id['sisa_jatah']) {
+                                            // Aturan berdasarkan hari dan jenis produk:
+                                            $rules = [
+                                                'Thursday' => [
+                                                    'BENANG'  => [$tomorrow => '08:30:00'],
+                                                    'NYLON'   => [$tomorrow => '08:30:00'],
+                                                    'SPANDEX' => [$twoDays  => '08:30:00', $threeDays => '09:00:00'],
+                                                    'KARET'   => [$twoDays  => '08:30:00', $threeDays => '09:00:00']
+                                                ],
+                                                'Friday' => [
+                                                    'BENANG'  => [$tomorrow => '08:30:00', $twoDays => '09:00:00'],
+                                                    'NYLON'   => [$tomorrow => '08:30:00'],
+                                                    'SPANDEX' => [$threeDays => '08:30:00'],
+                                                    'KARET'   => [$threeDays => '08:30:00']
+                                                ],
+                                                'Saturday' => [
+                                                    'BENANG'  => [$twoDays  => '08:30:00'],
+                                                    'NYLON'   => [$tomorrow => '08:30:00', $twoDays  => '09:00:00'],
+                                                    'SPANDEX' => [$threeDays => '08:30:00'],
+                                                    'KARET'   => [$threeDays => '08:30:00']
+                                                ],
+                                                // Default: bila hari selain yang di atas (misalnya, Sunday, Monday, dsb)
+                                                'default' => [
+                                                    'BENANG'  => [$tomorrow => '08:30:00'],
+                                                    'NYLON'   => [$tomorrow => '08:30:00'],
+                                                    'SPANDEX' => [$twoDays  => '08:30:00'],
+                                                    'KARET'   => [$twoDays  => '08:30:00']
+                                                ]
+                                            ];
+
+                                            // Cari aturan yang cocok berdasarkan hari (default jika tak ada aturan khusus)
+                                            $currentRules = isset($rules[$day]) ? $rules[$day] : $rules['default'];
+
+                                            // Periksa apakah jenis produk ada di aturan saat ini
+                                            if (isset($currentRules[$id['jenis']])) {
+                                                foreach ($currentRules[$id['jenis']] as $tgl => $waktu) {
+                                                    if ($id['tgl_pakai'] == $tgl) {
                                                         $show = "";
-                                                        $batasWaktu = '08:30:00';
-                                                    }
-                                                } elseif ($id['jenis'] == "SPANDEX" || $id['jenis'] == "KARET") {
-                                                    if ($id['tgl_pakai'] == $twoDays) {
-                                                        $show = "";
-                                                        $batasWaktu = '08:30:00';
-                                                    } elseif ($id['tgl_pakai'] == $threeDay) {
-                                                        $show = "";
-                                                        $batasWaktu = '09:00:00';
-                                                    }
-                                                }
-                                            }
-                                            // hari jumat pemesanan benang 2 hari
-                                            elseif ($day == "Friday") {
-                                                if ($id['jenis'] == "BENANG") {
-                                                    if ($id['tgl_pakai'] == $tomorrow) {
-                                                        $show = "";
-                                                        $batasWaktu = '08:30:00';
-                                                    } elseif ($id['tgl_pakai'] == $twoDays) {
-                                                        $show = "";
-                                                        $batasWaktu = '09:00:00';
-                                                    }
-                                                } elseif ($id['jenis'] == "NYLON") {
-                                                    if ($id['tgl_pakai'] == $tomorrow) {
-                                                        $show = "";
-                                                        $batasWaktu = '08:30:00';
-                                                    }
-                                                } elseif ($id['jenis'] == "SPANDEX" || $id['jenis'] == "KARET") {
-                                                    if ($id['tgl_pakai'] == $threeDay) {
-                                                        $show = "";
-                                                        $batasWaktu = '08:30:00';
-                                                    }
-                                                }
-                                            }
-                                            // hari sabtu pemesanan nylon 2 hari
-                                            elseif ($day == "Saturday") {
-                                                if ($id['jenis'] == "BENANG") {
-                                                    if ($id['tgl_pakai'] == $twoDays) {
-                                                        $show = "";
-                                                        $batasWaktu = '08:30:00';
-                                                    }
-                                                } elseif ($id['jenis'] == "NYLON") {
-                                                    if ($id['tgl_pakai'] == $tomorrow) {
-                                                        $show = "";
-                                                        $batasWaktu = '08:30:00';
-                                                    } elseif ($id['tgl_pakai'] == $twoDays) {
-                                                        $show = "";
-                                                        $batasWaktu = '09:00:00';
-                                                    }
-                                                } elseif ($id['jenis'] == "SPANDEX" || $id['jenis'] == "KARET") {
-                                                    if ($id['tgl_pakai'] == $threeDay) {
-                                                        $show = "";
-                                                        $batasWaktu = '08:30:00';
+                                                        $batasWaktu = $waktu;
+                                                        break; // Sudah ditemukan aturan yang pas
                                                     }
                                                 }
                                             }
                                         ?>
-                                            <button type="button" class="btn btn-info text-xs <?= $show ?> send-btn" data-toggle="modal"
+                                            <button type="button" id="sendBtn" class="btn btn-info text-xs <?= $show ?> send-btn" data-toggle="modal"
                                                 data-area="<?= $area; ?>"
                                                 data-tgl="<?= $id['tgl_pakai']; ?>"
                                                 data-model="<?= $id['no_model']; ?>"
@@ -279,13 +308,112 @@
 </div>
 <!-- modal update list pemesanan end -->
 <script src=" <?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+<script>
+    // SweetAlert untuk menampilkan pesan sukses/gagal
+    document.addEventListener("DOMContentLoaded", function() {
+        // Ambil flashdata dari server dan pastikan nilainya berupa string
+        const successMessage = "<?= htmlspecialchars(is_string(session()->getFlashdata('success')) ? session()->getFlashdata('success') : '') ?>";
+        const errorMessage = "<?= htmlspecialchars(is_string(session()->getFlashdata('error')) ? session()->getFlashdata('error') : '') ?>";
+
+        // Tampilkan SweetAlert jika ada pesan sukses
+        if (successMessage && successMessage.trim() !== "") {
+            Swal.fire({
+                title: "Berhasil!",
+                text: successMessage,
+                icon: "success",
+                confirmButtonText: "OK"
+            });
+        }
+
+        // Tampilkan SweetAlert jika ada pesan gagal
+        if (errorMessage && errorMessage.trim() !== "") {
+            Swal.fire({
+                title: "Gagal!",
+                text: errorMessage,
+                icon: "error",
+                confirmButtonText: "OK"
+            });
+        }
+    });
+</script>
 <script type="text/javascript">
     $(document).ready(function() {
+        // GET TGL PAKAI ADDITIONAL TIME
+        $('#jenisBenang').on('change', function() {
+            var jenis = $(this).val(); // Dapatkan nilai pilihan
+            var tomorrow = $('#tomorrow').val();
+            var twoDays = $('#twoDays').val();
+            var threeDays = $('#threeDays').val();
+            var day = $('#day').val();
+            if (jenis) {
+                // Lakukan AJAX request
+                $.ajax({
+                    url: "<?= base_url($role . '/requestAdditionalTime/getTanggalPakai') ?>", // Endpoint untuk data
+                    type: "POST",
+                    data: {
+                        jenis: jenis,
+                        tomorrow: tomorrow,
+                        twoDays: twoDays,
+                        threeDays: threeDays,
+                        day: day
+
+                    },
+                    success: function(response) {
+                        // Tampilkan response di elemen #tglPakai
+                        $('#tglPakai').html(response);
+                    },
+                    error: function() {
+                        alert('Terjadi kesalahan saat memuat data.');
+                    }
+                });
+            } else {
+                // Kosongkan elemen jika tidak ada pilihan
+                $('#tglPakai').html('');
+            }
+        });
+        // END GET TGL PAKAI ADDITIONAL TIME
+
+        // SHOW / HIDE BUTTON SEND
+        // Mendapatkan waktu saat ini
+        let currentTime = new Date();
+
+        // Mendapatkan batas waktu dari atribut data-waktu
+        let batasWaktuStr = $('#sendBtn').data('waktu'); // Format: HH:mm:ss
+        let [hours, minutes, seconds] = batasWaktuStr.split(':');
+        let batasWaktu = new Date(
+            currentTime.getFullYear(),
+            currentTime.getMonth(),
+            currentTime.getDate(),
+            hours,
+            minutes,
+            seconds
+        );
+
+        // Hitung waktu tersisa hingga batas waktu dalam milidetik
+        let waktuTersisa = batasWaktu - currentTime;
+
+        // Jika waktu tersisa lebih dari 0, atur timer untuk menyembunyikan tombol
+        if (waktuTersisa > 0) {
+            setTimeout(function() {
+                $('#sendBtn').addClass('d-none'); // Sembunyikan tombol
+                console.log('Tombol disembunyikan: Waktu sudah melewati batas');
+            }, waktuTersisa);
+        } else {
+            // Jika waktu sudah terlewati, sembunyikan tombol langsung
+            $('#sendBtn').addClass('d-none');
+            console.log('Tombol sudah disembunyikan: Waktu sudah lewat saat halaman dimuat');
+        }
+        // END SHOW / HIDE BUTTON SEND
+
+        // FILTER TABLE
         $('#example').DataTable({
             "order": [
                 [0, 'asc'] // Kolom pertama (indeks 0) diurutkan secara descending
             ]
         });
+        // END FILTER TABLE
+
+        // VIEW MODAL UPDATE PEMESANAN
         // Trigger import modal when import button is clicked
         $(document).on('click', '.update-btn', function() {
             var area = $(this).data('area');
@@ -476,6 +604,9 @@
                 }
             });
         });
+        // END VIEW MODAL UPDATE PEMESANAN
+
+        // PROSES UPDATE PEMESANAN
         document.getElementById('updatePemesanan').addEventListener('submit', function(event) {
             event.preventDefault();
 
@@ -539,6 +670,9 @@
                 });
 
         });
+        // END PROSES UPDATE PEMESANAN
+
+        // PROSES KIRIM PEMESANAN
         document.addEventListener("click", function(e) {
             if (e.target.matches(".send-btn") || e.target.closest(".send-btn")) {
                 const button = e.target.closest(".send-btn");
@@ -563,6 +697,7 @@
                             location.reload();
                         }
                     });
+                    button
                     return;
                 }
 
@@ -617,6 +752,7 @@
                     });
             }
         });
+        // END PROSES KIRIM PEMESANAN
     });
 </script>
 <?php $this->endSection(); ?>

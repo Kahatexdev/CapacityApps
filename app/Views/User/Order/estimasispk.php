@@ -68,6 +68,8 @@
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">BS Stocklot</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">PO+</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Estimasi SPK 2</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Waktu Minta</th>
 
                                 </tr>
                             </thead>
@@ -86,6 +88,8 @@
                                         <td class="text-xs"><?= $item['bs']; ?>pcs</td>
                                         <td class="text-xs"><?= $item['poplus']; ?>pcs</td>
                                         <td class="text-xs"><?= $item['estimasi']; ?>pcs</td>
+                                        <td class="text-xs"><?= $item['status']; ?></td>
+                                        <td class="text-xs"><?= $item['waktu']; ?></td>
                                     <?php endforeach ?>
                                     </tr>
                             </tbody>

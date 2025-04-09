@@ -17,11 +17,15 @@ class EstSpk extends Migration
             ],
             'model'      => [
                 'type'       => 'VARCHAR',
-                'constraint' => 100,
+                'constraint' => 10,
             ],
             'style'      => [
                 'type'       => 'VARCHAR',
-                'constraint' => 100,
+                'constraint' => 30,
+            ],
+            'area'      => [
+                'type'       => 'VARCHAR',
+                'constraint' => 10,
             ],
             'qty'        => [
                 'type'       => 'INT',

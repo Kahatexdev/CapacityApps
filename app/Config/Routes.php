@@ -511,6 +511,8 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('excelPPHNomodel/(:any)/(:any)', 'ExcelPPHController::excelPPHNomodel/$1/$2');
     $routes->get('excelPPHInisial/(:any)/(:any)', 'ExcelPPHController::excelPPHInisial/$1/$2');
     $routes->get('excelPPHDays/(:any)/(:any)', 'ExcelPPHController::excelPPHDays/$1/$2');
+    $routes->post('requestAdditionalTime', 'MaterialController::requestAdditionalTime');
+    $routes->post('requestAdditionalTime/getTanggalPakai', 'MaterialController::getTanggalPakai');
 });
 
 // sudo
