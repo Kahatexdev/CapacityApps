@@ -420,7 +420,7 @@ class MaterialController extends BaseController
 
         // Untuk tanggal ketiga, ambil 1 hari setelah tanggal "twoDays" dan cek ulang
         $initialthreeDay = date('Y-m-d', strtotime($twoDays . ' +1 day'));
-        $threeDay = getNextNonHoliday($initialthreeDay, $liburDates);
+        $threeDays = getNextNonHoliday($initialthreeDay, $liburDates);
 
         $data = [
             'role' => session()->get('role'),
@@ -437,7 +437,7 @@ class MaterialController extends BaseController
             'day' => $day,
             'tomorrow' => $tomorrow,
             'twoDays' => $twoDays,
-            'threeDay' => $threeDay,
+            'threeDays' => $threeDays,
         ];
 
         return view(session()->get('role') . '/Material/listPemesanan', $data);
