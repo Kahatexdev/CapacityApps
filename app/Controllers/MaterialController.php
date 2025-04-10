@@ -753,13 +753,14 @@ class MaterialController extends BaseController
 
         foreach ($data as $prod) {
             $key = $prod['mastermodel'] . '-' . $prod['size'];
-            $mastermodelStr = implode(',', $mastermodels);
-            $sizeStr = implode(',', $sizes);
+            // $mastermodelStr = implode(',', $mastermodels);
+            // $sizeStr = implode(',', $sizes);
 
-            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pphperhari?model=' . urlencode($mastermodelStr) . '&size=' . urlencode($sizeStr);
+            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pphperhari?model=' . urlencode($prod['mastermodel']) . '&size=' . urlencode($prod['size']);
 
             // Mengambil data dari API eksternal
             $response = @file_get_contents($apiUrl);
+            log_message('debug', 'Response dari API: ' . $response);
             if ($response === FALSE) {
                 log_message('error', "API tidak bisa diakses: $apiUrl");
                 log_message('debug', 'URL yang dikirim ke API: ' . $apiUrl);
