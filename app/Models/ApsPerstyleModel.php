@@ -981,15 +981,25 @@ class ApsPerstyleModel extends Model
             ->groupBy('idapsperstyle')
             ->findAll();
     }
-    public function monthlyTarget($month, $year)
+    public function monthlyTarget($filters)
     {
-        return $this->select('sum(qty) as qty, sum(sisa) as sisa')
-            ->where('Month(delivery)', $month)
-            ->where('YEAR(delivery)', $year)
-            ->where('production_unit !=', 'MJ')
-            ->groupBy("DATE_FORMAT(delivery, '%Y-%m')")
-            ->first();
+        $builder = $this->select('SUM(qty) as qty, SUM(sisa) as sisa')
+            ->where('production_unit !=', 'MJ');
+
+        if (!empty($filters['bulan'])) {
+            $builder->where('MONTH(delivery)', $filters['bulan']);
+        }
+
+        if (!empty($filters['tahun'])) {
+            $builder->where('YEAR(delivery)', $filters['tahun']);
+        }
+        if (!empty($filters['area'])) {
+            $builder->where('factory', $filters['area']);
+        }
+
+        return $builder->first();
     }
+
     public function getAreasByNoModel($nomodel)
     {
         return $this->select('factory')

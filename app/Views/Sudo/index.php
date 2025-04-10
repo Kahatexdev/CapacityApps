@@ -40,6 +40,18 @@
                         <div class="col-6 text-end">
                             <div>
                                 Filters:
+                                <select id="filter-buyer" class="form-control d-inline w-auto">
+                                    <option value="">Semua Buyer</option>
+                                    <?php foreach ($buyer as $buy): ?>
+                                        <option value="<?= $buy['kd_buyer_order'] ?>"><?= $buy['kd_buyer_order']  ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <select id="filter-area" class="form-control d-inline w-auto">
+                                    <option value="">Semua Area</option>
+                                    <?php foreach ($area as $ar): ?>
+                                        <option value="<?= $ar ?>"><?= $ar ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                                 <select id="filter-bulan" class="form-control d-inline w-auto">
                                     <option value="">Semua Bulan</option>
                                     <?php for ($i = 1; $i <= 12; $i++): ?>
@@ -264,13 +276,15 @@
 </script>
 
 <script>
-    function fetchDashboard(bulan, tahun) {
+    function fetchDashboard(bulan, tahun, buyer = "", area = "") {
         $.ajax({
             url: "<?= base_url('chart/dashboardData') ?>",
             type: "GET",
             data: {
                 bulan: bulan,
-                tahun: tahun
+                tahun: tahun,
+                buyer: buyer,
+                area: area
             },
             dataType: "json",
             success: function(response) {
@@ -279,13 +293,15 @@
         });
     }
 
-    function fetchData(bulan, tahun) {
+    function fetchData(bulan, tahun, buyer = "", area = "") {
         $.ajax({
             url: "<?= base_url('chart/getProductionData') ?>",
             type: "GET",
             data: {
                 bulan: bulan,
-                tahun: tahun
+                tahun: tahun,
+                buyer: buyer,
+                area: area
             },
             dataType: "json",
             success: function(response) {
@@ -294,13 +310,15 @@
         });
     }
 
-    function fetchDataBs(bulan, tahun) {
+    function fetchDataBs(bulan, tahun, buyer = "", area = "") {
         $.ajax({
             url: "<?= base_url('chart/getBsData') ?>",
             type: "GET",
             data: {
                 bulan: bulan,
-                tahun: tahun
+                tahun: tahun,
+                buyer: buyer,
+                area: area
             },
             dataType: "json",
             success: function(response) {
@@ -308,6 +326,7 @@
             }
         });
     }
+
 
 
 
@@ -571,27 +590,25 @@
 
 
     // Event listener filter bulan & tahun
-    document.getElementById("filter-bulan").addEventListener("change", function() {
-        let bulan = this.value.padStart(2, "0"); // Pastikan selalu dua digit
-        let tahun = document.getElementById("filter-tahun").value;
-        fetchDashboard(bulan, tahun);
-        fetchData(bulan, tahun);
-        fetchDataBs(bulan, tahun);
-        bsArea(bulan, tahun);
+    document.getElementById("filter-bulan").addEventListener("change", handleFilterChange);
+    document.getElementById("filter-tahun").addEventListener("change", handleFilterChange);
+    document.getElementById("filter-buyer").addEventListener("change", handleFilterChange);
+    document.getElementById("filter-area").addEventListener("change", handleFilterChange);
 
-    });
-
-    document.getElementById("filter-tahun").addEventListener("change", function() {
+    // Function untuk ambil semua filter & trigger fetch
+    function handleFilterChange() {
         let bulan = document.getElementById("filter-bulan").value.padStart(2, "0");
-        let tahun = this.value;
-        fetchDashboard(bulan, tahun);
-        fetchData(bulan, tahun);
-        fetchDataBs(bulan, tahun);
-        bsArea(bulan, tahun);
+        let tahun = document.getElementById("filter-tahun").value;
+        let buyer = document.getElementById("filter-buyer").value;
+        let area = document.getElementById("filter-area").value;
 
-    });
+        fetchDashboard(bulan, tahun, buyer, area);
+        fetchData(bulan, tahun, buyer, area);
+        fetchDataBs(bulan, tahun, buyer, area);
+        bsArea(bulan, tahun, buyer, area);
+    }
 
-    // Load awal dengan bulan & tahun sekarang
+    // Set default bulan & tahun saat halaman load
     let currentDate = new Date();
     let defaultBulan = String(currentDate.getMonth() + 1).padStart(2, "0");
     let defaultTahun = currentDate.getFullYear();
@@ -599,9 +616,7 @@
     document.getElementById("filter-bulan").value = defaultBulan;
     document.getElementById("filter-tahun").value = defaultTahun;
 
-    fetchDashboard(defaultBulan, defaultTahun);
-    fetchData(defaultBulan, defaultTahun);
-    fetchDataBs(defaultBulan, defaultTahun);
-    bsArea(defaultBulan, defaultTahun);
+    // Trigger pertama kali saat load
+    handleFilterChange();
 </script>
 <?php $this->endSection(); ?>

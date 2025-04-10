@@ -309,30 +309,59 @@ class ProduksiModel extends Model
         }
         return $qty;
     }
-    public function monthlyProd($bulan, $tahun)
+    public function monthlyProd($filters)
     {
-        return $this->select('sum(qty_produksi) as prod')
-            ->where('MONTH(tgl_produksi)', $bulan)
-            ->where('YEAR(tgl_produksi)', $tahun)
-            ->groupBy("DATE_FORMAT(tgl_produksi, '%Y-%m')")
-            ->first();
+        $builder = $this->select('SUM(qty_produksi) as prod');
+
+        if (!empty($filters['bulan'])) {
+            $builder->where('MONTH(tgl_produksi)', $filters['bulan']);
+        }
+
+        if (!empty($filters['tahun'])) {
+            $builder->where('YEAR(tgl_produksi)', $filters['tahun']);
+        }
+
+        if (!empty($filters['buyer'])) {
+            $builder->where('kd_buyer_order', $filters['buyer']);
+        }
+
+        if (!empty($filters['area'])) {
+            $builder->where('area', $filters['area']);
+        }
+
+        return $builder->first(); // ga perlu groupBy kalau ambil sum total bulanan
     }
-    public function directMonthly($bulan, $tahun)
+
+    public function directMonthly($filters)
     {
-        $mesin = $this->select('area, COUNT(DISTINCT no_mesin) as jumlah_mesin')
-            ->where('MONTH(tgl_produksi)', 02)
-            ->where('YEAR(tgl_produksi)', 2025)
-            ->groupBy('area')
-            ->findAll();
+        $builder = $this->select('area, COUNT(DISTINCT no_mesin) as jumlah_mesin');
+
+        if (!empty($filters['bulan'])) {
+            $builder->where('MONTH(tgl_produksi)', $filters['bulan']);
+        }
+
+        if (!empty($filters['tahun'])) {
+            $builder->where('YEAR(tgl_produksi)', $filters['tahun']);
+        }
+
+        if (!empty($filters['buyer'])) {
+            $builder->where('kd_buyer_order', $filters['buyer']);
+        }
+
+        if (!empty($filters['area'])) {
+            $builder->where('area', $filters['area']);
+        }
+
+        $mesin = $builder->groupBy('area')->findAll();
+
         $totalMesin = 0;
         foreach ($mesin as $mc) {
             $totalMesin += $mc['jumlah_mesin'];
         }
 
-
-
         return $totalMesin;
     }
+
     public function getProduksiPerStyle($area, $tanggal)
     {
         // Mulai query

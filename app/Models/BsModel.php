@@ -175,12 +175,27 @@ class BsModel extends Model
 
         return $return;
     }
-    public function bsMonthly($bulan, $tahun)
+    public function bsMonthly($filters)
     {
-        return $this->select('sum(qty) as bs')
-            ->where('MONTH(tgl_instocklot)', $bulan)
-            ->where('YEAR(tgl_instocklot)', $tahun)
-            ->first();
+        $builder = $this->select('SUM(qty) as bs');
+
+        if (!empty($filters['bulan'])) {
+            $builder->where('MONTH(tgl_instocklot)', $filters['bulan']);
+        }
+
+        if (!empty($filters['tahun'])) {
+            $builder->where('YEAR(tgl_instocklot)', $filters['tahun']);
+        }
+
+        if (!empty($filters['buyer'])) {
+            $builder->where('kd_buyer_order', $filters['buyer']);
+        }
+
+        if (!empty($filters['area'])) {
+            $builder->where('area', $filters['area']);
+        }
+
+        return $builder->first();
     }
     public function getBsPerhari($bulan, $year)
     {

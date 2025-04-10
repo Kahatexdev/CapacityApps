@@ -67,11 +67,12 @@ class GodController extends BaseController
         $terimaBooking = $this->bookingModel->getBookingMasuk();
         $mcJalan = $this->jarumModel->mcJalan();
         $totalMc = $this->jarumModel->totalMc();
+        $area = $this->jarumModel->getArea();
         $bulan = date('m');
+        $buyer = $this->orderModel->getBuyer();
         $yesterday = date('Y-m-d', strtotime('14 days ago'));
         $month = date('F');
         $year = date('Y');
-
 
         $data = [
             'role' => session()->get('role'),
@@ -86,7 +87,8 @@ class GodController extends BaseController
             'jalan' => $orderJalan,
             'TerimaBooking' => $terimaBooking,
             'mcJalan' => $mcJalan,
-
+            'area' => $area,
+            'buyer' => $buyer
 
 
 
@@ -1020,17 +1022,26 @@ class GodController extends BaseController
     {
         $bulan = $this->request->getGet('bulan');
         $tahun = $this->request->getGet('tahun');
-
+        $buyer = $this->request->getGet('buyer');
+        $area = $this->request->getGet('area');
 
         if (!$bulan || !$tahun) {
             return $this->response->setJSON(['error' => 'Bulan dan Tahun wajib diisi']);
         }
 
         try {
-            $prodYesterday = $this->produksiModel->monthlyProd($bulan, $tahun);
-            $bs = $this->BsModel->bsMonthly($bulan, $tahun);
-            $direct = $this->produksiModel->directMonthly($bulan, $tahun);
-            $target = $this->ApsPerstyleModel->monthlyTarget($bulan, $tahun);
+            // Oper filter ke model kalau tersedia
+            $filters = [
+                'bulan' => $bulan,
+                'tahun' => $tahun,
+                'buyer' => $buyer,
+                'area'  => $area
+            ];
+
+            $prodYesterday = $this->produksiModel->monthlyProd($filters);
+            $bs = $this->BsModel->bsMonthly($filters);
+            $direct = $this->produksiModel->directMonthly($filters);
+            $target = $this->ApsPerstyleModel->monthlyTarget($filters);
 
             if (empty($prodYesterday)) {
                 $deffectRate = 0;
@@ -1038,7 +1049,6 @@ class GodController extends BaseController
                 $quality = 0;
                 $percentage = 0;
             } else {
-
                 $deffectRate = ($bs['bs'] / $prodYesterday['prod']) * 100;
                 $pph = round(($prodYesterday['prod'] / 2) / ($direct / 24));
                 $good =  $prodYesterday['prod'] - $bs['bs'];
@@ -1046,6 +1056,7 @@ class GodController extends BaseController
                 $prod = $target['qty'] - $target['sisa'];
                 $percentage =  ($prod / $target['qty']) * 100;
             }
+
             $data = [
                 'deffect' => $deffectRate,
                 'bs' => $bs['bs'] ?? 0,
@@ -1055,7 +1066,6 @@ class GodController extends BaseController
                 'sisa' => $target['sisa'] ?? 0,
                 'quality' => $quality,
                 'percentage' => $percentage,
-
             ];
 
             return $this->response->setJSON($data);
