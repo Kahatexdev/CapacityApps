@@ -12,7 +12,7 @@ class AreaMachineModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields = ['id_monthly_mc', 'area', 'total_mc', 'planning_mc', 'output', 'operator', 'montir'];
+    protected $allowedFields = ['id_monthly_mc', 'area', 'total_mc', 'planning_mc', 'output', 'operator', 'montir', 'inline', 'wly'];
     protected bool $allowEmptyInserts = false;
 
     // Dates

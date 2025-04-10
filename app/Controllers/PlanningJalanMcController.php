@@ -658,7 +658,9 @@ class PlanningJalanMcController extends BaseController
                 'planning_mc' => $area['planMc'],
                 'output' => $area['outputDz'],
                 'operator' => $area['operator'],
-                'montir' => $area['montir']
+                'montir' => $area['montir'],
+                'inline' => $area['inLine'],
+                'wly' => $area['wly']
             ];
             $validate = [
                 'id_monthly_mc' => $idGlobal,
@@ -721,6 +723,8 @@ class PlanningJalanMcController extends BaseController
             $monthlyData[$area['area']]['outputDz'] = $area['output'];
             $monthlyData[$area['area']]['operator'] = $area['operator'];
             $monthlyData[$area['area']]['montir'] = $area['montir'];
+            $monthlyData[$area['area']]['inline'] = $area['inline'];
+            $monthlyData[$area['area']]['wly'] = $area['wly'];
             $monthlyData[$area['area']]['jarum'] = $this->detailAreaMc->getData($idAreaMc);
         }
         $statusOrder = $this->orderServices->statusOrder($judul);
@@ -796,7 +800,9 @@ class PlanningJalanMcController extends BaseController
                 'planning_mc' => $area['planMc'],
                 'output' => $area['outputDz'],
                 'operator' => $area['operator'],
-                'montir' => $area['montir']
+                'montir' => $area['montir'],
+                'inline' => $area['inLine'],
+                'wly' => $area['wly']
             ];
             $validate = [
                 'id_monthly_mc' => $idGlobal,
