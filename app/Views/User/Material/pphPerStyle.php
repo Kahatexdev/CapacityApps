@@ -145,7 +145,7 @@
         function fethcData(data, model, area) {
             let header = document.getElementById('HeaderRow');
 
-            let baseUrl = "<?= base_url($role . '/excelPPHInisial/') ?>" + area;
+            let baseUrl = "<?= base_url($role . '/excelPPHInisial/') ?>";
 
             header.innerHTML = `
             <div class="d-flex align-items-center justify-content-between">

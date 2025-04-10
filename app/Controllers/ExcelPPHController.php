@@ -81,7 +81,7 @@ class ExcelPPHController extends BaseController
                     $pph = ((($bruto + ($bsMesin / $gw)) * $comp * $gw) / 100) / 1000;
                 }
 
-                $ttl_kebutuhan = ($prod['qty'] * $comp * $gw /100 / 1000) + ($loss / 100 * ($prod['qty'] * $comp * $gw /100 / 1000));
+                $ttl_kebutuhan = ($prod['qty'] * $comp * $gw / 100 / 1000) + ($loss / 100 * ($prod['qty'] * $comp * $gw / 100 / 1000));
 
                 $pphInisial[] = [
                     'area'  => $items['area'],
@@ -343,7 +343,7 @@ class ExcelPPHController extends BaseController
                 } else {
                     $pph = ((($bruto + ($bsMesin / $gw)) * $comp * $gw) / 100) / 1000;
                 }
-                $ttl_kebutuhan = ($prod['qty'] * $comp * $gw /100 / 1000) + ($loss / 100 * ($prod['qty'] * $comp * $gw /100 / 1000));
+                $ttl_kebutuhan = ($prod['qty'] * $comp * $gw / 100 / 1000) + ($loss / 100 * ($prod['qty'] * $comp * $gw / 100 / 1000));
 
                 $pphInisial[] = [
                     'area'  => $items['area'],
@@ -579,7 +579,7 @@ class ExcelPPHController extends BaseController
                     'warna' => null,
                     'pph' => 0,
                     'bruto' => $prod['prod'],
-                    'bs_mesin' => $prod['bs_mesin'],
+                    'bs_mesin' => $prod['bs_mesin'] ?? 0,
                 ];
             } else {
                 foreach ($material as $mtr) {
