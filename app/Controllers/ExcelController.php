@@ -27,6 +27,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\{Border, Alignment, Fill};
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use App\Models\EstSpkModel;
 
 
 class ExcelController extends BaseController
@@ -48,6 +49,8 @@ class ExcelController extends BaseController
     protected $TanggalPlanningModel;
     protected $EstimatedPlanningModel;
     protected $orderServices;
+    protected $estspk;
+
 
     public function __construct()
     {
@@ -66,6 +69,8 @@ class ExcelController extends BaseController
         $this->TanggalPlanningModel = new TanggalPlanningModel();
         $this->EstimatedPlanningModel = new EstimatedPlanningModel();
         $this->orderServices = new orderServices();
+        $this->estspk = new EstSpkModel();
+
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -3431,6 +3436,15 @@ class ExcelController extends BaseController
                         'jarum'      => $result['machinetypeid'],
                         'estimasi'   => round(($estimasi * 100), 1),
                     ];
+                    $insert = [
+                        'model'      => $result['mastermodel'],
+                        'style'       => $result['size'],
+                        'area'       => $area,
+                        'qty'   => round(($estimasi * 100), 1),
+                        'status' => 'sudah'
+                    ];
+
+                    $this->estspk->insert($insert);
                     // }
                 }
             }

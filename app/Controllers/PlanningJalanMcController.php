@@ -100,6 +100,10 @@ class PlanningJalanMcController extends BaseController
                     'totalMc' => 0,
                     'PlanningMc' => 0,
                     'outputDz' => 0,
+                    'operator' => 0,
+                    'montir' => 0,
+                    'inLine' => 0,
+                    'wly' => 0,
                 ],
             ];
         }
@@ -111,12 +115,20 @@ class PlanningJalanMcController extends BaseController
             $totalMc = $ar['total_mc'] ?? 0;
             $planningMc = $ar['planning_mc'] ?? 0;
             $outputDz = isset($ar['output']) ? $ar['output'] : 0;
+            $operator = $ar['operator'] ?? 0;
+            $montir = $ar['montir'] ?? 0;
+            $inLine = $ar['inline'] ?? 0;
+            $wly = $ar['wly'] ?? 0;
 
             // Siapkan struktur untuk satu area
             $areaData = [
                 'total_mc' => $totalMc,
                 'planning_mc' => $planningMc,
                 'outputDz' => $outputDz,
+                'operator' => $operator,
+                'montir' => $montir,
+                'inline' => $inLine,
+                'wly' => $wly,
                 'jarums' => [] // Menampung data jarum di dalam area
             ];
 
@@ -203,7 +215,7 @@ class PlanningJalanMcController extends BaseController
         $sheet->getColumnDimension('G')->setWidth(12); // Lebar kolom C diatur menjadi 30
         $sheet->getColumnDimension('H')->setWidth(12); // Lebar kolom C diatur menjadi 30
         $sheet->getColumnDimension('I')->setWidth(12); // Lebar kolom C diatur menjadi 30
-        $col = 'D';
+        $col = 'H';
         foreach ($jarums as $jrm) {
             $col++;
         }
@@ -216,12 +228,20 @@ class PlanningJalanMcController extends BaseController
         $sheet->setCellValue('A3', 'Area');
         $sheet->setCellValue('B3', 'Jumlah MC');
         $sheet->setCellValue('C3', 'Planning MC');
+        $sheet->setCellValue('D3', 'Operator');
+        $sheet->setCellValue('E3', 'Montir');
+        $sheet->setCellValue('F3', 'In Line');
+        $sheet->setCellValue('G3', 'WLY');
         $sheet->getStyle('A3')->applyFromArray($styleHeader);
         $sheet->getStyle('B3')->applyFromArray($styleHeader);
         $sheet->getStyle('C3')->applyFromArray($styleHeader);
+        $sheet->getStyle('D3')->applyFromArray($styleHeader);
+        $sheet->getStyle('E3')->applyFromArray($styleHeader);
+        $sheet->getStyle('F3')->applyFromArray($styleHeader);
+        $sheet->getStyle('G3')->applyFromArray($styleHeader);
 
         // Tambahkan header untuk setiap jenis jarum
-        $col = 'D';
+        $col = 'H';
         foreach ($jarums as $jrm) {
             $sheet->setCellValue($col . '3', $jrm);
             $sheet->getStyle($col . '3')->applyFromArray($styleHeader);
@@ -243,6 +263,18 @@ class PlanningJalanMcController extends BaseController
         $outputDzSocks = 0;
         $outputDzGloves = 0;
         $totalOutputDz = 0;
+        $operatorSocks = 0;
+        $montirSocks = 0;
+        $inLineSocks = 0;
+        $wlySocks = 0;
+        $operatorGloves = 0;
+        $montirGloves = 0;
+        $inLineGloves = 0;
+        $wlyGloves = 0;
+        $totalOperator = 0;
+        $totalMontir = 0;
+        $totalInLine = 0;
+        $totalWly = 0;
         $row = 4;
         foreach ($monthlyData['areas'] as $areaData) {
             $area = $areaData['area'];
@@ -253,27 +285,47 @@ class PlanningJalanMcController extends BaseController
                 $planMcSocks += $data['planning_mc'];
                 $planMcSocks == ($planMcSocks == 0) ? '' : $planMcSocks;
                 $outputDzSocks += $data['outputDz'];
+                $operatorSocks += $data['operator'];
+                $montirSocks += $data['montir'];
+                $inLineSocks += $data['inline'];
+                $wlySocks += $data['wly'];
             } else if ($area == 'KK8J') {
                 $totalMcGloves = $data['total_mc'];
                 $planMcGloves = $data['planning_mc'];
                 $planMcGloves == ($planMcGloves == 0) ? '' : $planMcGloves;
                 $outputDzGloves += $data['outputDz'];
+                $operatorGloves += $data['operator'];
+                $montirGloves += $data['montir'];
+                $inLineGloves += $data['inline'];
+                $wlyGloves += $data['wly'];
             }
 
             $totalMcAll = $totalMcSocks + $totalMcGloves;
             $planMcAll = $planMcSocks + $planMcGloves;
             $totalOutputDz = $outputDzSocks + $outputDzGloves;
+            $totalOperator = $operatorSocks + $operatorGloves;
+            $totalMontir = $montirSocks + $montirGloves;
+            $totalInLine = $inLineSocks + $inLineGloves;
+            $totalWly = $wlySocks + $wlyGloves;
 
             //Mengisi sheet excel
             $sheet->setCellValue("A$row", $area);
             $sheet->setCellValue("B$row", $data['total_mc']);
             $sheet->setCellValue("C$row", $data['planning_mc']);
+            $sheet->setCellValue("D$row", $data['operator']);
+            $sheet->setCellValue("E$row", $data['montir']);
+            $sheet->setCellValue("F$row", $data['inline']);
+            $sheet->setCellValue("G$row", $data['wly']);
             $sheet->getStyle("A$row")->applyFromArray($styleBody);
             $sheet->getStyle("B$row")->applyFromArray($styleBody);
             $sheet->getStyle("C$row")->applyFromArray($styleBody);
+            $sheet->getStyle("D$row")->applyFromArray($styleBody);
+            $sheet->getStyle("E$row")->applyFromArray($styleBody);
+            $sheet->getStyle("F$row")->applyFromArray($styleBody);
+            $sheet->getStyle("G$row")->applyFromArray($styleBody);
 
             //Menambahkan planning mc perarea perjarum
-            $col = 'D';
+            $col = 'H';
             foreach ($jarums as $jarum) {
                 $planningMc = 0;
 
@@ -317,12 +369,20 @@ class PlanningJalanMcController extends BaseController
         $sheet->setCellValue("A$row", 'Total MC Socks');
         $sheet->setCellValue("B$row", $totalMcSocks);
         $sheet->setCellValue("C$row", $planMcSocks);
+        $sheet->setCellValue("D$row", $operatorSocks);
+        $sheet->setCellValue("E$row", $montirSocks);
+        $sheet->setCellValue("F$row", $inLineSocks);
+        $sheet->setCellValue("G$row", $wlySocks);
         $sheet->getStyle("A$row")->applyFromArray($styleTotal);
         $sheet->getStyle("B$row")->applyFromArray($styleTotal);
         $sheet->getStyle("C$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("D$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("E$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("F$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("G$row")->applyFromArray($styleTotal);
 
         //Total perjarum
-        $col = 'D';
+        $col = 'H';
         foreach ($jarums as $jrm) {
             $sheet->setCellValue($col . $row, $totalPlanMcJrmSocks[$jrm] ?? ' ');
             $sheet->getStyle("{$col}{$row}:{$col}{$row}")->applyFromArray($styleTotal);
@@ -338,8 +398,12 @@ class PlanningJalanMcController extends BaseController
         $sheet->getStyle("A$row")->applyFromArray($styleTotal);
         $sheet->getStyle("B$row")->applyFromArray($styleTotal);
         $sheet->getStyle("C$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("D$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("E$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("F$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("G$row")->applyFromArray($styleTotal);
 
-        $col = 'D';
+        $col = 'H';
         foreach ($jarums as $jrm) {
             $sheet->getStyle("{$col}{$row}:{$col}{$row}")->applyFromArray($styleTotal);
             $col++;
@@ -351,10 +415,18 @@ class PlanningJalanMcController extends BaseController
         $sheet->setCellValue("A$row", 'Total MC Gloves');
         $sheet->setCellValue("B$row", $totalMcGloves);
         $sheet->setCellValue("C$row", $planMcGloves);
+        $sheet->setCellValue("D$row", $operatorGloves);
+        $sheet->setCellValue("E$row", $montirGloves);
+        $sheet->setCellValue("F$row", $inLineGloves);
+        $sheet->setCellValue("G$row", $wlyGloves);
         $sheet->getStyle("A$row")->applyFromArray($styleTotal);
         $sheet->getStyle("B$row")->applyFromArray($styleTotal);
         $sheet->getStyle("C$row")->applyFromArray($styleTotal);
-        $col = 'D';
+        $sheet->getStyle("D$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("E$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("F$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("G$row")->applyFromArray($styleTotal);
+        $col = 'H';
         foreach ($jarums as $jrm) {
             $sheet->setCellValue($col . $row, $totalPlanMcJrmGloves[$jrm] ?? ' ');
             $sheet->getStyle("{$col}{$row}:{$col}{$row}")->applyFromArray($styleTotal);
@@ -370,8 +442,12 @@ class PlanningJalanMcController extends BaseController
         $sheet->getStyle("A$row")->applyFromArray($styleTotal);
         $sheet->getStyle("B$row")->applyFromArray($styleTotal);
         $sheet->getStyle("C$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("D$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("E$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("F$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("G$row")->applyFromArray($styleTotal);
 
-        $col = 'D';
+        $col = 'H';
         foreach ($jarums as $jrm) {
             $sheet->getStyle("{$col}{$row}:{$col}{$row}")->applyFromArray($styleTotal);
             $col++;
@@ -383,10 +459,18 @@ class PlanningJalanMcController extends BaseController
         $sheet->setCellValue("A$row", 'Total');
         $sheet->setCellValue("B$row", $totalMcAll);
         $sheet->setCellValue("C$row", $planMcAll);
+        $sheet->setCellValue("D$row", $totalOperator);
+        $sheet->setCellValue("E$row", $totalMontir);
+        $sheet->setCellValue("F$row", $totalInLine);
+        $sheet->setCellValue("G$row", $totalWly);
         $sheet->getStyle("A$row")->applyFromArray($styleTotal);
         $sheet->getStyle("B$row")->applyFromArray($styleTotal);
         $sheet->getStyle("C$row")->applyFromArray($styleTotal);
-        $col = 'D';
+        $sheet->getStyle("D$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("E$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("F$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("G$row")->applyFromArray($styleTotal);
+        $col = 'H';
         foreach ($jarums as $jrm) {
             $sheet->setCellValue($col . $row, $totalPlanMcJrmSocks[$jrm] + $totalPlanMcJrmGloves[$jrm] ?? ' ');
             $sheet->getStyle("{$col}{$row}:{$col}{$row}")->applyFromArray($styleTotal);
@@ -402,7 +486,11 @@ class PlanningJalanMcController extends BaseController
         $sheet->getStyle("A$row")->applyFromArray($styleTotal);
         $sheet->getStyle("B$row")->applyFromArray($styleTotal);
         $sheet->getStyle("C$row")->applyFromArray($styleTotal);
-        $col = 'D';
+        $sheet->getStyle("D$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("E$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("F$row")->applyFromArray($styleTotal);
+        $sheet->getStyle("G$row")->applyFromArray($styleTotal);
+        $col = 'H';
         foreach ($jarums as $jrm) {
             $sheet->getStyle("{$col}{$row}:{$col}{$row}")->applyFromArray($styleTotal);
             $col++;
@@ -612,7 +700,11 @@ class PlanningJalanMcController extends BaseController
                 'area' => $area['area'],
                 'total_mc' => $area['ttlMc'],
                 'planning_mc' => $area['planMc'],
-                'output' => $area['outputDz']
+                'output' => $area['outputDz'],
+                'operator' => $area['operator'],
+                'montir' => $area['montir'],
+                'inline' => $area['inLine'],
+                'wly' => $area['wly']
             ];
             $validate = [
                 'id_monthly_mc' => $idGlobal,
@@ -665,6 +757,7 @@ class PlanningJalanMcController extends BaseController
         $global = $this->globalModel->getData($judul);
         $idGlobal = $global['id_monthly_mc'];
         $areaMachine = $this->areaMcModel->getData($idGlobal);
+        // dd($areaMachine);
         $monthlyData = [];
         foreach ($areaMachine as $area) {
             $idAreaMc = $area['id_area_machine'];
@@ -672,6 +765,10 @@ class PlanningJalanMcController extends BaseController
             $monthlyData[$area['area']]['totalMesin'] = $area['total_mc'];
             $monthlyData[$area['area']]['planningMc'] = $area['planning_mc'];
             $monthlyData[$area['area']]['outputDz'] = $area['output'];
+            $monthlyData[$area['area']]['operator'] = $area['operator'];
+            $monthlyData[$area['area']]['montir'] = $area['montir'];
+            $monthlyData[$area['area']]['inline'] = $area['inline'];
+            $monthlyData[$area['area']]['wly'] = $area['wly'];
             $monthlyData[$area['area']]['jarum'] = $this->detailAreaMc->getData($idAreaMc);
         }
         $statusOrder = $this->orderServices->statusOrder($judul);
@@ -745,7 +842,11 @@ class PlanningJalanMcController extends BaseController
                 'area' => $area['area'],
                 'total_mc' => $area['ttlMc'],
                 'planning_mc' => $area['planMc'],
-                'output' => $area['outputDz']
+                'output' => $area['outputDz'],
+                'operator' => $area['operator'],
+                'montir' => $area['montir'],
+                'inline' => $area['inLine'],
+                'wly' => $area['wly']
             ];
             $validate = [
                 'id_monthly_mc' => $idGlobal,

@@ -32,6 +32,10 @@ $routes->group(
         $routes->get('getDataPerinisial/(:any)/(:any)/(:any)', 'ApiController::getDataPerinisial/$1/$2/$3');
         $routes->get('getDataArea', 'ApiController::getArea');
         $routes->get('getPPhPerhari/(:any)/(:any)', 'ApiController::getPPhPerhari/$1/$2');
+        $routes->get('getHariLibur', 'ApiController::getHariLibur');
+
+        $routes->get('getPlanMesin', 'ApiController::getPlanMesin');
+        $routes->get('exportPlanningJlMc/(:any)', 'PlanningJalanMcController::excelPlanningJlMc/$1');
     }
 );
 
@@ -455,6 +459,9 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('viewModelPlusPacking/(:any)', 'ProduksiController::viewModelPlusPacking/$1');
     $routes->get('pluspacking', 'ProduksiController::pluspacking');
     $routes->post('inputpo', 'ProduksiController::updatepo');
+    $routes->post('get-area', 'ProduksiController::getArea');
+    $routes->post('get-size', 'ProduksiController::getSize');
+    $routes->post('prosesInputProdManual', 'ProduksiController::inputProduksiManual');
 
     //summary
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
@@ -494,6 +501,18 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('listPemesanan/(:any)', 'MaterialController::listPemesanan/$1');
     $routes->get('stockbahanbaku/(:any)', 'MaterialController::stockBahanBaku/$1');
     $routes->get('filterstockbahanbaku/(:any)', 'MaterialController::filterStockBahanBaku/$1');
+    $routes->get('pph/(:any)', 'MaterialController::pph/$1');
+    $routes->get('filterpph/(:any)', 'MaterialController::filterPph/$1');
+    $routes->get('tampilPerStyle/(:any)', 'MaterialController::tampilPerStyle/$1');
+    $routes->get('pphinisial/(:any)', 'MaterialController::pphinisial/$1');
+    // $routes->get('tampilPerDays/(:any)', 'MaterialController::tampilPerDays/$1');
+    $routes->get('pphPerhari/(:any)', 'MaterialController::pphPerhari/$1');
+    $routes->get('getDataPerhari/(:any)', 'MaterialController::getDataPerhari/$1');
+    $routes->get('excelPPHNomodel/(:any)/(:any)', 'ExcelPPHController::excelPPHNomodel/$1/$2');
+    $routes->get('excelPPHInisial/(:any)/(:any)', 'ExcelPPHController::excelPPHInisial/$1/$2');
+    $routes->get('excelPPHDays/(:any)/(:any)', 'ExcelPPHController::excelPPHDays/$1/$2');
+    $routes->post('requestAdditionalTime', 'MaterialController::requestAdditionalTime');
+    $routes->post('requestAdditionalTime/getTanggalPakai', 'MaterialController::getTanggalPakai');
 });
 
 // sudo
@@ -632,7 +651,6 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('viewModelPlusPacking/(:any)', 'ProduksiController::viewModelPlusPacking/$1');
     $routes->get('pluspacking', 'ProduksiController::pluspacking');
     $routes->post('inputpo', 'ProduksiController::updatepo');
-
 
     // usermanageement
     $routes->get('account', 'GodController::account');
