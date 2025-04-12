@@ -513,6 +513,10 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('excelPPHDays/(:any)/(:any)', 'ExcelPPHController::excelPPHDays/$1/$2');
     $routes->post('requestAdditionalTime', 'MaterialController::requestAdditionalTime');
     $routes->post('requestAdditionalTime/getTanggalPakai', 'MaterialController::getTanggalPakai');
+
+    // retur
+    $routes->get('retur/(:any)', 'ReturController::index/$1');
+    $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
 });
 
 // sudo
