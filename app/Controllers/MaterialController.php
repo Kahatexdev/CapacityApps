@@ -258,17 +258,18 @@ class MaterialController extends BaseController
     }
     public function getJalanMcByModelSize()
     {
-        // Ambil No Model dan Style Size dari permintaan AJAX
+        // Ambil No Model, Style & Area Size dari permintaan AJAX
         $noModel = $this->request->getPost('no_model');
         $styleSize = $this->request->getPost('style_size');
+        $area = $this->request->getPost('area');
 
         // Query data Jalan MC berdasarkan No Model dan Style Size
-        $jalanMc = $this->MesinPerStyleModel->getJalanMc($noModel, $styleSize); // Sesuaikan dengan model Anda
+        $jalanMc = $this->MesinPerStyleModel->getJalanMc($noModel, $styleSize, $area); // Sesuaikan dengan model Anda
 
         // Kembalikan data dalam format JSON
         return $this->response->setJSON($jalanMc);
     }
-    public function getMU($model, $styleSize, $area)
+    public function getMU($model, $styleSize, $area, $qtyOrder)
     {
         $styleSize = urlencode($styleSize);  // Encode styleSize
         $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getMU/' . $model . '/' . $styleSize . '/' . $area;
@@ -279,7 +280,29 @@ class MaterialController extends BaseController
 
         $data = json_decode($response, true);  // Decode JSON response dari API
 
+        // Periksa apakah response dari API valid
+        if (!$data || !is_array($data)) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Invalid data received from API',
+            ]);
+        }
 
+        // Hitung ttl_kebutuhan
+        foreach ($data as $key => $item) {
+            if (isset($qtyOrder, $item['composition'], $item['gw'], $item['loss'])) {
+                // Hitung ttl_keb untuk setiap item
+                $ttl_keb = $qtyOrder * $item['gw'] * ($item['composition'] / 100) * (1 + ($item['loss'] / 100)) / 1000;
+
+                // Tambahkan ttl_keb ke elemen saat ini
+                $data[$key]['ttl_keb'] = number_format($ttl_keb, 2);
+            } else {
+                // Jika data tidak valid, tambahkan ttl_keb sebagai null
+                $data[$key]['ttl_keb'] = null;
+            }
+        }
+
+        // Return data sebagai JSON
         return $this->response->setJSON($data);
     }
     public function savePemesananSession()
@@ -388,12 +411,80 @@ class MaterialController extends BaseController
     }
     public function listPemesanan($area)
     {
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/listPemesanan/' . $area;
+        $apiUrl = 'http://172.23.39.118/MaterialSystem/public/api/listPemesanan/' . $area;
         $response = file_get_contents($apiUrl);  // Mendapatkan response dari API
         if ($response === FALSE) {
             die('Error occurred while fetching data.');
         }
         $dataList = json_decode($response, true);  // Decode JSON response dari API
+
+        if (!is_array($dataList)) {
+            die('Error: Invalid response format for listPemesanan API.');
+        }
+        foreach ($dataList as $key => $order) {
+            $dataList[$key]['ttl_kebutuhan_bb'] = 0; // Default value
+
+            // Validasi data input
+            if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
+                $styleApiUrl = 'http://172.23.39.118/MaterialSystem/public/api/getStyleSizeByBb?no_model='
+                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
+
+                error_log("Fetching: $styleApiUrl");
+
+                // Gunakan try-catch untuk menangani error
+                try {
+                    $styleResponse = file_get_contents($styleApiUrl);
+
+                    if ($styleResponse === false) {
+                        error_log("Error: Unable to fetch data from API for URL $styleApiUrl");
+                        $dataList[$key]['ttl_kebutuhan_bb'] = 0; // Default value if API fails
+                        continue; // Lanjutkan iterasi berikutnya
+                    }
+
+                    $styleList = json_decode($styleResponse, true);
+                    if (empty($styleList)) {
+                        error_log("Empty response or missing data for URL $styleApiUrl");
+                        continue;
+                    }
+
+                    // Validasi format respons API
+                    if (!is_array($styleList)) {
+                        error_log("Error: Invalid response format for URL $styleApiUrl");
+                        $dataList[$key]['ttl_kebutuhan_bb'] = 0;
+                        continue;
+                    }
+
+                    $totalRequirement = 0;
+                    foreach ($styleList as $style) {
+                        // Pastikan data style memiliki semua parameter yang dibutuhkan
+                        if (isset($style['no_model'], $style['style_size'], $style['gw'], $style['composition'], $style['loss'])) {
+                            $orderQty = $this->ApsPerstyleModel->getQtyOrder($style['no_model'], $style['style_size'], $area);
+
+                            // Validasi hasil dari model
+                            if (!isset($orderQty['qty'])) {
+                                error_log("Warning: Order quantity not found for style {$style['style_size']}");
+                                continue;
+                            }
+
+                            // Perhitungan kebutuhan bahan baku
+                            $requirement = $orderQty['qty'] * $style['gw'] * ($style['composition'] / 100) * (1 + ($style['loss'] / 100)) / 1000;
+                            $totalRequirement += $requirement;
+                            $dataList[$key]['qty'] = $orderQty['qty'];
+                        } else {
+                            error_log("Warning: Missing data in style response for no_model {$style['no_model']}");
+                        }
+                    }
+
+
+                    // Tambahkan total kebutuhan bahan baku ke data utama
+                    $dataList[$key]['ttl_kebutuhan_bb'] = $totalRequirement;
+                } catch (\Exception $e) { // Tambahkan backslash (\)
+                    error_log("Exception occurred: " . $e->getMessage());
+                }
+            } else {
+                error_log("Warning: Missing required fields in order data.");
+            }
+        }
 
         // ambil data libur hari kedepan untuk menentukan jadwal pemesanan
         $today = date('Y-m-d'); // ambil data hari ini
@@ -836,5 +927,18 @@ class MaterialController extends BaseController
             $result[$key]['pph'] += $item['pph'];
         }
         return $this->response->setJSON($result);
+    }
+    public function getQtyByModelSize()
+    {
+        // Ambil No Model, Style & Area Size dari permintaan AJAX
+        $noModel = $this->request->getPost('no_model');
+        $styleSize = $this->request->getPost('style_size');
+        $area = $this->request->getPost('area');
+
+        // Query data Jalan MC berdasarkan No Model dan Style Size
+        $qty = $this->ApsPerstyleModel->getQtyOrder($noModel, $styleSize, $area); // Sesuaikan dengan model Anda
+
+        // Kembalikan data dalam format JSON
+        return $this->response->setJSON($qty);
     }
 }
