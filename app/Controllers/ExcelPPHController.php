@@ -554,10 +554,8 @@ class ExcelPPHController extends BaseController
 
         foreach ($data as $prod) {
             $key = $prod['mastermodel'] . '-' . $prod['size'];
-            $mastermodelStr = implode(',', $mastermodels);
-            $sizeStr = implode(',', $sizes);
 
-            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pphperhari?model=' . urlencode($mastermodelStr) . '&size=' . urlencode($sizeStr);
+            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pphperhari?model=' . urlencode($prod['mastermodel']) . '&size=' . urlencode($prod['size']);
 
             // Mengambil data dari API eksternal
             $response = @file_get_contents($apiUrl);

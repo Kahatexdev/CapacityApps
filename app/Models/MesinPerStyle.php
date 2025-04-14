@@ -48,12 +48,13 @@ class MesinPerStyle extends Model
             ->where('idapsperstyle', $idAps)
             ->first();
     }
-    public function getJalanMc($noModel, $styleSize)
+    public function getJalanMc($noModel, $styleSize, $area)
     {
         return $this->select('SUM(mesin_perinisial.mesin) AS jalan_mc')
             ->join('apsperstyle', 'apsperstyle.idapsperstyle=mesin_perinisial.idapsperstyle')
             ->where('apsperstyle.mastermodel', $noModel)
             ->where('apsperstyle.size', $styleSize)
+            ->where('apsperstyle.factory', $area)
             ->first();
     }
 }

@@ -1020,4 +1020,20 @@ class ApsPerstyleModel extends Model
             ->groupBy('size')
             ->findAll();
     }
+    public function getQtyOrder($noModel, $styleSize, $area)
+    {
+        return $this->select('SUM(qty) AS qty')
+            ->where('mastermodel', $noModel)
+            ->where('size', $styleSize)
+            ->where('factory', $area)
+            ->first();
+    }
+    // public function getStyleSizeByBb($noModel, $styleSize, $area)
+    // {
+    //     return $this->select('qty')
+    //         ->where('mastermodel', $noModel)
+    //         ->where('size', $styleSize)
+    //         ->where('factory', $area)
+    //         ->first();
+    // }
 }
