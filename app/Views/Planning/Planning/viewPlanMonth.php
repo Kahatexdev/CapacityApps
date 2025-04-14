@@ -208,6 +208,18 @@
                                     value="  <?= $detailArea['montir']; ?>" readonly style="width: 70%">
                             </div>
                         </div>
+                        <div class="row text-bold">
+                            <div class="col-lg-4">
+                            </div>
+                            <div class="col-lg-4"> In Line:
+                                <input type="number" class="form-control" id="inline<?= $no ?>"
+                                    value="<?= $detailArea['inline']; ?>" readonly style="width: 70%">
+                            </div>
+                            <div class="col-lg-4"> WLY:
+                                <input type="text" class="form-control" id="wly<?= $no ?>"
+                                    value="  <?= $detailArea['wly']; ?>" readonly style="width: 70%">
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="table">
@@ -385,6 +397,8 @@
             var totalOutput = 0;
             var totalOperator = 0;
             var totalMontir = 0;
+            var totalInLine = 0;
+            var totalWly = 0;
 
             var no = $(this).closest(".card").find("input[id^='ttlmc']").attr("id").replace("ttlmc",
                 ""); // Get the current card number
@@ -406,6 +420,8 @@
             // Hitung operator dan montir setelah semua data diupdate
             totalOperator = ((totalMesin / 20) + (totalMesin / 20) / 7) * 3;
             totalMontir = ((totalMesin / 50) + (totalMesin / 50) / 7) * 3;
+            totalInLine = ((totalMesin / 80) + (totalMesin / 80) / 7) * 3;
+            totalWly = ((totalMesin / 180) + (totalMesin / 180) / 7) * 3;
 
             // Update nilai 'planmc' berdasarkan total kebutuhan mesin
             $("#planmc" + no).val(totalMesin);
@@ -418,6 +434,12 @@
 
             // Update nilai 'montir'
             $("#montir" + no).val(Math.round(totalMontir));
+
+            // Update nilai 'in line'
+            $("#inline" + no).val(Math.round(totalInLine));
+
+            // Update nilai 'montir'
+            $("#wly" + no).val(Math.round(totalWly));
 
             // Setelah setiap update kebmesin, kita update global values
             updateGlobalValues();
@@ -477,6 +499,8 @@
             let outputDz = document.querySelector(`#outputdz${index + 1}`);
             let operator = document.querySelector(`#operator${index + 1}`);
             let montir = document.querySelector(`#montir${index + 1}`);
+            let inLine = document.querySelector(`#inline${index + 1}`);
+            let wly = document.querySelector(`#wly${index + 1}`);
 
             // Check if elements exist before accessing textContent
             idarea = idarea ? idarea.value : null;
@@ -486,9 +510,11 @@
             outputDz = outputDz ? outputDz.value : null;
             operator = operator ? operator.value : null;
             montir = montir ? montir.value : null;
+            inLine = inLine ? inLine.value : null;
+            wly = wly ? wly.value : null;
 
             // Add to areaPlan only if ttlMc, planMc, and outputDz are not null
-            if (ttlMc && planMc && outputDz) {
+            if (ttlMc && planMc && outputDz && operator && montir && inLine && wly) {
                 areaPlan.push({
                     idarea: idarea, // Trim to clean up unwanted spaces
                     area: areaEl, // Trim to clean up unwanted spaces
@@ -496,7 +522,9 @@
                     planMc: planMc,
                     outputDz: outputDz,
                     operator: operator,
-                    montir: montir
+                    montir: montir,
+                    inLine: inLine,
+                    wly: wly
                 });
             }
         });

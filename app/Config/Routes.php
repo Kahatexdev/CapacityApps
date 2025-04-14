@@ -514,6 +514,10 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('requestAdditionalTime', 'MaterialController::requestAdditionalTime');
     $routes->post('requestAdditionalTime/getTanggalPakai', 'MaterialController::getTanggalPakai');
     $routes->post('getQty', 'MaterialController::getQtyByModelSize');
+
+    // retur
+    $routes->get('retur/(:any)', 'ReturController::index/$1');
+    $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
 });
 
 // sudo

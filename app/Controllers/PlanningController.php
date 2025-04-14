@@ -18,6 +18,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
 use App\Models\DetailPlanningModel;
 use App\Services\orderServices;
+use App\Models\MonthlyMcModel;
 
 
 
@@ -36,6 +37,7 @@ class PlanningController extends BaseController
     protected $MesinPlanningModel;
     protected $orderServices;
     protected $DetailPlanningModel;
+    protected $globalModel;
 
 
 
@@ -51,6 +53,7 @@ class PlanningController extends BaseController
         $this->KebutuhanMesinModel = new KebutuhanMesinModel();
         $this->MesinPlanningModel = new MesinPlanningModel();
         $this->DetailPlanningModel = new DetailPlanningModel();
+        $this->globalModel = new MonthlyMcModel();
 
         $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => ['planning']] != session()->get('role')) {
@@ -556,6 +559,8 @@ class PlanningController extends BaseController
             $outputDz = 0;
             $operator = 0;
             $montir = 0;
+            $inLine = 0;
+            $wly = 0;
             foreach ($mesin as $jarum) {
                 $sisaOrder = $this->ApsPerstyleModel->ambilSisaOrder($ar, $awalBulan, $jarum['jarum']);
                 $monthlyData[$ar][$jarum['jarum']]['kebutuhanMesin'] = $sisaOrder['totalKebMesin'];
@@ -569,12 +574,16 @@ class PlanningController extends BaseController
             // Perhitungan operator dan montir
             $operator = (($planningMc / 20) + ($planningMc / 20) / 7) * 3;
             $montir = (($planningMc / 50) + ($planningMc / 50) / 7) * 3;
+            $inLine = (($planningMc / 80) + ($planningMc / 80) / 7) * 3;
+            $wly = (($planningMc / 180) + ($planningMc / 180) / 7) * 3;
 
             $monthlyData[$ar]['totalMesin'] = $totalMesin;
             $monthlyData[$ar]['planningMc'] = $planningMc;
             $monthlyData[$ar]['outputDz'] = $outputDz;
             $monthlyData[$ar]['operator'] = round($operator); // Dibulatkan agar lebih masuk akal
             $monthlyData[$ar]['montir'] = round($montir);
+            $monthlyData[$ar]['inLine'] = round($inLine);
+            $monthlyData[$ar]['wly'] = round($wly);
         }
         $totalAllMesin = 0;
 
