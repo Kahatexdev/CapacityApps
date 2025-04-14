@@ -17,6 +17,11 @@
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     }
+
+    .input-group-text {
+        position: static !important;
+        z-index: auto !important;
+    }
 </style>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -89,18 +94,9 @@
             </div>
         </div>
         <div id="loading" style="display: none;">
-            <h3>Sedang Menghitung...</h3>
+            <h3>Sedang memuat data...</h3>
         </div>
     </div>
-</div>
-<div class="row my-3">
-
-</div>
-
-
-</div>
-
-
 </div>
 <!-- Notifikasi Flashdata -->
 <?php if (session()->getFlashdata('success')) : ?>
@@ -127,7 +123,7 @@
     </script>
 <?php endif; ?>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
-<script type="text/javascript">
+<!-- <script type="text/javascript">
     let btnSearch = document.getElementById('searchModel');
 
     btnSearch.onclick = function() {
@@ -168,6 +164,7 @@
         let totalKgsOut = 0;
         let rows = "";
         let index = 0;
+        let returVal = 0;
 
         // Daftar properti agregat yang tidak perlu diiterasi sebagai item
         let aggregateKeys = ["qty", "sisa", "bruto", "bs_setting", "bs_mesin"];
@@ -185,6 +182,7 @@
                 totalKgsOut += kgsOutVal;
             }
 
+
             rows += `
                 <tr>
                     <td>${index + 1}</td>
@@ -195,6 +193,7 @@
                     <td>${parseFloat(item.ttl_kebutuhan).toFixed(2)} kg</td>
                     <td>${parseFloat(item.pph).toFixed(2)}</td>
                     <td>${isNaN(kgsOutVal) ? '-' : kgsOutVal.toFixed(2)} kg</td>
+                    <td>${parseFloat(kgsOutVal - item.pph).toFixed(2)} kg</td>  
                 </tr>
             `;
             index++;
@@ -202,17 +201,62 @@
 
         // Update header dengan info total dan link export Excel
         let header = document.getElementById('HeaderRow');
-        let baseUrl = "<?= base_url($role . '/#/') ?>";
+        let baseUrl = "<?= base_url($role . '/') ?>";
         header.innerHTML = `
-            <div class="header-container mb-3">
-                <div class="d-flex align-items-center justify-content-between">
+            <div class="header-container">
+                <div class="d-flex align-items-center justify-content-between w-100">
                     <h3 class="model-title mb-0">${model}</h3>
-                    <a href="${baseUrl}${area}/${model}" id="exportExcel" class="btn btn-success">
-                        <i class="fas fa-file-excel"></i> Export Excel
-                    </a>
+                    <div class="d-flex align-items-center">
+                        <a href="${baseUrl}${area}/exportExcel" class="btn btn-success me-2" id="btnExportExcel">
+                            <i class="fas fa-file-excel"></i> Export Excel
+                        </a>
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalPengajuanRetur">
+                            <i class="fas fa-paper-plane"></i> Pengajuan Retur
+                        </button>
+                    </div>
                 </div>
             </div>
+
+            <div class="modal fade" id="modalPengajuanRetur" tabindex="-1" aria-labelledby="modalPengajuanReturLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-scrollable modal-xl">
+                    <form action="${baseUrl}${area}/pengajuanRetur" method="POST" id="formPengajuanRetur">
+                    <input type="hidden" name="model" value="${model}">
+                    <input type="hidden" name="area" value="${area}">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="modalPengajuanReturLabel">Pengajuan Retur</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                        <form action="${baseUrl}${area}/pengajuanRetur" method="POST" id="formPengajuanRetur">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th>No Model</th>
+                                    <td><input type="text" class="form-control" name="no_model" value="${model}" readonly></td>
+                                </tr>
+                                <tr>
+                                    <th>Area</th>
+                                    <td><input type="text" class="form-control" name="area" value="${area}" readonly></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <div id="listReturInputs"></div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-primary">Kirim</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            </div>
+                        </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         `;
+
+
 
         // Update tabel body dengan hasil iterasi
         let body = document.getElementById('bodyData');
@@ -228,7 +272,8 @@
                             <th class="text-center">Kode Warna</th>
                             <th class="text-center">PO (KGS)</th>
                             <th class="text-center">PPH</th>
-                            <th class="text-center">KGS Out</th>
+                            <th class="text-center">Kirim</th>
+                            <th class="text-center">Estimasi Retur</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -246,6 +291,268 @@
                 "info": true,
                 "autoWidth": false,
                 "responsive": true
+            });
+        });
+
+        // Generate input untuk item dengan estimasi > 0
+        let inputContainer = document.getElementById('listReturInputs');
+        inputContainer.innerHTML = '';
+
+        i = 0;
+        for (let key in data) {
+            if (aggregateKeys.includes(key)) continue;
+            let item = data[key];
+            let kgsOutVal = parseFloat(item.kgs_out);
+            let pphVal = parseFloat(item.pph);
+            let estimasi = parseFloat(kgsOutVal - pphVal).toFixed(2);
+
+            if (estimasi > 0) {
+                inputContainer.innerHTML += `
+            <div class="mb-2 border p-2 rounded bg-light">
+                <input type="text" name="items[${i}][no_model]" value="${item.no_model}">
+                <input type="text" name="items[${i}][area]" value="${item.area}">
+                <input type="text" name="items[${i}][item_type]" value="${item.item_type}">
+                <input type="text" name="items[${i}][kode_warna]" value="${item.kode_warna}">
+                <input type="text" name="items[${i}][estimasi]" value="${estimasi}">
+            </div>
+        `;
+                i++;
+            }
+        }
+
+    }
+</script> -->
+
+<script type="text/javascript">
+    // Inisialisasi elemen yang diperlukan
+    const btnSearch = document.getElementById('searchModel');
+
+    btnSearch.addEventListener('click', function() {
+        const area = document.getElementById('area').value;
+        const model = document.getElementById('no_model').value;
+        const role = <?= json_encode($role) ?>;
+        const loading = document.getElementById('loading');
+        const info = document.getElementById('info');
+
+        console.log(`Area: ${area}`);
+        console.log(`Model: ${model}`);
+
+        loading.style.display = 'block';
+        info.style.display = 'none';
+
+        $.ajax({
+            url: "<?= base_url($role . '/filterRetur/') ?>" + area,
+            type: "GET",
+            data: {
+                model: model
+            },
+            dataType: "json",
+            success: function(response) {
+                fetchData(response, model, area);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+            },
+            complete: function() {
+                loading.style.display = 'none';
+            }
+        });
+    });
+
+    /**
+     * Fungsi untuk membuat baris tabel dari data yang didapat
+     * @param {Object} data - Data JSON respons dari AJAX
+     * @returns {String} - HTML string untuk baris tabel
+     */
+    function buildTableRows(data, aggregateKeys) {
+        let rows = '';
+        let index = 0;
+        // Iterasi tiap properti object dan lewati properti agregat
+        for (const key in data) {
+            if (aggregateKeys.includes(key)) continue;
+
+            const item = data[key];
+            const kgsOutVal = parseFloat(item.kgs_out);
+            const validKgsOut = isNaN(kgsOutVal) ? '-' : kgsOutVal.toFixed(2);
+            const estimasi = parseFloat(kgsOutVal - parseFloat(item.pph)).toFixed(2);
+
+            rows += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${item.no_model}</td>
+                    <td>${item.area}</td>
+                    <td>${item.item_type}</td>
+                    <td>${item.kode_warna}</td>
+                    <td>${parseFloat(item.ttl_kebutuhan).toFixed(2)} kg</td>
+                    <td>${parseFloat(item.pph).toFixed(2)}</td>
+                    <td>${validKgsOut} kg</td>
+                    <td>${estimasi} kg</td>
+                </tr>
+            `;
+            index++;
+        }
+        return rows;
+    }
+
+    /**
+     * Fungsi untuk membuat input list pada modal dari item dengan estimasi > 0
+     * @param {Object} data - Data JSON respons dari AJAX
+     * @returns {String} - HTML string untuk input list di modal
+     */
+    function buildModalInputs(data, aggregateKeys) {
+        let inputs = '';
+        let i = 0;
+
+        for (const key in data) {
+            if (aggregateKeys.includes(key)) continue;
+
+            const item = data[key];
+            const kgsOutVal = parseFloat(item.kgs_out);
+            const pphVal = parseFloat(item.pph);
+            const estimasi = parseFloat(kgsOutVal - pphVal).toFixed(2);
+
+            if (estimasi > 0) {
+                inputs += `
+                <div class="mb-4 p-3 border rounded shadow-sm bg-white">
+                    <h6 class="mb-3">${i + 1}. <strong>${item.item_type} | ${item.kode_warna} | ${item.warna}</strong></h6>
+                    <input type="hidden" name="items[${i}][no_model]" value="${item.no_model}">
+                    <input type="hidden" name="items[${i}][area]" value="${item.area}">
+                    <input type="hidden" name="items[${i}][item_type]" value="${item.item_type}">
+                    <input type="hidden" name="items[${i}][kode_warna]" value="${item.kode_warna}">
+                    <input type="hidden" name="items[${i}][warna]" value="${item.warna}">
+                    <input type="hidden" name="items[${i}][lot]" value="${item.lot_out}">
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="kgs_${i}" class="form-label">Jml KGS</label>
+                            <div class="input-group">
+                            <input type="number" step="0.01" class="form-control" name="items[${i}][kgs]" id="kgs_${i}" value="${estimasi}" required>
+                            <span class="input-group-text text-bold">KG</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="cones_${i}" class="form-label">Jml Cones</label>
+                            <div class="input-group">
+                            <input type="number" class="form-control" name="items[${i}][cones]" id="cones_${i}" required>
+                            <span class="input-group-text text-bold">CNS</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="karung_${i}" class="form-label">Jml Karung</label>
+                            <div class="input-group">
+                            <input type="number" class="form-control" name="items[${i}][karung]" id="karung_${i}">
+                            <span class="input-group-text text-bold">KRG</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+                i++;
+            }
+        }
+
+        return inputs;
+    }
+
+
+    /**
+     * Fungsi utama untuk merender data ke dalam tabel dan modal
+     * @param {Object} data - Data JSON respons dari AJAX
+     * @param {String} model - Nomor model
+     * @param {String} area - Nama area
+     */
+    function fetchData(data, model, area) {
+        const aggregateKeys = ["qty", "sisa", "bruto", "bs_setting", "bs_mesin"];
+        // tanggal hari ini
+        const today = new Date();
+        // Render Header & Modal
+        const baseUrl = "<?= base_url($role . '/retur/') ?>";
+        const headerContainer = document.getElementById('HeaderRow');
+        headerContainer.innerHTML = `
+            <div class="header-container">
+                <div class="d-flex align-items-center justify-content-between w-100">
+                    <h3 class="model-title mb-0">${model}</h3>
+                    <div class="d-flex align-items-center">
+                        <a href="${baseUrl}${area}/exportExcel" class="btn btn-success me-2" id="btnExportExcel">
+                            <i class="fas fa-file-excel"></i> Export Excel
+                        </a>
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalPengajuanRetur">
+                            <i class="fas fa-paper-plane"></i> Pengajuan Retur
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="modalPengajuanRetur" tabindex="-1" aria-labelledby="modalPengajuanReturLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-scrollable modal-xl">
+                    <form action="${baseUrl}${area}/pengajuanRetur" method="POST" id="formPengajuanRetur">
+                        <input type="hidden" name="model" value="${model}">
+                        <input type="hidden" name="area" value="${area}">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalPengajuanReturLabel">Pengajuan Retur ${today.toLocaleDateString('id-ID', { year: 'numeric', month: '2-digit', day: '2-digit' })}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3 row">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-2 col-form-label">No Model</label>
+                                            <input type="text" class="form-control" name="model" value="${model}" readonly>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-2 col-form-label">Area</label>
+                                            <input type="text" class="form-control" name="area" value="${area}" readonly>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div id="listReturInputs">
+                                    ${buildModalInputs(data, aggregateKeys)}
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-info w-100"><i class="fas fa-paper-plane"></i> Ajukan Retur</button>
+                                <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Batal</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        `;
+
+        // Render Tabel Data
+        const tableBody = document.getElementById('bodyData');
+        tableBody.innerHTML = `
+            <div class="table-responsive">
+                <table class="display text-center text-uppercase text-xs font-bolder" id="dataTable" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th class="text-center">No</th>
+                            <th class="text-center">No Model</th>
+                            <th class="text-center">Area</th>
+                            <th class="text-center">Item Type</th>
+                            <th class="text-center">Kode Warna</th>
+                            <th class="text-center">PO (KGS)</th>
+                            <th class="text-center">PPH</th>
+                            <th class="text-center">Kirim</th>
+                            <th class="text-center">Estimasi Retur</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${buildTableRows(data, aggregateKeys)}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        // Inisialisasi DataTables (pastikan DataTables sudah terinclude)
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                responsive: true
             });
         });
     }
