@@ -356,4 +356,35 @@ class ReturController extends BaseController
 
         return $this->response->setJSON($result);
     }
+
+    public function pengajuanRetur($area)
+    {
+        $items = $this->request->getPost('items');
+
+        if (!empty($items) && is_array($items)) {
+            foreach ($items as $item) {
+                // Contoh simpan ke DB
+                $data = [
+                    'no_model'    => $item['no_model'],
+                    'area_retur'        => $item['area'],
+                    'item_type'   => $item['item_type'],
+                    'kode_warna'  => $item['kode_warna'],
+                    'warna'       => $item['warna'],
+                    'tgl_retur'   => date('Y-m-d'),
+                    'kgs_retur'         => (float) $item['kgs'],
+                    'cns_retur'       => (int) $item['cones'],
+                    'krg_retur'      => (int) $item['karung'],
+                    'lot_retur'     => $item['lot']
+                ];
+
+                dd ($data);
+                // Simpan ke DB (pakai model)
+                // $this->returModel->insert($data);
+            }
+
+            return redirect()->back()->with('success', 'Data retur berhasil disimpan.');
+        }
+
+        return redirect()->back()->with('error', 'Data retur tidak valid.');
+    }
 }
