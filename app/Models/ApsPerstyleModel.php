@@ -989,10 +989,6 @@ class ApsPerstyleModel extends Model
         if (!empty($filters['bulan'])) {
             $builder->where('MONTH(delivery)', $filters['bulan']);
         }
-
-        if (!empty($filters['tahun'])) {
-            $builder->where('YEAR(delivery)', $filters['tahun']);
-        }
         if (!empty($filters['area'])) {
             $builder->where('factory', $filters['area']);
         }

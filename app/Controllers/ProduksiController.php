@@ -1245,63 +1245,53 @@ class ProduksiController extends BaseController
     {
         $bulan = $this->request->getGet('bulan');
         $tahun = $this->request->getGet('tahun');
+        $area  = $this->request->getGet('area');
 
         if (!$bulan || !$tahun) {
             return $this->response->setJSON(['error' => 'Bulan dan Tahun wajib diisi']);
         }
 
         try {
-            $query = $this->produksiModel->select("DATE_FORMAT(tgl_produksi, '%d-%b') as tgl_produksi, SUM(qty_produksi) as qty_produksi")
-                ->groupBy('tgl_produksi')
-                ->orderBy('tgl_produksi', 'ASC')
+            $builder = $this->produksiModel
+                ->select("DATE_FORMAT(tgl_produksi, '%d-%b') as tgl_produksi, SUM(qty_produksi) as qty_produksi")
                 ->where('MONTH(tgl_produksi)', $bulan)
                 ->where('YEAR(tgl_produksi)', $tahun);
 
-            $data = $query->findAll();
+            if (!empty($area)) {
+                $builder->where('area', $area);
+            }
+
+            $data = $builder
+                ->groupBy('tgl_produksi')
+                ->orderBy('tgl_produksi', 'ASC')
+                ->findAll();
 
             return $this->response->setJSON($data);
         } catch (\Exception $e) {
             return $this->response->setJSON(['error' => $e->getMessage()]);
         }
     }
+
     public function getBsData()
     {
         $bulan = $this->request->getGet('bulan');
         $tahun = $this->request->getGet('tahun');
-
-
-        if (!$bulan || !$tahun) {
-            return $this->response->setJSON(['error' => 'Bulan dan Tahun wajib diisi']);
-        }
-
-        try {
-
-            $data = $this->BsModel->getBsPerhari($bulan, $tahun);
-
-            return $this->response->setJSON($data);
-        } catch (\Exception $e) {
-            return $this->response->setJSON(['error' => $e->getMessage()]);
-        }
-    }
-    public function BsArea()
-    {
-        $bulan = $this->request->getGet('bulan');
-        $tahun = $this->request->getGet('tahun');
-
+        $area  = $this->request->getGet('area');
 
         if (!$bulan || !$tahun) {
             return $this->response->setJSON(['error' => 'Bulan dan Tahun wajib diisi']);
         }
 
         try {
-
-            $data = $this->BsModel->getBsPerArea($bulan, $tahun);
-
+            $data = $this->BsModel->getBsPerhari($bulan, $tahun, $area);
             return $this->response->setJSON($data);
         } catch (\Exception $e) {
             return $this->response->setJSON(['error' => $e->getMessage()]);
         }
     }
+
+
+
     public function getArea()
     {
         $nomodel = $this->request->getPost('nomodel');

@@ -177,8 +177,8 @@ class BsModel extends Model
     }
     public function bsMonthly($filters)
     {
-        $builder = $this->select('SUM(qty) as bs');
-
+        $builder = $this->select(' apsperstyle.mastermodel, apsperstyle.size,SUM(data_bs.qty) as bs')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle');
         if (!empty($filters['bulan'])) {
             $builder->where('MONTH(tgl_instocklot)', $filters['bulan']);
         }
@@ -187,24 +187,24 @@ class BsModel extends Model
             $builder->where('YEAR(tgl_instocklot)', $filters['tahun']);
         }
 
-        if (!empty($filters['buyer'])) {
-            $builder->where('kd_buyer_order', $filters['buyer']);
-        }
-
         if (!empty($filters['area'])) {
             $builder->where('area', $filters['area']);
         }
-
-        return $builder->first();
+        return $builder->groupBy('data_bs.idapsperstyle')
+            ->groupBy('apsperstyle.size')->findAll();
     }
-    public function getBsPerhari($bulan, $year)
+    public function getBsPerhari($bulan, $year, $area = null)
     {
-        return $this->select('master_deffect.Keterangan, SUM(data_bs.qty) as qty')
+        $builder = $this->select('master_deffect.Keterangan, SUM(data_bs.qty) as qty')
             ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle')
             ->join('master_deffect', 'master_deffect.kode_deffect = data_bs.kode_deffect')
             ->where('MONTH(tgl_instocklot)', $bulan)
-            ->where('YEAR(tgl_instocklot)', $year)
-            ->groupBy('master_deffect.Keterangan')
+            ->where('YEAR(tgl_instocklot)', $year);
+        if (!empty($area)) {
+            $builder->where('area', $area); // pastiin kolom `area` memang ada di tabel ini
+        }
+
+        return $builder->groupBy('master_deffect.Keterangan')
             ->orderBy('qty', 'DESC')
             ->findAll();
     }

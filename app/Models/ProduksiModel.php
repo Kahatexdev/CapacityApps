@@ -311,7 +311,8 @@ class ProduksiModel extends Model
     }
     public function monthlyProd($filters)
     {
-        $builder = $this->select('SUM(qty_produksi) as prod');
+        $builder = $this->select(' apsperstyle.mastermodel, apsperstyle.size,SUM(qty_produksi) as prod')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle');
 
         if (!empty($filters['bulan'])) {
             $builder->where('MONTH(tgl_produksi)', $filters['bulan']);
@@ -321,15 +322,12 @@ class ProduksiModel extends Model
             $builder->where('YEAR(tgl_produksi)', $filters['tahun']);
         }
 
-        if (!empty($filters['buyer'])) {
-            $builder->where('kd_buyer_order', $filters['buyer']);
-        }
-
         if (!empty($filters['area'])) {
             $builder->where('area', $filters['area']);
         }
 
-        return $builder->first(); // ga perlu groupBy kalau ambil sum total bulanan
+        return $builder->groupBy('produksi.idapsperstyle')
+            ->groupBy('apsperstyle.size')->findAll();
     }
 
     public function directMonthly($filters)
@@ -343,11 +341,6 @@ class ProduksiModel extends Model
         if (!empty($filters['tahun'])) {
             $builder->where('YEAR(tgl_produksi)', $filters['tahun']);
         }
-
-        if (!empty($filters['buyer'])) {
-            $builder->where('kd_buyer_order', $filters['buyer']);
-        }
-
         if (!empty($filters['area'])) {
             $builder->where('area', $filters['area']);
         }
@@ -374,5 +367,23 @@ class ProduksiModel extends Model
 
 
         return $query->orderBy('produksi.tgl_produksi')->findAll();
+    }
+    public function hariProduksi($filters)
+    {
+        $builder = $this->select('COUNT(distinct(tgl_produksi)) as hari');
+
+        if (!empty($filters['bulan'])) {
+            $builder->where('MONTH(tgl_produksi)', $filters['bulan']);
+        }
+
+        if (!empty($filters['tahun'])) {
+            $builder->where('YEAR(tgl_produksi)', $filters['tahun']);
+        }
+
+        if (!empty($filters['area'])) {
+            $builder->where('area', $filters['area']);
+        }
+
+        return $builder->first(); // hasilnya ['hari' => jumlah_hari]
     }
 }
