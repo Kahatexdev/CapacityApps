@@ -140,4 +140,36 @@ class BsMesinModel extends Model
             ->groupBy('no_model, size')
             ->findAll();
     }
+    public function getbsMesinDaily($filters)
+    {
+        $builder = $this->select("DATE_FORMAT(tanggal_produksi, '%d-%b') as tanggal_produksi, SUM(qty_gram) as qty_gram")
+            ->where('MONTH(tanggal_produksi)',  $filters['bulan'])
+            ->where('YEAR(tanggal_produksi)',  $filters['tahun']);
+
+        if (!empty($filters['area'])) {
+            $builder->where('area',  $filters['area']);
+        }
+
+        $builder->groupBy('tanggal_produksi')
+            ->orderBy('tanggal_produksi', 'ASC');
+
+        // Ambil hasil query-nya
+        $result = $builder->findAll();
+
+        return $result;
+    }
+    public function getTotalKgMonth($filters)
+    {
+        $builder = $this->select(" SUM(qty_gram) as qty_gram")
+            ->where('MONTH(tanggal_produksi)',  $filters['bulan'])
+            ->where('YEAR(tanggal_produksi)',  $filters['tahun']);
+
+        if (!empty($filters['area'])) {
+            $builder->where('area',  $filters['area']);
+        }
+        // Ambil hasil query-nya
+        $result = $builder->first();
+
+        return $result ?? 0;
+    }
 }

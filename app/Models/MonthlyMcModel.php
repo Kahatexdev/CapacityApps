@@ -53,4 +53,18 @@ class MonthlyMcModel extends Model
     {
         return $this->select('judul')->findAll();
     }
+    public function getTarget($judul)
+    {
+        return $this->select('total_output')
+            ->where('judul', $judul)
+            ->first();
+    }
+    public function getTargetArea($judul, $area)
+    {
+        return $this->select('area_machine.output as total_output')
+            ->join('area_machine', 'area_machine.id_monthly_mc=monthly_mc.id_monthly_mc', 'left')
+            ->where('monthly_mc.judul', $judul)
+            ->where('area_machine.area', $area)
+            ->first();
+    }
 }
