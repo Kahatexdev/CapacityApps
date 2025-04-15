@@ -1151,9 +1151,10 @@ class GodController extends BaseController
                 'percentage' => $percentage,
                 'productivity' =>   round($productivity),
                 'prodtotal' => ($prodTotal / 24),
-                'target' => $targetMonth['total_output'],
-                'targethari' => $targetMonth['total_output'] * (int)$jumhari,
-                'hari' => $jumhari
+                'targetday' => $targetMonth['total_output'],
+                'targetOutput' => $targetMonth['total_output'] * (int)$jumhari,
+                'hari' => $jumhari,
+                'planmc' => $targetMonth['mesin']
             ];
 
             return $this->response->setJSON($data);

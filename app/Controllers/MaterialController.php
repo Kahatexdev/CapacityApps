@@ -824,6 +824,7 @@ class MaterialController extends BaseController
 
             // Fetch all bs_mesin data in one query
             $bsMesinData = $this->BsMesinModel->getBsMesinHarian($mastermodels, $sizes, $tanggal);
+            log_message('debug', 'Hasil bsMesinData: ' . print_r($bsMesinData, true));
 
             // Create a lookup table for fast matching
             $bsMesinMap = [];
@@ -831,11 +832,13 @@ class MaterialController extends BaseController
                 $key = $bs['no_model'] . '_' . $bs['size'];
                 $bsMesinMap[$key] = $bs['bs_mesin'];
             }
+            log_message('debug', 'Mapping bsMesinMap: ' . print_r($bsMesinMap, true));
 
             // Assign bs_mesin to production data
-            foreach ($data as $prod) {
+            foreach ($data as &$prod) {
                 $key = $prod['mastermodel'] . '_' . $prod['size'];
                 $prod['bs_mesin'] = $bsMesinMap[$key] ?? 0; // Default to null if not found
+                log_message('debug', 'Assign bs_mesin untuk ' . $key . ': ' . $prod['bs_mesin']);
             }
         }
 
@@ -925,7 +928,18 @@ class MaterialController extends BaseController
             $result[$key]['bs_mesin'] += $item['bs_mesin'];
             $result[$key]['pph'] += $item['pph'];
         }
-        return $this->response->setJSON($result);
+        $dataToSort = array_filter($result, 'is_array');
+
+        usort($dataToSort, function ($a, $b) {
+            if ($a['mastermodel'] !== $b['mastermodel']) {
+                return $a['mastermodel'] <=> $b['mastermodel'];
+            }
+            if ($a['item_type'] !== $b['item_type']) {
+                return $a['item_type'] <=> $b['item_type'];
+            }
+            return $a['kode_warna'] <=> $b['kode_warna'];
+        });
+        return $this->response->setJSON($dataToSort);
     }
     public function getQtyByModelSize()
     {

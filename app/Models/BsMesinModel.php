@@ -140,6 +140,26 @@ class BsMesinModel extends Model
             ->groupBy('no_model, size')
             ->findAll();
     }
+    public function existingData($insert)
+    {
+        $query = $this->select('*')
+            ->where('id_karyawan', $insert['id_karyawan'])
+            ->where('nama_karyawan', $insert['nama_karyawan'])
+            ->where('shift', $insert['shift'])
+            ->where('area', $insert['area'])
+            ->where('no_mesin', $insert['no_mesin'])
+            ->where('size', $insert['size'])
+            ->where('tanggal_produksi', $insert['tanggal_produksi'])
+            ->get(); // Pastikan panggilan get() dilakukan untuk menjalankan query
+
+        // Jika query gagal, get() akan mengembalikan false
+        if ($query === false) {
+            log_message('error', 'Query failed in existingData(): ' . $this->db->getLastQuery());
+            return false;
+        }
+
+        return $query->getResult();
+    }
     public function getbsMesinDaily($filters)
     {
         $builder = $this->select("DATE_FORMAT(tanggal_produksi, '%d-%b') as tanggal_produksi, SUM(qty_gram) as qty_gram")

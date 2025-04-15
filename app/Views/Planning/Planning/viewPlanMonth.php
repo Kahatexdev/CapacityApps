@@ -211,7 +211,7 @@
                         <div class="row text-bold">
                             <div class="col-lg-4">
                             </div>
-                            <div class="col-lg-4"> In Line:
+                            <div class="col-lg-4"> QC:
                                 <input type="number" class="form-control" id="inline<?= $no ?>"
                                     value="<?= $detailArea['inline']; ?>" readonly style="width: 70%">
                             </div>
@@ -417,11 +417,13 @@
                 totalMesin += kebutuhanMesin; // Total kebutuhan mesin
             });
 
+            let val;
+
             // Hitung operator dan montir setelah semua data diupdate
             totalOperator = ((totalMesin / 20) + (totalMesin / 20) / 7) * 3;
             totalMontir = ((totalMesin / 50) + (totalMesin / 50) / 7) * 3;
-            totalInLine = ((totalMesin / 80) + (totalMesin / 80) / 7) * 3;
-            totalWly = ((totalMesin / 180) + (totalMesin / 180) / 7) * 3;
+            totalInLine = ((val = (totalMesin / 80 * 3) + ((totalMesin / 80 * 3) / 7)) > 0 && val <= 4) ? 4 : val;
+            totalWly = ((val = (totalMesin / 180 * 3) + ((totalMesin / 180 * 3) / 7)) > 0 && val <= 4) ? 4 : val;
 
             // Update nilai 'planmc' berdasarkan total kebutuhan mesin
             $("#planmc" + no).val(totalMesin);

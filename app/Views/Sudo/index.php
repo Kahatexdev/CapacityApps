@@ -68,18 +68,18 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="col-xl-2 col-sm-6 mb-xl-0 mb-4">
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold"> Productivity </p>
-                                <h5 class="font-weight-bolder mb-0" id="productivity">
+                                <h6 class="font-weight-bolder mb-0" id="productivity">
                                     %
 
                                     <span class=" text-sm font-weight-bolder"></span>
-                                </h5>
+                                </h6>
                             </div>
                         </div>
                         <div class="col-4 text-end">
@@ -92,17 +92,17 @@
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="col-xl-2 col-sm-6 mb-xl-0 mb-4">
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Deffect Rate </p>
-                                <h5 class="font-weight-bolder mb-0" id="deffectRate">
+                                <h6 class="font-weight-bolder mb-0" id="deffectRate">
                                     %
                                     <span class=" text-sm font-weight-bolder"></span>
-                                </h5>
+                                </h6>
                             </div>
                         </div>
                         <div class="col-4 text-end">
@@ -114,18 +114,18 @@
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="col-xl-2 col-sm-6 mb-xl-0 mb-4">
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Output</p>
-                                <h5 class="font-weight-bolder mb-0" id="output">
+                                <h6 class="font-weight-bolder mb-0" id="output">
 
                                     <span class=" text-sm font-weight-bolder">pairs </span>
 
-                                </h5>
+                                </h6>
                             </div>
                         </div>
                         <div class="col-4 text-end">
@@ -137,15 +137,57 @@
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-sm-6">
+        <div class="col-xl-2 col-sm-6">
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">pairs/hour</p>
-                                <h5 class="font-weight-bolder mb-0" id="pph">
-                                </h5>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Target</p>
+                                <h6 class="font-weight-bolder mb-0" id="pph">
+                                </h6>
+                                <span class=" text-sm font-weight-bolder"></span>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                <i class="ni ni-check-bold text-lg opacity-10" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-sm-6">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Plan Mc</p>
+                                <h6 class="font-weight-bolder mb-0" id="planmc">
+                                </h6>
+                                <span class=" text-sm font-weight-bolder"></span>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                <i class="ni ni-check-bold text-lg opacity-10" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-sm-6">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Target/day</p>
+                                <h6 class="font-weight-bolder mb-0" id="targetday">
+                                </h6>
                                 <span class=" text-sm font-weight-bolder"></span>
                             </div>
                         </div>
@@ -166,7 +208,7 @@
 
                 <div class="card-body">
 
-                    Target Produksi
+                    Target Export
 
                     <div class="col-lg-12 col-sm-12">
                         <div class="progress-wrapper" id="progresTarget">
@@ -358,18 +400,22 @@
     function dashboard(data) {
         let deffect = parseFloat(data.deffect).toFixed(2); // Format 2 desimal
         let output = parseInt(data.output / 24).toLocaleString(); // Bagi 2, format angka
-        let pph = parseInt(data.pph).toLocaleString(); // Format angka
+        let pph = parseInt(data.targetOutput).toLocaleString(); // Format angka
         let qty = parseInt(data.qty).toLocaleString(); // Format angka
         let sisa = parseInt(data.sisa).toLocaleString(); // Format angka
         let prod = (parseInt(data.qty) - parseInt(data.sisa)) / 24; // Produksi yang selesai
         let percent = parseFloat(data.percentage).toFixed(2); // Gunakan `quality` karena `percentage` tidak ada di contoh data
         let qtyDz = parseInt(data.qty / 24).toLocaleString()
         let productivity = data.productivity;
+        let planMc = data.planmc;
+        let targetday = parseInt(data.targetday).toLocaleString();
 
         document.getElementById('deffectRate').textContent = `${deffect}%`;
         document.getElementById('output').textContent = `${output} dz`;
-        document.getElementById('pph').textContent = `${pph} `;
+        document.getElementById('pph').textContent = `${pph} dz`;
         document.getElementById('productivity').textContent = `${productivity} %`;
+        document.getElementById('planmc').textContent = `${planMc} mc`;
+        document.getElementById('targetday').textContent = `${targetday} dz`;
 
         let progres = document.getElementById("progresTarget"); // Gunakan string jika ini ID elemen
 
