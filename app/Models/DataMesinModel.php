@@ -569,6 +569,8 @@ class DataMesinModel extends Model
     {
         $data = $this->select('SUM(total_mc) as total')
             ->where('pu !=', 'MJ')
+            ->where('area !=', 'WAREHOUSE')
+            ->where('area !=', 'SAMPLE')
             ->groupStart()
             ->like('jarum', 'DC')
             ->orLike('jarum', 'JC')
