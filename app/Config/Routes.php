@@ -16,6 +16,7 @@ $routes->get('chart/getProductionData', 'ProduksiController::getProductionData')
 $routes->get('chart/getBsData', 'ProduksiController::getBsData');
 $routes->get('chart/getBsMesin', 'DeffectController::getBsMesin');
 $routes->get('chart/dashboardData', 'GodController::dashboardData');
+$routes->get('chart/getDailyProd', 'GodController::getDailyProd');
 
 // API ROUTES
 $routes->group(
