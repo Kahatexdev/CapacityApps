@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\HTTP\CURLRequest;
 
 use App\Models\DataMesinModel;
 use App\Models\OrderModel;
@@ -101,79 +102,6 @@ class ReturController extends BaseController
         return view(session()->get('role') . '/retur', $data);
     }
 
-    // public function dataRetur($area)
-    // {
-    //     // Ambil model dari query parameter
-    //     $noModel = $this->request->getGet('model') ?? '';
-
-    //     // URL API
-    //     $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
-    //     $apiUrlPengiriman = 'http://172.23.39.117/MaterialSystem/public/api/getPengirimanArea?noModel=' . urlencode($noModel);
-
-    //     // Ambil data dari API
-    //     $responsePph = file_get_contents($apiUrl);
-    //     $responsePengiriman = file_get_contents($apiUrlPengiriman);
-    //     log_message('debug', "API Response Pengiriman: " . $responsePengiriman);
-
-    //     if ($responsePph === FALSE) {
-    //         log_message('error', "API tidak bisa diakses: $apiUrl");
-    //         return $this->response->setJSON(["error" => "Gagal mengambil data dari API"]);
-    //     } else {
-    //         $models = json_decode($responsePph, true);
-    //         // Misal, $models adalah data dari API pph (sudah didecode)
-    //         $dataPph = [];
-    //         foreach ($models as $item) {
-    //             // Buat key gabungan dari data pph
-    //             $key = $item['no_model'] . '-' . $item['kode_warna'] . '-' . $item['item_type'] . '-' . $item['area'];
-    //             $dataPph[$key] = $item;
-    //         }
-
-    //         // Misal, $responsePengiriman adalah response dari API pengiriman (string JSON)
-    //         $dataPengirimanArr = json_decode($responsePengiriman, true);
-
-    //         // Buat mapping key => data pengiriman
-    //         $dataPengirimanMap = [];
-    //         foreach ($dataPengirimanArr as $pengiriman) {
-    //             // Buat key gabungan dari data pengiriman
-    //             $keyPengiriman = $pengiriman['no_model'] . '-' . $pengiriman['kode_warna'] . '-' . $pengiriman['item_type'] . '-' . $pengiriman['area_out'];
-    //             $dataPengirimanMap[$keyPengiriman] = $pengiriman;
-    //         }
-
-    //         // Tentukan daftar field dari pengiriman yang ingin digabungkan (sesuaikan dengan kebutuhan)
-    //         $pengirimanFields = [
-    //             'no_model',
-    //             'kode_warna',
-    //             'item_type',
-    //             'area_out',
-    //             'tgl_out',
-    //             'kgs_out',
-    //             'cns_out',
-    //             'krg_out',
-    //             'lot_out',
-    //             'nama_cluster',
-    //             'status',
-    //             'admin'
-    //         ];
-
-    //         // Lakukan iterasi pada data pph, jika ditemukan data pengiriman sesuai key maka merge, 
-    //         // jika tidak ada, tambahkan field-field tersebut dengan isi '-'
-    //         foreach ($dataPph as $key => $pphRecord) {
-    //             if (isset($dataPengirimanMap[$key])) {
-    //                 // Jika ada data pengiriman, tambahkan tiap field dari data pengiriman ke data pph
-    //                 foreach ($dataPengirimanMap[$key] as $field => $value) {
-    //                     $dataPph[$key][$field] = $value;
-    //                 }
-    //             } else {
-    //                 // Jika tidak ada data pengiriman, tambahkan field-field dengan isi '-'
-    //                 foreach ($pengirimanFields as $field) {
-    //                     $dataPph[$key][$field] = '-';
-    //                 }
-    //             }
-    //         }
-    //         return $this->response->setJSON($dataPph);
-    //     }
-    // }
-
     public function dataRetur($area)
     {
         // Ambil nilai 'model' dari query parameter
@@ -186,22 +114,22 @@ class ReturController extends BaseController
         // Ambil data dari API PPH
         $responsePph = file_get_contents($apiUrlPph);
         if ($responsePph === FALSE) {
-            log_message('error', "API PPH tidak bisa diakses: $apiUrlPph");
+            // log_message('error', "API PPH tidak bisa diakses: $apiUrlPph");
             return $this->response->setJSON(["error" => "Gagal mengambil data dari API PPH"]);
         }
 
         $models = json_decode($responsePph, true);
         if ($models === null) {
-            log_message('error', "Gagal mendecode data PPH dari: $apiUrlPph");
+            // log_message('error', "Gagal mendecode data PPH dari: $apiUrlPph");
             return $this->response->setJSON(["error" => "Gagal mengolah data dari API PPH"]);
         }
 
         // Ambil data dari API Pengiriman
         $responsePengiriman = file_get_contents($apiUrlPengiriman);
-        log_message('debug', "API Response Pengiriman: " . $responsePengiriman);
+        // log_message('debug', "API Response Pengiriman: " . $responsePengiriman);
         $pengirimanData = json_decode($responsePengiriman, true);
         if ($pengirimanData === null) {
-            log_message('error', "Gagal mendecode data Pengiriman dari: $apiUrlPengiriman");
+            // log_message('error', "Gagal mendecode data Pengiriman dari: $apiUrlPengiriman");
             $pengirimanData = [];
         }
 
@@ -288,11 +216,11 @@ class ReturController extends BaseController
                 'bs_mesin'     => $bsMesin,
                 'pph'          => $pph,
                 // Field tambahan dari API Pengiriman
-                'area_out'     => $pengirimanExtra['area_out'] ?? '-',
+                'area_out'     => $pengirimanExtra['area_out'] ?? '0',
                 'tgl_out'      => $pengirimanExtra['tgl_out'] ?? '-',
-                'kgs_out'      => $pengirimanExtra['kgs_out'] ?? '-',  // KGS out dari API Pengiriman
-                'cns_out'      => $pengirimanExtra['cns_out'] ?? '-',
-                'krg_out'      => $pengirimanExtra['krg_out'] ?? '-',
+                'kgs_out'      => $pengirimanExtra['kgs_out'] ?? '0',  // KGS out dari API Pengiriman
+                'cns_out'      => $pengirimanExtra['cns_out'] ?? '0',
+                'krg_out'      => $pengirimanExtra['krg_out'] ?? '0',
                 'lot_out'      => $pengirimanExtra['lot_out'] ?? '-',
                 'nama_cluster' => $pengirimanExtra['nama_cluster'] ?? '-',
                 'status'       => $pengirimanExtra['status'] ?? '-',
@@ -357,32 +285,87 @@ class ReturController extends BaseController
         return $this->response->setJSON($result);
     }
 
+    public function getKategoriRetur()
+    {
+        // get data kategori retur dari API
+        $url = 'http://172.23.39.117/MaterialSystem/public/api/getKategoriRetur';
+        $response = file_get_contents($url);
+        log_message('debug', "API Response: " . $response);
+        if ($response === FALSE) {
+            // log_message('error', "API tidak bisa diakses: $url");
+            return $this->response->setJSON(["error" => "Gagal mengambil data dari API"]);
+        }
+        $data = json_decode($response, true);
+        if ($data === null) {
+            log_message('error', "Gagal mendecode data dari API: $url");
+            // return $this->response->setJSON(["error" => "Gagal mengolah data dari API"]);
+        }
+        // Ambil data kategori retur
+        $kategoriRetur = [];
+        foreach ($data as $item) {
+            $kategoriRetur[] = [
+                'nama_kategori' => $item['nama_kategori'],
+                'tipe_kategori' => $item['tipe_kategori']
+            ];
+        }
+        return $this->response->setJSON($kategoriRetur);
+    }
+
+
+
     public function pengajuanRetur($area)
     {
-        $items = $this->request->getPost('items');
+        $postData = $this->request->getPost();
+        $items = $postData['items'] ?? [];
 
         if (!empty($items) && is_array($items)) {
+            // Init HTTP client
+            $client = \Config\Services::curlrequest();
+
             foreach ($items as $item) {
-                // Contoh simpan ke DB
                 $data = [
-                    'no_model'    => $item['no_model'],
-                    'area_retur'        => $item['area'],
-                    'item_type'   => $item['item_type'],
-                    'kode_warna'  => $item['kode_warna'],
-                    'warna'       => $item['warna'],
-                    'tgl_retur'   => date('Y-m-d'),
-                    'kgs_retur'         => (float) $item['kgs'],
-                    'cns_retur'       => (int) $item['cones'],
+                    'no_model'       => $postData['model'],
+                    'area_retur'     => $postData['area'],
+                    'item_type'      => $item['item_type'],
+                    'kode_warna'     => $item['kode_warna'],
+                    'warna'          => $item['warna'],
+                    'tgl_retur'      => date('Y-m-d'),
+                    'kgs_retur'      => (float) $item['kgs'],
+                    'cns_retur'      => (int) $item['cones'],
                     'krg_retur'      => (int) $item['karung'],
-                    'lot_retur'     => $item['lot']
+                    'lot_retur'      => $item['lot_retur'],
+                    'kategori' => $item['kategori_retur'],
+                    'keterangan_area'   => $item['alasan_retur']
                 ];
 
-                dd ($data);
-                // Simpan ke DB (pakai model)
-                // $this->returModel->insert($data);
+                try {
+                    // Kirim ke API
+                    $response = $client->post(
+                        'http://172.23.39.117/MaterialSystem/public/api/saveRetur',
+                        [
+                            'headers' => [
+                                'Accept' => 'application/json',
+                                'Content-Type' => 'application/json'
+                            ],
+                            'json' => $data
+                        ]
+                    );
+
+                    // Optional: Cek hasil
+                    $statusCode = $response->getStatusCode();
+                    $responseBody = json_decode($response->getBody(), true);
+
+                    if (!in_array($statusCode, [200, 201])) {
+                        log_message('error', 'Gagal kirim retur: ' . json_encode($responseBody));
+                    } else {
+                        log_message('info', 'Berhasil kirim retur: ' . json_encode($responseBody));
+                    }
+                } catch (\Exception $e) {
+                    log_message('error', 'Exception saat kirim retur: ' . $e->getMessage());
+                }
             }
 
-            return redirect()->back()->with('success', 'Data retur berhasil disimpan.');
+            return redirect()->back()->with('success', 'Pengajuan retur berhasil dikirim.');
         }
 
         return redirect()->back()->with('error', 'Data retur tidak valid.');
