@@ -309,30 +309,52 @@ class ProduksiModel extends Model
         }
         return $qty;
     }
-    public function monthlyProd($bulan, $tahun)
+    public function monthlyProd($filters)
     {
-        return $this->select('sum(qty_produksi) as prod')
-            ->where('MONTH(tgl_produksi)', $bulan)
-            ->where('YEAR(tgl_produksi)', $tahun)
-            ->groupBy("DATE_FORMAT(tgl_produksi, '%Y-%m')")
-            ->first();
+        $builder = $this->select(' apsperstyle.mastermodel, apsperstyle.size,SUM(qty_produksi) as prod')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle');
+
+        if (!empty($filters['bulan'])) {
+            $builder->where('MONTH(tgl_produksi)', $filters['bulan']);
+        }
+
+        if (!empty($filters['tahun'])) {
+            $builder->where('YEAR(tgl_produksi)', $filters['tahun']);
+        }
+
+        if (!empty($filters['area'])) {
+            $builder->where('area', $filters['area']);
+        }
+
+        return $builder->groupBy('produksi.idapsperstyle')
+            ->groupBy('apsperstyle.size')->findAll();
     }
-    public function directMonthly($bulan, $tahun)
+
+    public function directMonthly($filters)
     {
-        $mesin = $this->select('area, COUNT(DISTINCT no_mesin) as jumlah_mesin')
-            ->where('MONTH(tgl_produksi)', 02)
-            ->where('YEAR(tgl_produksi)', 2025)
-            ->groupBy('area')
-            ->findAll();
+        $builder = $this->select('area, COUNT(DISTINCT no_mesin) as jumlah_mesin');
+
+        if (!empty($filters['bulan'])) {
+            $builder->where('MONTH(tgl_produksi)', $filters['bulan']);
+        }
+
+        if (!empty($filters['tahun'])) {
+            $builder->where('YEAR(tgl_produksi)', $filters['tahun']);
+        }
+        if (!empty($filters['area'])) {
+            $builder->where('area', $filters['area']);
+        }
+
+        $mesin = $builder->groupBy('area')->findAll();
+
         $totalMesin = 0;
         foreach ($mesin as $mc) {
             $totalMesin += $mc['jumlah_mesin'];
         }
 
-
-
         return $totalMesin;
     }
+
     public function getProduksiPerStyle($area, $tanggal)
     {
         // Mulai query
@@ -345,5 +367,23 @@ class ProduksiModel extends Model
 
 
         return $query->orderBy('produksi.tgl_produksi')->findAll();
+    }
+    public function hariProduksi($filters)
+    {
+        $builder = $this->select('COUNT(distinct(tgl_produksi)) as hari');
+
+        if (!empty($filters['bulan'])) {
+            $builder->where('MONTH(tgl_produksi)', $filters['bulan']);
+        }
+
+        if (!empty($filters['tahun'])) {
+            $builder->where('YEAR(tgl_produksi)', $filters['tahun']);
+        }
+
+        if (!empty($filters['area'])) {
+            $builder->where('area', $filters['area']);
+        }
+
+        return $builder->first(); // hasilnya ['hari' => jumlah_hari]
     }
 }

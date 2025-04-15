@@ -230,7 +230,7 @@ class PlanningJalanMcController extends BaseController
         $sheet->setCellValue('C3', 'Planning MC');
         $sheet->setCellValue('D3', 'Operator');
         $sheet->setCellValue('E3', 'Montir');
-        $sheet->setCellValue('F3', 'In Line');
+        $sheet->setCellValue('F3', 'QC');
         $sheet->setCellValue('G3', 'WLY');
         $sheet->getStyle('A3')->applyFromArray($styleHeader);
         $sheet->getStyle('B3')->applyFromArray($styleHeader);

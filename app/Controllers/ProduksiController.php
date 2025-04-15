@@ -14,8 +14,10 @@ use App\Models\ProduksiModel;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\BsModel;
+use App\Models\BsMesinModel;
 use CodeIgniter\Controller;
 use PhpParser\Node\Stmt\Else_;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class ProduksiController extends BaseController
 {
@@ -28,6 +30,7 @@ class ProduksiController extends BaseController
     protected $ApsPerstyleModel;
     protected $liburModel;
     protected $BsModel;
+    protected $bsMesinModel;
     protected $db;
 
     public function __construct()
@@ -41,6 +44,7 @@ class ProduksiController extends BaseController
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         $this->BsModel = new BsModel();
+        $this->bsMesinModel = new BsMesinModel();
 
         if ($this->filters   = ['role' => [session()->get('role') . ''], 'role' => ['user'], 'role' => ['planning']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -1245,63 +1249,53 @@ class ProduksiController extends BaseController
     {
         $bulan = $this->request->getGet('bulan');
         $tahun = $this->request->getGet('tahun');
+        $area  = $this->request->getGet('area');
 
         if (!$bulan || !$tahun) {
             return $this->response->setJSON(['error' => 'Bulan dan Tahun wajib diisi']);
         }
 
         try {
-            $query = $this->produksiModel->select("DATE_FORMAT(tgl_produksi, '%d-%b') as tgl_produksi, SUM(qty_produksi) as qty_produksi")
-                ->groupBy('tgl_produksi')
-                ->orderBy('tgl_produksi', 'ASC')
+            $builder = $this->produksiModel
+                ->select("DATE_FORMAT(tgl_produksi, '%d-%b') as tgl_produksi, SUM(qty_produksi) as qty_produksi")
                 ->where('MONTH(tgl_produksi)', $bulan)
                 ->where('YEAR(tgl_produksi)', $tahun);
 
-            $data = $query->findAll();
+            if (!empty($area)) {
+                $builder->where('area', $area);
+            }
+
+            $data = $builder
+                ->groupBy('tgl_produksi')
+                ->orderBy('tgl_produksi', 'ASC')
+                ->findAll();
 
             return $this->response->setJSON($data);
         } catch (\Exception $e) {
             return $this->response->setJSON(['error' => $e->getMessage()]);
         }
     }
+
     public function getBsData()
     {
         $bulan = $this->request->getGet('bulan');
         $tahun = $this->request->getGet('tahun');
-
-
-        if (!$bulan || !$tahun) {
-            return $this->response->setJSON(['error' => 'Bulan dan Tahun wajib diisi']);
-        }
-
-        try {
-
-            $data = $this->BsModel->getBsPerhari($bulan, $tahun);
-
-            return $this->response->setJSON($data);
-        } catch (\Exception $e) {
-            return $this->response->setJSON(['error' => $e->getMessage()]);
-        }
-    }
-    public function BsArea()
-    {
-        $bulan = $this->request->getGet('bulan');
-        $tahun = $this->request->getGet('tahun');
-
+        $area  = $this->request->getGet('area');
 
         if (!$bulan || !$tahun) {
             return $this->response->setJSON(['error' => 'Bulan dan Tahun wajib diisi']);
         }
 
         try {
-
-            $data = $this->BsModel->getBsPerArea($bulan, $tahun);
-
+            $data = $this->BsModel->getBsPerhari($bulan, $tahun, $area);
             return $this->response->setJSON($data);
         } catch (\Exception $e) {
             return $this->response->setJSON(['error' => $e->getMessage()]);
         }
     }
+
+
+
     public function getArea()
     {
         $nomodel = $this->request->getPost('nomodel');
@@ -1448,5 +1442,200 @@ class ProduksiController extends BaseController
         } else {
             return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Data Gagal di hapus ❗');
         }
+    }
+    public function importbsmc()
+    {
+        $area = session()->get('username');
+
+        // Set execution time and memory limit
+        ini_set('memory_limit', '512M');
+        set_time_limit(180);
+
+        $file = $this->request->getFile('excel_file');
+        if (!$file->isValid() || $file->hasMoved()) {
+            return redirect()->to(base_url(session()->get('role') . '/bsmesin'))
+                ->with('error', 'No data found in the Excel file');
+        }
+
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
+        $worksheet   = $spreadsheet->getActiveSheet();
+
+        // Ambil nilai dari sel B1 dan hilangkan spasi ekstra
+        $tglProduksiRaw = trim($worksheet->getCell('B1')->getValue());
+        if (is_numeric($tglProduksiRaw)) {
+            // Konversi serial date Excel ke objek DateTime
+            $dateTime = Date::excelToDateTimeObject($tglProduksiRaw);
+            $tgl_produksi = $dateTime->format('Y-m-d');
+        } else {
+            // Jika bukan serial number, kita lakukan parsing seperti sebelumnya
+            $tglProduksiFormatted = str_replace('.', '-', $tglProduksiRaw);
+            $dateTime = \DateTime::createFromFormat('d-m-Y', $tglProduksiFormatted);
+            $tgl_produksi = $dateTime ? $dateTime->format('Y-m-d') : null;
+        }
+
+        $startRow   = 6;
+        $batchSize  = 100;
+        $batchData  = [];
+        $failedRows = [];
+        $db         = \Config\Database::connect();
+
+        // Looping baris mulai dari row ke-6
+        foreach ($worksheet->getRowIterator($startRow) as $row) {
+            $rowIndex = $row->getRowIndex();
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false);
+
+            // Data baris dengan menambahkan role
+            $rowData = ['role' => session()->get('role')];
+            foreach ($cellIterator as $cell) {
+                $rowData[] = $cell->getCalculatedValue();
+            }
+
+            if (!empty($rowData)) {
+                $batchData[] = ['rowIndex' => $rowIndex, 'data' => $rowData];
+            }
+
+            // Proses batch jika mencapai batas
+            if (count($batchData) >= $batchSize) {
+                $this->processBatchBsMc($batchData, $db, $failedRows, $area, $tgl_produksi);
+                $batchData = []; // Reset batch
+            }
+        }
+
+        // Proses sisa batch data
+        if (!empty($batchData)) {
+            $this->processBatchBsMc($batchData, $db, $failedRows, $area, $tgl_produksi);
+        }
+
+        // Jika ada baris gagal, tampilkan pesan error
+        if (!empty($failedRows)) {
+            $shiftToColumn = [
+                'A' => 'Kolom F (Operator Shift A)',
+                'B' => 'Kolom G (Operator Shift B)',
+                'C' => 'Kolom H (Operator Shift C)'
+            ];
+
+            $failedDetails = array_map(function ($errorInfo) use ($shiftToColumn) {
+                $shiftColumn = $shiftToColumn[$errorInfo['shift']] ?? 'Kolom Tidak Diketahui';
+                return "{$shiftColumn} baris ke {$errorInfo['row']} (Operator: {$errorInfo['operator']})";
+            }, $failedRows);
+
+            return redirect()->to(base_url(session()->get('role') . '/bsmesin'))
+                ->with('error', 'Beberapa data gagal diimpor:')
+                ->with('error_list', $failedDetails);
+        }
+
+        return redirect()->to(base_url(session()->get('role') . '/bsmesin'))
+            ->withInput()->with('success', 'Data Bs Mesin Berhasil di Import');
+    }
+
+
+    private function processBatchBsMc($batchData, $db, &$failedRows, $area, $tgl_produksi)
+    {
+        $db->transStart();
+        $today = date('Y-m-d H:i:s');
+
+        // Mapping shift dan kolom qty berdasarkan indeks dalam array data
+        $shiftMapping   = [0 => 'A', 1 => 'B', 2 => 'C'];
+        $qtyPcsMapping  = [0 => 9, 1 => 12, 2 => 15];
+        $qtyGramMapping = [0 => 17, 1 => 18, 2 => 19];
+
+        foreach ($batchData as $batchItem) {
+            $rowIndex = $batchItem['rowIndex'];
+            $data     = $batchItem['data'];
+
+            // Proses masing-masing operator (shift) di satu baris
+            foreach ($shiftMapping as $index => $shift) {
+                $operatorIndex = 5 + $index;  // Kolom operator: indeks 5, 6, 7
+                $operatorName  = trim($data[$operatorIndex] ?? '');
+                if (empty($operatorName)) {
+                    continue;
+                }
+
+                // API call untuk mendapatkan data karyawan
+                $operatorEncoded = urlencode($operatorName);
+                $apiUrl = "http://172.23.44.14/SkillMapping/public/api/getdataforbs/{$area}/{$operatorEncoded}";
+                $response = @file_get_contents($apiUrl);
+                log_message('debug', "Response API untuk operator '{$operatorName}': {$response}");
+
+                if ($response === false) {
+                    log_message('error', "Gagal mengakses API: {$apiUrl}");
+                    // Simpan informasi error secara detail: row, operator, dan shift
+                    $failedRows[] = [
+                        'row'      => $rowIndex,
+                        'operator' => $operatorName,
+                        'shift'    => $shift,
+                        'error'    => 'API tidak bisa diakses'
+                    ];
+                    continue;
+                }
+
+                $karyawan = json_decode($response, true);
+                if (empty($karyawan)) {
+                    log_message('error', "Data karyawan tidak ditemukan untuk operator '{$operatorName}' pada shift {$shift}");
+                    $failedRows[] = [
+                        'row'      => $rowIndex,
+                        'operator' => $operatorName,
+                        'shift'    => $shift,
+                        'error'    => 'Karyawan tidak ditemukan'
+                    ];
+                    continue;
+                }
+
+                // Asumsi API mengembalikan array, ambil record pertama
+                $karyawan = is_array($karyawan) ? ($karyawan[0] ?? $karyawan) : $karyawan;
+                $idKar    = $karyawan['id_karyawan'];
+                $namaKar  = $karyawan['nama_karyawan'];
+
+                // Ambil data qty berdasarkan shift yang sedang diproses
+                $qtyPcs  = $data[$qtyPcsMapping[$index]] ?? 0;
+                $qtyGram = $data[$qtyGramMapping[$index]] ?? 0;
+
+                // Lewati proses insert jika qty tidak valid (nol atau kosong)
+                if (((empty($qtyPcs) || $qtyPcs == 0) && (empty($qtyGram) || $qtyGram == 0))) {
+                    continue;
+                }
+
+                $noModel = $data[2];
+                $inisial = $data[3];
+                $sz      = $this->ApsPerstyleModel->getSizes($noModel, $inisial);
+                $size    = $sz['size'] ?? null;
+                $noMesin = $data[1];
+
+                $dataInsert = [
+                    'tanggal_produksi'  => $tgl_produksi,
+                    'id_karyawan'   => $idKar,
+                    'nama_karyawan' => $namaKar,
+                    'shift'         => $shift,
+                    'area'          => $area,
+                    'no_model'      => $noModel,
+                    'size'          => $size,
+                    'inisial'       => $inisial,
+                    'no_mesin'      => $noMesin,
+                    'qty_pcs'       => $qtyPcs,
+                    'qty_gram'      => $qtyGram,
+                    'created_at'    => $today,
+                ];
+
+                // Cek apakah data sudah ada
+                $existingBs = $this->bsMesinModel->existingData($dataInsert);
+                if (!$existingBs) {
+                    $result = $this->bsMesinModel->insert($dataInsert);
+                    if (!$result) {
+                        log_message('error', "Gagal insert data pada row {$rowIndex} untuk shift {$shift}");
+                        $failedRows[] = [
+                            'row'      => $rowIndex,
+                            'operator' => $operatorName,
+                            'shift'    => $shift,
+                            'error'    => 'Insert gagal'
+                        ];
+                    }
+                } else {
+                    log_message('info', "Data BS untuk shift {$shift} sudah ada pada row {$rowIndex}, dilewati");
+                }
+            } // end foreach shiftMapping
+        } // end foreach batchData
+
+        $db->transComplete();
     }
 }

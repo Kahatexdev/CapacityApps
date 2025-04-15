@@ -40,6 +40,13 @@
                         <div class="col-6 text-end">
                             <div>
                                 Filters:
+
+                                <select id="filter-area" class="form-control d-inline w-auto">
+                                    <option value="">Semua Area</option>
+                                    <?php foreach ($area as $ar): ?>
+                                        <option value="<?= $ar ?>"><?= $ar ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                                 <select id="filter-bulan" class="form-control d-inline w-auto">
                                     <option value="">Semua Bulan</option>
                                     <?php for ($i = 1; $i <= 12; $i++): ?>
@@ -61,18 +68,18 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="col-xl-2 col-sm-6 mb-xl-0 mb-4">
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold"> OEE </p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    78 %
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold"> Productivity </p>
+                                <h6 class="font-weight-bolder mb-0" id="productivity">
+                                    %
 
                                     <span class=" text-sm font-weight-bolder"></span>
-                                </h5>
+                                </h6>
                             </div>
                         </div>
                         <div class="col-4 text-end">
@@ -85,17 +92,17 @@
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="col-xl-2 col-sm-6 mb-xl-0 mb-4">
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Deffect Rate </p>
-                                <h5 class="font-weight-bolder mb-0" id="deffectRate">
+                                <h6 class="font-weight-bolder mb-0" id="deffectRate">
                                     %
                                     <span class=" text-sm font-weight-bolder"></span>
-                                </h5>
+                                </h6>
                             </div>
                         </div>
                         <div class="col-4 text-end">
@@ -107,18 +114,18 @@
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="col-xl-2 col-sm-6 mb-xl-0 mb-4">
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Output</p>
-                                <h5 class="font-weight-bolder mb-0" id="output">
+                                <h6 class="font-weight-bolder mb-0" id="output">
 
                                     <span class=" text-sm font-weight-bolder">pairs </span>
 
-                                </h5>
+                                </h6>
                             </div>
                         </div>
                         <div class="col-4 text-end">
@@ -130,15 +137,57 @@
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-sm-6">
+        <div class="col-xl-2 col-sm-6">
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">pairs/hour</p>
-                                <h5 class="font-weight-bolder mb-0" id="pph">
-                                </h5>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Target</p>
+                                <h6 class="font-weight-bolder mb-0" id="pph">
+                                </h6>
+                                <span class=" text-sm font-weight-bolder"></span>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                <i class="ni ni-check-bold text-lg opacity-10" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-sm-6">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Plan Mc</p>
+                                <h6 class="font-weight-bolder mb-0" id="planmc">
+                                </h6>
+                                <span class=" text-sm font-weight-bolder"></span>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                <i class="ni ni-check-bold text-lg opacity-10" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-sm-6">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Target/day</p>
+                                <h6 class="font-weight-bolder mb-0" id="targetday">
+                                </h6>
                                 <span class=" text-sm font-weight-bolder"></span>
                             </div>
                         </div>
@@ -159,7 +208,7 @@
 
                 <div class="card-body">
 
-                    Target Produksi
+                    Target Export
 
                     <div class="col-lg-12 col-sm-12">
                         <div class="progress-wrapper" id="progresTarget">
@@ -193,11 +242,30 @@
             </div>
         </div>
     </div>
+    <div class="row my-3">
+        <div class="col-lg-12">
+            <div class="card z-index-2">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h6 class="card-title">Data BS Mesin Harian</h6>
+
+                </div>
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12">
+                            <div class="chart">
+                                <canvas id="bsmesin-chart" class="chart-canvas" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="card">
         <div class="card-header">
             <h5>
                 <h5>
-                    Data Deffect
+                    Data Deffect stocklot
 
                 </h5>
         </div>
@@ -211,16 +279,6 @@
 
                 </div>
                 <div class="col-lg-6 col-md-6">
-
-                    <div class="chart">
-                        <canvas id="bs-area" class="chart-canvas" height="500"></canvas>
-                    </div>
-                </div>
-
-
-            </div>
-            <div class="row ">
-                <div class="col-lg-6 mx-4">
                     <table class="table-responsive mx-4">
                         <thead>
                             <tr>
@@ -232,6 +290,13 @@
 
                         </tbody>
                     </table>
+                </div>
+
+
+            </div>
+            <div class="row ">
+                <div class="col-lg-6 mx-4">
+
                 </div>
 
             </div>
@@ -264,13 +329,15 @@
 </script>
 
 <script>
-    function fetchDashboard(bulan, tahun) {
+    function fetchDashboard(bulan, tahun, area = "") {
         $.ajax({
             url: "<?= base_url('chart/dashboardData') ?>",
             type: "GET",
             data: {
                 bulan: bulan,
-                tahun: tahun
+                tahun: tahun,
+
+                area: area
             },
             dataType: "json",
             success: function(response) {
@@ -279,13 +346,14 @@
         });
     }
 
-    function fetchData(bulan, tahun) {
+    function fetchData(bulan, tahun, area = "") {
         $.ajax({
             url: "<?= base_url('chart/getProductionData') ?>",
             type: "GET",
             data: {
                 bulan: bulan,
-                tahun: tahun
+                tahun: tahun,
+                area: area
             },
             dataType: "json",
             success: function(response) {
@@ -294,13 +362,30 @@
         });
     }
 
-    function fetchDataBs(bulan, tahun) {
+    function fetchBsMesin(bulan, tahun, area = "") {
+        $.ajax({
+            url: "<?= base_url('chart/getBsMesin') ?>",
+            type: "GET",
+            data: {
+                bulan: bulan,
+                tahun: tahun,
+                area: area
+            },
+            dataType: "json",
+            success: function(response) {
+                updateChartBsMesin(response);
+            }
+        });
+    }
+
+    function fetchDataBs(bulan, tahun, area = "") {
         $.ajax({
             url: "<?= base_url('chart/getBsData') ?>",
             type: "GET",
             data: {
                 bulan: bulan,
-                tahun: tahun
+                tahun: tahun,
+                area: area
             },
             dataType: "json",
             success: function(response) {
@@ -311,19 +396,26 @@
 
 
 
+
     function dashboard(data) {
         let deffect = parseFloat(data.deffect).toFixed(2); // Format 2 desimal
         let output = parseInt(data.output / 24).toLocaleString(); // Bagi 2, format angka
-        let pph = parseInt(data.pph).toLocaleString(); // Format angka
+        let pph = parseInt(data.targetOutput).toLocaleString(); // Format angka
         let qty = parseInt(data.qty).toLocaleString(); // Format angka
         let sisa = parseInt(data.sisa).toLocaleString(); // Format angka
         let prod = (parseInt(data.qty) - parseInt(data.sisa)) / 24; // Produksi yang selesai
         let percent = parseFloat(data.percentage).toFixed(2); // Gunakan `quality` karena `percentage` tidak ada di contoh data
         let qtyDz = parseInt(data.qty / 24).toLocaleString()
+        let productivity = data.productivity;
+        let planMc = data.planmc;
+        let targetday = parseInt(data.targetday).toLocaleString();
 
         document.getElementById('deffectRate').textContent = `${deffect}%`;
         document.getElementById('output').textContent = `${output} dz`;
-        document.getElementById('pph').textContent = `${pph} `;
+        document.getElementById('pph').textContent = `${pph} dz`;
+        document.getElementById('productivity').textContent = `${productivity} %`;
+        document.getElementById('planmc').textContent = `${planMc} mc`;
+        document.getElementById('targetday').textContent = `${targetday} dz`;
 
         let progres = document.getElementById("progresTarget"); // Gunakan string jika ini ID elemen
 
@@ -350,38 +442,27 @@
     }
 
 
-    function bsArea(bulan, tahun) {
-        $.ajax({
-            url: "<?= base_url('chart/bsArea') ?>",
-            type: "GET",
-            data: {
-                bulan: bulan,
-                tahun: tahun
-            },
-            dataType: "json",
-            success: function(response) {
-                chartBsArea(response);
-            }
-        });
-    }
     let chartInstanceBsArea = null;
-    let chartInstanceMixed = null;;
+    let chartInstanceMixed = null;
+    let chartBsMixed = null;
 
-    function chartBsArea(data) {
-        let labels = data.map(item => item.area);
-        let values = data.map(item => item.bs);
 
-        if (chartInstanceBsArea) {
-            chartInstanceBsArea.destroy();
+
+    function updateChart(data) {
+        let labels = data.map(item => item.tgl_produksi);
+        let values = data.map(item => (item.qty_produksi / 24).toFixed(0));
+
+        if (chartInstanceMixed) {
+            chartInstanceMixed.destroy();
         }
 
-        var ctx2 = document.getElementById("bs-area").getContext("2d");
-        chartInstanceBsArea = new Chart(ctx2, {
+        var ctx2 = document.getElementById("mixed-chart").getContext("2d");
+        chartInstanceMixed = new Chart(ctx2, {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: "Jumlah Deffect",
+                    label: "Jumlah Produksi",
                     backgroundColor: "#3A416F",
                     data: values,
                     maxBarThickness: 20
@@ -417,21 +498,21 @@
         });
     }
 
-    function updateChart(data) {
-        let labels = data.map(item => item.tgl_produksi);
-        let values = data.map(item => (item.qty_produksi / 24).toFixed(0));
+    function updateChartBsMesin(data) {
+        let labels = data.map(item => item.tanggal_produksi);
+        let values = data.map(item => (item.qty_gram / 1000).toFixed(0));
 
-        if (chartInstanceMixed) {
-            chartInstanceMixed.destroy();
+        if (chartBsMixed) {
+            chartBsMixed.destroy();
         }
 
-        var ctx2 = document.getElementById("mixed-chart").getContext("2d");
-        chartInstanceMixed = new Chart(ctx2, {
+        var ctx2 = document.getElementById("bsmesin-chart").getContext("2d");
+        chartBsMixed = new Chart(ctx2, {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: "Jumlah Produksi",
+                    label: "Jumlah bs(KG)",
                     backgroundColor: "#3A416F",
                     data: values,
                     maxBarThickness: 20
@@ -571,27 +652,24 @@
 
 
     // Event listener filter bulan & tahun
-    document.getElementById("filter-bulan").addEventListener("change", function() {
-        let bulan = this.value.padStart(2, "0"); // Pastikan selalu dua digit
-        let tahun = document.getElementById("filter-tahun").value;
-        fetchDashboard(bulan, tahun);
-        fetchData(bulan, tahun);
-        fetchDataBs(bulan, tahun);
-        bsArea(bulan, tahun);
+    // Event listener filter bulan, tahun, dan area (buyer cuma ditampilin)
+    document.getElementById("filter-bulan").addEventListener("change", handleFilterChange);
+    document.getElementById("filter-tahun").addEventListener("change", handleFilterChange);
+    document.getElementById("filter-area").addEventListener("change", handleFilterChange);
 
-    });
-
-    document.getElementById("filter-tahun").addEventListener("change", function() {
+    // Function untuk ambil semua filter & trigger fetch
+    function handleFilterChange() {
         let bulan = document.getElementById("filter-bulan").value.padStart(2, "0");
-        let tahun = this.value;
-        fetchDashboard(bulan, tahun);
-        fetchData(bulan, tahun);
-        fetchDataBs(bulan, tahun);
-        bsArea(bulan, tahun);
+        let tahun = document.getElementById("filter-tahun").value;
+        let area = document.getElementById("filter-area").value;
 
-    });
+        fetchDashboard(bulan, tahun, area);
+        fetchData(bulan, tahun, area);
+        fetchDataBs(bulan, tahun, area);
+        fetchBsMesin(bulan, tahun, area);
+    }
 
-    // Load awal dengan bulan & tahun sekarang
+    // Set default bulan & tahun saat halaman load
     let currentDate = new Date();
     let defaultBulan = String(currentDate.getMonth() + 1).padStart(2, "0");
     let defaultTahun = currentDate.getFullYear();
@@ -599,9 +677,7 @@
     document.getElementById("filter-bulan").value = defaultBulan;
     document.getElementById("filter-tahun").value = defaultTahun;
 
-    fetchDashboard(defaultBulan, defaultTahun);
-    fetchData(defaultBulan, defaultTahun);
-    fetchDataBs(defaultBulan, defaultTahun);
-    bsArea(defaultBulan, defaultTahun);
+    // Trigger pertama kali saat halaman load
+    handleFilterChange();
 </script>
 <?php $this->endSection(); ?>

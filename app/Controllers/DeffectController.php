@@ -13,6 +13,8 @@ use App\Models\ProduksiModel;
 use App\Models\LiburModel;
 use App\Models\DeffectModel;
 use App\Models\BsModel;
+use App\Models\BsMesinModel;
+
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Week;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -29,6 +31,7 @@ class DeffectController extends BaseController
     protected $liburModel;
     protected $deffectModel;
     protected $BsModel;
+    protected $BsMesinModel;
     protected $db;
 
 
@@ -44,6 +47,8 @@ class DeffectController extends BaseController
         $this->deffectModel = new DeffectModel();
         $this->liburModel = new LiburModel();
         $this->BsModel = new BsModel();
+        $this->BsMesinModel = new BsMesinModel();
+
         if ($this->filters   = ['role' => ['capaciity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -210,6 +215,29 @@ class DeffectController extends BaseController
         } else {
             // Jika $idaps kosong
             return redirect()->to(base_url(session()->get('role') . '/datadeffect'))->withInput()->with('error', 'Tidak ada data yang ditemukan untuk di-reset.');
+        }
+    }
+    public function getBsMesin()
+    {
+        $bulan = $this->request->getGet('bulan');
+        $tahun = $this->request->getGet('tahun');
+        $area  = $this->request->getGet('area');
+
+        if (!$bulan || !$tahun) {
+            return $this->response->setJSON(['error' => 'Bulan dan Tahun wajib diisi']);
+        }
+
+        try {
+            $filters = [
+                'bulan' => $bulan,
+                'tahun' => $tahun,
+                'area'  => $area
+            ];
+            $data = $this->BsMesinModel->getbsMesinDaily($filters);
+
+            return $this->response->setJSON($data);
+        } catch (\Exception $e) {
+            return $this->response->setJSON(['error' => $e->getMessage()]);
         }
     }
 }

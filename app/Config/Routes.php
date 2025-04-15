@@ -14,8 +14,8 @@ $routes->post('authverify', 'AuthController::login');
 // chart
 $routes->get('chart/getProductionData', 'ProduksiController::getProductionData');
 $routes->get('chart/getBsData', 'ProduksiController::getBsData');
+$routes->get('chart/getBsMesin', 'DeffectController::getBsMesin');
 $routes->get('chart/dashboardData', 'GodController::dashboardData');
-$routes->get('chart/bsArea', 'ProduksiController::BsArea');
 
 // API ROUTES
 $routes->group(
@@ -456,6 +456,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     // $routes->post('importproduksi', 'ProduksiController::importproduksi');
     $routes->post('importproduksi', 'ProduksiController::importproduksinew');
     $routes->post('importbssetting', 'ProduksiController::importbssetting');
+    $routes->post('importbsmesin', 'ProduksiController::importbsmc');
     $routes->get('viewModelPlusPacking/(:any)', 'ProduksiController::viewModelPlusPacking/$1');
     $routes->get('pluspacking', 'ProduksiController::pluspacking');
     $routes->post('inputpo', 'ProduksiController::updatepo');
@@ -518,6 +519,8 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     // retur
     $routes->get('retur/(:any)', 'ReturController::index/$1');
     $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
+    $routes->post('retur/(:any)/pengajuanRetur', 'ReturController::pengajuanRetur/$1');
+    $routes->get('getKategoriRetur', 'ReturController::getKategoriRetur');
 });
 
 // sudo
