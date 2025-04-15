@@ -7,7 +7,7 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',
-                    text: '<?= session()->getFlashdata('success') ?>',
+                    html: '<?= session()->getFlashdata('success') ?>',
                 });
             });
         </script>
@@ -19,11 +19,19 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: '<?= session()->getFlashdata('error') ?>',
+                    html: `<?= session()->getFlashdata('error') ?> <br>
+                <?php if (session()->getFlashdata('error_list')): ?>
+                    <ul style="text-align: left; padding-left: 20px;">
+                        <?php foreach (session()->getFlashdata('error_list') as $item): ?>
+                            <li><?= esc($item) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>`
                 });
             });
         </script>
     <?php endif; ?>
+
 
     <div class="row">
         <div class="row">
@@ -31,6 +39,7 @@
                 <div class="card pb-0">
                     <div class="card-header d-flex justify-content-between">
                         <h5>Input BS Mesin</h5>
+                        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#importBs">Import</button>
                     </div>
                     <div class="card-body">
                         <form id="bsMesinForm">
@@ -143,8 +152,6 @@
                 </div>
             </div>
         </div>
-
-
     </div>
 
     <div class="row mt-3">
@@ -257,6 +264,30 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="importBs" tabindex="-1" aria-labelledby="importBS" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Import BS MC</h5>
+                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="<?= base_url($role . '/importbsmesin'); ?>" method="POST" enctype="multipart/form-data">
+                <div class="modal-body px-4"> <!-- Tambahkan padding horizontal -->
+                    <div id="drop-area" class="border rounded d-flex flex-column justify-content-center align-items-center p-4" style="height: 200px; cursor: pointer;">
+                        <i class="fas fa-upload mb-3" style="font-size: 48px;"></i>
+                        <p style="font-size: 20px;" class="text-center">Upload file here</p>
+                        <input type="file" id="fileInput" name="excel_file" accept=".xls,.xlsx" class="form-control mt-3" style="max-width: 300px;">
+                    </div>
+                </div>
+                <div class="modal-footer px-4"> <!-- Tambahkan padding horizontal -->
+                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-gradient-info">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <!-- jQuery (Diperlukan oleh Select2) -->

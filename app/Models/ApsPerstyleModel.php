@@ -1014,4 +1014,12 @@ class ApsPerstyleModel extends Model
             ->groupBy('size')
             ->findAll();
     }
+    public function getSizes($nomodel, $inisial)
+    {
+        return $this->select('size')
+            ->where('mastermodel', $nomodel)
+            ->where('inisial', $inisial)
+            ->groupBy('size')
+            ->first();
+    }
 }
