@@ -37,9 +37,12 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="card pb-0">
-                    <div class="card-header d-flex justify-content-between">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <h5>Input BS Mesin</h5>
-                        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#importBs">Import</button>
+                        <div class="d-flex gap-2 ms-auto">
+                            <a href="http://172.23.44.14/CapacityApps/public/templateExcel/Template Form Input BS MC.xlsx" target="_blank" class="btn btn-success"><i class="fa fa-download"></i> Download Template</a>
+                            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#importBs">Import</button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <form id="bsMesinForm">
