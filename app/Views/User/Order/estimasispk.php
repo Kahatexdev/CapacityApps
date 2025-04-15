@@ -11,8 +11,8 @@
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
                                     Estimasi SPK 2 di Area <?= $area ?>
-                                </h5>
-                                <p> <Strong>Rumus Estimasi SPK :</Strong> <br>((bs + tambahan packing)/Produksi/100 ) * Qty PO
+                                </h5><br>
+                                <p> <Strong>Rumus Estimasi SPK :</Strong> <br>((bs + tambahan packing)/Produksi/100 ) * Qty PO</p>
                             </div>
                         </div>
                         <div>

@@ -267,6 +267,7 @@
                                             </td>
                                             <td>
                                                 <input type="number" class="form-control jalan-mc" name="items[${row}][jalan_mc]">
+                                                <input type="number" class="form-control qty" name="items[${row}][qty]">
                                             </td>
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-info add-row" id="addTable">
@@ -334,6 +335,7 @@
                                 </td>
                                 <td>
                                     <input type="number" class="form-control jalan-mc" name="items[${row}][jalan_mc]">
+                                    <input type="number" class="form-control qty" name="items[${row}][qty]">
                                 </td>
                                 <td class="text-center">
                                     <button type="button" class="btn btn-danger remove-row" id="addTable">
@@ -397,6 +399,7 @@
         $('#detailBbCardsContainer').on('change', '.style-size', function() {
             let selectedStyleSize = $(this).val(); // Ambil nilai Style Size yang dipilih
             let jalanMcInput = $(this).closest('tr').find('.jalan-mc'); // Cari input "Jalan MC" di baris yang sama
+            let qty = $(this).closest('tr').find('.qty'); // Cari input "Jalan MC" di baris yang sama
             let gw = $(this).closest('tr').find('.gw'); // Cari input "Jalan MC" di baris yang sama
             let inisial = $(this).closest('tr').find('.inisial'); // Cari input "Jalan MC" di baris yang sama
             let tgl_pakai = $('#tgl_pakai').val(); // Ambil nilai No Model
@@ -421,6 +424,7 @@
                 alert('Style Size sudah ada');
                 $(this).val(''); // Kosongkan dropdown Style Size
                 jalanMcInput.val(''); // Kosongkan input Jalan MC
+                qty.val(''); // Kosongkan input Jalan MC
                 gw.val(''); // Kosongkan input Jalan MC
                 inisial.val(''); // Kosongkan input Jalan MC
                 table.empty(); // Kosongkan tabel Material Usage
@@ -449,95 +453,114 @@
                     }
                 });
 
-                // Lakukan permintaan AJAX
                 $.ajax({
-                    url: '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + selectedStyleSize + '/' + area, // Ganti URL sesuai kebutuhan
-                    type: 'GET',
-                    dataType: 'json',
+                    url: '<?= base_url($role . '/getQty') ?>', // Ganti dengan URL endpoint Anda
+                    type: 'POST',
+                    data: {
+                        style_size: selectedStyleSize,
+                        no_model: noModel,
+                        area: area
+                    },
+                    dataType: "json",
                     success: function(response) {
-                        console.log(response); // Debug data yang diterima
+                        console.log(response)
 
-                        // Jika response berupa array dan kita hanya ingin data dari elemen pertama
-                        if (response && response.length > 0) {
-                            // Ambil data inisial dan gw dari elemen pertama
-                            let firstData = response[0];
-                            inisial.val(firstData.inisial);
-                            gw.val(firstData.gw);
-                        }
+                        qty.val(response.qty); // Isi input "Jalan MC" dengan data dari server
+                        // Lakukan permintaan AJAX
+                        $.ajax({
+                            url: '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + encodeURIComponent(selectedStyleSize) + '/' + area + '/' + qty.val(), // Ganti URL sesuai kebutuhan
+                            type: 'GET',
+                            dataType: 'json',
+                            success: function(response) {
+                                console.log(response); // Debug data yang diterima
 
-                        table.empty(); // Hapus isi tabel sebelumnya
+                                // Jika response berupa array dan kita hanya ingin data dari elemen pertama
+                                if (response && response.length > 0) {
+                                    // Ambil data inisial dan gw dari elemen pertama
+                                    let firstData = response[0];
+                                    inisial.val(firstData.inisial);
+                                    gw.val(firstData.gw);
+                                }
 
-                        // Iterasi data yang diterima dari API dan tambahkan ke tabel
-                        response.forEach(function(item, index) {
-                            const uniqueKey = `[${row}][${index}]`;
-                            const total = (item.qty_cns * item.qty_berat_cns).toFixed(2);
-                            const jalanMc = parseFloat(jalanMcInput.val()) || 0; // Ganti dengan input jalanMc yang sesuai
-                            const totalCones = (item.qty_cns * jalanMc).toFixed(2);
-                            const totalBeratCones = (total * jalanMc).toFixed(2);
+                                table.empty(); // Hapus isi tabel sebelumnya
 
-                            table.append(`
-                                <tr>
-                                    // kolom hide
-                                    <input type="hidden" class="form-control text-center" name="items[${row}][${index}][tgl_pakai]" id="tgl_pakai" value="${tgl_pakai}" readonly>
-                                    <input type="hidden" class="form-control text-center" name="items[${row}][${index}][no_model]" id="no_model" value="${noModel}" readonly>
-                                    <input type="hidden" class="form-control text-center" name="items[${row}][${index}][style_size]" id="style_size" value="${selectedStyleSize}" readonly>
-                                    <input type="hidden" class="form-control text-center" name="items[${row}][${index}][id_material]" id="id_material" value="${item.id_material}" readonly>
-                                    <input type="hidden" class="form-control text-center jalan_mc" name="items[${row}][${index}][jalan_mc]" id="jalan_mc" value="${jalanMc}" readonly>
-                                    // 
-                                    <td width=20><input type="text" class="form-control text-center" name="items[${row}][${index}][no]" id="no" value="${index + 1}" readonly></td>
-                                    <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][komposisi]" id="komposisi" value="${item.composition}" readonly></td>
-                                    <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][loss]" id="loss" value="${item.loss}" readonly></td>
-                                    <td width=120><input type="text" class="form-control text-center" name="items[${row}][${index}][ttl_keb]" id="ttl_keb" value="${item.kgs}" readonly></td>
-                                    <td><input type="text" class="form-control text-center" name="items[${row}][${index}][item_type]" id="item_type" value="${item.item_type}" readonly></td>
-                                    <td><input type="text" class="form-control text-center" name="items[${row}][${index}][kode_warna]" id="kode_warna" value="${item.kode_warna}" readonly></td>
-                                    <td><input type="text" class="form-control text-center" name="items[${row}][${index}][warna]" id="warna" value="${item.color}" readonly></td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td class="text-center">
-                                        Qty Cones:
-                                        <input type="number" class="form-control text-center qty_cns" name="items[${row}][${index}][qty_cns]" id="qty_cns" value="${item.qty_cns}" required>    
-                                    </td>
-                                    <td class="text-center">
-                                        Berat Cones:
-                                        <input type="number" step="0.01" class="form-control text-center qty_berat_cns" name="items[${row}][${index}][qty_berat_cns]" id="qty_berat_cns" value="${item.qty_berat_cns}" required>
-                                    </td>
-                                    <td class="text-center">
-                                        Total:
-                                        <input type="number" step="0.01" class="form-control text-center ttl" name="items[${row}][${index}][ttl]" id="ttl" value="${total}" readonly>
-                                    </td>
-                                    <td class="text-center">
-                                        Total Cones:
-                                        <input type="number" step="0.01" class="form-control text-center ttl_cns" name="items[${row}][${index}][ttl_cns]" id="ttl_cns" value="${totalCones}" readonly>
-                                    </td>
-                                    <td class="text-center">
-                                        Total Berat Cones:
-                                        <input type="number" step="0.01" class="form-control text-center ttl_berat_cns" name="items[${row}][${index}][ttl_berat_cns]" id="ttl_berat_cns" value="${totalBeratCones}" readonly>
-                                    </td>
-                                    <td></td>
-                                </tr>
-                            `);
-                        });
-                        // Tambahkan event listener untuk perhitungan otomatis
-                        table.on('input', '.qty_cns, .qty_berat_cns, .ttl_berat_cns', function() {
-                            const row = $(this).closest('tr');
-                            const qty = parseFloat(row.find('.qty_cns').val());
-                            const berat = parseFloat(row.find('.qty_berat_cns').val());
-                            const total = qty * berat;
-                            row.find('.ttl').val(total.toFixed(2));
+                                // Iterasi data yang diterima dari API dan tambahkan ke tabel
+                                Object.values(response).forEach(function(item, index) {
+                                    const uniqueKey = `[${row}][${index}]`;
+                                    const total = (item.qty_cns * item.qty_berat_cns).toFixed(2);
+                                    const jalanMc = parseFloat(jalanMcInput.val()) || 0; // Ganti dengan input jalanMc yang sesuai
+                                    const totalCones = (item.qty_cns * jalanMc).toFixed(2);
+                                    const totalBeratCones = (total * jalanMc).toFixed(2);
+                                    console.log(qty);
 
-                            //Total Cones
-                            const jalanMc = parseFloat(jalanMcInput.val());
-                            const ttlCns = qty * jalanMc;
-                            row.find('.ttl_cns').val(ttlCns);
+                                    table.append(`
+                                        <tr>
+                                            // kolom hide
+                                            <input type="hidden" class="form-control text-center" name="items[${row}][${index}][tgl_pakai]" id="tgl_pakai" value="${tgl_pakai}" readonly>
+                                            <input type="hidden" class="form-control text-center" name="items[${row}][${index}][no_model]" id="no_model" value="${noModel}" readonly>
+                                            <input type="hidden" class="form-control text-center" name="items[${row}][${index}][style_size]" id="style_size" value="${selectedStyleSize}" readonly>
+                                            <input type="hidden" class="form-control text-center" name="items[${row}][${index}][id_material]" id="id_material" value="${item.id_material}" readonly>
+                                            <input type="hidden" class="form-control text-center jalan_mc" name="items[${row}][${index}][jalan_mc]" id="jalan_mc" value="${jalanMc}" readonly>
+                                            // 
+                                            <td width=20><input type="text" class="form-control text-center" name="items[${row}][${index}][no]" id="no" value="${index + 1}" readonly></td>
+                                            <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][komposisi]" id="komposisi" value="${item.composition}" readonly></td>
+                                            <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][loss]" id="loss" value="${item.loss}" readonly></td>
+                                            <td width=120><input type="text" class="form-control text-center" name="items[${row}][${index}][ttl_keb]" id="ttl_keb" value="${item.ttl_keb}" readonly></td>
+                                            <td><input type="text" class="form-control text-center" name="items[${row}][${index}][item_type]" id="item_type" value="${item.item_type}" readonly></td>
+                                            <td><input type="text" class="form-control text-center" name="items[${row}][${index}][kode_warna]" id="kode_warna" value="${item.kode_warna}" readonly></td>
+                                            <td><input type="text" class="form-control text-center" name="items[${row}][${index}][warna]" id="warna" value="${item.color}" readonly></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td class="text-center">
+                                                Qty Cones:
+                                                <input type="number" class="form-control text-center qty_cns" name="items[${row}][${index}][qty_cns]" id="qty_cns" value="${item.qty_cns}" required>    
+                                            </td>
+                                            <td class="text-center">
+                                                Berat Cones:
+                                                <input type="number" step="0.01" class="form-control text-center qty_berat_cns" name="items[${row}][${index}][qty_berat_cns]" id="qty_berat_cns" value="${item.qty_berat_cns}" required>
+                                            </td>
+                                            <td class="text-center">
+                                                Total:
+                                                <input type="number" step="0.01" class="form-control text-center ttl" name="items[${row}][${index}][ttl]" id="ttl" value="${total}" readonly>
+                                            </td>
+                                            <td class="text-center">
+                                                Total Cones:
+                                                <input type="number" step="0.01" class="form-control text-center ttl_cns" name="items[${row}][${index}][ttl_cns]" id="ttl_cns" value="${totalCones}" readonly>
+                                            </td>
+                                            <td class="text-center">
+                                                Total Berat Cones:
+                                                <input type="number" step="0.01" class="form-control text-center ttl_berat_cns" name="items[${row}][${index}][ttl_berat_cns]" id="ttl_berat_cns" value="${totalBeratCones}" readonly>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    `);
+                                });
+                                // Tambahkan event listener untuk perhitungan otomatis
+                                table.on('input', '.qty_cns, .qty_berat_cns, .ttl_berat_cns', function() {
+                                    const row = $(this).closest('tr');
+                                    const qty = parseFloat(row.find('.qty_cns').val());
+                                    const berat = parseFloat(row.find('.qty_berat_cns').val());
+                                    const total = qty * berat;
+                                    row.find('.ttl').val(total.toFixed(2));
 
-                            //Total Berat Cones
-                            const totalBeratCns = total * jalanMc;
-                            row.find('.ttl_berat_cns').val(totalBeratCns.toFixed(2));
+                                    //Total Cones
+                                    const jalanMc = parseFloat(jalanMcInput.val());
+                                    const ttlCns = qty * jalanMc;
+                                    row.find('.ttl_cns').val(ttlCns);
+
+                                    //Total Berat Cones
+                                    const totalBeratCns = total * jalanMc;
+                                    row.find('.ttl_berat_cns').val(totalBeratCns.toFixed(2));
+                                });
+                            },
+                            error: function() {
+                                alert('Gagal mengambil data Material Usage.');
+                            }
                         });
                     },
                     error: function() {
-                        alert('Gagal mengambil data Material Usage.');
+                        alert('Gagal mengambil data Jalan MC! Silakan coba lagi.');
                     }
                 });
             } else {
@@ -550,6 +573,7 @@
             e.preventDefault();
             $('.style-size').removeAttr('name');
             $('.jalan-mc').removeAttr('name');
+            $('.qty').removeAttr('name');
             $('.gw').removeAttr('name');
             $('.inisial').removeAttr('name');
             // Periksa apakah tabel Material Usage kosong

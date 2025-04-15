@@ -14,8 +14,8 @@ $routes->post('authverify', 'AuthController::login');
 // chart
 $routes->get('chart/getProductionData', 'ProduksiController::getProductionData');
 $routes->get('chart/getBsData', 'ProduksiController::getBsData');
+$routes->get('chart/getBsMesin', 'DeffectController::getBsMesin');
 $routes->get('chart/dashboardData', 'GodController::dashboardData');
-$routes->get('chart/bsArea', 'ProduksiController::BsArea');
 
 // API ROUTES
 $routes->group(
@@ -495,7 +495,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
     $routes->post('getStyleSizeByNoModel', 'MaterialController::getStyleSizeByNoModel');
     $routes->post('getJalanMc', 'MaterialController::getJalanMcByModelSize');
-    $routes->get('getMU/(:any)/(:any)/(:any)', 'MaterialController::getMU/$1/$2/$3');
+    $routes->get('getMU/(:any)/(:any)/(:any)/(:any)', 'MaterialController::getMU/$1/$2/$3/$4');
     $routes->post('bahanBaku/simpanKeSession', 'MaterialController::savePemesananSession');
     $routes->get('bahanBaku/hapusSession', 'MaterialController::deleteAllPemesananSession');
     $routes->get('bahanBaku/hapusSession/(:any)/(:any)', 'MaterialController::deletePemesananSession/$1/$2');
@@ -514,6 +514,12 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('excelPPHDays/(:any)/(:any)', 'ExcelPPHController::excelPPHDays/$1/$2');
     $routes->post('requestAdditionalTime', 'MaterialController::requestAdditionalTime');
     $routes->post('requestAdditionalTime/getTanggalPakai', 'MaterialController::getTanggalPakai');
+    $routes->post('getQty', 'MaterialController::getQtyByModelSize');
+
+    // retur
+    $routes->get('retur/(:any)', 'ReturController::index/$1');
+    $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
+    $routes->post('retur/(:any)/pengajuanRetur', 'ReturController::pengajuanRetur/$1');
 });
 
 // sudo
