@@ -57,6 +57,19 @@ class UserController extends BaseController
     }
     public function index()
     {
+        $area = $this->jarumModel->getArea();
+        $role = session()->get('role');
+        $bulan = date('m');
+        $month = date('F');
+        $year = date('Y');
+        $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan, $year);
+        $totalMesin = $this->jarumModel->getArea();
+        $model = $this->ApsPerstyleModel->getPdkProduksi();
+
+
+        $dataBuyer = $this->orderModel->getBuyer();
+        $dataArea = $this->jarumModel->getArea();
+        $dataJarum = $this->jarumModel->getJarum();
         $data = [
             'role' => session()->get('role'),
             'title' => 'Dashboard',
@@ -65,7 +78,13 @@ class UserController extends BaseController
             'active3' => '',
             'targetProd' => 0,
             'produksiBulan' => 0,
-            'produksiHari' => 0
+            'produksiHari' => 0,
+            'area' => $area,
+            'bulan' => $month,
+            'buyer' => $dataBuyer,
+            'area' => $dataArea,
+            'jarum' => $dataJarum,
+            'models' => $model,
 
         ];
         return view(session()->get('role') . '/index', $data);

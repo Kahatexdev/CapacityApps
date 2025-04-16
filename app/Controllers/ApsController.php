@@ -132,7 +132,7 @@ class ApsController extends BaseController
         $mcJalan = $this->jarumModel->mcJalan();
         $totalMc = $this->jarumModel->totalMc();
         $bulan = date('m');
-        $area = session()->get('username');
+        $area = $this->jarumModel->getArea();
         $data = [
             'role' => session()->get('role'),
             'title' => 'Capacity System',
