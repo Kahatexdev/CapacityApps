@@ -475,7 +475,7 @@ class ApsPerstyleModel extends Model
     }
     public function getIdForBs($validate)
     {
-        $data = $this->select('idapsperstyle, delivery, sisa,qty')
+        $builder = $this->select('idapsperstyle, delivery, sisa,qty')
             ->where('mastermodel', $validate['no_model'])
             ->where('size', $validate['style'])
             ->where('factory', $validate['area'])
@@ -483,7 +483,7 @@ class ApsPerstyleModel extends Model
             ->orderBy('sisa', 'ASC') // Mengurutkan berdasarkan 'sisa' dari yang terkecil
             ->first(); // Mengambil data pertama (yang terkecil)
 
-        return $data;
+        return $builder;
     }
     public function getStyle($pdk)
     {
@@ -974,13 +974,18 @@ class ApsPerstyleModel extends Model
     }
     public function getIdApsForPph($area, $no_model, $size)
     {
-        return $this->select('idapsperstyle')
-            ->where('factory', $area)
+        $builder = $this->select('idapsperstyle')
             ->where('mastermodel', $no_model)
-            ->where('size', $size)
-            ->groupBy('idapsperstyle')
+            ->where('size', $size);
+
+        if (!empty($area)) {
+            $builder->where('factory', $area);
+        }
+
+        return $builder->groupBy('idapsperstyle')
             ->findAll();
     }
+
     public function monthlyTarget($filters)
     {
         $builder = $this->select('SUM(qty) as qty, SUM(sisa) as sisa')

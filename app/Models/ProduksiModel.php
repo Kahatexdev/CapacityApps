@@ -386,4 +386,24 @@ class ProduksiModel extends Model
 
         return $builder->first(); // hasilnya ['hari' => jumlah_hari]
     }
+    public function dailyProductivity($filters)
+    {
+        $builder = $this->select(' produksi.tgl_produksi, apsperstyle.mastermodel, apsperstyle.size,SUM(qty_produksi) as prod')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle');
+
+        if (!empty($filters['bulan'])) {
+            $builder->where('MONTH(tgl_produksi)', $filters['bulan']);
+        }
+
+        if (!empty($filters['tahun'])) {
+            $builder->where('YEAR(tgl_produksi)', $filters['tahun']);
+        }
+
+        if (!empty($filters['area'])) {
+            $builder->where('area', $filters['area']);
+        }
+
+        return $builder->groupBy('produksi.idapsperstyle, produksi.tgl_produksi')
+            ->groupBy('apsperstyle.size')->findAll();
+    }
 }
