@@ -411,7 +411,7 @@ class MaterialController extends BaseController
     }
     public function listPemesanan($area)
     {
-        $apiUrl = 'http://172.23.39.118/MaterialSystem/public/api/listPemesanan/' . $area;
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/listPemesanan/' . $area;
         $response = file_get_contents($apiUrl);  // Mendapatkan response dari API
         if ($response === FALSE) {
             die('Error occurred while fetching data.');

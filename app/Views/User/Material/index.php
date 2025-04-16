@@ -267,7 +267,7 @@
                                             </td>
                                             <td>
                                                 <input type="number" class="form-control jalan-mc" name="items[${row}][jalan_mc]">
-                                                <input type="number" class="form-control qty" name="items[${row}][qty]">
+                                                <input type="hidden" class="form-control qty" name="items[${row}][qty]">
                                             </td>
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-info add-row" id="addTable">

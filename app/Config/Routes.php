@@ -16,6 +16,7 @@ $routes->get('chart/getProductionData', 'ProduksiController::getProductionData')
 $routes->get('chart/getBsData', 'ProduksiController::getBsData');
 $routes->get('chart/getBsMesin', 'DeffectController::getBsMesin');
 $routes->get('chart/dashboardData', 'GodController::dashboardData');
+$routes->get('chart/getDailyProd', 'GodController::getDailyProd');
 
 // API ROUTES
 $routes->group(
@@ -520,6 +521,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('retur/(:any)', 'ReturController::index/$1');
     $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
     $routes->post('retur/(:any)/pengajuanRetur', 'ReturController::pengajuanRetur/$1');
+    $routes->get('getKategoriRetur', 'ReturController::getKategoriRetur');
 });
 
 // sudo

@@ -151,7 +151,9 @@
                         </div>
                         <div class="col-4 text-end">
                             <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-check-bold text-lg opacity-10" aria-hidden="true"></i>
+                                <i class="fas fa-bullseye text-lg opacity-10" aria-hidden="true"></i>
+
+
                             </div>
                         </div>
                     </div>
@@ -172,7 +174,7 @@
                         </div>
                         <div class="col-4 text-end">
                             <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-check-bold text-lg opacity-10" aria-hidden="true"></i>
+                                <i class="fas fa-cogs text-lg opacity-10" aria-hidden="true"></i>
                             </div>
                         </div>
                     </div>
@@ -193,7 +195,7 @@
                         </div>
                         <div class="col-4 text-end">
                             <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-check-bold text-lg opacity-10" aria-hidden="true"></i>
+                                <i class="fas fa-bullseye text-lg opacity-10" aria-hidden="true"></i>
                             </div>
                         </div>
                     </div>
@@ -301,8 +303,42 @@
 
             </div>
         </div>
+
     </div>
 
+    <div class="row my-3 mx-2">
+        <div class="card">
+            <div class="card-header">
+                <h5>
+                    Productivity Daily
+                </h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr class="text-center">
+                            <th rowspan="2">Tanggal</th>
+                            <th rowspan="2">Target (dz)</th>
+                            <th rowspan="2">Productivity (%)</th>
+                            <th rowspan="2">Deffect Rate(%)</th>
+                            <th colspan="2">Produksi</th>
+                            <th colspan="2">Deffect</th>
+                        </tr>
+                        <tr class="text-center">
+                            <th>dz</th>
+                            <th>kg</th>
+                            <th>Mesin (kg)</th>
+                            <th>Setting (kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prodDetails">
+
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
 
 
 </div>
@@ -390,6 +426,22 @@
             dataType: "json",
             success: function(response) {
                 updateBs(response);
+            }
+        });
+    }
+
+    function fetchDailyProd(bulan, tahun, area = "") {
+        $.ajax({
+            url: "<?= base_url('chart/getDailyProd') ?>",
+            type: "GET",
+            data: {
+                bulan: bulan,
+                tahun: tahun,
+                area: area
+            },
+            dataType: "json",
+            success: function(response) {
+                dailyProd(response);
             }
         });
     }
@@ -649,6 +701,34 @@
         });
     }
 
+    function dailyProd(response) {
+        const tbody = document.getElementById("prodDetails");
+        tbody.innerHTML = ""; // Kosongkan dulu isinya
+
+        if (!response || response.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='8' class='text-center'>Tidak ada data</td></tr>";
+            return;
+        }
+
+        response.forEach(row => {
+            const tr = document.createElement("tr");
+            tr.classList.add("text-center");
+
+            tr.innerHTML = `
+            <td>${row.tanggal || "-"}</td>
+            <td>${(row.target ?? 0).toLocaleString()}</td>
+            <td>${(row.productivity ?? 0).toFixed(2)}</td>
+            <td>${(row.deffectRate ?? 0).toFixed(2)}</td>
+            <td>${(row.prodTotal ?? 0).toLocaleString()}</td>
+            <td>${(row.prodGr ?? 0).toLocaleString()}</td>
+            <td>${(row.bsmesin ?? 0).toLocaleString()}</td>
+            <td>${(row.bsSetting ?? 0).toLocaleString()}</td>
+        `;
+
+            tbody.appendChild(tr);
+        });
+    }
+
 
 
     // Event listener filter bulan & tahun
@@ -667,6 +747,7 @@
         fetchData(bulan, tahun, area);
         fetchDataBs(bulan, tahun, area);
         fetchBsMesin(bulan, tahun, area);
+        fetchDailyProd(bulan, tahun, area);
     }
 
     // Set default bulan & tahun saat halaman load
