@@ -1053,6 +1053,9 @@ class GodController extends BaseController
             }
 
             $prodYesterday = $this->produksiModel->monthlyProd($filters);
+            // $totalProd = $this->produksiModel->totalProdBulan($filters);
+            // return $this->response->setJSON($totalProd);
+
             $bs = $this->BsModel->bsMonthly($filters);
             $bsMesin = $this->BsMesinModel->getTotalKgMonth($filters) ?? 0;
             $direct = $this->produksiModel->directMonthly($filters);
@@ -1087,6 +1090,7 @@ class GodController extends BaseController
             $gwData = json_decode($response, true);
 
             // Index ulang hasil bulk berdasarkan 'model_size' key
+
             $gwMap = [];
             foreach ($gwData as $item) {
                 $key = $item['model'] . '_' . $item['size'];
@@ -1111,7 +1115,6 @@ class GodController extends BaseController
                 $bsQty = (int)$bsyes['bs'];
                 $bsGw = $gw * $bsQty;
 
-                $prodTotal += $prodQty;
                 $bsGr += $bsGw;
             }
 
