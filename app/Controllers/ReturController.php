@@ -84,7 +84,7 @@ class ReturController extends BaseController
     public function index($area)
     {
         // $api = \Config\Services::curlrequest();
-        // $response = $api->get('http://172.23.39.117/MaterialSystem/public/api/getPengirimanArea');
+        // $response = $api->get('http://172.23.44.14/MaterialSystem/public/api/getPengirimanArea');
         // dd ($response->getBody());
         $data = [
             'role' => session()->get('role'),
@@ -109,7 +109,7 @@ class ReturController extends BaseController
 
         // URL API
         $apiUrlPph = 'http://172.23.44.14/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
-        $apiUrlPengiriman = 'http://172.23.39.117/MaterialSystem/public/api/getPengirimanArea?noModel=' . urlencode($noModel);
+        $apiUrlPengiriman = 'http://172.23.44.14/MaterialSystem/public/api/getPengirimanArea?noModel=' . urlencode($noModel);
 
         // Ambil data dari API PPH
         $responsePph = file_get_contents($apiUrlPph);
@@ -288,7 +288,7 @@ class ReturController extends BaseController
     public function getKategoriRetur()
     {
         // get data kategori retur dari API
-        $url = 'http://172.23.39.117/MaterialSystem/public/api/getKategoriRetur';
+        $url = 'http://172.23.44.14/MaterialSystem/public/api/getKategoriRetur';
         $response = file_get_contents($url);
         log_message('debug', "API Response: " . $response);
         if ($response === FALSE) {
@@ -341,7 +341,7 @@ class ReturController extends BaseController
                 try {
                     // Kirim ke API
                     $response = $client->post(
-                        'http://172.23.39.117/MaterialSystem/public/api/saveRetur',
+                        'http://172.23.44.14/MaterialSystem/public/api/saveRetur',
                         [
                             'headers' => [
                                 'Accept' => 'application/json',
