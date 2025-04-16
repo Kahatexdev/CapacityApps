@@ -77,6 +77,8 @@ class PlanningController extends BaseController
         $bulan = date('m');
         $totalMesin = $this->jarumModel->getJalanMesinPerArea();
         $jarum = $this->jarumModel->jarumPerArea();
+        $area = $this->jarumModel->getArea();
+
         $data = [
             'role' => session()->get('role'),
             'title' => 'Capacity System',
@@ -93,7 +95,9 @@ class PlanningController extends BaseController
             'totalMc' => $totalMc,
             'Area' => $totalMesin,
             'order' => $this->ApsPerstyleModel->getTurunOrder($bulan),
-            'jarum' => $jarum
+            'jarum' => $jarum,
+            'area' => $area,
+
         ];
         return view(session()->get('role') . '/index', $data);
     }

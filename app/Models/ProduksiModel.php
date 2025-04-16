@@ -311,23 +311,24 @@ class ProduksiModel extends Model
     }
     public function monthlyProd($filters)
     {
-        $builder = $this->select(' apsperstyle.mastermodel, apsperstyle.size,SUM(qty_produksi) as prod')
-            ->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle');
+        $builder = $this->db->table('produksi');
+        $builder->select('produksi.idapsperstyle, apsperstyle.mastermodel, apsperstyle.size, SUM(produksi.qty_produksi) as prod');
+        $builder->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle', 'left');
 
         if (!empty($filters['bulan'])) {
-            $builder->where('MONTH(tgl_produksi)', $filters['bulan']);
+            $builder->where('MONTH(produksi.tgl_produksi)', $filters['bulan']);
         }
 
         if (!empty($filters['tahun'])) {
-            $builder->where('YEAR(tgl_produksi)', $filters['tahun']);
+            $builder->where('YEAR(produksi.tgl_produksi)', $filters['tahun']);
         }
 
         if (!empty($filters['area'])) {
-            $builder->where('area', $filters['area']);
+            $builder->where('produksi.area', $filters['area']);
         }
 
-        return $builder->groupBy('produksi.idapsperstyle')
-            ->groupBy('apsperstyle.size')->findAll();
+        // Pastikan group by hanya model & size untuk aggr per style
+        return $builder->groupBy(['produksi.idapsperstyle', 'apsperstyle.mastermodel', 'apsperstyle.size'])->get()->getResultArray();
     }
 
     public function directMonthly($filters)
@@ -405,5 +406,29 @@ class ProduksiModel extends Model
 
         return $builder->groupBy('produksi.idapsperstyle, produksi.tgl_produksi')
             ->groupBy('apsperstyle.size')->findAll();
+    }
+    public function totalProdBulan($filters)
+    {
+        $builder = $this->select('SUM(qty_produksi) as prod');
+
+        if (!empty($filters['bulan'])) {
+            $builder->where('MONTH(tgl_produksi)', $filters['bulan']);
+        }
+
+        if (!empty($filters['tahun'])) {
+            $builder->where('YEAR(tgl_produksi)', $filters['tahun']);
+        }
+
+        if (!empty($filters['area'])) {
+            $builder->where('area', $filters['area']);
+        }
+
+        // Ambil hasil query, pastikan ambil baris pertama
+        $result = $builder->findAll();
+
+        // Akses nilai 'prod' dari baris pertama
+        $prod = isset($result[0]['prod']) ? $result[0]['prod'] : 0; // Default ke 0 jika null
+
+        return $prod;
     }
 }

@@ -26,113 +26,568 @@
     <?php endif; ?>
     <div class="row my-4">
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-8">
+            <div class="card card-fixed-height">
+                <div class="card-header p-2"> <!-- Kurangi padding -->
+                    <div class="row d-flex align-items-center justify-content-between">
+                        <!-- Bagian Title -->
+                        <div class="col-auto">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    Analytical Dashboard
-                                </h5>
+                                <h5 class="font-weight-bolder mb-0">Data Produksi Per Area</h5>
+                            </div>
+                            <div class="my-2">
+                                Filters:
+
+                                <select id="filter-area" class="form-control d-inline w-auto">
+                                    <option value="">Semua Area</option>
+                                    <?php foreach ($area as $ar): ?>
+                                        <option value="<?= $ar ?>"><?= $ar ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <select id="filter-bulan" class="form-control d-inline w-auto">
+                                    <option value="">Semua Bulan</option>
+                                    <?php for ($i = 1; $i <= 12; $i++): ?>
+                                        <option value="<?= str_pad($i, 2, '0', STR_PAD_LEFT) ?>"><?= date("F", mktime(0, 0, 0, $i, 1)) ?></option>
+                                    <?php endfor; ?>
+                                </select>
+                                <select id="filter-tahun" class="form-control d-inline w-auto">
+                                    <option value="">Semua Tahun</option>
+                                    <?php for ($i = date("Y") - 5; $i <= date("Y"); $i++): ?>
+                                        <option value="<?= $i ?>"><?= $i ?></option>
+                                    <?php endfor; ?>
+                                </select>
                             </div>
                         </div>
-                        <div class="col-4 text-end">
-                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-chart-bar-32 text-lg opacity-10" aria-hidden="true"></i>
+
+                        <!-- Bagian Tombol -->
+                        <div class="col-auto d-flex align-items-center">
+
+                            <div class="btn-group me-2">
+                                <a class="btn btn-info btn-sm mx-2" href="<?= base_url($role . '/produksi') ?>">Import</a>
+                                <a class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#inputProduksi">Input Manual</a>
+                            </div>
+
+                            <!-- Dropdown Summary -->
+                            <div class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle text-body font-weight-bold" id="navbarDropdownReports" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+
+                                    <span class="d-lg-inline-block d-none ms-1 btn btn-info"> <i class="fas fa-file-alt"></i> Summary</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#summaryPertgl">Produksi Pertanggal</a></li>
+                                    <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#summaryTOD">Produksi Global</a></li>
+                                    <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#timter">Timter</a></li>
+                                </ul>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
+        </div>
 
+    </div>
+
+    <!-- modal summary produksi pertanggal -->
+    <div class="modal fade" id="summaryPertgl" tabindex="-1" role="dialog" aria-labelledby="summaryPerTgl" aria-hidden="true">
+        <div class="modal-dialog " role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Summary Produksi Per Tanggal</h5>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <form action="<?= base_url($role . '/summaryProdPerTanggal'); ?>" method="POST">
+                    <div class="modal-body align-items-center">
+                        <div class="form-group">
+                            <label for="buyer" class="col-form-label">Buyer</label>
+                            <select class="form-control" id="buyer" name="buyer">
+                                <option></option>
+                                <?php foreach ($buyer as $buy) : ?>
+                                    <option><?= $buy['kd_buyer_order'] ?></option>
+                                <?php endforeach ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="area" class="col-form-label">Area</label>
+                            <select class="form-control" id="area" name="area">
+                                <option></option>
+                                <?php foreach ($area as $ar) : ?>
+                                    <option><?= $ar ?></option>
+                                <?php endforeach ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="jarum" class="col-form-label">Jarum</label>
+                            <select class="form-control" id="jarum" name="jarum">
+                                <option></option>
+                                <option value="13">13</option>
+                                <option value="84">84</option>
+                                <option value="92">92</option>
+                                <option value="96">96</option>
+                                <option value="106">106</option>
+                                <option value="108">108</option>
+                                <option value="116">116</option>
+                                <option value="120">120</option>
+                                <option value="124">124</option>
+                                <option value="126">126</option>
+                                <option value="144">144</option>
+                                <option value="168">168</option>
+                                <option value="240">240</option>
+                                <option value="POM-POM">POM-POM</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="pdk" class="col-form-label">No Model</label>
+                            <input type="text" class="form-control" name="pdk">
+                        </div>
+                        <div class="form-group">
+                            <label for="awal" class="col-form-label">Dari</label>
+                            <input type="date" class="form-control" name="awal">
+                        </div>
+                        <div class="form-group">
+                            <label for="akhir" class="col-form-label">Sampai</label>
+                            <input type="date" class="form-control" name="akhir">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-info">Generate</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-    <div class="row">
+    <!-- modal summary produksi -->
+    <div class="modal fade" id="summaryTOD" tabindex="-1" role="dialog" aria-labelledby="summaryTOD" aria-hidden="true">
+        <div class="modal-dialog " role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Summary Produksi</h5>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <form action="<?= base_url($role . '/summaryproduksi'); ?>" method="POST">
+                    <div class="modal-body align-items-center">
+                        <div class="form-group">
+                            <label for="buyer" class="col-form-label">Buyer</label>
+                            <select class="form-control" id="buyer" name="buyer">
+                                <option></option>
+                                <?php foreach ($buyer as $buy) : ?>
+                                    <option><?= $buy['kd_buyer_order'] ?></option>
+                                <?php endforeach ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="area" class="col-form-label">Area</label>
+                            <select class="form-control" id="area" name="area">
+                                <option></option>
+                                <?php foreach ($area as $ar) : ?>
+                                    <option><?= $ar ?></option>
+                                <?php endforeach ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="jarum" class="col-form-label">Jarum</label>
+                            <select class="form-control" id="jarum" name="jarum">
+                                <option></option>
+                                <option value="13">13</option>
+                                <option value="84">84</option>
+                                <option value="92">92</option>
+                                <option value="96">96</option>
+                                <option value="106">106</option>
+                                <option value="108">108</option>
+                                <option value="116">116</option>
+                                <option value="120">120</option>
+                                <option value="124">124</option>
+                                <option value="126">126</option>
+                                <option value="144">144</option>
+                                <option value="168">168</option>
+                                <option value="240">240</option>
+                                <option value="POM-POM">POM-POM</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="pdk" class="col-form-label">No Model</label>
+                            <input type="text" class="form-control" name="pdk">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-info">Generate</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- modal timter produksi -->
+    <div class="modal fade" id="timter" tabindex="-1" role="dialog" aria-labelledby="timter" aria-hidden="true">
+        <div class="modal-dialog " role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Timter Produksi</h5>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <form action="<?= base_url($role . '/timterProduksi'); ?>" method="POST">
+                    <div class="modal-body align-items-center">
+                        <div class="form-group">
+                            <label for="area" class="col-form-label">Area</label>
+                            <select class="form-control" id="area" name="area" required>
+                                <option></option>
+                                <?php foreach ($area as $ar) : ?>
+                                    <option><?= $ar ?></option>
+                                <?php endforeach ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="jarum" class="col-form-label">Jarum</label>
+                            <select class="form-control" id="jarum" name="jarum" required>
+                                <option></option>
+                                <option value="13">13</option>
+                                <option value="84">84</option>
+                                <option value="92">92</option>
+                                <option value="96">96</option>
+                                <option value="106">106</option>
+                                <option value="108">108</option>
+                                <option value="116">116</option>
+                                <option value="120">120</option>
+                                <option value="124">124</option>
+                                <option value="126">126</option>
+                                <option value="144">144</option>
+                                <option value="168">168</option>
+                                <option value="240">240</option>
+                                <option value="POM-POM">POM-POM</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="pdk" class="col-form-label">No Model</label>
+                            <input type="text" class="form-control" name="pdk">
+                        </div>
+                        <div class="form-group">
+                            <label for="awal" class="col-form-label">Tanggal Produksi</label>
+                            <input type="date" class="form-control" name="awal" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-info">Generate</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="reset" tabindex="-1" role="dialog" aria-labelledby="reset" aria-hidden="true">
+        <div class="modal-dialog " role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Reset Produksi</h5>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body align-items-center">
+                    <form action="<?= base_url($role . '/resetproduksi'); ?>" method="post">
+                        <div class="form-group">
+                            <label for="awal">PDK</label>
+                            <input type="text" class="form-control" name="pdk">
+                        </div>
 
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-gradient-info">Reset</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="resetarea" tabindex="-1" role="dialog" aria-labelledby="resetarea" aria-hidden="true">
+        <div class="modal-dialog " role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Reset Produksi Area</h5>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body align-items-center">
+                    <form action="<?= base_url($role . '/resetproduksiarea'); ?>" method="post">
+                        <div class="form-group">
+                            <label for="awal">Area</label>
+                            <input type="text" class="form-control" name="area" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="awal">Awal</label>
+                            <input type="date" class="form-control" name="awal">
+                        </div>
+                        <div class="form-group">
+                            <label for="awal">Akhir</label>
+                            <input type="date" class="form-control" name="akhir">
+                        </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-gradient-info">Reset</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- modal input produksi -->
+    <div class="modal fade" id="inputProduksi" tabindex="-1" role="dialog" aria-labelledby="inputProduksi" aria-hidden="true">
+        <div class="modal-dialog " role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Input Produksi</h5>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <form action="<?= base_url($role . '/prosesInputProdManual'); ?>" method="POST">
+                    <div class="modal-body align-items-center">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="tgl_produksi" class="col-form-label">Tanggal Produksi</label>
+                                    <input type="date" class="form-control" name="tgl_produksi" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="area" class="col-form-label">Area</label>
+                                    <select class="form-control" id="area-prod" name="area" required>
+                                        <option></option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="box" class="col-form-label">No Box</label>
+                                    <input type="text" class="form-control" name="box" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="no_mesin" class="col-form-label">No Mesin</label>
+                                    <input type="text" class="form-control" name="no_mesin" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="shift_b" class="col-form-label">Shift B</label>
+                                    <input type="text" class="form-control" name="shift_b" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="nomodel" class="col-form-label">No Model</label>
+                                    <select class="form-control select2" id="nomodel" name="nomodel" required>
+                                        <option value="">Pilih No Model</option>
+                                        <?php foreach ($models as $model) : ?>
+                                            <option value="<?= $model['mastermodel']; ?>"><?= $model['mastermodel']; ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="size" class="col-form-label">Style Size</label>
+                                    <select class="form-control" id="size" name="size" required>
+                                        <option></option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="label" class="col-form-label">No Label</label>
+                                    <input type="text" class="form-control" name="label" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="shift_a" class="col-form-label">Shift A</label>
+                                    <input type="text" class="form-control" name="shift_a" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="shift_c" class="col-form-label">Shift C</label>
+                                    <input type="text" class="form-control" name="shift_c" required>
+                                </div>
+                                <input type="hidden" id="qty_produksi" name="qty_produksi">
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-info">Generate</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-xl-2 col-sm-6 mb-xl-0 mb-4">
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold"> Target Produksi </p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    <?= $targetProd ?>
-                                </h5>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold"> Productivity </p>
+                                <h6 class="font-weight-bolder mb-0" id="productivity">
+                                    %
+
+                                    <span class=" text-sm font-weight-bolder"></span>
+                                </h6>
                             </div>
                         </div>
                         <div class="col-4 text-end">
                             <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
                                 <i class="fas fa-tasks text-lg opacity-10" aria-hidden="true"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Produksi Bulan ini</p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    <?= $produksiBulan ?>
-                                    <span class=" text-sm font-weight-bolder">/ <?= $produksiBulan ?> </span>
 
-                                </h5>
-                            </div>
-                        </div>
-                        <div class="col-4 text-end">
-                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-settings text-lg opacity-10" aria-hidden="true"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="col-xl-2 col-sm-6 mb-xl-0 mb-4">
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Produksi Hari ini </p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    <span class=" text-sm font-weight-bolder">This Month</span>
-                                    <?= $produksiHari ?>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Deffect Rate </p>
+                                <h6 class="font-weight-bolder mb-0" id="deffectRate">
+                                    %
+                                    <span class=" text-sm font-weight-bolder"></span>
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                <i class="fas fa-percent text-lg opacity-10" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Output</p>
+                                <h6 class="font-weight-bolder mb-0" id="output">
 
-                                </h5>
+                                    <span class=" text-sm font-weight-bolder">pairs </span>
+
+                                </h6>
                             </div>
                         </div>
                         <div class="col-4 text-end">
                             <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="fas fa-book text-lg opacity-10" aria-hidden="true"></i>
+                                <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-sm-6">
+        <div class="col-xl-2 col-sm-6">
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Order Finished</p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    8
-                                    <span class=" text-sm font-weight-bolder">This Month</span>
-                                </h5>
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Target</p>
+                                <h6 class="font-weight-bolder mb-0" id="pph">
+                                </h6>
+                                <span class=" text-sm font-weight-bolder"></span>
                             </div>
                         </div>
                         <div class="col-4 text-end">
                             <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-check-bold text-lg opacity-10" aria-hidden="true"></i>
+                                <i class="fas fa-bullseye text-lg opacity-10" aria-hidden="true"></i>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-sm-6">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Plan Mc</p>
+                                <h6 class="font-weight-bolder mb-0" id="planmc">
+                                </h6>
+                                <span class=" text-sm font-weight-bolder"></span>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                <i class="fas fa-cogs text-lg opacity-10" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-sm-6">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Target/day</p>
+                                <h6 class="font-weight-bolder mb-0" id="targetday">
+                                </h6>
+                                <span class=" text-sm font-weight-bolder"></span>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                <i class="fas fa-bullseye text-lg opacity-10" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row my-3 progress-item">
+        <div class="col-lg-12">
+
+            <div class="card  z-index-2">
+
+                <div class="card-body">
+
+                    Target Export
+
+                    <div class="col-lg-12 col-sm-12">
+                        <div class="progress-wrapper" id="progresTarget">
+
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="row my-3">
+        <div class="col-lg-12">
+            <div class="card z-index-2">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h6 class="card-title">Data Produksi Harian</h6>
+
+                </div>
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12">
+                            <div class="chart">
+                                <canvas id="mixed-chart" class="chart-canvas" height="300"></canvas>
                             </div>
                         </div>
                     </div>
@@ -143,15 +598,95 @@
     <div class="row my-3">
         <div class="col-lg-12">
             <div class="card z-index-2">
-                <div class="card-header pb-0">
-                    <h6>Daily Production Charts</h6>
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h6 class="card-title">Data BS Mesin Harian</h6>
 
                 </div>
                 <div class="card-body p-3">
-                    <div class="chart">
-                        <canvas id="mixed-chart" class="chart-canvas" height="300"></canvas>
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12">
+                            <div class="chart">
+                                <canvas id="bsmesin-chart" class="chart-canvas" height="300"></canvas>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h5>
+                <h5>
+                    Data Deffect stocklot
+
+                </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-6 col-md-8">
+
+                    <div class="chart">
+                        <canvas id="bs-chart" class="chart-canvas" height="500"></canvas>
+                    </div>
+
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <table class="table-responsive mx-4">
+                        <thead>
+                            <tr>
+                                <th>Top 10 Deffect</th>
+                                <th>Jumlah</th>
+                            </tr>
+                        </thead>
+                        <tbody id="desc">
+
+                        </tbody>
+                    </table>
+                </div>
+
+
+            </div>
+            <div class="row ">
+                <div class="col-lg-6 mx-4">
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row my-3 mx-2">
+        <div class="card">
+            <div class="card-header">
+                <h5>
+                    Productivity Daily
+                </h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr class="text-center">
+                            <th rowspan="2">Tanggal</th>
+                            <th rowspan="2">Target (dz)</th>
+                            <th rowspan="2">Productivity (%)</th>
+                            <th rowspan="2">Deffect Rate(%)</th>
+                            <th colspan="2">Produksi</th>
+                            <th colspan="2">Deffect</th>
+                        </tr>
+                        <tr class="text-center">
+                            <th>dz</th>
+                            <th>kg</th>
+                            <th>Mesin (kg)</th>
+                            <th>Setting (kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prodDetails">
+
+                    </tbody>
+
+                </table>
             </div>
         </div>
     </div>
@@ -179,113 +714,402 @@
         });
     });
 </script>
-<!-- <script>
-    let data =;
-    console.log(data)
-    // Ekstraksi tanggal dan jumlah produksi dari data
-    let labels = data.map(item => item.created_at);
-    let values = data.map(item => item.total_produksi);
+
+<script>
+    function fetchDashboard(bulan, tahun, area = "") {
+        $.ajax({
+            url: "<?= base_url('chart/dashboardData') ?>",
+            type: "GET",
+            data: {
+                bulan: bulan,
+                tahun: tahun,
+
+                area: area
+            },
+            dataType: "json",
+            success: function(response) {
+                dashboard(response);
+            }
+        });
+    }
+
+    function fetchData(bulan, tahun, area = "") {
+        $.ajax({
+            url: "<?= base_url('chart/getProductionData') ?>",
+            type: "GET",
+            data: {
+                bulan: bulan,
+                tahun: tahun,
+                area: area
+            },
+            dataType: "json",
+            success: function(response) {
+                updateChart(response);
+            }
+        });
+    }
+
+    function fetchBsMesin(bulan, tahun, area = "") {
+        $.ajax({
+            url: "<?= base_url('chart/getBsMesin') ?>",
+            type: "GET",
+            data: {
+                bulan: bulan,
+                tahun: tahun,
+                area: area
+            },
+            dataType: "json",
+            success: function(response) {
+                updateChartBsMesin(response);
+            }
+        });
+    }
+
+    function fetchDataBs(bulan, tahun, area = "") {
+        $.ajax({
+            url: "<?= base_url('chart/getBsData') ?>",
+            type: "GET",
+            data: {
+                bulan: bulan,
+                tahun: tahun,
+                area: area
+            },
+            dataType: "json",
+            success: function(response) {
+                updateBs(response);
+            }
+        });
+    }
+
+    function fetchDailyProd(bulan, tahun, area = "") {
+        $.ajax({
+            url: "<?= base_url('chart/getDailyProd') ?>",
+            type: "GET",
+            data: {
+                bulan: bulan,
+                tahun: tahun,
+                area: area
+            },
+            dataType: "json",
+            success: function(response) {
+                dailyProd(response);
+            }
+        });
+    }
 
 
-    var ctx2 = document.getElementById("mixed-chart").getContext("2d");
 
-    var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
 
-    gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
-    gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-    gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)'); //purple colors
+    function dashboard(data) {
+        let deffect = parseFloat(data.deffect).toFixed(2); // Format 2 desimal
+        let output = parseInt(data.output / 24).toLocaleString(); // Bagi 2, format angka
+        let pph = parseInt(data.targetOutput).toLocaleString(); // Format angka
+        let qty = parseInt(data.qty).toLocaleString(); // Format angka
+        let sisa = parseInt(data.sisa).toLocaleString(); // Format angka
+        let prod = (parseInt(data.qty) - parseInt(data.sisa)) / 24; // Produksi yang selesai
+        let percent = parseFloat(data.percentage).toFixed(2); // Gunakan `quality` karena `percentage` tidak ada di contoh data
+        let qtyDz = parseInt(data.qty / 24).toLocaleString()
+        let productivity = data.productivity;
+        let planMc = data.planmc;
+        let targetday = parseInt(data.targetday).toLocaleString();
 
-    var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
+        document.getElementById('deffectRate').textContent = `${deffect}%`;
+        document.getElementById('output').textContent = `${output} dz`;
+        document.getElementById('pph').textContent = `${pph} dz`;
+        document.getElementById('productivity').textContent = `${productivity} %`;
+        document.getElementById('planmc').textContent = `${planMc} mc`;
+        document.getElementById('targetday').textContent = `${targetday} dz`;
 
-    gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
-    gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-    gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)'); //purple colors
+        let progres = document.getElementById("progresTarget"); // Gunakan string jika ini ID elemen
 
-    new Chart(ctx2, {
+        // Tentukan warna progress bar berdasarkan percent
+        let progressColor = percent < 100 ? "bg-gradient-info" : (percent == 100 ? "bg-gradient-success" : "bg-gradient-danger");
 
-        data: {
-            labels: labels,
-            datasets: [{
-                    type: "bar",
-                    label: "Data Turun Order",
-                    borderWidth: 0,
-                    pointRadius: 30,
+        progres.innerHTML = `
+        <div class="progress-info">
+            <div class="progress-percentage">
+                <span class="text-sm font-weight-bold">${percent}% (${prod.toLocaleString()} dz/${qtyDz}  dz) </span>
+            </div>
+        </div>
+        <div class="progress">
+            <div id="progress-bar"
+                class="progress-bar ${progressColor}"
+                role="progressbar"
+                aria-valuenow="${percent}"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                style="width: ${percent}%; height: 10px;">
+            </div>
+        </div>
+    `;
+    }
 
+
+    let chartInstanceBsArea = null;
+    let chartInstanceMixed = null;
+    let chartBsMixed = null;
+
+
+
+    function updateChart(data) {
+        let labels = data.map(item => item.tgl_produksi);
+        let values = data.map(item => (item.qty_produksi / 24).toFixed(0));
+
+        if (chartInstanceMixed) {
+            chartInstanceMixed.destroy();
+        }
+
+        var ctx2 = document.getElementById("mixed-chart").getContext("2d");
+        chartInstanceMixed = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Jumlah Produksi",
                     backgroundColor: "#3A416F",
-                    fill: true,
                     data: values,
                     maxBarThickness: 20
-
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
                 },
-                {
-                    type: "line",
-
-                    tension: 0.1,
-                    borderWidth: 0,
-                    pointRadius: 0,
-                    borderColor: "#3A416F",
-                    borderWidth: 2,
-                    backgroundColor: gradientStroke1,
-                    fill: true,
-                    data: values,
-                },
-            ],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false,
+                scales: {
+                    y: {
+                        grid: {
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            padding: 10
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            padding: 10
+                        }
+                    }
                 }
+            }
+        });
+    }
+
+    function updateChartBsMesin(data) {
+        let labels = data.map(item => item.tanggal_produksi);
+        let values = data.map(item => (item.qty_gram / 1000).toFixed(0));
+
+        if (chartBsMixed) {
+            chartBsMixed.destroy();
+        }
+
+        var ctx2 = document.getElementById("bsmesin-chart").getContext("2d");
+        chartBsMixed = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Jumlah bs(KG)",
+                    backgroundColor: "#3A416F",
+                    data: values,
+                    maxBarThickness: 20
+                }]
             },
-            interaction: {
-                intersect: false,
-                mode: 'index',
-            },
-            scales: {
-                y: {
-                    grid: {
-                        drawBorder: false,
-                        display: true,
-                        drawOnChartArea: true,
-                        drawTicks: false,
-                        borderDash: [5, 5]
-                    },
-                    ticks: {
-                        display: true,
-                        padding: 10,
-                        color: '#b2b9bf',
-                        font: {
-                            size: 11,
-                            family: "Open Sans",
-                            style: 'normal',
-                            lineHeight: 2
-                        },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
                     }
                 },
-                x: {
-                    grid: {
-                        drawBorder: false,
+                scales: {
+                    y: {
+                        grid: {
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            padding: 10
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            padding: 10
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function updateBs(data) {
+        if (!data || !Array.isArray(data)) {
+            console.error("Invalid data provided to updateBs function.");
+            return;
+        }
+
+        let labels = data.map(item => item.Keterangan);
+        let values = data.map(item => item.qty);
+
+        // Warna yang diulang jika jumlah data lebih banyak dari warna yang tersedia
+        let chartColors = ['#845ec2', '#d65db1', '#ff6f91', '#ff9671', '#ffc75f', '#f9f871', '#008f7a', '#b39cd0', '#c34a36', '#4b4453', '#4ffbdf', '#936c00', '#c493ff', '#296073'];
+        let colors = data.map((_, index) => chartColors[index % chartColors.length]);
+
+        let ctxElement = document.getElementById("bs-chart");
+        if (!ctxElement) {
+            console.error("Canvas element with ID 'bs-chart' not found.");
+            return;
+        }
+
+        let ctx4 = ctxElement.getContext("2d");
+
+        let desc = document.getElementById("desc");
+        if (!desc) {
+            console.error("Element with ID 'desc' not found.");
+            return;
+        }
+
+        // Buat tabel dari data menggunakan JavaScript
+        desc.innerHTML = data.slice(0, 10).map((ch, index) => {
+            let color = chartColors[index % chartColors.length]; // Ambil warna berdasarkan index
+            return `
+        <tr>
+            <td> <i class="ni ni-button-play" style="color: ${color};"></i> ${ch.Keterangan}</td>
+            <td>${ch.qty} Pcs</td>
+        </tr>
+    `;
+        }).join('');
+
+
+        // Hapus grafik lama sebelum menggambar yang baru
+        if (window.bsChart) {
+            window.bsChart.destroy();
+        }
+
+        // Buat grafik baru
+        window.bsChart = new Chart(ctx4, {
+            type: "pie",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Projects",
+                    weight: 9,
+                    cutout: 0,
+                    tension: 0.9,
+                    pointRadius: 2,
+                    borderWidth: 2,
+                    backgroundColor: colors,
+                    data: values, // Perbaikan di sini (sebelumnya salah referensi ke `value`)
+                    fill: false
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
                         display: false,
-                        drawOnChartArea: false,
-                        drawTicks: false,
-                        borderDash: [5, 5]
-                    },
-                    ticks: {
-                        display: true,
-                        color: '#b2b9bf',
-                        padding: 20,
-                        font: {
-                            size: 11,
-                            family: "Open Sans",
-                            style: 'normal',
-                            lineHeight: 2
-                        },
                     }
                 },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            drawBorder: false,
+                            display: false,
+                            drawOnChartArea: false,
+                            drawTicks: false,
+                        },
+                        ticks: {
+                            display: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            drawBorder: false,
+                            display: false,
+                            drawOnChartArea: false,
+                            drawTicks: false,
+                        },
+                        ticks: {
+                            display: false,
+                        }
+                    },
+                },
             },
-        },
-    });
-</script> -->
+        });
+    }
+
+    function dailyProd(response) {
+        const tbody = document.getElementById("prodDetails");
+        tbody.innerHTML = ""; // Kosongkan dulu isinya
+
+        if (!response || response.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='8' class='text-center'>Tidak ada data</td></tr>";
+            return;
+        }
+
+        response.forEach(row => {
+            const tr = document.createElement("tr");
+            tr.classList.add("text-center");
+
+            tr.innerHTML = `
+            <td>${row.tanggal || "-"}</td>
+            <td>${(row.target ?? 0).toLocaleString()}</td>
+            <td>${(row.productivity ?? 0).toFixed(2)}</td>
+            <td>${(row.deffectRate ?? 0).toFixed(2)}</td>
+            <td>${(row.prodTotal ?? 0).toLocaleString()}</td>
+            <td>${(row.prodGr ?? 0).toLocaleString()}</td>
+            <td>${(row.bsmesin ?? 0).toLocaleString()}</td>
+            <td>${(row.bsSetting ?? 0).toLocaleString()}</td>
+        `;
+
+            tbody.appendChild(tr);
+        });
+    }
+
+
+
+    // Event listener filter bulan & tahun
+    // Event listener filter bulan, tahun, dan area (buyer cuma ditampilin)
+    document.getElementById("filter-bulan").addEventListener("change", handleFilterChange);
+    document.getElementById("filter-tahun").addEventListener("change", handleFilterChange);
+    document.getElementById("filter-area").addEventListener("change", handleFilterChange);
+
+    // Function untuk ambil semua filter & trigger fetch
+    function handleFilterChange() {
+        let bulan = document.getElementById("filter-bulan").value.padStart(2, "0");
+        let tahun = document.getElementById("filter-tahun").value;
+        let area = document.getElementById("filter-area").value;
+
+        fetchDashboard(bulan, tahun, area);
+        fetchData(bulan, tahun, area);
+        fetchDataBs(bulan, tahun, area);
+        fetchBsMesin(bulan, tahun, area);
+        fetchDailyProd(bulan, tahun, area);
+    }
+
+    // Set default bulan & tahun saat halaman load
+    let currentDate = new Date();
+    let defaultBulan = String(currentDate.getMonth() + 1).padStart(2, "0");
+    let defaultTahun = currentDate.getFullYear();
+
+    document.getElementById("filter-bulan").value = defaultBulan;
+    document.getElementById("filter-tahun").value = defaultTahun;
+
+    // Trigger pertama kali saat halaman load
+    handleFilterChange();
+</script>
 <?php $this->endSection(); ?>
