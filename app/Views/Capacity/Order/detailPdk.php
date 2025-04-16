@@ -225,6 +225,8 @@ error_reporting(E_ALL); ?>
                                 <form action="" method="post" enctype="multipart/form-data">
                                     <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control ">
                                     <input type="text" name="no_model" value=<?= $noModel ?> hidden class="form-control ">
+                                    <!-- <p></p> -->
+                                    <input type="text" class="form-control" name="keterangan" placeholder="Keterangan ...." required>
                                     <button type="submit" class="btn btn-info btn-block w-100 "> Simpan</button>
                                 </form>
                             </div>
