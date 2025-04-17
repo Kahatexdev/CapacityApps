@@ -1476,35 +1476,73 @@ class ProduksiController extends BaseController
         $startRow   = 6;
         $batchSize  = 100;
         $batchData  = [];
+        $allBatchData = [];
+        $allOperators = [];
         $failedRows = [];
         $db         = \Config\Database::connect();
 
-        // Looping baris mulai dari row ke-6
+        // Ambil semua data operator dari kolom F, G, H
         foreach ($worksheet->getRowIterator($startRow) as $row) {
             $rowIndex = $row->getRowIndex();
             $cellIterator = $row->getCellIterator();
             $cellIterator->setIterateOnlyExistingCells(false);
 
-            // Data baris dengan menambahkan role
             $rowData = ['role' => session()->get('role')];
             foreach ($cellIterator as $cell) {
                 $rowData[] = $cell->getCalculatedValue();
+            }
+
+            // Ambil operator F (index 5), G (6), H (7)
+            for ($i = 5; $i <= 7; $i++) {
+                $operatorName = trim($rowData[$i] ?? '');
+                if (!empty($operatorName)) {
+                    $allOperators[] = $operatorName;
+                }
             }
 
             if (!empty($rowData)) {
                 $batchData[] = ['rowIndex' => $rowIndex, 'data' => $rowData];
             }
 
-            // Proses batch jika mencapai batas
             if (count($batchData) >= $batchSize) {
-                $this->processBatchBsMc($batchData, $db, $failedRows, $area, $tgl_produksi);
-                $batchData = []; // Reset batch
+                $allBatchData[] = $batchData;
+                $batchData = [];
             }
         }
 
-        // Proses sisa batch data
         if (!empty($batchData)) {
-            $this->processBatchBsMc($batchData, $db, $failedRows, $area, $tgl_produksi);
+            $allBatchData[] = $batchData;
+        }
+
+        // Ambil data operator unik
+        $uniqueOperators = array_unique($allOperators);
+        $operatorDataMap = [];
+
+        // Ambil data karyawan dari API
+        foreach ($uniqueOperators as $operatorName) {
+            $operatorEncoded = urlencode($operatorName);
+            $apiUrl = "http://172.23.44.14/SkillMapping/public/api/getdataforbs/{$area}/{$operatorEncoded}";
+            $response = @file_get_contents($apiUrl);
+            log_message('debug', "Response API untuk operator '{$operatorName}': {$response}");
+
+            if ($response === false) {
+                log_message('error', "Gagal mengakses API: {$apiUrl}");
+                $operatorDataMap[$operatorName] = null;
+            } else {
+                // Mengubah response JSON menjadi array
+                $decodedResponse = json_decode($response, true);
+
+                if (isset($decodedResponse[0]['nama_karyawan']) && isset($decodedResponse[0]['id_karyawan'])) {
+                    $operatorDataMap[$operatorName] = $decodedResponse[0];
+                } else {
+                    $operatorDataMap[$operatorName] = null;
+                }
+            }
+        }
+
+        // Proses semua batch dengan operator yang sudah ada datanya
+        foreach ($allBatchData as $batchData) {
+            $this->processBatchBsMc($batchData, $db, $failedRows, $area, $tgl_produksi, $operatorDataMap);
         }
 
         // Jika ada baris gagal, tampilkan pesan error
@@ -1517,7 +1555,11 @@ class ProduksiController extends BaseController
 
             $failedDetails = array_map(function ($errorInfo) use ($shiftToColumn) {
                 $shiftColumn = $shiftToColumn[$errorInfo['shift']] ?? 'Kolom Tidak Diketahui';
-                return "{$shiftColumn} baris ke {$errorInfo['row']} (Operator: {$errorInfo['operator']})";
+                $message = "{$shiftColumn} baris ke {$errorInfo['row']} (Operator: {$errorInfo['operator']})";
+                if (!empty($errorInfo['error'])) {
+                    $message .= " - " . $errorInfo['error'];
+                }
+                return $message;
             }, $failedRows);
 
             return redirect()->to(base_url(session()->get('role') . '/bsmesin'))
@@ -1529,8 +1571,7 @@ class ProduksiController extends BaseController
             ->withInput()->with('success', 'Data Bs Mesin Berhasil di Import');
     }
 
-
-    private function processBatchBsMc($batchData, $db, &$failedRows, $area, $tgl_produksi)
+    private function processBatchBsMc($batchData, $db, &$failedRows, $area, $tgl_produksi, $operatorDataMap)
     {
         $db->transStart();
         $today = date('Y-m-d H:i:s');
@@ -1540,55 +1581,37 @@ class ProduksiController extends BaseController
         $qtyPcsMapping  = [0 => 9, 1 => 12, 2 => 15];
         $qtyGramMapping = [0 => 17, 1 => 18, 2 => 19];
 
+        // Loop untuk batch data
         foreach ($batchData as $batchItem) {
             $rowIndex = $batchItem['rowIndex'];
-            $data     = $batchItem['data'];
+            $data = $batchItem['data'];
 
-            // Proses masing-masing operator (shift) di satu baris
-            foreach ($shiftMapping as $index => $shift) {
-                $operatorIndex = 5 + $index;  // Kolom operator: indeks 5, 6, 7
-                $operatorName  = trim($data[$operatorIndex] ?? '');
+            // Iterasi berdasarkan operator (shift A, B, C)
+            for ($index = 0; $index < 3; $index++) {
+                $operatorIndex = 5 + $index;
+                $operatorName = trim($data[$operatorIndex] ?? '');
                 if (empty($operatorName)) {
                     continue;
                 }
 
-                // API call untuk mendapatkan data karyawan
-                $operatorEncoded = urlencode($operatorName);
-                $apiUrl = "http://172.23.44.14/SkillMapping/public/api/getdataforbs/{$area}/{$operatorEncoded}";
-                $response = @file_get_contents($apiUrl);
-                log_message('debug', "Response API untuk operator '{$operatorName}': {$response}");
-
-                if ($response === false) {
-                    log_message('error', "Gagal mengakses API: {$apiUrl}");
-                    // Simpan informasi error secara detail: row, operator, dan shift
-                    $failedRows[] = [
-                        'row'      => $rowIndex,
-                        'operator' => $operatorName,
-                        'shift'    => $shift,
-                        'error'    => 'API tidak bisa diakses'
-                    ];
-                    continue;
+                // Mencocokkan nama operator dengan nama_karyawan dari API
+                $id_karyawan = null;
+                if (isset($operatorDataMap[$operatorName])) {
+                    $operatorData = $operatorDataMap[$operatorName];
+                    if ($operatorData && isset($operatorData['id_karyawan'])) {
+                        $id_karyawan = $operatorData['id_karyawan'];
+                    }
                 }
 
-                $karyawan = json_decode($response, true);
-                if (empty($karyawan)) {
-                    log_message('error', "Data karyawan tidak ditemukan untuk operator '{$operatorName}' pada shift {$shift}");
-                    $failedRows[] = [
-                        'row'      => $rowIndex,
-                        'operator' => $operatorName,
-                        'shift'    => $shift,
-                        'error'    => 'Karyawan tidak ditemukan'
-                    ];
-                    continue;
+                // Jika tidak ditemukan, id_karyawan tetap null
+                // Bisa juga menambahkan log jika diperlukan
+                if (is_null($id_karyawan)) {
+                    log_message('info', "Operator {$operatorName} tidak ditemukan di API, ID Karyawan di-set null");
                 }
 
-                // Asumsi API mengembalikan array, ambil record pertama
-                $karyawan = is_array($karyawan) ? ($karyawan[0] ?? $karyawan) : $karyawan;
-                $idKar    = $karyawan['id_karyawan'];
-                $namaKar  = $karyawan['nama_karyawan'];
-
-                // Ambil data qty berdasarkan shift yang sedang diproses
-                $qtyPcs  = $data[$qtyPcsMapping[$index]] ?? 0;
+                // Ambil shift yang sedang diproses
+                $shift = $shiftMapping[$index];
+                $qtyPcs = $data[$qtyPcsMapping[$index]] ?? 0;
                 $qtyGram = $data[$qtyGramMapping[$index]] ?? 0;
 
                 // Lewati proses insert jika qty tidak valid (nol atau kosong)
@@ -1598,23 +1621,36 @@ class ProduksiController extends BaseController
 
                 $noModel = $data[2];
                 $inisial = $data[3];
-                $sz      = $this->ApsPerstyleModel->getSizes($noModel, $inisial);
-                $size    = $sz['size'] ?? null;
+                $sz = $this->ApsPerstyleModel->getSizes($noModel, $inisial);
+
+                // Jika model tidak ditemukan
+                if (empty($sz) || !isset($sz['size']) || empty($sz['size'])) {
+                    $failedRows[] = [
+                        'row'      => $rowIndex,
+                        'no_model' => $noModel,
+                        'inisial'  => $inisial,
+                        'error'    => "No Model atau Inisial tidak ditemukan untuk model: '{$noModel}', inisial: '{$inisial}'"
+                    ];
+                    continue;
+                }
+
+                $size = $sz['size'];
                 $noMesin = $data[1];
 
+                // Prepare data insert
                 $dataInsert = [
-                    'tanggal_produksi'  => $tgl_produksi,
-                    'id_karyawan'   => $idKar,
-                    'nama_karyawan' => $namaKar,
-                    'shift'         => $shift,
-                    'area'          => $area,
-                    'no_model'      => $noModel,
-                    'size'          => $size,
-                    'inisial'       => $inisial,
-                    'no_mesin'      => $noMesin,
-                    'qty_pcs'       => $qtyPcs,
-                    'qty_gram'      => $qtyGram,
-                    'created_at'    => $today,
+                    'tanggal_produksi' => $tgl_produksi,
+                    'id_karyawan' => $id_karyawan,
+                    'nama_karyawan' => $operatorName,
+                    'shift' => $shift,
+                    'area' => $area,
+                    'no_model' => $noModel,
+                    'size' => $size,
+                    'inisial' => $inisial,
+                    'no_mesin' => $noMesin,
+                    'qty_pcs' => $qtyPcs,
+                    'qty_gram' => $qtyGram,
+                    'created_at' => $today,
                 ];
 
                 // Cek apakah data sudah ada
@@ -1633,8 +1669,8 @@ class ProduksiController extends BaseController
                 } else {
                     log_message('info', "Data BS untuk shift {$shift} sudah ada pada row {$rowIndex}, dilewati");
                 }
-            } // end foreach shiftMapping
-        } // end foreach batchData
+            }
+        }
 
         $db->transComplete();
     }
