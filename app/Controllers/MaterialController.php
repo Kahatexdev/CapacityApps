@@ -411,80 +411,62 @@ class MaterialController extends BaseController
     }
     public function listPemesanan($area)
     {
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/listPemesanan/' . $area;
-        $response = file_get_contents($apiUrl);  // Mendapatkan response dari API
-        if ($response === FALSE) {
-            die('Error occurred while fetching data.');
+        function fetchApiData($url)
+        {
+            try {
+                $response = file_get_contents($url);
+                if ($response === false) {
+                    throw new \Exception("Error fetching data from $url");
+                }
+                $data = json_decode($response, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new \Exception("Invalid JSON response from $url");
+                }
+                return $data;
+            } catch (\Exception $e) {
+                error_log($e->getMessage());
+                return null;
+            }
         }
-        $dataList = json_decode($response, true);  // Decode JSON response dari API
 
+        $dataList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listPemesanan/$area");
         if (!is_array($dataList)) {
             die('Error: Invalid response format for listPemesanan API.');
         }
+
         foreach ($dataList as $key => $order) {
-            $dataList[$key]['ttl_kebutuhan_bb'] = 0; // Default value
-
-            // Validasi data input
+            $dataList[$key]['ttl_kebutuhan_bb'] = 0;
             if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
-                $styleApiUrl = 'http://172.23.39.118/MaterialSystem/public/api/getStyleSizeByBb?no_model='
+                $styleApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model='
                     . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
+                $styleList = fetchApiData($styleApiUrl);
 
-                error_log("Fetching: $styleApiUrl");
-
-                // Gunakan try-catch untuk menangani error
-                try {
-                    $styleResponse = file_get_contents($styleApiUrl);
-
-                    if ($styleResponse === false) {
-                        error_log("Error: Unable to fetch data from API for URL $styleApiUrl");
-                        $dataList[$key]['ttl_kebutuhan_bb'] = 0; // Default value if API fails
-                        continue; // Lanjutkan iterasi berikutnya
-                    }
-
-                    $styleList = json_decode($styleResponse, true);
-                    if (empty($styleList)) {
-                        error_log("Empty response or missing data for URL $styleApiUrl");
-                        continue;
-                    }
-
-                    // Validasi format respons API
-                    if (!is_array($styleList)) {
-                        error_log("Error: Invalid response format for URL $styleApiUrl");
-                        $dataList[$key]['ttl_kebutuhan_bb'] = 0;
-                        continue;
-                    }
-
+                if ($styleList) {
                     $totalRequirement = 0;
                     foreach ($styleList as $style) {
-                        // Pastikan data style memiliki semua parameter yang dibutuhkan
                         if (isset($style['no_model'], $style['style_size'], $style['gw'], $style['composition'], $style['loss'])) {
                             $orderQty = $this->ApsPerstyleModel->getQtyOrder($style['no_model'], $style['style_size'], $area);
-
-                            // Validasi hasil dari model
-                            if (!isset($orderQty['qty'])) {
-                                error_log("Warning: Order quantity not found for style {$style['style_size']}");
-                                continue;
+                            if (isset($orderQty['qty'])) {
+                                $requirement = $orderQty['qty'] * $style['gw'] * ($style['composition'] / 100) * (1 + ($style['loss'] / 100)) / 1000;
+                                $totalRequirement += $requirement;
+                                $dataList[$key]['qty'] = $orderQty['qty'];
                             }
-
-                            // Perhitungan kebutuhan bahan baku
-                            $requirement = $orderQty['qty'] * $style['gw'] * ($style['composition'] / 100) * (1 + ($style['loss'] / 100)) / 1000;
-                            $totalRequirement += $requirement;
-                            $dataList[$key]['qty'] = $orderQty['qty'];
-                        } else {
-                            error_log("Warning: Missing data in style response for no_model {$style['no_model']}");
                         }
                     }
-
-
-                    // Tambahkan total kebutuhan bahan baku ke data utama
                     $dataList[$key]['ttl_kebutuhan_bb'] = $totalRequirement;
-                } catch (\Exception $e) { // Tambahkan backslash (\)
-                    error_log("Exception occurred: " . $e->getMessage());
                 }
-            } else {
-                error_log("Warning: Missing required fields in order data.");
+
+                $pengirimanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
+                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
+                $pengiriman = fetchApiData($pengirimanApiUrl);
+                $dataList[$key]['ttl_pengiriman'] = $pengiriman['kgs_out'] ?? 0;
+
+                // Hitung sisa jatah
+                $dataList[$key]['sisa_jatah'] = $dataList[$key]['ttl_kebutuhan_bb'] - $dataList[$key]['ttl_pengiriman'];
             }
         }
+
+        // dd($dataList);
 
         // ambil data libur hari kedepan untuk menentukan jadwal pemesanan
         $today = date('Y-m-d'); // ambil data hari ini

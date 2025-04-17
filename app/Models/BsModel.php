@@ -171,8 +171,7 @@ class BsModel extends Model
     }
     public function bsMonthly($filters)
     {
-        $builder = $this->select(' apsperstyle.mastermodel, apsperstyle.size,SUM(data_bs.qty) as bs')
-            ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle');
+        $builder = $this->select('SUM(data_bs.qty) as bs');
         if (!empty($filters['bulan'])) {
             $builder->where('MONTH(tgl_instocklot)', $filters['bulan']);
         }
@@ -184,8 +183,7 @@ class BsModel extends Model
         if (!empty($filters['area'])) {
             $builder->where('area', $filters['area']);
         }
-        return $builder->groupBy('data_bs.idapsperstyle')
-            ->groupBy('apsperstyle.size')->findAll();
+        return $builder->first();
     }
     public function getBsPerhari($bulan, $year, $area = null)
     {
@@ -213,15 +211,8 @@ class BsModel extends Model
     }
     public function getBsPertanggal($filters)
     {
-        $builder = $this->select('SUM(data_bs.qty) as bs')
-            ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle');
+        $builder = $this->select('SUM(data_bs.qty) as bs');
 
-        if (!empty($filters['model'])) {
-            $builder->where('apsperstyle.mastermodel', $filters['model']);
-        }
-        if (!empty($filters['style'])) {
-            $builder->where('apsperstyle.size', $filters['style']);
-        }
         if (!empty($filters['tanggal'])) {
             $builder->where('data_bs.tgl_instocklot', $filters['tanggal']);
         }

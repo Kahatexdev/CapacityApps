@@ -83,8 +83,8 @@
                             </div>
                         </div>
                         <div class="col-4 text-end">
-                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="fas fa-tasks text-lg opacity-10" aria-hidden="true"></i>
+                            <div class="icon icon-shape  shadow text-center border-radius-md" id="bground">
+                                <i aria-hidden="true" id="stats"></i>
 
                             </div>
                         </div>
@@ -328,7 +328,7 @@
                             <th>dz</th>
                             <th>kg</th>
                             <th>Mesin (kg)</th>
-                            <th>Setting (kg)</th>
+                            <th>Setting (dz)</th>
                         </tr>
                     </thead>
                     <tbody id="prodDetails">
@@ -468,6 +468,23 @@
         document.getElementById('productivity').textContent = `${productivity} %`;
         document.getElementById('planmc').textContent = `${planMc} mc`;
         document.getElementById('targetday').textContent = `${targetday} dz`;
+        const stats = document.getElementById('stats');
+        const bg = document.getElementById('bground');
+
+        // Reset class tambahan dulu (biar nggak numpuk)
+        stats.className = 'text-lg opacity-10';
+        bg.className = 'icon icon-shape shadow text-center border-radius-md';
+        console.log(productivity)
+        if (productivity >= 85) {
+            stats.classList.add('fas', 'fa-arrow-up');
+            bg.classList.add('bg-gradient-success');
+        } else if (productivity >= 80) {
+            stats.classList.add('fas', 'fa-exclamation-triangle');
+            bg.classList.add('bg-gradient-warning');
+        } else {
+            stats.classList.add('fas', 'fa-arrow-down');
+            bg.classList.add('bg-gradient-danger');
+        }
 
         let progres = document.getElementById("progresTarget"); // Gunakan string jika ini ID elemen
 
@@ -714,16 +731,26 @@
             const tr = document.createElement("tr");
             tr.classList.add("text-center");
 
+            const productivity = row.productivity ?? 0;
+
+            let prodClass = 'text-danger';
+            if (productivity >= 85) {
+                prodClass = 'text-success';
+            } else if (productivity >= 80) {
+                prodClass = 'text-warning';
+            }
+
             tr.innerHTML = `
-            <td>${row.tanggal || "-"}</td>
-            <td>${(row.target ?? 0).toLocaleString()}</td>
-            <td>${(row.productivity ?? 0).toFixed(2)}</td>
-            <td>${(row.deffectRate ?? 0).toFixed(2)}</td>
-            <td>${(row.prodTotal ?? 0).toLocaleString()}</td>
-            <td>${(row.prodGr ?? 0).toLocaleString()}</td>
-            <td>${(row.bsmesin ?? 0).toLocaleString()}</td>
-            <td>${(row.bsSetting ?? 0).toLocaleString()}</td>
-        `;
+        <td>${row.tanggal || "-"}</td>
+        <td>${(row.target ?? 0).toLocaleString()}</td>
+        <td class="${prodClass}">${productivity.toFixed(2)}</td>
+        <td>${(row.deffectRate ?? 0).toFixed(2)}</td>
+        <td>${(row.prodTotal ?? 0).toLocaleString()}</td>
+        <td>${(row.prodGr ?? 0).toLocaleString()}</td>
+        <td>${(row.bsmesin ?? 0).toLocaleString()}</td>
+        <td>${(row.bsSetting ?? 0).toLocaleString()}</td>
+    `;
+
 
             tbody.appendChild(tr);
         });
