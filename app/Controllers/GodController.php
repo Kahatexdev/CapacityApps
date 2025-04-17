@@ -1065,6 +1065,7 @@ class GodController extends BaseController
             $prodTotal = 0;
             $prodGr = 0;
             $bsGr = 0;
+            $bsPcs = $bs['bs'];
 
             // Siapin data model + size untuk dikirim ke API bulk
             $bulkRequest = [];
@@ -1108,24 +1109,7 @@ class GodController extends BaseController
                 $prodTotal += $prodQty;
                 $prodGr += $prodGw;
             }
-            foreach ($bs as $bsyes) {
-                $key = $bsyes['mastermodel'] . '_' . $bsyes['size'];
-                $gw = isset($gwMap[$key]) ? $gwMap[$key] : 0;
 
-                $bsQty = (int)$bsyes['bs'];
-                $bsGw = $gw * $bsQty;
-
-                $bsGr += $bsGw;
-            }
-
-            // return $this->response->setJSON([
-            //     'total_prod' => $prodTotal,
-            //     'total_prodgram' => $prodGr,
-            //     'bs_gr' => $bsGr,
-            //     'bs_mesin' => $bsMesin['qty_gram'],
-
-            // ]);
-            $total_bs = $bsGr + $bsMesin['qty_gram'];
 
             if (empty($prodYesterday)) {
                 $deffectRate = 0;
@@ -1134,9 +1118,9 @@ class GodController extends BaseController
                 $percentage = 0;
                 $productivity = 0;
             } else {
-                $deffectRate = (($total_bs / ($total_bs + $prodGr)) + ($bsGr / $prodGr)) * 100;
+                $deffectRate = (($bsMesin['qty_gram'] / ($bsMesin['qty_gram'] + $prodGr)) + ($bsPcs / $prodTotal)) * 100;
                 $pph = round(($prodTotal / 2) / ($direct / 24));
-                $good =  $prodGr - $total_bs;
+                $good = 100 - $deffectRate;
                 $quality = ($good / $prodTotal) * 100;
                 $prod = $target['qty'] - $target['sisa'];
                 $percentage =  ($prod / $target['qty']) * 100;
@@ -1145,7 +1129,7 @@ class GodController extends BaseController
 
             $data = [
                 'deffect' => $deffectRate,
-                'bs' => $bs['bs'] ?? 0,
+                'bs' => $bsPcs ?? 0,
                 'output' => $prodTotal ?? 0,
                 'pph' => $pph,
                 'qty' => $target['qty'] ?? 0,
@@ -1258,18 +1242,13 @@ class GodController extends BaseController
                 ];
 
                 if (!isset($summaryByTanggal[$tanggal])) {
-                    $bsMesinDaily = $this->BsMesinModel->bsTanggal($fill); // return satuan gram
-                    $idBs = $this->ApsPerstyleModel->getIdApsForPph($area, $model, $size); // return total qty per tanggal
-                    $idapsList = array_column($idBs, 'idapsperstyle');
-                    $bsPcs = $this->BsModel->getBsPph($idapsList);
-                    $bsSetting = $gw * $bsPcs['bs_setting'];
-                    $bsSetting += $bsSetting;
+                    $bsMesinDaily = $this->BsMesinModel->bsTanggal($fill);
+                    $bsSetting = $this->BsModel->getBsPertanggal($fill);
                     $summaryByTanggal[$tanggal] = [
                         'prodTotal' => 0,
                         'prodGr' => 0,
                         'bsmesin' => $bsMesinDaily['qty_gram'] ?? 0,
                         'bsSetting' => $bsSetting,
-                        'bspcs' =>  $bsPcs['bs_setting'],
                     ];
                 }
                 // Hitung produksi
@@ -1286,16 +1265,17 @@ class GodController extends BaseController
                 $data['prodTotal'] = $data['prodTotal'] / 24; // dz
                 $data['prodGr'] = $data['prodGr'] / 1000; // kg
                 $data['bsmesin'] = $data['bsmesin'] / 1000; // kg
-                $data['bsSetting'] = $data['bsSetting'] / 1000; // kg
+                $data['bsSetting'] = $data['bsSetting'] / 24; //dz
                 $data['target'] = $targetMonth['total_output'] ?? 0;
                 $data['productivity'] = ($data['target'] > 0) ? ($data['prodTotal'] / $data['target']) * 100 : 0;
 
                 $totalProdGr = $data['prodGr'];
                 $totalBsMesin = $data['bsmesin'];
                 $totalBsSetting = $data['bsSetting'];
+                $totalProd = $data['prodTotal'];
 
                 $data['deffectRate'] = ($totalProdGr > 0)
-                    ? (($totalBsMesin / ($totalBsMesin + $totalProdGr)) + ($totalBsSetting / $totalProdGr)) * 100
+                    ? (($totalBsMesin / ($totalBsMesin + $totalProdGr)) + ($totalBsSetting / $totalProd)) * 100
                     : 0;
             }
             unset($data);
