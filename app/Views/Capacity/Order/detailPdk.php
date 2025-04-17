@@ -170,7 +170,45 @@ error_reporting(E_ALL); ?>
 
                 </div>
 
+                <div class="card-body">
+                    <div class="row mt-3">
+                        <div class="d-flex justify-content-between align-item-center">
+                            <h5> <span class='badge  badge-pill badge-lg bg-gradient-info'>History Revisi</span></h5>
+                        </div>
 
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Tanggal Revisi</th>
+                                        <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($historyRev as $key): ?>
+                                        <tr>
+                                            <td><?= $key['tanggal_rev'] ?></td>
+                                            <td><?= $key['keterangan'] ?></td>
+                                        </tr>
+                                    <?php endforeach ?>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            <hr>
+                        </div>
+                    </div>
+                    <div class=" card-footer">
+                        <div>
+                            <br>
+
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="modal fade  bd-example-modal-lg" id="ModalDeleteAll" tabindex="-1" role="dialog" aria-labelledby="modaldeleteall" aria-hidden="true">
@@ -225,7 +263,7 @@ error_reporting(E_ALL); ?>
                                 <form action="" method="post" enctype="multipart/form-data">
                                     <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control ">
                                     <input type="text" name="no_model" value=<?= $noModel ?> hidden class="form-control ">
-                                    <!-- <p></p> -->
+                                    <input type="text" name="jarum" value=<?= $jarum ?> hidden class="form-control ">
                                     <input type="text" class="form-control" name="keterangan" placeholder="Keterangan ...." required>
                                     <button type="submit" class="btn btn-info btn-block w-100 "> Simpan</button>
                                 </form>

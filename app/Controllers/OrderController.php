@@ -17,6 +17,7 @@ use DateTime;
 use App\Models\HistorySmvModel;
 use App\Models\DataCancelOrderModel;
 use App\Models\EstSpkModel;
+use App\Models\HistoryRevisiModel;
 
 class OrderController extends BaseController
 {
@@ -33,6 +34,7 @@ class OrderController extends BaseController
     protected $areaModel;
     protected $cancelOrder;
     protected $estspk;
+    protected $historyRev;
 
 
     public function __construct()
@@ -48,6 +50,7 @@ class OrderController extends BaseController
         $this->areaModel = new AreaModel();
         $this->cancelOrder = new DataCancelOrderModel();
         $this->estspk = new EstSpkModel();
+        $this->historyRev = new HistoryRevisiModel();
 
         if ($this->filters   = ['role' => ['capacity',  'planning', 'aps', 'god']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -783,6 +786,7 @@ class OrderController extends BaseController
     public function detailPdk($noModel, $jarum)
     {
         $pdk = $this->ApsPerstyleModel->getSisaPerDeliv($noModel, $jarum);
+        $history = $this->historyRev->getData($noModel);
         $sisaPerDeliv = [];
         foreach ($pdk as $perdeliv) {
             $deliv = $perdeliv['delivery'];
@@ -897,7 +901,8 @@ class OrderController extends BaseController
             'target' => $targetPerhari,
             'hari' => $hari,
             'rekomendasi' => $top3Rekomendasi,
-            'totalPo' => $totalPo
+            'totalPo' => $totalPo,
+            'historyRev' => $history
         ];
         return view(session()->get('role') . '/Order/detailPdk', $data);
     }
@@ -1707,6 +1712,10 @@ class OrderController extends BaseController
     {
         $file = $this->request->getFile('excel_file');
         $nomodel = $this->request->getVar('no_model');
+        $keterangan = $this->request->getPost('keterangan');
+        $jarum = $this->request->getPost('jarum');
+        $today = DATE('Y-m-d H:i:s');
+
         if ($file->isValid() && !$file->hasMoved()) {
             $spreadsheet = IOFactory::load($file);
             $row = $spreadsheet->getActiveSheet();
@@ -1730,90 +1739,97 @@ class OrderController extends BaseController
                     if ($machinetypeid == "DC168L") {
                         $machinetypeid = $machinetypeid . "SF";
                     }
-                    if ($row[5] == null) {
-                        return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $machinetypeid))->withInput()->with('error', 'Data Gagal di revise');
-                    } else {
-                        if ($no_model != $nomodel) {
-                            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $machinetypeid))->with('error', 'Nomor Model Tidak Sama. Silahkan periksa kembali' . $rowIndex);
-                        } else {
-                            $recordID = $row[0];
-                            $articleNo = $row[30];
-                            $producttype = $row[5];
-                            $custCode = $row[7];
-                            $description = $row[10];
-                            $delivery = $row[11];
-                            $rdelivery = str_replace('/', '-', (substr($delivery, -10)));
-                            $delivery2 = date('Y-m-d', strtotime($rdelivery));
-                            $qty = $row[12];
-                            $country = $row[17];
-                            $color = $row[18];
-                            $size = $row[19];
-                            $sam = $row[20];
-                            if ($sam == null) {
-                                $sam = 185;
-                            }
-
-                            $prodtype = [
-                                'jarum' => $machinetypeid,
-                                'prodtype' => $producttype
-                            ];
-                            $idProduct = $this->productModel->getId($prodtype);
-
-                            $leadtime = $row[24];
-                            $processRoute = $row[25];
-                            $lcoDate = $row[26];
-                            $rlcoDate = str_replace('/', '-', (substr($lcoDate, -10)));
-                            $lcoDate2 = date('Y-m-d', strtotime($rlcoDate));
-
-
-                            $simpandata = [
-                                'machinetypeid' => $machinetypeid,
-                                'size' => $size,
-                                'mastermodel' => $nomodel,
-                                'no_order' => $articleNo,
-                                'delivery' => $delivery2,
-                                'qty' => $qty,
-                                'sisa' => $qty,
-                                'country' => $country,
-                                'color' => $color,
-                                'seam' => $processRoute,
-                                'smv' => $sam,
-                                'production_unit' => 'PU Belum Dipilih',
-                                'factory' => 'Belum Ada Area'
-                            ];
-
-                            $updateData = [
-                                'kd_buyer_order' => $custCode,
-                                'id_product_type' => $idProduct,
-                                'seam' => $processRoute,
-                                'leadtime' => $leadtime,
-                                'description' => $description
-                            ];
-                            $validate = [
-                                'size' => $size,
-                                'delivery' => $delivery2,
-                                'mastermodel' => $nomodel,
-                                'qty' => $qty,
-                                'country' => $country,
-                            ];
-
-                            $existingAps = $this->ApsPerstyleModel->checkAps($validate);
-                            if (!$existingAps) {
-                                $this->ApsPerstyleModel->insert($simpandata);
-                            } else {
-                                $id = $existingAps['idapsperstyle'];
-                                $qtyLama = $existingAps['qty'];
-                                $qtyBaru = $qty + $qtyLama;
-                                $this->ApsPerstyleModel->update($id, ['qty' => $qtyBaru]);
-                            }
-                            $this->orderModel->update($idModel, $updateData);
-
-                            // }
-                        }
+                    if (empty($machinetypeid)) {
+                        log_message('error', "machinetypeid kosong di baris ke-$rowIndex. Data tidak disimpan.");
+                        continue;
                     }
+                    // if ($row[5] == null) {
+                    //     return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $jarum))->withInput()->with('error', 'Data Gagal di revise');
+                    // } else {
+                    // if ($no_model != $nomodel) {
+                    //     return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $jarum))->with('error', 'Nomor Model Tidak Sama. Silahkan periksa kembali' . $rowIndex);
+                    // } else {
+                    $recordID = $row[0];
+                    $articleNo = $row[30];
+                    $producttype = $row[5];
+                    $custCode = $row[7];
+                    $description = $row[10];
+                    $delivery = $row[11];
+                    $rdelivery = str_replace('/', '-', (substr($delivery, -10)));
+                    $delivery2 = date('Y-m-d', strtotime($rdelivery));
+                    $qty = $row[12];
+                    $country = $row[17];
+                    $color = $row[18];
+                    $size = $row[19];
+                    $sam = $row[20];
+                    if ($sam == null) {
+                        $sam = 185;
+                    }
+
+                    $prodtype = [
+                        'jarum' => $machinetypeid,
+                        'prodtype' => $producttype
+                    ];
+                    $idProduct = $this->productModel->getId($prodtype);
+
+                    $leadtime = $row[24];
+                    $processRoute = $row[25];
+                    $lcoDate = $row[26];
+                    $rlcoDate = str_replace('/', '-', (substr($lcoDate, -10)));
+                    $lcoDate2 = date('Y-m-d', strtotime($rlcoDate));
+
+
+                    $simpandata = [
+                        'machinetypeid' => $machinetypeid,
+                        'size' => $size,
+                        'mastermodel' => $nomodel,
+                        'no_order' => $articleNo,
+                        'delivery' => $delivery2,
+                        'qty' => $qty,
+                        'sisa' => $qty,
+                        'country' => $country,
+                        'color' => $color,
+                        'seam' => $processRoute,
+                        'smv' => $sam,
+                        'production_unit' => 'PU Belum Dipilih',
+                        'factory' => 'Belum Ada Area'
+                    ];
+                    $updateData = [
+                        'kd_buyer_order' => $custCode,
+                        'id_product_type' => $idProduct,
+                        'seam' => $processRoute,
+                        'leadtime' => $leadtime,
+                        'description' => $description
+                    ];
+                    $validate = [
+                        'size' => $size,
+                        'delivery' => $delivery2,
+                        'mastermodel' => $nomodel,
+                        'qty' => $qty,
+                        'country' => $country,
+                    ];
+
+                    $existingAps = $this->ApsPerstyleModel->checkAps($validate);
+                    if (!$existingAps) {
+                        $this->ApsPerstyleModel->insert($simpandata);
+                    } else {
+                        $id = $existingAps['idapsperstyle'];
+                        $qtyLama = $existingAps['qty'];
+                        $qtyBaru = $qty + $qtyLama;
+                        $this->ApsPerstyleModel->update($id, ['qty' => $qtyBaru]);
+                    }
+                    $this->orderModel->update($idModel, $updateData);
+                    // }
+                    // }
                 }
             }
-            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $machinetypeid))->withInput()->with('success', 'Data Berhasil di revise');
+            $dataInput = [
+                'tanggal_rev' => $today,
+                'model' => $nomodel,
+                'keterangan' => $keterangan
+            ];
+            $this->historyRev->insert($dataInput);
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $jarum))->withInput()->with('success', 'Data Berhasil di revise');
         } else {
             return redirect()->back()->with('error', 'No data found in the Excel file');
         }
