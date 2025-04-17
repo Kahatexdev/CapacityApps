@@ -111,6 +111,7 @@
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Cns Pesan</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Lot</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Keterangan</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Total Terima</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Total Retur</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Jatah</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Status Jatah</th>
@@ -137,10 +138,11 @@
                                     <td class="text-xs text-start"><?= $id['lot']; ?></td>
                                     <td class="text-xs text-start"><?= $id['keterangan']; ?></td>
                                     <td class="text-xs text-start"></td>
-                                    <td class="text-xs text-start" style="<?= $id['ttl_kebutuhan_bb'] < 0 ? 'color: red;' : ''; ?>"><?= number_format($id['ttl_kebutuhan_bb'], 2); ?></td>
-                                    <td class="text-xs text-start" style="<?= $id['ttl_kebutuhan_bb'] < 0 ? 'color: red;' : ''; ?>">
-                                        <?php if ($id['ttl_kebutuhan_bb'] > 0) {
-                                            if ($ttl_kg_pesan >= $id['ttl_kebutuhan_bb']) { ?>
+                                    <td class="text-xs text-start"><?= number_format($id['ttl_pengiriman'], 2); ?></td>
+                                    <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>"><?= number_format($id['sisa_jatah'], 2); ?></td>
+                                    <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>">
+                                        <?php if ($id['sisa_jatah'] > 0) {
+                                            if ($ttl_kg_pesan >= $id['sisa_jatah']) { ?>
                                                 <span style="color: red;">Pemesanan Melebihi Jatah</span>
                                             <?php } ?>
                                         <?php } else { ?>
@@ -156,8 +158,8 @@
                                         <?php
                                         $show = "d-none";
                                         $batasWaktu = '08:30:00';
-                                        if ($id['ttl_kebutuhan_bb'] > 0) {
-                                            if ($ttl_kg_pesan <= $id['ttl_kebutuhan_bb']) {
+                                        if ($id['sisa_jatah'] > 0) {
+                                            if ($ttl_kg_pesan <= $id['sisa_jatah']) {
                                                 // Aturan berdasarkan hari dan jenis produk:
                                                 $rules = [
                                                     'Thursday' => [
