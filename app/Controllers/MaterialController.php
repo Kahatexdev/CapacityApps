@@ -426,7 +426,7 @@ class MaterialController extends BaseController
 
             // Validasi data input
             if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
-                $styleApiUrl = 'http://172.23.39.118/MaterialSystem/public/api/getStyleSizeByBb?no_model='
+                $styleApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model='
                     . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
 
                 error_log("Fetching: $styleApiUrl");
@@ -556,7 +556,7 @@ class MaterialController extends BaseController
         $warna = $this->request->getGet('warna');
 
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/stockbahanbaku/' . $area . '?noModel=' . urlencode($noModel) . '&warna=' . urlencode($warna);
+        $apiUrl = 'http:/172.23.44.14/MaterialSystem/public/api/stockbahanbaku/' . $area . '?noModel=' . urlencode($noModel) . '&warna=' . urlencode($warna);
 
         // Mengambil data dari API eksternal
         $response = file_get_contents($apiUrl);
