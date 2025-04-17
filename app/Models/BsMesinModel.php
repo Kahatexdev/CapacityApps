@@ -197,7 +197,7 @@ class BsMesinModel extends Model
         $builder = $this->select(" SUM(qty_gram) as qty_gram")
             ->where('tanggal_produksi',  $fill['tanggal']);
 
-        if (!empty($filters['area'])) {
+        if (!empty($fill['area'])) {
             $builder->where('area',  $fill['area']);
         }
         // Ambil hasil query-nya
