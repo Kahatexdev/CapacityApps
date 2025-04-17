@@ -230,10 +230,10 @@
                                             </td>
                                             <td>
                                                 <div class="form-group">
-                                                    <input type="number" class="form-control" id="kebmesin<?= $row ?>" value="<?= $jr['kebutuhanMesin'] ?>" style="width:40%">
-                                                    <input type="text" id="areaDetail" value="<?= $area ?>" hidden>
-                                                    <input type="text" id="target<?= $row ?>" value="<?= $jr['target'] ?>" hidden>
-                                                    <input type="text" id="output<?= $row ?>" value="<?= $jr['output'] ?>" hidden>
+                                                    <input type="number" class="form-control" id="kebmesin<?= $no ?>_<?= $row ?>" value="<?= $jr['kebutuhanMesin'] ?>" style="width:40%">
+                                                    <input type="text" id="areaDetail<?= $no ?>_<?= $row ?>" value="<?= $area ?>" hidden>
+                                                    <input type="text" id="target<?= $no ?>_<?= $row ?>" value="<?= $jr['target'] ?>" hidden>
+                                                    <input type="text" id="output<?= $no ?>_<?= $row ?>" value="<?= $jr['output'] ?>" hidden>
                                                 </div>
                                             </td>
                                         </tr>

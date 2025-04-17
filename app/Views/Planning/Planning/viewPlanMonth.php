@@ -244,11 +244,13 @@
                                             </td>
                                             <td>
                                                 <div class="form-group">
-                                                    <input type="number" class="form-control" id="kebmesin<?= $row ?>"
+                                                    <input type="number" class="form-control" id="kebmesin<?= $no ?>_<?= $row ?>"
                                                         value="<?= $jarumDetail['planning_mc'] ?>" style="width:40%">
-                                                    <input type="text" id="target<?= $row ?>"
+                                                    <input type="text" id="areaDetail<?= $no ?>_<?= $row ?>"
+                                                        value="<?= $area ?>" hidden>
+                                                    <input type="text" id="target<?= $no ?>_<?= $row ?>"
                                                         value="<?= $jarumDetail['target'] ?>" hidden>
-                                                    <input type="text" id="output<?= $row ?>"
+                                                    <input type="text" id="output<?= $no ?>_<?= $row ?>"
                                                         value="<?= $jarumDetail['output'] ?>" hidden>
 
                                                 </div>
@@ -541,12 +543,16 @@
             let jarum = detailRow.querySelector("[id^='jarum']");
             let kebMesin = detailRow.querySelector("[id^='kebmesin']");
             let areaDetail = detailRow.querySelector("[id^='areaDetail']");
+            let target = detailRow.querySelector("[id^='target']");
+            let output = detailRow.querySelector("[id^='output']");
 
             // Check if elements exist before accessing textContent
             idjarum = idjarum ? idjarum.value : null;
             jarum = jarum ? jarum.value : null;
             kebMesin = kebMesin ? kebMesin.value : null;
             areaDetail = areaDetail ? areaDetail.value : null;
+            target = target ? target.value : null;
+            output = output ? output.value : null;
 
             // Add to detailPlan only if jarum and kebMesin are not null
             if (jarum && kebMesin) {
@@ -554,7 +560,9 @@
                     idjarum: idjarum,
                     jarum: jarum,
                     kebMesin: kebMesin,
-                    areaDetail: areaDetail
+                    areaDetail: areaDetail,
+                    target: target,
+                    output: output
                 });
             }
         });
