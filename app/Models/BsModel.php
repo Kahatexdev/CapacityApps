@@ -163,22 +163,15 @@ class BsModel extends Model
     }
     public function getBsPph($idaps)
     {
-        $return = $this->select('SUM(data_bs.qty) AS bs_setting')
-            ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle', 'left')
-            ->whereIn('data_bs.idapsperstyle', $idaps)
-            ->first(); // Ambil satu hasil
+        $return = $this->select('SUM(qty) AS bs_setting')
+            ->whereIn('idapsperstyle', $idaps)
+            ->first();
 
-        // Pastikan hasil tidak null sebelum dikembalikan
-        if (!$return || empty($return->bs_setting)) {
-            $return = ['bs_setting' => 0];
-        }
-
-        return $return;
+        return $return ?? ['bs_setting' => 0];
     }
     public function bsMonthly($filters)
     {
-        $builder = $this->select(' apsperstyle.mastermodel, apsperstyle.size,SUM(data_bs.qty) as bs')
-            ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle');
+        $builder = $this->select('SUM(data_bs.qty) as bs');
         if (!empty($filters['bulan'])) {
             $builder->where('MONTH(tgl_instocklot)', $filters['bulan']);
         }
@@ -190,8 +183,7 @@ class BsModel extends Model
         if (!empty($filters['area'])) {
             $builder->where('area', $filters['area']);
         }
-        return $builder->groupBy('data_bs.idapsperstyle')
-            ->groupBy('apsperstyle.size')->findAll();
+        return $builder->first();
     }
     public function getBsPerhari($bulan, $year, $area = null)
     {
@@ -216,5 +208,22 @@ class BsModel extends Model
             ->groupBy('area')
             ->orderBy('bs', 'DESC')
             ->findAll();
+    }
+    public function getBsPertanggal($filters)
+    {
+        $builder = $this->select('SUM(data_bs.qty) as bs');
+
+        if (!empty($filters['tanggal'])) {
+            $builder->where('data_bs.tgl_instocklot', $filters['tanggal']);
+        }
+        if (!empty($filters['area'])) {
+            $builder->where('area', $filters['area']);
+        }
+
+        // Ambil satu baris aja
+        $result = $builder->first();
+
+        // Ambil nilai `bs` saja, atau 0 kalau null
+        return $result['bs'] ?? 0;
     }
 }

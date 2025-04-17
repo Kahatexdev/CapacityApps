@@ -16,6 +16,7 @@ $routes->get('chart/getProductionData', 'ProduksiController::getProductionData')
 $routes->get('chart/getBsData', 'ProduksiController::getBsData');
 $routes->get('chart/getBsMesin', 'DeffectController::getBsMesin');
 $routes->get('chart/dashboardData', 'GodController::dashboardData');
+$routes->get('chart/getDailyProd', 'GodController::getDailyProd');
 
 // API ROUTES
 $routes->group(
@@ -420,7 +421,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
 
 // user
 $routes->group('/user', ['filter' => 'user'], function ($routes) {
-    $routes->get('', 'ProduksiController::viewProduksi');
+    $routes->get('', 'UserController::index');
     $routes->get('produksi', 'UserController::produksi');
     $routes->get('bssetting', 'UserController::bssetting');
     $routes->get('bsmesin', 'UserController::bsmesin');

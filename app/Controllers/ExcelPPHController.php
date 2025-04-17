@@ -720,7 +720,7 @@ class ExcelPPHController extends BaseController
             $sheet->setCellValue('D' . $row, $data['kode_warna']);
             $sheet->setCellValue('E' . $row, $data['warna']);
             $sheet->setCellValue('F' . $row, number_format($data['bruto'] / 24, 2));
-            $sheet->setCellValue('G' . $row, number_format($data['bs_mesin'], 2));
+            $sheet->setCellValue('G' . $row, number_format($data['bs_mesin'], 0));
             $sheet->setCellValue('H' . $row, number_format($data['pph'], 2));
 
             // style body

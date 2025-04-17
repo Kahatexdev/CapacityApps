@@ -192,4 +192,17 @@ class BsMesinModel extends Model
 
         return $result ?? 0;
     }
+    public function bsTanggal($fill)
+    {
+        $builder = $this->select(" SUM(qty_gram) as qty_gram")
+            ->where('tanggal_produksi',  $fill['tanggal']);
+
+        if (!empty($fill['area'])) {
+            $builder->where('area',  $fill['area']);
+        }
+        // Ambil hasil query-nya
+        $result = $builder->first();
+
+        return $result ?? 0;
+    }
 }

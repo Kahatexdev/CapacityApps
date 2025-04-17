@@ -1053,6 +1053,9 @@ class GodController extends BaseController
             }
 
             $prodYesterday = $this->produksiModel->monthlyProd($filters);
+            // $totalProd = $this->produksiModel->totalProdBulan($filters);
+            // return $this->response->setJSON($totalProd);
+
             $bs = $this->BsModel->bsMonthly($filters);
             $bsMesin = $this->BsMesinModel->getTotalKgMonth($filters) ?? 0;
             $direct = $this->produksiModel->directMonthly($filters);
@@ -1062,6 +1065,7 @@ class GodController extends BaseController
             $prodTotal = 0;
             $prodGr = 0;
             $bsGr = 0;
+            $bsPcs = $bs['bs'];
 
             // Siapin data model + size untuk dikirim ke API bulk
             $bulkRequest = [];
@@ -1087,10 +1091,11 @@ class GodController extends BaseController
             $gwData = json_decode($response, true);
 
             // Index ulang hasil bulk berdasarkan 'model_size' key
+
             $gwMap = [];
             foreach ($gwData as $item) {
                 $key = $item['model'] . '_' . $item['size'];
-                $gwMap[$key] = (int)$item['gw'];
+                $gwMap[$key] = isset($item['gw']['gw']) ? (float)$item['gw']['gw'] : 0;
             }
 
             // Hitung produksi & gramasi
@@ -1104,25 +1109,7 @@ class GodController extends BaseController
                 $prodTotal += $prodQty;
                 $prodGr += $prodGw;
             }
-            foreach ($bs as $bsyes) {
-                $key = $bsyes['mastermodel'] . '_' . $bsyes['size'];
-                $gw = isset($gwMap[$key]) ? $gwMap[$key] : 0;
 
-                $bsQty = (int)$bsyes['bs'];
-                $bsGw = $gw * $bsQty;
-
-                $prodTotal += $prodQty;
-                $bsGr += $bsGw;
-            }
-
-            // return $this->response->setJSON([
-            //     'total_prod' => $prodTotal,
-            //     'total_prodgram' => $prodGr,
-            //     'bs_gr' => $bsGr,
-            //     'bs_mesin' => $bsMesin['qty_gram'],
-
-            // ]);
-            $total_bs = $bsGr + $bsMesin['qty_gram'];
 
             if (empty($prodYesterday)) {
                 $deffectRate = 0;
@@ -1131,9 +1118,9 @@ class GodController extends BaseController
                 $percentage = 0;
                 $productivity = 0;
             } else {
-                $deffectRate = ($total_bs / $prodGr) * 100;
+                $deffectRate = (($bsMesin['qty_gram'] / ($bsMesin['qty_gram'] + $prodGr)) + ($bsPcs / $prodTotal)) * 100;
                 $pph = round(($prodTotal / 2) / ($direct / 24));
-                $good =  $prodGr - $total_bs;
+                $good = 100 - $deffectRate;
                 $quality = ($good / $prodTotal) * 100;
                 $prod = $target['qty'] - $target['sisa'];
                 $percentage =  ($prod / $target['qty']) * 100;
@@ -1142,7 +1129,7 @@ class GodController extends BaseController
 
             $data = [
                 'deffect' => $deffectRate,
-                'bs' => $bs['bs'] ?? 0,
+                'bs' => $bsPcs ?? 0,
                 'output' => $prodTotal ?? 0,
                 'pph' => $pph,
                 'qty' => $target['qty'] ?? 0,
@@ -1158,6 +1145,146 @@ class GodController extends BaseController
             ];
 
             return $this->response->setJSON($data);
+        } catch (\Exception $e) {
+            return $this->response->setJSON(['error' => $e->getMessage()]);
+        }
+    }
+    public function getDailyProd()
+    {
+        $bulan = $this->request->getGet('bulan');
+        $tahun = $this->request->getGet('tahun');
+        $area = $this->request->getGet('area');
+
+        if (!$bulan || !$tahun) {
+            return $this->response->setJSON(['error' => 'Bulan dan Tahun wajib diisi']);
+        }
+        try {
+            // Oper filter ke model kalau tersedia
+            $filters = [
+                'bulan' => $bulan,
+                'tahun' => $tahun,
+                'area'  => $area
+            ];
+            $month = date('F', mktime(0, 0, 0, $bulan, 10)); // 10 = tanggal dummy, bisa berapa aja yg valid
+            $judul = $month . '-' . $tahun;
+            $targetMonth = 0;
+            if (!empty($filters['area'])) {
+                $targetMonth = $this->MonthlyMcModel->getTargetArea($judul, $area); // area spesifik
+            } else {
+                $targetMonth = $this->MonthlyMcModel->getTarget($judul); // target keseluruhan
+            }
+
+            $dailyProd = $this->produksiModel->dailyProductivity($filters);
+            $bulkRequest = [];
+            foreach ($dailyProd as $prd) {
+                $key = $prd['mastermodel'] . '_' . $prd['size'];
+                $bulkRequest[$key] = [
+                    'model' => $prd['mastermodel'],
+                    'size'  => $prd['size']
+                ];
+            }
+            // Kirim bulk ke API
+            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getGwBulk';
+            $options = [
+                'http' => [
+                    'method'  => 'POST',
+                    'header'  => "Content-Type: application/json\r\n",
+                    'content' => json_encode(array_values($bulkRequest))
+                ]
+            ];
+            $context = stream_context_create($options);
+            $response = file_get_contents($apiUrl, false, $context);
+            $gwData = json_decode($response, true);
+
+            // Index ulang hasil bulk berdasarkan 'model_size' key
+            $gwMap = [];
+            foreach ($gwData as $item) {
+                $key = $item['model'] . '_' . $item['size'];
+                $gwMap[$key] = isset($item['gw']['gw']) ? (float)$item['gw']['gw'] : 0;
+            }
+            $summaryByTanggal = [];
+            $groupedProd = [];
+            $tanggalList = [];
+            foreach ($dailyProd as $prd) {
+                $tanggal = $prd['tgl_produksi'];
+                $model = $prd['mastermodel'];
+                $size = $prd['size'];
+                $qty = (int)$prd['prod'];
+
+                $key = $tanggal . '_' . $model . '_' . $size;
+                $tanggalList[$tanggal] = true;
+
+                if (!isset($groupedProd[$key])) {
+                    $groupedProd[$key] = [
+                        'tanggal' => $tanggal,
+                        'model' => $model,
+                        'size' => $size,
+                        'qty' => 0
+                    ];
+                }
+                $groupedProd[$key]['qty'] += $qty;
+            }
+            foreach ($groupedProd as $item) {
+                $tanggal = $item['tanggal'];
+                $model = $item['model'];
+                $size = $item['size'];
+                $qty = $item['qty'];
+
+                $keyGw = $model . '_' . $size;
+                $gw = isset($gwMap[$keyGw]) ? $gwMap[$keyGw] : 0;
+
+                // Siapkan filter BS
+                $fill = [
+                    'no_model' =>  $prd['mastermodel'],
+                    'style' =>  $prd['size'],
+                    'area'  => $area,
+                    'tanggal' => $tanggal
+                ];
+
+                if (!isset($summaryByTanggal[$tanggal])) {
+                    $bsMesinDaily = $this->BsMesinModel->bsTanggal($fill);
+                    $bsSetting = $this->BsModel->getBsPertanggal($fill);
+                    $summaryByTanggal[$tanggal] = [
+                        'prodTotal' => 0,
+                        'prodGr' => 0,
+                        'bsmesin' => $bsMesinDaily['qty_gram'] ?? 0,
+                        'bsSetting' => $bsSetting,
+                    ];
+                }
+                // Hitung produksi
+                $prodGw = $gw * $qty;
+
+                $summaryByTanggal[$tanggal]['prodTotal'] += $qty;
+                $summaryByTanggal[$tanggal]['prodGr'] += $prodGw;
+                $summaryByTanggal[$tanggal]['gw'] = $gw;
+            }
+
+            // Post-process: convert satuan dan hitung persentase
+            foreach ($summaryByTanggal as $tanggal => &$data) {
+                $data['tanggal'] = $tanggal;
+                $data['prodTotal'] = $data['prodTotal'] / 24; // dz
+                $data['prodGr'] = $data['prodGr'] / 1000; // kg
+                $data['bsmesin'] = $data['bsmesin'] / 1000; // kg
+                $data['bsSetting'] = $data['bsSetting'] / 24; //dz
+                $data['target'] = $targetMonth['total_output'] ?? 0;
+                $data['productivity'] = ($data['target'] > 0) ? ($data['prodTotal'] / $data['target']) * 100 : 0;
+
+                $totalProdGr = $data['prodGr'];
+                $totalBsMesin = $data['bsmesin'];
+                $totalBsSetting = $data['bsSetting'];
+                $totalProd = $data['prodTotal'];
+
+                $data['deffectRate'] = ($totalProdGr > 0)
+                    ? (($totalBsMesin / ($totalBsMesin + $totalProdGr)) + ($totalBsSetting / $totalProd)) * 100
+                    : 0;
+            }
+            unset($data);
+
+            // Sort berdasarkan tanggal
+            ksort($summaryByTanggal);
+
+            // Return JSON response
+            return $this->response->setJSON(array_values($summaryByTanggal));
         } catch (\Exception $e) {
             return $this->response->setJSON(['error' => $e->getMessage()]);
         }
