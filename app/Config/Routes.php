@@ -421,7 +421,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
 
 // user
 $routes->group('/user', ['filter' => 'user'], function ($routes) {
-    $routes->get('', 'UserController::index');
+    $routes->get('', 'ProduksiController::viewproduksi');
     $routes->get('produksi', 'UserController::produksi');
     $routes->get('bssetting', 'UserController::bssetting');
     $routes->get('bsmesin', 'UserController::bsmesin');
