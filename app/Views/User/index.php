@@ -1,4 +1,4 @@
-<?php $this->extend('User/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -33,7 +33,7 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Socks System</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    Dashboard Produktivitas
+                                    Key Performance Indicator Monthly
                                 </h5>
                             </div>
                         </div>
@@ -732,6 +732,7 @@
             tr.classList.add("text-center");
 
             const productivity = row.productivity ?? 0;
+            const deffectRate = row.deffectRate ?? 0;
 
             let prodClass = 'text-danger';
             if (productivity >= 85) {
@@ -739,12 +740,18 @@
             } else if (productivity >= 80) {
                 prodClass = 'text-warning';
             }
+            let defClass = 'text-danger';
+            if (deffectRate <= 2) {
+                defClass = 'text-success';
+            } else if (deffectRate <= 5) {
+                defClass = 'text-warning';
+            }
 
             tr.innerHTML = `
         <td>${row.tanggal || "-"}</td>
         <td>${(row.target ?? 0).toLocaleString()}</td>
         <td class="${prodClass}">${productivity.toFixed(2)}</td>
-        <td>${(row.deffectRate ?? 0).toFixed(2)}</td>
+        <td class="${defClass}">${(row.deffectRate ?? 0).toFixed(2)}</td>
         <td>${(row.prodTotal ?? 0).toLocaleString()}</td>
         <td>${(row.prodGr ?? 0).toLocaleString()}</td>
         <td>${(row.bsmesin ?? 0).toLocaleString()}</td>
