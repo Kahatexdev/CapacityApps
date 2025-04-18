@@ -1667,6 +1667,7 @@ class ProduksiController extends BaseController
                         ];
                     }
                 } else {
+                    dd($existingBs,  $dataInsert);
                     log_message('info', "Data BS untuk shift {$shift} sudah ada pada row {$rowIndex}, dilewati");
                 }
             }
