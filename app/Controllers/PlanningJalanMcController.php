@@ -52,7 +52,6 @@ class PlanningJalanMcController extends BaseController
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         $this->liburModel = new LiburModel();
-        $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -641,7 +640,6 @@ class PlanningJalanMcController extends BaseController
         exit;
     }
 
-
     public function saveMonthlyMc()
     {
         // Set CORS Headers untuk mengizinkan request dari origin lain
@@ -749,7 +747,6 @@ class PlanningJalanMcController extends BaseController
         return $this->response->setJSON(['status' => 'success', 'message' => 'Data saved successfully'])->setStatusCode(200);
     }
 
-
     public function viewPlan($judul)
     {
         $role = session()->get('role');
@@ -771,7 +768,7 @@ class PlanningJalanMcController extends BaseController
             $monthlyData[$area['area']]['wly'] = $area['wly'];
             $monthlyData[$area['area']]['jarum'] = $this->detailAreaMc->getData($idAreaMc);
         }
-        $statusOrder = $this->orderServices->statusOrder($judul);
+        $statusOrder = $this->orderService->statusOrder($judul);
 
         $data = [
             'role' => $role,
@@ -814,6 +811,7 @@ class PlanningJalanMcController extends BaseController
         $global = $jsonData['global'] ?? null;
         $areaData = $jsonData['area'] ?? [];
         $detailData = $jsonData['detail'] ?? [];
+        log_message('debug', 'Isi detailData: ' . print_r($detailData, true));
 
         if (!$global || empty($areaData) || empty($detailData)) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Incomplete data'])->setStatusCode(400);
