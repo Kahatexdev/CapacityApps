@@ -94,6 +94,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
     $routes->post('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
     $routes->post('excelSisaOrderArea/(:any)', 'ExcelController::excelSisaOrderArea/$1');
+    $routes->post('inputhistoryrevise/(:any)', 'OrderController::inputHistory/$1');
 
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
