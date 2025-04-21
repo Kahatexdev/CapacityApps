@@ -143,10 +143,10 @@ class BsMesinModel extends Model
     public function existingData($insert)
     {
         $query = $this->select('*')
-            ->where('id_karyawan', $insert['id_karyawan'])
             ->where('nama_karyawan', $insert['nama_karyawan'])
             ->where('shift', $insert['shift'])
             ->where('area', $insert['area'])
+            ->where('no_model', $insert['no_model'])
             ->where('no_mesin', $insert['no_mesin'])
             ->where('size', $insert['size'])
             ->where('tanggal_produksi', $insert['tanggal_produksi'])
@@ -197,7 +197,7 @@ class BsMesinModel extends Model
         $builder = $this->select(" SUM(qty_gram) as qty_gram")
             ->where('tanggal_produksi',  $fill['tanggal']);
 
-        if (!empty($filters['area'])) {
+        if (!empty($fill['area'])) {
             $builder->where('area',  $fill['area']);
         }
         // Ambil hasil query-nya

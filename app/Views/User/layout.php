@@ -54,7 +54,7 @@
                 <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Order & Produksi</h6>
 
                 <li class="nav-item">
-                    <a class="nav-link <?= $active2 ?> " href="<?= base_url('user') ?>">
+                    <a class="nav-link <?= $active2 ?> " href="<?= base_url('user/dataproduksi') ?>">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                             <svg width="12px" height="12px" viewBox="0 0 40 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                                 <title>document</title>
