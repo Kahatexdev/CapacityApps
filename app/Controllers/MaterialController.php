@@ -538,7 +538,7 @@ class MaterialController extends BaseController
         $warna = $this->request->getGet('warna');
 
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/stockbahanbaku/' . $area . '?noModel=' . urlencode($noModel) . '&warna=' . urlencode($warna);
+        $apiUrl = 'http:/172.23.44.14/MaterialSystem/public/api/stockbahanbaku/' . $area . '?noModel=' . urlencode($noModel) . '&warna=' . urlencode($warna);
 
         // Mengambil data dari API eksternal
         $response = file_get_contents($apiUrl);
