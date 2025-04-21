@@ -1837,6 +1837,7 @@ class OrderController extends BaseController
     public function pdkDetail($noModel, $jarum)
     {
         $pdk = $this->ApsPerstyleModel->StylePerDelive($noModel, $jarum);
+        $history = $this->historyRev->getData($noModel);
         $pdkPerdlv = [];
         foreach ($pdk as $perdeliv) {
             $deliv = $perdeliv['delivery'];
@@ -1881,7 +1882,8 @@ class OrderController extends BaseController
             'headerRow' => $pdk,
             'noModel' => $noModel,
             'jarum' => $jarum,
-            'totalPo' => $totalPo
+            'totalPo' => $totalPo,
+            'historyRev' => $history
         ];
         return view(session()->get('role') . '/Order/detailPdk', $data);
     }
@@ -2063,5 +2065,28 @@ class OrderController extends BaseController
 
         ];
         return view(session()->get('role') . '/Order/orderMonthDetail', $data);
+    }
+    public function inputHistory()
+    {
+        $jarum = $this->request->getPost('jarum');
+        $tanggalInput = $this->request->getPost('tanggal_rev');
+        $nomodel = $this->request->getPost('no_model');
+        $keterangan = $this->request->getPost('keterangan');
+
+        $tanggal = date('Y-m-d H:i:s', strtotime($tanggalInput));
+
+        $dataInsert = [
+            'tanggal_rev' => $tanggal,
+            'model' => $nomodel,
+            'keterangan' => $keterangan
+        ];
+
+        $insert = $this->historyRev->insert($dataInsert);
+
+        if ($insert) {
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $jarum))->withInput()->with('success', 'Berhasil Input History Revisi');
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $jarum))->withInput()->with('error', 'Gagal Update Data');
+        }
     }
 }
