@@ -174,6 +174,7 @@ error_reporting(E_ALL); ?>
                     <div class="row mt-3">
                         <div class="d-flex justify-content-between align-item-center">
                             <h5> <span class='badge  badge-pill badge-lg bg-gradient-info'>History Revisi</span></h5>
+                            <button type="button" class="btn bg-gradient-info" data-bs-toggle="modal" data-bs-target="#ModalInputHistory">Input</button>
                         </div>
 
                         <div class="table-responsive">
@@ -324,8 +325,6 @@ error_reporting(E_ALL); ?>
                 </div>
             </div>
         </div>
-
-
         <div class="modal fade bd-example-modal-lg" id="ModalAssignAll" tabindex="-1" role="dialog" aria-labelledby="ModalAssignAll" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -483,6 +482,35 @@ error_reporting(E_ALL); ?>
                         <div class="modal-footer">
                             <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-danger">Cancel Order</button>
+                        </div>
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+        <div class="modal fade  bd-example-modal-lg" id="ModalInputHistory" tabindex="-1" role="dialog" aria-labelledby="ModalInputHistory" aria-hidden="true">
+            <div class="modal-dialog  modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">History Revisi Order <?= $noModel ?></h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <form action="<?= base_url($role . '/inputhistoryrevise/' . $noModel) ?>" method="post">
+                        <div class="modal-body">
+                            <input type="hidden" name="no_model" value="<?= $noModel ?>">
+                            <input type="hidden" name="jarum" value="<?= $jarum ?>">
+                            <label for="tanggal_rev">Tanggal Revisi:</label>
+                            <input type="datetime-local" name="tanggal_rev" id="tanggal_rev" class="form-control" style="margin-bottom: 10px;" required>
+                            <label for="keterangan">Keterangan:</label>
+                            <input type="text" name="keterangan" id="keterangan" class="form-control" style="margin-bottom: 10px;" required>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-success">Simpan</button>
                         </div>
                     </form>
 

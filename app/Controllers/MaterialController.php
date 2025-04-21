@@ -936,4 +936,5 @@ class MaterialController extends BaseController
         // Kembalikan data dalam format JSON
         return $this->response->setJSON($qty);
     }
+    public function stockbb() {}
 }
