@@ -1554,7 +1554,6 @@ class ProduksiController extends BaseController
             ];
 
             $failedDetails = array_map(function ($errorInfo) use ($shiftToColumn) {
-                dd($errorInfo);
                 $shiftColumn = $shiftToColumn[$errorInfo['error']] ?? 'Kolom Tidak Diketahui';
                 $message = "{$shiftColumn} baris ke {$errorInfo['row']} (Operator: {$errorInfo['operator']})";
                 if (!empty($errorInfo['error'])) {
