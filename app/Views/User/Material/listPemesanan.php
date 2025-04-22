@@ -137,8 +137,8 @@
                                     <td class="text-xs text-start"><?= $ttl_cns_pesan; ?></td>
                                     <td class="text-xs text-start"><?= $id['lot']; ?></td>
                                     <td class="text-xs text-start"><?= $id['keterangan']; ?></td>
-                                    <td class="text-xs text-start"></td>
                                     <td class="text-xs text-start"><?= number_format($id['ttl_pengiriman'], 2); ?></td>
+                                    <td class="text-xs text-start"></td>
                                     <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>"><?= number_format($id['sisa_jatah'], 2); ?></td>
                                     <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>">
                                         <?php if ($id['sisa_jatah'] > 0) {
@@ -158,6 +158,7 @@
                                         <?php
                                         $show = "d-none";
                                         $batasWaktu = '08:30:00';
+
                                         if ($id['sisa_jatah'] > 0) {
                                             if ($ttl_kg_pesan <= $id['sisa_jatah']) {
                                                 // Aturan berdasarkan hari dan jenis produk:
@@ -180,25 +181,27 @@
                                                         'SPANDEX' => [$threeDays => '08:30:00'],
                                                         'KARET'   => [$threeDays => '08:30:00']
                                                     ],
-                                                    // Default: bila hari selain yang di atas (misalnya, Sunday, Monday, dsb)
                                                     'default' => [
-                                                        'BENANG'  => [$tomorrow => '17:30:00'],
+                                                        'BENANG'  => [$tomorrow => '08:30:00'],
                                                         'NYLON'   => [$tomorrow => '08:30:00'],
                                                         'SPANDEX' => [$twoDays  => '08:30:00'],
                                                         'KARET'   => [$twoDays  => '08:30:00']
                                                     ]
                                                 ];
 
-                                                // Cari aturan yang cocok berdasarkan hari (default jika tak ada aturan khusus)
                                                 $currentRules = isset($rules[$day]) ? $rules[$day] : $rules['default'];
 
-                                                // Periksa apakah jenis produk ada di aturan saat ini
                                                 if (isset($currentRules[$id['jenis']])) {
                                                     foreach ($currentRules[$id['jenis']] as $tgl => $waktu) {
                                                         if ($id['tgl_pakai'] == $tgl) {
                                                             $show = "";
-                                                            $batasWaktu = $waktu;
-                                                            break; // Sudah ditemukan aturan yang pas
+
+                                                            if ($id['status_kirim'] === 'request accept') {
+                                                                $batasWaktu = $id['additional_time'];
+                                                            } else {
+                                                                $batasWaktu = $waktu;
+                                                            }
+                                                            break;
                                                         }
                                                     }
                                                 }
@@ -213,7 +216,9 @@
                                                     data-waktu="<?= $batasWaktu; ?>">
                                                     <i class="fa fa-paper-plane fa-lg"></i>
                                                 </button>
-                                        <?php }
+                                        <?php
+                                                echo $batasWaktu;
+                                            }
                                         }  ?>
                                     </td>
                                     </tr>
@@ -387,37 +392,44 @@
         });
         // END GET TGL PAKAI ADDITIONAL TIME
 
-        // SHOW / HIDE BUTTON SEND
         // Mendapatkan waktu saat ini
-        let currentTime = new Date();
+        // Iterasi melalui semua tombol dengan kelas .send-btn
+        $('.send-btn').each(function() {
+            let button = $(this); // Tombol saat ini dalam iterasi
+            let currentTime = new Date();
 
-        // Mendapatkan batas waktu dari atribut data-waktu
-        let batasWaktuStr = $('#sendBtn').data('waktu'); // Format: HH:mm:ss
-        let [hours, minutes, seconds] = batasWaktuStr.split(':');
-        let batasWaktu = new Date(
-            currentTime.getFullYear(),
-            currentTime.getMonth(),
-            currentTime.getDate(),
-            hours,
-            minutes,
-            seconds
-        );
+            // Mendapatkan batas waktu dari atribut data-waktu
+            let batasWaktuStr = button.data('waktu'); // Format: HH:mm:ss
+            if (!batasWaktuStr) {
+                console.warn('Batas waktu tidak ditemukan untuk tombol:', button);
+                return; // Lewati tombol jika tidak ada data-waktu
+            }
 
-        // Hitung waktu tersisa hingga batas waktu dalam milidetik
-        let waktuTersisa = batasWaktu - currentTime;
+            let [hours, minutes, seconds] = batasWaktuStr.split(':').map(Number);
+            let batasWaktu = new Date(
+                currentTime.getFullYear(),
+                currentTime.getMonth(),
+                currentTime.getDate(),
+                hours,
+                minutes,
+                seconds
+            );
 
-        // Jika waktu tersisa lebih dari 0, atur timer untuk menyembunyikan tombol
-        if (waktuTersisa > 0) {
-            setTimeout(function() {
-                $('#sendBtn').addClass('d-none'); // Sembunyikan tombol
-                console.log('Tombol disembunyikan: Waktu sudah melewati batas');
-            }, waktuTersisa);
-        } else {
-            // Jika waktu sudah terlewati, sembunyikan tombol langsung
-            $('#sendBtn').addClass('d-none');
-            console.log('Tombol sudah disembunyikan: Waktu sudah lewat saat halaman dimuat');
-        }
-        // END SHOW / HIDE BUTTON SEND
+            // Hitung waktu tersisa hingga batas waktu dalam milidetik
+            let waktuTersisa = batasWaktu - currentTime;
+
+            // Jika waktu tersisa lebih dari 0, atur timer untuk menyembunyikan tombol
+            if (waktuTersisa > 0) {
+                setTimeout(function() {
+                    button.addClass('d-none'); // Sembunyikan tombol
+                    console.log('Tombol disembunyikan: Waktu sudah melewati batas untuk', button);
+                }, waktuTersisa);
+            } else {
+                // Jika waktu sudah terlewati, sembunyikan tombol langsung
+                button.addClass('d-none');
+                console.log('Tombol sudah disembunyikan: Waktu sudah lewat saat halaman dimuat untuk', button);
+            }
+        });
 
         // FILTER TABLE
         $('#example').DataTable({
