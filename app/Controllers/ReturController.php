@@ -109,7 +109,7 @@ class ReturController extends BaseController
 
         // URL API
         $apiUrlPph = 'http://172.23.44.14/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
-        // $apiUrlPengiriman = 'http://172.23.39.117/MaterialSystem/public/api/getPengirimanArea?noModel=' . urlencode($noModel);
+        // $apiUrlPengiriman = 'http://172.23.39.114/MaterialSystem/public/api/getPengirimanArea?noModel=' . urlencode($noModel);
         $apiUrlPengiriman = 'http://172.23.44.14/MaterialSystem/public/api/getPengirimanArea?noModel=' . urlencode($noModel);
 
         // Ambil data dari API PPH
@@ -343,7 +343,7 @@ class ReturController extends BaseController
                     // Kirim ke API
                     $response = $client->post(
                         'http://172.23.44.14/MaterialSystem/public/api/saveRetur',
-                        // 'http://172.23.39.117/MaterialSystem/public/api/saveRetur',
+                        // 'http://172.23.39.114/MaterialSystem/public/api/saveRetur',
                         [
                             'headers' => [
                                 'Accept' => 'application/json',

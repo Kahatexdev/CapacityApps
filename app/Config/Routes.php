@@ -490,6 +490,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
 
     //summary bs mc
     $routes->post('exportSummaryBs', 'SummaryController::excelSummaryBs');
+    $routes->get('exportBsMesinPerbulan/(:any)/(:any)', 'SummaryController::summaryBsMesinPerbulan/$1/$2');
 
     // bahanbaku
     $routes->get('bahanBaku', 'MaterialController::index');
