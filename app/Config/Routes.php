@@ -236,6 +236,8 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('tampilPerdelivery', 'OrderController::tampilPerdelivery');
     $routes->get('orderPerbulan', 'OrderController::orderPerbulan');
     $routes->get('orderPerMonth/(:any)/(:any)', 'OrderController::orderPerMonth/$1/$2');
+    $routes->post('inputhistoryrevise/(:any)', 'OrderController::inputHistory/$1');
+
 
 
     // mesin

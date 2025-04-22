@@ -152,6 +152,7 @@ class ApsPerstyleModel extends Model
     public function asignarealall($data)
     {
         $this->set('factory', $data['area'])
+            ->set('production_unit', $data['pu'])
             ->where('mastermodel', $data['mastermodel'])
             ->update();
 
