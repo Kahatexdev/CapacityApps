@@ -217,7 +217,6 @@
                                                     <i class="fa fa-paper-plane fa-lg"></i>
                                                 </button>
                                         <?php
-                                                echo $batasWaktu;
                                             }
                                         }  ?>
                                     </td>
