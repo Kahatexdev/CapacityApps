@@ -108,9 +108,11 @@ class ReturController extends BaseController
         $noModel = $this->request->getGet('model') ?? '';
 
         // URL API
+        // 172.23.39.117
+        // $apiUrlPph = 'http://172.23.39.117/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
         $apiUrlPph = 'http://172.23.44.14/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
-        // $apiUrlPengiriman = 'http://172.23.39.114/MaterialSystem/public/api/getPengirimanArea?noModel=' . urlencode($noModel);
         $apiUrlPengiriman = 'http://172.23.44.14/MaterialSystem/public/api/getPengirimanArea?noModel=' . urlencode($noModel);
+        // $apiUrlPengiriman = 'http://172.23.39.117/MaterialSystem/public/api/getPengirimanArea?noModel=' . urlencode($noModel);
 
         // Ambil data dari API PPH
         $responsePph = file_get_contents($apiUrlPph);
@@ -290,6 +292,7 @@ class ReturController extends BaseController
     {
         // get data kategori retur dari API
         $url = 'http://172.23.44.14/MaterialSystem/public/api/getKategoriRetur';
+        // $url = 'http://172.23.39.117/MaterialSystem/public/api/getKategoriRetur';
         $response = file_get_contents($url);
         log_message('debug', "API Response: " . $response);
         if ($response === FALSE) {
@@ -318,6 +321,7 @@ class ReturController extends BaseController
     {
         $postData = $this->request->getPost();
         $items = $postData['items'] ?? [];
+        // dd ($postData);
 
         if (!empty($items) && is_array($items)) {
             // Init HTTP client
@@ -338,7 +342,7 @@ class ReturController extends BaseController
                     'kategori' => $item['kategori_retur'],
                     'keterangan_area'   => $item['alasan_retur']
                 ];
-
+                // dd($data);
                 try {
                     // Kirim ke API
                     $response = $client->post(

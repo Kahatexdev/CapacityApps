@@ -207,8 +207,7 @@
             const warna = $('input[name="warna"]').val();
 
             const query = `?no_model=${encodeURIComponent(noModel)}&warna=${encodeURIComponent(warna)}`;
-            window.location.href = "http://172.23.44.14/MaterialSystem/public/api/warehouse/exportExcel" + query;
-
+            window.location.href = "<?= base_url(session()->get('role') . '/warehouse/exportExcel') ?>" + query;
         });
 
     });
