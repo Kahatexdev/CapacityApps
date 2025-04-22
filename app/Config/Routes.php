@@ -94,6 +94,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
     $routes->post('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
     $routes->post('excelSisaOrderArea/(:any)', 'ExcelController::excelSisaOrderArea/$1');
+    $routes->post('inputhistoryrevise/(:any)', 'OrderController::inputHistory/$1');
 
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
@@ -417,6 +418,10 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('datadeffect', 'DeffectController::datadeffect');
     $routes->post('inputKode', 'DeffectController::inputKode');
     $routes->post('viewDataBs', 'DeffectController::viewDataBs');
+
+    //bahanbakyu
+    $routes->get('stockbb', 'MaterialController::stockbb');
+    $routes->get('filterstockbahanbaku/(:any)', 'MaterialController::filterStockBahanBaku/$1');
 });
 
 // user
@@ -516,6 +521,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('requestAdditionalTime', 'MaterialController::requestAdditionalTime');
     $routes->post('requestAdditionalTime/getTanggalPakai', 'MaterialController::getTanggalPakai');
     $routes->post('getQty', 'MaterialController::getQtyByModelSize');
+
 
     // retur
     $routes->get('retur/(:any)', 'ReturController::index/$1');

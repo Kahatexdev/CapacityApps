@@ -81,52 +81,7 @@ class ApsController extends BaseController
         $aksesArea = $this->aksesModel->aksesData($idUser);
         $pdk = [];
 
-        foreach ($aksesArea as $ar) {
-            // Dapatkan data progress per area
-            $areaProgress = $this->ApsPerstyleModel->getProgressperArea($ar);
-            $lastmonth = date('Y-m-d', strtotime('- 1 month'));
 
-            // Grup by mastermodel
-            $grouped = [];
-            foreach ($areaProgress as $item) {
-                $model = $item['mastermodel'];
-                if (!isset($grouped[$model])) {
-                    $grouped[$model] = [
-                        'mastermodel' => $model,
-                        'target' => 0,
-                        'remain' => 0,
-                        'delivery' => $item['delivery'],
-                        'percentage' => 0,
-                    ];
-                }
-
-                // Jumlahkan target dan remain
-                $grouped[$model]['target'] += (int)$item['target'];
-                $grouped[$model]['remain'] += (int)$item['remain'];
-                $produksi = $grouped[$model]['target'] - $grouped[$model]['remain'];
-
-                // Hitung percentage hanya jika produksi > 0
-                if ($produksi > 0) {
-                    $grouped[$model]['percentage'] = round(($produksi / $grouped[$model]['target']) * 100);
-                }
-
-                // Ambil delivery paling akhir
-                if ($grouped[$model]['delivery'] < $item['delivery']) {
-                    $grouped[$model]['delivery'] = $item['delivery'];
-                }
-            }
-
-            // Filter yang delivery >= hari ini
-            $filtered = array_filter($grouped, function ($item) use ($lastmonth) {
-                return $item['delivery'] >= $lastmonth;
-            });
-            usort($filtered, function ($a, $b) {
-                return $a['percentage'] <=> $b['percentage'];
-            });
-
-            // Simpan hasil per area
-            $pdk[$ar] = $filtered;
-        }
         $orderJalan = $this->bookingModel->getOrderJalan();
         $terimaBooking = $this->bookingModel->getBookingMasuk();
         $mcJalan = $this->jarumModel->mcJalan();

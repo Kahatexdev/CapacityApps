@@ -1554,10 +1554,10 @@ class ProduksiController extends BaseController
             ];
 
             $failedDetails = array_map(function ($errorInfo) use ($shiftToColumn) {
-                $shiftColumn = $shiftToColumn[$errorInfo['shift']] ?? 'Kolom Tidak Diketahui';
-                $message = "{$shiftColumn} baris ke {$errorInfo['row']} (Operator: {$errorInfo['operator']})";
+                $shiftColumn = $shiftToColumn[$errorInfo['error']] ?? $errorInfo['error'];
+                $message = "{$shiftColumn} baris ke {$errorInfo['row']}";
                 if (!empty($errorInfo['error'])) {
-                    $message .= " - " . $errorInfo['error'];
+                    $message .= " - " . $errorInfo['row'];
                 }
                 return $message;
             }, $failedRows);
@@ -1667,6 +1667,7 @@ class ProduksiController extends BaseController
                         ];
                     }
                 } else {
+                    dd($existingBs,  $dataInsert);
                     log_message('info', "Data BS untuk shift {$shift} sudah ada pada row {$rowIndex}, dilewati");
                 }
             }
