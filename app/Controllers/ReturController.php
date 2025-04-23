@@ -263,8 +263,8 @@ class ReturController extends BaseController
                     'item_type' => $item['item_type'],
                     'kode_warna' => $item['kode_warna'],
                     'warna'     => $item['color'],
-                    'ttl_kebutuhan' => $item['ttl_kebutuhan'],  // untuk PO (KGS)
-                    'pph'       => $item['pph'],
+                    'ttl_kebutuhan' => 0,
+                    'pph'       => 0,
                     'jarum'     => $item['jarum'],
                     'kgs_out' => $item['kgs_out'],
                     'cns_out' => $item['cns_out'],
@@ -273,6 +273,9 @@ class ReturController extends BaseController
                     'nama_cluster' => $item['nama_cluster']
                 ];
             }
+            // Akumulasi data berdasarkan item_type-kode_warna
+            $result[$key]['ttl_kebutuhan'] += $item['ttl_kebutuhan'];
+            $result[$key]['pph'] += $item['pph'];
         }
 
         foreach ($temporaryData as $res) {
