@@ -111,7 +111,11 @@
                                 <table id="header" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
-                                            <th class="text-center"><input type="checkbox" id="select-all" class="form-check-input"></th>
+                                            <th class="text-center">
+                                                <div class="form-check">
+                                                    <input type="checkbox" id="select-all" class="form-check-input">
+                                                </div>
+                                            </th>
                                             <th class="text-center">No</th>
                                             <th class="text-center">Tgl Pakai</th>
                                             <th class="text-center">No Model</th>
@@ -145,7 +149,9 @@
                                                     <input type="hidden" name="area[]" value="<?= $area; ?>">
                                                     <!-- kolom hide end -->
                                                     <td class="text-center">
-                                                        <input type="checkbox" class="form-check-input delete-checkbox" name="delete[]" value="<?= $record['id_material'] . ',' . $record['tgl_pakai']; ?>">
+                                                        <div class="form-check">
+                                                            <input type="checkbox" class="form-check-input delete-checkbox" name="delete[]" value="<?= $record['id_material'] . ',' . $record['tgl_pakai']; ?>">
+                                                        </div>
                                                     </td>
                                                     <td class="text-center"><?= $no++; ?></td>
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="tgl_pakai[]" value="<?= $record['tgl_pakai']; ?>" readonly></td>
@@ -157,7 +163,6 @@
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="jalan_mc[]" value="<?= $record['jalan_mc']; ?>" readonly></td>
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="ttl_cns[]" value="<?= $record['ttl_cns']; ?>" readonly></td>
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="ttl_berat_cns[]" value="<?= $record['ttl_berat_cns']; ?>" readonly></td>
-                                                    <!-- <td class="text-center"><a href="<?= base_url($role . '/bahanBaku/hapusSession/' . $record['id_material'] . '/' . $record['tgl_pakai']) ?>" class="btn btn-danger"><i class="fas fa-trash" style="height:5px;"></i></a></td> -->
                                                 </tr>
                                             <?php
                                             }
@@ -178,7 +183,6 @@
                                         ?>
                                         <tr>
                                             <td colspan="10" class="text-center font-weight-bolder align-middle">Hapus List Pemesanan</td>
-                                            <!-- <td class="text-center"><a href="<?= base_url($role . '/bahanBaku/hapusSession') ?>" class="btn btn-danger"><i class="fas fa-trash"></i></a></td> -->
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-danger" id="delete-selected"><i class="fas fa-trash"></i></button>
                                             </td>
