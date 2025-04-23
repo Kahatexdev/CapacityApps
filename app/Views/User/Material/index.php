@@ -464,8 +464,9 @@
                     dataType: "json",
                     success: function(response) {
                         console.log(response)
-
                         qty.val(response.qty); // Isi input "Jalan MC" dengan data dari server
+                        inisial.val(response.inisial);
+
                         // Lakukan permintaan AJAX
                         $.ajax({
                             url: '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + encodeURIComponent(selectedStyleSize) + '/' + area + '/' + qty.val(), // Ganti URL sesuai kebutuhan
@@ -478,7 +479,6 @@
                                 if (response && response.length > 0) {
                                     // Ambil data inisial dan gw dari elemen pertama
                                     let firstData = response[0];
-                                    inisial.val(firstData.inisial);
                                     gw.val(firstData.gw);
                                 }
 
@@ -555,7 +555,11 @@
                                 });
                             },
                             error: function() {
-                                alert('Gagal mengambil data Material Usage.');
+                                table.empty().append(`
+                                <tr>
+                                    <td colspan="7" class="text-center text-danger fw-bold">Gagal mengambil data Material Usage. Silakan coba lagi.</td>
+                                </tr>
+                            `);
                             }
                         });
                     },
