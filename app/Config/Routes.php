@@ -236,6 +236,8 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('tampilPerdelivery', 'OrderController::tampilPerdelivery');
     $routes->get('orderPerbulan', 'OrderController::orderPerbulan');
     $routes->get('orderPerMonth/(:any)/(:any)', 'OrderController::orderPerMonth/$1/$2');
+    $routes->post('inputhistoryrevise/(:any)', 'OrderController::inputHistory/$1');
+
 
 
     // mesin
@@ -494,6 +496,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
 
     //summary bs mc
     $routes->post('exportSummaryBs', 'SummaryController::excelSummaryBs');
+    $routes->get('exportBsMesinPerbulan/(:any)/(:any)', 'SummaryController::summaryBsMesinPerbulan/$1/$2');
 
     // bahanbaku
     $routes->get('bahanBaku', 'MaterialController::index');

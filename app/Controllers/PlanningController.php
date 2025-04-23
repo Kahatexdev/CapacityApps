@@ -156,12 +156,18 @@ class PlanningController extends BaseController
         $model = $this->request->getPost("no_model");
         $area = $this->request->getPost("area");
         $jarum = $this->request->getPost("jarum");
-
+        $pu = 'Pu Belum Di Pilih';
+        if ($area == 'Gedung 1' || $area == 'Gedung 2') {
+            $pu = 'MJ';
+        } else {
+            $pu = 'CJ';
+        }
         // Simpan ke sistem Capacity dulu
         $data = [
             'role' => session()->get('role'),
             'mastermodel' => $model,
-            'area' => $area
+            'area' => $area,
+            'pu' => $pu
         ];
         $assign = $this->ApsPerstyleModel->asignarealall($data);
 

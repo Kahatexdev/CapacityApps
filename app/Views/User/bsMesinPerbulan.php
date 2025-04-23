@@ -83,7 +83,7 @@
                 <div class="card pb-0">
                     <div class="card-header d-flex justify-content-between">
                         <h5>BS Mesin bulan <?= $month ?></h5>
-                        <a href="" class="btn btn-success">Export</a>
+                        <a href="<?= base_url($role . '/exportBsMesinPerbulan/' . $area . '/' . $month) ?>" class="btn btn-success">Export</a>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">

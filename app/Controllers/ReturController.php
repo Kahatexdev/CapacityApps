@@ -322,7 +322,7 @@ class ReturController extends BaseController
         $postData = $this->request->getPost();
         $items = $postData['items'] ?? [];
         // dd ($postData);
-        
+
         if (!empty($items) && is_array($items)) {
             // Init HTTP client
             $client = \Config\Services::curlrequest();
@@ -347,7 +347,7 @@ class ReturController extends BaseController
                     // Kirim ke API
                     $response = $client->post(
                         'http://172.23.44.14/MaterialSystem/public/api/saveRetur',
-                        // 'http://172.23.39.117/MaterialSystem/public/api/saveRetur',
+                        // 'http://172.23.39.114/MaterialSystem/public/api/saveRetur',
                         [
                             'headers' => [
                                 'Accept' => 'application/json',
