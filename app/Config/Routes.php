@@ -496,6 +496,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
 
     //summary bs mc
     $routes->post('exportSummaryBs', 'SummaryController::excelSummaryBs');
+    $routes->get('exportBsMesinPerbulan/(:any)/(:any)', 'SummaryController::summaryBsMesinPerbulan/$1/$2');
 
     // bahanbaku
     $routes->get('bahanBaku', 'MaterialController::index');
@@ -505,8 +506,8 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('getJalanMc', 'MaterialController::getJalanMcByModelSize');
     $routes->get('getMU/(:any)/(:any)/(:any)/(:any)', 'MaterialController::getMU/$1/$2/$3/$4');
     $routes->post('bahanBaku/simpanKeSession', 'MaterialController::savePemesananSession');
-    $routes->get('bahanBaku/hapusSession', 'MaterialController::deleteAllPemesananSession');
-    $routes->get('bahanBaku/hapusSession/(:any)/(:any)', 'MaterialController::deletePemesananSession/$1/$2');
+    $routes->post('bahanBaku/hapusSession', 'MaterialController::deletePemesananSession');
+    // $routes->get('bahanBaku/hapusSession/(:any)/(:any)', 'MaterialController::deletePemesananSession/$1/$2');
     $routes->get('listPemesanan/(:any)', 'MaterialController::listPemesanan/$1');
     $routes->get('stockbahanbaku/(:any)', 'MaterialController::stockBahanBaku/$1');
     $routes->get('filterstockbahanbaku/(:any)', 'MaterialController::filterStockBahanBaku/$1');
@@ -530,6 +531,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
     $routes->post('retur/(:any)/pengajuanRetur', 'ReturController::pengajuanRetur/$1');
     $routes->get('getKategoriRetur', 'ReturController::getKategoriRetur');
+    $routes->get('getKodeWarnaWarnaByItemType', 'ReturController::getKodeWarnaWarnaByItemType');
 });
 
 // sudo

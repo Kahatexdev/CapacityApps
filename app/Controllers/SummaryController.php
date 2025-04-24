@@ -14,6 +14,7 @@ use App\Models\LiburModel;
 use App\Models\DetailPlanningModel;
 use App\Models\TanggalPlanningModel;
 use App\Models\KebutuhanAreaModel;
+use App\Models\BsMesinModel;
 use LengthException;
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Week;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -38,6 +39,7 @@ class SummaryController extends BaseController
     protected $detailPlanningModel;
     protected $tanggalPlanningModel;
     protected $kebutuhanAreaModel;
+    protected $BsMesinModel;
 
 
     public function __construct()
@@ -52,6 +54,7 @@ class SummaryController extends BaseController
         $this->detailPlanningModel = new DetailPlanningModel();
         $this->tanggalPlanningModel = new TanggalPlanningModel();
         $this->kebutuhanAreaModel = new KebutuhanAreaModel();
+        $this->BsMesinModel = new BsMesinModel();
 
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -2249,6 +2252,140 @@ class SummaryController extends BaseController
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
 
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+    public function summaryBsMesinPerbulan($area, $bulan)
+    {
+        $bsPerbulan = $this->BsMesinModel->bsMesinPerbulan($area, $bulan);
+
+        // Buat spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('SUMMARY BS');
+
+        // border
+        $styleHeader = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+        $styleBody = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+        $styleSubTotal = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_RIGHT, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+        $styleTotal = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+
+        // Judul
+        $sheet->setCellValue('A1', 'BS MESIN AREA ' . $area . ' BULAN ' . $bulan);
+        $sheet->mergeCells('A1:G1');
+        // Mengatur teks menjadi rata tengah dan huruf tebal
+        $sheet->getStyle('A1')->getFont()->setBold(true);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $row_header = 3;
+
+        $sheet->setCellValue('A' . $row_header, 'Tanggal');
+        $sheet->setCellValue('B' . $row_header, 'Nama');
+        $sheet->setCellValue('C' . $row_header, 'No Mesin');
+        $sheet->setCellValue('D' . $row_header, 'No Model');
+        $sheet->setCellValue('E' . $row_header, 'Style Size');
+        $sheet->setCellValue('F' . $row_header, 'Qty (Gram)');
+        $sheet->setCellValue('G' . $row_header, 'Qty (Pcs)');
+
+        // style untuk header
+        $sheet->getStyle('A' . $row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('B' . $row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('C' . $row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('D' . $row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('E' . $row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('F' . $row_header)->applyFromArray($styleHeader);
+        $sheet->getStyle('G' . $row_header)->applyFromArray($styleHeader);
+
+        // Body
+        $row = 4; // Mulai dari baris ke-5 setelah header
+        foreach ($bsPerbulan as $data) {
+            $sheet->setCellValue('A' . $row, $data['tanggal_produksi']);
+            $sheet->setCellValue('B' . $row, $data['nama_karyawan']);
+            $sheet->setCellValue('C' . $row, $data['no_mesin']);
+            $sheet->setCellValue('D' . $row, $data['no_model']);
+            $sheet->setCellValue('E' . $row, $data['size']);
+            $sheet->setCellValue('F' . $row, $data['qty_gram']);
+            $sheet->setCellValue('G' . $row, $data['qty_pcs']);
+
+            // Terapkan style body ke setiap baris
+            $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('C' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('D' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('E' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('F' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('G' . $row)->applyFromArray($styleBody);
+
+            $row++;
+        }
+        // Total Qty
+        $sheet->mergeCells('A' . $row . ':E' . $row); // Merge kolom A sampai E
+        $sheet->setCellValue('A' . $row, 'Total');
+        $sheet->setCellValue('F' . $row, '=SUM(F4:F' . ($row - 1) . ')');
+        $sheet->setCellValue('G' . $row, '=SUM(G4:G' . ($row - 1) . ')');
+
+        // Terapkan style total ke seluruh baris total
+        $sheet->getStyle('A' . $row . ':E' . $row)->applyFromArray($styleTotal);
+        $sheet->getStyle('F' . $row)->applyFromArray($styleTotal);
+        $sheet->getStyle('G' . $row)->applyFromArray($styleTotal);
+
+        // Set judul file dan header untuk download
+        $filename = 'BS MESIN AREA ' . $area . ' BULAN ' . $bulan . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        // Tulis file excel ke output
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;

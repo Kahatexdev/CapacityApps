@@ -263,8 +263,8 @@ class ReturController extends BaseController
                     'item_type' => $item['item_type'],
                     'kode_warna' => $item['kode_warna'],
                     'warna'     => $item['color'],
-                    'ttl_kebutuhan' => $item['ttl_kebutuhan'],  // untuk PO (KGS)
-                    'pph'       => $item['pph'],
+                    'ttl_kebutuhan' => 0,
+                    'pph'       => 0,
                     'jarum'     => $item['jarum'],
                     'kgs_out' => $item['kgs_out'],
                     'cns_out' => $item['cns_out'],
@@ -273,6 +273,9 @@ class ReturController extends BaseController
                     'nama_cluster' => $item['nama_cluster']
                 ];
             }
+            // Akumulasi data berdasarkan item_type-kode_warna
+            $result[$key]['ttl_kebutuhan'] += $item['ttl_kebutuhan'];
+            $result[$key]['pph'] += $item['pph'];
         }
 
         foreach ($temporaryData as $res) {
@@ -322,7 +325,7 @@ class ReturController extends BaseController
         $postData = $this->request->getPost();
         $items = $postData['items'] ?? [];
         // dd ($postData);
-        
+
         if (!empty($items) && is_array($items)) {
             // Init HTTP client
             $client = \Config\Services::curlrequest();
@@ -347,7 +350,7 @@ class ReturController extends BaseController
                     // Kirim ke API
                     $response = $client->post(
                         'http://172.23.44.14/MaterialSystem/public/api/saveRetur',
-                        // 'http://172.23.39.117/MaterialSystem/public/api/saveRetur',
+                        // 'http://172.23.39.114/MaterialSystem/public/api/saveRetur',
                         [
                             'headers' => [
                                 'Accept' => 'application/json',
@@ -375,5 +378,16 @@ class ReturController extends BaseController
         }
 
         return redirect()->back()->with('error', 'Data retur tidak valid.');
+    }
+
+    public function getKodeWarnaWarnaByItemType()
+    {
+        $itemType = $this->request->getGet('item_type');
+
+        // Ambil data berdasarkan item_type dari database
+        $model = new \App\Models\ReturModel(); // Ganti sesuai model kamu
+        $result = $model->where('item_type', $itemType)->groupBy(['kode_warna', 'warna'])->findAll();
+
+        return $this->response->setJSON($result);
     }
 }
