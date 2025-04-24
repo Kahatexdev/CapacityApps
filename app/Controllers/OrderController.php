@@ -1921,7 +1921,7 @@ class OrderController extends BaseController
                 $percentage = round(($ttlProd / $qty) * 100);
                 $ganti = $bs + $poplus;
                 $estimasi = ($ganti / $ttlProd / 100) * $qty;
-                if ($percentage > 60 && $percentage < 90) {
+                if ($percentage > 75 && $percentage < 98) {
                     $perStyle[] = [
                         'model' => $id['mastermodel'],
                         'inisial' => $id['inisial'],
