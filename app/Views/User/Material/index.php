@@ -111,6 +111,11 @@
                                 <table id="header" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
+                                            <th class="text-center">
+                                                <div class="form-check">
+                                                    <input type="checkbox" id="select-all" class="form-check-input">
+                                                </div>
+                                            </th>
                                             <th class="text-center">No</th>
                                             <th class="text-center">Tgl Pakai</th>
                                             <th class="text-center">No Model</th>
@@ -121,7 +126,6 @@
                                             <th class="text-center">Jalan Mc</th>
                                             <th class="text-center">Ttl Cns</th>
                                             <th class="text-center">Ttl Berat Cns (Kg)</th>
-                                            <th class="text-center">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -144,6 +148,11 @@
                                                     <input type="hidden" name="id_material[]" value="<?= $record['id_material']; ?>">
                                                     <input type="hidden" name="area[]" value="<?= $area; ?>">
                                                     <!-- kolom hide end -->
+                                                    <td class="text-center">
+                                                        <div class="form-check">
+                                                            <input type="checkbox" class="form-check-input delete-checkbox" name="delete[]" value="<?= $record['id_material'] . ',' . $record['tgl_pakai']; ?>">
+                                                        </div>
+                                                    </td>
                                                     <td class="text-center"><?= $no++; ?></td>
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="tgl_pakai[]" value="<?= $record['tgl_pakai']; ?>" readonly></td>
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="no_model[]" value="<?= $record['no_model']; ?>" readonly></td>
@@ -154,7 +163,6 @@
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="jalan_mc[]" value="<?= $record['jalan_mc']; ?>" readonly></td>
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="ttl_cns[]" value="<?= $record['ttl_cns']; ?>" readonly></td>
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="ttl_berat_cns[]" value="<?= $record['ttl_berat_cns']; ?>" readonly></td>
-                                                    <td class="text-center"><a href="<?= base_url($role . '/bahanBaku/hapusSession/' . $record['id_material'] . '/' . $record['tgl_pakai']) ?>" class="btn btn-danger"><i class="fas fa-trash" style="height:5px;"></i></a></td>
                                                 </tr>
                                             <?php
                                             }
@@ -174,8 +182,10 @@
                                         }
                                         ?>
                                         <tr>
-                                            <td colspan="10" class="text-center font-weight-bolder align-middle">Hapus Semua List Pemesanan</td>
-                                            <td class="text-center"><a href="<?= base_url($role . '/bahanBaku/hapusSession') ?>" class="btn btn-danger"><i class="fas fa-trash"></i></a></td>
+                                            <td colspan="10" class="text-center font-weight-bolder align-middle">Hapus List Pemesanan</td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-danger" id="delete-selected"><i class="fas fa-trash"></i></button>
+                                            </td>
 
                                         </tr>
                                     </tbody>
@@ -814,6 +824,54 @@
             }
         });
     };
+
+    // Checkbox "Select All" functionality
+    document.getElementById('select-all').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.delete-checkbox');
+        const isChecked = this.checked;
+
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = isChecked;
+        });
+    });
+
+    // hapus session list pemesanan
+    document.getElementById('delete-selected').addEventListener('click', function() {
+        const selected = Array.from(document.querySelectorAll('.delete-checkbox:checked')).map(checkbox => checkbox.value);
+
+        if (selected.length === 0) {
+            alert('Pilih setidaknya satu item untuk dihapus!');
+            return;
+        }
+
+        if (confirm('Apakah Anda yakin ingin menghapus data yang dipilih?')) {
+            $.ajax({
+                url: '<?= base_url($role . "/bahanBaku/hapusSession") ?>',
+                type: 'POST',
+                data: {
+                    selected
+                },
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Data berhasil dihapus!',
+                        text: 'Data telah dihapus dengan sukses.',
+                        confirmButtonText: 'OK'
+                    }).then(function() {
+                        location.reload(); // Refresh halaman setelah penghapusan
+                    });
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal menghapus data',
+                        text: 'Terjadi kesalahan: ' + xhr.responseText,
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+    });
 </script>
 
 <?php $this->endSection(); ?>
