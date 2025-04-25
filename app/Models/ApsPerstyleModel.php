@@ -1042,12 +1042,4 @@ class ApsPerstyleModel extends Model
             ->where('factory', $area)
             ->first();
     }
-    // public function getStyleSizeByBb($noModel, $styleSize, $area)
-    // {
-    //     return $this->select('qty')
-    //         ->where('mastermodel', $noModel)
-    //         ->where('size', $styleSize)
-    //         ->where('factory', $area)
-    //         ->first();
-    // }
 }
