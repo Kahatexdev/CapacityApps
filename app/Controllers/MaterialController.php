@@ -404,42 +404,7 @@ class MaterialController extends BaseController
 
         // Jika tidak ada data yang dihapus
         return redirect()->back()->with('error', 'Tidak ada data yang ditemukan atau dihapus');
-
-        // // Ambil data session yang asli (data flattened)
-        // $pemesananBb = session()->get('pemesananBb') ?? [];
-        // $found = false; // Variabel untuk melacak apakah data ditemukan
-        // // dd($id_material);
-        // // Loop melalui data untuk menemukan dan menghapus elemen
-        // foreach ($pemesananBb as $groupKey => $group) {
-        //     foreach ($group as $itemKey => $item) {
-
-        //         // Cek apakah id_material cocok
-        //         if ($item['id_material'] === $id_material && $item['tgl_pakai'] === $tgl_pakai) {
-        //             unset($pemesananBb[$groupKey][$itemKey]); // Hapus elemen
-        //             $pemesananBb[$groupKey] = array_values($pemesananBb[$groupKey]); // Rapi indeks
-        //             $found = true;
-        //             break 2; // Hentikan loop setelah menemukan dan menghapus
-        //         }
-        //     }
-        // }
-
-        // // Perbarui session jika ada perubahan
-        // if ($found) {
-        //     session()->set('pemesananBb', $pemesananBb); // Gunakan set() untuk menyimpan data ke session
-        //     return redirect()->back()->with('success', 'Data berhasil dihapus');
-        // }
-
-        // // Jika data tidak ditemukan
-        // return redirect()->back()->with('error', 'Data tidak ditemukan');
     }
-    // public function deleteAllPemesananSession()
-    // {
-    //     // Menghapus data session 'pemesananBb'
-    //     session()->remove('pemesananBb');
-
-    //     // Redirect dengan pesan sukses
-    //     return redirect()->back()->with('success', 'Data berhasil dihapus dari session');
-    // }
     public function listPemesanan($area)
     {
         function fetchApiData($url)
