@@ -531,6 +531,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
     $routes->post('retur/(:any)/pengajuanRetur', 'ReturController::pengajuanRetur/$1');
     $routes->get('getKategoriRetur', 'ReturController::getKategoriRetur');
+    $routes->get('getKodeWarnaWarnaByItemType', 'ReturController::getKodeWarnaWarnaByItemType');
 });
 
 // sudo

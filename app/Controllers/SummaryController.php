@@ -2371,8 +2371,8 @@ class SummaryController extends BaseController
         // Total Qty
         $sheet->mergeCells('A' . $row . ':E' . $row); // Merge kolom A sampai E
         $sheet->setCellValue('A' . $row, 'Total');
-        $sheet->setCellValue('F' . $row, '=SUM(F5:F' . ($row - 1) . ')');
-        $sheet->setCellValue('G' . $row, '=SUM(G5:G' . ($row - 1) . ')');
+        $sheet->setCellValue('F' . $row, '=SUM(F4:F' . ($row - 1) . ')');
+        $sheet->setCellValue('G' . $row, '=SUM(G4:G' . ($row - 1) . ')');
 
         // Terapkan style total ke seluruh baris total
         $sheet->getStyle('A' . $row . ':E' . $row)->applyFromArray($styleTotal);
