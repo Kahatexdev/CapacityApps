@@ -1914,8 +1914,6 @@ class OrderController extends BaseController
             $poplus = (int)$id['poplus'];
             $produksi = $qty - $sisa;
             $ttlProd = (int)$dataProd['prod'];
-
-
             // Periksa apakah produksi valid dan memenuhi kondisi
             if ($ttlProd > 0) {
                 $percentage = round(($ttlProd / $qty) * 100);
