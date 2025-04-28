@@ -245,6 +245,17 @@ class MaterialController extends BaseController
 
         return $this->response->setJSON($stok);
     }
+    public function cekStokStyle()
+    {
+        $model = $this->request->getGet('model');
+        $styleSize = $this->request->getGet('style');
+        $style = urlencode($styleSize);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/cekStok/' . $model . '/' . $style;
+        $response = file_get_contents($apiUrl);
+        $stok = json_decode($response, true);
+
+        return $this->response->setJSON($stok);
+    }
     public function getStyleSizeByNoModel()
     {
         // Ambil No Model dari permintaan AJAX

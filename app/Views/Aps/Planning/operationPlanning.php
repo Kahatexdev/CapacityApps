@@ -477,8 +477,17 @@
         });
         $(document).on('click', '.btn-stock', function() {
             const style = $(this).data('style');
+            let model = <?= json_encode($pdk); ?>; // Ganti dengan nilai sebenarnya
 
-
+            $.ajax({
+                url: '<?= base_url($role . '/cekStokStyle') ?>', // Ganti dengan URL API yang benar
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                    style: style,
+                    model: model
+                },
+            })
             $('#modalStyle').text(style);
 
 
