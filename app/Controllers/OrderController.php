@@ -577,7 +577,7 @@ class OrderController extends BaseController
         } else {
 
             $inputModel = [
-                'tgl_terima_order' => $tgl_turun,
+                'created_at' => $tgl_turun,
                 'no_model' => $no_model,
                 'deskripsi' => $deskripsi,
                 'id_booking' => $id_booking,

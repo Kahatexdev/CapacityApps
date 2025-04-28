@@ -357,7 +357,25 @@
             </div>
         </div>
     </div>
-
+    <!-- cek stok -->
+    <div class="modal fade" id="modalStock" tabindex="-1" aria-labelledby="modalStockLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalStockLabel">Detail Stok</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Style:</strong> <span id="modalStyle"></span></p>
+                    <p><strong>Qty:</strong> <span id="modalQty"></span></p>
+                    <p><strong>Sisa:</strong> <span id="modalSisa"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             document.querySelectorAll(".btn-plan").forEach(button => {
@@ -395,6 +413,7 @@
                     <th>Sisa</th>
                     <th>Mesin</th>
                     <th>Keterangan</th>
+                    <th>Material</th>
                 </tr>
             </thead>
             <tbody>
@@ -411,6 +430,9 @@
                         </td>
                         <td>
                             <input type="text" class="form-control" value="${item.keterangan ?? ''}" name="keterangan[]">
+                        </td>
+                        <td>
+                        <button type="button" class="btn btn-info ml-auto btn-stock" data-style="${item.style}">Cek Stok</button>
                         </td>
                     </tr>
                 `).join('')}
@@ -452,6 +474,15 @@
 
                 });
             });
+        });
+        $(document).on('click', '.btn-stock', function() {
+            const style = $(this).data('style');
+
+
+            $('#modalStyle').text(style);
+
+
+            $('#modalStock').modal('show');
         });
         $(document).ready(function() {
             $("#dataTable").DataTable().destroy();
@@ -530,7 +561,6 @@
 
 
         }
-
 
 
         $(document).on('change', '#delivery', function() {
@@ -644,9 +674,6 @@
                 console.log('Invalid values for calculation');
             }
         }
-
-
-
 
         $(document).on('click', '.btn-update', function() {
             var idplan = $(this).data('idplan');
