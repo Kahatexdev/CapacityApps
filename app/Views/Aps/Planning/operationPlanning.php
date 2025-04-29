@@ -359,16 +359,14 @@
     </div>
     <!-- cek stok -->
     <div class="modal fade" id="modalStock" tabindex="-1" aria-labelledby="modalStockLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-scrollable  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalStockLabel">Detail Stok</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <p><strong>Style:</strong> <span id="modalStyle"></span></p>
-                    <p><strong>Qty:</strong> <span id="modalQty"></span></p>
-                    <p><strong>Sisa:</strong> <span id="modalSisa"></span></p>
+                <div class="modal-body" id="stockTable">
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -487,7 +485,68 @@
                     style: style,
                     model: model
                 },
-            })
+                success: function(response) {
+                    if (response) {
+                        let tableStock = `
+        <table id="stock" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Kode Benang</th>
+                    <th>Kode Warna</th>
+                    <th>Warna</th>
+                    <th>In</th>
+                    <th>Out</th>
+                    <th>Stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${response.map(item => `
+                    <tr>
+                        <td>${item.item_type}</td>
+                                           <td>${item.kode_warna} </td>
+                           <td>${item.color} </td>
+                           <td>${Number(item.masuk).toFixed(2)} kg</td>
+                <td>${Number(item.keluar).toFixed(2)} kg</td>
+                <td>${Number(item.stock).toFixed(2)} kg</td>
+                    
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+          
+    `;
+
+                        document.getElementById("stockTable").innerHTML = tableStock;
+
+                        $('#stock').DataTable({
+                            paging: true, // Pagination aktif
+                            searching: true, // Bisa cari data
+                            ordering: true, // Bisa sort kolom
+                            lengthMenu: [
+                                [5, 10, 25, -1],
+                                [5, 10, 25, "All"]
+                            ], // Dropdown jumlah data
+                            language: {
+                                search: "Cari:",
+                                lengthMenu: "Tampilkan _MENU_ data",
+                                info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+                                paginate: {
+                                    previous: "Sebelumnya",
+                                    next: "Berikutnya"
+                                }
+                            }
+                        });
+
+                        console.log('Data berhasil diambil:', response);
+                    } else {
+                        console.error('Error: Response format invalid.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', error);
+                }
+            });
+
             $('#modalStyle').text(style);
 
 
