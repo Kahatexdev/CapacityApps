@@ -13,12 +13,12 @@ class OrderModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_model', 'id_booking', 'no_model', 'kd_buyer_order', 'id_product_type', 'seam', 'leadtime', 'description', 'created at', 'updated_at'];
+    protected $allowedFields    = ['id_model', 'id_booking', 'no_model', 'kd_buyer_order', 'id_product_type', 'seam', 'leadtime', 'description', 'created_at', 'updated_at'];
 
     protected bool $allowEmptyInserts = false;
 
     // Dates
-    protected $useTimestamps = true;
+    protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -538,9 +538,11 @@ class OrderModel extends Model
            AND b.tanggal_produksi = bs_mesin.tanggal_produksi
         ) AS qty_gram, COUNT(DISTINCT bs_mesin.no_mesin) AS jl_mc, bs_mesin.tanggal_produksi, bs_mesin.area, bs_mesin.inisial, bs_mesin.no_mesin, shift')
             ->join('apsperstyle', 'apsperstyle.mastermodel = data_model.no_model', 'LEFT')
-            ->join('bs_mesin',
+            ->join(
+                'bs_mesin',
                 'apsperstyle.factory = bs_mesin.area AND apsperstyle.mastermodel = bs_mesin.no_model AND apsperstyle.size = bs_mesin.size',
-                'left')
+                'left'
+            )
             ->where('bs_mesin.tanggal_produksi IS NOT NULL');
 
         if (!empty($data['buyer'])) {

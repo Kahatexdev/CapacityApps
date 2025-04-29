@@ -123,6 +123,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('savePlanStyle', 'ApsController::savePlanStyle');
     $routes->get('cekBahanBaku/(:num)/(:num)', 'MaterialController::cekBahanBaku/$1/$2');
     $routes->get('cekStok', 'MaterialController::cekStok');
+    $routes->get('cekStokStyle', 'MaterialController::cekStokStyle');
     $routes->get('summaryPlanner/(:any)', 'SummaryController::summaryPlanner/$1');
     $routes->get('summaryStopPlanner/(:any)', 'SummaryController::summaryStopPlanner/$1');
 
@@ -413,6 +414,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('savePlanStyle', 'ApsController::savePlanStyle');
     $routes->get('cekBahanBaku/(:num)/(:num)', 'MaterialController::cekBahanBaku/$1/$2');
     $routes->get('cekStok', 'MaterialController::cekStok');
+    $routes->get('cekStokStyle', 'MaterialController::cekStokStyle');
     $routes->get('summaryPlanner/(:any)', 'SummaryController::summaryPlanner/$1');
     $routes->get('summaryStopPlanner/(:any)', 'SummaryController::summaryStopPlanner/$1');
 

@@ -577,7 +577,7 @@ class OrderController extends BaseController
         } else {
 
             $inputModel = [
-                'tgl_terima_order' => $tgl_turun,
+                'created_at' => $tgl_turun,
                 'no_model' => $no_model,
                 'deskripsi' => $deskripsi,
                 'id_booking' => $id_booking,
@@ -1914,8 +1914,6 @@ class OrderController extends BaseController
             $poplus = (int)$id['poplus'];
             $produksi = $qty - $sisa;
             $ttlProd = (int)$dataProd['prod'];
-
-
             // Periksa apakah produksi valid dan memenuhi kondisi
             if ($ttlProd > 0) {
                 $percentage = round(($ttlProd / $qty) * 100);

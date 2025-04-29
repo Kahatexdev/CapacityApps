@@ -206,9 +206,9 @@
                         <td>${item.item_type}</td>
                                            <td>${item.kode_warna} </td>
                            <td>${item.color} </td>
-                           <td>${item.masuk ?? '0'} kg</td>
-                           <td>${item.keluar ?? '0'} kg</td>
-                           <td>${item.stock} kg</td>
+                           <td>${Number(item.masuk).toFixed(2)} kg</td>
+                <td>${Number(item.keluar).toFixed(2)} kg</td>
+                <td>${Number(item.stock).toFixed(2)} kg</td>
                     
                     </tr>
                 `).join('')}

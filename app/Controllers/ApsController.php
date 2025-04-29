@@ -508,13 +508,15 @@ class ApsController extends BaseController
             $iddetail = $dp['id_detail_pln'];
             $qtysisa = $this->ApsPerstyleModel->getSisaPerModel($dp['model'], $dp['jarum']);
             $mesin = $this->TanggalPlanningModel->totalMc($iddetail);
-            $jum = 0;
+            $maxMesin = 0;
             foreach ($mesin as $mc) {
-                $jum += $mc['mesin'];
+                if ($mc['mesin'] > $maxMesin) {
+                    $maxMesin = $mc['mesin'];
+                }
             }
 
             $dp['delivery'] = date('d-M-y', strtotime($qtysisa['delivery']));
-            $dp['mesin'] = $jum;
+            $dp['mesin'] = $maxMesin;
             $dp['qty'] = round($qtysisa['qty']);
             $dp['sisa'] =
                 round($qtysisa['sisa']);
