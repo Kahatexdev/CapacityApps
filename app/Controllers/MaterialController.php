@@ -145,15 +145,10 @@ class MaterialController extends BaseController
 
         return view(session()->get('role') . '/Material/index', $data);
     }
-    public function statusbahanbaku($area)
+    public function statusbahanbaku()
     {
         // Ambil nilai search dari query string
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/' . $area;
-        // dd($search);
 
-        // Ambil data dari API
-        $response = file_get_contents($apiUrl);
-        $status = json_decode($response, true);
 
         // dd($status);
         $data = [
@@ -162,28 +157,21 @@ class MaterialController extends BaseController
             'active1' => '',
             'active2' => '',
             'active3' => '',
-            'targetProd' => 0,
-            'produksiBulan' => 0,
-            'produksiHari' => 0,
-            'material' => $status,
-            'area' => $area
 
         ];
 
         return view(session()->get('role') . '/Material/statusbahanbaku', $data);
     }
-    public function filterstatusbahanbaku($area)
+    public function filterstatusbahanbaku($model)
     {
         // Mengambil nilai 'search' yang dikirim oleh frontend
         $search = $this->request->getGet('search');
-
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/' . $area . '?search=' . urlencode($search);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/' . $model . '?search=' . urlencode($search);
 
         // Mengambil data dari API eksternal
         $response = file_get_contents($apiUrl);
         $status = json_decode($response, true);
-
         // Filter data berdasarkan 'no_model' jika ada keyword 'search'
         if ($search) {
             $status = array_filter($status, function ($item) use ($search) {

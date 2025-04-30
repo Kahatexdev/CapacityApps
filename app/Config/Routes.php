@@ -425,7 +425,9 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
 
     //bahanbakyu
     $routes->get('stockbb', 'MaterialController::stockbb');
-    $routes->get('filterstockbahanbaku/(:any)', 'MaterialController::filterStockBahanBaku/$1');
+    $routes->get('filterstockbahanbaku', 'MaterialController::filterStockBahanBaku');
+    $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
+    $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
 });
 
 // user
@@ -502,7 +504,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
 
     // bahanbaku
     $routes->get('bahanBaku', 'MaterialController::index');
-    $routes->get('statusbahanbaku/(:any)', 'MaterialController::statusbahanbaku/$1');
+    $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
     $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
     $routes->post('getStyleSizeByNoModel', 'MaterialController::getStyleSizeByNoModel');
     $routes->post('getJalanMc', 'MaterialController::getJalanMcByModelSize');
