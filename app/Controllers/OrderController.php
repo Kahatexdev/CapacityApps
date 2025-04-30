@@ -78,7 +78,7 @@ class OrderController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-            'TotalMesin' => $totalMesin,
+            'jenisJarum' => $totalMesin,
             'role' => $role
         ];
         return view($role . '/Order/ordermaster', $data);
@@ -605,7 +605,6 @@ class OrderController extends BaseController
     }
     public function inputOrderManual()
     {
-        $tgl = $this->request->getPost('tgl_turun');
         $model = $this->request->getPost('no_model');
         $jarum = $this->request->getPost('jarum');
         $prod = $this->request->getPost('productType');
@@ -617,6 +616,8 @@ class OrderController extends BaseController
         ];
         $idProdtype = $this->productModel->getId($getId);
 
+        $tgl = $this->request->getPost('tgl_turun');
+        $tanggal = date('Y-m-d', strtotime($tgl));
 
         if ($model) {
             $check = $this->orderModel->checkExist($model);
