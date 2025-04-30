@@ -557,7 +557,9 @@ class OrderController extends BaseController
         $sisa_booking = $this->request->getPost("sisa_booking_akhir");
         $id_booking = $this->request->getPost("id_booking");
         $jarum = $this->request->getPost("jarum");
-
+        if (empty($tgl_turun)) {
+            $tgl_turun = date('Y-m-d');
+        }
         $check = $this->orderModel->checkExist($no_model);
         if ($check) {
             $id = $id_booking;
@@ -618,7 +620,9 @@ class OrderController extends BaseController
 
         $tgl = $this->request->getPost('tgl_turun');
         $tanggal = date('Y-m-d', strtotime($tgl));
-
+        if (empty($tgl)) {
+            $tanggal = date('Y-m-d');
+        }
         if ($model) {
             $check = $this->orderModel->checkExist($model);
             if ($check) {

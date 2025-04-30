@@ -243,7 +243,7 @@
                                 </g>
                             </svg>
                         </div>
-                        <span class="nav-link-text ms-1">Status Bahan Baku</span>
+                        <span class="nav-link-text ms-1">Status Celup</span>
                     </a>
                 </li>
                 <li class="nav-item mt-3">
