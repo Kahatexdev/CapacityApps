@@ -315,11 +315,36 @@ class MaterialController extends BaseController
             return; // Pastikan $newData adalah array sebelum diproses
         }
 
+        // Inisialisasi array untuk menyimpan hasil filter
+        $filteredData = [];
+
+        // Iterasi setiap elemen pada `$newData`
+        foreach ($newData as $rowKey => $rows) {
+            foreach ($rows as $index => $item) {
+                // Periksa apakah nilai 'ttl' tidak sama dengan '0'
+                if (isset($item['ttl']) && floatval($item['ttl']) > 0) {
+                    // Tentukan tgl_pakai berdasarkan jenis item
+                    if (isset($item['jenis'])) {
+                        $jenisBenang = strtolower($item['jenis']);
+                        if (in_array($jenisBenang, ['benang', 'nylon'])) {
+                            $item['tgl_pakai'] = $this->request->getPost('tgl_pakai_benang_nylon');
+                        } else {
+                            $item['tgl_pakai'] = $this->request->getPost('tgl_pakai_spandex_karet');
+                        }
+                    } else {
+                        // Jika 'jenis' tidak ada, berikan default
+                        $item['tgl_pakai'] = "";
+                    }
+                    // Masukkan data yang valid ke array hasil filter
+                    $filteredData[$rowKey][$index] = $item;
+                }
+            }
+        }
         // Variabel untuk menyimpan data valid
         $validData = [];
 
         // Loop melalui data baru
-        foreach ($newData as $group) {
+        foreach ($filteredData as $group) {
             if (!is_array($group)) {
                 continue; // Pastikan $group adalah array sebelum diproses
             }
@@ -374,7 +399,9 @@ class MaterialController extends BaseController
     public function deletePemesananSession()
     {
         // Ambil data dari input POST (array `selected`)
-        $selected = $this->request->getPost('selected') ?? []; // Pastikan default adalah array kosong
+        // $selected = $this->request->getPost('selected') ?? []; // Pastikan default adalah array kosong
+        $selected = $this->request->getJSON(true)['selected'] ?? [];
+        log_message('debug', 'Isi selected: ' . json_encode($selected));
         $pemesananBb = session()->get('pemesananBb') ?? []; // Ambil data session asli
         $found = false; // Variabel untuk melacak apakah data ditemukan
 
@@ -395,14 +422,19 @@ class MaterialController extends BaseController
             }
         }
 
-        // Perbarui session jika ada perubahan
         if ($found) {
-            session()->set('pemesananBb', $pemesananBb); // Simpan data ke session
-            return redirect()->back()->with('success', 'Data berhasil dihapus');
+            session()->set('pemesananBb', $pemesananBb);
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Data berhasil dihapus',
+                'updated_session' => $pemesananBb
+            ]);
         }
 
-        // Jika tidak ada data yang dihapus
-        return redirect()->back()->with('error', 'Tidak ada data yang ditemukan atau dihapus');
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Tidak ada data yang ditemukan atau dihapus'
+        ]);
     }
     public function listPemesanan($area)
     {
