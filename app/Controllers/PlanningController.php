@@ -582,7 +582,11 @@ class PlanningController extends BaseController
                 $outputDz +=   $monthlyData[$ar][$jarum['jarum']]['output'];
             }
             // Perhitungan operator dan montir
-            $operator = ceil((($planningMc / 20) + ($planningMc / 20) / 7) * 3);
+            if ($ar == 'KK8J') {
+                $operator = ceil((($planningMc / 12) + ($planningMc / 12) / 7) * 3);
+            } else {
+                $operator = ceil((($planningMc / 20) + ($planningMc / 20) / 7) * 3);
+            }
             $montir = ceil((($planningMc / 50) + ($planningMc / 50) / 7) * 3);
             $inLine = (($val = ceil(($planningMc / 80 * 3) + (($planningMc / 80 * 3) / 7))) > 0 && $val <= 4) ? 4 : $val;
             $wly = (($val = ceil(($planningMc / 180 * 3) + (($planningMc / 180 * 3) / 7))) > 0 && $val <= 4) ? 4 : $val;

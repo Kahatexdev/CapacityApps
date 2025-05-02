@@ -421,8 +421,12 @@
 
             let val;
 
+            // Ambil area dari card yang sesuai
+            var area = $("#area" + no).val();
+            var pembagiOperator = (area === "KK8J") ? 12 : 20;
+
             // Hitung operator dan montir setelah semua data diupdate
-            totalOperator = ((totalMesin / 20) + (totalMesin / 20) / 7) * 3;
+            totalOperator = ((totalMesin / pembagiOperator) + (totalMesin / pembagiOperator) / 7) * 3;
             totalMontir = ((totalMesin / 50) + (totalMesin / 50) / 7) * 3;
             totalInLine = ((val = (totalMesin / 80 * 3) + ((totalMesin / 80 * 3) / 7)) > 0 && val <= 4) ? 4 : val;
             totalWly = ((val = (totalMesin / 180 * 3) + ((totalMesin / 180 * 3) / 7)) > 0 && val <= 4) ? 4 : val;
@@ -434,16 +438,16 @@
             $("#outputdz" + no).val(totalOutput);
 
             // Update nilai 'operator'
-            $("#operator" + no).val(Math.round(totalOperator));
+            $("#operator" + no).val(Math.ceil(totalOperator));
 
             // Update nilai 'montir'
-            $("#montir" + no).val(Math.round(totalMontir));
+            $("#montir" + no).val(Math.ceil(totalMontir));
 
             // Update nilai 'in line'
-            $("#inline" + no).val(Math.round(totalInLine));
+            $("#inline" + no).val(Math.ceil(totalInLine));
 
             // Update nilai 'montir'
-            $("#wly" + no).val(Math.round(totalWly));
+            $("#wly" + no).val(Math.ceil(totalWly));
 
             // Setelah setiap update kebmesin, kita update global values
             updateGlobalValues();
