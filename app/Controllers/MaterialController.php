@@ -145,15 +145,10 @@ class MaterialController extends BaseController
 
         return view(session()->get('role') . '/Material/index', $data);
     }
-    public function statusbahanbaku($area)
+    public function statusbahanbaku()
     {
         // Ambil nilai search dari query string
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/' . $area;
-        // dd($search);
 
-        // Ambil data dari API
-        $response = file_get_contents($apiUrl);
-        $status = json_decode($response, true);
 
         // dd($status);
         $data = [
@@ -162,28 +157,21 @@ class MaterialController extends BaseController
             'active1' => '',
             'active2' => '',
             'active3' => '',
-            'targetProd' => 0,
-            'produksiBulan' => 0,
-            'produksiHari' => 0,
-            'material' => $status,
-            'area' => $area
 
         ];
 
         return view(session()->get('role') . '/Material/statusbahanbaku', $data);
     }
-    public function filterstatusbahanbaku($area)
+    public function filterstatusbahanbaku($model)
     {
         // Mengambil nilai 'search' yang dikirim oleh frontend
         $search = $this->request->getGet('search');
-
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/' . $area . '?search=' . urlencode($search);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/' . $model . '?search=' . urlencode($search);
 
         // Mengambil data dari API eksternal
         $response = file_get_contents($apiUrl);
         $status = json_decode($response, true);
-
         // Filter data berdasarkan 'no_model' jika ada keyword 'search'
         if ($search) {
             $status = array_filter($status, function ($item) use ($search) {
@@ -240,6 +228,17 @@ class MaterialController extends BaseController
     {
         $model = $this->request->getGet('model');
         $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/cekStok/' . $model;
+        $response = file_get_contents($apiUrl);
+        $stok = json_decode($response, true);
+
+        return $this->response->setJSON($stok);
+    }
+    public function cekStokStyle()
+    {
+        $model = $this->request->getGet('model');
+        $styleSize = $this->request->getGet('style');
+        $style = urlencode($styleSize);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/cekStok/' . $model . '/' . $style;
         $response = file_get_contents($apiUrl);
         $stok = json_decode($response, true);
 
@@ -316,11 +315,36 @@ class MaterialController extends BaseController
             return; // Pastikan $newData adalah array sebelum diproses
         }
 
+        // Inisialisasi array untuk menyimpan hasil filter
+        $filteredData = [];
+
+        // Iterasi setiap elemen pada `$newData`
+        foreach ($newData as $rowKey => $rows) {
+            foreach ($rows as $index => $item) {
+                // Periksa apakah nilai 'ttl' tidak sama dengan '0'
+                if (isset($item['ttl']) && floatval($item['ttl']) > 0) {
+                    // Tentukan tgl_pakai berdasarkan jenis item
+                    if (isset($item['jenis'])) {
+                        $jenisBenang = strtolower($item['jenis']);
+                        if (in_array($jenisBenang, ['benang', 'nylon'])) {
+                            $item['tgl_pakai'] = $this->request->getPost('tgl_pakai_benang_nylon');
+                        } else {
+                            $item['tgl_pakai'] = $this->request->getPost('tgl_pakai_spandex_karet');
+                        }
+                    } else {
+                        // Jika 'jenis' tidak ada, berikan default
+                        $item['tgl_pakai'] = "";
+                    }
+                    // Masukkan data yang valid ke array hasil filter
+                    $filteredData[$rowKey][$index] = $item;
+                }
+            }
+        }
         // Variabel untuk menyimpan data valid
         $validData = [];
 
         // Loop melalui data baru
-        foreach ($newData as $group) {
+        foreach ($filteredData as $group) {
             if (!is_array($group)) {
                 continue; // Pastikan $group adalah array sebelum diproses
             }
@@ -375,7 +399,9 @@ class MaterialController extends BaseController
     public function deletePemesananSession()
     {
         // Ambil data dari input POST (array `selected`)
-        $selected = $this->request->getPost('selected') ?? []; // Pastikan default adalah array kosong
+        // $selected = $this->request->getPost('selected') ?? []; // Pastikan default adalah array kosong
+        $selected = $this->request->getJSON(true)['selected'] ?? [];
+        log_message('debug', 'Isi selected: ' . json_encode($selected));
         $pemesananBb = session()->get('pemesananBb') ?? []; // Ambil data session asli
         $found = false; // Variabel untuk melacak apakah data ditemukan
 
@@ -396,50 +422,20 @@ class MaterialController extends BaseController
             }
         }
 
-        // Perbarui session jika ada perubahan
         if ($found) {
-            session()->set('pemesananBb', $pemesananBb); // Simpan data ke session
-            return redirect()->back()->with('success', 'Data berhasil dihapus');
+            session()->set('pemesananBb', $pemesananBb);
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Data berhasil dihapus',
+                'updated_session' => $pemesananBb
+            ]);
         }
 
-        // Jika tidak ada data yang dihapus
-        return redirect()->back()->with('error', 'Tidak ada data yang ditemukan atau dihapus');
-
-        // // Ambil data session yang asli (data flattened)
-        // $pemesananBb = session()->get('pemesananBb') ?? [];
-        // $found = false; // Variabel untuk melacak apakah data ditemukan
-        // // dd($id_material);
-        // // Loop melalui data untuk menemukan dan menghapus elemen
-        // foreach ($pemesananBb as $groupKey => $group) {
-        //     foreach ($group as $itemKey => $item) {
-
-        //         // Cek apakah id_material cocok
-        //         if ($item['id_material'] === $id_material && $item['tgl_pakai'] === $tgl_pakai) {
-        //             unset($pemesananBb[$groupKey][$itemKey]); // Hapus elemen
-        //             $pemesananBb[$groupKey] = array_values($pemesananBb[$groupKey]); // Rapi indeks
-        //             $found = true;
-        //             break 2; // Hentikan loop setelah menemukan dan menghapus
-        //         }
-        //     }
-        // }
-
-        // // Perbarui session jika ada perubahan
-        // if ($found) {
-        //     session()->set('pemesananBb', $pemesananBb); // Gunakan set() untuk menyimpan data ke session
-        //     return redirect()->back()->with('success', 'Data berhasil dihapus');
-        // }
-
-        // // Jika data tidak ditemukan
-        // return redirect()->back()->with('error', 'Data tidak ditemukan');
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Tidak ada data yang ditemukan atau dihapus'
+        ]);
     }
-    // public function deleteAllPemesananSession()
-    // {
-    //     // Menghapus data session 'pemesananBb'
-    //     session()->remove('pemesananBb');
-
-    //     // Redirect dengan pesan sukses
-    //     return redirect()->back()->with('success', 'Data berhasil dihapus dari session');
-    // }
     public function listPemesanan($area)
     {
         function fetchApiData($url)

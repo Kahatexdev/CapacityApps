@@ -114,44 +114,88 @@
 
     // Fungsi untuk mengambil opsi item type secara dinamis melalui AJAX
     function loadDynamicItemTypes() {
-        return new Promise(function(resolve, reject) {
-            const area = document.getElementById('area').value;
-            const model = document.getElementById('no_model').value;
-            let selectEl = document.querySelector('#listReturInputs .retur-item select[name="items[0][item_type]"]');
-            if (selectEl) {
-                selectEl.innerHTML = '<option value="">Loading...</option>';
-                selectEl.disabled = true;
-            }
-            // console.log("Memanggil loadDynamicItemTypes() dengan model:", model, "dan area:", area);
+        return new Promise((resolve, reject) => {
+            const area = $('#area').val();
+            const model = $('#no_model').val();
             $.ajax({
                 url: "<?= base_url($role . '/filterRetur/') ?>" + area,
-                type: "GET",
                 data: {
-                    model: model
+                    model
                 },
                 dataType: "json",
-                success: function(response) {
-                    // console.log("Response loadDynamicItemTypes:", response);
-                    dynamicItemTypes = Object.keys(response)
-                        .filter(key => typeof response[key] === 'object' && response[key].item_type)
-                        .map(key => response[key]);
-                    if (selectEl) {
-                        selectEl.innerHTML = getItemTypeOptions();
-                        selectEl.disabled = false;
-                    }
+                success(response) {
+                    // map response values ke array objek
+                    dynamicItemTypes = Object.values(response)
+                        .filter(o => o.item_type);
                     isDynamicItemTypesLoaded = true;
                     resolve();
                 },
-                error: function(xhr, status, error) {
-                    if (selectEl) {
-                        selectEl.innerHTML = '<option value="">Gagal memuat data</option>';
-                        selectEl.disabled = false;
-                    }
-                    reject(error);
+                error(err) {
+                    reject(err);
                 }
             });
         });
     }
+
+    $(document).on('shown.bs.modal', '#modalPengajuanRetur', function() {
+        if (!isDynamicItemTypesLoaded) {
+            loadDynamicItemTypes();
+        }
+    });
+
+    // 1) Saat Item Type berubah → populate Kode Warna saja
+    $(document).on('change', '.select-item-type', function() {
+        const $block = $(this).closest('.retur-item');
+        const itemType = $(this).val();
+        const $kode = $block.find('.select-kode-warna');
+        const $warna = $block.find('.select-warna');
+
+        // reset dropdown
+        $kode.html('<option value="">Pilih Kode Warna…</option>');
+        $warna.html('<option value="">Pilih Warna setelah pilih Kode</option>');
+
+        if (!itemType || !isDynamicItemTypesLoaded) return;
+
+        // filter array global berdasarkan item_type
+        const list = dynamicItemTypes.filter(o => o.item_type === itemType);
+
+        // unique kode_warna
+        const seen = new Set();
+        list.forEach(o => {
+            if (o.kode_warna && !seen.has(o.kode_warna)) {
+                $kode.append(`<option value="${o.kode_warna}">${o.kode_warna}</option>`);
+                seen.add(o.kode_warna);
+            }
+        });
+    });
+
+    // 2) Saat Kode Warna berubah → populate Warna
+    $(document).on('change', '.select-kode-warna', function() {
+        const $block = $(this).closest('.retur-item');
+        const itemType = $block.find('.select-item-type').val();
+        const kodeWarna = $(this).val();
+        const $warna = $block.find('.select-warna');
+
+        // reset dropdown
+        $warna.html('<option value="">Pilih Warna…</option>');
+
+        if (!kodeWarna || !isDynamicItemTypesLoaded) return;
+
+        // filter berdasarkan item_type + kode_warna
+        const list = dynamicItemTypes.filter(o =>
+            o.item_type === itemType && o.kode_warna === kodeWarna
+        );
+
+        // unique warna (property `color` dari API)
+        const seen = new Set();
+        list.forEach(o => {
+            const c = o.warna;
+            if (c && !seen.has(c)) {
+                $warna.append(`<option value="${c}">${c}</option>`);
+                seen.add(c);
+            }
+        });
+    });
 
     // Fungsi untuk mengambil kategori retur melalui AJAX dan mengembalikan Promise
     function loadKategoriRetur(selectedValue = '') {
@@ -191,87 +235,87 @@
 
 
     // Fungsi untuk mengambil kode warna secara dinamis melalui AJAX
-    function loadKodeWarna(selectedValue = '') {
-        return new Promise(function(resolve, reject) {
-            const area = document.getElementById('area').value;
-            const model = document.getElementById('no_model').value;
-            let selectEl = document.querySelector('#listReturInputs .retur-item select[name="items[0][kode_warna]"]');
-            if (selectEl) {
-                selectEl.innerHTML = '<option value="">Loading...</option>';
-                selectEl.disabled = true;
-            }
-            // console.log("Memanggil loadKodeWarna() dengan model:", model, "dan area:", area);
-            $.ajax({
-                url: "<?= base_url($role . '/filterRetur/') ?>" + area,
-                type: "GET",
-                data: {
-                    model: model
-                },
-                dataType: "json",
-                success: function(response) {
-                    dynamicKodeWarna = Object.keys(response)
-                        .filter(key => typeof response[key] === 'object' && response[key].kode_warna)
-                        .map(key => response[key]);
-                    // console.log("Dynamic Kode Warna:", dynamicKodeWarna);
-                    if (selectEl) {
-                        selectEl.innerHTML = getKodeWarnaOptions(selectedValue);
-                        selectEl.disabled = false;
-                    }
-                    isKodeWarnaLoaded = true;
-                    resolve();
-                },
-                error: function(xhr, status, error) {
-                    if (selectEl) {
-                        selectEl.innerHTML = '<option value="">Gagal memuat data</option>';
-                        selectEl.disabled = false;
-                    }
-                    reject(error);
-                }
-            });
-        });
-    }
+    // function loadKodeWarna(selectedValue = '') {
+    //     return new Promise(function(resolve, reject) {
+    //         const area = document.getElementById('area').value;
+    //         const model = document.getElementById('no_model').value;
+    //         let selectEl = document.querySelector('#listReturInputs .retur-item select[name="items[0][kode_warna]"]');
+    //         if (selectEl) {
+    //             selectEl.innerHTML = '<option value="">Loading...</option>';
+    //             selectEl.disabled = true;
+    //         }
+    //         // console.log("Memanggil loadKodeWarna() dengan model:", model, "dan area:", area);
+    //         $.ajax({
+    //             url: "<?= base_url($role . '/filterRetur/') ?>" + area,
+    //             type: "GET",
+    //             data: {
+    //                 model: model
+    //             },
+    //             dataType: "json",
+    //             success: function(response) {
+    //                 dynamicKodeWarna = Object.keys(response)
+    //                     .filter(key => typeof response[key] === 'object' && response[key].kode_warna)
+    //                     .map(key => response[key]);
+    //                 // console.log("Dynamic Kode Warna:", dynamicKodeWarna);
+    //                 if (selectEl) {
+    //                     selectEl.innerHTML = getKodeWarnaOptions(selectedValue);
+    //                     selectEl.disabled = false;
+    //                 }
+    //                 isKodeWarnaLoaded = true;
+    //                 resolve();
+    //             },
+    //             error: function(xhr, status, error) {
+    //                 if (selectEl) {
+    //                     selectEl.innerHTML = '<option value="">Gagal memuat data</option>';
+    //                     selectEl.disabled = false;
+    //                 }
+    //                 reject(error);
+    //             }
+    //         });
+    //     });
+    // }
 
     // Fungsi untuk mengambil data warna secara dinamis melalui AJAX
-    function loadWarna(selectedValue = '') {
-        return new Promise(function(resolve, reject) {
-            const area = document.getElementById('area').value;
-            const model = document.getElementById('no_model').value;
-            let selectEl = document.querySelector('#listReturInputs .retur-item select[name="items[0][warna]"]');
-            if (selectEl) {
-                selectEl.innerHTML = '<option value="">Loading...</option>';
-                selectEl.disabled = true;
-            }
-            // console.log("Memanggil loadWarna() dengan model:", model, "dan area:", area);
-            $.ajax({
-                url: "<?= base_url($role . '/filterRetur/') ?>" + area,
-                type: "GET",
-                data: {
-                    model: model
-                },
-                dataType: "json",
-                success: function(response) {
-                    dynamicWarna = Object.keys(response)
-                        .filter(key => typeof response[key] === 'object' && response[key].warna)
-                        .map(key => response[key]);
-                    // console.log("Dynamic Warna:", dynamicWarna);
-                    if (selectEl) {
-                        selectEl.innerHTML = getWarnaOptions(selectedValue);
-                        selectEl.disabled = false;
-                    }
-                    isWarnaLoaded = true;
-                    resolve();
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error loadWarna:", error);
-                    if (selectEl) {
-                        selectEl.innerHTML = '<option value="">Gagal memuat data</option>';
-                        selectEl.disabled = false;
-                    }
-                    reject(error);
-                }
-            });
-        });
-    }
+    // function loadWarna(selectedValue = '') {
+    //     return new Promise(function(resolve, reject) {
+    //         const area = document.getElementById('area').value;
+    //         const model = document.getElementById('no_model').value;
+    //         let selectEl = document.querySelector('#listReturInputs .retur-item select[name="items[0][warna]"]');
+    //         if (selectEl) {
+    //             selectEl.innerHTML = '<option value="">Loading...</option>';
+    //             selectEl.disabled = true;
+    //         }
+    //         // console.log("Memanggil loadWarna() dengan model:", model, "dan area:", area);
+    //         $.ajax({
+    //             url: "<?= base_url($role . '/filterRetur/') ?>" + area,
+    //             type: "GET",
+    //             data: {
+    //                 model: model
+    //             },
+    //             dataType: "json",
+    //             success: function(response) {
+    //                 dynamicWarna = Object.keys(response)
+    //                     .filter(key => typeof response[key] === 'object' && response[key].warna)
+    //                     .map(key => response[key]);
+    //                 // console.log("Dynamic Warna:", dynamicWarna);
+    //                 if (selectEl) {
+    //                     selectEl.innerHTML = getWarnaOptions(selectedValue);
+    //                     selectEl.disabled = false;
+    //                 }
+    //                 isWarnaLoaded = true;
+    //                 resolve();
+    //             },
+    //             error: function(xhr, status, error) {
+    //                 console.error("Error loadWarna:", error);
+    //                 if (selectEl) {
+    //                     selectEl.innerHTML = '<option value="">Gagal memuat data</option>';
+    //                     selectEl.disabled = false;
+    //                 }
+    //                 reject(error);
+    //             }
+    //         });
+    //     });
+    // }
 
     // Fungsi untuk mengambil data lot retur secara dinamis melalui AJAX
     function loadLotRetur(selectedValue = '') {
@@ -379,6 +423,44 @@
         return options;
     }
 
+    // function updateKodeWarnaDanWarna(selectElement) {
+    //     const selectedItemType = selectElement.value;
+    //     const returItem = selectElement.closest('.retur-item');
+    //     const kodeWarnaSelect = returItem.querySelector('.select-kode-warna');
+    //     const warnaSelect = returItem.querySelector('.select-warna');
+
+    //     // Reset dropdown sementara
+    //     kodeWarnaSelect.innerHTML = '<option value="">Loading...</option>';
+    //     warnaSelect.innerHTML = '<option value="">Loading...</option>';
+
+    //     // Ambil kode warna berdasarkan item_type
+    //     $.ajax({
+    //         url: "<?= base_url($role . '/getKodeWarnaWarnaByItemType') ?>",
+    //         method: "GET",
+    //         data: {
+    //             item_type: selectedItemType
+    //         },
+    //         dataType: "json",
+    //         success: function(response) {
+    //             let kodeWarnaOptions = '<option value="">Pilih Kode Warna</option>';
+    //             let warnaOptions = '<option value="">Pilih Warna</option>';
+
+    //             response.forEach(item => {
+    //                 kodeWarnaOptions += `<option value="${item.kode_warna}">${item.kode_warna}</option>`;
+    //                 warnaOptions += `<option value="${item.warna}">${item.warna}</option>`;
+    //             });
+
+    //             kodeWarnaSelect.innerHTML = kodeWarnaOptions;
+    //             warnaSelect.innerHTML = warnaOptions;
+    //         },
+    //         error: function() {
+    //             kodeWarnaSelect.innerHTML = '<option value="">Gagal memuat</option>';
+    //             warnaSelect.innerHTML = '<option value="">Gagal memuat</option>';
+    //         }
+    //     });
+    // }
+
+
     // Panggil lazy loading ketika modal ditampilkan
     $(document).on('shown.bs.modal', '#modalPengajuanRetur', function() {
         if (!isDynamicItemTypesLoaded) {
@@ -387,12 +469,12 @@
         if (!isKategoriReturLoaded) {
             loadKategoriRetur();
         }
-        if (!isKodeWarnaLoaded) {
-            loadKodeWarna();
-        }
-        if (!isWarnaLoaded) {
-            loadWarna();
-        }
+        // if (!isKodeWarnaLoaded) {
+        //     loadKodeWarna();
+        // }
+        // if (!isWarnaLoaded) {
+        //     loadWarna();
+        // }
         if (!isLotReturLoaded) {
             loadLotRetur();
         }
@@ -403,8 +485,8 @@
         Promise.all([
             loadDynamicItemTypes(),
             loadKategoriRetur(),
-            loadKodeWarna(),
-            loadWarna(),
+            // loadKodeWarna(),
+            // loadWarna(),
             loadLotRetur()
         ]).then(function() {
             // Buka modal setelah semua data selesai diproses
@@ -540,7 +622,7 @@
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <label class="form-label">Jenis</label>
-                                                <select class="form-select select-item-type" name="items[0][item_type]" required>
+                                               <select class="form-select select-item-type" name="items[0][item_type]" required>
                                                     ${ getItemTypeOptions() }
                                                 </select>
                                             </div>

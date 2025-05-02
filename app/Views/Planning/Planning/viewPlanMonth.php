@@ -226,15 +226,16 @@
                             <table class="table">
                                 <thead class="bg-dark">
                                     <tr>
-                                        <th class="text-white"> Jarum </th>
-                                        <th class="text-white"> Plan Mesin </th>
+                                        <th class=" text-white"> Jarum </th>
+                                        <th class=" text-white"> Target </th>
+                                        <th class=" text-white"> Plan Mesin </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php
                                     $row = 1;
                                     foreach ($detailArea['jarum'] as $jarumDetail): ?>
-                                        <tr id="detail_area">
+                                        <tr id="detail_area" class="text-center">
                                             <td>
                                                 <?= $jarumDetail['jarum'] ?>
                                                 <input type="text" id="jarum<?= $row ?>" value="<?= $jarumDetail['jarum'] ?>" hidden>
@@ -243,13 +244,16 @@
 
                                             </td>
                                             <td>
+                                                <input class="form-control" type="number" id="target<?= $no ?>_<?= $row ?>"
+                                                    value="<?= $jarumDetail['target'] ?>" style="width:40%">
+                                            </td>
+                                            <td>
                                                 <div class="form-group">
                                                     <input type="number" class="form-control" id="kebmesin<?= $no ?>_<?= $row ?>"
                                                         value="<?= $jarumDetail['planning_mc'] ?>" style="width:40%">
                                                     <input type="text" id="areaDetail<?= $no ?>_<?= $row ?>"
                                                         value="<?= $area ?>" hidden>
-                                                    <input type="text" id="target<?= $no ?>_<?= $row ?>"
-                                                        value="<?= $jarumDetail['target'] ?>" hidden>
+
                                                     <input type="text" id="output<?= $no ?>_<?= $row ?>"
                                                         value="<?= $jarumDetail['output'] ?>" hidden>
 
@@ -452,6 +456,45 @@
             // Setelah setiap update kebmesin, kita update global values
             updateGlobalValues();
         });
+        $("[id^='target']").on('input', function() {
+            var totalMesin = 0;
+            var totalOutput = 0;
+            var totalOperator = 0;
+            var totalMontir = 0;
+            var totalInLine = 0;
+            var totalWly = 0;
+
+            var no = $(this).closest(".card").find("input[id^='ttlmc']").attr("id").replace("ttlmc", "");
+
+            // Loop semua row dalam card berdasarkan id target
+            $(this).closest("tbody").find("[id^='target']").each(function() {
+                var row = $(this).attr("id").replace("target", "");
+                var target = parseInt($(this).val()) || 0;
+                var kebutuhanMesin = parseInt($("#kebmesin" + row).val()) || 0;
+
+                var output = kebutuhanMesin * target;
+                $("#output" + row).val(output);
+                totalOutput += output;
+                totalMesin += kebutuhanMesin;
+            });
+
+            let val;
+
+            totalOperator = ((totalMesin / 20) + (totalMesin / 20) / 7) * 3;
+            totalMontir = ((totalMesin / 50) + (totalMesin / 50) / 7) * 3;
+            totalInLine = ((val = (totalMesin / 80 * 3) + ((totalMesin / 80 * 3) / 7)) > 0 && val <= 4) ? 4 : val;
+            totalWly = ((val = (totalMesin / 180 * 3) + ((totalMesin / 180 * 3) / 7)) > 0 && val <= 4) ? 4 : val;
+
+            $("#planmc" + no).val(totalMesin);
+            $("#outputdz" + no).val(totalOutput);
+            $("#operator" + no).val(Math.ceil(totalOperator));
+            $("#montir" + no).val(Math.ceil(totalMontir));
+            $("#inline" + no).val(Math.ceil(totalInLine));
+            $("#wly" + no).val(Math.ceil(totalWly));
+
+            updateGlobalValues();
+        });
+
     });
 
     document.addEventListener("DOMContentLoaded", function() {

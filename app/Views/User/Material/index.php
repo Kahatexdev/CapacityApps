@@ -57,10 +57,14 @@
                     <div class="card-body">
                         <form id="pemesananBbForm">
                             <div class="row mb-4">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <input type="hidden" name="area" id="area" value="<?= $area ?>">
-                                    <label>Tanggal Pakai</label>
-                                    <input type="date" class="form-control" id="tgl_pakai" name="tgl_pakai" min="<?= date('Y-m-d') ?>" required>
+                                    <label>Tanggal Pakai Benang Nylon</label>
+                                    <input type="date" class="form-control" id="tgl_pakai_benang_nylon" name="tgl_pakai_benang_nylon" min="<?= date('Y-m-d') ?>" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Tanggal Pakai Spandex Karet</label>
+                                    <input type="date" class="form-control" id="tgl_pakai_spandex_karet" name="tgl_pakai_spandex_karet" min="<?= date('Y-m-d') ?>" required>
                                 </div>
                             </div>
                             <div class="row g-3 mb-2">
@@ -150,7 +154,7 @@
                                                     <!-- kolom hide end -->
                                                     <td class="text-center">
                                                         <div class="form-check">
-                                                            <input type="checkbox" class="form-check-input delete-checkbox" name="delete[]" value="<?= $record['id_material'] . ',' . $record['tgl_pakai']; ?>">
+                                                            <input type="checkbox" class="form-check-input checkbox-pemesanan" name="checkbox[]" value="<?= $record['id_material'] . ',' . $record['tgl_pakai']; ?>">
                                                         </div>
                                                     </td>
                                                     <td class="text-center"><?= $no++; ?></td>
@@ -191,7 +195,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <button type="submit" class="btn btn-info w-100">Buat List Pemesanan</button>
+                            <button type="submit" class="btn btn-info w-100" id="submit-selected">Buat List Pemesanan</button>
                         </form>
                     </div>
                 </div>
@@ -205,12 +209,13 @@
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const tglPakaiInput = document.getElementById('tgl_pakai');
+        const tglPakaiBNInput = document.getElementById('tgl_pakai_benang_nylon');
+        const tglPakaiSKInput = document.getElementById('tgl_pakai_spandex_karet');
         const noModelSelect = document.getElementById('no_model');
 
         // Fungsi untuk mengubah status select berdasarkan nilai input tgl_pakai
         function toggleNoModel() {
-            if (tglPakaiInput.value.trim() === "") {
+            if (tglPakaiBNInput.value.trim() === "" || tglPakaiSKInput.value.trim() === "") {
                 noModelSelect.disabled = true;
             } else {
                 noModelSelect.disabled = false;
@@ -221,7 +226,8 @@
         toggleNoModel();
 
         // Panggil fungsi setiap kali input tgl_pakai berubah
-        tglPakaiInput.addEventListener('change', toggleNoModel);
+        tglPakaiBNInput.addEventListener('change', toggleNoModel);
+        tglPakaiSKInput.addEventListener('change', toggleNoModel);
     });
     $(document).ready(function() {
         // Inisialisasi Select2 di kolom no model
@@ -510,6 +516,7 @@
                                             <input type="hidden" class="form-control text-center" name="items[${row}][${index}][no_model]" id="no_model" value="${noModel}" readonly>
                                             <input type="hidden" class="form-control text-center" name="items[${row}][${index}][style_size]" id="style_size" value="${selectedStyleSize}" readonly>
                                             <input type="hidden" class="form-control text-center" name="items[${row}][${index}][id_material]" id="id_material" value="${item.id_material}" readonly>
+                                            <input type="hidden" class="form-control text-center" name="items[${row}][${index}][jenis]" id="jenis" value="${item.jenis}" readonly>
                                             <input type="hidden" class="form-control text-center jalan_mc" name="items[${row}][${index}][jalan_mc]" id="jalan_mc" value="${jalanMc}" readonly>
                                             // 
                                             <td width=20><input type="text" class="form-control text-center" name="items[${row}][${index}][no]" id="no" value="${index + 1}" readonly></td>
@@ -609,35 +616,24 @@
                 return; // Hentikan proses submit jika tabel kosong
             }
 
-            // Validasi: Pastikan Jalan MC, Qty Cones, dan Qty Berat Cones tidak 0
-            let isInvalidData = false;
-            $('.material-usage').each(function() {
-                const jalanMc = parseFloat($(this).find('.jalan_mc').val()) || 0;
-                const qtyCones = parseFloat($(this).find('.qty_cns').val()) || 0;
-                const qtyBeratCones = parseFloat($(this).find('.qty_berat_cns').val()) || 0;
-
-                // Debug (opsional)
-                console.log("Jalan MC:", jalanMc, "Qty Cones:", qtyCones, "Qty Berat Cones:", qtyBeratCones);
-
-                if (jalanMc === 0 || qtyCones === 0 || qtyBeratCones === 0) {
-                    isInvalidData = true;
-                    return false; // Hentikan iterasi jika ada data tidak valid
+            // 1) Validasi: Jalan MC tidak boleh kosong di tiap baris
+            let invalidMachine = false;
+            $('.material-usage').find('input.jalan_mc').each(function() {
+                const jm = parseFloat($(this).val()) || 0;
+                if (jm === 0) {
+                    invalidMachine = true;
+                    return false; // break .each
                 }
+                console.log('info', 'ini jl mc' + jm);
             });
-
-            console.log(isInvalidData)
-            if (isInvalidData) {
-                Swal.fire({
-                    title: "Peringatan!",
-                    text: "Nilai Jalan MC, Qty Cones, atau Qty Berat Cones tidak boleh 0.",
-                    icon: "warning",
-                    confirmButtonText: "OK"
-                });
-                return; // Hentikan proses submit jika ada data tidak valid
+            if (invalidMachine) {
+                Swal.fire('Peringatan', 'Nilai Jalan MC tidak boleh kosong atau 0', 'warning');
+                return;
             }
 
             // Jika tabel tidak kosong, lanjutkan proses submit
             const formData = $(this).serializeArray();
+            console.log(formData);
 
             $.ajax({
                 url: "<?= base_url($role . '/bahanBaku/simpanKeSession') ?>",
@@ -720,6 +716,62 @@
         });
     });
 
+
+    // save data yang dipilih pemesanan ke database
+    // document.getElementById('submit-selected').addEventListener('click', function() {
+    //     const selected = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked')).map(checkbox => checkbox.value);
+
+    //     if (selected.length === 0) {
+    //         Swal.fire({
+    //             icon: 'warning',
+    //             title: 'Peringatan',
+    //             text: 'Pilih setidaknya satu data!',
+    //             confirmButtonText: 'OK'
+    //         });
+    //         return;
+    //     }
+
+    //     // Kirim data yang dipilih melalui fetch
+    //     const BASE_URL = "<?= base_url(); ?>";
+    //     const payload = {
+    //         selected
+    //     };
+    //     fetch('http://172.23.44.14/MaterialSystem/public/api/saveListPemesanan', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify(payload),
+    //         })
+    //         .then(async (response) => {
+    //             const resData = await response.json();
+    //             if (response.ok) {
+    //                 Swal.fire({
+    //                     icon: 'success',
+    //                     title: 'Sukses!',
+    //                     text: 'Data berhasil dikirim!',
+    //                 }).then(() => {
+    //                     location.reload(); // Refresh halaman setelah sukses
+    //                 });
+    //             } else {
+    //                 Swal.fire({
+    //                     icon: 'error',
+    //                     title: 'Error!',
+    //                     text: resData.message || 'Gagal mengirim data',
+    //                 });
+    //                 console.error('Response Data:', resData);
+    //             }
+    //         })
+    //         .catch((error) => {
+    //             Swal.fire({
+    //                 icon: 'error',
+    //                 title: 'Error!',
+    //                 text: 'Terjadi kesalahan saat mengirim data',
+    //             });
+    //             console.error('Fetch Error:', error);
+    //         });
+    // });
+
     document.getElementById('formPemesanan').addEventListener('submit', function(event) {
         event.preventDefault();
 
@@ -727,13 +779,36 @@
         const formData = new FormData(form);
         const BASE_URL = "<?= base_url(); ?>";
 
-        // Konversi FormData ke JSON tanpa "[]"
+        // Ambil data checkbox yang tercentang
+        const selectedCheckboxes = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked'));
+
+        // Jika tidak ada yang tercentang, tampilkan alert
+        if (selectedCheckboxes.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Pilih setidaknya satu data!',
+            });
+            return;
+        }
+
+        // Siapkan payload
         const payload = {};
-        formData.forEach((value, key) => {
-            const cleanKey = key.replace(/\[\]$/, ""); // Hapus "[]"
-            if (!payload[cleanKey]) payload[cleanKey] = [];
-            payload[cleanKey].push(value);
+
+        selectedCheckboxes.forEach((checkbox) => {
+            // Cari elemen terkait di baris yang sama
+            const row = checkbox.closest('tr');
+
+            // Ambil semua input dalam baris tersebut
+            const inputs = row.querySelectorAll('input');
+
+            inputs.forEach((input) => {
+                const key = input.name.replace(/\[\]$/, ''); // Hapus "[]"
+                if (!payload[key]) payload[key] = [];
+                payload[key].push(input.value);
+            });
         });
+
 
         fetch('http://172.23.44.14/MaterialSystem/public/api/saveListPemesanan', {
                 method: 'POST',
@@ -745,31 +820,48 @@
             })
             .then(async (response) => {
                 const resData = await response.json();
+                const selected = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked')).map(checkbox => checkbox.value);
+                console.log('a' + selected)
                 if (response.ok) {
-                    // Hapus session dengan request GET
                     fetch('bahanBaku/hapusSession', {
-                            method: 'GET',
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json', // Penting untuk memastikan JSON diproses
+                            },
+                            body: JSON.stringify({
+                                selected
+                            }),
                         })
-                        .then(() => {
-                            // Tampilkan SweetAlert setelah session berhasil dihapus
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success!',
-                                text: resData.message,
-                            }).then(() => {
-                                // Redirect ke halaman yang diinginkan
-                                window.location.href = `${BASE_URL}user/bahanBaku`; // Halaman tujuan setelah sukses
-                            });
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.status === 'success') {
+                                // Tampilkan SweetAlert setelah session berhasil dihapus
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success!',
+                                    text: resData.message,
+                                }).then(() => {
+                                    // Redirect ke halaman yang diinginkan
+                                    window.location.href = `${BASE_URL}user/bahanBaku`; // Halaman tujuan setelah sukses
+                                });
+                            } else {
+                                console.error('Error saat menghapus session:', error);
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Warning!',
+                                    text: 'Data berhasil disimpan, tetapi session gagal dihapus.',
+                                }).then(() => {
+                                    // Tetap redirect meskipun ada error saat menghapus session
+                                    window.location.href = `${BASE_URL}user/bahanBaku`;
+                                });
+                            }
                         })
                         .catch((error) => {
-                            console.error('Error saat menghapus session:', error);
+                            console.error('Error:', error);
                             Swal.fire({
-                                icon: 'warning',
-                                title: 'Warning!',
-                                text: 'Data berhasil disimpan, tetapi session gagal dihapus.',
-                            }).then(() => {
-                                // Tetap redirect meskipun ada error saat menghapus session
-                                window.location.href = `${BASE_URL}user/bahanBaku`;
+                                icon: 'error',
+                                title: 'Terjadi Kesalahan',
+                                text: 'Gagal menghapus session',
                             });
                         });
                 } else {
@@ -827,7 +919,7 @@
 
     // Checkbox "Select All" functionality
     document.getElementById('select-all').addEventListener('change', function() {
-        const checkboxes = document.querySelectorAll('.delete-checkbox');
+        const checkboxes = document.querySelectorAll('.checkbox-pemesanan');
         const isChecked = this.checked;
 
         checkboxes.forEach(checkbox => {
@@ -837,10 +929,16 @@
 
     // hapus session list pemesanan
     document.getElementById('delete-selected').addEventListener('click', function() {
-        const selected = Array.from(document.querySelectorAll('.delete-checkbox:checked')).map(checkbox => checkbox.value);
+        const selected = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked')).map(checkbox => checkbox.value);
+        console.log('b' + selected)
 
         if (selected.length === 0) {
-            alert('Pilih setidaknya satu item untuk dihapus!');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Pilih setidaknya satu data!',
+                confirmButtonText: 'OK'
+            });
             return;
         }
 
@@ -848,14 +946,15 @@
             $.ajax({
                 url: '<?= base_url($role . "/bahanBaku/hapusSession") ?>',
                 type: 'POST',
-                data: {
+                contentType: 'application/json', // Tentukan format data sebagai JSON
+                data: JSON.stringify({
                     selected
-                },
+                }), // Ubah data menjadi string JSON
                 success: function(response) {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Data berhasil dihapus!',
-                        text: 'Data telah dihapus dengan sukses.',
+                        title: 'Berhasil',
+                        text: 'Data berhasil dihapus',
                         confirmButtonText: 'OK'
                     }).then(function() {
                         location.reload(); // Refresh halaman setelah penghapusan

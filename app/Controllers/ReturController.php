@@ -379,4 +379,15 @@ class ReturController extends BaseController
 
         return redirect()->back()->with('error', 'Data retur tidak valid.');
     }
+
+    public function getKodeWarnaWarnaByItemType()
+    {
+        $itemType = $this->request->getGet('item_type');
+
+        // Ambil data berdasarkan item_type dari database
+        $model = new \App\Models\ReturModel(); // Ganti sesuai model kamu
+        $result = $model->where('item_type', $itemType)->groupBy(['kode_warna', 'warna'])->findAll();
+
+        return $this->response->setJSON($result);
+    }
 }

@@ -78,7 +78,7 @@ class OrderController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-            'TotalMesin' => $totalMesin,
+            'jenisJarum' => $totalMesin,
             'role' => $role
         ];
         return view($role . '/Order/ordermaster', $data);
@@ -557,7 +557,9 @@ class OrderController extends BaseController
         $sisa_booking = $this->request->getPost("sisa_booking_akhir");
         $id_booking = $this->request->getPost("id_booking");
         $jarum = $this->request->getPost("jarum");
-
+        if (empty($tgl_turun)) {
+            $tgl_turun = date('Y-m-d');
+        }
         $check = $this->orderModel->checkExist($no_model);
         if ($check) {
             $id = $id_booking;
@@ -577,7 +579,7 @@ class OrderController extends BaseController
         } else {
 
             $inputModel = [
-                'tgl_terima_order' => $tgl_turun,
+                'created_at' => $tgl_turun,
                 'no_model' => $no_model,
                 'deskripsi' => $deskripsi,
                 'id_booking' => $id_booking,
@@ -605,7 +607,6 @@ class OrderController extends BaseController
     }
     public function inputOrderManual()
     {
-        $tgl = $this->request->getPost('tgl_turun');
         $model = $this->request->getPost('no_model');
         $jarum = $this->request->getPost('jarum');
         $prod = $this->request->getPost('productType');
@@ -617,7 +618,11 @@ class OrderController extends BaseController
         ];
         $idProdtype = $this->productModel->getId($getId);
 
-
+        $tgl = $this->request->getPost('tgl_turun');
+        $tanggal = date('Y-m-d', strtotime($tgl));
+        if (empty($tgl)) {
+            $tanggal = date('Y-m-d');
+        }
         if ($model) {
             $check = $this->orderModel->checkExist($model);
             if ($check) {
@@ -1914,14 +1919,12 @@ class OrderController extends BaseController
             $poplus = (int)$id['poplus'];
             $produksi = $qty - $sisa;
             $ttlProd = (int)$dataProd['prod'];
-
-
             // Periksa apakah produksi valid dan memenuhi kondisi
             if ($ttlProd > 0) {
                 $percentage = round(($ttlProd / $qty) * 100);
                 $ganti = $bs + $poplus;
                 $estimasi = ($ganti / $ttlProd / 100) * $qty;
-                if ($percentage > 60 && $percentage < 90) {
+                if ($percentage > 75 && $percentage < 98) {
                     $perStyle[] = [
                         'model' => $id['mastermodel'],
                         'inisial' => $id['inisial'],

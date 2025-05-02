@@ -123,6 +123,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('savePlanStyle', 'ApsController::savePlanStyle');
     $routes->get('cekBahanBaku/(:num)/(:num)', 'MaterialController::cekBahanBaku/$1/$2');
     $routes->get('cekStok', 'MaterialController::cekStok');
+    $routes->get('cekStokStyle', 'MaterialController::cekStokStyle');
     $routes->get('summaryPlanner/(:any)', 'SummaryController::summaryPlanner/$1');
     $routes->get('summaryStopPlanner/(:any)', 'SummaryController::summaryStopPlanner/$1');
 
@@ -413,6 +414,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('savePlanStyle', 'ApsController::savePlanStyle');
     $routes->get('cekBahanBaku/(:num)/(:num)', 'MaterialController::cekBahanBaku/$1/$2');
     $routes->get('cekStok', 'MaterialController::cekStok');
+    $routes->get('cekStokStyle', 'MaterialController::cekStokStyle');
     $routes->get('summaryPlanner/(:any)', 'SummaryController::summaryPlanner/$1');
     $routes->get('summaryStopPlanner/(:any)', 'SummaryController::summaryStopPlanner/$1');
 
@@ -423,7 +425,9 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
 
     //bahanbakyu
     $routes->get('stockbb', 'MaterialController::stockbb');
-    $routes->get('filterstockbahanbaku/(:any)', 'MaterialController::filterStockBahanBaku/$1');
+    $routes->get('filterstockbahanbaku', 'MaterialController::filterStockBahanBaku');
+    $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
+    $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
 });
 
 // user
@@ -500,7 +504,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
 
     // bahanbaku
     $routes->get('bahanBaku', 'MaterialController::index');
-    $routes->get('statusbahanbaku/(:any)', 'MaterialController::statusbahanbaku/$1');
+    $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
     $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
     $routes->post('getStyleSizeByNoModel', 'MaterialController::getStyleSizeByNoModel');
     $routes->post('getJalanMc', 'MaterialController::getJalanMcByModelSize');
@@ -531,6 +535,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
     $routes->post('retur/(:any)/pengajuanRetur', 'ReturController::pengajuanRetur/$1');
     $routes->get('getKategoriRetur', 'ReturController::getKategoriRetur');
+    $routes->get('getKodeWarnaWarnaByItemType', 'ReturController::getKodeWarnaWarnaByItemType');
 });
 
 // sudo
