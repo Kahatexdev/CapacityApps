@@ -143,7 +143,7 @@ class UserController extends BaseController
         $dataJarum = $this->jarumModel->getJarum();
         $area = session()->get('username');
         $month = [];
-        for ($i = -1; $i <= 12; $i++) {
+        for ($i = -3; $i <= 12; $i++) {
             $month[] = date('F-Y', strtotime("first day of $i month"));
         }
 
