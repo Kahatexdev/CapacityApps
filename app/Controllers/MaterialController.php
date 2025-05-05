@@ -161,7 +161,11 @@ class MaterialController extends BaseController
             'active1' => '',
             'active2' => '',
             'active3' => '',
-
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'targetProd' => 0,
         ];
 
         return view(session()->get('role') . '/Material/statusbahanbaku', $data);
