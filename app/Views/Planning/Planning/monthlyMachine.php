@@ -405,8 +405,15 @@
 
             let val;
 
+            // Ambil nomor card dari ID yang sedang di-loop
+            var no = $(this).closest(".card").find("input[id^='ttlmc']").attr("id").replace("ttlmc", "");
+
+            // Ambil area dari card yang sesuai
+            var area = $("#area" + no).val();
+            var pembagiOperator = (area === "KK8J") ? 12 : 20;
+
             // Hitung operator dan montir setelah semua data diupdate
-            totalOperator = ((totalMesin / 20) + (totalMesin / 20) / 7) * 3;
+            totalOperator = ((totalMesin / pembagiOperator) + (totalMesin / pembagiOperator) / 7) * 3;
             totalMontir = ((totalMesin / 50) + (totalMesin / 50) / 7) * 3;
             totalInLine = ((val = (totalMesin / 80 * 3) + ((totalMesin / 80 * 3) / 7)) > 0 && val <= 4) ? 4 : val;
             totalWly = ((val = (totalMesin / 180 * 3) + ((totalMesin / 180 * 3) / 7)) > 0 && val <= 4) ? 4 : val;
@@ -456,7 +463,12 @@
 
             let val;
 
-            totalOperator = ((totalMesin / 20) + (totalMesin / 20) / 7) * 3;
+            // Ambil area dari card yang sesuai
+            var area = $("#area" + no).val();
+            var pembagiOperator = (area === "KK8J") ? 12 : 20;
+
+            // Hitung operator dan montir setelah semua data diupdate
+            totalOperator = ((totalMesin / pembagiOperator) + (totalMesin / pembagiOperator) / 7) * 3;
             totalMontir = ((totalMesin / 50) + (totalMesin / 50) / 7) * 3;
             totalInLine = ((val = (totalMesin / 80 * 3) + ((totalMesin / 80 * 3) / 7)) > 0 && val <= 4) ? 4 : val;
             totalWly = ((val = (totalMesin / 180 * 3) + ((totalMesin / 180 * 3) / 7)) > 0 && val <= 4) ? 4 : val;
