@@ -454,20 +454,10 @@ class ApsPerstyleModel extends Model
             ->where('machinetypeid', $jarum)
             ->where('mastermodel', $model)
             ->where('sisa >=', 0)
-            ->where('qty >', 0)
+            ->where('qty >=', 0)
             ->groupby('delivery')
             ->findAll();
-        if (empty($result)) {
-            $data = [
-                'sisa' => 0,
-                'qty' => 0,
-                'mastermodel' => $model,
-                'smv' => 0,
-            ];
-            return $data;
-        } else {
-            return $result;
-        }
+        return $result;
     }
     public function getSisaPerDlv($model, $jarum, $deliv)
     {
