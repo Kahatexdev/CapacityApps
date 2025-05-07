@@ -813,6 +813,9 @@ class OrderController extends BaseController
         $totalPo = $this->ApsPerstyleModel->totalPo($noModel);
         // ini ngambil jumlah qty
         $sisaArray = array_column($pdk, 'sisa');
+        if (empty($sisaArray)) {
+            return 0; // atau nilai default lain yang masuk akal buatmu
+        }
         $maxValue = max($sisaArray);
         $indexMax = array_search($maxValue, $sisaArray);
         $totalQty = 0;
