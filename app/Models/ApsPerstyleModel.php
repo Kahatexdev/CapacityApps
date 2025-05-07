@@ -462,7 +462,7 @@ class ApsPerstyleModel extends Model
                 'sisa' => 0,
                 'qty' => 0,
                 'mastermodel' => $model,
-                'smv' => smv
+                'smv' => 0,
             ];
             return $data;
         } else {
