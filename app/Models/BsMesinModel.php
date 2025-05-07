@@ -237,7 +237,10 @@ class BsMesinModel extends Model
                 $final[$key] = [
                     'nama_karyawan' => $res['nama_karyawan'],
                     'qty_gram' => 0,
-                    'qty_produksi' => 0
+                    'qty_produksi' => 0,
+                    'area' =>  $res['area'],
+                    'tanggal_produksi' =>  $res['tanggal_produksi'],
+                    'shift' =>  $res['shift'],
                 ];
             }
             $final[$key]['qty_gram'] += $res['qty_gram'];
