@@ -314,6 +314,13 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('datadeffect', 'DeffectController::datadeffect');
     $routes->post('inputKode', 'DeffectController::inputKode');
     $routes->post('viewDataBs', 'DeffectController::viewDataBs');
+
+
+    //bahanbakyu
+    $routes->get('stockbb', 'MaterialController::stockbb');
+    $routes->get('filterstockbahanbaku', 'MaterialController::filterStockBahanBaku');
+    $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
+    $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
 });
 
 
