@@ -458,13 +458,14 @@ class ApsPerstyleModel extends Model
             ->groupby('delivery')
             ->findAll();
         if (empty($result)) {
-            $data=['sisa'=>0,
-                'qty'=>0,
-                'mastermodel'=>$model,
-                'smv'=>smv];
-            return $data
-        }
-        else{
+            $data = [
+                'sisa' => 0,
+                'qty' => 0,
+                'mastermodel' => $model,
+                'smv' => smv
+            ];
+            return $data;
+        } else {
             return $result;
         }
     }
