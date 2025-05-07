@@ -246,7 +246,6 @@ class BsMesinModel extends Model
             $final[$key]['qty_gram'] += $res['qty_gram'];
             $final[$key]['qty_produksi'] += $res['qty_produksi'];
         }
-        dd($final);
         return array_values($final); // balikin array yang udah dirapihin index-nya
     }
 }
