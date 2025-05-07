@@ -187,6 +187,6 @@ class ApiController extends ResourceController
     {
 
         $bsdata = $this->BsMesinModel->bsKary($area, $tanggal);
-        dd($bsdata);
+        return $this->response->setJSON($bsdata);
     }
 }
