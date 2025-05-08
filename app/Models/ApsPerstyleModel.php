@@ -450,13 +450,14 @@ class ApsPerstyleModel extends Model
     }
     public function getSisaPerDeliv($model, $jarum)
     {
-        return $this->select('sum(sisa) as sisa,sum(qty) as qty, delivery, mastermodel,smv')
+        $result = $this->select('sum(sisa) as sisa,sum(qty) as qty, delivery, mastermodel,smv')
             ->where('machinetypeid', $jarum)
             ->where('mastermodel', $model)
             ->where('sisa >=', 0)
-            ->where('qty >', 0)
+            ->where('qty >=', 0)
             ->groupby('delivery')
             ->findAll();
+        return $result;
     }
     public function getSisaPerDlv($model, $jarum, $deliv)
     {
@@ -465,7 +466,7 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $model)
             ->where('delivery', $deliv)
             ->where('sisa >=', 0)
-            ->where('qty >', 0)
+            ->where('qty >=', 0)
             ->groupBy('size,factory')
             ->findAll();
         $final = reset($sisa);

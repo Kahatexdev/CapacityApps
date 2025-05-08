@@ -183,4 +183,10 @@ class ApiController extends ResourceController
         $dataPlan = $this->globalModel->getPlan();
         return $this->response->setJSON($dataPlan);
     }
+    public function prodBsDaily($area, $tanggal)
+    {
+
+        $bsdata = $this->BsMesinModel->bsKary($area, $tanggal);
+        return $this->response->setJSON($bsdata);
+    }
 }

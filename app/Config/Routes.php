@@ -26,6 +26,8 @@ $routes->group(
         $routes->get('bsPeriode/(:any)', 'ApiController::bsPeriode/$1');
         $routes->get('bsDaily/(:any)', 'ApiController::bsDaily/$1');
 
+        $routes->get('prodBsDaily/(:any)/(:any)', 'ApiController::prodBsDaily/$1/$2');
+
         // material
         $routes->get('orderMaterial/(:any)/(:any)', 'ApiController::orderMaterial/$1/$2');
         $routes->get('reqstartmc/(:any)', 'ApiController::reqstartmc/$1');
@@ -312,6 +314,13 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('datadeffect', 'DeffectController::datadeffect');
     $routes->post('inputKode', 'DeffectController::inputKode');
     $routes->post('viewDataBs', 'DeffectController::viewDataBs');
+
+
+    //bahanbakyu
+    $routes->get('stockbb', 'MaterialController::stockbb');
+    $routes->get('filterstockbahanbaku', 'MaterialController::filterStockBahanBaku');
+    $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
+    $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
 });
 
 

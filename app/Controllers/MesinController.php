@@ -448,6 +448,10 @@ class MesinController extends BaseController
     public function DetailMesinPerAreaPlan($area)
     {
         $tampilperarea = $this->jarumModel->getJarumArea($area);
+        foreach ($tampilperarea as &$mc) {
+            $mc['kapasitas'] = $mc['mesin_jalan'] * $mc['target'];
+        }
+        unset($mc); // penting buat mencegah bug di loop selanjutnya
         $getPU = $this->jarumModel->getpu($area);
         $data = [
             'role' => session()->get('role'),

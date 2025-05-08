@@ -59,6 +59,7 @@
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Brand</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Machine Running</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Machine Not Running</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Capacity</th>
                                         <th colspan=3 class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
                                     </tr>
                                 </thead>
@@ -69,8 +70,9 @@
                                             <td class="text-sm"><?= $order['jarum']; ?></td>
                                             <td class="text-sm"><?= $order['total_mc']; ?> Mc</td>
                                             <td class="text-sm"><?= $order['brand']; ?></td>
-                                            <td class="text-sm"><?= $order['total_mc'] - $order['mesin_jalan']; ?> Mc</td>
                                             <td class="text-sm"><?= $order['mesin_jalan']; ?> Mc</td>
+                                            <td class="text-sm"><?= $order['total_mc'] - $order['mesin_jalan']; ?> Mc</td>
+                                            <td class="text-sm"><?= $order['kapasitas'] ?> dz</td>
                                             <td class="text-sm">
 
 
@@ -336,6 +338,11 @@
                         }).data().reduce(function(a, b) {
                             return parseInt(a) + parseInt(b);
                         }, 0);
+                        var kapasitas = api.column(6, {
+                            page: 'current'
+                        }).data().reduce(function(a, b) {
+                            return parseInt(a) + parseInt(b);
+                        }, 0);
 
                         var mesinMati = totalMesin - mesinJalan;
 
@@ -343,6 +350,7 @@
                         var totalMesinFormatted = numberWithDots(totalMesin) + " Mc";
                         var mesinJalanFormatted = numberWithDots(mesinJalan) + " Mc";
                         var mesinMatiFormatted = numberWithDots(mesinMati) + " Mc";
+                        var kapasitasFormatted = numberWithDots(kapasitas) + " Dz";
 
                         // Update the footer cell for the total Qty
                         $(api.column(2).footer()).html(totalMesinFormatted);
@@ -352,6 +360,7 @@
 
                         // Update the footer cell for the percentage
                         $(api.column(5).footer()).html(mesinMatiFormatted);
+                        $(api.column(6).footer()).html(kapasitasFormatted);
                     },
                 });
 

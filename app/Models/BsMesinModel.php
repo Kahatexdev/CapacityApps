@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use Config\Database;
 use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Sum;
 use DateTime;
 
@@ -204,5 +205,47 @@ class BsMesinModel extends Model
         $result = $builder->first();
 
         return $result ?? 0;
+    }
+    public function bsKary($area, $tanggal)
+    {
+        $bsList = $this->select('tanggal_produksi,nama_karyawan, no_mesin, qty_gram,area,shift')
+            ->where('tanggal_produksi',  $tanggal)
+            ->where('area',  $area)
+            ->findAll();
+
+        $prod = new \App\Models\ProduksiModel();
+        $result = [];
+
+        foreach ($bsList as $row) {
+            $noMc = $row['no_mesin'];
+            $shift = 'shift_' . $row['shift'];
+            $produksi = $prod->select($shift)
+                ->where('tgl_produksi', $tanggal)
+                ->where('area', $area)
+                ->where('no_mesin', $noMc)
+                ->first();
+
+            $row['qty_produksi'] = $produksi[$shift] ?? 0;
+            $result[] = $row;
+        }
+
+        // Grouping by nama_karyawan
+        $final = [];
+        foreach ($result as $res) {
+            $key = $res['nama_karyawan'];
+            if (!isset($final[$key])) {
+                $final[$key] = [
+                    'nama_karyawan' => $res['nama_karyawan'],
+                    'qty_gram' => 0,
+                    'qty_produksi' => 0,
+                    'area' =>  $res['area'],
+                    'tanggal_produksi' =>  $res['tanggal_produksi'],
+                    'shift' =>  $res['shift'],
+                ];
+            }
+            $final[$key]['qty_gram'] += $res['qty_gram'];
+            $final[$key]['qty_produksi'] += $res['qty_produksi'];
+        }
+        return array_values($final); // balikin array yang udah dirapihin index-nya
     }
 }
