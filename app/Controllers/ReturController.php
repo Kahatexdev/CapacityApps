@@ -83,9 +83,27 @@ class ReturController extends BaseController
     }
     public function index($area)
     {
-        // $api = \Config\Services::curlrequest();
-        // $response = $api->get('http://172.23.44.14/MaterialSystem/public/api/getPengirimanArea');
-        // dd ($response->getBody());
+        $url = 'http://172.23.44.14/MaterialSystem/public/api/getKategoriRetur';
+
+        $response = file_get_contents($url);
+        log_message('debug', "API Response: " . $response);
+        if ($response === FALSE) {
+            // log_message('error', "API tidak bisa diakses: $url");
+            return $this->response->setJSON(["error" => "Gagal mengambil data dari API"]);
+        }
+        $data = json_decode($response, true);
+        if ($data === null) {
+            log_message('error', "Gagal mendecode data dari API: $url");
+            // return $this->response->setJSON(["error" => "Gagal mengolah data dari API"]);
+        }
+        // Ambil data kategori retur
+        $kategoriRetur = [];
+        foreach ($data as $item) {
+            $kategoriRetur[] = [
+                'nama_kategori' => $item['nama_kategori'],
+                'tipe_kategori' => $item['tipe_kategori']
+            ];
+        }
         $data = [
             'role' => session()->get('role'),
             'title' => 'Retur Bahan Baku',
@@ -97,7 +115,8 @@ class ReturController extends BaseController
             'active6' => '',
             'active7' => '',
             'active8' => '',
-            'area' => $area
+            'area' => $area,
+            'kategori' => $kategoriRetur,
         ];
         return view(session()->get('role') . '/retur', $data);
     }
@@ -107,12 +126,9 @@ class ReturController extends BaseController
         // Ambil nilai 'model' dari query parameter
         $noModel = $this->request->getGet('model') ?? '';
 
-        // URL API
-        // 172.23.39.117
-        // $apiUrlPph = 'http://172.23.39.117/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
+
         $apiUrlPph = 'http://172.23.44.14/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
         $apiUrlPengiriman = 'http://172.23.44.14/MaterialSystem/public/api/getPengirimanArea?noModel=' . urlencode($noModel);
-        // $apiUrlPengiriman = 'http://172.23.39.117/MaterialSystem/public/api/getPengirimanArea?noModel=' . urlencode($noModel);
 
         // Ambil data dari API PPH
         $responsePph = file_get_contents($apiUrlPph);
@@ -291,94 +307,79 @@ class ReturController extends BaseController
         return $this->response->setJSON($result);
     }
 
-    public function getKategoriRetur()
-    {
-        // get data kategori retur dari API
-        $url = 'http://172.23.44.14/MaterialSystem/public/api/getKategoriRetur';
-        // $url = 'http://172.23.39.117/MaterialSystem/public/api/getKategoriRetur';
-        $response = file_get_contents($url);
-        log_message('debug', "API Response: " . $response);
-        if ($response === FALSE) {
-            // log_message('error', "API tidak bisa diakses: $url");
-            return $this->response->setJSON(["error" => "Gagal mengambil data dari API"]);
-        }
-        $data = json_decode($response, true);
-        if ($data === null) {
-            log_message('error', "Gagal mendecode data dari API: $url");
-            // return $this->response->setJSON(["error" => "Gagal mengolah data dari API"]);
-        }
-        // Ambil data kategori retur
-        $kategoriRetur = [];
-        foreach ($data as $item) {
-            $kategoriRetur[] = [
-                'nama_kategori' => $item['nama_kategori'],
-                'tipe_kategori' => $item['tipe_kategori']
-            ];
-        }
-        return $this->response->setJSON($kategoriRetur);
-    }
-
-
-
     public function pengajuanRetur($area)
     {
         $postData = $this->request->getPost();
-        $items = $postData['items'] ?? [];
-        // dd ($postData);
 
-        if (!empty($items) && is_array($items)) {
-            // Init HTTP client
-            $client = \Config\Services::curlrequest();
-
-            foreach ($items as $item) {
-                $data = [
-                    'no_model'       => $postData['model'],
-                    'area_retur'     => $postData['area'],
-                    'item_type'      => $item['item_type'],
-                    'kode_warna'     => $item['kode_warna'],
-                    'warna'          => $item['warna'],
-                    'tgl_retur'      => date('Y-m-d'),
-                    'kgs_retur'      => (float) $item['kgs'],
-                    'cns_retur'      => (int) $item['cones'],
-                    'krg_retur'      => (int) $item['karung'],
-                    'lot_retur'      => $item['lot_retur'],
-                    'kategori' => $item['kategori_retur'],
-                    'keterangan_area'   => $item['alasan_retur']
-                ];
-                // dd($data);
-                try {
-                    // Kirim ke API
-                    $response = $client->post(
-                        'http://172.23.44.14/MaterialSystem/public/api/saveRetur',
-                        // 'http://172.23.39.114/MaterialSystem/public/api/saveRetur',
-                        [
-                            'headers' => [
-                                'Accept' => 'application/json',
-                                'Content-Type' => 'application/json'
-                            ],
-                            'json' => $data
-                        ]
-                    );
-
-                    // Optional: Cek hasil
-                    $statusCode = $response->getStatusCode();
-                    $responseBody = json_decode($response->getBody(), true);
-
-                    if (!in_array($statusCode, [200, 201])) {
-                        log_message('error', 'Gagal kirim retur: ' . json_encode($responseBody));
-                    } else {
-                        log_message('info', 'Berhasil kirim retur: ' . json_encode($responseBody));
-                    }
-                } catch (\Exception $e) {
-                    log_message('error', 'Exception saat kirim retur: ' . $e->getMessage());
-                }
-            }
-
-            return redirect()->back()->with('success', 'Pengajuan retur berhasil dikirim.');
+        if (!$postData) {
+            return redirect()->back()->with('error', 'Data tidak ditemukan.');
         }
 
-        return redirect()->back()->with('error', 'Data retur tidak valid.');
+        /** @var CURLRequest $client */
+        $client = \Config\Services::curlrequest();
+
+        // Ambil data material dari API
+        $materialUrl = 'http://172.23.44.14/MaterialSystem/public/api/cekMaterial/' . $postData['material'];
+
+        try {
+            $materialResponse = $client->get($materialUrl, [
+                'headers' => ['Accept' => 'application/json']
+            ]);
+
+            $material = json_decode($materialResponse->getBody(), true);
+
+            if (!$material || !isset($material['item_type'])) {
+                throw new \Exception('Data material tidak valid atau tidak ditemukan.');
+            }
+
+            $data = [
+                'no_model'        => $postData['model'],
+                'area_retur'      => $postData['area'],
+                'item_type'       => $material['item_type'],
+                'kode_warna'      => $material['kode_warna'],
+                'warna'           => $material['color'],
+                'tgl_retur'       => date('Y-m-d'),
+                'kgs_retur'       => (float) $postData['kgs'],
+                'cns_retur'       => (int) $postData['cones'],
+                'krg_retur'       => (int) $postData['karung'],
+                'lot_retur'       => $postData['lotRetur'],
+                'kategori'        => $postData['kategori_retur'],
+                'keterangan_area' => $postData['keterangan']
+            ];
+
+            // Kirim data retur ke API
+            $response = $client->post('http://172.23.44.14/MaterialSystem/public/api/saveRetur', [
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => $data
+            ]);
+
+            $statusCode = $response->getStatusCode();
+            $body = json_decode($response->getBody(), true);
+
+            if (!in_array($statusCode, [200, 201])) {
+                log_message('error', 'Retur gagal: ' . json_encode($body));
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Gagal mengirim retur.'
+                ]);
+            }
+
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Pengajuan retur berhasil dikirim.'
+            ]);
+        } catch (\Exception $e) {
+            log_message('error', 'Error saat kirim retur: ' . $e->getMessage());
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Gagal mengirim retur.'
+            ]);
+        }
     }
+
 
     public function getKodeWarnaWarnaByItemType()
     {
