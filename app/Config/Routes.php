@@ -234,6 +234,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('assignareal', 'PlanningController::assignareal');
     $routes->post('splitarea', 'PlanningController::splitarea');
     $routes->post('editarea', 'PlanningController::editarea');
+    $routes->post('editqtyarea', 'PlanningController::editqtyarea');
     $routes->post('assignarealall', 'PlanningController::assignarealall');
     $routes->post('recomendationarea', 'MesinController::recomendationarea');
     $routes->post('tampilPerdelivery', 'OrderController::tampilPerdelivery');
