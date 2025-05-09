@@ -31,7 +31,7 @@
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 font-weight-bolder">Form Buka PO Tambahan <?= basename(current_url()) ?></h5>
-                <a href="<?= base_url($role . '/masterdata/poGabungan') ?>" class="btn bg-gradient-info"> Kembali</a>
+                <a href="<?= base_url($role . '/po_tambahan/' . $area) ?>" class="btn bg-gradient-info"> Kembali</a>
             </div>
         </div>
     </div>
