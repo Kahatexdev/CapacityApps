@@ -207,40 +207,14 @@
                 </div>
             </div>
         </div>
-        <div id="loading">
-            <h3>Sedang memuat data...</h3>
+        <div id="loading" style="display: none;">
+            <h3>Sedang Menghitung...</h3>
+            <img src="<?= base_url('assets/giphy2.gif') ?>" alt="Loading...">
         </div>
     </div>
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script type="text/javascript">
-    $(document).on('click', '.btnRetur', function() {
-        const area = document.getElementById('area').value;
-        const model = document.getElementById('no_model').value;
-        $('#modalPengajuanRetur').find('input[name="id"]').val(area);
-        $('#modalPengajuanRetur').find('input[name="model"]').val(model);
-
-        $.ajax({
-            url: "http://172.23.44.14/MaterialSystem/public/api/cekBahanBaku/" + model,
-            type: "GET",
-            data: {
-                model: model
-            },
-            dataType: "json",
-            success: function(response) {
-                updateItemSelect(response, model)
-            },
-            error: function(xhr, status, error) {
-                console.error("Error:", error);
-            },
-            complete: function() {
-                loading.style.display = 'none';
-            }
-        });
-
-        $('#modalPengajuanRetur').modal('show'); // Show the modal
-    });
-    // Sisanya (seperti event untuk search, build table, dan add more item) tetap sama
     $(document).ready(function() {
         const btnSearch = document.getElementById('searchModel');
         const returbtn = document.getElementById('btn-retur');
@@ -277,6 +251,32 @@
             });
         });
     });
+    $(document).on('click', '.btnRetur', function() {
+        const area = document.getElementById('area').value;
+        const model = document.getElementById('no_model').value;
+        $('#modalPengajuanRetur').find('input[name="id"]').val(area);
+        $('#modalPengajuanRetur').find('input[name="model"]').val(model);
+
+        $.ajax({
+            url: "http://172.23.44.14/MaterialSystem/public/api/cekBahanBaku/" + model,
+            type: "GET",
+            data: {
+                model: model
+            },
+            dataType: "json",
+            success: function(response) {
+                updateItemSelect(response, model)
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+            },
+            complete: function() {}
+        });
+
+        $('#modalPengajuanRetur').modal('show'); // Show the modal
+    });
+    // Sisanya (seperti event untuk search, build table, dan add more item) tetap sama
+
 
     function listRetur(model, area) {
         const rowbawah = document.getElementById('rowbawah')
@@ -368,8 +368,11 @@
             if (aggregateKeys.includes(key)) continue;
             const item = data[key];
             const kgsOutVal = parseFloat(item.kgs_out);
-            const validKgsOut = isNaN(kgsOutVal) ? '0' : kgsOutVal.toFixed(2);
-            const estimasi = parseFloat(kgsOutVal - parseFloat(item.pph)).toFixed(2) ?? 0;
+            const validKgsOut = isNaN(kgsOutVal) ? 0 : kgsOutVal;
+
+            const pphVal = parseFloat(item.pph);
+            const estimasiRaw = validKgsOut - (isNaN(pphVal) ? 0 : pphVal);
+            const estimasi = isNaN(estimasiRaw) ? 0 : estimasiRaw.toFixed(2);
 
             rows += `
                 <tr>

@@ -142,7 +142,6 @@ class ReturController extends BaseController
             // log_message('error', "Gagal mendecode data PPH dari: $apiUrlPph");
             return $this->response->setJSON(["error" => "Gagal mengolah data dari API PPH"]);
         }
-
         // Ambil data dari API Pengiriman
         $responsePengiriman = file_get_contents($apiUrlPengiriman);
         // log_message('debug', "API Response Pengiriman: " . $responsePengiriman);
