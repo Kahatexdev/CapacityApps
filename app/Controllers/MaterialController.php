@@ -1070,4 +1070,117 @@ class MaterialController extends BaseController
             'role'       => $role,
         ]);
     }
+    public function poTambahan($area)
+    {
+        $data = [
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'title' => 'Po Tambahan',
+            'area' => $area,
+            'role' => session()->get('role'),
+        ];
+        return view(session()->get('role') . '/Material/po_tambahan', $data);
+    }
+    public function formPoTambahan($area)
+    {
+        $model = $this->ApsPerstyleModel->getPerArea($area);
+        $noModel = array_unique(array_column($model, 'mastermodel'));
+        $data = [
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'noModel' => $noModel,
+            'title' => 'Po Tambahan',
+            'area' => $area,
+            'role' => session()->get('role'),
+        ];
+        return view(session()->get('role') . '/Material/form_po_tambahan', $data);
+    }
+    public function getStyleSize($area, $noModel)
+    {
+        // 1) Panggil API eksternal atau query db untuk style size
+        $size = $this->ApsPerstyleModel->getSizesByNoModelAndArea($noModel, $area);
+
+        // 2) Asumsikan API mengembalikan ["style_sizes"=>["S","M","L",...]]
+        return $this->response
+            ->setJSON($size);
+    }
+
+    public function poTambahanDetail($noModel, $styleSize)
+    {
+        $size    = rawurlencode($styleSize);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/poTambahanDetail/' . $noModel . '/' . $size;
+
+        // Mengambil data dari API eksternal
+        $response = @file_get_contents($apiUrl);
+
+        if ($response === false) {
+            log_message('error', 'Gagal mengambil data dari API untuk No Model: ' . $noModel . '& Size: ' . $styleSize);
+            return $this->response->setStatusCode(500)->setJSON(['error' => 'Tidak dapat mengambil data dari API']);
+        }
+
+        $detail = json_decode($response, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            log_message('error', 'JSON tidak valid: ' . json_last_error_msg());
+            return $this->response->setStatusCode(500)->setJSON(['error' => 'Data JSON tidak valid']);
+        }
+
+        // Cetak ke log
+        log_message('debug', print_r($detail, true));
+
+        // Mengembalikan data item-type dalam format JSON
+        return $this->response->setJSON($detail);
+    }
+
+    public function savePoTambahan($area)
+    {
+        $json = $this->request->getJSON(true);
+
+        $items = array_map(function ($item) use ($area) {
+            return [
+                'area'            => $area,
+                'no_model'        => $item['no_model'],
+                'style_size'      => $item['style_size'],
+                'item_type'       => $item['item_type'],
+                'kode_warna'      => $item['kode_warna'],
+                'color'           => $item['color'],
+                'pcs_po_tambahan' => $item['pcs_po'],
+                'kg_po_tambahan'  => $item['kg_po'],
+                'keterangan'      => $item['keterangan'],
+                'admin'           => session()->get('username'),
+                'created_at'      => date('Y-m-d H:i:s'),
+            ];
+        }, $json);
+
+        $payload = ['items' => $items];
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/savePoTambahan';
+
+        $ch = curl_init($apiUrl);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POSTFIELDS     => json_encode($payload),
+            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+        ]);
+
+        $response = curl_exec($ch);
+        $error    = curl_error($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($response === false) {
+            return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'message' => 'Curl error: ' . $error]);
+        }
+
+        $result = json_decode($response, true);
+
+        return $this->response->setStatusCode($httpCode)->setJSON($result);
+    }
 }

@@ -537,6 +537,11 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('requestAdditionalTime', 'MaterialController::requestAdditionalTime');
     $routes->post('requestAdditionalTime/getTanggalPakai', 'MaterialController::getTanggalPakai');
     $routes->post('getQty', 'MaterialController::getQtyByModelSize');
+    $routes->get('po_tambahan/(:any)', 'MaterialController::poTambahan/$1');
+    $routes->get('form-potambahan/(:any)', 'MaterialController::formPoTambahan/$1');
+    $routes->get('getStyleSize/(:any)/(:any)', 'MaterialController::getStyleSize/$1/$2');
+    $routes->get('poTambahanDetail/(:any)/(:any)', 'MaterialController::poTambahanDetail/$1/$2');
+    $routes->post('savePoTambahan/(:any)', 'MaterialController::savePoTambahan/$1');
 
 
     // retur
