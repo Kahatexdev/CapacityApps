@@ -57,7 +57,7 @@
                         </div>
                         <div class="col-3 d-flex align-items-center text-end gap-2">
                             <input type="hidden" class="form-control" id="area" value="<?= $area ?>">
-                            <input type="text" class="form-control" id="no_model" value="" placeholder="No Model">
+                            <input type="text" class="form-control" id="no_model" value="" placeholder="No Model" required>
                             <button id="searchModel" class="btn btn-info ms-2"><i class="fas fa-search"></i> Filter</button>
                         </div>
                     </div>
@@ -104,29 +104,29 @@
 
 </div>
 <!-- Notifikasi Flashdata -->
-    <?php if (session()->getFlashdata('success')) : ?>
-        <script>
-            $(document).ready(function() {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    html: '<?= session()->getFlashdata('success') ?>',
-                });
+<?php if (session()->getFlashdata('success')) : ?>
+    <script>
+        $(document).ready(function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                html: '<?= session()->getFlashdata('success') ?>',
             });
-        </script>
-    <?php endif; ?>
+        });
+    </script>
+<?php endif; ?>
 
-    <?php if (session()->getFlashdata('error')) : ?>
-        <script>
-            $(document).ready(function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    html: '<?= session()->getFlashdata('error') ?>',
-                });
+<?php if (session()->getFlashdata('error')) : ?>
+    <script>
+        $(document).ready(function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                html: '<?= session()->getFlashdata('error') ?>',
             });
-        </script>
-    <?php endif; ?>
+        });
+    </script>
+<?php endif; ?>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script type="text/javascript">
     let btnSearch = document.getElementById('searchModel');
@@ -139,7 +139,7 @@
         let info = document.getElementById('info');
 
         console.log("Area: " + area);
-        console.log("Model: " +model);
+        console.log("Model: " + model);
 
         loading.style.display = 'block'; // T
         info.style.display = 'none'; // Sembunyikan loading setelah selesai

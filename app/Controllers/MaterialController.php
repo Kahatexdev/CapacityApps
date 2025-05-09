@@ -1112,7 +1112,6 @@ class MaterialController extends BaseController
         return $this->response
             ->setJSON($size);
     }
-
     public function poTambahanDetail($noModel, $styleSize)
     {
         $size    = rawurlencode($styleSize);
@@ -1139,7 +1138,6 @@ class MaterialController extends BaseController
         // Mengembalikan data item-type dalam format JSON
         return $this->response->setJSON($detail);
     }
-
     public function savePoTambahan($area)
     {
         $json = $this->request->getJSON(true);
@@ -1175,6 +1173,31 @@ class MaterialController extends BaseController
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
+        if ($response === false) {
+            return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'message' => 'Curl error: ' . $error]);
+        }
+
+        $result = json_decode($response, true);
+
+        return $this->response->setStatusCode($httpCode)->setJSON($result);
+    }
+    public function filterPoTambahan($area)
+    {
+        $noModel = $this->request->getGet('model');
+        $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/filterPoTambahan"
+            . "?area=" . urlencode($area)
+            . "&model=" . urlencode($noModel);
+
+        $ch = curl_init($apiUrl);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+        ]);
+
+        $response = curl_exec($ch);
+        $error    = curl_error($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
         if ($response === false) {
             return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'message' => 'Curl error: ' . $error]);
         }
