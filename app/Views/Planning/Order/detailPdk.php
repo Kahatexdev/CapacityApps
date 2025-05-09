@@ -143,6 +143,9 @@ error_reporting(E_ALL); ?>
                                                         <button type=" button" class="btn btn-info btn-sm edit-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $list['idapsperstyle']; ?>" data-area="<?= $list['factory']; ?>" data-pdk="<?= $list['mastermodel']; ?>" data-deliv="<?= $list['delivery']; ?> " data-size="<?= $list['size']; ?>" data-jarum="<?= $jarum ?>">
                                                             Edit Area
                                                         </button>
+                                                        <button type=" button" class="btn btn-success btn-sm edit-qty-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $list['idapsperstyle']; ?>" data-area="<?= $list['factory']; ?>" data-pdk="<?= $list['mastermodel']; ?>" data-deliv="<?= $list['delivery']; ?> " data-size="<?= $list['size']; ?>" data-jarum="<?= $jarum ?>">
+                                                            Edit Qty
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             <?php endif; ?>
@@ -438,6 +441,51 @@ error_reporting(E_ALL); ?>
                 </div>
             </div>
         </div>
+        <div class="modal fade bd-example-modal-lg" id="editQtyModal" tabindex="-1" role="dialog" aria-labelledby="editQtyModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Edit Qty<Area:d></Area:d>
+                        </h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="<?= base_url($role . '/editqtyarea') ?>" method="post">
+                            <input type="text" name="id" id="" hidden value="">
+
+                            <input type="text" name="pdk" id="" hidden class="form-control" value="">
+                            <input type="text" name="deliv" id="" hidden class="form-control" value="">
+                            <div class="form-group">
+                                <label for="selectArea">Style size:</label>
+                                <input type="text" name="size" id="" readonly class="form-control" value="">
+                            </div>
+                            <input type="text" name="jarum" id="" hidden class="form-control" value="">
+                            <div class="form-group">
+                                <label for="selectArea">Area:</label>
+                                <input type="text" name="area" id="" readonly class="form-control" value="">
+                            </div>
+                            <div id="confirmationMessage"></div>
+                            <div class="form-group">
+                            </div>
+                            <div class="form-group">
+                                <label for="selectArea">Input Qty:</label>
+                                <input type="number" name="qty" id="" class="form-control" placeholder="masukan qty pcs">
+                            </div>
+                            <div class="form-group">
+                                <label for="selectArea">Input sisa:</label>
+                                <input type="number" name="sisa" id="" class="form-control" placeholder="masukan qty pcs">
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-danger">Ya</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="modal fade bd-example-modal-lg" id="recomendModal" tabindex="-1" role="dialog" aria-labelledby="recomendModal" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -592,6 +640,22 @@ error_reporting(E_ALL); ?>
                     $('#editModal').find('input[name="deliv"]').val(deliv);
                     $('#editModal').find('input[name="size"]').val(size);
                     $('#editModal').find('input[name="jarum"]').val(jarum);
+                });
+                $('.edit-qty-btn').click(function() {
+                    var idAps = $(this).data('id');
+                    var area = $(this).data('area');
+                    var pdk = $(this).data('pdk');
+                    var deliv = $(this).data('deliv');
+                    var size = $(this).data('size');
+                    var jarum = $(this).data('jarum');
+                    $('#editQtyModal').modal('show'); // Show the modal
+                    $('#editQtyModal').find('input[name="area"]').val(area);
+                    $('#editQtyModal').find('input[name="id"]').val(idAps);
+                    $('#editQtyModal').find('input[name="pdk"]').val(pdk);
+                    $('#editQtyModal').find('input[name="deliv"]').val(deliv);
+                    $('#editQtyModal').find('input[name="size"]').val(size);
+                    $('#editQtyModal').find('input[name="jarum"]').val(jarum);
+                    $('#editQtyModal').find('input[name="area"]').val(area);
                 });
                 $('.btn-recomend').click(function() {
 

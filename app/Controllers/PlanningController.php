@@ -421,6 +421,25 @@ class PlanningController extends BaseController
         }
         return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $pdk . '/' . $jarum))->withInput()->with('success', 'Berhasil Mengubah Area');
     }
+    public function editqtyarea()
+    {
+        $qty = $this->request->getPost('qty');
+        $sisa = $this->request->getPost('sisa');
+
+        $pdk = $this->request->getPost('pdk');
+        $size = $this->request->getPost('size');
+        $deliv = $this->request->getPost('deliv');
+        $id = $this->ApsPerstyleModel->getIdByDeliv($pdk, $size, $deliv);
+        $jarum = $this->request->getPost('jarum');
+        foreach ($id as $i) {
+            $aps = $i['idapsperstyle'];
+            $update = $this->ApsPerstyleModel->update($aps, ['qty' => $qty, 'sisa' => $sisa]);
+            if (!$update) {
+                return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $pdk . '/' . $jarum))->withInput()->with('error', 'Gagal Mengubah Qty');
+            }
+        }
+        return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $pdk . '/' . $jarum))->withInput()->with('success', 'Berhasil Mengubah Qty');
+    }
     public function jalanmesin()
     {
         $role = session()->get('role');

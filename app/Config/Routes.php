@@ -234,6 +234,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('assignareal', 'PlanningController::assignareal');
     $routes->post('splitarea', 'PlanningController::splitarea');
     $routes->post('editarea', 'PlanningController::editarea');
+    $routes->post('editqtyarea', 'PlanningController::editqtyarea');
     $routes->post('assignarealall', 'PlanningController::assignarealall');
     $routes->post('recomendationarea', 'MesinController::recomendationarea');
     $routes->post('tampilPerdelivery', 'OrderController::tampilPerdelivery');
@@ -549,7 +550,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     // retur
     $routes->get('retur/(:any)', 'ReturController::index/$1');
     $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
-    $routes->post('retur/(:any)/pengajuanRetur', 'ReturController::pengajuanRetur/$1');
+    $routes->post('pengajuanRetur/(:any)', 'ReturController::pengajuanRetur/$1');
     $routes->get('getKategoriRetur', 'ReturController::getKategoriRetur');
     $routes->get('getKodeWarnaWarnaByItemType', 'ReturController::getKodeWarnaWarnaByItemType');
 });
