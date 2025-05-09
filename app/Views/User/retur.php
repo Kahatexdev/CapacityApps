@@ -209,7 +209,7 @@
         </div>
         <div id="loading" style="display: none;">
             <h3>Sedang Menghitung...</h3>
-            <img src="<?= base_url('assets/giphy2.gif') ?>" alt="Loading...">
+            <img src="<?= base_url('assets/spinner.gif') ?>" alt="Loading...">
         </div>
     </div>
 </div>
