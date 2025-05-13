@@ -425,20 +425,20 @@ class PlanningController extends BaseController
     {
         $qty = $this->request->getPost('qty');
         $sisa = $this->request->getPost('sisa');
-
+        $id = $this->request->getPost('id');
         $pdk = $this->request->getPost('pdk');
         $size = $this->request->getPost('size');
         $deliv = $this->request->getPost('deliv');
-        $id = $this->ApsPerstyleModel->getIdByDeliv($pdk, $size, $deliv);
         $jarum = $this->request->getPost('jarum');
-        foreach ($id as $i) {
-            $aps = $i['idapsperstyle'];
-            $update = $this->ApsPerstyleModel->update($aps, ['qty' => $qty, 'sisa' => $sisa]);
-            if (!$update) {
-                return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $pdk . '/' . $jarum))->withInput()->with('error', 'Gagal Mengubah Qty');
-            }
+
+        $update = $this->ApsPerstyleModel->update($id, ['qty' => $qty, 'sisa' => $sisa]);
+        if (!$update) {
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $pdk . '/' . $jarum))->withInput()->with('error', 'Gagal Mengubah Qty');
+        } else {
+
+
+            return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $pdk . '/' . $jarum))->withInput()->with('success', 'Berhasil Mengubah Qty');
         }
-        return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $pdk . '/' . $jarum))->withInput()->with('success', 'Berhasil Mengubah Qty');
     }
     public function jalanmesin()
     {
