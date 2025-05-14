@@ -117,7 +117,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <!-- Item Type -->
+                                        <!-- Pcs Po(+) -->
                                         <div class="form-group">
                                             <div class="col"><label>PO (+) Pcs</label>
                                                 <input type="number" class="form-control pcs-po">
@@ -125,10 +125,20 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <!-- Kode Warna -->
+                                        <!-- Kg Po(+) -->
                                         <div class="form-group">
                                             <div class="col"><label>PO (+) Kg</label>
                                                 <input type="number" class="form-control kg-po" name="items[0][kg_po]" readonly required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <!-- Cones -->
+                                        <div class="form-group">
+                                            <div class="col"><label>PO (+) Cones</label>
+                                                <input type="number" class="form-control cns-po">
                                             </div>
                                         </div>
                                     </div>
@@ -251,6 +261,12 @@
                         <div class="col-md-6">
                             <label>PO (+) Kg</label>
                             <input type="number" class="form-control kg-po" name="items[${idx}][kg_po]" readonly required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label>PO (+) Cones</label>
+                            <input type="number" class="form-control cns-po">
                         </div>
                     </div>
                     <div class="text-center my-2">
@@ -418,6 +434,7 @@
                     color: $(this).find('.color').val(),
                     pcs_po: $(this).find('.pcs-po').val(),
                     kg_po: $(this).find('.kg-po').val(),
+                    cns_po: $(this).find('.cns-po').val(),
                     keterangan: $('#keterangan').val()
                 });
             });
