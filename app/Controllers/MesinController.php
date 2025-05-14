@@ -698,6 +698,9 @@ class MesinController extends BaseController
         }
 
         $tampilperarea = $this->jarumModel->getJarumArea($area);
+        foreach ($tampilperarea as &$mc) {
+            $mc['kapasitas'] = $mc['mesin_jalan'] * $mc['target'];
+        }
         $getPU = $this->jarumModel->getpu($area);
         $data = [
             'role' => session()->get('role'),
