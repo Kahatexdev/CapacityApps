@@ -135,6 +135,9 @@ error_reporting(E_ALL); ?>
                                                         <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#editModal" data-id="<?= $list['idapsperstyle']; ?>" data-no-model="<?= $list['mastermodel']; ?>" data-delivery="<?= $list['delivery']; ?>" data-jarum="<?= $jarum; ?>" data-style="<?= $list['size']; ?>" data-qty="<?= $list['qty']; ?>" data-sisa="<?= $list['sisa']; ?>" data-factory="<?= $list['factory']; ?>" data-production_unit="<?= $list['production_unit']; ?>" data-inisial="<?= $list['inisial'] ?>" data-smv="<?= $list['smv'] ?>" data-seam="<?= $list['seam'] ?>">
                                                             Edit
                                                         </button>
+                                                        <button type=" button" class="btn btn-info btn-sm inisial-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $list['idapsperstyle']; ?>" data-area="<?= $list['factory']; ?>" data-pdk="<?= $list['mastermodel']; ?>" data-deliv="<?= $list['delivery']; ?> " data-size="<?= $list['size']; ?>" data-jarum="<?= $jarum ?>">
+                                                            Ubah Inisial
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             <?php endif; ?>
@@ -475,8 +478,69 @@ error_reporting(E_ALL); ?>
             </div>
         </div>
 
+        <div class="modal fade bd-example-modal-lg" id="inisialMod" tabindex="-1" role="dialog" aria-labelledby="editModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Edit <Area:d></Area:d>
+                        </h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="<?= base_url($role . '/inputinisial') ?>" method="post">
+
+                            <div id="confirmationMessage"></div>
+                            <input type="text" class="form-control" name="jarum" id="" value="" hidden>
+
+                            <div class="form-group">
+                                <label for="pdk" class="label">PDK</label>
+                                <input type="text" class="form-control" name="pdk" id="" value="" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="size" class="label">Style Size</label>
+                                <input type="text" name="size" class="form-control" id="" value="" readonly>
+
+                            </div>
+                            <div class="form-group">
+                                <label for="inisial" class="label">Inisial</label>
+                                <input type="text" name="inisial" class="form-control" id="" value="" placeholder="Masukan Inisial">
+                            </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-danger">Ya</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
 
         <script>
+            $(document).ready(function() {
+                $('#dataTable').DataTable();
+
+                $('.inisial-btn').click(function() {
+                    var idAps = $(this).data('id');
+                    var area = $(this).data('area');
+                    var pdk = $(this).data('pdk');
+                    var deliv = $(this).data('deliv');
+                    var size = $(this).data('size');
+                    var jarum = $(this).data('jarum');
+                    $('#inisialMod').modal('show'); // Show the modal
+                    $('#inisialMod').find('input[name="area"]').val(area);
+                    $('#inisialMod').find('input[name="id"]').val(idAps);
+                    $('#inisialMod').find('input[name="pdk"]').val(pdk);
+                    $('#inisialMod').find('input[name="deliv"]').val(deliv);
+                    $('#inisialMod').find('input[name="size"]').val(size);
+                    $('#inisialMod').find('input[name="jarum"]').val(jarum);
+                });
+            });
+
             function areaRecomendation() {
                 // Ambil nilai dari form di dalam modal
                 var pdk = $('input[name="pdkRecomen"]').val();

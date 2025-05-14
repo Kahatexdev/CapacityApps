@@ -619,6 +619,7 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
     $routes->post('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
     $routes->post('excelSisaOrderArea/(:any)', 'ExcelController::excelSisaOrderArea/$1');
+    $routes->post('inputinisial', 'UserController::inputinisial');
 
 
     // produksi
