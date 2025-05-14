@@ -86,7 +86,7 @@ class PdfController extends BaseController
         $noModel = $this->request->getGet('model');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/filterPoTambahan"
+        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterPoTambahan"
             . "?area=" . urlencode($area)
             . "&model=" . urlencode($noModel);
 
