@@ -3535,4 +3535,129 @@ class ExcelController extends BaseController
             return redirect()->back()->with('error', 'Tidak ada data yang dipilih.');
         }
     }
+    public function exportExcelRetur($area, $model)
+    {
+
+        $url = 'http://172.23.44.14/MaterialSystem/public/api/listRetur?area=' . $area . '&model=' . $model;
+
+        $response = file_get_contents($url);
+        log_message('debug', "API Response: " . $response);
+        if ($response === FALSE) {
+            // log_message('error', "API tidak bisa diakses: $url");
+            return $this->response->setJSON(["error" => "Gagal mengambil data dari API"]);
+        }
+        $data = json_decode($response, true);
+        if ($data === null) {
+            log_message('error', "Gagal mendecode data dari API: $url");
+            // return $this->response->setJSON(["error" => "Gagal mengolah data dari API"]);
+        } else {
+            // Buat file Excel
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+
+            $styleTitle = [
+                'font' => [
+                    'bold' => true, // Tebalkan teks
+                    'color' => ['argb' => 'FF000000'],
+                    'size' => 15
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+                ],
+            ];
+
+            // border
+            $styleHeader = [
+                'font' => [
+                    'bold' => true, // Tebalkan teks
+                    'color' => ['argb' => 'FFFFFFFF']
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+                ],
+                'borders' => [
+                    'outline' => [
+                        'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                        'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                    ],
+                ],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID, // Jenis pengisian solid
+                    'startColor' => ['argb' => 'FF67748e'], // Warna latar belakang biru tua (HEX)
+                ],
+            ];
+            $styleBody = [
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+                ],
+                'borders' => [
+                    'outline' => [
+                        'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                        'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                    ],
+                ],
+            ];
+
+            $sheet->setCellValue('A1', 'LIST RETUR ' . $model);
+            $sheet->mergeCells('A1:H1');
+            $sheet->getStyle('A1:H1')->applyFromArray($styleTitle);
+            // Tulis header
+            $sheet->setCellValue('A3', 'NO');
+            $sheet->setCellValue('B3', 'ITEM TYPE');
+            $sheet->setCellValue('C3', 'KODE WARNA');
+            $sheet->setCellValue('D3', 'WARNA');
+            $sheet->setCellValue('E3', 'LOT RETUR');
+            $sheet->setCellValue('F3', 'KG RETUR');
+            $sheet->setCellValue('G3', 'KATEGORI');
+            $sheet->setCellValue('H3', 'KETERANGAN GBN');
+            $sheet->getStyle('A3')->applyFromArray($styleHeader);
+            $sheet->getStyle('B3')->applyFromArray($styleHeader);
+            $sheet->getStyle('C3')->applyFromArray($styleHeader);
+            $sheet->getStyle('D3')->applyFromArray($styleHeader);
+            $sheet->getStyle('E3')->applyFromArray($styleHeader);
+            $sheet->getStyle('F3')->applyFromArray($styleHeader);
+            $sheet->getStyle('G3')->applyFromArray($styleHeader);
+            $sheet->getStyle('H3')->applyFromArray($styleHeader);
+
+            // Tulis data mulai dari baris 2
+            $row = 4;
+            $no = 1;
+
+            foreach ($data as $item) {
+                $sheet->setCellValue('A' . $row, $no++);
+                $sheet->setCellValue('B' . $row, $item['item_type']);
+                $sheet->setCellValue('C' . $row, $item['kode_warna']);
+                $sheet->setCellValue('D' . $row, $item['warna']);
+                $sheet->setCellValue('E' . $row, $item['lot_retur']);
+                $sheet->setCellValue('F' . $row, $item['kgs_retur']);
+                $sheet->setCellValue('G' . $row, $item['kategori']);
+                $sheet->setCellValue('H' . $row, $item['keterangan_gbn']);
+                $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('C' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('D' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('E' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('F' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('G' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('H' . $row)->applyFromArray($styleBody);
+                $row++;
+            }
+
+            // Set lebar kolom agar menyesuaikan isi
+            foreach (range('A', 'H') as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+
+            // Buat writer dan output file Excel
+            $writer = new Xlsx($spreadsheet);
+            $fileName = 'Export Retur ' . $model . ' Area ' . $area . '.xlsx';
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename="' . $fileName . '"');
+            header('Cache-Control: max-age=0');
+
+            $writer->save('php://output');
+            exit;
+        }
+    }
 }

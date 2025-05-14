@@ -1152,6 +1152,7 @@ class MaterialController extends BaseController
                 'color'           => $item['color'],
                 'pcs_po_tambahan' => $item['pcs_po'],
                 'kg_po_tambahan'  => $item['kg_po'],
+                'cns_po_tambahan'  => $item['cns_po'],
                 'keterangan'      => $item['keterangan'],
                 'admin'           => session()->get('username'),
                 'created_at'      => date('Y-m-d H:i:s'),
@@ -1159,7 +1160,7 @@ class MaterialController extends BaseController
         }, $json);
 
         $payload = ['items' => $items];
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/savePoTambahan';
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/savePoTambahan';
 
         $ch = curl_init($apiUrl);
         curl_setopt_array($ch, [
@@ -1184,7 +1185,7 @@ class MaterialController extends BaseController
     public function filterPoTambahan($area)
     {
         $noModel = $this->request->getGet('model');
-        $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/filterPoTambahan"
+        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterPoTambahan"
             . "?area=" . urlencode($area)
             . "&model=" . urlencode($noModel);
 

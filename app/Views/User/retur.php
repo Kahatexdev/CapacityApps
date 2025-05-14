@@ -289,7 +289,7 @@
             },
             dataType: "json",
             success: function(response) {
-                fetchListRetur(response, model);
+                fetchListRetur(response, model, area);
 
             },
             error: function(xhr, status, error) {
@@ -301,14 +301,15 @@
         });
     }
 
-    function fetchListRetur(data, model) {
+    function fetchListRetur(data, model, area) {
         const tableBody = document.getElementById('bodyData2');
-        const baseUrl = "<?= base_url($role . '/retur/') ?>";
+        const baseUrl = "<?= base_url($role . '/exportExcelRetur/') ?>";
+
         tableBody.innerHTML = `
        <div class="d-flex align-items-center justify-content-between">
                     <h3 class="model-title mb-0">List Retur ${model}</h3>
                     <div class="d-flex align-items-center gap-2">
-                        <a href="${baseUrl}${area}/exportExcel" class="btn btn-success">
+                        <a href="${baseUrl}${area}/${model}" class="btn btn-success">
                             <i class="fas fa-file-excel"></i> Export Excel
                         </a>
                     
