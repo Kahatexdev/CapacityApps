@@ -133,29 +133,29 @@ class PdfController extends BaseController
         $pdf->SetFillColor(170, 255, 255);
         $pdf->Cell(234, 4, 'FORMULIR', 1, 1, 'C', 1); // Pindah ke baris berikutnya setelah ini
 
-        $pdf->SetFont('Arial', '', 6);
+        $pdf->SetFont('Arial', 'B', 6);
         $pdf->Cell(43, 5, '', 0, 0, 'L'); // Tetap di baris yang sama
-        $pdf->Cell(234, 5, 'DEPARTMEN CELUP CONES', 0, 1, 'C'); // Pindah ke baris berikutnya setelah ini
+        $pdf->Cell(234, 5, 'DEPARTMEN KAOS KAKI', 0, 1, 'C'); // Pindah ke baris berikutnya setelah ini
 
-        $pdf->SetFont('Arial', '', 5);
+        $pdf->SetFont('Arial', 'B', 6);
         $pdf->Cell(43, 4, 'PT KAHATEX', 0, 0, 'C'); // Tetap di baris yang sama
-        $pdf->Cell(234, 4, 'FORMULIR PO', 0, 1, 'C'); // Pindah ke baris berikutnya setelah ini
+        $pdf->Cell(234, 4, 'PO TAMBAHAN DAN RETURAN BAHAN BAKU MESIN KE GUDANG BENANG', 0, 1, 'C'); // Pindah ke baris berikutnya setelah ini
 
         // Tabel Header Atas
-        $pdf->SetFont('Arial', '', 5);
+        $pdf->SetFont('Arial', 'B', 5);
         $pdf->Cell(43, 4, 'No. Dokumen', 1, 0, 'L');
-        $pdf->Cell(162, 4, 'FOR-CC-087/REV_01/HAL_1/1', 1, 0, 'L');
+        $pdf->Cell(162, 4, 'FOR-KK-034/REV_05/HAL_1/1', 1, 0, 'L');
         $pdf->Cell(31, 4, 'Tanggal Revisi', 1, 0, 'L');
-        $pdf->Cell(41, 4, '04 Desember 2019', 1, 1, 'L');
+        $pdf->Cell(41, 4, '30 Januari 2025', 1, 1, 'L');
 
         $pdf->Cell(205, 4, '', 1, 0, 'L');
         $pdf->Cell(31, 4, 'Klasifikasi', 1, 0, 'L');
-        $pdf->Cell(41, 4, 'Internal', 1, 1, 'L');
+        $pdf->Cell(41, 4, 'Sensitif', 1, 1, 'L');
 
-        $pdf->SetFont('Arial', '', 7);
+        $pdf->SetFont('Arial', 'B', 6);
 
         $pdf->Cell(10, 5, 'Area', 0, 0, 'L');
-        $pdf->Cell(75, 5, ': ' . '', 0, 0, 'L');
+        $pdf->Cell(75, 5, ': ' . $area, 0, 0, 'L');
 
         $pdf->Cell(20, 5, 'Loss F.Up', 0, 0, 'L');
         $pdf->Cell(75, 5, ': ' . '', 0, 0, 'L');
@@ -163,33 +163,146 @@ class PdfController extends BaseController
         $pdf->Cell(24, 5, 'Tanggal Buat', 0, 0, 'L');
         $pdf->Cell(30, 5, ': ' . '', 0, 1, 'L');
 
-        $pdf->Cell(197, 5, 'Tanggal Buat', 0, 0, 'R');
-        $pdf->Cell(10, 5, ': ' . '', 0, 1, 'R');
+        $pdf->Cell(180, 5, '', 0, 0, 'L');
+        $pdf->Cell(24, 5, 'Tgl. Export', 0, 0, 'L');
+        $pdf->Cell(40, 5, ': ' . '', 0, 1, 'L');
 
         //Simpan posisi awal Season & MaterialType
-        $x = $pdf->GetX();
-        $y = $pdf->GetY();
+        function MultiCellFit($pdf, $w, $h, $txt, $border = 1, $align = 'C')
+        {
+            // Simpan posisi awal
+            $x = $pdf->GetX();
+            $y = $pdf->GetY();
+
+            // Simulasikan MultiCell tetapi tetap pakai tinggi tetap (12)
+            $pdf->MultiCell($w, $h, $txt, $border, $align);
+
+            // Kembalikan ke kanan cell agar sejajar
+            $pdf->SetXY($x + $w, $y);
+        }
 
         // Tabel Header Baris Pertama
         $pdf->SetFont('Arial', '', 7);
-        // Merge cells untuk kolom No, Bentuk Celup, Warna, Kode Warna, Buyer, Nomor Order, Delivery, Untuk Produksi, Contoh Warna, Keterangan Celup
-        $pdf->Cell(12, 12, 'Model', 1, 0, 'C'); // Merge 2 baris
-        $pdf->Cell(12, 12, 'Warna', 1, 0, 'C'); // Merge 2 kolom ke samping untuk baris pertama
-        $pdf->Cell(15, 12, 'Item Type', 1, 0, 'C'); // Merge 2 baris
-        $pdf->Cell(17, 12, 'Kode Warna', 1, 0, 'C'); // Merge 2 baris
-        $pdf->Cell(16, 12, 'Style / Size', 1, 0, 'C'); // Merge 2 baris
-        $pdf->Cell(16, 12, 'Komposisi (%)', 1, 0, 'C'); // Merge 2 baris
-        $pdf->Cell(7, 12, 'GW / Pcs', 1, 0, 'C'); // Merge 2 baris
-        $pdf->Cell(7, 12, 'Qty / Pcs', 1, 0, 'C'); // Merge 2 baris
-        $pdf->Cell(7, 12, 'Loss', 1, 0, 'C'); // Merge 2 baris
-        $pdf->Cell(12, 12, 'Pesanan Kgs', 1, 0, 'C'); // Merge 4 kolom
-        $pdf->Cell(21, 9, 'Terima', 1, 0, 'C'); // Merge 4 kolom
-        $pdf->Cell(15, 9, 'Sisa Benang di Mesin', 1, 0, 'C'); // Merge 2 baris
-        $pdf->Cell(28, 6, 'Tambahan I (mesin)', 1, 0, 'C'); // Merge 2 baris
-        $pdf->Cell(28, 6, 'Tamabahan II (Packing)', 1, 0, 'C'); // Merge 2 baris
-        $pdf->Cell(13, 9, 'Total lebih pakai benang', 1, 0, 'C'); // Merge 2 baris
-        $pdf->Cell(34, 6, 'RETURAN', 1, 0, 'C'); // Merge 2 baris
-        $pdf->Cell(17, 12, 'Keterangan', 1, 0, 'C'); // Merge 2 baris
+        $pdf->Cell(12, 12, 'Model', 1, 0, 'C');
+        $pdf->Cell(12, 12, 'Warna', 1, 0, 'C');
+        $pdf->Cell(15, 12, 'Item Type', 1, 0, 'C');
+        $pdf->Cell(17, 12, 'Kode Warna', 1, 0, 'C');
+        $pdf->Cell(16, 12, 'Style / Size', 1, 0, 'C');
+        MultiCellFit($pdf, 14, 6, "Komposisi\n (%)");
+        MultiCellFit($pdf, 7, 6, "GW/\nPcs");
+        MultiCellFit($pdf, 7, 6, "Qty/\nPcs");
+        $pdf->Cell(7, 12, 'Loss', 1, 0, 'C');
+        MultiCellFit($pdf, 12, 6, "Pesanan\nKgs");
+        $pdf->Cell(21, 9, 'Terima', 1, 0, 'C');
+        MultiCellFit($pdf, 13, 3, "Sisa Benang\ndi Mesin");
+        $pdf->Cell(29, 6, 'Tambahan I (mesin)', 1, 0, 'C');
+        $pdf->Cell(29, 6, 'Tamabahan II (Packing)', 1, 0, 'C');
+        MultiCellFit($pdf, 14, 3, "Total lebih\npakai benang");
+        $pdf->Cell(38, 6, 'RETURAN', 1, 0, 'C');
+        $pdf->Cell(14, 12, 'Keterangan', 1, 1, 'C');
+
+        // Tabel Header Baris Kedua
+        $pdf->Cell(153, -6, '', 0, 0);
+        $pdf->Cell(7, -6, 'Pcs', 1, 1, 'C');
+        $pdf->Cell(160, -6, '', 0, 0);
+        $pdf->Cell(15, 3, 'Benang', 1, 0, 'C');
+        $pdf->Cell(7, 6, '%', 1, 0, 'C');
+        $pdf->Cell(7, 6, 'Pcs', 1, 0, 'C');
+        $pdf->Cell(15, 3, 'Benang', 1, 0, 'C');
+        $pdf->Cell(7, 6, '%', 1, 0, 'C');
+        $pdf->Cell(14, -6, '', 0, 0);
+        $pdf->Cell(6, 6, 'Kg', 1, 0, 'C');
+        MultiCellFit($pdf, 12, 3, "%\ndari PSN");
+        $pdf->Cell(6, 6, 'Kg', 1, 0, 'C');
+        MultiCellFit($pdf, 14, 3, "%\ndari PO(+)");
+
+        $pdf->Ln(3);
+
+        // Tabel Header Baris Ketiga
+        $pdf->Cell(119);
+        $pdf->Cell(7, 3, 'Kg', 1, 0, 'C');
+        $pdf->Cell(7, 3, '+ / -', 1, 0, 'C');
+        $pdf->Cell(7, 3, '%', 1, 0, 'C');
+        $pdf->Cell(13, 3, 'Kg', 1, 0, 'C');
+        $pdf->Cell(7, -3, '', 0, 0, 'C');
+        $pdf->Cell(7, 3, 'Kg', 1, 0, 'C');
+        $pdf->Cell(8, 3, 'Cones', 1, 0, 'C');
+        $pdf->Cell(14, -3, '', 0, 0, 'C');
+        $pdf->Cell(7, 3, 'Kg', 1, 0, 'C');
+        $pdf->Cell(8, 3, 'Cones', 1, 0, 'C');
+        $pdf->Cell(7, -3, '', 0, 0, 'C');
+        $pdf->Cell(7, 3, 'Kg', 1, 0, 'C');
+        $pdf->Cell(7, 3, '%', 1, 0, 'C');
+        $pdf->Ln(3);
+
+        //Isi Tabel
+        $rowHeight = 6;
+        $lineHeight = 3;
+        $itemTypeWidth = 25;
+        $pdf->SetFont('Arial', '', 7);
+        $no = 1;
+        $yLimit = 180;
+
+        foreach ($data as $row) {
+            // Cek jika sudah mendekati batas bawah halaman, buat halaman baru
+            if ($pdf->GetY() > $yLimit) {
+                $pdf->AddPage();
+                // Panggil lagi header jika perlu
+            }
+
+            $pdf->Cell(12, $rowHeight, $row['no_model'], 1, 0, 'C'); //no model
+            $pdf->Cell(12, $rowHeight, $row['color'], 1, 0, 'C'); // warna
+            $pdf->Cell(15, $rowHeight, $row['item_type'], 1, 0, 'C'); // item type
+            $pdf->Cell(17, $rowHeight, $row['kode_warna'], 1, 0, 'C'); // kode warna
+            $pdf->Cell(16, $rowHeight, $row['style_size'], 1, 0, 'C'); //style size
+            $pdf->Cell(14, $rowHeight, $row['composition'], 1, 0, 'C'); //komposisi
+            $pdf->Cell(7, $rowHeight, $row['gw'], 1, 0, 'C'); //gw pcs
+            $pdf->Cell(7, $rowHeight, $row['qty_pcs'], 1, 0, 'C'); //qty pcs
+            $pdf->Cell(7, $rowHeight, $row['loss'], 1, 0, 'C'); //loss
+            $pdf->Cell(12, $rowHeight, $row['kgs_pesan'], 1, 0, 'C'); //kgs pesan
+
+            // Terima: terdiri dari 3 kolom
+            $pdf->Cell(7, $rowHeight, number_format($row['kgs_kirim'], 2), 1, 0, 'C'); //terima kg
+            $pdf->Cell(7, $rowHeight, '', 1, 0, 'C'); //terima +/-
+            $pdf->Cell(7, $rowHeight, '', 1, 0, 'C'); //terima %
+
+            $pdf->Cell(13, $rowHeight, '', 1, 0, 'C'); //sisa mesin
+
+            // Lanjutkan isi kolom lainnya sesuai dengan struktur header
+            if ($row['status'] === 'Po Tambahan Mesin') {
+                $pdf->Cell(7, $rowHeight, $row['pcs_po_tambahan'], 1, 0, 'C'); // tambahan I pcs
+                $pdf->Cell(7, $rowHeight, $row['kg_po_tambahan'], 1, 0, 'C'); // tambahan I benang kg
+                $pdf->Cell(8, $rowHeight, '', 1, 0, 'C'); // tambahan I benang cones
+                $pdf->Cell(7, $rowHeight, '', 1, 0, 'C'); // tambahan I %
+
+                $pdf->Cell(7, $rowHeight, '', 1, 0, 'C'); // tambahan II pcs
+                $pdf->Cell(7, $rowHeight, '', 1, 0, 'C'); // tambahan II benang kg
+                $pdf->Cell(8, $rowHeight, '', 1, 0, 'C'); // tambahan II benang cones
+                $pdf->Cell(7, $rowHeight, '', 1, 0, 'C'); // tambahan II %
+            } else {
+                $pdf->Cell(7, $rowHeight, '', 1, 0, 'C'); // tambahan I pcs
+                $pdf->Cell(7, $rowHeight, '', 1, 0, 'C'); // tambahan I benang kg
+                $pdf->Cell(8, $rowHeight, '', 1, 0, 'C'); // tambahan I benang cones
+                $pdf->Cell(7, $rowHeight, '', 1, 0, 'C'); // tambahan I %
+
+                $pdf->Cell(7, $rowHeight, $row['pcs_po_tambahan'], 1, 0, 'C'); // tambahan II pcs
+                $pdf->Cell(7, $rowHeight, $row['kg_po_tambahan'], 1, 0, 'C'); // tambahan II benang kg
+                $pdf->Cell(8, $rowHeight, '', 1, 0, 'C'); // tambahan II benang cones
+                $pdf->Cell(7, $rowHeight, '', 1, 0, 'C'); // tambahan II %
+            }
+
+            $pdf->Cell(7, $rowHeight, '', 1, 0, 'C'); //lebih pakai kg
+            $pdf->Cell(7, $rowHeight, '', 1, 0, 'C'); //lebih pakai %
+
+            $pdf->Cell(6, $rowHeight, '', 1, 0, 'C'); //returan kg
+            $pdf->Cell(12, $rowHeight, '', 1, 0, 'C'); //returan % dari PSN
+            $pdf->Cell(6, $rowHeight, '', 1, 0, 'C'); //returan kg
+            $pdf->Cell(14, $rowHeight, '', 1, 0, 'C'); //returan % dari PO(+)
+
+            $pdf->Cell(14, $rowHeight, $row['keterangan'], 1, 0, 'C'); //keterangan
+
+            $pdf->Ln(); // Pindah ke baris berikutnya
+        }
 
 
         // Output PDF
