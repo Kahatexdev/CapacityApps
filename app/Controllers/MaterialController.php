@@ -1160,7 +1160,7 @@ class MaterialController extends BaseController
         }, $json);
 
         $payload = ['items' => $items];
-        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/savePoTambahan';
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/savePoTambahan';
 
         $ch = curl_init($apiUrl);
         curl_setopt_array($ch, [
