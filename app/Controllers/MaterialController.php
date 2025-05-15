@@ -175,7 +175,7 @@ class MaterialController extends BaseController
         // Mengambil nilai 'search' yang dikirim oleh frontend
         $search = $this->request->getGet('search');
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/' . $model . '?search=' . urlencode($search);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/statusbahanbaku/' . $model . '?search=' . urlencode($search);
 
         // Mengambil data dari API eksternal
         $response = file_get_contents($apiUrl);
