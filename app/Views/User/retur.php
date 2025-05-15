@@ -526,9 +526,8 @@
                 const retur = kirim - pph;
 
                 textMax.innerHTML = `Max Retur: ${retur.toFixed(2)} kg`;
-                kgsInput.max = retur;
-                kgsInput.setAttribute('max', retur); // Tambahan untuk aman
-                kgsInput.dataset.maxRetur = retur;
+
+
                 console.log('Total retur:', retur);
             } else {
                 textMax.innerHTML = 'Max Retur: -';
@@ -540,7 +539,7 @@
             const max = parseFloat(this.dataset.maxRetur || 0);
             const value = parseFloat(this.value || 0);
 
-            if (value > max) {
+            if (value > max && max > 0) {
                 textmax = max.toFixed(2)
                 alert(`Maksimal retur hanya ${textmax} kg`);
                 this.value = textmax;
