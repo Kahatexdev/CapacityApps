@@ -127,7 +127,7 @@
 
             // CELUP SECTION (jika BENANG)
             let celupSection = '';
-            if (jenis === 'BENANG') {
+            if (['BENANG', 'NYLON'].includes(jenis)) {
                 celupSection = `
                     <div class="mb-4 border-bottom pb-3">
                         <h6 class="text-primary border-start border-4 ps-2 mb-3">🧪 Status CELUP</h6>
@@ -175,7 +175,7 @@
 
             // COVERING SECTION (jika KARET, NYLON, SPANDEX)
             let coveringSection = '';
-            if (['KARET', 'NYLON', 'SPANDEX'].includes(jenis)) {
+            if (['KARET', 'SPANDEX'].includes(jenis)) {
                 coveringSection = `
                     <div class="mb-3">
                         <h6 class="text-success border-start border-4 ps-2 mb-3">🧵 Status COVERING</h6>
