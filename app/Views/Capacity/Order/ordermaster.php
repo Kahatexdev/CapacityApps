@@ -1,5 +1,28 @@
 <?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
+<?php if (session()->getFlashdata('success')) : ?>
+    <script>
+        $(document).ready(function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '<?= session()->getFlashdata('success') ?>',
+            });
+        });
+    </script>
+<?php endif; ?>
+
+<?php if (session()->getFlashdata('error')) : ?>
+    <script>
+        $(document).ready(function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '<?= session()->getFlashdata('error') ?>',
+            });
+        });
+    </script>
+<?php endif; ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">

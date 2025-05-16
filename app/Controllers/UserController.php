@@ -530,4 +530,83 @@ class UserController extends BaseController
 
         return redirect()->to($redirectUrl)->with('success', 'Inisial berhasil diubah');
     }
+    public function importinisial()
+    {
+        ini_set('memory_limit', '512M');
+        set_time_limit(500);
+
+        $file = $this->request->getFile('excel_file');
+        if ($file->isValid() && !$file->hasMoved()) {
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
+            $worksheet = $spreadsheet->getActiveSheet();
+
+            $startRow = 4; // Ganti dengan nomor baris mulai
+            $batchSize = 100; // Ukuran batch
+            $batchData = [];
+            $failedRows = []; // Array untuk menyimpan informasi baris yang gagal
+            $db = \Config\Database::connect();
+            foreach ($worksheet->getRowIterator($startRow) as $row) {
+                $rowIndex = $row->getRowIndex();
+
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+                $data = ['role' => session()->get('role'),];
+
+                foreach ($cellIterator as $cell) {
+                    $data[] = $cell->getValue();
+                }
+
+                if (!empty($data)) {
+                    $batchData[] = ['rowIndex' => $rowIndex, 'data' => $data];
+                    // Process batch
+                    if (count($batchData) >= $batchSize) {
+                        $this->processBatchnew($batchData, $db, $failedRows);
+                        $batchData = []; // Reset batch data
+                    }
+                }
+            }
+
+            // Process any remaining data
+            if (!empty($batchData)) {
+                $this->processBatchnew($batchData, $db, $failedRows);
+            }
+
+            // Prepare notification message for failed rows
+            if (!empty($failedRows)) {
+                $failedRowsStr = implode(', ', $failedRows);
+                $errorMessage = "Baris berikut gagal diimpor: $failedRowsStr";
+                return redirect()->to(base_url(session()->get('role') . '/produksi'))->with('error', $errorMessage);
+            }
+
+            return redirect()->to(base_url(session()->get('role') . '/dataorder'))->withInput()->with('success', 'Data Berhasil di Import');
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/dataorder'))->with('error', 'No data found in the Excel file');
+        }
+    }
+    private function processBatchnew($batchData, $db, &$failedRows)
+    {
+        $db->transStart();
+        foreach ($batchData as $batchItem) {
+            $rowIndex = $batchItem['rowIndex'];
+            $data = $batchItem['data'];
+            try {
+                $no_model = $data[0];
+                $style = $data[1];
+                $inisial = $data[2];
+                $update = [
+                    'pdk' => $no_model,
+                    'size' => $style,
+                    'inisial' => $inisial,
+                ];
+                $update = $this->ApsPerstyleModel->updateInisial($update);
+                if (!$update) {
+                    $failedRows[] = 'Error on row ' . $rowIndex . ': Gagal Update ';
+                }
+            } catch (\Exception $e) {
+                log_message('error', 'Error in row ' . $rowIndex . ': ' . $e->getMessage());
+                $failedRows[] = 'Error on row ' . $rowIndex . ': ' . $e->getMessage();
+            }
+        }
+        $db->transComplete();
+    }
 }
