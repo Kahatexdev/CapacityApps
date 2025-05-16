@@ -118,9 +118,83 @@
             if (item.keterangan) {
                 item.keterangan.split(',').forEach(ket => {
                     keteranganBadge += `
-                <span class="badge bg-secondary m-1">${ket.trim()}</span>`;
+                    <div class="mb-1"><span>${ket.trim()}</span></div>`;
                 });
             }
+
+            // Ubah ke huruf besar agar konsisten
+            let jenis = (item.jenis || '').toUpperCase();
+
+            // CELUP SECTION (jika BENANG)
+            let celupSection = '';
+            if (jenis === 'BENANG') {
+                celupSection = `
+                    <div class="mb-4 border-bottom pb-3">
+                        <h6 class="text-primary border-start border-4 ps-2 mb-3">🧪 Status CELUP</h6>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <strong>Status:</strong>
+                            <span class="badge ${statusClass} px-3 py-2">${item.last_status}</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <p><strong>Qty PO:</strong> ${parseFloat(item.qty_po).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</p>
+                                <p><strong>Qty Celup:</strong> ${parseFloat(item.kg_celup).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</p>
+                                <p><strong>Lot Celup:</strong> ${item.lot_celup}</p>
+                                <p><strong>Start MC:</strong> ${formatDate(item.start_mc)}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p><strong>Tgl Schedule:</strong> ${formatDate(item.tanggal_schedule)}</p>
+                                <p><strong>Tgl Bon:</strong> ${formatDate(item.tanggal_bon)}</p>
+                                <p><strong>Tgl Celup:</strong> ${formatDate(item.tanggal_celup)}</p>
+                                <p><strong>Tgl Bongkar:</strong> ${formatDate(item.tanggal_bongkar)}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p><strong>Tgl Press:</strong> ${formatDate(item.tanggal_press)}</p>
+                                <p><strong>Tgl Oven:</strong> ${formatDate(item.tanggal_oven)}</p>
+                                <p><strong>Tgl TL:</strong> ${formatDate(item.tanggal_tl)}</p>
+                                <p><strong>Tgl Rajut Pagi:</strong> ${formatDate(item.tanggal_rajut_pagi)}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p><strong>Tgl ACC:</strong> ${formatDate(item.tanggal_acc)}</p>
+                                <p><strong>Tgl Kelos:</strong> ${formatDate(item.tanggal_kelos)}</p>
+                                <p><strong>Tgl Reject:</strong> ${formatDate(item.tanggal_reject)}</p>
+                                <p><strong>Tgl Perbaikan:</strong> ${formatDate(item.tanggal_perbaikan)}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p><strong>Ket Daily Cek:</strong></p>
+                        </div>
+                        <div class="col-md-9">
+                            <p>${item.ket_daily_cek || '-'}</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // COVERING SECTION (jika KARET, NYLON, SPANDEX)
+            let coveringSection = '';
+            if (['KARET', 'NYLON', 'SPANDEX'].includes(jenis)) {
+                coveringSection = `
+                    <div class="mb-3">
+                        <h6 class="text-success border-start border-4 ps-2 mb-3">🧵 Status COVERING</h6>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <strong>Status:</strong>
+                            <span class="badge ${statusCov} px-3 py-2">${item.status || '-'}</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <strong>Keterangan:</strong><br/>
+                            </div>
+                            <div class="col-md-8">
+                                ${keteranganBadge || '<span class="text-muted">-</span>'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
 
             let card = `
                 <div class="card shadow-sm my-4">
@@ -129,61 +203,12 @@
                         <small>Kode Warna: ${item.kode_warna} | Warna: ${item.color}</small>
                     </div>
                     <div class="card-body">
-
-                        <!-- CELUP Section -->
-                        <div class="mb-4 border-bottom pb-3">
-                            <h6 class="text-primary border-start border-4 ps-2 mb-3">🧪 Status CELUP</h6>
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <strong>Status:</strong>
-                                <span class="badge ${statusClass} px-3 py-2">${item.last_status}</span>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <p><strong>Qty PO:</strong> ${parseFloat(item.qty_po).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</p>
-                                    <p><strong>Qty Celup:</strong> ${parseFloat(item.kg_celup).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</p>
-                                    <p><strong>Lot Celup:</strong> ${item.lot_celup}</p>
-                                    <p><strong>Start MC:</strong> ${formatDate(item.start_mc)}</p>
-                                    <p><strong>Tgl Schedule:</strong> ${formatDate(item.tanggal_schedule)}</p>
-                                    <p><strong>Tgl Bon:</strong> ${formatDate(item.tanggal_bon)}</p>
-                                </div>
-                                <div class="col-md-4">
-                                    <p><strong>Tgl Celup:</strong> ${formatDate(item.tanggal_celup)}</p>
-                                    <p><strong>Tgl Bongkar:</strong> ${formatDate(item.tanggal_bongkar)}</p>
-                                    <p><strong>Tgl Press:</strong> ${formatDate(item.tanggal_press)}</p>
-                                    <p><strong>Tgl Oven:</strong> ${formatDate(item.tanggal_oven)}</p>
-                                    <p><strong>Tgl TL:</strong> ${formatDate(item.tanggal_tl)}</p>
-                                    <p><strong>Tgl Rajut Pagi:</strong> ${formatDate(item.tanggal_rajut_pagi)}</p>
-                                </div>
-                                <div class="col-md-4">
-                                <p><strong>Tgl ACC:</strong> ${formatDate(item.tanggal_acc)}</p>
-                                    <p><strong>Tgl Kelos:</strong> ${formatDate(item.tanggal_kelos)}</p>
-                                    <p><strong>Tgl Reject:</strong> ${formatDate(item.tanggal_reject)}</p>
-                                    <p><strong>Tgl Perbaikan:</strong> ${formatDate(item.tanggal_perbaikan)}</p>
-                                    <p><strong>Ket Daily Cek:</strong> ${item.ket_daily_cek || '-'}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- COVERING Section -->
-                        <div class="mb-3">
-                            <h6 class="text-success border-start border-4 ps-2 mb-3">🧵 Status COVERING</h6>
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <strong>Status:</strong>
-                                <span class="badge ${statusCov} px-3 py-2">${item.status}</span>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <strong>Keterangan:</strong><br/>
-                                </div>
-                                <div class="col-md-8">
-                                    ${keteranganBadge || '<span class="text-muted">-</span>'}
-                                </div>
-                            </div>
-                        </div>
-
+                        ${celupSection}
+                        ${coveringSection}
                     </div>
                 </div>
-                `;
+            `;
+
             resultContainer.innerHTML += card;
         });
 
