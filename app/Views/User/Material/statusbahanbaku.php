@@ -38,7 +38,6 @@
                             </div>
                         </div>
                         <div class="col-6 d-flex align-items-center text-end gap-2">
-
                             <input type="text" class="form-control" id="model" value="" placeholder="No Model" required>
                             <input type="text" class="form-control" id="filter" value="" placeholder="Kode Warna/Lot">
                             <button id="filterButton" class="btn btn-info ms-2" disabled><i class="fas fa-search"></i></button>

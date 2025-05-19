@@ -313,4 +313,125 @@ class PdfController extends BaseController
             ->setHeader('Content-Disposition', 'inline; filename="Report_Model_' . $noModel . '.pdf"')
             ->setBody($pdfContent);
     }
+    public function exportPemesanan($jenis, $area, $tgl_pakai)
+    {
+        // Ambil data berdasarkan area dan model
+        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/dataPemesananArea"
+            . "?jenis=" . urlencode($jenis)
+            . "&area=" . urlencode($area)
+            . "&tgl_pakai=" . urlencode($tgl_pakai);
+
+        $ch = curl_init($apiUrl);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+        ]);
+
+        $response = curl_exec($ch);
+        log_message('debug', 'Raw API response: ' . $response);
+
+        $error    = curl_error($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if ($response === false) {
+            return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'message' => 'Curl error: ' . $error]);
+        }
+
+        $data = json_decode($response, true);
+
+        // Inisialisasi FPDF
+        $pdf = new FPDF('L', 'mm', 'A4');
+        $pdf->AddPage();
+
+        // Garis margin luar (lebih tebal)
+        // $pdf->SetDrawColor(0, 0, 0); // Warna hitam
+        // $pdf->SetLineWidth(0.4); // Lebih tebal
+        // $pdf->Rect(9, 9, 279, 192); // Sedikit lebih besar dari margin dalam
+
+        // // Garis margin dalam (lebih tipis)
+        // $pdf->SetLineWidth(0.2); // Lebih tipis
+        // $pdf->Rect(10, 10, 277, 190); // Ukuran aslinya
+
+        $pdf->SetFont('Arial', 'B', 14);
+        $pdf->Cell(279, 5, 'REPORT PEMESANAN BAHAN BAKU', 0, 1, 'C');
+
+        $pdf->SetFont('Arial', 'B', 7);
+        $pdf->Cell(40, 5, 'JENIS BAHAN BAKU', 0, 0, 'L');
+        $pdf->Cell(92, 5, ': ' . $jenis, 0, 0, 'L');
+        $pdf->Cell(15, 5, 'AREA', 0, 0, 'L');
+        $pdf->Cell(92, 5, ': ' . $area, 0, 0, 'L');
+        $pdf->Cell(20, 5, 'TGL PAKAI' . '', 0, 0, 'L');
+        $pdf->Cell(50, 5, ': ' . $tgl_pakai, 0, 1, 'L');
+
+        //Simpan posisi awal Season & MaterialType
+        function MultiCellFit($pdf, $w, $h, $txt, $border = 1, $align = 'C')
+        {
+            // Simpan posisi awal
+            $x = $pdf->GetX();
+            $y = $pdf->GetY();
+
+            // Simulasikan MultiCell tetapi tetap pakai tinggi tetap (12)
+            $pdf->MultiCell($w, $h, $txt, $border, $align);
+
+            // Kembalikan ke kanan cell agar sejajar
+            $pdf->SetXY($x + $w, $y);
+        }
+
+        // Tabel Header Baris Pertama
+        $pdf->SetFont('Arial', '', 7);
+        $pdf->Cell(12, 8, 'Jam', 1, 0, 'C');
+        $pdf->Cell(15, 8, 'Tgl Pesan', 1, 0, 'C');
+        $pdf->Cell(15, 8, 'No Model', 1, 0, 'C');
+        $pdf->Cell(35, 8, 'Item Type', 1, 0, 'C');
+        $pdf->Cell(20, 8, 'Warna', 1, 0, 'C');
+        $pdf->Cell(25, 8, 'Kode Warna', 1, 0, 'C');
+        $pdf->Cell(20, 8, 'Lot', 1, 0, 'C');
+        $pdf->Cell(12, 8, 'Jl MC', 1, 0, 'C');
+        $pdf->Cell(21, 8, 'Qty Pesan (Kg)', 1, 0, 'C');
+        $pdf->Cell(21, 8, 'Qty Pesan (Cns)', 1, 0, 'C');
+        $pdf->Cell(20, 8, 'Jalur', 1, 0, 'C');
+        $pdf->Cell(21, 8, 'Qty Kirim (Kg)', 1, 0, 'C');
+        $pdf->Cell(40, 8, 'Keterangan', 1, 1, 'C');
+
+
+        //Isi Tabel
+        $rowHeight = 6;
+        $lineHeight = 3;
+        $itemTypeWidth = 25;
+        $pdf->SetFont('Arial', '', 7);
+        $no = 1;
+        $yLimit = 180;
+
+        foreach ($data as $row) {
+            // Cek jika sudah mendekati batas bawah halaman, buat halaman baru
+            if ($pdf->GetY() > $yLimit) {
+                $pdf->AddPage();
+                // Panggil lagi header jika perlu
+            }
+
+            $pdf->Cell(12, $rowHeight, $row['jam_pesan'], 1, 0, 'C'); // jam pesan
+            $pdf->Cell(12, $rowHeight, $row['tgl_pesan'], 1, 0, 'C'); // tgl pesan
+            $pdf->Cell(12, $rowHeight, $row['no_model'], 1, 0, 'C'); // no model
+            $pdf->Cell(15, $rowHeight, $row['item_type'], 1, 0, 'C'); // item type
+            $pdf->Cell(17, $rowHeight, $row['color'], 1, 0, 'C'); // warna
+            $pdf->Cell(17, $rowHeight, $row['kode_warna'], 1, 0, 'C'); // kode warna
+            $pdf->Cell(17, $rowHeight, '', 1, 0, 'C'); // lot
+            $pdf->Cell(14, $rowHeight, $row['jl_mc'], 1, 0, 'C'); // jl mc
+            $pdf->Cell(7, $rowHeight, $row['qty_pesan'], 1, 0, 'C'); // kg pesan
+            $pdf->Cell(7, $rowHeight, $row['cns_pesan'], 1, 0, 'C'); // cns pcs
+            $pdf->Cell(7, $rowHeight, '', 1, 0, 'C'); // jalur
+            $pdf->Cell(12, $rowHeight, '', 1, 0, 'C'); // kg kirim
+            $pdf->Cell(14, $rowHeight, $row['keterangan'], 1, 0, 'C'); // keterangan
+
+            $pdf->Ln(); // Pindah ke baris berikutnya
+        }
+
+        // Output PDF
+        $pdfContent = $pdf->Output('S');
+        return $this->response
+            ->setStatusCode(200)
+            ->setContentType('application/pdf')
+            ->setHeader('Content-Disposition', 'inline; filename="Report_Pemesanan_' . $jenis . '_Area_' . $area . '_' . $tgl_pakai . '.pdf"')
+            ->setBody($pdfContent);
+    }
 }
