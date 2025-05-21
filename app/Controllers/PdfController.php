@@ -353,15 +353,16 @@ class PdfController extends BaseController
         // $pdf->Rect(10, 10, 277, 190); // Ukuran aslinya
 
         $pdf->SetFont('Arial', 'B', 14);
-        $pdf->Cell(279, 5, 'REPORT PEMESANAN BAHAN BAKU', 0, 1, 'C');
+        $pdf->SetFillColor(255, 255, 255); // Atur warna latar belakang menjadi putih
+        $pdf->Cell(279, 8, 'REPORT PEMESANAN BAHAN BAKU', 0, 1, 'C');
 
         $pdf->SetFont('Arial', 'B', 7);
-        $pdf->Cell(40, 5, 'JENIS BAHAN BAKU', 0, 0, 'L');
-        $pdf->Cell(92, 5, ': ' . $jenis, 0, 0, 'L');
-        $pdf->Cell(15, 5, 'AREA', 0, 0, 'L');
-        $pdf->Cell(92, 5, ': ' . $area, 0, 0, 'L');
-        $pdf->Cell(20, 5, 'TGL PAKAI' . '', 0, 0, 'L');
-        $pdf->Cell(50, 5, ': ' . $tgl_pakai, 0, 1, 'L');
+        $pdf->Cell(40, 8, 'JENIS BAHAN BAKU', 0, 0, 'L');
+        $pdf->Cell(92, 8, ': ' . $jenis, 0, 0, 'L');
+        $pdf->Cell(15, 8, 'AREA', 0, 0, 'L');
+        $pdf->Cell(92, 8, ': ' . $area, 0, 0, 'L');
+        $pdf->Cell(20, 8, 'TGL PAKAI' . '', 0, 0, 'L');
+        $pdf->Cell(50, 8, ': ' . $tgl_pakai, 0, 1, 'L');
 
         //Simpan posisi awal Season & MaterialType
         function MultiCellFit($pdf, $w, $h, $txt, $border = 1, $align = 'C')
@@ -377,53 +378,101 @@ class PdfController extends BaseController
             $pdf->SetXY($x + $w, $y);
         }
 
+
         // Tabel Header Baris Pertama
-        $pdf->SetFont('Arial', '', 7);
-        $pdf->Cell(12, 8, 'Jam', 1, 0, 'C');
-        $pdf->Cell(15, 8, 'Tgl Pesan', 1, 0, 'C');
+        $pdf->SetFont('Arial', 'B', 7);
+        $pdf->Cell(25, 8, 'Tgl Pesan', 1, 0, 'C');
         $pdf->Cell(15, 8, 'No Model', 1, 0, 'C');
-        $pdf->Cell(35, 8, 'Item Type', 1, 0, 'C');
+        $pdf->Cell(37, 8, 'Item Type', 1, 0, 'C');
         $pdf->Cell(20, 8, 'Warna', 1, 0, 'C');
         $pdf->Cell(25, 8, 'Kode Warna', 1, 0, 'C');
-        $pdf->Cell(20, 8, 'Lot', 1, 0, 'C');
         $pdf->Cell(12, 8, 'Jl MC', 1, 0, 'C');
-        $pdf->Cell(21, 8, 'Qty Pesan (Kg)', 1, 0, 'C');
-        $pdf->Cell(21, 8, 'Qty Pesan (Cns)', 1, 0, 'C');
-        $pdf->Cell(20, 8, 'Jalur', 1, 0, 'C');
-        $pdf->Cell(21, 8, 'Qty Kirim (Kg)', 1, 0, 'C');
-        $pdf->Cell(40, 8, 'Keterangan', 1, 1, 'C');
+        $pdf->Cell(17, 8, 'Kgs Pesan', 1, 0, 'C');
+        MultiCellFit($pdf, 11, 4, "Cones\n Pesan");
+        $pdf->Cell(18, 8, 'Lot Pesan', 1, 0, 'C');
+        $pdf->Cell(17, 8, 'Kgs Kirim', 1, 0, 'C');
+        MultiCellFit($pdf, 12, 4, "Cones\n Kirim");
+        MultiCellFit($pdf, 12, 4, "Karung\n Kirim");
+        $pdf->Cell(19, 8, 'Lot Kirim', 1, 0, 'C');
+        $pdf->Cell(37, 8, 'Keterangan', 1, 1, 'C');
 
 
         //Isi Tabel
-        $rowHeight = 6;
         $lineHeight = 3;
-        $itemTypeWidth = 25;
         $pdf->SetFont('Arial', '', 7);
         $no = 1;
         $yLimit = 180;
 
         foreach ($data as $row) {
+            $rowHeight = 5;
+            $heights = [];
+
+            // hitung jumlah baris per kolom
+            $heights = [
+                'item_type'     => ceil($pdf->GetStringWidth($row['item_type']) / 37) * $rowHeight,
+                'color'         => ceil($pdf->GetStringWidth($row['color']) / 20) * $rowHeight,
+                'kode_warna'    => ceil($pdf->GetStringWidth($row['kode_warna']) / 25) * $rowHeight,
+                'lot_pesan'     => ceil($pdf->GetStringWidth($row['lot_pesan']) / 18) * $rowHeight,
+                'lot_out'       => ceil($pdf->GetStringWidth($row['lot_out']) / 19) * $rowHeight,
+                'ket_area'      => ceil($pdf->GetStringWidth($row['ket_area']) / 37) * $rowHeight,
+            ];
+
+            $rowHeight = max($heights);
+
             // Cek jika sudah mendekati batas bawah halaman, buat halaman baru
-            if ($pdf->GetY() > $yLimit) {
-                $pdf->AddPage();
-                // Panggil lagi header jika perlu
-            }
+            // if ($pdf->GetY() + $rowHeight > $yLimit) {
+            //     $pdf->AddPage();
+            //     $this->generateHeaderPemesanan($pdf, $no_model);
+            // }
 
-            $pdf->Cell(12, $rowHeight, $row['jam_pesan'], 1, 0, 'C'); // jam pesan
-            $pdf->Cell(12, $rowHeight, $row['tgl_pesan'], 1, 0, 'C'); // tgl pesan
-            $pdf->Cell(12, $rowHeight, $row['no_model'], 1, 0, 'C'); // no model
-            $pdf->Cell(15, $rowHeight, $row['item_type'], 1, 0, 'C'); // item type
-            $pdf->Cell(17, $rowHeight, $row['color'], 1, 0, 'C'); // warna
-            $pdf->Cell(17, $rowHeight, $row['kode_warna'], 1, 0, 'C'); // kode warna
-            $pdf->Cell(17, $rowHeight, '', 1, 0, 'C'); // lot
-            $pdf->Cell(14, $rowHeight, $row['jl_mc'], 1, 0, 'C'); // jl mc
-            $pdf->Cell(7, $rowHeight, $row['qty_pesan'], 1, 0, 'C'); // kg pesan
-            $pdf->Cell(7, $rowHeight, $row['cns_pesan'], 1, 0, 'C'); // cns pcs
-            $pdf->Cell(7, $rowHeight, '', 1, 0, 'C'); // jalur
-            $pdf->Cell(12, $rowHeight, '', 1, 0, 'C'); // kg kirim
-            $pdf->Cell(14, $rowHeight, $row['keterangan'], 1, 0, 'C'); // keterangan
+            $yStart = $pdf->GetY(); // posisi awal Y
+            $xStart = $pdf->GetX(); // posisi awal X
 
-            $pdf->Ln(); // Pindah ke baris berikutnya
+            // Kolom 
+            $pdf->SetXY($xStart, $yStart);
+
+            $pdf->Cell(25, $rowHeight, $row['tgl_pesan'], 1, 0, 'C'); // tgl pesan
+            $pdf->Cell(15, $rowHeight, $row['no_model'], 1, 0, 'C'); // no model
+
+            $xNow = $pdf->GetX();
+            $rowItem = $heights['item_type'] / 5 > 1 ? 5 : $rowHeight;
+            $pdf->MultiCell(37, $rowItem, $row['item_type'], 1, 'C'); // item type
+            $pdf->SetXY($xNow + 37, $yStart);
+
+            $xNow = $pdf->GetX();
+            $rowColor = $heights['color'] / 5 > 1 ? 5 : $rowHeight;
+            $pdf->MultiCell(20, $rowColor, $row['color'], 1, 'C'); // warna
+            $pdf->SetXY($xNow + 20, $yStart);
+
+            $xNow = $pdf->GetX();
+            $rowKode = $heights['kode_warna'] / 5 > 1 ? 5 : $rowHeight;
+            $pdf->MultiCell(25, $rowKode, $row['kode_warna'], 1, 'C'); // kode warna
+            $pdf->SetXY($xNow + 25, $yStart);
+
+            $pdf->Cell(12, $rowHeight, $row['jl_mc'], 1, 0, 'C'); // jl mc
+            $pdf->Cell(17, $rowHeight, $row['qty_pesan'], 1, 0, 'C'); // kg pesan
+            $pdf->Cell(11, $rowHeight, $row['cns_pesan'], 1, 0, 'C'); // cns pcs
+
+            $xNow = $pdf->GetX();
+            $rowLotP = $heights['lot_pesan'] / 5 > 1 ? 5 : $rowHeight;
+            $pdf->MultiCell(18, $rowLotP, $row['lot_pesan'], 1, 'C'); // lot
+            $pdf->SetXY($xNow + 18, $yStart);
+
+            $pdf->Cell(17, $rowHeight, number_format($row['kgs_out'], 2), 1, 0, 'C'); // kgs kirim
+            $pdf->Cell(12, $rowHeight, $row['cns_out'], 1, 0, 'C'); // cns kirim
+            $pdf->Cell(12, $rowHeight, $row['krg_out'], 1, 0, 'C'); // krg kirim
+
+            $xNow = $pdf->GetX();
+            $rowLotO = $heights['lot_out'] / 5 > 1 ? 5 : $rowHeight;
+            $pdf->MultiCell(19, $rowLotO, $row['lot_out'], 1, 'C'); // lot kirim
+            $pdf->SetXY($xNow + 19, $yStart);
+
+            $xNow = $pdf->GetX();
+            $rowKet = $heights['ket_area'] / 5 > 1 ? 5 : $rowHeight;
+            $pdf->MultiCell(37, $rowKet, $row['ket_area'], 1, 'C'); // keterangan
+            $pdf->SetXY($xNow + 37, $yStart);
+
+            $pdf->Ln($rowHeight); // Pindah ke baris berikutnya
         }
 
         // Output PDF

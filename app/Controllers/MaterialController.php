@@ -1221,7 +1221,7 @@ class MaterialController extends BaseController
         $tgl_akhir = $this->request->getPost('tgl_akhir');
 
         // Ambil data dari model sesuai range tanggal
-        $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/filterTglPakai/"
+        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterTglPakai/"
             . $area
             . "?awal=" . urlencode($tgl_awal)
             . "&akhir=" . urlencode($tgl_akhir);
@@ -1255,7 +1255,7 @@ class MaterialController extends BaseController
             }
         }
 
-        $dataList = fetchApiData("http://172.23.39.114/MaterialSystem/public/api/listPemesanan/$area");
+        $dataList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listPemesanan/$area");
         if (!is_array($dataList)) {
             die('Error: Invalid response format for listPemesanan API.');
         }
@@ -1263,7 +1263,7 @@ class MaterialController extends BaseController
         foreach ($dataList as $key => $order) {
             $dataList[$key]['ttl_kebutuhan_bb'] = 0;
             if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
-                $styleApiUrl = 'http://172.23.39.114/MaterialSystem/public/api/getStyleSizeByBb?no_model='
+                $styleApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model='
                     . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
                 $styleList = fetchApiData($styleApiUrl);
 
@@ -1282,7 +1282,7 @@ class MaterialController extends BaseController
                     $dataList[$key]['ttl_kebutuhan_bb'] = $totalRequirement;
                 }
 
-                $pengirimanApiUrl = 'http://172.23.39.114/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
+                $pengirimanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
                     . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
                 $pengiriman = fetchApiData($pengirimanApiUrl);
                 $dataList[$key]['ttl_pengiriman'] = $pengiriman['kgs_out'] ?? 0;
