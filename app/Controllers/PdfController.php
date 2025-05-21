@@ -321,6 +321,8 @@ class PdfController extends BaseController
             . "&area=" . urlencode($area)
             . "&tgl_pakai=" . urlencode($tgl_pakai);
 
+        log_message('debug', 'API Url: ' . $apiUrl);
+
         $ch = curl_init($apiUrl);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
@@ -341,6 +343,8 @@ class PdfController extends BaseController
 
         // Inisialisasi FPDF
         $pdf = new FPDF('L', 'mm', 'A4');
+        $pdf->AliasNbPages();          // <-- untuk {nb}
+        $pdf->SetAutoPageBreak(true, 5); // Atur margin bawah saat halaman penuh
         $pdf->AddPage();
 
         // Garis margin luar (lebih tebal)
@@ -361,8 +365,8 @@ class PdfController extends BaseController
         $pdf->Cell(92, 8, ': ' . $jenis, 0, 0, 'L');
         $pdf->Cell(15, 8, 'AREA', 0, 0, 'L');
         $pdf->Cell(92, 8, ': ' . $area, 0, 0, 'L');
-        $pdf->Cell(20, 8, 'TGL PAKAI' . '', 0, 0, 'L');
-        $pdf->Cell(50, 8, ': ' . $tgl_pakai, 0, 1, 'L');
+        $pdf->Cell(22, 8, 'TANGGAL PAKAI' . '', 0, 0, 'L');
+        $pdf->Cell(48, 8, ': ' . $tgl_pakai, 0, 1, 'L');
 
         //Simpan posisi awal Season & MaterialType
         function MultiCellFit($pdf, $w, $h, $txt, $border = 1, $align = 'C')
@@ -377,7 +381,6 @@ class PdfController extends BaseController
             // Kembalikan ke kanan cell agar sejajar
             $pdf->SetXY($x + $w, $y);
         }
-
 
         // Tabel Header Baris Pertama
         $pdf->SetFont('Arial', 'B', 7);
@@ -403,7 +406,19 @@ class PdfController extends BaseController
         $no = 1;
         $yLimit = 180;
 
+        $totalKgsPesan = 0;
+        $totalConesPesan = 0;
+        $totalKgsKirim = 0;
+        $totalConesKirim = 0;
+        $totalKarungKirim = 0;
+
         foreach ($data as $row) {
+            $totalKgsPesan    += floatval($row['qty_pesan']);
+            $totalConesPesan  += floatval($row['cns_pesan']);
+            $totalKgsKirim    += floatval($row['kgs_out']);
+            $totalConesKirim  += floatval($row['cns_out']);
+            $totalKarungKirim += floatval($row['krg_out']);
+
             $rowHeight = 5;
             $heights = [];
 
@@ -420,10 +435,10 @@ class PdfController extends BaseController
             $rowHeight = max($heights);
 
             // Cek jika sudah mendekati batas bawah halaman, buat halaman baru
-            // if ($pdf->GetY() + $rowHeight > $yLimit) {
-            //     $pdf->AddPage();
-            //     $this->generateHeaderPemesanan($pdf, $no_model);
-            // }
+            if ($pdf->GetY() + $rowHeight > $yLimit) {
+                $this->generateFooter($pdf);
+                $pdf->AddPage();
+            }
 
             $yStart = $pdf->GetY(); // posisi awal Y
             $xStart = $pdf->GetX(); // posisi awal X
@@ -458,9 +473,21 @@ class PdfController extends BaseController
             $pdf->MultiCell(18, $rowLotP, $row['lot_pesan'], 1, 'C'); // lot
             $pdf->SetXY($xNow + 18, $yStart);
 
-            $pdf->Cell(17, $rowHeight, number_format($row['kgs_out'], 2), 1, 0, 'C'); // kgs kirim
-            $pdf->Cell(12, $rowHeight, $row['cns_out'], 1, 0, 'C'); // cns kirim
-            $pdf->Cell(12, $rowHeight, $row['krg_out'], 1, 0, 'C'); // krg kirim
+            // Kgs Kirim: kosong kalau 0, format 2 desimal kalau >0
+            $valKgs = $row['kgs_out'] ?? 0;
+            $textKgs = $valKgs > 0 ? number_format($valKgs, 2) : '';
+            $pdf->Cell(17, $rowHeight, $textKgs, 1, 0, 'C');
+
+            // Cones Kirim: kosong kalau 0
+            $valCns = $row['cns_out'] ?? 0;
+            $textCns = $valCns > 0 ? $valCns : '';
+            $pdf->Cell(12, $rowHeight, $textCns, 1, 0, 'C');
+
+            // Karung Kirim: kosong kalau 0
+            $valKrg = $row['krg_out'] ?? 0;
+            $textKrg = $valKrg > 0 ? $valKrg : '';
+            $pdf->Cell(12, $rowHeight, $textKrg, 1, 0, 'C');
+
 
             $xNow = $pdf->GetX();
             $rowLotO = $heights['lot_out'] / 5 > 1 ? 5 : $rowHeight;
@@ -475,6 +502,20 @@ class PdfController extends BaseController
             $pdf->Ln($rowHeight); // Pindah ke baris berikutnya
         }
 
+        // Grand Total
+        $pdf->SetFont('Arial', 'B', 7);
+        $pdf->Cell(134, 6, 'GRAND TOTAL', 1, 0, 'C'); // Span 134 mm (dari awal sampai sebelum kolom-kolom jumlah)
+        $pdf->Cell(17, 6, number_format($totalKgsPesan, 2), 1, 0, 'C');
+        $pdf->Cell(11, 6, number_format($totalConesPesan), 1, 0, 'C');
+        $pdf->Cell(18, 6, '', 1, 0); // Lot Pesan kosong
+        $pdf->Cell(17, 6, number_format($totalKgsKirim, 2), 1, 0, 'C');
+        $pdf->Cell(12, 6, number_format($totalConesKirim), 1, 0, 'C');
+        $pdf->Cell(12, 6, number_format($totalKarungKirim), 1, 0, 'C');
+        $pdf->Cell(19, 6, '', 1, 0); // Lot Kirim kosong
+        $pdf->Cell(37, 6, '', 1, 1); // Keterangan kosong
+
+        $this->generateFooter($pdf);
+
         // Output PDF
         $pdfContent = $pdf->Output('S');
         return $this->response
@@ -482,5 +523,20 @@ class PdfController extends BaseController
             ->setContentType('application/pdf')
             ->setHeader('Content-Disposition', 'inline; filename="Report_Pemesanan_' . $jenis . '_Area_' . $area . '_' . $tgl_pakai . '.pdf"')
             ->setBody($pdfContent);
+    }
+
+    /**
+     * Cetak footer di posisi bawah halaman
+     * @param FPDF $pdf
+     */
+    private function generateFooter($pdf)
+    {
+        // 15 mm dari bawah
+        $pdf->SetY(-15);
+        $pdf->SetFont('Arial', 'I', 7);
+        // PageNo() mengembalikan halaman sekarang, {nb} diganti total halaman
+        $text = 'FOR_KK_369/TGL_REV_13_07_20/REV_02/HAL '
+            . $pdf->PageNo() . '/{nb}';
+        $pdf->Cell(0, 10, $text, 0, 0, 'C');
     }
 }
