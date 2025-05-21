@@ -94,17 +94,60 @@
         let resultContainer = document.getElementById('resultContainer');
         resultContainer.innerHTML = '';
 
-        if (!Array.isArray(data)) {
-            // Mengubah objek menjadi array
-            data = Object.values(data);
-        }
+        // console.log();
+        // const dataStatus = [];
 
-        if (data.length === 0) {
+        // if (!Array.isArray(data['status'])) {
+        //     // Mengubah objek menjadi array
+        //     dataStatus = Object.values(data['status']);
+        // }
+
+        // Pastikan data['status'] ada dan berbentuk array
+        let dataStatus = Array.isArray(data['status']) ? data['status'] : [];
+
+        if (dataStatus.length === 0) {
             resultContainer.innerHTML = '<p class="text-center text-muted">No data found</p>';
             return;
         }
 
-        data.forEach(item => {
+        resultContainer.innerHTML += `
+            <div class="row my-4">
+                <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row d-flex align-items-center justify-content-center">
+                                <div class="col-3 d-flex flex-column align-items-center">
+                                    <div class="numbers text-center">
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Buyer</p>
+                                        <h5 class="font-weight-bolder mb-0">${data['master']['kd_buyer_order']}</h5>
+                                    </div>
+                                </div>
+                                <div class="col-3 d-flex flex-column align-items-center">
+                                    <div class="numbers text-center">
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Delivery Awal</p>
+                                        <h5 class="font-weight-bolder mb-0">${data['master']['delivery_awal']}</h5>
+                                    </div>
+                                </div>
+                                <div class="col-3 d-flex flex-column align-items-center">
+                                    <div class="numbers text-center">
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Delivery Akhir</p>
+                                        <h5 class="font-weight-bolder mb-0">${data['master']['delivery_akhir']}</h5>
+                                    </div>
+                                </div>
+                                <div class="col-3 d-flex flex-column align-items-center">
+                                    <div class="numbers text-center">
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Start MC</p>
+                                        <h5 class="font-weight-bolder mb-0">${data['master']['start_mc'] ?? '-' }</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        dataStatus.forEach(item => {
             let statusClasses = {
                 'done': 'bg-gradient-success',
                 'retur': 'bg-gradient-warning',
@@ -165,8 +208,14 @@
                         <div class="col-md-3">
                             <p><strong>Ket Daily Cek:</strong></p>
                         </div>
-                        <div class="col-md-9">
+                        <div class="col-md-3">
                             <p>${item.ket_daily_cek || '-'}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Stock Gbn:</strong></p>
+                        </div>
+                        <div class="col-md-3">
+                            <p>${parseFloat(item.kg_stock).toLocaleString('id-ID', { minimumFractionDigits: 2 }) || '-'} Kg</p>
                         </div>
                     </div>
                 `;

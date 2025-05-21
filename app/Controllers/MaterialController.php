@@ -172,10 +172,13 @@ class MaterialController extends BaseController
     }
     public function filterstatusbahanbaku($model)
     {
+        // Mengambil data master
+        $master = $this->orderModel->getStartMc($model);
+
         // Mengambil nilai 'search' yang dikirim oleh frontend
         $search = $this->request->getGet('search');
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/' . $model . '?search=' . urlencode($search);
+        $apiUrl = 'http://172.23.39.118/MaterialSystem/public/api/statusbahanbaku/' . $model . '?search=' . urlencode($search);
 
         // Mengambil data dari API eksternal
         $response = file_get_contents($apiUrl);
@@ -200,9 +203,14 @@ class MaterialController extends BaseController
                 return false;
             });
         }
+        // Gabungkan data master dan status dalam satu array
+        $responseData = [
+            'master' => $master, // Data master dari getStartMc
+            'status' => $status // Data status yang sudah difilter (gunakan array_values untuk mereset indeks array)
+        ];
 
         // Kembalikan data yang sudah difilter ke frontend
-        return $this->response->setJSON($status);
+        return $this->response->setJSON($responseData);
     }
 
     public function cekBahanBaku($id, $idpln)
