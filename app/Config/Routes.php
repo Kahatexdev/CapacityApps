@@ -479,6 +479,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
     $routes->get('estimasispk/(:any)', 'OrderController::estimasispk/$1');
     $routes->post('exportEstimasispk', 'ExcelController::exportEstimasispk');
+    $routes->post('importinisial', 'UserController::importinisial');
 
 
     // $routes->post('importproduksi', 'ProduksiController::importproduksi');

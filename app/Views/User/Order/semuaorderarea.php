@@ -15,6 +15,14 @@
                             </div>
                         </div>
                         <div>
+                            <div class="col-4 text-end">
+                                <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-success bg-gradient-success shadow text-center border-radius-md">
+                                    Import Inisial
+                                </button>
+                                <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                    <i class="ni ni-chart-bar-32 text-lg opacity-10" aria-hidden="true"></i>
+                                </div>
+                            </div>
                             <a href="<?= base_url($role . '/estimasispk/' . $area) ?>" class="btn btn-info">Estimasi SPK</a>
                             <a href="<?= base_url($role . '/statusorder/' . $area) ?>" class="btn btn-info">Status Order</a>
                         </div>
@@ -27,7 +35,42 @@
 
         </div>
 
-
+        <div class="modal fade  bd-example-modal-lg" id="exampleModalMessage" tabindex="-1" role="dialog" aria-labelledby="exampleModalMessageTitle" aria-hidden="true">
+            <div class="modal-dialog " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Import Inisial</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body align-items-center">
+                        <div class="row align-items-center">
+                            <div id="drop-area" class="border rounded d-flex justify-content-center align-item-center mx-3" style="height:200px; width: 95%; cursor:pointer;">
+                                <div class="text-center mt-5">
+                                    <i class="ni ni-cloud-upload-96" style="font-size: 48px;"></i>
+                                    <p class="mt-3" style="font-size: 28px;">Upload file here</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-9 pl-0">
+                                <form action="<?= base_url($role . '/importinisial') ?>" id="modalForm" method="POST" enctype="multipart/form-data">
+                                    <input type="text" class="form-control" name="id_model" hidden>
+                                    <input type="text" class="form-control" name="no_model" hidden>
+                                    <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control ">
+                            </div>
+                            <div class="col-3 pl-0">
+                                <form>
+                                    <!-- Other form inputs go here -->
+                                    <button type="submit" class="btn btn-info btn-block" onclick="this.disabled=true; this.form.submit();">Simpan</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row mt-3">
             <div class="card">
                 <div class="card-body">
