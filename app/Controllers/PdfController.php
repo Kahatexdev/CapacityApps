@@ -346,6 +346,7 @@ class PdfController extends BaseController
         $pdf->AliasNbPages();          // <-- untuk {nb}
         $pdf->SetAutoPageBreak(true, 5); // Atur margin bawah saat halaman penuh
         $pdf->AddPage();
+        $this->generatePageNumber($pdf);   // cetak “Page X/{nb}”
 
         // Garis margin luar (lebih tebal)
         // $pdf->SetDrawColor(0, 0, 0); // Warna hitam
@@ -436,7 +437,7 @@ class PdfController extends BaseController
 
             // Cek jika sudah mendekati batas bawah halaman, buat halaman baru
             if ($pdf->GetY() + $rowHeight > $yLimit) {
-                $this->generateFooter($pdf);
+                $this->footerPemesanan($pdf);
                 $pdf->AddPage();
             }
 
@@ -514,7 +515,7 @@ class PdfController extends BaseController
         $pdf->Cell(19, 6, '', 1, 0); // Lot Kirim kosong
         $pdf->Cell(37, 6, '', 1, 1); // Keterangan kosong
 
-        $this->generateFooter($pdf);
+        $this->footerPemesanan($pdf);
 
         // Output PDF
         $pdfContent = $pdf->Output('S');
@@ -526,10 +527,27 @@ class PdfController extends BaseController
     }
 
     /**
+     * Cetak page number di pojok kanan atas
+     * @param FPDF $pdf
+     */
+    private function generatePageNumber($pdf)
+    {
+        // X = -30mm dari kanan, Y = 10mm dari atas
+        $pdf->SetXY(-30, 10);
+        $pdf->SetFont('Arial', 'I', 7);
+        // 'Page 1/5'
+        $text = 'Page ' . $pdf->PageNo() . '/{nb}';
+        // lebar 30mm, tinggi 5mm, no border, ln=0, align right
+        $pdf->Cell(30, 5, $text, 0, 0, 'R');
+        // kembalikan posisi ke margin kiri (jika perlu)
+        $pdf->SetXY(10, 10);
+    }
+
+    /**
      * Cetak footer di posisi bawah halaman
      * @param FPDF $pdf
      */
-    private function generateFooter($pdf)
+    private function footerPemesanan($pdf)
     {
         // 15 mm dari bawah
         $pdf->SetY(-15);
