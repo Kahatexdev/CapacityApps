@@ -585,4 +585,18 @@ class OrderModel extends Model
 
 
     public function getDataBsSetting() {}
+
+    public function getStartMc($model)
+    {
+        return $this->select('data_model.kd_buyer_order, data_model.no_model, 
+                      MIN(apsperstyle.delivery) AS delivery_awal, 
+                      MAX(apsperstyle.delivery) AS delivery_akhir, 
+                      COALESCE(MIN(tanggal_planning.start_mesin), NULL) AS start_mc')
+            ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left')
+            ->join('detail_planning', 'detail_planning.model = data_model.no_model', 'left')
+            ->join('estimated_planning', 'estimated_planning.id_detail_pln = detail_planning.id_detail_pln', 'left')
+            ->join('tanggal_planning', 'tanggal_planning.id_est_qty = estimated_planning.id_est_qty', 'left')
+            ->where('data_model.no_model', $model)
+            ->first();
+    }
 }

@@ -172,10 +172,13 @@ class MaterialController extends BaseController
     }
     public function filterstatusbahanbaku($model)
     {
+        // Mengambil data master
+        $master = $this->orderModel->getStartMc($model);
+
         // Mengambil nilai 'search' yang dikirim oleh frontend
         $search = $this->request->getGet('search');
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/' . $model . '?search=' . urlencode($search);
+        $apiUrl = 'http://172.23.39.118/MaterialSystem/public/api/statusbahanbaku/' . $model . '?search=' . urlencode($search);
 
         // Mengambil data dari API eksternal
         $response = file_get_contents($apiUrl);
@@ -200,9 +203,14 @@ class MaterialController extends BaseController
                 return false;
             });
         }
+        // Gabungkan data master dan status dalam satu array
+        $responseData = [
+            'master' => $master, // Data master dari getStartMc
+            'status' => $status // Data status yang sudah difilter (gunakan array_values untuk mereset indeks array)
+        ];
 
         // Kembalikan data yang sudah difilter ke frontend
-        return $this->response->setJSON($status);
+        return $this->response->setJSON($responseData);
     }
 
     public function cekBahanBaku($id, $idpln)
@@ -1206,5 +1214,131 @@ class MaterialController extends BaseController
         $result = json_decode($response, true);
 
         return $this->response->setStatusCode($httpCode)->setJSON($result);
+    }
+    public function filterTglPakai($area)
+    {
+        $tgl_awal = $this->request->getPost('tgl_awal');
+        $tgl_akhir = $this->request->getPost('tgl_akhir');
+
+        // Ambil data dari model sesuai range tanggal
+        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterTglPakai/"
+            . $area
+            . "?awal=" . urlencode($tgl_awal)
+            . "&akhir=" . urlencode($tgl_akhir);
+
+        $client = \Config\Services::curlrequest();
+        $response = $client->get($apiUrl);
+
+        $rows = json_decode($response->getBody(), true) ?? [];
+
+        log_message('debug', 'filterTglPakai rows: ' . print_r($rows, true));
+
+        return $this->response->setJSON($rows);
+    }
+    public function reportPemesanan($area)
+    {
+        function fetchApiData($url)
+        {
+            try {
+                $response = file_get_contents($url);
+                if ($response === false) {
+                    throw new \Exception("Error fetching data from $url");
+                }
+                $data = json_decode($response, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new \Exception("Invalid JSON response from $url");
+                }
+                return $data;
+            } catch (\Exception $e) {
+                error_log($e->getMessage());
+                return null;
+            }
+        }
+
+        $dataList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listPemesanan/$area");
+        if (!is_array($dataList)) {
+            die('Error: Invalid response format for listPemesanan API.');
+        }
+
+        foreach ($dataList as $key => $order) {
+            $dataList[$key]['ttl_kebutuhan_bb'] = 0;
+            if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
+                $styleApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model='
+                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
+                $styleList = fetchApiData($styleApiUrl);
+
+                if ($styleList) {
+                    $totalRequirement = 0;
+                    foreach ($styleList as $style) {
+                        if (isset($style['no_model'], $style['style_size'], $style['gw'], $style['composition'], $style['loss'])) {
+                            $orderQty = $this->ApsPerstyleModel->getQtyOrder($style['no_model'], $style['style_size'], $area);
+                            if (isset($orderQty['qty'])) {
+                                $requirement = $orderQty['qty'] * $style['gw'] * ($style['composition'] / 100) * (1 + ($style['loss'] / 100)) / 1000;
+                                $totalRequirement += $requirement;
+                                $dataList[$key]['qty'] = $orderQty['qty'];
+                            }
+                        }
+                    }
+                    $dataList[$key]['ttl_kebutuhan_bb'] = $totalRequirement;
+                }
+
+                $pengirimanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
+                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
+                $pengiriman = fetchApiData($pengirimanApiUrl);
+                $dataList[$key]['ttl_pengiriman'] = $pengiriman['kgs_out'] ?? 0;
+
+                // Hitung sisa jatah
+                $dataList[$key]['sisa_jatah'] = $dataList[$key]['ttl_kebutuhan_bb'] - $dataList[$key]['ttl_pengiriman'];
+            }
+        }
+
+        // dd($dataList);
+
+        // ambil data libur hari kedepan untuk menentukan jadwal pemesanan
+        $today = date('Y-m-d'); // ambil data hari ini
+        $dataLibur = $this->liburModel->getDataLiburForPemesanan($today);
+        // Ambil data tanggal libur menjadi array sederhana
+        $liburDates = array_column($dataLibur, 'tanggal'); // Ambil hanya kolom 'tanggal'
+
+        $day = date('l'); // ambil data hari ini
+        function getNextNonHoliday($date, $liburDates)
+        {
+            while (in_array($date, $liburDates)) {
+                // Jika tanggal ada di daftar libur, tambahkan 1 hari
+                $date = date('Y-m-d', strtotime($date . ' +1 day'));
+            }
+            return $date;
+        }
+
+        $initialTomorrow = date('Y-m-d', strtotime('+1 day')); // Mulai dari hari besok
+        $tomorrow = getNextNonHoliday($initialTomorrow, $liburDates); // Dapatkan tanggal "tomorrow" yang valid (bukan libur)
+
+        // Untuk tanggal berikutnya, kita ambil 1 hari setelah tanggal "tomorrow" dan cek ulang
+        $initialTwoDays = date('Y-m-d', strtotime($tomorrow . ' +1 day'));
+        $twoDays = getNextNonHoliday($initialTwoDays, $liburDates);
+
+        // Untuk tanggal ketiga, ambil 1 hari setelah tanggal "twoDays" dan cek ulang
+        $initialthreeDay = date('Y-m-d', strtotime($twoDays . ' +1 day'));
+        $threeDays = getNextNonHoliday($initialthreeDay, $liburDates);
+
+        $data = [
+            'role' => session()->get('role'),
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => 'active',
+            'active7' => '',
+            'area' => $area,
+            'title' => "List Pemesanan",
+            'dataList' => $dataList,
+            'day' => $day,
+            'tomorrow' => $tomorrow,
+            'twoDays' => $twoDays,
+            'threeDays' => $threeDays,
+        ];
+
+        return view(session()->get('role') . '/Material/reportPemesanan', $data);
     }
 }

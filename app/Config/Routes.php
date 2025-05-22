@@ -530,6 +530,9 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('bahanBaku/hapusSession', 'MaterialController::deletePemesananSession');
     // $routes->get('bahanBaku/hapusSession/(:any)/(:any)', 'MaterialController::deletePemesananSession/$1/$2');
     $routes->get('listPemesanan/(:any)', 'MaterialController::listPemesanan/$1');
+    $routes->get('report_pemesanan/(:any)', 'MaterialController::reportPemesanan/$1');
+    $routes->post('filterTglPakai/(:any)', 'MaterialController::filterTglPakai/$1');
+    $routes->get('report/pdf/(:any)/(:any)/(:any)', 'PdfController::exportPemesanan/$1/$2/$3');
     $routes->get('stockbahanbaku/(:any)', 'MaterialController::stockBahanBaku/$1');
     $routes->get('filterstockbahanbaku/(:any)', 'MaterialController::filterStockBahanBaku/$1');
     $routes->get('pph/(:any)', 'MaterialController::pph/$1');

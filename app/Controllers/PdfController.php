@@ -313,4 +313,230 @@ class PdfController extends BaseController
             ->setHeader('Content-Disposition', 'inline; filename="Report_Model_' . $noModel . '.pdf"')
             ->setBody($pdfContent);
     }
+    public function exportPemesanan($jenis, $area, $tgl_pakai)
+    {
+        // Ambil data berdasarkan area dan model
+        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/dataPemesananArea"
+            . "?jenis=" . urlencode($jenis)
+            . "&area=" . urlencode($area)
+            . "&tgl_pakai=" . urlencode($tgl_pakai);
+
+        log_message('debug', 'API Url: ' . $apiUrl);
+
+        $ch = curl_init($apiUrl);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+        ]);
+
+        $response = curl_exec($ch);
+        log_message('debug', 'Raw API response: ' . $response);
+
+        $error    = curl_error($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if ($response === false) {
+            return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'message' => 'Curl error: ' . $error]);
+        }
+
+        $data = json_decode($response, true);
+
+        // Inisialisasi FPDF
+        $pdf = new FPDF('L', 'mm', 'A4');
+        $pdf->AliasNbPages();          // <-- untuk {nb}
+        $pdf->SetAutoPageBreak(true, 5); // Atur margin bawah saat halaman penuh
+        $pdf->AddPage();
+
+        // Garis margin luar (lebih tebal)
+        // $pdf->SetDrawColor(0, 0, 0); // Warna hitam
+        // $pdf->SetLineWidth(0.4); // Lebih tebal
+        // $pdf->Rect(9, 9, 279, 192); // Sedikit lebih besar dari margin dalam
+
+        // // Garis margin dalam (lebih tipis)
+        // $pdf->SetLineWidth(0.2); // Lebih tipis
+        // $pdf->Rect(10, 10, 277, 190); // Ukuran aslinya
+
+        $pdf->SetFont('Arial', 'B', 14);
+        $pdf->SetFillColor(255, 255, 255); // Atur warna latar belakang menjadi putih
+        $pdf->Cell(279, 8, 'REPORT PEMESANAN BAHAN BAKU', 0, 1, 'C');
+
+        $pdf->SetFont('Arial', 'B', 7);
+        $pdf->Cell(40, 8, 'JENIS BAHAN BAKU', 0, 0, 'L');
+        $pdf->Cell(92, 8, ': ' . $jenis, 0, 0, 'L');
+        $pdf->Cell(15, 8, 'AREA', 0, 0, 'L');
+        $pdf->Cell(92, 8, ': ' . $area, 0, 0, 'L');
+        $pdf->Cell(22, 8, 'TANGGAL PAKAI' . '', 0, 0, 'L');
+        $pdf->Cell(48, 8, ': ' . $tgl_pakai, 0, 1, 'L');
+
+        //Simpan posisi awal Season & MaterialType
+        function MultiCellFit($pdf, $w, $h, $txt, $border = 1, $align = 'C')
+        {
+            // Simpan posisi awal
+            $x = $pdf->GetX();
+            $y = $pdf->GetY();
+
+            // Simulasikan MultiCell tetapi tetap pakai tinggi tetap (12)
+            $pdf->MultiCell($w, $h, $txt, $border, $align);
+
+            // Kembalikan ke kanan cell agar sejajar
+            $pdf->SetXY($x + $w, $y);
+        }
+
+        // Tabel Header Baris Pertama
+        $pdf->SetFont('Arial', 'B', 7);
+        $pdf->Cell(25, 8, 'Tgl Pesan', 1, 0, 'C');
+        $pdf->Cell(15, 8, 'No Model', 1, 0, 'C');
+        $pdf->Cell(37, 8, 'Item Type', 1, 0, 'C');
+        $pdf->Cell(20, 8, 'Warna', 1, 0, 'C');
+        $pdf->Cell(25, 8, 'Kode Warna', 1, 0, 'C');
+        $pdf->Cell(12, 8, 'Jl MC', 1, 0, 'C');
+        $pdf->Cell(17, 8, 'Kgs Pesan', 1, 0, 'C');
+        MultiCellFit($pdf, 11, 4, "Cones\n Pesan");
+        $pdf->Cell(18, 8, 'Lot Pesan', 1, 0, 'C');
+        $pdf->Cell(17, 8, 'Kgs Kirim', 1, 0, 'C');
+        MultiCellFit($pdf, 12, 4, "Cones\n Kirim");
+        MultiCellFit($pdf, 12, 4, "Karung\n Kirim");
+        $pdf->Cell(19, 8, 'Lot Kirim', 1, 0, 'C');
+        $pdf->Cell(37, 8, 'Keterangan', 1, 1, 'C');
+
+
+        //Isi Tabel
+        $lineHeight = 3;
+        $pdf->SetFont('Arial', '', 7);
+        $no = 1;
+        $yLimit = 180;
+
+        $totalKgsPesan = 0;
+        $totalConesPesan = 0;
+        $totalKgsKirim = 0;
+        $totalConesKirim = 0;
+        $totalKarungKirim = 0;
+
+        foreach ($data as $row) {
+            $totalKgsPesan    += floatval($row['qty_pesan']);
+            $totalConesPesan  += floatval($row['cns_pesan']);
+            $totalKgsKirim    += floatval($row['kgs_out']);
+            $totalConesKirim  += floatval($row['cns_out']);
+            $totalKarungKirim += floatval($row['krg_out']);
+
+            $rowHeight = 5;
+            $heights = [];
+
+            // hitung jumlah baris per kolom
+            $heights = [
+                'item_type'     => ceil($pdf->GetStringWidth($row['item_type']) / 37) * $rowHeight,
+                'color'         => ceil($pdf->GetStringWidth($row['color']) / 20) * $rowHeight,
+                'kode_warna'    => ceil($pdf->GetStringWidth($row['kode_warna']) / 25) * $rowHeight,
+                'lot_pesan'     => ceil($pdf->GetStringWidth($row['lot_pesan']) / 18) * $rowHeight,
+                'lot_out'       => ceil($pdf->GetStringWidth($row['lot_out']) / 19) * $rowHeight,
+                'ket_area'      => ceil($pdf->GetStringWidth($row['ket_area']) / 37) * $rowHeight,
+            ];
+
+            $rowHeight = max($heights);
+
+            // Cek jika sudah mendekati batas bawah halaman, buat halaman baru
+            if ($pdf->GetY() + $rowHeight > $yLimit) {
+                $this->generateFooter($pdf);
+                $pdf->AddPage();
+            }
+
+            $yStart = $pdf->GetY(); // posisi awal Y
+            $xStart = $pdf->GetX(); // posisi awal X
+
+            // Kolom 
+            $pdf->SetXY($xStart, $yStart);
+
+            $pdf->Cell(25, $rowHeight, $row['tgl_pesan'], 1, 0, 'C'); // tgl pesan
+            $pdf->Cell(15, $rowHeight, $row['no_model'], 1, 0, 'C'); // no model
+
+            $xNow = $pdf->GetX();
+            $rowItem = $heights['item_type'] / 5 > 1 ? 5 : $rowHeight;
+            $pdf->MultiCell(37, $rowItem, $row['item_type'], 1, 'C'); // item type
+            $pdf->SetXY($xNow + 37, $yStart);
+
+            $xNow = $pdf->GetX();
+            $rowColor = $heights['color'] / 5 > 1 ? 5 : $rowHeight;
+            $pdf->MultiCell(20, $rowColor, $row['color'], 1, 'C'); // warna
+            $pdf->SetXY($xNow + 20, $yStart);
+
+            $xNow = $pdf->GetX();
+            $rowKode = $heights['kode_warna'] / 5 > 1 ? 5 : $rowHeight;
+            $pdf->MultiCell(25, $rowKode, $row['kode_warna'], 1, 'C'); // kode warna
+            $pdf->SetXY($xNow + 25, $yStart);
+
+            $pdf->Cell(12, $rowHeight, $row['jl_mc'], 1, 0, 'C'); // jl mc
+            $pdf->Cell(17, $rowHeight, $row['qty_pesan'], 1, 0, 'C'); // kg pesan
+            $pdf->Cell(11, $rowHeight, $row['cns_pesan'], 1, 0, 'C'); // cns pcs
+
+            $xNow = $pdf->GetX();
+            $rowLotP = $heights['lot_pesan'] / 5 > 1 ? 5 : $rowHeight;
+            $pdf->MultiCell(18, $rowLotP, $row['lot_pesan'], 1, 'C'); // lot
+            $pdf->SetXY($xNow + 18, $yStart);
+
+            // Kgs Kirim: kosong kalau 0, format 2 desimal kalau >0
+            $valKgs = $row['kgs_out'] ?? 0;
+            $textKgs = $valKgs > 0 ? number_format($valKgs, 2) : '';
+            $pdf->Cell(17, $rowHeight, $textKgs, 1, 0, 'C');
+
+            // Cones Kirim: kosong kalau 0
+            $valCns = $row['cns_out'] ?? 0;
+            $textCns = $valCns > 0 ? $valCns : '';
+            $pdf->Cell(12, $rowHeight, $textCns, 1, 0, 'C');
+
+            // Karung Kirim: kosong kalau 0
+            $valKrg = $row['krg_out'] ?? 0;
+            $textKrg = $valKrg > 0 ? $valKrg : '';
+            $pdf->Cell(12, $rowHeight, $textKrg, 1, 0, 'C');
+
+
+            $xNow = $pdf->GetX();
+            $rowLotO = $heights['lot_out'] / 5 > 1 ? 5 : $rowHeight;
+            $pdf->MultiCell(19, $rowLotO, $row['lot_out'], 1, 'C'); // lot kirim
+            $pdf->SetXY($xNow + 19, $yStart);
+
+            $xNow = $pdf->GetX();
+            $rowKet = $heights['ket_area'] / 5 > 1 ? 5 : $rowHeight;
+            $pdf->MultiCell(37, $rowKet, $row['ket_area'], 1, 'C'); // keterangan
+            $pdf->SetXY($xNow + 37, $yStart);
+
+            $pdf->Ln($rowHeight); // Pindah ke baris berikutnya
+        }
+
+        // Grand Total
+        $pdf->SetFont('Arial', 'B', 7);
+        $pdf->Cell(134, 6, 'GRAND TOTAL', 1, 0, 'C'); // Span 134 mm (dari awal sampai sebelum kolom-kolom jumlah)
+        $pdf->Cell(17, 6, number_format($totalKgsPesan, 2), 1, 0, 'C');
+        $pdf->Cell(11, 6, number_format($totalConesPesan), 1, 0, 'C');
+        $pdf->Cell(18, 6, '', 1, 0); // Lot Pesan kosong
+        $pdf->Cell(17, 6, number_format($totalKgsKirim, 2), 1, 0, 'C');
+        $pdf->Cell(12, 6, number_format($totalConesKirim), 1, 0, 'C');
+        $pdf->Cell(12, 6, number_format($totalKarungKirim), 1, 0, 'C');
+        $pdf->Cell(19, 6, '', 1, 0); // Lot Kirim kosong
+        $pdf->Cell(37, 6, '', 1, 1); // Keterangan kosong
+
+        $this->generateFooter($pdf);
+
+        // Output PDF
+        $pdfContent = $pdf->Output('S');
+        return $this->response
+            ->setStatusCode(200)
+            ->setContentType('application/pdf')
+            ->setHeader('Content-Disposition', 'inline; filename="Report_Pemesanan_' . $jenis . '_Area_' . $area . '_' . $tgl_pakai . '.pdf"')
+            ->setBody($pdfContent);
+    }
+
+    /**
+     * Cetak footer di posisi bawah halaman
+     * @param FPDF $pdf
+     */
+    private function generateFooter($pdf)
+    {
+        // 15 mm dari bawah
+        $pdf->SetY(-15);
+        $pdf->SetFont('Arial', 'I', 7);
+        // PageNo() mengembalikan halaman sekarang, {nb} diganti total halaman
+        $text = 'FOR_KK_369/TGL_REV_13_07_20/REV_02/HAL '
+            . $pdf->PageNo() . '/{nb}';
+        $pdf->Cell(0, 10, $text, 0, 0, 'C');
+    }
 }

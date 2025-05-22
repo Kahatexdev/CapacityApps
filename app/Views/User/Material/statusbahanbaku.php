@@ -38,7 +38,6 @@
                             </div>
                         </div>
                         <div class="col-6 d-flex align-items-center text-end gap-2">
-
                             <input type="text" class="form-control" id="model" value="" placeholder="No Model" required>
                             <input type="text" class="form-control" id="filter" value="" placeholder="Kode Warna/Lot">
                             <button id="filterButton" class="btn btn-info ms-2" disabled><i class="fas fa-search"></i></button>
@@ -95,17 +94,60 @@
         let resultContainer = document.getElementById('resultContainer');
         resultContainer.innerHTML = '';
 
-        if (!Array.isArray(data)) {
-            // Mengubah objek menjadi array
-            data = Object.values(data);
-        }
+        // console.log();
+        // const dataStatus = [];
 
-        if (data.length === 0) {
+        // if (!Array.isArray(data['status'])) {
+        //     // Mengubah objek menjadi array
+        //     dataStatus = Object.values(data['status']);
+        // }
+
+        // Pastikan data['status'] ada dan berbentuk array
+        let dataStatus = Array.isArray(data['status']) ? data['status'] : [];
+
+        if (dataStatus.length === 0) {
             resultContainer.innerHTML = '<p class="text-center text-muted">No data found</p>';
             return;
         }
 
-        data.forEach(item => {
+        resultContainer.innerHTML += `
+            <div class="row my-4">
+                <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row d-flex align-items-center justify-content-center">
+                                <div class="col-3 d-flex flex-column align-items-center">
+                                    <div class="numbers text-center">
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Buyer</p>
+                                        <h5 class="font-weight-bolder mb-0">${data['master']['kd_buyer_order']}</h5>
+                                    </div>
+                                </div>
+                                <div class="col-3 d-flex flex-column align-items-center">
+                                    <div class="numbers text-center">
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Delivery Awal</p>
+                                        <h5 class="font-weight-bolder mb-0">${data['master']['delivery_awal']}</h5>
+                                    </div>
+                                </div>
+                                <div class="col-3 d-flex flex-column align-items-center">
+                                    <div class="numbers text-center">
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Delivery Akhir</p>
+                                        <h5 class="font-weight-bolder mb-0">${data['master']['delivery_akhir']}</h5>
+                                    </div>
+                                </div>
+                                <div class="col-3 d-flex flex-column align-items-center">
+                                    <div class="numbers text-center">
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Start MC</p>
+                                        <h5 class="font-weight-bolder mb-0">${data['master']['start_mc'] ?? '-' }</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        dataStatus.forEach(item => {
             let statusClasses = {
                 'done': 'bg-gradient-success',
                 'retur': 'bg-gradient-warning',
@@ -127,7 +169,7 @@
 
             // CELUP SECTION (jika BENANG)
             let celupSection = '';
-            if (jenis === 'BENANG') {
+            if (['BENANG', 'NYLON'].includes(jenis)) {
                 celupSection = `
                     <div class="mb-4 border-bottom pb-3">
                         <h6 class="text-primary border-start border-4 ps-2 mb-3">🧪 Status CELUP</h6>
@@ -166,8 +208,14 @@
                         <div class="col-md-3">
                             <p><strong>Ket Daily Cek:</strong></p>
                         </div>
-                        <div class="col-md-9">
+                        <div class="col-md-3">
                             <p>${item.ket_daily_cek || '-'}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Stock Gbn:</strong></p>
+                        </div>
+                        <div class="col-md-3">
+                            <p>${parseFloat(item.kg_stock).toLocaleString('id-ID', { minimumFractionDigits: 2 }) || '-'} Kg</p>
                         </div>
                     </div>
                 `;
@@ -175,7 +223,7 @@
 
             // COVERING SECTION (jika KARET, NYLON, SPANDEX)
             let coveringSection = '';
-            if (['KARET', 'NYLON', 'SPANDEX'].includes(jenis)) {
+            if (['KARET', 'SPANDEX'].includes(jenis)) {
                 coveringSection = `
                     <div class="mb-3">
                         <h6 class="text-success border-start border-4 ps-2 mb-3">🧵 Status COVERING</h6>
