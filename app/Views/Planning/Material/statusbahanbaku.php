@@ -1,4 +1,4 @@
-<?php $this->extend($role . '/layout'); ?>
+<?php $this->extend('user/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -38,7 +38,6 @@
                             </div>
                         </div>
                         <div class="col-6 d-flex align-items-center text-end gap-2">
-
                             <input type="text" class="form-control" id="model" value="" placeholder="No Model" required>
                             <input type="text" class="form-control" id="filter" value="" placeholder="Kode Warna/Lot">
                             <button id="filterButton" class="btn btn-info ms-2" disabled><i class="fas fa-search"></i></button>
@@ -95,17 +94,60 @@
         let resultContainer = document.getElementById('resultContainer');
         resultContainer.innerHTML = '';
 
-        if (!Array.isArray(data)) {
-            // Mengubah objek menjadi array
-            data = Object.values(data);
-        }
+        // console.log();
+        // const dataStatus = [];
 
-        if (data.length === 0) {
+        // if (!Array.isArray(data['status'])) {
+        //     // Mengubah objek menjadi array
+        //     dataStatus = Object.values(data['status']);
+        // }
+
+        // Pastikan data['status'] ada dan berbentuk array
+        let dataStatus = Array.isArray(data['status']) ? data['status'] : [];
+
+        if (dataStatus.length === 0) {
             resultContainer.innerHTML = '<p class="text-center text-muted">No data found</p>';
             return;
         }
 
-        data.forEach(item => {
+        resultContainer.innerHTML += `
+            <div class="row my-4">
+                <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row d-flex align-items-center justify-content-center">
+                                <div class="col-3 d-flex flex-column align-items-center">
+                                    <div class="numbers text-center">
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Buyer</p>
+                                        <h5 class="font-weight-bolder mb-0">${data['master']['kd_buyer_order']}</h5>
+                                    </div>
+                                </div>
+                                <div class="col-3 d-flex flex-column align-items-center">
+                                    <div class="numbers text-center">
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Delivery Awal</p>
+                                        <h5 class="font-weight-bolder mb-0">${data['master']['delivery_awal']}</h5>
+                                    </div>
+                                </div>
+                                <div class="col-3 d-flex flex-column align-items-center">
+                                    <div class="numbers text-center">
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Delivery Akhir</p>
+                                        <h5 class="font-weight-bolder mb-0">${data['master']['delivery_akhir']}</h5>
+                                    </div>
+                                </div>
+                                <div class="col-3 d-flex flex-column align-items-center">
+                                    <div class="numbers text-center">
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Start MC</p>
+                                        <h5 class="font-weight-bolder mb-0">${data['master']['start_mc'] ?? '-' }</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        dataStatus.forEach(item => {
             let statusClasses = {
                 'done': 'bg-gradient-success',
                 'retur': 'bg-gradient-warning',
@@ -127,7 +169,7 @@
 
             // CELUP SECTION (jika BENANG)
             let celupSection = '';
-            if (jenis === 'BENANG') {
+            if (['BENANG', 'NYLON'].includes(jenis)) {
                 celupSection = `
                     <div class="mb-4 border-bottom pb-3">
                         <h6 class="text-primary border-start border-4 ps-2 mb-3">🧪 Status CELUP</h6>
@@ -141,23 +183,24 @@
                                 <p><strong>Qty Celup:</strong> ${parseFloat(item.kg_celup).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</p>
                                 <p><strong>Lot Celup:</strong> ${item.lot_celup}</p>
                                 <p><strong>Start MC:</strong> ${formatDate(item.start_mc)}</p>
+                                <p><strong>Tgl Schedule:</strong> ${formatDate(item.tanggal_schedule)}</p>
                             </div>
                             <div class="col-md-3">
-                                <p><strong>Tgl Schedule:</strong> ${formatDate(item.tanggal_schedule)}</p>
                                 <p><strong>Tgl Bon:</strong> ${formatDate(item.tanggal_bon)}</p>
                                 <p><strong>Tgl Celup:</strong> ${formatDate(item.tanggal_celup)}</p>
                                 <p><strong>Tgl Bongkar:</strong> ${formatDate(item.tanggal_bongkar)}</p>
-                            </div>
-                            <div class="col-md-3">
-                                <p><strong>Tgl Press:</strong> ${formatDate(item.tanggal_press)}</p>
-                                <p><strong>Tgl Oven:</strong> ${formatDate(item.tanggal_oven)}</p>
+                                <p><strong>Tgl Press/Oven:</strong> ${formatDate(item.tanggal_press_oven)}</p>
                                 <p><strong>Tgl TL:</strong> ${formatDate(item.tanggal_tl)}</p>
-                                <p><strong>Tgl Rajut Pagi:</strong> ${formatDate(item.tanggal_rajut_pagi)}</p>
                             </div>
                             <div class="col-md-3">
-                                <p><strong>Tgl ACC:</strong> ${formatDate(item.tanggal_acc)}</p>
+                                <p><strong>Tgl Rajut Pagi:</strong> ${formatDate(item.tanggal_rajut_pagi)}</p>
+                                <p><strong>Serah Terima ACC:</strong> ${formatDate(item.serah_terima_acc)}</p>
+                                <p><strong>Tgl ACC KK:</strong> ${formatDate(item.tanggal_acc)}</p>
                                 <p><strong>Tgl Kelos:</strong> ${formatDate(item.tanggal_kelos)}</p>
-                                <p><strong>Tgl Reject:</strong> ${formatDate(item.tanggal_reject)}</p>
+                                <p><strong>Tgl Reject KK:</strong> ${formatDate(item.tanggal_reject)}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p><strong>Tgl Matching:</strong> ${formatDate(item.tanggal_matching)}</p>
                                 <p><strong>Tgl Perbaikan:</strong> ${formatDate(item.tanggal_perbaikan)}</p>
                             </div>
                         </div>
@@ -166,8 +209,14 @@
                         <div class="col-md-3">
                             <p><strong>Ket Daily Cek:</strong></p>
                         </div>
-                        <div class="col-md-9">
+                        <div class="col-md-3">
                             <p>${item.ket_daily_cek || '-'}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Stock Gbn:</strong></p>
+                        </div>
+                        <div class="col-md-3">
+                            <p>${parseFloat(item.kg_stock).toLocaleString('id-ID', { minimumFractionDigits: 2 }) || '-'} Kg</p>
                         </div>
                     </div>
                 `;
@@ -175,7 +224,7 @@
 
             // COVERING SECTION (jika KARET, NYLON, SPANDEX)
             let coveringSection = '';
-            if (['KARET', 'NYLON', 'SPANDEX'].includes(jenis)) {
+            if (['KARET', 'SPANDEX'].includes(jenis)) {
                 coveringSection = `
                     <div class="mb-3">
                         <h6 class="text-success border-start border-4 ps-2 mb-3">🧵 Status COVERING</h6>
