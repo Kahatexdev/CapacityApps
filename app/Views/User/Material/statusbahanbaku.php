@@ -183,23 +183,24 @@
                                 <p><strong>Qty Celup:</strong> ${parseFloat(item.kg_celup).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</p>
                                 <p><strong>Lot Celup:</strong> ${item.lot_celup}</p>
                                 <p><strong>Start MC:</strong> ${formatDate(item.start_mc)}</p>
+                                <p><strong>Tgl Schedule:</strong> ${formatDate(item.tanggal_schedule)}</p>
                             </div>
                             <div class="col-md-3">
-                                <p><strong>Tgl Schedule:</strong> ${formatDate(item.tanggal_schedule)}</p>
                                 <p><strong>Tgl Bon:</strong> ${formatDate(item.tanggal_bon)}</p>
                                 <p><strong>Tgl Celup:</strong> ${formatDate(item.tanggal_celup)}</p>
                                 <p><strong>Tgl Bongkar:</strong> ${formatDate(item.tanggal_bongkar)}</p>
-                            </div>
-                            <div class="col-md-3">
-                                <p><strong>Tgl Press:</strong> ${formatDate(item.tanggal_press)}</p>
-                                <p><strong>Tgl Oven:</strong> ${formatDate(item.tanggal_oven)}</p>
+                                <p><strong>Tgl Press/Oven:</strong> ${formatDate(item.tanggal_press_oven)}</p>
                                 <p><strong>Tgl TL:</strong> ${formatDate(item.tanggal_tl)}</p>
-                                <p><strong>Tgl Rajut Pagi:</strong> ${formatDate(item.tanggal_rajut_pagi)}</p>
                             </div>
                             <div class="col-md-3">
-                                <p><strong>Tgl ACC:</strong> ${formatDate(item.tanggal_acc)}</p>
+                                <p><strong>Tgl Rajut Pagi:</strong> ${formatDate(item.tanggal_rajut_pagi)}</p>
+                                <p><strong>Serah Terima ACC:</strong> ${formatDate(item.serah_terima_acc)}</p>
+                                <p><strong>Tgl ACC KK:</strong> ${formatDate(item.tanggal_acc)}</p>
                                 <p><strong>Tgl Kelos:</strong> ${formatDate(item.tanggal_kelos)}</p>
-                                <p><strong>Tgl Reject:</strong> ${formatDate(item.tanggal_reject)}</p>
+                                <p><strong>Tgl Reject KK:</strong> ${formatDate(item.tanggal_reject)}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p><strong>Tgl Matching:</strong> ${formatDate(item.tanggal_matching)}</p>
                                 <p><strong>Tgl Perbaikan:</strong> ${formatDate(item.tanggal_perbaikan)}</p>
                             </div>
                         </div>
