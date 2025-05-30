@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Database\Migrations\DataCancelOrder;
+use App\Database\Migrations\EstSpk;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\DataMesinModel;
 use App\Models\OrderModel;
@@ -2090,6 +2091,55 @@ class OrderController extends BaseController
             return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $jarum))->withInput()->with('success', 'Berhasil Input History Revisi');
         } else {
             return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $jarum))->withInput()->with('error', 'Gagal Update Data');
+        }
+    }
+    public function spk2()
+    {
+        $estimasiSpk = $this->estspk->getData();
+        // dd($estimasiSpk);
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Pengajuan SPK 2',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'data' => $estimasiSpk,
+
+        ];
+        return view(session()->get('role') . '/Order/pengajuanspk2', $data);
+    }
+    public function approveSpk2()
+    {
+        // Ambil array ID yang dikirim via POST
+        $ids = $this->request->getPost('data');
+
+        if (empty($ids)) {
+            return redirect()
+                ->to(base_url(session()->get('role') . '/pengajuanspk2'))
+                ->withInput()
+                ->with('error', 'Pilih minimal 1 SPK2 untuk di-approve');
+        }
+
+        // Update semua baris yang ID-nya ada di array $ids
+        $updated = $this->estspk
+            ->whereIn('id', $ids)
+            ->set('status', 'approved')
+            ->update();
+
+        if ($updated) {
+            return redirect()
+                ->to(base_url(session()->get('role') . '/pengajuanspk2'))
+                ->withInput()
+                ->with('success', 'Berhasil Approve SPK2');
+        } else {
+            return redirect()
+                ->to(base_url(session()->get('role') . '/pengajuanspk2'))
+                ->withInput()
+                ->with('error', 'Gagal Approve SPK2');
         }
     }
 }

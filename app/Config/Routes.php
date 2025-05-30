@@ -247,6 +247,8 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('orderPerbulan', 'OrderController::orderPerbulan');
     $routes->get('orderPerMonth/(:any)/(:any)', 'OrderController::orderPerMonth/$1/$2');
     $routes->post('inputhistoryrevise/(:any)', 'OrderController::inputHistory/$1');
+    $routes->get('pengajuanspk2', 'OrderController::spk2');
+    $routes->post('approveSpk2', 'OrderController::approveSpk2');
 
 
 

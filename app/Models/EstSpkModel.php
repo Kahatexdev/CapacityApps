@@ -50,4 +50,12 @@ class EstSpkModel extends Model
             ->where('area', $area)
             ->first();
     }
+
+    public function getData()
+    {
+        return $this->select('estimasi_spk.*')
+            ->where('status', 'sudah')
+            ->orderBy('created_at', 'DESC')
+            ->findAll();
+    }
 }
