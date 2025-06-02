@@ -47,16 +47,19 @@
 
 <body class="g-sidenav-show  bg-gray-100">
     <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 " data-color="info" id="sidenav-main">
-        <div class="sidenav-header">
-            <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
-            <a class="navbar-brand m-0" href="<?= base_url('/user') ?> " target="_blank">
-                <div class="icon icon-shape bg-dark shadow text-center border-radius-lg" style="font-size: 17px;">
-                    <i class="fab fa-cuttlefish text-lg opacity-10" aria-hidden="true"></i>
+        <div class="sidenav-header text-center">
+            <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
+                aria-hidden="true" id="iconSidenav"></i>
+            <a class="navbar-brand m-0 d-flex flex-column align-items-center" href="<?= base_url('/sudo') ?>" target="_blank">
+                <div class="icon icon-shape bg-white shadow text-center border-radius-lg mb-2"
+                    style="width: 60px; height: 60px;">
+                    <img src="<?= base_url('assets/img/lg.png') ?>" alt="Logo"
+                        style="max-height: 100%; max-width: 100%; object-fit: contain;">
                 </div>
-                <span class="ms-1 font-weight-bold" style="font-size: 20px;">Capacity Apps</span>
+                <span class="font-weight-bold" style="font-size: 20px;">Planning & Production</span>
             </a>
         </div>
-        <hr class="horizontal dark mt-0">
+        <hr class="horizontal dark mt-5">
         <div class="collapse navbar-collapse h-auto  w-auto " id="sidenav-collapse-main">
             <ul class="navbar-nav">
                 <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Order & Produksi</h6>
