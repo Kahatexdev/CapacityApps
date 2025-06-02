@@ -58,4 +58,13 @@ class EstSpkModel extends Model
             ->orderBy('created_at', 'DESC')
             ->findAll();
     }
+
+    public function getDataFilter($noModel)
+    {
+        return $this->select('estimasi_spk.*')
+            ->where('status', 'approved')
+            ->where('model', $noModel)
+            ->orderBy('created_at', 'DESC')
+            ->findAll();
+    }
 }
