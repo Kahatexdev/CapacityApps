@@ -1075,8 +1075,7 @@ class ApsPerstyleModel extends Model
     }
     public function gantiJarum($pdk, $jarumOld, $jarumnew)
     {
-        return $this->builder()
-            ->where('mastermodel', $pdk)
+        return $this->where('mastermodel', $pdk)
             ->where('machinetypeid', $jarumOld)
             ->set('machinetypeid', $jarumnew)
             ->update();
