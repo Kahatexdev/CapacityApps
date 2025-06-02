@@ -30,21 +30,23 @@
                             <thead>
                                 <tr>
                                     <th><input type="checkbox" id="select-all"></th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">No Model</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Style</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Area</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 text-center">Tanggal Dibuat</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 text-center">No Model</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Style</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Area</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Qty</th>
 
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ($data as $row) : ?>
                                     <tr>
-                                        <td><input type="checkbox" name="row[]" value="<?= $row['id']; ?>"></td>
-                                        <td><?= $row['model'] ?></td>
-                                        <td><?= $row['style'] ?></td>
-                                        <td><?= $row['area'] ?></td>
-                                        <td><?= $row['qty'] ?> pcs</td>
+                                        <td class="text-center"><input type="checkbox" name="row[]" value="<?= $row['id']; ?>"></td>
+                                        <td class="text-center"><?= $row['tgl_buat'] ?></td>
+                                        <td class="text-center"><?= $row['model'] ?></td>
+                                        <td class="text-center"><?= $row['style'] ?></td>
+                                        <td class="text-center"><?= $row['area'] ?></td>
+                                        <td class="text-center"><?= $row['qty'] ?> pcs</td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
