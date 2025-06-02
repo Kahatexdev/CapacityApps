@@ -1073,4 +1073,12 @@ class ApsPerstyleModel extends Model
             ->where('factory', $area)
             ->first();
     }
+    public function gantiJarum($pdk, $jarumOld, $jarumnew)
+    {
+        return $this->builder()
+            ->where('mastermodel', $pdk)
+            ->where('machinetypeid', $jarumOld)
+            ->set('machinetypeid', $jarumnew)
+            ->update();
+    }
 }

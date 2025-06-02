@@ -174,15 +174,21 @@ error_reporting(E_ALL); ?>
                         <form action="" method="post">
 
                             <input type="hidden" name="id_detail" id="id_detail">
+                            <input type="hidden" name="pdk" id="pdk">
+                            <input type="hidden" name="jarumOld" id="jarumOld">
                             <div class="form-group">
-                                <label for="pindahjarum" class="form-control">Pilih Jarum</label>
+                                <label for="jarumname" class="form-control-label">Pilih Jarum</label>
                                 <select name="jarumname" id="jarumname" class="form-control">
                                     <option value="">----</option>
                                     <?php foreach ($jarumList as $jrm): ?>
-                                        <option value="<?= $jrm['id_pln_mc'] ?>"><?= $jrm['jarum'] ?></option>
+                                        <option value="<?= $jrm['id_pln_mc'] ?>" data-jarum="<?= $jrm['jarum'] ?>">
+                                            <?= $jrm['jarum'] ?>
+                                        </option>
                                     <?php endforeach ?>
                                 </select>
+                                <input type="hidden" name="jarum" id="jarum-hidden">
                             </div>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -192,6 +198,13 @@ error_reporting(E_ALL); ?>
                 </div>
             </div>
         </div>
+        <script>
+            document.getElementById('jarumname').addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const jarumValue = selectedOption.getAttribute('data-jarum');
+                document.getElementById('jarum-hidden').value = jarumValue;
+            });
+        </script>
 
         <script>
             $(document).ready(function() {
@@ -240,11 +253,14 @@ error_reporting(E_ALL); ?>
                 $('.move-btn').click(function() {
                     var id = $(this).data('id');
                     var pdk = $(this).data('pdk');
+                    var jarumOld = <?= json_encode($jarum) ?>;
                     var area = $(this).data('area');
                     var idpage = <?= $id_pln_mc ?>
 
                     console.log(idpage);
                     $('#moveJarum').find('input[name="id_detail"]').val(id);
+                    $('#moveJarum').find('input[name="pdk"]').val(pdk);
+                    $('#moveJarum').find('input[name="jarumOld"]').val(jarumOld);
                     $('#moveJarum').find('#moveJarumText').text('Pindah Jarum ' + pdk);
 
                     $('#moveJarum').modal('show');
