@@ -729,7 +729,8 @@ class PlanningController extends BaseController
         $jarumnew = $this->request->getPost('jarum');
         $jarumOld = $this->request->getPost('jarumOld');
 
-        $update = $this->DetailPlanningModel->update($idPdk, ['id_pln_mc' => $idJarum, 'jarum' => $jarumnew]);
+        // $update = $this->DetailPlanningModel->update($idPdk, ['id_pln_mc' => $idJarum, 'jarum' => $jarumnew]);
+        $update = $this->DetailPlanningModel->pindahJarum($pdk, $idJarum,  $jarumnew, $jarumOld);
         $gantiJarum = $this->ApsPerstyleModel->gantiJarum($pdk, $jarumOld, $jarumnew);
 
         if ($update) {
