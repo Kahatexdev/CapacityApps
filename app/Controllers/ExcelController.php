@@ -3537,10 +3537,10 @@ class ExcelController extends BaseController
             return redirect()->back()->with('error', 'Tidak ada data yang dipilih.');
         }
     }
-    public function exportExcelRetur($area, $model)
+    public function exportExcelRetur($area)
     {
 
-        $url = 'http://172.23.44.14/MaterialSystem/public/api/listRetur?area=' . $area . '&model=' . $model;
+        $url = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area;
 
         $response = file_get_contents($url);
         log_message('debug', "API Response: " . $response);
@@ -3600,18 +3600,20 @@ class ExcelController extends BaseController
                 ],
             ];
 
-            $sheet->setCellValue('A1', 'LIST RETUR ' . $model);
+            $sheet->setCellValue('A1', 'LIST RETUR ' . $area);
             $sheet->mergeCells('A1:H1');
             $sheet->getStyle('A1:H1')->applyFromArray($styleTitle);
             // Tulis header
             $sheet->setCellValue('A3', 'NO');
-            $sheet->setCellValue('B3', 'ITEM TYPE');
-            $sheet->setCellValue('C3', 'KODE WARNA');
-            $sheet->setCellValue('D3', 'WARNA');
-            $sheet->setCellValue('E3', 'LOT RETUR');
-            $sheet->setCellValue('F3', 'KG RETUR');
-            $sheet->setCellValue('G3', 'KATEGORI');
-            $sheet->setCellValue('H3', 'KETERANGAN GBN');
+            $sheet->setCellValue('B3', 'TANGGAL RETUR');
+            $sheet->setCellValue('C3', 'NO MODEL');
+            $sheet->setCellValue('D3', 'ITEM TYPE');
+            $sheet->setCellValue('E3', 'KODE WARNA');
+            $sheet->setCellValue('F3', 'WARNA');
+            $sheet->setCellValue('G3', 'LOT RETUR');
+            $sheet->setCellValue('H3', 'KG RETUR');
+            $sheet->setCellValue('I3', 'KATEGORI');
+            $sheet->setCellValue('J3', 'KETERANGAN GBN');
             $sheet->getStyle('A3')->applyFromArray($styleHeader);
             $sheet->getStyle('B3')->applyFromArray($styleHeader);
             $sheet->getStyle('C3')->applyFromArray($styleHeader);
@@ -3620,6 +3622,8 @@ class ExcelController extends BaseController
             $sheet->getStyle('F3')->applyFromArray($styleHeader);
             $sheet->getStyle('G3')->applyFromArray($styleHeader);
             $sheet->getStyle('H3')->applyFromArray($styleHeader);
+            $sheet->getStyle('I3')->applyFromArray($styleHeader);
+            $sheet->getStyle('J3')->applyFromArray($styleHeader);
 
             // Tulis data mulai dari baris 2
             $row = 4;
@@ -3627,13 +3631,15 @@ class ExcelController extends BaseController
 
             foreach ($data as $item) {
                 $sheet->setCellValue('A' . $row, $no++);
-                $sheet->setCellValue('B' . $row, $item['item_type']);
-                $sheet->setCellValue('C' . $row, $item['kode_warna']);
-                $sheet->setCellValue('D' . $row, $item['warna']);
-                $sheet->setCellValue('E' . $row, $item['lot_retur']);
-                $sheet->setCellValue('F' . $row, $item['kgs_retur']);
-                $sheet->setCellValue('G' . $row, $item['kategori']);
-                $sheet->setCellValue('H' . $row, $item['keterangan_gbn']);
+                $sheet->setCellValue('B' . $row, $item['tgl_retur']);
+                $sheet->setCellValue('C' . $row, $item['no_model']);
+                $sheet->setCellValue('D' . $row, $item['item_type']);
+                $sheet->setCellValue('E' . $row, $item['kode_warna']);
+                $sheet->setCellValue('F' . $row, $item['warna']);
+                $sheet->setCellValue('G' . $row, $item['lot_retur']);
+                $sheet->setCellValue('H' . $row, $item['kgs_retur']);
+                $sheet->setCellValue('I' . $row, $item['kategori']);
+                $sheet->setCellValue('J' . $row, $item['keterangan_gbn']);
                 $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
                 $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
                 $sheet->getStyle('C' . $row)->applyFromArray($styleBody);
@@ -3642,17 +3648,19 @@ class ExcelController extends BaseController
                 $sheet->getStyle('F' . $row)->applyFromArray($styleBody);
                 $sheet->getStyle('G' . $row)->applyFromArray($styleBody);
                 $sheet->getStyle('H' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('I' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('J' . $row)->applyFromArray($styleBody);
                 $row++;
             }
 
             // Set lebar kolom agar menyesuaikan isi
-            foreach (range('A', 'H') as $col) {
+            foreach (range('A', 'J') as $col) {
                 $sheet->getColumnDimension($col)->setAutoSize(true);
             }
 
             // Buat writer dan output file Excel
             $writer = new Xlsx($spreadsheet);
-            $fileName = 'Export Retur ' . $model . ' Area ' . $area . '.xlsx';
+            $fileName = 'Export Retur ' . $area . '.xlsx';
 
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment; filename="' . $fileName . '"');

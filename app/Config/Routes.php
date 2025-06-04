@@ -567,7 +567,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('pengajuanRetur/(:any)', 'ReturController::pengajuanRetur/$1');
     $routes->get('getKategoriRetur', 'ReturController::getKategoriRetur');
     $routes->get('getKodeWarnaWarnaByItemType', 'ReturController::getKodeWarnaWarnaByItemType');
-    $routes->get('exportExcelRetur/(:any)/(:any)', 'ExcelController::exportExcelRetur/$1/$2');
+    $routes->get('exportExcelRetur/(:any)', 'ExcelController::exportExcelRetur/$1');
 });
 
 // sudo
