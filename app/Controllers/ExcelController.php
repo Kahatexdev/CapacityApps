@@ -3384,69 +3384,71 @@ class ExcelController extends BaseController
     }
     public function exportEstimasispk()
     {
-        $selectedData = $this->request->getPost('data');
+        $rows = $this->request->getPost('data');
 
-        if (!empty($selectedData)) {
-            $allData = []; // Inisialisasi array hasil di luar loop
+        if (!empty($rows)) {
+            $allData = [];
 
-            foreach ($selectedData as $dataString) {
-                // Pecah data string menjadi tiga bagian: model, size, dan area
-                list($model, $size, $area) = explode('|', $dataString);
+            foreach ($rows as $row) {
+                // Validasi minimal field penting
+                if (!isset($row['model'], $row['size'], $row['area'])) {
+                    continue;
+                }
 
-                // Buat parameter untuk query
+                // Siapkan data untuk query ke model
                 $data = [
-                    'model' => $model,
-                    'size'  => $size,
-                    'area'  => $area,
+                    'model'    => $row['model'],
+                    'size'     => $row['size'],
+                    'area'     => $row['area'],
+                    'po_plus'  => (int)$row['poplus'] ?? 0,
+                    'estimasi' => (int)$row['estimasi'] ?? 0,
                 ];
 
-                // Panggil model. Pastikan method exportDataEstimasi() tidak mengandung dd() di dalamnya.
+                // Ambil data estimasi dari model
                 $result = $this->ApsPerstyleModel->exportDataEstimasi($data);
 
-                // Pastikan ada hasil dari query
-                // if ($result) {
-                $dataProd = $this->produksiModel->getProdByPdkSize($result['mastermodel'], $result['size']);
-                $bs     = (int)$dataProd['bs'];
-                $qty    = (int)$result['qty'];
-                $sisa   = (int)$result['sisa'];
-                $poplus = (int)$result['poplus'];
-
-                // Dapatkan nilai produksi dari model produksi
-
-                // Gunakan nilai produksi sebagai ttlProd (sesuaikan logika jika diperlukan)
-                $ttlProd = $dataProd['prod'];
-
-                // Lanjutkan hanya jika ttlProd valid
-                if ($ttlProd > 0) {
-                    $percentage = round(($ttlProd / $qty) * 100);
-                    $ganti      = $bs + $poplus;
-                    $estimasi   = ($ganti / $ttlProd / 100) * $qty;
-
-                    // Tambahkan hasil ke array $allData
-                    $allData[] = [
-                        'model'      => $result['mastermodel'],
-                        'inisial'    => $result['inisial'],
-                        'size'       => $result['size'],
-                        'sisa'       => $sisa,
-                        'qty'        => $qty,
-                        'ttlProd'    => $ttlProd,
-                        'percentage' => $percentage,
-                        'bs'         => $bs,
-                        'poplus'     => $poplus,
-                        'jarum'      => $result['machinetypeid'],
-                        'estimasi'   => round(($estimasi * 100), 1),
-                    ];
-                    $insert = [
-                        'model'      => $result['mastermodel'],
-                        'style'       => $result['size'],
-                        'area'       => $area,
-                        'qty'   => round(($estimasi * 100), 1),
-                        'status' => 'sudah'
-                    ];
-
-                    $this->estspk->insert($insert);
-                    // }
+                if (!$result) {
+                    continue; // Lewati jika tidak ada hasil
                 }
+
+                // Ambil data produksi
+                $dataProd = $this->produksiModel->getProdByPdkSize($result['mastermodel'], $result['size']);
+                $bs       = (int)($dataProd['bs'] ?? 0);
+                $ttlProd  = (int)($dataProd['prod'] ?? 0);
+                $qty      = (int)($result['qty'] ?? 0);
+                $sisa     = (int)($result['sisa'] ?? 0);
+                $poplus   = (int)($row['poplus'] ?? 0);
+                $estimasi = (int)($row['estimasi'] ?? 0);
+
+                if ($ttlProd <= 0 || $qty <= 0) {
+                    continue; // Lewati jika tidak valid
+                }
+
+                $percentage = round(($ttlProd / $qty) * 100);
+                $estimasiQty = round($estimasi); // Perhitungan sesuai kebutuhan
+
+                $allData[] = [
+                    'model'      => $result['mastermodel'],
+                    'inisial'    => $result['inisial'],
+                    'size'       => $result['size'],
+                    'sisa'       => $sisa,
+                    'qty'        => $qty,
+                    'ttlProd'    => $ttlProd,
+                    'percentage' => $percentage,
+                    'bs'         => $bs,
+                    'poplus'     => $poplus,
+                    'jarum'      => $result['machinetypeid'],
+                    'estimasi'   => $estimasiQty,
+                ];
+
+                // Simpan ke tabel estimasi SPK
+                $this->estspk->insert([
+                    'model'  => $result['mastermodel'],
+                    'style'  => $result['size'],
+                    'area'   => $row['area'],
+                    'qty'    => $estimasiQty,
+                    'status' => 'sudah'
+                ]);
             }
             // var_dump($allData);
             // dd($allData);

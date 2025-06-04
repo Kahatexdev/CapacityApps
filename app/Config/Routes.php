@@ -480,6 +480,8 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('inputinisial', 'UserController::inputinisial');
     $routes->get('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
     $routes->get('estimasispk/(:any)', 'OrderController::estimasispk/$1');
+    $routes->post('mintaSpk2', 'OrderController::mintaSpk2');
+    $routes->post('spkmanual', 'OrderController::spkmanual');
     $routes->post('exportEstimasispk', 'ExcelController::exportEstimasispk');
     $routes->post('importinisial', 'UserController::importinisial');
 
