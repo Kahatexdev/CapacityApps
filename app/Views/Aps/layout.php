@@ -49,7 +49,7 @@
         <div class="sidenav-header text-center">
             <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
                 aria-hidden="true" id="iconSidenav"></i>
-            <a class="navbar-brand m-0 d-flex flex-column align-items-center" href="<?= base_url('/sudo') ?>" target="_blank">
+            <a class="navbar-brand m-0 d-flex flex-column align-items-center" href="<?= base_url($role) ?>" target="_blank">
                 <div class="icon icon-shape bg-white shadow text-center border-radius-lg mb-2"
                     style="width: 60px; height: 60px;">
                     <img src="<?= base_url('assets/img/lg.png') ?>" alt="Logo"

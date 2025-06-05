@@ -609,4 +609,18 @@ class UserController extends BaseController
         }
         $db->transComplete();
     }
+    public function deleteBsMc()
+    {
+        $area = $this->request->getPost('area');
+        $awal = $this->request->getPost('awal');
+        $akhir = $this->request->getPost('akhir');
+
+        $delete = $this->BsMesinModel->deleteBsRange($area, $awal, $akhir);
+
+        if ($delete) {
+            return redirect()->back()->with('success', 'Data berhasil dihapus.');
+        } else {
+            return redirect()->back()->with('error', 'Data gagal dihapus.');
+        }
+    }
 }

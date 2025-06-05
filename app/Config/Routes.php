@@ -520,6 +520,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('excelPenggunaanPerbulan/(:any)/(:any)', 'UserController::exportPenggunaanPerbulan/$1/$2');
 
     //summary bs mc
+    $routes->post('deleteBsMc', 'UserController::deleteBsMc');
     $routes->post('exportSummaryBs', 'SummaryController::excelSummaryBs');
     $routes->get('exportBsMesinPerbulan/(:any)/(:any)', 'SummaryController::summaryBsMesinPerbulan/$1/$2');
 

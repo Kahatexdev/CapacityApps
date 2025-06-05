@@ -248,4 +248,11 @@ class BsMesinModel extends Model
         }
         return array_values($final); // balikin array yang udah dirapihin index-nya
     }
+    public function deleteBsRange($area, $awal, $akhir)
+    {
+        return $this->where('area', $area)
+            ->where('tanggal_produksi >=', $awal)
+            ->where('tanggal_produksi <=', $akhir)
+            ->delete();
+    }
 }
