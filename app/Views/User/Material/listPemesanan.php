@@ -115,7 +115,8 @@
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Total Retur</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Jatah</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Status Jatah</th>
-                                    <th class="text-uppercase text-dark text-xxs text-center font-weight-bolder opacity-7 ps-2" colspan="2">Action</th>
+                                    <th class="text-uppercase text-dark text-xxs text-center font-weight-bolder opacity-7 ps-2">Edit</th>
+                                    <th class="text-uppercase text-dark text-xxs text-center font-weight-bolder opacity-7 ps-2">Send</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -125,101 +126,102 @@
                                     $ttl_kg_pesan = number_format($id['qty_pesan'] - $id['qty_sisa'], 2);
                                     $ttl_cns_pesan = $id['cns_pesan'] - $id['cns_sisa'];
                                 ?>
-                                    <td class="text-xs text-start"><?= $no++; ?></td>
-                                    <td class="text-xs text-start"><?= $id['tgl_pakai']; ?></td>
-                                    <td class="text-xs text-start"><?= $id['no_model']; ?></td>
-                                    <td class="text-xs text-start"><?= $id['item_type']; ?></td>
-                                    <td class="text-xs text-start"><?= $id['kode_warna']; ?></td>
-                                    <td class="text-xs text-start"><?= $id['color']; ?></td>
-                                    <td class="text-xs text-start"><?= number_format($id['ttl_kebutuhan_bb'], 2); ?></td>
-                                    <td class="text-xs text-start"><?= $id['jl_mc']; ?></td>
-                                    <td class="text-xs text-start"><?= $ttl_kg_pesan; ?></td>
-                                    <td class="text-xs text-start"><?= $ttl_cns_pesan; ?></td>
-                                    <td class="text-xs text-start"><?= $id['lot']; ?></td>
-                                    <td class="text-xs text-start"><?= $id['keterangan']; ?></td>
-                                    <td class="text-xs text-start"><?= number_format($id['ttl_pengiriman'], 2); ?></td>
-                                    <td class="text-xs text-start"></td>
-                                    <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>"><?= number_format($id['sisa_jatah'], 2); ?></td>
-                                    <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>">
-                                        <?php if ($id['sisa_jatah'] > 0) {
-                                            if ($ttl_kg_pesan >= $id['sisa_jatah']) { ?>
-                                                <span style="color: red;">Pemesanan Melebihi Jatah</span>
+                                    <tr>
+                                        <td class="text-xs text-start"><?= $no++; ?></td>
+                                        <td class="text-xs text-start"><?= $id['tgl_pakai']; ?></td>
+                                        <td class="text-xs text-start"><?= $id['no_model']; ?></td>
+                                        <td class="text-xs text-start"><?= $id['item_type']; ?></td>
+                                        <td class="text-xs text-start"><?= $id['kode_warna']; ?></td>
+                                        <td class="text-xs text-start"><?= $id['color']; ?></td>
+                                        <td class="text-xs text-start"><?= number_format($id['ttl_kebutuhan_bb'], 2); ?></td>
+                                        <td class="text-xs text-start"><?= $id['jl_mc']; ?></td>
+                                        <td class="text-xs text-start"><?= $ttl_kg_pesan; ?></td>
+                                        <td class="text-xs text-start"><?= $ttl_cns_pesan; ?></td>
+                                        <td class="text-xs text-start"><?= $id['lot']; ?></td>
+                                        <td class="text-xs text-start"><?= $id['keterangan']; ?></td>
+                                        <td class="text-xs text-start"><?= number_format($id['ttl_pengiriman'], 2); ?></td>
+                                        <td class="text-xs text-start"></td>
+                                        <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>"><?= number_format($id['sisa_jatah'], 2); ?></td>
+                                        <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>">
+                                            <?php if ($id['sisa_jatah'] > 0) {
+                                                if ($ttl_kg_pesan >= $id['sisa_jatah']) { ?>
+                                                    <span style="color: red;">Pemesanan Melebihi Jatah</span>
+                                                <?php } ?>
+                                            <?php } else { ?>
+                                                <span style="color: red;">Habis Jatah</span>
                                             <?php } ?>
-                                        <?php } else { ?>
-                                            <span style="color: red;">Habis Jatah</span>
-                                        <?php } ?>
-                                    </td>
-                                    <td class="text-xs text-start">
-                                        <button type="button" class="btn btn-warning update-btn" data-toggle="modal" data-target="#updateListModal" data-area="<?= $area; ?>" data-tgl="<?= $id['tgl_pakai']; ?>" data-model="<?= $id['no_model']; ?>" data-item="<?= $id['item_type']; ?>" data-kode="<?= $id['kode_warna']; ?>" data-color="<?= $id['color']; ?>">
-                                            <i class="fa fa-edit fa-lg"></i>
-                                        </button>
-                                    </td>
-                                    <td class="text-xs">
-                                        <?php
-                                        $show = "d-none";
-                                        $batasWaktu = '08:30:00';
+                                        </td>
+                                        <td class="text-xs text-start">
+                                            <button type="button" class="btn btn-warning update-btn" data-toggle="modal" data-target="#updateListModal" data-area="<?= $area; ?>" data-tgl="<?= $id['tgl_pakai']; ?>" data-model="<?= $id['no_model']; ?>" data-item="<?= $id['item_type']; ?>" data-kode="<?= $id['kode_warna']; ?>" data-color="<?= $id['color']; ?>">
+                                                <i class="fa fa-edit fa-lg"></i>
+                                            </button>
+                                        </td>
+                                        <td class="text-xs">
+                                            <?php
+                                            $show = "d-none";
+                                            $batasWaktu = '08:30:00';
 
-                                        if ($id['sisa_jatah'] > 0) {
-                                            if ($ttl_kg_pesan <= $id['sisa_jatah']) {
-                                                // Aturan berdasarkan hari dan jenis produk:
-                                                $rules = [
-                                                    'Thursday' => [
-                                                        'BENANG'  => [$tomorrow => '08:30:00'],
-                                                        'NYLON'   => [$tomorrow => '08:30:00'],
-                                                        'SPANDEX' => [$twoDays  => '08:30:00', $threeDays => '09:00:00'],
-                                                        'KARET'   => [$twoDays  => '08:30:00', $threeDays => '09:00:00']
-                                                    ],
-                                                    'Friday' => [
-                                                        'BENANG'  => [$tomorrow => '08:30:00', $twoDays => '09:00:00'],
-                                                        'NYLON'   => [$tomorrow => '08:30:00'],
-                                                        'SPANDEX' => [$threeDays => '08:30:00'],
-                                                        'KARET'   => [$threeDays => '08:30:00']
-                                                    ],
-                                                    'Saturday' => [
-                                                        'BENANG'  => [$twoDays  => '08:30:00'],
-                                                        'NYLON'   => [$tomorrow => '08:30:00', $twoDays  => '09:00:00'],
-                                                        'SPANDEX' => [$threeDays => '08:30:00'],
-                                                        'KARET'   => [$threeDays => '08:30:00']
-                                                    ],
-                                                    'default' => [
-                                                        'BENANG'  => [$tomorrow => '08:30:00'],
-                                                        'NYLON'   => [$tomorrow => '08:30:00'],
-                                                        'SPANDEX' => [$twoDays  => '08:30:00'],
-                                                        'KARET'   => [$twoDays  => '08:30:00']
-                                                    ]
-                                                ];
+                                            if ($id['sisa_jatah'] > 0) {
+                                                if ($ttl_kg_pesan <= $id['sisa_jatah']) {
+                                                    // Aturan berdasarkan hari dan jenis produk:
+                                                    $rules = [
+                                                        'Thursday' => [
+                                                            'BENANG'  => [$tomorrow => '08:30:00'],
+                                                            'NYLON'   => [$tomorrow => '08:30:00'],
+                                                            'SPANDEX' => [$twoDays  => '08:30:00', $threeDays => '09:00:00'],
+                                                            'KARET'   => [$twoDays  => '08:30:00', $threeDays => '09:00:00']
+                                                        ],
+                                                        'Friday' => [
+                                                            'BENANG'  => [$tomorrow => '08:30:00', $twoDays => '09:00:00'],
+                                                            'NYLON'   => [$tomorrow => '08:30:00'],
+                                                            'SPANDEX' => [$threeDays => '08:30:00'],
+                                                            'KARET'   => [$threeDays => '08:30:00']
+                                                        ],
+                                                        'Saturday' => [
+                                                            'BENANG'  => [$twoDays  => '08:30:00'],
+                                                            'NYLON'   => [$tomorrow => '08:30:00', $twoDays  => '09:00:00'],
+                                                            'SPANDEX' => [$threeDays => '08:30:00'],
+                                                            'KARET'   => [$threeDays => '08:30:00']
+                                                        ],
+                                                        'default' => [
+                                                            'BENANG'  => [$tomorrow => '08:30:00'],
+                                                            'NYLON'   => [$tomorrow => '08:30:00'],
+                                                            'SPANDEX' => [$twoDays  => '08:30:00'],
+                                                            'KARET'   => [$twoDays  => '08:30:00']
+                                                        ]
+                                                    ];
 
-                                                $currentRules = isset($rules[$day]) ? $rules[$day] : $rules['default'];
+                                                    $currentRules = isset($rules[$day]) ? $rules[$day] : $rules['default'];
 
-                                                if (isset($currentRules[$id['jenis']])) {
-                                                    foreach ($currentRules[$id['jenis']] as $tgl => $waktu) {
-                                                        if ($id['tgl_pakai'] == $tgl) {
-                                                            $show = "";
+                                                    if (isset($currentRules[$id['jenis']])) {
+                                                        foreach ($currentRules[$id['jenis']] as $tgl => $waktu) {
+                                                            if ($id['tgl_pakai'] == $tgl) {
+                                                                $show = "";
 
-                                                            if ($id['status_kirim'] === 'request accept') {
-                                                                $batasWaktu = $id['additional_time'];
-                                                            } else {
-                                                                $batasWaktu = $waktu;
+                                                                if ($id['status_kirim'] === 'request accept') {
+                                                                    $batasWaktu = $id['additional_time'];
+                                                                } else {
+                                                                    $batasWaktu = $waktu;
+                                                                }
+                                                                break;
                                                             }
-                                                            break;
                                                         }
                                                     }
+                                            ?>
+                                                    <button type="button" id="sendBtn" class="btn btn-info text-xs <?= $show ?> send-btn" data-toggle="modal"
+                                                        data-area="<?= $area; ?>"
+                                                        data-tgl="<?= $id['tgl_pakai']; ?>"
+                                                        data-model="<?= $id['no_model']; ?>"
+                                                        data-item="<?= $id['item_type']; ?>"
+                                                        data-kode="<?= $id['kode_warna']; ?>"
+                                                        data-color="<?= $id['color']; ?>"
+                                                        data-waktu="<?= $batasWaktu; ?>">
+                                                        <i class="fa fa-paper-plane fa-lg"></i>
+                                                    </button>
+                                            <?php
                                                 }
-                                        ?>
-                                                <button type="button" id="sendBtn" class="btn btn-info text-xs <?= $show ?> send-btn" data-toggle="modal"
-                                                    data-area="<?= $area; ?>"
-                                                    data-tgl="<?= $id['tgl_pakai']; ?>"
-                                                    data-model="<?= $id['no_model']; ?>"
-                                                    data-item="<?= $id['item_type']; ?>"
-                                                    data-kode="<?= $id['kode_warna']; ?>"
-                                                    data-color="<?= $id['color']; ?>"
-                                                    data-waktu="<?= $batasWaktu; ?>">
-                                                    <i class="fa fa-paper-plane fa-lg"></i>
-                                                </button>
-                                        <?php
-                                            }
-                                        }  ?>
-                                    </td>
+                                            }  ?>
+                                        </td>
                                     </tr>
                                 <?php
                                 } ?>
