@@ -99,8 +99,9 @@ class BookingModel extends Model
     public function getBookingMasuk()
     {
         $bulan = date('m');
-
-        return $this->where("MONTH(tgl_terima_booking) =", $bulan)->countAllResults();
+        $year = date('y');
+        return $this->where("MONTH(tgl_terima_booking) =", $bulan)
+            ->where("YEAR(tgl_terima_booking) =", $year)->countAllResults();
     }
     public function getBulan($jarum)
     {
