@@ -80,7 +80,7 @@ class ApsPerstyleModel extends Model
     }
     public function getTurunOrder($bulan)
     {
-        $year = date('y');
+        $year = date('Y');
         return $this->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
             ->select('data_model.created_at, SUM(apsperstyle.qty) as total_produksi')
             ->where('MONTH(data_model.created_at)', $bulan)
