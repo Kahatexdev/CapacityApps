@@ -887,7 +887,6 @@ class OrderController extends BaseController
         });
         $top3Rekomendasi = array_slice($rekomendasi, 0, 3);
         $dataMc = $this->jarumModel->getAreabyJarum($jarum);
-
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Order',
@@ -1895,14 +1894,11 @@ class OrderController extends BaseController
     }
     public function estimasispk($area)
     {
-        $lastmonth = date('Y-m-01', strtotime('-1 month'));
-        $data = $this->ApsPerstyleModel->dataEstimasi($area);
-
-        $newestData = array_filter($data, function ($item) use ($lastmonth) {
-            return isset($item['delivery']) && $item['delivery'] > $lastmonth;
-        });
+        $lastmonth = date('Y-m-01', strtotime('-2 month'));
+        $data = $this->ApsPerstyleModel->dataEstimasi($area, $lastmonth);
+        $pdkArea = $this->ApsPerstyleModel->getModelArea($area);
         $perStyle = [];
-        foreach ($newestData as $id) {
+        foreach ($data as $id) {
 
             // get data produksi
             $dataProd = $this->produksiModel->getProdByPdkSize($id['mastermodel'], $id['size']);
@@ -1925,23 +1921,21 @@ class OrderController extends BaseController
                 $percentage = round(($ttlProd / $qty) * 100);
                 $ganti = $bs + $poplus;
                 $estimasi = ($ganti / $ttlProd / 100) * $qty;
-                if ($percentage > 75 && $percentage < 98) {
-                    $perStyle[] = [
-                        'model' => $id['mastermodel'],
-                        'inisial' => $id['inisial'],
-                        'size' => $id['size'],
-                        'sisa' => $sisa,
-                        'qty' => $qty,
-                        'ttlProd' => $ttlProd,
-                        'percentage' => $percentage,
-                        'bs' => $bs,
-                        'poplus' => $poplus,
-                        'jarum' => $id['machinetypeid'],
-                        'estimasi' => round(($estimasi * 100), 1),
-                        'status' => $status,
-                        'waktu' => $kapan
-                    ];
-                }
+                $perStyle[] = [
+                    'model' => $id['mastermodel'],
+                    'inisial' => $id['inisial'],
+                    'size' => $id['size'],
+                    'sisa' => $sisa,
+                    'qty' => $qty,
+                    'ttlProd' => $ttlProd,
+                    'percentage' => $percentage,
+                    'bs' => $bs,
+                    'poplus' => $poplus,
+                    'jarum' => $id['machinetypeid'],
+                    'estimasi' => round(($estimasi * 100), 1),
+                    'status' => $status,
+                    'waktu' => $kapan
+                ];
             }
         }
 
@@ -1958,7 +1952,8 @@ class OrderController extends BaseController
             'active7' => '',
             'data' => $data,
             'area' => $area,
-            'perStyle' => $perStyle
+            'perStyle' => $perStyle,
+            'model' => $pdkArea
         ];
         return view(session()->get('role') . '/Order/estimasispk', $data2);
     }
@@ -2141,5 +2136,59 @@ class OrderController extends BaseController
                 ->withInput()
                 ->with('error', 'Gagal Approve SPK2');
         }
+    }
+    public function mintaSpk2()
+    {
+        $rows = $this->request->getPost('data');
+
+        if (!empty($rows)) {
+            $allData = [];
+
+            foreach ($rows as $row) {
+                // Validasi minimal field penting
+                if (!isset($row['model'], $row['size'], $row['area'])) {
+                    continue;
+                }
+
+                $this->estspk->insert([
+                    'model'    => $row['model'],
+                    'style'     => $row['size'],
+                    'area'     => $row['area'],
+                    'qty'    => (int)$row['estimasi'] ?? 0,
+                    'status' => 'sudah'
+                ]);
+            }
+            return redirect()->back()->with('sucess', 'Permintaan terikirm');
+        } else {
+            return redirect()->back()->with('error', 'Tidak ada data yang dipilih.');
+        }
+    }
+    public function spkmanual()
+    {
+        $items = $this->request->getPost('items');
+
+        if (!$items || !is_array($items)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Data tidak valid.'
+            ]);
+        }
+
+
+        foreach ($items as $item) {
+
+            $this->estspk->insert([
+                'model' => $item['no_model'],
+                'style' => $item['size'],
+                'area' => $item['area'],
+                'qty' => $item['qty'],
+                'status' => 'sudah'
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Data berhasil disimpan.'
+        ]);
     }
 }

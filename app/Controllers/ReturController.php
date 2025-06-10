@@ -104,6 +104,9 @@ class ReturController extends BaseController
                 'tipe_kategori' => $item['tipe_kategori']
             ];
         }
+        $listRetur = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area;
+        $res = file_get_contents($listRetur);
+        $list = json_decode($res, true);
         $data = [
             'role' => session()->get('role'),
             'title' => 'Retur Bahan Baku',
@@ -117,6 +120,7 @@ class ReturController extends BaseController
             'active8' => '',
             'area' => $area,
             'kategori' => $kategoriRetur,
+            'list' => $list
         ];
         return view(session()->get('role') . '/retur', $data);
     }

@@ -725,7 +725,13 @@ class PlanningController extends BaseController
         $role = session()->get('role');
         $idPdk = $this->request->getPost('id_detail');
         $idJarum = $this->request->getPost('jarumname');
-        $update = $this->DetailPlanningModel->update($idPdk, ['id_pln_mc' => $idJarum]);
+        $pdk = $this->request->getPost('pdk');
+        $jarumnew = $this->request->getPost('jarum');
+        $jarumOld = $this->request->getPost('jarumOld');
+
+        // $update = $this->DetailPlanningModel->update($idPdk, ['id_pln_mc' => $idJarum, 'jarum' => $jarumnew]);
+        $update = $this->DetailPlanningModel->pindahJarum($pdk, $idJarum,  $jarumnew, $jarumOld);
+        $gantiJarum = $this->ApsPerstyleModel->gantiJarum($pdk, $jarumOld, $jarumnew);
 
         if ($update) {
             return redirect()->to(base_url($role . '/detailplnmc/' . $pageid))->with('success', 'Model berhasil Dipindahkan');

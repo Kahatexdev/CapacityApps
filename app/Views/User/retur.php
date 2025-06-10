@@ -212,6 +212,55 @@
             <img src="<?= base_url('assets/spinner.gif') ?>" alt="Loading...">
         </div>
     </div>
+    <div class="card mt-3">
+        <div class="card-body">
+
+
+            <div class="d-flex align-items-center justify-content-between">
+                <h3 class="model-title mb-0">List Returan <?= $area ?></h3>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="<?= base_url($role . '/exportExcelRetur/' . $area) ?>" class="btn btn-success">
+                        <i class="fas fa-file-excel"></i> Export Excel
+                    </a>
+
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table display text-center text-uppercase text-xs font-bolder table-bordered" id="dataTableRetur" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Tanggal Retur</th>
+                            <th class="text-center">No Model</th>
+                            <th class="text-center">Item Type</th>
+                            <th class="text-center">Kode Warna</th>
+                            <th class="text-center"> Warna</th>
+                            <th class="text-center">Lot Retur</th>
+                            <th class="text-center">KG Retur</th>
+                            <th class="text-center">Kategori</th>
+                            <th class="text-center">Keterangan GBN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($list as $ls): ?>
+                            <tr>
+                                <td><?= $ls['tgl_retur'] ?></td>
+                                <td><?= $ls['no_model'] ?></td>
+                                <td><?= $ls['item_type'] ?></td>
+                                <td><?= $ls['kode_warna'] ?></td>
+                                <td><?= $ls['warna'] ?></td>
+                                <td><?= $ls['lot_retur'] ?></td>
+                                <td><?= $ls['kgs_retur'] ?></td>
+                                <td><?= $ls['kategori'] ?></td>
+                                <td><?= $ls['keterangan_gbn'] ?></td>
+
+                            </tr>
+                        <?php endforeach ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script type="text/javascript">
@@ -246,7 +295,7 @@
                 complete: function() {
                     loading.style.display = 'none';
                     returbtn.classList.remove('d-none')
-                    listRetur(model, area);
+
                 }
             });
         });
@@ -276,90 +325,6 @@
         $('#modalPengajuanRetur').modal('show'); // Show the modal
     });
     // Sisanya (seperti event untuk search, build table, dan add more item) tetap sama
-
-
-    function listRetur(model, area) {
-        const rowbawah = document.getElementById('rowbawah')
-        $.ajax({
-            url: "http://172.23.44.14/MaterialSystem/public/api/listRetur",
-            type: "GET",
-            data: {
-                model: model,
-                area: area
-            },
-            dataType: "json",
-            success: function(response) {
-                fetchListRetur(response, model, area);
-
-            },
-            error: function(xhr, status, error) {
-                console.error("Error:", error);
-            },
-            complete: function() {
-                rowbawah.classList.remove('d-none')
-            }
-        });
-    }
-
-    function fetchListRetur(data, model, area) {
-        const tableBody = document.getElementById('bodyData2');
-        const baseUrl = "<?= base_url($role . '/exportExcelRetur/') ?>";
-
-        tableBody.innerHTML = `
-       <div class="d-flex align-items-center justify-content-between">
-                    <h3 class="model-title mb-0">List Retur ${model}</h3>
-                    <div class="d-flex align-items-center gap-2">
-                        <a href="${baseUrl}${area}/${model}" class="btn btn-success">
-                            <i class="fas fa-file-excel"></i> Export Excel
-                        </a>
-                    
-                    </div>
-                </div>
-        <div class="table-responsive">
-            <table class="display text-center text-uppercase text-xs font-bolder" id="dataTableRetur" style="width:100%">
-                <thead>
-                    <tr>
-                        <th class="text-center">No</th>
-                        <th class="text-center">Item Type</th>
-                        <th class="text-center">Kode Warna</th>
-                        <th class="text-center"> Warna</th>
-                        <th class="text-center">Lot Retur</th>
-                        <th class="text-center">KG Retur</th>
-                        <th class="text-center">Kategori</th>
-                        <th class="text-center">Keterangan GBN</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${data.map((item, index) => `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td>${item.item_type}</td>
-                            <td>${item.kode_warna}</td>
-                            <td>${item.warna}</td>
-                            <td>${item.lot_retur}</td>
-                            <td>${parseFloat(item.kgs_retur).toFixed(2)} kg</td>
-                            <td>${item.kategori}</td>
-                            <td>${item.keterangan_gbn}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        </div>
-    `;
-
-        // Inisialisasi DataTable
-        $(document).ready(function() {
-            $('#dataTableRetur').DataTable({
-                paging: true,
-                searching: true,
-                ordering: true,
-                info: true,
-                autoWidth: false,
-                responsive: true
-            });
-        });
-    }
-
 
 
     function buildTableRows(data, aggregateKeys) {
@@ -443,6 +408,14 @@
         // Inisialisasi DataTables (pastikan plugin DataTables sudah disertakan)
         $(document).ready(function() {
             $('#dataTable').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                responsive: true
+            });
+            $('#dataTableRetur').DataTable({
                 paging: true,
                 searching: true,
                 ordering: true,

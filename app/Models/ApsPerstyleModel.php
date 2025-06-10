@@ -80,9 +80,11 @@ class ApsPerstyleModel extends Model
     }
     public function getTurunOrder($bulan)
     {
+        $year = date('Y');
         return $this->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
             ->select('data_model.created_at, SUM(apsperstyle.qty) as total_produksi')
             ->where('MONTH(data_model.created_at)', $bulan)
+            ->where('YEAR(data_model.created_at)', $year)
             ->groupBy('data_model.created_at')
             ->orderBy('data_model.created_at')
             ->findAll();
@@ -905,14 +907,36 @@ class ApsPerstyleModel extends Model
 
         return $result;
     }
-    public function dataEstimasi($area)
+    public function dataEstimasi($area, $lastmonth)
     {
-        return $this->select('mastermodel, inisial, size, SUM(sisa) AS sisa, sum(qty) as qty,sum(po_plus) as poplus, delivery,machinetypeid')
+        $model = $this->select('mastermodel, inisial, size')
             ->where('factory', $area)
             ->where('qty >', 0)
+            ->where('delivery >', $lastmonth)
             ->groupBy('mastermodel,size')
             ->orderBy('delivery', 'DESC')
             ->findAll();
+        $data = [];
+        foreach ($model as $pdk) {
+            $data[] = $this->select('mastermodel, inisial, size, SUM(sisa) AS sisa, sum(qty) as qty,sum(po_plus) as poplus, delivery,machinetypeid')
+                ->where('mastermodel', $pdk['mastermodel'])
+                ->where('size', $pdk['size'])
+                ->groupBy('mastermodel,size')
+                ->orderBy('delivery', 'DESC')
+                ->first();
+        }
+        $result = [];
+        foreach ($data as $dt) {
+            $qty = $dt['qty'];
+            $sisa = $dt['sisa'];
+            $prod = $qty - $sisa;
+            $percent = $prod / $qty * 100;
+            if ($percent > 65 && $percent < 98) {
+                $result[] = $dt;
+            }
+        }
+
+        return $result;
     }
 
 
@@ -1072,5 +1096,19 @@ class ApsPerstyleModel extends Model
             ->where('size', $styleSize)
             ->where('factory', $area)
             ->first();
+    }
+    public function gantiJarum($pdk, $jarumOld, $jarumnew)
+    {
+        return $this->where('mastermodel', $pdk)
+            ->where('machinetypeid', $jarumOld)
+            ->set('machinetypeid', $jarumnew)
+            ->update();
+    }
+    public function getModelArea($area)
+    {
+        return $this->select('mastermodel')
+            ->where('factory', $area)
+            ->groupBy('mastermodel')
+            ->findAll();
     }
 }

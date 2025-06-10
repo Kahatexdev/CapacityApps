@@ -480,6 +480,8 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('inputinisial', 'UserController::inputinisial');
     $routes->get('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
     $routes->get('estimasispk/(:any)', 'OrderController::estimasispk/$1');
+    $routes->post('mintaSpk2', 'OrderController::mintaSpk2');
+    $routes->post('spkmanual', 'OrderController::spkmanual');
     $routes->post('exportEstimasispk', 'ExcelController::exportEstimasispk');
     $routes->post('importinisial', 'UserController::importinisial');
 
@@ -518,6 +520,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('excelPenggunaanPerbulan/(:any)/(:any)', 'UserController::exportPenggunaanPerbulan/$1/$2');
 
     //summary bs mc
+    $routes->post('deleteBsMc', 'UserController::deleteBsMc');
     $routes->post('exportSummaryBs', 'SummaryController::excelSummaryBs');
     $routes->get('exportBsMesinPerbulan/(:any)/(:any)', 'SummaryController::summaryBsMesinPerbulan/$1/$2');
 
@@ -565,7 +568,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('pengajuanRetur/(:any)', 'ReturController::pengajuanRetur/$1');
     $routes->get('getKategoriRetur', 'ReturController::getKategoriRetur');
     $routes->get('getKodeWarnaWarnaByItemType', 'ReturController::getKodeWarnaWarnaByItemType');
-    $routes->get('exportExcelRetur/(:any)/(:any)', 'ExcelController::exportExcelRetur/$1/$2');
+    $routes->get('exportExcelRetur/(:any)', 'ExcelController::exportExcelRetur/$1');
 });
 
 // sudo

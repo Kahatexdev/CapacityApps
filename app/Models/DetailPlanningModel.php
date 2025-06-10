@@ -145,4 +145,12 @@ class DetailPlanningModel extends Model
             ->orderBy('detail_planning.model', 'ASC')
             ->findAll();
     }
+    public function pindahJarum($pdk, $idJarum,  $jarumnew, $jarumOld)
+    {
+        return $this->where('model', $pdk)
+            ->where('jarum', $jarumOld)
+            ->set('id_pln_mc', $idJarum)
+            ->set('jarum', $jarumnew)
+            ->update();
+    }
 }

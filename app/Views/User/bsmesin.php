@@ -167,9 +167,15 @@
                             BS Mesin Perbulan <?= $areas ?>
 
                         </h4>
-                        <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#summaryBS">
-                            <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary BS MC
-                        </button>
+                        <div>
+
+                            <button type="button" class="btn btn-sm btn-danger bg-gradient-danger shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#deleteBs">
+                                <i class="fas fa-trash text-lg opacity-10" aria-hidden="true"></i> Delete BS MC
+                            </button>
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#summaryBS">
+                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary BS MC
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -262,6 +268,45 @@
                 <div class="modal-footer">
                     <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn bg-gradient-info">Generate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteBs" tabindex="-1" role="dialog" aria-labelledby="deleteBs" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">delete Bs MC</h5>
+                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form action="<?= base_url($role . '/deleteBsMc'); ?>" method="POST">
+                <div class="modal-body align-items-center">
+
+                    <div class="form-group">
+                        <label for="area" class="col-form-label">Area</label>
+                        <select class="form-control" id="area" name="area">
+                            <option></option>
+                            <?php foreach ($area as $ar) : ?>
+                                <option><?= $ar ?></option>
+                            <?php endforeach ?>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="awal" class="col-form-label">Dari</label>
+                        <input type="date" class="form-control" name="awal">
+                    </div>
+                    <div class="form-group">
+                        <label for="akhir" class="col-form-label">Sampai</label>
+                        <input type="date" class="form-control" name="akhir">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-gradient-danger">Hapus</button>
                 </div>
             </form>
         </div>

@@ -425,8 +425,8 @@ error_reporting(E_ALL); ?>
                                     <option value="">-- Choose --</option>
 
                                     <?php
-                                    $uniqueAreas = array_unique(array_column($dataMc, 'area'));
-                                    foreach ($uniqueAreas as $area) :
+
+                                    foreach ($dataMc as $area) :
                                     ?>
                                         <option value="<?= $area; ?>"><?= $area; ?></option>
                                     <?php endforeach; ?>
