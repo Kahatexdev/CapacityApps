@@ -66,7 +66,7 @@
                             <table id="example" class="table table-border" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" colspan="10" style="text-align: center;">Tanggal</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" colspan="12" style="text-align: center;">Tanggal</th>
                                         <?php foreach ($tglProdUnik as $tgl_produksi) : ?>
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" colspan="2" style="text-align: center;"><?= date('d-M', strtotime($tgl_produksi)) ?></th>
                                         <?php endforeach; ?>

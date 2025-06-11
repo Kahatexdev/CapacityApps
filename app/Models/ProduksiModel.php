@@ -363,7 +363,7 @@ class ProduksiModel extends Model
             ->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle')
             ->where('apsperstyle.factory', $area)
             ->where('produksi.tgl_produksi', $tanggal)
-            ->groupBy('produksi.idapsperstyle')
+            ->groupBy('apsperstyle.mastermodel')
             ->groupBy('apsperstyle.size');
 
 
