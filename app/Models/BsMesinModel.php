@@ -132,12 +132,13 @@ class BsMesinModel extends Model
             ->where('apsperstyle.size', $size)
             ->first(); // Ambil satu hasil
     }
-    public function getBsMesinHarian(array $mastermodels, array $sizes, string $tanggal)
+    public function getBsMesinHarian(array $mastermodels, array $sizes, string $tanggal, $area)
     {
         return $this->select('no_model, size, SUM(qty_gram) as bs_mesin')
             ->whereIn('no_model', $mastermodels)
             ->whereIn('size', $sizes)
             ->where('tanggal_produksi', $tanggal)
+            ->where('area', $area)
             ->groupBy('no_model, size')
             ->findAll();
     }

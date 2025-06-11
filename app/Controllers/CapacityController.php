@@ -47,7 +47,7 @@ class CapacityController extends BaseController
     }
     public function index()
     {
-        $orderJalan = $this->bookingModel->getOrderJalan();
+        $orderJalan = '-';
         $terimaBooking = $this->bookingModel->getBookingMasuk();
         $mcJalan = $this->jarumModel->mcJalan();
         $totalMc = $this->jarumModel->totalMc();
