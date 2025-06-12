@@ -557,7 +557,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('po_tambahan/(:any)', 'MaterialController::poTambahan/$1');
     $routes->get('form-potambahan/(:any)', 'MaterialController::formPoTambahan/$1');
     $routes->get('getStyleSize/(:any)/(:any)', 'MaterialController::getStyleSize/$1/$2');
-    $routes->get('poTambahanDetail/(:any)/(:any)', 'MaterialController::poTambahanDetail/$1/$2');
+    $routes->get('poTambahanDetail/(:any)/(:any)/(:any)', 'MaterialController::poTambahanDetail/$1/$2/$3');
     $routes->post('savePoTambahan/(:any)', 'MaterialController::savePoTambahan/$1');
     $routes->get('filter_list_potambahan/(:any)', 'MaterialController::filterPoTambahan/$1');
     $routes->get('generate_po_tambahan', 'PdfController::generatePoTambahan');

@@ -127,6 +127,12 @@ class BsModel extends Model
             ->groupBy('idapsperstyle')
             ->findAll(); // Ambil satu hasil
     }
+    public function getTotalBsSet($idaps)
+    {
+        return $this->select('SUM(qty) AS qty')
+            ->whereIn('idapsperstyle', $idaps)
+            ->first(); // Ambil satu hasil
+    }
     public function getQtyBs($idaps)
     {
         return $this->select('idapsperstyle, qty')

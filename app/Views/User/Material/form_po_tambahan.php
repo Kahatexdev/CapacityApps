@@ -1,4 +1,4 @@
-<?php $this->extend('User/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <?php if (session()->getFlashdata('success')) : ?>
@@ -96,7 +96,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="row">
                                     <div class="col-md-6">
                                         <!-- Item Type -->
@@ -117,9 +116,27 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6">
+                                        <!-- BS Mesin -->
+                                        <div class="form-group">
+                                            <div class="col"><label>BS Mesin (Kg)</label>
+                                                <input type="text" class="form-control bs-mesin" name="items[0][bs_mesin]" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <!-- BS Setting -->
+                                        <div class="form-group">
+                                            <div class="col"><label>BS Setting (Pcs)</label>
+                                                <input type="text" class="form-control bs-setting" name="items[0][bs_setting]" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
                                         <!-- Pcs Po(+) -->
                                         <div class="form-group">
-                                            <div class="col"><label>PO (+) Pcs</label>
+                                            <div class="col"><label>(+) Packing</label>
                                                 <input type="number" class="form-control pcs-po">
                                             </div>
                                         </div>
@@ -255,7 +272,25 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <label>PO (+) Pcs</label>
+                            <!-- BS Mesin -->
+                            <div class="form-group">
+                                <div class="col"><label>BS Mesin (Kg)</label>
+                                    <input type="text" class="form-control bs-mesin" name="items[${idx}][bs_mesin]" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- BS Setting -->
+                            <div class="form-group">
+                                <div class="col"><label>BS Setting (Pcs)</label>
+                                    <input type="text" class="form-control bs-setting" name="items[${idx}][bs_setting]" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>(+) Packing</label>
                             <input type="number" class="form-control pcs-po">
                         </div>
                         <div class="col-md-6">
@@ -338,21 +373,35 @@
             const $row = $(this).closest('.kebutuhan-item');
             const modelCode = $row.find('.select-no-model option:selected').data('no-model');
             const styleSize = $(this).val();
+            const area = <?= json_encode($area); ?>;
 
             $row.find('.item-type, .kode-warna').empty().append('<option value="">Pilih</option>').trigger('change');
             $row.find('.color, .kg-mu, .kg-po, .pcs-po').val('');
 
             if (!modelCode || !styleSize) return;
 
-            if (materialDataCache[modelCode]) {
-                populateItemTypes(materialDataCache[modelCode], modelCode, $row);
+            const cacheKey = `${modelCode}_${styleSize}`;
+
+            if (materialDataCache[cacheKey]) {
+                const cached = materialDataCache[cacheKey];
+                populateItemTypes(cached.material, modelCode, $row);
+                $row.find('.bs-mesin').val((parseFloat(cached.bs) || 0).toFixed(2));
+                $row.find('.bs-setting').val((parseFloat(cached.st) || 0).toFixed(2));
             } else {
-                fetch(`${base}/${role}/poTambahanDetail/${modelCode}/${styleSize}`)
+                fetch(`${base}/${role}/poTambahanDetail/${modelCode}/${styleSize}/${area}`)
                     .then(res => res.ok ? res.json() : Promise.reject('Error response'))
                     .then(json => {
                         if (!json.material) throw 'Material kosong';
-                        materialDataCache[modelCode] = json.material;
+                        materialDataCache[cacheKey] = {
+                            material: json.material,
+                            bs: json.bs,
+                            st: json.st
+                        };
                         populateItemTypes(json.material, modelCode, $row);
+                        console.log(json.bs);
+                        console.log(json.st);
+                        $row.find('.bs-mesin').val((parseFloat(json.bs) || 0).toFixed(2));
+                        $row.find('.bs-setting').val((parseFloat(json.st) || 0).toFixed(2));
                     })
                     .catch(err => console.error('Fetch error:', err));
             }
@@ -374,7 +423,9 @@
             const $row = $(this).closest('.kebutuhan-item');
             const type = $(this).val();
             const modelCode = $row.find('.select-no-model option:selected').data('no-model');
-            const matData = materialDataCache[modelCode] || {};
+            const styleSize = $row.find('.select-style-size').val();
+            const cacheKey = `${modelCode}_${styleSize}`;
+            const matData = (materialDataCache[cacheKey] || {}).material || {};
 
             const $kw = $row.find('.kode-warna').empty().append('<option value="">Pilih Kode Warna</option>');
             $row.find('.color, .kg-mu, .kg-po, .pcs-po').val('');
@@ -382,14 +433,14 @@
             if (matData[type]) {
                 matData[type].kode_warna.forEach(w => {
                     $kw.append(`
-                <option value="${w.kode_warna}"
-                        data-color="${w.color}"
-                        data-kg-mu="${w.total_kg}"
-                        data-composition="${w.composition}"
-                        data-gw="${w.gw}"
-                        data-loss="${w.loss}">
-                    ${w.kode_warna}
-                </option>`);
+                    <option value="${w.kode_warna}"
+                            data-color="${w.color}"
+                            data-kg-mu="${w.total_kg}"
+                            data-composition="${w.composition}"
+                            data-gw="${w.gw}"
+                            data-loss="${w.loss}">
+                        ${w.kode_warna}
+                    </option>`);
                 });
             }
             $kw.trigger('change');
@@ -410,13 +461,17 @@
             const $row = $(this).closest('.kebutuhan-item');
             const pcs = parseFloat($(this).val()) || 0;
             const $opt = $row.find('.kode-warna option:selected');
+            const bsMesin = parseFloat($row.find('.bs-mesin').val()) || 0;
+            const bsSetting = parseFloat($row.find('.bs-setting').val()) || 0;
 
             const composition = parseFloat($opt.data('composition')) || 0;
             const gw = parseFloat($opt.data('gw')) || 0;
             const loss = parseFloat($opt.data('loss')) || 0;
 
-            const base = pcs * composition * gw / 100 / 1000;
-            const kgPo = base * (1 + loss / 100);
+            const stKg = bsSetting * composition * gw / 100 / 1000;
+
+            const pluspck = pcs * composition * gw / 100 / 1000;
+            const kgPo = (pluspck * (1 + loss / 100)) + bsMesin + stKg;
 
             $row.find('.kg-po').val(kgPo.toFixed(2));
         });
