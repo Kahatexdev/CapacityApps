@@ -45,16 +45,36 @@
                             <form action="<?= base_url($role . '/detailproduksi/' . $area) ?>" method="get">
                                 <div class="row">
                                     <div class="col-md-2 mb-2">
-                                        <p>Tanggal Produksi</p>
+                                        <p>Tgl Produksi Dari</p>
                                     </div>
-                                    <div class="col-md-3 mb-2">
+                                    <div class="col-md-2 mb-2">
+                                        <p>Tgl Produksi Sampai</p>
+                                    </div>
+                                    <div class="col-md-2 mb-2">
+                                        <p>No Model</p>
+                                    </div>
+                                    <div class="col-md-2 mb-2">
+                                        <p>No Box</p>
+                                    </div>
+                                    <div class="col-md-2 mb-2">
+                                        <p>No Label</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-2 mb-2">
                                         <input type="date" class="form-control text-secondary" name="tgl_produksi" id="tgl_produksi" required>
                                     </div>
-                                    <div class="col-md-3 mb-2">
+                                    <div class="col-md-2 mb-2">
+                                        <input type="date" class="form-control text-secondary" name="tgl_produksi_sampai" id="tgl_produksi_sampai" required>
+                                    </div>
+                                    <div class="col-md-2 mb-2">
                                         <input type="text" class="form-control" name="no_model" id="no_model" placeholder="No Model">
                                     </div>
-                                    <div class="col-md-3 mb-2">
-                                        <input type="text" class="form-control" name="size" id="size" placeholder="Size">
+                                    <div class="col-md-2 mb-2">
+                                        <input type="text" class="form-control" name="no_box" id="no_box" placeholder="No Box">
+                                    </div>
+                                    <div class="col-md-2 mb-2">
+                                        <input type="text" class="form-control" name="no_label" id="no_label" placeholder="No Label">
                                     </div>
                                     <div class="col-md-1 text-end">
                                         <button type="submit" class="btn bg-gradient-success">FILTER</button>

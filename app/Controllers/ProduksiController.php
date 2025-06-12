@@ -92,8 +92,11 @@ class ProduksiController extends BaseController
     {
         $bulan = $this->request->getGet('bulan');
         $tglProduksi = $this->request->getGet('tgl_produksi');
+        $tglProduksiSampai = $this->request->getGet('tgl_produksi_sampai') ?? null;
         $noModel = $this->request->getGet('no_model');
-        $size = $this->request->getGet('size');
+        $size = $this->request->getGet('size') ?? null;
+        $noBox = $this->request->getGet('no_box') ?? null;
+        $noLabel = $this->request->getGet('no_label') ?? null;
 
         $produksi = [];
 
@@ -110,7 +113,8 @@ class ProduksiController extends BaseController
         }
 
         if ($bulan || $tglProduksi || $noModel || $size) {
-            $produksi = $this->produksiModel->getProduksi($area, $bulan, $tglProduksi, $noModel, $size);
+            $produksi = $this->produksiModel->getProduksi($area, $bulan, $tglProduksi, $tglProduksiSampai, $noModel, $size, $noBox, $noLabel);
+            // dd($produksi);
         }
 
         $data = [

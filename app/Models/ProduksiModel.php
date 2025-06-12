@@ -41,15 +41,18 @@ class ProduksiModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getProduksi($area, $bulan, $tglProduksi = null, $noModel = null, $size = null)
+    public function getProduksi($area, $bulan, $tglProduksi = null, $tglProduksiSampai = null, $noModel = null, $size = null, $noBox = null, $noLabel = null)
     {
+        // dd($tglProduksi, $tglProduksiSampai);
         // Mulai query
         $query = $this->select('tgl_produksi, produksi.*, apsperstyle.mastermodel, apsperstyle.size, sisa')
             ->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle')
             ->where('produksi.area', $area);
 
         // Tambahkan filter hanya jika parameter tidak null
-        if ($tglProduksi) {
+        if ($tglProduksi && $tglProduksiSampai) {
+            $query->where("produksi.tgl_produksi BETWEEN '$tglProduksi' AND '$tglProduksiSampai'");
+        } elseif ($tglProduksi) {
             $query->where('produksi.tgl_produksi', $tglProduksi);
         }
 
@@ -59,6 +62,14 @@ class ProduksiModel extends Model
 
         if ($size) {
             $query->where('apsperstyle.size', $size);
+        }
+
+        if ($noBox) {
+            $query->where('produksi.no_box', $noBox);
+        }
+
+        if ($noLabel) {
+            $query->where('produksi.no_label', $noLabel);
         }
 
         // Eksekusi dan kembalikan hasil
