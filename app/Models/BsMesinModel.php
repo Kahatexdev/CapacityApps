@@ -121,23 +121,19 @@ class BsMesinModel extends Model
     }
     public function getBsMesinPph($area, $nomodel, $size)
     {
-        return $this->select('apsperstyle.factory, apsperstyle.mastermodel, apsperstyle.size, (SELECT SUM(qty_gram) FROM bs_mesin AS b WHERE b.no_model = apsperstyle.mastermodel AND b.area = apsperstyle.factory AND b.size = apsperstyle.size) AS bs_gram,')
-            ->join(
-                'apsperstyle',
-                'apsperstyle.factory = bs_mesin.area AND apsperstyle.mastermodel = bs_mesin.no_model AND apsperstyle.size = bs_mesin.size',
-                'left'
-            )
-            ->where('apsperstyle.factory', $area)
-            ->where('apsperstyle.mastermodel', $nomodel)
-            ->where('apsperstyle.size', $size)
+        return $this->select('sum(qty_gram) as bs_gram')
+            ->where('area', $area)
+            ->where('no_model', $nomodel)
+            ->where('size', $size)
             ->first(); // Ambil satu hasil
     }
-    public function getBsMesinHarian(array $mastermodels, array $sizes, string $tanggal)
+    public function getBsMesinHarian(array $mastermodels, array $sizes, string $tanggal, $area)
     {
         return $this->select('no_model, size, SUM(qty_gram) as bs_mesin')
             ->whereIn('no_model', $mastermodels)
             ->whereIn('size', $sizes)
             ->where('tanggal_produksi', $tanggal)
+            ->where('area', $area)
             ->groupBy('no_model, size')
             ->findAll();
     }
