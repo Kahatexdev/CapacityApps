@@ -359,7 +359,7 @@ class ProduksiModel extends Model
     public function getProduksiPerStyle($area, $tanggal)
     {
         // Mulai query
-        $query = $this->select(' tgl_produksi, apsperstyle.mastermodel, apsperstyle.size,apsperstyle.inisial,apsperstyle.qty, sisa,sum(qty_produksi) as prod,')
+        $query = $this->select(' tgl_produksi, apsperstyle.mastermodel, apsperstyle.size, apsperstyle.inisial, apsperstyle.qty, sisa,sum(qty_produksi) as prod,')
             ->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle')
             ->where('apsperstyle.factory', $area)
             ->where('produksi.tgl_produksi', $tanggal)

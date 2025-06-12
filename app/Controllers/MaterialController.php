@@ -1120,8 +1120,9 @@ class MaterialController extends BaseController
         return $this->response
             ->setJSON($size);
     }
-    public function poTambahanDetail($noModel, $styleSize)
+    public function poTambahanDetail($noModel, $styleSize, $area)
     {
+        $detail = [];
         $size    = rawurlencode($styleSize);
         $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/poTambahanDetail/' . $noModel . '/' . $size;
 
@@ -1133,12 +1134,24 @@ class MaterialController extends BaseController
             return $this->response->setStatusCode(500)->setJSON(['error' => 'Tidak dapat mengambil data dari API']);
         }
 
-        $detail = json_decode($response, true);
+        $detail['material'] = json_decode($response, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             log_message('error', 'JSON tidak valid: ' . json_last_error_msg());
             return $this->response->setStatusCode(500)->setJSON(['error' => 'Data JSON tidak valid']);
         }
+
+        $bsMesin = $this->BsMesinModel->getBsMesinPph($area, $noModel, $styleSize);
+        $bsMesinKg = $bsMesin['bs_gram'] / 1000;
+        $validate = [
+            'area' => $area,
+            'style' => $styleSize,
+            'no_model' => $noModel
+        ];
+        $idaps = $this->ApsPerstyleModel->getIdForBs($validate);
+        $bsSetting = $this->bsModel->getTotalBsSet($idaps);
+        $detail['bs'] = $bsMesinKg;
+        $detail['st'] = $bsSetting['qty'];
 
         // Cetak ke log
         log_message('debug', print_r($detail, true));
