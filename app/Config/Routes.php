@@ -484,6 +484,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('spkmanual', 'OrderController::spkmanual');
     $routes->post('exportEstimasispk', 'ExcelController::exportEstimasispk');
     $routes->post('importinisial', 'UserController::importinisial');
+    $routes->get('progressdetail/(:any)/(:any)', 'ApsController::progressdetail/$1/$2');
 
 
     // $routes->post('importproduksi', 'ProduksiController::importproduksi');
