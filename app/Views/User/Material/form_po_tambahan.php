@@ -30,7 +30,7 @@
     <div class="card card-frame">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 font-weight-bolder">Form Buka PO Tambahan <?= basename(current_url()) ?></h5>
+                <h5 class="mb-0 font-weight-bolder">Form Buka PO Tambahan <?= $area ?></h5>
                 <a href="<?= base_url($role . '/po_tambahan/' . $area) ?>" class="btn bg-gradient-info"> Kembali</a>
             </div>
         </div>
@@ -43,138 +43,132 @@
 
                 <div id="kebutuhan-container">
                     <label>Pilih Bahan Baku</label>
-                    <nav>
-                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                            <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">1</button>
-                        </div>
-                    </nav>
-                    <!-- Tab Konten Item Type -->
-                    <!-- HTML Struktur (tab-content seperti di atas) -->
-                    <div class="tab-content" id="nav-tabContent">
-                        <div class="tab-pane fade show active" id="nav-home" role="tabpanel">
-                            <div class="kebutuhan-item" data-index="0">
-                                <div class=" row">
-                                    <div class="col-md-6">
-                                        <!-- No Model -->
-                                        <div class="form-group">
-                                            <label>No Model</label>
-                                            <select class="form-control select-no-model" name="no_model[0][no_model]" required>
-                                                <option value="">Pilih No Model</option>
-                                                <?php foreach ($noModel as $m): ?>
-                                                    <option value="<?= $m ?>" data-no-model="<?= $m ?>"><?= $m ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <!-- Style Size -->
-                                        <div class="form-group">
-                                            <label>Style Size</label>
-                                            <select class="form-control select-style-size" name="style_size[0][no_model]" required>
-                                                <option value="">Pilih Style Size</option>
-                                            </select>
-                                        </div>
-                                    </div>
+                    <div class="kebutuhan-item">
+                        <div class=" row">
+                            <div class="col-md-6">
+                                <!-- No Model -->
+                                <div class="form-group">
+                                    <label>No Model</label>
+                                    <select class="form-control select-no-model" name="no_model[0][no_model]" required>
+                                        <option value="">Pilih No Model</option>
+                                        <?php foreach ($noModel as $m): ?>
+                                            <option value="<?= $m ?>" data-no-model="<?= $m ?>"><?= $m ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </div>
-                                <div class=" row">
-                                    <div class="col-md-6">
-                                        <!-- Item Type -->
-                                        <div class="form-group">
-                                            <label>Item Type</label>
-                                            <select class="form-control item-type" name="items[0][item_type]" required>
-                                                <option value="">Pilih Item Type</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <!-- Kode Warna -->
-                                        <div class="form-group">
-                                            <label>Kode Warna</label>
-                                            <select class="form-control kode-warna" name="items[0][kode_warna]" required>
-                                                <option value="">Pilih Kode Warna</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <!-- Item Type -->
-                                        <div class="form-group">
-                                            <div class="col"><label>Color</label>
-                                                <input type="text" class="form-control color" name="items[0][color]" readonly>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <!-- Kode Warna -->
-                                        <div class="form-group">
-                                            <div class="col"><label>Kg MU</label>
-                                                <input type="text" class="form-control kg-mu" readonly>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <!-- BS Mesin -->
-                                        <div class="form-group">
-                                            <div class="col"><label>BS Mesin (Kg)</label>
-                                                <input type="text" class="form-control bs-mesin" name="items[0][bs_mesin]" readonly>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <!-- BS Setting -->
-                                        <div class="form-group">
-                                            <div class="col"><label>BS Setting (Pcs)</label>
-                                                <input type="text" class="form-control bs-setting" name="items[0][bs_setting]" readonly>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <!-- Pcs Po(+) -->
-                                        <div class="form-group">
-                                            <div class="col"><label>(+) Packing</label>
-                                                <input type="number" class="form-control pcs-po">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <!-- Kg Po(+) -->
-                                        <div class="form-group">
-                                            <div class="col"><label>PO (+) Kg</label>
-                                                <input type="number" class="form-control kg-po" name="items[0][kg_po]" readonly required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <!-- Cones -->
-                                        <div class="form-group">
-                                            <div class="col"><label>PO (+) Cones</label>
-                                                <input type="number" class="form-control cns-po">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Buttons -->
-                                <div class="text-center my-2">
-                                    <button type="button" class="btn btn-outline-info add-more"><i class="fas fa-plus"></i></button>
-                                    <button type="button" class="btn btn-outline-danger remove"><i class="fas fa-trash"></i></button>
+                            </div>
+                            <div class="col-md-6">
+                                <!-- Item Type -->
+                                <div class="form-group">
+                                    <label>Item Type</label>
+                                    <select class="form-control item-type" name="items[0][item_type]" required>
+                                        <option value="">Pilih Item Type</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                        <div class=" row">
 
+                            <div class="col-md-6">
+                                <!-- Kode Warna -->
+                                <div class="form-group">
+                                    <label>Kode Warna</label>
+                                    <select class="form-control kode-warna" name="items[0][kode_warna]" required>
+                                        <option value="">Pilih Kode Warna</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <!-- Item Type -->
+                                <div class="form-group">
+                                    <div class="col"><label>Color</label>
+                                        <input type="text" class="form-control color" name="items[0][color]" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-none" id="populateSize">
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <!-- Item Type -->
+                                    <div class="form-group">
+                                        <div class="col"><label>Style Size</label>
+                                            <input type="text" class="form-control color" name="items[0][color]" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <!-- Kode Warna -->
+                                    <div class="form-group">
+                                        <div class="col"><label>Kg MU</label>
+                                            <input type="text" class="form-control kg-mu" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <!-- BS Mesin -->
+                                    <div class="form-group">
+                                        <div class="col"><label>BS Mesin (Kg)</label>
+                                            <input type="text" class="form-control bs-mesin" name="items[0][bs_mesin]" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <!-- BS Setting -->
+                                    <div class="form-group">
+                                        <div class="col"><label>BS Setting (Pcs)</label>
+                                            <input type="text" class="form-control bs-setting" name="items[0][bs_setting]" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <!-- Pcs Po(+) -->
+                                    <div class="form-group">
+                                        <div class="col"><label>(+) Packing</label>
+                                            <input type="number" class="form-control pcs-po">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <!-- Kg Po(+) -->
+                                    <div class="form-group">
+                                        <div class="col"><label>PO (+) Kg</label>
+                                            <input type="number" class="form-control kg-po" name="items[0][kg_po]" readonly required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <!-- Cones -->
+                                    <div class="form-group">
+                                        <div class="col"><label>PO (+) Cones</label>
+                                            <input type="number" class="form-control cns-po">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col"><label>Total Kg</label>
+                        <input type="number" class="form-control total-kg" name="items[0][kg_po]" readonly required>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="exampleFormControlInput1">Keterangan</label>
                     <textarea class="form-control" name="keterangan" id="keterangan"></textarea>
                 </div>
+
                 <button type="button" class="btn btn-info w-100" id="btn-save">Save</button>
         </div>
         </form>
@@ -190,11 +184,7 @@
         const role = '<?= $role ?>';
         const area = '<?= esc($area) ?>';
         const materialDataCache = {};
-        let tabIndex = 2;
 
-        const $navTab = $('#nav-tab');
-        const $navTabContent = $('#nav-tabContent');
-        // simpan opsi no-model awal untuk template tab baru
         const noModelOptions = $('.select-no-model').first().html();
 
         // Inisialisasi Select2 pada konteks tertentu
@@ -207,151 +197,16 @@
         }
 
         // Tambah tab baru
-        function addNewTab() {
-            const idx = tabIndex - 1; // 0-based index untuk nama array
-            // buat tombol tab
-            const $btn = $(`
-            <button class="nav-link" id="nav-tab-${tabIndex}-button"
-                    data-bs-toggle="tab" data-bs-target="#nav-content-${tabIndex}"
-                    type="button" role="tab" aria-selected="false">
-                ${tabIndex}
-            </button>
-        `);
-            $navTab.append($btn);
 
-            // buat pane
-            const paneHtml = `
-            <div class="tab-pane fade" id="nav-content-${tabIndex}" role="tabpanel"
-                 aria-labelledby="nav-tab-${tabIndex}-button">
-                <div class="kebutuhan-item" data-index="${idx}">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>No Model</label>
-                                <select class="form-control select-no-model" name="no_model[${idx}][no_model]" required>
-                                    ${noModelOptions}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Style Size</label>
-                                <select class="form-control select-style-size" name="style_size[${idx}][style_size]" required>
-                                    ${noModelOptions}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Item Type</label>
-                                <select class="form-control item-type" name="items[${idx}][item_type]" required>
-                                    <option value="">Pilih Item Type</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Kode Warna</label>
-                                <select class="form-control kode-warna" name="items[${idx}][kode_warna]" required>
-                                    <option value="">Pilih Kode Warna</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label>Color</label>
-                            <input type="text" class="form-control color" name="items[${idx}][color]" readonly>
-                        </div>
-                        <div class="col-md-6">
-                            <label>Kg MU</label>
-                            <input type="text" class="form-control kg-mu" readonly>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <!-- BS Mesin -->
-                            <div class="form-group">
-                                <div class="col"><label>BS Mesin (Kg)</label>
-                                    <input type="text" class="form-control bs-mesin" name="items[${idx}][bs_mesin]" readonly>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <!-- BS Setting -->
-                            <div class="form-group">
-                                <div class="col"><label>BS Setting (Pcs)</label>
-                                    <input type="text" class="form-control bs-setting" name="items[${idx}][bs_setting]" readonly>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label>(+) Packing</label>
-                            <input type="number" class="form-control pcs-po">
-                        </div>
-                        <div class="col-md-6">
-                            <label>PO (+) Kg</label>
-                            <input type="number" class="form-control kg-po" name="items[${idx}][kg_po]" readonly required>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <label>PO (+) Cones</label>
-                            <input type="number" class="form-control cns-po">
-                        </div>
-                    </div>
-                    <div class="text-center my-2">
-                        <button type="button" class="btn btn-outline-info add-more"><i class="fas fa-plus"></i></button>
-                        <button type="button" class="btn btn-outline-danger remove"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-            </div>
-        `;
-            const $pane = $(paneHtml);
-            $navTabContent.append($pane);
-
-            // re-init Select2 di tab baru
-            initSelect2($pane);
-
-            // tunjukkan tab baru
-            new bootstrap.Tab($btn[0]).show();
-
-            tabIndex++;
-        }
-
-        // Hapus tab (tombol Remove baik di tab lama maupun baru)
-        function removeTab($btn, $pane) {
-            if ($navTab.children().length <= 1) {
-                return alert('Minimal harus ada satu tab.');
-            }
-            $btn.remove();
-            $pane.remove();
-            // setelah hapus, selalu aktifkan tab pertama
-            new bootstrap.Tab($navTab.find('button').first()[0]).show();
-        }
-
-        // -----------------------
-        // Binding awal
-        // -----------------------
         initSelect2(document);
-        $(document).on('click', '.add-more', addNewTab);
-        $(document).on('click', '.remove', function() {
-            const $pane = $(this).closest('.tab-pane');
-            const target = '#' + $pane.attr('id');
-            const $btn = $navTab.find(`[data-bs-target="${target}"]`);
-            removeTab($btn, $pane);
-        });
+
 
         // Handler saat No Model dipilih
         $(document).on('change', '.select-no-model', function() {
             const $row = $(this).closest('.kebutuhan-item');
             const modelCode = $(this).find('option:selected').data('no-model');
 
-            const $ss = $row.find('.select-style-size').empty().append('<option value="">Pilih Style Size</option>').trigger('change');
+            const $ss = $row.find('.item-type').empty().append('<option value="">Pilih Kode Benang</option>').trigger('change');
             $row.find('.item-type, .kode-warna').empty().append('<option value="">Pilih</option>').trigger('change');
             $row.find('.color, .kg-mu, .kg-po, .pcs-po').val('');
 
@@ -368,44 +223,6 @@
                 .catch(err => console.error('Gagal load style_size:', err));
         });
 
-        // Handler saat Style Size dipilih
-        $(document).on('change', '.select-style-size', function() {
-            const $row = $(this).closest('.kebutuhan-item');
-            const modelCode = $row.find('.select-no-model option:selected').data('no-model');
-            const styleSize = $(this).val();
-            const area = <?= json_encode($area); ?>;
-
-            $row.find('.item-type, .kode-warna').empty().append('<option value="">Pilih</option>').trigger('change');
-            $row.find('.color, .kg-mu, .kg-po, .pcs-po').val('');
-
-            if (!modelCode || !styleSize) return;
-
-            const cacheKey = `${modelCode}_${styleSize}`;
-
-            if (materialDataCache[cacheKey]) {
-                const cached = materialDataCache[cacheKey];
-                populateItemTypes(cached.material, modelCode, $row);
-                $row.find('.bs-mesin').val((parseFloat(cached.bs) || 0).toFixed(2));
-                $row.find('.bs-setting').val((parseFloat(cached.st) || 0).toFixed(2));
-            } else {
-                fetch(`${base}/${role}/poTambahanDetail/${modelCode}/${styleSize}/${area}`)
-                    .then(res => res.ok ? res.json() : Promise.reject('Error response'))
-                    .then(json => {
-                        if (!json.material) throw 'Material kosong';
-                        materialDataCache[cacheKey] = {
-                            material: json.material,
-                            bs: json.bs,
-                            st: json.st
-                        };
-                        populateItemTypes(json.material, modelCode, $row);
-                        console.log(json.bs);
-                        console.log(json.st);
-                        $row.find('.bs-mesin').val((parseFloat(json.bs) || 0).toFixed(2));
-                        $row.find('.bs-setting').val((parseFloat(json.st) || 0).toFixed(2));
-                    })
-                    .catch(err => console.error('Fetch error:', err));
-            }
-        });
 
         // Isi dropdown Item Type berdasarkan data material
         function populateItemTypes(matData, modelCode, $row) {
