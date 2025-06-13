@@ -87,77 +87,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="d-none" id="populateSize">
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <!-- Item Type -->
-                                    <div class="form-group">
-                                        <div class="col"><label>Style Size</label>
-                                            <input type="text" class="form-control color" name="items[0][color]" readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <!-- Kode Warna -->
-                                    <div class="form-group">
-                                        <div class="col"><label>Kg MU</label>
-                                            <input type="text" class="form-control kg-mu" readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <!-- BS Mesin -->
-                                    <div class="form-group">
-                                        <div class="col"><label>BS Mesin (Kg)</label>
-                                            <input type="text" class="form-control bs-mesin" name="items[0][bs_mesin]" readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <!-- BS Setting -->
-                                    <div class="form-group">
-                                        <div class="col"><label>BS Setting (Pcs)</label>
-                                            <input type="text" class="form-control bs-setting" name="items[0][bs_setting]" readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <!-- Pcs Po(+) -->
-                                    <div class="form-group">
-                                        <div class="col"><label>(+) Packing</label>
-                                            <input type="number" class="form-control pcs-po">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <!-- Kg Po(+) -->
-                                    <div class="form-group">
-                                        <div class="col"><label>PO (+) Kg</label>
-                                            <input type="number" class="form-control kg-po" name="items[0][kg_po]" readonly required>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <!-- Cones -->
-                                    <div class="form-group">
-                                        <div class="col"><label>PO (+) Cones</label>
-                                            <input type="number" class="form-control cns-po">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
+                        <div class="populate-size-wrapper">
                         </div>
-
                     </div>
+
                 </div>
                 <div class="form-group">
                     <div class="col"><label>Total Kg</label>
@@ -170,188 +103,338 @@
                 </div>
 
                 <button type="button" class="btn btn-info w-100" id="btn-save">Save</button>
+                <div class="d-none" id="populateSizeTemplate">
+                    <div class="size-block mb-3 p-1 border rounded shadow-sm bg-white">
+
+                        <!-- Judul Style Size -->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr class="mt-1 mb-2">
+                                <h7 class="text-dark fw-bold label-style-size text-uppercase"></h7>
+                                <hr class="mb-3">
+                                <input type="hidden" class="form-control style-size-hidden" name="items[0][style_size]">
+                                <input type="hidden" class="form-control color" name="items[0][color]">
+                            </div>
+                        </div>
+
+                        <!-- Form Fields -->
+                        <div class="row">
+                            <div class="col-md-1">
+                                <div class="form-group">
+                                    <label>Kg MU</label>
+                                    <input type="text" class="form-control kg-mu" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>BS Mesin (Kg)</label>
+                                    <input type="text" class="form-control bs-mesin" name="items[0][bs_mesin]" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>BS Setting (Pcs)</label>
+                                    <input type="text" class="form-control bs-setting" name="items[0][bs_setting]" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>(+) Packing (Pcs)</label>
+                                    <input type="number" class="form-control pcs-po">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>PO (+) Kg</label>
+                                    <input type="number" class="form-control kg-po" name="items[0][kg_po]" readonly required>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>PO (+) Cones</label>
+                                    <input type="number" class="form-control cns-po">
+                                </div>
+                            </div>
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button class="btn btn-danger remove-size-row w-100"><i class="fa fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
         </div>
-        </form>
     </div>
-</div>
 
-<!-- Pastikan jQuery load pertama -->
-<!-- Tambahkan ini di layout HTML-mu -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    $(function() {
-        const base = '<?= base_url() ?>';
-        const role = '<?= $role ?>';
-        const area = '<?= esc($area) ?>';
-        const materialDataCache = {};
+    <!-- Pastikan jQuery load pertama -->
+    <!-- Tambahkan ini di layout HTML-mu -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(function() {
+            const base = '<?= base_url() ?>';
+            const role = '<?= $role ?>';
+            const area = '<?= esc($area) ?>';
+            const materialDataCache = {};
 
-        const noModelOptions = $('.select-no-model').first().html();
+            const noModelOptions = $('.select-no-model').first().html();
 
-        // Inisialisasi Select2 pada konteks tertentu
-        function initSelect2(ctx) {
-            $(ctx).find('.select-no-model, .select-style-size, .item-type, .kode-warna')
-                .select2({
-                    width: '100%',
-                    allowClear: true
-                });
-        }
-
-        // Tambah tab baru
-
-        initSelect2(document);
-
-
-        // Handler saat No Model dipilih
-        $(document).on('change', '.select-no-model', function() {
-            const $row = $(this).closest('.kebutuhan-item');
-            const modelCode = $(this).find('option:selected').data('no-model');
-
-            const $ss = $row.find('.item-type').empty().append('<option value="">Pilih Kode Benang</option>').trigger('change');
-            $row.find('.item-type, .kode-warna').empty().append('<option value="">Pilih</option>').trigger('change');
-            $row.find('.color, .kg-mu, .kg-po, .pcs-po').val('');
-
-            if (!modelCode) return;
-
-            fetch(`${base}/${role}/getStyleSize/${area}/${modelCode}`)
-                .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
-                .then(json => {
-                    json.forEach(row => {
-                        $ss.append(`<option value="${row.size}">${row.size}</option>`);
+            // Inisialisasi Select2 pada konteks tertentu
+            function initSelect2(ctx) {
+                $(ctx).find('.select-no-model, .select-style-size, .item-type, .kode-warna')
+                    .select2({
+                        width: '100%',
+                        allowClear: true
                     });
-                    $ss.trigger('change');
-                })
-                .catch(err => console.error('Gagal load style_size:', err));
-        });
+            }
+
+            // Tambah tab baru
+
+            initSelect2(document);
+
+            // Handler saat No Model dipilih
+            $(document).on('change', '.select-no-model', function() {
+                const $row = $(this).closest('.kebutuhan-item');
+                const modelCode = $(this).find('option:selected').data('no-model');
+
+                const $ss = $row.find('.item-type').empty().append('<option value="">Pilih Kode Benang</option>').trigger('change');
+                $row.find('.item-type, .kode-warna').empty().append('<option value="">Pilih Item Type</option>').trigger('change');
+                $row.find('.color, .kg-mu, .kg-po, .pcs-po').val('');
+
+                if (!modelCode) return;
+
+                fetch(`${base}/${role}/poTambahanDetail/${modelCode}/${area}`)
+                    .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
+                    .then(json => {
+                        const itemTypes = json.item_types;
+                        const materialData = json.material;
+
+                        itemTypes.forEach(row => {
+                            $ss.append(`<option value="${row.item_type}">${row.item_type}</option>`);
+                        });
+
+                        $row.data('material', materialData);
+                        $row.data('bsMesin', json.bs_mesin);
+                        $row.data('bsSetting', json.bs_setting);
+                        $ss.trigger('change');
+                    })
+                    .catch(err => console.error('Gagal load item_type:', err));
+            });
+
+            // Event listener saat Item Type dipilih
+            $(document).on('change', '.item-type', function() {
+                const $row = $(this).closest('.kebutuhan-item');
+                const modelCode = $row.find('.select-no-model option:selected').data('no-model');
+
+                if (!modelCode) return;
+
+                const materialData = $row.data('material'); // ambil dari data-attribute
+                if (!materialData) return;
+
+                populateKodeWarnas(materialData, modelCode, $row);
+            });
 
 
-        // Isi dropdown Item Type berdasarkan data material
-        function populateItemTypes(matData, modelCode, $row) {
-            const $it = $row.find('.item-type').empty().append('<option value="">Pilih Item Type</option>');
-            Object.entries(matData).forEach(([type, info]) => {
-                if (info.no_model === modelCode) {
-                    $it.append(`<option value="${type}">${type}</option>`);
+            // Isi dropdown Kode Warna berdasarkan data item type
+            function populateKodeWarnas(matData, modelCode, $row) {
+                const selectedItemType = $row.find('.item-type').val();
+                const $it = $row.find('.kode-warna').empty().append('<option value="">Pilih Kode Warna</option>');
+
+                if (!selectedItemType || !matData[selectedItemType]) return;
+
+                const kodeWarnas = matData[selectedItemType].kode_warna;
+
+                Object.entries(kodeWarnas).forEach(([kode, detail]) => {
+                    const styleSizes = detail.style_size || [];
+
+                    const cocok = styleSizes.some(item => item.no_model === modelCode);
+                    if (cocok) {
+                        $it.append(`<option value="${kode}" data-color="${detail.color}">${kode}</option>`);
+                    }
+                });
+
+                $it.trigger('change');
+            }
+
+            // Handler gabungan saat Kode Warna dipilih
+            $(document).on('change', '.kode-warna', function() {
+                const $opt = $(this).find(':selected');
+                const $row = $(this).closest('.kebutuhan-item');
+
+                const color = $opt.data('color') || '';
+                $row.find('.color').val(color);
+
+                const itemType = $row.find('.item-type').val();
+                const kodeWarna = $(this).val();
+                const modelCode = $row.find('.select-no-model option:selected').data('no-model');
+
+                const materialData = $row.data('material');
+                const bsMesinMap = $row.data('bsMesin') || {};
+                const bsSettingMap = $row.data('bsSetting') || {};
+
+                if (!materialData || !materialData[itemType] || !materialData[itemType].kode_warna[kodeWarna]) {
+                    return;
+                }
+
+                const detail = materialData[itemType].kode_warna[kodeWarna];
+                const allStyleSizes = (detail.style_size || []).filter(s => s.no_model === modelCode);
+
+                const $wrapper = $row.find('.populate-size-wrapper').empty();
+
+                allStyleSizes.forEach((style, i) => {
+                    const $template = $('#populateSizeTemplate').clone().removeAttr('id').removeClass('d-none');
+
+                    const size = style.style_size;
+
+                    $template.find('.color').val(size || '');
+                    $template.find('.kg-mu').val(parseFloat(style.kg_mu || 0).toFixed(2));
+                    $template.find('.bs-mesin').val(((bsMesinMap[size] || 0) / 1000).toFixed(2)); // Convert gram to kg
+                    $template.find('.bs-setting').val(bsSettingMap[size] || 0);
+                    $template.find('.pcs-po').val(style.pcs_po || '');
+                    $template.find('.kg-po').val(style.kg_po || '');
+                    $template.find('.cns-po').val(style.cns_po || '');
+                    $template.find('.label-style-size').text(size);
+                    $template.find('.style-size-hidden').val(size);
+
+                    $template.find('input').each(function() {
+                        const name = $(this).attr('name');
+                        if (name) {
+                            $(this).attr('name', name.replace('[0]', `[${i}]`));
+                        }
+                    });
+
+                    $wrapper.append($template);
+                });
+            });
+
+            // Fungsi untuk hitung total KG PO
+
+            function hitungTotalKg() {
+                let total = 0;
+                $('.kg-po').each(function() {
+                    const val = parseFloat($(this).val()) || 0;
+                    total += val;
+                });
+
+                $('.total-kg').val(total.toFixed(2));
+            }
+
+            // Saat user mengisi PO Pcs, hitung otomatis KG PO
+            $(document).on('input', '.pcs-po', function() {
+                const $row = $(this).closest('.size-block');
+                const $wrapper = $row.closest('.kebutuhan-item');
+                const pcs = parseFloat($(this).val()) || 0;
+                const bsMesin = parseFloat($row.find('.bs-mesin').val()) || 0;
+                const bsSetting = parseFloat($row.find('.bs-setting').val()) || 0;
+
+                const itemType = $wrapper.find('.item-type').val();
+                const kodeWarna = $wrapper.find('.kode-warna').val();
+                const modelCode = $wrapper.find('.select-no-model option:selected').data('no-model');
+                const styleSize = $row.find('.style-size-hidden').val();
+
+                const materialData = $wrapper.data('material');
+
+                let composition = 0,
+                    gw = 0,
+                    loss = 0;
+
+                if (
+                    materialData &&
+                    materialData[itemType] &&
+                    materialData[itemType].kode_warna[kodeWarna]
+                ) {
+                    const styleList = materialData[itemType].kode_warna[kodeWarna].style_size || [];
+
+                    const match = styleList.find(item => item.no_model === modelCode && item.style_size === styleSize);
+                    if (match) {
+                        composition = parseFloat(match.composition) || 0;
+                        gw = parseFloat(match.gw) || 0;
+                        loss = parseFloat(match.loss) || 0;
+                    }
+                }
+
+                const stKg = bsSetting * composition * gw / 100 / 1000;
+                const pluspck = pcs * composition * gw / 100 / 1000;
+                const kgPo = (pluspck * (1 + loss / 100)) + bsMesin + stKg;
+
+                $row.find('.kg-po').val(kgPo.toFixed(2));
+
+                // Setelah update, hitung total
+                hitungTotalKg();
+            });
+
+            hitungTotalKg();
+
+            //Delete Row Size
+            $(document).on('click', '.remove-size-row', function(e) {
+                e.preventDefault();
+
+                const $row = $(this).closest('.size-block');
+
+                // Konfirmasi dulu, boleh juga langsung hapus tanpa konfirmasi
+                if (confirm('Yakin ingin menghapus baris ini?')) {
+                    $row.remove();
                 }
             });
-            $it.trigger('change');
-        }
 
-        // Handler saat Item Type dipilih → isi Kode Warna
-        $(document).on('change', '.item-type', function() {
-            const $row = $(this).closest('.kebutuhan-item');
-            const type = $(this).val();
-            const modelCode = $row.find('.select-no-model option:selected').data('no-model');
-            const styleSize = $row.find('.select-style-size').val();
-            const cacheKey = `${modelCode}_${styleSize}`;
-            const matData = (materialDataCache[cacheKey] || {}).material || {};
+            //Save data
+            $('#btn-save').on('click', function() {
+                let formData = [];
 
-            const $kw = $row.find('.kode-warna').empty().append('<option value="">Pilih Kode Warna</option>');
-            $row.find('.color, .kg-mu, .kg-po, .pcs-po').val('');
-
-            if (matData[type]) {
-                matData[type].kode_warna.forEach(w => {
-                    $kw.append(`
-                    <option value="${w.kode_warna}"
-                            data-color="${w.color}"
-                            data-kg-mu="${w.total_kg}"
-                            data-composition="${w.composition}"
-                            data-gw="${w.gw}"
-                            data-loss="${w.loss}">
-                        ${w.kode_warna}
-                    </option>`);
+                $('.kebutuhan-item').each(function() {
+                    formData.push({
+                        no_model: $(this).find('.select-no-model').val(),
+                        style_size: $(this).find('.select-style-size').val(),
+                        item_type: $(this).find('.item-type').val(),
+                        kode_warna: $(this).find('.kode-warna').val(),
+                        color: $(this).find('.color').val(),
+                        pcs_po: $(this).find('.pcs-po').val(),
+                        kg_po: $(this).find('.kg-po').val(),
+                        cns_po: $(this).find('.cns-po').val(),
+                        keterangan: $('#keterangan').val()
+                    });
                 });
-            }
-            $kw.trigger('change');
-        });
 
-        // Handler gabungan saat Kode Warna dipilih
-        $(document).on('change', '.kode-warna', function() {
-            const $opt = $(this).find(':selected');
-            const $row = $(this).closest('.kebutuhan-item');
+                console.log(formData); // Lihat data sebelum dikirim
 
-            $row.find('.color').val($opt.data('color') || '');
-            $row.find('.kg-mu').val(parseFloat($opt.data('kg-mu') || 0).toFixed(2));
-            $row.find('.kg-po, .pcs-po').val('');
-        });
-
-        // Saat user mengisi PO Pcs, hitung otomatis KG PO
-        $(document).on('input', '.pcs-po', function() {
-            const $row = $(this).closest('.kebutuhan-item');
-            const pcs = parseFloat($(this).val()) || 0;
-            const $opt = $row.find('.kode-warna option:selected');
-            const bsMesin = parseFloat($row.find('.bs-mesin').val()) || 0;
-            const bsSetting = parseFloat($row.find('.bs-setting').val()) || 0;
-
-            const composition = parseFloat($opt.data('composition')) || 0;
-            const gw = parseFloat($opt.data('gw')) || 0;
-            const loss = parseFloat($opt.data('loss')) || 0;
-
-            const stKg = bsSetting * composition * gw / 100 / 1000;
-
-            const pluspck = pcs * composition * gw / 100 / 1000;
-            const kgPo = (pluspck * (1 + loss / 100)) + bsMesin + stKg;
-
-            $row.find('.kg-po').val(kgPo.toFixed(2));
-        });
-
-        //Save data
-        $('#btn-save').on('click', function() {
-            let formData = [];
-
-            $('.kebutuhan-item').each(function() {
-                formData.push({
-                    no_model: $(this).find('.select-no-model').val(),
-                    style_size: $(this).find('.select-style-size').val(),
-                    item_type: $(this).find('.item-type').val(),
-                    kode_warna: $(this).find('.kode-warna').val(),
-                    color: $(this).find('.color').val(),
-                    pcs_po: $(this).find('.pcs-po').val(),
-                    kg_po: $(this).find('.kg-po').val(),
-                    cns_po: $(this).find('.cns-po').val(),
-                    keterangan: $('#keterangan').val()
-                });
-            });
-
-            console.log(formData); // Lihat data sebelum dikirim
-
-            $.ajax({
-                url: base + '/' + role + '/savePoTambahan/' + area,
-                method: 'POST',
-                data: JSON.stringify(formData),
-                contentType: 'application/json',
-                success: function(response) {
-                    if (response.status === 'ok' || response.status === 'success') {
-                        Swal.fire({
-                            title: 'Berhasil!',
-                            icon: 'success',
-                            html: `
+                $.ajax({
+                    url: base + '/' + role + '/savePoTambahan/' + area,
+                    method: 'POST',
+                    data: JSON.stringify(formData),
+                    contentType: 'application/json',
+                    success: function(response) {
+                        if (response.status === 'ok' || response.status === 'success') {
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                icon: 'success',
+                                html: `
                         <strong>Sukses:</strong> ${response.sukses || 0}<br>
                         <strong>Gagal:</strong> ${response.gagal || 0}
                     `,
-                            confirmButtonText: 'OK'
-                        }).then(() => {
-                            location.reload(); // reload setelah OK ditekan
-                        });
-                    } else {
-                        Swal.fire({
-                            title: 'Gagal!',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                location.reload(); // reload setelah OK ditekan
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Gagal!',
+                                icon: 'error',
+                                text: response.message || 'Gagal menyimpan data.',
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                        aSwal.fire({
+                            title: 'Error!',
                             icon: 'error',
-                            text: response.message || 'Gagal menyimpan data.',
+                            text: 'Terjadi kesalahan saat menyimpan data.',
                         });
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
-                    aSwal.fire({
-                        title: 'Error!',
-                        icon: 'error',
-                        text: 'Terjadi kesalahan saat menyimpan data.',
-                    });
-                }
+                });
             });
+
         });
-
-    });
-</script>
+    </script>
 
 
-<?php $this->endSection(); ?>
+    <?php $this->endSection(); ?>

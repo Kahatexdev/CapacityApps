@@ -1120,44 +1120,83 @@ class MaterialController extends BaseController
         return $this->response
             ->setJSON($size);
     }
-    public function poTambahanDetail($noModel, $styleSize, $area)
+    public function poTambahanDetail($noModel, $area)
     {
         $detail = [];
-        $size    = rawurlencode($styleSize);
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/poTambahanDetail/' . $noModel . '/' . $size;
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/poTambahanDetail/' . $noModel . '/' . $area;
 
         // Mengambil data dari API eksternal
         $response = @file_get_contents($apiUrl);
 
+        log_message('debug', 'API response: ' . $response);
+
         if ($response === false) {
-            log_message('error', 'Gagal mengambil data dari API untuk No Model: ' . $noModel . '& Size: ' . $styleSize);
+            log_message('error', 'Gagal mengambil data dari API');
             return $this->response->setStatusCode(500)->setJSON(['error' => 'Tidak dapat mengambil data dari API']);
         }
 
-        $detail['material'] = json_decode($response, true);
+        $materialData = json_decode($response, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             log_message('error', 'JSON tidak valid: ' . json_last_error_msg());
             return $this->response->setStatusCode(500)->setJSON(['error' => 'Data JSON tidak valid']);
         }
 
-        $bsMesin = $this->BsMesinModel->getBsMesinPph($area, $noModel, $styleSize);
-        $bsMesinKg = $bsMesin['bs_gram'] / 1000;
-        $validate = [
-            'area' => $area,
-            'style' => $styleSize,
-            'no_model' => $noModel
-        ];
-        $idaps = $this->ApsPerstyleModel->getIdForBs($validate);
-        $bsSetting = $this->bsModel->getTotalBsSet($idaps);
-        $detail['bs'] = $bsMesinKg;
-        $detail['st'] = $bsSetting['qty'];
+        // Ambil item_type saja (key dari level pertama JSON)
+        $itemTypes = [];
+        foreach ($materialData as $key => $value) {
+            if (isset($value['item_type'])) {
+                $itemTypes[] = [
+                    'item_type' => $value['item_type']
+                ];
+            }
+        }
 
-        // Cetak ke log
-        log_message('debug', print_r($detail, true));
+        // Ambil semua style_size
+        $styleSize = [];
+        foreach ($materialData as $itemTypeData) {
+            if (isset($itemTypeData['kode_warna']) && is_array($itemTypeData['kode_warna'])) {
+                foreach ($itemTypeData['kode_warna'] as $kodeWarnaData) {
+                    if (isset($kodeWarnaData['style_size']) && is_array($kodeWarnaData['style_size'])) {
+                        foreach ($kodeWarnaData['style_size'] as $style) {
+                            if (isset($style['style_size'])) {
+                                $styleSize[] = $style['style_size'];
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-        // Mengembalikan data item-type dalam format JSON
-        return $this->response->setJSON($detail);
+        $styleSize = array_unique($styleSize);
+
+        // Ambil BS MESIN per style_size
+        $bsMesinList = [];
+        foreach ($styleSize as $style) {
+            $bs = $this->BsMesinModel->getBsMesin($area, $noModel, [$style]);
+            $bsGram = is_array($bs) ? $bs['bs_gram'] ?? 0 : ($bs->bs_gram ?? 0);
+            $bsMesinList[$style] = (float)$bsGram;
+        }
+
+        // Ambil BS SETTING per style_size
+        $bsSettingList = [];
+        foreach ($styleSize as $style) {
+            $validate = [
+                'area' => $area,
+                'style' => $style,
+                'no_model' => $noModel
+            ];
+            $idaps = $this->ApsPerstyleModel->getIdForBs($validate);
+            $bsSetting = $this->bsModel->getTotalBsSet($idaps);
+            $bsSettingList[$style] = isset($bsSetting['qty']) ? (int)$bsSetting['qty'] : 0;
+        }
+
+        return $this->response->setJSON([
+            'item_types' => $itemTypes,
+            'material' => $materialData,
+            'bs_mesin' => $bsMesinList,
+            'bs_setting' => $bsSettingList
+        ]);
     }
     public function savePoTambahan($area)
     {
