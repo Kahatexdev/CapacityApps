@@ -1120,4 +1120,11 @@ class ApsPerstyleModel extends Model
             ->where('factory', $area)
             ->findAll();
     }
+
+    public function getApsPerStyleById($id)
+    {
+        return $this->select('idapsperstyle, mastermodel, size, inisial, delivery, factory')
+            ->where('idapsperstyle', $id)
+            ->findAll();
+    }
 }

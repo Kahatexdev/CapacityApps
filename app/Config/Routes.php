@@ -46,6 +46,7 @@ $routes->group(
         $routes->get('getKategoriRetur', 'ReturController::getKategoriRetur');
         $routes->get('getKodeWarnaWarnaByItemType', 'ReturController::getKodeWarnaWarnaByItemType');
         $routes->get('getApsPerStyle/(:any)/(:any)/(:any)', 'ApiController::getApsPerStyle/$1/$2/$3');
+        $routes->get('getApsPerStyleById/(:any)', 'ApiController::getApsPerStyleById/$1');
     }
 );
 
