@@ -25,6 +25,25 @@
         });
     </script>
 <?php endif; ?>
+<style>
+    .loading-spinner {
+        background: rgba(255, 255, 255, 0.8);
+        position: absolute;
+        padding: 8px 16px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+    }
+
+    .kebutuhan-item {
+        position: relative;
+        /* biar spinner-nya bisa absolute di dalam */
+    }
+</style>
 
 <div class="container-fluid py-4">
     <div class="card card-frame">
@@ -201,7 +220,12 @@
                 $row.find('.color, .kg-mu, .kg-po, .pcs-po').val('');
 
                 if (!modelCode) return;
+                if (!$row.find('.loading-spinner').length) {
+                    $row.append('<div class="loading-spinner">Sedang Mengambil material...</div>');
+                }
 
+                // Tampilkan spinner
+                $row.find('.loading-spinner').show();
                 fetch(`${base}/${role}/poTambahanDetail/${modelCode}/${area}`)
                     .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
                     .then(json => {
@@ -217,9 +241,12 @@
                         $row.data('bsSetting', json.bs_setting);
                         $ss.trigger('change');
                     })
-                    .catch(err => console.error('Gagal load item_type:', err));
+                    .catch(err => console.error('Gagal load item_type:', err))
+                    .finally(() => {
+                        // Sembunyikan loading spinner
+                        $row.find('.loading-spinner').hide();
+                    });
             });
-
             // Event listener saat Item Type dipilih
             $(document).on('change', '.item-type', function() {
                 const $row = $(this).closest('.kebutuhan-item');
@@ -381,20 +408,30 @@
                 let formData = [];
 
                 $('.kebutuhan-item').each(function() {
-                    formData.push({
-                        no_model: $(this).find('.select-no-model').val(),
-                        style_size: $(this).find('.select-style-size').val(),
-                        item_type: $(this).find('.item-type').val(),
-                        kode_warna: $(this).find('.kode-warna').val(),
-                        color: $(this).find('.color').val(),
-                        pcs_po: $(this).find('.pcs-po').val(),
-                        kg_po: $(this).find('.kg-po').val(),
-                        cns_po: $(this).find('.cns-po').val(),
-                        keterangan: $('#keterangan').val()
+                    const no_model = $(this).find('.select-no-model').val();
+                    const item_type = $(this).find('.item-type').val();
+                    const kode_warna = $(this).find('.kode-warna').val();
+                    const color = $(this).find('.color').first().val(); // Ambil color utama
+                    const keterangan = $('#keterangan').val();
+
+                    $(this).find('.size-block').each(function() {
+                        formData.push({
+                            no_model: no_model,
+                            item_type: item_type,
+                            kode_warna: kode_warna,
+                            color: color,
+                            style_size: $(this).find('.style-size-hidden').val(),
+                            bs_mesin: $(this).find('.bs-mesin').val(),
+                            bs_setting: $(this).find('.bs-setting').val(),
+                            pcs_po: $(this).find('.pcs-po').val(),
+                            kg_po: $(this).find('.kg-po').val(),
+                            cns_po: $(this).find('.cns-po').val(),
+                            keterangan: keterangan
+                        });
                     });
                 });
 
-                console.log(formData); // Lihat data sebelum dikirim
+                console.log(formData); // Debug sebelum submit
 
                 $.ajax({
                     url: base + '/' + role + '/savePoTambahan/' + area,
@@ -412,7 +449,7 @@
                     `,
                                 confirmButtonText: 'OK'
                             }).then(() => {
-                                location.reload(); // reload setelah OK ditekan
+                                location.reload();
                             });
                         } else {
                             Swal.fire({
@@ -424,7 +461,7 @@
                     },
                     error: function(xhr, status, error) {
                         console.error(xhr.responseText);
-                        aSwal.fire({
+                        Swal.fire({
                             title: 'Error!',
                             icon: 'error',
                             text: 'Terjadi kesalahan saat menyimpan data.',
