@@ -223,7 +223,7 @@ class ApiController extends ResourceController
             return $this->response->setJSON([
                 "error" => "Parameter tidak lengkap",
                 "received" => [
-                    "id" => $id,
+                    "idapsperstyle" => $id,
                 ]
             ])->setStatusCode(400);
         }
