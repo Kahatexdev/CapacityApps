@@ -1111,4 +1111,13 @@ class ApsPerstyleModel extends Model
             ->groupBy('mastermodel')
             ->findAll();
     }
+
+    public function getApsPerStyle($nomodel, $size, $area)
+    {
+        return $this->select('idapsperstyle, mastermodel, size, inisial, delivery, factory')
+            ->where('mastermodel', $nomodel)
+            ->where('size', $size)
+            ->where('factory', $area)
+            ->findAll();
+    }
 }

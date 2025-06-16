@@ -190,22 +190,29 @@ class ApiController extends ResourceController
         return $this->response->setJSON($bsdata);
     }
 
-    public function getApsPerStyle()
+    public function getApsPerStyle($mastermodel, $size, $factory)
     {
-        $apsData = $this->ApsPerstyleModel->select('idapsperstyle, mastermodel, size, inisial, factory')
-            ->findAll();
-        $count = count($apsData);
-        if ($count === 0) {
+        // Validate the input parameters
+        if (!$mastermodel || !$size) {
+            return $this->response->setJSON([
+                "error" => "Parameter tidak lengkap",
+                "received" => [
+                    "mastermodel" => $mastermodel,
+                    "size" => $size,
+                    "factory" => $factory,
+                ]
+            ])->setStatusCode(400);
+        }
+
+        // Fetch data from the model
+        $apsData = $this->ApsPerstyleModel->getApsPerStyle($mastermodel, $size, $factory);
+
+        // Check if data is found
+        if (empty($apsData)) {
             return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
         }
-        // Sort the data by 'mastermodel' and 'size'
-        usort($apsData, function ($a, $b) {
-            return strcmp($a['mastermodel'], $b['mastermodel']) ?: strcmp($a['size'], $b['size']);
-        });
-        // Return the sorted data
-        return $this->respond([
-            'count' => $count,
-            'data' => $apsData
-        ], ResponseInterface::HTTP_OK);
+
+        // Return the data with a 200 status
+        return $this->respond($apsData, ResponseInterface::HTTP_OK);
     }
 }
