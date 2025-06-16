@@ -189,4 +189,23 @@ class ApiController extends ResourceController
         $bsdata = $this->BsMesinModel->bsKary($area, $tanggal);
         return $this->response->setJSON($bsdata);
     }
+
+    public function getApsPerStyle()
+    {
+        $apsData = $this->ApsPerstyleModel->select('idapsperstyle, mastermodel, size, inisial, factory')
+            ->findAll();
+        $count = count($apsData);
+        if ($count === 0) {
+            return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
+        }
+        // Sort the data by 'mastermodel' and 'size'
+        usort($apsData, function ($a, $b) {
+            return strcmp($a['mastermodel'], $b['mastermodel']) ?: strcmp($a['size'], $b['size']);
+        });
+        // Return the sorted data
+        return $this->respond([
+            'count' => $count,
+            'data' => $apsData
+        ], ResponseInterface::HTTP_OK);
+    }
 }
