@@ -1111,4 +1111,12 @@ class ApsPerstyleModel extends Model
             ->groupBy('mastermodel')
             ->findAll();
     }
+    public function getSisaPerSize($area, $nomodel, $size)
+    {
+        return $this->select('sum(sisa) as sisa')
+            ->where('factory', $area)
+            ->where('mastermodel', $nomodel)
+            ->whereIn('size', $size)
+            ->first(); // Ambil satu hasil
+    }
 }
