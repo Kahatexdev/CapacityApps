@@ -1119,4 +1119,20 @@ class ApsPerstyleModel extends Model
             ->whereIn('size', $size)
             ->first(); // Ambil satu hasil
     }
+
+    public function getApsPerStyle($nomodel, $size, $area)
+    {
+        return $this->select('idapsperstyle, mastermodel, size, inisial, delivery, factory')
+            ->where('mastermodel', $nomodel)
+            ->where('size', $size)
+            ->where('factory', $area)
+            ->findAll();
+    }
+
+    public function getApsPerStyleById($id)
+    {
+        return $this->select('idapsperstyle, mastermodel, size, inisial, delivery, factory')
+            ->where('idapsperstyle', $id)
+            ->findAll();
+    }
 }
