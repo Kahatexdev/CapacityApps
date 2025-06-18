@@ -26,17 +26,24 @@
     </script>
 <?php endif; ?>
 <style>
-    .loading-spinner {
-        background: rgba(255, 255, 255, 0.8);
-        position: absolute;
-        padding: 8px 16px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 14px;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10;
+    .loading-spinner-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        /* semi-transparent */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        /* biar di atas semuanya */
+    }
+
+    .loading-spinner-content img {
+        max-width: 200px;
+        margin-top: 10px;
     }
 
     .kebutuhan-item {
@@ -44,7 +51,12 @@
         /* biar spinner-nya bisa absolute di dalam */
     }
 </style>
-
+<div class="loading-spinner-overlay d-none" id="loading-spinner">
+    <div class="loading-spinner-content text-center">
+        <h4>loading...</h4>
+        <img src="<?= base_url('assets/newspin.gif') ?>" alt="Loading...">
+    </div>
+</div>
 <div class="container-fluid py-4">
     <div class="card card-frame">
         <div class="card-body">
@@ -269,18 +281,14 @@
             $(document).on('change', '.select-no-model', function() {
                 const $row = $(this).closest('.kebutuhan-item');
                 const modelCode = $(this).find('option:selected').data('no-model');
-
+                let loading = document.getElementById('loading-spinner');
                 const $ss = $row.find('.item-type').empty().append('<option value="">Pilih Kode Benang</option>').trigger('change');
                 $row.find('.item-type, .kode-warna').empty().append('<option value="">Pilih Item Type</option>').trigger('change');
-                $row.find('.color, .kg-mu, .plus-pck-kg, .plus-pck-pcs').val('');
+                $row.find('.color, .kg-mu, .kg-po, .pcs-po').val('');
 
                 if (!modelCode) return;
-                if (!$row.find('.loading-spinner').length) {
-                    $row.append('<div class="loading-spinner">Sedang Mengambil material...</div>');
-                }
 
-                // Tampilkan spinner
-                $row.find('.loading-spinner').show();
+                loading.classList.remove('d-none');
                 fetch(`${base}/${role}/poTambahanDetail/${modelCode}/${area}`)
                     .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
                     .then(json => {
@@ -301,7 +309,7 @@
                     .catch(err => console.error('Gagal load item_type:', err))
                     .finally(() => {
                         // Sembunyikan loading spinner
-                        $row.find('.loading-spinner').hide();
+                        loading.classList.add('d-none')
                     });
             });
             // Event listener saat Item Type dipilih
@@ -570,6 +578,8 @@
             //Save data
             $('#btn-save').on('click', function() {
                 let formData = [];
+                let loading = document.getElementById('loading-spinner');
+                loading.classList.remove('d-none')
 
                 $('.kebutuhan-item').each(function() {
                     const no_model = $(this).find('.select-no-model').val();
@@ -640,6 +650,9 @@
                             icon: 'error',
                             text: 'Terjadi kesalahan saat menyimpan data.',
                         });
+                    },
+                    complete: function() {
+                        loading.classList.add('d-none'); // Sembunyikan loading setelah selesai
                     }
                 });
             });

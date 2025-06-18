@@ -2150,13 +2150,23 @@ class OrderController extends BaseController
                     continue;
                 }
 
-                $this->estspk->insert([
-                    'model'    => $row['model'],
-                    'style'     => $row['size'],
-                    'area'     => $row['area'],
-                    'qty'    => (int)$row['estimasi'] ?? 0,
-                    'status' => 'sudah'
-                ]);
+                // Cek apakah sudah ada di database
+                $exists = $this->estspk
+                    ->where('model', $row['model'])
+                    ->where('style', $row['size'])
+                    ->where('area', $row['area'])
+                    ->where('qty', $row['estimasi'])
+                    ->first();
+
+                if (!$exists) {
+                    $this->estspk->insert([
+                        'model'  => $row['model'],
+                        'style'  => $row['size'],
+                        'area'   => $row['area'],
+                        'qty'    => isset($row['estimasi']) ? (int)$row['estimasi'] : 0,
+                        'status' => 'sudah'
+                    ]);
+                }
             }
             return redirect()->back()->with('sucess', 'Permintaan terikirm');
         } else {
@@ -2176,14 +2186,24 @@ class OrderController extends BaseController
 
 
         foreach ($items as $item) {
+            // Cek apakah item sudah ada berdasarkan kombinasi unik
+            $exists = $this->estspk
+                ->where('model', $item['no_model'])
+                ->where('style', $item['size'])
+                ->where('area', $item['area'])
+                ->where('qty', $item['qty'])
+                ->first();
 
-            $this->estspk->insert([
-                'model' => $item['no_model'],
-                'style' => $item['size'],
-                'area' => $item['area'],
-                'qty' => $item['qty'],
-                'status' => 'sudah'
-            ]);
+            if (!$exists) {
+                // Hanya insert jika belum ada
+                $this->estspk->insert([
+                    'model' => $item['no_model'],
+                    'style' => $item['size'],
+                    'area' => $item['area'],
+                    'qty'   => $item['qty'],
+                    'status' => 'sudah'
+                ]);
+            }
         }
 
         return $this->response->setJSON([

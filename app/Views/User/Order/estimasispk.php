@@ -46,7 +46,7 @@ $this->extend($role . '/layout'); ?>
                         <div>
                             <button type="button" class="btn btn-warning btn-petunjuk" ata-toggle="modal" data-target="#petunjuk">Petunjuk</button>
                             <button id="minta-btn" class="btn btn-info">Minta</button>
-                            <button id="export-btn" class="btn btn-success"><i class="far fa-file-excel"></i></button>
+                            <!-- <button id="export-btn" class="btn btn-success"><i class="far fa-file-excel"></i></button> -->
                         </div>
                     </div>
                 </div>
