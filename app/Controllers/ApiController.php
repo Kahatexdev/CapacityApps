@@ -269,4 +269,67 @@ class ApiController extends ResourceController
         // Return the data with a 200 status
         return $this->respond($apsData, ResponseInterface::HTTP_OK);
     }
+
+    public function getMasterModel()
+    {
+        // Fetch data from the model
+        $masterModels = $this->ApsPerstyleModel->getMasterModel();
+
+        // Check if data is found
+        if (empty($masterModels)) {
+            return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
+        }
+
+        // Return the data with a 200 status
+        return $this->respond($masterModels, ResponseInterface::HTTP_OK);
+    }
+
+    public function getInisialByModel($mastermodel)
+    {
+        // Validate the input parameter
+        if (!$mastermodel) {
+            return $this->response->setJSON([
+                "error" => "Parameter tidak lengkap",
+                "received" => [
+                    "mastermodel" => $mastermodel,
+                ]
+            ])->setStatusCode(400);
+        }
+
+        // Fetch data from the model
+        $inisialData = $this->ApsPerstyleModel->getInisialByModel($mastermodel);
+
+        // Check if data is found
+        if (empty($inisialData)) {
+            return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
+        }
+
+        // Return the data with a 200 status
+        return $this->respond($inisialData, ResponseInterface::HTTP_OK);
+    }
+
+    public function getIdApsByModelInisial($mastermodel, $inisial)
+    {
+        // Validate the input parameters
+        if (!$mastermodel || !$inisial) {
+            return $this->response->setJSON([
+                "error" => "Parameter tidak lengkap",
+                "received" => [
+                    "mastermodel" => $mastermodel,
+                    "inisial" => $inisial,
+                ]
+            ])->setStatusCode(400);
+        }
+
+        // Fetch data from the model
+        $idApsData = $this->ApsPerstyleModel->getIdApsByModelInisial($mastermodel, $inisial);
+
+        // Check if data is found
+        if (empty($idApsData)) {
+            return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
+        }
+
+        // Return the data with a 200 status
+        return $this->respond($idApsData, ResponseInterface::HTTP_OK);
+    }
 }

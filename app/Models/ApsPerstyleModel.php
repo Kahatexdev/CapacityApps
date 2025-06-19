@@ -1127,4 +1127,32 @@ class ApsPerstyleModel extends Model
             ->where('idapsperstyle', $id)
             ->findAll();
     }
+
+    public function getMasterModel()
+    {
+        return $this->select('mastermodel')
+            ->groupBy('mastermodel')
+            // 3 bulan sebelumnya dan 3 bulan ke depan
+            ->where('delivery >=', date('Y-m-d', strtotime('-3 months')))
+            ->where('delivery <=', date('Y-m-d', strtotime('+3 months')))
+            ->findAll();
+    }
+
+    public function getInisialByModel($model)
+    {
+        return $this->select('inisial')
+            ->where('mastermodel', $model)
+            ->groupBy('inisial')
+            ->where('delivery >=', date('Y-m-d', strtotime('-3 months')))
+            ->where('delivery <=', date('Y-m-d', strtotime('+3 months')))
+            ->findAll();
+    }
+
+    public function getIdApsByModelInisial($model, $inisial)
+    {
+        return $this->select('idapsperstyle')
+            ->where('mastermodel', $model)
+            ->where('inisial', $inisial)
+            ->findAll();
+    }
 }
