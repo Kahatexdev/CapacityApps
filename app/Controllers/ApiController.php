@@ -189,4 +189,20 @@ class ApiController extends ResourceController
         $bsdata = $this->BsMesinModel->bsKary($area, $tanggal);
         return $this->response->setJSON($bsdata);
     }
+    public function getQtyPcsByAreaByStyle($area)
+    {
+        $noModel = $this->request->getGet('no_model');
+        $styleSize = $this->request->getGet('style_size');
+
+        $data = [
+            'area' => $area,
+            'noModel' => $noModel,
+            'styleSize' => $styleSize
+        ];
+
+        $getQty = $this->ApsPerstyleModel->getQtyPcsByAreaByStyle($data);
+
+        // log_message('info', ': ' . json_encode($getQty));
+        return $this->response->setJSON($getQty['qty']);
+    }
 }

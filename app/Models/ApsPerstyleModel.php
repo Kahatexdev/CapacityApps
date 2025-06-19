@@ -1111,4 +1111,12 @@ class ApsPerstyleModel extends Model
             ->groupBy('mastermodel')
             ->findAll();
     }
+    public function getQtyPcsByAreaByStyle($data)
+    {
+        return $this->select('SUM(qty) AS qty')
+            ->where('factory', $data['area'])
+            ->where('mastermodel', $data['noModel'])
+            ->where('size', $data['styleSize'])
+            ->first();
+    }
 }

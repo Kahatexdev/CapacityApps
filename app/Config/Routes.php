@@ -45,6 +45,7 @@ $routes->group(
         $routes->post('pengajuanRetur/(:any)', 'ReturController::pengajuanRetur/$1');
         $routes->get('getKategoriRetur', 'ReturController::getKategoriRetur');
         $routes->get('getKodeWarnaWarnaByItemType', 'ReturController::getKodeWarnaWarnaByItemType');
+        $routes->get('getQtyPcsByAreaByStyle/(:any)', 'ApiController::getQtyPcsByAreaByStyle/$1');
     }
 );
 
