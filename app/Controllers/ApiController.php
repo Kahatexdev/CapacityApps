@@ -300,8 +300,10 @@ class ApiController extends ResourceController
         return $this->respond($masterModels, ResponseInterface::HTTP_OK);
     }
 
-    public function getInisialByModel($mastermodel)
+    public function getInisialByModel()
     {
+        // Get the mastermodel parameter from the request
+        $mastermodel = $this->request->getGet('mastermodel');
         // Validate the input parameter
         if (!$mastermodel) {
             return $this->response->setJSON([
@@ -324,8 +326,11 @@ class ApiController extends ResourceController
         return $this->respond($inisialData, ResponseInterface::HTTP_OK);
     }
 
-    public function getIdApsByModelInisial($mastermodel, $inisial)
+    public function getIdApsByModelInisial()
     {
+        // Get the parameters from the request
+        $mastermodel = $this->request->getGet('mastermodel');
+        $inisial = $this->request->getGet('inisial');
         // Validate the input parameters
         if (!$mastermodel || !$inisial) {
             return $this->response->setJSON([
