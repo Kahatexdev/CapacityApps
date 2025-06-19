@@ -50,8 +50,8 @@ $routes->group(
         $routes->get('getApsPerStyleById/(:any)', 'ApiController::getApsPerStyleById/$1');
         $routes->get('getQtyPcsByAreaByStyle/(:any)', 'ApiController::getQtyPcsByAreaByStyle/$1');
         $routes->get('getMasterModel', 'ApiController::getMasterModel');
-        $routes->get('getInisialByModel/(:any)', 'ApiController::getInisialByModel/$1');
-        $routes->get('getIdApsByModelInisial/(:any)/(:any)', 'ApiController::getApsPerStyleByInisial/$1/$2');
+        $routes->get('getInisialByModel', 'ApiController::getInisialByModel');
+        $routes->get('getIdApsByModelInisial', 'ApiController::getApsPerStyleByInisial');
     }
 );
 
