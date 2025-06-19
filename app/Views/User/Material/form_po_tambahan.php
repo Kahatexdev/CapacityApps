@@ -26,17 +26,24 @@
     </script>
 <?php endif; ?>
 <style>
-    .loading-spinner {
-        background: rgba(255, 255, 255, 0.8);
-        position: absolute;
-        padding: 8px 16px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 14px;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10;
+    .loading-spinner-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        /* semi-transparent */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        /* biar di atas semuanya */
+    }
+
+    .loading-spinner-content img {
+        max-width: 200px;
+        margin-top: 10px;
     }
 
     .kebutuhan-item {
@@ -44,7 +51,12 @@
         /* biar spinner-nya bisa absolute di dalam */
     }
 </style>
-
+<div class="loading-spinner-overlay d-none" id="loading-spinner">
+    <div class="loading-spinner-content text-center">
+        <h4>loading...</h4>
+        <img src="<?= base_url('assets/newspin.gif') ?>" alt="Loading...">
+    </div>
+</div>
 <div class="container-fluid py-4">
     <div class="card card-frame">
         <div class="card-body">
@@ -98,7 +110,7 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <!-- Item Type -->
+                                <!-- Color -->
                                 <div class="form-group">
                                     <div class="col"><label>Color</label>
                                         <input type="text" class="form-control color" name="items[0][color]" readonly>
@@ -106,14 +118,52 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="populate-size-wrapper">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- Terima -->
+                                <div class="form-group">
+                                    <div class="col"><label>Terima (Kg)</label>
+                                        <input type="text" class="form-control terima" name="items[0][terima]" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <!-- Sisa BB di Mesin (Kg) -->
+                                <div class="form-group">
+                                    <label>Sisa BB di Mesin (Kg)</label>
+                                    <input type="number" class="form-control sisa-mc-kg" name="items[0][sisa_mc_kg]">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- (+) Mesin (Cns) -->
+                                <div class="form-group">
+                                    <label>(+) Mesin (Cns)</label>
+                                    <input type="number" class="form-control poplus-mc-cns" name="items[0][poplus_mc_cns]">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <!-- (+) Packing (Cns) -->
+                                <div class="form-group">
+                                    <label>(+) Packing (Cns)</label>
+                                    <input type="number" class="form-control plus-pck-cns" name="items[0][plus_pck_cns]">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row populate-size-wrapper">
                         </div>
                     </div>
 
                 </div>
                 <div class="form-group">
                     <div class="col"><label>Total Kg</label>
-                        <input type="number" class="form-control total-kg" name="items[0][kg_po]" readonly required>
+                        <input type="number" class="form-control total-kg" name="items[0][total_kg_po]" readonly required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col"><label>Total Cones</label>
+                        <input type="number" class="form-control total-cns" name="items[0][total_cns_po]" readonly required>
                     </div>
                 </div>
                 <div class="form-group">
@@ -127,54 +177,71 @@
 
                         <!-- Judul Style Size -->
                         <div class="row">
-                            <div class="col-12">
+                            <div class="col-12 text-center">
                                 <hr class="mt-1 mb-2">
-                                <h7 class="text-dark fw-bold label-style-size text-uppercase"></h7>
+                                <h5 class="text-dark fw-bold label-style-size text-uppercase"></h5>
                                 <hr class="mb-3">
                                 <input type="hidden" class="form-control style-size-hidden" name="items[0][style_size]">
                                 <input type="hidden" class="form-control color" name="items[0][color]">
                             </div>
                         </div>
+                        <hr class="mb-3" style="border-color: #6c757d;">
 
                         <!-- Form Fields -->
                         <div class="row">
-                            <div class="col-md-1">
+                            <div class="col-md-3">
                                 <div class="form-group">
-                                    <label>Kg MU</label>
-                                    <input type="text" class="form-control kg-mu" readonly>
+                                    <label>Pesanan<br>Kgs</label>
+                                    <input type="number" class="form-control kg-mu" readonly>
                                 </div>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <div class="form-group">
-                                    <label>BS Mesin (Kg)</label>
-                                    <input type="text" class="form-control bs-mesin" name="items[0][bs_mesin]" readonly>
+                                    <label>Sisa<br>Order</label>
+                                    <input type="number" class="form-control sisa-order" name="items[0][sisa_order]" readonly>
                                 </div>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <div class="form-group">
-                                    <label>BS Setting (Pcs)</label>
-                                    <input type="text" class="form-control bs-setting" name="items[0][bs_setting]" readonly>
+                                    <label>BS Mesin<br>(Kg)</label>
+                                    <input type="number" class="form-control bs-mesin" name="items[0][bs_mesin]" readonly>
                                 </div>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <div class="form-group">
-                                    <label>(+) Packing (Pcs)</label>
-                                    <input type="number" class="form-control pcs-po">
+                                    <label>BS<br>Setting</label>
+                                    <input type="number" class="form-control bs-setting" name="items[0][bs_setting]" readonly>
                                 </div>
                             </div>
-                            <div class="col-md-2">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
                                 <div class="form-group">
-                                    <label>PO (+) Kg</label>
-                                    <input type="number" class="form-control kg-po" name="items[0][kg_po]" readonly required>
+                                    <label>(+) Mesin<br>(Kg)</label>
+                                    <input type="number" class="form-control poplus-mc-kg" name="items[0][poplus_mc_kg]" readonly>
                                 </div>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <div class="form-group">
-                                    <label>PO (+) Cones</label>
-                                    <input type="number" class="form-control cns-po">
+                                    <label>(+) Pcs<br>Packing</label>
+                                    <input type="number" class="form-control plus-pck-pcs">
                                 </div>
                             </div>
-                            <div class="col-md-1 d-flex align-items-end">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>(+) Kg<br>Packing</label>
+                                    <input type="number" class="form-control plus-pck-kg" name="items[0][plus_pck_kg]" readonly required>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Lebih<br>Pakai(Kg)</label>
+                                    <input type="number" class="form-control lebih-pakai" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 d-flex align-items-end">
                                 <button class="btn btn-danger remove-size-row w-100"><i class="fa fa-trash"></i></button>
                             </div>
                         </div>
@@ -214,18 +281,14 @@
             $(document).on('change', '.select-no-model', function() {
                 const $row = $(this).closest('.kebutuhan-item');
                 const modelCode = $(this).find('option:selected').data('no-model');
-
+                let loading = document.getElementById('loading-spinner');
                 const $ss = $row.find('.item-type').empty().append('<option value="">Pilih Kode Benang</option>').trigger('change');
                 $row.find('.item-type, .kode-warna').empty().append('<option value="">Pilih Item Type</option>').trigger('change');
                 $row.find('.color, .kg-mu, .kg-po, .pcs-po').val('');
 
                 if (!modelCode) return;
-                if (!$row.find('.loading-spinner').length) {
-                    $row.append('<div class="loading-spinner">Sedang Mengambil material...</div>');
-                }
 
-                // Tampilkan spinner
-                $row.find('.loading-spinner').show();
+                loading.classList.remove('d-none');
                 fetch(`${base}/${role}/poTambahanDetail/${modelCode}/${area}`)
                     .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
                     .then(json => {
@@ -237,14 +300,16 @@
                         });
 
                         $row.data('material', materialData);
+                        $row.data('sisaOrder', json.sisa_order);
                         $row.data('bsMesin', json.bs_mesin);
                         $row.data('bsSetting', json.bs_setting);
+                        $row.data('lebihPakai', json.lebih_pakai);
                         $ss.trigger('change');
                     })
                     .catch(err => console.error('Gagal load item_type:', err))
                     .finally(() => {
                         // Sembunyikan loading spinner
-                        $row.find('.loading-spinner').hide();
+                        loading.classList.add('d-none')
                     });
             });
             // Event listener saat Item Type dipilih
@@ -275,7 +340,7 @@
 
                     const cocok = styleSizes.some(item => item.no_model === modelCode);
                     if (cocok) {
-                        $it.append(`<option value="${kode}" data-color="${detail.color}">${kode}</option>`);
+                        $it.append(`<option value="${kode}" data-color="${detail.color}" data-terima="${detail.kgs_out}">${kode}</option>`);
                     }
                 });
 
@@ -290,13 +355,18 @@
                 const color = $opt.data('color') || '';
                 $row.find('.color').val(color);
 
+                const terima = parseFloat($opt.data('terima')) || 0;
+                $row.find('.terima').val(terima.toFixed(2));
+
                 const itemType = $row.find('.item-type').val();
                 const kodeWarna = $(this).val();
                 const modelCode = $row.find('.select-no-model option:selected').data('no-model');
 
                 const materialData = $row.data('material');
+                const sisaOrderMap = $row.data('sisaOrder') || {};
                 const bsMesinMap = $row.data('bsMesin') || {};
                 const bsSettingMap = $row.data('bsSetting') || {};
+                const lebihPakaiMap = $row.data('lebihPakai') || {};
 
                 if (!materialData || !materialData[itemType] || !materialData[itemType].kode_warna[kodeWarna]) {
                     return;
@@ -314,11 +384,14 @@
 
                     $template.find('.color').val(size || '');
                     $template.find('.kg-mu').val(parseFloat(style.kg_mu || 0).toFixed(2));
+                    $template.find('.sisa-order').val(sisaOrderMap[size] || 0);
                     $template.find('.bs-mesin').val(((bsMesinMap[size] || 0) / 1000).toFixed(2)); // Convert gram to kg
                     $template.find('.bs-setting').val(bsSettingMap[size] || 0);
-                    $template.find('.pcs-po').val(style.pcs_po || '');
-                    $template.find('.kg-po').val(style.kg_po || '');
-                    $template.find('.cns-po').val(style.cns_po || '');
+                    const lebihPakaiVal = parseFloat(lebihPakaiMap[size] || 0).toFixed(2);
+                    $template.find('.lebih-pakai').val(lebihPakaiVal);
+                    $template.find('.plus-pck-pcs').val(style.pcs_po || '');
+                    $template.find('.plus-pck-kg').val(style.kg_po || '');
+                    $template.find('.po-pck-cns').val(style.cns_po || '');
                     $template.find('.label-style-size').text(size);
                     $template.find('.style-size-hidden').val(size);
 
@@ -329,29 +402,80 @@
                         }
                     });
 
-                    $wrapper.append($template);
+                    // Bungkus tiap card ke dalam .col-md-4
+                    const $col = $('<div class="col-md-4 mb-3"></div>').append($template);
+                    $wrapper.append($col);
+
+                    hitungPoplusMc($template, $row);
                 });
             });
 
-            // Fungsi untuk hitung total KG PO
+            // Fungsi untuk hitung total Cns PO
+            function hitungTotalCns() {
+                let plusMcCns = 0;
+                let plusPckCns = 0;
 
-            function hitungTotalKg() {
-                let total = 0;
-                $('.kg-po').each(function() {
+                $('.poplus-mc-cns').each(function() {
                     const val = parseFloat($(this).val()) || 0;
-                    total += val;
+                    plusMcCns += val;
                 });
+
+                $('.plus-pck-cns').each(function() {
+                    const val = parseFloat($(this).val()) || 0;
+                    plusPckCns += val;
+                });
+
+                const total = plusMcCns + plusPckCns;
+
+                $('.total-cns').val(total.toFixed(2));
+            }
+
+            // Saat nilai poplus-mc-cns berubah, hitung ulang total
+            $(document).on('input', '.poplus-mc-cns', function() {
+                hitungTotalCns();
+            });
+
+            // Saat nilai plus-pck-cns berubah, hitung ulang total
+            $(document).on('input', '.plus-pck-cns', function() {
+                hitungTotalCns();
+            });
+
+            // Fungsi untuk hitung total KG PO
+            function hitungTotalKg() {
+                let plusPckTotal = 0;
+                let poplusMcTotal = 0;
+                let sisaMcTotal = 0;
+
+                $('.plus-pck-kg').each(function() {
+                    const val = parseFloat($(this).val()) || 0;
+                    plusPckTotal += val;
+                });
+
+                $('.poplus-mc-kg').each(function() {
+                    const val = parseFloat($(this).val()) || 0;
+                    poplusMcTotal += val;
+                });
+
+                $('.sisa-mc-kg').each(function() {
+                    const val = parseFloat($(this).val()) || 0;
+                    sisaMcTotal += val;
+                });
+
+                const total = (plusPckTotal + poplusMcTotal) - sisaMcTotal;
 
                 $('.total-kg').val(total.toFixed(2));
             }
 
-            // Saat user mengisi PO Pcs, hitung otomatis KG PO
-            $(document).on('input', '.pcs-po', function() {
+            // Saat nilai sisa-mc-kg berubah, hitung ulang total
+            $(document).on('input', '.sisa-mc-kg', function() {
+                hitungTotalKg();
+            });
+
+            // Saat user mengisi PO Pcs, hitung otomatis Plus Pck Kg
+            $(document).on('input', '.plus-pck-pcs', function() {
                 const $row = $(this).closest('.size-block');
                 const $wrapper = $row.closest('.kebutuhan-item');
                 const pcs = parseFloat($(this).val()) || 0;
-                const bsMesin = parseFloat($row.find('.bs-mesin').val()) || 0;
-                const bsSetting = parseFloat($row.find('.bs-setting').val()) || 0;
 
                 const itemType = $wrapper.find('.item-type').val();
                 const kodeWarna = $wrapper.find('.kode-warna').val();
@@ -379,15 +503,62 @@
                     }
                 }
 
-                const stKg = bsSetting * composition * gw / 100 / 1000;
                 const pluspck = pcs * composition * gw / 100 / 1000;
-                const kgPo = (pluspck * (1 + loss / 100)) + bsMesin + stKg;
+                const kgPlusPck = pluspck + (pluspck * (1 + loss / 100));
 
-                $row.find('.kg-po').val(kgPo.toFixed(2));
+                $row.find('.plus-pck-kg').val(kgPlusPck.toFixed(2));
 
                 // Setelah update, hitung total
                 hitungTotalKg();
             });
+
+            // Fungsi Untuk Menghitung Po Tambahan Mesin Kg
+            function hitungPoplusMc($row, $wrapper) {
+                const sisaOrder = parseFloat($row.find('.sisa-order').val()) || 0;
+                const bsMesin = parseFloat($row.find('.bs-mesin').val()) || 0;
+                const bsSetting = parseFloat($row.find('.bs-setting').val()) || 0;
+
+                const itemType = $wrapper.find('.item-type').val();
+                const kodeWarna = $wrapper.find('.kode-warna').val();
+                const modelCode = $wrapper.find('.select-no-model option:selected').data('no-model');
+                const styleSize = $row.find('.style-size-hidden').val();
+
+                const materialData = $wrapper.data('material');
+
+                let composition = 0,
+                    gw = 0,
+                    loss = 0;
+
+                if (
+                    materialData &&
+                    materialData[itemType] &&
+                    materialData[itemType].kode_warna[kodeWarna]
+                ) {
+                    const styleList = materialData[itemType].kode_warna[kodeWarna].style_size || [];
+                    const match = styleList.find(item => item.no_model === modelCode && item.style_size === styleSize);
+                    if (match) {
+                        composition = parseFloat(match.composition) || 0;
+                        gw = parseFloat(match.gw) || 0;
+                        loss = parseFloat(match.loss) || 0;
+                    }
+                }
+
+                const stKg = bsSetting * composition * gw / 100 / 1000;
+                const poplus = sisaOrder * composition * gw / 100 / 1000;
+                const kgPoplusMc = (poplus * (1 + loss / 100)) + bsMesin + stKg;
+
+                console.log('Sisa Order:', sisaOrder);
+                console.log('BS Mesin:', bsMesin);
+                console.log('BS Setting:', bsSetting);
+                console.log('Composition:', composition);
+                console.log('GW:', gw);
+                console.log('Loss:', loss);
+                console.log('Kg Po Plus Mc:', kgPoplusMc);
+
+                $row.find('.poplus-mc-kg').val(kgPoplusMc.toFixed(2));
+
+                hitungTotalKg();
+            }
 
             hitungTotalKg();
 
@@ -395,23 +566,30 @@
             $(document).on('click', '.remove-size-row', function(e) {
                 e.preventDefault();
 
-                const $row = $(this).closest('.size-block');
+                const $row = $(this).closest('.col-md-4');
 
                 // Konfirmasi dulu, boleh juga langsung hapus tanpa konfirmasi
                 if (confirm('Yakin ingin menghapus baris ini?')) {
                     $row.remove();
+                    hitungTotalKg();
                 }
             });
 
             //Save data
             $('#btn-save').on('click', function() {
                 let formData = [];
+                let loading = document.getElementById('loading-spinner');
+                loading.classList.remove('d-none')
 
                 $('.kebutuhan-item').each(function() {
                     const no_model = $(this).find('.select-no-model').val();
                     const item_type = $(this).find('.item-type').val();
                     const kode_warna = $(this).find('.kode-warna').val();
                     const color = $(this).find('.color').first().val(); // Ambil color utama
+                    const sisa_bb_mc = $(this).find('.sisa-mc-kg').val();
+                    const terima_kg = $(this).find('.terima').first().val(); // Ambil color utama
+                    const poplus_mc_cns = $(this).find('.poplus-mc-cns').val();
+                    const plus_pck_cns = $(this).find('.plus-pck-cns').val();
                     const keterangan = $('#keterangan').val();
 
                     $(this).find('.size-block').each(function() {
@@ -420,12 +598,18 @@
                             item_type: item_type,
                             kode_warna: kode_warna,
                             color: color,
+                            sisa_bb_mc: sisa_bb_mc,
+                            terima_kg: terima_kg,
+                            poplus_mc_cns: poplus_mc_cns,
+                            plus_pck_cns: plus_pck_cns,
                             style_size: $(this).find('.style-size-hidden').val(),
-                            bs_mesin: $(this).find('.bs-mesin').val(),
-                            bs_setting: $(this).find('.bs-setting').val(),
-                            pcs_po: $(this).find('.pcs-po').val(),
-                            kg_po: $(this).find('.kg-po').val(),
-                            cns_po: $(this).find('.cns-po').val(),
+                            sisa_order_pcs: $(this).find('.sisa-order').val(),
+                            bs_mesin_kg: $(this).find('.bs-mesin').val(),
+                            bs_st_pcs: $(this).find('.bs-setting').val(),
+                            poplus_mc_kg: $(this).find('.poplus-mc-kg').val(),
+                            plus_pck_pcs: $(this).find('.plus-pck-pcs').val(),
+                            plus_pck_kg: $(this).find('.plus-pck-kg').val(),
+                            lebih_pakai_kg: $(this).find('.lebih-pakai').val(),
                             keterangan: keterangan
                         });
                     });
@@ -466,6 +650,9 @@
                             icon: 'error',
                             text: 'Terjadi kesalahan saat menyimpan data.',
                         });
+                    },
+                    complete: function() {
+                        loading.classList.add('d-none'); // Sembunyikan loading setelah selesai
                     }
                 });
             });

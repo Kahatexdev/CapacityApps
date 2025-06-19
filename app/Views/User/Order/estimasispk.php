@@ -46,7 +46,7 @@ $this->extend($role . '/layout'); ?>
                         <div>
                             <button type="button" class="btn btn-warning btn-petunjuk" ata-toggle="modal" data-target="#petunjuk">Petunjuk</button>
                             <button id="minta-btn" class="btn btn-info">Minta</button>
-                            <button id="export-btn" class="btn btn-success"><i class="far fa-file-excel"></i></button>
+                            <!-- <button id="export-btn" class="btn btn-success"><i class="far fa-file-excel"></i></button> -->
                         </div>
                     </div>
                 </div>
@@ -138,10 +138,10 @@ $this->extend($role . '/layout'); ?>
                         </table>
                     </div>
                 </div>
-            </div>\
-            <div class="card">
+            </div>
+            <div class="card mt-3">
 
-                <div class="mt-5">
+                <div class="">
                     <h3>Form Input SPK 2 Manual</h3>
                 </div>
 
@@ -189,6 +189,51 @@ $this->extend($role . '/layout'); ?>
                     </div>
                 </div>
             </div>
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h3>History Permintaan </h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="exampleHistory" class="table display hover" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">No Model</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Style</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php $index = 0; ?>
+                                <?php foreach ($history as $item): ?>
+                                    <tr>
+                                        <td class="text-xs"><?= $item['model']; ?></td>
+                                        <td class="text-xs"><?= $item['style']; ?></td>
+                                        <td class="text-xs"><?= round($item['qty']); ?> pcs</td>
+                                        <td class="text-xs">
+                                            <?php if ($item['status'] === 'approved'): ?>
+                                                <span class="badge bg-success text-white"><?= esc($item['status']); ?></span>
+                                            <?php else: ?>
+                                                <span class="badge bg-warning text-dark"><?= esc($item['status']); ?></span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="text-xs"><?= $item['updated_at']; ?></td>
+
+                                        <!-- Hidden inputs -->
+                                        <input type="hidden" name="row[<?= $index ?>][model]" value="<?= $item['model'] ?>">
+                                        <input type="hidden" name="row[<?= $index ?>][style]" value="<?= $item['style'] ?>">
+                                        <input type="hidden" name="row[<?= $index ?>][area]" value="<?= $area ?>">
+                                    </tr>
+                                    <?php $index++; ?>
+                                <?php endforeach ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -202,6 +247,11 @@ $this->extend($role . '/layout'); ?>
         var table = $('#example').DataTable({
             "order": [
                 [0, 'desc'] // Urutkan kolom pertama secara descending
+            ]
+        });
+        var tableHistory = $('#exampleHistory').DataTable({
+            "order": [
+                [4, 'desc'] // Urutkan kolom pertama secara descending
             ]
         });
 
