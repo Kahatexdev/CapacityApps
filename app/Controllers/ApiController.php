@@ -189,6 +189,86 @@ class ApiController extends ResourceController
         $bsdata = $this->BsMesinModel->bsKary($area, $tanggal);
         return $this->response->setJSON($bsdata);
     }
+
+    public function getApsPerStyles()
+    {
+        // Get the parameters from the request
+        $mastermodel = $this->request->getGet('mastermodel');
+        $size = $this->request->getGet('size');
+        $factory = $this->request->getGet('factory');
+        // Validate the input parameters
+        if (!$mastermodel || !$size) {
+            return $this->response->setJSON([
+                "error" => "Parameter tidak lengkap",
+                "received" => [
+                    "mastermodel" => $mastermodel,
+                    "size" => $size,
+                    "factory" => $factory,
+                ]
+            ])->setStatusCode(400);
+        }
+
+        // Fetch data from the model
+        $apsData = $this->ApsPerstyleModel->getApsPerStyle($mastermodel, $size, $factory);
+
+        // Check if data is found
+        if (empty($apsData)) {
+            return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
+        }
+
+        // Return the data with a 200 status
+        return $this->respond($apsData, ResponseInterface::HTTP_OK);
+    }
+
+    public function getApsPerStyle($mastermodel, $size, $factory)
+    {
+        // Validate the input parameters
+        if (!$mastermodel || !$size) {
+            return $this->response->setJSON([
+                "error" => "Parameter tidak lengkap",
+                "received" => [
+                    "mastermodel" => $mastermodel,
+                    "size" => $size,
+                    "factory" => $factory,
+                ]
+            ])->setStatusCode(400);
+        }
+
+        // Fetch data from the model
+        $apsData = $this->ApsPerstyleModel->getApsPerStyle($mastermodel, $size, $factory);
+
+        // Check if data is found
+        if (empty($apsData)) {
+            return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
+        }
+
+        // Return the data with a 200 status
+        return $this->respond($apsData, ResponseInterface::HTTP_OK);
+    }
+
+    public function getApsPerStyleById($id)
+    {
+        // Validate the input parameter
+        if (!$id) {
+            return $this->response->setJSON([
+                "error" => "Parameter tidak lengkap",
+                "received" => [
+                    "idapsperstyle" => $id,
+                ]
+            ])->setStatusCode(400);
+        }
+
+        // Fetch data from the model
+        $apsData = $this->ApsPerstyleModel->getApsPerStyleById($id);
+
+        // Check if data is found
+        if (empty($apsData)) {
+            return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
+        }
+
+        // Return the data with a 200 status
+        return $this->respond($apsData, ResponseInterface::HTTP_OK);
+    }
     public function getQtyPcsByAreaByStyle($area)
     {
         $noModel = $this->request->getGet('no_model');

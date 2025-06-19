@@ -1898,17 +1898,26 @@ class OrderController extends BaseController
         $data = $this->ApsPerstyleModel->dataEstimasi($area, $lastmonth);
         $pdkArea = $this->ApsPerstyleModel->getModelArea($area);
         $perStyle = [];
+        $requeseted = [];
         foreach ($data as $id) {
 
             // get data produksi
             $dataProd = $this->produksiModel->getProdByPdkSize($id['mastermodel'], $id['size']);
             $sudahMinta = $this->estspk->cekStatus($id['mastermodel'], $id['size'], $area);
-            $status = $sudahMinta['status'] ?? 'belum';
-            $kapan = isset($sudahMinta['created_at'])
-                ? date('d-m-Y', strtotime($sudahMinta['created_at']))
-                : '-';
 
-
+            if ($sudahMinta) {
+                if ($sudahMinta['status'] === 'sudah') {
+                    $sudahMinta['status'] = 'Menunggu Acc';
+                }
+                $requeseted[] = [
+                    'model' => $sudahMinta['model'],
+                    'style' => $sudahMinta['style'],
+                    'area' => $sudahMinta['area'],
+                    'qty' => $sudahMinta['qty'],
+                    'status' => $sudahMinta['status'],
+                    'updated_at' => $sudahMinta['updated_at'],
+                ];
+            }
             // Hitung nilai akumulasi awal
             $bs =  (int)$dataProd['bs'];
             $qty = (int)$id['qty'];
@@ -1933,11 +1942,12 @@ class OrderController extends BaseController
                     'poplus' => $poplus,
                     'jarum' => $id['machinetypeid'],
                     'estimasi' => round(($estimasi * 100), 1),
-                    'status' => $status,
-                    'waktu' => $kapan
+                    'status' => 'belum',
+                    'waktu' => '-'
                 ];
             }
         }
+
 
 
         $data2 = [
@@ -1953,7 +1963,8 @@ class OrderController extends BaseController
             'data' => $data,
             'area' => $area,
             'perStyle' => $perStyle,
-            'model' => $pdkArea
+            'model' => $pdkArea,
+            'history' => $requeseted
         ];
         return view(session()->get('role') . '/Order/estimasispk', $data2);
     }
@@ -2150,13 +2161,23 @@ class OrderController extends BaseController
                     continue;
                 }
 
-                $this->estspk->insert([
-                    'model'    => $row['model'],
-                    'style'     => $row['size'],
-                    'area'     => $row['area'],
-                    'qty'    => (int)$row['estimasi'] ?? 0,
-                    'status' => 'sudah'
-                ]);
+                // Cek apakah sudah ada di database
+                $exists = $this->estspk
+                    ->where('model', $row['model'])
+                    ->where('style', $row['size'])
+                    ->where('area', $row['area'])
+                    ->where('qty', $row['estimasi'])
+                    ->first();
+
+                if (!$exists) {
+                    $this->estspk->insert([
+                        'model'  => $row['model'],
+                        'style'  => $row['size'],
+                        'area'   => $row['area'],
+                        'qty'    => isset($row['estimasi']) ? (int)$row['estimasi'] : 0,
+                        'status' => 'sudah'
+                    ]);
+                }
             }
             return redirect()->back()->with('sucess', 'Permintaan terikirm');
         } else {
@@ -2176,14 +2197,24 @@ class OrderController extends BaseController
 
 
         foreach ($items as $item) {
+            // Cek apakah item sudah ada berdasarkan kombinasi unik
+            $exists = $this->estspk
+                ->where('model', $item['no_model'])
+                ->where('style', $item['size'])
+                ->where('area', $item['area'])
+                ->where('qty', $item['qty'])
+                ->first();
 
-            $this->estspk->insert([
-                'model' => $item['no_model'],
-                'style' => $item['size'],
-                'area' => $item['area'],
-                'qty' => $item['qty'],
-                'status' => 'sudah'
-            ]);
+            if (!$exists) {
+                // Hanya insert jika belum ada
+                $this->estspk->insert([
+                    'model' => $item['no_model'],
+                    'style' => $item['size'],
+                    'area' => $item['area'],
+                    'qty'   => $item['qty'],
+                    'status' => 'sudah'
+                ]);
+            }
         }
 
         return $this->response->setJSON([

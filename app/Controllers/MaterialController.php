@@ -1120,65 +1120,164 @@ class MaterialController extends BaseController
         return $this->response
             ->setJSON($size);
     }
-    public function poTambahanDetail($noModel, $styleSize, $area)
+    public function poTambahanDetail($noModel, $area)
     {
         $detail = [];
-        $size    = rawurlencode($styleSize);
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/poTambahanDetail/' . $noModel . '/' . $size;
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/poTambahanDetail/' . $noModel . '/' . $area;
 
         // Mengambil data dari API eksternal
         $response = @file_get_contents($apiUrl);
 
+        log_message('debug', 'API response: ' . $response);
+
         if ($response === false) {
-            log_message('error', 'Gagal mengambil data dari API untuk No Model: ' . $noModel . '& Size: ' . $styleSize);
+            log_message('error', 'Gagal mengambil data dari API');
             return $this->response->setStatusCode(500)->setJSON(['error' => 'Tidak dapat mengambil data dari API']);
         }
 
-        $detail['material'] = json_decode($response, true);
+        $materialData = json_decode($response, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             log_message('error', 'JSON tidak valid: ' . json_last_error_msg());
             return $this->response->setStatusCode(500)->setJSON(['error' => 'Data JSON tidak valid']);
         }
 
-        $bsMesin = $this->BsMesinModel->getBsMesinPph($area, $noModel, $styleSize);
-        $bsMesinKg = $bsMesin['bs_gram'] / 1000;
-        $validate = [
-            'area' => $area,
-            'style' => $styleSize,
-            'no_model' => $noModel
-        ];
-        $idaps = $this->ApsPerstyleModel->getIdForBs($validate);
-        $bsSetting = $this->bsModel->getTotalBsSet($idaps);
-        $detail['bs'] = $bsMesinKg;
-        $detail['st'] = $bsSetting['qty'];
+        // Ambil item_type saja (key dari level pertama JSON)
+        $itemTypes = [];
+        foreach ($materialData as $key => $value) {
+            if (isset($value['item_type'])) {
+                $itemTypes[] = [
+                    'item_type' => $value['item_type']
+                ];
+            }
+        }
 
-        // Cetak ke log
-        log_message('debug', print_r($detail, true));
+        // Ambil semua style_size
+        $styleSize = [];
+        foreach ($materialData as $itemTypeData) {
+            if (isset($itemTypeData['kode_warna']) && is_array($itemTypeData['kode_warna'])) {
+                foreach ($itemTypeData['kode_warna'] as $kodeWarnaData) {
+                    if (isset($kodeWarnaData['style_size']) && is_array($kodeWarnaData['style_size'])) {
+                        foreach ($kodeWarnaData['style_size'] as $style) {
+                            if (isset($style['style_size'])) {
+                                $styleSize[] = $style['style_size'];
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-        // Mengembalikan data item-type dalam format JSON
-        return $this->response->setJSON($detail);
+        $styleSize = array_unique($styleSize);
+
+        // Ambil BS MESIN per style_size
+        $sisaOrderList = [];
+        foreach ($styleSize as $style) {
+            $sisa = $this->ApsPerstyleModel->getSisaPerSize($area, $noModel, [$style]);
+            $sisaPcs = is_array($sisa) ? $sisa['sisa'] ?? 0 : ($sisa->sisa ?? 0);
+            $sisaOrderList[$style] = (float)$sisaPcs;
+        }
+
+        // Ambil BS MESIN per style_size
+        $bsMesinList = [];
+        foreach ($styleSize as $style) {
+            $bs = $this->BsMesinModel->getBsMesin($area, $noModel, [$style]);
+            $bsGram = is_array($bs) ? $bs['bs_gram'] ?? 0 : ($bs->bs_gram ?? 0);
+            $bsMesinList[$style] = (float)$bsGram;
+        }
+
+        // Ambil BS SETTING per style_size
+        $bsSettingList = [];
+        foreach ($styleSize as $style) {
+            $validate = [
+                'area' => $area,
+                'style' => $style,
+                'no_model' => $noModel
+            ];
+            $idaps = $this->ApsPerstyleModel->getIdForBs($validate);
+            $bsSetting = $this->bsModel->getTotalBsSet($idaps);
+            $bsSettingList[$style] = isset($bsSetting['qty']) ? (int)$bsSetting['qty'] : 0;
+        }
+
+        $lebihPakaiList = [];
+        foreach ($materialData as $itemType => $itemData) {
+            foreach ($itemData['kode_warna'] as $kodeWarna => $warnaData) {
+                foreach ($warnaData['style_size'] as $style) {
+                    $styleSize = $style['style_size'] ?? '';
+                    $kgs = $style['kg_mu'] ?? 0;
+                    $gw = (float)($style['gw'] ?? 0);
+                    $comp = (float)($style['composition'] ?? 0);
+                    $loss = (float)($style['loss'] ?? 0);
+
+                    $prod = $this->orderModel->getDataPph($area, $noModel, $styleSize);
+                    $prod = is_array($prod) ? $prod : [];
+
+
+                    $bsMesin = $bsMesinList[$styleSize] ?? 0;
+                    $bruto = $prod['bruto'] ?? 0;
+
+                    if ($gw == 0) {
+                        $pph = 0;
+                    } else {
+                        $pph = ((($bruto + ($bsMesin / $gw)) * $comp * $gw) / 100) / 1000;
+                    }
+
+                    $lebihPakai = max(0, $pph - $kgs);
+
+                    $lebihPakaiList[$styleSize] = $lebihPakai;
+                }
+            }
+        }
+
+        log_message('debug', 'Lebih Pakai: ' . print_r($lebihPakaiList, true));
+
+        return $this->response->setJSON([
+            'item_types' => $itemTypes,
+            'material' => $materialData,
+            'sisa_order' => $sisaOrderList,
+            'bs_mesin' => $bsMesinList,
+            'bs_setting' => $bsSettingList,
+            'lebih_pakai' => $lebihPakaiList
+        ]);
     }
     public function savePoTambahan($area)
     {
         $json = $this->request->getJSON(true);
 
+        if (empty($json) || !isset($json[0])) {
+            return $this->response
+                ->setStatusCode(400)
+                ->setJSON(['status' => 'error', 'message' => 'Payload invalid.']);
+        }
+
+        // Siapkan items
         $items = array_map(function ($item) use ($area) {
             return [
-                'area'            => $area,
-                'no_model'        => $item['no_model'],
-                'style_size'      => $item['style_size'],
-                'item_type'       => $item['item_type'],
-                'kode_warna'      => $item['kode_warna'],
-                'color'           => $item['color'],
-                'pcs_po_tambahan' => $item['pcs_po'],
-                'kg_po_tambahan'  => $item['kg_po'],
-                'cns_po_tambahan'  => $item['cns_po'],
-                'keterangan'      => $item['keterangan'],
-                'admin'           => session()->get('username'),
-                'created_at'      => date('Y-m-d H:i:s'),
+                'area'              => $area,
+                'no_model'          => $item['no_model'] ?? '',
+                'item_type'         => $item['item_type'] ?? '',
+                'kode_warna'        => $item['kode_warna'] ?? '',
+                'color'             => $item['color'] ?? '',
+                'style_size'        => $item['style_size'] ?? '',
+                'terima_kg'         => (float) ($item['terima_kg'] ?? 0),
+                'sisa_bb_mc'        => (float) ($item['sisa_bb_mc'] ?? 0),
+                'sisa_order_pcs'    => (float) ($item['sisa_order_pcs'] ?? 0),
+                'bs_mesin_kg'       => (float) ($item['bs_mesin_kg'] ?? 0),
+                'bs_st_pcs'         => (float) ($item['bs_st_pcs'] ?? 0),
+                'poplus_mc_kg'      => (float) ($item['poplus_mc_kg'] ?? 0),
+                'poplus_mc_cns'     => (float) ($item['poplus_mc_cns'] ?? 0),
+                'plus_pck_pcs'      => (float) ($item['plus_pck_pcs'] ?? 0),
+                'plus_pck_kg'       => (float) ($item['plus_pck_kg'] ?? 0),
+                'plus_pck_cns'      => (float) ($item['plus_pck_cns'] ?? 0),
+                'lebih_pakai_kg'    => (float) ($item['lebih_pakai_kg'] ?? 0),
+                'keterangan'        => $item['keterangan'] ?? '',
+                'admin'             => session()->get('username'),
+                'created_at'        => date('Y-m-d H:i:s'),
             ];
         }, $json);
+
+        // Log isi items ke log file
+        log_message('debug', 'ITEMS untuk dikirim ke API: ' . json_encode($items));
 
         $payload = ['items' => $items];
         $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/savePoTambahan';
@@ -1206,7 +1305,7 @@ class MaterialController extends BaseController
     public function filterPoTambahan($area)
     {
         $noModel = $this->request->getGet('model');
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterPoTambahan"
+        $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/filterPoTambahan"
             . "?area=" . urlencode($area)
             . "&model=" . urlencode($noModel);
 

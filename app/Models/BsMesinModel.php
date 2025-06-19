@@ -127,6 +127,14 @@ class BsMesinModel extends Model
             ->where('size', $size)
             ->first(); // Ambil satu hasil
     }
+    public function getBsMesin($area, $nomodel, $size)
+    {
+        return $this->select('sum(qty_gram) as bs_gram')
+            ->where('area', $area)
+            ->where('no_model', $nomodel)
+            ->whereIn('size', $size)
+            ->first(); // Ambil satu hasil
+    }
     public function getBsMesinHarian(array $mastermodels, array $sizes, string $tanggal, $area)
     {
         return $this->select('no_model, size, SUM(qty_gram) as bs_mesin')

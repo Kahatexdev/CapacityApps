@@ -63,16 +63,27 @@
                         <table class="display text-center text-uppercase text-xs font-bolder" id="dataTable" style="width:100%">
                             <thead>
                                 <tr>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">No</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal PO(+)</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Model</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Style Size</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Item Type</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Kode Warna</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Color</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Pcs PO(+)</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Kg PO(+)</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Keterangan</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7">No</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal PO(+)</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Model</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Style Size</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Item_Type</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Kode Warna</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Color</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty (Pcs)</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Kgs</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Terima (Kg)</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa BB_Mesin(Kg)</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Order(Pcs)</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">BS Mesin(Kg)</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">BS Setting(Pcs)</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">(+)Mesin (Kg)</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">(+)Mesin (Cns)</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">(+)Packing (Pcs)</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">(+)Packing (Kg)</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">(+)Packing (Cns)</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Lebih Pakai(Kg)</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Keterangan</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -80,6 +91,29 @@
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- modal export pdf -->
+<div class="modal fade" id="exportPdf" tabindex="-1" role="dialog" aria-labelledby="exportPdf" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Export PDF</h5>
+                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body align-items-center">
+                <div class="form-group">
+                    <label for="area" class="col-form-label">Tanggal Buka PO(+)</label>
+                    <input type="date" class="form-control" id="tgl_buat">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="generatePdfBtn" class="btn bg-gradient-info">Generate</button>
             </div>
         </div>
     </div>
@@ -183,8 +217,19 @@
                 item.item_type || '',
                 item.kode_warna || '',
                 item.color || '',
-                item.pcs_po_tambahan || 0,
-                item.kg_po_tambahan || 0,
+                item.qty_pcs || 0,
+                item.kgs || 0,
+                item.terima_kg || 0,
+                item.sisa_bb_mc || 0,
+                item.sisa_order_pcs || 0,
+                item.bs_mesin_kg || 0,
+                item.bs_st_pcs || 0,
+                item.poplus_mc_kg || 0,
+                item.poplus_mc_cns || 0,
+                item.plus_pck_pcs || 0,
+                item.plus_pck_kg || 0,
+                item.plus_pck_cns || 0,
+                item.lebih_pakai_kg || 0,
                 item.keterangan || '',
             ]);
         });
@@ -208,9 +253,16 @@
         });
     });
 
-    $('#exportPdfBtn').on('click', function() {
+    $(document).ready(function() {
+        $('#exportPdfBtn').on('click', function() {
+            $('#exportPdf').modal('show');
+        });
+    });
+
+    $('#generatePdfBtn').on('click', function() {
         const area = $('#area').val();
         const model = $('#no_model').val();
+        const tglBuat = $('#tgl_buat').val();
         const role = <?= json_encode($role) ?>;
 
         if (!model) {
@@ -220,7 +272,8 @@
 
         const url = "<?= base_url($role . '/generate_po_tambahan') ?>" +
             "?area=" + encodeURIComponent(area) +
-            "&model=" + encodeURIComponent(model);
+            "&model=" + encodeURIComponent(model) +
+            "&tgl_buat=" + encodeURIComponent(tglBuat);
 
         window.open(url, '_blank');
     });

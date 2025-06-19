@@ -1111,6 +1111,30 @@ class ApsPerstyleModel extends Model
             ->groupBy('mastermodel')
             ->findAll();
     }
+    public function getSisaPerSize($area, $nomodel, $size)
+    {
+        return $this->select('sum(sisa) as sisa')
+            ->where('factory', $area)
+            ->where('mastermodel', $nomodel)
+            ->whereIn('size', $size)
+            ->first(); // Ambil satu hasil
+    }
+
+    public function getApsPerStyle($nomodel, $size, $area)
+    {
+        return $this->select('idapsperstyle, mastermodel, size, inisial, delivery, factory')
+            ->where('mastermodel', $nomodel)
+            ->where('size', $size)
+            ->where('factory', $area)
+            ->findAll();
+    }
+
+    public function getApsPerStyleById($id)
+    {
+        return $this->select('idapsperstyle, mastermodel, size, inisial, delivery, factory')
+            ->where('idapsperstyle', $id)
+            ->findAll();
+    }
     public function getQtyPcsByAreaByStyle($data)
     {
         return $this->select('SUM(qty) AS qty')

@@ -44,7 +44,7 @@ class EstSpkModel extends Model
 
     public function cekStatus($model, $style, $area)
     {
-        return $this->select('status,created_at')
+        return $this
             ->where('model', $model)
             ->where('style', $style)
             ->where('area', $area)
