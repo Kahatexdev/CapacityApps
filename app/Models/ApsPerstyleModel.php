@@ -1135,4 +1135,40 @@ class ApsPerstyleModel extends Model
             ->where('idapsperstyle', $id)
             ->findAll();
     }
+    public function getQtyPcsByAreaByStyle($data)
+    {
+        return $this->select('SUM(qty) AS qty')
+            ->where('factory', $data['area'])
+            ->where('mastermodel', $data['noModel'])
+            ->where('size', $data['styleSize'])
+            ->first();
+    }
+
+    public function getMasterModel()
+    {
+        return $this->select('mastermodel')
+            ->groupBy('mastermodel')
+            // 3 bulan sebelumnya dan 3 bulan ke depan
+            ->where('delivery >=', date('Y-m-d', strtotime('-3 months')))
+            ->where('delivery <=', date('Y-m-d', strtotime('+3 months')))
+            ->findAll();
+    }
+
+    public function getInisialByModel($model)
+    {
+        return $this->select('inisial')
+            ->where('mastermodel', $model)
+            ->groupBy('inisial')
+            ->where('delivery >=', date('Y-m-d', strtotime('-3 months')))
+            ->where('delivery <=', date('Y-m-d', strtotime('+3 months')))
+            ->findAll();
+    }
+
+    public function getIdApsByModelInisial($model, $inisial)
+    {
+        return $this->select('idapsperstyle')
+            ->where('mastermodel', $model)
+            ->where('inisial', $inisial)
+            ->findAll();
+    }
 }

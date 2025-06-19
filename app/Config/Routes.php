@@ -48,6 +48,10 @@ $routes->group(
         $routes->get('getApsPerStyles', 'ApiController::getApsPerStyles');
         $routes->get('getApsPerStyle/(:any)/(:any)/(:any)', 'ApiController::getApsPerStyle/$1/$2/$3');
         $routes->get('getApsPerStyleById/(:any)', 'ApiController::getApsPerStyleById/$1');
+        $routes->get('getQtyPcsByAreaByStyle/(:any)', 'ApiController::getQtyPcsByAreaByStyle/$1');
+        $routes->get('getMasterModel', 'ApiController::getMasterModel');
+        $routes->get('getInisialByModel/(:any)', 'ApiController::getInisialByModel/$1');
+        $routes->get('getIdApsByModelInisial/(:any)/(:any)', 'ApiController::getApsPerStyleByInisial/$1/$2');
     }
 );
 
