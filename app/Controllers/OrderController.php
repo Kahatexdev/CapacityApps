@@ -1902,46 +1902,59 @@ class OrderController extends BaseController
         $data = $this->ApsPerstyleModel->dataEstimasi($area, $lastmonth);
         $pdkArea = $this->ApsPerstyleModel->getModelArea($area);
         $perStyle = [];
+        $requeseted = [];
+        $history = $this->estspk->getHistory($area, $lastmonth);
         foreach ($data as $id) {
 
             // get data produksi
             $dataProd = $this->produksiModel->getProdByPdkSize($id['mastermodel'], $id['size']);
             $sudahMinta = $this->estspk->cekStatus($id['mastermodel'], $id['size'], $area);
-            $status = $sudahMinta['status'] ?? 'belum';
-            $kapan = isset($sudahMinta['created_at'])
-                ? date('d-m-Y', strtotime($sudahMinta['created_at']))
-                : '-';
 
-
-            // Hitung nilai akumulasi awal
-            $bs =  (int)$dataProd['bs'];
-            $qty = (int)$id['qty'];
-            $sisa = (int)$id['sisa'];
-            $poplus = (int)$id['poplus'];
-            $produksi = $qty - $sisa;
-            $ttlProd = (int)$dataProd['prod'];
-            // Periksa apakah produksi valid dan memenuhi kondisi
-            if ($ttlProd > 0) {
-                $percentage = round(($ttlProd / $qty) * 100);
-                $ganti = $bs + $poplus;
-                $estimasi = ($ganti / $ttlProd / 100) * $qty;
-                $perStyle[] = [
-                    'model' => $id['mastermodel'],
-                    'inisial' => $id['inisial'],
-                    'size' => $id['size'],
-                    'sisa' => $sisa,
-                    'qty' => $qty,
-                    'ttlProd' => $ttlProd,
-                    'percentage' => $percentage,
-                    'bs' => $bs,
-                    'poplus' => $poplus,
-                    'jarum' => $id['machinetypeid'],
-                    'estimasi' => round(($estimasi * 100), 1),
-                    'status' => $status,
-                    'waktu' => $kapan
+            if ($sudahMinta) {
+                if ($sudahMinta['status'] === 'sudah') {
+                    $sudahMinta['status'] = 'Menunggu Acc';
+                }
+                $requeseted[] = [
+                    'model' => $sudahMinta['model'],
+                    'style' => $sudahMinta['style'],
+                    'area' => $sudahMinta['area'],
+                    'qty' => $sudahMinta['qty'],
+                    'status' => $sudahMinta['status'],
+                    'updated_at' => $sudahMinta['updated_at'],
                 ];
+            } else {
+
+                // Hitung nilai akumulasi awal
+                $bs =  (int)$dataProd['bs'];
+                $qty = (int)$id['qty'];
+                $sisa = (int)$id['sisa'];
+                $poplus = (int)$id['poplus'];
+                $produksi = $qty - $sisa;
+                $ttlProd = (int)$dataProd['prod'];
+                // Periksa apakah produksi valid dan memenuhi kondisi
+                if ($ttlProd > 0) {
+                    $percentage = round(($ttlProd / $qty) * 100);
+                    $ganti = $bs + $poplus;
+                    $estimasi = ($ganti / $ttlProd / 100) * $qty;
+                    $perStyle[] = [
+                        'model' => $id['mastermodel'],
+                        'inisial' => $id['inisial'],
+                        'size' => $id['size'],
+                        'sisa' => $sisa,
+                        'qty' => $qty,
+                        'ttlProd' => $ttlProd,
+                        'percentage' => $percentage,
+                        'bs' => $bs,
+                        'poplus' => $poplus,
+                        'jarum' => $id['machinetypeid'],
+                        'estimasi' => round(($estimasi * 100), 1),
+                        'status' => 'belum',
+                        'waktu' => '-'
+                    ];
+                }
             }
         }
+
 
 
         $data2 = [
@@ -1957,7 +1970,8 @@ class OrderController extends BaseController
             'data' => $data,
             'area' => $area,
             'perStyle' => $perStyle,
-            'model' => $pdkArea
+            'model' => $pdkArea,
+            'history' => $history
         ];
         return view(session()->get('role') . '/Order/estimasispk', $data2);
     }

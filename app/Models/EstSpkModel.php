@@ -44,7 +44,7 @@ class EstSpkModel extends Model
 
     public function cekStatus($model, $style, $area)
     {
-        return $this->select('status,created_at')
+        return $this
             ->where('model', $model)
             ->where('style', $style)
             ->where('area', $area)
@@ -56,6 +56,12 @@ class EstSpkModel extends Model
         return $this->select('estimasi_spk.*, DATE(created_at) AS tgl_buat')
             ->where('status', 'sudah')
             ->orderBy('created_at', 'ASC')
+            ->findAll();
+    }
+    public function getHistory($area, $lastmonth)
+    {
+        return $this->where('area', $area)
+            ->where('updated_at>', $lastmonth)
             ->findAll();
     }
 }
