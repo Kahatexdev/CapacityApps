@@ -1305,7 +1305,7 @@ class MaterialController extends BaseController
     public function filterPoTambahan($area)
     {
         $noModel = $this->request->getGet('model');
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterPoTambahan"
+        $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/filterPoTambahan"
             . "?area=" . urlencode($area)
             . "&model=" . urlencode($noModel);
 
