@@ -1135,4 +1135,40 @@ class ApsPerstyleModel extends Model
             ->where('idapsperstyle', $id)
             ->findAll();
     }
+    public function getDataOrder($validate)
+    {
+        $builder = $this->select('apsperstyle.*, SUM(apsperstyle.qty) AS qty_pcs, data_model.kd_buyer_order')
+            ->join('data_model', 'apsperstyle.mastermodel =  data_model.no_model', 'left')
+            ->where('apsperstyle.qty != 0');
+
+        if (!empty($validate['buyer'])) {
+            $this->where('data_model.kd_buyer_order', $validate['buyer']);
+        }
+
+        if (!empty($validate['area'])) {
+            $this->where('apsperstyle.factory', $validate['area']);
+        }
+
+        if (!empty($validate['jarum'])) {
+            $this->where('apsperstyle.machinetypeid', $validate['jarum']);
+        }
+
+        if (!empty($validate['pdk'])) {
+            $this->where('data_model.no_model', $validate['pdk']);
+        }
+
+        if (!empty($validate['awal'])) {
+            $this->where('apsperstyle.delivery >=', $validate['awal']);
+        }
+        if (!empty($validate['akhir'])) {
+            $this->where('apsperstyle.delivery <=', $validate['akhir']);
+        }
+        return $builder
+            ->groupBy('apsperstyle.mastermodel')
+            ->groupBy('apsperstyle.machinetypeid')
+            ->groupBy('apsperstyle.size')
+            ->groupBy('apsperstyle.delivery')
+            ->orderBy('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.size, apsperstyle.delivery', 'ASC')
+            ->findAll();
+    }
 }

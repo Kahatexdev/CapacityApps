@@ -115,6 +115,8 @@ class OrderController extends BaseController
     public function semuaOrder()
     {
         $role = session()->get('role');
+        $dataBuyer = $this->orderModel->getBuyer();
+        $dataArea = $this->jarumModel->getArea();
 
         $product = $this->productModel->findAll();
         $data = [
@@ -128,7 +130,9 @@ class OrderController extends BaseController
             'active6' => '',
             'active7' => '',
             'product' => $product,
-            'role' => $role
+            'role' => $role,
+            'buyer' => $dataBuyer,
+            'area' => $dataArea,
 
         ];
         return view($role . '/Order/semuaorder', $data);
