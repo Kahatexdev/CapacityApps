@@ -1899,6 +1899,7 @@ class OrderController extends BaseController
         $pdkArea = $this->ApsPerstyleModel->getModelArea($area);
         $perStyle = [];
         $requeseted = [];
+        $history = $this->estspk->getHistory($area, $lastmonth);
         foreach ($data as $id) {
 
             // get data produksi
@@ -1966,7 +1967,7 @@ class OrderController extends BaseController
             'area' => $area,
             'perStyle' => $perStyle,
             'model' => $pdkArea,
-            'history' => $requeseted
+            'history' => $history
         ];
         return view(session()->get('role') . '/Order/estimasispk', $data2);
     }

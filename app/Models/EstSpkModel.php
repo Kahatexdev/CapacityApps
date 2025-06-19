@@ -58,4 +58,10 @@ class EstSpkModel extends Model
             ->orderBy('created_at', 'ASC')
             ->findAll();
     }
+    public function getHistory($area, $lastmonth)
+    {
+        return $this->where('area', $area)
+            ->where('updated_at>', $lastmonth)
+            ->findAll();
+    }
 }
