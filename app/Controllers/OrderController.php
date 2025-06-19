@@ -1898,17 +1898,26 @@ class OrderController extends BaseController
         $data = $this->ApsPerstyleModel->dataEstimasi($area, $lastmonth);
         $pdkArea = $this->ApsPerstyleModel->getModelArea($area);
         $perStyle = [];
+        $requeseted = [];
         foreach ($data as $id) {
 
             // get data produksi
             $dataProd = $this->produksiModel->getProdByPdkSize($id['mastermodel'], $id['size']);
             $sudahMinta = $this->estspk->cekStatus($id['mastermodel'], $id['size'], $area);
-            $status = $sudahMinta['status'] ?? 'belum';
-            $kapan = isset($sudahMinta['created_at'])
-                ? date('d-m-Y', strtotime($sudahMinta['created_at']))
-                : '-';
 
-
+            if ($sudahMinta) {
+                if ($sudahMinta['status'] === 'sudah') {
+                    $sudahMinta['status'] = 'Menunggu Acc';
+                }
+                $requeseted[] = [
+                    'model' => $sudahMinta['model'],
+                    'style' => $sudahMinta['style'],
+                    'area' => $sudahMinta['area'],
+                    'qty' => $sudahMinta['qty'],
+                    'status' => $sudahMinta['status'],
+                    'updated_at' => $sudahMinta['updated_at'],
+                ];
+            }
             // Hitung nilai akumulasi awal
             $bs =  (int)$dataProd['bs'];
             $qty = (int)$id['qty'];
@@ -1933,11 +1942,12 @@ class OrderController extends BaseController
                     'poplus' => $poplus,
                     'jarum' => $id['machinetypeid'],
                     'estimasi' => round(($estimasi * 100), 1),
-                    'status' => $status,
-                    'waktu' => $kapan
+                    'status' => 'belum',
+                    'waktu' => '-'
                 ];
             }
         }
+
 
 
         $data2 = [
@@ -1953,7 +1963,8 @@ class OrderController extends BaseController
             'data' => $data,
             'area' => $area,
             'perStyle' => $perStyle,
-            'model' => $pdkArea
+            'model' => $pdkArea,
+            'history' => $requeseted
         ];
         return view(session()->get('role') . '/Order/estimasispk', $data2);
     }
