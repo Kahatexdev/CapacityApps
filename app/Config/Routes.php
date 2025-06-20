@@ -257,7 +257,14 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('inputhistoryrevise/(:any)', 'OrderController::inputHistory/$1');
     $routes->get('pengajuanspk2', 'OrderController::spk2');
     $routes->post('approveSpk2', 'OrderController::approveSpk2');
-
+    $routes->get('sisaOrder', 'OrderController::sisaOrder');
+    $routes->get('sisaOrder/(:any)', 'OrderController::sisaOrderBuyer/$1');
+    $routes->post('sisaOrder/(:any)', 'OrderController::sisaOrderBuyer/$1');
+    $routes->post('excelSisaOrderBuyer/(:any)', 'ExcelController::excelSisaOrderBuyer/$1');
+    $routes->get('sisaOrderArea', 'OrderController::sisaOrderArea');
+    $routes->get('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
+    $routes->post('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
+    $routes->post('excelSisaOrderArea/(:any)', 'ExcelController::excelSisaOrderArea/$1');
 
 
     // mesin
