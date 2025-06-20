@@ -552,7 +552,7 @@ class MesinController extends BaseController
         $today->setTime(0, 0); // Ensuring the time is set to midnight
         $jarum = $this->request->getPost('jarum');
         $listjarum = $this->jarumModel->getJarumByArea($area);
-        $maxCapacity = $this->jarumModel->maxCapacity($area, $jarum);
+        $maxCapacity = $this->jarumModel->maxCapacity($area, $jarum, $targetInput);
         $listOrder = $this->ApsPerstyleModel->listOrderArea($area, $jarum);
         $capacity = [];
         foreach ($listOrder as $order) {

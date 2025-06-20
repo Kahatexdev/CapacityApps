@@ -39,7 +39,7 @@
                                 <div class="col-lg-6">: <?= $max ?> dz / Week</div>
                             </div>
                             <div class="row">
-                                <div class="col-lg-4"> Total Mesin</div>
+                                <div class="col-lg-4"> Mesin Running</div>
                                 <div class="col-lg-6">: <?= $headerData['totalmesin'] ?> Mesin</div>
                             </div>
                         </div>
