@@ -168,11 +168,11 @@
                         </div>
                         <div class="form-group">
                             <label for="awal" class="col-form-label">Delivery Dari</label>
-                            <input type="date" class="form-control" name="awal">
+                            <input type="date" class="form-control" name="awal" required>
                         </div>
                         <div class="form-group">
                             <label for="akhir" class="col-form-label">Delivery Sampai</label>
-                            <input type="date" class="form-control" name="akhir">
+                            <input type="date" class="form-control" name="akhir" required>
                         </div>
                     </div>
                     <div class="modal-footer">

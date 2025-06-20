@@ -1137,7 +1137,7 @@ class ApsPerstyleModel extends Model
     }
     public function getDataOrder($validate)
     {
-        $builder = $this->select('apsperstyle.*, SUM(apsperstyle.qty) AS qty_pcs, data_model.kd_buyer_order')
+        $builder = $this->select('apsperstyle.*, SUM(apsperstyle.qty) AS qty_pcs, SUM(apsperstyle.sisa) AS sisa_pcs, data_model.kd_buyer_order')
             ->join('data_model', 'apsperstyle.mastermodel =  data_model.no_model', 'left')
             ->where('apsperstyle.qty != 0');
 
@@ -1166,9 +1166,9 @@ class ApsPerstyleModel extends Model
         return $builder
             ->groupBy('apsperstyle.mastermodel')
             ->groupBy('apsperstyle.machinetypeid')
-            ->groupBy('apsperstyle.size')
             ->groupBy('apsperstyle.delivery')
-            ->orderBy('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.size, apsperstyle.delivery', 'ASC')
+            ->groupBy('apsperstyle.size')
+            ->orderBy('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.delivery, apsperstyle.size', 'ASC')
             ->findAll();
     }
     public function getQtyPcsByAreaByStyle($data)

@@ -1170,7 +1170,7 @@ class MaterialController extends BaseController
 
         $styleSize = array_unique($styleSize);
 
-        // Ambil BS MESIN per style_size
+        // Ambil SISA per style_size
         $sisaOrderList = [];
         foreach ($styleSize as $style) {
             $sisa = $this->ApsPerstyleModel->getSisaPerSize($area, $noModel, [$style]);
@@ -1199,7 +1199,7 @@ class MaterialController extends BaseController
             $bsSettingList[$style] = isset($bsSetting['qty']) ? (int)$bsSetting['qty'] : 0;
         }
 
-        $lebihPakaiList = [];
+        $pphList = [];
         foreach ($materialData as $itemType => $itemData) {
             foreach ($itemData['kode_warna'] as $kodeWarna => $warnaData) {
                 foreach ($warnaData['style_size'] as $style) {
@@ -1222,14 +1222,14 @@ class MaterialController extends BaseController
                         $pph = ((($bruto + ($bsMesin / $gw)) * $comp * $gw) / 100) / 1000;
                     }
 
-                    $lebihPakai = max(0, $pph - $kgs);
+                    // $lebihPakai = max(0, $pph - $kgs);
 
-                    $lebihPakaiList[$styleSize] = $lebihPakai;
+                    $pphList[$styleSize] = $pph;
                 }
             }
         }
 
-        log_message('debug', 'Lebih Pakai: ' . print_r($lebihPakaiList, true));
+        log_message('debug', 'Lebih Pakai: ' . print_r($pphList, true));
 
         return $this->response->setJSON([
             'item_types' => $itemTypes,
@@ -1237,7 +1237,7 @@ class MaterialController extends BaseController
             'sisa_order' => $sisaOrderList,
             'bs_mesin' => $bsMesinList,
             'bs_setting' => $bsSettingList,
-            'lebih_pakai' => $lebihPakaiList
+            'pph' => $pphList
         ]);
     }
     public function savePoTambahan($area)
@@ -1305,8 +1305,10 @@ class MaterialController extends BaseController
     public function filterPoTambahan($area)
     {
         $noModel = $this->request->getGet('model');
+        $tglBuat = $this->request->getGet('tglBuat');
         $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterPoTambahan"
             . "?area=" . urlencode($area)
+            . "&tglBuat=" . urlencode($tglBuat)
             . "&model=" . urlencode($noModel);
 
         $ch = curl_init($apiUrl);

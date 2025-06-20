@@ -303,7 +303,7 @@
                         $row.data('sisaOrder', json.sisa_order);
                         $row.data('bsMesin', json.bs_mesin);
                         $row.data('bsSetting', json.bs_setting);
-                        $row.data('lebihPakai', json.lebih_pakai);
+                        $row.data('pph', json.pph);
                         $ss.trigger('change');
                     })
                     .catch(err => console.error('Gagal load item_type:', err))
@@ -366,7 +366,7 @@
                 const sisaOrderMap = $row.data('sisaOrder') || {};
                 const bsMesinMap = $row.data('bsMesin') || {};
                 const bsSettingMap = $row.data('bsSetting') || {};
-                const lebihPakaiMap = $row.data('lebihPakai') || {};
+                const pphMap = $row.data('pph') || {};
 
                 if (!materialData || !materialData[itemType] || !materialData[itemType].kode_warna[kodeWarna]) {
                     return;
@@ -387,8 +387,7 @@
                     $template.find('.sisa-order').val(sisaOrderMap[size] || 0);
                     $template.find('.bs-mesin').val(((bsMesinMap[size] || 0) / 1000).toFixed(2)); // Convert gram to kg
                     $template.find('.bs-setting').val(bsSettingMap[size] || 0);
-                    const lebihPakaiVal = parseFloat(lebihPakaiMap[size] || 0).toFixed(2);
-                    $template.find('.lebih-pakai').val(lebihPakaiVal);
+                    $template.find('.lebih-pakai').val(((parseFloat(pphMap[size] || 0) - parseFloat(style.kg_mu || 0)) < 0 ? 0 : (parseFloat(pphMap[size] || 0) - parseFloat(style.kg_mu || 0))).toFixed(2));
                     $template.find('.plus-pck-pcs').val(style.pcs_po || '');
                     $template.find('.plus-pck-kg').val(style.kg_po || '');
                     $template.find('.po-pck-cns').val(style.cns_po || '');
@@ -517,6 +516,7 @@
                 const sisaOrder = parseFloat($row.find('.sisa-order').val()) || 0;
                 const bsMesin = parseFloat($row.find('.bs-mesin').val()) || 0;
                 const bsSetting = parseFloat($row.find('.bs-setting').val()) || 0;
+                const pphMap = $row.data('pph') || {};
 
                 const itemType = $wrapper.find('.item-type').val();
                 const kodeWarna = $wrapper.find('.kode-warna').val();
@@ -544,8 +544,13 @@
                 }
 
                 const stKg = bsSetting * composition * gw / 100 / 1000;
-                const poplus = sisaOrder * composition * gw / 100 / 1000;
-                const kgPoplusMc = (poplus * (1 + loss / 100)) + bsMesin + stKg;
+                const sisaKeb = sisaOrder * composition * gw / 100 / 1000;
+                const pph = parseFloat(pphMap[styleSize]) || 0;
+
+                const eff = ((pph - stKg) / (bsMesin / 1000)) * 100;
+                const newKeb = sisaKeb / eff;
+                const estPoPlusMc = newKeb - sisaKeb;
+
 
                 console.log('Sisa Order:', sisaOrder);
                 console.log('BS Mesin:', bsMesin);
@@ -553,9 +558,13 @@
                 console.log('Composition:', composition);
                 console.log('GW:', gw);
                 console.log('Loss:', loss);
-                console.log('Kg Po Plus Mc:', kgPoplusMc);
+                console.log('Bs Setting Kg:', stKg);
+                console.log('Sisa Keb:', sisaKeb);
+                console.log('PPH:', pph);
+                console.log('Eff:', eff);
+                console.log('Estimasi PO+ Mesin:', estPoPlusMc);
 
-                $row.find('.poplus-mc-kg').val(kgPoplusMc.toFixed(2));
+                $row.find('.poplus-mc-kg').val((estPoPlusMc > 0 ? estPoPlusMc : 0).toFixed(2));
 
                 hitungTotalKg();
             }
