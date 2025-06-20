@@ -421,11 +421,11 @@ class DataMesinModel extends Model
         return $formattedData;
     }
 
-    public function maxCapacity($area, $jarum)
+    public function maxCapacity($area, $jarum, $target)
     {
-        $totalmc = $this->select('sum(total_mc) as total')->where('area', $area)->where('jarum', $jarum)->first();
-        $target = $this->select('target')->where('area', $area)->where('jarum', $jarum)->first();
-        $maxCapacity = $totalmc['total'] * 7 * $target['target'];
+        $totalmc = $this->select('sum(mesin_jalan) as total')->where('area', $area)->where('jarum', $jarum)->first();
+        // $target = $this->select('target')->where('area', $area)->where('jarum', $jarum)->first();
+        $maxCapacity = $totalmc['total'] * 7 * $target;
         $data = [
             'totalmesin' => $totalmc['total'],
             'maxCapacity' => $maxCapacity
