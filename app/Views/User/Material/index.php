@@ -57,7 +57,15 @@
                     <div class="card-body">
                         <form id="pemesananBbForm">
                             <div class="row mb-4">
-                                <div class="col-md-6">
+                                <!-- PO Tambahan -->
+                                <div class="col-md-1 mb-3">
+                                    <label for="po_tambahan" class="form-label">PO Tambahan</label>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="po_tambahan" name="po_tambahan">
+                                        <label class="form-check-label" for="po_tambahan">Ya</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
                                     <input type="hidden" name="area" id="area" value="<?= $area ?>">
                                     <label>Tanggal Pakai Benang Nylon</label>
                                     <input type="date" class="form-control" id="tgl_pakai_benang_nylon" name="tgl_pakai_benang_nylon" min="<?= date('Y-m-d') ?>" required>
@@ -72,9 +80,6 @@
                                     <label for="itemType">No Model</label>
                                     <select class="form-control" id="no_model" name="no_model" required>
                                         <option value="">Pilih No Model</option>
-                                        <?php foreach ($noModel as $model): ?>
-                                            <option value="<?= $model['model'] ?>"><?= $model['model'] ?></option>
-                                        <?php endforeach; ?>
                                     </select>
                                 </div>
                             </div>
@@ -130,6 +135,7 @@
                                             <th class="text-center">Jalan Mc</th>
                                             <th class="text-center">Ttl Cns</th>
                                             <th class="text-center">Ttl Berat Cns (Kg)</th>
+                                            <th class="text-center">PO (+)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -167,6 +173,16 @@
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="jalan_mc[]" value="<?= $record['jalan_mc']; ?>" readonly></td>
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="ttl_cns[]" value="<?= $record['ttl_cns']; ?>" readonly></td>
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="ttl_berat_cns[]" value="<?= $record['ttl_berat_cns']; ?>" readonly></td>
+                                                    <!-- <td class="text-center"><input type="text" class="form-control text-center w-100" name="po_tambahan[]" value="<?= $record['po_tambahan']; ?>" readonly></td> -->
+                                                    <td class="text-center">
+                                                        <input type="hidden" class="form-control text-center w-100"
+                                                            value="<?= $record['po_tambahan'] ?>">
+                                                        <?php if ($record['po_tambahan'] == 1): ?>
+                                                            <span class="text-success fw-bold">✅</span>
+                                                        <?php else: ?>
+                                                            <!-- Biarkan kosong -->
+                                                        <?php endif; ?>
+                                                    </td>
                                                 </tr>
                                             <?php
                                             }
@@ -176,7 +192,7 @@
                                             <!-- Baris subtotal dengan informasi grouping ditampilkan di kolom yang sesuai -->
                                             <tr class="subtotal">
                                                 <!-- Kolom No dan Tanggal Pakai bisa dikosongkan atau diberi label Total -->
-                                                <td colspan="7" class="font-weight-bolder" style="text-align: right;">TOTAL <?= $first['no_model'] . ' / ' . $first['item_type'] . ' / ' . $first['kode_warna'] . ' / ' . $first['warna']; ?></td>
+                                                <td colspan="8" class="font-weight-bolder" style="text-align: right;">TOTAL <?= $first['no_model'] . ' / ' . $first['item_type'] . ' / ' . $first['kode_warna'] . ' / ' . $first['warna']; ?></td>
                                                 <td class="text-center font-weight-bolder"><?= $total_jalan_mc; ?></td>
                                                 <td class="text-center font-weight-bolder"><?= $total_ttl_cns; ?></td>
                                                 <td class="text-center font-weight-bolder"><?= $total_ttl_berat_cns; ?></td>
@@ -186,7 +202,7 @@
                                         }
                                         ?>
                                         <tr>
-                                            <td colspan="10" class="text-center font-weight-bolder align-middle">Hapus List Pemesanan</td>
+                                            <td colspan="11" class="text-center font-weight-bolder align-middle">Hapus List Pemesanan</td>
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-danger" id="delete-selected"><i class="fas fa-trash"></i></button>
                                             </td>
@@ -212,6 +228,8 @@
         const tglPakaiBNInput = document.getElementById('tgl_pakai_benang_nylon');
         const tglPakaiSKInput = document.getElementById('tgl_pakai_spandex_karet');
         const noModelSelect = document.getElementById('no_model');
+        const poTambahanCheckbox = document.getElementById('po_tambahan');
+        const area = $('#area').val(); // Ambil nilai area dari input hidden
 
         // Fungsi untuk mengubah status select berdasarkan nilai input tgl_pakai
         function toggleNoModel() {
@@ -228,8 +246,48 @@
         // Panggil fungsi setiap kali input tgl_pakai berubah
         tglPakaiBNInput.addEventListener('change', toggleNoModel);
         tglPakaiSKInput.addEventListener('change', toggleNoModel);
+
+        // Fungsi untuk mengambil data no model
+        function fetchNoModelData() {
+            const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
+            $('#no_model').empty();
+            $('#no_model').append('<option value="">Pilih No Model</option>');
+            $('#detailBbCardsContainer').empty(); // kosongkan data style size yg telah di pilih sebelumnya
+
+            $.ajax({
+                url: '<?= base_url($role . '/bahanBaku/getNomodel') ?>',
+                method: 'GET',
+                data: {
+                    po_tambahan: poTambahanChecked,
+                    area: area
+                }, // Kirim data PO Tambahan sebagai parameter
+                dataType: 'json',
+                success: function(data) {
+                    // Kosongkan dropdown
+                    $('#no_model').empty();
+                    $('#no_model').append('<option value="">Pilih No Model</option>');
+
+                    // Tambahkan data baru ke dropdown
+                    data.forEach(function(model) {
+                        $('#no_model').append(`<option value="${model.model}">${model.model}</option>`);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching No Model data:', error);
+                }
+            });
+        }
+
+        // Panggil fetchNoModelData saat halaman pertama kali dimuat
+        fetchNoModelData();
+
+        // Deteksi perubahan pada checkbox PO Tambahan
+        poTambahanCheckbox.addEventListener('change', fetchNoModelData);
     });
     $(document).ready(function() {
+        const area = $('#area').val(); // Ambil nilai area dari input hidden
+        const poTambahanCheckbox = document.getElementById('po_tambahan');
+
         // Inisialisasi Select2 di kolom no model
         $('#no_model').select2({
             width: '100%'
@@ -239,14 +297,17 @@
         let globalData = []; // Variabel global untuk menyimpan data AJAX
         // Event ketika no model berubah
         $('#no_model').change(function() {
+            const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
             let noModel = $(this).val(); // Ambil value yang dipilih di select2
             if (noModel) {
                 // ambil style size by model
                 $.ajax({
-                    url: '<?= base_url($role . '/getStyleSizeByNoModel') ?>',
-                    type: "POST",
+                    url: '<?= base_url($role . '/getStyleSizeByNoModelPemesanan') ?>',
+                    type: "GET",
                     data: {
-                        no_model: noModel
+                        no_model: noModel,
+                        po_tambahan: poTambahanChecked,
+                        area: area
                     }, // Kirim dalam format object
                     dataType: "json",
                     success: function(data) {
@@ -434,7 +495,6 @@
                     return false; // Hentikan iterasi jika duplikat ditemukan
                 }
             });
-            console.log(isDuplicate)
 
             if (isDuplicate) {
                 alert('Style Size sudah ada');
@@ -480,17 +540,32 @@
                     dataType: "json",
                     success: function(response) {
                         console.log(response)
-                        qty.val(response.qty); // Isi input "Jalan MC" dengan data dari server
-                        inisial.val(response.inisial);
+                        qty.val(response.qty);
+                        const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
+                        if (poTambahanChecked == 1) {
+                            urlMu = `http://172.23.44.14/MaterialSystem/public/api/getMUPoTambahan?no_model=${encodeURIComponent(noModel)}&style_size=${encodeURIComponent(selectedStyleSize)}&area=${encodeURIComponent(area)}`;
+                        } else {
+                            urlMu = '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + encodeURIComponent(selectedStyleSize) + '/' + area + '/' + qty.val();
+                        }
 
                         // Lakukan permintaan AJAX
                         $.ajax({
-                            url: '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + encodeURIComponent(selectedStyleSize) + '/' + area + '/' + qty.val(), // Ganti URL sesuai kebutuhan
+                            url: urlMu, // Ganti URL sesuai kebutuhan
                             type: 'GET',
                             dataType: 'json',
                             success: function(response) {
                                 console.log(response); // Debug data yang diterima
+                                table.empty(); // Hapus isi tabel sebelumnya
 
+                                // Jika response ada tetapi kosong
+                                if (response.status === 'empty') {
+                                    table.append(`
+                                        <tr>
+                                            <td colspan="7" class="text-center text-danger fw-bold">Material Usage belum ada, hubungi Gbn</td>
+                                        </tr>
+                                    `);
+                                    return;
+                                }
                                 // Jika response berupa array dan kita hanya ingin data dari elemen pertama
                                 if (response && response.length > 0) {
                                     // Ambil data inisial dan gw dari elemen pertama
@@ -498,60 +573,60 @@
                                     gw.val(firstData.gw);
                                 }
 
-                                table.empty(); // Hapus isi tabel sebelumnya
 
                                 // Iterasi data yang diterima dari API dan tambahkan ke tabel
-                                Object.values(response).forEach(function(item, index) {
+                                response.forEach(function(item, index) {
                                     const uniqueKey = `[${row}][${index}]`;
                                     const total = (item.qty_cns * item.qty_berat_cns).toFixed(2);
                                     const jalanMc = parseFloat(jalanMcInput.val()) || 0; // Ganti dengan input jalanMc yang sesuai
                                     const totalCones = (item.qty_cns * jalanMc).toFixed(2);
                                     const totalBeratCones = (total * jalanMc).toFixed(2);
-                                    console.log(qty);
+                                    const poTambahan = poTambahanChecked;
 
                                     table.append(`
-                                        <tr>
-                                            // kolom hide
-                                            <input type="hidden" class="form-control text-center" name="items[${row}][${index}][tgl_pakai]" id="tgl_pakai" value="${tgl_pakai}" readonly>
-                                            <input type="hidden" class="form-control text-center" name="items[${row}][${index}][no_model]" id="no_model" value="${noModel}" readonly>
-                                            <input type="hidden" class="form-control text-center" name="items[${row}][${index}][style_size]" id="style_size" value="${selectedStyleSize}" readonly>
-                                            <input type="hidden" class="form-control text-center" name="items[${row}][${index}][id_material]" id="id_material" value="${item.id_material}" readonly>
-                                            <input type="hidden" class="form-control text-center" name="items[${row}][${index}][jenis]" id="jenis" value="${item.jenis}" readonly>
-                                            <input type="hidden" class="form-control text-center jalan_mc" name="items[${row}][${index}][jalan_mc]" id="jalan_mc" value="${jalanMc}" readonly>
-                                            // 
-                                            <td width=20><input type="text" class="form-control text-center" name="items[${row}][${index}][no]" id="no" value="${index + 1}" readonly></td>
-                                            <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][komposisi]" id="komposisi" value="${item.composition}" readonly></td>
-                                            <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][loss]" id="loss" value="${item.loss}" readonly></td>
-                                            <td width=120><input type="text" class="form-control text-center" name="items[${row}][${index}][ttl_keb]" id="ttl_keb" value="${item.ttl_keb}" readonly></td>
-                                            <td><input type="text" class="form-control text-center" name="items[${row}][${index}][item_type]" id="item_type" value="${item.item_type}" readonly></td>
-                                            <td><input type="text" class="form-control text-center" name="items[${row}][${index}][kode_warna]" id="kode_warna" value="${item.kode_warna}" readonly></td>
-                                            <td><input type="text" class="form-control text-center" name="items[${row}][${index}][warna]" id="warna" value="${item.color}" readonly></td>
-                                        </tr>
-                                        <tr>
-                                            <td></td>
-                                            <td class="text-center">
-                                                Qty Cones:
-                                                <input type="number" class="form-control text-center qty_cns" name="items[${row}][${index}][qty_cns]" id="qty_cns" value="${item.qty_cns}" required>    
-                                            </td>
-                                            <td class="text-center">
-                                                Berat Cones:
-                                                <input type="number" step="0.01" class="form-control text-center qty_berat_cns" name="items[${row}][${index}][qty_berat_cns]" id="qty_berat_cns" value="${item.qty_berat_cns}" required>
-                                            </td>
-                                            <td class="text-center">
-                                                Total:
-                                                <input type="number" step="0.01" class="form-control text-center ttl" name="items[${row}][${index}][ttl]" id="ttl" value="${total}" readonly>
-                                            </td>
-                                            <td class="text-center">
-                                                Total Cones:
-                                                <input type="number" step="0.01" class="form-control text-center ttl_cns" name="items[${row}][${index}][ttl_cns]" id="ttl_cns" value="${totalCones}" readonly>
-                                            </td>
-                                            <td class="text-center">
-                                                Total Berat Cones:
-                                                <input type="number" step="0.01" class="form-control text-center ttl_berat_cns" name="items[${row}][${index}][ttl_berat_cns]" id="ttl_berat_cns" value="${totalBeratCones}" readonly>
-                                            </td>
-                                            <td></td>
-                                        </tr>
-                                    `);
+                                            <tr>
+                                                // kolom hide
+                                                <input type="hidden" class="form-control text-center" name="items[${row}][${index}][tgl_pakai]" id="tgl_pakai" value="${tgl_pakai}" readonly>
+                                                <input type="hidden" class="form-control text-center" name="items[${row}][${index}][po_tambahan]" id="po_tambahan" value="${poTambahan}" readonly>
+                                                <input type="hidden" class="form-control text-center" name="items[${row}][${index}][no_model]" id="no_model" value="${noModel}" readonly>
+                                                <input type="hidden" class="form-control text-center" name="items[${row}][${index}][style_size]" id="style_size" value="${selectedStyleSize}" readonly>
+                                                <input type="hidden" class="form-control text-center" name="items[${row}][${index}][id_material]" id="id_material" value="${item.id_material}" readonly>
+                                                <input type="hidden" class="form-control text-center" name="items[${row}][${index}][jenis]" id="jenis" value="${item.jenis}" readonly>
+                                                <input type="hidden" class="form-control text-center jalan_mc" name="items[${row}][${index}][jalan_mc]" id="jalan_mc" value="${jalanMc}" readonly>
+                                                // 
+                                                <td width=20><input type="text" class="form-control text-center" name="items[${row}][${index}][no]" id="no" value="${index + 1}" readonly></td>
+                                                <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][komposisi]" id="komposisi" value="${item.composition}" readonly></td>
+                                                <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][loss]" id="loss" value="${item.loss}" readonly></td>
+                                                <td width=120><input type="text" class="form-control text-center" name="items[${row}][${index}][ttl_keb]" id="ttl_keb" value="${parseFloat(item.ttl_keb || 0).toFixed(2)}" readonly></td>
+                                                <td><input type="text" class="form-control text-center" name="items[${row}][${index}][item_type]" id="item_type" value="${item.item_type}" readonly></td>
+                                                <td><input type="text" class="form-control text-center" name="items[${row}][${index}][kode_warna]" id="kode_warna" value="${item.kode_warna}" readonly></td>
+                                                <td><input type="text" class="form-control text-center" name="items[${row}][${index}][warna]" id="warna" value="${item.color}" readonly></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td class="text-center">
+                                                    Qty Cones:
+                                                    <input type="number" class="form-control text-center qty_cns" name="items[${row}][${index}][qty_cns]" id="qty_cns" value="${item.qty_cns}">    
+                                                </td>
+                                                <td class="text-center">
+                                                    Berat Cones:
+                                                    <input type="number" step="0.01" class="form-control text-center qty_berat_cns" name="items[${row}][${index}][qty_berat_cns]" id="qty_berat_cns" value="${item.qty_berat_cns}">
+                                                </td>
+                                                <td class="text-center">
+                                                    Total:
+                                                    <input type="number" step="0.01" class="form-control text-center ttl" name="items[${row}][${index}][ttl]" id="ttl" value="${total}" readonly>
+                                                </td>
+                                                <td class="text-center">
+                                                    Total Cones:
+                                                    <input type="number" step="0.01" class="form-control text-center ttl_cns" name="items[${row}][${index}][ttl_cns]" id="ttl_cns" value="${totalCones}" readonly>
+                                                </td>
+                                                <td class="text-center">
+                                                    Total Berat Cones:
+                                                    <input type="number" step="0.01" class="form-control text-center ttl_berat_cns" name="items[${row}][${index}][ttl_berat_cns]" id="ttl_berat_cns" value="${totalBeratCones}" readonly>
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                        `);
                                 });
                                 // Tambahkan event listener untuk perhitungan otomatis
                                 table.on('input', '.qty_cns, .qty_berat_cns, .ttl_berat_cns', function() {
@@ -624,7 +699,6 @@
                     invalidMachine = true;
                     return false; // break .each
                 }
-                console.log('info', 'ini jl mc' + jm);
             });
             if (invalidMachine) {
                 Swal.fire('Peringatan', 'Nilai Jalan MC tidak boleh kosong atau 0', 'warning');
@@ -633,7 +707,6 @@
 
             // Jika tabel tidak kosong, lanjutkan proses submit
             const formData = $(this).serializeArray();
-            console.log(formData);
 
             $.ajax({
                 url: "<?= base_url($role . '/bahanBaku/simpanKeSession') ?>",
@@ -821,7 +894,6 @@
             .then(async (response) => {
                 const resData = await response.json();
                 const selected = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked')).map(checkbox => checkbox.value);
-                console.log('a' + selected)
                 if (response.ok) {
                     fetch('bahanBaku/hapusSession', {
                             method: 'POST',
@@ -888,17 +960,14 @@
         let today = new Date();
         let twoDaysAgo = new Date(today);
         twoDaysAgo.setDate(today.getDate() - 2);
-        console.log('Two days ago:', twoDaysAgo);
         // Format ke YYYY-MM-DD
         let dd = String(twoDaysAgo.getDate()).padStart(2, '0');
         let mm = String(twoDaysAgo.getMonth() + 1).padStart(2, '0'); // Januari = 0
         let yyyy = twoDaysAgo.getFullYear();
         let tgl_pakai = yyyy + '-' + mm + '-' + dd;
-        console.log('tgl_pakai:', tgl_pakai);
 
         // ambil are
         let area = document.getElementById('area').value; // Atau ambil dari variable lain
-        console.log(area, tgl_pakai);
 
         $.ajax({
             url: 'http://172.23.44.14/MaterialSystem/public/api/hapusOldPemesanan',
@@ -930,7 +999,6 @@
     // hapus session list pemesanan
     document.getElementById('delete-selected').addEventListener('click', function() {
         const selected = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked')).map(checkbox => checkbox.value);
-        console.log('b' + selected)
 
         if (selected.length === 0) {
             Swal.fire({
