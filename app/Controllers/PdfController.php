@@ -245,69 +245,84 @@ class PdfController extends BaseController
         $pdf->Ln(3);
 
         //Isi Tabel
-        $rowHeight = 6;
-        $lineHeight = 3;
         $pdf->SetFont('Arial', '', 7);
         $no = 1;
         $yLimit = 180;
 
-        foreach ($data as $row) {
-            // Cek jika sudah mendekati batas bawah halaman, buat halaman baru
-            if ($pdf->GetY() > $yLimit) {
-                $pdf->AddPage();
-                // Panggil lagi header jika perlu
-            }
+        $barisNormalHeight  = 3; // tinggi baris logis
+        $lineHeight         = 3;
 
+        foreach ($data as $row) {
             $startX = $pdf->GetX();
             $startY = $pdf->GetY();
 
-            // Simpan tinggi maksimum dari semua MultiCell di baris ini
-            $maxHeight = 0;
+            $heights = [];
+            $tempX   = $startX;
 
-            $pdf->Cell(12, $rowHeight, $row['no_model'], 1, 0, 'C'); //no model
-            // Simpan posisi awal X untuk MultiCell berikutnya
-            $xBefore = $pdf->GetX();
-            $yBefore = $pdf->GetY();
+            // Ubah text color jadi putih agar tidak terlihat saat simulasi
+            $pdf->SetTextColor(255, 255, 255);
 
-            // Kolom 2: color
-            $pdf->MultiCell(12, $lineHeight, $row['color'], 1, 'C');
-            $h1 = $pdf->GetY() - $yBefore;
-            $maxHeight = max($maxHeight, $h1);
-            $pdf->SetXY($xBefore + 12, $yBefore);
-            // Kolom 3: item_type
-            $xBefore = $pdf->GetX();
-            $pdf->MultiCell(19, $lineHeight, $row['item_type'], 1, 'C');
-            $h2 = $pdf->GetY() - $yBefore;
-            $maxHeight = max($maxHeight, $h2);
-            $pdf->SetXY($xBefore + 19, $yBefore);
+            $simCols = [
+                ['w' => 12, 't' => $row['color']],
+                ['w' => 19, 't' => $row['item_type']],
+                ['w' => 16, 't' => $row['kode_warna']],
+                ['w' => 15, 't' => $row['style_size']],
+                ['w' => 14, 't' => $row['keterangan']],
+            ];
+            foreach ($simCols as $col) {
+                $pdf->SetXY($tempX, $startY);
+                $y0 = $pdf->GetY();
+                $pdf->MultiCell($col['w'], $lineHeight, $col['t'], 0, 'C');
+                $heights[] = $pdf->GetY() - $y0;
+                $pdf->SetXY($tempX, $startY);
+                $tempX += $col['w'];
+            }
 
-            // Kolom 4: kode_warna
-            $xBefore = $pdf->GetX();
-            $pdf->MultiCell(16, $lineHeight, $row['kode_warna'], 1, 'C');
-            $h3 = $pdf->GetY() - $yBefore;
-            $maxHeight = max($maxHeight, $h3);
-            $pdf->SetXY($xBefore + 16, $yBefore);
+            // kembalikan text color
+            $pdf->SetTextColor(0, 0, 0);
 
-            // Kolom 5: style_size
-            $xBefore = $pdf->GetX();
-            $pdf->MultiCell(15, $lineHeight, $row['style_size'], 1, 'C');
-            $h4 = $pdf->GetY() - $yBefore;
-            $maxHeight = max($maxHeight, $h4);
-            $pdf->SetXY($xBefore + 15, $yBefore);
+            // ambil yang tertinggi
+            $maxHeight = max($heights);
+
+            // reset posisi
+            $pdf->SetXY($startX, $startY);
+
+            // No Model
+            $pdf->Cell(12, $maxHeight, $row['no_model'], 1, 0, 'C');
+
+            // Kolom Warna
+            $x = $pdf->GetX();
+            $pdf->MultiCell(12, $maxHeight, $row['color'], 1, 'C');
+            $pdf->SetXY($x + 12, $startY);
+
+            // Item Type
+            $x = $pdf->GetX();
+            $pdf->MultiCell(19, $maxHeight, $row['item_type'], 1, 'C');
+            $pdf->SetXY($x + 19, $startY);
+
+            // Kode Warna
+            $x = $pdf->GetX();
+            $pdf->MultiCell(16, $maxHeight, $row['kode_warna'], 1, 'C');
+            $pdf->SetXY($x + 16, $startY);
+
+            // Style Size
+            $x = $pdf->GetX();
+            $pdf->MultiCell(15, $maxHeight, $row['style_size'], 1, 'C');
+            $pdf->SetXY($x + 15, $startY);
 
             // Kolom-kolom berikut: isi seperti biasa, tapi tingginya harus `maxHeight`
-            $pdf->Cell(12, $maxHeight, $row['composition'], 1, 0, 'C');
-            $pdf->Cell(7, $maxHeight, $row['gw'], 1, 0, 'C');
-            $pdf->Cell(7, $maxHeight, $row['qty_pcs'], 1, 0, 'C');
-            $pdf->Cell(7, $maxHeight, $row['loss'], 1, 0, 'C');
-            $pdf->Cell(12, $maxHeight, $row['kgs'], 1, 0, 'C');
+            $pdf->Cell(12, $maxHeight, $row['composition'], 1, 0, 'C'); // composition
+            $pdf->Cell(7, $maxHeight, $row['gw'], 1, 0, 'C'); // gw
+            $pdf->Cell(7, $maxHeight, $row['qty_pcs'], 1, 0, 'C'); // qty pcs
+            $pdf->Cell(7, $maxHeight, $row['loss'], 1, 0, 'C'); // loss
+            $pdf->Cell(12, $maxHeight, $row['kgs'], 1, 0, 'C'); // kgs
 
             // Terima: terdiri dari 3 kolom
-            $pdf->Cell(7, $rowHeight, number_format($row['terima_kg'], 2), 1, 0, 'C'); //terima kg
-            $pdf->Cell(7, $rowHeight, '', 1, 0, 'C'); //terima +/-
-            $pdf->Cell(7, $rowHeight, '', 1, 0, 'C'); //terima %
+            $pdf->Cell(7, $maxHeight, number_format($row['terima_kg'], 2), 1, 0, 'C'); //terima kg
+            $pdf->Cell(7, $maxHeight, '', 1, 0, 'C'); //terima +/-
+            $pdf->Cell(7, $maxHeight, '', 1, 0, 'C'); //terima %
 
-            $pdf->Cell(13, $rowHeight, number_format($row['sisa_bb_mc'], 2), 1, 0, 'C'); //sisa mesin
+            $pdf->Cell(13, $maxHeight, number_format($row['sisa_bb_mc'], 2), 1, 0, 'C'); //sisa mesin
 
             // Lanjutkan isi kolom lainnya sesuai dengan struktur header
 
@@ -329,11 +344,13 @@ class PdfController extends BaseController
             $pdf->Cell(6, $maxHeight, '', 1, 0, 'C'); //returan kg
             $pdf->Cell(14, $maxHeight, '', 1, 0, 'C'); //returan % dari PO(+)
 
-            $xBefore = $pdf->GetX();
-            $pdf->MultiCell(14, $lineHeight, $row['keterangan'], 1, 'C');
-            $h5 = $pdf->GetY() - $startY;
-            $maxHeight = max($maxHeight, $h5);
-            $pdf->SetY($startY + $maxHeight); //keterangan
+            // Keterangan (kolom terakhir)
+            $x = $pdf->GetX();
+            $pdf->MultiCell(14, $maxHeight, $row['keterangan'], 1, 'C');
+            $pdf->SetXY($x + 14, $startY);
+
+            // Akhiri baris
+            $pdf->SetY($startY + $maxHeight);
         }
 
         // FOOTER

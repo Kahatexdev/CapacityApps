@@ -3670,4 +3670,152 @@ class ExcelController extends BaseController
             exit;
         }
     }
+    public function exportDataOrder()
+    {
+        $buyer = $this->request->getPost('buyer');
+        $area = $this->request->getPost('area');
+        $jarum = $this->request->getPost('jarum');
+        $pdk = $this->request->getPost('pdk');
+        $awal = $this->request->getPost('awal');
+        $akhir = $this->request->getPost('akhir');
+
+        $validate = [
+            'buyer' => $buyer,
+            'area' => $area,
+            'jarum' => $jarum,
+            'pdk' => $pdk,
+            'awal' => $awal,
+            'akhir' => $akhir,
+        ];
+
+        $data = $this->ApsPerstyleModel->getDataOrder($validate);
+        // dd($data);
+        // Buat file Excel
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $styleTitle = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FF000000'],
+                'size' => 15
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+        ];
+
+        // border
+        $styleHeader = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FFFFFFFF']
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID, // Jenis pengisian solid
+                'startColor' => ['argb' => 'FF67748e'], // Warna latar belakang biru tua (HEX)
+            ],
+        ];
+        $styleBody = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+
+        $sheet->setCellValue('A1', 'DATA ORDER ' . $area);
+        $sheet->mergeCells('A1:M1');
+        $sheet->getStyle('A1:M1')->applyFromArray($styleTitle);
+        // Tulis header
+        $sheet->setCellValue('A3', 'NO');
+        $sheet->setCellValue('B3', 'NO MODEL');
+        $sheet->setCellValue('C3', 'NO ORDER');
+        $sheet->setCellValue('D3', 'BUYER');
+        $sheet->setCellValue('E3', 'SEAM');
+        $sheet->setCellValue('F3', 'PRODUCTION UNIT');
+        $sheet->setCellValue('G3', 'AREA');
+        $sheet->setCellValue('H3', 'JARUM');
+        $sheet->setCellValue('I3', 'INISIAL');
+        $sheet->setCellValue('J3', 'STYLE SIZE');
+        $sheet->setCellValue('K3', 'DELIVERY');
+        $sheet->setCellValue('L3', 'QTY');
+        $sheet->setCellValue('M3', 'SISA');
+        $sheet->getStyle('A3')->applyFromArray($styleHeader);
+        $sheet->getStyle('B3')->applyFromArray($styleHeader);
+        $sheet->getStyle('C3')->applyFromArray($styleHeader);
+        $sheet->getStyle('D3')->applyFromArray($styleHeader);
+        $sheet->getStyle('E3')->applyFromArray($styleHeader);
+        $sheet->getStyle('F3')->applyFromArray($styleHeader);
+        $sheet->getStyle('G3')->applyFromArray($styleHeader);
+        $sheet->getStyle('H3')->applyFromArray($styleHeader);
+        $sheet->getStyle('I3')->applyFromArray($styleHeader);
+        $sheet->getStyle('J3')->applyFromArray($styleHeader);
+        $sheet->getStyle('K3')->applyFromArray($styleHeader);
+        $sheet->getStyle('L3')->applyFromArray($styleHeader);
+        $sheet->getStyle('M3')->applyFromArray($styleHeader);
+
+        // Tulis data mulai dari baris 2
+        $row = 4;
+        $no = 1;
+
+        foreach ($data as $item) {
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $item['mastermodel']);
+            $sheet->setCellValue('C' . $row, $item['no_order']);
+            $sheet->setCellValue('D' . $row, $item['kd_buyer_order']);
+            $sheet->setCellValue('E' . $row, $item['seam']);
+            $sheet->setCellValue('F' . $row, $item['production_unit']);
+            $sheet->setCellValue('G' . $row, $item['factory']);
+            $sheet->setCellValue('H' . $row, $item['machinetypeid']);
+            $sheet->setCellValue('I' . $row, $item['inisial']);
+            $sheet->setCellValue('J' . $row, $item['size']);
+            $sheet->setCellValue('K' . $row, $item['delivery']);
+            $sheet->setCellValue('L' . $row, $item['qty_pcs']);
+            $sheet->setCellValue('M' . $row, $item['sisa_pcs']);
+            $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('C' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('D' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('E' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('F' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('G' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('H' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('I' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('J' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('K' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('L' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('M' . $row)->applyFromArray($styleBody);
+            $row++;
+        }
+
+        // Set lebar kolom agar menyesuaikan isi
+        foreach (range('A', 'M') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Buat writer dan output file Excel
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'Data Order.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit;
+    }
 }

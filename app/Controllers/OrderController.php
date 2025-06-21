@@ -115,6 +115,8 @@ class OrderController extends BaseController
     public function semuaOrder()
     {
         $role = session()->get('role');
+        $dataBuyer = $this->orderModel->getBuyer();
+        $dataArea = $this->jarumModel->getArea();
 
         $product = $this->productModel->findAll();
         $data = [
@@ -128,7 +130,9 @@ class OrderController extends BaseController
             'active6' => '',
             'active7' => '',
             'product' => $product,
-            'role' => $role
+            'role' => $role,
+            'buyer' => $dataBuyer,
+            'area' => $dataArea,
 
         ];
         return view($role . '/Order/semuaorder', $data);
@@ -1899,6 +1903,7 @@ class OrderController extends BaseController
         $pdkArea = $this->ApsPerstyleModel->getModelArea($area);
         $perStyle = [];
         $requeseted = [];
+        $history = $this->estspk->getHistory($area, $lastmonth);
         foreach ($data as $id) {
 
             // get data produksi
@@ -1966,7 +1971,7 @@ class OrderController extends BaseController
             'area' => $area,
             'perStyle' => $perStyle,
             'model' => $pdkArea,
-            'history' => $requeseted
+            'history' => $history
         ];
         return view(session()->get('role') . '/Order/estimasispk', $data2);
     }
