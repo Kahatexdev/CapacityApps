@@ -175,7 +175,7 @@
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="ttl_berat_cns[]" value="<?= $record['ttl_berat_cns']; ?>" readonly></td>
                                                     <!-- <td class="text-center"><input type="text" class="form-control text-center w-100" name="po_tambahan[]" value="<?= $record['po_tambahan']; ?>" readonly></td> -->
                                                     <td class="text-center">
-                                                        <input type="hidden" class="form-control text-center w-100"
+                                                        <input type="hidden" class="form-control text-center w-100" name="po_tambahan[]"
                                                             value="<?= $record['po_tambahan'] ?>">
                                                         <?php if ($record['po_tambahan'] == 1): ?>
                                                             <span class="text-success fw-bold">✅</span>
@@ -882,7 +882,7 @@
             });
         });
 
-
+        console.log('inf : ' + payload);
         fetch('http://172.23.44.14/MaterialSystem/public/api/saveListPemesanan', {
                 method: 'POST',
                 headers: {
