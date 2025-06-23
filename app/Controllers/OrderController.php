@@ -1021,34 +1021,36 @@ class OrderController extends BaseController
     {
         $areaProgress =  $this->ApsPerstyleModel->getProgressperArea($area);
         $lastmonth = date('Y-m-d', strtotime('- 1 month'));
-
         // Grup by mastermodel
         $grouped = [];
         foreach ($areaProgress as $item) {
-            $model = $item['mastermodel'];
-            if (!isset($grouped[$model])) {
-                $grouped[$model] = [
-                    'mastermodel' => $model,
-                    'target' => 0,
-                    'remain' => 0,
-                    'delivery' => $item['delivery'],
-                    'percentage' => 0,
-                ];
-            }
+            if ($item['target'] > 0) {
 
-            // Jumlahkan target dan remain
-            $grouped[$model]['target'] += (int)$item['target'];
-            $grouped[$model]['remain'] += (int)$item['remain'];
-            $produksi = $grouped[$model]['target'] - $grouped[$model]['remain'];
+                $model = $item['mastermodel'];
+                if (!isset($grouped[$model])) {
+                    $grouped[$model] = [
+                        'mastermodel' => $model,
+                        'target' => 0,
+                        'remain' => 0,
+                        'delivery' => $item['delivery'],
+                        'percentage' => 0,
+                    ];
+                }
 
-            // Hitung percentage hanya jika produksi > 0
-            if ($produksi > 0) {
-                $grouped[$model]['percentage'] = round(($produksi / $grouped[$model]['target']) * 100);
-            }
+                // Jumlahkan target dan remain
+                $grouped[$model]['target'] += (int)$item['target'];
+                $grouped[$model]['remain'] += (int)$item['remain'];
+                $produksi = $grouped[$model]['target'] - $grouped[$model]['remain'];
 
-            // Ambil delivery paling akhir
-            if ($grouped[$model]['delivery'] < $item['delivery']) {
-                $grouped[$model]['delivery'] = $item['delivery'];
+                // Hitung percentage hanya jika produksi > 0
+                if ($produksi > 0) {
+                    $grouped[$model]['percentage'] = round(($produksi / $grouped[$model]['target']) * 100);
+                }
+
+                // Ambil delivery paling akhir
+                if ($grouped[$model]['delivery'] < $item['delivery']) {
+                    $grouped[$model]['delivery'] = $item['delivery'];
+                }
             }
         }
 
