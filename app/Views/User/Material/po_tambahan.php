@@ -115,6 +115,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" id="generatePdfBtn" class="btn bg-gradient-info">Generate</button>
+                <button type="button" id="generateExcelBtn" class="btn bg-gradient-success">Generate Excel</button>
             </div>
         </div>
     </div>
@@ -281,6 +282,25 @@
         }
 
         const url = "<?= base_url($role . '/generate_po_tambahan') ?>" +
+            "?area=" + encodeURIComponent(area) +
+            "&model=" + encodeURIComponent(model) +
+            "&tgl_buat=" + encodeURIComponent(tglBuat);
+
+        window.open(url, '_blank');
+    });
+
+    $('#generatExcelBtn').on('click', function() {
+        const area = $('#area').val();
+        const model = $('#no_model').val();
+        const tglBuat = $('#tgl_buat').val();
+        const role = <?= json_encode($role) ?>;
+
+        if (!model) {
+            alert("Silakan isi No Model terlebih dahulu.");
+            return;
+        }
+
+        const url = "<?= base_url($role . '/generate_excel_po_tambahan') ?>" +
             "?area=" + encodeURIComponent(area) +
             "&model=" + encodeURIComponent(model) +
             "&tgl_buat=" + encodeURIComponent(tglBuat);

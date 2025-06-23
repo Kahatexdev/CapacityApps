@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Database\Migrations\BsMesin;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\DataMesinModel;
 use App\Models\OrderModel;
@@ -1199,37 +1200,23 @@ class MaterialController extends BaseController
             $bsSettingList[$style] = isset($bsSetting['qty']) ? (int)$bsSetting['qty'] : 0;
         }
 
-        $pphList = [];
+        $brutoList = [];
         foreach ($materialData as $itemType => $itemData) {
             foreach ($itemData['kode_warna'] as $kodeWarna => $warnaData) {
                 foreach ($warnaData['style_size'] as $style) {
                     $styleSize = $style['style_size'] ?? '';
-                    $kgs = $style['kg_mu'] ?? 0;
-                    $gw = (float)($style['gw'] ?? 0);
-                    $comp = (float)($style['composition'] ?? 0);
-                    $loss = (float)($style['loss'] ?? 0);
 
+                    // ambil data produksi per style
                     $prod = $this->orderModel->getDataPph($area, $noModel, $styleSize);
                     $prod = is_array($prod) ? $prod : [];
-
-
-                    $bsMesin = $bsMesinList[$styleSize] ?? 0;
                     $bruto = $prod['bruto'] ?? 0;
 
-                    if ($gw == 0) {
-                        $pph = 0;
-                    } else {
-                        $pph = ((($bruto + ($bsMesin / $gw)) * $comp * $gw) / 100) / 1000;
-                    }
-
-                    // $lebihPakai = max(0, $pph - $kgs);
-
-                    $pphList[$styleSize] = $pph;
+                    $brutoList[$styleSize] = $bruto;
                 }
             }
         }
 
-        log_message('debug', 'Lebih Pakai: ' . print_r($pphList, true));
+        log_message('debug', 'PPH: ' . print_r($brutoList, true));
 
         return $this->response->setJSON([
             'item_types' => $itemTypes,
@@ -1237,7 +1224,7 @@ class MaterialController extends BaseController
             'sisa_order' => $sisaOrderList,
             'bs_mesin' => $bsMesinList,
             'bs_setting' => $bsSettingList,
-            'pph' => $pphList
+            'bruto' => $brutoList
         ]);
     }
     public function savePoTambahan($area)
