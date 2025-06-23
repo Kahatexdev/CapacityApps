@@ -542,9 +542,11 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
 
     // bahanbaku
     $routes->get('bahanBaku', 'MaterialController::index');
+    $routes->get('bahanBaku/getNomodel', 'MaterialController::getNomodel');
     $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
     $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
     $routes->post('getStyleSizeByNoModel', 'MaterialController::getStyleSizeByNoModel');
+    $routes->get('getStyleSizeByNoModelPemesanan', 'MaterialController::getStyleSizeByNoModelPemesanan');
     $routes->post('getJalanMc', 'MaterialController::getJalanMcByModelSize');
     $routes->get('getMU/(:any)/(:any)/(:any)/(:any)', 'MaterialController::getMU/$1/$2/$3/$4');
     $routes->post('bahanBaku/simpanKeSession', 'MaterialController::savePemesananSession');

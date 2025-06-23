@@ -84,7 +84,7 @@ class MaterialController extends BaseController
         $area = session()->get('username');
         $role = session()->get('role');
         $logged_in = true;
-        $noModel = $this->DetailPlanningModel->getNoModelAktif($area);
+        // $noModel = $this->DetailPlanningModel->getNoModelAktif($area);
         $pemesananBb = session()->get('pemesananBb');
         // Kita "flatten" data sehingga tiap baris tersimpan sebagai record tunggal
         $flattenData = [];
@@ -103,6 +103,7 @@ class MaterialController extends BaseController
                         'ttl_cns'        => $row['ttl_cns'] ?? '',
                         'ttl_berat_cns'  => $row['ttl_berat_cns'] ?? '',
                         'id_material'    => $row['id_material'] ?? '',
+                        'po_tambahan'    => $row['po_tambahan'] ?? 0,
                     ];
                 }
             }
@@ -142,7 +143,7 @@ class MaterialController extends BaseController
             'targetProd' => 0,
             'produksiBulan' => 0,
             'produksiHari' => 0,
-            'noModel' => $noModel,
+            // 'noModel' => $noModel,
             'groupedData' => $groupedData
 
         ];
@@ -289,17 +290,35 @@ class MaterialController extends BaseController
         $styleSize = urlencode($styleSize);  // Encode styleSize
         $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getMU/' . $model . '/' . $styleSize . '/' . $area;
         $response = file_get_contents($apiUrl);  // Mendapatkan response dari API
+        // if ($response === FALSE) {
+        //     die('Error occurred while fetching data.');
+        // }
         if ($response === FALSE) {
-            die('Error occurred while fetching data.');
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Error occurred while fetching data.',
+            ]);
         }
 
         $data = json_decode($response, true);  // Decode JSON response dari API
 
-        // Periksa apakah response dari API valid
-        if (!$data || !is_array($data)) {
+        if ($data === null) {
             return $this->response->setJSON([
                 'status'  => 'error',
                 'message' => 'Invalid data received from API',
+            ]);
+        }
+
+        // Pastikan respons berupa array
+        if (!is_array($data)) {
+            $data = (array)$data;  // Paksa konversi ke array
+        }
+
+        // Jika respons berupa array tetapi kosong
+        if (empty($data)) {
+            return $this->response->setJSON([
+                'status'  => 'empty',
+                'message' => 'Material Usage belum ada, hubungi Gbn',
             ]);
         }
 
@@ -1170,7 +1189,7 @@ class MaterialController extends BaseController
 
         $styleSize = array_unique($styleSize);
 
-        // Ambil BS MESIN per style_size
+        // Ambil SISA per style_size
         $sisaOrderList = [];
         foreach ($styleSize as $style) {
             $sisa = $this->ApsPerstyleModel->getSisaPerSize($area, $noModel, [$style]);
@@ -1199,7 +1218,7 @@ class MaterialController extends BaseController
             $bsSettingList[$style] = isset($bsSetting['qty']) ? (int)$bsSetting['qty'] : 0;
         }
 
-        $lebihPakaiList = [];
+        $pphList = [];
         foreach ($materialData as $itemType => $itemData) {
             foreach ($itemData['kode_warna'] as $kodeWarna => $warnaData) {
                 foreach ($warnaData['style_size'] as $style) {
@@ -1222,14 +1241,14 @@ class MaterialController extends BaseController
                         $pph = ((($bruto + ($bsMesin / $gw)) * $comp * $gw) / 100) / 1000;
                     }
 
-                    $lebihPakai = max(0, $pph - $kgs);
+                    // $lebihPakai = max(0, $pph - $kgs);
 
-                    $lebihPakaiList[$styleSize] = $lebihPakai;
+                    $pphList[$styleSize] = $pph;
                 }
             }
         }
 
-        log_message('debug', 'Lebih Pakai: ' . print_r($lebihPakaiList, true));
+        log_message('debug', 'Lebih Pakai: ' . print_r($pphList, true));
 
         return $this->response->setJSON([
             'item_types' => $itemTypes,
@@ -1237,7 +1256,7 @@ class MaterialController extends BaseController
             'sisa_order' => $sisaOrderList,
             'bs_mesin' => $bsMesinList,
             'bs_setting' => $bsSettingList,
-            'lebih_pakai' => $lebihPakaiList
+            'pph' => $pphList
         ]);
     }
     public function savePoTambahan($area)
@@ -1305,8 +1324,10 @@ class MaterialController extends BaseController
     public function filterPoTambahan($area)
     {
         $noModel = $this->request->getGet('model');
+        $tglBuat = $this->request->getGet('tglBuat');
         $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterPoTambahan"
             . "?area=" . urlencode($area)
+            . "&tglBuat=" . urlencode($tglBuat)
             . "&model=" . urlencode($noModel);
 
         $ch = curl_init($apiUrl);
@@ -1452,5 +1473,68 @@ class MaterialController extends BaseController
         ];
 
         return view(session()->get('role') . '/Material/reportPemesanan', $data);
+    }
+    public function getNomodel()
+    {
+        $poTambahan = $this->request->getGet('po_tambahan'); // Ambil parameter PO Tambahan
+        $area = $this->request->getGet('area'); // Ambil parameter PO Tambahan
+
+        // Logika untuk menentukan data berdasarkan status PO Tambahan
+        if ($poTambahan == 1) {
+            // Jika search ada, panggil API eksternal dengan query parameter 'search'
+            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getNoModelByPoTambahan?area=' . $area;
+
+            try {
+                $response = file_get_contents($apiUrl);
+                if ($response === false) {
+                    throw new \Exception("Failed to fetch data from API: $apiUrl");
+                }
+
+                $data = json_decode($response, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new \Exception("Invalid JSON response from API: $apiUrl");
+                }
+            } catch (\Exception $e) {
+                // Tangani error
+                return $this->response->setJSON(['error' => $e->getMessage()])->setStatusCode(500);
+            }
+        } else {
+            $data = $this->DetailPlanningModel->getNoModelAktif($area);
+        }
+
+        return $this->response->setJSON($data)->setStatusCode(200);
+    }
+    public function getStyleSizeByNoModelPemesanan()
+    {
+        // Ambil No Model dari permintaan AJAX
+        $noModel = $this->request->getGet('no_model');
+        $area = $this->request->getGet('area');
+        $poTambahan = $this->request->getGet('po_tambahan');
+
+        // Logika untuk menentukan data berdasarkan status PO Tambahan
+        if ($poTambahan == 1) {
+            // Jika search ada, panggil API eksternal dengan query parameter 'search'
+            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByPoTambahan?no_model=' . $noModel . '&area=' . $area;
+
+            try {
+                $response = file_get_contents($apiUrl);
+                if ($response === false) {
+                    throw new \Exception("Failed to fetch data from API: $apiUrl");
+                }
+
+                $data = json_decode($response, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new \Exception("Invalid JSON response from API: $apiUrl");
+                }
+            } catch (\Exception $e) {
+                // Tangani error
+                return $this->response->setJSON(['error' => $e->getMessage()])->setStatusCode(500);
+            }
+        } else {
+            $data = $this->ApsPerstyleModel->getStyleSize($noModel); // Sesuaikan dengan model Anda
+        }
+
+        // Kembalikan data dalam format JSON
+        return $this->response->setJSON($data)->setStatusCode(200);
     }
 }

@@ -30,16 +30,17 @@
             <div class="card">
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between">
-                        <div class="col-9">
+                        <div class="col-7">
                             <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                             <h5 class="font-weight-bolder mb-0">
                                 List PO Tambahan <?= $area ?>
                             </h5>
                         </div>
-                        <div class="col-3 d-flex align-items-center text-end gap-2">
+                        <div class="col-5 d-flex align-items-center text-end gap-2">
                             <input type="hidden" class="form-control" id="area" value="<?= $area ?>">
-                            <input type="text" class="form-control" id="no_model" value="" placeholder="No Model" required>
-                            <button id="searchModel" class="btn btn-info ms-2"><i class="fas fa-search"></i> Filter</button>
+                            <input type="text" class="form-control" id="no_model" value="" placeholder="No Model">
+                            <input type="date" class="form-control" id="tgl_po" value="" required>
+                            <button id="searchFilter" class="btn btn-info ms-2"><i class="fas fa-search"></i> Filter</button>
                             <button class="btn btn-info ms-2">
                                 <a href="<?= base_url($role . '/form-potambahan/' . $area) ?>" class="fa fa-list text-white" style="text-decoration: none;"> List</a>
                             </button>
@@ -56,7 +57,7 @@
                 <div class="card-body">
                     <div class="table-responsive">
                         <div id="headerModel" class="table-header" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <h4 style="margin: 0;"><span id="no-model"></span></h4>
+                            <h4 style="margin: 0;"><span id="table-header"></span></h4>
                             <button id="exportPdfBtn" class="btn btn-danger">Export PDF</button>
                         </div>
 
@@ -149,26 +150,35 @@
     });
 </script>
 <script type="text/javascript">
-    let btnSearch = document.getElementById('searchModel');
+    let btnSearch = document.getElementById('searchFilter');
 
     btnSearch.onclick = function() {
         let area = document.getElementById('area').value;
         let model = document.getElementById('no_model').value;
+        let tglBuat = document.getElementById('tgl_po').value;
         let role = <?= json_encode($role) ?>;
         let info = document.getElementById('info');
 
+        // Cek apakah tgl_po kosong
+        if (!tglBuat) {
+            alert("Silakan isi tanggal PO terlebih dahulu!");
+            return; // Stop eksekusi
+        }
+
         console.log("Area: " + area);
         console.log("Model: " + model);
+        console.log("Tgl PO: " + tglBuat);
 
         $.ajax({
             url: "<?= base_url($role . '/filter_list_potambahan/') ?>" + area,
             type: "GET",
             data: {
-                model: model
+                model: model,
+                tglBuat: tglBuat
             },
             dataType: "json",
             success: function(response) {
-                fethcData(response, model, area);
+                fethcData(response, model, tglBuat, area);
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error);
@@ -176,7 +186,7 @@
         });
     };
 
-    function fethcData(data, model, area) {
+    function fethcData(data, model, tglBuat, area) {
         let dataTable = $('#dataTable').DataTable();
         dataTable.clear(); // Hapus semua data sebelumnya
 
@@ -188,7 +198,7 @@
 
             $td
                 .attr('colspan', 11)
-                .html(`Data tidak ditemukan untuk model: <strong>${model}</strong>`)
+                .html(`Data tidak ditemukan untuk model: <strong>${model}</strong> & tgl Po: <strong>${tglBuat}</strong>`)
                 .css({
                     'text-align': 'center',
                     'font-style': 'italic',
@@ -203,9 +213,9 @@
         }
 
 
-        // ✅ Tampilkan header dan isi span no-model
+        // ✅ Tampilkan header dan isi span table-header
         $('#headerModel').css('display', 'flex');
-        $('#no-model').text(model);
+        $('#table-header').text(tglBuat);
 
         let no = 1;
         data.forEach(item => {
