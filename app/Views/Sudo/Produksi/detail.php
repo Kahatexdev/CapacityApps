@@ -62,10 +62,10 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-2 mb-2">
-                                        <input type="date" class="form-control text-secondary" name="tgl_produksi" id="tgl_produksi" required>
+                                        <input type="date" class="form-control text-secondary" name="tgl_produksi" id="tgl_produksi">
                                     </div>
                                     <div class="col-md-2 mb-2">
-                                        <input type="date" class="form-control text-secondary" name="tgl_produksi_sampai" id="tgl_produksi_sampai" required>
+                                        <input type="date" class="form-control text-secondary" name="tgl_produksi_sampai" id="tgl_produksi_sampai">
                                     </div>
                                     <div class="col-md-2 mb-2">
                                         <input type="text" class="form-control" name="no_model" id="no_model" placeholder="No Model">

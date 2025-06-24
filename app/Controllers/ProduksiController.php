@@ -91,9 +91,9 @@ class ProduksiController extends BaseController
     public function produksiPerArea($area)
     {
         $bulan = $this->request->getGet('bulan');
-        $tglProduksi = $this->request->getGet('tgl_produksi');
+        $tglProduksi = $this->request->getGet('tgl_produksi') ?? null;
         $tglProduksiSampai = $this->request->getGet('tgl_produksi_sampai') ?? null;
-        $noModel = $this->request->getGet('no_model');
+        $noModel = $this->request->getGet('no_model') ?? null;
         $size = $this->request->getGet('size') ?? null;
         $noBox = $this->request->getGet('no_box') ?? null;
         $noLabel = $this->request->getGet('no_label') ?? null;
