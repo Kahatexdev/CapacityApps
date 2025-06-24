@@ -58,7 +58,13 @@
                     <div class="table-responsive">
                         <div id="headerModel" class="table-header" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                             <h4 style="margin: 0;"><span id="table-header"></span></h4>
-                            <button id="exportPdfBtn" class="btn btn-danger">Export PDF</button>
+
+                            <div class="d-flex align-items-center  gap-3">
+                                <!-- <button id="exportPdfBtn" class="btn btn-danger">Export PDF</button> -->
+                                <input type="hidden" id="tgl_buat" name="tgl_buat" value="">
+                                <button id="generatePdfBtn" class="btn btn-danger">Export PDF</button>
+                                <!-- <button id="generateExcelBtn" class="btn btn-success">Export Excel</button> -->
+                            </div>
                         </div>
 
                         <table class="display text-center text-uppercase text-xs font-bolder" id="dataTable" style="width:100%">
@@ -115,6 +121,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" id="generatePdfBtn" class="btn bg-gradient-info">Generate</button>
+                <button type="button" id="generateExcelBtn" class="btn bg-gradient-success">Generate Excel</button>
             </div>
         </div>
     </div>
@@ -187,6 +194,8 @@
     };
 
     function fethcData(data, model, tglBuat, area) {
+        $('#tgl_buat').val(tglBuat);
+
         let dataTable = $('#dataTable').DataTable();
         dataTable.clear(); // Hapus semua data sebelumnya
 
@@ -275,12 +284,31 @@
         const tglBuat = $('#tgl_buat').val();
         const role = <?= json_encode($role) ?>;
 
-        if (!model) {
-            alert("Silakan isi No Model terlebih dahulu.");
-            return;
-        }
+        // if (!tglBuat) {
+        //     alert("Silakan isi No Model terlebih dahulu.");
+        //     return;
+        // }
 
         const url = "<?= base_url($role . '/generate_po_tambahan') ?>" +
+            "?area=" + encodeURIComponent(area) +
+            "&model=" + encodeURIComponent(model) +
+            "&tgl_buat=" + encodeURIComponent(tglBuat);
+
+        window.open(url, '_blank');
+    });
+
+    $('#generateExcelBtn').on('click', function() {
+        const area = $('#area').val();
+        const model = $('#no_model').val();
+        const tglBuat = $('#tgl_buat').val();
+        const role = <?= json_encode($role) ?>;
+
+        // if (!tglBuat) {
+        //     alert("Silakan isi No Model terlebih dahulu.");
+        //     return;
+        // }
+
+        const url = "<?= base_url($role . '/generate_excel_po_tambahan') ?>" +
             "?area=" + encodeURIComponent(area) +
             "&model=" + encodeURIComponent(model) +
             "&tgl_buat=" + encodeURIComponent(tglBuat);

@@ -1150,26 +1150,31 @@ class ApsPerstyleModel extends Model
             ->where('apsperstyle.qty != 0');
 
         if (!empty($validate['buyer'])) {
-            $this->where('data_model.kd_buyer_order', $validate['buyer']);
+            $builder->where('data_model.kd_buyer_order', $validate['buyer']);
         }
 
         if (!empty($validate['area'])) {
-            $this->where('apsperstyle.factory', $validate['area']);
+            $builder->where('apsperstyle.factory', $validate['area']);
         }
 
         if (!empty($validate['jarum'])) {
-            $this->where('apsperstyle.machinetypeid', $validate['jarum']);
+            $builder->like('apsperstyle.machinetypeid', $validate['jarum']);
         }
 
         if (!empty($validate['pdk'])) {
-            $this->where('data_model.no_model', $validate['pdk']);
+            $builder->where('data_model.no_model', $validate['pdk']);
         }
 
         if (!empty($validate['awal'])) {
-            $this->where('apsperstyle.delivery >=', $validate['awal']);
+            $builder->where('data_model.created_at', $validate['tglTurun']);
         }
+
+        if (!empty($validate['awal'])) {
+            $builder->where('apsperstyle.delivery >=', $validate['awal']);
+        }
+
         if (!empty($validate['akhir'])) {
-            $this->where('apsperstyle.delivery <=', $validate['akhir']);
+            $builder->where('apsperstyle.delivery <=', $validate['akhir']);
         }
         return $builder
             ->groupBy('apsperstyle.mastermodel')
@@ -1213,6 +1218,13 @@ class ApsPerstyleModel extends Model
         return $this->select('idapsperstyle')
             ->where('mastermodel', $model)
             ->where('inisial', $inisial)
+            ->findAll();
+    }
+    public function getDeliv($model)
+    {
+        return $this->select('delivery')
+            ->where('mastermodel', $model)
+            ->groupBy('delivery')
             ->findAll();
     }
 }
