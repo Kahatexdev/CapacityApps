@@ -52,6 +52,7 @@ $routes->group(
         $routes->get('getMasterModel', 'ApiController::getMasterModel');
         $routes->get('getInisialByModel', 'ApiController::getInisialByModel');
         $routes->get('getIdApsByModelInisial', 'ApiController::getApsPerStyleByInisial');
+        $routes->get('getDeliv/(:any)', 'ApiController::getDeliv/$1');
     }
 );
 

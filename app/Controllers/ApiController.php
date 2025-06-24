@@ -353,4 +353,14 @@ class ApiController extends ResourceController
         // Return the data with a 200 status
         return $this->respond($idApsData, ResponseInterface::HTTP_OK);
     }
+    public function getDeliv($model)
+    {
+        $deliv = $this->ApsPerstyleModel->getDeliv($model);
+        if (empty($deliv)) {
+            return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
+        }
+
+        // Return the data with a 200 status
+        return $this->respond($deliv, ResponseInterface::HTTP_OK);
+    }
 }
