@@ -3826,7 +3826,7 @@ class ExcelController extends BaseController
         $tglBuat = $this->request->getGet('tgl_buat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/filterPoTambahan"
+        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterPoTambahan"
             . "?area=" . urlencode($area)
             . "&model=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);
@@ -4566,19 +4566,19 @@ class ExcelController extends BaseController
             ],
             'borders' => [
                 'top' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'bottom' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'left' => [
-                    'borderStyle' => Border::BORDER_THIN,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'right' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
             ],

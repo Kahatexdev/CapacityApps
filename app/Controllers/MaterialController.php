@@ -1312,7 +1312,7 @@ class MaterialController extends BaseController
     {
         $noModel = $this->request->getGet('model');
         $tglBuat = $this->request->getGet('tglBuat');
-        $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/filterPoTambahan"
+        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterPoTambahan"
             . "?area=" . urlencode($area)
             . "&tglBuat=" . urlencode($tglBuat)
             . "&model=" . urlencode($noModel);
