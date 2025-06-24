@@ -3826,7 +3826,7 @@ class ExcelController extends BaseController
         $tglBuat = $this->request->getGet('tgl_buat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterPoTambahan"
+        $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/filterPoTambahan"
             . "?area=" . urlencode($area)
             . "&model=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);
@@ -3857,7 +3857,7 @@ class ExcelController extends BaseController
         // Style
         $styleHeader = [
             'font' => [
-                'size' => 12,
+                'size' => 10,
                 'bold' => true,
                 'name' => 'Arial',
             ],
@@ -3874,7 +3874,7 @@ class ExcelController extends BaseController
         ];
         $styleHeader2 = [
             'font' => [
-                'size' => 11,
+                'size' => 10,
                 'bold' => true,
                 'name' => 'Arial',
             ],
@@ -3891,7 +3891,7 @@ class ExcelController extends BaseController
         ];
         $styleBody = [
             'font' => [
-                'size' => 12,
+                'size' => 10,
                 'name' => 'Arial',
             ],
             'alignment' => [
@@ -4012,7 +4012,7 @@ class ExcelController extends BaseController
         ]);
 
         $sheet->setCellValue('E1', 'FORMULIR');
-        $sheet->mergeCells('B1:AD1')->getStyle('E1:AD1')->applyFromArray([
+        $sheet->mergeCells('E1:AD1')->getStyle('E1:AD1')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'size' => 16,
@@ -4121,7 +4121,7 @@ class ExcelController extends BaseController
         ]);
 
         $sheet->setCellValue('A4', 'No. Dokumen');
-        $sheet->mergeCells('A4:D4')->$sheet->getStyle('A4:D4')->applyFromArray([
+        $sheet->mergeCells('A4:D4')->getStyle('A4:D4')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'size' => 11,
@@ -4137,7 +4137,7 @@ class ExcelController extends BaseController
                     'color' => ['rgb' => '000000'],
                 ],
                 'bottom' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_THIN,
                     'color' => ['rgb' => '000000'],
                 ],
                 'left' => [
@@ -4168,7 +4168,7 @@ class ExcelController extends BaseController
                     'color' => ['rgb' => '000000'],
                 ],
                 'bottom' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_THIN,
                     'color' => ['rgb' => '000000'],
                 ],
                 'left' => [
@@ -4199,7 +4199,7 @@ class ExcelController extends BaseController
                     'color' => ['rgb' => '000000'],
                 ],
                 'bottom' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_THIN,
                     'color' => ['rgb' => '000000'],
                 ],
                 'left' => [
@@ -4230,7 +4230,7 @@ class ExcelController extends BaseController
                     'color' => ['rgb' => '000000'],
                 ],
                 'bottom' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_THIN,
                     'color' => ['rgb' => '000000'],
                 ],
                 'left' => [
@@ -4239,6 +4239,36 @@ class ExcelController extends BaseController
                 ],
                 'right' => [
                     'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+        ]);
+
+        $sheet->getStyle('A5:R5')->applyFromArray([
+            'font' => [
+                'size' => 11,
+                'bold' => true,
+                'name' => 'Arial',
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_LEFT,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'top' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'bottom' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'left' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+                'right' => [
+                    'borderStyle' => Border::BORDER_THIN,
                     'color' => ['rgb' => '000000'],
                 ],
             ],
@@ -4257,7 +4287,7 @@ class ExcelController extends BaseController
             ],
             'borders' => [
                 'top' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_THIN,
                     'color' => ['rgb' => '000000'],
                 ],
                 'bottom' => [
@@ -4288,7 +4318,7 @@ class ExcelController extends BaseController
             ],
             'borders' => [
                 'top' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_THIN,
                     'color' => ['rgb' => '000000'],
                 ],
                 'bottom' => [
@@ -4319,11 +4349,11 @@ class ExcelController extends BaseController
             ],
             'borders' => [
                 'top' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'bottom' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'left' => [
@@ -4331,7 +4361,7 @@ class ExcelController extends BaseController
                     'color' => ['rgb' => '000000'],
                 ],
                 'right' => [
-                    'borderStyle' => Border::BORDER_THIN,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
             ],
@@ -4350,19 +4380,19 @@ class ExcelController extends BaseController
             ],
             'borders' => [
                 'top' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'bottom' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'left' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'right' => [
-                    'borderStyle' => Border::BORDER_THIN,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
             ],
@@ -4381,19 +4411,19 @@ class ExcelController extends BaseController
             ],
             'borders' => [
                 'top' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'bottom' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'left' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'right' => [
-                    'borderStyle' => Border::BORDER_THIN,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
             ],
@@ -4412,15 +4442,15 @@ class ExcelController extends BaseController
             ],
             'borders' => [
                 'top' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'bottom' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'left' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'right' => [
@@ -4443,19 +4473,19 @@ class ExcelController extends BaseController
             ],
             'borders' => [
                 'top' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'bottom' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'left' => [
-                    'borderStyle' => Border::BORDER_THIN,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'right' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
             ],
@@ -4474,19 +4504,19 @@ class ExcelController extends BaseController
             ],
             'borders' => [
                 'top' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'bottom' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'left' => [
-                    'borderStyle' => Border::BORDER_THIN,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'right' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
             ],
@@ -4505,19 +4535,19 @@ class ExcelController extends BaseController
             ],
             'borders' => [
                 'top' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'bottom' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'left' => [
-                    'borderStyle' => Border::BORDER_THIN,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
                 'right' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'borderStyle' => Border::BORDER_NONE,
                     'color' => ['rgb' => '000000'],
                 ],
             ],
@@ -4557,22 +4587,121 @@ class ExcelController extends BaseController
 
         // Header Table
         $sheet->setCellValue('A8', 'Model');
-        $sheet->mergeCells('A8:A10')->getStyle('A8:A10')->applyFromArray($styleHeader);
+        $sheet->mergeCells('A8:B10')->getStyle('A8:B10')->applyFromArray($styleHeader);
 
-        $sheet->setCellValue('B8', 'Warna');
-        $sheet->mergeCells('B8:B10')->getStyle('B8:B10')->applyFromArray($styleHeader);
-
-        $sheet->setCellValue('C8', 'Item Type');
+        $sheet->setCellValue('C8', 'Warna');
         $sheet->mergeCells('C8:C10')->getStyle('C8:C10')->applyFromArray($styleHeader);
 
-        $sheet->setCellValue('D8', 'Kode Warna');
+        $sheet->setCellValue('D8', 'Item Type');
         $sheet->mergeCells('D8:D10')->getStyle('D8:D10')->applyFromArray($styleHeader);
 
-        $sheet->setCellValue('E8', 'Style / Size');
+        $sheet->setCellValue('E8', 'Kode Warna');
         $sheet->mergeCells('E8:E10')->getStyle('E8:E10')->applyFromArray($styleHeader);
 
-        $sheet->setCellValue('E8', 'Style / Size');
-        $sheet->mergeCells('E8:E10')->getStyle('E8:E10')->applyFromArray($styleHeader);
+        $sheet->setCellValue('F8', 'Style / Size');
+        $sheet->mergeCells('F8:F10')->getStyle('F8:F10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('G8', 'Komposisi (%)');
+        $sheet->mergeCells('G8:G10')->getStyle('G8:G10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('H8', 'Gw / Pcs');
+        $sheet->mergeCells('H8:H10')->getStyle('H8:H10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('I8', 'Qty / Pcs');
+        $sheet->mergeCells('I8:I10')->getStyle('I8:I10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('J8', 'Loss');
+        $sheet->mergeCells('J8:J10')->getStyle('J8:J10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('K8', 'Pesanan Kgs');
+        $sheet->mergeCells('K8:K10')->getStyle('K8:K10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('L8', 'Terima');
+        $sheet->mergeCells('L8:N9')->getStyle('L8:N9')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('L10', 'Kg');
+        $sheet->getStyle('L10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('M10', '+ / -');
+        $sheet->getStyle('M10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('N10', '%');
+        $sheet->getStyle('N10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('O8', 'Sisa Benang di mesin');
+        $sheet->mergeCells('O8:O9')->getStyle('O8:O9')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('O10', 'Kg');
+        $sheet->getStyle('O10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('P8', 'Tambahan I (mesin)');
+        $sheet->mergeCells('P8:S8')->getStyle('P8:S8')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('P9', 'Pcs');
+        $sheet->mergeCells('P9:P10')->getStyle('P9:P10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('Q9', 'Benang');
+        $sheet->mergeCells('Q9:R9')->getStyle('Q9:R9')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('Q10', 'Kg');
+        $sheet->getStyle('Q10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('R10', 'Cones');
+        $sheet->getStyle('R10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('S9', '%');
+        $sheet->mergeCells('S9:S10')->getStyle('S9:S10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('T8', 'Tambahan II (Packing)');
+        $sheet->mergeCells('T8:W8')->getStyle('T8:W8')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('T9', 'Pcs');
+        $sheet->mergeCells('T9:T10')->getStyle('T9:T10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('U9', 'Benang');
+        $sheet->mergeCells('U9:P9')->getStyle('U9:P9')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('U10', 'Kg');
+        $sheet->getStyle('U10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('V10', 'Cones');
+        $sheet->getStyle('V10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('W9', '%');
+        $sheet->mergeCells('W9:W10')->getStyle('W9:W10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('X8', 'Total lebih pakai benang');
+        $sheet->mergeCells('X8:Y9')->getStyle('X8:Y9')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('X10', 'Kg');
+        $sheet->getStyle('X10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('Y10', '%');
+        $sheet->getStyle('Y10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('Z8', 'RETURAN');
+        $sheet->mergeCells('Z8:AC8')->getStyle('Z8:AC8')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('Z9', 'Kg');
+        $sheet->mergeCells('Z9:Z10')->getStyle('Z9:Z10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('AA9', '%');
+        $sheet->getStyle('AA9')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('AA10', 'dari PSN');
+        $sheet->getStyle('AA10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('AB9', 'Kg');
+        $sheet->mergeCells('AB9:AB10')->getStyle('AB9:AB10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('AC9', '%');
+        $sheet->getStyle('AC9')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('AC10', 'dari PSN');
+        $sheet->getStyle('AC10')->applyFromArray($styleHeader);
+
+        $sheet->setCellValue('AD8', 'Keterangan');
+        $sheet->mergeCells('AD8:AD10')->getStyle('AD8:AD10')->applyFromArray($styleHeader);
 
         // Terapkan border double bawah pada setiap kolom di baris terakhir
         // foreach ($columns as $column) {

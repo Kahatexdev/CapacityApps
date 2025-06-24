@@ -87,7 +87,7 @@ class PdfController extends BaseController
         $tglBuat = $this->request->getGet('tgl_buat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterPoTambahan"
+        $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/filterPoTambahan"
             . "?area=" . urlencode($area)
             . "&model=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);
@@ -247,110 +247,186 @@ class PdfController extends BaseController
         //Isi Tabel
         $pdf->SetFont('Arial', '', 7);
         $no = 1;
-        $yLimit = 180;
-
-        $barisNormalHeight  = 3; // tinggi baris logis
-        $lineHeight         = 3;
+        $yLimit = 175;
+        $lineHeight = 4;
 
         foreach ($data as $row) {
+            // Cek dulu apakah nambah baris ini bakal lewat batas
+            if ($pdf->GetY() + $lineHeight > $yLimit) {
+                $this->renderFooterPage($pdf);
+                $pdf->AddPage();
+                $this->renderHeaderPage($pdf, $area, $tglBuat, $deliveryAkhir);
+
+                // Gambar ulang margin & header halaman
+                $pdf->SetDrawColor(0, 0, 0);
+                $pdf->SetLineWidth(0.4);
+                $pdf->Rect(9, 9, 279, 192);
+                $pdf->SetLineWidth(0.2);
+                $pdf->Rect(10, 10, 277, 190);
+
+                // (Kalau header halaman lain ada lagi, panggil disini...)
+
+                // Gambar ulang header tabel
+                $this->renderTableHeader($pdf);
+            }
+
             $startX = $pdf->GetX();
             $startY = $pdf->GetY();
 
+            // 1. SIMULASI: Hitung tinggi maksimum yang dibutuhkan
             $heights = [];
-            $tempX   = $startX;
+            $tempX = $startX;
 
-            // Ubah text color jadi putih agar tidak terlihat saat simulasi
-            $pdf->SetTextColor(255, 255, 255);
+            $pdf->SetTextColor(255, 255, 255); // putih agar tidak terlihat
 
-            $simCols = [
-                ['w' => 12, 't' => $row['color']],
-                ['w' => 19, 't' => $row['item_type']],
-                ['w' => 16, 't' => $row['kode_warna']],
-                ['w' => 15, 't' => $row['style_size']],
-                ['w' => 14, 't' => $row['keterangan']],
+            $multiCellData = [
+                ['w' => 12, 'text' => $row['no_model']],
+                ['w' => 12, 'text' => $row['color']],
+                ['w' => 19, 'text' => $row['item_type']],
+                ['w' => 16, 'text' => $row['kode_warna']],
+                ['w' => 15, 'text' => $row['style_size']],
+                ['w' => 14, 'text' => $row['keterangan']],
             ];
-            foreach ($simCols as $col) {
+
+            foreach ($multiCellData as $data) {
                 $pdf->SetXY($tempX, $startY);
                 $y0 = $pdf->GetY();
-                $pdf->MultiCell($col['w'], $lineHeight, $col['t'], 0, 'C');
+                $pdf->MultiCell($data['w'], $lineHeight, $data['text'], 0, 'C');
                 $heights[] = $pdf->GetY() - $y0;
-                $pdf->SetXY($tempX, $startY);
-                $tempX += $col['w'];
+                $tempX += $data['w'];
             }
 
-            // kembalikan text color
-            $pdf->SetTextColor(0, 0, 0);
-
-            // ambil yang tertinggi
+            $pdf->SetTextColor(0, 0, 0); // kembali ke hitam
             $maxHeight = max($heights);
 
-            // reset posisi
+            // 2. RENDER: Gambar semua cell dengan tinggi yang sama
             $pdf->SetXY($startX, $startY);
 
+            // Buat semua cell dengan border dan tinggi yang sama, tapi isi kosong dulu
+            $cellWidths = [12, 12, 19, 16, 15, 12, 7, 7, 7, 12, 7, 7, 7, 13, 7, 7, 8, 7, 7, 7, 8, 7, 7, 7, 6, 12, 6, 14, 14];
+            $cellData = [
+                '',
+                '',
+                '',
+                '',
+                '', // 5 kolom multiCell akan diisi kemudian
+                $row['composition'],
+                $row['gw'],
+                $row['qty_pcs'],
+                $row['loss'],
+                $row['kgs'],
+                number_format($row['terima_kg'], 2),
+                number_format($row['terima_kg'] - $row['kgs'], 2),
+                number_format($row['terima_kg'] / $row['kgs'], 2) * 100 . '%', // terima
+                number_format($row['sisa_bb_mc'], 2), // sisa mesin
+                $row['sisa_order_pcs'],
+                number_format($row['poplus_mc_kg'], 2),
+                $row['poplus_mc_cns'],
+                number_format($row['poplus_mc_kg'] / $row['kgs'], 2) * 100 . '%',
+                number_format($row['plus_pck_pcs'], 2),
+                number_format($row['plus_pck_kg'], 2),
+                $row['plus_pck_cns'],
+                number_format($row['plus_pck_kg'] / $row['kgs'], 2) * 100 . '%',
+                number_format($row['lebih_pakai_kg'], 2),
+                number_format($row['lebih_pakai_kg'] / $row['kgs'], 2) * 100 . '%',
+                '',
+                '',
+                '',
+                '',
+                '' // keterangan akan diisi kemudian
+            ];
+
+            // Gambar semua cell dengan border
+            for ($i = 0; $i < count($cellWidths); $i++) {
+                $pdf->Cell($cellWidths[$i], $maxHeight, $cellData[$i], 1, 0, 'C');
+            }
+
+            // 3. ISI TEXT untuk kolom multiCell (overlay tanpa border)
+            $currentX = $startX;
+
             // No Model
-            $pdf->Cell(12, $maxHeight, $row['no_model'], 1, 0, 'C');
+            $textCenterY = $startY + ($maxHeight / 2) - ($lineHeight / 2);
+            $pdf->SetXY($currentX, $textCenterY);
+            $pdf->Cell(12, $lineHeight, $row['no_model'], 0, 0, 'C');
+            $currentX += 12;
 
-            // Kolom Warna
-            $x = $pdf->GetX();
-            $pdf->MultiCell(12, $maxHeight, $row['color'], 1, 'C');
-            $pdf->SetXY($x + 12, $startY);
+            // Color  
+            $pdf->SetXY($currentX, $textCenterY);
+            $pdf->Cell(12, $lineHeight, $row['color'], 0, 0, 'C');
+            $currentX += 12;
 
-            // Item Type
-            $x = $pdf->GetX();
-            $pdf->MultiCell(19, $maxHeight, $row['item_type'], 1, 'C');
-            $pdf->SetXY($x + 19, $startY);
+            // Item Type (mungkin multiline)
+            $pdf->SetXY($currentX, $startY);
+            $pdf->SetTextColor(255, 255, 255);
+            $y0 = $pdf->GetY();
+            $pdf->MultiCell(19, $lineHeight, $row['item_type'], 0, 'C');
+            $textHeight = $pdf->GetY() - $y0;
+            $pdf->SetTextColor(0, 0, 0);
 
-            // Kode Warna
-            $x = $pdf->GetX();
-            $pdf->MultiCell(16, $maxHeight, $row['kode_warna'], 1, 'C');
-            $pdf->SetXY($x + 16, $startY);
+            $centerY = $startY + ($maxHeight - $textHeight) / 2;
+            $pdf->SetXY($currentX, $centerY);
+            $pdf->MultiCell(19, $lineHeight, $row['item_type'], 0, 'C');
+            $currentX += 19;
+
+            // Kode Warna (mungkin multiline)
+            $pdf->SetXY($currentX, $startY);
+            $pdf->SetTextColor(255, 255, 255);
+            $y0 = $pdf->GetY();
+            $pdf->MultiCell(16, $lineHeight, $row['kode_warna'], 0, 'C');
+            $textHeight = $pdf->GetY() - $y0;
+            $pdf->SetTextColor(0, 0, 0);
+
+            $centerY = $startY + ($maxHeight - $textHeight) / 2;
+            $pdf->SetXY($currentX, $centerY);
+            $pdf->MultiCell(16, $lineHeight, $row['kode_warna'], 0, 'C');
+            $currentX += 16;
 
             // Style Size
-            $x = $pdf->GetX();
-            $pdf->MultiCell(15, $maxHeight, $row['style_size'], 1, 'C');
-            $pdf->SetXY($x + 15, $startY);
+            $centerY = $startY + ($maxHeight - $textHeight) / 2;
+            $pdf->SetXY($currentX, $centerY);
+            $pdf->MultiCell(15, $lineHeight, $row['style_size'], 0, 'C');
+            $currentX += 15;
 
-            // Kolom-kolom berikut: isi seperti biasa, tapi tingginya harus `maxHeight`
-            $pdf->Cell(12, $maxHeight, $row['composition'], 1, 0, 'C'); // composition
-            $pdf->Cell(7, $maxHeight, $row['gw'], 1, 0, 'C'); // gw
-            $pdf->Cell(7, $maxHeight, $row['qty_pcs'], 1, 0, 'C'); // qty pcs
-            $pdf->Cell(7, $maxHeight, $row['loss'], 1, 0, 'C'); // loss
-            $pdf->Cell(12, $maxHeight, $row['kgs'], 1, 0, 'C'); // kgs
+            // Skip kolom yang sudah terisi dengan Cell biasa
+            $currentX += 12 + 7 + 7 + 7 + 12 + 7 + 7 + 7 + 13 + 7 + 7 + 8 + 7 + 7 + 7 + 8 + 7 + 7 + 7 + 6 + 12 + 6 + 14;
 
-            // Terima: terdiri dari 3 kolom
-            $pdf->Cell(7, $maxHeight, number_format($row['terima_kg'], 2), 1, 0, 'C'); //terima kg
-            $pdf->Cell(7, $maxHeight, '', 1, 0, 'C'); //terima +/-
-            $pdf->Cell(7, $maxHeight, '', 1, 0, 'C'); //terima %
+            // Keterangan (mungkin multiline)
+            $pdf->SetXY($currentX, $startY);
+            $pdf->SetTextColor(255, 255, 255);
+            $y0 = $pdf->GetY();
+            $pdf->MultiCell(14, $lineHeight, $row['keterangan'], 0, 'C');
+            $textHeight = $pdf->GetY() - $y0;
+            $pdf->SetTextColor(0, 0, 0);
 
-            $pdf->Cell(13, $maxHeight, number_format($row['sisa_bb_mc'], 2), 1, 0, 'C'); //sisa mesin
+            $centerY = $startY + ($maxHeight - $textHeight) / 2;
+            $pdf->SetXY($currentX, $centerY);
+            $pdf->MultiCell(14, $lineHeight, $row['keterangan'], 0, 'C');
 
-            // Lanjutkan isi kolom lainnya sesuai dengan struktur header
-
-            $pdf->Cell(7, $maxHeight, $row['sisa_order_pcs'], 1, 0, 'C'); // tambahan I pcs
-            $pdf->Cell(7, $maxHeight, number_format($row['poplus_mc_kg'], 2), 1, 0, 'C'); // tambahan I benang kg
-            $pdf->Cell(8, $maxHeight, $row['poplus_mc_cns'], 1, 0, 'C'); // tambahan I benang cones
-            $pdf->Cell(7, $maxHeight, '', 1, 0, 'C'); // tambahan I %
-
-            $pdf->Cell(7, $maxHeight, number_format($row['plus_pck_pcs'], 2), 1, 0, 'C'); // tambahan II pcs
-            $pdf->Cell(7, $maxHeight, number_format($row['plus_pck_kg'], 2), 1, 0, 'C'); // tambahan II benang kg
-            $pdf->Cell(8, $maxHeight, $row['plus_pck_cns'], 1, 0, 'C'); // tambahan II benang cones
-            $pdf->Cell(7, $maxHeight, '', 1, 0, 'C'); // tambahan II %
-
-            $pdf->Cell(7, $maxHeight, number_format($row['lebih_pakai_kg'], 2), 1, 0, 'C'); //lebih pakai kg
-            $pdf->Cell(7, $maxHeight, '', 1, 0, 'C'); //lebih pakai %
-
-            $pdf->Cell(6, $maxHeight, '', 1, 0, 'C'); //returan kg
-            $pdf->Cell(12, $maxHeight, '', 1, 0, 'C'); //returan % dari PSN
-            $pdf->Cell(6, $maxHeight, '', 1, 0, 'C'); //returan kg
-            $pdf->Cell(14, $maxHeight, '', 1, 0, 'C'); //returan % dari PO(+)
-
-            // Keterangan (kolom terakhir)
-            $x = $pdf->GetX();
-            $pdf->MultiCell(14, $maxHeight, $row['keterangan'], 1, 'C');
-            $pdf->SetXY($x + 14, $startY);
-
-            // Akhiri baris
+            // Pindah ke baris berikutnya
             $pdf->SetY($startY + $maxHeight);
+
+            $no++;
+        }
+
+        $currentY = $pdf->GetY();
+        $footerY = 175; // batas sebelum footer (tergantung desain kamu)
+
+        // Tinggi standar baris kosong (bisa sesuaikan ke $maxHeight rata-rata atau tetap 6 misal)
+        $emptyRowHeight = 5;
+
+        // Selama posisi Y masih di atas footer, tambahkan baris kosong
+        while ($currentY + $emptyRowHeight < $footerY) {
+            $startX = $pdf->GetX();
+            $pdf->SetXY($startX, $currentY);
+
+            // Gambar semua cell border kosong
+            $cellWidths = [12, 12, 19, 16, 15, 12, 7, 7, 7, 12, 7, 7, 7, 13, 7, 7, 8, 7, 7, 7, 8, 7, 7, 7, 6, 12, 6, 14, 14];
+            foreach ($cellWidths as $width) {
+                $pdf->Cell($width, $emptyRowHeight, '', 1, 0, 'C');
+            }
+            $pdf->Ln($emptyRowHeight);
+
+            $currentY = $pdf->GetY();
         }
 
         // FOOTER
@@ -390,6 +466,162 @@ class PdfController extends BaseController
             ->setHeader('Content-Disposition', 'inline; filename="Report_Model_' . $noModel . '.pdf"')
             ->setBody($pdfContent);
     }
+
+    private function renderHeaderPage($pdf, $area, $tglBuat, $deliveryAkhir)
+    {
+        // Inisialisasi FPDF
+        $pdf->SetAutoPageBreak(false);
+
+        // Garis margin luar (lebih tebal)
+        $pdf->SetDrawColor(0, 0, 0); // Warna hitam
+        $pdf->SetLineWidth(0.4); // Lebih tebal
+        $pdf->Rect(9, 9, 279, 192); // Sedikit lebih besar dari margin dalam
+
+        // Garis margin dalam (lebih tipis)
+        $pdf->SetLineWidth(0.2); // Lebih tipis
+        $pdf->Rect(10, 10, 277, 190); // Ukuran aslinya
+
+        // Masukkan gambar di dalam kolom
+        $x = $pdf->GetX(); // Simpan posisi X saat ini
+        $y = $pdf->GetY(); // Simpan posisi Y saat ini
+
+        // Menambahkan gambar
+        $pdf->Image('assets/img/logo-kahatex.png', $x + 16, $y + 1, 10, 8); // Lokasi X, Y, lebar, tinggi
+
+        // Header
+        $pdf->SetFont('Arial', 'B', 7);
+        $pdf->Cell(43, 13, '', 1, 0, 'C'); // Tetap di baris yang sama
+        // Set warna latar belakang menjadi biru telur asin (RGB: 170, 255, 255)
+        $pdf->SetFillColor(170, 255, 255);
+        $pdf->Cell(234, 4, 'FORMULIR', 1, 1, 'C', 1); // Pindah ke baris berikutnya setelah ini
+
+        $pdf->SetFont('Arial', 'B', 6);
+        $pdf->Cell(43, 5, '', 0, 0, 'L'); // Tetap di baris yang sama
+        $pdf->Cell(234, 5, 'DEPARTMEN KAOS KAKI', 0, 1, 'C'); // Pindah ke baris berikutnya setelah ini
+
+        $pdf->SetFont('Arial', 'B', 6);
+        $pdf->Cell(43, 4, 'PT KAHATEX', 0, 0, 'C'); // Tetap di baris yang sama
+        $pdf->Cell(234, 4, 'PO TAMBAHAN DAN RETURAN BAHAN BAKU MESIN KE GUDANG BENANG', 0, 1, 'C'); // Pindah ke baris berikutnya setelah ini
+
+        // Tabel Header Atas
+        $pdf->SetFont('Arial', 'B', 5);
+        $pdf->Cell(43, 4, 'No. Dokumen', 1, 0, 'L');
+        $pdf->Cell(162, 4, 'FOR-KK-034/REV_05/HAL_1/1', 1, 0, 'L');
+        $pdf->Cell(31, 4, 'Tanggal Revisi', 1, 0, 'L');
+        $pdf->Cell(41, 4, '30 Januari 2025', 1, 1, 'L');
+
+        $pdf->Cell(205, 4, '', 1, 0, 'L');
+        $pdf->Cell(31, 4, 'Klasifikasi', 1, 0, 'L');
+        $pdf->Cell(41, 4, 'Sensitif', 1, 1, 'L');
+
+        $pdf->SetFont('Arial', 'B', 6);
+
+        $pdf->Cell(10, 5, 'Area', 0, 0, 'L');
+        $pdf->Cell(75, 5, ': ' . $area, 0, 0, 'L');
+
+        $pdf->Cell(20, 5, 'Loss F.Up', 0, 0, 'L');
+        $pdf->Cell(75, 5, ': ' . '', 0, 0, 'L');
+
+        $pdf->Cell(24, 5, 'Tanggal Buat', 0, 0, 'L');
+        $pdf->Cell(30, 5, ': ' . $tglBuat, 0, 1, 'L');
+
+        $firstItem = $data[0] ?? null;
+        $deliveryAkhir = $firstItem['delivery_akhir'] ?? '-';
+
+        $pdf->Cell(180, 5, '', 0, 0, 'L');
+        $pdf->Cell(24, 5, 'Tgl. Export', 0, 0, 'L');
+        $pdf->Cell(40, 5, ': ' . $deliveryAkhir, 0, 1, 'L');
+    }
+
+    private function renderTableHeader($pdf)
+    {
+        // Tabel Header Baris Pertama
+        $pdf->SetFont('Arial', '', 7);
+        $pdf->Cell(12, 12, 'Model', 1, 0, 'C');
+        $pdf->Cell(12, 12, 'Warna', 1, 0, 'C');
+        $pdf->Cell(19, 12, 'Item Type', 1, 0, 'C');
+        $pdf->Cell(16, 12, 'Kode Warna', 1, 0, 'C');
+        $pdf->Cell(15, 12, 'Style / Size', 1, 0, 'C');
+        MultiCellFit($pdf, 12, 6, "Komposi\nsi (%)");
+        MultiCellFit($pdf, 7, 6, "GW/\nPcs");
+        MultiCellFit($pdf, 7, 6, "Qty/\nPcs");
+        $pdf->Cell(7, 12, 'Loss', 1, 0, 'C');
+        MultiCellFit($pdf, 12, 6, "Pesanan\nKgs");
+        $pdf->Cell(21, 9, 'Terima', 1, 0, 'C');
+        MultiCellFit($pdf, 13, 3, "Sisa Benang\ndi Mesin");
+        $pdf->Cell(29, 6, 'Tambahan I (mesin)', 1, 0, 'C');
+        $pdf->Cell(29, 6, 'Tamabahan II (Packing)', 1, 0, 'C');
+        MultiCellFit($pdf, 14, 3, "Total lebih\npakai benang");
+        $pdf->Cell(38, 6, 'RETURAN', 1, 0, 'C');
+        $pdf->Cell(14, 12, 'Keterangan', 1, 1, 'C');
+
+        // Tabel Header Baris Kedua
+        $pdf->Cell(153, -6, '', 0, 0);
+        $pdf->Cell(7, -6, 'Pcs', 1, 1, 'C');
+        $pdf->Cell(160, -6, '', 0, 0);
+        $pdf->Cell(15, 3, 'Benang', 1, 0, 'C');
+        $pdf->Cell(7, 6, '%', 1, 0, 'C');
+        $pdf->Cell(7, 6, 'Pcs', 1, 0, 'C');
+        $pdf->Cell(15, 3, 'Benang', 1, 0, 'C');
+        $pdf->Cell(7, 6, '%', 1, 0, 'C');
+        $pdf->Cell(14, -6, '', 0, 0);
+        $pdf->Cell(6, 6, 'Kg', 1, 0, 'C');
+        MultiCellFit($pdf, 12, 3, "%\ndari PSN");
+        $pdf->Cell(6, 6, 'Kg', 1, 0, 'C');
+        MultiCellFit($pdf, 14, 3, "%\ndari PO(+)");
+
+        $pdf->Ln(3);
+
+        // Tabel Header Baris Ketiga
+        $pdf->Cell(119);
+        $pdf->Cell(7, 3, 'Kg', 1, 0, 'C');
+        $pdf->Cell(7, 3, '+ / -', 1, 0, 'C');
+        $pdf->Cell(7, 3, '%', 1, 0, 'C');
+        $pdf->Cell(13, 3, 'Kg', 1, 0, 'C');
+        $pdf->Cell(7, -3, '', 0, 0, 'C');
+        $pdf->Cell(7, 3, 'Kg', 1, 0, 'C');
+        $pdf->Cell(8, 3, 'Cones', 1, 0, 'C');
+        $pdf->Cell(14, -3, '', 0, 0, 'C');
+        $pdf->Cell(7, 3, 'Kg', 1, 0, 'C');
+        $pdf->Cell(8, 3, 'Cones', 1, 0, 'C');
+        $pdf->Cell(7, -3, '', 0, 0, 'C');
+        $pdf->Cell(7, 3, 'Kg', 1, 0, 'C');
+        $pdf->Cell(7, 3, '%', 1, 0, 'C');
+        $pdf->Ln(3);
+    }
+
+    private function renderFooterPage($pdf)
+    {
+        // FOOTER
+        // Posisi 55 mm dari bawah
+        $pdf->SetY(-40);
+        $pdf->SetFont('Arial', '', 7);
+
+        // Baris kosong
+        $pdf->Cell(277, 5, '', 0, 1, 'C');
+        // Judul kolom tanda tangan
+        $pdf->Cell(27, 5, 'MANAJEMEN NS', 0, 0, 'C');
+        $pdf->Cell(27, 5, 'KEPALA AREA', 0, 0, 'C');
+        $pdf->Cell(27, 5, 'IE TEKNISI', 0, 0, 'C');
+        $pdf->Cell(27, 5, 'PIC PACKING', 0, 0, 'C');
+        $pdf->Cell(27, 5, 'PPC', 0, 0, 'C');
+        $pdf->Cell(27, 5, 'PPC', 0, 0, 'C');
+        $pdf->Cell(27, 5, 'PPC', 0, 0, 'C');
+        $pdf->Cell(27, 5, 'GD BENANG', 0, 0, 'C');
+        $pdf->Cell(27, 5, 'MENGETAHUI', 0, 0, 'C');
+        $pdf->Cell(27, 5, 'MENGETAHUI', 0, 1, 'C');
+
+        // Pindah ke bawah sedikit (tetap aman)
+        $pdf->SetY(194); // sekitar 18 mm dari bawah halaman (bukan dari margin)
+        $pdf->SetFont('Arial', '', 7);
+
+        // Garis tanda tangan
+        for ($i = 0; $i < 10; $i++) {
+            $pdf->Cell(27, 5, '(________________)', 0, 0, 'C');
+        }
+        $pdf->Ln();
+    }
+
     public function exportPemesanan($jenis, $area, $tgl_pakai)
     {
         // Ambil data berdasarkan area dan model
