@@ -480,6 +480,7 @@
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                     <h6 class="card-title">Data Produksi Harian</h6>
                     <div>
+
                         <select id="filter-bulan" class="form-control d-inline w-auto">
                             <option value="">Semua Bulan</option>
                             <?php for ($i = 1; $i <= 12; $i++): ?>
@@ -492,6 +493,9 @@
                                 <option value="<?= $i ?>"><?= $i ?></option>
                             <?php endfor; ?>
                         </select>
+                        <a href="<?= base_url($role . '/detailproduksi') ?>" class="btn btn-info btn-sm">
+                            <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i> Details
+                        </a>
                     </div>
                 </div>
                 <div class="card-body p-3">

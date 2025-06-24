@@ -42,7 +42,7 @@
                     <!-- Baris Kedua: Form -->
                     <div class="row">
                         <div class="col-12">
-                            <form action="<?= base_url($role . '/detailproduksi/' . $area) ?>" method="get">
+                            <form action="<?= base_url($role . '/detailproduksi') ?>" method="get">
                                 <div class="row">
                                     <div class="col-md-2 mb-2">
                                         <p>Tgl Produksi Dari</p>
@@ -76,6 +76,14 @@
                                     <div class="col-md-2 mb-2">
                                         <input type="text" class="form-control" name="no_label" id="no_label" placeholder="No Label">
                                     </div>
+                                    <div class="col-md-1 mb-2">
+                                        <select id="filter-tahun" class="form-control d-inline w-auto" name="area">
+                                            <option value="">Pilih Area</option>
+                                            <?php foreach ($listArea as $ar): ?>
+                                                <option value="<?= $ar ?>"><?= $ar ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
                                     <div class="col-md-1 text-end">
                                         <button type="submit" class="btn bg-gradient-success">FILTER</button>
                                     </div>
@@ -101,6 +109,7 @@
                                     <thead>
                                         <tr>
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Tgl Produksi</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Area</th>
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">PDK</th>
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Style</th>
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Delivery</th>
@@ -115,6 +124,7 @@
                                         <?php foreach ($produksi as $order) : ?>
                                             <tr>
                                                 <td class="text-sm text-center"><?= $order['tgl_produksi']; ?></td>
+                                                <td class="text-sm text-center"><?= $order['area']; ?></td>
                                                 <td class="text-sm text-center"><?= $order['mastermodel']; ?></td>
                                                 <td class="text-sm text-center"><?= $order['size']; ?></td>
                                                 <td class="text-sm text-center"><?= $order['delivery']; ?></td>

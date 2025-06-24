@@ -1207,4 +1207,11 @@ class ApsPerstyleModel extends Model
             ->where('inisial', $inisial)
             ->findAll();
     }
+    public function getDeliv($model)
+    {
+        return $this->select('delivery')
+            ->where('mastermodel', $model)
+            ->groupBy('delivery')
+            ->findAll();
+    }
 }
