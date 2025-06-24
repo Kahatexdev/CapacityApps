@@ -52,6 +52,7 @@ $routes->group(
         $routes->get('getMasterModel', 'ApiController::getMasterModel');
         $routes->get('getInisialByModel', 'ApiController::getInisialByModel');
         $routes->get('getIdApsByModelInisial', 'ApiController::getApsPerStyleByInisial');
+        $routes->get('getDeliv/(:any)', 'ApiController::getDeliv/$1');
     }
 );
 
@@ -578,6 +579,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('savePoTambahan/(:any)', 'MaterialController::savePoTambahan/$1');
     $routes->get('filter_list_potambahan/(:any)', 'MaterialController::filterPoTambahan/$1');
     $routes->get('generate_po_tambahan', 'PdfController::generatePoTambahan');
+    $routes->get('generate_excel_po_tambahan', 'ExcelController::generatePoTambahan');
 
 
     // retur

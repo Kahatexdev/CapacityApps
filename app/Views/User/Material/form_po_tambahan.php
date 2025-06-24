@@ -303,7 +303,7 @@
                         $row.data('sisaOrder', json.sisa_order);
                         $row.data('bsMesin', json.bs_mesin);
                         $row.data('bsSetting', json.bs_setting);
-                        $row.data('pph', json.pph);
+                        $row.data('bruto', json.bruto);
                         $ss.trigger('change');
                     })
                     .catch(err => console.error('Gagal load item_type:', err))
@@ -366,7 +366,8 @@
                 const sisaOrderMap = $row.data('sisaOrder') || {};
                 const bsMesinMap = $row.data('bsMesin') || {};
                 const bsSettingMap = $row.data('bsSetting') || {};
-                const pphMap = $row.data('pph') || {};
+                const brutoMap = $row.data('bruto') || {};
+
 
                 if (!materialData || !materialData[itemType] || !materialData[itemType].kode_warna[kodeWarna]) {
                     return;
@@ -381,13 +382,26 @@
                     const $template = $('#populateSizeTemplate').clone().removeAttr('id').removeClass('d-none');
 
                     const size = style.style_size;
+                    const kgMu = parseFloat(style.kg_mu || 0);
+                    const composition = parseFloat(style.composition || 0);
+                    const gw = parseFloat(style.gw || 0);
 
                     $template.find('.color').val(size || '');
                     $template.find('.kg-mu').val(parseFloat(style.kg_mu || 0).toFixed(2));
                     $template.find('.sisa-order').val(sisaOrderMap[size] || 0);
                     $template.find('.bs-mesin').val(((bsMesinMap[size] || 0) / 1000).toFixed(2)); // Convert gram to kg
                     $template.find('.bs-setting').val(bsSettingMap[size] || 0);
-                    $template.find('.lebih-pakai').val(((parseFloat(pphMap[size] || 0) - parseFloat(style.kg_mu || 0)) < 0 ? 0 : (parseFloat(pphMap[size] || 0) - parseFloat(style.kg_mu || 0))).toFixed(2));
+
+                    const rawBruto = parseFloat(brutoMap[size] || 0);
+                    const brutoKg = gw > 0 ?
+                        rawBruto * composition * gw / 100 / 1000 :
+                        0;
+
+                    // 3) Hitung lebih-pakai = brutoKg - kgMu, minimal 0
+                    const lebih = Math.max(0, brutoKg - kgMu);
+
+                    $template.find('.lebih-pakai').val(lebih.toFixed(2));
+
                     $template.find('.plus-pck-pcs').val(style.pcs_po || '');
                     $template.find('.plus-pck-kg').val(style.kg_po || '');
                     $template.find('.po-pck-cns').val(style.cns_po || '');
@@ -516,26 +530,22 @@
                 const sisaOrder = parseFloat($row.find('.sisa-order').val()) || 0;
                 const bsMesin = parseFloat($row.find('.bs-mesin').val()) || 0;
                 const bsSetting = parseFloat($row.find('.bs-setting').val()) || 0;
-                const pphMap = $row.data('pph') || {};
 
                 const itemType = $wrapper.find('.item-type').val();
                 const kodeWarna = $wrapper.find('.kode-warna').val();
                 const modelCode = $wrapper.find('.select-no-model option:selected').data('no-model');
                 const styleSize = $row.find('.style-size-hidden').val();
 
-                const materialData = $wrapper.data('material');
+                const mat = $wrapper.data('material') || {};
+                const brutoMap = $wrapper.data('bruto') || {};
 
+                // ambil composition, gw, loss
                 let composition = 0,
                     gw = 0,
                     loss = 0;
-
-                if (
-                    materialData &&
-                    materialData[itemType] &&
-                    materialData[itemType].kode_warna[kodeWarna]
-                ) {
-                    const styleList = materialData[itemType].kode_warna[kodeWarna].style_size || [];
-                    const match = styleList.find(item => item.no_model === modelCode && item.style_size === styleSize);
+                if (mat[itemType] && mat[itemType].kode_warna[kodeWarna]) {
+                    const styleList = mat[itemType].kode_warna[kodeWarna].style_size || [];
+                    const match = styleList.find(s => s.no_model === modelCode && s.style_size === styleSize);
                     if (match) {
                         composition = parseFloat(match.composition) || 0;
                         gw = parseFloat(match.gw) || 0;
@@ -543,31 +553,45 @@
                     }
                 }
 
+                // 1) stKg & sisaKeb (kg terpakai untuk setting & order)
                 const stKg = bsSetting * composition * gw / 100 / 1000;
-                const sisaKeb = sisaOrder * composition * gw / 100 / 1000;
-                const pph = parseFloat(pphMap[styleSize]) || 0;
+                const sisaKg = sisaOrder * composition * gw / 100 / 1000;
 
-                const eff = ((pph - stKg) / (bsMesin / 1000)) * 100;
-                const newKeb = sisaKeb / eff;
-                const estPoPlusMc = newKeb - sisaKeb;
+                // 2) brutoKg: rawBruto * comp * gw /100/1000
+                const rawBruto = parseFloat(brutoMap[styleSize]) || 0;
+                const brutoKg = gw > 0 ?
+                    rawBruto * composition * gw / 100 / 1000 :
+                    0;
 
+                // 3) efficiency: pastikan pembagi ≠ 0
+                const denom = brutoKg + bsMesin;
+                const eff = denom > 0 ?
+                    ((brutoKg - stKg) / denom) * 100 :
+                    0;
 
-                console.log('Sisa Order:', sisaOrder);
-                console.log('BS Mesin:', bsMesin);
-                console.log('BS Setting:', bsSetting);
-                console.log('Composition:', composition);
-                console.log('GW:', gw);
-                console.log('Loss:', loss);
-                console.log('Bs Setting Kg:', stKg);
-                console.log('Sisa Keb:', sisaKeb);
-                console.log('PPH:', pph);
-                console.log('Eff:', eff);
-                console.log('Estimasi PO+ Mesin:', estPoPlusMc);
+                // 4) newKeb & estPoPlusMc
+                const newKeb = eff > 0 ? sisaKg / eff * 100 : 0;
+                const estPoPlusMc = Math.max(0, newKeb - sisaKg);
 
-                $row.find('.poplus-mc-kg').val((estPoPlusMc > 0 ? estPoPlusMc : 0).toFixed(2));
+                console.log({
+                    sisaOrder,
+                    bsMesin,
+                    bsSetting,
+                    composition,
+                    gw,
+                    loss,
+                    stKg,
+                    sisaKg,
+                    brutoKg,
+                    eff,
+                    newKeb,
+                    estPoPlusMc
+                });
 
+                $row.find('.poplus-mc-kg').val(estPoPlusMc.toFixed(2));
                 hitungTotalKg();
             }
+
 
             hitungTotalKg();
 

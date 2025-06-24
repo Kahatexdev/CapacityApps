@@ -160,7 +160,7 @@
                                             <?php } ?>
                                         </td>
                                         <td class="text-xs text-start">
-                                            <button type="button" class="btn btn-warning update-btn" data-toggle="modal" data-target="#updateListModal" data-area="<?= $area; ?>" data-tgl="<?= $id['tgl_pakai']; ?>" data-model="<?= $id['no_model']; ?>" data-item="<?= $id['item_type']; ?>" data-kode="<?= $id['kode_warna']; ?>" data-color="<?= $id['color']; ?>">
+                                            <button type="button" class="btn btn-warning update-btn" data-toggle="modal" data-target="#updateListModal" data-area="<?= $area; ?>" data-tgl="<?= $id['tgl_pakai']; ?>" data-model="<?= $id['no_model']; ?>" data-item="<?= $id['item_type']; ?>" data-kode="<?= $id['kode_warna']; ?>" data-color="<?= $id['color']; ?>" data-po-tambahan="<?= $id['po_tambahan']; ?>">
                                                 <i class="fa fa-edit fa-lg"></i>
                                             </button>
                                         </td>
@@ -749,6 +749,7 @@
                     item_type: button.getAttribute("data-item"),
                     kode_warna: button.getAttribute("data-kode"),
                     color: button.getAttribute("data-color"),
+                    po_tambahan: button.getAttribute("data-po-tambahan"),
                     waktu: batasWaktu,
                 };
 
