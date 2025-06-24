@@ -123,6 +123,41 @@ class ProduksiController extends BaseController
         ];
         return view(session()->get('role') . '/Produksi/detail', $data);
     }
+    public function produksiGlobal()
+    {
+        $bulan = $this->request->getGet('bulan');
+        $tglProduksi = $this->request->getGet('tgl_produksi') ?? null;
+        $area = $this->request->getGet('area') ?? null;
+        $tglProduksiSampai = $this->request->getGet('tgl_produksi_sampai') ?? null;
+        $noModel = $this->request->getGet('no_model') ?? null;
+        $size = $this->request->getGet('size') ?? null;
+        $noBox = $this->request->getGet('no_box') ?? null;
+        $noLabel = $this->request->getGet('no_label') ?? null;
+        $listArea = $this->jarumModel->getArea();
+
+        $produksi = [];
+        if ($bulan || $tglProduksi || $noModel || $size) {
+            $produksi = $this->produksiModel->getProduksi($area, $bulan, $tglProduksi, $tglProduksiSampai, $noModel, $size, $noBox, $noLabel);
+            // dd($produksi);
+        }
+
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Produksi',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'bulan' => date('M-Y'),
+            'produksi' => $produksi,
+            'area' => $area,
+            'listArea' => $listArea
+        ];
+        return view(session()->get('role') . '/Produksi/detailGlobal', $data);
+    }
     public function importproduksi()
     {
         // Set maximum execution time and memory limit
