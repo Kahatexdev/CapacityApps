@@ -51,8 +51,8 @@
                         <div class="col-8">
                         </div>
                         <div class="col-4 text-end">
-                            <form action="<?= base_url($role . '/excelSisaOrderArea/' . $area) ?>" method="post" ?>
-                                <input type="hidden" class="form-control" name="buyer" value="<?= $area ?>">
+                            <form action="<?= base_url($role . '/excelSisaOrderArea') ?>" method="post" ?>
+                                <input type="hidden" class="form-control" name="area" value="<?= $area ?>">
                                 <input type="hidden" class="form-control" name="months" value="<?= date('F', strtotime($bulan)) ?>">
                                 <input type="hidden" class="form-control" name="years" value="<?= date('Y', strtotime($bulan)) ?>">
                                 <button type="submit" class="btn btn-info"><i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Report Excel</button>

@@ -2748,8 +2748,9 @@ class ExcelController extends BaseController
         exit;
     }
 
-    public function excelSisaOrderArea($ar)
+    public function excelSisaOrderArea()
     {
+        $ar = $this->request->getPost('area') ?: "";
         $role = session()->get('role');
         $month = $this->request->getPost('months');
         $yearss = $this->request->getPost('years');
@@ -3815,6 +3816,641 @@ class ExcelController extends BaseController
         header('Content-Disposition: attachment; filename="' . $fileName . '"');
         header('Cache-Control: max-age=0');
 
+        $writer->save('php://output');
+        exit;
+    }
+    function excelSisaOrderAllArea()
+    {
+        $ar = $this->request->getPost('area') ?: "";
+        $role = session()->get('role');
+        $month = $this->request->getPost('months');
+        $yearss = $this->request->getPost('years');
+
+        // Jika bulan atau tahun tidak diisi, gunakan bulan dan tahun ini
+        if (empty($month) || empty($yearss)) {
+            $bulan = date('Y-m-01', strtotime('this month')); // Bulan ini
+        } else {
+            // Atur tanggal berdasarkan input bulan dan tahun dari POST
+            $bulan = date('Y-m-01', strtotime("$yearss-$month-01"));
+        }
+
+        $role = session()->get('role');
+        $data = $this->ApsPerstyleModel->getAreaOrder($ar, $bulan);
+        // Ambil tanggal awal dan akhir bulan
+        $startDate = new \DateTime($bulan); // Awal bulan
+        $startDate->setTime(0, 0, 0);
+        $endDate = (clone $startDate)->modify('last day of this month');   // Akhir bulan
+
+
+        $allData = [];
+        $totalPerWeek = []; // Untuk menyimpan total produksi per minggu
+
+        foreach ($data as $id) {
+            $buyer = $id['kd_buyer_order'];
+            $seam = $id['seam'];
+            $mastermodel = $id['mastermodel'];
+            $machinetypeid = $id['machinetypeid'];
+            $factory = $id['factory'];
+
+            // Ambil data qty, sisa, dan produksi
+            $qty = $id['qty'];
+            $sisa = $id['sisa'];
+            $produksi = $qty - $sisa;
+            $deliveryDate = new \DateTime($id['delivery']); // Asumsikan ada field delivery
+
+            // Loop untuk membagi data ke dalam minggu
+            $weekCount = 1;
+            $currentStartDate = clone $startDate;
+
+            for ($weekCount = 1; $currentStartDate <= $endDate; $weekCount++) {
+                $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
+                $endOfWeek = min($endOfWeek, $endDate);
+                $dateWeek = $currentStartDate->format('d') . " - " . $endOfWeek->format('d');
+                $week[$weekCount] = $dateWeek;
+
+                // Periksa apakah tanggal pengiriman berada dalam minggu ini
+                if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
+                    // Ambil total jl_mc untuk minggu ini dan jumlahkan jika sudah ada data sebelumnya
+                    $dataOrder = [
+                        'model' => $mastermodel,
+                        'jarum' => $machinetypeid,
+                        'area' => $factory,
+                        'delivery' => $id['delivery'],
+                    ];
+                    $jlMc = 0;
+                    $jlMcData = $this->produksiModel->getJlMc($dataOrder);
+
+                    // Pastikan data jl_mc ada
+                    if ($jlMcData) {
+                        // Loop untuk menjumlahkan jl_mc
+                        foreach ($jlMcData as $mc) {
+                            $jlMc += $mc['jl_mc'];
+                        }
+                    }
+
+                    $allData[$factory][$mastermodel][$machinetypeid][$weekCount][] = json_encode([
+                        'del' => $id['delivery'],
+                        'qty' => $qty,
+                        'prod' => $produksi,
+                        'sisa' => $sisa,
+                        'jlMc' => $jlMc,
+                        'buyer' => $buyer,
+                        'seam' => $seam,
+                    ]);
+
+                    // Hitung total per minggu
+                    if (!isset($totalPerWeek[$weekCount])) {
+                        $totalPerWeek[$weekCount] = [
+                            'totalQty' => 0,
+                            'totalProd' => 0,
+                            'totalSisa' => 0,
+                            'totalJlMc' => 0,
+                        ];
+                    }
+                    $totalPerWeek[$weekCount]['totalQty'] += $qty;
+                    $totalPerWeek[$weekCount]['totalProd'] += $produksi;
+                    $totalPerWeek[$weekCount]['totalSisa'] += $sisa;
+                    $totalPerWeek[$weekCount]['totalJlMc'] += $jlMc;
+                }
+
+                // Pindahkan ke minggu berikutnya
+                $currentStartDate = (clone $endOfWeek)->modify('+1 day');
+            }
+        }
+        ksort($allData);
+
+        // DATA BY JARUM
+        $allDataPerjarum = [];
+        $totalPerWeekJrm = []; // Total per minggu
+        $dataPerjarum = $this->ApsPerstyleModel->getAreaOrderPejarum($ar, $bulan);
+
+        foreach ($dataPerjarum as $id2) {
+            $machinetypeid = $id2['machinetypeid'];
+            $delivery = $id2['delivery'];
+            $qty = $id2['qty'];
+            $sisa = $id2['sisa'];
+            $produksi = $qty - $sisa;
+            $deliveryDate = new \DateTime($delivery); // Tanggal pengiriman
+
+            $weekCount = 1;
+            $currentStartDate = clone $startDate;
+            for ($weekCount = 1; $currentStartDate <= $endDate; $weekCount++) {
+                $endOfWeek = (clone $currentStartDate)->modify('Sunday this week');
+                $endOfWeek = min($endOfWeek, $endDate);
+
+                // Periksa apakah tanggal pengiriman berada dalam minggu ini
+                if ($deliveryDate >= $currentStartDate && $deliveryDate <= $endOfWeek) {
+                    $jlMcJrm = 0;
+                    $dataOrder2 = [
+                        'area' => $ar,
+                        'jarum' => $machinetypeid,
+                        'delivery' => $delivery,
+                    ];
+                    $jlMcJrmData = $this->produksiModel->getJlMcJrmArea($dataOrder2);
+                    if ($jlMcJrmData) {
+                        foreach ($jlMcJrmData as $mcJrm) {
+                            $jlMcJrm += $mcJrm['jl_mc'];
+                        }
+                    }
+
+                    // Pastikan array utama memiliki key jarum
+                    if (!isset($allDataPerjarum[$machinetypeid])) {
+                        $allDataPerjarum[$machinetypeid] = [];
+                    }
+                    // Pastikan minggu tersedia
+                    if (!isset($allDataPerjarum[$machinetypeid][$weekCount])) {
+                        $allDataPerjarum[$machinetypeid][$weekCount] = [
+                            'qtyJrm' => 0,
+                            'prodJrm' => 0,
+                            'sisaJrm' => 0,
+                            'jlMcJrm' => 0,
+                        ];
+                    }
+
+                    // Tambahkan data minggu
+                    $allDataPerjarum[$machinetypeid][$weekCount]['qtyJrm'] += $qty;
+                    $allDataPerjarum[$machinetypeid][$weekCount]['prodJrm'] += $produksi;
+                    $allDataPerjarum[$machinetypeid][$weekCount]['sisaJrm'] += $sisa;
+                    $allDataPerjarum[$machinetypeid][$weekCount]['jlMcJrm'] += $jlMcJrm;
+
+                    // Hitung total per minggu
+                    if (!isset($totalPerWeekJrm[$weekCount])) {
+                        $totalPerWeekJrm[$weekCount] = [
+                            'totalQty' => 0,
+                            'totalProd' => 0,
+                            'totalSisa' => 0,
+                            'totalJlMc' => 0,
+                        ];
+                    }
+                    $totalPerWeekJrm[$weekCount]['totalQty'] += $qty;
+                    $totalPerWeekJrm[$weekCount]['totalProd'] += $produksi;
+                    $totalPerWeekJrm[$weekCount]['totalSisa'] += $sisa;
+                    $totalPerWeekJrm[$weekCount]['totalJlMc'] += $jlMcJrm;
+                }
+
+                // Pindahkan ke minggu berikutnya
+                $currentStartDate = (clone $endOfWeek)->modify('+1 day');
+            }
+        }
+        $maxWeek = $weekCount - 1;
+
+        // Generate Excel
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet()->setTitle("Report Sisa Order");
+
+        $styleTitle = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FF000000'],
+                'size' => 30
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+        ];
+
+        // border
+        $styleHeader = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FFFFFFFF']
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID, // Jenis pengisian solid
+                'startColor' => ['argb' => 'FF67748e'], // Warna latar belakang biru tua (HEX)
+            ],
+        ];
+        $styleBody = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+        $styleTotal = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+
+        // Judul
+        $sheet->setCellValue('A1', 'SISA PRODUKSI ' . $ar . ' Bulan ' . date('F', strtotime($bulan)));
+
+        $row_header = 3;
+        $row_header2 = 4;
+
+        // Tambahkan header
+        $sheet->setCellValue('A' . $row_header, 'BUYER');
+        $sheet->setCellValue('B' . $row_header, 'AREAL');
+        $sheet->setCellValue('C' . $row_header, 'PDK');
+        $sheet->setCellValue('D' . $row_header, 'SEAM');
+        $sheet->setCellValue('E' . $row_header, 'REPEAT');
+        $sheet->setCellValue('F' . $row_header, 'JARUM');
+        $sheet->mergeCells('A' . $row_header . ':' . 'A' . $row_header2);
+        $sheet->getStyle('A' . $row_header . ':' . 'A' . $row_header2)->applyFromArray($styleHeader);
+        $sheet->mergeCells('B' . $row_header . ':' . 'B' . $row_header2);
+        $sheet->getStyle('B' . $row_header . ':' . 'B' . $row_header2)->applyFromArray($styleHeader);
+        $sheet->mergeCells('C' . $row_header . ':' . 'C' . $row_header2);
+        $sheet->getStyle('C' . $row_header . ':' . 'C' . $row_header2)->applyFromArray($styleHeader);
+        $sheet->mergeCells('D' . $row_header . ':' . 'D' . $row_header2);
+        $sheet->getStyle('D' . $row_header . ':' . 'D' . $row_header2)->applyFromArray($styleHeader);
+        $sheet->mergeCells('E' . $row_header . ':' . 'E' . $row_header2);
+        $sheet->getStyle('E' . $row_header . ':' . 'E' . $row_header2)->applyFromArray($styleHeader);
+        $sheet->mergeCells('F' . $row_header . ':' . 'F' . $row_header2);
+        $sheet->getStyle('F' . $row_header . ':' . 'F' . $row_header2)->applyFromArray($styleHeader);
+
+        // looping week
+        $col = 'G'; // Kolom awal week
+        $col2 = 'K'; // Kolom akhir week
+
+        // Konversi huruf kolom ke nomor indeks kolom
+        $col_index = Coordinate::columnIndexFromString($col);
+        $col2_index = Coordinate::columnIndexFromString($col2);
+
+        for ($i = 1; $i <= $maxWeek; $i++) {
+            $sheet->setCellValue($col . $row_header, 'WEEK ' . $i . ' (' . $week[$i] . ')');
+            $sheet->mergeCells($col . $row_header . ':' . $col2 . $row_header); // Merge sel antara kolom $col dan $col2
+            $sheet->getStyle($col . $row_header . ':' . $col2 . $row_header)->applyFromArray($styleHeader);
+
+
+            // Tambahkan 2 pada indeks kolom
+            $col_index += 5;
+            $col2_index = $col_index + 4; // Tambahkan 1 pada indeks kedua kolom
+
+            // Konversi kembali dari nomor indeks kolom ke huruf kolom
+            $col = Coordinate::stringFromColumnIndex($col_index);
+            $col2 = Coordinate::stringFromColumnIndex($col2_index);
+        }
+        $col3 = $col;
+        $sheet->setCellValue($col3 . $row_header, 'KETERANGAN');
+        $sheet->mergeCells($col3 . $row_header . ':' . $col3 . $row_header2);
+        $sheet->getStyle($col3 . $row_header . ':' . $col3 . $row_header2)->applyFromArray($styleHeader);
+
+
+        // Menghitung kolom terakhir untuk menggabungkan judul
+        $col_last_index = Coordinate::columnIndexFromString($col3); // Indeks kolom KETERANGAN
+        $col_last = Coordinate::stringFromColumnIndex($col_last_index); // Mengonversi indeks kolom ke huruf kolom
+
+        // Style Judul
+        $sheet->mergeCells('A1:' . $col_last . '1');
+        $sheet->getStyle('A1')->applyFromArray($styleTitle);
+
+        $col4 = 'G';
+        // Tambahkan header dinamis untuk tanggal produksi
+        for ($i = 1; $i <= $maxWeek; $i++) {
+            $sheet->setCellValue($col4 . $row_header2, 'DEL');
+            $sheet->getStyle($col4 . $row_header2)->applyFromArray($styleHeader);
+            $col4++;
+            $sheet->setCellValue($col4 . $row_header2, 'QTY');
+            $sheet->getStyle($col4 . $row_header2)->applyFromArray($styleHeader);
+            $col4++;
+            $sheet->setCellValue($col4 . $row_header2, 'PROD');
+            $sheet->getStyle($col4 . $row_header2)->applyFromArray($styleHeader);
+            $col4++;
+            $sheet->setCellValue($col4 . $row_header2, 'SISA');
+            $sheet->getStyle($col4 . $row_header2)->applyFromArray($styleHeader);
+            $col4++;
+            $sheet->setCellValue($col4 . $row_header2, 'JLN MC');
+            $sheet->getStyle($col4 . $row_header2)->applyFromArray($styleHeader);
+            $col4++;
+        }
+
+        // dd($allData);
+
+        // Mulai di baris 5
+        $row = 5;
+        foreach ($allData as $area => $models) {
+            // 1. Hitung total baris di area
+            $rowsArea = 0;
+            foreach ($models as $model => $jarums) {
+                foreach ($jarums as $jarum => $weeks) {
+                    foreach ($weeks as $weekEntries) {
+                        $rowsArea += count($weekEntries);
+                    }
+                }
+            }
+            if ($rowsArea === 0) {
+                continue;
+            }
+            $startRowArea = $row;
+            $endRowArea = $startRowArea + $rowsArea - 1;
+
+            // Ambil buyer pertama (jika diperlukan)
+            $buyer = '';
+            $seam = '';
+            reset($models);
+            $firstModel = key($models);
+            if ($firstModel !== null) {
+                reset($models[$firstModel]);
+                $firstJarum = key($models[$firstModel]);
+                if ($firstJarum !== null) {
+                    foreach ($models[$firstModel][$firstJarum] as $weekEntries) {
+                        if (!empty($weekEntries)) {
+                            $entryData = json_decode($weekEntries[0], true);
+                            if (isset($entryData['buyer'])) {
+                                $buyer = $entryData['buyer'];
+                            }
+                            if (isset($entryData['seam'])) {
+                                $seam = $entryData['seam'];
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Merge & tulis kolom A (buyer) dan B (area)
+            $sheet->setCellValue('A' . $startRowArea, $buyer);
+            $sheet->setCellValue('B' . $startRowArea, $area);
+            $sheet->mergeCells('A' . $startRowArea . ':A' . $endRowArea);
+            $sheet->getStyle('A' . $startRowArea . ':A' . $endRowArea)->applyFromArray($styleBody);
+            $sheet->mergeCells('B' . $startRowArea . ':B' . $endRowArea);
+            $sheet->getStyle('B' . $startRowArea . ':B' . $endRowArea)->applyFromArray($styleBody);
+
+            // 2. Loop per model
+            foreach ($models as $model => $jarums) {
+                // Hitung rowsModel
+                $rowsModel = 0;
+                foreach ($jarums as $jarum => $weeks) {
+                    foreach ($weeks as $weekEntries) {
+                        $rowsModel += count($weekEntries);
+                    }
+                }
+                if ($rowsModel === 0) {
+                    continue;
+                }
+                $startRowModel = $row;
+                $endRowModel = $startRowModel + $rowsModel - 1;
+
+                // Merge & tulis kolom C (No Model)
+                $sheet->setCellValue('C' . $startRowModel, $model);
+                $sheet->mergeCells('C' . $startRowModel . ':C' . $endRowModel);
+                $sheet->getStyle('C' . $startRowModel . ':C' . $endRowModel)->applyFromArray($styleBody);
+
+                $sheet->setCellValue('D' . $startRowModel, $seam);
+                $sheet->mergeCells('D' . $startRowModel . ':D' . $endRowModel);
+                $sheet->getStyle('D' . $startRowModel . ':D' . $endRowModel)->applyFromArray($styleBody);
+
+                $sheet->setCellValue('E' . $startRowModel, '');
+                $sheet->mergeCells('E' . $startRowModel . ':E' . $endRowModel);
+                $sheet->getStyle('E' . $startRowModel . ':E' . $endRowModel)->applyFromArray($styleBody);
+
+                // 3. Loop per jarum
+                foreach ($jarums as $jarum => $weeks) {
+                    // Hitung rowsJarum
+                    $rowsJarum = 0;
+                    foreach ($weeks as $weekEntries) {
+                        $rowsJarum += count($weekEntries);
+                    }
+                    if ($rowsJarum === 0) {
+                        continue;
+                    }
+                    $startRowJarum = $row;
+                    $endRowJarum = $startRowJarum + $rowsJarum - 1;
+
+                    // Merge & tulis kolom D (jarum)
+                    $sheet->setCellValue('F' . $startRowJarum, $jarum);
+                    $sheet->mergeCells('F' . $startRowJarum . ':F' . $endRowJarum);
+                    $sheet->getStyle('F' . $startRowJarum . ':F' . $endRowJarum)->applyFromArray($styleBody);
+
+                    // Pastikan setiap minggu ada key
+                    for ($w = 1; $w <= $maxWeek; $w++) {
+                        if (!isset($weeks[$w])) {
+                            $weeks[$w] = [];
+                        }
+                    }
+                    // Siapkan pointer per minggu dengan key 1..$maxWeek
+                    $pointers = [];
+                    for ($w = 1; $w <= $maxWeek; $w++) {
+                        $pointers[$w] = 0;
+                    }
+                    $totalRows = $rowsJarum;
+
+                    // Loop menulis baris untuk jarum ini
+                    for ($offset = 0; $offset < $totalRows; $offset++) {
+                        for ($weekNum = 1; $weekNum <= $maxWeek; $weekNum++) {
+                            $baseColIndex = Coordinate::columnIndexFromString('G') + ($weekNum - 1) * 5;
+                            $cols = [];
+                            for ($k = 0; $k < 5; $k++) {
+                                $cols[] = Coordinate::stringFromColumnIndex($baseColIndex + $k);
+                            }
+                            if ($pointers[$weekNum] < count($weeks[$weekNum])) {
+                                $json = $weeks[$weekNum][$pointers[$weekNum]];
+                                $data = json_decode($json, true) ?: [];
+                                $del  = $data['del']  ?? '';
+                                $qty  = $data['qty']  ?? '';
+                                $prod = $data['prod'] ?? '';
+                                $sisa = $data['sisa'] ?? '';
+                                $jlMc = $data['jlMc'] ?? '';
+                                $sheet->setCellValue($cols[0] . $row, $del !== 0 ? $del : ($del === 0 ? 0 : ''));
+                                $sheet->getStyle($cols[0] . $row)->applyFromArray($styleBody);
+                                $sheet->setCellValue($cols[1] . $row, $qty !== 0 ? $qty : ($qty === 0 ? 0 : ''));
+                                $sheet->getStyle($cols[1] . $row)->applyFromArray($styleBody);
+                                $sheet->setCellValue($cols[2] . $row, $prod !== 0 ? $prod : '-');
+                                $sheet->getStyle($cols[2] . $row)->applyFromArray($styleBody);
+                                $sheet->setCellValue($cols[3] . $row, $sisa !== 0 ? $sisa : '-');
+                                $sheet->getStyle($cols[3] . $row)->applyFromArray($styleBody);
+                                $sheet->setCellValue($cols[4] . $row, $jlMc !== 0 ? $jlMc : '-');
+                                $sheet->getStyle($cols[4] . $row)->applyFromArray($styleBody);
+                                $pointers[$weekNum]++;
+                            } else {
+                                foreach ($cols as $colLetter) {
+                                    $sheet->setCellValue($colLetter . $row, '');
+                                    $sheet->getStyle($colLetter . $row)->applyFromArray($styleBody);
+                                }
+                            }
+                            $sheet->setCellValue($col3 . $row, '');
+                            $sheet->getStyle($col3 . $row)->applyFromArray($styleBody);
+                        }
+                        $row++;
+                    }
+                    // Setelah selesai jarum, $row == $endRowJarum + 1
+                }
+                // Setelah selesai semua jarum di model, $row == $endRowModel + 1
+            }
+            // Setelah selesai semua model di area, $row == $endRowArea + 1
+        }
+
+        // TOTAL
+
+        $sheet->setCellValue('A' . $row, 'TOTAL');
+        $sheet->setCellValue('B' . $row, '');
+        $sheet->setCellValue('C' . $row, '');
+        $sheet->setCellValue('D' . $row, '');
+        $sheet->getStyle('A' . $row)->applyFromArray($styleHeader);
+        $sheet->getStyle('B' . $row)->applyFromArray($styleHeader);
+        $sheet->getStyle('C' . $row)->applyFromArray($styleHeader);
+        $sheet->getStyle('D' . $row)->applyFromArray($styleHeader);
+        $col6 = 'E';
+        for ($i = 1; $i <= $maxWeek; $i++) {
+            $sheet->setCellValue($col6 . $row, '');
+            $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
+            $col6++;
+            $sheet->setCellValue($col6 . $row, isset($totalPerWeek[$i]['totalQty']) && $totalPerWeek[$i]['totalQty'] != 0 ? $totalPerWeek[$i]['totalQty'] : '-');
+            $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
+            $col6++;
+            $sheet->setCellValue($col6 . $row, isset($totalPerWeek[$i]['totalProd']) && $totalPerWeek[$i]['totalProd'] != 0 ? $totalPerWeek[$i]['totalProd'] : '-');
+            $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
+            $col6++;
+            $sheet->setCellValue($col6 . $row, isset($totalPerWeek[$i]['totalSisa']) && $totalPerWeek[$i]['totalSisa'] != 0 ? $totalPerWeek[$i]['totalSisa'] : '-');
+            $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
+            $col6++;
+            $sheet->setCellValue($col6 . $row, isset($totalPerWeek[$i]['totalJlMc']) && $totalPerWeek[$i]['totalJlMc'] != 0 ? $totalPerWeek[$i]['totalJlMc'] : '-');
+            $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
+            $col6++;
+        }
+        $col7 = $col6;
+        $sheet->setCellValue($col7 . $row, '');
+        $sheet->getStyle($col7 . $row)->applyFromArray($styleHeader);
+
+        $rowJudul = $row + 3;
+        $row_header3 = $rowJudul + 2;
+        $row_header4 = $row_header3 + 1;
+
+        // Judul
+        $sheet->setCellValue('A' . $rowJudul, 'SISA PRODUKSI PERJARUM');
+
+        $sheet->setCellValue('A' . $row_header3, 'JARUM');
+        $sheet->mergeCells('A' . $row_header3 . ':' . 'A' . $row_header4);
+        $sheet->getStyle('A' . $row_header3 . ':' . 'A' . $row_header4)->applyFromArray($styleHeader);
+
+        // Kolom awal untuk looping week
+        $col_idx = Coordinate::columnIndexFromString('B');
+        $col2_idx = $col_idx + 3;
+
+        for ($i = 1; $i <= $maxWeek; $i++) {
+            // Set kolom untuk week ke-i
+            $colJrm = Coordinate::stringFromColumnIndex($col_idx);
+            $colJrm2 = Coordinate::stringFromColumnIndex($col2_idx);
+
+            $sheet->setCellValue($colJrm . $row_header3, 'WEEK ' . $i . ' (' . $week[$i] . ')');
+            $sheet->mergeCells($colJrm . $row_header3 . ':' . $colJrm2 . $row_header3); // Merge sel antara kolom $col dan $col2
+            $sheet->getStyle($colJrm . $row_header3 . ':' . $colJrm2 . $row_header3)->applyFromArray($styleHeader);
+
+
+            // Tambahkan 2 pada indeks kolom
+            $col_idx += 4;
+            $col2_idx = $col_idx + 3; // Tambahkan 1 pada indeks kedua kolom
+        }
+
+        $colEnd = Coordinate::stringFromColumnIndex($col_idx - 1);
+        // Style Judul
+        $sheet->mergeCells('A' . $rowJudul . ':' . $colEnd . $rowJudul);
+        $sheet->getStyle('A' . $rowJudul . ':' . $colEnd . $rowJudul)->applyFromArray($styleTitle);
+
+        $col8 = 'B';
+        // Tambahkan header dinamis untuk tanggal produksi
+        for ($i = 1; $i <= $maxWeek; $i++) {
+            $sheet->setCellValue($col8 . $row_header4, 'QTY');
+            $sheet->getStyle($col8 . $row_header4)->applyFromArray($styleHeader);
+            $col8++;
+            $sheet->setCellValue($col8 . $row_header4, 'PROD');
+            $sheet->getStyle($col8 . $row_header4)->applyFromArray($styleHeader);
+            $col8++;
+            $sheet->setCellValue($col8 . $row_header4, 'SISA');
+            $sheet->getStyle($col8 . $row_header4)->applyFromArray($styleHeader);
+            $col8++;
+            $sheet->setCellValue($col8 . $row_header4, 'JLN MC');
+            $sheet->getStyle($col8 . $row_header4)->applyFromArray($styleHeader);
+            $col8++;
+        }
+
+        $row = $row_header4 + 1;
+        foreach ($allDataPerjarum as $jarum => $idJrm) {
+            $sheet->setCellValue('A' . $row, $jarum);
+            $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
+            $col5 = 'B';
+            for ($i = 1; $i <= $maxWeek; $i++) {
+                // Mengecek apakah week ada di data
+                if (isset($idJrm[$i])) {
+                    // Ambil data per week
+                    $qtyJrm = $idJrm[$i]['qtyJrm'] ?? 0;
+                    $prodJrm = $idJrm[$i]['prodJrm'] ?? 0;
+                    $sisaJrm = $idJrm[$i]['sisaJrm'] ?? 0;
+                    $jlMcJrm = $idJrm[$i]['jlMcJrm'] ?? 0;
+
+                    $sheet->setCellValue($col5 . $row, $qtyJrm !== 0 ? $qtyJrm : '-');
+                    $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                    $col5++;
+                    $sheet->setCellValue($col5 . $row, $prodJrm !== 0 ? $prodJrm : '-');
+                    $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                    $col5++;
+                    $sheet->setCellValue($col5 . $row, $sisaJrm !== 0 ? $sisaJrm : '-');
+                    $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                    $col5++;
+                    $sheet->setCellValue($col5 . $row, $jlMcJrm !== 0 ? $jlMcJrm : '-');
+                    $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                    $col5++;
+                } else {
+                    $sheet->setCellValue($col5 . $row, '');
+                    $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                    $col5++;
+                    $sheet->setCellValue($col5 . $row, '');
+                    $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                    $col5++;
+                    $sheet->setCellValue($col5 . $row, '');
+                    $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                    $col5++;
+                    $sheet->setCellValue($col5 . $row, '');
+                    $sheet->getStyle($col5 . $row)->applyFromArray($styleBody);
+                    $col5++;
+                }
+            }
+            $row++;
+        }
+        // TOTAL
+
+        $sheet->setCellValue('A' . $row, 'TOTAL');
+        $sheet->getStyle('A' . $row)->applyFromArray($styleHeader);
+
+        $col6 = 'B';
+        for ($i = 1; $i <= $maxWeek; $i++) {
+            $sheet->setCellValue($col6 . $row, isset($totalPerWeekJrm[$i]['totalQty']) && $totalPerWeekJrm[$i]['totalQty'] != 0 ? $totalPerWeekJrm[$i]['totalQty'] : '-');
+            $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
+            $col6++;
+            $sheet->setCellValue($col6 . $row, isset($totalPerWeekJrm[$i]['totalProd']) && $totalPerWeekJrm[$i]['totalProd'] != 0 ? $totalPerWeekJrm[$i]['totalProd'] : '-');
+            $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
+            $col6++;
+            $sheet->setCellValue($col6 . $row, isset($totalPerWeekJrm[$i]['totalSisa']) && $totalPerWeekJrm[$i]['totalSisa'] != 0 ? $totalPerWeekJrm[$i]['totalSisa'] : '-');
+            $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
+            $col6++;
+            $sheet->setCellValue($col6 . $row, isset($totalPerWeekJrm[$i]['totalJlMc']) && $totalPerWeekJrm[$i]['totalJlMc'] != 0 ? $totalPerWeekJrm[$i]['totalJlMc'] : '-');
+            $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
+            $col6++;
+        }
+
+        // Set sheet pertama sebagai active sheet
+        $spreadsheet->setActiveSheetIndex(0);
+
+        // Export file ke Excel
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Sisa Produksi ' . $ar . ' Bulan ' . date('F', strtotime($bulan)) . '.xlsx';
+
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
         $writer->save('php://output');
         exit;
     }
