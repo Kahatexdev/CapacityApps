@@ -1143,7 +1143,7 @@ class MaterialController extends BaseController
     public function poTambahanDetail($noModel, $area)
     {
         $detail = [];
-        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/poTambahanDetail/' . $noModel . '/' . $area;
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/poTambahanDetail/' . $noModel . '/' . $area;
 
         // Mengambil data dari API eksternal
         $response = @file_get_contents($apiUrl);
@@ -1286,7 +1286,7 @@ class MaterialController extends BaseController
         log_message('debug', 'ITEMS untuk dikirim ke API: ' . json_encode($items));
 
         $payload = ['items' => $items];
-        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/savePoTambahan';
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/savePoTambahan';
 
         $ch = curl_init($apiUrl);
         curl_setopt_array($ch, [
@@ -1312,7 +1312,7 @@ class MaterialController extends BaseController
     {
         $noModel = $this->request->getGet('model');
         $tglBuat = $this->request->getGet('tglBuat');
-        $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/filterPoTambahan"
+        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterPoTambahan"
             . "?area=" . urlencode($area)
             . "&tglBuat=" . urlencode($tglBuat)
             . "&model=" . urlencode($noModel);
