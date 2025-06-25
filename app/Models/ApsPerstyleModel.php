@@ -753,37 +753,45 @@ class ApsPerstyleModel extends Model
     }
     public function getAreaOrder($ar, $bulan)
     {
-        return $this->select('data_model.kd_buyer_order, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.delivery, apsperstyle.factory, apsperstyle.production_unit, round(sum(apsperstyle.qty)/24) as qty, round(sum(apsperstyle.sisa)/24) as sisa')
-            ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
-            ->where('apsperstyle.factory', $ar)
-            ->where('apsperstyle.production_unit !=', 'MJ')
+        $builder = $this->select('data_model.kd_buyer_order, data_model.seam, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.delivery, apsperstyle.factory, apsperstyle.production_unit, round(sum(apsperstyle.qty)/24) as qty, round(sum(apsperstyle.sisa)/24) as sisa')
+            ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel');
+
+        // Tambahkan kondisi WHERE hanya jika $ar tidak kosong
+        if (!empty($ar)) {
+            $builder->where('apsperstyle.factory', $ar);
+        }
+        $builder->where('apsperstyle.production_unit !=', 'MJ')
+            // ->where('apsperstyle.mastermodel', 'DA2549')
             ->where('MONTH(apsperstyle.delivery)', date('m', strtotime($bulan))) // Filter bulan
             ->where('YEAR(apsperstyle.delivery)', date('Y', strtotime($bulan))) // Filter tahun
             ->groupBy('apsperstyle.mastermodel')
+            ->groupBy('apsperstyle.factory')
             ->groupBy('apsperstyle.machinetypeid')
             ->groupBy('apsperstyle.delivery')
-            ->groupBy('apsperstyle.factory')
             ->orderBy('apsperstyle.mastermodel')
             ->orderBy('apsperstyle.machinetypeid')
             ->orderBy('apsperstyle.factory')
-            ->orderBy('apsperstyle.delivery')
-            ->findAll();
-        // dd($ar, $bulan);
+            ->orderBy('apsperstyle.delivery');
+        $result = $builder->findAll(); // Eksekusi query
+        return $result;
     }
     public function getAreaOrderPejarum($ar, $bulan)
     {
-        return $this->select('data_model.kd_buyer_order, machinetypeid, delivery, production_unit, round(sum(qty)/24) as qty, round(sum(sisa)/24) as sisa, data_model.kd_buyer_order')
-            ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
-            ->where('apsperstyle.factory', $ar)
-            ->where('apsperstyle.production_unit !=', 'MJ')
+        $builder = $this->select('data_model.kd_buyer_order, machinetypeid, delivery, production_unit, round(sum(qty)/24) as qty, round(sum(sisa)/24) as sisa, data_model.kd_buyer_order')
+            ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel');
+        // Tambahkan kondisi WHERE hanya jika $ar tidak kosong
+        if (!empty($ar)) {
+            $builder->where('apsperstyle.factory', $ar);
+        }
+        $builder->where('apsperstyle.production_unit !=', 'MJ')
             ->where('MONTH(apsperstyle.delivery)', date('m', strtotime($bulan))) // Filter bulan
             ->where('YEAR(apsperstyle.delivery)', date('Y', strtotime($bulan))) // Filter tahun
             ->groupBy('apsperstyle.machinetypeid')
             ->groupBy('apsperstyle.delivery')
             ->orderBy('apsperstyle.machinetypeid')
-            ->orderBy('apsperstyle.delivery')
-
-            ->findAll();
+            ->orderBy('apsperstyle.delivery');
+        $result = $builder->findAll(); // Eksekusi query
+        return $result;
     }
     public function setZero($nomodel)
     {

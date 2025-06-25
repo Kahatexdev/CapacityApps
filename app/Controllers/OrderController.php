@@ -1244,6 +1244,7 @@ class OrderController extends BaseController
     {
         $role = session()->get('role');
         $buyer = $this->orderModel->getBuyer();
+
         $data = [
             'role' => $role,
             'title' => 'Data Order',
@@ -1484,6 +1485,44 @@ class OrderController extends BaseController
     {
         $role = session()->get('role');
         $area = $this->areaModel->getArea();
+
+        $month = $this->request->getPost('month');
+        $yearss = $this->request->getPost('year');
+
+        // Jika bulan atau tahun tidak diisi, gunakan bulan dan tahun ini
+        if (empty($month) || empty($yearss)) {
+            $bulan = date('Y-m-01', strtotime('this month')); // Bulan ini
+        } else {
+            // Atur tanggal berdasarkan input bulan dan tahun dari POST
+            $bulan = date('Y-m-01', strtotime("$yearss-$month-01"));
+        }
+
+        $years = [];
+        $currentYear = date('Y');
+        $startYear = $currentYear - 2;
+        $endYear = $currentYear + 7;
+
+        // Loop dari tahun ini sampai 10 tahun ke depan
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $months = [];
+
+            // Loop untuk setiap bulan dalam setahun
+            for ($i = 1; $i <= 12; $i++) {
+                $monthName = date('F', mktime(0, 0, 0, $i, 1)); // Nama bulan
+                $months[] = $monthName;
+            }
+
+            // Simpan data tahun dengan bulan-bulannya
+            $years[$year] = array_unique($months); // array_unique memastikan bulan unik meskipun tidak perlu dalam kasus ini
+        }
+
+        $months = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $monthName = date('F', mktime(0, 0, 0, $i, 1)); // Nama bulan
+            $months[] = $monthName;
+        }
+        $months = array_unique($months);
+
         $data = [
             'role' => $role,
             'title' => 'Data Order',
@@ -1495,12 +1534,15 @@ class OrderController extends BaseController
             'active6' => '',
             'active7' => '',
             'area' => $area,
+            'years' => $years,
+            'months' => $months,
             'role' => $role
         ];
         return view($role . '/Order/sisaOrderArea', $data);
     }
-    public function detailSisaOrderArea($ar)
+    public function detailSisaOrderArea()
     {
+        $ar = $this->request->getPost('area') ?: "";
         $role = session()->get('role');
         $month = $this->request->getPost('month');
         $yearss = $this->request->getPost('year');

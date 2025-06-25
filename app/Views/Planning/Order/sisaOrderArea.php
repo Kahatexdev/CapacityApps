@@ -6,7 +6,7 @@
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
-                        <div class="col-8">
+                        <div class="col-7">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
@@ -14,10 +14,36 @@
                                 </h5>
                             </div>
                         </div>
-                        <div class="col-4 text-end">
-                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-chart-bar-32 text-lg opacity-10" aria-hidden="true"></i>
-                            </div>
+                        <div class="col-5">
+                            <form method="post" action="<?= base_url(session()->get('role') . '/excelSisaOrderAllArea'); ?>">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <select class="form-control" id="planSelect" name="months" required>
+                                                <option value="">Pilih Bulan</option>
+                                                <?php foreach ($months as $month): ?>
+                                                    <option value="<?= $month; ?>"><?= $month; ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <select class="form-control" id="planSelect" name="years" required>
+                                                <option value="">Pilih Tahun</option>
+                                                <?php foreach (array_keys($years) as $year): ?>
+                                                    <option value="<?= $year; ?>"><?= $year; ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-info">OK</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

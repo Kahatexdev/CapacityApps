@@ -1,4 +1,4 @@
-<?php $this->extend('user/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -81,7 +81,7 @@
             .then(response => response.json())
             .then(data => {
                 console.log('Filtered Data:', data);
-                displayData(data);
+                displayData(data, model);
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
@@ -90,7 +90,7 @@
 
 
 
-    function displayData(data) {
+    function displayData(data, model) {
         let resultContainer = document.getElementById('resultContainer');
         resultContainer.innerHTML = '';
 
@@ -116,7 +116,7 @@
                     <div class="card">
                         <div class="card-body p-3">
                             <div class="row d-flex align-items-center justify-content-center">
-                                <div class="col-3 d-flex flex-column align-items-center">
+                                <div class="col-2 d-flex flex-column align-items-center">
                                     <div class="numbers text-center">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">Buyer</p>
                                         <h5 class="font-weight-bolder mb-0">${data['master']['kd_buyer_order']}</h5>
@@ -134,10 +134,16 @@
                                         <h5 class="font-weight-bolder mb-0">${data['master']['delivery_akhir']}</h5>
                                     </div>
                                 </div>
-                                <div class="col-3 d-flex flex-column align-items-center">
+                                <div class="col-2 d-flex flex-column align-items-center">
                                     <div class="numbers text-center">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">Start MC</p>
                                         <h5 class="font-weight-bolder mb-0">${data['master']['start_mc'] ?? '-' }</h5>
+                                    </div>
+                                </div>
+                                <div class="col-2 d-flex flex-column align-items-center">
+                                    <div class="numbers text-center">
+                                      <a class="btn btn-success" href='http://172.23.44.14/MaterialSystem/public/api/apiexportGlobalReport/${model}'>Excel Bahan Baku</a>
+                                        
                                     </div>
                                 </div>
                             </div>
