@@ -363,4 +363,20 @@ class ApiController extends ResourceController
         // Return the data with a 200 status
         return $this->respond($deliv, ResponseInterface::HTTP_OK);
     }
+    public function getQtyOrder()
+    {
+        $noModel = $this->request->getGet('no_model');
+        $styleSize = $this->request->getGet('style_size');
+        $area = $this->request->getGet('area');
+
+        $orderQty = $this->ApsPerstyleModel->getQtyOrder($noModel, $styleSize, $area);
+
+        // Check if data is found
+        if (empty($orderQty)) {
+            return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
+        }
+
+        // Return the data with a 200 status
+        return $this->respond($orderQty, ResponseInterface::HTTP_OK);
+    }
 }
