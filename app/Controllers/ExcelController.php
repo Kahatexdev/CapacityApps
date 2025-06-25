@@ -5061,35 +5061,12 @@ class ExcelController extends BaseController
             $startRowArea = $row;
             $endRowArea = $startRowArea + $rowsArea - 1;
 
-            // Ambil buyer pertama (jika diperlukan)
-            $buyer = '';
-            $seam = '';
-            reset($models);
-            $firstModel = key($models);
-            if ($firstModel !== null) {
-                reset($models[$firstModel]);
-                $firstJarum = key($models[$firstModel]);
-                if ($firstJarum !== null) {
-                    foreach ($models[$firstModel][$firstJarum] as $weekEntries) {
-                        if (!empty($weekEntries)) {
-                            $entryData = json_decode($weekEntries[0], true);
-                            if (isset($entryData['buyer'])) {
-                                $buyer = $entryData['buyer'];
-                            }
-                            if (isset($entryData['seam'])) {
-                                $seam = $entryData['seam'];
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // Merge & tulis kolom A (buyer) dan B (area)
-            $sheet->setCellValue('A' . $startRowArea, $buyer);
+            // Merge & tulis kolom B (area)
+            // $sheet->setCellValue('A' . $startRowArea, $buyer);
+            // $sheet->getStyle('A' . $startRowArea);
             $sheet->setCellValue('B' . $startRowArea, $area);
-            $sheet->mergeCells('A' . $startRowArea . ':A' . $endRowArea);
-            $sheet->getStyle('A' . $startRowArea . ':A' . $endRowArea)->applyFromArray($styleBody);
+            // $sheet->mergeCells('A' . $startRowArea . ':A' . $endRowArea);
+            // $sheet->getStyle('A' . $startRowArea . ':A' . $endRowArea)->applyFromArray($styleBody);
             $sheet->mergeCells('B' . $startRowArea . ':B' . $endRowArea);
             $sheet->getStyle('B' . $startRowArea . ':B' . $endRowArea)->applyFromArray($styleBody);
 
@@ -5107,6 +5084,34 @@ class ExcelController extends BaseController
                 }
                 $startRowModel = $row;
                 $endRowModel = $startRowModel + $rowsModel - 1;
+
+                // === Ambil buyer (dan seam jika ingin) untuk seluruh model ini ===
+                $buyer = '';
+                $seam = '';
+                // scan semua jarum & minggu di model untuk cari first non-empty entry
+                foreach ($jarums as $jarumScan => $weeksScan) {
+                    $found = false;
+                    foreach ($weeksScan as $weekEntriesScan) {
+                        if (!empty($weekEntriesScan)) {
+                            $entryData = json_decode($weekEntriesScan[0], true);
+                            if (isset($entryData['buyer'])) {
+                                $buyer = $entryData['buyer'];
+                            }
+                            if (isset($entryData['seam'])) {
+                                $seam = $entryData['seam'];
+                            }
+                            $found = true;
+                            break;
+                        }
+                    }
+                    if ($found) {
+                        break;
+                    }
+                }
+                // Merge & tulis kolom A (buyer) untuk model ini
+                $sheet->setCellValue('A' . $startRowModel, $buyer);
+                $sheet->mergeCells('A' . $startRowModel . ':A' . $endRowModel);
+                $sheet->getStyle('A' . $startRowModel . ':A' . $endRowModel)->applyFromArray($styleBody);
 
                 // Merge & tulis kolom C (No Model)
                 $sheet->setCellValue('C' . $startRowModel, $model);
