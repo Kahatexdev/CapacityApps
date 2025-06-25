@@ -533,7 +533,7 @@ class ExcelPPHController extends BaseController
             $sizes = array_column($data, 'size');
 
             // Fetch all bs_mesin data in one query
-            $bsMesinData = $this->BsMesinModel->getBsMesinHarian($mastermodels, $sizes, $tanggal);
+            $bsMesinData = $this->BsMesinModel->getBsMesinHarian($mastermodels, $sizes, $tanggal, $area);
 
             // Create a lookup table for fast matching
             $bsMesinMap = [];
