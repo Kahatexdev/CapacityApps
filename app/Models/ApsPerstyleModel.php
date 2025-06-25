@@ -1165,7 +1165,7 @@ class ApsPerstyleModel extends Model
             $builder->where('data_model.no_model', $validate['pdk']);
         }
 
-        if (!empty($validate['awal'])) {
+        if (!empty($validate['tglTurun'])) {
             $builder->where('data_model.created_at', $validate['tglTurun']);
         }
 
