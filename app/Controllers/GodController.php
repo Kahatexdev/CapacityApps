@@ -1078,7 +1078,7 @@ class GodController extends BaseController
             }
 
             // Kirim bulk ke API
-            $apiUrl = 'http://172.23.39.118/MaterialSystem/public/api/getGwBulk';
+            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getGwBulk';
             $options = [
                 'http' => [
                     'method'  => 'POST',
@@ -1184,7 +1184,7 @@ class GodController extends BaseController
                 ];
             }
             // Kirim bulk ke API
-            $apiUrl = 'http://172.23.39.118/MaterialSystem/public/api/getGwBulk';
+            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getGwBulk';
             $options = [
                 'http' => [
                     'method'  => 'POST',

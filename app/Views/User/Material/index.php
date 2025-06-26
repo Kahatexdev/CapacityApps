@@ -544,7 +544,7 @@
                         inisial.val(response.inisial);
                         const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
                         if (poTambahanChecked == 1) {
-                            urlMu = `http://172.23.39.118/MaterialSystem/public/api/getMUPoTambahan?no_model=${encodeURIComponent(noModel)}&style_size=${encodeURIComponent(selectedStyleSize)}&area=${encodeURIComponent(area)}`;
+                            urlMu = `http://172.23.44.14/MaterialSystem/public/api/getMUPoTambahan?no_model=${encodeURIComponent(noModel)}&style_size=${encodeURIComponent(selectedStyleSize)}&area=${encodeURIComponent(area)}`;
                         } else {
                             urlMu = '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + encodeURIComponent(selectedStyleSize) + '/' + area + '/' + qty.val();
                         }
@@ -719,7 +719,7 @@
                     if (response.status === "success") {
                         // Proses 2: Mengirim ke URL kedua
                         $.ajax({
-                            url: "http://172.23.39.118/MaterialSystem/public/api/insertQtyCns",
+                            url: "http://172.23.44.14/MaterialSystem/public/api/insertQtyCns",
                             method: "POST",
                             data: formData,
                             success: function(secondResponse) {
@@ -810,7 +810,7 @@
     //     const payload = {
     //         selected
     //     };
-    //     fetch('http://172.23.39.118/MaterialSystem/public/api/saveListPemesanan', {
+    //     fetch('http://172.23.44.14/MaterialSystem/public/api/saveListPemesanan', {
     //             method: 'POST',
     //             headers: {
     //                 'Content-Type': 'application/json',
@@ -884,7 +884,7 @@
         });
 
         console.log('inf : ' + payload);
-        fetch('http://172.23.39.118/MaterialSystem/public/api/saveListPemesanan', {
+        fetch('http://172.23.44.14/MaterialSystem/public/api/saveListPemesanan', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -971,7 +971,7 @@
         let area = document.getElementById('area').value; // Atau ambil dari variable lain
 
         $.ajax({
-            url: 'http://172.23.39.118/MaterialSystem/public/api/hapusOldPemesanan',
+            url: 'http://172.23.44.14/MaterialSystem/public/api/hapusOldPemesanan',
             type: 'POST',
             data: JSON.stringify({
                 area: area,
