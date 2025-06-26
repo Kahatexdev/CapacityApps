@@ -159,7 +159,7 @@
                                                     <input type="hidden" name="area[]" value="<?= $area; ?>">
                                                     <!-- kolom hide end -->
                                                     <td class="text-center">
-                                                        <div class="form-check">
+                                                        <div class="form-check d-flex justify-content-center">
                                                             <input type="checkbox" class="form-check-input checkbox-pemesanan" name="checkbox[]" value="<?= $record['id_material'] . ',' . $record['tgl_pakai']; ?>">
                                                         </div>
                                                     </td>
@@ -178,7 +178,7 @@
                                                         <input type="hidden" class="form-control text-center w-100" name="po_tambahan[]"
                                                             value="<?= $record['po_tambahan'] ?>">
                                                         <?php if ($record['po_tambahan'] == 1): ?>
-                                                            <span class="text-success fw-bold">✅</span>
+                                                            <i class="fas fa-check-square fa-2x" style="color: #6fbf73;"></i>
                                                         <?php else: ?>
                                                             <!-- Biarkan kosong -->
                                                         <?php endif; ?>
@@ -541,9 +541,10 @@
                     success: function(response) {
                         console.log(response)
                         qty.val(response.qty);
+                        inisial.val(response.inisial);
                         const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
                         if (poTambahanChecked == 1) {
-                            urlMu = `http://172.23.44.14/MaterialSystem/public/api/getMUPoTambahan?no_model=${encodeURIComponent(noModel)}&style_size=${encodeURIComponent(selectedStyleSize)}&area=${encodeURIComponent(area)}`;
+                            urlMu = `http://172.23.39.118/MaterialSystem/public/api/getMUPoTambahan?no_model=${encodeURIComponent(noModel)}&style_size=${encodeURIComponent(selectedStyleSize)}&area=${encodeURIComponent(area)}`;
                         } else {
                             urlMu = '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + encodeURIComponent(selectedStyleSize) + '/' + area + '/' + qty.val();
                         }
@@ -718,7 +719,7 @@
                     if (response.status === "success") {
                         // Proses 2: Mengirim ke URL kedua
                         $.ajax({
-                            url: "http://172.23.44.14/MaterialSystem/public/api/insertQtyCns",
+                            url: "http://172.23.39.118/MaterialSystem/public/api/insertQtyCns",
                             method: "POST",
                             data: formData,
                             success: function(secondResponse) {
@@ -809,7 +810,7 @@
     //     const payload = {
     //         selected
     //     };
-    //     fetch('http://172.23.44.14/MaterialSystem/public/api/saveListPemesanan', {
+    //     fetch('http://172.23.39.118/MaterialSystem/public/api/saveListPemesanan', {
     //             method: 'POST',
     //             headers: {
     //                 'Content-Type': 'application/json',
@@ -883,7 +884,7 @@
         });
 
         console.log('inf : ' + payload);
-        fetch('http://172.23.44.14/MaterialSystem/public/api/saveListPemesanan', {
+        fetch('http://172.23.39.118/MaterialSystem/public/api/saveListPemesanan', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -970,7 +971,7 @@
         let area = document.getElementById('area').value; // Atau ambil dari variable lain
 
         $.ajax({
-            url: 'http://172.23.44.14/MaterialSystem/public/api/hapusOldPemesanan',
+            url: 'http://172.23.39.118/MaterialSystem/public/api/hapusOldPemesanan',
             type: 'POST',
             data: JSON.stringify({
                 area: area,

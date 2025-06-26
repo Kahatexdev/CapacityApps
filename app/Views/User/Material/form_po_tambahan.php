@@ -192,25 +192,25 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Pesanan<br>Kgs</label>
-                                    <input type="number" class="form-control kg-mu" readonly>
+                                    <input type="text" class="form-control kg-mu" readonly>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Sisa<br>Order</label>
-                                    <input type="number" class="form-control sisa-order" name="items[0][sisa_order]" readonly>
+                                    <input type="text" class="form-control sisa-order" name="items[0][sisa_order]" readonly>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>BS Mesin<br>(Kg)</label>
-                                    <input type="number" class="form-control bs-mesin" name="items[0][bs_mesin]" readonly>
+                                    <input type="text" class="form-control bs-mesin" name="items[0][bs_mesin]" readonly>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>BS<br>Setting</label>
-                                    <input type="number" class="form-control bs-setting" name="items[0][bs_setting]" readonly>
+                                    <input type="text" class="form-control bs-setting" name="items[0][bs_setting]" readonly>
                                 </div>
                             </div>
                         </div>
@@ -218,7 +218,7 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>(+) Mesin<br>(Kg)</label>
-                                    <input type="number" class="form-control poplus-mc-kg" name="items[0][poplus_mc_kg]" readonly>
+                                    <input type="text" class="form-control poplus-mc-kg" name="items[0][poplus_mc_kg]" readonly>
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -230,13 +230,13 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>(+) Kg<br>Packing</label>
-                                    <input type="number" class="form-control plus-pck-kg" name="items[0][plus_pck_kg]" readonly required>
+                                    <input type="text" class="form-control plus-pck-kg" name="items[0][plus_pck_kg]" readonly required>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Lebih<br>Pakai(Kg)</label>
-                                    <input type="number" class="form-control lebih-pakai" readonly>
+                                    <input type="text" class="form-control lebih-pakai" readonly>
                                 </div>
                             </div>
                         </div>
