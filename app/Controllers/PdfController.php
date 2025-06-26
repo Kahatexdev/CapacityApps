@@ -197,13 +197,13 @@ class PdfController extends BaseController
         $pdf->Cell(19, 12, 'Item Type', 1, 0, 'C');
         $pdf->Cell(16, 12, 'Kode Warna', 1, 0, 'C');
         $pdf->Cell(15, 12, 'Style / Size', 1, 0, 'C');
-        MultiCellFit($pdf, 12, 6, "Komposi\nsi (%)");
+        MultiCellFit($pdf, 10, 6, "Kompo\nsisi(%)");
         MultiCellFit($pdf, 7, 6, "GW/\nPcs");
-        MultiCellFit($pdf, 7, 6, "Qty/\nPcs");
+        MultiCellFit($pdf, 9, 6, "Qty/\nPcs");
         $pdf->Cell(7, 12, 'Loss', 1, 0, 'C');
         MultiCellFit($pdf, 12, 6, "Pesanan\nKgs");
-        $pdf->Cell(21, 9, 'Terima', 1, 0, 'C');
-        MultiCellFit($pdf, 13, 3, "Sisa Benang\ndi Mesin");
+        $pdf->Cell(23, 9, 'Terima', 1, 0, 'C');
+        MultiCellFit($pdf, 11, 3, "Sisa Benang\ndi Mesin");
         $pdf->Cell(29, 6, 'Tambahan I (mesin)', 1, 0, 'C');
         $pdf->Cell(29, 6, 'Tamabahan II (Packing)', 1, 0, 'C');
         MultiCellFit($pdf, 14, 3, "Total lebih\npakai benang");
@@ -229,10 +229,10 @@ class PdfController extends BaseController
 
         // Tabel Header Baris Ketiga
         $pdf->Cell(119);
-        $pdf->Cell(7, 3, 'Kg', 1, 0, 'C');
+        $pdf->Cell(8, 3, 'Kg', 1, 0, 'C');
         $pdf->Cell(7, 3, '+ / -', 1, 0, 'C');
-        $pdf->Cell(7, 3, '%', 1, 0, 'C');
-        $pdf->Cell(13, 3, 'Kg', 1, 0, 'C');
+        $pdf->Cell(8, 3, '%', 1, 0, 'C');
+        $pdf->Cell(11, 3, '', 0, 0, 'C');
         $pdf->Cell(7, -3, '', 0, 0, 'C');
         $pdf->Cell(7, 3, 'Kg', 1, 0, 'C');
         $pdf->Cell(8, 3, 'Cones', 1, 0, 'C');
@@ -247,10 +247,45 @@ class PdfController extends BaseController
         //Isi Tabel
         $pdf->SetFont('Arial', '', 7);
         $no = 1;
-        $yLimit = 175;
+        $yLimit = 170;
         $lineHeight = 4;
 
+        $prevKey    = null;
+        $totals     = [
+            'qty_pcs' => 0,
+            'kgs'      => 0,
+            'terima_kg'      => 0,
+            'sisa_benang'      => 0,
+            'plus_mc_pcs'      => 0,
+            'plus_mc_kg'      => 0,
+            'plus_mc_cns'      => 0,
+            'plus_pck_pcs'      => 0,
+            'plus_pck_kg'      => 0,
+            'plus_pck_cns'      => 0,
+            'lebih_pakai'      => 0,
+        ];
+
+
         foreach ($data as $row) {
+            // bangun “key” unik untuk group
+            $currentKey = implode('|', [
+                $row['no_model'],
+                $row['color'],
+                $row['item_type'],
+                $row['kode_warna'],
+            ]);
+
+            // 1) kalau pindah group (bukan pertama)
+            if ($prevKey !== null && $currentKey !== $prevKey) {
+                // cetak subtotal untuk group sebelumnya
+                $this->printSubtotalRow($pdf, $totals);
+
+                // reset accumulator
+                foreach ($totals as $k => $v) {
+                    $totals[$k] = 0;
+                }
+            }
+
             // Cek dulu apakah nambah baris ini bakal lewat batas
             if ($pdf->GetY() + $lineHeight > $yLimit) {
                 $this->renderFooterPage($pdf);
@@ -303,7 +338,7 @@ class PdfController extends BaseController
             $pdf->SetXY($startX, $startY);
 
             // Buat semua cell dengan border dan tinggi yang sama, tapi isi kosong dulu
-            $cellWidths = [12, 12, 19, 16, 15, 12, 7, 7, 7, 12, 7, 7, 7, 13, 7, 7, 8, 7, 7, 7, 8, 7, 7, 7, 6, 12, 6, 14, 14];
+            $cellWidths = [12, 12, 19, 16, 15, 10, 7, 9, 7, 12, 8, 7, 8, 11, 7, 7, 8, 7, 7, 7, 8, 7, 7, 7, 6, 12, 6, 14, 14];
             $cellData = [
                 '',
                 '',
@@ -350,9 +385,17 @@ class PdfController extends BaseController
             $pdf->Cell(12, $lineHeight, $row['no_model'], 0, 0, 'C');
             $currentX += 12;
 
-            // Color  
-            $pdf->SetXY($currentX, $textCenterY);
-            $pdf->Cell(12, $lineHeight, $row['color'], 0, 0, 'C');
+            // Color
+            $pdf->SetXY($currentX, $startY);
+            $pdf->SetTextColor(255, 255, 255);
+            $y0 = $pdf->GetY();
+            $pdf->MultiCell(12, $lineHeight, $row['color'], 0, 'C');
+            $textHeight = $pdf->GetY() - $y0;
+            $pdf->SetTextColor(0, 0, 0);
+
+            $centerY = $startY + ($maxHeight - $textHeight) / 2;
+            $pdf->SetXY($currentX, $centerY);
+            $pdf->MultiCell(12, $lineHeight, $row['color'], 0, 'C');
             $currentX += 12;
 
             // Item Type (mungkin multiline)
@@ -388,7 +431,7 @@ class PdfController extends BaseController
             $currentX += 15;
 
             // Skip kolom yang sudah terisi dengan Cell biasa
-            $currentX += 12 + 7 + 7 + 7 + 12 + 7 + 7 + 7 + 13 + 7 + 7 + 8 + 7 + 7 + 7 + 8 + 7 + 7 + 7 + 6 + 12 + 6 + 14;
+            $currentX += 10 + 7 + 9 + 7 + 12 + 8 + 7 + 8 + 11 + 7 + 7 + 8 + 7 + 7 + 7 + 8 + 7 + 7 + 7 + 6 + 12 + 6 + 14;
 
             // Keterangan (mungkin multiline)
             $pdf->SetXY($currentX, $startY);
@@ -406,10 +449,32 @@ class PdfController extends BaseController
             $pdf->SetY($startY + $maxHeight);
 
             $no++;
+
+            // 3) akumulasi nilai-nilai numeric
+            $totals['qty_pcs']          += $row['qty_pcs'];
+            $totals['kgs']              += $row['kgs'];
+            $totals['terima_kg']        += $row['terima_kg'];
+            $totals['sisa_benang']      += $row['sisa_bb_mc'];
+            $totals['plus_mc_pcs']      += $row['sisa_order_pcs'];
+            $totals['plus_mc_kg']       += $row['poplus_mc_kg'];
+            $totals['plus_mc_cns']      += $row['poplus_mc_cns'];
+            $totals['plus_pck_pcs']     += $row['plus_pck_pcs'];
+            $totals['plus_pck_kg']      += $row['plus_pck_kg'];
+            $totals['plus_pck_cns']     += $row['plus_pck_cns'];
+            $totals['lebih_pakai']      += $row['lebih_pakai_kg'];
+            // dst.
+
+            // update prevKey
+            $prevKey = $currentKey;
+        }
+
+        // Setelah loop, cetak subtotal untuk group terakhir
+        if ($prevKey !== null) {
+            $this->printSubtotalRow($pdf, $totals);
         }
 
         $currentY = $pdf->GetY();
-        $footerY = 175; // batas sebelum footer (tergantung desain kamu)
+        $footerY = 170; // batas sebelum footer (tergantung desain kamu)
 
         // Tinggi standar baris kosong (bisa sesuaikan ke $maxHeight rata-rata atau tetap 6 misal)
         $emptyRowHeight = 5;
@@ -420,7 +485,7 @@ class PdfController extends BaseController
             $pdf->SetXY($startX, $currentY);
 
             // Gambar semua cell border kosong
-            $cellWidths = [12, 12, 19, 16, 15, 12, 7, 7, 7, 12, 7, 7, 7, 13, 7, 7, 8, 7, 7, 7, 8, 7, 7, 7, 6, 12, 6, 14, 14];
+            $cellWidths = [12, 12, 19, 16, 15, 10, 7, 9, 7, 12, 8, 7, 8, 11, 7, 7, 8, 7, 7, 7, 8, 7, 7, 7, 6, 12, 6, 14, 14];
             foreach ($cellWidths as $width) {
                 $pdf->Cell($width, $emptyRowHeight, '', 1, 0, 'C');
             }
@@ -542,13 +607,13 @@ class PdfController extends BaseController
         $pdf->Cell(19, 12, 'Item Type', 1, 0, 'C');
         $pdf->Cell(16, 12, 'Kode Warna', 1, 0, 'C');
         $pdf->Cell(15, 12, 'Style / Size', 1, 0, 'C');
-        MultiCellFit($pdf, 12, 6, "Komposi\nsi (%)");
+        MultiCellFit($pdf, 10, 6, "Kompo\nsisi(%)");
         MultiCellFit($pdf, 7, 6, "GW/\nPcs");
-        MultiCellFit($pdf, 7, 6, "Qty/\nPcs");
+        MultiCellFit($pdf, 9, 6, "Qty/\nPcs");
         $pdf->Cell(7, 12, 'Loss', 1, 0, 'C');
         MultiCellFit($pdf, 12, 6, "Pesanan\nKgs");
-        $pdf->Cell(21, 9, 'Terima', 1, 0, 'C');
-        MultiCellFit($pdf, 13, 3, "Sisa Benang\ndi Mesin");
+        $pdf->Cell(23, 9, 'Terima', 1, 0, 'C');
+        MultiCellFit($pdf, 11, 3, "Sisa Benang\ndi Mesin");
         $pdf->Cell(29, 6, 'Tambahan I (mesin)', 1, 0, 'C');
         $pdf->Cell(29, 6, 'Tamabahan II (Packing)', 1, 0, 'C');
         MultiCellFit($pdf, 14, 3, "Total lebih\npakai benang");
@@ -574,10 +639,10 @@ class PdfController extends BaseController
 
         // Tabel Header Baris Ketiga
         $pdf->Cell(119);
-        $pdf->Cell(7, 3, 'Kg', 1, 0, 'C');
+        $pdf->Cell(8, 3, 'Kg', 1, 0, 'C');
         $pdf->Cell(7, 3, '+ / -', 1, 0, 'C');
-        $pdf->Cell(7, 3, '%', 1, 0, 'C');
-        $pdf->Cell(13, 3, 'Kg', 1, 0, 'C');
+        $pdf->Cell(8, 3, '%', 1, 0, 'C');
+        $pdf->Cell(11, 3, '', 0, 0, 'C');
         $pdf->Cell(7, -3, '', 0, 0, 'C');
         $pdf->Cell(7, 3, 'Kg', 1, 0, 'C');
         $pdf->Cell(8, 3, 'Cones', 1, 0, 'C');
@@ -620,6 +685,39 @@ class PdfController extends BaseController
             $pdf->Cell(27, 5, '(________________)', 0, 0, 'C');
         }
         $pdf->Ln();
+    }
+
+    private function printSubtotalRow($pdf, array $totals)
+    {
+        // kolom label “Subtotal”
+        $pdf->Cell(91 /*atau lebar yg sesuai*/, 6, 'Subtotal', 'LTR', 0, 'R');
+
+        // kolom-kolom numeric, sesuaikan urutan & lebar
+        $pdf->Cell(9, 6, number_format($totals['qty_pcs']), 'LTR', 0, 'C');
+        $pdf->Cell(7, 6, '', 'LTR', 0, 'C');
+        $pdf->Cell(12, 6, number_format($totals['kgs'], 2), 'LTR', 0, 'C');
+        $pdf->Cell(8, 6, number_format($totals['terima_kg'], 2), 'LTR', 0, 'C');
+        $pdf->Cell(7, 6, '', 'LTR', 0, 'C');
+        $pdf->Cell(8, 6, '', 'LTR', 0, 'C');
+        $pdf->Cell(11, 6, number_format($totals['sisa_benang'], 2), 'LTR', 0, 'C');
+        $pdf->Cell(7, 6, $totals['plus_mc_pcs'], 'LTR', 0, 'C');
+        $pdf->Cell(7, 6, number_format($totals['plus_mc_kg'], 2), 'LTR', 0, 'C');
+        $pdf->Cell(8, 6, $totals['plus_mc_cns'], 'LTR', 0, 'C');
+        $pdf->Cell(7, 6, '', 'LTR', 0, 'C');
+        $pdf->Cell(7, 6, $totals['plus_pck_pcs'], 'LTR', 0, 'C');
+        $pdf->Cell(7, 6, number_format($totals['plus_pck_kg'], 2), 'LTR', 0, 'C');
+        $pdf->Cell(8, 6, $totals['plus_pck_cns'], 'LTR', 0, 'C');
+        $pdf->Cell(7, 6, '', 'LTR', 0, 'C');
+        $pdf->Cell(7, 6, number_format($totals['lebih_pakai'], 2), 'LTR', 0, 'C');
+        $pdf->Cell(7, 6, '', 'LTR', 0, 'C');
+        $pdf->Cell(6, 6, '', 'LTR', 0, 'C');
+        $pdf->Cell(12, 6, '', 'LTR', 0, 'C');
+        $pdf->Cell(6, 6, '', 'LTR', 0, 'C');
+        $pdf->Cell(14, 6, '', 'LTR', 0, 'C');
+        $pdf->Cell(14, 6, '', 'LTR', 1, 'C');
+
+        // border bawah
+        // (atau jika mau garis ganda, kamu bisa ulang loop Cell dengan border 'LBR')
     }
 
     public function exportPemesanan($jenis, $area, $tgl_pakai)
