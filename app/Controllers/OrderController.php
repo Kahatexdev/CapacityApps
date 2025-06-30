@@ -2153,6 +2153,7 @@ class OrderController extends BaseController
     public function spk2()
     {
         $estimasiSpk = $this->estspk->getData();
+        $aproved = $this->estspk->getApprove();
         // dd($estimasiSpk);
         $data = [
             'role' => session()->get('role'),
@@ -2165,6 +2166,7 @@ class OrderController extends BaseController
             'active6' => '',
             'active7' => '',
             'data' => $estimasiSpk,
+            'history' => $aproved,
 
         ];
         return view(session()->get('role') . '/Order/pengajuanspk2', $data);

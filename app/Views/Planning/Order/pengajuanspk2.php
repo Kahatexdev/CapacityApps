@@ -57,6 +57,41 @@
                 </div>
             </div>
         </div>
+        <div class="row mt-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="example1" class="display compact " style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 text-center">Tanggal Dibuat</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 text-center">Jam</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 text-center">No Model</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Style</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Area</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Qty</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Status</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($history as $row1) : ?>
+                                    <tr>
+                                        <td class="text-center"><?= $row1['created_at'] ?></td>
+                                        <td class="text-center"><?= $row1['jam'] ?></td>
+                                        <td class="text-center"><?= $row1['model'] ?></td>
+                                        <td class="text-center"><?= $row1['style'] ?></td>
+                                        <td class="text-center"><?= $row1['area'] ?></td>
+                                        <td class="text-center"><?= $row1['qty'] ?> pcs</td>
+                                        <td class="text-center"><?= $row1['status'] ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -90,6 +125,11 @@
     $(document).ready(function() {
         // Inisialisasi DataTable dengan opsi yang diinginkan
         var table = $('#example').DataTable({
+            "order": [
+                [0, 'desc'] // Urutkan kolom pertama secara descending
+            ]
+        });
+        var table1 = $('#example1').DataTable({
             "order": [
                 [0, 'desc'] // Urutkan kolom pertama secara descending
             ]
