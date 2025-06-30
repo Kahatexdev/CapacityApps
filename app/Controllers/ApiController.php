@@ -369,6 +369,9 @@ class ApiController extends ResourceController
         $styleSize = $this->request->getGet('style_size');
         $area = $this->request->getGet('area');
 
+        // Debug ke log CI
+        log_message('debug', 'API getQtyOrder params => no_model: ' . $noModel . ', style_size: ' . $styleSize . ', area: ' . $area);
+
         $orderQty = $this->ApsPerstyleModel->getQtyOrder($noModel, $styleSize, $area);
 
         // Check if data is found
@@ -378,5 +381,19 @@ class ApiController extends ResourceController
 
         // Return the data with a 200 status
         return $this->respond($orderQty, ResponseInterface::HTTP_OK);
+    }
+    public function getDataBuyer()
+    {
+        $noModel = $this->request->getGet('no_model');
+
+        $buyer = $this->orderModel->getDataBuyer($noModel);
+
+        // Check if data is found
+        if (empty($buyer)) {
+            return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
+        }
+
+        // Return the data with a 200 status
+        return $this->respond($buyer, ResponseInterface::HTTP_OK);
     }
 }
