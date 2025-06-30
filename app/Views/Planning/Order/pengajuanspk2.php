@@ -77,7 +77,7 @@
                             <tbody>
                                 <?php foreach ($history as $row1) : ?>
                                     <tr>
-                                        <td class="text-center"><?= $row1['created_at'] ?></td>
+                                        <td class="text-center"><?= $row1['tgl_buat'] ?></td>
                                         <td class="text-center"><?= $row1['jam'] ?></td>
                                         <td class="text-center"><?= $row1['model'] ?></td>
                                         <td class="text-center"><?= $row1['style'] ?></td>
