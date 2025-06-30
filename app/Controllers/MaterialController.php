@@ -509,8 +509,13 @@ class MaterialController extends BaseController
                     foreach ($styleList as $style) {
                         if (isset($style['no_model'], $style['style_size'], $style['gw'], $style['composition'], $style['loss'])) {
                             $orderQty = $this->ApsPerstyleModel->getQtyOrder($style['no_model'], $style['style_size'], $area);
+                            $tambahanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getKgTambahan?no_model='
+                                . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&style_size=' . urlencode($style['style_size']) . '&area=' . $area;
+                            $tambahan = fetchApiData($tambahanApiUrl);
+                            $kgPoTambahan = $tambahan['ttl_keb_potambahan'] ?? 0;
+                            log_message('info', 'inii :' . $kgPoTambahan);
                             if (isset($orderQty['qty'])) {
-                                $requirement = $orderQty['qty'] * $style['gw'] * ($style['composition'] / 100) * (1 + ($style['loss'] / 100)) / 1000;
+                                $requirement = ($orderQty['qty'] * $style['gw'] * ($style['composition'] / 100) * (1 + ($style['loss'] / 100)) / 1000) + $kgPoTambahan;
                                 $totalRequirement += $requirement;
                                 $dataList[$key]['qty'] = $orderQty['qty'];
                             }

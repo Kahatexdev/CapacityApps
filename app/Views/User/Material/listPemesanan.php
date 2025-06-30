@@ -100,7 +100,7 @@
                             <thead>
                                 <tr>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">No</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal Pkai</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal Pakai</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Model</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Item Type</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Kode Warna</th>
@@ -142,12 +142,13 @@
                                         <td class="text-xs text-start"><?= $id['keterangan']; ?></td>
                                         <td class="text-xs text-start">
                                             <?php if ($id['po_tambahan'] == 1): ?>
-                                                <span class="text-success fw-bold">✅</span>
+                                                <i class="fas fa-check-square fa-2x" style="color: #6fbf73;"></i>
                                             <?php else: ?>
                                                 <!-- Biarkan kosong -->
                                             <?php endif; ?>
                                         </td>
-                                        <td class="text-xs text-start"><?= number_format($id['ttl_pengiriman'], 2); ?></td>
+                                        <td class=" text-xs text-start"><?= number_format($id['ttl_pengiriman'], 2); ?>
+                                        </td>
                                         <td class="text-xs text-start"></td>
                                         <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>"><?= number_format($id['sisa_jatah'], 2); ?></td>
                                         <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>">
@@ -223,7 +224,8 @@
                                                         data-item="<?= $id['item_type']; ?>"
                                                         data-kode="<?= $id['kode_warna']; ?>"
                                                         data-color="<?= $id['color']; ?>"
-                                                        data-waktu="<?= $batasWaktu; ?>">
+                                                        data-waktu="<?= $batasWaktu; ?>"
+                                                        data-po-tambahan="<?= $id['po_tambahan']; ?>">
                                                         <i class="fa fa-paper-plane fa-lg"></i>
                                                     </button>
                                             <?php
@@ -462,6 +464,9 @@
             var itemType = $(this).data('item');
             var kode_warna = $(this).data('kode');
             var color = $(this).data('color');
+            var po_tambahan = $(this).data('po-tambahan');
+
+            console.log(po_tambahan);
 
             // Kirim data ke server untuk pencarian
             $.ajax({
@@ -473,7 +478,8 @@
                     no_model: noModel,
                     item_type: itemType,
                     kode_warna: kode_warna,
-                    color: color
+                    color: color,
+                    po_tambahan: po_tambahan
                 },
                 dataType: 'json',
                 success: function(response) {
@@ -507,6 +513,7 @@
                         let sisaCns = 0; // Total jalan_mc
 
                         response.data.forEach(function(item, index) {
+                            console.log(response);
                             const jalanMc = parseFloat(item.jl_mc) || 0;
                             const totalCones = jalanMc * item.qty_cns;
                             const totalBeratCones = totalCones * item.qty_berat_cns;
@@ -523,6 +530,7 @@
                                 <div class="row mb-1">
                                 <input type="hidden" class="form-control id_material" name="items[${index}][id_material]" value="${item.id_material}" readonly>
                                 <input type="hidden" class="form-control id_pemesanan" name="items[${index}][id_pemesanan]" value="${item.id_pemesanan}" readonly>
+                                <input type="hidden" class="form-control po_tambahan" name="items[${index}][po_tambahan]" value="${item.po_tambahan}" readonly>
                                 <div class="col-lg-3">
                                     <input type="text" class="form-control style" name="items[${index}][style]" value="${item.style_size}" readonly>
                                 </div>

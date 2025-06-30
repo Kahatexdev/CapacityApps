@@ -159,7 +159,7 @@
                                                     <input type="hidden" name="area[]" value="<?= $area; ?>">
                                                     <!-- kolom hide end -->
                                                     <td class="text-center">
-                                                        <div class="form-check">
+                                                        <div class="form-check d-flex justify-content-center">
                                                             <input type="checkbox" class="form-check-input checkbox-pemesanan" name="checkbox[]" value="<?= $record['id_material'] . ',' . $record['tgl_pakai']; ?>">
                                                         </div>
                                                     </td>
@@ -178,7 +178,7 @@
                                                         <input type="hidden" class="form-control text-center w-100" name="po_tambahan[]"
                                                             value="<?= $record['po_tambahan'] ?>">
                                                         <?php if ($record['po_tambahan'] == 1): ?>
-                                                            <span class="text-success fw-bold">✅</span>
+                                                            <i class="fas fa-check-square fa-2x" style="color: #6fbf73;"></i>
                                                         <?php else: ?>
                                                             <!-- Biarkan kosong -->
                                                         <?php endif; ?>
@@ -541,6 +541,7 @@
                     success: function(response) {
                         console.log(response)
                         qty.val(response.qty);
+                        inisial.val(response.inisial);
                         const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
                         if (poTambahanChecked == 1) {
                             urlMu = `http://172.23.44.14/MaterialSystem/public/api/getMUPoTambahan?no_model=${encodeURIComponent(noModel)}&style_size=${encodeURIComponent(selectedStyleSize)}&area=${encodeURIComponent(area)}`;

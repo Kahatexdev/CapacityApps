@@ -64,4 +64,10 @@ class EstSpkModel extends Model
             ->where('updated_at>', $lastmonth)
             ->findAll();
     }
+    public function getApprove()
+    {
+        return $this->select('estimasi_spk.*, DATE(created_at) AS tgl_buat, TIME(created_at) as jam')
+            ->where('status', 'approved')
+            ->findAll();
+    }
 }
