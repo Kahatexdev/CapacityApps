@@ -55,6 +55,7 @@ $routes->group(
         $routes->get('getDeliv/(:any)', 'ApiController::getDeliv/$1');
 
         $routes->get('getQtyOrder', 'ApiController::getQtyOrder');
+        $routes->get('getDataBuyer', 'ApiController::getDataBuyer');
     }
 );
 
