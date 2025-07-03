@@ -1231,7 +1231,8 @@ class ApsPerstyleModel extends Model
     public function searchApsPerStyleByMastermodel($mastermodel)
     {
         return $this->select('idapsperstyle, mastermodel, size, inisial, delivery, factory')
-            ->where('mastermodel', $mastermodel)
+            ->like('mastermodel', $mastermodel)
+            ->groupBy('mastermodel, size, inisial, delivery, factory')
             ->findAll();
     }
 }
