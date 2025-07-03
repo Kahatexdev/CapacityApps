@@ -1227,4 +1227,12 @@ class ApsPerstyleModel extends Model
             ->groupBy('delivery')
             ->findAll();
     }
+
+    public function searchApsPerStyleByMastermodel($mastermodel)
+    {
+        return $this->select('idapsperstyle, mastermodel, size, inisial, delivery, factory')
+            ->like('mastermodel', $mastermodel)
+            ->groupBy('mastermodel, size, inisial, delivery, factory')
+            ->findAll();
+    }
 }
