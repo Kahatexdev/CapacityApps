@@ -82,7 +82,7 @@
 
                                             </td>
                                             <td class="text-sm">
-                                                <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['id_data_mesin']; ?>" data-area="<?= $order['area']; ?>" data-total="<?= $order['total_mc']; ?>" data-jarum="<?= $order['jarum']; ?>" data-mc-jalan="<?= $order['mesin_jalan']; ?>" data-brand="<?= $order['brand']; ?>" data-pu="<?= $order['pu']; ?>">
+                                                <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['id_data_mesin']; ?>" data-area="<?= $order['area']; ?>" data-total="<?= $order['total_mc']; ?>" data-jarum="<?= $order['jarum']; ?>" data-mc-jalan="<?= $order['mesin_jalan']; ?>" data-brand="<?= $order['brand']; ?>" data-pu="<?= $order['pu']; ?>" data-trgt="<?= $order['target']; ?>">
                                                     Edit
                                                 </button>
                                             </td>
@@ -126,7 +126,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Edit Data Machine</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Edit Data Machine </h5>
                         <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
@@ -150,7 +150,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="buyer" class="col-form-label">Target</label>
-                                        <input type="number" name="targer" class="form-control">
+                                        <input type="number" name="target" class="form-control">
                                     </div>
 
                                 </div>
@@ -222,7 +222,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="buyer" class="col-form-label">Target</label>
-                                        <input type="number" name="targer" class="form-control">
+                                        <input type="number" name="target" class="form-control">
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-sm-12">
@@ -380,16 +380,18 @@
                     var jarum = $(this).data('jarum');
                     var total_mc = $(this).data('total');
                     var brand = $(this).data('brand');
+                    var target = $(this).data('trgt');
                     var mesin_jalan = $(this).data('mc-jalan');
                     var pu = $(this).data('pu');
                     var mesin_mati = total_mc - mesin_jalan;
-
+                    console.log(target);
                     $('#ModalEdit').find('form').attr('action', '<?= base_url($role . '/updatemesinperjarum/') ?>' + id_data_mesin);
                     $('#ModalEdit').find('input[name="id"]').val(id_data_mesin);
                     $('#ModalEdit').find('input[name="area"]').val(area);
                     $('#ModalEdit').find('input[name="jarum"]').val(jarum);
                     $('#ModalEdit').find('input[name="total_mc"]').val(total_mc);
                     $('#ModalEdit').find('input[name="brand"]').val(brand);
+                    $('#ModalEdit').find('input[name="target"]').val(target);
                     $('#ModalEdit').find('input[name="mesin_jalan"]').val(mesin_jalan);
                     $('#ModalEdit').find('input[name="mesin_mati"]').val(mesin_mati);
                     if (pu === "CJ") {

@@ -10,15 +10,15 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    Sisa Produksi <?= $area ?> Bulan <?= date('F', strtotime($bulan)) ?> - <?= date('Y', strtotime($bulan)) ?>
+                                    Sisa Produksi <?= $buyer ?> Bulan <?= date('F-Y', strtotime($bulan)) ?>
                                 </h5>
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <form method="post" action="<?= base_url(session()->get('role') . '/sisaOrderArea/' . $area); ?>">
+                            <form method="post" action="<?= base_url(session()->get('role') . '/sisaOrder/' . $buyer); ?>">
                                 <div class="row">
                                     <div class="col-lg-5">
-                                        <input type="hidden" value="<?= $area ?>" name="area">
+                                        <input type="hidden" value="<?= $buyer ?>" name="buyer">
                                         <div class="form-group">
                                             <select class="form-control" id="planSelect" name="month">
                                                 <option value="">Pilih Bulan</option>
@@ -51,13 +51,13 @@
                         <div class="col-8">
                         </div>
                         <div class="col-4 text-end">
-                            <form action="<?= base_url($role . '/excelSisaOrderArea') ?>" method="post" ?>
-                                <input type="hidden" class="form-control" name="area" value="<?= $area ?>">
+                            <form action="<?= base_url($role . '/excelSisaOrderBuyer/' . $buyer) ?>" method="post">
+                                <input type="hidden" class="form-control" name="buyer" value="<?= $buyer ?>">
                                 <input type="hidden" class="form-control" name="months" value="<?= date('F', strtotime($bulan)) ?>">
                                 <input type="hidden" class="form-control" name="years" value="<?= date('Y', strtotime($bulan)) ?>">
                                 <button type="submit" class="btn btn-info"><i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Report Excel</button>
 
-                                <a href="<?= base_url($role . '/sisaOrderArea') ?>" class="btn bg-gradient-dark">
+                                <a href="<?= base_url($role . '/sisaOrder') ?>" class="btn bg-gradient-dark">
                                     <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
                                     Back</a>
                             </form>
@@ -74,7 +74,7 @@
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="table-responsive">
-                            <table id="example" class="table table-border" style="width:100%">
+                            <table id="table1" class="table table-border" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">NO MODEL</th>
@@ -100,14 +100,36 @@
                                         $rowsModel = 0;
                                         foreach ($allData as $noModel => $id) {
                                             $rowsModel = count($id);
-                                            $rowsJarum = 0;
                                             foreach ($id as $jarum => $rowJarum) {
-                                                $rowsJarum = count($rowJarum);
+                                                $rowsJarums = count($rowJarum);
+                                                if ($rowsJarums > 1) {
+                                                    $rowsModel += $rowsJarums - 1;
+                                                }
+                                                $rowsArea = 0;
+                                                foreach ($rowJarum as $area2 => $rowArea) {
+                                                    for ($i = 1; $i <= $maxWeek; $i++) {
+                                                        if (isset($rowArea[$i])) {
+                                                            $rowsArea = count($rowArea[$i]);
+                                                            $rowDelivery = count($rowArea[$i]);
+                                                            if ($rowDelivery > 1) {
+                                                                $rowsModel += $rowDelivery - 1;
+                                                                $rowsJarums += $rowDelivery - 1;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ?>
+                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsModel ?>"><?= $noModel ?></td>
+                                            <?php
+                                            $rowJarum = 0;
+                                            foreach ($id as $jarum => $id2) {
+                                                $rowsJarum = count($id2);
                                                 if ($rowsJarum > 1) {
                                                     $rowsModel += $rowsJarum - 1;
                                                 }
                                                 $rowsArea = 0;
-                                                foreach ($rowJarum as $area => $rowArea) {
+                                                foreach ($id2 as $area2 => $rowArea) {
                                                     for ($i = 1; $i <= $maxWeek; $i++) {
                                                         if (isset($rowArea[$i])) {
                                                             $rowsArea = count($rowArea[$i]);
@@ -118,11 +140,7 @@
                                                             }
                                                         }
                                                     }
-                                                }
-                                            }
-                                        ?>
-                                            <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsModel ?>"><?= $noModel ?></td>
-                                            <?php foreach ($id as $jarum => $id2) { ?>
+                                                } ?>
                                                 <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsJarum ?>"><?= $jarum ?></td>
                                                 <?php foreach ($id2 as $area => $id3) { ?>
                                                     <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;" rowspan="<?= $rowsArea ?>"><?= $area ?></td>
@@ -135,7 +153,7 @@
                                                                 if ($parsedData) {
                                                                     // Menampilkan data yang sudah di-parse
                                                     ?>
-                                                                    <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $parsedData['del'] ?? '-' ?></td>
+                                                                    <td class=" text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $parsedData['del'] ?? '-' ?></td>
                                                                     <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $parsedData['qty'] ?? 0 ?></td>
                                                                     <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $parsedData['prod'] ?? 0 ?></td>
                                                                     <td class="text-uppercase text-dark text-xxs font-weight opacity-7 ps-2" style="text-align: center;"><?= $parsedData['sisa'] ?? 0 ?></td>
@@ -174,7 +192,7 @@
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="3">Total</td>
+                                        <td colspan="3" class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Total</td>
                                         <?php for ($i = 1; $i <= $maxWeek; $i++) { ?>
                                             <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"></td>
                                             <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalData[$i]['totalQty']) ? $totalData[$i]['totalQty'] : 0 ?></td>
@@ -200,13 +218,13 @@
                             Sisa Produksi Perjarum
                         </h5>
                         <div class="table-responsive">
-                            <table id="example" class="table table-border" style="width:100%">
+                            <table id="table2" class="table table-border" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" rowspan="2">NEEDLE</th>
                                         <!-- untuk menampilkan banyak week -->
                                         <?php for ($i = 1; $i <= $maxWeek; $i++) { ?>
-                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="4">WEEK <?= $i ?> (<?= $week[$i] ?>)</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;" colspan="4">WEEK <?= $i ?> ( <?= $week[$i] ?> )</th>
                                         <?php } ?>
                                     </tr>
                                     <tr>
@@ -218,6 +236,7 @@
                                         <?php } ?>
                                     </tr>
                                 </thead>
+
                                 <tbody>
                                     <tr>
                                         <?php foreach ($allDataJrm as $jarum => $idJrm) { ?>
@@ -228,10 +247,10 @@
                                                 // Mengecek apakah week ada di data
                                                 if (isset($idJrm[$i])) {
                                                     // Ambil data per week
-                                                    $qtyJrm = $idJrm[$i]['qtyJrm'] ?? 0;
-                                                    $prodJrm = $idJrm[$i]['prodJrm'] ?? 0;
-                                                    $sisaJrm = $idJrm[$i]['sisaJrm'] ?? 0;
-                                                    $jlMcJrm = $idJrm[$i]['jlMcJrm'] ?? 0;
+                                                    $qtyJrm = $idJrm[$i]['qtyJrm'];
+                                                    $prodJrm = $idJrm[$i]['prodJrm'];
+                                                    $sisaJrm = $idJrm[$i]['sisaJrm'];
+                                                    $jlMcJrm = $idJrm[$i]['jlMcJrm'];
 
                                                     // Menampilkan data dari week yang ditemukan
                                             ?>
@@ -258,14 +277,12 @@
                                 <tfoot>
                                     <tr>
                                         <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;">Total</td>
-                                        <?php
-                                        for ($i = 1; $i <= $maxWeek; $i++) { ?>
+                                        <?php for ($i = 1; $i <= $maxWeek; $i++) { ?>
                                             <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalDataJrm[$i]['totalQty']) ? $totalDataJrm[$i]['totalQty'] : 0 ?></td>
                                             <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalDataJrm[$i]['totalProd']) ? $totalDataJrm[$i]['totalProd'] : 0 ?></td>
                                             <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalDataJrm[$i]['totalSisa']) ? $totalDataJrm[$i]['totalSisa'] : 0 ?></td>
                                             <td class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2" style="text-align: center;"><?= isset($totalDataJrm[$i]['totalJlMc']) ? $totalDataJrm[$i]['totalJlMc'] : 0 ?></td>
-                                        <?php
-                                        } ?>
+                                        <?php } ?>
                                     </tr>
                                 </tfoot>
                             </table>

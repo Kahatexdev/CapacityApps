@@ -53,7 +53,7 @@ class EstSpkModel extends Model
 
     public function getData()
     {
-        return $this->select('estimasi_spk.*, DATE(created_at) AS tgl_buat')
+        return $this->select('estimasi_spk.*, DATE(created_at) AS tgl_buat, TIME(created_at) as jam')
             ->where('status', 'sudah')
             ->orderBy('created_at', 'ASC')
             ->findAll();
@@ -62,6 +62,12 @@ class EstSpkModel extends Model
     {
         return $this->where('area', $area)
             ->where('updated_at>', $lastmonth)
+            ->findAll();
+    }
+    public function getApprove()
+    {
+        return $this->select('estimasi_spk.*, DATE(updated_at) AS tgl_buat, TIME(created_at) as jam')
+            ->where('status', 'approved')
             ->findAll();
     }
 }

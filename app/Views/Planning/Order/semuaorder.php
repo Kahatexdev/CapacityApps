@@ -122,7 +122,7 @@
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <form action="<?= base_url($role . '/exportDataOrder'); ?>" method="POST">
+                <form id="exportDataOrderForm" action="<?= base_url($role . '/exportDataOrder'); ?>" method="POST">
                     <div class="modal-body align-items-center">
                         <div class="form-group">
                             <label for="buyer" class="col-form-label">Buyer</label>
@@ -165,6 +165,10 @@
                         <div class="form-group">
                             <label for="pdk" class="col-form-label">No Model</label>
                             <input type="text" class="form-control" name="pdk">
+                        </div>
+                        <div class="form-group">
+                            <label for="tgl_turun_order" class="col-form-label">Tgl Turun Order</label>
+                            <input type="date" class="form-control" name="tgl_turun_order">
                         </div>
                         <div class="form-group">
                             <label for="awal" class="col-form-label">Delivery Dari</label>
@@ -307,4 +311,33 @@
             }
         }
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('exportDataOrderForm');
+            form.addEventListener('submit', function(e) {
+                // ambil semua nilai field
+                const buyer = form.buyer.value;
+                const area = form.area.value;
+                const jarum = form.jarum.value;
+                const pdk = form.pdk.value.trim();
+                const tglOrder = form.tgl_turun_order.value;
+                const awal = form.awal.value;
+                const akhir = form.akhir.value;
+
+                // cek: ada minimal satu yang tidak kosong?
+                const isAnyFilled = [buyer, area, jarum, pdk, tglOrder, awal, akhir]
+                    .some(val => val !== '' && val !== null);
+
+                if (!isAnyFilled) {
+                    e.preventDefault(); // batalkan submit
+                    alert('Harap isi minimal salah satu field sebelum Generate!');
+                    // fokus ke modal agar user bisa lihat pesan
+                    const modalEl = document.getElementById('exportDataOrder');
+                    const bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                    bsModal.show();
+                }
+            });
+        });
+    </script>
+
     <?php $this->endSection(); ?>

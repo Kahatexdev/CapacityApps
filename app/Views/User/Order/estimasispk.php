@@ -41,6 +41,7 @@ $this->extend($role . '/layout'); ?>
                                     Estimasi SPK 2 di Area <?= $area ?>
                                 </h5><br>
                                 <p> <Strong>Rumus Estimasi SPK :</Strong> <br>((bs + tambahan packing)/Produksi/100 ) * Qty PO</p>
+                                <p> <Strong>- Permintaan diatas Pukul 15:00 akan di buka di hari berikutnya. Kecuali Urgent -</p></Strong>
                             </div>
                         </div>
                         <div>

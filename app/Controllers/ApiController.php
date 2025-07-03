@@ -353,6 +353,7 @@ class ApiController extends ResourceController
         // Return the data with a 200 status
         return $this->respond($idApsData, ResponseInterface::HTTP_OK);
     }
+<<<<<<< HEAD
 
     public function searchApsPerStyleByMastermodel($mastermodel)
     {
@@ -371,10 +372,53 @@ class ApiController extends ResourceController
 
         // Check if data is found
         if (empty($apsData)) {
+=======
+    public function getDeliv($model)
+    {
+        $deliv = $this->ApsPerstyleModel->getDeliv($model);
+        if (empty($deliv)) {
+>>>>>>> 3f6f259253a28fe71ebda6f733836256c217f000
             return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
         }
 
         // Return the data with a 200 status
+<<<<<<< HEAD
         return $this->respond($apsData, ResponseInterface::HTTP_OK);
+=======
+        return $this->respond($deliv, ResponseInterface::HTTP_OK);
+    }
+    public function getQtyOrder()
+    {
+        $noModel = $this->request->getGet('no_model');
+        $styleSize = $this->request->getGet('style_size');
+        $area = $this->request->getGet('area');
+
+        // Debug ke log CI
+        log_message('debug', 'API getQtyOrder params => no_model: ' . $noModel . ', style_size: ' . $styleSize . ', area: ' . $area);
+
+        $orderQty = $this->ApsPerstyleModel->getQtyOrder($noModel, $styleSize, $area);
+
+        // Check if data is found
+        if (empty($orderQty)) {
+            return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
+        }
+
+        // Return the data with a 200 status
+        return $this->respond($orderQty, ResponseInterface::HTTP_OK);
+    }
+    public function getDataBuyer()
+    {
+        $noModel = $this->request->getGet('no_model');
+
+        $buyer = $this->orderModel->getDataBuyer($noModel);
+
+        // Check if data is found
+        if (empty($buyer)) {
+            return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
+        }
+
+        // Return the data with a 200 status
+        return $this->respond($buyer, ResponseInterface::HTTP_OK);
+>>>>>>> 3f6f259253a28fe71ebda6f733836256c217f000
     }
 }

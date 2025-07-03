@@ -599,4 +599,13 @@ class OrderModel extends Model
             ->where('data_model.no_model', $model)
             ->first();
     }
+
+    public function getDataBuyer($noModel)
+    {
+        return $this->select('kd_buyer_order')->DISTINCT()
+            ->where('kd_buyer_order !=', null)
+            ->where('no_model', $noModel)
+            ->orderBy('kd_buyer_order', 'ASC')
+            ->first();
+    }
 }

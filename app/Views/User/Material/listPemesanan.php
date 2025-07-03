@@ -37,7 +37,7 @@
                             </h5>
                         </div>
                         <div>
-                            <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#requestTimeModal">
+                            <button class="btn btn-info requestTimeButton" data-bs-toggle="modal" data-bs-target="#requestTimeModal">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="15">
                                     <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com -->
                                     <path d="M432 304c0 114.9-93.1 208-208 208S16 418.9 16 304c0-104 76.3-190.2 176-205.5V64h-28c-6.6 0-12-5.4-12-12V12c0-6.6 5.4-12 12-12h120c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-28v34.5c37.5 5.8 71.7 21.6 99.7 44.6l27.5-27.5c4.7-4.7 12.3-4.7 17 0l28.3 28.3c4.7 4.7 4.7 12.3 0 17l-29.4 29.4-.6 .6C419.7 223.3 432 262.2 432 304z" fill="#ffffff" />
@@ -100,7 +100,7 @@
                             <thead>
                                 <tr>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">No</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal Pkai</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal Pakai</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Model</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Item Type</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Kode Warna</th>
@@ -111,6 +111,7 @@
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Cns Pesan</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Lot</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Keterangan</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">PO(+)</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Total Terima</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Total Retur</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Jatah</th>
@@ -139,7 +140,15 @@
                                         <td class="text-xs text-start"><?= $ttl_cns_pesan; ?></td>
                                         <td class="text-xs text-start"><?= $id['lot']; ?></td>
                                         <td class="text-xs text-start"><?= $id['keterangan']; ?></td>
-                                        <td class="text-xs text-start"><?= number_format($id['ttl_pengiriman'], 2); ?></td>
+                                        <td class="text-xs text-start">
+                                            <?php if ($id['po_tambahan'] == 1): ?>
+                                                <i class="fas fa-check-square fa-2x" style="color: #6fbf73;"></i>
+                                            <?php else: ?>
+                                                <!-- Biarkan kosong -->
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class=" text-xs text-start"><?= number_format($id['ttl_pengiriman'], 2); ?>
+                                        </td>
                                         <td class="text-xs text-start"></td>
                                         <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>"><?= number_format($id['sisa_jatah'], 2); ?></td>
                                         <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>">
@@ -152,7 +161,7 @@
                                             <?php } ?>
                                         </td>
                                         <td class="text-xs text-start">
-                                            <button type="button" class="btn btn-warning update-btn" data-toggle="modal" data-target="#updateListModal" data-area="<?= $area; ?>" data-tgl="<?= $id['tgl_pakai']; ?>" data-model="<?= $id['no_model']; ?>" data-item="<?= $id['item_type']; ?>" data-kode="<?= $id['kode_warna']; ?>" data-color="<?= $id['color']; ?>">
+                                            <button type="button" class="btn btn-warning update-btn" data-toggle="modal" data-target="#updateListModal" data-area="<?= $area; ?>" data-tgl="<?= $id['tgl_pakai']; ?>" data-model="<?= $id['no_model']; ?>" data-item="<?= $id['item_type']; ?>" data-kode="<?= $id['kode_warna']; ?>" data-color="<?= $id['color']; ?>" data-po-tambahan="<?= $id['po_tambahan']; ?>">
                                                 <i class="fa fa-edit fa-lg"></i>
                                             </button>
                                         </td>
@@ -215,7 +224,8 @@
                                                         data-item="<?= $id['item_type']; ?>"
                                                         data-kode="<?= $id['kode_warna']; ?>"
                                                         data-color="<?= $id['color']; ?>"
-                                                        data-waktu="<?= $batasWaktu; ?>">
+                                                        data-waktu="<?= $batasWaktu; ?>"
+                                                        data-po-tambahan="<?= $id['po_tambahan']; ?>">
                                                         <i class="fa fa-paper-plane fa-lg"></i>
                                                     </button>
                                             <?php
@@ -358,6 +368,11 @@
 </script>
 <script type="text/javascript">
     $(document).ready(function() {
+        // const day = '<?= $day ?>'
+        // if (day.toLowerCase() === 'sunday') {
+        //     $('.requestTimeButton').hide();
+        // }
+
         // GET TGL PAKAI ADDITIONAL TIME
         $('#jenisBenang').on('change', function() {
             var jenis = $(this).val(); // Dapatkan nilai pilihan
@@ -449,6 +464,9 @@
             var itemType = $(this).data('item');
             var kode_warna = $(this).data('kode');
             var color = $(this).data('color');
+            var po_tambahan = $(this).data('po-tambahan');
+
+            console.log(po_tambahan);
 
             // Kirim data ke server untuk pencarian
             $.ajax({
@@ -460,7 +478,8 @@
                     no_model: noModel,
                     item_type: itemType,
                     kode_warna: kode_warna,
-                    color: color
+                    color: color,
+                    po_tambahan: po_tambahan
                 },
                 dataType: 'json',
                 success: function(response) {
@@ -494,6 +513,7 @@
                         let sisaCns = 0; // Total jalan_mc
 
                         response.data.forEach(function(item, index) {
+                            console.log(response);
                             const jalanMc = parseFloat(item.jl_mc) || 0;
                             const totalCones = jalanMc * item.qty_cns;
                             const totalBeratCones = totalCones * item.qty_berat_cns;
@@ -510,6 +530,7 @@
                                 <div class="row mb-1">
                                 <input type="hidden" class="form-control id_material" name="items[${index}][id_material]" value="${item.id_material}" readonly>
                                 <input type="hidden" class="form-control id_pemesanan" name="items[${index}][id_pemesanan]" value="${item.id_pemesanan}" readonly>
+                                <input type="hidden" class="form-control po_tambahan" name="items[${index}][po_tambahan]" value="${item.po_tambahan}" readonly>
                                 <div class="col-lg-3">
                                     <input type="text" class="form-control style" name="items[${index}][style]" value="${item.style_size}" readonly>
                                 </div>
@@ -534,23 +555,23 @@
                         });
 
                         // Hitung rata-rata jalan_mc
-                        const sisaCnsMc = totalRows > 0 ? (sisaCns / totalRows) : 0;
-                        const sisaKgMc = totalRows > 0 ? (sisaKg / totalRows) : 0;
-                        const ttl_cns_pesan = sisaCnsMc > 0 ? cns_pesan - sisaCnsMc : cns_pesan;
-                        const ttl_kg_pesan = sisaKgMc > 0 ? kg_pesan - sisaKgMc : kg_pesan;
+                        // const sisaCnsMc = totalRows > 0 ? (sisaCns / totalRows) : 0;
+                        // const sisaKgMc = totalRows > 0 ? (sisaKg / totalRows) : 0;
+                        const ttl_cns_pesan = sisaCns > 0 ? cns_pesan - sisaCns : cns_pesan;
+                        const ttl_kg_pesan = sisaKg > 0 ? kg_pesan - sisaKg : kg_pesan;
                         dataPerstyle += `
                             <div class="row mt-1">
                                 <div class="col-lg-6">
                                     <label for="recipient-name" class="col-form-label text-center">Stock Area</label>
                                 </div>
                                 <div class="col-lg-2">
-                                    <input type="number" class="form-control sisa_cns" name="sisa_cns" value="${sisaCnsMc}">
+                                    <input type="number" class="form-control sisa_cns" name="sisa_cns" value="${sisaCns}">
                                 </div>
                                 <div class="col-lg-2">
                                     
                                 </div>
                                 <div class="col-lg-2">
-                                    <input type="number" step="0.01" class="form-control sisa_kg" name="sisa_kg" value="${parseFloat(sisaKgMc).toFixed(2)}">
+                                    <input type="number" step="0.01" class="form-control sisa_kg" name="sisa_kg" value="${parseFloat(sisaKg).toFixed(2)}">
                                 </div>
                             </div>
                             <div class="row mt-1">
@@ -736,6 +757,7 @@
                     item_type: button.getAttribute("data-item"),
                     kode_warna: button.getAttribute("data-kode"),
                     color: button.getAttribute("data-color"),
+                    po_tambahan: button.getAttribute("data-po-tambahan"),
                     waktu: batasWaktu,
                 };
 

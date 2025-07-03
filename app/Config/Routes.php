@@ -52,6 +52,10 @@ $routes->group(
         $routes->get('getMasterModel', 'ApiController::getMasterModel');
         $routes->get('getInisialByModel', 'ApiController::getInisialByModel');
         $routes->get('getIdApsByModelInisial', 'ApiController::getApsPerStyleByInisial');
+        $routes->get('getDeliv/(:any)', 'ApiController::getDeliv/$1');
+
+        $routes->get('getQtyOrder', 'ApiController::getQtyOrder');
+        $routes->get('getDataBuyer', 'ApiController::getDataBuyer');
     }
 );
 
@@ -108,7 +112,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('sisaOrderArea', 'OrderController::sisaOrderArea');
     $routes->get('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
     $routes->post('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
-    $routes->post('excelSisaOrderArea/(:any)', 'ExcelController::excelSisaOrderArea/$1');
+    $routes->post('excelSisaOrderArea', 'ExcelController::excelSisaOrderArea');
     $routes->post('inputhistoryrevise/(:any)', 'OrderController::inputHistory/$1');
 
     // produksi
@@ -257,8 +261,15 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('inputhistoryrevise/(:any)', 'OrderController::inputHistory/$1');
     $routes->get('pengajuanspk2', 'OrderController::spk2');
     $routes->post('approveSpk2', 'OrderController::approveSpk2');
-
-
+    $routes->get('sisaOrder', 'OrderController::sisaOrder');
+    $routes->get('sisaOrder/(:any)', 'OrderController::sisaOrderBuyer/$1');
+    $routes->post('sisaOrder/(:any)', 'OrderController::sisaOrderBuyer/$1');
+    $routes->post('excelSisaOrderBuyer/(:any)', 'ExcelController::excelSisaOrderBuyer/$1');
+    $routes->get('sisaOrderArea', 'OrderController::sisaOrderArea');
+    $routes->get('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
+    $routes->post('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
+    $routes->post('excelSisaOrderArea', 'ExcelController::excelSisaOrderArea');
+    $routes->post('excelSisaOrderAllArea', 'ExcelController::excelSisaOrderAllArea');
 
     // mesin
     $routes->get('datamesin', 'MesinController::indexPlan');
@@ -535,9 +546,11 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
 
     // bahanbaku
     $routes->get('bahanBaku', 'MaterialController::index');
+    $routes->get('bahanBaku/getNomodel', 'MaterialController::getNomodel');
     $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
     $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
     $routes->post('getStyleSizeByNoModel', 'MaterialController::getStyleSizeByNoModel');
+    $routes->get('getStyleSizeByNoModelPemesanan', 'MaterialController::getStyleSizeByNoModelPemesanan');
     $routes->post('getJalanMc', 'MaterialController::getJalanMcByModelSize');
     $routes->get('getMU/(:any)/(:any)/(:any)/(:any)', 'MaterialController::getMU/$1/$2/$3/$4');
     $routes->post('bahanBaku/simpanKeSession', 'MaterialController::savePemesananSession');
@@ -569,6 +582,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('savePoTambahan/(:any)', 'MaterialController::savePoTambahan/$1');
     $routes->get('filter_list_potambahan/(:any)', 'MaterialController::filterPoTambahan/$1');
     $routes->get('generate_po_tambahan', 'PdfController::generatePoTambahan');
+    $routes->get('generate_excel_po_tambahan', 'ExcelController::generatePoTambahan');
 
 
     // retur
@@ -637,7 +651,8 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('sisaOrderArea', 'OrderController::sisaOrderArea');
     $routes->get('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
     $routes->post('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
-    $routes->post('excelSisaOrderArea/(:any)', 'ExcelController::excelSisaOrderArea/$1');
+    $routes->post('excelSisaOrderAllArea', 'ExcelController::excelSisaOrderAllArea');
+    $routes->post('excelSisaOrderArea', 'ExcelController::excelSisaOrderArea');
     $routes->post('inputinisial', 'UserController::inputinisial');
     $routes->post('importinisial', 'UserController::importinisial');
 
@@ -653,6 +668,7 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->post('resetproduksiarea', 'ProduksiController::resetproduksiarea');
     $routes->post('editproduksi', 'ProduksiController::editproduksi');
     $routes->get('updateproduksi', 'ProduksiController::updateproduksi');
+    $routes->get('detailproduksi', 'ProduksiController::produksiGlobal');
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->get('updatebs', 'ProduksiController::updatebs');
