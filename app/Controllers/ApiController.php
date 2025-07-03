@@ -353,38 +353,14 @@ class ApiController extends ResourceController
         // Return the data with a 200 status
         return $this->respond($idApsData, ResponseInterface::HTTP_OK);
     }
-<<<<<<< HEAD
-
-    public function searchApsPerStyleByMastermodel($mastermodel)
-    {
-        // Validate the input parameter
-        if (!$mastermodel) {
-            return $this->response->setJSON([
-                "error" => "Parameter tidak lengkap",
-                "received" => [
-                    "mastermodel" => $mastermodel,
-                ]
-            ])->setStatusCode(400);
-        }
-
-        // Fetch data from the model
-        $apsData = $this->ApsPerstyleModel->searchApsPerStyleByMastermodel($mastermodel);
-
-        // Check if data is found
-        if (empty($apsData)) {
-=======
     public function getDeliv($model)
     {
         $deliv = $this->ApsPerstyleModel->getDeliv($model);
         if (empty($deliv)) {
->>>>>>> 3f6f259253a28fe71ebda6f733836256c217f000
             return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
         }
 
         // Return the data with a 200 status
-<<<<<<< HEAD
-        return $this->respond($apsData, ResponseInterface::HTTP_OK);
-=======
         return $this->respond($deliv, ResponseInterface::HTTP_OK);
     }
     public function getQtyOrder()
@@ -419,6 +395,29 @@ class ApiController extends ResourceController
 
         // Return the data with a 200 status
         return $this->respond($buyer, ResponseInterface::HTTP_OK);
->>>>>>> 3f6f259253a28fe71ebda6f733836256c217f000
+    }
+
+    public function searchApsPerStyleByMastermodel($mastermodel)
+    {
+        // Validate the input parameter
+        if (!$mastermodel) {
+            return $this->response->setJSON([
+                "error" => "Parameter tidak lengkap",
+                "received" => [
+                    "mastermodel" => $mastermodel,
+                ]
+            ])->setStatusCode(400);
+        }
+
+        // Fetch data from the model
+        $apsData = $this->ApsPerstyleModel->searchApsPerStyleByMastermodel($mastermodel);
+
+        // Check if data is found
+        if (empty($apsData)) {
+            return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
+        }
+
+        // Return the data with a 200 status
+        return $this->respond($apsData, ResponseInterface::HTTP_OK);
     }
 }
