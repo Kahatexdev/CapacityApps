@@ -397,8 +397,9 @@ class ApiController extends ResourceController
         return $this->respond($buyer, ResponseInterface::HTTP_OK);
     }
 
-    public function searchApsPerStyleByMastermodel($mastermodel)
+    public function searchApsPerStyleByMastermodel()
     {
+        $mastermodel = $this->request->getGet('mastermodel');
         // Validate the input parameter
         if (!$mastermodel) {
             return $this->response->setJSON([
