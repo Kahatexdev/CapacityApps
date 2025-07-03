@@ -98,7 +98,18 @@ error_reporting(E_ALL); ?>
                         </div>
 
                     </div>
-
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <h6>Repeat Dari</h6>
+                            <form action="<?= base_url($role . '/saveRepeat') ?>" method="post">
+                                <div class="d-flex gap-2">
+                                    <input type="text" class="form-control" name="repeat" id="repeatPdk" placeholder="Tulis disini jika ini PDK Repeat" value="<?= $repeat ?>">
+                                    <input type="hidden" name="model" id="" value="<?= $noModel ?>">
+                                    <button type="submit" class="btn btn-info d-none" id="repeatBtn">Simpan</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="card-body">
@@ -674,6 +685,17 @@ error_reporting(E_ALL); ?>
                 checkboxes.forEach(function(checkbox) {
                     checkbox.checked = e.target.checked;
                 });
+            });
+
+            const repeatInput = document.getElementById('repeatPdk');
+            const repeatBtn = document.getElementById('repeatBtn');
+
+            repeatInput.addEventListener('input', function() {
+                if (this.value.trim() !== "") {
+                    repeatBtn.classList.remove('d-none');
+                } else {
+                    repeatBtn.classList.add('d-none');
+                }
             });
         </script>
         <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>

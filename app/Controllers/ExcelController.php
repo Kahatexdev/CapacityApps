@@ -4748,10 +4748,10 @@ class ExcelController extends BaseController
 
         $allData = [];
         $totalPerWeek = []; // Untuk menyimpan total produksi per minggu
-
         foreach ($data as $id) {
             $buyer = $id['kd_buyer_order'];
             $seam = $id['seam'];
+            $repeat = $id['repeat'];
             $mastermodel = $id['mastermodel'];
             $machinetypeid = $id['machinetypeid'];
             $factory = $id['factory'];
@@ -4800,6 +4800,7 @@ class ExcelController extends BaseController
                         'jlMc' => $jlMc,
                         'buyer' => $buyer,
                         'seam' => $seam,
+                        'repeat' => $repeat,
                     ]);
 
                     // Hitung total per minggu
@@ -5088,6 +5089,7 @@ class ExcelController extends BaseController
                 // === Ambil buyer (dan seam jika ingin) untuk seluruh model ini ===
                 $buyer = '';
                 $seam = '';
+                $repeat = '';
                 // scan semua jarum & minggu di model untuk cari first non-empty entry
                 foreach ($jarums as $jarumScan => $weeksScan) {
                     $found = false;
@@ -5099,6 +5101,9 @@ class ExcelController extends BaseController
                             }
                             if (isset($entryData['seam'])) {
                                 $seam = $entryData['seam'];
+                            }
+                            if (isset($entryData['repeat'])) {
+                                $repeat = $entryData['repeat'];
                             }
                             $found = true;
                             break;
@@ -5122,7 +5127,7 @@ class ExcelController extends BaseController
                 $sheet->mergeCells('D' . $startRowModel . ':D' . $endRowModel);
                 $sheet->getStyle('D' . $startRowModel . ':D' . $endRowModel)->applyFromArray($styleBody);
 
-                $sheet->setCellValue('E' . $startRowModel, '');
+                $sheet->setCellValue('E' . $startRowModel, $repeat);
                 $sheet->mergeCells('E' . $startRowModel . ':E' . $endRowModel);
                 $sheet->getStyle('E' . $startRowModel . ':E' . $endRowModel)->applyFromArray($styleBody);
 
