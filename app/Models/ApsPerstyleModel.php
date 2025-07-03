@@ -1207,4 +1207,11 @@ class ApsPerstyleModel extends Model
             ->where('inisial', $inisial)
             ->findAll();
     }
+
+    public function searchApsPerStyleByMastermodel($mastermodel)
+    {
+        return $this->select('idapsperstyle, mastermodel, size, inisial, delivery, factory')
+            ->where('mastermodel', $mastermodel)
+            ->findAll();
+    }
 }
