@@ -56,6 +56,7 @@ $routes->group(
 
         $routes->get('getQtyOrder', 'ApiController::getQtyOrder');
         $routes->get('getDataBuyer', 'ApiController::getDataBuyer');
+        $routes->get('getDeliveryAwalAkhir', 'ApiController::getDeliveryAwalAkhir');
     }
 );
 
