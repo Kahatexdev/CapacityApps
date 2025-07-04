@@ -272,7 +272,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
     $routes->post('excelSisaOrderArea', 'ExcelController::excelSisaOrderArea');
     $routes->post('excelSisaOrderAllArea', 'ExcelController::excelSisaOrderAllArea');
-    $routes->post('saveRepeat', 'orderController::saveRepeat');
+    $routes->post('saveRepeat', 'OrderController::saveRepeat');
 
     // mesin
     $routes->get('datamesin', 'MesinController::indexPlan');
