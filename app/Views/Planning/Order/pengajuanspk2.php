@@ -64,7 +64,7 @@
                         <table id="example1" class="display compact " style="width:100%">
                             <thead>
                                 <tr>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 text-center">Tanggal Dibuat</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 text-center">Tanggal Approve</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 text-center">Jam</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 text-center">No Model</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Style</th>
@@ -77,7 +77,7 @@
                             <tbody>
                                 <?php foreach ($history as $row1) : ?>
                                     <tr>
-                                        <td class="text-center"><?= $row1['created_at'] ?></td>
+                                        <td class="text-center"><?= $row1['tgl_buat'] ?></td>
                                         <td class="text-center"><?= $row1['jam'] ?></td>
                                         <td class="text-center"><?= $row1['model'] ?></td>
                                         <td class="text-center"><?= $row1['style'] ?></td>

@@ -797,6 +797,10 @@ class OrderController extends BaseController
     {
         $pdk = $this->ApsPerstyleModel->getSisaPerDeliv($noModel, $jarum);
         $history = $this->historyRev->getData($noModel);
+        $repeat = $this->orderModel
+            ->select('repeat_from')
+            ->where('no_model', $noModel)
+            ->first()['repeat_from'] ?? null;
         $sisaPerDeliv = [];
         foreach ($pdk as $perdeliv) {
             $deliv = $perdeliv['delivery'];
@@ -911,7 +915,8 @@ class OrderController extends BaseController
             'hari' => $hari,
             'rekomendasi' => $top3Rekomendasi,
             'totalPo' => $totalPo,
-            'historyRev' => $history
+            'historyRev' => $history,
+            'repeat' => $repeat
         ];
         return view(session()->get('role') . '/Order/detailPdk', $data);
     }
@@ -2274,5 +2279,20 @@ class OrderController extends BaseController
             'status' => 'success',
             'message' => 'Data berhasil disimpan.'
         ]);
+    }
+    public function saveRepeat()
+    {
+        $repeat = $this->request->getPost('repeat');
+        $model = $this->request->getPost('model');
+        $update = $this->orderModel
+            ->where('no_model', $model)
+            ->set('repeat_from', $repeat)
+            ->update();
+
+        if ($update) {
+            return redirect()->back()->with('success', 'Berhasil update repeat!');
+        } else {
+            return redirect()->back()->with('error', 'Gagal update repeat!');
+        }
     }
 }
