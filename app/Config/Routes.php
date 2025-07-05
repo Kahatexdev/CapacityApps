@@ -56,6 +56,8 @@ $routes->group(
 
         $routes->get('getQtyOrder', 'ApiController::getQtyOrder');
         $routes->get('getDataBuyer', 'ApiController::getDataBuyer');
+        $routes->get('getDeliveryAwalAkhir', 'ApiController::getDeliveryAwalAkhir');
+        $routes->get('searchApsPerStyleByMastermodel', 'ApiController::searchApsPerStyleByMastermodel');
     }
 );
 
@@ -114,6 +116,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
     $routes->post('excelSisaOrderArea', 'ExcelController::excelSisaOrderArea');
     $routes->post('inputhistoryrevise/(:any)', 'OrderController::inputHistory/$1');
+    $routes->post('saveRepeat', 'orderController::saveRepeat');
 
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
@@ -270,6 +273,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
     $routes->post('excelSisaOrderArea', 'ExcelController::excelSisaOrderArea');
     $routes->post('excelSisaOrderAllArea', 'ExcelController::excelSisaOrderAllArea');
+    $routes->post('saveRepeat', 'OrderController::saveRepeat');
 
     // mesin
     $routes->get('datamesin', 'MesinController::indexPlan');
