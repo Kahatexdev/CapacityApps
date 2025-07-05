@@ -394,6 +394,7 @@
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4" aria-labelledby="navbarDropdownReports">
                                     <li><a class="dropdown-item" href="<?= base_url($role . '/report_pemesanan/' . $area) ?>">Report Pemesanan</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/sisaKebutuhanArea/' . $area) ?>">Report Sisa Kebutuhan</a></li>
                                 </ul>
                             </li>
                         </ul>

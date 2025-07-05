@@ -583,6 +583,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('filter_list_potambahan/(:any)', 'MaterialController::filterPoTambahan/$1');
     $routes->get('generate_po_tambahan', 'PdfController::generatePoTambahan');
     $routes->get('generate_excel_po_tambahan', 'ExcelController::generatePoTambahan');
+    $routes->get('sisaKebutuhanArea/(:any)', 'MaterialController::sisaKebutuhanArea/$1');
 
 
     // retur

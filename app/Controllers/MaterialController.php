@@ -83,7 +83,6 @@ class MaterialController extends BaseController
     public function index()
     {
         $area = session()->get('username');
-        $role = session()->get('role');
         $logged_in = true;
         // $noModel = $this->DetailPlanningModel->getNoModelAktif($area);
         $pemesananBb = session()->get('pemesananBb');
@@ -132,7 +131,6 @@ class MaterialController extends BaseController
         $data = [
             'role' => session()->get('role'),
             'area' => $area,
-            'role' => $role,
             'title' => 'Bahan Baku',
             'active1' => '',
             'active2' => '',
@@ -141,9 +139,6 @@ class MaterialController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-            'targetProd' => 0,
-            'produksiBulan' => 0,
-            'produksiHari' => 0,
             // 'noModel' => $noModel,
             'groupedData' => $groupedData
 
@@ -573,7 +568,7 @@ class MaterialController extends BaseController
             'active6' => 'active',
             'active7' => '',
             'area' => $area,
-            'title' => "List Pemesanan",
+            'title' => 'Bahan Baku',
             'dataList' => $dataList,
             'day' => $day,
             'tomorrow' => $tomorrow,
@@ -1456,7 +1451,7 @@ class MaterialController extends BaseController
             'active6' => 'active',
             'active7' => '',
             'area' => $area,
-            'title' => "List Pemesanan",
+            'title' => "Bahan Baku",
             'dataList' => $dataList,
             'day' => $day,
             'tomorrow' => $tomorrow,
@@ -1528,5 +1523,198 @@ class MaterialController extends BaseController
 
         // Kembalikan data dalam format JSON
         return $this->response->setJSON($data)->setStatusCode(200);
+    }
+    public function sisaKebutuhanArea($area)
+    {
+        $noModel = $this->request->getGet('filter_model') ?? '';
+
+        // Initialize dataPemesanan as empty by default
+        $dataPemesanan = [];
+        $dataRetur = [];
+
+        if (!empty($area) && !empty($noModel)) {
+
+            $pemesananUrl  = 'http://172.23.44.14/MaterialSystem/public/api/getPemesananByAreaModel?area=' . $area . '&no_model=' . urlencode($noModel);
+            $pemesananResponse = file_get_contents($pemesananUrl);
+            $dataPemesanan   = json_decode($pemesananResponse, true);
+
+            $returUrl  = 'http://172.23.44.14/MaterialSystem/public/api/getReturByAreaModel?area=' . $area . '&no_model=' . urlencode($noModel);
+            $returResponse = file_get_contents($returUrl);
+            $dataRetur     = json_decode($returResponse, true);
+        }
+
+        $mergedData = [];
+        $kebutuhan = [];
+
+        // Tambahkan semua data pemesanan ke mergedData
+        foreach ($dataPemesanan as $key => $pemesanan) {
+            // ambil data styleSize by bb
+            $urlStyle = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model=' . $pemesanan['no_model']
+                . '&item_type=' . urlencode($pemesanan['item_type'])
+                . '&kode_warna=' . urlencode($pemesanan['kode_warna']);
+
+            $styleResponse = file_get_contents($urlStyle);
+            $getStyle     = json_decode($styleResponse, true);
+
+            $ttlKeb = 0;
+            $ttlQty = 0;
+
+            foreach ($getStyle as $i => $data) {
+                // Ambil qty
+                $qtyData = $this->ApsPerstyleModel->getQtyOrder($noModel, $data['style_size'], $area);
+                $qty         = (intval($qtyData['qty']) ?? 0);
+
+                // Ambil kg po tambahan
+                $PoPlus = 'http://172.23.44.14/MaterialSystem/public/api/getKgPoTambahan?no_model=' . $pemesanan['no_model']
+                    . '&item_type=' . urlencode($pemesanan['item_type'])
+                    . '&area=' . $area;
+
+                $poPlusResponse = file_get_contents($PoPlus);
+                $getPoPlus     = json_decode($poPlusResponse, true);
+
+
+                $kgPoTambahan = floatval(
+                    $getPoPlus['ttl_keb_potambahan'] ?? 0
+                );
+                if ($qty > 0) {
+                    $kebutuhan = (($qty * $data['gw'] * ($data['composition'] / 100)) * (1 + ($data['loss'] / 100)) / 1000) + $kgPoTambahan;
+                    $pemesanan['ttl_keb'] = $ttlKeb;
+                }
+                $ttlKeb += $kebutuhan;
+                $ttlQty += $qty;
+            }
+            $pemesanan['qty']     = $ttlQty; // ttl qty pcs
+            $pemesanan['ttl_keb'] = $ttlKeb; // ttl kebutuhan bb
+
+
+            $mergedData[] = [
+                'no_model'           => $pemesanan['no_model'],
+                'item_type'          => $pemesanan['item_type'],
+                'kode_warna'         => $pemesanan['kode_warna'],
+                'color'              => $pemesanan['color'],
+                'max_loss'           => $pemesanan['max_loss'],
+                'tgl_pakai'          => $pemesanan['tgl_pakai'],
+                'id_total_pemesanan' => $pemesanan['id_total_pemesanan'],
+                'ttl_jl_mc'          => $pemesanan['ttl_jl_mc'],
+                'ttl_kg'             => number_format($pemesanan['ttl_kg'], 2),
+                'po_tambahan'        => $pemesanan['po_tambahan'],
+                'ttl_keb'            => number_format($pemesanan['ttl_keb'], 2),
+                'kg_out'             => number_format($pemesanan['kgs_out'], 2),
+                'lot_out'            => $pemesanan['lot_out'],
+                // field retur kosong
+                'tgl_retur'          => null,
+                'kgs_retur'          => null,
+                'lot_retur'          => null,
+                'ket_gbn'            => null,
+            ];
+            $kebutuhanDipakai[$key] = true;
+        }
+
+        // Tambahkan semua data retur ke mergedData (data pemesanan diset null)
+        foreach ($dataRetur as $retur) {
+            // ambil data styleSize by bb
+            $urlStyle = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model=' . $retur['no_model']
+                . '&item_type=' . urlencode($retur['item_type'])
+                . '&kode_warna=' . urlencode($retur['kode_warna']);
+
+            $styleResponse = file_get_contents($urlStyle);
+            $getStyle      = json_decode($styleResponse, true);
+
+            $ttlKeb = 0;
+            $ttlQty = 0;
+
+            foreach ($getStyle as $i => $data) {
+                // Ambil qty
+                $qtyData = $this->ApsPerstyleModel->getQtyOrder($noModel, $data['style_size'], $area);
+                $qty     = (intval($qtyData['qty']) ?? 0);
+
+                // Ambil kg po tambahan
+                $PoPlus = 'http://172.23.44.14/MaterialSystem/public/api/getKgPoTambahan?no_model=' . $retur['no_model']
+                    . '&item_type=' . urlencode($retur['item_type'])
+                    . '&area=' . $area;
+
+                $poPlusResponse = file_get_contents($PoPlus);
+                $getPoPlus     = json_decode($poPlusResponse, true);
+
+
+                $kgPoTambahan = floatval(
+                    $getPoPlus['ttl_keb_potambahan'] ?? 0
+                );
+
+                if ($qty > 0) {
+                    $kebutuhan = (($qty * $data['gw'] * ($data['composition'] / 100)) * (1 + ($data['loss'] / 100)) / 1000) + $kgPoTambahan;
+                    $retur['ttl_keb'] = $ttlKeb;
+                }
+                $ttlKeb += $kebutuhan;
+                $ttlQty += $qty;
+            }
+            $retur['qty']     = $ttlQty; // ttl qty pcs
+            $retur['ttl_keb'] = $ttlKeb; // ttl kebutuhan bb
+
+
+            $mergedData[] = [
+                'no_model'           => $retur['no_model'],
+                'item_type'          => $retur['item_type'],
+                'kode_warna'         => $retur['kode_warna'],
+                'color'              => $retur['warna'],
+                'max_loss'           => 0,
+                'tgl_pakai'          => null,
+                'id_total_pemesanan' => null,
+                'ttl_jl_mc'          => null,
+                'ttl_kg'             => null,
+                'po_tambahan'        => null,
+                'ttl_keb'            => number_format($retur['ttl_keb'], 2),
+                'kg_out'             => null,
+                'lot_out'            => null,
+                'tgl_retur'          => $retur['tgl_retur'],
+                'kgs_retur'          => number_format($retur['kgs_retur'], 2),
+                'lot_retur'          => $retur['lot_retur'],
+                'ket_gbn'            => $retur['keterangan_gbn'],
+            ];
+        }
+
+        if ($mergedData) {
+            usort($mergedData, function ($a, $b) {
+                // Bandingkan item_type (ASC)
+                $cmpItem = strcmp($a['item_type'], $b['item_type']);
+                if ($cmpItem !== 0) {
+                    return $cmpItem;
+                }
+
+                // Bandingkan kode_warna (ASC)
+                $cmpWarna = strcmp($a['kode_warna'], $b['kode_warna']);
+                if ($cmpWarna !== 0) {
+                    return $cmpWarna;
+                }
+
+                // Ambil tanggal (prioritas tgl_pakai, fallback ke tgl_retur)
+                $tanggalA = $a['tgl_pakai'] ?: $a['tgl_retur'];
+                $tanggalB = $b['tgl_pakai'] ?: $b['tgl_retur'];
+
+                // Handle tanggal kosong supaya selalu di bawah
+                if (empty($tanggalA) && !empty($tanggalB)) return 1;
+                if (!empty($tanggalA) && empty($tanggalB)) return -1;
+
+                // Bandingkan tanggal (DESC)
+                return strtotime($tanggalB) <=> strtotime($tanggalA);
+            });
+        }
+
+        $data = [
+            'role' => session()->get('role'),
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => 'active',
+            'active7' => '',
+            'area' => $area,
+            'noModel' => $noModel,
+            'title' => "Bahan Baku",
+            'dataPemesanan' => $mergedData,
+        ];
+
+        return view(session()->get('role') . '/Material/reportSisaKebutuhan', $data);
     }
 }
