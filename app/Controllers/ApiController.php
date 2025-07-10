@@ -396,6 +396,20 @@ class ApiController extends ResourceController
         // Return the data with a 200 status
         return $this->respond($buyer, ResponseInterface::HTTP_OK);
     }
+    public function getDeliveryAwalAkhir()
+    {
+        $noModel = $this->request->getGet('model');
+
+        $delivery = $this->ApsPerstyleModel->getDeliveryAwalAkhir($noModel);
+
+        // Check if data is found
+        if (empty($delivery)) {
+            return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
+        }
+
+        // Return the data with a 200 status
+        return $this->respond($delivery, ResponseInterface::HTTP_OK);
+    }
 
     public function searchApsPerStyleByMastermodel()
     {

@@ -1227,6 +1227,12 @@ class ApsPerstyleModel extends Model
             ->groupBy('delivery')
             ->findAll();
     }
+    public function getDeliveryAwalAkhir($model)
+    {
+        return $this->select('MIN(delivery) AS delivery_awal, MAX(delivery) AS delivery_akhir')
+            ->where('mastermodel', $model)
+            ->first();
+    }
 
     public function searchApsPerStyleByMastermodel($mastermodel)
     {
