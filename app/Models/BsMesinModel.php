@@ -155,7 +155,7 @@ class BsMesinModel extends Model
             ->where('no_mesin', $insert['no_mesin'])
             ->where('size', $insert['size'])
             ->where('tanggal_produksi', $insert['tanggal_produksi'])
-            ->get(); // Pastikan panggilan get() dilakukan untuk menjalankan query
+            ->first(); // Pastikan panggilan get() dilakukan untuk menjalankan query
 
         // Jika query gagal, get() akan mengembalikan false
         if ($query === false) {
@@ -163,7 +163,7 @@ class BsMesinModel extends Model
             return false;
         }
 
-        return $query->getResult();
+        return $query;
     }
     public function getbsMesinDaily($filters)
     {
@@ -212,7 +212,7 @@ class BsMesinModel extends Model
     }
     public function bsKary($area, $tanggal)
     {
-        $bsList = $this->select('tanggal_produksi,nama_karyawan, no_mesin, qty_gram,area,shift')
+        $bsList = $this->select('tanggal_produksi,nama_karyawan, no_mesin, qty_pcs,area,shift')
             ->where('tanggal_produksi',  $tanggal)
             ->where('area',  $area)
             ->findAll();
@@ -240,14 +240,14 @@ class BsMesinModel extends Model
             if (!isset($final[$key])) {
                 $final[$key] = [
                     'nama_karyawan' => $res['nama_karyawan'],
-                    'qty_gram' => 0,
+                    'qty_pcs' => 0,
                     'qty_produksi' => 0,
                     'area' =>  $res['area'],
                     'tanggal_produksi' =>  $res['tanggal_produksi'],
                     'shift' =>  $res['shift'],
                 ];
             }
-            $final[$key]['qty_gram'] += $res['qty_gram'];
+            $final[$key]['qty_pcs'] += $res['qty_pcs'];
             $final[$key]['qty_produksi'] += $res['qty_produksi'];
         }
         return array_values($final); // balikin array yang udah dirapihin index-nya

@@ -1696,8 +1696,17 @@ class ProduksiController extends BaseController
                         ];
                     }
                 } else {
-                    dd($existingBs,  $dataInsert);
-                    log_message('info', "Data BS untuk shift {$shift} sudah ada pada row {$rowIndex}, dilewati");
+                    $idbs = $existingBs['id_bsmc'];
+                    $result = $this->bsMesinModel->update($idbs, ['qty_pcs' => $dataInsert['qty_pcs'], 'qty_gram' => $dataInsert['qty_gram']]);
+                    if (!$result) {
+                        log_message('error', "Gagal update data pada row {$rowIndex} untuk shift {$shift}");
+                        $failedRows[] = [
+                            'row'      => $rowIndex,
+                            'operator' => $operatorName,
+                            'shift'    => $shift,
+                            'error'    => 'update gagal'
+                        ];
+                    }
                 }
             }
         }
