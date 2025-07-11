@@ -97,9 +97,10 @@
             <div class="row">
                 <div class="col-8 mx-auto text-center mt-1">
                     <p class="mb-0 text-secondary">
-                        Copyright © <script>
+                        RnD BP System <br>
+                        © <script>
                             document.write(new Date().getFullYear())
-                        </script> RnD BP System
+                        </script>UI Template by <a href="https://www.creative-tim.com/">Creative Tim</a>, licensed under MIT License
                     </p>
                 </div>
             </div>
