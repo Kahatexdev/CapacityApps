@@ -1145,8 +1145,9 @@ class ApsPerstyleModel extends Model
     }
     public function getDataOrder($validate)
     {
-        $builder = $this->select('apsperstyle.*, SUM(apsperstyle.qty) AS qty_pcs, SUM(apsperstyle.sisa) AS sisa_pcs, data_model.kd_buyer_order, data_model.description, data_model.repeat_from, data_model.created_at')
+        $builder = $this->select('apsperstyle.*, SUM(apsperstyle.qty) AS qty_pcs, SUM(apsperstyle.sisa) AS sisa_pcs, data_model.kd_buyer_order, data_model.description, data_model.repeat_from, data_model.created_at, master_product_type.product_type')
             ->join('data_model', 'apsperstyle.mastermodel =  data_model.no_model', 'left')
+            ->join('master_product_type', 'master_product_type.id_product_type =  data_model.id_product_type', 'left')
             ->where('apsperstyle.qty != 0');
 
         if (!empty($validate['buyer'])) {

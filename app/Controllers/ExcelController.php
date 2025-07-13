@@ -3789,12 +3789,19 @@ class ExcelController extends BaseController
         $no = 1;
 
         foreach ($data as $item) {
+
+            $kode = $item['product_type'];
+
+            $pecah = explode('-', $kode);
+            $product = $pecah[0];
+            $type = $pecah[1];
+
             $sheet->setCellValue('A' . $row, $item['created_at']);
             $sheet->setCellValue('B' . $row, $no++);
             $sheet->setCellValue('C' . $row, $item['repeat_from']);
             $sheet->setCellValue('D' . $row, $item['mastermodel']);
-            $sheet->setCellValue('E' . $row, '');
-            $sheet->setCellValue('F' . $row, '');
+            $sheet->setCellValue('E' . $row, $product);
+            $sheet->setCellValue('F' . $row, $type);
             $sheet->setCellValue('G' . $row, $item['no_order']);
             $sheet->setCellValue('H' . $row, $item['kd_buyer_order']);
             $sheet->setCellValue('I' . $row, $item['seam']);
