@@ -222,16 +222,17 @@ class BsMesinModel extends Model
 
         foreach ($bsList as $row) {
             $noMc = $row['no_mesin'];
-            $shift = 'shift_' . $row['shift'];
-            $produksi = $prod->select($shift)
+            $shift = 'shift_' . strtolower($row['shift']);
+            $produksi = $prod->selectSum($shift)
                 ->where('tgl_produksi', $tanggal)
                 ->where('area', $area)
                 ->where('no_mesin', $noMc)
+                ->groupBy('no_mesin')
                 ->first();
-
             $row['qty_produksi'] = $produksi[$shift] ?? 0;
             $result[] = $row;
         }
+        // dd($result);
 
         // Grouping by nama_karyawan
         $final = [];
@@ -250,6 +251,7 @@ class BsMesinModel extends Model
             $final[$key]['qty_pcs'] += $res['qty_pcs'];
             $final[$key]['qty_produksi'] += $res['qty_produksi'];
         }
+
         return array_values($final); // balikin array yang udah dirapihin index-nya
     }
     public function deleteBsRange($area, $awal, $akhir)
