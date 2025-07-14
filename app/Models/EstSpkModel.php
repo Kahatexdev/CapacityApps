@@ -64,10 +64,10 @@ class EstSpkModel extends Model
             ->where('updated_at>', $lastmonth)
             ->findAll();
     }
-    public function getApprove()
+    public function getHistorySpk()
     {
         return $this->select('estimasi_spk.*, DATE(updated_at) AS tgl_buat, TIME(created_at) as jam')
-            ->where('status', 'approved')
+            ->whereIn('status', ['Ditolak', 'approved'])
             ->findAll();
     }
 }

@@ -2158,7 +2158,7 @@ class OrderController extends BaseController
     public function spk2()
     {
         $estimasiSpk = $this->estspk->getData();
-        $aproved = $this->estspk->getApprove();
+        $aproved = $this->estspk->getHistorySpk();
         // dd($estimasiSpk);
         $data = [
             'role' => session()->get('role'),
@@ -2293,6 +2293,36 @@ class OrderController extends BaseController
             return redirect()->back()->with('success', 'Berhasil update repeat!');
         } else {
             return redirect()->back()->with('error', 'Gagal update repeat!');
+        }
+    }
+    public function rejectSpk2()
+    {
+        // Ambil array ID yang dikirim via POST
+        $ids = $this->request->getPost('data');
+
+        if (empty($ids)) {
+            return redirect()
+                ->to(base_url(session()->get('role') . '/pengajuanspk2'))
+                ->withInput()
+                ->with('error', 'Pilih minimal 1 SPK2 untuk di-reject');
+        }
+
+        // Update semua baris yang ID-nya ada di array $ids
+        $updated = $this->estspk
+            ->whereIn('id', $ids)
+            ->set('status', 'Ditolak')
+            ->update();
+
+        if ($updated) {
+            return redirect()
+                ->to(base_url(session()->get('role') . '/pengajuanspk2'))
+                ->withInput()
+                ->with('success', 'Berhasil reject SPK2');
+        } else {
+            return redirect()
+                ->to(base_url(session()->get('role') . '/pengajuanspk2'))
+                ->withInput()
+                ->with('error', 'Gagal reject SPK2');
         }
     }
 }
