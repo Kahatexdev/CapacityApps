@@ -185,7 +185,6 @@ class ApiController extends ResourceController
     }
     public function prodBsDaily($area, $tanggal)
     {
-
         $bsdata = $this->BsMesinModel->bsKary($area, $tanggal);
         return $this->response->setJSON($bsdata);
     }
@@ -434,5 +433,29 @@ class ApiController extends ResourceController
 
         // Return the data with a 200 status
         return $this->respond($apsData, ResponseInterface::HTTP_OK);
+    }
+
+    public function getStartMc($model)
+    {
+        // Validate the input parameter
+        if (!$model) {
+            return $this->response->setJSON([
+                "error" => "Parameter tidak lengkap",
+                "received" => [
+                    "model" => $model,
+                ]
+            ])->setStatusCode(400);
+        }
+
+        // Fetch data from the model
+        $startMc = $this->orderModel->getStartMc($model);
+
+        // Check if data is found
+        if (empty($startMc)) {
+            return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
+        }
+
+        // Return the data with a 200 status
+        return $this->respond($startMc, ResponseInterface::HTTP_OK);
     }
 }
