@@ -212,7 +212,7 @@ class BsMesinModel extends Model
     }
     public function bsKary($area, $tanggal)
     {
-        $bsList = $this->select('tanggal_produksi,nama_karyawan, no_mesin, qty_pcs,area,shift')
+        $bsList = $this->select('tanggal_produksi, nama_karyawan, no_mesin, qty_pcs,area, shift')
             ->where('tanggal_produksi',  $tanggal)
             ->where('area',  $area)
             ->findAll();
@@ -232,7 +232,6 @@ class BsMesinModel extends Model
             $row['qty_produksi'] = $produksi[$shift] ?? 0;
             $result[] = $row;
         }
-        // dd($result);
 
         // Grouping by nama_karyawan
         $final = [];
