@@ -123,7 +123,7 @@ class OrderModel extends Model
     }
     public function tampilPerModelBlmAdaArea()
     {
-        $nextweek = date('Y-m-d', strtotime('+7 days'));
+        $nextweek = date('Y-m-d', strtotime('+1 days'));
         $builder = $this->db->table('data_model');
 
         $builder->select('data_model.*, mastermodel,no_order, machinetypeid, ROUND(SUM(QTy), 0) AS qty, ROUND(SUM(sisa), 0) AS sisa, factory, delivery, product_type');
