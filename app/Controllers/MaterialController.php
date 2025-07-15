@@ -21,10 +21,12 @@ use App\Models\EstimatedPlanningModel;
 use App\Models\AksesModel;/*  */
 use App\Models\BsModel;
 use App\Models\BsMesinModel;
+use App\Models\AreaModel;
 use App\Models\MesinPerStyle;
 use App\Services\orderServices;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
+
 
 
 class MaterialController extends BaseController
@@ -48,6 +50,7 @@ class MaterialController extends BaseController
     protected $orderServices;
     protected $bsModel;
     protected $BsMesinModel;
+    protected $areaModel;
 
     public function __construct()
     {
@@ -69,6 +72,7 @@ class MaterialController extends BaseController
         $this->orderServices = new orderServices();
         $this->bsModel = new BsModel();
         $this->BsMesinModel = new BsMesinModel();
+        $this->areaModel = new AreaModel();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -697,16 +701,30 @@ class MaterialController extends BaseController
     }
     public function pph($area)
     {
+        $areas = $this->areaModel->getArea();
+        // Filter agar 'name' yang mengandung 'Gedung' tidak ikut
+        $filteredArea = array_filter($areas, function ($item) {
+            return stripos($item['name'], 'Gedung') === false; // Cek jika 'Gedung' tidak ada di 'name'
+        });
+
+        // Ambil hanya field 'name'
+        $result = array_column($filteredArea, 'name');
+
         $data = [
             'role' => session()->get('role'),
             'title' => 'PPH',
             'active1' => '',
             'active2' => '',
             'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
             'targetProd' => 0,
             'produksiBulan' => 0,
             'produksiHari' => 0,
-            'area' => $area
+            'area' => $area, // khusus untuk akun area
+            'areas' => $result,
         ];
 
         return view(session()->get('role') . '/Material/pph', $data);
@@ -842,13 +860,28 @@ class MaterialController extends BaseController
     public function tampilPerStyle($area)
     {
         $role = session()->get('role');
+
+        $areas = $this->areaModel->getArea();
+        // Filter agar 'name' yang mengandung 'Gedung' tidak ikut
+        $filteredArea = array_filter($areas, function ($item) {
+            return stripos($item['name'], 'Gedung') === false; // Cek jika 'Gedung' tidak ada di 'name'
+        });
+
+        // Ambil hanya field 'name'
+        $result = array_column($filteredArea, 'name');
+
         return view($role . '/Material/pphPerStyle', [
             'active1' => '',
             'active2' => '',
             'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
             'title' => 'PPH',
             'role' => $role,
             'area' => $area,
+            'areas' => $result,
             'dataPph' => []
         ]);
     }
@@ -932,13 +965,28 @@ class MaterialController extends BaseController
     public function pphPerhari($area)
     {
         $role = session()->get('role');
+
+        $areas = $this->areaModel->getArea();
+        // Filter agar 'name' yang mengandung 'Gedung' tidak ikut
+        $filteredArea = array_filter($areas, function ($item) {
+            return stripos($item['name'], 'Gedung') === false; // Cek jika 'Gedung' tidak ada di 'name'
+        });
+
+        // Ambil hanya field 'name'
+        $result = array_column($filteredArea, 'name');
+
         return view($role . '/Material/pphPerDays', [
             'active1' => '',
             'active2' => '',
             'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
             'title'      => 'PPH',
             'role'       => $role,
             'area'       => $area,
+            'areas'       => $result,
             'mergedData' => [] // Tidak ada data sampai search diisi
         ]);
     }
@@ -1100,6 +1148,15 @@ class MaterialController extends BaseController
     }
     public function poTambahan($area)
     {
+        $areas = $this->areaModel->getArea();
+        // Filter agar 'name' yang mengandung 'Gedung' tidak ikut
+        $filteredArea = array_filter($areas, function ($item) {
+            return stripos($item['name'], 'Gedung') === false; // Cek jika 'Gedung' tidak ada di 'name'
+        });
+
+        // Ambil hanya field 'name'
+        $result = array_column($filteredArea, 'name');
+
         $data = [
             'active1' => '',
             'active2' => '',
@@ -1109,6 +1166,7 @@ class MaterialController extends BaseController
             'active6' => '',
             'title' => 'Po Tambahan',
             'area' => $area,
+            'areas' => $result,
             'role' => session()->get('role'),
         ];
         return view(session()->get('role') . '/Material/po_tambahan', $data);

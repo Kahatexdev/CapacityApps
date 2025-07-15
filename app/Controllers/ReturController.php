@@ -23,6 +23,7 @@ use App\Models\AksesModel;/*  */
 use App\Models\BsModel;
 use App\Models\BsMesinModel;
 use App\Models\MesinPerStyle;
+use App\Models\AreaModel;
 use App\Services\orderServices;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
@@ -48,6 +49,7 @@ class ReturController extends BaseController
     protected $orderServices;
     protected $bsModel;
     protected $BsMesinModel;
+    protected $areaModel;
 
     public function __construct()
     {
@@ -69,6 +71,7 @@ class ReturController extends BaseController
         $this->orderServices = new orderServices();
         $this->bsModel = new BsModel();
         $this->BsMesinModel = new BsMesinModel();
+        $this->areaModel = new AreaModel();
 
         if ($this->filters   = ['role' => [session()->get('role') . ''], 'role' => ['user'], 'role' => ['planning']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -83,6 +86,15 @@ class ReturController extends BaseController
     }
     public function index($area)
     {
+        $areas = $this->areaModel->getArea();
+        // Filter agar 'name' yang mengandung 'Gedung' tidak ikut
+        $filteredArea = array_filter($areas, function ($item) {
+            return stripos($item['name'], 'Gedung') === false; // Cek jika 'Gedung' tidak ada di 'name'
+        });
+
+        // Ambil hanya field 'name'
+        $result = array_column($filteredArea, 'name');
+
         $url = 'http://172.23.44.14/MaterialSystem/public/api/getKategoriRetur';
 
         $response = file_get_contents($url);
@@ -119,6 +131,7 @@ class ReturController extends BaseController
             'active7' => '',
             'active8' => '',
             'area' => $area,
+            'areas' => $result,
             'kategori' => $kategoriRetur,
             'list' => $list
         ];

@@ -1,4 +1,4 @@
-<?php $this->extend('user/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <div class="container-fluid py-4">
@@ -37,13 +37,15 @@
                             </h5>
                         </div>
                         <div class="col-5 d-flex align-items-center text-end gap-2">
-                            <input type="hidden" class="form-control" id="area" value="<?= $area ?>">
+                            <select name="area" id="area" class="form-control">
+                                <option value="">Pilih Area</option>
+                                <?php foreach ($areas as $ar) : ?>
+                                    <option value="<?= $ar ?>"><?= $ar ?></option>
+                                <?php endforeach ?>
+                            </select>
                             <input type="text" class="form-control" id="no_model" value="" placeholder="No Model">
                             <input type="date" class="form-control" id="tgl_po" value="" required>
                             <button id="searchFilter" class="btn btn-info ms-2"><i class="fas fa-search"></i> Filter</button>
-                            <button class="btn btn-info ms-2">
-                                <a href="<?= base_url($role . '/form-potambahan/' . $area) ?>" class="fa fa-list text-white" style="text-decoration: none;"> List</a>
-                            </button>
                         </div>
                     </div>
                 </div>

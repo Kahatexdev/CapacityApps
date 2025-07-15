@@ -355,6 +355,35 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('filterstockbahanbaku', 'MaterialController::filterStockBahanBaku');
     $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
     $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
+
+    //pph
+    $routes->get('pph/(:any)', 'MaterialController::pph/$1');
+    $routes->get('filterpph/(:any)', 'MaterialController::filterPph/$1');
+    $routes->get('tampilPerStyle/(:any)', 'MaterialController::tampilPerStyle/$1');
+    $routes->get('pphinisial/(:any)', 'MaterialController::pphinisial/$1');
+    $routes->get('pphPerhari/(:any)', 'MaterialController::pphPerhari/$1');
+    $routes->get('getDataPerhari/(:any)', 'MaterialController::getDataPerhari/$1');
+    $routes->get('excelPPHNomodel/(:any)/(:any)', 'ExcelPPHController::excelPPHNomodel/$1/$2');
+    $routes->get('excelPPHInisial/(:any)/(:any)', 'ExcelPPHController::excelPPHInisial/$1/$2');
+    $routes->get('excelPPHDays/(:any)/(:any)', 'ExcelPPHController::excelPPHDays/$1/$2');
+
+    //retur
+    $routes->get('retur/(:any)', 'ReturController::index/$1');
+    $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
+    $routes->post('pengajuanRetur/(:any)', 'ReturController::pengajuanRetur/$1');
+    $routes->get('getKategoriRetur', 'ReturController::getKategoriRetur');
+    $routes->get('getKodeWarnaWarnaByItemType', 'ReturController::getKodeWarnaWarnaByItemType');
+    $routes->get('exportExcelRetur/(:any)', 'ExcelController::exportExcelRetur/$1');
+
+    //po tambahan
+    $routes->get('po_tambahan/(:any)', 'MaterialController::poTambahan/$1');
+    $routes->get('form-potambahan/(:any)', 'MaterialController::formPoTambahan/$1');
+    $routes->get('getStyleSize/(:any)/(:any)', 'MaterialController::getStyleSize/$1/$2');
+    $routes->get('poTambahanDetail/(:any)/(:any)', 'MaterialController::poTambahanDetail/$1/$2');
+    $routes->post('savePoTambahan/(:any)', 'MaterialController::savePoTambahan/$1');
+    $routes->get('filter_list_potambahan/(:any)', 'MaterialController::filterPoTambahan/$1');
+    $routes->get('generate_po_tambahan', 'PdfController::generatePoTambahan');
+    $routes->get('generate_excel_po_tambahan', 'ExcelController::generatePoTambahan');
 });
 
 
@@ -568,6 +597,8 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('report/pdf/(:any)/(:any)/(:any)', 'PdfController::exportPemesanan/$1/$2/$3');
     $routes->get('stockbahanbaku/(:any)', 'MaterialController::stockBahanBaku/$1');
     $routes->get('filterstockbahanbaku/(:any)', 'MaterialController::filterStockBahanBaku/$1');
+
+    //pph
     $routes->get('pph/(:any)', 'MaterialController::pph/$1');
     $routes->get('filterpph/(:any)', 'MaterialController::filterPph/$1');
     $routes->get('tampilPerStyle/(:any)', 'MaterialController::tampilPerStyle/$1');
@@ -581,6 +612,8 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('requestAdditionalTime', 'MaterialController::requestAdditionalTime');
     $routes->post('requestAdditionalTime/getTanggalPakai', 'MaterialController::getTanggalPakai');
     $routes->post('getQty', 'MaterialController::getQtyByModelSize');
+
+    //po tambahan
     $routes->get('po_tambahan/(:any)', 'MaterialController::poTambahan/$1');
     $routes->get('form-potambahan/(:any)', 'MaterialController::formPoTambahan/$1');
     $routes->get('getStyleSize/(:any)/(:any)', 'MaterialController::getStyleSize/$1/$2');
@@ -589,8 +622,8 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('filter_list_potambahan/(:any)', 'MaterialController::filterPoTambahan/$1');
     $routes->get('generate_po_tambahan', 'PdfController::generatePoTambahan');
     $routes->get('generate_excel_po_tambahan', 'ExcelController::generatePoTambahan');
-    $routes->get('sisaKebutuhanArea/(:any)', 'MaterialController::sisaKebutuhanArea/$1');
 
+    $routes->get('sisaKebutuhanArea/(:any)', 'MaterialController::sisaKebutuhanArea/$1');
 
     // retur
     $routes->get('retur/(:any)', 'ReturController::index/$1');
