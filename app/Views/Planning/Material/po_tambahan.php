@@ -33,11 +33,11 @@
                         <div class="col-7">
                             <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                             <h5 class="font-weight-bolder mb-0">
-                                List PO Tambahan <?= $area ?>
+                                List PO Tambahan
                             </h5>
                         </div>
                         <div class="col-5 d-flex align-items-center text-end gap-2">
-                            <select name="area" id="area" class="form-control">
+                            <select name="area" id="area" class="form-control" required>
                                 <option value="">Pilih Area</option>
                                 <?php foreach ($areas as $ar) : ?>
                                     <option value="<?= $ar ?>"><?= $ar ?></option>
@@ -174,6 +174,11 @@
             return; // Stop eksekusi
         }
 
+        if (!area) {
+            alert("Silakan pilih area terlebih dahulu!");
+            return; // Stop eksekusi
+        }
+
         console.log("Area: " + area);
         console.log("Model: " + model);
         console.log("Tgl PO: " + tglBuat);
@@ -208,8 +213,8 @@
             const $td = $(node).find('td').first(); // Ambil td pertama
 
             $td
-                .attr('colspan', 11)
-                .html(`Data tidak ditemukan untuk model: <strong>${model}</strong> & tgl Po: <strong>${tglBuat}</strong>`)
+                .attr('colspan', 16)
+                .html(`Data tidak ditemukan untuk model: <strong>${model}</strong>, area: <strong>${area}</strong> & tgl Po: <strong>${tglBuat}</strong>`)
                 .css({
                     'text-align': 'center',
                     'font-style': 'italic',

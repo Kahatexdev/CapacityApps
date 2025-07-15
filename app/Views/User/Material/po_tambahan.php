@@ -206,7 +206,7 @@
             const $td = $(node).find('td').first(); // Ambil td pertama
 
             $td
-                .attr('colspan', 11)
+                .attr('colspan', 16)
                 .html(`Data tidak ditemukan untuk model: <strong>${model}</strong> & tgl Po: <strong>${tglBuat}</strong>`)
                 .css({
                     'text-align': 'center',
