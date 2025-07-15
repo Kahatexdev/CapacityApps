@@ -19,6 +19,7 @@ use App\Models\HistorySmvModel;
 use App\Models\DataCancelOrderModel;
 use App\Models\EstSpkModel;
 use App\Models\HistoryRevisiModel;
+use App\Models\BsModel;
 
 class OrderController extends BaseController
 {
@@ -36,6 +37,7 @@ class OrderController extends BaseController
     protected $cancelOrder;
     protected $estspk;
     protected $historyRev;
+    protected $bsModel;
 
 
     public function __construct()
@@ -52,6 +54,7 @@ class OrderController extends BaseController
         $this->cancelOrder = new DataCancelOrderModel();
         $this->estspk = new EstSpkModel();
         $this->historyRev = new HistoryRevisiModel();
+        $this->bsModel = new BsModel();
 
         if ($this->filters   = ['role' => ['capacity',  'planning', 'aps', 'god']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -2158,6 +2161,15 @@ class OrderController extends BaseController
     public function spk2()
     {
         $estimasiSpk = $this->estspk->getData();
+        foreach ($estimasiSpk as &$spk) {
+            $noModel = $spk['model'];
+            $styleSize = $spk['style'];
+            $area = $spk['area'];
+            $idaps = $this->ApsPerstyleModel->getIdApsForPph($area, $noModel, $styleSize);
+            $idapsList = array_column($idaps, 'idapsperstyle');
+            $spk['qty_order'] = $this->ApsPerstyleModel->getQtyOrder($noModel, $styleSize, $area)['qty'] ?? '-';
+            $spk['deffect'] =  $this->bsModel->getBsPph($idapsList)['bs_setting'] ?? '-';
+        }
         $aproved = $this->estspk->getHistorySpk();
         // dd($estimasiSpk);
         $data = [
