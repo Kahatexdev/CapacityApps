@@ -185,7 +185,6 @@ class ApiController extends ResourceController
     }
     public function prodBsDaily($area, $tanggal)
     {
-
         $bsdata = $this->BsMesinModel->bsKary($area, $tanggal);
         return $this->response->setJSON($bsdata);
     }

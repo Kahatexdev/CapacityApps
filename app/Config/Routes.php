@@ -265,6 +265,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('inputhistoryrevise/(:any)', 'OrderController::inputHistory/$1');
     $routes->get('pengajuanspk2', 'OrderController::spk2');
     $routes->post('approveSpk2', 'OrderController::approveSpk2');
+    $routes->post('rejectSpk2', 'OrderController::rejectSpk2');
     $routes->get('sisaOrder', 'OrderController::sisaOrder');
     $routes->get('sisaOrder/(:any)', 'OrderController::sisaOrderBuyer/$1');
     $routes->post('sisaOrder/(:any)', 'OrderController::sisaOrderBuyer/$1');

@@ -1644,9 +1644,9 @@ class ProduksiController extends BaseController
                 $qtyGram = $data[$qtyGramMapping[$index]] ?? 0;
 
                 // Lewati proses insert jika qty tidak valid (nol atau kosong)
-                if (((empty($qtyPcs) || $qtyPcs == 0) && (empty($qtyGram) || $qtyGram == 0))) {
-                    continue;
-                }
+                // if (((empty($qtyPcs) || $qtyPcs == 0) && (empty($qtyGram) || $qtyGram == 0))) {
+                //     continue;
+                // }
 
                 $noModel = $data[2];
                 $inisial = $data[3];

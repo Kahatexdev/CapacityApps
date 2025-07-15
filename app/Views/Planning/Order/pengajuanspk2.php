@@ -16,6 +16,7 @@
                             </div>
                         </div>
                         <div>
+                            <button id="reject-btn" class="btn btn-danger">Reject</button>
                             <button id="approve-btn" class="btn btn-info">Approve</button>
                         </div>
                     </div>
@@ -168,6 +169,38 @@
             // Kirim data dengan AJAX POST
             // Buat form tersembunyi dan submit data via POST
             var form = $('<form action="<?= base_url($role . '/approveSpk2') ?>" method="POST"></form>');
+            // Masukkan data checkbox ke dalam form
+            $.each(selected, function(index, value) {
+                form.append('<input type="hidden" name="data[]" value="' + value + '">');
+            });
+
+            // Tambahkan form ke body dan submit
+            $('body').append(form);
+            form.submit();
+        });
+        $('#reject-btn').on('click', function(e) {
+            e.preventDefault();
+
+            var table = $('#example').DataTable();
+            var selected = [];
+            // Mengambil semua baris dari seluruh halaman yang sesuai dengan pencarian (applied search)
+            var rows = table.rows({
+                search: 'applied'
+            }).nodes();
+            $('input[name="row[]"]', rows).each(function() {
+                if ($(this).prop('checked')) {
+                    selected.push($(this).val());
+                }
+            });
+
+            if (selected.length === 0) {
+                alert("Pilih minimal 1 data untuk di-reject.");
+                return;
+            }
+            console.log(selected);
+            // Kirim data dengan AJAX POST
+            // Buat form tersembunyi dan submit data via POST
+            var form = $('<form action="<?= base_url($role . '/rejectSpk2') ?>" method="POST"></form>');
             // Masukkan data checkbox ke dalam form
             $.each(selected, function(index, value) {
                 form.append('<input type="hidden" name="data[]" value="' + value + '">');
