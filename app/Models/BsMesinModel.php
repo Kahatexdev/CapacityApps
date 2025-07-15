@@ -227,17 +227,38 @@ class BsMesinModel extends Model
             }
         }
 
-        // 3. Hitung produksi sekali per mesin+shift
         $prod = new \App\Models\ProduksiModel();
+        $dbs = new \App\Models\ApsPerstyleModel();
+
         $result = [];
+
         foreach ($unique as $row) {
             $shiftCol = 'shift_' . strtolower($row['shift']);
+
+            // Ambil idapsperstyle (hanya kolom ID saja)
+            $idApsRows = $dbs->select('idapsperstyle')
+                ->where('mastermodel', $row['no_model'])
+                ->where('size', $row['size'])
+                ->findAll();
+
+            $idApsList = array_column($idApsRows, 'idapsperstyle');
+
+            if (empty($idApsList)) {
+                $row['qty_produksi'] = 0;
+                $result[] = $row;
+                continue;
+            }
+
+            // Hitung sum produksi untuk shift
             $sum = $prod->selectSum($shiftCol)
                 ->where('tgl_produksi', $tanggal)
                 ->where('area', $area)
                 ->where('no_mesin', $row['no_mesin'])
+                ->whereIn('idapsperstyle', $idApsList)
                 ->first();
+
             $row['qty_produksi'] = $sum[$shiftCol] ?? 0;
+
             $result[] = $row;
         }
 
