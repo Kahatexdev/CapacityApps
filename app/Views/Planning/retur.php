@@ -1,4 +1,4 @@
-<?php $this->extend('user/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <style>
     #loading {
@@ -53,7 +53,7 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Material System</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    <?= $title . ' ' . $area ?>
+                                    <?= $title ?>
                                 </h5>
                             </div>
                         </div>
@@ -72,107 +72,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="modal fade" id="modalPengajuanRetur" tabindex="-1" aria-labelledby="modalPengajuanReturLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-xl">
-            <form id="formPengajuanRetur">
-
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalPengajuanReturLabel"><strong>Form Pengajuan Retur</strong> </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3 row">
-                            <div class="col-sm-6">
-                                <label class="col-form-label">No Model</label>
-                                <input type="text" class="form-control" name="model" value="" id="modelText" readonly>
-                            </div>
-                            <div class="col-sm-6">
-                                <label class="col-form-label">Area</label>
-                                <input type="text" class="form-control" name="area" id="areaText" value="<?= $area ?>" readonly>
-                            </div>
-                        </div>
-                        <hr>
-                        <div id="listReturInputs">
-                            <!-- Blok input retur pertama dengan nomor urut -->
-                            <div class="retur-item mb-4 p-3 border rounded shadow-sm bg-white">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-
-                                    <div class="form-group">
-                                        <label class="form-label">Kategori Retur</label>
-                                        <select class="form-select select-kategori-retur" name="kategori_retur" required>
-                                            <option> Pilih Kategori</option>
-                                            <?php foreach ($kategori as $kt): ?>
-                                                <option value="<?= $kt['nama_kategori'] ?>"> <?= $kt['nama_kategori'] ?> | <?= $kt['tipe_kategori'] ?></option>
-
-                                            <?php endforeach ?>
-                                        </select>
-                                    </div>
-                                    <!-- Tombol Remove hanya tampil untuk blok tambahan -->
-                                    <button type="button" class="btn btn-danger remove-item" style="display:none;">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <label class="form-label">Jenis | Kode Warna | Warna</label>
-                                        <select class="form-select select-item-type" name="material" id="itemSelect" required>
-
-
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="d-flex justify-content-between">
-
-                                            <label class="form-label">Jml KGS</label>
-                                            <label class="form-label" id="textMax">Max Retur</label>
-                                        </div>
-                                        <div class="input-group">
-                                            <input type="number" step="0.01" class="form-control" name="kgs" id="kgs" required>
-                                            <span class="input-group-text text-bold">KG</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Jml Cones</label>
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" name="cones" required>
-                                            <span class="input-group-text text-bold">CNS</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Jml Karung</label>
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" name="karung">
-                                            <span class="input-group-text text-bold">KRG</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <label class="form-label">Lot Retur</label>
-                                        <select class="form-select select-lot-retur" name="lotRetur" id="lotRetur" required>
-
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-8">
-                                        <label class="form-label">Alasan Retur</label>
-                                        <textarea class="form-control" name="keterangan" rows="2" required></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-info w-100" id="submitRetur"><i class="fas fa-paper-plane"></i> Ajukan Retur</button>
-                        <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Batal</button>
-                    </div>
-                </div>
-            </form>
         </div>
     </div>
     <div id="resultContainer">
@@ -222,7 +121,7 @@
 
 
             <div class="d-flex align-items-center justify-content-between">
-                <h3 class="model-title mb-0">List Returan <?= $area ?></h3>
+                <h3 class="model-title mb-0">List Returan</h3>
                 <div class="d-flex align-items-center gap-2">
                     <a href="<?= base_url($role . '/exportExcelRetur/' . $area) ?>" class="btn btn-success">
                         <i class="fas fa-file-excel"></i> Export Excel

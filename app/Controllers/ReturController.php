@@ -86,6 +86,9 @@ class ReturController extends BaseController
     }
     public function index($area)
     {
+        if (empty($area)) {
+            $area = $this->request->getGet('area');
+        }
         $areas = $this->areaModel->getArea();
         // Filter agar 'name' yang mengandung 'Gedung' tidak ikut
         $filteredArea = array_filter($areas, function ($item) {
