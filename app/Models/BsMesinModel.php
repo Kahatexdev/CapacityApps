@@ -213,7 +213,7 @@ class BsMesinModel extends Model
     public function bsKary($area, $tanggal)
     {
         // 1. Ambil semua baris BS
-        $bsList = $this->select('tanggal_produksi, nama_karyawan, no_mesin, qty_pcs, area, shift')
+        $bsList = $this->select('tanggal_produksi,size, nama_karyawan, no_mesin, qty_pcs, area, shift')
             ->where('tanggal_produksi', $tanggal)
             ->where('area', $area)
             ->findAll();
@@ -221,7 +221,7 @@ class BsMesinModel extends Model
         // 2. Deduplikasi per mesin+shift
         $unique = [];
         foreach ($bsList as $row) {
-            $key = $row['no_mesin'] . '::' . $row['shift'];
+            $key = $row['no_mesin'] . '::' . $row['shift'] . '::' . $row['size'];
             if (! isset($unique[$key])) {
                 $unique[$key] = $row;
             }
