@@ -368,19 +368,12 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('excelPPHDays/(:any)/(:any)', 'ExcelPPHController::excelPPHDays/$1/$2');
 
     //retur
-    $routes->get('retur/(:any)', 'ReturController::index/$1');
-    $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
-    $routes->post('pengajuanRetur/(:any)', 'ReturController::pengajuanRetur/$1');
-    $routes->get('getKategoriRetur', 'ReturController::getKategoriRetur');
-    $routes->get('getKodeWarnaWarnaByItemType', 'ReturController::getKodeWarnaWarnaByItemType');
+    $routes->get('retur', 'ReturController::listdataReturArea');
     $routes->get('exportExcelRetur/(:any)', 'ExcelController::exportExcelRetur/$1');
 
     //po tambahan
     $routes->get('po_tambahan/(:any)', 'MaterialController::poTambahan/$1');
-    $routes->get('form-potambahan/(:any)', 'MaterialController::formPoTambahan/$1');
-    $routes->get('getStyleSize/(:any)/(:any)', 'MaterialController::getStyleSize/$1/$2');
     $routes->get('poTambahanDetail/(:any)/(:any)', 'MaterialController::poTambahanDetail/$1/$2');
-    $routes->post('savePoTambahan/(:any)', 'MaterialController::savePoTambahan/$1');
     $routes->get('filter_list_potambahan/(:any)', 'MaterialController::filterPoTambahan/$1');
     $routes->get('generate_po_tambahan', 'PdfController::generatePoTambahan');
     $routes->get('generate_excel_po_tambahan', 'ExcelController::generatePoTambahan');
