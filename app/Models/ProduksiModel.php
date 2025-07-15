@@ -444,4 +444,18 @@ class ProduksiModel extends Model
 
         return $prod;
     }
+    public function getJlMcByModel($data)
+    {
+        return $this->select('COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle', 'left')
+            ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel', 'left')
+            ->where('produksi.no_mesin !=', 'STOK PAKING')
+            ->where('produksi.tgl_produksi IS NOT NULL')
+            ->where('data_model.no_model', $data['model'])
+            ->where('apsperstyle.size', $data['size'])
+            ->where('apsperstyle.delivery', $data['delivery'])
+            ->where('produksi.tgl_produksi', $data['yesterday'])
+            ->groupBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size, apsperstyle.delivery')
+            ->first();
+    }
 }
