@@ -3681,6 +3681,7 @@ class ExcelController extends BaseController
         $tglTurun = $this->request->getPost('tgl_turun_order');
         $awal = $this->request->getPost('awal');
         $akhir = $this->request->getPost('akhir');
+        $yesterday = date('Y-m-d', strtotime('-1 day'));
 
         $validate = [
             'buyer' => $buyer,
@@ -3691,8 +3692,20 @@ class ExcelController extends BaseController
             'awal' => $awal,
             'akhir' => $akhir,
         ];
-
         $data = $this->ApsPerstyleModel->getDataOrder($validate);
+        foreach ($data as &$id) {
+            $key = [
+                'model' => $id['mastermodel'],
+                'size' => $id['size'],
+                'delivery' => $id['delivery'],
+                'machinetypeid' => $id['machinetypeid'],
+                'yesterday' => $yesterday
+            ];
+            // get data jl mc
+            $mc = $this->produksiModel->getJlMcByModel($key);
+
+            $id['jl_mc'] = $mc['jl_mc'] ?? '';
+        }
         // dd($data);
         // Buat file Excel
         $spreadsheet = new Spreadsheet();
@@ -3813,8 +3826,9 @@ class ExcelController extends BaseController
             $sheet->setCellValue('O' . $row, $item['delivery']);
             $sheet->setCellValue('P' . $row, $item['qty_pcs']);
             $sheet->setCellValue('Q' . $row, $item['sisa_pcs']);
-            $sheet->setCellValue('R' . $row, '');
+            $sheet->setCellValue('R' . $row, $item['jl_mc']);
             $sheet->setCellValue('S' . $row, $item['description']);
+            // 
             $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('C' . $row)->applyFromArray($styleBody);

@@ -36,7 +36,9 @@
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 text-center">No Model</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Style</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Area</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Qty</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Qty Order</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">BS Stocklot</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Qty Minta</th>
 
                                 </tr>
                             </thead>
@@ -49,6 +51,8 @@
                                         <td class="text-center"><?= $row['model'] ?></td>
                                         <td class="text-center"><?= $row['style'] ?></td>
                                         <td class="text-center"><?= $row['area'] ?></td>
+                                        <td class="text-center"><?= $row['qty_order'] ?> pcs</td>
+                                        <td class="text-center"><?= $row['deffect'] ?> pcs</td>
                                         <td class="text-center"><?= $row['qty'] ?> pcs</td>
                                     </tr>
                                 <?php endforeach; ?>

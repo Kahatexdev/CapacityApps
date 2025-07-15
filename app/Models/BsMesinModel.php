@@ -212,47 +212,56 @@ class BsMesinModel extends Model
     }
     public function bsKary($area, $tanggal)
     {
-        $bsList = $this->select('tanggal_produksi, nama_karyawan, no_mesin, qty_pcs,area, shift')
-            ->where('tanggal_produksi',  $tanggal)
-            ->where('area',  $area)
+        // 1. Ambil semua baris BS
+        $bsList = $this->select('tanggal_produksi, nama_karyawan, no_mesin, qty_pcs, area, shift')
+            ->where('tanggal_produksi', $tanggal)
+            ->where('area', $area)
             ->findAll();
 
+        // 2. Deduplikasi per mesin+shift
+        $unique = [];
+        foreach ($bsList as $row) {
+            $key = $row['no_mesin'] . '::' . $row['shift'];
+            if (! isset($unique[$key])) {
+                $unique[$key] = $row;
+            }
+        }
+
+        // 3. Hitung produksi sekali per mesin+shift
         $prod = new \App\Models\ProduksiModel();
         $result = [];
-
-        foreach ($bsList as $row) {
-            $noMc = $row['no_mesin'];
-            $shift = 'shift_' . strtolower($row['shift']);
-            $produksi = $prod->selectSum($shift)
+        foreach ($unique as $row) {
+            $shiftCol = 'shift_' . strtolower($row['shift']);
+            $sum = $prod->selectSum($shiftCol)
                 ->where('tgl_produksi', $tanggal)
                 ->where('area', $area)
-                ->where('no_mesin', $noMc)
-                ->groupBy('no_mesin')
+                ->where('no_mesin', $row['no_mesin'])
                 ->first();
-            $row['qty_produksi'] = $produksi[$shift] ?? 0;
+            $row['qty_produksi'] = $sum[$shiftCol] ?? 0;
             $result[] = $row;
         }
 
-        // Grouping by nama_karyawan
+        // 4. Grouping per nama_karyawan
         $final = [];
-        foreach ($result as $res) {
-            $key = $res['nama_karyawan'];
-            if (!isset($final[$key])) {
-                $final[$key] = [
-                    'nama_karyawan' => $res['nama_karyawan'],
-                    'qty_pcs' => 0,
-                    'qty_produksi' => 0,
-                    'area' =>  $res['area'],
-                    'tanggal_produksi' =>  $res['tanggal_produksi'],
-                    'shift' =>  $res['shift'],
+        foreach ($result as $r) {
+            $k = $r['nama_karyawan'];
+            if (! isset($final[$k])) {
+                $final[$k] = [
+                    'nama_karyawan'    => $k,
+                    'qty_pcs'          => 0,
+                    'qty_produksi'     => 0,
+                    'area'             => $r['area'],
+                    'tanggal_produksi' => $r['tanggal_produksi'],
+                    'shift'            => $r['shift'],
                 ];
             }
-            $final[$key]['qty_pcs'] += $res['qty_pcs'];
-            $final[$key]['qty_produksi'] += $res['qty_produksi'];
+            $final[$k]['qty_pcs']      += $r['qty_pcs'];
+            $final[$k]['qty_produksi'] += $r['qty_produksi'];
         }
 
-        return array_values($final); // balikin array yang udah dirapihin index-nya
+        return array_values($final);
     }
+
     public function deleteBsRange($area, $awal, $akhir)
     {
         return $this->where('area', $area)
