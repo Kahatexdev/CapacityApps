@@ -988,6 +988,9 @@ class ProduksiController extends BaseController
         $sisa = $this->request->getPost('sisa');
         $curr = $this->request->getPost('qtycurrent');
         $qtynow = $this->request->getPost('qty_prod');
+        $shiftA = $this->request->getPost('shift_a');
+        $shiftB = $this->request->getPost('shift_b');
+        $shiftC = $this->request->getPost('shift_c');
         $realqty = $sisa + $curr;
         $updateqty = $realqty - $qtynow;
         $updateSisaAps = $this->ApsPerstyleModel->update($idaps, ['sisa' => $updateqty]);
@@ -997,6 +1000,9 @@ class ProduksiController extends BaseController
                 'no_label' => $this->request->getPost('no_label'),
                 'no_box' => $this->request->getPost('no_box'),
                 'qty_produksi' => $qtynow,
+                'shift_a' => $shiftA,
+                'shift_b' => $shiftB,
+                'shift_c' => $shiftC,
                 'tgl_produksi' => $this->request->getPost('tgl_prod'),
             ];
             $u = $this->produksiModel->update($id, $update);
