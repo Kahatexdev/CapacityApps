@@ -188,6 +188,25 @@
         </div>
     </div>
 
+    <!-- modal flowproses -->
+    <div class="modal fade" id="flowProsesModal" tabindex="-1" aria-labelledby="flowProsesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl"> <!-- or modal-lg -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="flowProsesModalLabel">Flow Proses</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- we’ll inject content here -->
+                    <div id="flowProsesContent">
+                        <p class="text-center">Loading…</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
     <script type="text/javascript">
         $(document).ready(function() {
@@ -305,9 +324,18 @@
                             Import
                         </button>`;
             } else {
-                return `<a href="<?= base_url($role . '/detailPdk') ?>/${row.no_model}/${row.machinetypeid}">
+                return `
+                        <a href="<?= base_url($role . '/detailPdk') ?>/${row.no_model}/${row.machinetypeid}">
                             <button type="button" class="btn btn-info btn-sm details-btn">Details</button>
-                        </a>`;
+                        </a>
+                        <button
+                            type="button"
+                            class="btn bg-gradient-info btn-sm flowproses-btn"
+                            data-no-model="${row.no_model}"
+                            data-delivery="${row.delivery}">
+                            Flow Proses
+                        </button>
+                        `;
             }
         }
     </script>
@@ -339,5 +367,77 @@
             });
         });
     </script>
+    <script>
+        $(document).on('click', '.flowproses-btn', function() {
+            const model = $(this).data('no-model');
+            const delivery = $(this).data('delivery');
+            const url = `<?= base_url($role . '/flowProses') ?>?mastermodel=` + encodeURIComponent(model) + `&delivery=` + encodeURIComponent(delivery);
+
+            // show the modal
+            $('#flowProsesModal').modal('show');
+            $('#flowProsesContent').html('<p class="text-center">Loading…</p>');
+
+            // fetch API
+            $.getJSON(url)
+                .done(function(res) {
+                    // no data?
+                    if (!res.flows || res.flows.length === 0) {
+                        $('#flowProsesContent').html(
+                            `<p>No data found for model <strong>${model}</strong>.</p>`
+                        );
+                        return;
+                    }
+
+                    // build table
+                    let html = `
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Master Model</th>
+              <th>Size</th>
+              <th>Inisial</th>
+              <th>Delivery</th>
+              <th>Flow Proses</th>
+            </tr>
+          </thead>
+          <tbody>
+        `;
+
+                    res.flows.forEach(function(flow) {
+                        html += '<tr>';
+                        html += `<td>${flow.style.mastermodel}</td>`;
+                        html += `<td>${flow.style.size}</td>`;
+                        html += `<td>${flow.style.inisial}</td>`;
+                        html += `<td>${
+            flow.style.delivery
+              ? new Date(flow.style.delivery).toLocaleDateString('en-GB')
+              : 'N/A'
+          }</td>`;
+
+                        // Flow Proses column
+                        html += '<td>';
+                        flow.flow_proses.forEach(function(fp) {
+                            html += `(${fp.step_order}) ${fp.master_proses.nama_proses}<br>`;
+                        });
+                        html += '</td>';
+
+                        html += '</tr>';
+                    });
+
+                    html += `
+          </tbody>
+        </table>`;
+
+                    $('#flowProsesContent').html(html);
+                })
+                .fail(function(xhr, status, err) {
+                    $('#flowProsesContent').html(
+                        `<p class="text-danger">Flow Proses tidak ditemukan untuk model <strong>${model}</strong> pada delivery <strong>${delivery}</strong>.
+           </p>`
+                    );
+                });
+        });
+    </script>
+
 
     <?php $this->endSection(); ?>
