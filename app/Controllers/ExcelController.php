@@ -3803,11 +3803,12 @@ class ExcelController extends BaseController
 
         foreach ($data as $item) {
 
-            $kode = $item['product_type'];
+            $kode = $item['product_type'] ?? '';
 
             $pecah = explode('-', $kode);
-            $product = $pecah[0];
-            $type = $pecah[1];
+
+            $product = $pecah[0] ?? '';
+            $type    = $pecah[1] ?? '';
 
             $sheet->setCellValue('A' . $row, $item['created_at']);
             $sheet->setCellValue('B' . $row, $no++);
