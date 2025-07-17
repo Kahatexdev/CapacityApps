@@ -3681,7 +3681,7 @@ class ExcelController extends BaseController
         $tglTurun = $this->request->getPost('tgl_turun_order');
         $awal = $this->request->getPost('awal');
         $akhir = $this->request->getPost('akhir');
-        $yesterday = date('Y-m-d', strtotime('-1 day'));
+        $yesterday = date('Y-m-d', strtotime('-2 day')); // DUA HARI KE BELAKANG
 
         $validate = [
             'buyer' => $buyer,
