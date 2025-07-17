@@ -109,33 +109,57 @@
                     <h5>PDK in Area</h5>
                 </div>
                 <div class="card-body">
+                    <?php
+                    // Urutkan $orderWeek berdasarkan tanggal delivery (terdekat dulu)
+                    usort($orderWeek, function ($a, $b) {
+                        return strtotime($a['delivery']) - strtotime($b['delivery']);
+                    });
+
+                    // Hitung jumlah baris untuk setiap delivery (buat rowspan)
+                    $deliveryCounts = [];
+                    foreach ($orderWeek as $order) {
+                        $delivery = $order['delivery'];
+                        if (!isset($deliveryCounts[$delivery])) {
+                            $deliveryCounts[$delivery] = 0;
+                        }
+                        $deliveryCounts[$delivery]++;
+                    }
+                    ?>
+
                     <table class="table table-bordered">
                         <thead>
                             <tr>
+                                <th>Delivery</th>
                                 <th>PDK</th>
                                 <th>Sisa</th>
-                                <th>Delivery</th>
-
                                 <th>Target Mesin</th>
                                 <th>Kebutuhan Mesin</th>
                                 <th>Produksi Perhari</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($orderWeek as $order) : ?>
+                            <?php
+                            $lastDelivery = null;
+                            foreach ($orderWeek as $order) :
+                            ?>
                                 <tr>
+                                    <?php if ($order['delivery'] !== $lastDelivery) : ?>
+                                        <td rowspan="<?= $deliveryCounts[$order['delivery']] ?>">
+                                            <?= $order['delivery'] ?>
+                                        </td>
+                                        <?php $lastDelivery = $order['delivery']; ?>
+                                    <?php endif; ?>
+
                                     <td><?= $order['PDK'] ?></td>
                                     <td><?= $order['sisa'] ?> dz</td>
-                                    <td><?= $order['delivery'] ?></td>
-
                                     <td><?= $order['targetPerMesin'] ?> dz/machine</td>
                                     <td><?= round($order['kebMesin']) ?> Machine</td>
                                     <td><?= $order['produksi'] ?> dz</td>
                                 </tr>
                             <?php endforeach; ?>
-
                         </tbody>
                     </table>
+
                 </div>
             </div>
 
