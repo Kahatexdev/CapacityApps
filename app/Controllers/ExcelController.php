@@ -3681,7 +3681,7 @@ class ExcelController extends BaseController
         $tglTurun = $this->request->getPost('tgl_turun_order');
         $awal = $this->request->getPost('awal');
         $akhir = $this->request->getPost('akhir');
-        $yesterday = date('Y-m-d', strtotime('-1 day'));
+        $yesterday = date('Y-m-d', strtotime('-2 day')); // DUA HARI KE BELAKANG
 
         $validate = [
             'buyer' => $buyer,
@@ -3803,11 +3803,12 @@ class ExcelController extends BaseController
 
         foreach ($data as $item) {
 
-            $kode = $item['product_type'];
+            $kode = $item['product_type'] ?? '';
 
             $pecah = explode('-', $kode);
-            $product = $pecah[0];
-            $type = $pecah[1];
+
+            $product = $pecah[0] ?? '';
+            $type    = $pecah[1] ?? '';
 
             $sheet->setCellValue('A' . $row, $item['created_at']);
             $sheet->setCellValue('B' . $row, $no++);
