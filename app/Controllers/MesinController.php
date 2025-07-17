@@ -648,16 +648,17 @@ class MesinController extends BaseController
             }
 
             $orderWeek[] = [
+                'delivery' => $delivery,
                 'PDK' => $pdk,
                 'sisa' => $sisa,
                 'leadtime' => $leadtime,
-                'delivery' => $delivery,
                 'targetPerMesin' => $targetPerMesin,
                 'produksi' => $produksi,
                 'kebMesin' => $kebMesin,
                 'produksiHarian' => $produksiHarian
             ];
         }
+
 
         $maxCapacityPerWeek = $maxCapacity['maxCapacity'];
         $availableCapacity = [];
