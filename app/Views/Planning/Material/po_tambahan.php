@@ -1,4 +1,4 @@
-<?php $this->extend('user/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <div class="container-fluid py-4">
@@ -33,17 +33,19 @@
                         <div class="col-7">
                             <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                             <h5 class="font-weight-bolder mb-0">
-                                List PO Tambahan <?= $area ?>
+                                List PO Tambahan
                             </h5>
                         </div>
                         <div class="col-5 d-flex align-items-center text-end gap-2">
-                            <input type="hidden" class="form-control" id="area" value="<?= $area ?>">
+                            <select name="area" id="area" class="form-control" required>
+                                <option value="">Pilih Area</option>
+                                <?php foreach ($areas as $ar) : ?>
+                                    <option value="<?= $ar ?>"><?= $ar ?></option>
+                                <?php endforeach ?>
+                            </select>
                             <input type="text" class="form-control" id="no_model" value="" placeholder="No Model">
                             <input type="date" class="form-control" id="tgl_po" value="" required>
                             <button id="searchFilter" class="btn btn-info ms-2"><i class="fas fa-search"></i> Filter</button>
-                            <button class="btn btn-info ms-2">
-                                <a href="<?= base_url($role . '/form-potambahan/' . $area) ?>" class="fa fa-list text-white" style="text-decoration: none;"> List</a>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -172,6 +174,11 @@
             return; // Stop eksekusi
         }
 
+        if (!area) {
+            alert("Silakan pilih area terlebih dahulu!");
+            return; // Stop eksekusi
+        }
+
         console.log("Area: " + area);
         console.log("Model: " + model);
         console.log("Tgl PO: " + tglBuat);
@@ -207,7 +214,7 @@
 
             $td
                 .attr('colspan', 16)
-                .html(`Data tidak ditemukan untuk model: <strong>${model}</strong> & tgl Po: <strong>${tglBuat}</strong>`)
+                .html(`Data tidak ditemukan untuk model: <strong>${model}</strong>, area: <strong>${area}</strong> & tgl Po: <strong>${tglBuat}</strong>`)
                 .css({
                     'text-align': 'center',
                     'font-style': 'italic',

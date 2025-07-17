@@ -123,7 +123,7 @@
                                                 <td class="text-sm text-center"><?= $order['no_label']; ?></td>
                                                 <td class="text-sm text-center"><?= $order['qty_produksi']; ?></td>
                                                 <td class="text-sm text-center">
-                                                    <button class="btn btn-warning edit-btn" data-id="<?= $order['id_produksi']; ?>" data-pdk="<?= $order['mastermodel']; ?>" data-style="<?= $order['size']; ?>" data-nomc="<?= $order['no_mesin']; ?>" data-nobox="<?= $order['no_box']; ?>" data-nolabel="<?= $order['no_label']; ?>" data-qty="<?= $order['qty_produksi']; ?>" data-tgl="<?= $order['tgl_produksi']; ?>" data-sisa="<?= $order['sisa']; ?>" data-idaps="<?= $order['idapsperstyle']; ?>">
+                                                    <button class="btn btn-warning edit-btn" data-id="<?= $order['id_produksi']; ?>" data-pdk="<?= $order['mastermodel']; ?>" data-style="<?= $order['size']; ?>" data-nomc="<?= $order['no_mesin']; ?>" data-nobox="<?= $order['no_box']; ?>" data-nolabel="<?= $order['no_label']; ?>" data-shift-a=<?= $order['shift_a'] ?> data-shift-b=<?= $order['shift_b'] ?> data-shift-c=<?= $order['shift_c'] ?> data-qty="<?= $order['qty_produksi']; ?>" data-tgl="<?= $order['tgl_produksi']; ?>" data-sisa="<?= $order['sisa']; ?>" data-idaps="<?= $order['idapsperstyle']; ?>">
                                                         Edit</button>
                                                     <!-- Button Delete -->
                                                     <button class="btn btn-danger delete-btn" data-id="<?= $order['id_produksi']; ?>" data-pdk="<?= $order['mastermodel']; ?>" data-style="<?= $order['size']; ?>" data-nomc="<?= $order['no_mesin']; ?>" data-nobox="<?= $order['no_box']; ?>" data-nolabel="<?= $order['no_label']; ?>" data-qty="<?= $order['qty_produksi']; ?>" data-tgl="<?= $order['tgl_produksi']; ?>" data-sisa="<?= $order['sisa']; ?>" data-idaps="<?= $order['idapsperstyle']; ?>">
@@ -174,19 +174,31 @@
                                         <label for="no_mc">No Mesin :</label>
                                         <input type="text" name="no_mc" id="no_mc" class="form-control" value="">
                                     </div>
-                                </div>
-                                <div class="col-lg-6">
                                     <div class="form-group">
                                         <label for="no_box">No Box :</label>
                                         <input type="text" name="no_box" id="no_box" class="form-control" value="">
                                     </div>
+                                </div>
+                                <div class="col-lg-6">
                                     <div class="form-group">
                                         <label for="no_label">No Label :</label>
                                         <input type="text" name="no_label" id="no_label" class="form-control" value="">
                                     </div>
                                     <div class="form-group">
+                                        <label for="shift_a">Shift A :</label>
+                                        <input type="text" name="shift_a" id="shift_a" class="form-control" value="">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shift_b">Shift B :</label>
+                                        <input type="text" name="shift_b" id="shift_b" class="form-control" value="">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shift_c">Shift C :</label>
+                                        <input type="text" name="shift_c" id="shift_c" class="form-control" value="">
+                                    </div>
+                                    <div class="form-group">
                                         <label for="qty_prod">Qty Produksi :</label>
-                                        <input type="text" name="qty_prod" id="qty_prod" class="form-control" value="">
+                                        <input type="text" name="qty_prod" id="qty_prod" class="form-control" value="" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -224,6 +236,10 @@
         var tgl = $(this).data('tgl');
         var sisa = $(this).data('sisa');
         var idaps = $(this).data('idaps');
+        var shiftA = $(this).data('shift-a');
+        var shiftB = $(this).data('shift-b');
+        var shiftC = $(this).data('shift-c');
+
 
 
         $('#editModal').modal('show'); // Show the modal
@@ -238,9 +254,41 @@
         $('#editModal').find('input[name="tgl_prod"]').val(tgl);
         $('#editModal').find('input[name="sisa"]').val(sisa);
         $('#editModal').find('input[name="idaps"]').val(idaps);
+        $('#editModal').find('input[name="shift_a"]').val(shiftA);
+        $('#editModal').find('input[name="shift_b"]').val(shiftB);
+        $('#editModal').find('input[name="shift_c"]').val(shiftC);
 
+        // ambil data dari button
+        var $btn = $(this);
+        var shiftA = +$btn.data('shift-a') || 0;
+        var shiftB = +$btn.data('shift-b') || 0;
+        var shiftC = +$btn.data('shift-c') || 0;
+        var qty = +$btn.data('qty') || 0;
+        // isi modal
+        $('#editModal').modal('show');
+        $('#shift_a').val(shiftA);
+        $('#shift_b').val(shiftB);
+        $('#shift_c').val(shiftC);
+        $('#qty_prod').val(qty);
+        // ... isi field lain seperti sebelumnya ...
 
-        document.getElementById('confirmationMessage').innerHTML = "Apakah anda yakin memecah" + noModel + " dengan jarum " + selectedMachineTypeId + " ke " + selectedArea;
+        // fungsi untuk recalculate
+        function recalc() {
+            var a = +$('#shift_a').val() || 0;
+            var b = +$('#shift_b').val() || 0;
+            var c = +$('#shift_c').val() || 0;
+            $('#qty_prod').val(a + b + c);
+        }
+
+        // bind listener (hapus dulu untuk menghindari ganda)
+        $('#shift_a, #shift_b, #shift_c')
+            .off('input.recalc') // namespace supaya safe
+            .on('input.recalc', recalc);
+
+        // jalankan sekali agar langsung terupdate
+        recalc();
+
+        // document.getElementById('confirmationMessage').innerHTML = "Apakah anda yakin memecah" + noModel + " dengan jarum " + selectedMachineTypeId + " ke " + selectedArea;
     });
 </script>
 <script>
