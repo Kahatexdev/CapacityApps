@@ -495,6 +495,28 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('filterstockbahanbaku', 'MaterialController::filterStockBahanBaku');
     $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
     $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
+
+    //pph
+    $routes->get('pph/(:any)', 'MaterialController::pph/$1');
+    $routes->get('filterpph/(:any)', 'MaterialController::filterPph/$1');
+    $routes->get('tampilPerStyle/(:any)', 'MaterialController::tampilPerStyle/$1');
+    $routes->get('pphinisial/(:any)', 'MaterialController::pphinisial/$1');
+    $routes->get('pphPerhari/(:any)', 'MaterialController::pphPerhari/$1');
+    $routes->get('getDataPerhari/(:any)', 'MaterialController::getDataPerhari/$1');
+    $routes->get('excelPPHNomodel/(:any)/(:any)', 'ExcelPPHController::excelPPHNomodel/$1/$2');
+    $routes->get('excelPPHInisial/(:any)/(:any)', 'ExcelPPHController::excelPPHInisial/$1/$2');
+    $routes->get('excelPPHDays/(:any)/(:any)', 'ExcelPPHController::excelPPHDays/$1/$2');
+
+    //retur
+    $routes->get('retur', 'ReturController::listdataReturArea');
+    $routes->get('exportExcelRetur/(:any)', 'ExcelController::exportExcelRetur/$1');
+
+    //po tambahan
+    $routes->get('po_tambahan/(:any)', 'MaterialController::poTambahan/$1');
+    $routes->get('poTambahanDetail/(:any)/(:any)', 'MaterialController::poTambahanDetail/$1/$2');
+    $routes->get('filter_list_potambahan/(:any)', 'MaterialController::filterPoTambahan/$1');
+    $routes->get('generate_po_tambahan', 'PdfController::generatePoTambahan');
+    $routes->get('generate_excel_po_tambahan', 'ExcelController::generatePoTambahan');
 });
 
 // user
