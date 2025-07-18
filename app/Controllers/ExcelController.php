@@ -3542,7 +3542,7 @@ class ExcelController extends BaseController
     public function exportExcelRetur($area)
     {
 
-        $url = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area;
+        $url = 'http://172.23.39.114/MaterialSystem/public/api/listRetur/' . $area;
 
         $response = file_get_contents($url);
         log_message('debug', "API Response: " . $response);
@@ -3874,7 +3874,7 @@ class ExcelController extends BaseController
         $tglBuat = $this->request->getGet('tgl_buat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterPoTambahan"
+        $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/filterPoTambahan"
             . "?area=" . urlencode($area)
             . "&model=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);
