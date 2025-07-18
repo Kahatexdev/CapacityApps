@@ -26,7 +26,7 @@ use App\Models\MesinPerStyle;
 use App\Services\orderServices;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
-
+use DateTime;
 
 
 class MaterialController extends BaseController
@@ -1600,6 +1600,7 @@ class MaterialController extends BaseController
             $returResponse = file_get_contents($returUrl);
             $dataRetur     = json_decode($returResponse, true);
         }
+        // dd($noModel);
 
         $mergedData = [];
         $kebutuhan = [];
@@ -1774,5 +1775,147 @@ class MaterialController extends BaseController
         ];
 
         return view(session()->get('role') . '/Material/reportSisaKebutuhan', $data);
+    }
+    public function jatahBahanBaku()
+    {
+        $noModel = $this->request->getGet('no_model');
+
+        // Inisialisasi data default
+        $order          = [];
+        $headerRow      = [];
+        $result         = [];
+        $areas          = [];
+        $totalPo        = 0;
+        $models         = [];
+        $totalAllDelivery = [];
+
+        if ($noModel) {
+            //
+            // 1) Ambil headerRow & hitung totalQty per delivery (untuk $order)
+            //
+            $order = $this->ApsPerstyleModel->getQtyArea($noModel) ?: [];
+
+            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
+            $material = @file_get_contents($apiUrl);
+
+            // $models = [];
+            if ($material !== FALSE) {
+                $models = json_decode($material, true);
+            }
+
+            // Ambil semua area unik dari $order
+
+            foreach ($order as $ord) {
+                if (!in_array($ord['area'], $areas)) {
+                    $areas[] = $ord['area'];
+                }
+            }
+            sort($areas);
+
+            // Kelompokkan order berdasarkan style_size, lalu delivery dan area
+            $groupedOrders = [];
+            foreach ($order as $ord) {
+                $style_size = $ord['size'];
+                $delivery = $ord['delivery'];
+                $area = $ord['area'];
+                $qty = $ord['qty'];
+                $sisa = $ord['sisa'];
+
+                if (!isset($groupedOrders[$style_size][$delivery][$area])) {
+                    $groupedOrders[$style_size][$delivery][$area] = [
+                        'qty' => 0,
+                        'sisa' => 0,
+                    ];
+                }
+
+                $groupedOrders[$style_size][$delivery][$area]['qty'] += $qty;
+                $groupedOrders[$style_size][$delivery][$area]['sisa'] += $sisa;
+            }
+
+            // Hitung total per kombinasi delivery, item_type, kode_warna, dan area
+            foreach ($models as $mat) {
+                $style_size = $mat['style_size'];
+                $item_type = $mat['item_type'];
+                $kode_warna = $mat['kode_warna'];
+                $warna = $mat['color']; // warna
+                $comp = floatval($mat['composition']);
+                $gw = floatval($mat['gw']);
+                $loss = floatval($mat['loss']);
+
+                if (!isset($groupedOrders[$style_size])) {
+                    continue;
+                }
+
+                foreach ($groupedOrders[$style_size] as $delivery => $areaData) {
+                    foreach ($areaData as $area => $values) {
+                        $qty = $values['qty'];
+                        $sisa = $values['sisa'];
+
+                        $jatah = ($qty * $comp * $gw / 100 / 1000) * (1 + ($loss / 100));
+                        $sisaVal = ($sisa * $comp * $gw / 100 / 1000) * (1 + ($loss / 100));
+
+                        if (!isset($result[$delivery][$item_type][$kode_warna])) {
+                            $result[$delivery][$item_type][$kode_warna] = [];
+                            foreach ($areas as $a) {
+                                $result[$delivery][$item_type][$kode_warna][$a] = ['jatah' => 0, 'sisa' => 0];
+                            }
+                            $result[$delivery][$item_type][$kode_warna]['Grand Total Jatah'] = 0;
+                            $result[$delivery][$item_type][$kode_warna]['Grand Total Sisa'] = 0;
+                        }
+
+                        $result[$delivery][$item_type][$kode_warna][$area]['jatah'] += $jatah;
+                        $result[$delivery][$item_type][$kode_warna][$area]['sisa'] += $sisaVal;
+
+                        // Total hanya berdasarkan jatah (tanpa sisa), tapi bisa ditambah sisa jika perlu
+                        $result[$delivery][$item_type][$kode_warna]['Grand Total Jatah'] += $jatah;
+                        $result[$delivery][$item_type][$kode_warna]['Grand Total Sisa'] += $sisaVal;
+                    }
+                }
+            }
+
+            // Akumulasi total semua delivery
+            foreach ($result as $delivery => $itemTypes) {
+                foreach ($itemTypes as $item_type => $colors) {
+                    foreach ($colors as $kode_warna => $areaData) {
+                        if (!isset($totalAllDelivery[$item_type][$kode_warna])) {
+                            foreach ($areas as $a) {
+                                $totalAllDelivery[$item_type][$kode_warna][$a] = ['jatah' => 0, 'sisa' => 0];
+                            }
+                            $totalAllDelivery[$item_type][$kode_warna]['Grand Total Jatah'] = 0;
+                            $totalAllDelivery[$item_type][$kode_warna]['Grand Total Sisa'] = 0;
+                        }
+
+                        foreach ($areas as $area) {
+                            $totalAllDelivery[$item_type][$kode_warna][$area]['jatah'] += $areaData[$area]['jatah'] ?? 0;
+                            $totalAllDelivery[$item_type][$kode_warna][$area]['sisa'] += $areaData[$area]['sisa'] ?? 0;
+                        }
+
+                        $totalAllDelivery[$item_type][$kode_warna]['Grand Total Jatah'] += $areaData['Grand Total Jatah'] ?? 0;
+                        $totalAllDelivery[$item_type][$kode_warna]['Grand Total Sisa'] += $areaData['Grand Total Sisa'] ?? 0;
+                    }
+                }
+            }
+            //
+            $totalPo = $this->ApsPerstyleModel->totalPo($noModel)['totalPo'] ?? 0;
+        }
+
+        // Render full page—AJAX akan mengambil ulang #table-container saja
+        return view(session()->get('role') . '/Material/jatahBahanBaku', [
+            'role'            => session()->get('role'),
+            'title'           => 'Jatah Bahan Baku',
+            'active1'         => '',
+            'active2'         => '',
+            'active3'         => '',
+            'active4'         => '',
+            'active5'         => '',
+            'active6'         => 'active',
+            'active7'         => '',
+            'noModel'         => $noModel,
+            'totalPo'         => $totalPo,
+            'result'          => $result,
+            'areas'           => $areas,
+            'models'          => $models,
+            'totalAllDelivery'  => $totalAllDelivery,
+        ]);
     }
 }

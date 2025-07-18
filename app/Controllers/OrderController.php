@@ -2381,6 +2381,5 @@ class OrderController extends BaseController
             'flows' => $flows,
             'styles' => $styles,
         ]);
-        
     }
 }

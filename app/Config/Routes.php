@@ -379,6 +379,9 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('filter_list_potambahan/(:any)', 'MaterialController::filterPoTambahan/$1');
     $routes->get('generate_po_tambahan', 'PdfController::generatePoTambahan');
     $routes->get('generate_excel_po_tambahan', 'ExcelController::generatePoTambahan');
+
+    //summary pakai
+    $routes->get('jatah_bahan_baku', 'MaterialController::jatahBahanBaku');
 });
 
 

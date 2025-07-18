@@ -1242,4 +1242,15 @@ class ApsPerstyleModel extends Model
             ->groupBy('mastermodel, size, inisial, delivery, factory')
             ->findAll();
     }
+
+    public function getQtyArea($model)
+    {
+        $result = $this->select(' mastermodel,size,factory as area,delivery,sum(qty) as qty,sum(sisa) as sisa')
+            ->where('mastermodel', $model)
+            ->where('sisa >=', 0)
+            ->where('qty >=', 0)
+            ->groupby('size,factory,delivery')
+            ->findAll();
+        return $result;
+    }
 }
