@@ -2087,6 +2087,7 @@ class ExcelController extends BaseController
         $role = session()->get('role');
         $month = $this->request->getPost('months');
         $yearss = $this->request->getPost('years');
+        $weekCount = 0;
 
         // Atur tanggal berdasarkan input bulan dan tahun dari POST
         $bulan = date('Y-m-01', strtotime("$yearss-$month-01"));
@@ -2201,7 +2202,6 @@ class ExcelController extends BaseController
         $dataPerjarum = $this->ApsPerstyleModel->getBuyerOrderPejarum($buyer, $bulan);
         $allDataPerjarum = [];
         $totalPerWeekJrm = [];
-
         foreach ($dataPerjarum as $id2) {
             $machinetypeid = $id2['machinetypeid'];
             $delivery = $id2['delivery'];
@@ -2271,7 +2271,6 @@ class ExcelController extends BaseController
             }
         }
         // dd($allDataPerjarum);
-
         $maxWeek = $weekCount - 1;
 
         // Generate Excel
