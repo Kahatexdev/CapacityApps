@@ -34,7 +34,7 @@ error_reporting(E_ALL); ?>
                 <small>Sedang menghitung…</small>
             </div>
 
-            <!-- Tabel Kontainer -->
+            <!-- Tabel Delivery Kontainer -->
             <div id="table-container">
                 <?php if (!empty($result)): ?>
                     <?php
@@ -47,22 +47,29 @@ error_reporting(E_ALL); ?>
                     ?>
 
                     <?php foreach ($result as $delivery => $itemTypes): ?>
-                        <h5 class="mt-4">Delivery: <?= date('d M Y', strtotime($delivery)) ?></h5>
+                        <hr class="my-4">
+                        <h5> <span class='badge  badge-pill badge-lg bg-gradient-info'>Delivery: <?= date('d M Y', strtotime($delivery)) ?> </span></h5>
+                        <!-- <h5> <span class='badge  badge-pill badge-lg bg-gradient-info'>Qty Order  dz</span></h5> -->
 
                         <div class="table-responsive mb-4">
-                            <table class="table table-sm table-bordered table-striped">
-                                <thead class="table-info text-center align-middle">
+                            <table class="table table-bordered table-striped">
+                                <thead class="table-dark text-center">
                                     <tr>
-                                        <th rowspan="2">Item type</th>
-                                        <th rowspan="2">Kode Warna</th>
-                                        <th rowspan="2">Warna</th>
-                                        <th colspan="<?= count($areas) ?>">Area</th>
-                                        <th rowspan="2" class="bg-warning text-dark">Grand Total</th>
+                                        <th class="text-uppercase text-white text-xs font-weight-bolder opacity-10" rowspan="2">Item type</th>
+                                        <th class="text-uppercase text-white text-xs font-weight-bolder opacity-10" rowspan="2">Kode Warna</th>
+                                        <th class="text-uppercase text-white text-xs font-weight-bolder opacity-10" rowspan="2">Warna</th>
+                                        <?php foreach ($areas as $area): ?>
+                                            <th class="text-uppercase text-white text-xs font-weight-bolder opacity-10" colspan="2"><?= esc($area) ?></th>
+                                        <?php endforeach; ?>
+                                        <th class="text-uppercase text-white text-xs font-weight-bolder opacity-10" colspan="2" class="text-primary fw-semibold">Grand Total</th>
                                     </tr>
                                     <tr>
                                         <?php foreach ($areas as $area): ?>
-                                            <th><?= esc($area) ?></th>
+                                            <th class="text-uppercase text-white text-xs font-weight-bolder opacity-10">Jatah</th>
+                                            <th class="text-uppercase text-white text-xs font-weight-bolder opacity-10">Sisa</th>
                                         <?php endforeach; ?>
+                                        <th class="text-uppercase text-white text-xs font-weight-bolder opacity-10">Jatah</th>
+                                        <th class="text-uppercase text-white text-xs font-weight-bolder opacity-10">Sisa</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -73,9 +80,12 @@ error_reporting(E_ALL); ?>
                                                 <td class="text-start"><?= esc($kode_warna) ?></td>
                                                 <td class="text-start"><?= esc($warnaMap[$kode_warna] ?? '-') ?></td>
                                                 <?php foreach ($areas as $area): ?>
-                                                    <td><?= number_format($areaData[$area] ?? 0, 2) ?></td>
+                                                    <?php $data = $areaData[$area] ?? ['jatah' => 0, 'sisa' => 0]; ?>
+                                                    <td><?= number_format($data['jatah'], 2) ?></td>
+                                                    <td><?= number_format($data['sisa'], 2) ?></td>
                                                 <?php endforeach; ?>
-                                                <td class="fw-bold bg-success text-white"><?= number_format($areaData['Grand Total'] ?? 0, 2) ?></td>
+                                                <td class="fw-semibold text-dark"><?= number_format($areaData['Grand Total Jatah'] ?? 0, 2) ?></td>
+                                                <td class="fw-semibold text-dark"><?= number_format($areaData['Grand Total Sisa'] ?? 0, 2) ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php endforeach; ?>
@@ -83,6 +93,50 @@ error_reporting(E_ALL); ?>
                             </table>
                         </div>
                     <?php endforeach; ?>
+
+                    <!-- Grand Total Semua Delivery -->
+                    <h4 class="mt-5 mb-3">Grand Total Semua Delivery</h4>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered">
+                            <thead class="table-light text-center">
+                                <tr>
+                                    <th rowspan="2">Item Type</th>
+                                    <th rowspan="2">Kode Warna</th>
+                                    <th rowspan="2">Warna</th>
+                                    <?php foreach ($areas as $area): ?>
+                                        <th colspan="2"><?= esc($area) ?></th>
+                                    <?php endforeach; ?>
+                                    <th rowspan="2">Grand Total Jatah</th>
+                                    <th rowspan="2">Grand Total Sisa</th>
+                                </tr>
+                                <tr>
+                                    <?php foreach ($areas as $area): ?>
+                                        <th>Jatah</th>
+                                        <th>Sisa</th>
+                                    <?php endforeach; ?>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($totalAllDelivery as $item_type => $colors): ?>
+                                    <?php foreach ($colors as $kode_warna => $areaData): ?>
+                                        <tr>
+                                            <td><?= esc($item_type) ?></td>
+                                            <td><?= esc($kode_warna) ?></td>
+                                            <td><?= esc($warnaMap[$kode_warna] ?? '-') ?></td>
+                                            <?php foreach ($areas as $area): ?>
+                                                <td><?= number_format($areaData[$area]['jatah'] ?? 0, 2) ?></td>
+                                                <td><?= number_format($areaData[$area]['sisa'] ?? 0, 2) ?></td>
+                                            <?php endforeach; ?>
+                                            <td class="fw-bold text-dark"><?= number_format($areaData['Grand Total Jatah'], 2) ?></td>
+                                            <td class="fw-bold text-dark"><?= number_format($areaData['Grand Total Sisa'], 2) ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+
                 <?php else: ?>
                     <div class="alert alert-warning">Tidak ada data material yang ditemukan.</div>
                 <?php endif; ?>

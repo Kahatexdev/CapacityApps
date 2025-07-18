@@ -1243,7 +1243,7 @@ class ApsPerstyleModel extends Model
             ->findAll();
     }
 
-    public function getSisaDeliv($model)
+    public function getQtyArea($model)
     {
         $result = $this->select(' mastermodel,size,factory as area,delivery,sum(qty) as qty,sum(sisa) as sisa')
             ->where('mastermodel', $model)
