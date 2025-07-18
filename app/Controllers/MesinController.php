@@ -547,6 +547,7 @@ class MesinController extends BaseController
     }
     public function capacityperarea($area)
     {
+        $yesterday = date('Y-m-d', strtotime('-2 days'));
         $targetInput = $this->request->getPost('target');
         $today = new DateTime();
         $today->setTime(0, 0); // Ensuring the time is set to midnight
@@ -601,7 +602,8 @@ class MesinController extends BaseController
         // Initialize weekly production and machines array
         $weeklyProduction = array_fill($startWeek, 12, 0);
         $weeklyMachines = array_fill($startWeek, 12, 0);
-
+        $weeklySisa = array_fill($startWeek, 12, 0);
+        // dd($capacity);
         foreach ($capacity as $row) {
             $pdk = $row['mastermodel'];
             $delivery = $row['delivery'];
@@ -618,7 +620,17 @@ class MesinController extends BaseController
             $produksi = $targetPerMesin * $kebMesin;
             $totalProduksi += $produksi;
             $totalKebMesin += $kebMesin;
-
+            $data = [
+                'area' => $area,
+                'jarum' => $jarum,
+                'pdk' => $pdk,
+                'awal' => $yesterday,
+            ];
+            $jlMC = $this->produksiModel->getJlMcTimter($data);
+            $mcJalan = 0;
+            foreach ($jlMC as $mc) {
+                $mcJalan += $mc['jl_mc'];
+            }
             $produksiHarian = [];
             $sisaOrder = $sisa;
 
@@ -631,7 +643,8 @@ class MesinController extends BaseController
                 $produksiHarian[] = [
                     'hari' => $i + 1,
                     'produksi' => $produksiHariIni,
-                    'kebMesin' => $kebMesin
+                    'kebMesin' => $kebMesin,
+                    'sisaOrder' => $sisaOrder
                 ];
 
                 // Calculating weekly production
@@ -642,29 +655,38 @@ class MesinController extends BaseController
                 if (!isset($weeklyMachines[$currentWeek])) {
                     $weeklyMachines[$currentWeek] = 0; // Initialize if undefined
                 }
+                if (!isset($weeklySisa[$currentWeek])) {
+                    $weeklySisa[$currentWeek] = 0; // Initialize if undefined
+                }
 
                 $weeklyProduction[$currentWeek] += $produksiHariIni;
                 $weeklyMachines[$currentWeek] += $kebMesin;
+                $weeklySisa[$currentWeek] += $sisaOrder;
             }
 
             $orderWeek[] = [
+                'delivery' => $delivery,
                 'PDK' => $pdk,
                 'sisa' => $sisa,
                 'leadtime' => $leadtime,
-                'delivery' => $delivery,
                 'targetPerMesin' => $targetPerMesin,
                 'produksi' => $produksi,
                 'kebMesin' => $kebMesin,
-                'produksiHarian' => $produksiHarian
+                'produksiHarian' => $produksiHarian,
+                'jlMc' => $mcJalan
             ];
         }
 
         $maxCapacityPerWeek = $maxCapacity['maxCapacity'];
         $availableCapacity = [];
+
         foreach ($weeklyProduction as $week => $production) {
             $availableCapacity[$week] = $maxCapacityPerWeek - $production;
         }
-
+        $sisaOrderWeekly = [];
+        foreach ($weeklySisa as $week => $sisa) {
+            $sisaOrderWeekly[$week] = $sisa;
+        }
         $availableMachines = [];
         foreach ($weeklyMachines as $week => $machines) {
             $averageMachinesUsed = $machines / 7;
@@ -693,7 +715,8 @@ class MesinController extends BaseController
                 'start_date' => $startOfWeek->format('Y-m-d'),
                 'end_date' => $endOfWeek->format('Y-m-d'),
                 'available_capacity' => $availableCapacity[$weekNum],
-                'available_machines' => $availableMachines[$weekNum]
+                'available_machines' => $availableMachines[$weekNum],
+                'sisa_weekly' => $sisaOrderWeekly[$weekNum]
             ];
         }
 
@@ -722,6 +745,7 @@ class MesinController extends BaseController
             'calendar' => $formattedCalendar,
             'availableMachines' => $availableMachines,
             'availableCapacity' => $availableCapacity,
+            'sisaOrderWeekly' => $sisaOrderWeekly,
             'pu' => $getPU,
             'jarum' => $jarum,
             'tampildata' => $tampilperarea,

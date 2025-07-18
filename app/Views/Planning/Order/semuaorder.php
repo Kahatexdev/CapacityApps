@@ -188,6 +188,58 @@
         </div>
     </div>
 
+    <!-- modal flowproses -->
+    <div
+        class="modal fade"
+        id="flowProsesModal"
+        tabindex="-1"
+        aria-labelledby="flowProsesModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down">
+            <div class="modal-content rounded-3 shadow">
+                <!-- HEADER -->
+                <div class="modal-header bg-light border-bottom-2">
+                    <h5 class="modal-title" id="flowProsesModalLabel">
+                        <i class="fas fa-cogs me-2"></i>
+                        Flow Proses
+                    </h5>
+                    <button
+                        type="button"
+                        class="btn-close bg-transparent text-dark"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+
+                <!-- BODY -->
+                <div class="modal-body">
+                    <div id="flowProsesContent">
+                        <!-- Spinner -->
+                        <div class="d-flex justify-content-center my-5">
+                            <div
+                                class="spinner-border text-info"
+                                role="status"
+                                style="width: 3rem; height: 3rem;">
+                                <span class="visually-hidden">Loading…</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="modal-footer bg-light border-top-2">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
     <script type="text/javascript">
         $(document).ready(function() {
@@ -305,9 +357,18 @@
                             Import
                         </button>`;
             } else {
-                return `<a href="<?= base_url($role . '/detailPdk') ?>/${row.no_model}/${row.machinetypeid}">
+                return `
+                        <a href="<?= base_url($role . '/detailPdk') ?>/${row.no_model}/${row.machinetypeid}">
                             <button type="button" class="btn btn-info btn-sm details-btn">Details</button>
-                        </a>`;
+                        </a>
+                        <button
+                            type="button"
+                            class="btn bg-gradient-info btn-sm flowproses-btn"
+                            data-no-model="${row.no_model}"
+                            data-delivery="${row.delivery}">
+                            Flow Proses
+                        </button>
+                        `;
             }
         }
     </script>
@@ -339,5 +400,100 @@
             });
         });
     </script>
+    <script>
+        $(document).on('click', '.flowproses-btn', function() {
+            const model = $(this).data('no-model');
+            const delivery = $(this).data('delivery');
+            const url = `<?= base_url($role . '/flowProses') ?>?mastermodel=` +
+                encodeURIComponent(model) +
+                `&delivery=` +
+                encodeURIComponent(delivery);
+
+            $('#flowProsesModal').modal('show');
+            // reset konten dengan spinner
+            $('#flowProsesContent').html(`
+      <div class="d-flex justify-content-center my-5">
+        <div class="spinner-border text-info" style="width: 2.5rem; height: 2.5rem;" role="status">
+          <span class="visually-hidden">Loading…</span>
+        </div>
+      </div>
+    `);
+
+            $.getJSON(url)
+                .done(function(res) {
+                    if (!res.flows || res.flows.length === 0) {
+                        $('#flowProsesContent').html(
+                            `<p class="text-center text-warning">
+               <i class="bi bi-exclamation-triangle-fill me-1"></i>
+               No data found for model <strong>${model}</strong>.
+             </p>`
+                        );
+                        return;
+                    }
+
+                    let html = `
+          <div class="table-responsive">
+            <table class="table table-striped align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>No Model</th>
+                  <th>Size</th>
+                  <th>Inisial</th>
+                  <th>Delivery</th>
+                  <th>Flow Proses</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+
+                    res.flows.forEach(function(flow) {
+                        html += `
+            <tr>
+              <td>${flow.style.mastermodel}</td>
+              <td>${flow.style.size}</td>
+              <td>${flow.style.inisial}</td>
+              <td>${
+                flow.style.delivery
+                  ? new Date(flow.style.delivery).toLocaleDateString(
+                      'id-ID', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric'
+                      }) 
+                    : 'N/A'
+              }</td>
+              <td>
+          `;
+                        // tampilkan setiap step dengan badge
+                        flow.flow_proses.forEach(function(fp) {
+                            html += `<span class="badge bg-info me-1">
+                       ${fp.step_order}. ${fp.master_proses.nama_proses}
+                     </span>`;
+                        });
+                        html += `</td></tr>`;
+                    });
+
+                    html += `
+              </tbody>
+            </table>
+          </div>
+        `;
+
+                    $('#flowProsesContent').html(html);
+                })
+                .fail(function() {
+                    $('#flowProsesContent').html(`
+          <p class="text-center text-danger">
+            <i class="bi bi-x-circle-fill me-1"></i>
+            Gagal memuat flow proses untuk model
+            <strong>${model}</strong> pada delivery
+            <strong>${delivery}</strong>.
+          </p>
+        `);
+                });
+        });
+    </script>
+
+
 
     <?php $this->endSection(); ?>

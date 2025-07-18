@@ -85,6 +85,7 @@
                                 <th>Start Date</th>
                                 <th>End Date</th>
                                 <th>Available Capacity</th>
+                                <th>Sisa Order</th>
                                 <th>Available Machines</th>
                             </tr>
                         </thead>
@@ -95,6 +96,7 @@
                                     <td><?= $weekData['start_date'] ?></td>
                                     <td><?= $weekData['end_date'] ?></td>
                                     <td><?= $weekData['available_capacity'] ?> dz</td>
+                                    <td><?= ceil($weekData['sisa_weekly'] / 24) ?> dz</td>
                                     <td><?= ceil($weekData['available_machines']) ?> Machine</td>
                                 </tr>
                             <?php endforeach; ?>
@@ -109,34 +111,73 @@
                     <h5>PDK in Area</h5>
                 </div>
                 <div class="card-body">
+                    <?php
+                    // Urutkan dan kelompokkan berdasarkan delivery
+                    usort($orderWeek, function ($a, $b) {
+                        return strtotime($a['delivery']) - strtotime($b['delivery']);
+                    });
+
+                    $grouped = [];
+                    foreach ($orderWeek as $order) {
+                        $grouped[$order['delivery']][] = $order;
+                    }
+                    ?>
+
                     <table class="table table-bordered">
                         <thead>
                             <tr>
+                                <th>Delivery</th>
                                 <th>PDK</th>
                                 <th>Sisa</th>
-                                <th>Delivery</th>
-
+                                <th>Actual Jalan Mc</th>
                                 <th>Target Mesin</th>
                                 <th>Kebutuhan Mesin</th>
                                 <th>Produksi Perhari</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($orderWeek as $order) : ?>
-                                <tr>
-                                    <td><?= $order['PDK'] ?></td>
-                                    <td><?= $order['sisa'] ?> dz</td>
-                                    <td><?= $order['delivery'] ?></td>
-
-                                    <td><?= $order['targetPerMesin'] ?> dz/machine</td>
-                                    <td><?= round($order['kebMesin']) ?> Machine</td>
-                                    <td><?= $order['produksi'] ?> dz</td>
+                            <?php foreach ($grouped as $delivery => $orders):
+                                $totalSisa = 0;
+                                $totalTarget = 0;
+                                $totalJlMc = 0;
+                                $totalKebMesin = 0;
+                                $totalProduksi = 0;
+                                $rowspan = count($orders);
+                            ?>
+                                <?php foreach ($orders as $index => $order):
+                                    $totalSisa += $order['sisa'];
+                                    $totalTarget += $order['targetPerMesin'];
+                                    $totalKebMesin += $order['kebMesin'];
+                                    $totalProduksi += $order['produksi'];
+                                    $totalJlMc += $order['jlMc'];
+                                ?>
+                                    <tr>
+                                        <?php if ($index === 0): ?>
+                                            <td rowspan="<?= $rowspan + 1 ?>">
+                                                <?= $delivery ?>
+                                            </td>
+                                        <?php endif; ?>
+                                        <td><?= $order['PDK'] ?></td>
+                                        <td><?= $order['sisa'] ?> dz</td>
+                                        <td><?= $order['jlMc'] ?> dz/machine</td>
+                                        <td><?= $order['targetPerMesin'] ?> dz/machine</td>
+                                        <td><?= round($order['kebMesin']) ?> Machine</td>
+                                        <td><?= $order['produksi'] ?> dz</td>
+                                    </tr>
+                                <?php endforeach; ?>
+                                <tr class="fw-bold text-primary bg-warning">
+                                    <td>Total</td>
+                                    <td><?= $totalSisa ?> dz</td>
+                                    <td><?= $totalJlMc ?> mc</td>
+                                    <td><?= round($totalTarget / $rowspan) ?> dz/machine</td>
+                                    <td><?= $totalKebMesin ?> Machine</td>
+                                    <td><?= $totalProduksi ?> dz</td>
                                 </tr>
                             <?php endforeach; ?>
-
                         </tbody>
                     </table>
                 </div>
+
             </div>
 
         </div>

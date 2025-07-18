@@ -2087,6 +2087,7 @@ class ExcelController extends BaseController
         $role = session()->get('role');
         $month = $this->request->getPost('months');
         $yearss = $this->request->getPost('years');
+        $weekCount = 0;
 
         // Atur tanggal berdasarkan input bulan dan tahun dari POST
         $bulan = date('Y-m-01', strtotime("$yearss-$month-01"));
@@ -2201,7 +2202,6 @@ class ExcelController extends BaseController
         $dataPerjarum = $this->ApsPerstyleModel->getBuyerOrderPejarum($buyer, $bulan);
         $allDataPerjarum = [];
         $totalPerWeekJrm = [];
-
         foreach ($dataPerjarum as $id2) {
             $machinetypeid = $id2['machinetypeid'];
             $delivery = $id2['delivery'];
@@ -2271,7 +2271,6 @@ class ExcelController extends BaseController
             }
         }
         // dd($allDataPerjarum);
-
         $maxWeek = $weekCount - 1;
 
         // Generate Excel
@@ -3681,7 +3680,7 @@ class ExcelController extends BaseController
         $tglTurun = $this->request->getPost('tgl_turun_order');
         $awal = $this->request->getPost('awal');
         $akhir = $this->request->getPost('akhir');
-        $yesterday = date('Y-m-d', strtotime('-1 day'));
+        $yesterday = date('Y-m-d', strtotime('-2 day')); // DUA HARI KE BELAKANG
 
         $validate = [
             'buyer' => $buyer,
@@ -3803,11 +3802,12 @@ class ExcelController extends BaseController
 
         foreach ($data as $item) {
 
-            $kode = $item['product_type'];
+            $kode = $item['product_type'] ?? '';
 
             $pecah = explode('-', $kode);
-            $product = $pecah[0];
-            $type = $pecah[1];
+
+            $product = $pecah[0] ?? '';
+            $type    = $pecah[1] ?? '';
 
             $sheet->setCellValue('A' . $row, $item['created_at']);
             $sheet->setCellValue('B' . $row, $no++);
