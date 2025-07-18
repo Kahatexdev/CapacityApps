@@ -1865,7 +1865,7 @@ class MaterialController extends BaseController
         // Render full page—AJAX akan mengambil ulang #table-container saja
         return view(session()->get('role') . '/Material/jatahBahanBaku', [
             'role'            => session()->get('role'),
-            'title'           => 'Sisa Jatah Area',
+            'title'           => 'Jatah Bahan Baku',
             'active1'         => '',
             'active2'         => '',
             'active3'         => '',

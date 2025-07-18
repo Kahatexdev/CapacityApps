@@ -8,7 +8,7 @@ error_reporting(E_ALL); ?>
         <!-- Header & Filter -->
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5>Sisa Jatah Area</h5>
+                <h5>Jatah Bahan Baku</h5>
                 <div class="d-flex gap-2">
                     <input
                         type="text"
