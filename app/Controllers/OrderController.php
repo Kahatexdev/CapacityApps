@@ -2337,4 +2337,50 @@ class OrderController extends BaseController
                 ->with('error', 'Gagal reject SPK2');
         }
     }
+
+    public function flowProses()
+    {
+        // baca query param
+        $model = $this->request->getGet('mastermodel') ?? '';
+        $delivery = $this->request->getGet('delivery') ?? '';
+
+        // URL API (bisa juga tanpa ?mastermodel= di url, karena kita kirim via 'query' di get())
+        $url = 'http://172.23.44.14/KHTEXT/public/api/flowproses';
+
+        /** @var \CodeIgniter\HTTP\CURLRequest $client */
+        $client = \Config\Services::curlrequest([
+            'baseURI' => $url,
+            'timeout' => 5,
+        ]);
+
+        // hit API
+        $response = $client->get('', [
+            'query' => [
+                'mastermodel' => $model,
+                'delivery' => $delivery,
+            ],
+        ]);
+
+        // pastikan status 200
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('API error: ' . $response->getStatusCode());
+        }
+
+        // 1) ambil body, 2) decode JSON jadi array
+        $body = $response->getBody();
+        $json = json_decode($body, true);
+
+        // sekarang $json['flows'] punya struktur pagination (atau data array)
+        // misal kamu sudah matikan paginate, maka flows langsung data:
+        $flows  = $json['flows'];    // kalau kamu pakai ->get() langsung collection
+        $styles = $json['styles'];
+
+        // kirim data ke modal bukan ke view
+        return $this->response->setJSON([
+            'status' => 'success',
+            'flows' => $flows,
+            'styles' => $styles,
+        ]);
+        
+    }
 }
