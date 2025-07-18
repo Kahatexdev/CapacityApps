@@ -1776,7 +1776,7 @@ class MaterialController extends BaseController
 
         return view(session()->get('role') . '/Material/reportSisaKebutuhan', $data);
     }
-    public function sisaJatahArea()
+    public function jatahBahanBaku()
     {
         $noModel = $this->request->getGet('no_model');
 
@@ -1863,7 +1863,7 @@ class MaterialController extends BaseController
         }
 
         // Render full page—AJAX akan mengambil ulang #table-container saja
-        return view(session()->get('role') . '/Material/sisaJatahArea', [
+        return view(session()->get('role') . '/Material/jatahBahanBaku', [
             'role'            => session()->get('role'),
             'title'           => 'Sisa Jatah Area',
             'active1'         => '',

@@ -381,8 +381,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('generate_excel_po_tambahan', 'ExcelController::generatePoTambahan');
 
     //summary pakai
-    $routes->get('sisa_jatah_area', 'MaterialController::sisaJatahArea');
-    $routes->get('detail_pakai/(:any)', 'MaterialController::detailPakai/$1');
+    $routes->get('jatah_bahan_baku', 'MaterialController::jatahBahanBaku');
 });
 
 

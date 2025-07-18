@@ -101,7 +101,7 @@ error_reporting(E_ALL); ?>
             if (!model) return;
 
             $.ajax({
-                url: '<?= base_url($role . "/sisa_jatah_area") ?>',
+                url: '<?= base_url($role . "/jatah_bahan_baku") ?>',
                 data: {
                     no_model: model
                 },
