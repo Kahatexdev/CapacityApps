@@ -54,35 +54,19 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table id="example" class="display compact " style="width:100%">
+                            <table id="example" class="display compact" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Model</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Size</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">SMV</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Action</th>
-
-
+                                        <th>Model</th>
+                                        <th>Size</th>
+                                        <th>SMV</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <?php foreach ($order as $key) : ?>
-                                        <tr>
-                                            <td class="text-xs"><?= $key['mastermodel'] ?></td>
-                                            <td class="text-xs"><?= $key['size'] ?></td>
-                                            <td class="text-xs"><?= $key['smv'] ?> second</td>
-
-                                            <td class=" text-xs">
-
-                                                <button class="btn bg-gradient-success btn-sm text-xxs edit-btn" data-bs-toggle="modal" data-bs-target="#edit-btn" data-id="<?= $key['idapsperstyle'] ?> " data-model="<?= $key['mastermodel'] ?>" data-size="<?= $key['size'] ?>" data-smv="<?= $key['smv'] ?>">Edit</button>
-
-                                                <button class="btn bg-gradient-info btn-sm text-xxs history-btn" data-bs-toggle="modal" data-bs-target="#edit-btn" data-id="<?= $key['idapsperstyle'] ?> " data-model="<?= $key['mastermodel'] ?>" data-size="<?= $key['size'] ?>" data-smv="<?= $key['smv'] ?>">History</button>
-
-                                            </td>
-                                        </tr>
-                                    <?php endforeach ?>
-                                </tbody>
                             </table>
+
+
+
                         </div>
                     </div>
 
@@ -187,6 +171,42 @@
 
 </div>
 <script>
+    $(document).ready(function() {
+        $('#example').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "<?= site_url($role . '/getServerSide') ?>", // ganti sesuai route kamu
+                type: "POST"
+            },
+            columns: [{
+                    data: 'mastermodel'
+                },
+                {
+                    data: 'size'
+                },
+                {
+                    data: 'smv',
+                    render: function(data) {
+                        return data + ' second';
+                    }
+                },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function(data) {
+                        return `
+                        <button class="btn btn-success btn-sm text-xxs edit-btn" data-bs-toggle="modal" data-bs-target="#edit-btn" data-id="${data.idapsperstyle}" data-model="${data.mastermodel}" data-size="${data.size}" data-smv="${data.smv}">Edit</button>
+                        <button class="btn btn-info btn-sm text-xxs history-btn" data-bs-toggle="modal" data-bs-target="#edit-btn" data-id="${data.idapsperstyle}" data-model="${data.mastermodel}" data-size="${data.size}" data-smv="${data.smv}">History</button>
+                    `;
+                    }
+                }
+            ]
+        });
+    });
+</script>
+<script>
     function hitungJumlahHari() {
         var opdString = document.getElementById("opd").value
         var shipmentString = document.getElementById("shipment").value
@@ -227,25 +247,28 @@
     });
 
 
-    $('.edit-btn').click(function() {
+    // Untuk tombol Edit
+    $('#example').on('click', '.edit-btn', function() {
         var id = $(this).data('id');
         var size = $(this).data('size');
         var model = $(this).data('model');
         var smv = $(this).data('smv');
+
         $('#ModalEdit').find('form').attr('action', '<?= base_url('ie/inputsmv') ?>');
         $('#ModalEdit').find('input[name="id"]').val(id);
         $('#ModalEdit').find('input[name="model"]').val(model);
         $('#ModalEdit').find('input[name="size"]').val(size);
         $('#ModalEdit').find('input[name="smv"]').val(smv);
         $('#ModalEdit').find('input[name="smvold"]').val(smv);
-        $('#ModalEdit').modal('show'); // Show the modal
+        $('#ModalEdit').modal('show');
     });
-    $('.history-btn').click(function() {
+
+    // Untuk tombol History
+    $('#example').on('click', '.history-btn', function() {
         var id = $(this).data('id');
         var size = $(this).data('size');
         var smv = $(this).data('smv');
 
-        // Clear existing table data
         $('#ModalHistory tbody').empty();
 
         $.ajax({
@@ -256,19 +279,13 @@
             },
             success: function(response) {
                 var history = JSON.parse(response);
-
-                // Loop through history data and append to table
                 for (const item of history) {
-                    var tanggal = item.created_at;
-                    var smvold = item.smv_old;
-
                     var row = `
                     <tr>
-                        <td>${tanggal}</td>
-                        <td>${smvold}</td>
+                        <td>${item.created_at}</td>
+                        <td>${item.smv_old}</td>
                     </tr>
                 `;
-
                     $('#ModalHistory tbody').append(row);
                 }
             },
@@ -277,13 +294,10 @@
             }
         });
 
-        // Set modal fields
         $('#ModalHistory').find('form').attr('action', '<?= base_url('ie/inputsmv') ?>');
         $('#ModalHistory').find('input[name="id"]').val(id);
         $('#ModalHistory').find('input[name="size"]').val(size);
         $('#ModalHistory').find('input[name="currentsmv"]').val(smv);
-
-        // Show the modal
         $('#ModalHistory').modal('show');
     });
 </script>

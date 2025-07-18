@@ -49,7 +49,7 @@ class IeController extends BaseController
     public function index()
     {
         $role = session()->get('role');
-        $orders = $this->ApsPerstyleModel->getSmv();
+
         $data = [
             'role' => session()->get('role'),
             'title' => 'Dashboard',
@@ -58,7 +58,6 @@ class IeController extends BaseController
             'targetProd' => 0,
             'produksiBulan' => 0,
             'produksiHari' => 0,
-            'order' => $orders
         ];
         return view($role . '/index', $data);
     }
@@ -111,5 +110,50 @@ class IeController extends BaseController
         }
 
         return json_encode($data);
+    }
+    public function getServerSide()
+    {
+        $request = service('request');
+        $req = $request->getPost();
+
+        // Ambil semua data dari model (tidak filter di SQL)
+        $allData = $this->ApsPerstyleModel->getSmv();
+
+        // Ambil parameter datatable
+        $start = $req['start'] ?? 0;
+        $length = $req['length'] ?? 10;
+        $draw = intval($req['draw'] ?? 1);
+        $search = $req['search']['value'] ?? '';
+        $orderColIndex = $req['order'][0]['column'] ?? 0;
+        $orderDir = $req['order'][0]['dir'] ?? 'asc';
+        $columns = ['mastermodel', 'size', 'smv']; // Sesuaikan nama kolom view
+
+        // Optional: filter by search (di PHP)
+        if ($search) {
+            $allData = array_filter($allData, function ($row) use ($search) {
+                return stripos($row['mastermodel'], $search) !== false
+                    || stripos($row['size'], $search) !== false
+                    || stripos($row['smv'], $search) !== false;
+            });
+        }
+
+        // Optional: sort (di PHP)
+        $orderColumn = $columns[$orderColIndex] ?? 'mastermodel';
+        usort($allData, function ($a, $b) use ($orderColumn, $orderDir) {
+            return $orderDir === 'asc'
+                ? strcmp($a[$orderColumn], $b[$orderColumn])
+                : strcmp($b[$orderColumn], $a[$orderColumn]);
+        });
+
+        // Pagination
+        $recordsTotal = count($allData);
+        $data = array_slice($allData, $start, $length);
+
+        return $this->response->setJSON([
+            'draw' => $draw,
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsTotal,
+            'data' => array_values($data)
+        ]);
     }
 }

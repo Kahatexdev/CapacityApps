@@ -61,8 +61,8 @@
                                         <td class="text-xs"><?= $order->seam; ?></td>
                                         <td class="text-xs"><?= $order->leadtime; ?></td>
                                         <td class="text-xs"><?= $order->delivery; ?></td>
-                                        <td class="text-xs"><?= $order->qty; ?></td>
-                                        <td class="text-xs"><?= $order->sisa; ?></td>
+                                        <td class="text-xs"><?= $order->qty; ?> dz</td>
+                                        <td class="text-xs"><?= $order->sisa; ?> dz</td>
                                         <td class="text-xs">
                                             <?php if ($order->qty === null) : ?>
                                                 <!-- If qty is null, set action to Import -->

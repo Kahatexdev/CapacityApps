@@ -66,8 +66,8 @@ class OrderModel extends Model
                         data_model.description, 
                         data_model.seam, 
                         data_model.leadtime, 
-                        ROUND(SUM(apsperstyle.qty), 0) AS qty, 
-                        ROUND(SUM(apsperstyle.sisa), 0) AS sisa, 
+                        ROUND(SUM(apsperstyle.qty/24), 0) AS qty, 
+                        ROUND(SUM(apsperstyle.sisa/24), 0) AS sisa, 
                         apsperstyle.delivery')
             // Joining the required tables
             ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left')
@@ -109,7 +109,7 @@ class OrderModel extends Model
     {
         $builder = $this->db->table('data_model');
 
-        $builder->select('data_model.*, mastermodel,no_order, machinetypeid, ROUND(SUM(QTy), 0) AS qty, ROUND(SUM(sisa), 0) AS sisa, factory, delivery, product_type');
+        $builder->select('data_model.*, mastermodel,no_order, machinetypeid, ROUND(SUM(qty/24), 0) AS qty, ROUND(SUM(sisa/24), 0) AS sisa, factory, delivery, product_type');
         $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
         $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
         $builder->where('qty IS NULL'); // Add this line to filter records where qty is null
@@ -126,7 +126,7 @@ class OrderModel extends Model
         $nextweek = date('Y-m-d', strtotime('+1 days'));
         $builder = $this->db->table('data_model');
 
-        $builder->select('data_model.*, mastermodel,no_order, machinetypeid, ROUND(SUM(QTy), 0) AS qty, ROUND(SUM(sisa), 0) AS sisa, factory, delivery, product_type');
+        $builder->select('data_model.*, mastermodel,no_order, machinetypeid, ROUND(SUM(qty/24), 0) AS qty, ROUND(SUM(sisa/24), 0) AS sisa, factory, delivery, product_type');
         $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
         $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
         $builder->where('factory', "Belum Ada Area");
@@ -142,7 +142,7 @@ class OrderModel extends Model
     {
         $builder = $this->db->table('data_model');
 
-        $builder->select('data_model.*, mastermodel, no_order, machinetypeid, ROUND(SUM(QTy), 0) AS qty, ROUND(SUM(sisa), 0) AS sisa, factory, delivery, product_type');
+        $builder->select('data_model.*, mastermodel, no_order, machinetypeid, ROUND(SUM(qty/24), 0) AS qty, ROUND(SUM(sisa/24), 0) AS sisa, factory, delivery, product_type');
         $builder->select('CONCAT(mastermodel, "/", machinetypeid) AS model_machine');
         $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
         $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
@@ -181,7 +181,7 @@ class OrderModel extends Model
     {
         $builder = $this->db->table('data_model');
 
-        $builder->select('data_model.*, mastermodel,no_order, machinetypeid, ROUND(SUM(QTy), 0) AS qty, ROUND(SUM(sisa), 0) AS sisa, factory, delivery, product_type');
+        $builder->select('data_model.*, mastermodel,no_order, machinetypeid, ROUND(SUM(qty/24), 0) AS qty, ROUND(SUM(sisa/24), 0) AS sisa, factory, delivery, product_type');
         $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
         $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
         $builder->where('machinetypeid', $jarum);
@@ -200,7 +200,7 @@ class OrderModel extends Model
     {
         $builder = $this->db->table('data_model');
 
-        $builder->select('data_model.*, mastermodel,no_order, machinetypeid, ROUND(SUM(QTy), 0) AS qty, ROUND(SUM(sisa), 0) AS sisa, factory, delivery, product_type');
+        $builder->select('data_model.*, mastermodel,no_order, machinetypeid, ROUND(SUM(qty/24), 0) AS qty, ROUND(SUM(sisa/24), 0) AS sisa, factory, delivery, product_type');
         $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
         $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
         $builder->where('monthname(delivery)', $bulan);
@@ -221,11 +221,12 @@ class OrderModel extends Model
 
         $builder = $this->db->table('data_model');
 
-        $builder->select('data_model.*, mastermodel,no_order, machinetypeid, ROUND(SUM(QTy), 0) AS qty, ROUND(SUM(sisa), 0) AS sisa, factory, delivery, product_type');
+        $builder->select('data_model.*, mastermodel,no_order, machinetypeid, ROUND(SUM(qty/24), 0) AS qty, ROUND(SUM(sisa/24), 0) AS sisa, factory, delivery, product_type');
         $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
         $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
         $builder->where('factory', $area);
         $builder->where('delivery >', $twomonth);
+        $builder->where('qty >', 0);
         $builder->orderby('created_at', 'desc');
         $builder->orderby('no_model', 'asc');
         $builder->orderby('delivery', 'asc');

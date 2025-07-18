@@ -312,6 +312,7 @@ class ApsPerstyleModel extends Model
         return $this->select('idapsperstyle,mastermodel,size,smv')
             ->where('delivery >', $monthago) // Perbaiki spasi di operator where
             ->groupBy(['size', 'mastermodel']) // Menggunakan array untuk groupBy
+            ->orderBy('delivery')
             ->findAll();
     }
 

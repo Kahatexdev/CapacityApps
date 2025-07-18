@@ -520,6 +520,8 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('filter_list_potambahan/(:any)', 'MaterialController::filterPoTambahan/$1');
     $routes->get('generate_po_tambahan', 'PdfController::generatePoTambahan');
     $routes->get('generate_excel_po_tambahan', 'ExcelController::generatePoTambahan');
+
+    $routes->get('jatah_bahan_baku', 'MaterialController::jatahBahanBaku');
 });
 
 // user
@@ -810,8 +812,10 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
 $routes->group('/ie', ['filter' => 'ie'], function ($routes) {
     $routes->get('', 'IeController::index');
     $routes->get('historysmv', 'IeController::historysmv');
+    $routes->post('getServerSide', 'IeController::getServerSide');
     $routes->post('inputsmv', 'IeController::inputsmv');
     $routes->post('gethistory', 'IeController::gethistory');
+
 
 
     $routes->get('mesinperarea/(:any)', 'MesinController::mesinperareaPlan/$1');
