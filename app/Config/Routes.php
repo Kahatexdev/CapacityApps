@@ -723,7 +723,7 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
     $routes->get('produksi', 'ProduksiController::produksi');
     $routes->get('dataprogress', 'ProduksiController::progressData');
-    $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
+    $routes->get('produksiareaw', 'ProduksiController::produksiAreaChart');
     $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('importproduksi', 'ProduksiController::importproduksinew');
     $routes->post('resetproduksi', 'ProduksiController::resetproduksi');

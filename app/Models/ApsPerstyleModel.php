@@ -283,7 +283,7 @@ class ApsPerstyleModel extends Model
             '10G116N-FL' => ['10G116N-FL', '10G116N-FLPL'],
             '10G116N-FLPL' => ['10G116N-FLPL'],
             '10G106N' => ['10G106N', '10G106N-PL'],
-            '10G106N-pl' => ['10G106N-PL'],
+            '10G106N-PL' => ['10G106N-PL'],
             '10G106N-FL' => ['10G106N-FL', '10G106N-FLPL'],
             '10G106N-FLPL' => ['10G106N-FLPL'],
         ];
