@@ -62,6 +62,7 @@ class DetailPlanningModel extends Model
             ->join('(SELECT id_est_qty, MIN(date) AS start_date, MAX(date) AS stop_date FROM tanggal_planning GROUP BY id_est_qty) tp', 'tp.id_est_qty = ep.id_est_qty', 'left')
             // Kondisi WHERE
             ->where('detail_planning.id_pln_mc', $id)
+            ->where('detail_planning.status', 'aktif')
             // Grouping berdasarkan kolom yang relevan
             ->groupBy('detail_planning.model, ap.delivery, detail_planning.id_detail_pln, ep.id_est_qty, ep.hari, ep.precentage_target')
             // Urutkan berdasarkan mastermodel
