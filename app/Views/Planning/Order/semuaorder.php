@@ -167,8 +167,12 @@
                             <input type="text" class="form-control" name="pdk">
                         </div>
                         <div class="form-group">
-                            <label for="tgl_turun_order" class="col-form-label">Tgl Turun Order</label>
+                            <label for="tgl_turun_order" class="col-form-label">Tgl Turun Order Dari</label>
                             <input type="date" class="form-control" name="tgl_turun_order">
+                        </div>
+                        <div class="form-group">
+                            <label for="tgl_turun_order" class="col-form-label">Tgl Turun Orde Sampai</label>
+                            <input type="date" class="form-control" name="tgl_turun_order_akhir">
                         </div>
                         <div class="form-group">
                             <label for="awal" class="col-form-label">Delivery Dari</label>
