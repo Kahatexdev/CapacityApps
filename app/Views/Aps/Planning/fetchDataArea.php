@@ -81,7 +81,8 @@ error_reporting(E_ALL); ?>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Target 100%</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Start</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Stop</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Machine</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Plan Machine</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Actual Running</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Days</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2"></th>
@@ -104,6 +105,9 @@ error_reporting(E_ALL); ?>
                                             </td>
                                             <td class="text-sm">
                                                 <?= htmlspecialchars($order['mesin']) ? htmlspecialchars($order['mesin']) . ' Mc' : ''; ?>
+                                            </td>
+                                            <td class="text-sm">
+                                                <?= htmlspecialchars($order['actualMc']) ? htmlspecialchars($order['actualMc']) . ' Mc' : '0'; ?>
                                             </td>
                                             <td class="text-sm"><?= htmlspecialchars($order['hari']); ?> Days</td>
                                             <td class="text-sm">
@@ -138,6 +142,22 @@ error_reporting(E_ALL); ?>
                                     <?php endforeach; ?>
 
                                 </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="2" class="text-end text-sm fw-bold">TOTAL:</th>
+                                        <th class="text-sm fw-bold" id="totalQty">0 Dz</th>
+                                        <th class="text-sm fw-bold" id="totalSisa">0 Dz</th>
+                                        <th class="text-sm fw-bold" id="totalEstQty">0 Dz</th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th class="text-sm fw-bold" id="totalMesin">0 Mc</th>
+                                        <th class="text-sm fw-bold" id="totalActualMc">0 Mc</th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
@@ -166,16 +186,17 @@ error_reporting(E_ALL); ?>
         <div class="modal fade" id="moveJarum" tabindex="-1" aria-labelledby="moveJarum" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="moveJarumText">Pindah Jarum</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="" method="post">
+                    <form action="" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="moveJarumText">Pindah Jarum</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
 
                             <input type="hidden" name="id_detail" id="id_detail">
                             <input type="hidden" name="pdk" id="pdk">
                             <input type="hidden" name="jarumOld" id="jarumOld">
+
                             <div class="form-group">
                                 <label for="jarumname" class="form-control-label">Pilih Jarum</label>
                                 <select name="jarumname" id="jarumname" class="form-control">
@@ -189,11 +210,16 @@ error_reporting(E_ALL); ?>
                                 <input type="hidden" name="jarum" id="jarum-hidden">
                             </div>
 
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" id="" class="btn btn-info">Pindah</button>
-                    </div>
+                            <!-- Tempat checkbox inject -->
+                            <div class="form-group mt-3" id="checkboxContainer">
+                                <!-- Checkbox dari data.data akan muncul di sini -->
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-info">Pindah</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -208,10 +234,38 @@ error_reporting(E_ALL); ?>
 
         <script>
             $(document).ready(function() {
-                $('#dataTable').DataTable({
-                    "pageLength": 35,
-                    "order": []
+                const table = $('#dataTable').DataTable({
+                    footerCallback: function(row, data, start, end, display) {
+                        let totalQty = 0,
+                            totalSisa = 0,
+                            totalEstQty = 0,
+                            totalMesin = 0,
+                            totalActualMc = 0;
+
+                        data.forEach(rowData => {
+                            // Ambil dan parsing data dari kolom
+                            const qty = parseFloat(rowData[2].replace(/[^\d.-]/g, '')) || 0;
+                            const sisa = parseFloat(rowData[3].replace(/[^\d.-]/g, '')) || 0;
+                            const est = parseFloat(rowData[4].replace(/[^\d.-]/g, '')) || 0;
+                            const mesin = parseFloat(rowData[8].replace(/[^\d.-]/g, '')) || 0;
+                            const actual = parseFloat(rowData[9].replace(/[^\d.-]/g, '')) || 0;
+
+                            totalQty += qty;
+                            totalSisa += sisa;
+                            totalEstQty += est;
+                            totalMesin += mesin;
+                            totalActualMc += actual;
+                        });
+
+                        // Tampilkan ke footer
+                        $('#totalQty').html(totalQty.toLocaleString() + ' Dz');
+                        $('#totalSisa').html(totalSisa.toLocaleString() + ' Dz');
+                        $('#totalEstQty').html(totalEstQty.toLocaleString() + ' Dz');
+                        $('#totalMesin').html(totalMesin + ' Mc');
+                        $('#totalActualMc').html(totalActualMc + ' Mc');
+                    }
                 });
+
                 $('#fetch-data-button').click(function() {
                     var area = '<?= $area; ?>';
                     var jarum = '<?= $jarum; ?>';
@@ -255,20 +309,36 @@ error_reporting(E_ALL); ?>
                     var pdk = $(this).data('pdk');
                     var jarumOld = <?= json_encode($jarum) ?>;
                     var area = $(this).data('area');
-                    var idpage = <?= $id_pln_mc ?>
+                    var idpage = <?= json_encode($id_pln_mc) ?>;
 
-                    console.log(idpage);
-                    $('#moveJarum').find('input[name="id_detail"]').val(id);
-                    $('#moveJarum').find('input[name="pdk"]').val(pdk);
-                    $('#moveJarum').find('input[name="jarumOld"]').val(jarumOld);
-                    $('#moveJarum').find('#moveJarumText').text('Pindah Jarum ' + pdk);
-
-                    $('#moveJarum').modal('show');
-                    $('#moveJarum').find('form').attr('action', '<?= base_url($role . '/pindahjarum/') ?>' + idpage);
-
+                    $.ajax({
+                        url: '<?= base_url('api/getPlanStyle'); ?>',
+                        type: 'GET',
+                        data: {
+                            id: id,
+                            area: area,
+                            jarum: jarumOld,
+                            pdk: pdk,
+                            idpage: idpage
+                        },
+                        success: function(response) {
+                            console.log(response);
+                            PindahJarumModal(response, id, idpage, pdk, jarumOld); // kirim id & idpage ke fungsi modal
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'Gagal Ambil Data: ' + error,
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    });
                 });
 
             });
+
+
 
 
             document.addEventListener('DOMContentLoaded', function() {
@@ -308,6 +378,38 @@ error_reporting(E_ALL); ?>
                 });
 
             });
+
+            function PindahJarumModal(data, id, idpage, pdk, jarum) {
+                // Set hidden input
+                $('#moveJarum').find('input[name="id_detail"]').val(id);
+                $('#moveJarum').find('input[name="pdk"]').val(pdk);
+                $('#moveJarum').find('input[name="jarumOld"]').val(jarum);
+                $('#moveJarum').find('#moveJarumText').text('Pindah Jarum ' + pdk);
+
+                // Kosongkan container checkbox
+                const container = $('#checkboxContainer');
+                container.html('');
+
+                // Cek apakah data valid array
+                if (Array.isArray(data.data)) {
+                    data.data.forEach(function(item) {
+                        const checkbox = `
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox"
+                           name="pilih_size[]" value="${item.idapsperstyle}"
+                           id="check${item.idapsperstyle}">
+                    <label class="form-check-label" for="check${item.idapsperstyle}">
+                        ${item.inisial} - ${item.size} (Sisa: ${item.sisa})
+                    </label>
+                </div>`;
+                        container.append(checkbox);
+                    });
+                }
+
+                // Show modal dan set action URL
+                $('#moveJarum').modal('show');
+                $('#moveJarum').find('form').attr('action', '<?= base_url($role . '/pindahjarum/') ?>' + idpage);
+            }
         </script>
 
         <?php $this->endSection(); ?>

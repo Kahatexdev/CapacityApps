@@ -59,6 +59,7 @@ $routes->group(
         $routes->get('getDeliveryAwalAkhir', 'ApiController::getDeliveryAwalAkhir');
         $routes->get('searchApsPerStyleByMastermodel', 'ApiController::searchApsPerStyleByMastermodel');
         $routes->get('getStartMc/(:any)', 'ApiController::getStartMc/$1');
+        $routes->get('getPlanStyle', 'ApsController::getPlanStyle/$1');
     }
 );
 

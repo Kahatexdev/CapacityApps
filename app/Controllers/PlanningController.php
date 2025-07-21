@@ -731,7 +731,7 @@ class PlanningController extends BaseController
 
         // $update = $this->DetailPlanningModel->update($idPdk, ['id_pln_mc' => $idJarum, 'jarum' => $jarumnew]);
         $update = $this->DetailPlanningModel->pindahJarum($pdk, $idJarum,  $jarumnew, $jarumOld);
-        $gantiJarum = $this->ApsPerstyleModel->gantiJarum($pdk, $jarumOld, $jarumnew);
+        $this->ApsPerstyleModel->gantiJarum($pdk, $jarumOld, $jarumnew);
 
         if ($update) {
             return redirect()->to(base_url($role . '/detailplnmc/' . $pageid))->with('success', 'Model berhasil Dipindahkan');
