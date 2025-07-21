@@ -128,27 +128,30 @@
                             <tr>
                                 <th>Delivery</th>
                                 <th>PDK</th>
+                                <th>Qty</th>
                                 <th>Sisa</th>
                                 <th>Actual Jalan Mc</th>
                                 <th>Target Mesin</th>
                                 <th>Kebutuhan Mesin</th>
-                                <th>Produksi Perhari</th>
+
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($grouped as $delivery => $orders):
+                                $totalQty = 0;
                                 $totalSisa = 0;
                                 $totalTarget = 0;
                                 $totalJlMc = 0;
                                 $totalKebMesin = 0;
-                                $totalProduksi = 0;
+
                                 $rowspan = count($orders);
                             ?>
                                 <?php foreach ($orders as $index => $order):
+                                    $totalQty += $order['qty'];
                                     $totalSisa += $order['sisa'];
                                     $totalTarget += $order['targetPerMesin'];
                                     $totalKebMesin += $order['kebMesin'];
-                                    $totalProduksi += $order['produksi'];
+
                                     $totalJlMc += $order['jlMc'];
                                 ?>
                                     <tr>
@@ -158,20 +161,22 @@
                                             </td>
                                         <?php endif; ?>
                                         <td><?= $order['PDK'] ?></td>
+                                        <td><?= $order['qty'] ?> dz</td>
                                         <td><?= $order['sisa'] ?> dz</td>
                                         <td><?= $order['jlMc'] ?> dz/machine</td>
                                         <td><?= $order['targetPerMesin'] ?> dz/machine</td>
                                         <td><?= round($order['kebMesin']) ?> Machine</td>
-                                        <td><?= $order['produksi'] ?> dz</td>
+
                                     </tr>
                                 <?php endforeach; ?>
                                 <tr class="fw-bold text-primary bg-warning">
                                     <td>Total</td>
+                                    <td><?= $totalQty ?> dz</td>
                                     <td><?= $totalSisa ?> dz</td>
                                     <td><?= $totalJlMc ?> mc</td>
                                     <td><?= round($totalTarget / $rowspan) ?> dz/machine</td>
                                     <td><?= $totalKebMesin ?> Machine</td>
-                                    <td><?= $totalProduksi ?> dz</td>
+
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>

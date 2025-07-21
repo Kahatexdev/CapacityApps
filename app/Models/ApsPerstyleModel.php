@@ -390,7 +390,7 @@ class ApsPerstyleModel extends Model
     public function CapacityArea($pdk, $area, $jarum)
     {
         $oneweek = date('Y-m-d', strtotime('today'));
-        $data = $this->select('mastermodel,sum(sisa)as sisa,delivery,smv')
+        $data = $this->select('mastermodel,sum(qty) as qty, sum(sisa)as sisa,delivery,smv')
             ->where('mastermodel', $pdk)
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
@@ -401,14 +401,18 @@ class ApsPerstyleModel extends Model
             ->get()
             ->getResultArray();
 
+        $qtyArray = array_column($data, 'qty');
         $sisaArray = array_column($data, 'sisa');
         $maxValue = max($sisaArray);
         $indexMax = array_search($maxValue, $sisaArray);
         $totalQty = 0;
+        $totalSisa = 0;
         for ($i = 0; $i <= $indexMax; $i++) {
-            $totalQty += $sisaArray[$i];
+            $totalSisa += $sisaArray[$i];
+            $totalQty += $qtyArray[$i];
         }
         $totalQty = round($totalQty / 24);
+        $totalSisa = round($totalSisa / 24);
 
         $deliveryTerjauh = end($data)['delivery'];
         $today = new DateTime(date('Y-m-d'));
@@ -427,7 +431,8 @@ class ApsPerstyleModel extends Model
         $pdk = $data[$indexMax]['mastermodel'];
         $order = [
             'mastermodel' => $pdk,
-            'sisa' => $totalQty,
+            'sisa' => $totalSisa,
+            'qty' => $totalQty,
             'delivery' => $deliveryTerjauh,
             'targetHari' => $hariTarget,
             'smv' => $averageSmv
@@ -1087,7 +1092,7 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $pdk)
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
-            ->groupBy('size')
+            ->groupBy('size, machinetypeid')
             ->findAll();
     }
     public function getSizes($nomodel, $inisial)
