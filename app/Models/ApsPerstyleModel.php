@@ -286,6 +286,7 @@ class ApsPerstyleModel extends Model
             '10G106N-PL' => ['10G106N-PL'],
             '10G106N-FL' => ['10G106N-FL', '10G106N-FLPL'],
             '10G106N-FLPL' => ['10G106N-FLPL'],
+            '10G106N-MTPL' => ['10G106N-MTPL'],
         ];
 
         return $this->select('mastermodel AS model, SUM(qty)/24 AS qty, SUM(sisa)/24 AS sisa, AVG(smv) AS smv,machinetypeid')

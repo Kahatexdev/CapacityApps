@@ -504,6 +504,7 @@ class ApsController extends BaseController
     public function detailplanmc($id)
     {
         $detailplan = $this->DetailPlanningModel->getDataPlanning($id);
+        dd($detailplan);
         foreach ($detailplan as &$dp) {
             $iddetail = $dp['id_detail_pln'];
             $qtysisa = $this->ApsPerstyleModel->getSisaPerModel($dp['model'], $dp['jarum']);
@@ -515,6 +516,7 @@ class ApsController extends BaseController
                 }
             }
 
+            dd($qtysisa);
             $dp['delivery'] = date('d-M-y', strtotime($qtysisa['delivery']));
             $dp['mesin'] = $maxMesin;
             $dp['qty'] = round($qtysisa['qty']);
