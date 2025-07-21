@@ -1173,8 +1173,15 @@ class ApsPerstyleModel extends Model
             $builder->where('data_model.no_model', $validate['pdk']);
         }
 
-        if (!empty($validate['tglTurun'])) {
+        if (!empty($validate['tglTurun']) && !empty($validate['tglTurunAkhir'])) {
+            $builder->where('data_model.created_at >=', $validate['tglTurun']);
+            $builder->where('data_model.created_at <=', $validate['tglTurunAkhir']);
+        }
+        if (!empty($validate['tglTurun']) && empty($validate['tglTurunAkhir'])) {
             $builder->where('data_model.created_at', $validate['tglTurun']);
+        }
+        if (empty($validate['tglTurun']) && !empty($validate['tglTurunAkhir'])) {
+            $builder->where('data_model.created_at', $validate['tglTurunAkhir']);
         }
 
         if (!empty($validate['awal'])) {

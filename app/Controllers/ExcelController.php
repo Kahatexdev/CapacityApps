@@ -3678,6 +3678,7 @@ class ExcelController extends BaseController
         $jarum = $this->request->getPost('jarum');
         $pdk = $this->request->getPost('pdk');
         $tglTurun = $this->request->getPost('tgl_turun_order');
+        $tglTurunAkhir = $this->request->getPost('tgl_turun_order_akhir') ?? '';
         $awal = $this->request->getPost('awal');
         $akhir = $this->request->getPost('akhir');
         $yesterday = date('Y-m-d', strtotime('-2 day')); // DUA HARI KE BELAKANG
@@ -3688,6 +3689,7 @@ class ExcelController extends BaseController
             'jarum' => $jarum,
             'pdk' => $pdk,
             'tglTurun' => $tglTurun,
+            'tglTurunAkhir' => $tglTurunAkhir,
             'awal' => $awal,
             'akhir' => $akhir,
         ];
