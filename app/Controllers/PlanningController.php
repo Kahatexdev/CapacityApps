@@ -728,10 +728,27 @@ class PlanningController extends BaseController
         $pdk = $this->request->getPost('pdk');
         $jarumnew = $this->request->getPost('jarum');
         $jarumOld = $this->request->getPost('jarumOld');
+        $size = $this->request->getPost('pilih_size'); // array
+        foreach ($size as $sz) {
+            dd($jarumOld);
+            $insert = [
+                'id_pln_mc' => $row['id_pln_mc'],
+                'model' => $pdk,
+                'smv' => $row['smv'],
+                'jarum' => $jarumnew,
+                'status' => 'aktif',
+                'delivery' => 'delivery',
+            ];
+            $cek = $this->DetailPlanningModel->cekPlanning($validate);
+            if (!$cek) {
+                $this->DetailPlanningModel->insert($insert);
+            }
 
-        // $update = $this->DetailPlanningModel->update($idPdk, ['id_pln_mc' => $idJarum, 'jarum' => $jarumnew]);
-        $update = $this->DetailPlanningModel->pindahJarum($pdk, $idJarum,  $jarumnew, $jarumOld);
-        $gantiJarum = $this->ApsPerstyleModel->gantiJarum($pdk, $jarumOld, $jarumnew);
+            // $update = $this->DetailPlanningModel->update($idPdk, ['id_pln_mc' => $idJarum, 'jarum' => $jarumnew]);
+            $update = $this->DetailPlanningModel->pindahJarum($pdk, $idJarum,  $jarumnew, $jarumOld);
+            $this->ApsPerstyleModel->gantiJarum($pdk, $jarumOld, $jarumnew);
+        }
+
 
         if ($update) {
             return redirect()->to(base_url($role . '/detailplnmc/' . $pageid))->with('success', 'Model berhasil Dipindahkan');

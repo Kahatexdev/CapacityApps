@@ -610,6 +610,7 @@ class MesinController extends BaseController
             $smv = $row['smv'];
             $targetPerMesin = round((86400 / (intval($smv))) * 0.85 / 24);
             $sisa = $row['sisa'];
+            $qty = $row['qty'];
             $deliveryDate = new DateTime($row['delivery']);
             $time = $today->diff($deliveryDate);
             $leadtime = $row['targetHari'];
@@ -668,6 +669,7 @@ class MesinController extends BaseController
                 'delivery' => $delivery,
                 'PDK' => $pdk,
                 'sisa' => $sisa,
+                'qty' => $qty,
                 'leadtime' => $leadtime,
                 'targetPerMesin' => $targetPerMesin,
                 'produksi' => $produksi,

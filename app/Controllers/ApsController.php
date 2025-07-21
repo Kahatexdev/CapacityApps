@@ -437,6 +437,7 @@ class ApsController extends BaseController
         foreach ($area as $ar) {
             $planarea[] = $this->KebutuhanAreaModel->getDatabyArea($ar);
         }
+
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Planning Area',
@@ -504,7 +505,7 @@ class ApsController extends BaseController
     public function detailplanmc($id)
     {
         $detailplan = $this->DetailPlanningModel->getDataPlanning($id);
-        dd($detailplan);
+
         foreach ($detailplan as &$dp) {
             $iddetail = $dp['id_detail_pln'];
             $qtysisa = $this->ApsPerstyleModel->getSisaPerModel($dp['model'], $dp['jarum']);
@@ -516,7 +517,7 @@ class ApsController extends BaseController
                 }
             }
 
-            dd($qtysisa);
+            // dd($qtysisa);
             $dp['delivery'] = date('d-M-y', strtotime($qtysisa['delivery']));
             $dp['mesin'] = $maxMesin;
             $dp['qty'] = round($qtysisa['qty']);
@@ -534,6 +535,22 @@ class ApsController extends BaseController
         $mesinarea = $this->jarumModel->getMesinByArea($area, $jarum); //mesin yang dipakai semua mesin tanpa melibatkan head planning
         // $mesinplanning = $this->MesinPlanningModel->getMesinByArea($area,$jarum); //mesin yang dipilih oleh head planning di teruskan ke bagian aps
         $jarumList = $this->KebutuhanAreaModel->getDataByAreaGroupJrm($area);
+        $yesterday = date('Y-m-d', strtotime('-2 days'));
+        foreach ($detailplan as &$dp) {
+            $val = [
+                'area' => $area,
+                'jarum' => $jarum,
+                'pdk' => $dp['model'],
+                'awal' => $yesterday,
+            ];
+            $jlMC = $this->produksiModel->getJlMcTimter($val) ?? 0;
+            $mcJalan = 0;
+            foreach ($jlMC as $mc) {
+                $mcJalan += $mc['jl_mc'];
+            }
+            $dp['actualMc'] = $mcJalan;
+        }
+        // dd($detailplan);
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Planning',
@@ -552,6 +569,7 @@ class ApsController extends BaseController
             'id_pln_mc' => $id,
             'jarumList' => $jarumList
         ];
+
         return view(session()->get('role') . '/Planning/fetchDataArea', $data);
     }
 
@@ -637,11 +655,12 @@ class ApsController extends BaseController
         $jarum = $this->request->getGet('jarum');
         $id_pln_mc = $this->request->getGet('id_pln_mc');
 
-        if ($area == 'KK8J') {
-            $data = $this->ApsPerstyleModel->getDetailPlanningGloves($area, $jarum);
-        } else {
-            $data = $this->ApsPerstyleModel->getDetailPlanning($area, $jarum);
-        }
+        // if ($area == 'KK8J') {
+        //     $data = $this->ApsPerstyleModel->getDetailPlanningGloves($area, $jarum);
+        // } else {
+        //     $data = $this->ApsPerstyleModel->getDetailPlanning($area, $jarum);
+        // }
+        $data = $this->ApsPerstyleModel->getDetailPlanning($area, $jarum);
 
         // Cek jika data kosong, langsung return atau berikan pesan
         if (empty($data)) {
@@ -1119,7 +1138,7 @@ class ApsController extends BaseController
                 });
                 return $this->response->setJSON([
                     'status' => 'success',
-                    'data' => $return // Replace with your data
+                    'data' => $style // Replace with your data
                 ]);
             } catch (\Exception $e) {
                 return $this->response->setJSON([
