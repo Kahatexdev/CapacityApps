@@ -739,4 +739,33 @@ class PlanningController extends BaseController
             return redirect()->to(base_url($role . '/detailplnmc/' . $pageid))->with('error', 'Model Gagal Dipindahkan');
         }
     }
+    public function startStopMcByPdk()
+    {
+        $role = session()->get('role');
+        $noModel = $this->request->getGet('no_model') ?? "AK5416";
+        $dataMc = []; // Default kosong
+        $dataMc  = !empty($noModel) ? $this->produksiModel->getStartStopMc($noModel) : [];
+
+        // Jika ini AJAX request → kembalikan JSON:
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'dataMc' => $dataMc
+            ]);
+        }
+
+        $data = [
+            'role' => $role,
+            'title' => 'Start Stop Mc',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'acive7' => '',
+            'dataMc' => $dataMc,
+        ];
+        // dd($dataMc);
+        return view($role . '/Order/startStopMc', $data);
+    }
 }

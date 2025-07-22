@@ -235,6 +235,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     //order
     $routes->get('', 'PlanningController::index');
     $routes->get('dataorder', 'PlanningController::order');
+    $routes->get('startStopMcByPdk', 'PlanningController::startStopMcByPdk');
     $routes->get('blmAdaArea', 'OrderController::orderBlmAdaAreal');
     $routes->get('orderPerjarum', 'OrderController::OrderPerJarumPlan');
     $routes->get('orderPerArea', 'OrderController::orderPerAreaPlan');

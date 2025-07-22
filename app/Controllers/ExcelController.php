@@ -3706,6 +3706,7 @@ class ExcelController extends BaseController
             $mc = $this->produksiModel->getJlMcByModel($key);
 
             $id['jl_mc'] = $mc['jl_mc'] ?? '';
+            $id['qty_produksi'] = $mc['qty_produksi'] ?? '';
         }
         // dd($data);
         // Buat file Excel
@@ -3775,9 +3776,10 @@ class ExcelController extends BaseController
         $sheet->setCellValue('N3', 'STYLE SIZE');
         $sheet->setCellValue('O3', 'DELIVERY');
         $sheet->setCellValue('P3', 'QTY');
-        $sheet->setCellValue('Q3', 'SISA');
-        $sheet->setCellValue('R3', 'JLN MC');
-        $sheet->setCellValue('S3', 'DESCRIPTION');
+        $sheet->setCellValue('Q3', 'PRODUKSI');
+        $sheet->setCellValue('R3', 'SISA');
+        $sheet->setCellValue('S3', 'JLN MC');
+        $sheet->setCellValue('T3', 'DESCRIPTION');
         $sheet->getStyle('A3')->applyFromArray($styleHeader);
         $sheet->getStyle('B3')->applyFromArray($styleHeader);
         $sheet->getStyle('C3')->applyFromArray($styleHeader);
@@ -3797,6 +3799,7 @@ class ExcelController extends BaseController
         $sheet->getStyle('Q3')->applyFromArray($styleHeader);
         $sheet->getStyle('R3')->applyFromArray($styleHeader);
         $sheet->getStyle('S3')->applyFromArray($styleHeader);
+        $sheet->getStyle('T3')->applyFromArray($styleHeader);
 
         // Tulis data mulai dari baris 2
         $row = 4;
@@ -3827,9 +3830,10 @@ class ExcelController extends BaseController
             $sheet->setCellValue('N' . $row, $item['size']);
             $sheet->setCellValue('O' . $row, $item['delivery']);
             $sheet->setCellValue('P' . $row, $item['qty_pcs']);
-            $sheet->setCellValue('Q' . $row, $item['sisa_pcs']);
-            $sheet->setCellValue('R' . $row, $item['jl_mc']);
-            $sheet->setCellValue('S' . $row, $item['description']);
+            $sheet->setCellValue('Q' . $row, $item['qty_produksi']);
+            $sheet->setCellValue('R' . $row, $item['sisa_pcs']);
+            $sheet->setCellValue('S' . $row, $item['jl_mc']);
+            $sheet->setCellValue('T' . $row, $item['description']);
             // 
             $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
@@ -3850,6 +3854,7 @@ class ExcelController extends BaseController
             $sheet->getStyle('Q' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('R' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('S' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('T' . $row)->applyFromArray($styleBody);
             $row++;
         }
 

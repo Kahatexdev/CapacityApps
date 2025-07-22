@@ -446,7 +446,7 @@ class ProduksiModel extends Model
     }
     public function getJlMcByModel($data)
     {
-        return $this->select('COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
+        return $this->select('COUNT(DISTINCT produksi.no_mesin) AS jl_mc, SUM(qty_produksi) AS qty_produksi')
             ->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle', 'left')
             ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel', 'left')
             ->where('produksi.no_mesin !=', 'STOK PAKING')
@@ -457,5 +457,16 @@ class ProduksiModel extends Model
             ->where('produksi.tgl_produksi', $data['yesterday'])
             ->groupBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size, apsperstyle.delivery')
             ->first();
+    }
+    public function getStartStopMc($noModel)
+    {
+        return $this->select('produksi.tgl_produksi, data_model.no_model, MIN(produksi.tgl_produksi) AS start_mc, MAX(produksi.tgl_produksi) AS stop_mc')
+            ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
+            ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel', 'left')
+            ->where('apsperstyle.production_unit !=', 'MJ')
+            ->where('data_model.no_model', $noModel)
+            ->groupBy('data_model.no_model')
+            ->orderBy('apsperstyle.machinetypeid')
+            ->findAll();
     }
 }
