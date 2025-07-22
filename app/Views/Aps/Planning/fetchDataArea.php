@@ -94,12 +94,12 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm"><?= htmlspecialchars($order['model']); ?></td>
                                             <td class="text-sm"><?= $order['delivery'] ?></td>
                                             <td class="text-sm">
-                                                <?= ($jarum === '240n')
+                                                <?= ($jarum === '240N')
                                                     ? number_format($order['qty'] * 2, 0, '.', ',')
                                                     : number_format($order['qty'], 0, '.', ','); ?> Dz
                                             </td>
                                             <td class="text-sm">
-                                                <?= ($jarum === '240n')
+                                                <?= ($jarum === '240N')
                                                     ? number_format($order['sisa'] * 2, 0, '.', ',')
                                                     : number_format($order['sisa'], 0, '.', ','); ?> Dz
                                             </td>

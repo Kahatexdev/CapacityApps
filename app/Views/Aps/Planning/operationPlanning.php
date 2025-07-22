@@ -421,8 +421,8 @@
                         <td>${item.size}
                             <input type="hidden" value="${item.idAps}" name="idAps[]">
                         </td>
-<td>${jarum === '240n' ? (item.qty *2).toFixed(2) : item.qty.toFixed(2)} Dz</td>
-<td>${jarum === '240n' ? (item.sisa *2).toFixed(2) : item.sisa.toFixed(2)} Dz</td>
+<td>${jarum === '240N' ? (item.qty *2).toFixed(2) : item.qty.toFixed(2)} Dz</td>
+<td>${jarum === '240N' ? (item.sisa *2).toFixed(2) : item.sisa.toFixed(2)} Dz</td>
 
 
                         <td>
@@ -689,7 +689,7 @@
 
                                 stopDate.value = formattedDate.toISOString().split('T')[0];
                                 target100.value = response.smv;
-                                if (jarum === '240n') {
+                                if (jarum === '240N') {
                                     qty.value = response.qty * 2;
                                     remainingQty.value = response.sisa * 2;
                                 } else {
