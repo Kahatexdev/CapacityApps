@@ -235,6 +235,9 @@ error_reporting(E_ALL); ?>
         <script>
             $(document).ready(function() {
                 const table = $('#dataTable').DataTable({
+                    order: [
+                        [1, 'asc']
+                    ],
                     footerCallback: function(row, data, start, end, display) {
                         let totalQty = 0,
                             totalSisa = 0,
@@ -396,8 +399,8 @@ error_reporting(E_ALL); ?>
                         const checkbox = `
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox"
-                           name="pilih_size[]" value="${item.idapsperstyle}"
-                           id="check${item.idapsperstyle}">
+                           name="pilih_size[]" value="${item.size}"
+                           id="check${item.size}">
                     <label class="form-check-label" for="check${item.idapsperstyle}">
                         ${item.inisial} - ${item.size} (Sisa: ${item.sisa})
                     </label>

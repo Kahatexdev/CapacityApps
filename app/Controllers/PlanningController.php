@@ -728,15 +728,45 @@ class PlanningController extends BaseController
         $pdk = $this->request->getPost('pdk');
         $jarumnew = $this->request->getPost('jarum');
         $jarumOld = $this->request->getPost('jarumOld');
+        $size = $this->request->getPost('pilih_size'); // array
+        foreach ($size as $sz) {
+            $update = $this->ApsPerstyleModel->gantiJarum($pdk, $sz, $jarumOld, $jarumnew);
+            $ambilSmv = $this->ApsPerstyleModel->smvPerSize($pdk, $sz) ?? '0';
+            $validate = [
+                'id' => $idJarum,
+                'model' => $pdk,
+            ];
+            $insert = [
+                'id_pln_mc' => $idJarum,
+                'model' => $pdk,
+                'smv' => $ambilSmv['smv'],
+                'jarum' => $jarumnew,
+                'status' => 'aktif',
+                'delivery' => 'delivery',
+            ];
+            $cek = $this->DetailPlanningModel->cekPlanning($validate);
+            if (!$cek) {
+                $this->DetailPlanningModel->insert($insert);
+            }
 
-        // $update = $this->DetailPlanningModel->update($idPdk, ['id_pln_mc' => $idJarum, 'jarum' => $jarumnew]);
-        $update = $this->DetailPlanningModel->pindahJarum($pdk, $idJarum,  $jarumnew, $jarumOld);
-        $this->ApsPerstyleModel->gantiJarum($pdk, $jarumOld, $jarumnew);
+            // $update = $this  ->DetailPlanningModel->update($idPdk, ['id_pln_mc' => $idJarum, 'jarum' => $jarumnew]);
+            // $update = $this->DetailPlanningModel->pindahJarum($pdk, $idJarum,  $jarumnew, $jarumOld);
+            // cek data masih ada engga style di jarum itu
 
-        if ($update) {
-            return redirect()->to(base_url($role . '/detailplnmc/' . $pageid))->with('success', 'Model berhasil Dipindahkan');
+        }
+
+        $cekPlan = $this->ApsPerstyleModel->getSisaPerDeliv($pdk, $jarumOld);
+        if ($cekPlan === null) {
+            dd($idPdk);
+            $delete = $this->DetailPlanningModel->delete($idPdk);
+            if ($delete) {
+                $this->EstimatedPlanningModel->deletePlaningan($idPdk);
+                return redirect()->to(base_url($role . '/detailplnmc/' . $pageid))->with('success', 'Model berhasil Dipindahkan');
+            } else {
+                return redirect()->to(base_url($role . '/detailplnmc/' . $pageid))->with('error', 'Model Gagal Dipindahkan');
+            }
         } else {
-            return redirect()->to(base_url($role . '/detailplnmc/' . $pageid))->with('error', 'Model Gagal Dipindahkan');
+            return redirect()->to(base_url($role . '/detailplnmc/' . $pageid))->with('success', 'Model berhasil Dipindahkan');
         }
     }
     public function startStopMcByPdk()

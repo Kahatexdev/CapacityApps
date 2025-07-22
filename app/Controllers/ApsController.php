@@ -505,7 +505,6 @@ class ApsController extends BaseController
     public function detailplanmc($id)
     {
         $detailplan = $this->DetailPlanningModel->getDataPlanning($id);
-
         foreach ($detailplan as &$dp) {
             $iddetail = $dp['id_detail_pln'];
             $qtysisa = $this->ApsPerstyleModel->getSisaPerModel($dp['model'], $dp['jarum']);
@@ -516,15 +515,23 @@ class ApsController extends BaseController
                     $maxMesin = $mc['mesin'];
                 }
             }
-
-            $dp['delivery'] = date('d-M-y', strtotime($qtysisa['delivery']));
-            $dp['mesin'] = $maxMesin;
-            $dp['qty'] = round($qtysisa['qty']);
-            $dp['sisa'] =
-                round($qtysisa['sisa']);
+            if (!$qtysisa) {
+                $this->DetailPlanningModel->delete($iddetail);
+                continue;
+            } else {
+                // Gunakan format Y-m-d untuk sorting (standar format)
+                $dp['delivery_raw'] = $qtysisa['delivery']; // untuk sorting
+                $dp['delivery'] = date('d-M-y', strtotime($qtysisa['delivery'])); // untuk tampil
+                $dp['mesin'] = $maxMesin;
+                $dp['qty'] = round($qtysisa['qty']);
+                $dp['sisa'] = round($qtysisa['sisa']);
+            }
         }
+
+        // Sort pakai field 'delivery_raw'
+        // dd($detailplan);
         usort($detailplan, function ($a, $b) {
-            return strtotime($a['delivery']) - strtotime($b['delivery']);
+            return strtotime($a['delivery_raw']) - strtotime($b['delivery_raw']);
         });
 
         $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();

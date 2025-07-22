@@ -283,9 +283,10 @@ class ApsPerstyleModel extends Model
             '10G116N-FL' => ['10G116N-FL', '10G116N-FLPL'],
             '10G116N-FLPL' => ['10G116N-FLPL'],
             '10G106N' => ['10G106N', '10G106N-PL'],
-            '10G106N-pl' => ['10G106N-PL'],
+            '10G106N-PL' => ['10G106N-PL'],
             '10G106N-FL' => ['10G106N-FL', '10G106N-FLPL'],
             '10G106N-FLPL' => ['10G106N-FLPL'],
+            '10G106N-MTPL' => ['10G106N-MTPL'],
         ];
 
         return $this->select('mastermodel AS model, SUM(qty)/24 AS qty, SUM(sisa)/24 AS sisa, AVG(smv) AS smv,machinetypeid')
@@ -461,7 +462,7 @@ class ApsPerstyleModel extends Model
         $result = $this->select('sum(sisa) as sisa,sum(qty) as qty, delivery, mastermodel,smv')
             ->where('machinetypeid', $jarum)
             ->where('mastermodel', $model)
-            ->where('sisa >=', 0)
+            // ->where('sisa >=', 0)
             ->where('qty >=', 0)
             ->groupby('delivery')
             ->findAll();
@@ -1092,7 +1093,7 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $pdk)
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
-            ->groupBy('size, machinetypeid')
+            ->groupBy('size,machinetypeid')
             ->findAll();
     }
     public function getSizes($nomodel, $inisial)
@@ -1111,9 +1112,10 @@ class ApsPerstyleModel extends Model
             ->where('factory', $area)
             ->first();
     }
-    public function gantiJarum($pdk, $jarumOld, $jarumnew)
+    public function gantiJarum($pdk, $sz, $jarumOld, $jarumnew)
     {
         return $this->where('mastermodel', $pdk)
+            ->where('size', $sz)
             ->where('machinetypeid', $jarumOld)
             ->set('machinetypeid', $jarumnew)
             ->update();
@@ -1265,5 +1267,9 @@ class ApsPerstyleModel extends Model
             ->groupby('size,factory,delivery')
             ->findAll();
         return $result;
+    }
+    public function smvPerSize($pdk, $sz)
+    {
+        return $this->select('smv')->where('mastermodel', $pdk)->where('size', $sz)->first();
     }
 }

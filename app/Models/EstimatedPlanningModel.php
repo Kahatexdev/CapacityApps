@@ -55,4 +55,8 @@ class EstimatedPlanningModel extends Model
             ->groupBy('id_est_qty')
             ->findAll();
     }
+    public function deletePlaningan($idPdk)
+    {
+        return $this->where('id_detail_pln', $idPdk)->delete();
+    }
 }
