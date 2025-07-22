@@ -235,6 +235,9 @@ error_reporting(E_ALL); ?>
         <script>
             $(document).ready(function() {
                 const table = $('#dataTable').DataTable({
+                    order: [
+                        [1, 'asc']
+                    ],
                     footerCallback: function(row, data, start, end, display) {
                         let totalQty = 0,
                             totalSisa = 0,

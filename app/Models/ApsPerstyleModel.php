@@ -1093,7 +1093,7 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $pdk)
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
-            ->groupBy('size, machinetypeid')
+            ->groupBy('size,machinetypeid')
             ->findAll();
     }
     public function getSizes($nomodel, $inisial)
@@ -1112,9 +1112,10 @@ class ApsPerstyleModel extends Model
             ->where('factory', $area)
             ->first();
     }
-    public function gantiJarum($pdk, $jarumOld, $jarumnew)
+    public function gantiJarum($pdk, $sz, $jarumOld, $jarumnew)
     {
         return $this->where('mastermodel', $pdk)
+            ->where('size', $sz)
             ->where('machinetypeid', $jarumOld)
             ->set('machinetypeid', $jarumnew)
             ->update();
@@ -1266,5 +1267,9 @@ class ApsPerstyleModel extends Model
             ->groupby('size,factory,delivery')
             ->findAll();
         return $result;
+    }
+    public function smvPerSize($pdk, $sz)
+    {
+        return $this->select('smv')->where('mastermodel', $pdk)->where('size', $sz)->first();
     }
 }

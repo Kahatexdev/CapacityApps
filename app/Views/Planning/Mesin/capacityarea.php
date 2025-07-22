@@ -163,7 +163,7 @@
                                         <td><?= $order['PDK'] ?></td>
                                         <td><?= $order['qty'] ?> dz</td>
                                         <td><?= $order['sisa'] ?> dz</td>
-                                        <td><?= $order['jlMc'] ?> dz/machine</td>
+                                        <td><?= $order['jlMc'] ?> machine</td>
                                         <td><?= $order['targetPerMesin'] ?> dz/machine</td>
                                         <td><?= round($order['kebMesin']) ?> Machine</td>
 

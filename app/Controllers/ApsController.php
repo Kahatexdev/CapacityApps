@@ -517,16 +517,19 @@ class ApsController extends BaseController
                 }
             }
 
-            // dd($qtysisa);
-            $dp['delivery'] = date('d-M-y', strtotime($qtysisa['delivery']));
+            // Gunakan format Y-m-d untuk sorting (standar format)
+            $dp['delivery_raw'] = $qtysisa['delivery']; // untuk sorting
+            $dp['delivery'] = date('d-M-y', strtotime($qtysisa['delivery'])); // untuk tampil
             $dp['mesin'] = $maxMesin;
             $dp['qty'] = round($qtysisa['qty']);
-            $dp['sisa'] =
-                round($qtysisa['sisa']);
+            $dp['sisa'] = round($qtysisa['sisa']);
         }
+
+        // Sort pakai field 'delivery_raw'
         usort($detailplan, function ($a, $b) {
-            return strtotime($a['delivery']) - strtotime($b['delivery']);
+            return strtotime($a['delivery_raw']) - strtotime($b['delivery_raw']);
         });
+        // dd($detailplan);
 
         $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();
         $judul = $kebutuhanArea['judul'];

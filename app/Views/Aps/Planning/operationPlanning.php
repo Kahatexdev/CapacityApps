@@ -418,7 +418,7 @@
                 ${response.data.map(item => `
                     <tr>
                         <td>${item.inisial}</td>
-                        <td>${item.style}
+                        <td>${item.size}
                             <input type="hidden" value="${item.idAps}" name="idAps[]">
                         </td>
                            <td>${item.qty} dz</td>
