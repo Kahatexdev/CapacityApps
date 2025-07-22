@@ -93,8 +93,18 @@ error_reporting(E_ALL); ?>
                                         <tr>
                                             <td class="text-sm"><?= htmlspecialchars($order['model']); ?></td>
                                             <td class="text-sm"><?= $order['delivery'] ?></td>
-                                            <td class="text-sm"><?= number_format($order['qty'], 0, '.', ','); ?> Dz</td>
-                                            <td class="text-sm"><?= number_format($order['sisa'], 0, '.', ','); ?> Dz</td>
+                                            <td class="text-sm">
+                                                <?= ($jarum === '240n')
+                                                    ? number_format($order['qty'] * 2, 0, '.', ',')
+                                                    : number_format($order['qty'], 0, '.', ','); ?> Dz
+                                            </td>
+                                            <td class="text-sm">
+                                                <?= ($jarum === '240n')
+                                                    ? number_format($order['sisa'] * 2, 0, '.', ',')
+                                                    : number_format($order['sisa'], 0, '.', ','); ?> Dz
+                                            </td>
+
+
                                             <td class="text-sm"><?= number_format($order['est_qty'], 0, '.', ','); ?> Dz</td>
                                             <td class="text-sm"><?= number_format(3600 / $order['smv'], 2, '.', ','); ?> Dz/Days</td>
                                             <td class="text-sm">
@@ -124,7 +134,6 @@ error_reporting(E_ALL); ?>
                                                 </button>
                                             </td>
                                             <td class="text-sm">
-
 
                                                 <span class="badge bg-warning text-dark move-btn "
                                                     data-id="<?= $order['id_detail_pln']; ?>"
@@ -307,40 +316,35 @@ error_reporting(E_ALL); ?>
                         }
                     });
                 });
-                $('.move-btn').click(function() {
-                    var id = $(this).data('id');
-                    var pdk = $(this).data('pdk');
-                    var jarumOld = <?= json_encode($jarum) ?>;
-                    var area = $(this).data('area');
-                    var idpage = <?= json_encode($id_pln_mc) ?>;
 
-                    $.ajax({
-                        url: '<?= base_url('api/getPlanStyle'); ?>',
-                        type: 'GET',
-                        data: {
-                            id: id,
-                            area: area,
-                            jarum: jarumOld,
-                            pdk: pdk,
-                            idpage: idpage
-                        },
-                        success: function(response) {
-                            console.log(response);
-                            PindahJarumModal(response, id, idpage, pdk, jarumOld); // kirim id & idpage ke fungsi modal
-                        },
-                        error: function(xhr, status, error) {
-                            Swal.fire({
-                                title: 'Error!',
-                                text: 'Gagal Ambil Data: ' + error,
-                                icon: 'error',
-                                confirmButtonText: 'OK'
-                            });
-                        }
-                    });
-                });
 
             });
+            $(document).on('click', '.move-btn', function() {
 
+                var id = $(this).data('id');
+                var pdk = $(this).data('pdk');
+                var jarumOld = <?= json_encode($jarum) ?>;
+                var area = $(this).data('area');
+                var idpage = <?= json_encode($id_pln_mc) ?>;
+                $.ajax({
+                    url: '<?= base_url('api/getPlanStyle'); ?>',
+                    type: 'GET',
+                    data: {
+                        id: id,
+                        area: area,
+                        jarum: jarumOld,
+                        pdk: pdk,
+                        idpage: idpage
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        PindahJarumModal(response, id, idpage, pdk, jarumOld); // kirim id & idpage ke fungsi modal
+                    },
+                    error: function(response) {
+                        console.log(response);
+                    }
+                });
+            });
 
 
 

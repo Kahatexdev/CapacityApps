@@ -421,8 +421,9 @@
                         <td>${item.size}
                             <input type="hidden" value="${item.idAps}" name="idAps[]">
                         </td>
-                         <td>${(item.qty / 24).toFixed(2)} Dz</td>
-                        <td>${(item.sisa / 24).toFixed(2)} Dz</td>
+<td>${jarum === '240n' ? (item.qty *2).toFixed(2) : item.qty.toFixed(2)} Dz</td>
+<td>${jarum === '240n' ? (item.sisa *2).toFixed(2) : item.sisa.toFixed(2)} Dz</td>
+
 
                         <td>
                             <input type="number" class="form-control" value="${item.mesin ?? '0'}" name="mesin[]">
@@ -680,6 +681,7 @@
                             const target100 = document.getElementById('target-100');
                             const qty = document.getElementById('qty');
                             const remainingQty = document.getElementById('remaining-qty');
+                            const jarum = <?= json_encode($jarum) ?>;
 
                             if (stopDate && target100 && qty && remainingQty) {
                                 const formattedDate = new Date(deliv);
@@ -687,8 +689,14 @@
 
                                 stopDate.value = formattedDate.toISOString().split('T')[0];
                                 target100.value = response.smv;
-                                qty.value = response.qty;
-                                remainingQty.value = response.sisa;
+                                if (jarum === '240n') {
+                                    qty.value = response.qty * 2;
+                                    remainingQty.value = response.sisa * 2;
+                                } else {
+                                    qty.value = response.qty;
+                                    remainingQty.value = response.sisa;
+                                }
+
                             } else {
                                 console.error('Error: One or more HTML elements not found.');
                             }

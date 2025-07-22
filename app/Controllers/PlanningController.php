@@ -19,6 +19,7 @@ use CodeIgniter\HTTP\RequestInterface;
 use App\Models\DetailPlanningModel;
 use App\Services\orderServices;
 use App\Models\MonthlyMcModel;
+use App\Models\EstimatedPlanningModel;
 
 
 
@@ -37,6 +38,7 @@ class PlanningController extends BaseController
     protected $MesinPlanningModel;
     protected $orderServices;
     protected $DetailPlanningModel;
+    protected $EstimatedPlanningModel;
     protected $globalModel;
 
 
@@ -54,6 +56,7 @@ class PlanningController extends BaseController
         $this->MesinPlanningModel = new MesinPlanningModel();
         $this->DetailPlanningModel = new DetailPlanningModel();
         $this->globalModel = new MonthlyMcModel();
+        $this->EstimatedPlanningModel = new EstimatedPlanningModel();
 
         $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => ['planning']] != session()->get('role')) {
@@ -756,8 +759,8 @@ class PlanningController extends BaseController
         }
 
         $cekPlan = $this->ApsPerstyleModel->getSisaPerDeliv($pdk, $jarumOld);
-        if ($cekPlan === null) {
-            dd($idPdk);
+        if (empty($cekPlan)) {
+
             $delete = $this->DetailPlanningModel->delete($idPdk);
             if ($delete) {
                 $this->EstimatedPlanningModel->deletePlaningan($idPdk);
