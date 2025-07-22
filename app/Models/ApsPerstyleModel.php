@@ -462,7 +462,7 @@ class ApsPerstyleModel extends Model
         $result = $this->select('sum(sisa) as sisa,sum(qty) as qty, delivery, mastermodel,smv')
             ->where('machinetypeid', $jarum)
             ->where('mastermodel', $model)
-            ->where('sisa >=', 0)
+            // ->where('sisa >=', 0)
             ->where('qty >=', 0)
             ->groupby('delivery')
             ->findAll();

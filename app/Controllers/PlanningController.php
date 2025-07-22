@@ -757,6 +757,7 @@ class PlanningController extends BaseController
 
         $cekPlan = $this->ApsPerstyleModel->getSisaPerDeliv($pdk, $jarumOld);
         if ($cekPlan === null) {
+            dd($idPdk);
             $delete = $this->DetailPlanningModel->delete($idPdk);
             if ($delete) {
                 $this->EstimatedPlanningModel->deletePlaningan($idPdk);
@@ -764,6 +765,8 @@ class PlanningController extends BaseController
             } else {
                 return redirect()->to(base_url($role . '/detailplnmc/' . $pageid))->with('error', 'Model Gagal Dipindahkan');
             }
+        } else {
+            return redirect()->to(base_url($role . '/detailplnmc/' . $pageid))->with('success', 'Model berhasil Dipindahkan');
         }
     }
 }

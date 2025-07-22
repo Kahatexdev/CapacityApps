@@ -421,8 +421,9 @@
                         <td>${item.size}
                             <input type="hidden" value="${item.idAps}" name="idAps[]">
                         </td>
-                           <td>${item.qty} dz</td>
-                           <td>${item.sisa} dz</td>
+                         <td>${(item.qty / 24).toFixed(2)} Dz</td>
+                        <td>${(item.sisa / 24).toFixed(2)} Dz</td>
+
                         <td>
                             <input type="number" class="form-control" value="${item.mesin ?? '0'}" name="mesin[]">
                         </td>
