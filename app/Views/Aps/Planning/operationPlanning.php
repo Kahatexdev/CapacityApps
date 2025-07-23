@@ -421,8 +421,9 @@
                         <td>${item.size}
                             <input type="hidden" value="${item.idAps}" name="idAps[]">
                         </td>
-<td>${jarum === '240N' ? (item.qty *2).toFixed(2) : item.qty.toFixed(2)} Dz</td>
-<td>${jarum === '240N' ? (item.sisa *2).toFixed(2) : item.sisa.toFixed(2)} Dz</td>
+<td>${jarum === '240N' ? (Number(item.qty) * 2).toFixed(2) : Number(item.qty).toFixed(2)} Dz</td>
+<td>${jarum === '240N' ? (Number(item.sisa) * 2).toFixed(2) : Number(item.sisa).toFixed(2)} Dz</td>
+
 
 
                         <td>
