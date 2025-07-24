@@ -89,10 +89,11 @@ error_reporting(E_ALL); ?>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($detailplan as $order) : ?>
+
+                                    <?php foreach ($detailplan as $order): ?>
                                         <tr>
-                                            <td class="text-sm"><?= htmlspecialchars($order['model']); ?></td>
-                                            <td class="text-sm"><?= $order['delivery'] ?></td>
+                                            <td class="text-sm"><?= $order['model']; ?></td>
+                                            <td class="text-sm" data-order="<?= $order['delivery_raw'] ?>"> <?= $order['delivery'] ?></td>
                                             <td class="text-sm">
                                                 <?= ($jarum === '240N')
                                                     ? number_format($order['qty'] * 2, 0, '.', ',')
