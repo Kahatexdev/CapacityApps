@@ -1089,7 +1089,7 @@ class ApsPerstyleModel extends Model
     }
     public function getPlanStyle($area, $pdk, $jarum)
     {
-        return $this->select('idapsperstyle,inisial, size, sum(qty) as qty, sum(sisa) as sisa')
+        return $this->select('idapsperstyle,inisial, size, sum(qty) as qty, sum(sisa) as sisa, color')
             ->where('mastermodel', $pdk)
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)

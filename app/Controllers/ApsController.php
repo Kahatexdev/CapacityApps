@@ -1129,10 +1129,12 @@ class ApsController extends BaseController
                 foreach ($style as $jc) {
                     $idAps = $jc['idapsperstyle'];
                     $mesin = $this->MesinPerStyle->getMesin($idAps);
+                    // dd($mesin);
                     $return[] = [
                         'idAps' => $idAps,
                         'inisial' => $jc['inisial'] ?? null,
                         'style' => $jc['size'] ?? null,
+                        'color' => $jc['color'] ?? null,
                         'qty' => round($jc['qty'] / 24) ?? null,
                         'sisa' => round($jc['sisa'] / 24) ?? null,
                         'mesin' => $mesin['mesin'] ?? null,
@@ -1144,7 +1146,7 @@ class ApsController extends BaseController
                 });
                 return $this->response->setJSON([
                     'status' => 'success',
-                    'data' => $style // Replace with your data
+                    'data' => $return // Replace with your data
                 ]);
             } catch (\Exception $e) {
                 return $this->response->setJSON([
@@ -1158,11 +1160,9 @@ class ApsController extends BaseController
     {
 
         $request = $this->request;
-
         $idAps = $request->getPost('idAps');
         $mesin = $request->getPost('mesin');
         $keterangan = $request->getPost('keterangan');
-
         if (!empty($idAps) && is_array($idAps)) {
             foreach ($idAps as $key => $id_apsperstyle) {
 
@@ -1172,6 +1172,7 @@ class ApsController extends BaseController
                 // Cek apakah data sudah ada di tabel
                 $existing = $this->MesinPerStyle->where('idapsperstyle', $id_apsperstyle)
                     ->first();
+                // dd($existing);
 
                 if ($existing) {
                     // Jika data sudah ada, lakukan update

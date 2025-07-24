@@ -402,48 +402,62 @@
                                     </div>
                                 `;
                                 let planHtml = `
-        <table id="planTable" class="table table-bordered">
-            <thead>
+    <table id="planTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Inisial</th>
+                <th>Style</th>
+                <th>Warna</th>
+                <th>Qty</th>
+                <th>Sisa</th>
+                <th>Mesin</th>
+                <th>Keterangan</th>
+                <th>Material</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${response.data.map(item => `
                 <tr>
-                    <th>Inisial</th>
-                    <th>Style</th>
-                    <th>Qty</th>
-                    <th>Sisa</th>
-                    <th>Mesin</th>
-                    <th>Keterangan</th>
-                    <th>Material</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${response.data.map(item => `
-                    <tr>
-                        <td>${item.inisial}</td>
-                        <td>${item.size}
-                            <input type="hidden" value="${item.idAps}" name="idAps[]">
-                        </td>
-<td>${jarum === '240N' ? (Number(item.qty) * 2).toFixed(2) : Number(item.qty).toFixed(2)} Dz</td>
-<td>${jarum === '240N' ? (Number(item.sisa) * 2).toFixed(2) : Number(item.sisa).toFixed(2)} Dz</td>
-
-
-
-                        <td>
-                            <input type="number" class="form-control" value="${item.mesin ?? '0'}" name="mesin[]">
-                        </td>
-                        <td>
-                            <input type="text" class="form-control" value="${item.keterangan ?? ''}" name="keterangan[]">
-                        </td>
-                        <td>
+                    <td>${item.inisial}</td>
+                    <td>${item.style}
+                        <input type="hidden" value="${item.idAps}" name="idAps[]">
+                    </td>
+                    <td>${item.color.length > 15 ? item.color.substring(0, 15) + '...' : item.color}</td>
+                    <td>${jarum === '240N' ? (Number(item.qty) * 2).toFixed(2) : Number(item.qty).toFixed(2)} Dz</td>
+                    <td>${jarum === '240N' ? (Number(item.sisa) * 2).toFixed(2) : Number(item.sisa).toFixed(2)} Dz</td>
+                    <td>
+                        <input type="number" class="form-control mesin-input" value="${item.mesin ?? '0'}" name="mesin[]">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" value="${item.keterangan ?? ''}" name="keterangan[]">
+                    </td>
+                    <td>
                         <button type="button" class="btn btn-info ml-auto btn-stock" data-style="${item.style}">Cek Stok</button>
-                        </td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
-          
-    `;
+                    </td>
+                </tr>
+            `).join('')}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="5" class="text-right">Total Mesin</th>
+                <th id="totalMesin">0</th>
+                <th colspan="2"></th>
+            </tr>
+        </tfoot>
+    </table>
+`;
+
 
                                 document.querySelector(".planDetail").innerHTML = planHtml;
                                 document.querySelector(".planStyleCard").classList.toggle("d-none");
+
+                                // Hitung awal
+                                hitungTotalMesin();
+
+                                // Hitung ulang saat input mesin diubah
+                                document.querySelectorAll('.mesin-input').forEach(input => {
+                                    input.addEventListener('input', hitungTotalMesin);
+                                });
 
                                 // **Aktifkan DataTables setelah tabel dirender**
                                 $('#planTable').DataTable({
@@ -451,8 +465,8 @@
                                     searching: true, // Bisa cari data
                                     ordering: true, // Bisa sort kolom
                                     lengthMenu: [
-                                        [5, 10, 25, -1],
-                                        [5, 10, 25, "All"]
+                                        [25, -1],
+                                        [25, "All"]
                                     ], // Dropdown jumlah data
                                     language: {
                                         search: "Cari:",
@@ -990,6 +1004,14 @@
         });
 
         initCalculations();
+
+        function hitungTotalMesin() {
+            let total = 0;
+            document.querySelectorAll('.mesin-input').forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+            document.getElementById('totalMesin').textContent = total;
+        }
     </script>
 
     <?php $this->endSection(); ?>

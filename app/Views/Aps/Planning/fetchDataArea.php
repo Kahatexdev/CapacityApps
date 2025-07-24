@@ -403,10 +403,10 @@ error_reporting(E_ALL); ?>
                         const checkbox = `
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox"
-                           name="pilih_size[]" value="${item.size}"
-                           id="check${item.size}">
-                    <label class="form-check-label" for="check${item.idapsperstyle}">
-                        ${item.inisial} - ${item.size} (Sisa: ${item.sisa})
+                           name="pilih_size[]" value="${item.style}"
+                           id="check${item.style}">
+                    <label class="form-check-label" for="check${item.idAps}">
+                        ${item.inisial} - ${item.style} (Sisa: ${item.sisa})
                     </label>
                 </div>`;
                         container.append(checkbox);
