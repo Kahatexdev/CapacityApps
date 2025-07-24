@@ -103,9 +103,9 @@ class MaterialController extends BaseController
                         'item_type'      => $row['item_type'] ?? '',
                         'kode_warna'     => $row['kode_warna'] ?? '',
                         'warna'          => $row['warna'] ?? '',
-                        'jalan_mc'       => $row['jalan_mc'] ?? '',
-                        'ttl_cns'        => $row['ttl_cns'] ?? '',
-                        'ttl_berat_cns'  => $row['ttl_berat_cns'] ?? '',
+                        'jalan_mc'       => $row['jalan_mc'] ?? 0,
+                        'ttl_cns'        => $row['ttl_cns'] ?? 0,
+                        'ttl_berat_cns'  => $row['ttl_berat_cns'] ?? 0,
                         'id_material'    => $row['id_material'] ?? '',
                         'po_tambahan'    => $row['po_tambahan'] ?? 0,
                     ];
