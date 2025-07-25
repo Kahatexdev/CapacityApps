@@ -2359,7 +2359,7 @@ class OrderController extends BaseController
                 'delivery' => $delivery,
             ],
         ]);
-        dd($response);
+        // dd($response);
 
         // pastikan status 200
         if ($response->getStatusCode() !== 200) {
