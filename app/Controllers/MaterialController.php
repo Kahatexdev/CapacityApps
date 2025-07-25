@@ -90,6 +90,7 @@ class MaterialController extends BaseController
         $logged_in = true;
         // $noModel = $this->DetailPlanningModel->getNoModelAktif($area);
         $pemesananBb = session()->get('pemesananBb');
+        // dd ($pemesananBb);
         // Kita "flatten" data sehingga tiap baris tersimpan sebagai record tunggal
         $flattenData = [];
 
@@ -107,7 +108,7 @@ class MaterialController extends BaseController
                         'ttl_cns'        => $row['ttl_cns'] ?? 0,
                         'ttl_berat_cns'  => $row['ttl_berat_cns'] ?? 0,
                         'id_material'    => $row['id_material'] ?? '',
-                        'po_tambahan'    => $row['po_tambahan'] ?? 0,
+                        'po_tambahan'    => $row['po_tambahan'] ?? '0',
                     ];
                 }
             }
@@ -131,7 +132,7 @@ class MaterialController extends BaseController
             $groupKey = $data['tgl_pakai'] . '|' . $data['no_model'] . '|' . $data['item_type'] . '|' . $data['kode_warna'] . '|' . $data['warna'];
             $groupedData[$groupKey][] = $data;
         }
-
+        // dd ($groupedData);
         $data = [
             'role' => session()->get('role'),
             'area' => $area,
@@ -342,22 +343,22 @@ class MaterialController extends BaseController
     public function savePemesananSession()
     {
         $existingData = session()->get('pemesananBb') ?? [];
-
+        // dd ($existingData);
         // Ambil data baru dari request POST dengan key 'items'
         $newData = $this->request->getPost('items');
-
+        // \var_dump($newData);
         if (!is_array($newData)) {
             return; // Pastikan $newData adalah array sebelum diproses
         }
 
         // Inisialisasi array untuk menyimpan hasil filter
         $filteredData = [];
-
+        // dd ($newData);
         // Iterasi setiap elemen pada `$newData`
         foreach ($newData as $rowKey => $rows) {
             foreach ($rows as $index => $item) {
                 // Periksa apakah nilai 'ttl' tidak sama dengan '0'
-                if (isset($item['ttl']) && floatval($item['ttl']) > 0) {
+                if (isset($item['ttl']) && floatval($item['ttl']) > 0 && isset($item['ttl_cns']) && floatval($item['ttl_cns']) > 0) {
                     // Tentukan tgl_pakai berdasarkan jenis item
                     if (isset($item['jenis'])) {
                         $jenisBenang = strtolower($item['jenis']);
