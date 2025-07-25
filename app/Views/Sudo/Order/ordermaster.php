@@ -94,6 +94,31 @@
     <div class="row">
 
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
+            <a href="<?= base_url($role . '/blmAdaArea/') ?>">
+                <div class="card">
+                    <div class="card-body p-3">
+                        <div class="row">
+
+                            <div class="col-8">
+                                <div class="numbers">
+                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Order Not Yet Planned</p>
+                                    <h5 class="font-weight-bolder mb-0">
+                                    </h5>
+                                </div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                    <i class="ni ni-archive-2 text-lg opacity-10" aria-hidden="true"></i>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </a>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
             <a href="<?= base_url($role . '/semuaOrder/') ?>">
                 <div class="card">
                     <div class="card-body p-3">
@@ -119,7 +144,6 @@
             </a>
         </div>
 
-
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
             <a href="<?= base_url($role . '/orderPerjarum/') ?>">
                 <div class="card">
@@ -128,7 +152,7 @@
 
                             <div class="col-8">
                                 <div class="numbers">
-                                    <p class="text-md mb-0 text-capitalize font-weight-bold">All Data Order by Needles</p>
+                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Order Data Per Needle</p>
                                     <h5 class="font-weight-bolder mb-0">
                                     </h5>
                                 </div>
@@ -144,17 +168,18 @@
 
                 </div>
             </a>
+
         </div>
 
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-            <a href="<?= base_url($role . '/orderPerjarumBln/') ?>">
+            <a href="<?= base_url($role . '/orderPerArea/') ?>">
                 <div class="card">
                     <div class="card-body p-3">
                         <div class="row">
 
                             <div class="col-8">
                                 <div class="numbers">
-                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Data Order By Needle and Month</p>
+                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Order Data Per Area</p>
                                     <h5 class="font-weight-bolder mb-0">
                                     </h5>
                                 </div>
@@ -170,17 +195,17 @@
 
                 </div>
             </a>
-        </div>
 
+        </div>
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
-            <a href="<?= base_url($role . '/belumImport/') ?>">
+            <a href="<?= base_url($role . '/orderPerbulan/') ?>">
                 <div class="card">
                     <div class="card-body p-3">
                         <div class="row">
 
                             <div class="col-8">
                                 <div class="numbers">
-                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Order Not Yet Import</p>
+                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Data Order Perbulan</p>
                                     <h5 class="font-weight-bolder mb-0">
                                     </h5>
                                 </div>
@@ -196,6 +221,7 @@
 
                 </div>
             </a>
+
         </div>
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
             <a href="<?= base_url($role . '/statusOrder/') ?>">
@@ -205,7 +231,7 @@
 
                             <div class="col-8">
                                 <div class="numbers">
-                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Order Status</p>
+                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Status Order</p>
                                     <h5 class="font-weight-bolder mb-0">
                                     </h5>
                                 </div>
@@ -221,6 +247,33 @@
 
                 </div>
             </a>
+
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
+            <a href="<?= base_url($role . '/pengajuanspk2/') ?>">
+                <div class="card">
+                    <div class="card-body p-3">
+                        <div class="row">
+
+                            <div class="col-8">
+                                <div class="numbers">
+                                    <p class="text-md mb-0 text-capitalize font-weight-bold">SPK 2</p>
+                                    <h5 class="font-weight-bolder mb-0">
+                                    </h5>
+                                </div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                    <i class="ni ni-archive-2 text-lg opacity-10" aria-hidden="true"></i>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </a>
+
         </div>
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
             <a href="<?= base_url($role . '/sisaOrder/') ?>">
@@ -272,7 +325,29 @@
                 </div>
             </a>
         </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4 mt-2">
+            <a href="<?= base_url($role . '/startStopMcByPdk') ?>">
+                <div class="card">
+                    <div class="card-body p-3">
+                        <div class="row">
 
+                            <div class="col-8">
+                                <div class="numbers">
+                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Start - Stop Mc</p>
+                                    <h5 class="font-weight-bolder mb-0">
+                                    </h5>
+                                </div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                    <i class="ni ni-archive-2 text-lg opacity-10" aria-hidden="true"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
     </div>
 
 </div>
