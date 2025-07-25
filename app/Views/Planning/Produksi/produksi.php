@@ -588,7 +588,7 @@
                                     ticks: {
                                         display: true,
                                         padding: 10,
-                                        color: '#b2b9bf',
+                                        color: '#323435ff',
                                         font: {
                                             size: 11,
                                             family: "Open Sans"
@@ -602,7 +602,7 @@
                                     },
                                     ticks: {
                                         display: true,
-                                        color: '#b2b9bf',
+                                        color: '#323435ff',
                                         padding: 20,
                                         font: {
                                             size: 11,
