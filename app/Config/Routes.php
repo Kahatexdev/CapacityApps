@@ -415,6 +415,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('detailPdk/(:any)/(:any)', 'OrderController::detailPdk/$1/$2');
     $routes->get('estimasispk/(:any)', 'OrderController::estimasispk/$1');
     $routes->post('exportEstimasispk', 'ExcelController::exportEstimasispk');
+    $routes->post('exportDataOrderArea', 'ExcelController::exportDataOrderArea');
 
 
     // mesin

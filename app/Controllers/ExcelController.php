@@ -5420,4 +5420,129 @@ class ExcelController extends BaseController
         $writer->save('php://output');
         exit;
     }
+    public function exportDataOrderArea()
+    {
+        $area = $this->request->getPost('area');
+        $pdk = $this->request->getPost('searchModel');
+
+        $data = $this->ApsPerstyleModel->getDataModel($area, $pdk);
+        // dd($area, $pdk, $data);
+        // Buat file Excel
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $styleTitle = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FF000000'],
+                'size' => 15
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+        ];
+
+        // border
+        $styleHeader = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FFFFFFFF']
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID, // Jenis pengisian solid
+                'startColor' => ['argb' => 'FF67748e'], // Warna latar belakang biru tua (HEX)
+            ],
+        ];
+        $styleBody = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+
+        $sheet->setCellValue('A1', 'DATA ORDER ' . $pdk);
+        $sheet->mergeCells('A1:G1');
+        $sheet->getStyle('A1:G1')->applyFromArray($styleTitle);
+        // Tulis header
+        $sheet->setCellValue('A3', 'JO');
+        $sheet->setCellValue('B3', 'Delivery Date');
+        $sheet->setCellValue('C3', 'Qty');
+        $sheet->setCellValue('D3', 'Customer');
+        $sheet->setCellValue('E3', 'Style');
+        $sheet->setCellValue('F3', 'Product Type');
+        $sheet->setCellValue('G3', 'Std. Time(s)');
+
+        $sheet->getStyle('A3')->applyFromArray($styleHeader);
+        $sheet->getStyle('B3')->applyFromArray($styleHeader);
+        $sheet->getStyle('C3')->applyFromArray($styleHeader);
+        $sheet->getStyle('D3')->applyFromArray($styleHeader);
+        $sheet->getStyle('E3')->applyFromArray($styleHeader);
+        $sheet->getStyle('F3')->applyFromArray($styleHeader);
+        $sheet->getStyle('G3')->applyFromArray($styleHeader);
+
+        // Tulis data mulai dari baris 4
+        $row = 4;
+        $no = 1;
+        $counterMap = [];
+
+        foreach ($data as $item) {
+            // Kunci berdasarkan no_model + size
+            $key = $item['no_model'] . '_' . $item['size'];
+
+            // Inisialisasi counter jika belum ada
+            if (!isset($counterMap[$key])) {
+                $counterMap[$key] = 1;
+            }
+
+            $sheet->setCellValue('A' . $row, $item['no_model'] . '/' . $counterMap[$key] . ' ' . $item['machinetypeid']);
+            $sheet->setCellValue('B' . $row, $item['delivery']);
+            $sheet->setCellValue('C' . $row, $item['qty']);
+            $sheet->setCellValue('D' . $row, $item['kd_buyer_order']);
+            $sheet->setCellValue('E' . $row, $item['size']);
+            $sheet->setCellValue('F' . $row, $item['product_type']);
+            $sheet->setCellValue('G' . $row, $item['smv']);
+
+            // 
+            $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('C' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('D' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('E' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('F' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('G' . $row)->applyFromArray($styleBody);
+
+            $counterMap[$key]++;
+            $row++;
+        }
+
+        // Set lebar kolom agar menyesuaikan isi
+        foreach (range('A', 'G') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Buat writer dan output file Excel
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'Data Order' . $pdk . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit;
+    }
 }
