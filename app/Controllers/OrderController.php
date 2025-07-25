@@ -2343,7 +2343,6 @@ class OrderController extends BaseController
         // baca query param
         $model = $this->request->getGet('mastermodel') ?? '';
         $delivery = $this->request->getGet('delivery') ?? '';
-
         // URL API (bisa juga tanpa ?mastermodel= di url, karena kita kirim via 'query' di get())
         $url = 'http://172.23.44.14/KHTEXT/public/api/flowproses';
 
@@ -2360,6 +2359,7 @@ class OrderController extends BaseController
                 'delivery' => $delivery,
             ],
         ]);
+        // dd($response);
 
         // pastikan status 200
         if ($response->getStatusCode() !== 200) {

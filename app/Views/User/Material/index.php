@@ -143,14 +143,14 @@
                                         $no = 1;
                                         foreach ($groupedData as $groupKey => $group) {
                                             // Inisialisasi total untuk grup ini
-                                            $total_jalan_mc = 0;
-                                            $total_ttl_cns = 0;
-                                            $total_ttl_berat_cns = 0;
+                                            $total_jalan_mc       = 0.0;
+                                            $total_ttl_cns        = 0.0;
+                                            $total_ttl_berat_cns  = 0.0;
                                             // Tampilkan tiap record dalam grup
                                             foreach ($group as $index => $record) {
-                                                $total_jalan_mc += number_format((float)$record['jalan_mc'], 2);
-                                                $total_ttl_cns += number_format((float)$record['ttl_cns'], 2);
-                                                $total_ttl_berat_cns += number_format((float)$record['ttl_berat_cns'], 2);
+                                                $total_jalan_mc      += (float) $record['jalan_mc'];
+                                                $total_ttl_cns       += (float) $record['ttl_cns'];
+                                                $total_ttl_berat_cns += (float) $record['ttl_berat_cns'];
                                         ?>
                                                 <tr>
                                                     <!-- kolom hide -->
@@ -170,9 +170,9 @@
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="item_type[]" value="<?= $record['item_type']; ?>" readonly></td>
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="kode_warna[]" value="<?= $record['kode_warna']; ?>" readonly></td>
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="warna[]" value="<?= $record['warna']; ?>" readonly></td>
-                                                    <td class="text-center"><input type="text" class="form-control text-center w-100" name="jalan_mc[]" value="<?= $record['jalan_mc']; ?>" readonly></td>
-                                                    <td class="text-center"><input type="text" class="form-control text-center w-100" name="ttl_cns[]" value="<?= $record['ttl_cns']; ?>" readonly></td>
-                                                    <td class="text-center"><input type="text" class="form-control text-center w-100" name="ttl_berat_cns[]" value="<?= $record['ttl_berat_cns']; ?>" readonly></td>
+                                                    <td class="text-center"><input type="number" class="form-control text-center w-100" name="jalan_mc[]" value=<?= $record['jalan_mc']; ?> readonly></td>
+                                                    <td class="text-center"><input type="number" step="0.01" class="form-control text-center w-100" name="ttl_cns[]" value=<?= isset($record['ttl_cns']) ? $record['ttl_cns'] : 0 ?> readonly></td>
+                                                    <td class="text-center"><input type="number" step="0.01" class="form-control text-center w-100" name="ttl_berat_cns[]" value=<?= isset($record['ttl_berat_cns']) ? $record['ttl_berat_cns'] : 0 ?> readonly></td>
                                                     <!-- <td class="text-center"><input type="text" class="form-control text-center w-100" name="po_tambahan[]" value="<?= $record['po_tambahan']; ?>" readonly></td> -->
                                                     <td class="text-center">
                                                         <input type="hidden" class="form-control text-center w-100" name="po_tambahan[]"
@@ -193,9 +193,15 @@
                                             <tr class="subtotal">
                                                 <!-- Kolom No dan Tanggal Pakai bisa dikosongkan atau diberi label Total -->
                                                 <td colspan="8" class="font-weight-bolder" style="text-align: right;">TOTAL <?= $first['no_model'] . ' / ' . $first['item_type'] . ' / ' . $first['kode_warna'] . ' / ' . $first['warna']; ?></td>
-                                                <td class="text-center font-weight-bolder"><?= $total_jalan_mc; ?></td>
-                                                <td class="text-center font-weight-bolder"><?= $total_ttl_cns; ?></td>
-                                                <td class="text-center font-weight-bolder"><?= $total_ttl_berat_cns; ?></td>
+                                                <td class="text-center font-weight-bolder">
+                                                    <?= number_format($total_jalan_mc, 2) ?>
+                                                </td>
+                                                <td class="text-center font-weight-bolder">
+                                                    <?= number_format($total_ttl_cns, 2) ?>
+                                                </td>
+                                                <td class="text-center font-weight-bolder">
+                                                    <?= number_format($total_ttl_berat_cns, 2) ?>
+                                                </td>
                                             </tr>
 
                                         <?php
@@ -337,7 +343,7 @@
                                                 </select>
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control gw" name="items[${row}][gw]" readonly>
+                                                <input type="number" step="0.01" class="form-control gw" name="items[${row}][gw]" readonly>
                                             </td>
                                             <td>
                                                 <input type="text" class="form-control inisial" name="items[${row}][inisial]" readonly>
@@ -405,7 +411,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control gw" name="items[${row}][gw]" readonly>
+                                    <input type="number" step="0.01" class="form-control gw" name="items[${row}][gw]" readonly>
                                 </td>
                                 <td>
                                     <input type="text" class="form-control inisial" name="items[${row}][inisial]" readonly>
@@ -598,7 +604,7 @@
                                                 <td width=20><input type="text" class="form-control text-center" name="items[${row}][${index}][no]" id="no" value="${index + 1}" readonly></td>
                                                 <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][komposisi]" id="komposisi" value="${item.composition}" readonly></td>
                                                 <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][loss]" id="loss" value="${item.loss}" readonly></td>
-                                                <td width=120><input type="text" class="form-control text-center" name="items[${row}][${index}][ttl_keb]" id="ttl_keb" value="${parseFloat(item.ttl_keb || 0).toFixed(2)}" readonly></td>
+                                                <td width=120><input type="number" class="form-control text-center" name="items[${row}][${index}][ttl_keb]" id="ttl_keb" value="${parseFloat(item.ttl_keb || 0).toFixed(2)}" readonly></td>
                                                 <td><input type="text" class="form-control text-center" name="items[${row}][${index}][item_type]" id="item_type" value="${item.item_type}" readonly></td>
                                                 <td><input type="text" class="form-control text-center" name="items[${row}][${index}][kode_warna]" id="kode_warna" value="${item.kode_warna}" readonly></td>
                                                 <td><input type="text" class="form-control text-center" name="items[${row}][${index}][warna]" id="warna" value="${item.color}" readonly></td>
@@ -607,23 +613,23 @@
                                                 <td></td>
                                                 <td class="text-center">
                                                     Qty Cones:
-                                                    <input type="number" class="form-control text-center qty_cns" name="items[${row}][${index}][qty_cns]" id="qty_cns" value="${item.qty_cns}">    
+                                                    <input type="number" class="form-control text-center qty_cns" name="items[${row}][${index}][qty_cns]" id="qty_cns" value=${item.qty_cns || 0}>
                                                 </td>
                                                 <td class="text-center">
                                                     Berat Cones:
-                                                    <input type="number" step="0.01" class="form-control text-center qty_berat_cns" name="items[${row}][${index}][qty_berat_cns]" id="qty_berat_cns" value="${item.qty_berat_cns}">
+                                                    <input type="number" step="0.01" class="form-control text-center qty_berat_cns" name="items[${row}][${index}][qty_berat_cns]" id="qty_berat_cns" value=${item.qty_berat_cns || 0}>
                                                 </td>
                                                 <td class="text-center">
                                                     Total:
-                                                    <input type="number" step="0.01" class="form-control text-center ttl" name="items[${row}][${index}][ttl]" id="ttl" value="${total}" readonly>
+                                                    <input type="number" step="0.01" class="form-control text-center ttl" name="items[${row}][${index}][ttl]" id="ttl" value=${total || 0} readonly>
                                                 </td>
                                                 <td class="text-center">
                                                     Total Cones:
-                                                    <input type="number" step="0.01" class="form-control text-center ttl_cns" name="items[${row}][${index}][ttl_cns]" id="ttl_cns" value="${totalCones}" readonly>
+                                                    <input type="number" step="0.01" class="form-control text-center ttl_cns" name="items[${row}][${index}][ttl_cns]" id="ttl_cns" value=${totalCones || 0} readonly>
                                                 </td>
                                                 <td class="text-center">
                                                     Total Berat Cones:
-                                                    <input type="number" step="0.01" class="form-control text-center ttl_berat_cns" name="items[${row}][${index}][ttl_berat_cns]" id="ttl_berat_cns" value="${totalBeratCones}" readonly>
+                                                    <input type="number" step="0.01" class="form-control text-center ttl_berat_cns" name="items[${row}][${index}][ttl_berat_cns]" id="ttl_berat_cns" value=${totalBeratCones || 0} readonly>
                                                 </td>
                                                 <td></td>
                                             </tr>
