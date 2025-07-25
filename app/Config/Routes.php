@@ -719,6 +719,7 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->post('excelSisaOrderArea', 'ExcelController::excelSisaOrderArea');
     $routes->post('inputinisial', 'UserController::inputinisial');
     $routes->post('importinisial', 'UserController::importinisial');
+    $routes->get('flowProses', 'OrderController::flowProses');
 
 
     // produksi
