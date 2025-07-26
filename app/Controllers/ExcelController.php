@@ -5545,4 +5545,189 @@ class ExcelController extends BaseController
         $writer->save('php://output');
         exit;
     }
+
+    public function exportProd()
+    {
+        $bulan = $this->request->getGet('bulan');
+        $tahun = $this->request->getGet('tahun');
+        $area = $this->request->getGet('area');
+        // dd($bulan, $tahun, $area);
+        // Ambil data berdasarkan filter
+        $data = $this->produksiModel->getProductionStats($bulan, $tahun, $area);
+        // dd ($data);
+        // Buat file Excel
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Tulis data ke dalam sheet
+        $this->writeDataToSheet($sheet, $data);
+
+        // Buat writer dan output file Excel
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'Data Order ' . $bulan . '-' . $tahun . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit;
+    }
+
+    private function writeDataToSheet($sheet, $data, $tahun = null, $bulan = null, $area = null)
+    {
+        // ... [style definitions remain unchanged] ...
+        $styleSubHeader = [
+            'font' => [
+                'bold' => true,
+                'size' => 12,
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+        // Set header style
+        $styleHeader = [
+            'font' => [
+                'bold' => true,
+                'size' => 12,
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+        $styleBody = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+        // Get unique dates
+        $dates = array_unique(array_column($data, 'tgl_produksi'));
+        sort($dates);
+        $dateCount = count($dates);
+
+        // Calculate total columns (4 base columns + 6 columns per date)
+        $totalColumns = 4 + (6 * $dateCount);
+
+        // Get last column letter correctly
+        $lastCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($totalColumns);
+
+        // 1. Area header (merged)
+        $sheet->setCellValue('A1', 'Area');
+        $sheet->setCellValue('B1', $area);
+        $sheet->mergeCells("A1:{$lastCol}1");
+        $sheet->getStyle("A1:{$lastCol}1")->applyFromArray($styleHeader);
+
+        // 2. Month header (merged)
+        $sheet->setCellValue('A2', 'Bulan');
+        $sheet->setCellValue('B2', strtoupper(date('F Y', strtotime("$tahun-$bulan-01"))));
+        $sheet->mergeCells("A2:{$lastCol}2");
+        $sheet->getStyle("A2:{$lastCol}2")->applyFromArray($styleHeader);
+
+        // 3. Date headers
+        $baseHeaders = ['Buyer', 'PDK', 'Style-size', 'Jarum'];
+        $col = 'A';
+
+        // Write base headers
+        foreach ($baseHeaders as $h) {
+            $sheet->setCellValue($col . '3', $h);
+            $sheet->mergeCells("{$col}3:{$col}4");
+            $sheet->getStyle($col . '3')->applyFromArray($styleSubHeader);
+            $col++;
+        }
+
+        // Write date headers (merged per 6 columns)
+        foreach ($dates as $tgl) {
+            $tglLabel = date('d M Y', strtotime($tgl));
+            $startCol = $col;
+            $endCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(
+                \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($col) + 5
+            );
+
+            $sheet->setCellValue($startCol . '3', $tglLabel);
+            $sheet->mergeCells("{$startCol}3:{$endCol}3");
+            $sheet->getStyle("{$startCol}3:{$endCol}3")->applyFromArray($styleSubHeader);
+
+            // Move to next group
+            $col = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(
+                \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($endCol) + 1
+            );
+        }
+
+        // 4. Sub-headers
+        $subHeaders = ['Prod', 'Jl MC', 'Prod/mc', 'Target', 'Productivity', 'Loss'];
+        $col = 'E'; // Start after base headers
+
+        foreach ($dates as $tgl) {
+            foreach ($subHeaders as $sh) {
+                $sheet->setCellValue($col . '4', $sh);
+                $sheet->getStyle($col . '4')->applyFromArray($styleSubHeader);
+                $col++;
+            }
+        }
+
+        // 5. Data rows
+        $row = 5;
+        foreach ($data as $item) {
+            $sheet->setCellValue("A{$row}", $item['buyer']);
+            $sheet->setCellValue("B{$row}", $item['mastermodel']);
+            $sheet->setCellValue("C{$row}", $item['size']);
+            $sheet->setCellValue("D{$row}", $item['machinetypeid']);
+
+            $col = 'E'; // Start after base headers
+            foreach ($dates as $tgl) {
+                $val = $item['perDate'][$tgl] ?? [
+                    'prod' => $item['prod'] ?? 0,
+                    'jl_mc' => $item['jl_mc'] ?? 0,
+                    'prodmc' => $item['prodmc'] ?? 0,
+                    'target' => $item['target'] ?? 0,
+                    'productivity' => $item['productivity'] ?? '0%',
+                    'loss' => $item['loss'] ?? '0%'
+                ];
+                // dd ($val);
+                $sheet->setCellValue($col . $row, number_format($val['prod'], 2, '.', ','));
+                $col++;
+                $sheet->setCellValue($col . $row, $val['jl_mc']);
+                $col++;
+                $sheet->setCellValue($col . $row, number_format($val['prodmc'], 2, '.', ','));
+                $col++;
+                $sheet->setCellValue($col . $row, number_format($val['target'], 2, '.', ','));
+                $col++;
+                $sheet->setCellValue($col . $row, number_format($val['productivity'], 2, '.', ','));
+                $col++;
+                $sheet->setCellValue($col . $row, number_format($val['loss'], 2, '.', ','));
+                $col++;
+            }
+
+            $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray($styleBody);
+            $row++;
+        }
+
+        // 6. Auto-size columns
+        for ($i = 1; $i <= $totalColumns; $i++) {
+            $col = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+    }
 }
