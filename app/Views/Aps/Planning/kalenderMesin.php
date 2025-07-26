@@ -110,7 +110,8 @@ error_reporting(E_ALL); ?>
                     eventClick: function(info) {
                         // Ambil data event
                         var title = info.event.title;
-                        var date = info.event.start.toISOString().split('T')[0]; // Format tanggal
+                        var date = info.event.start.toLocaleDateString('en-CA'); // Format tanggal
+                        console.log(date)
                         var description = JSON.parse(info.event.extendedProps.desk || '[]'); // Parse deskripsi JSON
 
                         // Masukkan data ke modal
