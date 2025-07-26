@@ -173,14 +173,15 @@ class PlanningController extends BaseController
             'pu' => $pu
         ];
         $assign = $this->ApsPerstyleModel->asignarealall($data);
-
+        $getDeliv = $this->ApsPerstyleModel->getDeliveryAwalAkhir($model);
         // Kirim ke API MaterialSystem dengan cURL
         $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/assignArea';
         $postData = [
             'model' => $model,
-            'area' => $area
+            'area' => $area,
+            'delivery' => $getDeliv,
+            'pu' => $pu
         ];
-
         $ch = curl_init($apiUrl);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
