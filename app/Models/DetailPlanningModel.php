@@ -57,7 +57,7 @@ class DetailPlanningModel extends Model
             ->select("detail_planning.model, ap.delivery, ap.qty, ap.sisa, ap.machinetypeid, detail_planning.id_detail_pln, detail_planning.id_pln_mc, detail_planning.smv, est.id_est_qty, est.hari, est.precentage_target, est.delivery2, est.start_date, est.stop_date
             ")
             // join aps
-            ->join("(SELECT mastermodel, delivery, machinetypeid,SUM(qty) AS qty, SUM(sisa) AS sisa,factory FROM apsperstyle GROUP BY mastermodel, delivery, machinetypeid, factory) AS ap", 'ap.mastermodel = detail_planning.model AND ap.machinetypeid = detail_planning.jarum', 'left')
+            ->join("(SELECT mastermodel, delivery, machinetypeid,SUM(qty/24) AS qty, SUM(sisa/24) AS sisa,factory FROM apsperstyle GROUP BY mastermodel, delivery, machinetypeid, factory) AS ap", 'ap.mastermodel = detail_planning.model AND ap.machinetypeid = detail_planning.jarum', 'left')
             // join est & tgl planning
             ->join("(SELECT ep.id_detail_pln, ep.id_est_qty, ep.hari, ep.precentage_target, ep.delivery AS delivery2, MIN(tp.date) AS start_date, MAX(tp.date) AS stop_date FROM estimated_planning ep LEFT JOIN tanggal_planning tp ON tp.id_est_qty = ep.id_est_qty GROUP BY ep.id_detail_pln, ep.id_est_qty, ep.hari, ep.precentage_target, ep.delivery) AS est", 'est.id_detail_pln = detail_planning.id_detail_pln AND ap.delivery = est.delivery2', 'left')
             ->where('detail_planning.status', 'aktif')
