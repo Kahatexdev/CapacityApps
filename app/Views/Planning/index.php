@@ -308,10 +308,17 @@
 
     <div class="row my-3 mx-2">
         <div class="card">
-            <div class="card-header">
-                <h5>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
                     Productivity Daily
                 </h5>
+                <!-- button export -->
+                <form method="get" action="<?= base_url('/exportProd') ?>" class="d-inline" target="_blank">
+                    <input type="hidden" name="bulan" id="export-bulan">
+                    <input type="hidden" name="tahun" id="export-tahun">
+                    <input type="hidden" name="area" id="export-area">
+                    <button type="submit" class="btn btn-info" id="exportBtn">Report MC</button>
+                </form>
             </div>
             <div class="card-body">
                 <table class="table">
@@ -794,5 +801,14 @@
 
     // Trigger pertama kali saat halaman load
     handleFilterChange();
+</script>
+
+<script>
+    // Sync filter values to hidden export form fields before submit
+    document.getElementById("exportBtn").addEventListener("click", function(e) {
+        document.getElementById("export-bulan").value = document.getElementById("filter-bulan").value.padStart(2, "0");
+        document.getElementById("export-tahun").value = document.getElementById("filter-tahun").value;
+        document.getElementById("export-area").value = document.getElementById("filter-area").value;
+    });
 </script>
 <?php $this->endSection(); ?>

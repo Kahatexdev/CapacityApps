@@ -980,15 +980,7 @@ class ApsController extends BaseController
     {
         $id = $this->request->getPost('id');
         $idpln = $this->request->getPost('idpl');
-
-        // Fetch estimated planning data
-        $est = $this->EstimatedPlanningModel->where('id_detail_pln', $id)->first();
-        if (!$est) {
-            return redirect()->back()->withInput()->with('error', 'Data Planning tidak ditemukan');
-        }
-
-        $idest = $est['id_est_qty'];
-
+        $idest = $this->request->getPost('idest');
         // Delete from TanggalPlanningModel
         $deleteTanggal = $this->TanggalPlanningModel->hapusData($idest, $id);
         if ($deleteTanggal) {
