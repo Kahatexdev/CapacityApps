@@ -517,7 +517,7 @@
                 }
 
                 const pluspck = pcs * composition * gw / 100 / 1000;
-                const kgPlusPck = pluspck + (pluspck * (1 + (loss / 100)));
+                const kgPlusPck = pluspck * (1 + (loss / 100));
 
                 $row.find('.plus-pck-kg').val(kgPlusPck.toFixed(2));
 
