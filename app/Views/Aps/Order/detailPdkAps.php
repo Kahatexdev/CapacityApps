@@ -38,8 +38,12 @@ error_reporting(E_ALL); ?>
                             </h5>
                         </div>
                         <div class="col-auto">
-
-                            <a href="<?= base_url($role . '/dataorderperarea/' . $area) ?>" class="btn bg-gradient-info">Kembali</a>
+                            <form action="<?= base_url($role . '/exportDataOrderArea') ?>" method="post">
+                                <input type="hidden" value="<?= $area ?>" name="area">
+                                <input type="text" value="<?= $noModel ?>" name="searchModel" hidden>
+                                <button type="submit" class="btn bg-gradient-success"> <i class="fas fa-file-excel"></i> Export</button>
+                                <a href="<?= base_url($role . '/dataorderperarea/' . $area) ?>" class="btn bg-gradient-info">Kembali</a>
+                            </form>
                         </div>
                     </div>
 
@@ -76,7 +80,7 @@ error_reporting(E_ALL); ?>
                                             <?php if (is_array($list)): // Pastikan $list adalah array 
                                             ?>
                                                 <tr>
-                                                    <td><?= htmlspecialchars($list['mastermodel'] ?? '-') ?> / <?= $key + 1 ?> <?= htmlspecialchars($list['machinetypeid'] ?? '-') ?></td>
+                                                    <td><?= htmlspecialchars($list['mastermodel'] ?? '-') ?>/<?= $key + 1 ?> <?= htmlspecialchars($list['machinetypeid'] ?? '-') ?></td>
                                                     <td><?= $list['buyer'] ?></td>
                                                     <td><?= $list['no_order'] ?></td>
                                                     <td><?= $list['delivery'] ?></td>
