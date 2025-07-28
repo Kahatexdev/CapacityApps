@@ -5574,7 +5574,7 @@ class ExcelController extends BaseController
         exit;
     }
 
-    private function writeDataToSheet($sheet, $data, $tahun = null, $bulan = null, $area = null)
+    private function writeDataToSheet($sheet, $data, $tahun, $bulan, $area)
     {
         // ... [style definitions remain unchanged] ...
         $styleSubHeader = [
