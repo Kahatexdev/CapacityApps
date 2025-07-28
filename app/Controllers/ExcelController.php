@@ -5560,7 +5560,7 @@ class ExcelController extends BaseController
         $sheet = $spreadsheet->getActiveSheet();
 
         // Tulis data ke dalam sheet
-        $this->writeDataToSheet($sheet, $data);
+        $this->writeDataToSheet($sheet, $data, $tahun, $bulan, $area);
 
         // Buat writer dan output file Excel
         $writer = new Xlsx($spreadsheet);
@@ -5576,9 +5576,6 @@ class ExcelController extends BaseController
 
     private function writeDataToSheet($sheet, $data, $tahun, $bulan, $area)
     {
-        $bulan = $this->request->getGet('bulan');
-        $tahun = $this->request->getGet('tahun');
-        $area = $this->request->getGet('area');
         // ... [style definitions remain unchanged] ...
         $styleSubHeader = [
             'font' => [
