@@ -424,7 +424,7 @@
                     <td>${item.style}
                         <input type="hidden" value="${item.idAps}" name="idAps[]">
                     </td>
-                    <td>${item.color.length > 15 ? item.color.substring(0, 15) + '...' : item.color}</td>
+                   <td>${item.color ? (item.color.length > 15 ? item.color.substring(0, 15) + '...' : item.color) : '-'}</td>
                     <td>${jarum === '240N' ? (Number(item.qty) * 2).toFixed(2) : Number(item.qty).toFixed(2)} Dz</td>
                     <td>${jarum === '240N' ? (Number(item.sisa) * 2).toFixed(2) : Number(item.sisa).toFixed(2)} Dz</td>
                     <td>
