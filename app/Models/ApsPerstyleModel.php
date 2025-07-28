@@ -1279,6 +1279,7 @@ class ApsPerstyleModel extends Model
             ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model')
             ->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type')
             ->where('apsperstyle.factory', $area)
+            ->where('apsperstyle.qty >', 0)
             ->where('data_model.no_model', $pdk)
             ->groupBy('apsperstyle.size, apsperstyle.delivery')
             ->orderBy('apsperstyle.size, apsperstyle.delivery', 'ASC')
