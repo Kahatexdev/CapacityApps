@@ -1197,6 +1197,7 @@ class ApsPerstyleModel extends Model
             ->groupBy('apsperstyle.machinetypeid')
             ->groupBy('apsperstyle.delivery')
             ->groupBy('apsperstyle.size')
+            ->groupBy('apsperstyle.factory')
             ->orderBy('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.delivery, apsperstyle.size', 'ASC')
             ->findAll();
     }
