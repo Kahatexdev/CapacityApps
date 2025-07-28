@@ -3700,6 +3700,7 @@ class ExcelController extends BaseController
                 'size' => $id['size'],
                 'delivery' => $id['delivery'],
                 'machinetypeid' => $id['machinetypeid'],
+                'area' => $id['factory'],
                 'yesterday' => $yesterday
             ];
             // get data jl mc
