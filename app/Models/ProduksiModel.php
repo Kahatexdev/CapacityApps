@@ -455,6 +455,7 @@ class ProduksiModel extends Model
             ->where('apsperstyle.size', $data['size'])
             ->where('apsperstyle.delivery', $data['delivery'])
             ->where('produksi.tgl_produksi', $data['yesterday'])
+            ->where('produksi.area', $data['area'])
             ->groupBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size, apsperstyle.delivery')
             ->first();
     }
@@ -473,7 +474,7 @@ class ProduksiModel extends Model
     public function getProductionStats($bulan, $tahun, $area)
     {
         return $this->select('produksi.tgl_produksi, produksi.area,data_model.kd_buyer_order AS buyer, apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.size, (SUM(produksi.qty_produksi)/24) as prod, COUNT(produksi.no_mesin) as jl_mc, ((SUM(produksi.qty_produksi)/ 24) / COUNT(produksi.no_mesin)) as prodmc, (3600 / apsperstyle.smv) AS target,((SUM(produksi.qty_produksi) / 24) / COUNT(produksi.no_mesin) / (3600 / apsperstyle.smv)) * 100 AS productivity, bs.bsdz / ((SUM(produksi.qty_produksi) / 24) + bs.bsdz) AS loss')
-            ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle' , 'inner')
+            ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'inner')
             ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'inner')
             ->join(
                 '(SELECT no_model, size, area, SUM(qty_pcs) / 24 AS bsdz FROM bs_mesin GROUP BY no_model, size, area) AS bs',
