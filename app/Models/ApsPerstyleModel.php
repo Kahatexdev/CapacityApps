@@ -1286,4 +1286,14 @@ class ApsPerstyleModel extends Model
             ->orderBy('apsperstyle.size, apsperstyle.delivery', 'ASC')
             ->findAll();
     }
+
+    public function getPembagianModel($noModel)
+    {
+        return $this->select('mastermodel, SUM(qty) AS qty, size, machinetypeid, factory, color')
+            ->where('qty >', 0)
+            ->where('mastermodel', $noModel)
+            ->groupBy('factory, size')
+            ->orderBy('factory, size', 'ASC')
+            ->findAll();
+    }
 }

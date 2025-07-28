@@ -5733,6 +5733,27 @@ class ExcelController extends BaseController
     public function exportExcelJatahNoModel()
     {
         $noModel = $this->request->getGet('no_model');
+        $pdk = $this->ApsPerstyleModel->getPembagianModel($noModel);
+
+        $grouped = [];
+
+        foreach ($pdk as $row) {
+            $key = $row['size'] . '|' . $row['machinetypeid'] . '|' . $row['color'];
+
+            if (!isset($grouped[$key])) {
+                $grouped[$key] = [
+                    'size' => $row['size'],
+                    'machinetypeid' => $row['machinetypeid'],
+                    'color' => $row['color'],
+                    'total_qty' => 0,
+                    'areas' => []
+                ];
+            }
+
+            $grouped[$key]['total_qty'] += (int)$row['qty'];
+            $grouped[$key]['areas'][$row['factory']] =
+                ($grouped[$key]['areas'][$row['factory']] ?? 0) + (int)$row['qty'];
+        }
 
         // Inisialisasi data default
         $order          = [];
@@ -5871,47 +5892,57 @@ class ExcelController extends BaseController
         // border
         $styleHeader = [
             'font' => [
-                'bold' => true, // Tebalkan teks
-                'color' => ['argb' => 'FFFFFFFF']
+                'bold' => true,
+                'color' => ['argb' => 'FF000000'],
             ],
             'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+                'wrapText'   => true,
             ],
             'borders' => [
-                'outline' => [
-                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
-                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
                 ],
             ],
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID, // Jenis pengisian solid
-                'startColor' => ['argb' => 'FF67748e'], // Warna latar belakang biru tua (HEX)
-            ],
+            // 'fill' => [
+            //     'fillType' => Fill::FILL_SOLID,
+            //     'startColor' => ['argb' => 'FF67748E'],
+            // ],
         ];
         $styleBody = [
-            'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
-            ],
             'borders' => [
-                'outline' => [
-                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
-                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
-                ],
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000']
+                ]
             ],
+            'alignment' => [
+                'vertical' => Alignment::VERTICAL_CENTER,
+                'horizontal' => Alignment::HORIZONTAL_CENTER
+            ]
         ];
 
-        $sheet->setCellValue('A1', 'RINCIAN PEMBAGIAN QTY PDK ' . $noModel);
-        $sheet->mergeCells('A1:G1');
-        $sheet->getStyle('A1:G1')->applyFromArray($styleTitle);
+        //TABEL PEMBAGIAN QTY
+        $totalCols = 2 + 2 + (count($areas) * 2) + 1;
+        $lastCol = Coordinate::stringFromColumnIndex($totalCols);
 
-        // Tulis header
-        $sheet->setCellValue('A2', 'STYLE   ');
+        $sheet->setCellValue('A1', 'RINCIAN PEMBAGIAN QTY PDK ' . $noModel);
+        $sheet->mergeCells("A1:{$lastCol}1");
+        $sheet->getStyle("A1:{$lastCol}1")->applyFromArray($styleHeader);
+
+        // Tulis header statis
+        $sheet->setCellValue('A2', 'STYLE');
         $sheet->mergeCells('A2:A3');
         $sheet->setCellValue('B2', 'NEEDLE');
         $sheet->mergeCells('B2:B3');
         $sheet->setCellValue('C2', 'QTY PO');
-        $sheet->setCellValue('C3', 'QTY(Pcs)');
-        $sheet->setCellValue('D3', 'QTY(Dz)');
+        $sheet->mergeCells('C2:D2');
+        $sheet->setCellValue('C3', 'QTY (Pcs)');
+        $sheet->setCellValue('D3', 'QTY (Dz)');
+
+        // Header area dinamis
         $colIndex = 5; // Kolom E
         foreach ($areas as $area) {
             $col1 = Coordinate::stringFromColumnIndex($colIndex);
@@ -5925,32 +5956,144 @@ class ExcelController extends BaseController
 
             $colIndex += 2;
         }
+        $colColor = Coordinate::stringFromColumnIndex($colIndex);
+        $sheet->setCellValue("{$colColor}2", 'COLOR');
+        $sheet->mergeCells("{$colColor}2:{$colColor}3");
+        // $sheet->getColumnDimension($colColor)->setAutoSize(true);
 
-        // Apply style header
-        // $sheet->getStyle("A2:{$lastCol}3")->applyFromArray($styleHeader);
-
-        $sheet->getStyle('A2')->applyFromArray($styleHeader);
-        $sheet->getStyle('B2')->applyFromArray($styleHeader);
-        $sheet->getStyle('C2')->applyFromArray($styleHeader);
-        $sheet->getStyle('D2')->applyFromArray($styleHeader);
-        $sheet->getStyle('E2')->applyFromArray($styleHeader);
-        $sheet->getStyle('F2')->applyFromArray($styleHeader);
-        $sheet->getStyle('G2')->applyFromArray($styleHeader);
+        // ✅ APPLY $styleHeader ke seluruh header dari A2 sampai kolom terakhir
+        $lastHeaderCol = $colColor;
+        $sheet->getStyle("A2:{$lastHeaderCol}3")->applyFromArray($styleHeader);
 
         // Tulis data mulai dari baris 4
         $row = 4;
-        $no = 1;
+        foreach ($grouped as $data) {
+            $sheet->setCellValue("A{$row}", $data['size']);
+            $sheet->setCellValue("B{$row}", $data['machinetypeid']);
+            $sheet->setCellValue("C{$row}", $data['total_qty']);
+            $sheet->setCellValue("D{$row}", number_format($data['total_qty'] / 24, 2));
 
+            $colIndex = 5;
+            foreach ($areas as $area) {
+                $pcsCol = Coordinate::stringFromColumnIndex($colIndex);
+                $dzCol  = Coordinate::stringFromColumnIndex($colIndex + 1);
 
-        $row2 = $row + 1;
-        // Set lebar kolom agar menyesuaikan isi
-        foreach (range('A', 'G') as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
+                $qtyArea = $data['areas'][$area] ?? 0;
+
+                $sheet->setCellValue("{$pcsCol}{$row}", $qtyArea);
+                $sheet->setCellValue("{$dzCol}{$row}", number_format($qtyArea / 24, 2));
+
+                $colIndex += 2;
+            }
+
+            $sheet->setCellValue("{$colColor}{$row}", $data['color']);
+            $row++;
         }
+
+        $dataStartRow = 4;
+        $dataEndRow = $row - 1; // Karena $row sudah ditambah 1 setelah loop
+        $sheet->getStyle("A{$dataStartRow}:{$lastCol}{$dataEndRow}")->applyFromArray($styleBody);
+
+        // Tambah baris total
+        $sheet->setCellValue("A{$row}", 'TOTAL');
+        $sheet->mergeCells("A{$row}:B{$row}");
+        $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray($styleHeader);
+
+        // Kolom C dan D (QTY PO)
+        $sheet->setCellValue("C{$row}", "=SUM(C{$dataStartRow}:C{$dataEndRow})");
+        $sheet->setCellValue("D{$row}", "=SUM(D{$dataStartRow}:D{$dataEndRow})");
+
+        // QTY area
+        $colIndex = 5;
+        foreach ($areas as $area) {
+            $pcsCol = Coordinate::stringFromColumnIndex($colIndex);
+            $dzCol  = Coordinate::stringFromColumnIndex($colIndex + 1);
+
+            $sheet->setCellValue("{$pcsCol}{$row}", "=SUM({$pcsCol}{$dataStartRow}:{$pcsCol}{$dataEndRow})");
+            $sheet->setCellValue("{$dzCol}{$row}", "=SUM({$dzCol}{$dataStartRow}:{$dzCol}{$dataEndRow})");
+
+            $colIndex += 2;
+        }
+
+        // Set lebar kolom agar menyesuaikan isi
+        for ($i = 1; $i <= $totalCols; $i++) {
+            $colLetter = Coordinate::stringFromColumnIndex($i);
+            $sheet->getColumnDimension($colLetter)->setAutoSize(true);
+        }
+
+        // TABEL PEMBAGIAN BAHAN BAKU
+        $row = $row + 2;
+        $totalCols = 4 + count($areas);
+        $lastCol = Coordinate::stringFromColumnIndex($totalCols);
+        $sheet->setCellValue("A{$row}", 'PEMBAGIAN KEBUTUHAN BAHAN BAKU');
+        $sheet->mergeCells("A{$row}:{$lastCol}{$row}");
+        $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray($styleHeader);
+
+        // Header baris ke-1 dan ke-2
+        $row++;
+        $headerRow1 = $row;
+        $headerRow2 = $row + 1;
+
+        // Tulis header statis
+        $sheet->setCellValue("A{$headerRow1}", 'Color');
+        $sheet->mergeCells("A{$headerRow1}:A{$headerRow2}");
+        $sheet->setCellValue("B{$headerRow1}", 'Item Type');
+        $sheet->mergeCells("B{$headerRow1}:B{$headerRow2}");
+        $sheet->setCellValue("C{$headerRow1}", 'Kode Warna');
+        $sheet->mergeCells("C{$headerRow1}:C{$headerRow2}");
+        $sheet->setCellValue("D{$headerRow1}", 'Pesanan');
+        $sheet->setCellValue("D{$headerRow2}", 'Kgs');
+
+        // Header area dinamis (mulai dari kolom E)
+        $colIndex = 5;
+        foreach ($areas as $area) {
+            $col = Coordinate::stringFromColumnIndex($colIndex);
+            $sheet->setCellValue("{$col}{$headerRow1}", 'Keb ' . strtoupper($area));
+            $sheet->setCellValue("{$col}{$headerRow2}", 'Kgs');
+            $colIndex++;
+        }
+
+        // Grand Total Jatah & Sisa
+        $lastCol = Coordinate::stringFromColumnIndex($colIndex - 1);
+
+        // Apply style ke header keseluruhan
+        $sheet->getStyle("A{$headerRow1}:{$lastCol}{$headerRow2}")->applyFromArray($styleHeader);
+
+        $warnaMap = [];
+        foreach ($models ?? [] as $m) {
+            if (isset($m['kode_warna']) && isset($m['color'])) {
+                $warnaMap[$m['kode_warna']] = $m['color'];
+            }
+        }
+
+        // Data Rows
+        $row = $headerRow2 + 1;
+        foreach ($totalAllDelivery as $item_type => $colors) {
+            foreach ($colors as $kode_warna => $areaData) {
+                $sheet->setCellValue("A{$row}", $warnaMap[$kode_warna] ?? '-');
+                $sheet->setCellValue("B{$row}", $item_type);
+                $sheet->setCellValue("C{$row}", $kode_warna);
+                $sheet->setCellValue("D{$row}", number_format($areaData['Grand Total Jatah'] ?? 0, 2));
+
+                $colIndex = 5;
+                foreach ($areas as $area) {
+                    $jatah = $areaData[$area]['jatah'] ?? 0;
+                    $col = Coordinate::stringFromColumnIndex($colIndex);
+                    $sheet->setCellValue("{$col}{$row}", number_format($jatah, 2));
+                    $colIndex++;
+                }
+                $row++;
+            }
+        }
+
+        // Apply style ke body
+        $dataStartRow = $headerRow2 + 1;
+        $dataEndRow = $row - 1;
+        $sheet->getStyle("A{$dataStartRow}:{$lastCol}{$dataEndRow}")->applyFromArray($styleBody);
 
         // Buat writer dan output file Excel
         $writer = new Xlsx($spreadsheet);
-        $fileName = 'Data Order' . $noModel . '.xlsx';
+        $fileName = 'Pembagian Jatah Area ' . $noModel . '.xlsx';
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="' . $fileName . '"');
