@@ -34,46 +34,24 @@ error_reporting(E_ALL); ?>
                     <div class="row justify-content-between align-items-center mb-3">
                         <div class="col-auto">
                             <h5>
-                                Detail Data Model <?= esc($noModel) ?> Jarum <?= esc($jarum) ?>
+                                Detail Data Model <?= esc($noModel) ?>
                             </h5>
                         </div>
                         <div class="col-auto">
 
-                            <a href="<?= base_url($role . '/dataorder/') ?>" class="btn bg-gradient-info">Kembali</a>
+                            <a href="<?= base_url($role . '/dataorderperarea/' . $area) ?>" class="btn bg-gradient-info">Kembali</a>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-4">
-                            <h6>
-                                Qty Order Perdelivery
-                            </h6>
-                            <?php foreach ($headerRow as $val): ?>
-                                <li><?= date('d M Y', strtotime($val['delivery']))  ?> : <?= round($val['qty'] / 24) ?> dz</li>
-                            <?php endforeach ?>
-                            <p>---------------------------------------------</p>
 
-                            Total Order : <?= round($totalPo['totalPo'] / 24) ?> dz
-
-                        </div>
-
-                        <div class="col-md-4">
-                            <h6>Summarize <?= $noModel ?> <?= $jarum ?></h6>
-                            <li>Kebutuhan Mesin : <?= $kebMesin ?> Machine</li>
-                            <li>Duration : <?= $hari ?> days </li>
-                            <li>Target Perhari : <?= $target ?> dz/day</li>
-
-                        </div>
-
-                    </div>
 
                 </div>
 
                 <div class="card-body">
-                    <?php foreach ($order as $deliv => $val): ?>
+                    <?php foreach ($order as $style => $val): ?>
                         <div class="row mt-3">
                             <div class="d-flex justify-content-between align-item-center">
-                                <h5> <span class='badge  badge-pill badge-lg bg-gradient-info'>Detail Order Delivery <?= date('d M Y', strtotime($deliv)) ?> </span></h5>
+                                <h5> <span class='badge  badge-pill badge-lg bg-gradient-info'> <?= $style ?> </span></h5>
                                 <h5> <span class='badge  badge-pill badge-lg bg-gradient-info'>Qty Order <?= round($val['totalQty'] / 24) ?> dz</span></h5>
 
                             </div>
@@ -82,13 +60,15 @@ error_reporting(E_ALL); ?>
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Size</th>
-                                            <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Inisial</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">JO</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Buyer</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">No Order</th>
+                                            <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Delivery</th>
                                             <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Qty</th>
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Sisa</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Product Type</th>
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">SMV</th>
                                             <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Area</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Factory</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -96,13 +76,15 @@ error_reporting(E_ALL); ?>
                                             <?php if (is_array($list)): // Pastikan $list adalah array 
                                             ?>
                                                 <tr>
-                                                    <td> <?= $list['size'] ?></td>
-                                                    <td><?= $list['inisial'] ?></td>
+                                                    <td><?= htmlspecialchars($list['mastermodel'] ?? '-') ?> / <?= $key + 1 ?> <?= htmlspecialchars($list['machinetypeid'] ?? '-') ?></td>
+                                                    <td><?= $list['buyer'] ?></td>
+                                                    <td><?= $list['no_order'] ?></td>
+                                                    <td><?= $list['delivery'] ?></td>
                                                     <td><?= round($list['qty'] / 24) ?> dz</td>
                                                     <td><?= round($list['sisa'] / 24) ?> dz</td>
+                                                    <td><?= $list['product_type'] ?></td>
                                                     <td><?= $list['smv'] ?></td>
                                                     <td><?= $list['factory'] ?></td>
-                                                    <td><?= $list['production_unit'] ?></td>x
 
                                                 </tr>
                                             <?php endif; ?>
@@ -179,67 +161,12 @@ error_reporting(E_ALL); ?>
 
 
 
-        <div class="modal fade bd-example-modal-lg" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModal" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Edit <Area:d></Area:d>
-                        </h5>
-                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="<?= base_url($role . '/inputinisial') ?>" method="post">
-
-                            <div id="confirmationMessage"></div>
-                            <input type="text" class="form-control" name="jarum" id="" value="" hidden>
-
-                            <div class="form-group">
-                                <label for="pdk" class="label">PDK</label>
-                                <input type="text" class="form-control" name="pdk" id="" value="" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="size" class="label">Style Size</label>
-                                <input type="text" name="size" class="form-control" id="" value="" readonly>
-
-                            </div>
-                            <div class="form-group">
-                                <label for="inisial" class="label">Inisial</label>
-                                <input type="text" name="inisial" class="form-control" id="" value="" placeholder="Masukan Inisial">
-                            </div>
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn bg-gradient-danger">Ya</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
 
         <script>
             $(document).ready(function() {
                 $('#dataTable').DataTable();
 
-                $('.edit-btn').click(function() {
-                    var idAps = $(this).data('id');
-                    var area = $(this).data('area');
-                    var pdk = $(this).data('pdk');
-                    var deliv = $(this).data('deliv');
-                    var size = $(this).data('size');
-                    var jarum = $(this).data('jarum');
-                    $('#editModal').modal('show'); // Show the modal
-                    $('#editModal').find('input[name="area"]').val(area);
-                    $('#editModal').find('input[name="id"]').val(idAps);
-                    $('#editModal').find('input[name="pdk"]').val(pdk);
-                    $('#editModal').find('input[name="deliv"]').val(deliv);
-                    $('#editModal').find('input[name="size"]').val(size);
-                    $('#editModal').find('input[name="jarum"]').val(jarum);
-                });
+
 
 
 

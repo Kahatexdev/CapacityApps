@@ -236,6 +236,26 @@ class OrderModel extends Model
 
         return $builder->get()->getResult();
     }
+    public function getPDk($area)
+    {
+        $twomonth = date('Y-m-d', strtotime('60 days ago'));
+
+        $builder = $this->db->table('data_model');
+
+        $builder->select('data_model.*, mastermodel,no_order, machinetypeid, ROUND(SUM(qty/24), 0) AS qty, ROUND(SUM(sisa/24), 0) AS sisa, factory, delivery, product_type');
+        $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
+        $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
+        $builder->where('factory', $area);
+        $builder->where('delivery >', $twomonth);
+        $builder->where('qty >', 0);
+        $builder->orderby('created_at', 'desc');
+        $builder->orderby('no_model', 'asc');
+        $builder->orderby('delivery', 'asc');
+        $builder->groupBy('data_model.no_model');
+        $builder->groupBy('factory');
+
+        return $builder->get()->getResult();
+    }
     public function getId($nomodel)
     {
         return $this->select('id_model')->where('no_model', $nomodel)->first();
