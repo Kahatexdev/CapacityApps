@@ -5576,6 +5576,9 @@ class ExcelController extends BaseController
 
     private function writeDataToSheet($sheet, $data, $tahun, $bulan, $area)
     {
+        $bulan = $this->request->getGet('bulan');
+        $tahun = $this->request->getGet('tahun');
+        $area = $this->request->getGet('area');
         // ... [style definitions remain unchanged] ...
         $styleSubHeader = [
             'font' => [
