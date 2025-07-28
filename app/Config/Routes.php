@@ -527,6 +527,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('generate_excel_po_tambahan', 'ExcelController::generatePoTambahan');
 
     $routes->get('jatah_bahan_baku', 'MaterialController::jatahBahanBaku');
+    $routes->get('export_excel_jatah_bb', 'ExcelController::exportExcelJatahNoModel');
 });
 
 // user
