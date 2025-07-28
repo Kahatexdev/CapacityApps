@@ -19,6 +19,9 @@ error_reporting(E_ALL); ?>
                     <button id="btnFilter" class="btn btn-sm bg-gradient-info">
                         <i class="fa fa-search"></i> Filter
                     </button>
+                    <button id="btnExport" class="btn btn-sm bg-gradient-success">
+                        <i class="fa fa-file-excel"></i> Export Excel
+                    </button>
                 </div>
             </div>
         </div>
@@ -175,6 +178,14 @@ error_reporting(E_ALL); ?>
                     $loader.hide();
                 }
             });
+        });
+
+        $('#btnExport').on('click', function() {
+            const model = $('#no_model').val().trim();
+            if (!model) return;
+
+            // Redirect ke controller export_excel dengan parameter no_model
+            window.location.href = '<?= base_url($role . "/export_excel_jatah_bb") ?>?no_model=' + encodeURIComponent(model);
         });
     });
 </script>

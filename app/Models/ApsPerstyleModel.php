@@ -468,6 +468,17 @@ class ApsPerstyleModel extends Model
             ->findAll();
         return $result;
     }
+    public function getSisaPerStyleArea($model, $area)
+    {
+        $result = $this->select('mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,smv,inisial')
+            ->where('mastermodel', $model)
+            ->where('factory', $area)
+            // ->where('sisa >=', 0)
+            ->where('qty >', 0)
+            ->groupby('size')
+            ->findAll();
+        return $result;
+    }
     public function getSisaPerDlv($model, $jarum, $deliv)
     {
         $sisa = $this->select('idapsperstyle,inisial,mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,factory, production_unit, delivery,smv,seam,country,no_order')
@@ -477,6 +488,20 @@ class ApsPerstyleModel extends Model
             ->where('sisa >=', 0)
             ->where('qty >=', 0)
             ->groupBy('size,factory')
+            ->findAll();
+        $final = reset($sisa);
+        return $sisa;
+    }
+    public function getSisaPerStyle($model, $style)
+    {
+        $sisa = $this->select('idapsperstyle,inisial,mastermodel,machinetypeid,size,sum(qty) as qty,sum(sisa) as sisa,factory, production_unit, delivery,smv,apsperstyle.seam,country,no_order, data_model.kd_buyer_order as buyer, master_product_type.product_type')
+            ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel', 'left')
+            ->join('master_product_type', 'master_product_type.id_product_type = data_model.id_product_type', 'left')
+            ->where('mastermodel', $model)
+            ->where('size', $style)
+            ->where('sisa >=', 0)
+            ->where('qty >', 0)
+            ->groupBy('machinetypeid,delivery')
             ->findAll();
         $final = reset($sisa);
         return $sisa;
@@ -1197,6 +1222,7 @@ class ApsPerstyleModel extends Model
             ->groupBy('apsperstyle.machinetypeid')
             ->groupBy('apsperstyle.delivery')
             ->groupBy('apsperstyle.size')
+            ->groupBy('apsperstyle.factory')
             ->orderBy('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.delivery, apsperstyle.size', 'ASC')
             ->findAll();
     }
@@ -1271,6 +1297,19 @@ class ApsPerstyleModel extends Model
     public function smvPerSize($pdk, $sz)
     {
         return $this->select('smv')->where('mastermodel', $pdk)->where('size', $sz)->first();
+    }
+
+    public function getDataModel($area, $pdk)
+    {
+        return $this->select('data_model.no_model, data_model.kd_buyer_order, apsperstyle.delivery, SUM(apsperstyle.qty) AS qty, apsperstyle.size, apsperstyle.smv, apsperstyle.machinetypeid, master_product_type.product_type')
+            ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model')
+            ->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type')
+            ->where('apsperstyle.factory', $area)
+            ->where('apsperstyle.qty >', 0)
+            ->where('data_model.no_model', $pdk)
+            ->groupBy('apsperstyle.size, apsperstyle.delivery')
+            ->orderBy('apsperstyle.size, apsperstyle.delivery', 'ASC')
+            ->findAll();
     }
 
     public function getIdApsForFlowProses($noModel)

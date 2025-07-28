@@ -3700,6 +3700,7 @@ class ExcelController extends BaseController
                 'size' => $id['size'],
                 'delivery' => $id['delivery'],
                 'machinetypeid' => $id['machinetypeid'],
+                'area' => $id['factory'],
                 'yesterday' => $yesterday
             ];
             // get data jl mc
@@ -5417,6 +5418,544 @@ class ExcelController extends BaseController
         header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
+        $writer->save('php://output');
+        exit;
+    }
+    public function exportDataOrderArea()
+    {
+        $area = $this->request->getPost('area');
+        $pdk = $this->request->getPost('searchModel');
+
+        $data = $this->ApsPerstyleModel->getDataModel($area, $pdk);
+        // dd($area, $pdk, $data);
+        // Buat file Excel
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $styleTitle = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FF000000'],
+                'size' => 15
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+        ];
+
+        // border
+        $styleHeader = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FFFFFFFF']
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID, // Jenis pengisian solid
+                'startColor' => ['argb' => 'FF67748e'], // Warna latar belakang biru tua (HEX)
+            ],
+        ];
+        $styleBody = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+
+        $sheet->setCellValue('A1', 'DATA ORDER ' . $pdk);
+        $sheet->mergeCells('A1:G1');
+        $sheet->getStyle('A1:G1')->applyFromArray($styleTitle);
+        // Tulis header
+        $sheet->setCellValue('A3', 'JO');
+        $sheet->setCellValue('B3', 'Delivery Date');
+        $sheet->setCellValue('C3', 'Qty');
+        $sheet->setCellValue('D3', 'Customer');
+        $sheet->setCellValue('E3', 'Style');
+        $sheet->setCellValue('F3', 'Product Type');
+        $sheet->setCellValue('G3', 'Std. Time(s)');
+
+        $sheet->getStyle('A3')->applyFromArray($styleHeader);
+        $sheet->getStyle('B3')->applyFromArray($styleHeader);
+        $sheet->getStyle('C3')->applyFromArray($styleHeader);
+        $sheet->getStyle('D3')->applyFromArray($styleHeader);
+        $sheet->getStyle('E3')->applyFromArray($styleHeader);
+        $sheet->getStyle('F3')->applyFromArray($styleHeader);
+        $sheet->getStyle('G3')->applyFromArray($styleHeader);
+
+        // Tulis data mulai dari baris 4
+        $row = 4;
+        $no = 1;
+        $counterMap = [];
+
+        foreach ($data as $item) {
+            // Kunci berdasarkan no_model + size
+            $key = $item['no_model'] . '_' . $item['size'];
+
+            // Inisialisasi counter jika belum ada
+            if (!isset($counterMap[$key])) {
+                $counterMap[$key] = 1;
+            }
+
+            $sheet->setCellValue('A' . $row, $item['no_model'] . '/' . $counterMap[$key] . ' ' . $item['machinetypeid']);
+            $sheet->setCellValue('B' . $row, $item['delivery']);
+            $sheet->setCellValue('C' . $row, $item['qty']);
+            $sheet->setCellValue('D' . $row, $item['kd_buyer_order']);
+            $sheet->setCellValue('E' . $row, $item['size']);
+            $sheet->setCellValue('F' . $row, $item['product_type']);
+            $sheet->setCellValue('G' . $row, $item['smv']);
+
+            // 
+            $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('C' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('D' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('E' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('F' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('G' . $row)->applyFromArray($styleBody);
+
+            $counterMap[$key]++;
+            $row++;
+        }
+
+        // Set lebar kolom agar menyesuaikan isi
+        foreach (range('A', 'G') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Buat writer dan output file Excel
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'Data Order' . $pdk . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function exportProd()
+    {
+        $bulan = $this->request->getGet('bulan');
+        $tahun = $this->request->getGet('tahun');
+        $area = $this->request->getGet('area');
+        // dd($bulan, $tahun, $area);
+        // Ambil data berdasarkan filter
+        $data = $this->produksiModel->getProductionStats($bulan, $tahun, $area);
+        // dd ($data);
+        // Buat file Excel
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Tulis data ke dalam sheet
+        $this->writeDataToSheet($sheet, $data, $tahun, $bulan, $area);
+
+        // Buat writer dan output file Excel
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'Report MC Area ' . $area . ' (' . strtoupper(date('F Y', strtotime("$tahun-$bulan-01"))) . ').xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit;
+    }
+
+    private function writeDataToSheet($sheet, $data, $tahun, $bulan, $area)
+    {
+        // ... [style definitions remain unchanged] ...
+        $styleSubHeader = [
+            'font' => [
+                'bold' => true,
+                'size' => 12,
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+        // Set header style
+        $styleHeader = [
+            'font' => [
+                'bold' => true,
+                'size' => 12,
+            ],
+            // 'alignment' => [
+            //     'horizontal' => Alignment::HORIZONTAL_CENTER,
+            //     'vertical'   => Alignment::VERTICAL_CENTER,
+            // ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+        $styleBody = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+        // Get unique dates
+        $dates = array_unique(array_column($data, 'tgl_produksi'));
+        sort($dates);
+        $dateCount = count($dates);
+
+        // Calculate total columns (4 base columns + 6 columns per date)
+        $totalColumns = 4 + (6 * $dateCount);
+
+        // Get last column letter correctly
+        $lastCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($totalColumns);
+
+        // 1. Area header (merged)
+        $sheet->setCellValue('A1', 'Area: ' . $area);
+        $sheet->mergeCells("A1:{$lastCol}1");
+        $sheet->getStyle("A1:{$lastCol}1")->applyFromArray($styleHeader);
+
+        // 2. Month header (merged)
+        $sheet->setCellValue('A2', 'Bulan: ' . strtoupper(date('F Y', strtotime("$tahun-$bulan-01"))));
+        $sheet->mergeCells("A2:{$lastCol}2");
+        $sheet->getStyle("A2:{$lastCol}2")->applyFromArray($styleHeader);
+
+        // 3. Date headers
+        $baseHeaders = ['Buyer', 'PDK', 'Style-size', 'Jarum'];
+        $col = 'A';
+
+        // Write base headers
+        foreach ($baseHeaders as $h) {
+            $sheet->setCellValue($col . '3', $h);
+            $sheet->mergeCells("{$col}3:{$col}4");
+            $sheet->getStyle($col . '3:' . $col . '4')->applyFromArray($styleSubHeader);
+            $col++;
+        }
+
+        // Write date headers (merged per 6 columns)
+        foreach ($dates as $tgl) {
+            $tglLabel = date('d M Y', strtotime($tgl));
+            $startCol = $col;
+            $endCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(
+                \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($col) + 5
+            );
+
+            $sheet->setCellValue($startCol . '3', $tglLabel);
+            $sheet->mergeCells("{$startCol}3:{$endCol}3");
+            $sheet->getStyle("{$startCol}3:{$endCol}3")->applyFromArray($styleSubHeader);
+
+            // Move to next group
+            $col = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(
+                \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($endCol) + 1
+            );
+        }
+
+        // 4. Sub-headers
+        $subHeaders = ['Prod', 'Jl MC', 'Prod/mc', 'Target', 'Productivity', 'Loss'];
+        $col = 'E'; // Start after base headers
+
+        foreach ($dates as $tgl) {
+            foreach ($subHeaders as $sh) {
+                $sheet->setCellValue($col . '4', $sh);
+                $sheet->getStyle($col . '4')->applyFromArray($styleSubHeader);
+                $col++;
+            }
+        }
+
+        // 5. Data rows
+        $row = 5;
+        foreach ($data as $item) {
+            $sheet->setCellValue("A{$row}", $item['buyer']);
+            $sheet->setCellValue("B{$row}", $item['mastermodel']);
+            $sheet->setCellValue("C{$row}", $item['size']);
+            $sheet->setCellValue("D{$row}", $item['machinetypeid']);
+
+            $col = 'E'; // Start after base headers
+            foreach ($dates as $tgl) {
+                $val = $item['perDate'][$tgl] ?? [
+                    'prod' => $item['prod'] ?? 0,
+                    'jl_mc' => $item['jl_mc'] ?? 0,
+                    'prodmc' => $item['prodmc'] ?? 0,
+                    'target' => $item['target'] ?? 0,
+                    'productivity' => $item['productivity'] ?? '0%',
+                    'loss' => $item['loss'] ?? '0%'
+                ];
+                // dd ($val);
+                $sheet->setCellValue($col . $row, number_format($val['prod'], 2, '.', ','));
+                $col++;
+                $sheet->setCellValue($col . $row, $val['jl_mc']);
+                $col++;
+                $sheet->setCellValue($col . $row, number_format($val['prodmc'], 2, '.', ','));
+                $col++;
+                $sheet->setCellValue($col . $row, number_format($val['target'], 2, '.', ','));
+                $col++;
+                $sheet->setCellValue($col . $row, number_format($val['productivity'], 2, '.', ',') . '%');
+                $col++;
+                $sheet->setCellValue($col . $row, number_format($val['loss'], 2, '.', ',') . '%');
+                $col++;
+            }
+
+            $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray($styleBody);
+            $row++;
+        }
+
+        // 6. Auto-size columns
+        for ($i = 1; $i <= $totalColumns; $i++) {
+            $col = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+    }
+
+    public function exportExcelJatahNoModel()
+    {
+        $noModel = $this->request->getGet('no_model');
+
+        // Inisialisasi data default
+        $order          = [];
+        $headerRow      = [];
+        $result         = [];
+        $areas          = [];
+        $totalPo        = 0;
+        $models         = [];
+        $totalAllDelivery = [];
+
+        if ($noModel) {
+            //
+            // 1) Ambil headerRow & hitung totalQty per delivery (untuk $order)
+            //
+            $order = $this->ApsPerstyleModel->getQtyArea($noModel) ?: [];
+
+            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
+            $material = @file_get_contents($apiUrl);
+
+            // $models = [];
+            if ($material !== FALSE) {
+                $models = json_decode($material, true);
+            }
+
+            // Ambil semua area unik dari $order
+
+            foreach ($order as $ord) {
+                if (!in_array($ord['area'], $areas)) {
+                    $areas[] = $ord['area'];
+                }
+            }
+            sort($areas);
+
+            // Kelompokkan order berdasarkan style_size, lalu delivery dan area
+            $groupedOrders = [];
+            foreach ($order as $ord) {
+                $style_size = $ord['size'];
+                $delivery = $ord['delivery'];
+                $area = $ord['area'];
+                $qty = $ord['qty'];
+                $sisa = $ord['sisa'];
+
+                if (!isset($groupedOrders[$style_size][$delivery][$area])) {
+                    $groupedOrders[$style_size][$delivery][$area] = [
+                        'qty' => 0,
+                        'sisa' => 0,
+                    ];
+                }
+
+                $groupedOrders[$style_size][$delivery][$area]['qty'] += $qty;
+                $groupedOrders[$style_size][$delivery][$area]['sisa'] += $sisa;
+            }
+
+            // Hitung total per kombinasi delivery, item_type, kode_warna, dan area
+            foreach ($models as $mat) {
+                $style_size = $mat['style_size'];
+                $item_type = $mat['item_type'];
+                $kode_warna = $mat['kode_warna'];
+                $warna = $mat['color']; // warna
+                $comp = floatval($mat['composition']);
+                $gw = floatval($mat['gw']);
+                $loss = floatval($mat['loss']);
+
+                if (!isset($groupedOrders[$style_size])) {
+                    continue;
+                }
+
+                foreach ($groupedOrders[$style_size] as $delivery => $areaData) {
+                    foreach ($areaData as $area => $values) {
+                        $qty = $values['qty'];
+                        $sisa = $values['sisa'];
+
+                        $jatah = ($qty * $comp * $gw / 100 / 1000) * (1 + ($loss / 100));
+                        $sisaVal = ($sisa * $comp * $gw / 100 / 1000) * (1 + ($loss / 100));
+
+                        if (!isset($result[$delivery][$item_type][$kode_warna])) {
+                            $result[$delivery][$item_type][$kode_warna] = [];
+                            foreach ($areas as $a) {
+                                $result[$delivery][$item_type][$kode_warna][$a] = ['jatah' => 0, 'sisa' => 0];
+                            }
+                            $result[$delivery][$item_type][$kode_warna]['Grand Total Jatah'] = 0;
+                            $result[$delivery][$item_type][$kode_warna]['Grand Total Sisa'] = 0;
+                        }
+
+                        $result[$delivery][$item_type][$kode_warna][$area]['jatah'] += $jatah;
+                        $result[$delivery][$item_type][$kode_warna][$area]['sisa'] += $sisaVal;
+
+                        // Total hanya berdasarkan jatah (tanpa sisa), tapi bisa ditambah sisa jika perlu
+                        $result[$delivery][$item_type][$kode_warna]['Grand Total Jatah'] += $jatah;
+                        $result[$delivery][$item_type][$kode_warna]['Grand Total Sisa'] += $sisaVal;
+                    }
+                }
+            }
+
+            // Akumulasi total semua delivery
+            foreach ($result as $delivery => $itemTypes) {
+                foreach ($itemTypes as $item_type => $colors) {
+                    foreach ($colors as $kode_warna => $areaData) {
+                        if (!isset($totalAllDelivery[$item_type][$kode_warna])) {
+                            foreach ($areas as $a) {
+                                $totalAllDelivery[$item_type][$kode_warna][$a] = ['jatah' => 0, 'sisa' => 0];
+                            }
+                            $totalAllDelivery[$item_type][$kode_warna]['Grand Total Jatah'] = 0;
+                            $totalAllDelivery[$item_type][$kode_warna]['Grand Total Sisa'] = 0;
+                        }
+
+                        foreach ($areas as $area) {
+                            $totalAllDelivery[$item_type][$kode_warna][$area]['jatah'] += $areaData[$area]['jatah'] ?? 0;
+                            $totalAllDelivery[$item_type][$kode_warna][$area]['sisa'] += $areaData[$area]['sisa'] ?? 0;
+                        }
+
+                        $totalAllDelivery[$item_type][$kode_warna]['Grand Total Jatah'] += $areaData['Grand Total Jatah'] ?? 0;
+                        $totalAllDelivery[$item_type][$kode_warna]['Grand Total Sisa'] += $areaData['Grand Total Sisa'] ?? 0;
+                    }
+                }
+            }
+            //
+            $totalPo = $this->ApsPerstyleModel->totalPo($noModel)['totalPo'] ?? 0;
+        }
+
+        // Buat file Excel
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $styleTitle = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FF000000'],
+                'size' => 15
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+        ];
+
+        // border
+        $styleHeader = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FFFFFFFF']
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID, // Jenis pengisian solid
+                'startColor' => ['argb' => 'FF67748e'], // Warna latar belakang biru tua (HEX)
+            ],
+        ];
+        $styleBody = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+
+        $sheet->setCellValue('A1', 'RINCIAN PEMBAGIAN QTY PDK ' . $noModel);
+        $sheet->mergeCells('A1:G1');
+        $sheet->getStyle('A1:G1')->applyFromArray($styleTitle);
+
+        // Tulis header
+        $sheet->setCellValue('A2', 'STYLE   ');
+        $sheet->mergeCells('A2:A3');
+        $sheet->setCellValue('B2', 'NEEDLE');
+        $sheet->mergeCells('B2:B3');
+        $sheet->setCellValue('C2', 'QTY PO');
+        $sheet->setCellValue('C3', 'QTY(Pcs)');
+        $sheet->setCellValue('D3', 'QTY(Dz)');
+        $colIndex = 5; // Kolom E
+        foreach ($areas as $area) {
+            $col1 = Coordinate::stringFromColumnIndex($colIndex);
+            $col2 = Coordinate::stringFromColumnIndex($colIndex + 1);
+
+            // Merge area di baris ke-2
+            $sheet->mergeCells("{$col1}2:{$col2}2");
+            $sheet->setCellValue("{$col1}2", 'QTY ' . strtoupper($area));
+            $sheet->setCellValue("{$col1}3", 'QTY (Pcs)');
+            $sheet->setCellValue("{$col2}3", 'QTY (Dz)');
+
+            $colIndex += 2;
+        }
+
+        // Apply style header
+        // $sheet->getStyle("A2:{$lastCol}3")->applyFromArray($styleHeader);
+
+        $sheet->getStyle('A2')->applyFromArray($styleHeader);
+        $sheet->getStyle('B2')->applyFromArray($styleHeader);
+        $sheet->getStyle('C2')->applyFromArray($styleHeader);
+        $sheet->getStyle('D2')->applyFromArray($styleHeader);
+        $sheet->getStyle('E2')->applyFromArray($styleHeader);
+        $sheet->getStyle('F2')->applyFromArray($styleHeader);
+        $sheet->getStyle('G2')->applyFromArray($styleHeader);
+
+        // Tulis data mulai dari baris 4
+        $row = 4;
+        $no = 1;
+
+
+        $row2 = $row + 1;
+        // Set lebar kolom agar menyesuaikan isi
+        foreach (range('A', 'G') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Buat writer dan output file Excel
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'Data Order' . $noModel . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Cache-Control: max-age=0');
+
         $writer->save('php://output');
         exit;
     }

@@ -2384,6 +2384,63 @@ class OrderController extends BaseController
             'styles' => $styles,
         ]);
     }
+    public function detailPdkAps($noModel, $area)
+    {
+        $pdk = $this->ApsPerstyleModel->getSisaPerStyleArea($noModel, $area);
+        $history = $this->historyRev->getData($noModel);
+        $repeat = $this->orderModel
+            ->select('repeat_from')
+            ->where('no_model', $noModel)
+            ->first()['repeat_from'] ?? null;
+        $sisaPerStyle = [];
+        foreach ($pdk as $perStyle) {
+            $style = $perStyle['size'];
+            $sisaPerStyle[$style . '||' . $perStyle['inisial']] = $this->ApsPerstyleModel->getSisaPerStyle($noModel, $style);
+        }
+        foreach ($sisaPerStyle as $style => $list) {
+            $totalqty = 0;
+            $qty = 0;
+            if (is_array($list)) {
+                foreach ($list as $val) {
+                    if (isset($val['sisa'])) {
+                        $qty += $val['qty'];
+                        $totalqty = $qty;
+                    }
+                }
+            }
+            $sisaPerStyle[$style]['totalQty'] = $totalqty;
+        }
+        // dd($sisaPerStyle);
+        $totalPo = $this->ApsPerstyleModel->totalPo($noModel);
+        // ini ngambil jumlah qty
+        $sisaArray = array_column($pdk, 'sisa');
+        $maxValue = max($sisaArray);
+        $indexMax = array_search($maxValue, $sisaArray);
+        $totalQty = 0;
+        for ($i = 0; $i <= $indexMax; $i++) {
+            $totalQty += $sisaArray[$i];
+        }
+
+
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'order' => $sisaPerStyle,
+            'headerRow' => $pdk,
+            'noModel' => $noModel,
+            'historyRev' => $history,
+            'repeat' => $repeat,
+            'area' => $area
+        ];
+        return view(session()->get('role') . '/Order/detailPdkAps', $data);
+    }
 
     public function importFlowproses()
     {

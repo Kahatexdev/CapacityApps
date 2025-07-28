@@ -17,6 +17,7 @@
                         <div>
                             <a href="<?= base_url($role . '/estimasispk/' . $area) ?>" class="btn btn-info">Estimasi SPK</a>
                             <a href="<?= base_url($role . '/statusorder/' . $area) ?>" class="btn btn-info">Status Order</a>
+                            <a type="button" class="btn bg-gradient-success" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="fas fa-file-excel"></i> Excel Data Order</a>
                         </div>
 
                     </div>
@@ -38,7 +39,6 @@
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Turun PDK</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Buyer</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Model</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jarum</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Desc</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Seam</th>
@@ -55,7 +55,6 @@
                                         <td class="text-xs"><?= $order->created_at; ?></td>
                                         <td class="text-xs"><?= $order->kd_buyer_order; ?></td>
                                         <td class="text-xs"><?= $order->no_model; ?></td>
-                                        <td class="text-xs"><?= $order->machinetypeid; ?></td>
                                         <td class="text-xs"><?= $order->product_type; ?></td>
                                         <td class="text-xs"><?= $order->description; ?></td>
                                         <td class="text-xs"><?= $order->seam; ?></td>
@@ -71,7 +70,7 @@
                                                 </button>
                                             <?php else : ?>
                                                 <!-- If qty is not null, set action to Details -->
-                                                <a href="<?= base_url($role . '/detailPdk/' . $order->no_model . '/'  . $order->machinetypeid); ?>" <button type="button" class="btn btn-info btn-sm details-btn">
+                                                <a href="<?= base_url($role . '/detailPdkAps/' . $order->no_model . '/'   . $area); ?>" <button type="button" class="btn btn-info btn-sm details-btn">
                                                     Details
                                                     </button>
                                                 </a>
@@ -153,6 +152,38 @@
             </div>
         </div>
 
+        <!-- export modal -->
+        <div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModal" aria-hidden="true">
+            <div class="modal-dialog " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Export Data Order</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">x</span>
+                        </button>
+                    </div>
+                    <div class="modal-body align-items-center">
+                        <form action="<?= base_url($role . '/exportDataOrderArea') ?>" method="POST">
+                            <div class="row align-items-center">
+                                <label for="searchModel">Pilih Model</label>
+                                <input type="hidden" value="<?= $area ?>" name="area">
+                                <select name="searchModel" id="searchModel" class="form-select">
+                                    <?php foreach ($tampildata as $order) : ?>
+                                        <option value="<?= $order->no_model ?>"><?= $order->no_model ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col text-end">
+                                    <button type="submit" class="btn btn-success btn-block">Generate</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
         <script type="text/javascript">
             $(document).ready(function() {
@@ -160,6 +191,13 @@
                     "order": [
                         [0, 'desc'] // Kolom pertama (indeks 0) diurutkan secara descending
                     ]
+                });
+
+                $('#searchModel').select2({
+                    placeholder: 'Cari model...',
+                    allowClear: true,
+                    width: '100%',
+                    dropdownParent: $('#exportModal') // Ini penting
                 });
 
                 // Trigger import modal when import button is clicked
@@ -174,4 +212,5 @@
                 });
             });
         </script>
+
         <?php $this->endSection(); ?>
