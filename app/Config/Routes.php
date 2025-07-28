@@ -279,7 +279,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('excelSisaOrderAllArea', 'ExcelController::excelSisaOrderAllArea');
     $routes->post('saveRepeat', 'OrderController::saveRepeat');
     $routes->get('flowProses', 'OrderController::flowProses');
-
+    $routes->post('semuaOrder/importFlowproses', 'OrderController::importFlowproses');
 
     // mesin
     $routes->get('datamesin', 'MesinController::indexPlan');

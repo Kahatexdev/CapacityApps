@@ -1272,4 +1272,12 @@ class ApsPerstyleModel extends Model
     {
         return $this->select('smv')->where('mastermodel', $pdk)->where('size', $sz)->first();
     }
+
+    public function getIdApsForFlowProses($noModel)
+    {
+        return $this->select('idapsperstyle, size, inisial, factory')
+            ->where('mastermodel', $noModel)
+            ->groupBy('size')
+            ->findAll();
+    }
 }

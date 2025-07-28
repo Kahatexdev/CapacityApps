@@ -20,6 +20,7 @@ use App\Models\DataCancelOrderModel;
 use App\Models\EstSpkModel;
 use App\Models\HistoryRevisiModel;
 use App\Models\BsModel;
+use CodeIgniter\HTTP\Exceptions\HTTPException;
 
 class OrderController extends BaseController
 {
@@ -38,7 +39,7 @@ class OrderController extends BaseController
     protected $estspk;
     protected $historyRev;
     protected $bsModel;
-
+    protected $curl;
 
     public function __construct()
     {
@@ -55,6 +56,7 @@ class OrderController extends BaseController
         $this->estspk = new EstSpkModel();
         $this->historyRev = new HistoryRevisiModel();
         $this->bsModel = new BsModel();
+        $this->curl              = \Config\Services::curlrequest();
 
         if ($this->filters   = ['role' => ['capacity',  'planning', 'aps', 'god']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -2381,5 +2383,115 @@ class OrderController extends BaseController
             'flows' => $flows,
             'styles' => $styles,
         ]);
+    }
+
+    public function importFlowproses()
+    {
+        $role = session()->get('role');
+        $noModel  = $this->request->getPost('no_model');
+        $delivery = $this->request->getPost('delivery');
+        $needle = $this->request->getPost('machinetypeid');
+        $tanggalInput = $this->request->getPost('tanggal_input');
+
+        // 1) Ambil data order & style dari DB
+        $orderData   = $this->orderModel->getByModelAndDelivery($noModel, $delivery, $needle);
+        $styleList   = $this->ApsPerstyleModel->getIdApsForFlowProses($orderData->no_model);
+
+        // 2) Ambil file Excel
+        $file = $this->request->getFile('excel_file');
+        if (! $file->isValid()) {
+            return redirect()->back()->with('error', 'File tidak valid');
+        }
+
+        // 3) Load spreadsheet
+        $reader      = IOFactory::createReaderForFile($file->getTempName());
+        $spreadsheet = $reader->load($file->getTempName());
+        $sheetData   = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+
+        $insertCount  = 0;
+        $notMatched   = [];
+        $idApsList = [];
+        // 4) Loop mulai baris ke-2
+        $rowCount = count($sheetData);
+        for ($row = 2; $row <= $rowCount; $row++) {
+            $noModelExcel = trim($sheetData[$row]['A']);
+            $areaExcel    = trim($sheetData[$row]['B']);
+            $sizeExcel    = trim($sheetData[$row]['C']);
+            $inisialExcel = trim($sheetData[$row]['D']);
+
+            // pastikan no_model Excel sama dengan orderData
+            if ($noModelExcel !== $orderData->no_model) {
+                continue;
+            }
+
+            // cari semua idapsperstyle yang cocok
+            $found = false;
+            foreach ($styleList as $style) {
+                if (
+                    $style['size']    === $sizeExcel
+                    // && $style['inisial'] === $inisialExcel
+                    && $style['factory'] === $areaExcel
+                ) {
+                    $idApsList[] = $style['idapsperstyle'];
+                    $area = $style['factory'];
+                    $found = true;
+                }
+            }
+            // $idApsList = array_unique($idApsList);
+            // dd($idApsList);
+            if (empty($idApsList)) {
+                $notMatched[] = [
+                    'row'     => $row,
+                    'size'    => $sizeExcel,
+                    'inisial' => $inisialExcel,
+                ];
+                continue;
+            }
+
+            // 5) Panggil API untuk insert ke TLS
+            $data = [
+                'idapsperstyle' => $idApsList,
+                'tanggal'       => $tanggalInput,
+                'area'          => $area,
+                'admin'          => session()->get('username')
+            ];
+
+            $url = 'http://172.23.39.116/KHTEXT/public/api/saveFlowProses';
+
+            try {
+                $response = $this->curl->request('POST', $url, [
+                    'headers'      => [
+                        'Accept'       => 'application/json',
+                        'Content-Type' => 'application/json',
+                    ],
+                    'body'         => json_encode($data),
+                    'timeout'      => 10,
+                    'ignoreErrors' => true,   // penting: biar CI4 tidak throw 500 otomatis
+                ]);
+                if (in_array($response->getStatusCode(), [200, 201])) {
+                    $insertCount++;
+                } else {
+                    // bisa log ke notMatched atau ke log CI4
+                    log_message('error', "Row $row API error: " . $response->getBody());
+                }
+            } catch (HTTPException $e) {
+                // kalau masih throw, ambil response-nya
+                $response = $e->getMessage();
+            }
+        }
+
+        // dd($response, $data);
+
+        // dd($payload, $response);
+        // hasil akhir
+        if ($insertCount > 0) {
+            return redirect()->back()->with('success', "$insertCount baris berhasil di‐insert ke TLS.");
+        }
+
+        if (! empty($notMatched)) {
+            session()->setFlashdata('error', $notMatched);
+        }
+
+        return redirect()->back()->with('warning', 'Tidak ada baris yang cocok untuk di‐insert.');
     }
 }
