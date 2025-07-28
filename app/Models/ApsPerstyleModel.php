@@ -1311,4 +1311,12 @@ class ApsPerstyleModel extends Model
             ->orderBy('apsperstyle.size, apsperstyle.delivery', 'ASC')
             ->findAll();
     }
+
+    public function getIdApsForFlowProses($noModel)
+    {
+        return $this->select('idapsperstyle, size, inisial, factory')
+            ->where('mastermodel', $noModel)
+            ->groupBy('size')
+            ->findAll();
+    }
 }

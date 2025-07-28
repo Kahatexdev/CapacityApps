@@ -629,4 +629,38 @@ class OrderModel extends Model
             ->orderBy('kd_buyer_order', 'ASC')
             ->first();
     }
+
+    public function getByModelAndDelivery(string $no_model, string $delivery, $needle)
+    {
+        $builder = $this->db->table('data_model');
+        $builder
+            ->select('
+            data_model.created_at,
+            data_model.kd_buyer_order,
+            data_model.no_model,
+            apsperstyle.no_order,
+            apsperstyle.machinetypeid,
+            apsperstyle.factory,
+            master_product_type.product_type,
+            data_model.description,
+            data_model.seam,
+            data_model.leadtime,
+            ROUND(SUM(apsperstyle.qty/24), 0) AS qty,
+            ROUND(SUM(apsperstyle.sisa/24), 0) AS sisa,
+            apsperstyle.delivery
+        ')
+            ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left')
+            ->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left')
+            ->where('data_model.no_model', $no_model)
+            ->where('apsperstyle.delivery', $delivery)
+            ->where('apsperstyle.machinetypeid', $needle)
+            ->groupBy('apsperstyle.delivery')
+            ->groupBy('apsperstyle.machinetypeid')
+            ->groupBy('data_model.no_model')
+            ->orderBy('data_model.created_at', 'DESC')
+            ->limit(1);
+
+        $query = $builder->get();
+        return $query->getRow();  // langsung ambil satu baris
+    }
 }
