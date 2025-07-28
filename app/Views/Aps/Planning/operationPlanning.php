@@ -197,7 +197,7 @@
             <div class="card">
                 <div class="card-header  d-flex  justify-content-between">
                     <h5>Detail Planning for Model <?= $pdk ?></h5>
-                    <button class="btn btn-warning btn-plan" id="planStyle" onclick="planStyle()"
+                    <button class="btn btn-warning btn-plan"
                         data-pdk="<?= $pdk ?>"
                         data-jarum="<?= $jarum ?>"
                         data-area="<?= $area ?>">
