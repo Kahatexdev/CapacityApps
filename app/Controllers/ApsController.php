@@ -504,10 +504,17 @@ class ApsController extends BaseController
     }
     public function detailplanmc($id)
     {
+        $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();
+        $judul = $kebutuhanArea['judul'];
+        $area = $kebutuhanArea['area'];
+        $jarum =  $kebutuhanArea['jarum'];
+        $mesinarea = $this->jarumModel->getMesinByArea($area, $jarum); //mesin yang dipakai semua mesin tanpa melibatkan head planning
+        // $mesinplanning = $this->MesinPlanningModel->getMesinByArea($area,$jarum); //mesin yang dipilih oleh head planning di teruskan ke bagian aps
+        $jarumList = $this->KebutuhanAreaModel->getDataByAreaGroupJrm($area);
         $detailplan = $this->DetailPlanningModel->getDataPlanning($id);
         foreach ($detailplan as &$dp) {
             $iddetail = $dp['id_detail_pln'];
-            $qtysisa = $this->ApsPerstyleModel->getSisaPerModel($dp['model'], $dp['jarum']);
+            $qtysisa = $this->ApsPerstyleModel->getSisaPerModel($dp['model'], $dp['jarum'], $area);
             $mesin = $this->TanggalPlanningModel->totalMc($iddetail);
             $maxMesin = 0;
             foreach ($mesin as $mc) {
@@ -534,13 +541,7 @@ class ApsController extends BaseController
             return strtotime($a['delivery_raw']) - strtotime($b['delivery_raw']);
         });
 
-        $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();
-        $judul = $kebutuhanArea['judul'];
-        $area = $kebutuhanArea['area'];
-        $jarum =  $kebutuhanArea['jarum'];
-        $mesinarea = $this->jarumModel->getMesinByArea($area, $jarum); //mesin yang dipakai semua mesin tanpa melibatkan head planning
-        // $mesinplanning = $this->MesinPlanningModel->getMesinByArea($area,$jarum); //mesin yang dipilih oleh head planning di teruskan ke bagian aps
-        $jarumList = $this->KebutuhanAreaModel->getDataByAreaGroupJrm($area);
+
         $yesterday = date('Y-m-d', strtotime('-2 days'));
         foreach ($detailplan as &$dp) {
             $val = [
