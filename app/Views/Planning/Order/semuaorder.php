@@ -19,6 +19,31 @@
                         </div>
                     </div>
                 </div>
+                <!-- alert from response -->
+                <?php if (session()->getFlashdata('importSummary')) : ?>
+                    <div class="alert alert-<?= session()->getFlashdata('importSummary')['status'] === 'done' ? 'success' : 'danger' ?> alert-dismissible fade show" role="alert">
+                        <strong><?= session()->getFlashdata('importSummary')['status'] === 'done' ? 'Success!' : 'Error!' ?></strong>
+                        <?= session()->getFlashdata('importSummary')['message'] ?? '' ?>
+                        <?php if (session()->getFlashdata('importSummary')['status'] === 'done') : ?>
+                            <p>Inserted: <?= session()->getFlashdata('importSummary')['inserted'] ?></p>
+                            <p>Not Matched: 
+                                <?php 
+                                    $notMatched = session()->getFlashdata('importSummary')['notMatched'];
+                                    if (is_array($notMatched)) {
+                                        if (!empty($notMatched)) {
+                                            echo implode(', ', $notMatched);
+                                        } else {
+                                            echo '-';
+                                        }
+                                    } else {
+                                        echo !empty($notMatched) ? $notMatched : '-';
+                                    }
+                                ?>
+                            </p>
+                        <?php endif; ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -365,13 +390,15 @@
                         <a href="<?= base_url($role . '/detailPdk') ?>/${row.no_model}/${row.machinetypeid}">
                             <button type="button" class="btn btn-info btn-sm details-btn">Details</button>
                         </a>
-                        <button
-                            type="button"
-                            class="btn bg-gradient-info btn-sm flowproses-btn"
-                            data-no-model="${row.no_model}"
-                            data-delivery="${row.delivery}">
-                            Flow Proses
-                        </button>
+                       <button
+    type="button"
+    class="btn bg-gradient-info btn-sm flowproses-btn"
+    data-no-model="${row.no_model}"
+    data-delivery="${row.delivery}"
+    data-machinetypeid="${row.machinetypeid}">
+    Flow Proses
+</button>
+
                         `;
             }
         }
@@ -408,6 +435,12 @@
         $(document).on('click', '.flowproses-btn', function() {
             const model = $(this).data('no-model');
             const delivery = $(this).data('delivery');
+            const machinetypeid = $(this).data('machinetypeid');
+
+            $('#import_no_model').val(model);
+            $('#import_delivery').val(delivery);
+            $('#import_needle').val(machinetypeid);
+
             const url = `<?= base_url($role . '/flowProses') ?>?mastermodel=` +
                 encodeURIComponent(model) +
                 `&delivery=` +
@@ -487,17 +520,26 @@
                 })
                 .fail(function() {
                     $('#flowProsesContent').html(`
-          <p class="text-center text-danger">
-            <i class="bi bi-x-circle-fill me-1"></i>
-            Gagal memuat flow proses untuk model
-            <strong>${model}</strong> pada delivery
-            <strong>${delivery}</strong>.
-          </p>
+                    <form action="<?= base_url($role . '/semuaOrder/importFlowproses') ?>" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="no_model" id="import_no_model" value="${model}">
+                        <input type="hidden" name="delivery" id="import_delivery" value="${delivery}">
+                        <input type="hidden" name="machinetypeid" id="import_machinetypeid" value="${machinetypeid}">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Tanggal Input</label>
+                                    <input type="date" class="form-control" name="tanggal_input" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Import Flow Proses</label>
+                                    <input type="file" class="form-control" name="excel_file" required>
+                                    <p style="color: red; font-size: 12px;">* Tipe file .xlsx atau .xls</p>
+                                </div>
+                            </div>
+                        <button type="submit" class="btn btn-info w-100">Import</button>
+                    </form>
         `);
                 });
         });
     </script>
-
-
 
     <?php $this->endSection(); ?>

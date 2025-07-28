@@ -281,7 +281,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('excelSisaOrderAllArea', 'ExcelController::excelSisaOrderAllArea');
     $routes->post('saveRepeat', 'OrderController::saveRepeat');
     $routes->get('flowProses', 'OrderController::flowProses');
-
+    $routes->post('semuaOrder/importFlowproses', 'OrderController::importFlowproses');
 
     // mesin
     $routes->get('datamesin', 'MesinController::indexPlan');
@@ -410,11 +410,11 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'ApsController::detailmodeljarum/$1/$2/$3');
     $routes->get('semuaOrder', 'ApsController::semuaOrder');
     $routes->get('dataorderperjarum/(:any)', 'ApsController::DetailOrderPerJarum/$1');
-    $routes->get('dataorderperarea/(:any)', 'ApsController::DetailOrderPerArea/$1');
+    $routes->get('dataorderperarea/(:any)', 'ApsController::DetailOrderPerAreaAps/$1');
     $routes->post('updatedetailorder/(:any)', 'OrderController::updateorder/$1');
     $routes->post('updatedetailjarum/(:any)', 'OrderController::updateorderjarum/$1');
     $routes->get('orderPerjarumBln', 'ApsController::orderPerJarumBln');
-    $routes->get('detailPdk/(:any)/(:any)', 'OrderController::detailPdk/$1/$2');
+    $routes->get('detailPdkAps/(:any)/(:any)', 'OrderController::detailPdkAps/$1/$2');
     $routes->get('estimasispk/(:any)', 'OrderController::estimasispk/$1');
     $routes->post('exportEstimasispk', 'ExcelController::exportEstimasispk');
     $routes->post('exportDataOrderArea', 'ExcelController::exportDataOrderArea');

@@ -655,6 +655,26 @@ class ApsController extends BaseController
         ];
         return view(session()->get('role') . '/Order/semuaorderarea', $data);
     }
+    public function DetailOrderPerAreaAps($area)
+    {
+        $tampilperdelivery = $this->orderModel->getPDk($area);
+        $product = $this->productModel->findAll();
+        $booking = $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'area' => $area,
+            'tampildata' => $tampilperdelivery,
+            'product' => $product,
+        ];
+        return view(session()->get('role') . '/Order/semuaorderarea', $data);
+    }
     public function fetchdetailorderarea()
     {
         $area = $this->request->getGet('area');

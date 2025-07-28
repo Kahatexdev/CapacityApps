@@ -236,6 +236,26 @@ class OrderModel extends Model
 
         return $builder->get()->getResult();
     }
+    public function getPDk($area)
+    {
+        $twomonth = date('Y-m-d', strtotime('60 days ago'));
+
+        $builder = $this->db->table('data_model');
+
+        $builder->select('data_model.*, mastermodel,no_order, machinetypeid, ROUND(SUM(qty/24), 0) AS qty, ROUND(SUM(sisa/24), 0) AS sisa, factory, delivery, product_type');
+        $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
+        $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
+        $builder->where('factory', $area);
+        $builder->where('delivery >', $twomonth);
+        $builder->where('qty >', 0);
+        $builder->orderby('created_at', 'desc');
+        $builder->orderby('no_model', 'asc');
+        $builder->orderby('delivery', 'asc');
+        $builder->groupBy('data_model.no_model');
+        $builder->groupBy('factory');
+
+        return $builder->get()->getResult();
+    }
     public function getId($nomodel)
     {
         return $this->select('id_model')->where('no_model', $nomodel)->first();
@@ -608,5 +628,39 @@ class OrderModel extends Model
             ->where('no_model', $noModel)
             ->orderBy('kd_buyer_order', 'ASC')
             ->first();
+    }
+
+    public function getByModelAndDelivery(string $no_model, string $delivery, $needle)
+    {
+        $builder = $this->db->table('data_model');
+        $builder
+            ->select('
+            data_model.created_at,
+            data_model.kd_buyer_order,
+            data_model.no_model,
+            apsperstyle.no_order,
+            apsperstyle.machinetypeid,
+            apsperstyle.factory,
+            master_product_type.product_type,
+            data_model.description,
+            data_model.seam,
+            data_model.leadtime,
+            ROUND(SUM(apsperstyle.qty/24), 0) AS qty,
+            ROUND(SUM(apsperstyle.sisa/24), 0) AS sisa,
+            apsperstyle.delivery
+        ')
+            ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left')
+            ->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left')
+            ->where('data_model.no_model', $no_model)
+            ->where('apsperstyle.delivery', $delivery)
+            ->where('apsperstyle.machinetypeid', $needle)
+            ->groupBy('apsperstyle.delivery')
+            ->groupBy('apsperstyle.machinetypeid')
+            ->groupBy('data_model.no_model')
+            ->orderBy('data_model.created_at', 'DESC')
+            ->limit(1);
+
+        $query = $builder->get();
+        return $query->getRow();  // langsung ambil satu baris
     }
 }
