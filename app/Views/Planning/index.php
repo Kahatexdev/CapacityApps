@@ -317,7 +317,7 @@
                     <input type="hidden" name="bulan" id="export-bulan">
                     <input type="hidden" name="tahun" id="export-tahun">
                     <input type="hidden" name="area" id="export-area">
-                    <button type="submit" class="btn btn-info" id="exportBtn">Export to Excel</button>
+                    <button type="submit" class="btn btn-info" id="exportBtn">Report MC</button>
                 </form>
             </div>
             <div class="card-body">

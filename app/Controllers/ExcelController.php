@@ -5564,7 +5564,7 @@ class ExcelController extends BaseController
 
         // Buat writer dan output file Excel
         $writer = new Xlsx($spreadsheet);
-        $fileName = 'Data Order ' . $bulan . '-' . $tahun . '.xlsx';
+        $fileName = 'Report MC Area ' . $area . ' (' . strtoupper(date('F Y', strtotime("$tahun-$bulan-01"))) . ').xlsx';
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="' . $fileName . '"');
@@ -5599,10 +5599,10 @@ class ExcelController extends BaseController
                 'bold' => true,
                 'size' => 12,
             ],
-            'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER,
-                'vertical'   => Alignment::VERTICAL_CENTER,
-            ],
+            // 'alignment' => [
+            //     'horizontal' => Alignment::HORIZONTAL_CENTER,
+            //     'vertical'   => Alignment::VERTICAL_CENTER,
+            // ],
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => Border::BORDER_THIN,
@@ -5634,14 +5634,12 @@ class ExcelController extends BaseController
         $lastCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($totalColumns);
 
         // 1. Area header (merged)
-        $sheet->setCellValue('A1', 'Area');
-        $sheet->setCellValue('B1', $area);
+        $sheet->setCellValue('A1', 'Area' . $area);
         $sheet->mergeCells("A1:{$lastCol}1");
         $sheet->getStyle("A1:{$lastCol}1")->applyFromArray($styleHeader);
 
         // 2. Month header (merged)
-        $sheet->setCellValue('A2', 'Bulan');
-        $sheet->setCellValue('B2', strtoupper(date('F Y', strtotime("$tahun-$bulan-01"))));
+        $sheet->setCellValue('A2', 'Bulan ' . strtoupper(date('F Y', strtotime("$tahun-$bulan-01"))));
         $sheet->mergeCells("A2:{$lastCol}2");
         $sheet->getStyle("A2:{$lastCol}2")->applyFromArray($styleHeader);
 
@@ -5653,7 +5651,7 @@ class ExcelController extends BaseController
         foreach ($baseHeaders as $h) {
             $sheet->setCellValue($col . '3', $h);
             $sheet->mergeCells("{$col}3:{$col}4");
-            $sheet->getStyle($col . '3')->applyFromArray($styleSubHeader);
+            $sheet->getStyle($col . '3:' . $col . '4')->applyFromArray($styleSubHeader);
             $col++;
         }
 
@@ -5714,9 +5712,9 @@ class ExcelController extends BaseController
                 $col++;
                 $sheet->setCellValue($col . $row, number_format($val['target'], 2, '.', ','));
                 $col++;
-                $sheet->setCellValue($col . $row, number_format($val['productivity'], 2, '.', ','));
+                $sheet->setCellValue($col . $row, number_format($val['productivity'], 2, '.', ',') . '%');
                 $col++;
-                $sheet->setCellValue($col . $row, number_format($val['loss'], 2, '.', ','));
+                $sheet->setCellValue($col . $row, number_format($val['loss'], 2, '.', ',') . '%');
                 $col++;
             }
 
