@@ -19,6 +19,31 @@
                         </div>
                     </div>
                 </div>
+                <!-- alert from response -->
+                <?php if (session()->getFlashdata('importSummary')) : ?>
+                    <div class="alert alert-<?= session()->getFlashdata('importSummary')['status'] === 'done' ? 'success' : 'danger' ?> alert-dismissible fade show" role="alert">
+                        <strong><?= session()->getFlashdata('importSummary')['status'] === 'done' ? 'Success!' : 'Error!' ?></strong>
+                        <?= session()->getFlashdata('importSummary')['message'] ?? '' ?>
+                        <?php if (session()->getFlashdata('importSummary')['status'] === 'done') : ?>
+                            <p>Inserted: <?= session()->getFlashdata('importSummary')['inserted'] ?></p>
+                            <p>Not Matched: 
+                                <?php 
+                                    $notMatched = session()->getFlashdata('importSummary')['notMatched'];
+                                    if (is_array($notMatched)) {
+                                        if (!empty($notMatched)) {
+                                            echo implode(', ', $notMatched);
+                                        } else {
+                                            echo '-';
+                                        }
+                                    } else {
+                                        echo !empty($notMatched) ? $notMatched : '-';
+                                    }
+                                ?>
+                            </p>
+                        <?php endif; ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

@@ -21,6 +21,8 @@ use App\Models\EstSpkModel;
 use App\Models\HistoryRevisiModel;
 use App\Models\BsModel;
 use CodeIgniter\HTTP\Exceptions\HTTPException;
+use CodeIgniter\HTTP\IncomingRequest;
+use CodeIgniter\HTTP\CURLRequest;
 
 class OrderController extends BaseController
 {
@@ -56,7 +58,6 @@ class OrderController extends BaseController
         $this->estspk = new EstSpkModel();
         $this->historyRev = new HistoryRevisiModel();
         $this->bsModel = new BsModel();
-        $this->curl              = \Config\Services::curlrequest();
 
         if ($this->filters   = ['role' => ['capacity',  'planning', 'aps', 'god']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -2342,48 +2343,39 @@ class OrderController extends BaseController
 
     public function flowProses()
     {
-        // baca query param
-        $model = $this->request->getGet('mastermodel') ?? '';
-        $delivery = $this->request->getGet('delivery') ?? '';
-        // URL API (bisa juga tanpa ?mastermodel= di url, karena kita kirim via 'query' di get())
+        $model    = $this->request->getGet('mastermodel') ?? '';
+        $delivery = $this->request->getGet('delivery')   ?? '';
+
+        // Full URL including path:
         $url = 'http://172.23.44.14/KHTEXT/public/api/flowproses';
 
         /** @var \CodeIgniter\HTTP\CURLRequest $client */
         $client = \Config\Services::curlrequest([
-            'baseURI' => $url,
             'timeout' => 5,
         ]);
 
-        // hit API
-        $response = $client->get('', [
+        $response = $client->get($url, [
             'query' => [
                 'mastermodel' => $model,
-                'delivery' => $delivery,
+                'delivery'    => $delivery,
             ],
         ]);
-        // dd($response);
 
-        // pastikan status 200
         if ($response->getStatusCode() !== 200) {
             throw new \Exception('API error: ' . $response->getStatusCode());
         }
 
-        // 1) ambil body, 2) decode JSON jadi array
-        $body = $response->getBody();
-        $json = json_decode($body, true);
-
-        // sekarang $json['flows'] punya struktur pagination (atau data array)
-        // misal kamu sudah matikan paginate, maka flows langsung data:
-        $flows  = $json['flows'];    // kalau kamu pakai ->get() langsung collection
+        $json   = json_decode($response->getBody(), true);
+        $flows  = $json['flows'];
         $styles = $json['styles'];
 
-        // kirim data ke modal bukan ke view
         return $this->response->setJSON([
             'status' => 'success',
-            'flows' => $flows,
+            'flows'  => $flows,
             'styles' => $styles,
         ]);
     }
+
     public function detailPdkAps($noModel, $area)
     {
         $pdk = $this->ApsPerstyleModel->getSisaPerStyleArea($noModel, $area);
@@ -2444,111 +2436,149 @@ class OrderController extends BaseController
 
     public function importFlowproses()
     {
-        $role = session()->get('role');
-        $noModel  = $this->request->getPost('no_model');
-        $delivery = $this->request->getPost('delivery');
-        $needle = $this->request->getPost('machinetypeid');
-        $tanggalInput = $this->request->getPost('tanggal_input');
-
-        // 1) Ambil data order & style dari DB
-        $orderData   = $this->orderModel->getByModelAndDelivery($noModel, $delivery, $needle);
-        $styleList   = $this->ApsPerstyleModel->getIdApsForFlowProses($orderData->no_model);
+        $request      = $this->request;
+        $noModel      = $request->getPost('no_model');
+        $delivery     = $request->getPost('delivery');
+        $needle       = $request->getPost('machinetypeid');
+        $tanggalInput = $request->getPost('tanggal_input');
+        
+        // 1) Ambil style list dari DB
+        $styleList = $this->ApsPerstyleModel->getIdApsForFlowProses($noModel);
 
         // 2) Ambil file Excel
-        $file = $this->request->getFile('excel_file');
+        $file = $request->getFile('excel_file');
         if (! $file->isValid()) {
             return redirect()->back()->with('error', 'File tidak valid');
         }
 
-        // 3) Load spreadsheet
-        $reader      = IOFactory::createReaderForFile($file->getTempName());
-        $spreadsheet = $reader->load($file->getTempName());
-        $sheetData   = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+        // 3) Load spreadsheet dan ubah jadi array-assoc per baris
+        $spreadsheet = IOFactory::load($file->getTempName());
+        $rows        = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+        $header      = array_shift($rows);
 
-        $insertCount  = 0;
-        $notMatched   = [];
-        $idApsList = [];
-        // 4) Loop mulai baris ke-2
-        $rowCount = count($sheetData);
-        for ($row = 2; $row <= $rowCount; $row++) {
-            $noModelExcel = trim($sheetData[$row]['A']);
-            $areaExcel    = trim($sheetData[$row]['B']);
-            $sizeExcel    = trim($sheetData[$row]['C']);
-            $inisialExcel = trim($sheetData[$row]['D']);
+        // Inisialisasi hasil
+        $insertCount = 0;
+        $notMatched  = [];
+        $errors      = [];
 
-            // pastikan no_model Excel sama dengan orderData
-            if ($noModelExcel !== $orderData->no_model) {
+        // 4) Loop tiap baris data
+        foreach ($rows as $idx => $row) {
+            $rowData = array_combine($header, $row);
+
+            // Ambil field dasar
+            $noModelExcel = $rowData['NO MODEL'] ?? '';
+            $areaExcel    = $rowData['AREA']     ?? '';
+            $sizeExcel    = $rowData['JC']       ?? '';
+            $inisialExcel = $rowData['INISIAL']  ?? '';
+
+            // Jika model tidak cocok, skip
+            // if ($noModelExcel !== $noModel) {
+            //     continue;
+            // }
+            // dd ($noModelExcel, $areaExcel, $sizeExcel, $inisialExcel);
+            // 5) Extract semua kolom "PROSES *"
+            $prosesList = [];
+            foreach ($rowData as $colName => $value) {
+                if (strpos($colName, 'PROSES') === 0 && trim((string)$value) !== '') {
+                    $prosesList[] = trim($value);
+                }
+            }
+            $prosesList = array_values(array_unique($prosesList));
+            if (empty($prosesList)) {
+                $notMatched[] = ['row' => $idx + 2, 'reason' => 'Tidak ada PROSES'];
                 continue;
             }
 
-            // cari semua idapsperstyle yang cocok
-            $found = false;
+            // 6) Cari semua idapsperstyle yang cocok
+            // dd ($styleList, $prosesList, $sizeExcel, $areaExcel);
+            // Gabungkan proses untuk setiap idapsperstyle (1 idaps bisa punya banyak proses)
+            $idApsList = [];
             foreach ($styleList as $style) {
                 if (
-                    $style['size']    === $sizeExcel
-                    // && $style['inisial'] === $inisialExcel
+                    $style['mastermodel'] === $noModelExcel
+                    && $style['size']    === $sizeExcel
                     && $style['factory'] === $areaExcel
                 ) {
-                    $idApsList[] = $style['idapsperstyle'];
-                    $area = $style['factory'];
-                    $found = true;
+                    // Setiap idapsperstyle dapat memiliki banyak proses
+                    $idApsList[] = [
+                        'idapsperstyle' => $style['idapsperstyle'],
+                        'proses'        => $prosesList
+                    ];
+                    // dd  ($idApsList);
                 }
             }
-            // $idApsList = array_unique($idApsList);
-            // dd($idApsList);
+            // dd ($idApsList);
+            // Jika tidak ada idapsperstyle yang cocok, catat sebagai not matched
             if (empty($idApsList)) {
                 $notMatched[] = [
-                    'row'     => $row,
-                    'size'    => $sizeExcel,
-                    'inisial' => $inisialExcel,
+                    'row'    => $idx + 2,
+                    'reason' => 'Tidak ada idapsperstyle yang cocok'
+                ];
+                continue;
+            }
+            // dd ($idApsList);
+            // Validasi wajib
+            if (empty($areaExcel) || empty($tanggalInput)) {
+                $notMatched[] = [
+                    'row'    => $idx + 2,
+                    'reason' => empty($areaExcel) ? 'Area kosong' : 'Tanggal input kosong'
                 ];
                 continue;
             }
 
-            // 5) Panggil API untuk insert ke TLS
-            $data = [
+            // 5) Kirim ke API — hanya kirim array of IDs
+            $payload = [
                 'idapsperstyle' => $idApsList,
                 'tanggal'       => $tanggalInput,
-                'area'          => $area,
-                'admin'          => session()->get('username')
+                'area'          => $areaExcel,
+                'admin'         => session()->get('username'),
             ];
-
-            $url = 'http://172.23.39.116/KHTEXT/public/api/saveFlowProses';
-
+            // dd ($payload);
+            $client = \Config\Services::curlrequest([
+                'headers'     => [
+                    'Accept'       => 'application/json',
+                    'Content-Type' => 'application/json',
+                ],
+                'http_errors' => false,  // penting: CI4 tidak akan throw exception meski status 500
+            ]);
             try {
-                $response = $this->curl->request('POST', $url, [
-                    'headers'      => [
-                        'Accept'       => 'application/json',
-                        'Content-Type' => 'application/json',
-                    ],
-                    'body'         => json_encode($data),
-                    'timeout'      => 10,
-                    'ignoreErrors' => true,   // penting: biar CI4 tidak throw 500 otomatis
+                $response = $client->post('http://172.23.39.117/KHTEXT/public/api/saveFlowProses', [
+                    'json'        => $payload,
+                    'http_errors' => false,   // supaya tidak otomatis throw
                 ]);
-                if (in_array($response->getStatusCode(), [200, 201])) {
-                    $insertCount++;
-                } else {
-                    // bisa log ke notMatched atau ke log CI4
-                    log_message('error', "Row $row API error: " . $response->getBody());
-                }
-            } catch (HTTPException $e) {
-                // kalau masih throw, ambil response-nya
-                $response = $e->getMessage();
+                $status = $response->getStatusCode();
+                $body   = (string)$response->getBody();
+            } catch (\Exception $e) {
+                // Log message saja, karena exception-nya tidak menyertakan response
+                log_message('error', 'CurlRequest failed: ' . $e->getMessage());
+                $errors[] = [
+                    'row'    => $idx + 2,
+                    'status' => 'Request error: ' . $e->getMessage(),
+                ];
+                continue;
             }
+
+
+            $status = $response->getStatusCode();       // misal 200, 422, 500
+            $body   = (string) $response->getBody();    // isi JSON error atau success
+
+            if ($status !== 200) {
+                log_message('error', "FlowProses import gagal: HTTP $status — $body");
+                $errors[] = [
+                    'row'    => $idx + 2,
+                    'status' => $body,
+                ];
+                continue;
+            }
+
+            $insertCount++;
         }
-
-        // dd($response, $data);
-
-        // dd($payload, $response);
-        // hasil akhir
-        if ($insertCount > 0) {
-            return redirect()->back()->with('success', "$insertCount baris berhasil di‐insert ke TLS.");
-        }
-
-        if (! empty($notMatched)) {
-            session()->setFlashdata('error', $notMatched);
-        }
-
-        return redirect()->back()->with('warning', 'Tidak ada baris yang cocok untuk di‐insert.');
+        // 6) Kembalikan ringkasan
+        return redirect()->back()->with('success', 'Flow proses berhasil diimpor')->with('importSummary', [
+            'status'     => 'done',
+            'inserted'   => $insertCount,
+            'notMatched' => $notMatched,
+            'errors'     => $errors,
+        ]);
     }
 }

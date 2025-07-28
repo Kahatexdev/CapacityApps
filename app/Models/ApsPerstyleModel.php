@@ -1314,9 +1314,19 @@ class ApsPerstyleModel extends Model
 
     public function getIdApsForFlowProses($noModel)
     {
-        return $this->select('idapsperstyle, size, inisial, factory')
+        return $this->select('idapsperstyle,mastermodel, size, inisial, factory, delivery')
             ->where('mastermodel', $noModel)
             ->groupBy('size')
+            ->findAll();
+    }
+
+    public function getPembagianModel($noModel)
+    {
+        return $this->select('mastermodel, SUM(qty) AS qty, size, machinetypeid, factory, color')
+            ->where('qty >', 0)
+            ->where('mastermodel', $noModel)
+            ->groupBy('factory, size')
+            ->orderBy('factory, size', 'ASC')
             ->findAll();
     }
 }
