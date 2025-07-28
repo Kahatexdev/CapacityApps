@@ -254,7 +254,7 @@ class ApsPerstyleModel extends Model
     }
     public function getDetailPlanning($area, $jarum) // funtion ieu kudu diganti where na kade ulah poho
     {
-        return $this->select('mastermodel AS model, SUM(qty)/24 AS qty, SUM(sisa)/24 AS sisa, AVG(smv) AS smv, machinetypeid')
+        return $this->select('mastermodel AS model, SUM(qty/24) AS qty, SUM(sisa/24) AS sisa, AVG(smv) AS smv, machinetypeid')
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
             ->where('sisa >', 0)
