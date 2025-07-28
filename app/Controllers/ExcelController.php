@@ -5634,12 +5634,12 @@ class ExcelController extends BaseController
         $lastCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($totalColumns);
 
         // 1. Area header (merged)
-        $sheet->setCellValue('A1', 'Area' . $area);
+        $sheet->setCellValue('A1', 'Area: ' . $area);
         $sheet->mergeCells("A1:{$lastCol}1");
         $sheet->getStyle("A1:{$lastCol}1")->applyFromArray($styleHeader);
 
         // 2. Month header (merged)
-        $sheet->setCellValue('A2', 'Bulan ' . strtoupper(date('F Y', strtotime("$tahun-$bulan-01"))));
+        $sheet->setCellValue('A2', 'Bulan: ' . strtoupper(date('F Y', strtotime("$tahun-$bulan-01"))));
         $sheet->mergeCells("A2:{$lastCol}2");
         $sheet->getStyle("A2:{$lastCol}2")->applyFromArray($styleHeader);
 
