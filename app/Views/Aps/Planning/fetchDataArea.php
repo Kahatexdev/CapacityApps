@@ -248,6 +248,10 @@ error_reporting(E_ALL); ?>
                     order: [
                         [1, 'asc']
                     ],
+                    lengthMenu: [
+                        [100, -1],
+                        [100, "All"]
+                    ],
                     footerCallback: function(row, data, start, end, display) {
                         let totalQty = 0,
                             totalSisa = 0,

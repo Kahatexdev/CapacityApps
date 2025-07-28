@@ -268,6 +268,7 @@
                                                 data-start="<?= $order['start_date'] ?>"
                                                 data-idplan="<?= $order['id_detail_pln'] ?>"
                                                 data-idpl="<?= $id_pln ?>"
+                                                data-idest="<?= $order['id_est_qty']; ?>"
                                                 data-stop="<?= $order['stop_date'] ?>">
                                                 Hapus
                                             </button>
@@ -344,6 +345,7 @@
                                 <div class="form-group">
                                     <input type="text" name="id" hidden>
                                     <input type="text" name="idpl" hidden>
+                                    <input type="text" name="idest" hidden>
                                     Anda yakin ingin menghapus?
                                 </div>
                             </div>
@@ -770,10 +772,12 @@
         $(document).on('click', '.btn-update', function() {
             var idplan = $(this).data('idplan');
 
+            var idest = $(this).data('idest');
             var idpl = $(this).data('idpl');
             $('#modalUpdate').find('form').attr('action', '<?= base_url($role . '/deleteplanmesin') ?>');
             $('#modalUpdate').find('input[name="id"]').val(idplan);
             $('#modalUpdate').find('input[name="idpl"]').val(idpl);
+            $('#modalUpdate').find('input[name="idest"]').val(idest);
 
 
 

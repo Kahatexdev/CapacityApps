@@ -53,6 +53,7 @@ class EstimatedPlanningModel extends Model
             ->join('tanggal_planning', 'estimated_planning.id_est_qty = tanggal_planning.id_est_qty', 'RIGHT')
             ->where('estimated_planning.id_detail_pln', $id)
             ->groupBy('id_est_qty')
+            ->orderBy('delivery', 'asc')
             ->findAll();
     }
     public function deletePlaningan($idPdk)
