@@ -487,10 +487,8 @@ class BookingController extends BaseController
                         // $existOrder = $this->bookingModel->existingOrder($no_order);
                         // if (!$existOrder) {
                         $this->bookingModel->insert($insert);
-                        $cekKeterangan = $this->bookingModel->select('keterangan')->where('id_booking', $refId)->first();
-                        $oldKeterangan = $cekKeterangan['keterangan'] ?? '';
-                        $ket = $oldKeterangan . ' | ' . $keterangan;
-                        $this->bookingModel->update($refId, ['sisa_booking' => $sisa, 'keterangan' => $ket]);
+
+                        $this->bookingModel->update($refId, ['sisa_booking' => $sisa]);
                         // }
                     }
                 }
