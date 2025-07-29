@@ -495,6 +495,10 @@ class BookingController extends BaseController
                     }
                 }
             }
+            $cekKeterangan = $this->bookingModel->select('keterangan')->where('id_booking', $refId)->first();
+            $oldKeterangan = $cekKeterangan['keterangan'] ?? '';
+            $ket = $oldKeterangan . ' | ' . $keterangan;
+            $this->bookingModel->update($refId, ['keterangan' => $ket]);
             return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $refId))->withInput()->with('success', 'Data Berhasil di Import');
         } else {
             return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $refId))->with('error', 'No data found in the Excel file');
