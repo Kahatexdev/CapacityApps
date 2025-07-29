@@ -566,6 +566,7 @@ class OrderController extends BaseController
         $no_booking = $this->request->getPost("no_booking");
         $deskripsi = $this->request->getPost("deskripsi");
         $sisa_booking = $this->request->getPost("sisa_booking_akhir");
+        $keterangan = $this->request->getPost("keterangan");
         $id_booking = $this->request->getPost("id_booking");
         $jarum = $this->request->getPost("jarum");
         if (empty($tgl_turun)) {
@@ -580,11 +581,16 @@ class OrderController extends BaseController
             } else {
                 $status = "Aktif";
             }
+            $cekKeterangan = $this->bookingModel->select('keterangan')->where('id_booking', $id)->first();
+            $oldKeterangan = $cekKeterangan['keterangan'] ?? '';
+            $ket = $oldKeterangan . ' | ' . $keterangan;
             $data = [
                 'role' => session()->get('role'),
                 'sisa_booking' => $sisa_booking,
+                'keterangan' => $ket,
                 'status' => $status
             ];
+            // dd($data);
             $this->bookingModel->update($id, $data);
             return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $id_booking))->withInput()->with('success', 'Data Berhasil Diinput');
         } else {
@@ -606,9 +612,13 @@ class OrderController extends BaseController
                 } else {
                     $status = "Aktif";
                 }
+                $cekKeterangan = $this->bookingModel->select('keterangan')->where('id_booking', $id)->first();
+                $oldKeterangan = $cekKeterangan['keterangan'] ?? '';
+                $ket = $oldKeterangan . ' | ' . $keterangan;
                 $data = [
                     'role' => session()->get('role'),
                     'sisa_booking' => $sisa_booking,
+                    'keterangan' => $ket,
                     'status' => $status
                 ];
                 $this->bookingModel->update($id, $data);
@@ -2441,7 +2451,7 @@ class OrderController extends BaseController
         $delivery     = $request->getPost('delivery');
         $needle       = $request->getPost('machinetypeid');
         $tanggalInput = $request->getPost('tanggal_input');
-        
+
         // 1) Ambil style list dari DB
         $styleList = $this->ApsPerstyleModel->getIdApsForFlowProses($noModel);
 
