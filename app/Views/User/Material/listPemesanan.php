@@ -168,35 +168,62 @@
                                         <td class="text-xs">
                                             <?php
                                             $show = "d-none";
-                                            $batasWaktu = '08:30:00';
+                                            // $batasWaktu = '08:30:00';
+                                            $batasWaktu = '23:30:00';
 
                                             if ($id['sisa_jatah'] > 0) {
                                                 if ($ttl_kg_pesan <= $id['sisa_jatah']) {
                                                     // Aturan berdasarkan hari dan jenis produk:
+                                                    // $rules = [
+                                                    //     'Thursday' => [
+                                                    //         'BENANG'  => [$tomorrow => '08:30:00'],
+                                                    //         'NYLON'   => [$tomorrow => '08:30:00'],
+                                                    //         'SPANDEX' => [$twoDays  => '08:30:00', $fourDays => '09:00:00'],
+                                                    //         'KARET'   => [$twoDays  => '08:30:00', $fourDays => '09:00:00']
+                                                    //     ],
+                                                    //     'Friday' => [
+                                                    //         'BENANG'  => [$tomorrow => '08:30:00'],
+                                                    //         'NYLON'   => [$tomorrow => '08:30:00'],
+                                                    //         'SPANDEX' => [$fourDays => '08:30:00'],
+                                                    //         'KARET'   => [$fourDays => '08:30:00']
+                                                    //     ],
+                                                    //     'Saturday' => [
+                                                    //         'BENANG'  => [$threeDays  => '08:30:00'],
+                                                    //         'NYLON'   => [$threeDays => '08:30:00'],
+                                                    //         'SPANDEX' => [$threeDays => '00:00:00'],
+                                                    //         'KARET'   => [$threeDays => '00:00:00']
+                                                    //     ],
+                                                    //     'default' => [
+                                                    //         'BENANG'  => [$tomorrow => '08:30:00'],
+                                                    //         'NYLON'   => [$tomorrow => '08:30:00'],
+                                                    //         'SPANDEX' => [$twoDays  => '08:30:00'],
+                                                    //         'KARET'   => [$twoDays  => '08:30:00']
+                                                    //     ]
+                                                    // ];
                                                     $rules = [
                                                         'Thursday' => [
-                                                            'BENANG'  => [$tomorrow => '08:30:00'],
-                                                            'NYLON'   => [$tomorrow => '08:30:00'],
-                                                            'SPANDEX' => [$twoDays  => '08:30:00', $threeDays => '09:00:00'],
-                                                            'KARET'   => [$twoDays  => '08:30:00', $threeDays => '09:00:00']
+                                                            'BENANG'  => [$tomorrow => '23:30:00'],
+                                                            'NYLON'   => [$tomorrow => '23:30:00'],
+                                                            'SPANDEX' => [$twoDays  => '23:30:00', $fourDays => '24:00:00'],
+                                                            'KARET'   => [$twoDays  => '23:30:00', $fourDays => '24:00:00']
                                                         ],
                                                         'Friday' => [
-                                                            'BENANG'  => [$tomorrow => '08:30:00', $twoDays => '09:00:00'],
-                                                            'NYLON'   => [$tomorrow => '08:30:00'],
-                                                            'SPANDEX' => [$threeDays => '08:30:00'],
-                                                            'KARET'   => [$threeDays => '08:30:00']
+                                                            'BENANG'  => [$tomorrow => '23:30:00'],
+                                                            'NYLON'   => [$tomorrow => '23:30:00'],
+                                                            'SPANDEX' => [$fourDays => '23:30:00'],
+                                                            'KARET'   => [$fourDays => '23:30:00']
                                                         ],
                                                         'Saturday' => [
-                                                            'BENANG'  => [$twoDays  => '08:30:00'],
-                                                            'NYLON'   => [$tomorrow => '08:30:00', $twoDays  => '09:00:00'],
-                                                            'SPANDEX' => [$threeDays => '08:30:00'],
-                                                            'KARET'   => [$threeDays => '08:30:00']
+                                                            'BENANG'  => [$threeDays  => '23:30:00'],
+                                                            'NYLON'   => [$threeDays => '23:30:00'],
+                                                            'SPANDEX' => [$threeDays => '00:00:00'],
+                                                            'KARET'   => [$threeDays => '00:00:00']
                                                         ],
                                                         'default' => [
-                                                            'BENANG'  => [$tomorrow => '08:30:00'],
-                                                            'NYLON'   => [$tomorrow => '08:30:00'],
-                                                            'SPANDEX' => [$twoDays  => '08:30:00'],
-                                                            'KARET'   => [$twoDays  => '08:30:00']
+                                                            'BENANG'  => [$tomorrow => '23:30:00'],
+                                                            'NYLON'   => [$tomorrow => '23:30:00'],
+                                                            'SPANDEX' => [$twoDays  => '23:30:00'],
+                                                            'KARET'   => [$twoDays  => '23:30:00']
                                                         ]
                                                     ];
 

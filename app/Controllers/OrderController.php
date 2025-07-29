@@ -2441,7 +2441,7 @@ class OrderController extends BaseController
         $delivery     = $request->getPost('delivery');
         $needle       = $request->getPost('machinetypeid');
         $tanggalInput = $request->getPost('tanggal_input');
-        
+
         // 1) Ambil style list dari DB
         $styleList = $this->ApsPerstyleModel->getIdApsForFlowProses($noModel);
 
