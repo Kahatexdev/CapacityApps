@@ -986,6 +986,7 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $model)
             ->where('machinetypeid', $jarum)
             ->where('factory', $area)
+            ->where('qty >', 0)
             ->groupBy('machinetypeid')
             ->orderBy('delivery', 'asc')
             ->first();
