@@ -323,6 +323,10 @@
         <script>
             $(document).ready(function() {
                 $('#dataTable').DataTable({
+                    lengthMenu: [
+                        [100, -1],
+                        [100, "All"]
+                    ],
                     "footerCallback": function(row, data, start, end, display) {
                         var api = this.api();
 
