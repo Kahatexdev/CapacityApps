@@ -633,7 +633,6 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $update['mastermodel'])
             ->where('delivery', $update['delivery'])
             ->where('size', $update['size'])
-            ->where('qty >', 0)
             ->first();
     }
     public function totalPo($model)
