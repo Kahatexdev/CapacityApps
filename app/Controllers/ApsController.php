@@ -728,7 +728,7 @@ class ApsController extends BaseController
         $jarum =  $kebutuhanArea['jarum'];
         // $detailplan = $this->DetailPlanningModel->getDetailPlanning($id); //get data model with detail quantity,model etc.
         $pdk = $this->DetailPlanningModel->detailPdk($id);
-        $listDeliv = $this->ApsPerstyleModel->getDetailPerDeliv($pdk);
+        $listDeliv = $this->ApsPerstyleModel->getDetailPerDeliv($pdk, $area);
         $listPlanning = $this->EstimatedPlanningModel->listPlanning($id);
         // dd($listPlanning);
         // $mesinpertgl = $this->TanggalPlanningModel->getMesinByDate($idutama);//get data machine per date and return into array

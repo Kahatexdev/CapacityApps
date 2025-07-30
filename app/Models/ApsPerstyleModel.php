@@ -881,11 +881,13 @@ class ApsPerstyleModel extends Model
         return $result;
     }
     public function
-    getDetailPerDeliv($pdk)
+    getDetailPerDeliv($pdk, $area)
     {
         return $this->select('mastermodel, delivery')
             ->where('mastermodel', $pdk['model'])
             ->where('machinetypeid', $pdk['jarum'])
+            ->where('factory', $area)
+            ->where('qty>', 0)
             ->groupBy('delivery')
             ->findAll();
     }
