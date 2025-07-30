@@ -50,7 +50,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($tampildata as $order) : ?>
+                                <?php foreach ($tampildata as $order) :
+                                    $isDouble = in_array(strtoupper($order->machinetypeid), ['240', '240-PL']);
+
+                                    $qty = $isDouble ? $order->qty * 2 : $order->qty;
+                                    $sisa = $isDouble ? $order->sisa * 2 : $order->sisa; ?>
                                     <tr>
                                         <td class="text-xs"><?= $order->created_at; ?></td>
                                         <td class="text-xs"><?= $order->kd_buyer_order; ?></td>
