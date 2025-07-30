@@ -77,23 +77,28 @@ error_reporting(E_ALL); ?>
                                     </thead>
                                     <tbody>
                                         <?php foreach ($val as $key => $list): ?>
-                                            <?php if (is_array($list)): // Pastikan $list adalah array 
-                                            ?>
+                                            <?php if (is_array($list)): ?>
+                                                <?php
+                                                $machine = strtoupper($list['machinetypeid'] ?? '');
+                                                $pembagi = in_array($machine, ['240', '240-PL']) ? 12 : 24;
+                                                $qty = $list['qty'] ?? 0;
+                                                $sisa = $list['sisa'] ?? 0;
+                                                ?>
                                                 <tr>
-                                                    <td><?= htmlspecialchars($list['mastermodel'] ?? '-') ?>/<?= $key + 1 ?> <?= htmlspecialchars($list['machinetypeid'] ?? '-') ?></td>
-                                                    <td><?= $list['buyer'] ?></td>
-                                                    <td><?= $list['no_order'] ?></td>
-                                                    <td><?= $list['delivery'] ?></td>
-                                                    <td><?= round($list['qty'] / 24) ?> dz</td>
-                                                    <td><?= round($list['sisa'] / 24) ?> dz</td>
-                                                    <td><?= $list['product_type'] ?></td>
-                                                    <td><?= $list['smv'] ?></td>
-                                                    <td><?= $list['factory'] ?></td>
-
+                                                    <td><?= htmlspecialchars($list['mastermodel'] ?? '-') ?>/<?= $key + 1 ?> <?= htmlspecialchars($machine) ?></td>
+                                                    <td><?= htmlspecialchars($list['buyer'] ?? '-') ?></td>
+                                                    <td><?= htmlspecialchars($list['no_order'] ?? '-') ?></td>
+                                                    <td><?= htmlspecialchars($list['delivery'] ?? '-') ?></td>
+                                                    <td><?= round($qty / $pembagi) ?> dz</td>
+                                                    <td><?= round($sisa / $pembagi) ?> dz</td>
+                                                    <td><?= htmlspecialchars($list['product_type'] ?? '-') ?></td>
+                                                    <td><?= htmlspecialchars($list['smv'] ?? '-') ?></td>
+                                                    <td><?= htmlspecialchars($list['factory'] ?? '-') ?></td>
                                                 </tr>
                                             <?php endif; ?>
                                         <?php endforeach ?>
                                     </tbody>
+
                                     <tfoot>
                                         <tr>
                                             <th></th>
