@@ -896,6 +896,7 @@ class ApsPerstyleModel extends Model
             ->where('delivery', $getData['delivery'])
             ->where('factory', $getData['area'])
             ->where('machinetypeid', $getData['jarum'])
+            ->where('qty >', 0)
             ->groupBy('machinetypeid')
             ->findAll();
     }

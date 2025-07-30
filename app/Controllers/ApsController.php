@@ -1056,9 +1056,14 @@ class ApsController extends BaseController
     public function detailplanstop($id)
     {
         $detailplan = $this->DetailPlanningModel->getDataPlanningStop($id);
+        $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();
+        $judul = $kebutuhanArea['judul'];
+        $area = $kebutuhanArea['area'];
+        $jarum =  $kebutuhanArea['jarum'];
         foreach ($detailplan as &$dp) {
+            // dd($dp);
             $iddetail = $dp['id_detail_pln'];
-            $qtysisa = $this->ApsPerstyleModel->getSisaPerModel($dp['model'], $dp['jarum']);
+            $qtysisa = $this->ApsPerstyleModel->getSisaPerModel($dp['model'], $dp['jarum'], $area);
             $mesin = $this->TanggalPlanningModel->totalMc($iddetail);
             $jum = 0;
             foreach ($mesin as $mc) {
@@ -1069,10 +1074,7 @@ class ApsController extends BaseController
             $dp['sisa'] =
                 round($qtysisa['sisa']);
         }
-        $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();
-        $judul = $kebutuhanArea['judul'];
-        $area = $kebutuhanArea['area'];
-        $jarum =  $kebutuhanArea['jarum'];
+
         $mesinarea = $this->jarumModel->getMesinByArea($area, $jarum); //mesin yang dipakai semua mesin tanpa melibatkan head planning
         // $mesinplanning = $this->MesinPlanningModel->getMesinByArea($area,$jarum); //mesin yang dipilih oleh head planning di teruskan ke bagian aps
         $data = [
