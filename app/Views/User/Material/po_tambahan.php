@@ -63,7 +63,7 @@
                                 <!-- <button id="exportPdfBtn" class="btn btn-danger">Export PDF</button> -->
                                 <input type="hidden" id="tgl_buat" name="tgl_buat" value="">
                                 <button id="generatePdfBtn" class="btn btn-danger">Export PDF</button>
-                                <!-- <button id="generateExcelBtn" class="btn btn-success">Export Excel</button> -->
+                                <button id="generateExcelBtn" class="btn btn-success">Export Excel</button>
                             </div>
                         </div>
 

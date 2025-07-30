@@ -401,6 +401,23 @@
                     <?php
                     }
                     ?>
+                    <?php
+                    if ($title == "Retur Bahan Baku") {
+                    ?>
+                        <ul class="navbar-nav justify-content-end">
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle text-body font-weight-bold px-2" id="navbarDropdownReports" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span class="d-lg-inline-block d-none ms-1">List</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4" aria-labelledby="navbarDropdownReports">
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/listRetur/' . $area) ?>">List Retur</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    <?php
+                    }
+                    ?>
                     <ul class="navbar-nav  justify-content-end">
                         <li class="nav-item d-flex align-items-center">
                             <a href="" data-bs-toggle="modal" data-bs-target="#LogoutModal" class=" nav-link text-body font-weight-bold px-0">
