@@ -1329,4 +1329,13 @@ class ApsPerstyleModel extends Model
             ->orderBy('factory, size', 'ASC')
             ->findAll();
     }
+
+    public function getNoModel()
+    {
+        return $this->select('mastermodel, factory')
+            ->where('qty >', 0)
+            ->groupBy('mastermodel, factory')
+            ->orderBy('mastermodel, factory')
+            ->findAll();
+    }
 }

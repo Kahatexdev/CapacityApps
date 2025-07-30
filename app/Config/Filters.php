@@ -32,6 +32,7 @@ class Filters extends BaseConfig
         'sudo' => \App\Filters\Sudo::class,
         'ie' => \App\Filters\IEFilter::class,
         'cors' => \App\Filters\CorsFilter::class,
+        'rosso' => \App\Filters\RossoFilter::class,
 
     ];
 

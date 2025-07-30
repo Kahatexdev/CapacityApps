@@ -660,6 +660,8 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('getKategoriRetur', 'ReturController::getKategoriRetur');
     $routes->get('getKodeWarnaWarnaByItemType', 'ReturController::getKodeWarnaWarnaByItemType');
     $routes->get('exportExcelRetur/(:any)', 'ExcelController::exportExcelRetur/$1');
+    $routes->get('listRetur/(:any)', 'ReturController::listRetur/$1');
+    $routes->get('exportPdfRetur/(:any)', 'PdfController::exportPdfRetur/$1');
 });
 
 // sudo
@@ -846,3 +848,14 @@ $routes->group('/ie', ['filter' => 'ie'], function ($routes) {
     $routes->get('updatesmv', 'IeController::updatesmv');
     $routes->post('importupdate', 'OrderController::importupdatesmv');
 });
+
+// rosso
+$routes->group(
+    '/rosso',
+    ['filter' => 'rosso'],
+    function ($routes) {
+        $routes->get('', 'RossoController::index');
+        $routes->get('pemesanan', 'RossoController::index');
+        $routes->get('bahanBaku/getNomodel', 'RossoController::getNomodel');
+    }
+);
