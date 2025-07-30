@@ -154,9 +154,17 @@
     <div class="row" id="card-container">
         <?php
         $no = 1;
-        foreach ($data as $area => $jarum): ?>
-            <div class="col-xl-4 col-sm-12 mb-xl-0 mb-4 mt-2">
-                <div class="card equal-height">
+        foreach ($data as $area => $jarum):
+
+            if (in_array($area, ['KK8D', 'KK8J'])) {
+                $colClass = 'col-xl-6';
+            } else {
+                $colClass = 'col-xl-4';
+            }
+
+        ?>
+            <div class="<?= $colClass ?> col-sm-12 mb-xl-0 mb-4 mt-2">
+                <div class="card equal-height" data-area="<?= $area ?>">
                     <div class="card-header" id="area_mc">
                         <div class="row form-group">
                             <h6> <?= $area ?></h6>
@@ -486,10 +494,10 @@
     });
 
     document.addEventListener("DOMContentLoaded", function() {
-        let cards = document.querySelectorAll('.equal-height');
+        let cards = document.querySelectorAll('.equal-height:not([data-area="KK8J"]):not([data-area="KK8D"])');
         let maxHeight = 0;
 
-        // Loop untuk cek tinggi tertinggi
+        // Cek tinggi maksimum selain KK8J
         cards.forEach(function(card) {
             let cardHeight = card.offsetHeight;
             if (cardHeight > maxHeight) {
@@ -497,7 +505,7 @@
             }
         });
 
-        // Set tinggi semua card ke maxHeight
+        // Set tinggi untuk semua kecuali KK8J
         cards.forEach(function(card) {
             card.style.height = maxHeight + 'px';
         });

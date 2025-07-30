@@ -254,7 +254,7 @@ class ApsPerstyleModel extends Model
     }
     public function getDetailPlanning($area, $jarum) // funtion ieu kudu diganti where na kade ulah poho
     {
-        return $this->select('mastermodel AS model, SUM(qty)/24 AS qty, SUM(sisa)/24 AS sisa, AVG(smv) AS smv, machinetypeid')
+        return $this->select('mastermodel AS model, SUM(qty/24) AS qty, SUM(sisa/24) AS sisa, AVG(smv) AS smv, machinetypeid')
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
             ->where('sisa >', 0)
@@ -303,6 +303,7 @@ class ApsPerstyleModel extends Model
         return $this->where('mastermodel', $validate['no_model'])
             ->where('size', $validate['style'])
             ->where('factory', $validate['area'])
+            ->where('qty >', 0)
             ->orderBy('delivery', 'ASC') // Optional: sort berdasarkan delivery date, bisa diubah sesuai kebutuhan
             ->findAll();
     }
@@ -463,7 +464,7 @@ class ApsPerstyleModel extends Model
             ->where('machinetypeid', $jarum)
             ->where('mastermodel', $model)
             // ->where('sisa >=', 0)
-            ->where('qty >=', 0)
+            ->where('qty >', 0)
             ->groupby('delivery')
             ->findAll();
         return $result;
@@ -486,7 +487,7 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $model)
             ->where('delivery', $deliv)
             ->where('sisa >=', 0)
-            ->where('qty >=', 0)
+            ->where('qty >', 0)
             ->groupBy('size,factory')
             ->findAll();
         $final = reset($sisa);
@@ -524,6 +525,7 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $validate['no_model'])
             ->where('size', $validate['style'])
             ->where('factory', $validate['area'])
+            ->where('qty >', 0)
             ->where('qty != sisa')
             ->orderBy('sisa', 'ASC') // Mengurutkan berdasarkan 'sisa' dari yang terkecil
             ->first(); // Mengambil data pertama (yang terkecil)
@@ -831,6 +833,13 @@ class ApsPerstyleModel extends Model
             ->set('qty', 0)
             ->update();
     }
+    public function setSisaZero($nomodel)
+    {
+        return $this->where('mastermodel', $nomodel)
+            ->where('qty', 0)
+            ->set('sisa', 0)
+            ->update();
+    }
     public function StylePerDelive($model, $jarum)
     {
         // Ambil data sisa dan qty jika sisa >= 0 dan qty > 0
@@ -881,11 +890,13 @@ class ApsPerstyleModel extends Model
         return $result;
     }
     public function
-    getDetailPerDeliv($pdk)
+    getDetailPerDeliv($pdk, $area)
     {
         return $this->select('mastermodel, delivery')
             ->where('mastermodel', $pdk['model'])
             ->where('machinetypeid', $pdk['jarum'])
+            ->where('factory', $area)
+            ->where('qty>', 0)
             ->groupBy('delivery')
             ->findAll();
     }
@@ -896,6 +907,7 @@ class ApsPerstyleModel extends Model
             ->where('delivery', $getData['delivery'])
             ->where('factory', $getData['area'])
             ->where('machinetypeid', $getData['jarum'])
+            ->where('qty >', 0)
             ->groupBy('machinetypeid')
             ->findAll();
     }
@@ -980,11 +992,13 @@ class ApsPerstyleModel extends Model
     }
 
 
-    public function getSisaPerModel($model, $jarum)
+    public function getSisaPerModel($model, $jarum, $area)
     {
         return $this->select('sum(qty/24) as qty, sum(sisa/24) as sisa, delivery')
             ->where('mastermodel', $model)
             ->where('machinetypeid', $jarum)
+            ->where('factory', $area)
+            ->where('qty >', 0)
             ->groupBy('machinetypeid')
             ->orderBy('delivery', 'asc')
             ->first();

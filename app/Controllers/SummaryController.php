@@ -660,7 +660,7 @@ class SummaryController extends BaseController
                 // Mengambil detail planning berdasarkan ID
                 $area = $kebutuhanArea['area'];
                 $jarum = $kebutuhanArea['jarum'];
-                $detailPlan = $this->detailPlanningModel->getDataPlanning2($id['id_pln_mc']);
+                $detailPlan = $this->detailPlanningModel->getDataPlanning2($id['id_pln_mc'], $area);
 
                 $seenCombinations = [];
                 foreach ($detailPlan as $key => $dp) {

@@ -537,98 +537,83 @@ class ProduksiController extends BaseController
                 $lastId = null;
                 $delivery = null;
 
-                if ($dataMaster) {
+                if ($dataMaster && count($dataMaster) > 0) {
                     log_message('debug', 'Data Master found: ' . json_encode($dataMaster));
                     log_message('debug', 'Original remainingQty: ' . $remainingQty);
 
-                    // Sorting logic
-                    if (count($dataMaster) > 1) {
-                        // Sort by delivery date if multiple deliveries
-                        usort($dataMaster, function ($a, $b) {
-                            return strtotime($a['delivery']) - strtotime($b['delivery']);
-                        });
-                        log_message('debug', 'Data sorted by delivery date: ' . json_encode($dataMaster));
-                    } else {
-                        // Sort by qty descending if only one delivery
-                        usort($dataMaster, function ($a, $b) {
-                            return $b['sisa'] - $a['sisa'];
-                        });
-                        log_message('debug', 'Data sorted by qty descending: ' . json_encode($dataMaster));
-                    }
+                    // Sort delivery ascending if not sorted from query
+                    usort($dataMaster, fn($a, $b) => strtotime($a['delivery']) <=> strtotime($b['delivery']));
+                    log_message('debug', 'Sorted Data: ' . json_encode($dataMaster));
 
-                    // Process each row in the master data for the given model/style
+                    $remaining = $remainingQty;
+                    $lastDeliveryRow = end($dataMaster);
+                    reset($dataMaster);
+
                     foreach ($dataMaster as $item) {
-                        $currentQty = $item['sisa'];
-                        $id = $item['idapsperstyle'];
+                        if ($remaining <= 0) break;
+
+                        $id       = $item['idapsperstyle'];
+                        $sisa     = (float) $item['sisa'];
                         $delivery = $item['delivery'];
 
-                        log_message('debug', 'Processing id: ' . $id . ' | Size: ' . $size . ' | Current qty: ' . $currentQty . ' | Remaining qty: ' . $remainingQty);
+                        log_message('debug', "Processing ID: $id | Delivery: $delivery | Sisa: $sisa | Remaining: $remaining");
 
-                        if ($remainingQty <= 0) break; // Stop when no remaining qty to subtract
-
-                        if ($currentQty >= $remainingQty) {
-                            $newQty = $currentQty - $remainingQty;
-                            $remainingQty = 0; // Production quantity used up
+                        if ($sisa >= $remaining) {
+                            $newSisa  = $sisa - $remaining;
+                            $remaining = 0;
                         } else {
-                            $remainingQty -= $currentQty;
-                            $newQty = 0; // This delivery's qty used up
+                            $remaining -= $sisa;
+                            $newSisa = 0;
                         }
 
-                        log_message('debug', 'Updating id: ' . $id . ' | Size: ' . $size . ' | New qty: ' . $newQty . ' | Remaining after update: ' . $remainingQty);
-                        $this->ApsPerstyleModel->update($id, ['sisa' => $newQty]);
-                        log_message('debug', 'Updated id: ' . $id . ' with new sisa: ' . $newQty);
-                        $lastId = $id;
+                        $this->ApsPerstyleModel->update($id, ['sisa' => $newSisa]);
+                        log_message('debug', "Updated ID: $id | New Sisa: $newSisa");
                     }
 
-                    // If there's remaining qty after processing all deliveries
-                    if ($remainingQty > 0 && $lastId !== null) {
-                        log_message('debug', 'Final remaining qty after processing all rows: ' . $remainingQty);
-                        $this->ApsPerstyleModel->update($lastId, ['sisa' => -1 * $remainingQty]);
-                        log_message('debug', 'Final update for lastId: ' . $lastId . ' | Remaining qty: ' . $remainingQty);
+                    // Overproduction → simpan ke delivery terakhir
+                    if ($remaining > 0 && $lastDeliveryRow) {
+                        $lastId = $lastDeliveryRow['idapsperstyle'];
+                        $this->ApsPerstyleModel->update($lastId, ['sisa' => -1 * $remaining]);
+                        log_message('debug', "Overproduction: updated ID $lastId with negative sisa: -" . $remaining);
                     }
 
-                    // Insert production data
+                    // Setup tanggal produksi = tgl input - 1 hari
                     $tglInputProduksi = $data[0];
-                    $date = new DateTime($tglInputProduksi);
-                    $date->modify('-1 day');
-                    $tglprod = $date->format('Y-m-d');
+                    $tglProduksi = (new DateTime($tglInputProduksi))->modify('-1 day')->format('Y-m-d');
 
-                    if ($lastId !== null) {
-                        $dataInsert = [
-                            'tgl_produksi' => $tglprod,
-                            'idapsperstyle' => $lastId,
-                            'bagian' => "-",
-                            'storage_awal' => "-",
-                            'storage_akhir' => "-",
-                            'qty_produksi' => str_replace('-', '', $data[14]),
-                            'bs_prod' => 0,
-                            'kategori_bs' => "-",
-                            'no_box' => $data[12] ?? 0,
-                            'no_label' => $data[13],
-                            'admin' => session()->get('username'),
-                            'shift' => "-",
-                            'shift_a' => $data[9] ?? 0,
-                            'shift_b' => $data[10] ?? 0,
-                            'shift_c' => $data[11] ?? 0,
-                            'no_mesin' => $data[8] ?? 0,
-                            'delivery' => $delivery,
-                            'area' => $area,
-                            'size' => $style
-                        ];
+                    // Siapkan data insert produksi
+                    $dataInsert = [
+                        'tgl_produksi'   => $tglProduksi,
+                        'idapsperstyle'  => $lastDeliveryRow['idapsperstyle'],
+                        'bagian'         => "-",
+                        'storage_awal'   => "-",
+                        'storage_akhir'  => "-",
+                        'qty_produksi'   => abs((int) $data[14]),
+                        'bs_prod'        => 0,
+                        'kategori_bs'    => "-",
+                        'no_box'         => $data[12] ?? 0,
+                        'no_label'       => $data[13],
+                        'admin'          => session()->get('username'),
+                        'shift'          => "-",
+                        'shift_a'        => $data[9] ?? 0,
+                        'shift_b'        => $data[10] ?? 0,
+                        'shift_c'        => $data[11] ?? 0,
+                        'no_mesin'       => $data[8] ?? 0,
+                        'delivery'       => $lastDeliveryRow['delivery'],
+                        'area'           => $area,
+                        'size'           => $style,
+                    ];
 
-                        $existingProduction = $this->produksiModel->existingData($dataInsert);
-                        if (!$existingProduction) {
-                            $this->produksiModel->insert($dataInsert);
-                            log_message('debug', 'Inserted production data for row: ' . $rowIndex);
-                        } else {
-                            $failedRows[] = $rowIndex . " duplikat";
-                        }
+                    // Cek duplikat sebelum insert
+                    if (!$this->produksiModel->existingData($dataInsert)) {
+                        $this->produksiModel->insert($dataInsert);
+                        log_message('debug', "Inserted production data for row: $rowIndex");
                     } else {
-                        $failedRows[] = 'Failed to insert production data for row: ' . $rowIndex . ' due to missing lastId';
+                        $failedRows[] = "$rowIndex duplikat";
                     }
                 } else {
-                    $failedRows[] = "Style tidak ditemukan " . $rowIndex;
-                    log_message('debug', 'Style not found for row: ' . $rowIndex);
+                    $failedRows[] = "Style tidak ditemukan $rowIndex";
+                    log_message('debug', "Style not found for row: $rowIndex");
                 }
             } catch (\Exception $e) {
                 log_message('error', 'Error in row ' . $rowIndex . ': ' . $e->getMessage());

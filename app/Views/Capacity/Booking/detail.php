@@ -119,6 +119,12 @@
                                 <input class="form-control" type="text" value="<?= $booking['lead_time'] ?>" readonly id="">
                             </div>
                         </div>
+                        <div class="col-lg-6 col-sm-12">
+                            <div class="form-group">
+                                <label for="" class="form-control-label">Keterangan</label>
+                                <textarea class="form-control" readonly id=""><?= $booking['keterangan'] ?></textarea>
+                            </div>
+                        </div>
 
                     </div>
                 </div>
@@ -305,6 +311,10 @@
                                     <label for="col-lg-6 col-sm-12">Ending Remaining Booking</label>
                                     <input type="text" name="sisa_booking_akhir" class="form-control">
                                 </div>
+                                <div class="form-group">
+                                    <label for="col-lg-6 col-sm-12">Keterangan</label>
+                                    <input type="text" name="keterangan" class="form-control">
+                                </div>
                             </div>
                         </div>
 
@@ -361,6 +371,10 @@
                                     <label for="col-lg-6 col-sm-12">Ending Remaining Booking</label>
                                     <input type="text" name="sisaQty" class="form-control">
                                 </div>
+                                <div class="form-group">
+                                    <label for="col-lg-6 col-sm-12">keterangan</label>
+                                    <input type="text" name="keterangan" class="form-control">
+                                </div>
 
                             </div>
                         </div>
@@ -410,7 +424,7 @@
 
                                 <div class="form-group">
                                     <label for="productType" class="col-form-label">Product Type</label>
-                                    <select class="form-control" id="productType" name="productType">
+                                    <select class="form-control" id="productType" name="productType" required>
                                         <option value=""> Choose</option>
                                         <?php foreach ($product as $key => $val) : ?>
                                             <option value="<?= $val['product_type'] ?>"><?= $val['product_type'] ?></option>
@@ -451,6 +465,10 @@
                                 <div class="form-group">
                                     <label for="qty" class="col-form-label">Booking Remaining (pcs)</label>
                                     <input type="number" name="sisa" id="" class="form-control" value="<?= $booking['sisa_booking']; ?>">
+                                </div>
+                                <div class="form-group">
+                                    <label for="qty" class="col-form-label">Keterangan</label>
+                                    <textarea name="keterangan" id="" class="form-control"><?= $booking['keterangan']; ?></textarea>
                                 </div>
                             </div>
                         </div>
@@ -549,21 +567,27 @@
                     </div>
                 </div>
                 <div class="row mt-2">
-                    <div class="col-9 pl-0">
+                    <div class="col-12 pl-0">
 
                         <form action="<?= base_url($role . '/importpecahbooking/' . $booking['id_booking']) ?>" id="modalForm" method="POST" enctype="multipart/form-data">
                             <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control ">
-                            Sisa: <input type="number" id="sisa" name="sisa" class="form-control">
                             <div class="form-group">
+                                Sisa: <input type="number" id="sisa" name="sisa" class="form-control">
                                 <input type="text" name="refid" id="" class="form-control" value=<?= $booking['id_booking'] ?> hidden>
                             </div>
+                            <div class="form-group">
+                                Keterangan:
+                                <textarea name="keterangan" class="form-control"></textarea>
+                            </div>
                     </div>
-                    <div class="col-3 pl-0">
-                        <button type="submit" class="btn btn-info btn-block"> Simpan</button>
-                        </form>
+
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-info">Simpan</button>
                     </div>
                 </div>
-
+                </form>
             </div>
 
         </div>
@@ -647,11 +671,13 @@
                                 <label for="qty" class="col-form-label">Booking Remaining (pcs):</label>
                                 <input type="number" name="sisa" id="" class="form-control">
                             </div>
+                            <div class="form-group">
+                                <label for="keterangan" class="col-form-label">Keterangan:</label>
+                                <textarea name="keterangan" id="" class="form-control"></textarea>
+                            </div>
 
                         </div>
                     </div>
-
-
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>

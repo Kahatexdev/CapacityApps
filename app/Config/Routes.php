@@ -121,6 +121,8 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('excelSisaOrderArea', 'ExcelController::excelSisaOrderArea');
     $routes->post('inputhistoryrevise/(:any)', 'OrderController::inputHistory/$1');
     $routes->post('saveRepeat', 'orderController::saveRepeat');
+    $routes->post('excelSisaOrderAllArea', 'ExcelController::excelSisaOrderAllArea');
+
 
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');

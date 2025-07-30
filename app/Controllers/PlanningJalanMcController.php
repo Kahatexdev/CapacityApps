@@ -769,7 +769,21 @@ class PlanningJalanMcController extends BaseController
             $monthlyData[$area['area']]['jarum'] = $this->detailAreaMc->getData($idAreaMc);
         }
         $statusOrder = $this->orderService->statusOrder($judul);
+        $specialAreas = ['KK8D', 'KK8J'];
+        $normalData = [];
+        $specialData = [];
 
+        // Pisahkan array-nya
+        foreach ($monthlyData as $area => $data) {
+            if (in_array($area, $specialAreas)) {
+                $specialData[$area] = $data;
+            } else {
+                $normalData[$area] = $data;
+            }
+        }
+
+        // Gabungkan: normal dulu, lalu special
+        $orderedData = $normalData + $specialData;
         $data = [
             'role' => $role,
             'title' =>  $judul,
@@ -781,7 +795,7 @@ class PlanningJalanMcController extends BaseController
             'active6' => '',
             'active7' => '',
             'summary' => $global,
-            'data' => $monthlyData,
+            'data' => $orderedData,
             'statusOrder' => $statusOrder
         ];
         return view($role . '/Planning/viewPlanMonth', $data);
