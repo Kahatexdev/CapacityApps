@@ -486,7 +486,7 @@ class ApsPerstyleModel extends Model
             ->where('machinetypeid', $jarum)
             ->where('mastermodel', $model)
             ->where('delivery', $deliv)
-            ->where('sisa >=', 0)
+            // ->where('sisa >=', 0)
             ->where('qty >', 0)
             ->groupBy('size,factory')
             ->findAll();
@@ -500,7 +500,7 @@ class ApsPerstyleModel extends Model
             ->join('master_product_type', 'master_product_type.id_product_type = data_model.id_product_type', 'left')
             ->where('mastermodel', $model)
             ->where('size', $style)
-            ->where('sisa >=', 0)
+            // ->where('sisa >=', 0)
             ->where('qty >', 0)
             ->groupBy('machinetypeid,delivery')
             ->findAll();
