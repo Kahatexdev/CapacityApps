@@ -1893,6 +1893,7 @@ class OrderController extends BaseController
                         $this->ApsPerstyleModel->update($id, ['qty' => $qtyBaru]);
                     }
                     $this->orderModel->update($idModel, $updateData);
+                    $this->ApsPerstyleModel->setSisaZero($nomodel);
                     // }
                     // }
                 }

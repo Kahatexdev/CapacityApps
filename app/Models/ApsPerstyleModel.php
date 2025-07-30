@@ -303,6 +303,7 @@ class ApsPerstyleModel extends Model
         return $this->where('mastermodel', $validate['no_model'])
             ->where('size', $validate['style'])
             ->where('factory', $validate['area'])
+            ->where('qty >', 0)
             ->orderBy('delivery', 'ASC') // Optional: sort berdasarkan delivery date, bisa diubah sesuai kebutuhan
             ->findAll();
     }
@@ -829,6 +830,13 @@ class ApsPerstyleModel extends Model
     {
         return $this->where('mastermodel', $nomodel)
             ->set('qty', 0)
+            ->update();
+    }
+    public function setSisaZero($nomodel)
+    {
+        return $this->where('mastermodel', $nomodel)
+            ->where('qty', 0)
+            ->set('sisa', 0)
             ->update();
     }
     public function StylePerDelive($model, $jarum)
