@@ -661,7 +661,21 @@ class PlanningController extends BaseController
             'persenGloves' => $persenGloves
         ];
         $statusOrder = $this->orderServices->statusOrder($bulan);
+        $specialAreas = ['KK8D', 'KK8J'];
+        $normalData = [];
+        $specialData = [];
 
+        // Pisahkan array-nya
+        foreach ($monthlyData as $area => $data) {
+            if (in_array($area, $specialAreas)) {
+                $specialData[$area] = $data;
+            } else {
+                $normalData[$area] = $data;
+            }
+        }
+
+        // Gabungkan: normal dulu, lalu special
+        $orderedData = $normalData + $specialData;
         // print(json_encode($statusOrder, JSON_PRETTY_PRINT));
         $data = [
             'role' => $role,
@@ -674,7 +688,7 @@ class PlanningController extends BaseController
             'active6' => '',
             'active7' => '',
             'bulan' => $bulanIni,
-            'data' => $monthlyData,
+            'data' => $orderedData,
             'summary' => $summary,
             'statusOrder' => $statusOrder
         ];
