@@ -859,5 +859,10 @@ $routes->group(
         $routes->get('', 'RossoController::index');
         $routes->get('pemesanan', 'RossoController::index');
         $routes->get('bahanBaku/getNomodel', 'RossoController::getNomodel');
+        $routes->get('getStyleSizeByNoModelPemesanan', 'RossoController::getStyleSizeByNoModelPemesanan');
+        $routes->post('getQty', 'MaterialController::getQtyByModelSize');
+        $routes->get('getMU/(:any)/(:any)/(:any)/(:any)', 'RossoController::getMU/$1/$2/$3/$4');
+        $routes->post('bahanBaku/simpanKeSession', 'RossoController::savePemesananSession');
+        $routes->post('bahanBaku/hapusSession', 'RossoController::deletePemesananSession');
     }
 );
