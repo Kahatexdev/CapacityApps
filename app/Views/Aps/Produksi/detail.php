@@ -24,60 +24,94 @@
             });
         </script>
     <?php endif; ?>
-    <div class="row">
-        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
-
+    <div class="row my-4">
+        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-12">
             <div class="card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between">
-                        <h5>
-                            Data Produksi <?= $area ?> <?= $bulan ?>
-                        </h5>
-                        <a href="<?= base_url($role . '/dataproduksi/') ?>" class="btn bg-gradient-info"> Kembali</a>
+                <div class="card-body">
+                    <!-- Baris Pertama: H5 dan Tombol Kembali -->
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <h5>
+                                Data Produksi <?= $area ?> <?= $bulan ?>
+                            </h5>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a href="<?= base_url($role . '/dataproduksi/') ?>" class="btn bg-gradient-info">Kembali</a>
+                        </div>
+                    </div>
+                    <!-- Baris Kedua: Form -->
+                    <div class="row">
+                        <div class="col-12">
+                            <form action="<?= base_url($role . '/detailproduksi/' . $area) ?>" method="get">
+                                <div class="row">
+                                    <div class="col-md-2 mb-2">
+                                        <p>Tanggal Produksi</p>
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <input type="date" class="form-control text-secondary" name="tgl_produksi" id="tgl_produksi" required>
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <input type="text" class="form-control" name="no_model" id="no_model" placeholder="No Model">
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <input type="text" class="form-control" name="size" id="size" placeholder="Size">
+                                    </div>
+                                    <div class="col-md-1 text-end">
+                                        <button type="submit" class="btn bg-gradient-success">FILTER</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
+            <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="table-responsive">
-                            <table id="dataTable" class="display  striped" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tgl Produksi</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">PDK</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Style</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Delivery</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No MC</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Box</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Label</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Produksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($produksi as $order) : ?>
+                            <?php if (empty($produksi)) : ?>
+                                <p class="text-center">Silakan gunakan filter untuk menampilkan data produksi.</p>
+                            <?php else : ?>
+                                <table id="dataTable" class="display  striped" style="width:100%">
+                                    <thead>
                                         <tr>
-                                            <td class="text-sm"><?= $order['tgl_produksi']; ?></td>
-                                            <td class="text-sm"><?= $order['mastermodel']; ?></td>
-                                            <td class="text-sm"><?= $order['size']; ?></td>
-                                            <td class="text-sm"><?= $order['delivery']; ?></td>
-                                            <td class="text-sm"><?= $order['no_mesin']; ?></td>
-                                            <td class="text-sm"><?= $order['no_box']; ?></td>
-                                            <td class="text-sm"><?= $order['no_label']; ?></td>
-                                            <td class="text-sm"><?= $order['qty_produksi']; ?></td>
-
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Tgl Produksi</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">PDK</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Style</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Delivery</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">No MC</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">No Box</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">No Label</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Qty Produksi</th>
                                         </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($produksi as $order) : ?>
+                                            <tr>
+                                                <td class="text-sm text-center"><?= $order['tgl_produksi']; ?></td>
+                                                <td class="text-sm text-center"><?= $order['mastermodel']; ?></td>
+                                                <td class="text-sm text-center"><?= $order['size']; ?></td>
+                                                <td class="text-sm text-center"><?= $order['delivery']; ?></td>
+                                                <td class="text-sm text-center"><?= $order['no_mesin']; ?></td>
+                                                <td class="text-sm text-center"><?= $order['no_box']; ?></td>
+                                                <td class="text-sm text-center"><?= $order['no_label']; ?></td>
+                                                <td class="text-sm text-center"><?= $order['qty_produksi']; ?></td>
 
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            <?php endif; ?>
                         </div>
                     </div>
-
-
-
                 </div>
-
-
             </div>
+
         </div>
         <div class="modal fade bd-example-modal-lg" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModal" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
@@ -141,44 +175,79 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(function() {
+        $('#dataTable').DataTable({
+            "order": [
+                [0, "desc"]
+            ]
+        });
+    });
+    $('.edit-btn').click(function() {
+        var noModel = $(this).data('pdk');
+        var id_prod = $(this).data('id');
+        var style = $(this).data('style');
+        var nobox = $(this).data('nobox');
+        var qty = $(this).data('qty');
+        var nolabel = $(this).data('nolabel');
+        var nomc = $(this).data('nomc');
+        var tgl = $(this).data('tgl');
+        var sisa = $(this).data('sisa');
+        var idaps = $(this).data('idaps');
 
-        <script>
-            $(document).ready(function() {
-                $('#dataTable').DataTable({
-                    "order": [
-                        [0, "desc"]
-                    ]
+
+        $('#editModal').modal('show'); // Show the modal
+        $('#editModal').find('input[name="no_model"]').val(noModel);
+        $('#editModal').find('input[name="id"]').val(id_prod);
+        $('#editModal').find('input[name="style"]').val(style);
+        $('#editModal').find('input[name="no_mc"]').val(nomc);
+        $('#editModal').find('input[name="no_box"]').val(nobox);
+        $('#editModal').find('input[name="no_label"]').val(nolabel);
+        $('#editModal').find('input[name="qty_prod"]').val(qty);
+        $('#editModal').find('input[name="qtycurrent"]').val(qty);
+        $('#editModal').find('input[name="tgl_prod"]').val(tgl);
+        $('#editModal').find('input[name="sisa"]').val(sisa);
+        $('#editModal').find('input[name="idaps"]').val(idaps);
+
+
+        document.getElementById('confirmationMessage').innerHTML = "Apakah anda yakin memecah" + noModel + " dengan jarum " + selectedMachineTypeId + " ke " + selectedArea;
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const deleteButtons = document.querySelectorAll(".delete-btn");
+
+        deleteButtons.forEach(button => {
+            button.addEventListener("click", function(event) {
+                event.preventDefault(); // Hindari submit langsung
+
+                const id = this.getAttribute("data-id");
+                const idaps = this.getAttribute("data-idaps");
+                const qty = this.getAttribute("data-qty");
+                const sisa = this.getAttribute("data-sisa");
+                const area = "<?= $area ?>";
+
+                Swal.fire({
+                    title: "Yakin ingin menghapus data ini?",
+                    text: "Data akan dihapus secara permanen!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Ya!",
+                    cancelButtonText: "Batal"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "<?= base_url($role . '/hapus-produksi/'); ?>" + id + "?idaps=" + idaps + "&area=" + area + "&qty=" + qty + "&sisa=" + sisa;
+                    }
                 });
             });
-            $('.edit-btn').click(function() {
-                var noModel = $(this).data('pdk');
-                var id_prod = $(this).data('id');
-                var style = $(this).data('style');
-                var nobox = $(this).data('nobox');
-                var qty = $(this).data('qty');
-                var nolabel = $(this).data('nolabel');
-                var nomc = $(this).data('nomc');
-                var tgl = $(this).data('tgl');
-                var sisa = $(this).data('sisa');
-                var idaps = $(this).data('idaps');
+        });
+    });
+</script>
 
-
-                $('#editModal').modal('show'); // Show the modal
-                $('#editModal').find('input[name="no_model"]').val(noModel);
-                $('#editModal').find('input[name="id"]').val(id_prod);
-                $('#editModal').find('input[name="style"]').val(style);
-                $('#editModal').find('input[name="no_mc"]').val(nomc);
-                $('#editModal').find('input[name="no_box"]').val(nobox);
-                $('#editModal').find('input[name="no_label"]').val(nolabel);
-                $('#editModal').find('input[name="qty_prod"]').val(qty);
-                $('#editModal').find('input[name="qtycurrent"]').val(qty);
-                $('#editModal').find('input[name="tgl_prod"]').val(tgl);
-                $('#editModal').find('input[name="sisa"]').val(sisa);
-                $('#editModal').find('input[name="idaps"]').val(idaps);
-
-
-                document.getElementById('confirmationMessage').innerHTML = "Apakah anda yakin memecah" + noModel + " dengan jarum " + selectedMachineTypeId + " ke " + selectedArea;
-            });
-        </script>
-        <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
-        <?php $this->endSection(); ?>
+<script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+<?php $this->endSection(); ?>
