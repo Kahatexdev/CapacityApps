@@ -687,7 +687,7 @@ class SummaryController extends BaseController
                     $prod = $this->produksiModel->getProduksiByModelDelivery($data); // Ambil data produksi
 
                     // Menghitung total mesin
-                    $mesinTotal = array_sum(array_column($this->tanggalPlanningModel->totalMc($dp['id_est_qty']), 'mesin'));
+                    $mesinTotal = array_sum(array_column($this->tanggalPlanningModel->totalMc($dp['id_detail_pln']), 'mesin'));
 
                     // Memodifikasi data dalam array secara langsung
                     $detailPlan[$key]['mesin'] = $mesinTotal;
