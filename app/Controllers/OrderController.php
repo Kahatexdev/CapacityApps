@@ -1893,7 +1893,6 @@ class OrderController extends BaseController
                         $this->ApsPerstyleModel->update($id, ['qty' => $qtyBaru]);
                     }
                     $this->orderModel->update($idModel, $updateData);
-                    $this->ApsPerstyleModel->setSisaZero($nomodel);
                     // }
                     // }
                 }
@@ -1904,6 +1903,7 @@ class OrderController extends BaseController
                 'keterangan' => $keterangan
             ];
             $this->historyRev->insert($dataInput);
+            $this->ApsPerstyleModel->setSisaZero($nomodel);
             return redirect()->to(base_url(session()->get('role') . '/detailPdk/' . $nomodel . '/' . $jarum))->withInput()->with('success', 'Data Berhasil di revise');
         } else {
             return redirect()->back()->with('error', 'No data found in the Excel file');
