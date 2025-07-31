@@ -58,15 +58,14 @@
                         <form id="pemesananBbForm">
                             <div class="row mb-4">
                                 <!-- PO Tambahan -->
-                                <div class="col-md-1 mb-3">
+                                <!-- <div class="col-md-1 mb-3">
                                     <label for="po_tambahan" class="form-label">PO Tambahan</label>
                                     <div class="form-check">
                                         <input type="checkbox" class="form-check-input" id="po_tambahan" name="po_tambahan">
                                         <label class="form-check-label" for="po_tambahan">Ya</label>
                                     </div>
-                                </div>
-                                <div class="col-md-5">
-                                    <input type="hidden" name="area" id="area" value="<?= $area ?>">
+                                </div> -->
+                                <div class="col-md-12">
                                     <label>Tanggal Pakai Nylon</label>
                                     <input type="date" class="form-control" id="tgl_pakai_nylon" name="tgl_pakai_nylon" min="<?= date('Y-m-d') ?>" required>
                                 </div>
@@ -235,17 +234,21 @@
     document.addEventListener('DOMContentLoaded', function() {
         const tglPakaiInput = document.getElementById('tgl_pakai_nylon');
         const noModelSelect = document.getElementById('no_model');
-        const poTambahanCheckbox = document.getElementById('po_tambahan');
-        const area = $('#area').val(); // Ambil nilai area dari input hidden
+        const areaSelect = document.getElementById('area');
+        // const poTambahanCheckbox = document.getElementById('po_tambahan');
+        // const area = $('#area').val(); // Ambil nilai area dari input hidden
 
         // Fungsi untuk mengubah status select berdasarkan nilai input tgl_pakai
         function toggleNoModel() {
             if (tglPakaiInput.value.trim() === "") {
                 noModelSelect.disabled = true;
+                areaSelect.disabled = true;
             } else {
                 noModelSelect.disabled = false;
+                areaSelect.disabled = false;
             }
         }
+
 
         // Panggil fungsi saat halaman pertama kali dimuat
         toggleNoModel();
@@ -255,27 +258,34 @@
 
         // Fungsi untuk mengambil data no model
         function fetchNoModelData() {
-            const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
-            $('#no_model').empty();
-            $('#no_model').append('<option value="">Pilih No Model</option>');
+            // const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
+            $('#no_model').empty().append('<option value="">Pilih No Model</option>');
+            $('#area').empty().append('<option value="">Pilih Area</option>');
             $('#detailBbCardsContainer').empty(); // kosongkan data style size yg telah di pilih sebelumnya
 
             $.ajax({
                 url: '<?= base_url($role . '/bahanBaku/getNomodel') ?>',
                 method: 'GET',
                 data: {
-                    po_tambahan: poTambahanChecked,
-                    area: area
+                    // po_tambahan: poTambahanChecked,
+                    // area: area
                 }, // Kirim data PO Tambahan sebagai parameter
                 dataType: 'json',
                 success: function(data) {
-                    // Kosongkan dropdown
-                    $('#no_model').empty();
-                    $('#no_model').append('<option value="">Pilih No Model</option>');
+                    // Ambil model unik (jika banyak factory)
+                    const uniqueModels = [...new Set(data.map(item => item.mastermodel))];
 
-                    // Tambahkan data baru ke dropdown
-                    data.forEach(function(model) {
-                        $('#no_model').append(`<option value="${model.mastermodel}">${model.mastermodel}</option>`);
+                    uniqueModels.forEach(function(model) {
+                        $('#no_model').append(`<option value="${model}">${model}</option>`);
+                    });
+
+                    // Simpan data area per model ke memory
+                    window.modelToAreaMap = {};
+                    data.forEach(item => {
+                        if (!window.modelToAreaMap[item.mastermodel]) {
+                            window.modelToAreaMap[item.mastermodel] = [];
+                        }
+                        window.modelToAreaMap[item.mastermodel].push(item.factory);
                     });
                 },
                 error: function(xhr, status, error) {
@@ -287,13 +297,20 @@
         // Panggil fetchNoModelData saat halaman pertama kali dimuat
         fetchNoModelData();
 
-        // Deteksi perubahan pada checkbox PO Tambahan
-        poTambahanCheckbox.addEventListener('change', fetchNoModelData);
+        // Saat No Model dipilih, tampilkan daftar area
+        $('#no_model').on('change', function() {
+            const selectedModel = $(this).val();
+            const areaList = window.modelToAreaMap[selectedModel] || [];
+
+            $('#area').empty().append('<option value="">Pilih Area</option>');
+
+            areaList.forEach(function(factory) {
+                $('#area').append(`<option value="${factory}">${factory}</option>`);
+            });
+        });
+
     });
     $(document).ready(function() {
-        const area = $('#area').val(); // Ambil nilai area dari input hidden
-        const poTambahanCheckbox = document.getElementById('po_tambahan');
-
         // Inisialisasi Select2 di kolom no model
         $('#no_model').select2({
             width: '100%'
@@ -303,16 +320,21 @@
         let globalData = []; // Variabel global untuk menyimpan data AJAX
         // Event ketika no model berubah
         $('#area').change(function() {
-            const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
-            let noModel = $(this).val(); // Ambil value yang dipilih di select2
-            if (noModel) {
+            // const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
+            let noModel = $('#no_model').val();; // Ambil value yang dipilih di select2
+            let area = $(this).val(); // Ambil value yang dipilih di select2
+
+            const ajaxUrl = '<?= base_url($role . '/getStyleSizeByNoModelPemesanan') ?>';
+            console.log('URL yang dipakai:', ajaxUrl);
+
+            if (area && noModel) {
                 // ambil style size by model
                 $.ajax({
-                    url: '<?= base_url($role . '/getStyleSizeByNoModelPemesanan') ?>',
+                    url: ajaxUrl,
                     type: "GET",
                     data: {
                         no_model: noModel,
-                        po_tambahan: poTambahanChecked,
+                        // po_tambahan: poTambahanChecked,
                         area: area
                     }, // Kirim dalam format object
                     dataType: "json",
@@ -491,6 +513,12 @@
             // Cari elemen <tbody> "material-usage" yang terkait dengan baris ini
             let table = $(this).closest('.table-responsive').find('.material-usage');
 
+            console.log('Mengirim data ke AJAX:', {
+                no_model: noModel,
+                area: area,
+                selectedStyleSize: selectedStyleSize
+            });
+
             // Validasi untuk memastikan Style Size tidak duplikat di baris lain
             let isDuplicate = false;
             let currentElement = $(this); // Elemen yang memicu event 'change'
@@ -517,23 +545,23 @@
                 noModel !== "" && noModel !== null &&
                 area !== "" && area !== null) {
                 // AJAX untuk mengambil Jalan MC
-                $.ajax({
-                    url: '<?= base_url($role . '/getJalanMc') ?>', // Ganti dengan URL endpoint Anda
-                    type: 'POST',
-                    data: {
-                        style_size: selectedStyleSize,
-                        no_model: noModel,
-                        area: area
-                    },
-                    dataType: "json",
-                    success: function(response) {
+                // $.ajax({
+                //     url: '<?= base_url($role . '/getJalanMc') ?>', // Ganti dengan URL endpoint Anda
+                //     type: 'POST',
+                //     data: {
+                //         style_size: selectedStyleSize,
+                //         no_model: noModel,
+                //         area: area
+                //     },
+                //     dataType: "json",
+                //     success: function(response) {
 
-                        jalanMcInput.val(response.jalan_mc); // Isi input "Jalan MC" dengan data dari server
-                    },
-                    error: function() {
-                        alert('Gagal mengambil data Jalan MC! Silakan coba lagi.');
-                    }
-                });
+                //         jalanMcInput.val(response.jalan_mc); // Isi input "Jalan MC" dengan data dari server
+                //     },
+                //     error: function() {
+                //         alert('Gagal mengambil data Jalan MC! Silakan coba lagi.');
+                //     }
+                // });
 
                 $.ajax({
                     url: '<?= base_url($role . '/getQty') ?>', // Ganti dengan URL endpoint Anda
@@ -548,12 +576,12 @@
                         console.log(response)
                         qty.val(response.qty);
                         inisial.val(response.inisial);
-                        const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
-                        if (poTambahanChecked == 1) {
-                            urlMu = `http://172.23.44.14/MaterialSystem/public/api/getMUPoTambahan?no_model=${encodeURIComponent(noModel)}&style_size=${encodeURIComponent(selectedStyleSize)}&area=${encodeURIComponent(area)}`;
-                        } else {
-                            urlMu = '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + encodeURIComponent(selectedStyleSize) + '/' + area + '/' + qty.val();
-                        }
+                        // const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
+                        // if (poTambahanChecked == 1) {
+                        //     urlMu = `http://172.23.44.14/MaterialSystem/public/api/getMUPoTambahan?no_model=${encodeURIComponent(noModel)}&style_size=${encodeURIComponent(selectedStyleSize)}&area=${encodeURIComponent(area)}`;
+                        // } else {
+                        urlMu = '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + encodeURIComponent(selectedStyleSize) + '/' + area + '/' + qty.val();
+                        // }
 
                         // Lakukan permintaan AJAX
                         $.ajax({
@@ -588,19 +616,20 @@
                                     const jalanMc = parseFloat(jalanMcInput.val()) || 0; // Ganti dengan input jalanMc yang sesuai
                                     const totalCones = (item.qty_cns * jalanMc).toFixed(2);
                                     const totalBeratCones = (total * jalanMc).toFixed(2);
-                                    const poTambahan = poTambahanChecked;
+                                    // const poTambahan = poTambahanChecked;
 
                                     table.append(`
                                             <tr>
+                                            <td colspan="7" style="display:none;">
                                                 // kolom hide
                                                 <input type="hidden" class="form-control text-center" name="items[${row}][${index}][tgl_pakai]" id="tgl_pakai" value="${tgl_pakai}" readonly>
-                                                <input type="hidden" class="form-control text-center" name="items[${row}][${index}][po_tambahan]" id="po_tambahan" value="${poTambahan}" readonly>
                                                 <input type="hidden" class="form-control text-center" name="items[${row}][${index}][no_model]" id="no_model" value="${noModel}" readonly>
                                                 <input type="hidden" class="form-control text-center" name="items[${row}][${index}][style_size]" id="style_size" value="${selectedStyleSize}" readonly>
                                                 <input type="hidden" class="form-control text-center" name="items[${row}][${index}][id_material]" id="id_material" value="${item.id_material}" readonly>
                                                 <input type="hidden" class="form-control text-center" name="items[${row}][${index}][jenis]" id="jenis" value="${item.jenis}" readonly>
                                                 <input type="hidden" class="form-control text-center jalan_mc" name="items[${row}][${index}][jalan_mc]" id="jalan_mc" value="${jalanMc}" readonly>
                                                 // 
+                                                </td>
                                                 <td width=20><input type="text" class="form-control text-center" name="items[${row}][${index}][no]" id="no" value="${index + 1}" readonly></td>
                                                 <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][komposisi]" id="komposisi" value="${item.composition}" readonly></td>
                                                 <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][loss]" id="loss" value="${item.loss}" readonly></td>
@@ -663,7 +692,7 @@
                         });
                     },
                     error: function() {
-                        alert('Gagal mengambil data Jalan MC! Silakan coba lagi.');
+                        alert('Gagal mengambil data Qty! Silakan coba lagi.');
                     }
                 });
             } else {

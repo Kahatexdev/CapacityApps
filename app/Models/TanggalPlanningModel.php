@@ -58,10 +58,7 @@ class TanggalPlanningModel extends Model
     }
     public function totalMc($id_est_qty)
     {
-        return $this->select('id_est_qty, mesin')
-            ->distinct()
-            ->where('id_est_qty', $id_est_qty)
-            ->findAll();
+        return $this->select('id_est_qty,mesin')->distinct('id_est_qty')->where('id_detail_pln', $id_est_qty)->findAll();
     }
     public function dailyMachine($id)
     {

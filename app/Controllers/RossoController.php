@@ -4,14 +4,10 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\DataMesinModel;
 use App\Models\OrderModel;
 use App\Models\BookingModel;
 use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
-use App\Models\BsMesinModel;
-use App\Models\PenggunaanJarum;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpParser\Node\Stmt\Return_;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -22,27 +18,16 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 class RossoController extends BaseController
 {
     protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
     protected $bookingModel;
+    protected $productModel;
     protected $orderModel;
     protected $ApsPerstyleModel;
-    protected $liburModel;
-    protected $BsMesinModel;
-    protected $PenggunaanJarumModel;
     public function __construct()
     {
-
-
-        $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->BsMesinModel = new BsMesinModel();
-        $this->PenggunaanJarumModel = new PenggunaanJarum();
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -124,32 +109,271 @@ class RossoController extends BaseController
 
     public function getNomodel()
     {
-        $poTambahan = $this->request->getGet('po_tambahan'); // Ambil parameter PO Tambahan
-        $area = $this->request->getGet('area'); // Ambil parameter PO Tambahan
+        // $poTambahan = $this->request->getGet('po_tambahan'); // Ambil parameter PO Tambahan
+        // $area = $this->request->getGet('area'); // Ambil parameter PO Tambahan
 
         // Logika untuk menentukan data berdasarkan status PO Tambahan
-        if ($poTambahan == 1) {
-            // Jika search ada, panggil API eksternal dengan query parameter 'search'
-            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getNoModelByPoTambahan?area=' . $area;
+        // if ($poTambahan == 1) {
+        //     // Jika search ada, panggil API eksternal dengan query parameter 'search'
+        //     $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getNoModelByPoTambahan?area=' . $area;
 
-            try {
-                $response = file_get_contents($apiUrl);
-                if ($response === false) {
-                    throw new \Exception("Failed to fetch data from API: $apiUrl");
-                }
+        //     try {
+        //         $response = file_get_contents($apiUrl);
+        //         if ($response === false) {
+        //             throw new \Exception("Failed to fetch data from API: $apiUrl");
+        //         }
 
-                $data = json_decode($response, true);
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    throw new \Exception("Invalid JSON response from API: $apiUrl");
-                }
-            } catch (\Exception $e) {
-                // Tangani error
-                return $this->response->setJSON(['error' => $e->getMessage()])->setStatusCode(500);
-            }
-        } else {
-            $data = $this->ApsPerstyleModel->getNoModel();
-        }
+        //         $data = json_decode($response, true);
+        //         if (json_last_error() !== JSON_ERROR_NONE) {
+        //             throw new \Exception("Invalid JSON response from API: $apiUrl");
+        //         }
+        //     } catch (\Exception $e) {
+        //         // Tangani error
+        //         return $this->response->setJSON(['error' => $e->getMessage()])->setStatusCode(500);
+        //     }
+        // } else {
+        $data = $this->ApsPerstyleModel->getNoModel();
+        // }
 
         return $this->response->setJSON($data)->setStatusCode(200);
+    }
+
+    public function getStyleSizeByNoModelPemesanan()
+    {
+        // Ambil No Model dari permintaan AJAX
+        $noModel = $this->request->getGet('no_model');
+        $area = $this->request->getGet('area');
+
+        // $poTambahan = $this->request->getGet('po_tambahan');
+
+        // Logika untuk menentukan data berdasarkan status PO Tambahan
+        // if ($poTambahan == 1) {
+        //     // Jika search ada, panggil API eksternal dengan query parameter 'search'
+        //     $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByPoTambahan?no_model=' . $noModel . '&area=' . $area;
+
+        //     try {
+        //         $response = file_get_contents($apiUrl);
+        //         if ($response === false) {
+        //             throw new \Exception("Failed to fetch data from API: $apiUrl");
+        //         }
+
+        //         $data = json_decode($response, true);
+        //         if (json_last_error() !== JSON_ERROR_NONE) {
+        //             throw new \Exception("Invalid JSON response from API: $apiUrl");
+        //         }
+        //     } catch (\Exception $e) {
+        //         // Tangani error
+        //         return $this->response->setJSON(['error' => $e->getMessage()])->setStatusCode(500);
+        //     }
+        // } else {
+        $data = $this->ApsPerstyleModel->getSizesByNoModelAndArea($noModel, $area); // Sesuaikan dengan model Anda
+        // }
+
+        // Kembalikan data dalam format JSON
+        return $this->response->setJSON($data)->setStatusCode(200);
+    }
+
+    public function getQtyByModelSize()
+    {
+        // Ambil No Model, Style & Area Size dari permintaan AJAX
+        $noModel = $this->request->getPost('no_model');
+        $styleSize = $this->request->getPost('style_size');
+        $area = $this->request->getPost('area');
+
+        // Query data Jalan MC berdasarkan No Model dan Style Size
+        $qty = $this->ApsPerstyleModel->getQtyOrder($noModel, $styleSize, $area); // Sesuaikan dengan model Anda
+
+        // Kembalikan data dalam format JSON
+        return $this->response->setJSON($qty);
+    }
+
+    public function getMU($model, $styleSize, $area, $qtyOrder)
+    {
+        $styleSize = urlencode($styleSize);  // Encode styleSize
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getMUForRosso/' . $model . '/' . $styleSize . '/' . $area;
+        $response = file_get_contents($apiUrl);  // Mendapatkan response dari API
+        // if ($response === FALSE) {
+        //     die('Error occurred while fetching data.');
+        // }
+        if ($response === FALSE) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Error occurred while fetching data.',
+            ]);
+        }
+
+        $data = json_decode($response, true);  // Decode JSON response dari API
+
+        if ($data === null) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Invalid data received from API',
+            ]);
+        }
+
+        // Pastikan respons berupa array
+        if (!is_array($data)) {
+            $data = (array)$data;  // Paksa konversi ke array
+        }
+
+        // Jika respons berupa array tetapi kosong
+        if (empty($data)) {
+            return $this->response->setJSON([
+                'status'  => 'empty',
+                'message' => 'Material Usage belum ada, hubungi Gbn',
+            ]);
+        }
+
+        // Hitung ttl_kebutuhan
+        foreach ($data as $key => $item) {
+            if (isset($qtyOrder, $item['composition'], $item['gw'], $item['loss'])) {
+                // Hitung ttl_keb untuk setiap item
+                $ttl_keb = $qtyOrder * $item['gw'] * ($item['composition'] / 100) * (1 + ($item['loss'] / 100)) / 1000;
+
+                // Tambahkan ttl_keb ke elemen saat ini
+                $data[$key]['ttl_keb'] = number_format($ttl_keb, 2);
+            } else {
+                // Jika data tidak valid, tambahkan ttl_keb sebagai null
+                $data[$key]['ttl_keb'] = null;
+            }
+        }
+
+        // Return data sebagai JSON
+        return $this->response->setJSON($data);
+    }
+    public function savePemesananSession()
+    {
+        $existingData = session()->get('pemesananBb') ?? [];
+        // dd ($existingData);
+        // Ambil data baru dari request POST dengan key 'items'
+        $newData = $this->request->getPost('items');
+        // \var_dump($newData);
+        if (!is_array($newData)) {
+            return; // Pastikan $newData adalah array sebelum diproses
+        }
+
+        // Inisialisasi array untuk menyimpan hasil filter
+        $filteredData = [];
+        // dd ($newData);
+        // Iterasi setiap elemen pada `$newData`
+        foreach ($newData as $rowKey => $rows) {
+            foreach ($rows as $index => $item) {
+                // Periksa apakah nilai 'ttl' tidak sama dengan '0'
+                if (isset($item['ttl']) && floatval($item['ttl']) > 0 && isset($item['ttl_cns']) && floatval($item['ttl_cns']) > 0) {
+                    // Tentukan tgl_pakai berdasarkan jenis item
+                    if (isset($item['jenis'])) {
+                        $jenisBenang = strtolower($item['jenis']);
+                        if (in_array($jenisBenang, ['nylon'])) {
+                            $item['tgl_pakai'] = $this->request->getPost('tgl_pakai_nylon');
+                        }
+                    } else {
+                        // Jika 'jenis' tidak ada, berikan default
+                        $item['tgl_pakai'] = "";
+                    }
+                    // Masukkan data yang valid ke array hasil filter
+                    $filteredData[$rowKey][$index] = $item;
+                }
+            }
+        }
+        $isDuplicateFound = false;
+        // Variabel untuk menyimpan data valid
+        $validData = [];
+
+        // Loop melalui data baru
+        foreach ($filteredData as $group) {
+            if (!is_array($group)) {
+                continue; // Pastikan $group adalah array sebelum diproses
+            }
+
+            foreach ($group as $record) {
+                $isDuplicate = false;
+
+                // Cek ke existingData untuk duplikasi
+                foreach ($existingData as $existingGroup) {
+                    foreach ($existingGroup as $existingRecord) {
+                        if (
+                            isset($record['id_material'], $record['tgl_pakai'], $existingRecord['id_material'], $existingRecord['tgl_pakai']) &&
+                            $record['id_material'] === $existingRecord['id_material'] &&
+                            $record['tgl_pakai'] === $existingRecord['tgl_pakai']
+                        ) {
+                            log_message('error', 'Duplikat: ' . json_encode([
+                                'new' => $record,
+                                'existing' => $existingRecord
+                            ]));
+                            // Tandai data sebagai duplikat
+                            $isDuplicate = true;
+
+                            // Log pesan error atau berikan respon status warning
+                            log_message('error', 'Duplikasi ditemukan: ' . json_encode($record));
+                            break 3; // Keluar dari loop jika duplikat ditemukan
+                        }
+                    }
+                }
+
+                // Jika tidak ada duplikasi, tambahkan ke data valid
+                if (!$isDuplicate) {
+                    $validData[] = $record;
+                }
+            }
+        }
+
+        // Update session dengan data valid baru
+        if (!empty($validData)) {
+            session()->set('pemesananBb', array_merge($existingData, [$validData]));
+        } else {
+            // Tampilkan respon warning
+            return $this->response->setJSON([
+                'status' => 'warning',
+                'message' => 'Beberapa data tidak disimpan karena duplikasi ditemukan.'
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'message' => 'Data berhasil diupdate & disimpan ke session',
+            'data'    => $existingData,
+            'status'  => 'success',
+            'title'  => 'Sukses!',
+
+        ]);
+    }
+    public function deletePemesananSession()
+    {
+        // Ambil data dari input POST (array `selected`)
+        // $selected = $this->request->getPost('selected') ?? []; // Pastikan default adalah array kosong
+        $selected = $this->request->getJSON(true)['selected'] ?? [];
+        log_message('debug', 'Isi selected: ' . json_encode($selected));
+        $pemesananBb = session()->get('pemesananBb') ?? []; // Ambil data session asli
+        $found = false; // Variabel untuk melacak apakah data ditemukan
+
+        // Loop melalui data `selected`
+        foreach ($selected as $selectedItem) {
+            // Pecah `selectedItem` menjadi `id_material` dan `tgl_pakai`
+            list($id_material, $tgl_pakai) = explode(',', $selectedItem);
+
+            // Loop melalui session data untuk menemukan dan menghapus
+            foreach ($pemesananBb as $groupKey => $group) {
+                foreach ($group as $itemKey => $item) {
+                    if ($item['id_material'] === $id_material && $item['tgl_pakai'] === $tgl_pakai) {
+                        unset($pemesananBb[$groupKey][$itemKey]); // Hapus elemen
+                        $pemesananBb[$groupKey] = array_values($pemesananBb[$groupKey]); // Rapi indeks
+                        $found = true;
+                    }
+                }
+            }
+        }
+
+        if ($found) {
+            session()->set('pemesananBb', $pemesananBb);
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Data berhasil dihapus',
+                'updated_session' => $pemesananBb
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Tidak ada data yang ditemukan atau dihapus'
+        ]);
     }
 }
