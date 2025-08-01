@@ -56,9 +56,9 @@ class TanggalPlanningModel extends Model
             ->where('id_detail_pln', $iddetail)
             ->delete();
     }
-    public function totalMc($id_est_qty)
+    public function totalMc($id_detail_pln)
     {
-        return $this->select('id_est_qty,mesin')->distinct('id_est_qty')->where('id_detail_pln', $id_est_qty)->findAll();
+        return $this->select('id_est_qty,mesin')->distinct('id_est_qty')->where('id_detail_pln', $id_detail_pln)->findAll();
     }
     public function dailyMachine($id)
     {
@@ -67,6 +67,13 @@ class TanggalPlanningModel extends Model
             ->selectSum('mesin')
             ->where('tanggal_planning.id_detail_pln', $id)
             ->groupBy('date')
+            ->findAll();
+    }
+    public function totalMcSumamryPlanner($id_est_qty)
+    {
+        return $this->select('id_est_qty, mesin')
+            ->distinct()
+            ->where('id_est_qty', $id_est_qty)
             ->findAll();
     }
 }
