@@ -451,7 +451,7 @@ class MesinController extends BaseController
         $yesterday = date('Y-m-d', strtotime('-2 day'));
         $tampilperarea = $this->jarumModel->getJarumArea($area);
         $ProdMesin = $this->produksiModel->getProductionPerJarum($yesterday, $area);
-        dd($ProdMesin);
+        // dd($ProdMesin);
         $tampilperarea = $this->jarumModel->getJarumArea($area);
         foreach ($tampilperarea as &$mc) {
             $mc['kapasitas'] = $mc['mesin_jalan'] * $mc['target'];
