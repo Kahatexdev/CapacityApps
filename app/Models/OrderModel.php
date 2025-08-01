@@ -66,8 +66,8 @@ class OrderModel extends Model
                         data_model.description, 
                         data_model.seam, 
                         data_model.leadtime, 
-                        ROUND(SUM(apsperstyle.qty/24), 0) AS qty, 
-                        ROUND(SUM(apsperstyle.sisa/24), 0) AS sisa, 
+                        FORMAT(SUM(apsperstyle.qty / 24), 2) AS qty,
+                        FORMAT(SUM(apsperstyle.sisa / 24), 2) AS sisa,
                         apsperstyle.delivery')
             // Joining the required tables
             ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left')

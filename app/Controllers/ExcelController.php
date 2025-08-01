@@ -5484,9 +5484,10 @@ class ExcelController extends BaseController
         $sheet->setCellValue('B3', 'Delivery Date');
         $sheet->setCellValue('C3', 'Qty');
         $sheet->setCellValue('D3', 'Customer');
-        $sheet->setCellValue('E3', 'Style');
-        $sheet->setCellValue('F3', 'Product Type');
-        $sheet->setCellValue('G3', 'Std. Time(s)');
+        $sheet->setCellValue('E3', 'No Order');
+        $sheet->setCellValue('F3', 'Style');
+        $sheet->setCellValue('G3', 'Product Type');
+        $sheet->setCellValue('H3', 'Std. Time(s)');
 
         $sheet->getStyle('A3')->applyFromArray($styleHeader);
         $sheet->getStyle('B3')->applyFromArray($styleHeader);
@@ -5495,6 +5496,7 @@ class ExcelController extends BaseController
         $sheet->getStyle('E3')->applyFromArray($styleHeader);
         $sheet->getStyle('F3')->applyFromArray($styleHeader);
         $sheet->getStyle('G3')->applyFromArray($styleHeader);
+        $sheet->getStyle('H3')->applyFromArray($styleHeader);
 
         // Tulis data mulai dari baris 4
         $row = 4;
@@ -5514,9 +5516,10 @@ class ExcelController extends BaseController
             $sheet->setCellValue('B' . $row, $item['delivery']);
             $sheet->setCellValue('C' . $row, $item['qty']);
             $sheet->setCellValue('D' . $row, $item['kd_buyer_order']);
-            $sheet->setCellValue('E' . $row, $item['size']);
-            $sheet->setCellValue('F' . $row, $item['product_type']);
-            $sheet->setCellValue('G' . $row, $item['smv']);
+            $sheet->setCellValue('E' . $row, $item['no_order']);
+            $sheet->setCellValue('F' . $row, $item['size']);
+            $sheet->setCellValue('G' . $row, $item['product_type']);
+            $sheet->setCellValue('H' . $row, $item['smv']);
 
             // 
             $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
@@ -5526,6 +5529,7 @@ class ExcelController extends BaseController
             $sheet->getStyle('E' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('F' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('G' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('H' . $row)->applyFromArray($styleBody);
 
             $counterMap[$key]++;
             $row++;
