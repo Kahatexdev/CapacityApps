@@ -1341,14 +1341,13 @@ class ProduksiController extends BaseController
         $shiftA = $this->request->getPost('shift_a');
         $shiftB = $this->request->getPost('shift_b');
         $shiftC = $this->request->getPost('shift_c');
-        $qtyProduksi = $this->request->getPost('qty_produksi');
+        $qtyProduksi = $shiftA + $shiftB + $shiftC;
         $admin = session()->get('username');
 
         $validate = [
             'no_model' => $noModel,
             'style' => $size
         ];
-
         $idAps = $this->ApsPerstyleModel->getIdProd($validate);
 
         if (!$idAps) {
@@ -1357,8 +1356,8 @@ class ProduksiController extends BaseController
                 $idnext = $idMinus['idapsperstyle'];
                 $qtysisa = $idMinus['sisa'];
                 $deliv = $idMinus['delivery'];
+                // dd($qtyProduksi);
                 $sisa = $qtysisa - $qtyProduksi;
-
                 $this->ApsPerstyleModel->update($idnext, ['sisa' => $sisa]);
 
                 $dataInsert = [
@@ -1375,9 +1374,11 @@ class ProduksiController extends BaseController
                     'shift_b' => $shiftB,
                     'shift_c' => $shiftC,
                 ];
+                // dd($dataInsert);
                 $existingProduction = $this->produksiModel->existingData($dataInsert);
                 if (!$existingProduction) {
                     $this->produksiModel->insert($dataInsert);
+                    return redirect()->to('/' . session()->get('role'))->with('success', 'Berhasil input data');
                 } else {
                     return redirect()->to('/' . session()->get('role'))->with('error', 'Data gagal diinput');
                 }
