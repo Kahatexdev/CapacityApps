@@ -1315,7 +1315,7 @@ class ApsPerstyleModel extends Model
 
     public function getDataModel($area, $pdk)
     {
-        return $this->select('data_model.no_model, data_model.kd_buyer_order, apsperstyle.delivery, SUM(apsperstyle.qty) AS qty, apsperstyle.size, apsperstyle.smv, apsperstyle.machinetypeid, master_product_type.product_type')
+        return $this->select('data_model.no_model, data_model.kd_buyer_order, apsperstyle.delivery, SUM(apsperstyle.qty) AS qty, apsperstyle.size, apsperstyle.smv, apsperstyle.machinetypeid,apsperstyle.no_order, master_product_type.product_type')
             ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model')
             ->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type')
             ->where('apsperstyle.factory', $area)
