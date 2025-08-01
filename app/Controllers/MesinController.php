@@ -447,15 +447,14 @@ class MesinController extends BaseController
     }
     public function DetailMesinPerAreaPlan($area)
     {
-        $dt = new DateTime('first day of last month');
-        $yesterday = date('Y-m-d', strtotime('-2 day'));
+        $newest = $this->produksiModel->newestDate($area)['tgl_produksi'];
         $tampilperarea = $this->jarumModel->getJarumArea($area);
-        $ProdMesin = $this->produksiModel->getProductionPerJarum($yesterday, $area);
-        // dd($ProdMesin);
+        $ProdMesin = $this->produksiModel->getProductionPerJarum($newest, $area);
         $tampilperarea = $this->jarumModel->getJarumArea($area);
         foreach ($tampilperarea as &$mc) {
             $mc['kapasitas'] = $mc['mesin_jalan'] * $mc['target'];
         }
+        // dd($ProdMesin);
         unset($mc); // penting buat mencegah bug di loop selanjutnya
         $getPU = $this->jarumModel->getpu($area);
         $data = [
@@ -471,7 +470,10 @@ class MesinController extends BaseController
             'area' => $area,
             'pu' => $getPU,
             'tampildata' => $tampilperarea,
+            'capability' => $ProdMesin,
+            'tanggal' => $newest,
         ];
+        // dd($data);
 
         return view(session()->get('role') . '/Mesin/detailMesinArea', $data);
     }

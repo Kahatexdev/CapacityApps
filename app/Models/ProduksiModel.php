@@ -504,4 +504,8 @@ class ProduksiModel extends Model
             ->orderBy('produksi.tgl_produksi')
             ->findAll();
     }
+    public function newestDate($area)
+    {
+        return $this->select('tgl_produksi')->where('area', $area)->orderBy('tgl_produksi', 'desc')->first();
+    }
 }
