@@ -146,12 +146,12 @@
                                             <tr>
                                                 <td class="text-sm"><?= $od['machinetypeid']; ?></td>
                                                 <td class="text-sm"><?= number_format($od['prod'], 0, '.', ',') ?> dz</td>
-                                                <td class="text-sm"><?= number_format($od['jl_mc'], 0, '.', ',') ?>mc</td>
-                                                <td class="text-sm"><?= number_format($od['prodmc'], 0, '.', ',') ?> Mc</td>
+                                                <td class="text-sm"><?= number_format($od['jl_mc'], 0, '.', ',') ?> mc</td>
+                                                <td class="text-sm"><?= number_format($od['prodmc'], 0, '.', ',') ?> dz</td>
 
                                                 <td class="text-sm"><?= number_format($od['target'], 2, '.', ',') ?> dz</td>
-                                                <td class="text-sm"><?= number_format($od['productivity'], 2, '.', ',') ?> dz</td>
-                                                <td class="text-sm"><?= number_format($od['loss'], 2, '.', ',') ?> dz</td>
+                                                <td class="text-sm"><?= number_format($od['productivity'], 2, '.', ',') ?> %</td>
+                                                <td class="text-sm"><?= number_format($od['loss'], 2, '.', ',') ?> %</td>
 
 
 
