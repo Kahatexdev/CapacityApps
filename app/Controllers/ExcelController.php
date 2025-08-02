@@ -3678,6 +3678,7 @@ class ExcelController extends BaseController
         $area = $this->request->getPost('area');
         $jarum = $this->request->getPost('jarum');
         $pdk = $this->request->getPost('pdk');
+        $seam = $this->request->getPost('seam');
         $tglTurun = $this->request->getPost('tgl_turun_order');
         $tglTurunAkhir = $this->request->getPost('tgl_turun_order_akhir') ?? '';
         $awal = $this->request->getPost('awal');
@@ -3689,6 +3690,7 @@ class ExcelController extends BaseController
             'area' => $area,
             'jarum' => $jarum,
             'pdk' => $pdk,
+            'seam' => $seam,
             'tglTurun' => $tglTurun,
             'tglTurunAkhir' => $tglTurunAkhir,
             'awal' => $awal,

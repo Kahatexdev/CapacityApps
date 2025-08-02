@@ -120,6 +120,52 @@
 
 
             </div>
+            <div class="col-lg-12 mt-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="text-header">Actual Productivity <?= $area ?> <?= $tanggal ?></h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="table-responsive">
+                                <table id="tabledua" class="display " style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jarum</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Produksi</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Actual JL Mc</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Prod/Mc</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Target</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Productivity($)</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Bs Rate (%)</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($capability as $od) :  ?>
+                                            <tr>
+                                                <td class="text-sm"><?= $od['machinetypeid']; ?></td>
+                                                <td class="text-sm"><?= number_format($od['prod'], 0, '.', ',') ?> dz</td>
+                                                <td class="text-sm"><?= number_format($od['jl_mc'], 0, '.', ',') ?> mc</td>
+                                                <td class="text-sm"><?= number_format($od['prodmc'], 0, '.', ',') ?> dz</td>
+
+                                                <td class="text-sm"><?= number_format($od['target'], 2, '.', ',') ?> dz</td>
+                                                <td class="text-sm"><?= number_format($od['productivity'], 2, '.', ',') ?> %</td>
+                                                <td class="text-sm"><?= number_format($od['loss'], 2, '.', ',') ?> %</td>
+
+
+
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="row">
             <?= $this->renderSection('capacity'); ?>
@@ -366,9 +412,10 @@
 
                         // Update the footer cell for the percentage
                         $(api.column(5).footer()).html(mesinMatiFormatted);
-                        $(api.column(6).footer()).html(kapasitasFormatted);
+                        $(api.column(7).footer()).html(kapasitasFormatted);
                     },
                 });
+
 
                 function numberWithDots(x) {
                     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -423,6 +470,50 @@
                     $('#ModalCapacity').modal('show'); // Show the modal
                 });
 
+            });
+            $(document).ready(function() {
+                $('#tabledua').DataTable({
+                    lengthMenu: [
+                        [100, -1],
+                        [100, "All"]
+                    ],
+                    "footerCallback": function(row, data, start, end, display) {
+                        var api = this.api();
+
+                        var produksi = api.column(2, {
+                            page: 'current'
+                        }).data().reduce(function(a, b) {
+                            return parseInt(a) + parseInt(b);
+                        }, 0);
+
+                        // Calculate the total of the 5th column (Remaining Qty in dozens) - index 4
+                        var mesinJalan = api.column(3, {
+                            page: 'current'
+                        }).data().reduce(function(a, b) {
+                            return parseInt(a) + parseInt(b);
+                        }, 0);
+                        var prodpermc = api.column(4, {
+                            page: 'current'
+                        }).data().reduce(function(a, b) {
+                            return parseInt(a) + parseInt(b);
+                        }, 0);
+
+
+                        // Format totalMesin and mesinJalan with " Mc" suffix and dots for thousands
+                        var produksiFormated = numberWithDots(produksi) + " dz";
+                        var mesinJalanFormatted = numberWithDots(mesinJalan) + " Mc";
+                        var prodpermcFormated = numberWithDots(prodpermc) + " dz";
+
+                        // Update the footer cell for the total Qty
+                        $(api.column(2).footer()).html(produksiFormated);
+
+                        // Update the footer cell for the total Mesin Jalan
+                        $(api.column(3).footer()).html(mesinJalanFormatted);
+
+                        // Update the footer cell for the percentage
+                        $(api.column(4).footer()).html(prodpermcFormated);
+                    },
+                });
             });
         </script>
         <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>

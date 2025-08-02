@@ -1213,6 +1213,10 @@ class ApsPerstyleModel extends Model
             $builder->where('data_model.no_model', $validate['pdk']);
         }
 
+        if (!empty($validate['seam'])) {
+            $builder->like('apsperstyle.seam', $validate['seam']);
+        }
+
         if (!empty($validate['tglTurun']) && !empty($validate['tglTurunAkhir'])) {
             $builder->where('data_model.created_at >=', $validate['tglTurun']);
             $builder->where('data_model.created_at <=', $validate['tglTurunAkhir']);

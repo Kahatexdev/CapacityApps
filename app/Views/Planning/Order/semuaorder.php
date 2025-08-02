@@ -26,18 +26,18 @@
                         <?= session()->getFlashdata('importSummary')['message'] ?? '' ?>
                         <?php if (session()->getFlashdata('importSummary')['status'] === 'done') : ?>
                             <p>Inserted: <?= session()->getFlashdata('importSummary')['inserted'] ?></p>
-                            <p>Not Matched: 
-                                <?php 
-                                    $notMatched = session()->getFlashdata('importSummary')['notMatched'];
-                                    if (is_array($notMatched)) {
-                                        if (!empty($notMatched)) {
-                                            echo implode(', ', $notMatched);
-                                        } else {
-                                            echo '-';
-                                        }
+                            <p>Not Matched:
+                                <?php
+                                $notMatched = session()->getFlashdata('importSummary')['notMatched'];
+                                if (is_array($notMatched)) {
+                                    if (!empty($notMatched)) {
+                                        echo implode(', ', $notMatched);
                                     } else {
-                                        echo !empty($notMatched) ? $notMatched : '-';
+                                        echo '-';
                                     }
+                                } else {
+                                    echo !empty($notMatched) ? $notMatched : '-';
+                                }
                                 ?>
                             </p>
                         <?php endif; ?>
@@ -190,6 +190,10 @@
                         <div class="form-group">
                             <label for="pdk" class="col-form-label">No Model</label>
                             <input type="text" class="form-control" name="pdk">
+                        </div>
+                        <div class="form-group">
+                            <label for="pdk" class="col-form-label">Seam</label>
+                            <input type="text" class="form-control" name="seam">
                         </div>
                         <div class="form-group">
                             <label for="tgl_turun_order" class="col-form-label">Tgl Turun Order Dari</label>
