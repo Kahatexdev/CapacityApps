@@ -664,6 +664,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('exportExcelRetur/(:any)', 'ExcelController::exportExcelRetur/$1');
     $routes->get('listRetur/(:any)', 'ReturController::listRetur/$1');
     $routes->get('exportPdfRetur/(:any)', 'PdfController::exportPdfRetur/$1');
+    $routes->get('generateFormRetur/(:any)', 'ExcelController::generateFormRetur/$1');
 });
 
 // sudo

@@ -76,10 +76,11 @@
             <!-- 2. Button Export -->
             <div class="d-flex align-items-center justify-content-end mb-3">
                 <div class="d-flex gap-2">
-                    <button id="generatePdfBtn" class="btn btn-danger">Export PDF</button>
-                    <a id="exportExcelBtn" href="#" class="btn btn-success">
+                    <button id="generatePdfBtn" class="btn btn-danger"><i class="fas fa-file-pdf" target="_blank"></i> Export PDF</button>
+                    <button id="generateExcelBtn" class="btn bg-gradient-success"><i class="fas fa-file-excel"></i> Export Excel</button>
+                    <!-- <a id="exportExcelBtn" href="#" class="btn btn-success">
                         <i class="fas fa-file-excel"></i> Export Excel
-                    </a>
+                    </a> -->
                 </div>
             </div>
             <!-- 3. Tabel Retur -->
@@ -150,10 +151,14 @@
         // Utility: update link Export PDF & Excel
         function updateExportLinks(area, model, tgl) {
             const basePdf = "<?= base_url($role . '/exportPdfRetur/') ?>";
+            const baseExcel = "<?= base_url($role . '/generateFormRetur/') ?>";
             const baseXls = "<?= base_url($role . '/exportExcelRetur/') ?>";
             // contoh: /exportPdfRetur/AREA?model=XXX&tglBuat=YYYY-MM-DD
             $('#generatePdfBtn').off('click').on('click', () => {
                 window.location = `${basePdf}${area}?model=${model}&tglBuat=${tgl}`;
+            });
+            $('#generateExcelBtn').off('click').on('click', () => {
+                window.location = `${baseExcel}${area}?model=${model}&tglBuat=${tgl}`;
             });
             $('#exportExcelBtn').attr(
                 'href',
@@ -172,7 +177,7 @@
 
             // Validasi sederhana
             if (!tgl) {
-                alert('Tolong Isi Tgl Retur Terlebih Daghulu !');
+                alert('Tolong Isi Tgl Retur Terlebih Dahulu !');
                 return;
             }
 
@@ -200,24 +205,5 @@
             });
         });
     });
-
-    // $('#generatePdfBtn').on('click', function() {
-    //     const area = $('#area').val();
-    //     const model = $('#no_model').val();
-    //     const tglBuat = $('#tgl_buat').val();
-    //     const role = <?= json_encode($role) ?>;
-
-    //     // if (!tglBuat) {
-    //     //     alert("Silakan isi No Model terlebih dahulu.");
-    //     //     return;
-    //     // }
-
-    //     const url = "<?= base_url($role . '/generate_form_retur') ?>" +
-    //         "?area=" + encodeURIComponent(area) +
-    //         "&model=" + encodeURIComponent(model) +
-    //         "&tgl_buat=" + encodeURIComponent(tglBuat);
-
-    //     window.open(url, '_blank');
-    // });
 </script>
 <?php $this->endSection(); ?>

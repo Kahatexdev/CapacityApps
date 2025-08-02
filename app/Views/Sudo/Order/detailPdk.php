@@ -125,8 +125,9 @@ error_reporting(E_ALL); ?>
                                                 <tr>
                                                     <td> <?= $list['inisial'] ?></td>
                                                     <td> <?= $list['size'] ?></td>
-                                                    <td><?= round($list['qty'] / 24) ?> dz</td>
-                                                    <td><?= round($list['sisa'] / 24) ?> dz</td>
+                                                    <td><?= number_format($list['qty'] / 24, 2, '.', '') ?> dz</td>
+                                                    <td><?= number_format($list['sisa'] / 24, 2, '.', '') ?> dz</td>
+
                                                     <td><?= $list['smv'] ?></td>
                                                     <td><?= $list['factory'] ?></td>
                                                     <td><?= $list['production_unit'] ?></td>x

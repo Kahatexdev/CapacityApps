@@ -972,7 +972,7 @@ class PdfController extends BaseController
         $tglBuat = $this->request->getGet('tglBuat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/listRetur/"
+        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/listExportRetur/"
             . $area
             . "?noModel=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);
@@ -1059,7 +1059,7 @@ class PdfController extends BaseController
 
         $pdf->Cell(180, 5, '', 0, 0, 'L');
         $pdf->Cell(24, 5, 'Tgl. Export', 0, 0, 'L');
-        $pdf->Cell(40, 5, ': ' . $deliveryAkhir, 0, 1, 'L');
+        $pdf->Cell(40, 5, ': ' . '', 0, 1, 'L');
 
         //Simpan posisi awal Season & MaterialType
         function MultiCellFit($pdf, $w, $h, $txt, $border = 1, $align = 'C')
@@ -1156,7 +1156,7 @@ class PdfController extends BaseController
             // bangun “key” unik untuk group
             $currentKey = implode('|', [
                 $row['no_model'],
-                $row['warna'],
+                $row['color'],
                 $row['item_type'],
                 $row['kode_warna'],
             ]);
@@ -1202,7 +1202,7 @@ class PdfController extends BaseController
 
             $multiCellData = [
                 ['w' => 12, 'text' => $row['no_model']],
-                ['w' => 12, 'text' => $row['warna']],
+                ['w' => 12, 'text' => $row['color']],
                 ['w' => 19, 'text' => $row['item_type']],
                 ['w' => 16, 'text' => $row['kode_warna']],
                 ['w' => 15, 'text' => ''],
@@ -1231,25 +1231,25 @@ class PdfController extends BaseController
                 '',
                 '',
                 '', // 5 kolom multiCell akan diisi kemudian
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-                '', // terima
-                '', // sisa mesin
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
+                $row['composition'],
+                $row['gw'],
+                $row['qty_pcs'],
+                $row['loss'],
+                $row['kgs'],
+                number_format($row['terima_kg'], 2),
+                number_format($row['terima_kg'] - $row['kgs'], 2),
+                number_format($row['terima_kg'] / $row['kgs'], 2) * 100 . '%', // terima
+                number_format($row['sisa_bb_mc'], 2), // sisa mesin
+                $row['sisa_order_pcs'],
+                number_format($row['poplus_mc_kg'], 2),
+                $row['poplus_mc_cns'],
+                number_format($row['poplus_mc_kg'] / $row['kgs'], 2) * 100 . '%',
+                number_format($row['plus_pck_pcs'], 2),
+                number_format($row['plus_pck_kg'], 2),
+                $row['plus_pck_cns'],
+                number_format($row['plus_pck_kg'] / $row['kgs'], 2) * 100 . '%',
+                number_format($row['lebih_pakai_kg'], 2),
+                number_format($row['lebih_pakai_kg'] / $row['kgs'], 2) * 100 . '%',
                 number_format($row['kgs_retur'], 2),
                 '',
                 '',
@@ -1275,13 +1275,13 @@ class PdfController extends BaseController
             $pdf->SetXY($currentX, $startY);
             $pdf->SetTextColor(255, 255, 255);
             $y0 = $pdf->GetY();
-            $pdf->MultiCell(12, $lineHeight, $row['warna'], 0, 'C');
+            $pdf->MultiCell(12, $lineHeight, $row['color'], 0, 'C');
             $textHeight = $pdf->GetY() - $y0;
             $pdf->SetTextColor(0, 0, 0);
 
             $centerY = $startY + ($maxHeight - $textHeight) / 2;
             $pdf->SetXY($currentX, $centerY);
-            $pdf->MultiCell(12, $lineHeight, $row['warna'], 0, 'C');
+            $pdf->MultiCell(12, $lineHeight, $row['color'], 0, 'C');
             $currentX += 12;
 
             // Item Type (mungkin multiline)
