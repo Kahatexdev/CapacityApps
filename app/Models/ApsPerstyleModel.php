@@ -1214,7 +1214,7 @@ class ApsPerstyleModel extends Model
         }
 
         if (!empty($validate['seam'])) {
-            $builder->like('data_model.seam', $validate['seam']);
+            $builder->like('apsperstyle.seam', $validate['seam']);
         }
 
         if (!empty($validate['tglTurun']) && !empty($validate['tglTurunAkhir'])) {
