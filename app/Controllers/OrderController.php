@@ -815,6 +815,8 @@ class OrderController extends BaseController
     public function detailPdk($noModel, $jarum)
     {
         $pdk = $this->ApsPerstyleModel->getSisaPerDeliv($noModel, $jarum);
+        $stok = $this->stokPdk->where('mastermodel', $noModel)->findAll() ?? null;
+        // dd($stok);
         $history = $this->historyRev->getData($noModel);
         $repeat = $this->orderModel
             ->select('repeat_from')
@@ -935,7 +937,8 @@ class OrderController extends BaseController
             'rekomendasi' => $top3Rekomendasi,
             'totalPo' => $totalPo,
             'historyRev' => $history,
-            'repeat' => $repeat
+            'repeat' => $repeat,
+            'stok' => $stok
         ];
         return view(session()->get('role') . '/Order/detailPdk', $data);
     }
