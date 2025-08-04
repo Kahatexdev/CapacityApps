@@ -38,6 +38,12 @@ class PdkStockTable extends Migration
                 'type' => 'int',
                 'constraint' => 50,
             ],
+            'created_at' => [
+                'type' => 'DATETIME',
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+            ],
 
         ]);
         $this->forge->addKey('id_stok_pdk', true);

@@ -1356,4 +1356,14 @@ class ApsPerstyleModel extends Model
             ->orderBy('mastermodel, factory')
             ->findAll();
     }
+
+    public function updateQtyStok($data)
+    {
+        return $this->where('mastermodel', $data['mastermodel'])
+            ->where('size', $data['size'])
+            ->where('delivery', $data['delivery'])
+            ->set('qty', $data['qty_akhir'])
+            ->set('sisa', $data['qty_akhir'])
+            ->update();
+    }
 }

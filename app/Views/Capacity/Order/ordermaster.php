@@ -29,7 +29,7 @@
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
-                        <div class="col-8">
+                        <div class="col-6">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
@@ -37,14 +37,43 @@
                                 </h5>
                             </div>
                         </div>
-                        <div class="col-4 text-end">
-                            <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-success bg-gradient-success shadow text-center border-radius-md">
-                                Input Data Order
-                            </button>
-                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
-                                <i class="ni ni-chart-bar-32 text-lg opacity-10" aria-hidden="true"></i>
+                        <div class="col-6 text-end d-flex align-items-center justify-content-end gap-2">
+                            <div class="btn-group mr-2" role="group" aria-label="Stok order actions">
+                                <button type="button"
+                                    class="btn btn-info bg-gradient-info shadow border-radius-md dropdown-toggle"
+                                    id="stokOrderDropdown"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    Stok Order
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="stokOrderDropdown">
+                                    <li>
+                                        <a class="dropdown-item" href="<?= base_url('templateExcel/Template input Stok.xlsx') ?>">
+                                            Download Template
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#importStok">
+                                            Import Stok
+                                        </a>
+                                    </li>
+                                </ul>
+                                <button type="button"
+                                    class="btn btn-success bg-gradient-success shadow border-radius-md"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#exampleModalMessage"
+                                    aria-label="Input Data Order">
+                                    Input Data Order
+                                </button>
+                            </div>
+
+                            <div class="d-flex align-items-center">
+                                <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md me-2">
+                                    <i class="ni ni-chart-bar-32 text-lg opacity-10" aria-hidden="true"></i>
+                                </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -91,6 +120,46 @@
                     <button type="submit" class="btn bg-gradient-primary">Simpan</button>
                 </div>
                 </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade  bd-example-modal-lg" id="importStok" tabindex="-1" role="dialog" aria-labelledby="importStokTitle" aria-hidden="true">
+        <div class="modal-dialog " role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Input Stok Order</h5>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body align-items-center">
+                    <div class="row align-items-center">
+                        <div id="drop-area" class="border rounded d-flex justify-content-center align-item-center mx-3" style="height:200px; width: 95%; cursor:pointer;">
+                            <div class="text-center mt-5">
+                                <i class="ni ni-cloud-upload-96" style="font-size: 48px;">
+
+                                </i>
+                                <p class="mt-3" style="font-size: 28px;">
+                                    Upload file here
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-9 pl-0">
+
+                            <form action="<?= base_url($role . '/importStokOrder') ?>" id="modalForm" method="POST" enctype="multipart/form-data">
+
+                                <input type="file" id="fileInput" name="excel_file" multiple accept=".xls , .xlsx" class="form-control ">
+                        </div>
+                        <div class="col-3 pl-0">
+                            <button type="submit" class="btn btn-info btn-block"> Simpan</button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
         </div>
     </div>
