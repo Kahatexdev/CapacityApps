@@ -8,6 +8,7 @@ use App\Models\OrderModel;
 use App\Models\BookingModel;
 use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
+use App\Models\LiburModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpParser\Node\Stmt\Return_;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -22,12 +23,14 @@ class RossoController extends BaseController
     protected $productModel;
     protected $orderModel;
     protected $ApsPerstyleModel;
+    protected $liburModel;
     public function __construct()
     {
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
+        $this->liburModel = new LiburModel();
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -343,19 +346,19 @@ class RossoController extends BaseController
         $selected = $this->request->getJSON(true)['selected'] ?? [];
         log_message('debug', 'Isi selected: ' . json_encode($selected));
         $pemesananBb = session()->get('pemesananBb') ?? []; // Ambil data session asli
+        log_message('debug', 'Session pemesananBb sebelum hapus: ' . json_encode($pemesananBb));
         $found = false; // Variabel untuk melacak apakah data ditemukan
 
-        // Loop melalui data `selected`
         foreach ($selected as $selectedItem) {
-            // Pecah `selectedItem` menjadi `id_material` dan `tgl_pakai`
+            if (strpos($selectedItem, ',') === false) continue;
             list($id_material, $tgl_pakai) = explode(',', $selectedItem);
 
-            // Loop melalui session data untuk menemukan dan menghapus
             foreach ($pemesananBb as $groupKey => $group) {
                 foreach ($group as $itemKey => $item) {
-                    if ($item['id_material'] === $id_material && $item['tgl_pakai'] === $tgl_pakai) {
-                        unset($pemesananBb[$groupKey][$itemKey]); // Hapus elemen
-                        $pemesananBb[$groupKey] = array_values($pemesananBb[$groupKey]); // Rapi indeks
+                    log_message('debug', "Bandingkan: item.id_material={$item['id_material']} vs $id_material | tgl_pakai={$item['tgl_pakai']} vs $tgl_pakai");
+                    if ($item['id_material'] == $id_material && $item['tgl_pakai'] == $tgl_pakai) {
+                        unset($pemesananBb[$groupKey][$itemKey]);
+                        $pemesananBb[$groupKey] = array_values($pemesananBb[$groupKey]);
                         $found = true;
                     }
                 }
@@ -375,5 +378,121 @@ class RossoController extends BaseController
             'status' => 'error',
             'message' => 'Tidak ada data yang ditemukan atau dihapus'
         ]);
+    }
+    public function listPemesanan($area)
+    {
+        function fetchApiData($url)
+        {
+            try {
+                $response = file_get_contents($url);
+                if ($response === false) {
+                    throw new \Exception("Error fetching data from $url");
+                }
+                $data = json_decode($response, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new \Exception("Invalid JSON response from $url");
+                }
+                return $data;
+            } catch (\Exception $e) {
+                error_log($e->getMessage());
+                return null;
+            }
+        }
+
+        $dataList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listPemesanan/$area");
+        if (!is_array($dataList)) {
+            die('Error: Invalid response format for listPemesanan API.');
+        }
+
+        foreach ($dataList as $key => $order) {
+            $dataList[$key]['ttl_kebutuhan_bb'] = 0;
+            if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
+                $styleApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model='
+                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
+                $styleList = fetchApiData($styleApiUrl);
+
+                if ($styleList) {
+                    $totalRequirement = 0;
+                    foreach ($styleList as $style) {
+                        if (isset($style['no_model'], $style['style_size'], $style['gw'], $style['composition'], $style['loss'])) {
+                            $orderQty = $this->ApsPerstyleModel->getQtyOrder($style['no_model'], $style['style_size'], $area);
+                            $tambahanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getKgTambahan?no_model='
+                                . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&style_size=' . urlencode($style['style_size']) . '&area=' . $area;
+                            $tambahan = fetchApiData($tambahanApiUrl);
+                            $kgPoTambahan = $tambahan['ttl_keb_potambahan'] ?? 0;
+                            log_message('info', 'inii :' . $kgPoTambahan);
+                            if (isset($orderQty['qty'])) {
+                                $requirement = ($orderQty['qty'] * $style['gw'] * ($style['composition'] / 100) * (1 + ($style['loss'] / 100)) / 1000) + $kgPoTambahan;
+                                $totalRequirement += $requirement;
+                                $dataList[$key]['qty'] = $orderQty['qty'];
+                            }
+                        }
+                    }
+                    $dataList[$key]['ttl_kebutuhan_bb'] = $totalRequirement;
+                }
+
+                $pengirimanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
+                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
+                $pengiriman = fetchApiData($pengirimanApiUrl);
+                $dataList[$key]['ttl_pengiriman'] = $pengiriman['kgs_out'] ?? 0;
+
+                // Hitung sisa jatah
+                $dataList[$key]['sisa_jatah'] = $dataList[$key]['ttl_kebutuhan_bb'] - $dataList[$key]['ttl_pengiriman'];
+            }
+        }
+
+        // dd($dataList);
+
+        // ambil data libur hari kedepan untuk menentukan jadwal pemesanan
+        $today = date('Y-m-d'); // ambil data hari ini
+        $dataLibur = $this->liburModel->getDataLiburForPemesanan($today);
+        // Ambil data tanggal libur menjadi array sederhana
+        $liburDates = array_column($dataLibur, 'tanggal'); // Ambil hanya kolom 'tanggal'
+
+        $day = date('l'); // ambil data hari ini
+        function getNextNonHoliday($date, $liburDates)
+        {
+            while (in_array($date, $liburDates)) {
+                // Jika tanggal ada di daftar libur, tambahkan 1 hari
+                $date = date('Y-m-d', strtotime($date . ' +1 day'));
+            }
+            return $date;
+        }
+
+        $initialTomorrow = date('Y-m-d', strtotime('+1 day')); // Mulai dari hari besok
+        $tomorrow = getNextNonHoliday($initialTomorrow, $liburDates); // Dapatkan tanggal "tomorrow" yang valid (bukan libur)
+
+        // Untuk tanggal berikutnya, kita ambil 1 hari setelah tanggal "tomorrow" dan cek ulang
+        $initialTwoDays = date('Y-m-d', strtotime($tomorrow . ' +1 day'));
+        $twoDays = getNextNonHoliday($initialTwoDays, $liburDates);
+
+        // Untuk tanggal ketiga, ambil 1 hari setelah tanggal "twoDays" dan cek ulang
+        $initialthreeDay = date('Y-m-d', strtotime($twoDays . ' +1 day'));
+        $threeDays = getNextNonHoliday($initialthreeDay, $liburDates);
+
+        // Untuk tanggal keempat, ambil 1 hari setelah tanggal "threeDays" dan cek ulang
+        $initialFourDays = date('Y-m-d', strtotime($threeDays . ' +1 day'));
+        $fourDays        = getNextNonHoliday($initialFourDays, $liburDates);
+
+        $data = [
+            'role' => session()->get('role'),
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => 'active',
+            'active7' => '',
+            'area' => $area,
+            'title' => 'Bahan Baku',
+            'dataList' => $dataList,
+            'day' => $day,
+            'tomorrow' => $tomorrow,
+            'twoDays' => $twoDays,
+            'threeDays' => $threeDays,
+            'fourDays' => $fourDays,
+        ];
+
+        return view(session()->get('role') . '/listPemesanan', $data);
     }
 }

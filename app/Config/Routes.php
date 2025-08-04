@@ -865,5 +865,6 @@ $routes->group(
         $routes->get('getMU/(:any)/(:any)/(:any)/(:any)', 'RossoController::getMU/$1/$2/$3/$4');
         $routes->post('bahanBaku/simpanKeSession', 'RossoController::savePemesananSession');
         $routes->post('bahanBaku/hapusSession', 'RossoController::deletePemesananSession');
+        $routes->get('listPemesanan/(:any)', 'RossoController::listPemesanan/$1');
     }
 );
