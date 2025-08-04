@@ -106,7 +106,6 @@
                         <th>Judul</th>
                         <th>Jarum</th>
                         <th>Area</th>
-                        <th>Last Update</th>
                         <th>Details</th>
                     </thead>
                     <tbody>
@@ -117,7 +116,6 @@
                                     <td><?= $val['judul'] ?></td>
                                     <td><?= $val['jarum'] ?></td>
                                     <td><?= $val['area'] ?></td>
-                                    <td><?= date('F j, Y \a\t g:i A', strtotime($val['updated_at'])) ?></td>
                                     <td>
                                         <a href=" <?= base_url($role . '/detailplnmc/' . $val['id_pln_mc']) ?>" class="btn btn-info">View Details</a>
 
