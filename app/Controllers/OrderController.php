@@ -2358,7 +2358,7 @@ class OrderController extends BaseController
         $delivery = $this->request->getGet('delivery')   ?? '';
 
         // Full URL including path:
-        $url = 'http://172.23.44.14/KHTEXT/public/api/flowproses';
+        $url = 'http://172.23.39.114/KHTEXT/public/api/flowproses';
 
         /** @var \CodeIgniter\HTTP\CURLRequest $client */
         $client = \Config\Services::curlrequest([

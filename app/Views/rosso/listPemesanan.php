@@ -66,10 +66,10 @@
                                                 <div class="mb-3">
                                                     <select name="jenis" id="jenisBenang" class="form-select" required>
                                                         <option value="">Pilih Jenis Benang</option>
-                                                        <option value="BENANG">BENANG</option>
+                                                        <!-- <option value="BENANG">BENANG</option> -->
                                                         <option value="NYLON">NYLON</option>
-                                                        <option value="KARET">KARET</option>
-                                                        <option value="SPANDEX">SPANDEX</option>
+                                                        <!-- <option value="KARET">KARET</option> -->
+                                                        <!-- <option value="SPANDEX">SPANDEX</option> -->
                                                     </select>
                                                 </div>
                                                 <div class="mb-3" id="tglPakai">
