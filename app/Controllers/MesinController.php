@@ -447,8 +447,8 @@ class MesinController extends BaseController
     }
     public function DetailMesinPerAreaPlan($area)
     {
-        $newest = $this->produksiModel->newestDate($area)['tgl_produksi'];
         $tampilperarea = $this->jarumModel->getJarumArea($area);
+        $newest = $this->produksiModel->newestDate($area)['tgl_produksi'];
         $ProdMesin = $this->produksiModel->getProductionPerJarum($newest, $area);
         $tampilperarea = $this->jarumModel->getJarumArea($area);
         foreach ($tampilperarea as &$mc) {
@@ -554,7 +554,8 @@ class MesinController extends BaseController
     }
     public function capacityperarea($area)
     {
-        $yesterday = date('Y-m-d', strtotime('-2 days'));
+        $newest = $this->produksiModel->newestDate($area)['tgl_produksi'];
+        $ProdMesin = $this->produksiModel->getProductionPerJarum($newest, $area);
         $targetInput = $this->request->getPost('target');
         $today = new DateTime();
         $today->setTime(0, 0); // Ensuring the time is set to midnight
@@ -632,7 +633,7 @@ class MesinController extends BaseController
                 'area' => $area,
                 'jarum' => $jarum,
                 'pdk' => $pdk,
-                'awal' => $yesterday,
+                'awal' => $newest,
             ];
             $jlMC = $this->produksiModel->getJlMcTimter($data);
             $mcJalan = 0;
@@ -758,7 +759,9 @@ class MesinController extends BaseController
             'pu' => $getPU,
             'jarum' => $jarum,
             'tampildata' => $tampilperarea,
-            'startWeek' => $startWeek
+            'startWeek' => $startWeek,
+            'tanggal' => $newest,
+            'capability' => $ProdMesin
         ];
 
         return view(session()->get('role') . '/Mesin/capacityarea', $data);

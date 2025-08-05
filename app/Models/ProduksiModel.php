@@ -473,7 +473,21 @@ class ProduksiModel extends Model
 
     public function getProductionStats($bulan, $tahun, $area)
     {
-        return $this->select('produksi.tgl_produksi, produksi.area,data_model.kd_buyer_order AS buyer, apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.size, (SUM(produksi.qty_produksi)/24) as prod, COUNT(produksi.no_mesin) as jl_mc, ((SUM(produksi.qty_produksi)/ 24) / COUNT(produksi.no_mesin)) as prodmc, (3600 / apsperstyle.smv) AS target,((SUM(produksi.qty_produksi) / 24) / COUNT(produksi.no_mesin) / (3600 / apsperstyle.smv)) * 100 AS productivity, bs.bsdz / ((SUM(produksi.qty_produksi) / 24) + bs.bsdz) AS loss')
+        return $this->select(
+            'produksi.tgl_produksi,
+     produksi.area,
+     data_model.kd_buyer_order AS buyer,
+     apsperstyle.mastermodel,
+     apsperstyle.machinetypeid,
+     apsperstyle.size,
+     (SUM(produksi.qty_produksi) / 24) AS prod,
+     COUNT(DISTINCT produksi.no_mesin) AS jl_mc,
+     ((SUM(produksi.qty_produksi) / 24) / COUNT(DISTINCT produksi.no_mesin)) AS prodmc,
+     (3600 / apsperstyle.smv) AS target,
+     (((SUM(produksi.qty_produksi) / 24) / COUNT(DISTINCT produksi.no_mesin)) / (3600 / apsperstyle.smv)) * 100 AS productivity,
+     bs.bsdz / ((SUM(produksi.qty_produksi) / 24) + bs.bsdz) AS loss'
+        )
+
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'inner')
             ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'inner')
             ->join(
@@ -490,7 +504,17 @@ class ProduksiModel extends Model
     }
     public function getProductionPerJarum($yesterday, $area)
     {
-        return $this->select(' produksi.area, apsperstyle.machinetypeid, (SUM(produksi.qty_produksi)/24) as prod, COUNT(produksi.no_mesin) as jl_mc, ((SUM(produksi.qty_produksi)/ 24) / COUNT(produksi.no_mesin)) as prodmc, (3600 / apsperstyle.smv) AS target,((SUM(produksi.qty_produksi) / 24) / COUNT(produksi.no_mesin) / (3600 / apsperstyle.smv)) * 100 AS productivity, bs.bsdz / ((SUM(produksi.qty_produksi) / 24) + bs.bsdz) AS loss')
+        return $this->select(
+            'produksi.area,
+     apsperstyle.machinetypeid,
+     (SUM(produksi.qty_produksi) / 24) AS prod,
+     COUNT(DISTINCT produksi.no_mesin) AS jl_mc,
+     ((SUM(produksi.qty_produksi) / 24) / COUNT(DISTINCT produksi.no_mesin)) AS prodmc,
+     (3600 / apsperstyle.smv) AS target,
+     (((SUM(produksi.qty_produksi) / 24) / COUNT(DISTINCT produksi.no_mesin)) / (3600 / apsperstyle.smv)) * 100 AS productivity,
+     bs.bsdz / ((SUM(produksi.qty_produksi) / 24) + bs.bsdz) AS loss'
+        )
+
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'inner')
             ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'inner')
             ->join(

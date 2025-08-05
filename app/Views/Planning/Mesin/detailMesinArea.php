@@ -134,9 +134,9 @@
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jarum</th>
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Produksi</th>
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Actual JL Mc</th>
-                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Prod/Mc</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Average Prod/Mc</th>
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Target</th>
-                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Productivity($)</th>
+                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Productivity(%)</th>
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Bs Rate (%)</th>
 
                                         </tr>

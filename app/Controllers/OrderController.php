@@ -16,6 +16,7 @@ use App\Models\ProduksiModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use DateTime;
 use App\Models\HistorySmvModel;
+use App\Models\StockPdk;
 use App\Models\DataCancelOrderModel;
 use App\Models\EstSpkModel;
 use App\Models\HistoryRevisiModel;
@@ -41,6 +42,7 @@ class OrderController extends BaseController
     protected $estspk;
     protected $historyRev;
     protected $bsModel;
+    protected $stokPdk;
     protected $curl;
 
     public function __construct()
@@ -58,6 +60,7 @@ class OrderController extends BaseController
         $this->estspk = new EstSpkModel();
         $this->historyRev = new HistoryRevisiModel();
         $this->bsModel = new BsModel();
+        $this->stokPdk = new StockPdk();
 
         if ($this->filters   = ['role' => ['capacity',  'planning', 'aps', 'god']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -812,6 +815,8 @@ class OrderController extends BaseController
     public function detailPdk($noModel, $jarum)
     {
         $pdk = $this->ApsPerstyleModel->getSisaPerDeliv($noModel, $jarum);
+        $stok = $this->stokPdk->where('mastermodel', $noModel)->findAll() ?? null;
+        // dd($stok);
         $history = $this->historyRev->getData($noModel);
         $repeat = $this->orderModel
             ->select('repeat_from')
@@ -932,7 +937,8 @@ class OrderController extends BaseController
             'rekomendasi' => $top3Rekomendasi,
             'totalPo' => $totalPo,
             'historyRev' => $history,
-            'repeat' => $repeat
+            'repeat' => $repeat,
+            'stok' => $stok
         ];
         return view(session()->get('role') . '/Order/detailPdk', $data);
     }
@@ -2591,5 +2597,120 @@ class OrderController extends BaseController
             'notMatched' => $notMatched,
             'errors'     => $errors,
         ]);
+    }
+
+
+    public function importStokOrder()
+    {
+        $file = $this->request->getFile('excel_file');
+        if (!($file && $file->isValid() && !$file->hasMoved())) {
+            return redirect()->to(base_url(session()->get('role') . '/dataorder'))
+                ->with('error', 'File tidak valid atau tidak ditemukan.');
+        }
+
+        try {
+            $spreadsheet = IOFactory::load($file);
+            $sheet = $spreadsheet->getActiveSheet();
+            $startRow = 3; // baris data mulai (header diasumsikan di atas)
+
+            // Mulai transaction agar insert + update konsisten
+            $db = \Config\Database::connect();
+            $db->transStart();
+
+            foreach ($sheet->getRowIterator($startRow) as $rowObj) {
+                $rowIndex = $rowObj->getRowIndex();
+                $cellIterator = $rowObj->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = $cell->getValue();
+                }
+
+                // Cek apakah seluruh baris kosong (trim supaya whitespace diabaikan)
+                $allEmpty = true;
+                foreach ($rowData as $v) {
+                    if (is_string($v) && trim($v) !== '') {
+                        $allEmpty = false;
+                        break;
+                    } elseif (!is_string($v) && $v !== null && $v !== '') {
+                        $allEmpty = false;
+                        break;
+                    }
+                }
+                if ($allEmpty) {
+                    continue; // skip baris kosong
+                }
+
+                // Ambil field dengan defensif
+                $nomodel = isset($rowData[0]) ? trim($rowData[0]) : null;
+                $size = isset($rowData[1]) ? trim($rowData[1]) : null;
+                $deliveryRaw = $rowData[2] ?? null;
+                $qty = isset($rowData[3]) ? $rowData[3] : null;
+                $stok = isset($rowData[4]) ? $rowData[4] : null;
+                $qty_akhir = isset($rowData[5]) ? $rowData[5] : null;
+
+                if (!$nomodel || !$size) {
+                    // skip atau log, karena minimal dua key penting hilang
+                    log_message('warning', "Skipping row {$rowIndex}: missing mastermodel or size.");
+                    continue;
+                }
+
+                // Normalize delivery date (Excel serial or string)
+                try {
+                    if (is_numeric($deliveryRaw)) {
+                        $deliveryDate = (new \DateTimeImmutable('1899-12-30'))
+                            ->modify('+' . intval($deliveryRaw) . ' days');
+                    } else {
+                        $deliveryDate = new \DateTimeImmutable($deliveryRaw);
+                    }
+                    $delivery2 = $deliveryDate->format('Y-m-d');
+                } catch (\Exception $e) {
+                    log_message('error', "Invalid delivery date at row {$rowIndex}: " . var_export($deliveryRaw, true));
+                    continue; // skip baris dengan tanggal invalid
+                }
+
+                $simpandata = [
+                    'mastermodel' => $nomodel,
+                    'size' => $size,
+                    'delivery' => $delivery2,
+                    'qty_asli' => $qty,
+                    'stok' => $stok,
+                    'qty_akhir' => $qty_akhir,
+                ];
+                $insert = $this->stokPdk->insert($simpandata);
+                if ($insert === false) {
+                    log_message('error', "Insert stokPdk gagal di row {$rowIndex}: " . json_encode($this->stokPdk->errors()));
+                    continue; // lanjut ke baris berikut
+                }
+
+                $updateData = [
+                    'mastermodel' => $nomodel,
+                    'size' => $size,
+                    'delivery' => $delivery2,
+                    'qty_akhir' => $qty_akhir,
+                ];
+                $update = $this->ApsPerstyleModel->updateQtyStok($updateData);
+                if ($update === false) {
+                    log_message('error', "UpdateQtyStok gagal di row {$rowIndex}: " . json_encode($this->ApsPerstyleModel->errors()));
+                    // jangan rollback langsung, tergantung policy — bisa catat dan lanjut
+                }
+            }
+
+            $db->transComplete();
+
+            if ($db->transStatus() === false) {
+                // rollback terjadi
+                return redirect()->to(base_url(session()->get('role') . '/dataorder'))
+                    ->with('error', 'Gagal mengimport data, transaksi dibatalkan.');
+            }
+
+            return redirect()->to(base_url(session()->get('role') . '/dataorder'))
+                ->with('success', 'Data berhasil diimport.');
+        } catch (\Throwable $e) {
+            log_message('error', 'Exception saat importStokOrder: ' . $e->getMessage());
+            return redirect()->to(base_url(session()->get('role') . '/dataorder'))
+                ->with('error', 'Terjadi error saat memproses file: ' . $e->getMessage());
+        }
     }
 }

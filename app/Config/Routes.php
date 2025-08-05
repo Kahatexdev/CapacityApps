@@ -122,6 +122,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('inputhistoryrevise/(:any)', 'OrderController::inputHistory/$1');
     $routes->post('saveRepeat', 'orderController::saveRepeat');
     $routes->post('excelSisaOrderAllArea', 'ExcelController::excelSisaOrderAllArea');
+    $routes->post('importStokOrder', 'OrderController::importStokOrder');
 
 
     // produksi
@@ -865,6 +866,5 @@ $routes->group(
         $routes->get('getMU/(:any)/(:any)/(:any)/(:any)', 'RossoController::getMU/$1/$2/$3/$4');
         $routes->post('bahanBaku/simpanKeSession', 'RossoController::savePemesananSession');
         $routes->post('bahanBaku/hapusSession', 'RossoController::deletePemesananSession');
-        $routes->get('listPemesanan/(:any)', 'RossoController::listPemesanan/$1');
     }
 );

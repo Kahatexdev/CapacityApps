@@ -210,6 +210,52 @@ error_reporting(E_ALL); ?>
                         </div>
                     </div>
                 </div>
+                <div class="card-body">
+                    <div class="row mt-3">
+                        <div class="d-flex justify-content-between align-item-center">
+                            <h5> <span class='badge  badge-pill badge-lg bg-gradient-info'>History Stok</span></h5>
+
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Model</th>
+                                        <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Size</th>
+                                        <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Qty Asli</th>
+                                        <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Stok</th>
+                                        <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-10">Qty - Stok</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($stok as $keys): ?>
+                                        <tr>
+                                            <td><?= $keys['mastermodel'] ?></td>
+                                            <td><?= $keys['size'] ?></td>
+                                            <td><?= $keys['qty_asli'] ?></td>
+                                            <td><?= $keys['stok'] ?></td>
+                                            <td><?= $keys['qty_akhir'] ?></td>
+                                        </tr>
+                                    <?php endforeach ?>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            <hr>
+                        </div>
+                    </div>
+                    <div class=" card-footer">
+                        <div>
+                            <br>
+
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="modal fade  bd-example-modal-lg" id="ModalDeleteAll" tabindex="-1" role="dialog" aria-labelledby="modaldeleteall" aria-hidden="true">
