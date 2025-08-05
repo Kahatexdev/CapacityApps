@@ -633,7 +633,7 @@
                                                 <td width=20><input type="text" class="form-control text-center" name="items[${row}][${index}][no]" id="no" value="${index + 1}" readonly></td>
                                                 <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][komposisi]" id="komposisi" value="${item.composition}" readonly></td>
                                                 <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][loss]" id="loss" value="${item.loss}" readonly></td>
-                                                <td width=120><input type="number" class="form-control text-center" name="items[${row}][${index}][ttl_keb]" id="ttl_keb" value="${parseFloat(item.ttl_keb || 0).toFixed(2)}" readonly></td>
+                                                <td width=120><input type="number" class="form-control text-center" name="items[${row}][${index}][ttl_keb]" id="ttl_keb" value="${parseFloat(item.kgs || 0).toFixed(2)}" readonly></td>
                                                 <td><input type="text" class="form-control text-center" name="items[${row}][${index}][item_type]" id="item_type" value="${item.item_type}" readonly></td>
                                                 <td><input type="text" class="form-control text-center" name="items[${row}][${index}][kode_warna]" id="kode_warna" value="${item.kode_warna}" readonly></td>
                                                 <td><input type="text" class="form-control text-center" name="items[${row}][${index}][warna]" id="warna" value="${item.color}" readonly></td>

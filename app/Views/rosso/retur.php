@@ -388,14 +388,17 @@
         option.innerHTML = '<option value="">-- Pilih Item --</option>';
 
         for (const key of data) {
-            const opt = document.createElement('option');
-            opt.value = key.id_material;
-            opt.dataset.item = key.item_type;
-            opt.dataset.kodeWarna = key.kode_warna;
-            opt.dataset.warna = key.color;
-            opt.dataset.model = model;
-            opt.textContent = `${key.item_type} | ${key.kode_warna} | ${key.color}`;
-            option.appendChild(opt);
+            // ✅ Filter item_type LIKE '%JHT%'
+            if (key.item_type && key.item_type.includes('JHT')) {
+                const opt = document.createElement('option');
+                opt.value = key.id_material;
+                opt.dataset.item = key.item_type;
+                opt.dataset.kodeWarna = key.kode_warna;
+                opt.dataset.warna = key.color;
+                opt.dataset.model = model;
+                opt.textContent = `${key.item_type} | ${key.kode_warna} | ${key.color}`;
+                option.appendChild(opt);
+            }
         }
         $.ajax({
             url: "http://172.23.44.14/MaterialSystem/public/api/getPengirimanArea?noModel=" + model,

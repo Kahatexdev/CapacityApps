@@ -227,20 +227,6 @@ class RossoController extends BaseController
             ]);
         }
 
-        // Hitung ttl_kebutuhan
-        foreach ($data as $key => $item) {
-            if (isset($qtyOrder, $item['composition'], $item['gw'], $item['loss'])) {
-                // Hitung ttl_keb untuk setiap item
-                $ttl_keb = $qtyOrder * $item['gw'] * ($item['composition'] / 100) * (1 + ($item['loss'] / 100)) / 1000;
-
-                // Tambahkan ttl_keb ke elemen saat ini
-                $data[$key]['ttl_keb'] = number_format($ttl_keb, 2);
-            } else {
-                // Jika data tidak valid, tambahkan ttl_keb sebagai null
-                $data[$key]['ttl_keb'] = null;
-            }
-        }
-
         // Return data sebagai JSON
         return $this->response->setJSON($data);
     }
