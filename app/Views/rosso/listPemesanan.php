@@ -134,7 +134,7 @@
                                         <td class="text-xs text-start"><?= $id['item_type']; ?></td>
                                         <td class="text-xs text-start"><?= $id['kode_warna']; ?></td>
                                         <td class="text-xs text-start"><?= $id['color']; ?></td>
-                                        <td class="text-xs text-start"><?= number_format($id['kgs'], 2); ?></td>
+                                        <td class="text-xs text-start"><?= number_format($id['ttl_kebutuhan_bb'], 2); ?></td>
                                         <td class="text-xs text-start"><?= $id['jl_mc']; ?></td>
                                         <td class="text-xs text-start"><?= $ttl_kg_pesan; ?></td>
                                         <td class="text-xs text-start"><?= $ttl_cns_pesan; ?></td>
