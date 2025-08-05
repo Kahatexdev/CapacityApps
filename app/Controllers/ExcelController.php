@@ -5502,19 +5502,46 @@ class ExcelController extends BaseController
 
         // Tulis data mulai dari baris 4
         $row = 4;
-        $no = 1;
-        $counterMap = [];
+        $deliveryOrderMap = [];
 
+        // 1. Kumpulkan dan sort tanggal delivery per no_model
         foreach ($data as $item) {
-            // Kunci berdasarkan no_model + size
-            $key = $item['no_model'] . '_' . $item['size'];
+            $no_model = $item['no_model'];
+            $delivery = $item['delivery'];
 
-            // Inisialisasi counter jika belum ada
-            if (!isset($counterMap[$key])) {
-                $counterMap[$key] = 1;
+            if (!isset($deliveryOrderMap[$no_model])) {
+                $deliveryOrderMap[$no_model] = [];
             }
 
-            $sheet->setCellValue('A' . $row, $item['no_model'] . '/' . $counterMap[$key] . ' ' . $item['machinetypeid']);
+            if (!in_array($delivery, $deliveryOrderMap[$no_model])) {
+                $deliveryOrderMap[$no_model][] = $delivery;
+            }
+        }
+
+        // 2. Sort delivery date ASCENDING untuk setiap no_model
+        foreach ($deliveryOrderMap as $no_model => &$dates) {
+            usort($dates, function ($a, $b) {
+                return strtotime($a) <=> strtotime($b);
+            });
+        }
+        // un-reference
+        unset($dates);
+
+        // 3. Buat mapping delivery → nomor urut
+        $deliveryIndexMap = [];
+        foreach ($deliveryOrderMap as $no_model => $dates) {
+            foreach ($dates as $i => $date) {
+                $deliveryIndexMap[$no_model][$date] = $i + 1; // mulai dari 1
+            }
+        }
+
+        // 4. Loop data asli tanpa diurutkan, tapi ambil urutan delivery dari mapping
+        foreach ($data as $item) {
+            $no_model = $item['no_model'];
+            $delivery = $item['delivery'];
+            $urutan = $deliveryIndexMap[$no_model][$delivery] ?? 1;
+
+            $sheet->setCellValue('A' . $row, $no_model . '/' . $urutan . ' ' . $item['machinetypeid']);
             $sheet->setCellValue('B' . $row, $item['delivery']);
             $sheet->setCellValue('C' . $row, $item['qty']);
             $sheet->setCellValue('D' . $row, $item['kd_buyer_order']);
@@ -5523,17 +5550,10 @@ class ExcelController extends BaseController
             $sheet->setCellValue('G' . $row, $item['product_type']);
             $sheet->setCellValue('H' . $row, $item['smv']);
 
-            // 
-            $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('C' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('D' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('E' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('F' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('G' . $row)->applyFromArray($styleBody);
-            $sheet->getStyle('H' . $row)->applyFromArray($styleBody);
+            foreach (range('A', 'H') as $col) {
+                $sheet->getStyle($col . $row)->applyFromArray($styleBody);
+            }
 
-            $counterMap[$key]++;
             $row++;
         }
 
