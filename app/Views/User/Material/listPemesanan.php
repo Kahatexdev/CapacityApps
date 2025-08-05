@@ -1,274 +1,274 @@
-<?php $this->extend('User/layout'); ?>
+<?php $this->extend('user/layout'); ?>
 <?php $this->section('content'); ?>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<div class="container-fluid py-4">
-    <?php if (session()->getFlashdata('success')) : ?>
-        <script>
-            $(document).ready(function() {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: '<?= session()->getFlashdata('success') ?>',
-                });
+
+<?php if (session()->getFlashdata('success')) : ?>
+    <script>
+        $(document).ready(function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '<?= session()->getFlashdata('success') ?>',
             });
-        </script>
-    <?php endif; ?>
+        });
+    </script>
+<?php endif; ?>
 
-    <?php if (session()->getFlashdata('error')) : ?>
-        <script>
-            $(document).ready(function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: '<?= session()->getFlashdata('error') ?>',
-                });
+<?php if (session()->getFlashdata('error')) : ?>
+    <script>
+        $(document).ready(function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '<?= session()->getFlashdata('error') ?>',
             });
-        </script>
-    <?php endif; ?>
-    <div class="row my-4">
-        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between">
-                        <div class="numbers">
-                            <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
-                            <h5 class="font-weight-bolder mb-0">
-                                List Pemesanan Bahan Baku <?= $area ?>
-                            </h5>
-                        </div>
-                        <div>
-                            <button class="btn btn-info requestTimeButton" data-bs-toggle="modal" data-bs-target="#requestTimeModal">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="15">
-                                    <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com -->
-                                    <path d="M432 304c0 114.9-93.1 208-208 208S16 418.9 16 304c0-104 76.3-190.2 176-205.5V64h-28c-6.6 0-12-5.4-12-12V12c0-6.6 5.4-12 12-12h120c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-28v34.5c37.5 5.8 71.7 21.6 99.7 44.6l27.5-27.5c4.7-4.7 12.3-4.7 17 0l28.3 28.3c4.7 4.7 4.7 12.3 0 17l-29.4 29.4-.6 .6C419.7 223.3 432 262.2 432 304z" fill="#ffffff" />
+        });
+    </script>
+<?php endif; ?>
+<div class="row my-4">
+    <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+        <div class="card">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between">
+                    <div class="numbers">
+                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
+                        <h5 class="font-weight-bolder mb-0">
+                            List Pemesanan Bahan Baku <?= $area ?>
+                        </h5>
+                    </div>
+                    <div>
+                        <button class="btn btn-info requestTimeButton" data-bs-toggle="modal" data-bs-target="#requestTimeModal">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="15">
+                                <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com -->
+                                <path d="M432 304c0 114.9-93.1 208-208 208S16 418.9 16 304c0-104 76.3-190.2 176-205.5V64h-28c-6.6 0-12-5.4-12-12V12c0-6.6 5.4-12 12-12h120c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-28v34.5c37.5 5.8 71.7 21.6 99.7 44.6l27.5-27.5c4.7-4.7 12.3-4.7 17 0l28.3 28.3c4.7 4.7 4.7 12.3 0 17l-29.4 29.4-.6 .6C419.7 223.3 432 262.2 432 304z" fill="#ffffff" />
 
-                                    <!-- Tanda plus putih besar dan sedikit turun -->
-                                    <line x1="224" y1="244" x2="224" y2="364" stroke="#17c1e8" stroke-width="50" stroke-linecap="round" />
-                                    <line x1="164" y1="304" x2="284" y2="304" stroke="#17c1e8" stroke-width="50" stroke-linecap="round" />
-                                </svg> Waktu
-                            </button>
-                            <!-- Modal Additional Time -->
-                            <div class="modal fade" id="requestTimeModal" tabindex="-1" aria-labelledby="requestTimeModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="requestTimeModalLabel">Pilih Jenis Benang</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <!-- Konten modal, misalnya formulir -->
-                                            <form action="<?= base_url($role . '/requestAdditionalTime') ?>" method="post">
-                                                <input type="hidden" name="area" value="<?= $area ?>">
-                                                <input type="hidden" name="tomorrow" id="tomorrow" value="<?= $tomorrow ?>">
-                                                <input type="hidden" name="twoDays" id="twoDays" value="<?= $twoDays ?>">
-                                                <input type="hidden" name="threeDays" id="threeDays" value="<?= $threeDays ?>">
-                                                <input type="hidden" name="day" id="day" value="<?= $day ?>">
-                                                <div class="mb-3">
-                                                    <select name="jenis" id="jenisBenang" class="form-select" required>
-                                                        <option value="">Pilih Jenis Benang</option>
-                                                        <option value="BENANG">BENANG</option>
-                                                        <option value="NYLON">NYLON</option>
-                                                        <option value="KARET">KARET</option>
-                                                        <option value="SPANDEX">SPANDEX</option>
-                                                    </select>
-                                                </div>
-                                                <div class="mb-3" id="tglPakai">
+                                <!-- Tanda plus putih besar dan sedikit turun -->
+                                <line x1="224" y1="244" x2="224" y2="364" stroke="#17c1e8" stroke-width="50" stroke-linecap="round" />
+                                <line x1="164" y1="304" x2="284" y2="304" stroke="#17c1e8" stroke-width="50" stroke-linecap="round" />
+                            </svg> Waktu
+                        </button>
+                        <!-- Modal Additional Time -->
+                        <div class="modal fade" id="requestTimeModal" tabindex="-1" aria-labelledby="requestTimeModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="requestTimeModalLabel">Pilih Jenis Benang</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!-- Konten modal, misalnya formulir -->
+                                        <form action="<?= base_url($role . '/requestAdditionalTime') ?>" method="post">
+                                            <input type="hidden" name="area" value="<?= $area ?>">
+                                            <input type="hidden" name="tomorrow" id="tomorrow" value="<?= $tomorrow ?>">
+                                            <input type="hidden" name="twoDays" id="twoDays" value="<?= $twoDays ?>">
+                                            <input type="hidden" name="threeDays" id="threeDays" value="<?= $threeDays ?>">
+                                            <input type="hidden" name="day" id="day" value="<?= $day ?>">
+                                            <div class="mb-3">
+                                                <select name="jenis" id="jenisBenang" class="form-select" required>
+                                                    <option value="">Pilih Jenis Benang</option>
+                                                    <option value="BENANG">BENANG</option>
+                                                    <option value="NYLON">NYLON</option>
+                                                    <option value="KARET">KARET</option>
+                                                    <option value="SPANDEX">SPANDEX</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3" id="tglPakai">
 
-                                                </div>
-                                                <div class="d-grid">
-                                                    <button type="submit" class="btn btn-info">Pilih</button>
-                                                </div>
-                                            </form>
-                                        </div>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-info">Pilih</button>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
-                            <!-- End Modal Additional Time -->
                         </div>
+                        <!-- End Modal Additional Time -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="row my-4">
-        <div class="card">
-            <div class="card-body p-3">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table id="example" class="display compact " style="width:100%">
-                            <thead>
+<div class="row my-4">
+    <div class="card">
+        <div class="card-body p-3">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="example" class="display compact " style="width:100%">
+                        <thead>
+                            <tr>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">No</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal Pakai</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Model</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Item Type</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Kode Warna</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Color</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Kg Kebtuhan</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jl Mc</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Kg Pesan</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Cns Pesan</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Lot</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Keterangan</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">PO(+)</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Total Terima</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Total Retur</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Jatah</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Status Jatah</th>
+                                <th class="text-uppercase text-dark text-xxs text-center font-weight-bolder opacity-7 ps-2">Edit</th>
+                                <th class="text-uppercase text-dark text-xxs text-center font-weight-bolder opacity-7 ps-2">Send</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $no = 1;
+                            foreach ($dataList as $key => $id) {
+                                $ttl_kg_pesan = number_format($id['qty_pesan'] - $id['qty_sisa'], 2);
+                                $ttl_cns_pesan = $id['cns_pesan'] - $id['cns_sisa'];
+                            ?>
                                 <tr>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">No</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal Pakai</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Model</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Item Type</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Kode Warna</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Color</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Kg Kebtuhan</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Jl Mc</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Kg Pesan</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Cns Pesan</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Lot</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Keterangan</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">PO(+)</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Total Terima</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Total Retur</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Jatah</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Status Jatah</th>
-                                    <th class="text-uppercase text-dark text-xxs text-center font-weight-bolder opacity-7 ps-2">Edit</th>
-                                    <th class="text-uppercase text-dark text-xxs text-center font-weight-bolder opacity-7 ps-2">Send</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                $no = 1;
-                                foreach ($dataList as $key => $id) {
-                                    $ttl_kg_pesan = number_format($id['qty_pesan'] - $id['qty_sisa'], 2);
-                                    $ttl_cns_pesan = $id['cns_pesan'] - $id['cns_sisa'];
-                                ?>
-                                    <tr>
-                                        <td class="text-xs text-start"><?= $no++; ?></td>
-                                        <td class="text-xs text-start"><?= $id['tgl_pakai']; ?></td>
-                                        <td class="text-xs text-start"><?= $id['no_model']; ?></td>
-                                        <td class="text-xs text-start"><?= $id['item_type']; ?></td>
-                                        <td class="text-xs text-start"><?= $id['kode_warna']; ?></td>
-                                        <td class="text-xs text-start"><?= $id['color']; ?></td>
-                                        <td class="text-xs text-start"><?= number_format($id['ttl_kebutuhan_bb'], 2); ?></td>
-                                        <td class="text-xs text-start"><?= $id['jl_mc']; ?></td>
-                                        <td class="text-xs text-start"><?= $ttl_kg_pesan; ?></td>
-                                        <td class="text-xs text-start"><?= $ttl_cns_pesan; ?></td>
-                                        <td class="text-xs text-start"><?= $id['lot']; ?></td>
-                                        <td class="text-xs text-start"><?= $id['keterangan']; ?></td>
-                                        <td class="text-xs text-start">
-                                            <?php if ($id['po_tambahan'] == 1): ?>
-                                                <i class="fas fa-check-square fa-2x" style="color: #6fbf73;"></i>
-                                            <?php else: ?>
-                                                <!-- Biarkan kosong -->
-                                            <?php endif; ?>
-                                        </td>
-                                        <td class=" text-xs text-start"><?= number_format($id['ttl_pengiriman'], 2); ?>
-                                        </td>
-                                        <td class="text-xs text-start"></td>
-                                        <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>"><?= number_format($id['sisa_jatah'], 2); ?></td>
-                                        <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>">
-                                            <?php if ($id['sisa_jatah'] > 0) {
-                                                if ($ttl_kg_pesan >= $id['sisa_jatah']) { ?>
-                                                    <span style="color: red;">Pemesanan Melebihi Jatah</span>
-                                                <?php } ?>
-                                            <?php } else { ?>
-                                                <span style="color: red;">Habis Jatah</span>
+                                    <td class="text-xs text-start"><?= $no++; ?></td>
+                                    <td class="text-xs text-start"><?= $id['tgl_pakai']; ?></td>
+                                    <td class="text-xs text-start"><?= $id['no_model']; ?></td>
+                                    <td class="text-xs text-start"><?= $id['item_type']; ?></td>
+                                    <td class="text-xs text-start"><?= $id['kode_warna']; ?></td>
+                                    <td class="text-xs text-start"><?= $id['color']; ?></td>
+                                    <td class="text-xs text-start"><?= number_format($id['ttl_kebutuhan_bb'], 2); ?></td>
+                                    <td class="text-xs text-start"><?= $id['jl_mc']; ?></td>
+                                    <td class="text-xs text-start"><?= $ttl_kg_pesan; ?></td>
+                                    <td class="text-xs text-start"><?= $ttl_cns_pesan; ?></td>
+                                    <td class="text-xs text-start"><?= $id['lot']; ?></td>
+                                    <td class="text-xs text-start"><?= $id['keterangan']; ?></td>
+                                    <td class="text-xs text-start">
+                                        <?php if ($id['po_tambahan'] == 1): ?>
+                                            <i class="fas fa-check-square fa-2x" style="color: #6fbf73;"></i>
+                                        <?php else: ?>
+                                            <!-- Biarkan kosong -->
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class=" text-xs text-start"><?= number_format($id['ttl_pengiriman'], 2); ?>
+                                    </td>
+                                    <td class="text-xs text-start"></td>
+                                    <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>"><?= number_format($id['sisa_jatah'], 2); ?></td>
+                                    <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>">
+                                        <?php if ($id['sisa_jatah'] > 0) {
+                                            if ($ttl_kg_pesan >= $id['sisa_jatah']) { ?>
+                                                <span style="color: red;">Pemesanan Melebihi Jatah</span>
                                             <?php } ?>
-                                        </td>
-                                        <td class="text-xs text-start">
-                                            <button type="button" class="btn btn-warning update-btn" data-toggle="modal" data-target="#updateListModal" data-area="<?= $area; ?>" data-tgl="<?= $id['tgl_pakai']; ?>" data-model="<?= $id['no_model']; ?>" data-item="<?= $id['item_type']; ?>" data-kode="<?= $id['kode_warna']; ?>" data-color="<?= $id['color']; ?>" data-po-tambahan="<?= $id['po_tambahan']; ?>">
-                                                <i class="fa fa-edit fa-lg"></i>
-                                            </button>
-                                        </td>
-                                        <td class="text-xs">
-                                            <?php
-                                            $show = "d-none";
-                                            // $batasWaktu = '08:30:00';
-                                            $batasWaktu = '23:30:00';
+                                        <?php } else { ?>
+                                            <span style="color: red;">Habis Jatah</span>
+                                        <?php } ?>
+                                    </td>
+                                    <td class="text-xs text-start">
+                                        <button type="button" class="btn btn-warning update-btn" data-toggle="modal" data-target="#updateListModal" data-area="<?= $area; ?>" data-tgl="<?= $id['tgl_pakai']; ?>" data-model="<?= $id['no_model']; ?>" data-item="<?= $id['item_type']; ?>" data-kode="<?= $id['kode_warna']; ?>" data-color="<?= $id['color']; ?>" data-po-tambahan="<?= $id['po_tambahan']; ?>">
+                                            <i class="fa fa-edit fa-lg"></i>
+                                        </button>
+                                    </td>
+                                    <td class="text-xs">
+                                        <?php
+                                        $show = "d-none";
+                                        // $batasWaktu = '08:30:00';
+                                        $batasWaktu = '23:30:00';
 
-                                            if ($id['sisa_jatah'] > 0) {
-                                                if ($ttl_kg_pesan <= $id['sisa_jatah']) {
-                                                    // Aturan berdasarkan hari dan jenis produk:
-                                                    // $rules = [
-                                                    //     'Thursday' => [
-                                                    //         'BENANG'  => [$tomorrow => '08:30:00'],
-                                                    //         'NYLON'   => [$tomorrow => '08:30:00'],
-                                                    //         'SPANDEX' => [$twoDays  => '08:30:00', $fourDays => '09:00:00'],
-                                                    //         'KARET'   => [$twoDays  => '08:30:00', $fourDays => '09:00:00']
-                                                    //     ],
-                                                    //     'Friday' => [
-                                                    //         'BENANG'  => [$tomorrow => '08:30:00'],
-                                                    //         'NYLON'   => [$tomorrow => '08:30:00'],
-                                                    //         'SPANDEX' => [$fourDays => '08:30:00'],
-                                                    //         'KARET'   => [$fourDays => '08:30:00']
-                                                    //     ],
-                                                    //     'Saturday' => [
-                                                    //         'BENANG'  => [$threeDays  => '08:30:00'],
-                                                    //         'NYLON'   => [$threeDays => '08:30:00'],
-                                                    //         'SPANDEX' => [$threeDays => '00:00:00'],
-                                                    //         'KARET'   => [$threeDays => '00:00:00']
-                                                    //     ],
-                                                    //     'default' => [
-                                                    //         'BENANG'  => [$tomorrow => '08:30:00'],
-                                                    //         'NYLON'   => [$tomorrow => '08:30:00'],
-                                                    //         'SPANDEX' => [$twoDays  => '08:30:00'],
-                                                    //         'KARET'   => [$twoDays  => '08:30:00']
-                                                    //     ]
-                                                    // ];
-                                                    $rules = [
-                                                        'Thursday' => [
-                                                            'BENANG'  => [$tomorrow => '23:30:00'],
-                                                            'NYLON'   => [$tomorrow => '23:30:00'],
-                                                            'SPANDEX' => [$twoDays  => '23:30:00', $fourDays => '24:00:00'],
-                                                            'KARET'   => [$twoDays  => '23:30:00', $fourDays => '24:00:00']
-                                                        ],
-                                                        'Friday' => [
-                                                            'BENANG'  => [$tomorrow => '23:30:00'],
-                                                            'NYLON'   => [$tomorrow => '23:30:00'],
-                                                            'SPANDEX' => [$fourDays => '23:30:00'],
-                                                            'KARET'   => [$fourDays => '23:30:00']
-                                                        ],
-                                                        'Saturday' => [
-                                                            'BENANG'  => [$threeDays  => '23:30:00'],
-                                                            'NYLON'   => [$threeDays => '23:30:00'],
-                                                            'SPANDEX' => [$threeDays => '00:00:00'],
-                                                            'KARET'   => [$threeDays => '00:00:00']
-                                                        ],
-                                                        'default' => [
-                                                            'BENANG'  => [$tomorrow => '23:30:00'],
-                                                            'NYLON'   => [$tomorrow => '23:30:00'],
-                                                            'SPANDEX' => [$twoDays  => '23:30:00'],
-                                                            'KARET'   => [$twoDays  => '23:30:00']
-                                                        ]
-                                                    ];
+                                        if ($id['sisa_jatah'] > 0) {
+                                            if ($ttl_kg_pesan <= $id['sisa_jatah']) {
+                                                // Aturan berdasarkan hari dan jenis produk:
+                                                // $rules = [
+                                                //     'Thursday' => [
+                                                //         'BENANG'  => [$tomorrow => '08:30:00'],
+                                                //         'NYLON'   => [$tomorrow => '08:30:00'],
+                                                //         'SPANDEX' => [$twoDays  => '08:30:00', $fourDays => '09:00:00'],
+                                                //         'KARET'   => [$twoDays  => '08:30:00', $fourDays => '09:00:00']
+                                                //     ],
+                                                //     'Friday' => [
+                                                //         'BENANG'  => [$tomorrow => '08:30:00'],
+                                                //         'NYLON'   => [$tomorrow => '08:30:00'],
+                                                //         'SPANDEX' => [$fourDays => '08:30:00'],
+                                                //         'KARET'   => [$fourDays => '08:30:00']
+                                                //     ],
+                                                //     'Saturday' => [
+                                                //         'BENANG'  => [$threeDays  => '08:30:00'],
+                                                //         'NYLON'   => [$threeDays => '08:30:00'],
+                                                //         'SPANDEX' => [$threeDays => '00:00:00'],
+                                                //         'KARET'   => [$threeDays => '00:00:00']
+                                                //     ],
+                                                //     'default' => [
+                                                //         'BENANG'  => [$tomorrow => '08:30:00'],
+                                                //         'NYLON'   => [$tomorrow => '08:30:00'],
+                                                //         'SPANDEX' => [$twoDays  => '08:30:00'],
+                                                //         'KARET'   => [$twoDays  => '08:30:00']
+                                                //     ]
+                                                // ];
+                                                $rules = [
+                                                    'Thursday' => [
+                                                        'BENANG'  => [$tomorrow => '23:30:00'],
+                                                        'NYLON'   => [$tomorrow => '23:30:00'],
+                                                        'SPANDEX' => [$twoDays  => '23:30:00', $fourDays => '24:00:00'],
+                                                        'KARET'   => [$twoDays  => '23:30:00', $fourDays => '24:00:00']
+                                                    ],
+                                                    'Friday' => [
+                                                        'BENANG'  => [$tomorrow => '23:30:00'],
+                                                        'NYLON'   => [$tomorrow => '23:30:00'],
+                                                        'SPANDEX' => [$fourDays => '23:30:00'],
+                                                        'KARET'   => [$fourDays => '23:30:00']
+                                                    ],
+                                                    'Saturday' => [
+                                                        'BENANG'  => [$threeDays  => '23:30:00'],
+                                                        'NYLON'   => [$threeDays => '23:30:00'],
+                                                        'SPANDEX' => [$threeDays => '00:00:00'],
+                                                        'KARET'   => [$threeDays => '00:00:00']
+                                                    ],
+                                                    'default' => [
+                                                        'BENANG'  => [$tomorrow => '23:30:00'],
+                                                        'NYLON'   => [$tomorrow => '23:30:00'],
+                                                        'SPANDEX' => [$twoDays  => '23:30:00'],
+                                                        'KARET'   => [$twoDays  => '23:30:00']
+                                                    ]
+                                                ];
 
-                                                    $currentRules = isset($rules[$day]) ? $rules[$day] : $rules['default'];
+                                                $currentRules = isset($rules[$day]) ? $rules[$day] : $rules['default'];
 
-                                                    if (isset($currentRules[$id['jenis']])) {
-                                                        foreach ($currentRules[$id['jenis']] as $tgl => $waktu) {
-                                                            if ($id['tgl_pakai'] == $tgl) {
-                                                                $show = "";
+                                                if (isset($currentRules[$id['jenis']])) {
+                                                    foreach ($currentRules[$id['jenis']] as $tgl => $waktu) {
+                                                        if ($id['tgl_pakai'] == $tgl) {
+                                                            $show = "";
 
-                                                                if ($id['status_kirim'] === 'request accept') {
-                                                                    $batasWaktu = $id['additional_time'];
-                                                                } else {
-                                                                    $batasWaktu = $waktu;
-                                                                }
-                                                                break;
+                                                            if ($id['status_kirim'] === 'request accept') {
+                                                                $batasWaktu = $id['additional_time'];
+                                                            } else {
+                                                                $batasWaktu = $waktu;
                                                             }
+                                                            break;
                                                         }
                                                     }
-                                            ?>
-                                                    <button type="button" id="sendBtn" class="btn btn-info text-xs <?= $show ?> send-btn" data-toggle="modal"
-                                                        data-area="<?= $area; ?>"
-                                                        data-tgl="<?= $id['tgl_pakai']; ?>"
-                                                        data-model="<?= $id['no_model']; ?>"
-                                                        data-item="<?= $id['item_type']; ?>"
-                                                        data-kode="<?= $id['kode_warna']; ?>"
-                                                        data-color="<?= $id['color']; ?>"
-                                                        data-waktu="<?= $batasWaktu; ?>"
-                                                        data-po-tambahan="<?= $id['po_tambahan']; ?>">
-                                                        <i class="fa fa-paper-plane fa-lg"></i>
-                                                    </button>
-                                            <?php
                                                 }
-                                            }  ?>
-                                        </td>
-                                    </tr>
-                                <?php
-                                } ?>
-                            </tbody>
-                        </table>
-                    </div>
+                                        ?>
+                                                <button type="button" id="sendBtn" class="btn btn-info text-xs <?= $show ?> send-btn" data-toggle="modal"
+                                                    data-area="<?= $area; ?>"
+                                                    data-tgl="<?= $id['tgl_pakai']; ?>"
+                                                    data-model="<?= $id['no_model']; ?>"
+                                                    data-item="<?= $id['item_type']; ?>"
+                                                    data-kode="<?= $id['kode_warna']; ?>"
+                                                    data-color="<?= $id['color']; ?>"
+                                                    data-waktu="<?= $batasWaktu; ?>"
+                                                    data-po-tambahan="<?= $id['po_tambahan']; ?>">
+                                                    <i class="fa fa-paper-plane fa-lg"></i>
+                                                </button>
+                                        <?php
+                                            }
+                                        }  ?>
+                                    </td>
+                                </tr>
+                            <?php
+                            } ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <!-- modal update list pemesanan -->
