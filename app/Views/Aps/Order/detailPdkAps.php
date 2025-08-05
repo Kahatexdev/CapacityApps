@@ -39,10 +39,10 @@ error_reporting(E_ALL); ?>
                         </div>
                         <div class="col-auto">
                             <form action="<?= base_url($role . '/exportDataOrderArea') ?>" method="post">
-                                <input type="hidden" value="<?= $area ?>" name="area">
-                                <input type="text" value="<?= $noModel ?>" name="searchModel" hidden>
+                                <input type="hidden" value="" name="area">
+                                <input type="text" value="<?= $noModel ?>|<?= $area ?>" name="searchModel" hidden>
                                 <button type="submit" class="btn bg-gradient-success"> <i class="fas fa-file-excel"></i> Export</button>
-                                <a href="<?= base_url($role . '/dataorderperarea/' . $area) ?>" class="btn bg-gradient-info">Kembali</a>
+                                <a href="<?= base_url($role . '/dataorder') ?>" class="btn bg-gradient-info">Kembali</a>
                             </form>
                         </div>
                     </div>

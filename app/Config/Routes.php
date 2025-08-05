@@ -405,7 +405,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('progressdetail/(:any)/(:any)', 'ApsController::progressdetail/$1/$2');
     //order
     $routes->get('', 'ApsController::index');
-    $routes->get('dataorder', 'ApsController::orderPerArea');
+    $routes->get('dataorder', 'ApsController::orderPerAreaAps');
     $routes->get('blmAdaArea', 'ApsController::orderBlmAdaAreal');
     $routes->get('orderPerjarum', 'ApsController::OrderPerJarum');
     $routes->get('orderPerArea', 'ApsController::orderPerArea');
@@ -858,6 +858,7 @@ $routes->group(
     '/rosso',
     ['filter' => 'rosso'],
     function ($routes) {
+        //pemesanan
         $routes->get('', 'RossoController::index');
         $routes->get('pemesanan', 'RossoController::index');
         $routes->get('bahanBaku/getNomodel', 'RossoController::getNomodel');
@@ -866,5 +867,23 @@ $routes->group(
         $routes->get('getMU/(:any)/(:any)/(:any)/(:any)', 'RossoController::getMU/$1/$2/$3/$4');
         $routes->post('bahanBaku/simpanKeSession', 'RossoController::savePemesananSession');
         $routes->post('bahanBaku/hapusSession', 'RossoController::deletePemesananSession');
+        $routes->get('listPemesanan/(:any)', 'RossoController::listPemesanan/$1');
+        $routes->post('requestAdditionalTime', 'MaterialController::requestAdditionalTime');
+        $routes->post('requestAdditionalTime/getTanggalPakai', 'RossoController::getTanggalPakai');
+        $routes->get('report_pemesanan/(:any)', 'RossoController::reportPemesanan/$1');
+        $routes->post('filterTglPakai/(:any)', 'RossoController::filterTglPakai/$1');
+        $routes->get('report/pdf/(:any)/(:any)/(:any)', 'PdfController::exportPemesanan/$1/$2/$3');
+        $routes->get('sisaKebutuhanArea/(:any)', 'RossoController::sisaKebutuhanArea/$1');
+
+        // retur
+        $routes->get('retur/(:any)', 'ReturController::index/$1');
+        $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
+        $routes->post('pengajuanRetur/(:any)', 'ReturController::pengajuanRetur/$1');
+        $routes->get('getKategoriRetur', 'ReturController::getKategoriRetur');
+        $routes->get('getKodeWarnaWarnaByItemType', 'ReturController::getKodeWarnaWarnaByItemType');
+        $routes->get('exportExcelRetur/(:any)', 'ExcelController::exportExcelRetur/$1');
+        $routes->get('listRetur/(:any)', 'ReturController::listRetur/$1');
+        $routes->get('exportPdfRetur/(:any)', 'PdfController::exportPdfRetur/$1');
+        $routes->get('generateFormRetur/(:any)', 'ExcelController::generateFormRetur/$1');
     }
 );
