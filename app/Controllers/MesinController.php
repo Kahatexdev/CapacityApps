@@ -555,7 +555,9 @@ class MesinController extends BaseController
     public function capacityperarea($area)
     {
         $newest = $this->produksiModel->newestDate($area)['tgl_produksi'];
-        $ProdMesin = $this->produksiModel->getProductionPerJarum($newest, $area);
+        $datas = ['area' => $area, 'awal' => $newest];
+        $ProdMesin = $this->produksiModel->getProductionPerJarum($datas);
+        // dd($ProdMesin);
         $targetInput = $this->request->getPost('target');
         $today = new DateTime();
         $today->setTime(0, 0); // Ensuring the time is set to midnight
