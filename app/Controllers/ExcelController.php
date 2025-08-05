@@ -5426,10 +5426,10 @@ class ExcelController extends BaseController
     }
     public function exportDataOrderArea()
     {
-        $area = $this->request->getPost('area');
-        $pdk = $this->request->getPost('searchModel');
+        $selected = $this->request->getPost('searchModel');
+        list($pdk, $factory) = explode('|', $selected);
 
-        $data = $this->ApsPerstyleModel->getDataModel($area, $pdk);
+        $data = $this->ApsPerstyleModel->getDataModel($factory, $pdk);
         // dd($area, $pdk, $data);
         // Buat file Excel
         $spreadsheet = new Spreadsheet();

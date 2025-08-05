@@ -405,7 +405,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('progressdetail/(:any)/(:any)', 'ApsController::progressdetail/$1/$2');
     //order
     $routes->get('', 'ApsController::index');
-    $routes->get('dataorder', 'ApsController::orderPerArea');
+    $routes->get('dataorder', 'ApsController::orderPerAreaAps');
     $routes->get('blmAdaArea', 'ApsController::orderBlmAdaAreal');
     $routes->get('orderPerjarum', 'ApsController::OrderPerJarum');
     $routes->get('orderPerArea', 'ApsController::orderPerArea');
