@@ -142,7 +142,7 @@
                                 </div>
                                 <div class="col-2 d-flex flex-column align-items-center">
                                     <div class="numbers text-center">
-                                      <a class="btn btn-success" href='http://172.23.44.14/MaterialSystem/public/api/apiexportGlobalReport/${model}'>Excel Bahan Baku</a>
+                                      <a class="btn btn-success" href='http://172.23.39.114/MaterialSystem/public/api/apiexportGlobalReport/${model}'>Excel Bahan Baku</a>
                                         
                                     </div>
                                 </div>

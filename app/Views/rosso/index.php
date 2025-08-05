@@ -578,7 +578,7 @@
                         inisial.val(response.inisial);
                         // const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
                         // if (poTambahanChecked == 1) {
-                        //     urlMu = `http://172.23.44.14/MaterialSystem/public/api/getMUPoTambahan?no_model=${encodeURIComponent(noModel)}&style_size=${encodeURIComponent(selectedStyleSize)}&area=${encodeURIComponent(area)}`;
+                        //     urlMu = `http://172.23.39.114/MaterialSystem/public/api/getMUPoTambahan?no_model=${encodeURIComponent(noModel)}&style_size=${encodeURIComponent(selectedStyleSize)}&area=${encodeURIComponent(area)}`;
                         // } else {
                         urlMu = '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + encodeURIComponent(selectedStyleSize) + '/' + area + '/' + qty.val();
                         // }
@@ -633,7 +633,7 @@
                                                 <td width=20><input type="text" class="form-control text-center" name="items[${row}][${index}][no]" id="no" value="${index + 1}" readonly></td>
                                                 <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][komposisi]" id="komposisi" value="${item.composition}" readonly></td>
                                                 <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][loss]" id="loss" value="${item.loss}" readonly></td>
-                                                <td width=120><input type="number" class="form-control text-center" name="items[${row}][${index}][ttl_keb]" id="ttl_keb" value="${parseFloat(item.ttl_keb || 0).toFixed(2)}" readonly></td>
+                                                <td width=120><input type="number" class="form-control text-center" name="items[${row}][${index}][ttl_keb]" id="ttl_keb" value="${parseFloat(item.kgs || 0).toFixed(2)}" readonly></td>
                                                 <td><input type="text" class="form-control text-center" name="items[${row}][${index}][item_type]" id="item_type" value="${item.item_type}" readonly></td>
                                                 <td><input type="text" class="form-control text-center" name="items[${row}][${index}][kode_warna]" id="kode_warna" value="${item.kode_warna}" readonly></td>
                                                 <td><input type="text" class="form-control text-center" name="items[${row}][${index}][warna]" id="warna" value="${item.color}" readonly></td>
@@ -754,7 +754,7 @@
                     if (response.status === "success") {
                         // Proses 2: Mengirim ke URL kedua
                         $.ajax({
-                            url: "http://172.23.44.14/MaterialSystem/public/api/insertQtyCns",
+                            url: "http://172.23.39.114/MaterialSystem/public/api/insertQtyCns",
                             method: "POST",
                             data: formData,
                             success: function(secondResponse) {
@@ -863,7 +863,7 @@
         });
 
         console.log('inf : ' + payload);
-        fetch('http://172.23.44.14/MaterialSystem/public/api/saveListPemesanan', {
+        fetch('http://172.23.39.114/MaterialSystem/public/api/saveListPemesanan', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -950,7 +950,7 @@
         let area = document.getElementById('area').value; // Atau ambil dari variable lain
 
         $.ajax({
-            url: 'http://172.23.44.14/MaterialSystem/public/api/hapusOldPemesanan',
+            url: 'http://172.23.39.114/MaterialSystem/public/api/hapusOldPemesanan',
             type: 'POST',
             data: JSON.stringify({
                 area: area,
