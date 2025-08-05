@@ -449,7 +449,6 @@ class MesinController extends BaseController
     {
         $newest = $this->produksiModel->newestDate($area)['tgl_produksi'];
         $datas = ['area' => $area, 'awal' => $newest];
-        dd($datas);
         $ProdMesin = $this->produksiModel->getProductionPerJarum($datas);
         $tampilperarea = $this->jarumModel->getJarumArea($area);
         foreach ($tampilperarea as &$mc) {
@@ -557,7 +556,6 @@ class MesinController extends BaseController
     {
         $newest = $this->produksiModel->newestDate($area)['tgl_produksi'];
         $datas = ['area' => $area, 'awal' => $newest];
-        dd($datas);
         $ProdMesin = $this->produksiModel->getProductionPerJarum($datas);
         // dd($ProdMesin);
         $targetInput = $this->request->getPost('target');
