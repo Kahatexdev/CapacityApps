@@ -327,44 +327,56 @@ class RossoController extends BaseController
     }
     public function deletePemesananSession()
     {
-        // Ambil data dari input POST (array `selected`)
-        // $selected = $this->request->getPost('selected') ?? []; // Pastikan default adalah array kosong
-        $selected = $this->request->getJSON(true)['selected'] ?? [];
-        log_message('debug', 'Isi selected: ' . json_encode($selected));
-        $pemesananBb = session()->get('pemesananBb') ?? []; // Ambil data session asli
+        log_message('debug', 'Session ID: ' . session_id());
+        $selectedItems = $this->request->getJSON()->selected ?? [];
+
+        log_message('debug', 'Selected Items: ' . json_encode($selectedItems));
+        $pemesananBb = session()->get('pemesananBb');
         log_message('debug', 'Session pemesananBb sebelum hapus: ' . json_encode($pemesananBb));
-        $found = false; // Variabel untuk melacak apakah data ditemukan
 
-        foreach ($selected as $selectedItem) {
-            if (strpos($selectedItem, ',') === false) continue;
-            list($id_material, $tgl_pakai) = explode(',', $selectedItem);
-
-            foreach ($pemesananBb as $groupKey => $group) {
-                foreach ($group as $itemKey => $item) {
-                    log_message('debug', "Bandingkan: item.id_material={$item['id_material']} vs $id_material | tgl_pakai={$item['tgl_pakai']} vs $tgl_pakai");
-                    if ($item['id_material'] == $id_material && $item['tgl_pakai'] == $tgl_pakai) {
-                        unset($pemesananBb[$groupKey][$itemKey]);
-                        $pemesananBb[$groupKey] = array_values($pemesananBb[$groupKey]);
-                        $found = true;
-                    }
-                }
-            }
-        }
-
-        if ($found) {
-            session()->set('pemesananBb', $pemesananBb);
+        if (empty($pemesananBb) || !is_array($pemesananBb)) {
             return $this->response->setJSON([
-                'status' => 'success',
-                'message' => 'Data berhasil dihapus',
-                'updated_session' => $pemesananBb
+                'status' => 'error',
+                'message' => 'Session tidak ditemukan atau kosong',
             ]);
         }
 
+        foreach ($selectedItems as $selectedItem) {
+            [$id_material, $tgl_pakai] = explode(',', $selectedItem);
+
+            foreach ($pemesananBb as $groupIndex => $group) {
+                foreach ($group as $itemIndex => $item) {
+                    if ((string)$item['id_material'] === (string)$id_material && $item['tgl_pakai'] === $tgl_pakai) {
+                        unset($pemesananBb[$groupIndex][$itemIndex]);
+                    }
+                }
+                // Reset index array agar tidak bolong
+                $pemesananBb[$groupIndex] = array_values($pemesananBb[$groupIndex]);
+            }
+        }
+
+        // Hapus session jika sudah kosong semua
+        $allEmpty = true;
+        foreach ($pemesananBb as $group) {
+            if (!empty($group)) {
+                $allEmpty = false;
+                break;
+            }
+        }
+
+        if ($allEmpty) {
+            session()->remove('pemesananBb');
+        } else {
+            session()->set('pemesananBb', $pemesananBb);
+        }
+
         return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Tidak ada data yang ditemukan atau dihapus'
+            'status' => 'success',
+            'message' => 'Data berhasil dihapus',
+            'updated_session' => $pemesananBb
         ]);
     }
+
     public function listPemesanan($area)
     {
         function fetchApiData($url)

@@ -880,11 +880,18 @@
                             headers: {
                                 'Content-Type': 'application/json', // Penting untuk memastikan JSON diproses
                             },
+                            credentials: 'include',
                             body: JSON.stringify({
                                 selected
                             }),
                         })
-                        .then((response) => response.json())
+                        // .then((response) => response.json())
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP ${response.status}`);
+                            }
+                            return response.json();
+                        })
                         .then((data) => {
                             if (data.status === 'success') {
                                 // Tampilkan SweetAlert setelah session berhasil dihapus
@@ -898,6 +905,7 @@
                                 });
                             } else {
                                 console.error('Error saat menghapus session:', error);
+                                // console.warn('Gagal hapus session:', data.message);
                                 Swal.fire({
                                     icon: 'warning',
                                     title: 'Warning!',

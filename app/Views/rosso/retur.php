@@ -427,11 +427,17 @@
         // Tambahkan opsi default jika perlu
         option.innerHTML = '<option value="">-- Pilih Item --</option>';
 
+        const uniqueLots = new Set(); // untuk simpan lot_kirim unik
+
         for (const key of data) {
-            const opt = document.createElement('option');
-            opt.value = key.lot_kirim;
-            opt.textContent = `${key.lot_kirim}`;
-            option.appendChild(opt);
+            if (!uniqueLots.has(key.lot_kirim)) {
+                uniqueLots.add(key.lot_kirim);
+
+                const opt = document.createElement('option');
+                opt.value = key.lot_kirim;
+                opt.textContent = `${key.lot_kirim}`;
+                option.appendChild(opt);
+            }
         }
 
     }
@@ -487,11 +493,20 @@
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
 
-        fetch('<?= site_url($role . "/pengajuanRetur/" . $area) ?>', {
+        fetch('<?= base_url($role . "/pengajuanRetur/" . $area) ?>', {
                 method: 'POST',
                 body: formData,
             })
-            .then(response => response.json())
+            // .then(response => response.json())
+            .then(async response => {
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    return response.json();
+                } else {
+                    const text = await response.text();
+                    throw new Error("Unexpected response: " + text);
+                }
+            })
             .then(res => {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Ajukan Retur';
@@ -515,16 +530,17 @@
                     });
                 }
             })
-            .catch(err => {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Ajukan Retur';
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: 'Terjadi kesalahan jaringan!',
-                });
-                console.error(err);
-            });
+        // .catch(err => {
+        //     submitBtn.disabled = false;
+        //     submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Ajukan Retur';
+        //     Swal.fire({
+        //         icon: 'error',
+        //         title: 'Error!',
+        //         text: 'Terjadi kesalahan jaringan!',
+        //     });
+        //     console.error(err);
+        // });
+
     });
 </script>
 <?php $this->endSection(); ?>

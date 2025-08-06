@@ -74,7 +74,7 @@
     <div class="card mt-3">
         <div class="card-body">
             <!-- 2. Button Export -->
-            <div class="d-flex align-items-center justify-content-end mb-3">
+            <div class="d-flex align-items-center justify-content-end mb-3 d-none" id="exportButtons">
                 <div class="d-flex gap-2">
                     <button id="generatePdfBtn" class="btn btn-danger"><i class="fas fa-file-pdf" target="_blank"></i> Export PDF</button>
                     <button id="generateExcelBtn" class="btn bg-gradient-success"><i class="fas fa-file-excel"></i> Export Excel</button>
@@ -198,6 +198,8 @@
                     dt.draw();
                     // 4) Update link Export
                     updateExportLinks(area, model, tgl);
+                    // 5) Tampilkan tombol Export
+                    $('#exportButtons').removeClass('d-none');
                 },
                 error: function() {
                     alert('Gagal memuat data. Coba lagi.');
