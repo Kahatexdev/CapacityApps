@@ -447,7 +447,7 @@ class MesinController extends BaseController
     }
     public function DetailMesinPerAreaPlan($area)
     {
-        $newest = $this->produksiModel->newestDate($area)['tgl_produksi'];
+        $newest = $this->produksiModel->newestDate($area)['tgl_produksi'] ?? null;
         $datas = ['area' => $area, 'awal' => $newest];
         $ProdMesin = $this->produksiModel->getProductionPerJarum($datas);
         $tampilperarea = $this->jarumModel->getJarumArea($area);
@@ -554,7 +554,7 @@ class MesinController extends BaseController
     }
     public function capacityperarea($area)
     {
-        $newest = $this->produksiModel->newestDate($area)['tgl_produksi'];
+        $newest = $this->produksiModel->newestDate($area)['tgl_produksi'] ?? null;
         $datas = ['area' => $area, 'awal' => $newest];
         $ProdMesin = $this->produksiModel->getProductionPerJarum($datas);
         // dd($ProdMesin);

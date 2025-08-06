@@ -510,8 +510,8 @@ class ProduksiModel extends Model
      (SUM(produksi.qty_produksi) / 24) AS prod,
      COUNT(DISTINCT produksi.no_mesin) AS jl_mc,
      ((SUM(produksi.qty_produksi) / 24) / COUNT(DISTINCT produksi.no_mesin)) AS prodmc,
-     (3600 / apsperstyle.smv) AS target,
-     (((SUM(produksi.qty_produksi) / 24) / COUNT(DISTINCT produksi.no_mesin)) / (3600 / apsperstyle.smv)) * 100 AS productivity'
+     (3600 / AVG(apsperstyle.smv)) AS target,
+     (((SUM(produksi.qty_produksi) / 24) / COUNT(DISTINCT produksi.no_mesin)) / (3600 / AVG(apsperstyle.smv))) * 100 AS productivity'
         )
 
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'inner')
