@@ -363,6 +363,18 @@ class ReturController extends BaseController
                 'keterangan_area' => $postData['keterangan']
             ];
 
+            log_message('debug', 'Mengirim retur ke API dengan data: ' . json_encode($data));
+
+            $response = $client->post('http://172.23.44.14/MaterialSystem/public/api/saveRetur', [
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => $data
+            ]);
+
+            log_message('debug', 'Response dari API: ' . $response->getBody());
+
             // Kirim data retur ke API
             $response = $client->post('http://172.23.44.14/MaterialSystem/public/api/saveRetur', [
                 'headers' => [
