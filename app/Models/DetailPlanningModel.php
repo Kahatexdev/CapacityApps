@@ -153,4 +153,10 @@ class DetailPlanningModel extends Model
             ->set('jarum', $jarumnew)
             ->update();
     }
+    public function getIdAktif($idPlan)
+    {
+        return $this->select('id_detail_pln')
+            ->where('id_pln_mc', $idPlan)
+            ->findAll();
+    }
 }

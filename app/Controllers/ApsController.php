@@ -1231,4 +1231,43 @@ class ApsController extends BaseController
 
         return redirect()->back()->with('success', 'Data berhasil disimpan.');
     }
+    public function deletePlanPdk()
+    {
+        $idDetail = $this->request->getPost('id');
+        $idEst = $this->EstimatedPlanningModel->getIdEst($idDetail) ?? null;
+        if (!empty($idEst)) {
+            foreach ($idEst as $id) {
+                $this->TanggalPlanningModel->hapusData($id['id_est_qty'], $idDetail);
+            }
+            $delete = $this->EstimatedPlanningModel->deletePlaningan($idDetail);
+            if ($delete) {
+                return redirect()->back()->with('success', 'Data berhasil dihapus.');
+            } else {
+                return redirect()->back()->with('error', 'Data Gagal dihapus.');
+            }
+        } else {
+            return redirect()->back()->with('error', 'Data Belum Di planning.');
+        }
+    }
+    public function deletePlanAll()
+    {
+        $idPlan = $this->request->getPost('id');
+        $idDetail = $this->DetailPlanningModel->getIdAktif($idPlan) ?? null;
+        if (empty($idDetail)) {
+            return redirect()->back()->with('error', 'Belum Ada planningan');
+        } else {
+            foreach ($idDetail as $detailPln) {
+                $idEst = $this->EstimatedPlanningModel->getIdEst($detailPln['id_detail_pln']) ?? null;
+                if (!empty($idEst)) {
+                    foreach ($idEst as $id) {
+                        $this->TanggalPlanningModel->hapusData($id['id_est_qty'], $detailPln['id_detail_pln']);
+                    }
+                    $this->EstimatedPlanningModel->deletePlaningan($detailPln['id_detail_pln']);
+                } else {
+                    continue;
+                }
+            }
+            return redirect()->back()->with('success', 'Data berhasil dihapus.');
+        }
+    }
 }

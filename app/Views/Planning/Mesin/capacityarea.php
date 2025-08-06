@@ -71,40 +71,7 @@
 
             </div>
 
-            <div class="card mt-2">
-                <div class="card-header">
-                    <h4>Capacity Area Per Week</h4>
 
-                </div>
-                <div class="card-body">
-
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Week</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Available Capacity</th>
-                                <th>Sisa Order</th>
-                                <th>Available Machines</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($calendar as $weekData) : ?>
-                                <tr>
-                                    <td><?= $weekData['week'] ?></td>
-                                    <td><?= $weekData['start_date'] ?></td>
-                                    <td><?= $weekData['end_date'] ?></td>
-                                    <td><?= $weekData['available_capacity'] ?> dz</td>
-                                    <td><?= ceil($weekData['sisa_weekly'] / 24) ?> dz</td>
-                                    <td><?= ceil($weekData['available_machines']) ?> Machine</td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                    </table>
-                </div>
-            </div>
             <div class="card mt-2">
                 <div class="card-header">
 

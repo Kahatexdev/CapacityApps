@@ -137,7 +137,6 @@
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Average Prod/Mc</th>
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Target</th>
                                             <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Productivity(%)</th>
-                                            <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Bs Rate (%)</th>
 
                                         </tr>
                                     </thead>
@@ -151,8 +150,6 @@
 
                                                 <td class="text-sm"><?= number_format($od['target'], 2, '.', ',') ?> dz</td>
                                                 <td class="text-sm"><?= number_format($od['productivity'], 2, '.', ',') ?> %</td>
-                                                <td class="text-sm"><?= number_format($od['loss'], 2, '.', ',') ?> %</td>
-
 
 
                                             </tr>

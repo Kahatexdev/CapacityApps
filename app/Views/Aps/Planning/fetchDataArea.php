@@ -61,8 +61,15 @@ error_reporting(E_ALL); ?>
                         <div class="col-auto">
                             <a href="<?= base_url($role . '/kalenderMesin/' . $id_pln_mc) ?>" class="btn btn-success"> Jadwal Mesin <i class="fas fa-calendar-plus text-lg opacity-10" aria-hidden="true"></i> </a>
                             <button id="fetch-data-button" class="btn btn-info">Fetch Data</button>
-                            <a href="<?= base_url($role . '/planningmesin') ?>" class="btn btn-secondary">Back</a>
                             <a href="<?= base_url($role . '/detailplanstop/' . $id_pln_mc) ?>" class="btn btn-warning">PDK Stop</a>
+                            <button class="btn bg-danger text-white deleteAll-btn "
+                                data-id="<?= $id_pln_mc ?>"
+                                data-bs-toggle="modal"
+                                data-bs-target="#confirmDeleteAll">
+                                <i class="fas fa-trash"></i>
+                                Hapus Semua
+                            </button>
+                            <a href="<?= base_url($role . '/planningmesin') ?>" class="btn btn-secondary">Back</a>
                         </div>
                     </div>
                 </div>
@@ -85,7 +92,6 @@ error_reporting(E_ALL); ?>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Actual Running</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Days</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -123,30 +129,33 @@ error_reporting(E_ALL); ?>
                                             <td class="text-sm"><?= htmlspecialchars($order['hari']); ?> Days</td>
                                             <td class="text-sm">
                                                 <?php if ($order['est_qty'] < $order['sisa']) : ?>
-                                                    <a href="<?= base_url($role . '/planningpage/' . $order['id_detail_pln']) . '/' . $id_pln_mc ?>" class="btn btn-primary btn-sm">Detail</a>
+                                                    <a href="<?= base_url($role . '/planningpage/' . $order['id_detail_pln']) . '/' . $id_pln_mc ?>" class="badge bg-info mb-2"><i class="fas fa-eye"></i> </a>
                                                 <?php else : ?>
-                                                    <a href="<?= base_url($role . '/planningpage/' . $order['id_detail_pln']) . '/' . $id_pln_mc ?>" class="btn btn-secondary btn-sm">Detail</a>
+                                                    <a href="<?= base_url($role . '/planningpage/' . $order['id_detail_pln']) . '/' . $id_pln_mc ?>" class="badge bg-success mb-2"><i class="fas fa-eye"></i> </a>
                                                 <?php endif; ?>
-                                                <button class="btn btn-sm text-white bg-danger stop-btn  mr-2"
+                                                <span class="badge btn-sm text-white bg-secondary stop-btn  mr-2"
                                                     data-id="<?= $order['id_detail_pln']; ?>"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#confirmStopModal">
-                                                    Stop
-                                                </button>
-                                            </td>
-                                            <td class="text-sm">
-
-                                                <span class="badge bg-warning text-dark move-btn "
+                                                    <i class="fas fa-ban"> </i>
+                                                </span>
+                                                <span class="badge bg-warning text-dark move-btn mr-2 mb-2"
                                                     data-id="<?= $order['id_detail_pln']; ?>"
                                                     data-area="<?= $area ?>"
                                                     data-pdk="<?= $order['model'] ?>"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#moveJarum">
                                                     <i class="fas fa-sign-out-alt"></i>
-                                                    Pindah
+
+                                                </span>
+                                                <span class="badge bg-danger text-white delete-btn "
+                                                    data-id="<?= $order['id_detail_pln']; ?>"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#confirmDelete">
+                                                    <i class="fas fa-trash"></i>
+
                                                 </span>
                                             </td>
-
 
                                         </tr>
                                     <?php endforeach; ?>
@@ -163,7 +172,6 @@ error_reporting(E_ALL); ?>
                                         <th></th>
                                         <th class="text-sm fw-bold" id="totalMesin">0 Mc</th>
                                         <th class="text-sm fw-bold" id="totalActualMc">0 Mc</th>
-                                        <th></th>
                                         <th></th>
                                         <th></th>
                                     </tr>
@@ -189,6 +197,46 @@ error_reporting(E_ALL); ?>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="button" id="confirmStopButton" class="btn btn-danger">Yes, Stop</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="confirmDelete" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmStopModalLabel">Confirm Delete</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to Delete this plan?</p>
+                        <form action="<?= base_url($role . '/deletePlanPdk') ?>" method="post">
+                            <input type="hidden" id="idDelete" name="id">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Yes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="confirmDeleteAll" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmStopModalLabel">Confirm Delete All</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Apakah Anda yakin menghapus semua planningan</p>
+                        <form action="<?= base_url($role . '/deletePlanAll') ?>" method="post">
+                            <input type="hidden" id="" name="id" value="<?= $id_pln_mc ?>">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Yes</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -388,6 +436,17 @@ error_reporting(E_ALL); ?>
                         })
                         .catch(error => console.error('Error:', error));
                 });
+                const deleteBtn = document.querySelectorAll('.delete-btn');
+                const idInput = document.getElementById('idDelete');
+
+                deleteBtn.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const planId = this.getAttribute('data-id');
+                        idInput.value = planId; // Set ID ke input hidden
+                    });
+                });
+
+
 
             });
 

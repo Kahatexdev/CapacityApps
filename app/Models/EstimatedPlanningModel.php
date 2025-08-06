@@ -60,4 +60,10 @@ class EstimatedPlanningModel extends Model
     {
         return $this->where('id_detail_pln', $idPdk)->delete();
     }
+    public function getIdEst($idDetail)
+    {
+        return $this->select('id_est_qty')
+            ->where('id_detail_pln', $idDetail)
+            ->findAll();
+    }
 }
