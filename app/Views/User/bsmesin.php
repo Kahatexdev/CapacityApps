@@ -477,26 +477,32 @@
         let id = document.getElementById('nama').value;
 
         if (id) {
-            // Panggil API menggunakan fetch
             fetch(`http://172.23.44.14/HumanResourceSystem/public/api/karyawan/${id}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok ' + response.statusText);
                     }
-                    return response.json(); // Parsing hasil ke JSON
+                    return response.json();
                 })
                 .then(data => {
-                    // Update input field dengan data dari API
-                    document.getElementById('nama_kar').value = data.nama_karyawan || '';
-                    document.getElementById('kode_kartu').value = data.kode_kartu || '';
-                    document.getElementById('shift').value = data.shift || '';
+                    // Data berupa array, ambil elemen pertama
+                    if (Array.isArray(data) && data.length > 0) {
+                        const kar = data[0];
+                        document.getElementById('nama_kar').value = kar.nama_karyawan || '';
+                        document.getElementById('kode_kartu').value = kar.kode_kartu || '';
+                        document.getElementById('shift').value = kar.shift || '';
+                    } else {
+                        document.getElementById('nama_kar').value = '';
+                        document.getElementById('kode_kartu').value = '';
+                        document.getElementById('shift').value = '';
+                    }
                 })
                 .catch(error => {
                     console.error('Terjadi kesalahan:', error);
                     alert('Gagal mengambil data dari server.');
                 });
         } else {
-            // Jika id kosong, kosongkan input
+            document.getElementById('nama_kar').value = '';
             document.getElementById('kode_kartu').value = '';
             document.getElementById('shift').value = '';
         }
