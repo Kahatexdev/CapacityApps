@@ -2362,7 +2362,7 @@ class OrderController extends BaseController
     {
         $model    = $this->request->getGet('mastermodel') ?? '';
         $delivery = $this->request->getGet('delivery')   ?? '';
-
+        // dd($model);
         // Full URL including path:
         $url = 'http://172.23.44.14/KHTEXT/public/api/flowproses';
 
