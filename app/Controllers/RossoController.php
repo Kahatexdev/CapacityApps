@@ -376,7 +376,6 @@ class RossoController extends BaseController
             'updated_session' => $pemesananBb
         ]);
     }
-
     public function listPemesanan($area)
     {
         function fetchApiData($url)

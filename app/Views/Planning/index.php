@@ -45,6 +45,8 @@
                                     <?php foreach ($area as $ar): ?>
                                         <option value="<?= $ar ?>"><?= $ar ?></option>
                                     <?php endforeach; ?>
+                                    <option value="">Semua Area</option>
+
                                 </select>
                                 <select id="filter-bulan" class="form-control d-inline w-auto">
                                     <option value="">Semua Bulan</option>

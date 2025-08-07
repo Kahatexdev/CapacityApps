@@ -61,9 +61,6 @@
                             <input type="text" class="form-control" id="no_model" value="" placeholder="No Model">
                             <input type="date" class="form-control" id="tgl_buat" value="" required>
                             <button id="searchFilter" class="btn btn-info ms-2"><i class="fas fa-search"></i> Filter</button>
-                            <button class="btn btn-info ms-2">
-                                <a href="<?= base_url($role . '/generate_form_retur/' . $area) ?>" class="fa fa-list text-white" style="text-decoration: none;"> List</a>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -180,7 +177,7 @@
                 alert('Tolong Isi Tgl Retur Terlebih Dahulu !');
                 return;
             }
-
+            //pakai method GET
             $.ajax({
                 url: "<?= base_url($role . '/listRetur/') ?>" + area,
                 type: "GET",
