@@ -471,11 +471,17 @@
         // Tambahkan opsi default jika perlu
         option.innerHTML = '<option value="">-- Pilih Item --</option>';
 
+        const uniqueLots = new Set(); // untuk simpan lot_kirim unik
+
         for (const key of data) {
-            const opt = document.createElement('option');
-            opt.value = key.lot_kirim;
-            opt.textContent = `${key.lot_kirim}`;
-            option.appendChild(opt);
+            if (!uniqueLots.has(key.lot_kirim)) {
+                uniqueLots.add(key.lot_kirim);
+
+                const opt = document.createElement('option');
+                opt.value = key.lot_kirim;
+                opt.textContent = `${key.lot_kirim}`;
+                option.appendChild(opt);
+            }
         }
 
     }
