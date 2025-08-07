@@ -875,48 +875,34 @@
                 const resData = await response.json();
                 const selected = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked')).map(checkbox => checkbox.value);
                 if (response.ok) {
-                    fetch('bahanBaku/hapusSession', {
+                    fetch(`${BASE_URL}bahanBaku/hapusSession`, {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'application/json', // Penting untuk memastikan JSON diproses
+                                'Content-Type': 'application/json',
                             },
                             credentials: 'include',
                             body: JSON.stringify({
                                 selected
                             }),
                         })
-                        // .then((response) => response.json())
-                        .then((response) => {
-                            if (!response.ok) {
-                                throw new Error(`HTTP ${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then((data) => {
+                        .then(response => response.json())
+                        .then(data => {
                             if (data.status === 'success') {
-                                // Tampilkan SweetAlert setelah session berhasil dihapus
                                 Swal.fire({
-                                    icon: 'success',
-                                    title: 'Success!',
-                                    text: resData.message,
-                                }).then(() => {
-                                    // Redirect ke halaman yang diinginkan
-                                    window.location.href = `${BASE_URL}user/bahanBaku`; // Halaman tujuan setelah sukses
-                                });
+                                        icon: 'success',
+                                        title: 'Success!',
+                                        text: resData.message
+                                    })
+                                    .then(() => window.location.href = `${BASE_URL}user/bahanBaku`);
                             } else {
-                                console.error('Error saat menghapus session:', error);
-                                // console.warn('Gagal hapus session:', data.message);
                                 Swal.fire({
                                     icon: 'warning',
                                     title: 'Warning!',
                                     text: 'Data berhasil disimpan, tetapi session gagal dihapus.',
-                                }).then(() => {
-                                    // Tetap redirect meskipun ada error saat menghapus session
-                                    window.location.href = `${BASE_URL}user/bahanBaku`;
-                                });
+                                }).then(() => window.location.href = `${BASE_URL}user/bahanBaku`);
                             }
                         })
-                        .catch((error) => {
+                        .catch(error => {
                             console.error('Error:', error);
                             Swal.fire({
                                 icon: 'error',
