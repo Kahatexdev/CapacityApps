@@ -536,7 +536,9 @@
                                 <div class="col-md-6">
                                     <label>Import Flow Proses</label>
                                     <input type="file" class="form-control" name="excel_file" required>
-                                    <p style="color: red; font-size: 12px;">* Tipe file .xlsx atau .xls</p>
+                                    <p style="color: red; font-size: 12px;">* Tipe file .xlsx atau .xls
+                                    <a href="<?= base_url('assets/templateExcel/CONTOH FORMAT IMPORT FLOW PROSES TLS.xls') ?>" class="text-info">Download Template</a>
+                                    </p>
                                 </div>
                             </div>
                         <button type="submit" class="btn btn-info w-100">Import</button>
