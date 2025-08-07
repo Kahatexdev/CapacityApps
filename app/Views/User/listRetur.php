@@ -177,7 +177,7 @@
                 alert('Tolong Isi Tgl Retur Terlebih Dahulu !');
                 return;
             }
-
+            //pakai method GET
             $.ajax({
                 url: "<?= base_url($role . '/listRetur/') ?>" + area,
                 type: "GET",
