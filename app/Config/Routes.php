@@ -424,6 +424,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('tampilPerdelivery', 'OrderController::tampilPerdelivery');
     $routes->post('dataOrderSearch', 'OrderController::dataOrderSearch');
     $routes->get('flowProses', 'OrderController::flowProses');
+    $routes->get('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
 
 
     // mesin
