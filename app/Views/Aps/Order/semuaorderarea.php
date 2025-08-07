@@ -223,15 +223,12 @@
                             <form action="<?= base_url($role . '/exportDataOrderArea') ?>" method="POST">
                                 <div class="row align-items-center">
                                     <label for="searchModel">Pilih Model</label>
-
-                                    <select name="searchModel" id="searchModel" class="form-select">
-                                        <?php foreach ($tampildata as $order) : ?>
-                                            <option value="<?= $order->no_model . '|' . $order->factory ?>">
-                                                <?= $order->no_model ?>
-                                            </option>
-                                        <?php endforeach; ?>
+                                    <select name="searchModel" id="searchModel" class="form-select" style="width: 100%">
+                                        <option value="">Pilih Model</option>
                                     </select>
+
                                 </div>
+
                                 <div class="row mt-2">
                                     <div class="col text-end">
                                         <button type="submit" class="btn btn-success btn-block">Generate</button>
@@ -244,8 +241,38 @@
             </div>
 
             <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+
             <script type="text/javascript">
                 $(document).ready(function() {
+                    $('#searchModel').select2({
+                        placeholder: 'Pilih Model',
+                        allowClear: true,
+                        dropdownParent: $('#exportModal'), // ini penting biar dropdown muncul dalam modal
+                        ajax: {
+                            url: '<?= base_url($role . "/dataOrderSearch") ?>',
+                            type: 'POST',
+                            dataType: 'json',
+                            delay: 250,
+                            data: function(params) {
+                                return {
+                                    searchTerm: params.term // user input
+                                };
+                            },
+                            processResults: function(data) {
+                                return {
+                                    results: $.map(data, function(item) {
+                                        console.log(data)
+                                        return {
+                                            id: item.value, // VALUE dari <option>
+                                            text: item.label // TEXT yang ditampilkan
+                                        }
+                                    })
+                                };
+                            },
+                            cache: true
+                        }
+                    });
+
                     $('#example').DataTable({
                         "processing": true,
                         "serverSide": true,

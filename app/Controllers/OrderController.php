@@ -179,7 +179,29 @@ class OrderController extends BaseController
 
         return $this->response->setJSON($response);
     }
+    public function dataOrderSearch()
+    {
+        $searchTerm = $this->request->getPost('searchTerm');
 
+        $model = new \App\Models\ApsPerstyleModel(); // ganti sesuai model kamu
+
+        $result = $model->select('mastermodel, factory')
+            ->groupBy(['mastermodel', 'factory'])
+            ->like('mastermodel', $searchTerm)
+            ->limit(20)
+            ->findAll();
+
+        $data = [];
+
+        foreach ($result as $row) {
+            $data[] = [
+                'value' => $row['mastermodel'] . '|' . $row['factory'], // akan jadi value di <option>
+                'label' => $row['mastermodel']                          // akan jadi label di Select2
+            ];
+        }
+
+        return $this->response->setJSON($data);
+    }
 
     public function belumImport()
     {
