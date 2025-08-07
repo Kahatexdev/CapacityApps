@@ -62,7 +62,7 @@
         <hr class="horizontal dark mt-5">
         <div class="collapse navbar-collapse h-auto  w-auto " id="sidenav-collapse-main">
             <ul class="navbar-nav">
-                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Order & Produksi</h6>
+                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder ">Order & Produksi</h6>
 
                 <li class="nav-item">
                     <a class="nav-link <?= $active2 ?> " href="<?= base_url('user/dataproduksi') ?>">
@@ -359,10 +359,7 @@
                 </nav>
                 <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
                     <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-                        <div class="input-group">
-                            <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
-                            <input type="text" class="form-control" placeholder="Type here...">
-                        </div>
+
                     </div>
                     <?php
                     if ($title == "PPH") {

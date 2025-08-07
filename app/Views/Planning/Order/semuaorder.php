@@ -41,9 +41,37 @@
                                 ?>
                             </p>
                         <?php endif; ?>
+
+                        <!-- Not Matched -->
+                        <?php if (! empty($notMatched)): ?>
+                            <p>Tidak Cocok:</p>
+                            <ul class="mb-0">
+                                <?php foreach ($notMatched as $item): ?>
+                                    <li>
+                                        Row <?= esc($item['row']) ?>: <?= esc($item['reason']) ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+
+                        <!-- Errors -->
+                        <?php if (! empty($errors)): ?>
+                            <p>Errors:</p>
+                            <ul class="mb-0">
+                                <?php foreach ($errors as $err): ?>
+                                    <li>
+                                        Row <?= esc($err['row']) ?>: <?= esc($err['status']) ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 <?php endif; ?>
+
+
+
             </div>
         </div>
     </div>
@@ -536,7 +564,9 @@
                                 <div class="col-md-6">
                                     <label>Import Flow Proses</label>
                                     <input type="file" class="form-control" name="excel_file" required>
-                                    <p style="color: red; font-size: 12px;">* Tipe file .xlsx atau .xls</p>
+                                    <p style="color: red; font-size: 12px;">* Tipe file .xlsx atau .xls
+                                    <a href="<?= base_url('templateExcel/CONTOH FORMAT IMPORT FLOW PROSES TLS.xls') ?>" class="text-info">Download Template</a>
+                                    </p>
                                 </div>
                             </div>
                         <button type="submit" class="btn btn-info w-100">Import</button>

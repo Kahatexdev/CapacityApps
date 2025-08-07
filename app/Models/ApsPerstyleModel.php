@@ -994,7 +994,7 @@ class ApsPerstyleModel extends Model
 
     public function getSisaPerModel($model, $jarum, $area)
     {
-        return $this->select('sum(qty/24) as qty, sum(sisa/24) as sisa, delivery')
+        $result = $this->select('sum(qty/24) as qty, sum(sisa/24) as sisa, delivery')
             ->where('mastermodel', $model)
             ->where('machinetypeid', $jarum)
             ->where('factory', $area)
@@ -1002,6 +1002,8 @@ class ApsPerstyleModel extends Model
             ->groupBy('machinetypeid')
             ->orderBy('delivery', 'asc')
             ->first();
+
+        return $result ?? ['qty' => 0, 'sisa' => 0];
     }
     public function getQtyCancel($idaps)
     {
@@ -1330,10 +1332,11 @@ class ApsPerstyleModel extends Model
             ->findAll();
     }
 
-    public function getIdApsForFlowProses($noModel)
+    public function getIdApsForFlowProses($noModel, $needle)
     {
-        return $this->select('idapsperstyle,mastermodel, size, inisial, factory, delivery')
+        return $this->select('idapsperstyle,mastermodel, size, inisial, factory, delivery, machinetypeid')
             ->where('mastermodel', $noModel)
+            ->where('machinetypeid', $needle)
             ->groupBy('size')
             ->findAll();
     }

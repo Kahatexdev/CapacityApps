@@ -640,7 +640,7 @@ class ApsController extends BaseController
     {
         $id = session()->get('id_user');
         $area = $this->aksesModel->getArea($id);
-        $tampilperdelivery = $this->orderModel->getPDk($area);
+
         // dd($tampilperdelivery);
         $product = $this->productModel->findAll();
         $booking = $data = [
@@ -654,7 +654,7 @@ class ApsController extends BaseController
             'active6' => '',
             'active7' => '',
             'area' => $area,
-            'tampildata' => $tampilperdelivery,
+
             'product' => $product,
         ];
         return view(session()->get('role') . '/Order/semuaorderarea', $data);
