@@ -640,7 +640,7 @@ class ApsController extends BaseController
     {
         $id = session()->get('id_user');
         $area = $this->aksesModel->getArea($id);
-        $tampilperdelivery = $this->orderModel->tampilPerdelivery();
+        $tampilperdelivery = '';
 
         // dd($tampilperdelivery);
         $product = $this->productModel->findAll();
