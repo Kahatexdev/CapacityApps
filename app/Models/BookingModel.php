@@ -12,7 +12,7 @@ class BookingModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_booking', 'tgl_terima_booking', 'kd_buyer_booking', 'id_product_type', 'no_order', 'no_booking', 'desc', 'opd', 'delivery', 'qty_booking', 'sisa_booking', 'needle', 'seam', 'status', 'lead_time', 'ref_id', 'created_at', 'updated_at'];
+    protected $allowedFields    = ['id_booking', 'tgl_terima_booking', 'kd_buyer_booking', 'id_product_type', 'no_order', 'no_booking', 'desc', 'opd', 'delivery', 'qty_booking', 'sisa_booking', 'needle', 'seam', 'status', 'lead_time', 'ref_id', 'created_at', 'updated_at', 'keterangan'];
 
     protected bool $allowEmptyInserts = false;
 

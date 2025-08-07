@@ -245,7 +245,7 @@ class OrderModel extends Model
         $builder->select('data_model.*, mastermodel,no_order, machinetypeid, ROUND(SUM(qty/24), 0) AS qty, ROUND(SUM(sisa/24), 0) AS sisa, factory, delivery, product_type');
         $builder->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left');
         $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
-        $builder->where('factory', $area);
+        $builder->whereIn('factory', $area);
         $builder->where('delivery >', $twomonth);
         $builder->where('qty >', 0);
         $builder->orderby('created_at', 'desc');

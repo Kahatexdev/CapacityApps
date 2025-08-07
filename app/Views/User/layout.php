@@ -62,7 +62,7 @@
         <hr class="horizontal dark mt-5">
         <div class="collapse navbar-collapse h-auto  w-auto " id="sidenav-collapse-main">
             <ul class="navbar-nav">
-                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Order & Produksi</h6>
+                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder ">Order & Produksi</h6>
 
                 <li class="nav-item">
                     <a class="nav-link <?= $active2 ?> " href="<?= base_url('user/dataproduksi') ?>">
@@ -359,10 +359,7 @@
                 </nav>
                 <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
                     <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-                        <div class="input-group">
-                            <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
-                            <input type="text" class="form-control" placeholder="Type here...">
-                        </div>
+
                     </div>
                     <?php
                     if ($title == "PPH") {
@@ -395,6 +392,23 @@
                                 <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4" aria-labelledby="navbarDropdownReports">
                                     <li><a class="dropdown-item" href="<?= base_url($role . '/report_pemesanan/' . $area) ?>">Report Pemesanan</a></li>
                                     <li><a class="dropdown-item" href="<?= base_url($role . '/sisaKebutuhanArea/' . $area) ?>">Report Sisa Kebutuhan</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    <?php
+                    }
+                    ?>
+                    <?php
+                    if ($title == "Retur Bahan Baku") {
+                    ?>
+                        <ul class="navbar-nav justify-content-end">
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle text-body font-weight-bold px-2" id="navbarDropdownReports" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span class="d-lg-inline-block d-none ms-1">List</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4" aria-labelledby="navbarDropdownReports">
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/listRetur/' . $area) ?>">List Retur</a></li>
                                 </ul>
                             </li>
                         </ul>

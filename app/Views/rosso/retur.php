@@ -1,4 +1,4 @@
-<?php $this->extend('user/layout'); ?>
+<?php $this->extend('rosso/layout'); ?>
 <?php $this->section('content'); ?>
 <style>
     #loading {
@@ -212,54 +212,7 @@
             <img src="<?= base_url('assets/spinner.gif') ?>" alt="Loading...">
         </div>
     </div>
-    <div class="card mt-3">
-        <div class="card-body">
 
-
-            <div class="d-flex align-items-center justify-content-between">
-                <h3 class="model-title mb-0">List Returan <?= $area ?></h3>
-                <div class="d-flex align-items-center gap-2">
-                    <a href="<?= base_url($role . '/exportExcelRetur/' . $area) ?>" class="btn btn-success">
-                        <i class="fas fa-file-excel"></i> Export Excel
-                    </a>
-
-                </div>
-            </div>
-            <div class="table-responsive">
-                <table class="table display text-center text-uppercase text-xs font-bolder table-bordered" id="dataTableRetur" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th class="text-center">Tanggal Retur</th>
-                            <th class="text-center">No Model</th>
-                            <th class="text-center">Item Type</th>
-                            <th class="text-center">Kode Warna</th>
-                            <th class="text-center"> Warna</th>
-                            <th class="text-center">Lot Retur</th>
-                            <th class="text-center">KG Retur</th>
-                            <th class="text-center">Kategori</th>
-                            <th class="text-center">Keterangan GBN</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($list as $ls): ?>
-                            <tr>
-                                <td><?= $ls['tgl_retur'] ?></td>
-                                <td><?= $ls['no_model'] ?></td>
-                                <td><?= $ls['item_type'] ?></td>
-                                <td><?= $ls['kode_warna'] ?></td>
-                                <td><?= $ls['warna'] ?></td>
-                                <td><?= $ls['lot_retur'] ?></td>
-                                <td><?= $ls['kgs_retur'] ?></td>
-                                <td><?= $ls['kategori'] ?></td>
-                                <td><?= $ls['keterangan_gbn'] ?></td>
-
-                            </tr>
-                        <?php endforeach ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
 
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
@@ -435,14 +388,17 @@
         option.innerHTML = '<option value="">-- Pilih Item --</option>';
 
         for (const key of data) {
-            const opt = document.createElement('option');
-            opt.value = key.id_material;
-            opt.dataset.item = key.item_type;
-            opt.dataset.kodeWarna = key.kode_warna;
-            opt.dataset.warna = key.color;
-            opt.dataset.model = model;
-            opt.textContent = `${key.item_type} | ${key.kode_warna} | ${key.color}`;
-            option.appendChild(opt);
+            // ✅ Filter item_type LIKE '%JHT%'
+            if (key.item_type && key.item_type.includes('JHT')) {
+                const opt = document.createElement('option');
+                opt.value = key.id_material;
+                opt.dataset.item = key.item_type;
+                opt.dataset.kodeWarna = key.kode_warna;
+                opt.dataset.warna = key.color;
+                opt.dataset.model = model;
+                opt.textContent = `${key.item_type} | ${key.kode_warna} | ${key.color}`;
+                option.appendChild(opt);
+            }
         }
         $.ajax({
             url: "http://172.23.44.14/MaterialSystem/public/api/getPengirimanArea?noModel=" + model,
@@ -537,11 +493,20 @@
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
 
-        fetch('<?= site_url($role . "/pengajuanRetur/" . $area) ?>', {
+        fetch('<?= base_url($role . "/pengajuanRetur/" . $area) ?>', {
                 method: 'POST',
                 body: formData,
             })
-            .then(response => response.json())
+            // .then(response => response.json())
+            .then(async response => {
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    return response.json();
+                } else {
+                    const text = await response.text();
+                    throw new Error("Unexpected response: " + text);
+                }
+            })
             .then(res => {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Ajukan Retur';
@@ -565,16 +530,17 @@
                     });
                 }
             })
-            .catch(err => {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Ajukan Retur';
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: 'Terjadi kesalahan jaringan!',
-                });
-                console.error(err);
-            });
+        // .catch(err => {
+        //     submitBtn.disabled = false;
+        //     submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Ajukan Retur';
+        //     Swal.fire({
+        //         icon: 'error',
+        //         title: 'Error!',
+        //         text: 'Terjadi kesalahan jaringan!',
+        //     });
+        //     console.error(err);
+        // });
+
     });
 </script>
 <?php $this->endSection(); ?>

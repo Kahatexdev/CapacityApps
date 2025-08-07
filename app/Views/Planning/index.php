@@ -45,6 +45,8 @@
                                     <?php foreach ($area as $ar): ?>
                                         <option value="<?= $ar ?>"><?= $ar ?></option>
                                     <?php endforeach; ?>
+                                    <option value="">Semua Area</option>
+
                                 </select>
                                 <select id="filter-bulan" class="form-control d-inline w-auto">
                                     <option value="">Semua Bulan</option>
@@ -58,6 +60,12 @@
                                         <option value="<?= $i ?>"><?= $i ?></option>
                                     <?php endfor; ?>
                                 </select>
+                                <form method="get" action="<?= base_url('/exportProd') ?>" class="d-inline" target="_blank">
+                                    <input type="hidden" name="bulan" id="export-bulan">
+                                    <input type="hidden" name="tahun" id="export-tahun">
+                                    <input type="hidden" name="area" id="export-area">
+                                    <button type="submit" class="btn btn-info" id="exportBtn">Export</button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -305,46 +313,7 @@
 
     </div>
 
-    <div class="row my-3 mx-2">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">
-                    Productivity Daily
-                </h5>
-                <!-- button export -->
-                <form method="get" action="<?= base_url('/exportProd') ?>" class="d-inline" target="_blank">
-                    <input type="hidden" name="bulan" id="export-bulan">
-                    <input type="hidden" name="tahun" id="export-tahun">
-                    <input type="hidden" name="area" id="export-area">
-                    <button type="submit" class="btn btn-info" id="exportBtn">Report MC</button>
-                </form>
-            </div>
-            <div class="card-body">
-                <table class="table">
-                    <thead>
-                        <tr class="text-center">
-                            <th rowspan="2">Tanggal</th>
-                            <th rowspan="2">Target (dz)</th>
-                            <th rowspan="2">Productivity (%)</th>
-                            <th rowspan="2">Deffect Rate(%)</th>
-                            <th colspan="2">Produksi</th>
-                            <th colspan="2">Deffect</th>
-                        </tr>
-                        <tr class="text-center">
-                            <th>dz</th>
-                            <th>kg</th>
-                            <th>Mesin (kg)</th>
-                            <th>Setting (dz)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="prodDetails">
 
-                    </tbody>
-
-                </table>
-            </div>
-        </div>
-    </div>
 
 
 </div>
@@ -436,21 +405,7 @@
         });
     }
 
-    function fetchDailyProd(bulan, tahun, area = "") {
-        $.ajax({
-            url: "<?= base_url('chart/getDailyProd') ?>",
-            type: "GET",
-            data: {
-                bulan: bulan,
-                tahun: tahun,
-                area: area
-            },
-            dataType: "json",
-            success: function(response) {
-                dailyProd(response);
-            }
-        });
-    }
+
 
 
 
@@ -724,50 +679,7 @@
         });
     }
 
-    function dailyProd(response) {
-        const tbody = document.getElementById("prodDetails");
-        tbody.innerHTML = ""; // Kosongkan dulu isinya
 
-        if (!response || response.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='8' class='text-center'>Tidak ada data</td></tr>";
-            return;
-        }
-
-        response.forEach(row => {
-            const tr = document.createElement("tr");
-            tr.classList.add("text-center");
-
-            const productivity = row.productivity ?? 0;
-            const deffectRate = row.deffectRate ?? 0;
-
-            let prodClass = 'text-danger';
-            if (productivity >= 85) {
-                prodClass = 'text-success';
-            } else if (productivity >= 80) {
-                prodClass = 'text-warning';
-            }
-            let defClass = 'text-danger';
-            if (deffectRate <= 2) {
-                defClass = 'text-success';
-            } else if (deffectRate <= 5) {
-                defClass = 'text-warning';
-            }
-
-            tr.innerHTML = `
-        <td>${row.tanggal || "-"}</td>
-        <td>${(row.target ?? 0).toLocaleString()}</td>
-        <td class="${prodClass}">${productivity.toFixed(2)}</td>
-        <td class="${defClass}">${(row.deffectRate ?? 0).toFixed(2)}</td>
-        <td>${(row.prodTotal ?? 0).toLocaleString()}</td>
-        <td>${(row.prodGr ?? 0).toLocaleString()}</td>
-        <td>${(row.bsmesin ?? 0).toLocaleString()}</td>
-        <td>${(row.bsSetting ?? 0).toLocaleString()}</td>
-    `;
-
-
-            tbody.appendChild(tr);
-        });
-    }
 
 
 
@@ -787,7 +699,6 @@
         fetchData(bulan, tahun, area);
         fetchDataBs(bulan, tahun, area);
         fetchBsMesin(bulan, tahun, area);
-        fetchDailyProd(bulan, tahun, area);
     }
 
     // Set default bulan & tahun saat halaman load

@@ -363,6 +363,18 @@ class ReturController extends BaseController
                 'keterangan_area' => $postData['keterangan']
             ];
 
+            log_message('debug', 'Mengirim retur ke API dengan data: ' . json_encode($data));
+
+            $response = $client->post('http://172.23.44.14/MaterialSystem/public/api/saveRetur', [
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => $data
+            ]);
+
+            log_message('debug', 'Response dari API: ' . $response->getBody());
+
             // Kirim data retur ke API
             $response = $client->post('http://172.23.44.14/MaterialSystem/public/api/saveRetur', [
                 'headers' => [
@@ -447,5 +459,35 @@ class ReturController extends BaseController
             'list' => $list
         ];
         return view(session()->get('role') . '/retur', $data);
+    }
+
+    public function listRetur($area)
+    {
+        $noModel = $this->request->getGet('noModel');
+        $tglBuat = $this->request->getGet('tglBuat');
+
+        $listRetur = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area . '?noModel=' . $noModel . '&tglBuat=' . $tglBuat;
+        $res = file_get_contents($listRetur);
+        $list = json_decode($res, true);
+        // Kalau request-nya AJAX, _return_ JSON langsung
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON($list);
+        }
+
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Retur Bahan Baku',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'active8' => '',
+            'area' => $area,
+            'list' => $list
+        ];
+        return view(session()->get('role') . '/listRetur', $data);
     }
 }

@@ -254,7 +254,7 @@ class ApsPerstyleModel extends Model
     }
     public function getDetailPlanning($area, $jarum) // funtion ieu kudu diganti where na kade ulah poho
     {
-        return $this->select('mastermodel AS model, SUM(qty)/24 AS qty, SUM(sisa)/24 AS sisa, AVG(smv) AS smv, machinetypeid')
+        return $this->select('mastermodel AS model, SUM(qty/24) AS qty, SUM(sisa/24) AS sisa, AVG(smv) AS smv, machinetypeid')
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
             ->where('sisa >', 0)
@@ -303,6 +303,7 @@ class ApsPerstyleModel extends Model
         return $this->where('mastermodel', $validate['no_model'])
             ->where('size', $validate['style'])
             ->where('factory', $validate['area'])
+            ->where('qty >', 0)
             ->orderBy('delivery', 'ASC') // Optional: sort berdasarkan delivery date, bisa diubah sesuai kebutuhan
             ->findAll();
     }
@@ -463,7 +464,7 @@ class ApsPerstyleModel extends Model
             ->where('machinetypeid', $jarum)
             ->where('mastermodel', $model)
             // ->where('sisa >=', 0)
-            ->where('qty >=', 0)
+            ->where('qty >', 0)
             ->groupby('delivery')
             ->findAll();
         return $result;
@@ -485,8 +486,8 @@ class ApsPerstyleModel extends Model
             ->where('machinetypeid', $jarum)
             ->where('mastermodel', $model)
             ->where('delivery', $deliv)
-            ->where('sisa >=', 0)
-            ->where('qty >=', 0)
+            // ->where('sisa >=', 0)
+            ->where('qty >', 0)
             ->groupBy('size,factory')
             ->findAll();
         $final = reset($sisa);
@@ -499,7 +500,7 @@ class ApsPerstyleModel extends Model
             ->join('master_product_type', 'master_product_type.id_product_type = data_model.id_product_type', 'left')
             ->where('mastermodel', $model)
             ->where('size', $style)
-            ->where('sisa >=', 0)
+            // ->where('sisa >=', 0)
             ->where('qty >', 0)
             ->groupBy('machinetypeid,delivery')
             ->findAll();
@@ -524,6 +525,7 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $validate['no_model'])
             ->where('size', $validate['style'])
             ->where('factory', $validate['area'])
+            ->where('qty >', 0)
             ->where('qty != sisa')
             ->orderBy('sisa', 'ASC') // Mengurutkan berdasarkan 'sisa' dari yang terkecil
             ->first(); // Mengambil data pertama (yang terkecil)
@@ -831,6 +833,13 @@ class ApsPerstyleModel extends Model
             ->set('qty', 0)
             ->update();
     }
+    public function setSisaZero($nomodel)
+    {
+        return $this->where('mastermodel', $nomodel)
+            ->where('qty', 0)
+            ->set('sisa', 0)
+            ->update();
+    }
     public function StylePerDelive($model, $jarum)
     {
         // Ambil data sisa dan qty jika sisa >= 0 dan qty > 0
@@ -881,11 +890,13 @@ class ApsPerstyleModel extends Model
         return $result;
     }
     public function
-    getDetailPerDeliv($pdk)
+    getDetailPerDeliv($pdk, $area)
     {
         return $this->select('mastermodel, delivery')
             ->where('mastermodel', $pdk['model'])
             ->where('machinetypeid', $pdk['jarum'])
+            ->where('factory', $area)
+            ->where('qty>', 0)
             ->groupBy('delivery')
             ->findAll();
     }
@@ -896,6 +907,7 @@ class ApsPerstyleModel extends Model
             ->where('delivery', $getData['delivery'])
             ->where('factory', $getData['area'])
             ->where('machinetypeid', $getData['jarum'])
+            ->where('qty >', 0)
             ->groupBy('machinetypeid')
             ->findAll();
     }
@@ -980,11 +992,13 @@ class ApsPerstyleModel extends Model
     }
 
 
-    public function getSisaPerModel($model, $jarum)
+    public function getSisaPerModel($model, $jarum, $area)
     {
         return $this->select('sum(qty/24) as qty, sum(sisa/24) as sisa, delivery')
             ->where('mastermodel', $model)
             ->where('machinetypeid', $jarum)
+            ->where('factory', $area)
+            ->where('qty >', 0)
             ->groupBy('machinetypeid')
             ->orderBy('delivery', 'asc')
             ->first();
@@ -1199,6 +1213,10 @@ class ApsPerstyleModel extends Model
             $builder->where('data_model.no_model', $validate['pdk']);
         }
 
+        if (!empty($validate['seam'])) {
+            $builder->like('apsperstyle.seam', $validate['seam']);
+        }
+
         if (!empty($validate['tglTurun']) && !empty($validate['tglTurunAkhir'])) {
             $builder->where('data_model.created_at >=', $validate['tglTurun']);
             $builder->where('data_model.created_at <=', $validate['tglTurunAkhir']);
@@ -1301,7 +1319,7 @@ class ApsPerstyleModel extends Model
 
     public function getDataModel($area, $pdk)
     {
-        return $this->select('data_model.no_model, data_model.kd_buyer_order, apsperstyle.delivery, SUM(apsperstyle.qty) AS qty, apsperstyle.size, apsperstyle.smv, apsperstyle.machinetypeid, master_product_type.product_type')
+        return $this->select('data_model.no_model, data_model.kd_buyer_order, apsperstyle.delivery, SUM(apsperstyle.qty) AS qty, apsperstyle.size, apsperstyle.smv, apsperstyle.machinetypeid,apsperstyle.no_order, master_product_type.product_type')
             ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model')
             ->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type')
             ->where('apsperstyle.factory', $area)
@@ -1319,5 +1337,34 @@ class ApsPerstyleModel extends Model
             ->where('machinetypeid', $needle)
             ->groupBy('size')
             ->findAll();
+    }
+
+    public function getPembagianModel($noModel)
+    {
+        return $this->select('mastermodel, SUM(qty) AS qty, size, machinetypeid, factory, color')
+            ->where('qty >', 0)
+            ->where('mastermodel', $noModel)
+            ->groupBy('factory, size')
+            ->orderBy('factory, size', 'ASC')
+            ->findAll();
+    }
+
+    public function getNoModel()
+    {
+        return $this->select('mastermodel, factory')
+            ->where('qty >', 0)
+            ->groupBy('mastermodel, factory')
+            ->orderBy('mastermodel, factory')
+            ->findAll();
+    }
+
+    public function updateQtyStok($data)
+    {
+        return $this->where('mastermodel', $data['mastermodel'])
+            ->where('size', $data['size'])
+            ->where('delivery', $data['delivery'])
+            ->set('qty', $data['qty_akhir'])
+            ->set('sisa', $data['qty_akhir'])
+            ->update();
     }
 }

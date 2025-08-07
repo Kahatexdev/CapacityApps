@@ -51,17 +51,18 @@ class DetailPlanningModel extends Model
             ->orderBy('detail_planning.model')
             ->findAll();
     }
-    public function getDataPlanning2($id)
+    public function getDataPlanning2($id, $area)
     {
         return $this->db->table('detail_planning')
-            ->select("detail_planning.model, ap.delivery, ap.qty, ap.sisa, ap.machinetypeid, detail_planning.id_detail_pln, detail_planning.id_pln_mc, detail_planning.smv, est.id_est_qty, est.hari, est.precentage_target, est.delivery2, est.start_date, est.stop_date
+            ->select("detail_planning.model, ap.no_order, ap.delivery, ap.qty, ap.sisa, ap.machinetypeid, detail_planning.id_detail_pln, detail_planning.id_pln_mc, detail_planning.smv, est.id_est_qty, est.hari, est.precentage_target, est.delivery2, est.start_date, est.stop_date
             ")
             // join aps
-            ->join("(SELECT mastermodel, delivery, machinetypeid,SUM(qty) AS qty, SUM(sisa) AS sisa FROM apsperstyle GROUP BY mastermodel, delivery, machinetypeid) AS ap", 'ap.mastermodel = detail_planning.model AND ap.machinetypeid = detail_planning.jarum', 'left')
+            ->join("(SELECT mastermodel, no_order, delivery, machinetypeid,SUM(qty/24) AS qty, SUM(sisa/24) AS sisa,factory FROM apsperstyle GROUP BY mastermodel, delivery, machinetypeid, factory) AS ap", 'ap.mastermodel = detail_planning.model AND ap.machinetypeid = detail_planning.jarum', 'left')
             // join est & tgl planning
             ->join("(SELECT ep.id_detail_pln, ep.id_est_qty, ep.hari, ep.precentage_target, ep.delivery AS delivery2, MIN(tp.date) AS start_date, MAX(tp.date) AS stop_date FROM estimated_planning ep LEFT JOIN tanggal_planning tp ON tp.id_est_qty = ep.id_est_qty GROUP BY ep.id_detail_pln, ep.id_est_qty, ep.hari, ep.precentage_target, ep.delivery) AS est", 'est.id_detail_pln = detail_planning.id_detail_pln AND ap.delivery = est.delivery2', 'left')
             ->where('detail_planning.status', 'aktif')
             ->where('detail_planning.id_pln_mc', $id)
+            ->where('ap.factory', $area)
             ->groupBy('detail_planning.model, ap.delivery, detail_planning.id_detail_pln')
             ->orderBy('detail_planning.model')
             ->orderBy('ap.delivery')
@@ -151,5 +152,11 @@ class DetailPlanningModel extends Model
             ->set('id_pln_mc', $idJarum)
             ->set('jarum', $jarumnew)
             ->update();
+    }
+    public function getIdAktif($idPlan)
+    {
+        return $this->select('id_detail_pln')
+            ->where('id_pln_mc', $idPlan)
+            ->findAll();
     }
 }

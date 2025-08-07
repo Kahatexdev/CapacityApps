@@ -1,13 +1,6 @@
-<?php $this->extend('user/layout'); ?>
+<?php $this->extend('rosso/layout'); ?>
 <?php $this->section('content'); ?>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<style>
-    input[readonly] {
-        background-color: #e9ecef;
-        color: #000000ff;
-        cursor: not-allowed;
-    }
-</style>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
         <script>
@@ -65,28 +58,29 @@
                         <form id="pemesananBbForm">
                             <div class="row mb-4">
                                 <!-- PO Tambahan -->
-                                <div class="col-md-1 mb-3">
+                                <!-- <div class="col-md-1 mb-3">
                                     <label for="po_tambahan" class="form-label">PO Tambahan</label>
                                     <div class="form-check">
                                         <input type="checkbox" class="form-check-input" id="po_tambahan" name="po_tambahan">
                                         <label class="form-check-label" for="po_tambahan">Ya</label>
                                     </div>
-                                </div>
-                                <div class="col-md-5">
-                                    <input type="hidden" name="area" id="area" value="<?= $area ?>">
-                                    <label>Tanggal Pakai Benang Nylon</label>
-                                    <input type="date" class="form-control" id="tgl_pakai_benang_nylon" name="tgl_pakai_benang_nylon" min="<?= date('Y-m-d') ?>" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label>Tanggal Pakai Spandex Karet</label>
-                                    <input type="date" class="form-control" id="tgl_pakai_spandex_karet" name="tgl_pakai_spandex_karet" min="<?= date('Y-m-d') ?>" required>
+                                </div> -->
+                                <div class="col-md-12">
+                                    <label>Tanggal Pakai Nylon</label>
+                                    <input type="date" class="form-control" id="tgl_pakai_nylon" name="tgl_pakai_nylon" min="<?= date('Y-m-d') ?>" required>
                                 </div>
                             </div>
                             <div class="row g-3 mb-2">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <label for="itemType">No Model</label>
                                     <select class="form-control" id="no_model" name="no_model" required>
                                         <option value="">Pilih No Model</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="itemType">Area</label>
+                                    <select class="form-control" id="area" name="area" required>
+                                        <option value="">Pilih Area</option>
                                     </select>
                                 </div>
                             </div>
@@ -238,51 +232,60 @@
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const tglPakaiBNInput = document.getElementById('tgl_pakai_benang_nylon');
-        const tglPakaiSKInput = document.getElementById('tgl_pakai_spandex_karet');
+        const tglPakaiInput = document.getElementById('tgl_pakai_nylon');
         const noModelSelect = document.getElementById('no_model');
-        const poTambahanCheckbox = document.getElementById('po_tambahan');
-        const area = $('#area').val(); // Ambil nilai area dari input hidden
+        const areaSelect = document.getElementById('area');
+        // const poTambahanCheckbox = document.getElementById('po_tambahan');
+        // const area = $('#area').val(); // Ambil nilai area dari input hidden
 
         // Fungsi untuk mengubah status select berdasarkan nilai input tgl_pakai
         function toggleNoModel() {
-            if (tglPakaiBNInput.value.trim() === "" || tglPakaiSKInput.value.trim() === "") {
+            if (tglPakaiInput.value.trim() === "") {
                 noModelSelect.disabled = true;
+                areaSelect.disabled = true;
             } else {
                 noModelSelect.disabled = false;
+                areaSelect.disabled = false;
             }
         }
+
 
         // Panggil fungsi saat halaman pertama kali dimuat
         toggleNoModel();
 
         // Panggil fungsi setiap kali input tgl_pakai berubah
-        tglPakaiBNInput.addEventListener('change', toggleNoModel);
-        tglPakaiSKInput.addEventListener('change', toggleNoModel);
+        tglPakaiInput.addEventListener('change', toggleNoModel);
 
         // Fungsi untuk mengambil data no model
         function fetchNoModelData() {
-            const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
-            $('#no_model').empty();
-            $('#no_model').append('<option value="">Pilih No Model</option>');
+            // const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
+            $('#no_model').empty().append('<option value="">Pilih No Model</option>');
+            $('#area').empty().append('<option value="">Pilih Area</option>');
             $('#detailBbCardsContainer').empty(); // kosongkan data style size yg telah di pilih sebelumnya
 
             $.ajax({
                 url: '<?= base_url($role . '/bahanBaku/getNomodel') ?>',
                 method: 'GET',
                 data: {
-                    po_tambahan: poTambahanChecked,
-                    area: area
+                    // po_tambahan: poTambahanChecked,
+                    // area: area
                 }, // Kirim data PO Tambahan sebagai parameter
                 dataType: 'json',
                 success: function(data) {
-                    // Kosongkan dropdown
-                    $('#no_model').empty();
-                    $('#no_model').append('<option value="">Pilih No Model</option>');
+                    // Ambil model unik (jika banyak factory)
+                    const uniqueModels = [...new Set(data.map(item => item.mastermodel))];
 
-                    // Tambahkan data baru ke dropdown
-                    data.forEach(function(model) {
-                        $('#no_model').append(`<option value="${model.model}">${model.model}</option>`);
+                    uniqueModels.forEach(function(model) {
+                        $('#no_model').append(`<option value="${model}">${model}</option>`);
+                    });
+
+                    // Simpan data area per model ke memory
+                    window.modelToAreaMap = {};
+                    data.forEach(item => {
+                        if (!window.modelToAreaMap[item.mastermodel]) {
+                            window.modelToAreaMap[item.mastermodel] = [];
+                        }
+                        window.modelToAreaMap[item.mastermodel].push(item.factory);
                     });
                 },
                 error: function(xhr, status, error) {
@@ -294,13 +297,20 @@
         // Panggil fetchNoModelData saat halaman pertama kali dimuat
         fetchNoModelData();
 
-        // Deteksi perubahan pada checkbox PO Tambahan
-        poTambahanCheckbox.addEventListener('change', fetchNoModelData);
+        // Saat No Model dipilih, tampilkan daftar area
+        $('#no_model').on('change', function() {
+            const selectedModel = $(this).val();
+            const areaList = window.modelToAreaMap[selectedModel] || [];
+
+            $('#area').empty().append('<option value="">Pilih Area</option>');
+
+            areaList.forEach(function(factory) {
+                $('#area').append(`<option value="${factory}">${factory}</option>`);
+            });
+        });
+
     });
     $(document).ready(function() {
-        const area = $('#area').val(); // Ambil nilai area dari input hidden
-        const poTambahanCheckbox = document.getElementById('po_tambahan');
-
         // Inisialisasi Select2 di kolom no model
         $('#no_model').select2({
             width: '100%'
@@ -309,17 +319,22 @@
         let row = 0;
         let globalData = []; // Variabel global untuk menyimpan data AJAX
         // Event ketika no model berubah
-        $('#no_model').change(function() {
-            const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
-            let noModel = $(this).val(); // Ambil value yang dipilih di select2
-            if (noModel) {
+        $('#area').change(function() {
+            // const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
+            let noModel = $('#no_model').val();; // Ambil value yang dipilih di select2
+            let area = $(this).val(); // Ambil value yang dipilih di select2
+
+            const ajaxUrl = '<?= base_url($role . '/getStyleSizeByNoModelPemesanan') ?>';
+            console.log('URL yang dipakai:', ajaxUrl);
+
+            if (area && noModel) {
                 // ambil style size by model
                 $.ajax({
-                    url: '<?= base_url($role . '/getStyleSizeByNoModelPemesanan') ?>',
+                    url: ajaxUrl,
                     type: "GET",
                     data: {
                         no_model: noModel,
-                        po_tambahan: poTambahanChecked,
+                        // po_tambahan: poTambahanChecked,
                         area: area
                     }, // Kirim dalam format object
                     dataType: "json",
@@ -498,6 +513,12 @@
             // Cari elemen <tbody> "material-usage" yang terkait dengan baris ini
             let table = $(this).closest('.table-responsive').find('.material-usage');
 
+            console.log('Mengirim data ke AJAX:', {
+                no_model: noModel,
+                area: area,
+                selectedStyleSize: selectedStyleSize
+            });
+
             // Validasi untuk memastikan Style Size tidak duplikat di baris lain
             let isDuplicate = false;
             let currentElement = $(this); // Elemen yang memicu event 'change'
@@ -524,23 +545,23 @@
                 noModel !== "" && noModel !== null &&
                 area !== "" && area !== null) {
                 // AJAX untuk mengambil Jalan MC
-                $.ajax({
-                    url: '<?= base_url($role . '/getJalanMc') ?>', // Ganti dengan URL endpoint Anda
-                    type: 'POST',
-                    data: {
-                        style_size: selectedStyleSize,
-                        no_model: noModel,
-                        area: area
-                    },
-                    dataType: "json",
-                    success: function(response) {
+                // $.ajax({
+                //     url: '<?= base_url($role . '/getJalanMc') ?>', // Ganti dengan URL endpoint Anda
+                //     type: 'POST',
+                //     data: {
+                //         style_size: selectedStyleSize,
+                //         no_model: noModel,
+                //         area: area
+                //     },
+                //     dataType: "json",
+                //     success: function(response) {
 
-                        jalanMcInput.val(response.jalan_mc); // Isi input "Jalan MC" dengan data dari server
-                    },
-                    error: function() {
-                        alert('Gagal mengambil data Jalan MC! Silakan coba lagi.');
-                    }
-                });
+                //         jalanMcInput.val(response.jalan_mc); // Isi input "Jalan MC" dengan data dari server
+                //     },
+                //     error: function() {
+                //         alert('Gagal mengambil data Jalan MC! Silakan coba lagi.');
+                //     }
+                // });
 
                 $.ajax({
                     url: '<?= base_url($role . '/getQty') ?>', // Ganti dengan URL endpoint Anda
@@ -555,12 +576,12 @@
                         console.log(response)
                         qty.val(response.qty);
                         inisial.val(response.inisial);
-                        const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
-                        if (poTambahanChecked == 1) {
-                            urlMu = `http://172.23.44.14/MaterialSystem/public/api/getMUPoTambahan?no_model=${encodeURIComponent(noModel)}&style_size=${encodeURIComponent(selectedStyleSize)}&area=${encodeURIComponent(area)}`;
-                        } else {
-                            urlMu = '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + encodeURIComponent(selectedStyleSize) + '/' + area + '/' + qty.val();
-                        }
+                        // const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
+                        // if (poTambahanChecked == 1) {
+                        //     urlMu = `http://172.23.44.14/MaterialSystem/public/api/getMUPoTambahan?no_model=${encodeURIComponent(noModel)}&style_size=${encodeURIComponent(selectedStyleSize)}&area=${encodeURIComponent(area)}`;
+                        // } else {
+                        urlMu = '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + encodeURIComponent(selectedStyleSize) + '/' + area + '/' + qty.val();
+                        // }
 
                         // Lakukan permintaan AJAX
                         $.ajax({
@@ -595,23 +616,24 @@
                                     const jalanMc = parseFloat(jalanMcInput.val()) || 0; // Ganti dengan input jalanMc yang sesuai
                                     const totalCones = (item.qty_cns * jalanMc).toFixed(2);
                                     const totalBeratCones = (total * jalanMc).toFixed(2);
-                                    const poTambahan = poTambahanChecked;
+                                    // const poTambahan = poTambahanChecked;
 
                                     table.append(`
                                             <tr>
+                                            <td colspan="7" style="display:none;">
                                                 // kolom hide
                                                 <input type="hidden" class="form-control text-center" name="items[${row}][${index}][tgl_pakai]" id="tgl_pakai" value="${tgl_pakai}" readonly>
-                                                <input type="hidden" class="form-control text-center" name="items[${row}][${index}][po_tambahan]" id="po_tambahan" value="${poTambahan}" readonly>
                                                 <input type="hidden" class="form-control text-center" name="items[${row}][${index}][no_model]" id="no_model" value="${noModel}" readonly>
                                                 <input type="hidden" class="form-control text-center" name="items[${row}][${index}][style_size]" id="style_size" value="${selectedStyleSize}" readonly>
                                                 <input type="hidden" class="form-control text-center" name="items[${row}][${index}][id_material]" id="id_material" value="${item.id_material}" readonly>
                                                 <input type="hidden" class="form-control text-center" name="items[${row}][${index}][jenis]" id="jenis" value="${item.jenis}" readonly>
                                                 <input type="hidden" class="form-control text-center jalan_mc" name="items[${row}][${index}][jalan_mc]" id="jalan_mc" value="${jalanMc}" readonly>
                                                 // 
+                                                </td>
                                                 <td width=20><input type="text" class="form-control text-center" name="items[${row}][${index}][no]" id="no" value="${index + 1}" readonly></td>
                                                 <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][komposisi]" id="komposisi" value="${item.composition}" readonly></td>
                                                 <td width=50><input type="text" class="form-control text-center" name="items[${row}][${index}][loss]" id="loss" value="${item.loss}" readonly></td>
-                                                <td width=120><input type="number" class="form-control text-center" name="items[${row}][${index}][ttl_keb]" id="ttl_keb" value="${parseFloat(item.ttl_keb || 0).toFixed(2)}" readonly></td>
+                                                <td width=120><input type="number" class="form-control text-center" name="items[${row}][${index}][ttl_keb]" id="ttl_keb" value="${parseFloat(item.kgs || 0).toFixed(2)}" readonly></td>
                                                 <td><input type="text" class="form-control text-center" name="items[${row}][${index}][item_type]" id="item_type" value="${item.item_type}" readonly></td>
                                                 <td><input type="text" class="form-control text-center" name="items[${row}][${index}][kode_warna]" id="kode_warna" value="${item.kode_warna}" readonly></td>
                                                 <td><input type="text" class="form-control text-center" name="items[${row}][${index}][warna]" id="warna" value="${item.color}" readonly></td>
@@ -670,7 +692,7 @@
                         });
                     },
                     error: function() {
-                        alert('Gagal mengambil data Jalan MC! Silakan coba lagi.');
+                        alert('Gagal mengambil data Qty! Silakan coba lagi.');
                     }
                 });
             } else {
@@ -803,62 +825,6 @@
         });
     });
 
-
-    // save data yang dipilih pemesanan ke database
-    // document.getElementById('submit-selected').addEventListener('click', function() {
-    //     const selected = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked')).map(checkbox => checkbox.value);
-
-    //     if (selected.length === 0) {
-    //         Swal.fire({
-    //             icon: 'warning',
-    //             title: 'Peringatan',
-    //             text: 'Pilih setidaknya satu data!',
-    //             confirmButtonText: 'OK'
-    //         });
-    //         return;
-    //     }
-
-    //     // Kirim data yang dipilih melalui fetch
-    //     const BASE_URL = "<?= base_url(); ?>";
-    //     const payload = {
-    //         selected
-    //     };
-    //     fetch('http://172.23.44.14/MaterialSystem/public/api/saveListPemesanan', {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             body: JSON.stringify(payload),
-    //         })
-    //         .then(async (response) => {
-    //             const resData = await response.json();
-    //             if (response.ok) {
-    //                 Swal.fire({
-    //                     icon: 'success',
-    //                     title: 'Sukses!',
-    //                     text: 'Data berhasil dikirim!',
-    //                 }).then(() => {
-    //                     location.reload(); // Refresh halaman setelah sukses
-    //                 });
-    //             } else {
-    //                 Swal.fire({
-    //                     icon: 'error',
-    //                     title: 'Error!',
-    //                     text: resData.message || 'Gagal mengirim data',
-    //                 });
-    //                 console.error('Response Data:', resData);
-    //             }
-    //         })
-    //         .catch((error) => {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: 'Error!',
-    //                 text: 'Terjadi kesalahan saat mengirim data',
-    //             });
-    //             console.error('Fetch Error:', error);
-    //         });
-    // });
-
     document.getElementById('formPemesanan').addEventListener('submit', function(event) {
         event.preventDefault();
 
@@ -909,40 +875,34 @@
                 const resData = await response.json();
                 const selected = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked')).map(checkbox => checkbox.value);
                 if (response.ok) {
-                    fetch('bahanBaku/hapusSession', {
+                    fetch(`${BASE_URL}bahanBaku/hapusSession`, {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'application/json', // Penting untuk memastikan JSON diproses
+                                'Content-Type': 'application/json',
                             },
+                            credentials: 'include',
                             body: JSON.stringify({
                                 selected
                             }),
                         })
-                        .then((response) => response.json())
-                        .then((data) => {
+                        .then(response => response.json())
+                        .then(data => {
                             if (data.status === 'success') {
-                                // Tampilkan SweetAlert setelah session berhasil dihapus
                                 Swal.fire({
-                                    icon: 'success',
-                                    title: 'Success!',
-                                    text: resData.message,
-                                }).then(() => {
-                                    // Redirect ke halaman yang diinginkan
-                                    window.location.href = `${BASE_URL}user/bahanBaku`; // Halaman tujuan setelah sukses
-                                });
+                                        icon: 'success',
+                                        title: 'Success!',
+                                        text: resData.message
+                                    })
+                                    .then(() => window.location.href = `${BASE_URL}user/bahanBaku`);
                             } else {
-                                console.error('Error saat menghapus session:', error);
                                 Swal.fire({
                                     icon: 'warning',
                                     title: 'Warning!',
                                     text: 'Data berhasil disimpan, tetapi session gagal dihapus.',
-                                }).then(() => {
-                                    // Tetap redirect meskipun ada error saat menghapus session
-                                    window.location.href = `${BASE_URL}user/bahanBaku`;
-                                });
+                                }).then(() => window.location.href = `${BASE_URL}user/bahanBaku`);
                             }
                         })
-                        .catch((error) => {
+                        .catch(error => {
                             console.error('Error:', error);
                             Swal.fire({
                                 icon: 'error',

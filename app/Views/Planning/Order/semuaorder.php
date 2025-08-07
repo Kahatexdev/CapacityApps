@@ -20,22 +20,26 @@
                     </div>
                 </div>
                 <!-- alert from response -->
-                <?php if (session()->getFlashdata('importSummary')): ?>
-                    <?php
-                    $summary     = session()->getFlashdata('importSummary');
-                    $status      = $summary['status']    ?? '';
-                    $inserted    = $summary['inserted']  ?? 0;
-                    $notMatched  = $summary['notMatched'] ?? [];
-                    $errors      = $summary['error']    ?? []; // pastikan key-nya 'errors'
-                    $isSuccess   = ($status === 'done' && $inserted > 0);
-                    ?>
-                    <div class="alert alert-<?= $isSuccess ? 'success' : 'danger' ?> alert-dismissible fade show" role="alert">
-                        <strong><?= $isSuccess ? 'Success!' : 'Import Gagal!' ?></strong>
-
-                        <?php if ($isSuccess): ?>
-                            <p>Inserted: <?= $inserted ?></p>
-                        <?php else: ?>
-                            <p>Tidak ada data yang berhasil di-insert.</p>
+                <?php if (session()->getFlashdata('importSummary')) : ?>
+                    <div class="alert alert-<?= session()->getFlashdata('importSummary')['status'] === 'done' ? 'success' : 'danger' ?> alert-dismissible fade show" role="alert">
+                        <strong><?= session()->getFlashdata('importSummary')['status'] === 'done' ? 'Success!' : 'Error!' ?></strong>
+                        <?= session()->getFlashdata('importSummary')['message'] ?? '' ?>
+                        <?php if (session()->getFlashdata('importSummary')['status'] === 'done') : ?>
+                            <p>Inserted: <?= session()->getFlashdata('importSummary')['inserted'] ?></p>
+                            <p>Not Matched:
+                                <?php
+                                $notMatched = session()->getFlashdata('importSummary')['notMatched'];
+                                if (is_array($notMatched)) {
+                                    if (!empty($notMatched)) {
+                                        echo implode(', ', $notMatched);
+                                    } else {
+                                        echo '-';
+                                    }
+                                } else {
+                                    echo !empty($notMatched) ? $notMatched : '-';
+                                }
+                                ?>
+                            </p>
                         <?php endif; ?>
 
                         <!-- Not Matched -->
@@ -214,6 +218,10 @@
                         <div class="form-group">
                             <label for="pdk" class="col-form-label">No Model</label>
                             <input type="text" class="form-control" name="pdk">
+                        </div>
+                        <div class="form-group">
+                            <label for="pdk" class="col-form-label">Seam</label>
+                            <input type="text" class="form-control" name="seam">
                         </div>
                         <div class="form-group">
                             <label for="tgl_turun_order" class="col-form-label">Tgl Turun Order Dari</label>
@@ -556,7 +564,9 @@
                                 <div class="col-md-6">
                                     <label>Import Flow Proses</label>
                                     <input type="file" class="form-control" name="excel_file" required>
-                                    <p style="color: red; font-size: 12px;">* Tipe file .xlsx atau .xls</p>
+                                    <p style="color: red; font-size: 12px;">* Tipe file .xlsx atau .xls
+                                    <a href="<?= base_url('templateExcel/CONTOH FORMAT IMPORT FLOW PROSES TLS.xls') ?>" class="text-info">Download Template</a>
+                                    </p>
                                 </div>
                             </div>
                         <button type="submit" class="btn btn-info w-100">Import</button>

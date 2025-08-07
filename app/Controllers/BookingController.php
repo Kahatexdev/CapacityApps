@@ -240,6 +240,7 @@ class BookingController extends BaseController
             'transferData' => $transferData
 
         ];
+        // dd($data);
         return view(session()->get('role') . '/Booking/detail', $data);
     }
     public function inputOrder()
@@ -338,7 +339,10 @@ class BookingController extends BaseController
             $insert =   $this->bookingModel->insert($input);
 
             if ($insert) {
-                $this->bookingModel->update($id_booking, ['sisa_booking' => $this->request->getPost("sisa")]);
+                $cekKeterangan = $this->bookingModel->select('keterangan')->where('id_booking', $id_booking)->first();
+                $oldKeterangan = $cekKeterangan['keterangan'] ?? ''; // kalau null, fallback ke string kosong
+                $keterangan = $oldKeterangan . ' | ' . $this->request->getPost('keterangan');
+                $this->bookingModel->update($id_booking, ['sisa_booking' => $this->request->getPost("sisa"), 'keterangan' => $keterangan,]);
                 return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('success', 'Data Berhasil Di Input');
             } else {
                 return redirect()->to(base_url(session()->get('role') . '/databooking/' . $jarum))->withInput()->with('error', 'Data Gagal Di Input');
@@ -425,7 +429,8 @@ class BookingController extends BaseController
         $file = $this->request->getFile('excel_file');
         $refId = $this->request->getPost('refid');
         $sisa = $this->request->getPost('sisa');
-
+        $keterangan = $this->request->getPost('keterangan');
+        // dd($keterangan);
         if ($file->isValid() && !$file->hasMoved()) {
             $spreadsheet = IOFactory::load($file);
             $data = $spreadsheet->getActiveSheet();
@@ -482,11 +487,16 @@ class BookingController extends BaseController
                         // $existOrder = $this->bookingModel->existingOrder($no_order);
                         // if (!$existOrder) {
                         $this->bookingModel->insert($insert);
+
                         $this->bookingModel->update($refId, ['sisa_booking' => $sisa]);
                         // }
                     }
                 }
             }
+            $cekKeterangan = $this->bookingModel->select('keterangan')->where('id_booking', $refId)->first();
+            $oldKeterangan = $cekKeterangan['keterangan'] ?? '';
+            $ket = $oldKeterangan . ' | ' . $keterangan;
+            $this->bookingModel->update($refId, ['keterangan' => $ket]);
             return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $refId))->withInput()->with('success', 'Data Berhasil di Import');
         } else {
             return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $refId))->with('error', 'No data found in the Excel file');
@@ -516,7 +526,8 @@ class BookingController extends BaseController
             'delivery' => $this->request->getPost("delivery"),
             'lead_time' => $this->request->getPost("lead"),
             'qty_booking' => $this->request->getPost("qty"),
-            'sisa_booking' => $this->request->getPost("sisa")
+            'sisa_booking' => $this->request->getPost("sisa"),
+            'keterangan' => $this->request->getPost("keterangan")
         ];
         $id = $idBooking;
         $update = $this->bookingModel->update($id, $data);
@@ -863,6 +874,7 @@ class BookingController extends BaseController
             return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $asal))->with('error', 'Data booking tujuan transfer tidak ditemukan');
         } else {
             $sisa = $this->request->getPost('sisaQty');
+            $keterangan = $this->request->getPost('keterangan');
             $qtyTransfer = $this->request->getPost('transferQty');
             $totalqty = $tujuan['qty_booking'] + $qtyTransfer;
             $sisaTotalQty = $tujuan['sisa_booking'] + $qtyTransfer;
@@ -875,7 +887,10 @@ class BookingController extends BaseController
             $insert = $tfModel->insert($data);
 
             if ($insert) {
-                $this->bookingModel->update($asal, ['sisa_booking' => $sisa]);
+                $cekKeterangan = $this->bookingModel->select('keterangan')->where('id_booking', $id_booking)->first();
+                $oldKeterangan = $cekKeterangan['keterangan'] ?? ''; // kalau null, fallback ke string kosong
+                $ket = $oldKeterangan . ' | ' .  $keterangan;
+                $this->bookingModel->update($asal, ['sisa_booking' => $sisa, 'keterangan' => $ket]);
                 $this->bookingModel->update($tujuan['id_booking'], ['qty_booking' => $totalqty, 'sisa_booking' => $sisaTotalQty]);
                 return redirect()->to(base_url(session()->get('role') . '/detailbooking/' . $asal))->with('success', 'Data transfer berhasil disimpan dan data booking berhasil diperbarui.');
             } else {

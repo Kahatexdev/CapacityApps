@@ -197,7 +197,7 @@
             <div class="card">
                 <div class="card-header  d-flex  justify-content-between">
                     <h5>Detail Planning for Model <?= $pdk ?></h5>
-                    <button class="btn btn-warning btn-plan" id="planStyle" onclick="planStyle()"
+                    <button class="btn btn-warning btn-plan"
                         data-pdk="<?= $pdk ?>"
                         data-jarum="<?= $jarum ?>"
                         data-area="<?= $area ?>">
@@ -424,9 +424,9 @@
                     <td>${item.style}
                         <input type="hidden" value="${item.idAps}" name="idAps[]">
                     </td>
-                    <td>${item.color.length > 15 ? item.color.substring(0, 15) + '...' : item.color}</td>
-                    <td>${jarum === '240N' ? (Number(item.qty) * 2).toFixed(2) : Number(item.qty).toFixed(2)} Dz</td>
-                    <td>${jarum === '240N' ? (Number(item.sisa) * 2).toFixed(2) : Number(item.sisa).toFixed(2)} Dz</td>
+                   <td>${item.color ? (item.color.length > 15 ? item.color.substring(0, 15) + '...' : item.color) : '-'}</td>
+                   <td>${(jarum === '240N' || jarum === '240N-PL') ? (Number(item.qty) * 2).toFixed(2) : Number(item.qty).toFixed(2)} Dz</td>
+<td>${(jarum === '240N' || jarum === '240N-PL') ? (Number(item.sisa) * 2).toFixed(2) : Number(item.sisa).toFixed(2)} Dz</td>
                     <td>
                         <input type="number" class="form-control mesin-input" value="${item.mesin ?? '0'}" name="mesin[]">
                     </td>
@@ -706,13 +706,14 @@
 
                                 stopDate.value = formattedDate.toISOString().split('T')[0];
                                 target100.value = response.smv;
-                                if (jarum === '240N') {
+                                if (jarum === '240N' || jarum === '240N-PL') {
                                     qty.value = response.qty * 2;
                                     remainingQty.value = response.sisa * 2;
                                 } else {
                                     qty.value = response.qty;
                                     remainingQty.value = response.sisa;
                                 }
+
 
                             } else {
                                 console.error('Error: One or more HTML elements not found.');

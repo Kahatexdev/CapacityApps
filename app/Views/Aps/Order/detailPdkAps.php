@@ -39,10 +39,10 @@ error_reporting(E_ALL); ?>
                         </div>
                         <div class="col-auto">
                             <form action="<?= base_url($role . '/exportDataOrderArea') ?>" method="post">
-                                <input type="hidden" value="<?= $area ?>" name="area">
-                                <input type="text" value="<?= $noModel ?>" name="searchModel" hidden>
+                                <input type="hidden" value="" name="area">
+                                <input type="text" value="<?= $noModel ?>|<?= $area ?>" name="searchModel" hidden>
                                 <button type="submit" class="btn bg-gradient-success"> <i class="fas fa-file-excel"></i> Export</button>
-                                <a href="<?= base_url($role . '/dataorderperarea/' . $area) ?>" class="btn bg-gradient-info">Kembali</a>
+                                <a href="<?= base_url($role . '/dataorder') ?>" class="btn bg-gradient-info">Kembali</a>
                             </form>
                         </div>
                     </div>
@@ -77,23 +77,28 @@ error_reporting(E_ALL); ?>
                                     </thead>
                                     <tbody>
                                         <?php foreach ($val as $key => $list): ?>
-                                            <?php if (is_array($list)): // Pastikan $list adalah array 
-                                            ?>
+                                            <?php if (is_array($list)): ?>
+                                                <?php
+                                                $machine = strtoupper($list['machinetypeid'] ?? '');
+                                                $pembagi = in_array($machine, ['240', '240-PL']) ? 12 : 24;
+                                                $qty = $list['qty'] ?? 0;
+                                                $sisa = $list['sisa'] ?? 0;
+                                                ?>
                                                 <tr>
-                                                    <td><?= htmlspecialchars($list['mastermodel'] ?? '-') ?>/<?= $key + 1 ?> <?= htmlspecialchars($list['machinetypeid'] ?? '-') ?></td>
-                                                    <td><?= $list['buyer'] ?></td>
-                                                    <td><?= $list['no_order'] ?></td>
-                                                    <td><?= $list['delivery'] ?></td>
-                                                    <td><?= round($list['qty'] / 24) ?> dz</td>
-                                                    <td><?= round($list['sisa'] / 24) ?> dz</td>
-                                                    <td><?= $list['product_type'] ?></td>
-                                                    <td><?= $list['smv'] ?></td>
-                                                    <td><?= $list['factory'] ?></td>
-
+                                                    <td><?= htmlspecialchars($list['mastermodel'] ?? '-') ?>/<?= $key + 1 ?> <?= htmlspecialchars($machine) ?></td>
+                                                    <td><?= htmlspecialchars($list['buyer'] ?? '-') ?></td>
+                                                    <td><?= htmlspecialchars($list['no_order'] ?? '-') ?></td>
+                                                    <td><?= htmlspecialchars($list['delivery'] ?? '-') ?></td>
+                                                    <td><?= round($qty / $pembagi) ?> dz</td>
+                                                    <td><?= round($sisa / $pembagi) ?> dz</td>
+                                                    <td><?= htmlspecialchars($list['product_type'] ?? '-') ?></td>
+                                                    <td><?= htmlspecialchars($list['smv'] ?? '-') ?></td>
+                                                    <td><?= htmlspecialchars($list['factory'] ?? '-') ?></td>
                                                 </tr>
                                             <?php endif; ?>
                                         <?php endforeach ?>
                                     </tbody>
+
                                     <tfoot>
                                         <tr>
                                             <th></th>

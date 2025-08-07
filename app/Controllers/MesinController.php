@@ -447,10 +447,14 @@ class MesinController extends BaseController
     }
     public function DetailMesinPerAreaPlan($area)
     {
+        $newest = $this->produksiModel->newestDate($area)['tgl_produksi'] ?? null;
+        $datas = ['area' => $area, 'awal' => $newest];
+        $ProdMesin = $this->produksiModel->getProductionPerJarum($datas);
         $tampilperarea = $this->jarumModel->getJarumArea($area);
         foreach ($tampilperarea as &$mc) {
             $mc['kapasitas'] = $mc['mesin_jalan'] * $mc['target'];
         }
+        // dd($ProdMesin);
         unset($mc); // penting buat mencegah bug di loop selanjutnya
         $getPU = $this->jarumModel->getpu($area);
         $data = [
@@ -466,7 +470,10 @@ class MesinController extends BaseController
             'area' => $area,
             'pu' => $getPU,
             'tampildata' => $tampilperarea,
+            'capability' => $ProdMesin,
+            'tanggal' => $newest,
         ];
+        // dd($data);
 
         return view(session()->get('role') . '/Mesin/detailMesinArea', $data);
     }
@@ -547,7 +554,10 @@ class MesinController extends BaseController
     }
     public function capacityperarea($area)
     {
-        $yesterday = date('Y-m-d', strtotime('-2 days'));
+        $newest = $this->produksiModel->newestDate($area)['tgl_produksi'] ?? null;
+        $datas = ['area' => $area, 'awal' => $newest];
+        $ProdMesin = $this->produksiModel->getProductionPerJarum($datas);
+        // dd($ProdMesin);
         $targetInput = $this->request->getPost('target');
         $today = new DateTime();
         $today->setTime(0, 0); // Ensuring the time is set to midnight
@@ -625,7 +635,7 @@ class MesinController extends BaseController
                 'area' => $area,
                 'jarum' => $jarum,
                 'pdk' => $pdk,
-                'awal' => $yesterday,
+                'awal' => $newest,
             ];
             $jlMC = $this->produksiModel->getJlMcTimter($data);
             $mcJalan = 0;
@@ -751,7 +761,9 @@ class MesinController extends BaseController
             'pu' => $getPU,
             'jarum' => $jarum,
             'tampildata' => $tampilperarea,
-            'startWeek' => $startWeek
+            'startWeek' => $startWeek,
+            'tanggal' => $newest,
+            'capability' => $ProdMesin
         ];
 
         return view(session()->get('role') . '/Mesin/capacityarea', $data);

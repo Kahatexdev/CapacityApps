@@ -473,7 +473,21 @@ class ProduksiModel extends Model
 
     public function getProductionStats($bulan, $tahun, $area)
     {
-        return $this->select('produksi.tgl_produksi, produksi.area,data_model.kd_buyer_order AS buyer, apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.size, (SUM(produksi.qty_produksi)/24) as prod, COUNT(produksi.no_mesin) as jl_mc, ((SUM(produksi.qty_produksi)/ 24) / COUNT(produksi.no_mesin)) as prodmc, (3600 / apsperstyle.smv) AS target,((SUM(produksi.qty_produksi) / 24) / COUNT(produksi.no_mesin) / (3600 / apsperstyle.smv)) * 100 AS productivity, bs.bsdz / ((SUM(produksi.qty_produksi) / 24) + bs.bsdz) AS loss')
+        return $this->select(
+            'produksi.tgl_produksi,
+     produksi.area,
+     data_model.kd_buyer_order AS buyer,
+     apsperstyle.mastermodel,
+     apsperstyle.machinetypeid,
+     apsperstyle.size,
+     (SUM(produksi.qty_produksi) / 24) AS prod,
+     COUNT(DISTINCT produksi.no_mesin) AS jl_mc,
+     ((SUM(produksi.qty_produksi) / 24) / COUNT(DISTINCT produksi.no_mesin)) AS prodmc,
+     (3600 / apsperstyle.smv) AS target,
+     (((SUM(produksi.qty_produksi) / 24) / COUNT(DISTINCT produksi.no_mesin)) / (3600 / apsperstyle.smv)) * 100 AS productivity,
+     bs.bsdz / ((SUM(produksi.qty_produksi) / 24) + bs.bsdz) AS loss'
+        )
+
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'inner')
             ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'inner')
             ->join(
@@ -487,5 +501,48 @@ class ProduksiModel extends Model
             ->groupBy(['produksi.tgl_produksi', 'produksi.area', 'apsperstyle.mastermodel', 'apsperstyle.machinetypeid', 'apsperstyle.size', 'apsperstyle.smv', 'bs.bsdz'])
             ->orderBy('produksi.tgl_produksi')
             ->findAll();
+    }
+    public function getProductionPerJarum($data)
+    {
+        return $this->select(
+            'produksi.area,
+     apsperstyle.machinetypeid,
+     (SUM(produksi.qty_produksi) / 24) AS prod,
+     COUNT(DISTINCT produksi.no_mesin) AS jl_mc,
+     ((SUM(produksi.qty_produksi) / 24) / COUNT(DISTINCT produksi.no_mesin)) AS prodmc,
+     (3600 / AVG(apsperstyle.smv)) AS target,
+     (((SUM(produksi.qty_produksi) / 24) / COUNT(DISTINCT produksi.no_mesin)) / (3600 / AVG(apsperstyle.smv))) * 100 AS productivity'
+        )
+
+            ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'inner')
+            ->join('data_model', 'apsperstyle.mastermodel = data_model.no_model', 'inner')
+            ->where('produksi.tgl_produksi', $data['awal'])
+            ->where('produksi.area', $data['area'])
+            ->groupBy('apsperstyle.machinetypeid')
+            ->orderBy('produksi.tgl_produksi')
+            ->findAll();
+    }
+    // public function getProductionPerJarum($data)
+    // {
+    //     $query = $this->select('\ apsperstyle.machinetypeid, apsperstyle.size, produksi.tgl_produksi, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
+    //         ->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle', 'left')
+    //         ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel', 'left')
+    //         ->where('produksi.no_mesin !=', 'STOK PAKING')
+    //         ->where('produksi.tgl_produksi IS NOT NULL');
+
+    //     if (!empty($data['area'])) {
+    //         $this->where('produksi.area', $data['area']);
+    //     }
+    //     if (!empty($data['awal'])) {
+    //         $this->where('produksi.tgl_produksi =', $data['awal']);
+    //     }
+
+    //     return $query->groupBy('apsperstyle.machinetypeid')
+    //         ->orderBy('apsperstyle.machinetypeid, data_model.no_model, apsperstyle.size, produksi.tgl_produksi', 'ASC')
+    //         ->findAll();
+    // }
+    public function newestDate($area)
+    {
+        return $this->select('tgl_produksi')->where('area', $area)->orderBy('tgl_produksi', 'desc')->first();
     }
 }

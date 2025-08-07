@@ -504,10 +504,17 @@ class ApsController extends BaseController
     }
     public function detailplanmc($id)
     {
+        $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();
+        $judul = $kebutuhanArea['judul'];
+        $area = $kebutuhanArea['area'];
+        $jarum =  $kebutuhanArea['jarum'];
+        $mesinarea = $this->jarumModel->getMesinByArea($area, $jarum); //mesin yang dipakai semua mesin tanpa melibatkan head planning
+        // $mesinplanning = $this->MesinPlanningModel->getMesinByArea($area,$jarum); //mesin yang dipilih oleh head planning di teruskan ke bagian aps
+        $jarumList = $this->KebutuhanAreaModel->getDataByAreaGroupJrm($area);
         $detailplan = $this->DetailPlanningModel->getDataPlanning($id);
         foreach ($detailplan as &$dp) {
             $iddetail = $dp['id_detail_pln'];
-            $qtysisa = $this->ApsPerstyleModel->getSisaPerModel($dp['model'], $dp['jarum']);
+            $qtysisa = $this->ApsPerstyleModel->getSisaPerModel($dp['model'], $dp['jarum'], $area);
             $mesin = $this->TanggalPlanningModel->totalMc($iddetail);
             $maxMesin = 0;
             foreach ($mesin as $mc) {
@@ -534,13 +541,7 @@ class ApsController extends BaseController
             return strtotime($a['delivery_raw']) - strtotime($b['delivery_raw']);
         });
 
-        $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();
-        $judul = $kebutuhanArea['judul'];
-        $area = $kebutuhanArea['area'];
-        $jarum =  $kebutuhanArea['jarum'];
-        $mesinarea = $this->jarumModel->getMesinByArea($area, $jarum); //mesin yang dipakai semua mesin tanpa melibatkan head planning
-        // $mesinplanning = $this->MesinPlanningModel->getMesinByArea($area,$jarum); //mesin yang dipilih oleh head planning di teruskan ke bagian aps
-        $jarumList = $this->KebutuhanAreaModel->getDataByAreaGroupJrm($area);
+
         $yesterday = date('Y-m-d', strtotime('-2 days'));
         foreach ($detailplan as &$dp) {
             $val = [
@@ -635,6 +636,30 @@ class ApsController extends BaseController
         ];
         return view(session()->get('role') . '/Order/orderarea', $data);
     }
+    public function orderPerAreaAps()
+    {
+        $id = session()->get('id_user');
+        $area = $this->aksesModel->getArea($id);
+        $tampilperdelivery = $this->orderModel->tampilPerdelivery();
+
+        // dd($tampilperdelivery);
+        $product = $this->productModel->findAll();
+        $booking = $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'area' => $area,
+            'tampildata' => $tampilperdelivery,
+            'product' => $product,
+        ];
+        return view(session()->get('role') . '/Order/semuaorderarea', $data);
+    }
     public function DetailOrderPerArea($area)
     {
         $tampilperdelivery = $this->orderModel->tampilPerarea($area);
@@ -727,7 +752,7 @@ class ApsController extends BaseController
         $jarum =  $kebutuhanArea['jarum'];
         // $detailplan = $this->DetailPlanningModel->getDetailPlanning($id); //get data model with detail quantity,model etc.
         $pdk = $this->DetailPlanningModel->detailPdk($id);
-        $listDeliv = $this->ApsPerstyleModel->getDetailPerDeliv($pdk);
+        $listDeliv = $this->ApsPerstyleModel->getDetailPerDeliv($pdk, $area);
         $listPlanning = $this->EstimatedPlanningModel->listPlanning($id);
         // dd($listPlanning);
         // $mesinpertgl = $this->TanggalPlanningModel->getMesinByDate($idutama);//get data machine per date and return into array
@@ -1055,9 +1080,14 @@ class ApsController extends BaseController
     public function detailplanstop($id)
     {
         $detailplan = $this->DetailPlanningModel->getDataPlanningStop($id);
+        $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();
+        $judul = $kebutuhanArea['judul'];
+        $area = $kebutuhanArea['area'];
+        $jarum =  $kebutuhanArea['jarum'];
         foreach ($detailplan as &$dp) {
+            // dd($dp);
             $iddetail = $dp['id_detail_pln'];
-            $qtysisa = $this->ApsPerstyleModel->getSisaPerModel($dp['model'], $dp['jarum']);
+            $qtysisa = $this->ApsPerstyleModel->getSisaPerModel($dp['model'], $dp['jarum'], $area);
             $mesin = $this->TanggalPlanningModel->totalMc($iddetail);
             $jum = 0;
             foreach ($mesin as $mc) {
@@ -1068,10 +1098,7 @@ class ApsController extends BaseController
             $dp['sisa'] =
                 round($qtysisa['sisa']);
         }
-        $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id)->first();
-        $judul = $kebutuhanArea['judul'];
-        $area = $kebutuhanArea['area'];
-        $jarum =  $kebutuhanArea['jarum'];
+
         $mesinarea = $this->jarumModel->getMesinByArea($area, $jarum); //mesin yang dipakai semua mesin tanpa melibatkan head planning
         // $mesinplanning = $this->MesinPlanningModel->getMesinByArea($area,$jarum); //mesin yang dipilih oleh head planning di teruskan ke bagian aps
         $data = [
@@ -1204,5 +1231,44 @@ class ApsController extends BaseController
         }
 
         return redirect()->back()->with('success', 'Data berhasil disimpan.');
+    }
+    public function deletePlanPdk()
+    {
+        $idDetail = $this->request->getPost('id');
+        $idEst = $this->EstimatedPlanningModel->getIdEst($idDetail) ?? null;
+        if (!empty($idEst)) {
+            foreach ($idEst as $id) {
+                $this->TanggalPlanningModel->hapusData($id['id_est_qty'], $idDetail);
+            }
+            $delete = $this->EstimatedPlanningModel->deletePlaningan($idDetail);
+            if ($delete) {
+                return redirect()->back()->with('success', 'Data berhasil dihapus.');
+            } else {
+                return redirect()->back()->with('error', 'Data Gagal dihapus.');
+            }
+        } else {
+            return redirect()->back()->with('error', 'Data Belum Di planning.');
+        }
+    }
+    public function deletePlanAll()
+    {
+        $idPlan = $this->request->getPost('id');
+        $idDetail = $this->DetailPlanningModel->getIdAktif($idPlan) ?? null;
+        if (empty($idDetail)) {
+            return redirect()->back()->with('error', 'Belum Ada planningan');
+        } else {
+            foreach ($idDetail as $detailPln) {
+                $idEst = $this->EstimatedPlanningModel->getIdEst($detailPln['id_detail_pln']) ?? null;
+                if (!empty($idEst)) {
+                    foreach ($idEst as $id) {
+                        $this->TanggalPlanningModel->hapusData($id['id_est_qty'], $detailPln['id_detail_pln']);
+                    }
+                    $this->EstimatedPlanningModel->deletePlaningan($detailPln['id_detail_pln']);
+                } else {
+                    continue;
+                }
+            }
+            return redirect()->back()->with('success', 'Data berhasil dihapus.');
+        }
     }
 }
