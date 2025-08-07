@@ -20,30 +20,54 @@
                     </div>
                 </div>
                 <!-- alert from response -->
-                <?php if (session()->getFlashdata('importSummary')) : ?>
-                    <div class="alert alert-<?= session()->getFlashdata('importSummary')['status'] === 'done' ? 'success' : 'danger' ?> alert-dismissible fade show" role="alert">
-                        <strong><?= session()->getFlashdata('importSummary')['status'] === 'done' ? 'Success!' : 'Error!' ?></strong>
-                        <?= session()->getFlashdata('importSummary')['message'] ?? '' ?>
-                        <?php if (session()->getFlashdata('importSummary')['status'] === 'done') : ?>
-                            <p>Inserted: <?= session()->getFlashdata('importSummary')['inserted'] ?></p>
-                            <p>Not Matched: 
-                                <?php 
-                                    $notMatched = session()->getFlashdata('importSummary')['notMatched'];
-                                    if (is_array($notMatched)) {
-                                        if (!empty($notMatched)) {
-                                            echo implode(', ', $notMatched);
-                                        } else {
-                                            echo '-';
-                                        }
-                                    } else {
-                                        echo !empty($notMatched) ? $notMatched : '-';
-                                    }
-                                ?>
-                            </p>
+                <?php if (session()->getFlashdata('importSummary')): ?>
+                    <?php
+                    $summary     = session()->getFlashdata('importSummary');
+                    $status      = $summary['status']    ?? '';
+                    $inserted    = $summary['inserted']  ?? 0;
+                    $notMatched  = $summary['notMatched'] ?? [];
+                    $errors      = $summary['error']    ?? []; // pastikan key-nya 'errors'
+                    $isSuccess   = ($status === 'done' && $inserted > 0);
+                    ?>
+                    <div class="alert alert-<?= $isSuccess ? 'success' : 'danger' ?> alert-dismissible fade show" role="alert">
+                        <strong><?= $isSuccess ? 'Success!' : 'Import Gagal!' ?></strong>
+
+                        <?php if ($isSuccess): ?>
+                            <p>Inserted: <?= $inserted ?></p>
+                        <?php else: ?>
+                            <p>Tidak ada data yang berhasil di-insert.</p>
                         <?php endif; ?>
+
+                        <!-- Not Matched -->
+                        <?php if (! empty($notMatched)): ?>
+                            <p>Tidak Cocok:</p>
+                            <ul class="mb-0">
+                                <?php foreach ($notMatched as $item): ?>
+                                    <li>
+                                        Row <?= esc($item['row']) ?>: <?= esc($item['reason']) ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+
+                        <!-- Errors -->
+                        <?php if (! empty($errors)): ?>
+                            <p>Errors:</p>
+                            <ul class="mb-0">
+                                <?php foreach ($errors as $err): ?>
+                                    <li>
+                                        Row <?= esc($err['row']) ?>: <?= esc($err['status']) ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 <?php endif; ?>
+
+
+
             </div>
         </div>
     </div>

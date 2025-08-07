@@ -1312,10 +1312,11 @@ class ApsPerstyleModel extends Model
             ->findAll();
     }
 
-    public function getIdApsForFlowProses($noModel)
+    public function getIdApsForFlowProses($noModel, $needle)
     {
-        return $this->select('idapsperstyle,mastermodel, size, inisial, factory, delivery')
+        return $this->select('idapsperstyle,mastermodel, size, inisial, factory, delivery, machinetypeid')
             ->where('mastermodel', $noModel)
+            ->where('machinetypeid', $needle)
             ->groupBy('size')
             ->findAll();
     }
