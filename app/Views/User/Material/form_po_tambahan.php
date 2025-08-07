@@ -304,6 +304,7 @@
                         $row.data('bsMesin', json.bs_mesin);
                         $row.data('bsSetting', json.bs_setting);
                         $row.data('bruto', json.bruto);
+                        $row.data('plusPck', json.plusPck);
                         $ss.trigger('change');
                     })
                     .catch(err => console.error('Gagal load item_type:', err))
@@ -367,7 +368,7 @@
                 const bsMesinMap = $row.data('bsMesin') || {};
                 const bsSettingMap = $row.data('bsSetting') || {};
                 const brutoMap = $row.data('bruto') || {};
-
+                const plusPckMap = $row.data('plusPck') || {};
 
                 if (!materialData || !materialData[itemType] || !materialData[itemType].kode_warna[kodeWarna]) {
                     return;
@@ -384,13 +385,16 @@
                     const size = style.style_size;
                     const kgMu = parseFloat(style.kg_mu || 0);
                     const composition = parseFloat(style.composition || 0);
+                    const loss = parseFloat(style.loss || 0);
                     const gw = parseFloat(style.gw || 0);
 
                     $template.find('.color').val(size || '');
                     $template.find('.kg-mu').val(parseFloat(style.kg_mu || 0).toFixed(2));
-                    $template.find('.sisa-order').val(sisaOrderMap[size] || 0);
+                    const sisaOrderVal = (parseFloat(sisaOrderMap[size]) || 0) - (parseFloat(plusPckMap[size]) || 0);
+                    $template.find('.sisa-order').val(sisaOrderVal);
                     $template.find('.bs-mesin').val(((bsMesinMap[size] || 0) / 1000).toFixed(2)); // Convert gram to kg
                     $template.find('.bs-setting').val(bsSettingMap[size] || 0);
+                    $template.find('.plus-pck-pcs').val(plusPckMap[size] || 0);
 
                     const rawBruto = parseFloat(brutoMap[size] || 0);
                     const brutoKg = gw > 0 ?
@@ -402,9 +406,15 @@
 
                     $template.find('.lebih-pakai').val(lebih.toFixed(2));
 
-                    $template.find('.plus-pck-pcs').val(style.pcs_po || '');
-                    $template.find('.plus-pck-kg').val(style.kg_po || '');
-                    $template.find('.po-pck-cns').val(style.cns_po || '');
+                    const rawPlusPck = parseFloat(plusPckMap[size] || 0);
+                    const pluspck = gw > 0 ?
+                        rawPlusPck * composition * gw / 100 / 1000 :
+                        0;
+                    const kgPlusPck = pluspck * (1 + (loss / 100));
+
+                    $template.find('.plus-pck-pcs').val(rawPlusPck);
+                    $template.find('.plus-pck-kg').val(kgPlusPck.toFixed(2));
+                    // $template.find('.po-pck-cns').val(style.cns_po || '');
                     $template.find('.label-style-size').text(size);
                     $template.find('.style-size-hidden').val(size);
 

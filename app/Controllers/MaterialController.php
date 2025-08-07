@@ -1254,12 +1254,15 @@ class MaterialController extends BaseController
 
         $styleSize = array_unique($styleSize);
 
-        // Ambil SISA per style_size
+        // Ambil SISA dan QTY PO PLUS per style_size
         $sisaOrderList = [];
+        $poPlusList = [];
         foreach ($styleSize as $style) {
             $sisa = $this->ApsPerstyleModel->getSisaPerSize($area, $noModel, [$style]);
             $sisaPcs = is_array($sisa) ? $sisa['sisa'] ?? 0 : ($sisa->sisa ?? 0);
             $sisaOrderList[$style] = (float)$sisaPcs;
+            $poPlusPcs = is_array($sisa) ? $sisa['po_plus'] ?? 0 : ($sisa->po_plus ?? 0);
+            $poPlusList[$style] = (float)$poPlusPcs;
         }
 
         // Ambil BS MESIN per style_size
@@ -1307,7 +1310,8 @@ class MaterialController extends BaseController
             'sisa_order' => $sisaOrderList,
             'bs_mesin' => $bsMesinList,
             'bs_setting' => $bsSettingList,
-            'bruto' => $brutoList
+            'bruto' => $brutoList,
+            'plusPck' => $poPlusList,
         ]);
     }
     public function savePoTambahan($area)
