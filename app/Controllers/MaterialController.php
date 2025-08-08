@@ -567,6 +567,7 @@ class MaterialController extends BaseController
         $initialFourDays = date('Y-m-d', strtotime($threeDays . ' +1 day'));
         $fourDays        = getNextNonHoliday($initialFourDays, $liburDates);
 
+        dd($threeDays);
         $data = [
             'role' => session()->get('role'),
             'active1' => '',
