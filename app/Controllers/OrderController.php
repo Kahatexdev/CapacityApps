@@ -2482,7 +2482,7 @@ class OrderController extends BaseController
         $tanggalInput = $request->getPost('tanggal_input');
 
         // 1) Ambil style list dari DB
-        $styleList = $this->ApsPerstyleModel->getIdApsForFlowProses($noModel);
+        $styleList = $this->ApsPerstyleModel->getIdApsForFlowProses($noModel, $needle);
 
         // 2) Ambil file Excel
         $file = $request->getFile('excel_file');
@@ -2503,12 +2503,15 @@ class OrderController extends BaseController
         // 4) Loop tiap baris data
         foreach ($rows as $idx => $row) {
             $rowData = array_combine($header, $row);
-
             // Ambil field dasar
             $noModelExcel = $rowData['NO MODEL'] ?? '';
             $areaExcel    = $rowData['AREA']     ?? '';
             $sizeExcel    = $rowData['JC']       ?? '';
             $inisialExcel = $rowData['INISIAL']  ?? '';
+
+            if (empty($noModelExcel) && empty($areaExcel) && empty($sizeExcel)) {
+                continue;
+            }
 
             // Jika model tidak cocok, skip
             // if ($noModelExcel !== $noModel) {
@@ -2551,7 +2554,7 @@ class OrderController extends BaseController
             if (empty($idApsList)) {
                 $notMatched[] = [
                     'row'    => $idx + 2,
-                    'reason' => 'Tidak ada idapsperstyle yang cocok'
+                    'reason' => 'No Model : ' . $noModelExcel . ' Size : ' . $sizeExcel . ' Area : ' . $areaExcel . ' Tidak Ada'
                 ];
                 continue;
             }
@@ -2581,7 +2584,7 @@ class OrderController extends BaseController
                 'http_errors' => false,  // penting: CI4 tidak akan throw exception meski status 500
             ]);
             try {
-                $response = $client->post('http://172.23.39.117/KHTEXT/public/api/saveFlowProses', [
+                $response = $client->post('http://172.23.44.14/KHTEXT/public/api/saveFlowProses', [
                     'json'        => $payload,
                     'http_errors' => false,   // supaya tidak otomatis throw
                 ]);
@@ -2602,23 +2605,43 @@ class OrderController extends BaseController
             $body   = (string) $response->getBody();    // isi JSON error atau success
 
             if ($status !== 200) {
-                log_message('error', "FlowProses import gagal: HTTP $status — $body");
-                $errors[] = [
+                $decoded = json_decode($body, true);
+                $errorMsg = $decoded['errors']
+                    ?? $decoded['error']
+                    ?? 'Unknown API error';
+
+                $notMatched[] = [
                     'row'    => $idx + 2,
-                    'status' => $body,
+                    'reason' => $errorMsg,
                 ];
                 continue;
             }
 
+
             $insertCount++;
         }
+
         // 6) Kembalikan ringkasan
-        return redirect()->back()->with('success', 'Flow proses berhasil diimpor')->with('importSummary', [
-            'status'     => 'done',
+        $summary = [
             'inserted'   => $insertCount,
             'notMatched' => $notMatched,
             'errors'     => $errors,
-        ]);
+        ];
+
+        if ($insertCount > 0) {
+            $flashType = 'success';
+            $message   = 'Flow proses berhasil diimpor';
+            $summary['status'] = 'done';
+        } else {
+            $flashType = 'error';
+            // key 'error' nanti bisa dipakai di view untuk alert-danger
+            $message   = 'Import Gagal! Tidak ada data yang berhasil di-insert.';
+            $summary['status'] = 'fail';
+        }
+
+        return redirect()->back()
+            ->with($flashType, $message)
+            ->with('importSummary', $summary);
     }
 
 

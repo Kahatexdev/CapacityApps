@@ -41,9 +41,37 @@
                                 ?>
                             </p>
                         <?php endif; ?>
+
+                        <!-- Not Matched -->
+                        <?php if (! empty($notMatched)): ?>
+                            <p>Tidak Cocok:</p>
+                            <ul class="mb-0">
+                                <?php foreach ($notMatched as $item): ?>
+                                    <li>
+                                        Row <?= esc($item['row']) ?>: <?= esc($item['reason']) ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+
+                        <!-- Errors -->
+                        <?php if (! empty($errors)): ?>
+                            <p>Errors:</p>
+                            <ul class="mb-0">
+                                <?php foreach ($errors as $err): ?>
+                                    <li>
+                                        Row <?= esc($err['row']) ?>: <?= esc($err['status']) ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 <?php endif; ?>
+
+
+
             </div>
         </div>
     </div>
