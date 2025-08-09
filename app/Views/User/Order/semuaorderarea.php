@@ -87,6 +87,7 @@
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Shipment</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Order</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa Order</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Status Planning</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
                                     </tr>
                                 </thead>
@@ -104,6 +105,7 @@
                                             <td class="text-xs"><?= $order->delivery; ?></td>
                                             <td class="text-xs"><?= $order->qty; ?></td>
                                             <td class="text-xs"><?= $order->sisa; ?></td>
+                                            <td class="text-xs"><?= $order->status_plan; ?></td>
                                             <td class="text-xs">
                                                 <?php if ($order->qty === null) : ?>
                                                     <!-- If qty is null, set action to Import -->

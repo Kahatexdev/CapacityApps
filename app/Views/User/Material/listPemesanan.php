@@ -216,8 +216,8 @@
                                                     'Saturday' => [
                                                         'BENANG'  => [$tomorrow  => '23:30:00'],
                                                         'NYLON'   => [$tomorrow => '23:30:00'],
-                                                        'SPANDEX' => [$threeDays => '00:00:00'],
-                                                        'KARET'   => [$threeDays => '00:00:00']
+                                                        'SPANDEX' => "LOCKED",
+                                                        'KARET'   => "LOCKED"
                                                     ],
                                                     'default' => [
                                                         'BENANG'  => [$tomorrow => '23:30:00'],

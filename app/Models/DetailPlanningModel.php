@@ -113,7 +113,7 @@ class DetailPlanningModel extends Model
         return $this->select('detail_planning.model, ap.delivery, ap.qty, ap.sisa, detail_planning.id_detail_pln, detail_planning.id_pln_mc, detail_planning.smv, ep.id_est_qty, ep.hari, ep.precentage_target, ep.delivery2, tp.start_date, tp.stop_date')
             // Subquery untuk apsperstyle, dengan SUM untuk qty dan sisa
             ->join('(SELECT mastermodel, delivery, SUM(qty) AS qty, SUM(sisa) AS sisa FROM apsperstyle GROUP BY mastermodel, delivery) ap', 'ap.mastermodel = detail_planning.model', 'right')
-            // Subquery untuk estimated_planning
+            // Subquery untuk estimated_
             ->join('(SELECT id_detail_pln, id_est_qty, hari, precentage_target, delivery AS delivery2 FROM estimated_planning GROUP BY id_est_qty) ep', 'ep.id_detail_pln = detail_planning.id_detail_pln AND ep.delivery2 = ap.delivery', 'left')
             // Join dengan tanggal_planning
             ->join('(SELECT id_est_qty, MIN(date) AS start_date, MAX(date) AS stop_date FROM tanggal_planning GROUP BY id_est_qty) tp', 'tp.id_est_qty = ep.id_est_qty', 'left')
@@ -158,5 +158,14 @@ class DetailPlanningModel extends Model
         return $this->select('id_detail_pln')
             ->where('id_pln_mc', $idPlan)
             ->findAll();
+    }
+    public function getStatusPlanning($area, $noModel, $jarum)
+    {
+        return $this->select('detail_planning.status')
+            ->join('kebutuhan_area', 'kebutuhan_area.id_pln_mc=detail_planning.id_pln_mc', 'left')
+            ->where('kebutuhan_area.area', $area)
+            ->where('detail_planning.model', $noModel)
+            ->where('detail_planning.jarum', $jarum)
+            ->first();
     }
 }
