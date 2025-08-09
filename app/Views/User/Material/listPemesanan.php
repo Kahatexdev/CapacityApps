@@ -214,8 +214,8 @@
                                                         'KARET'   => [$threeDays => '23:30:00']
                                                     ],
                                                     'Saturday' => [
-                                                        'BENANG'  => [$twoDays  => '23:30:00'],
-                                                        'NYLON'   => [$twoDays => '23:30:00'],
+                                                        'BENANG'  => [$tomorrow  => '23:30:00'],
+                                                        'NYLON'   => [$tomorrow => '23:30:00'],
                                                         'SPANDEX' => [$threeDays => '00:00:00'],
                                                         'KARET'   => [$threeDays => '00:00:00']
                                                     ],
