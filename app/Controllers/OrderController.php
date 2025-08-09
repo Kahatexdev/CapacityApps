@@ -21,6 +21,7 @@ use App\Models\DataCancelOrderModel;
 use App\Models\EstSpkModel;
 use App\Models\HistoryRevisiModel;
 use App\Models\BsModel;
+use App\Models\DetailPlanningModel;
 use CodeIgniter\HTTP\Exceptions\HTTPException;
 use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\CURLRequest;
@@ -42,6 +43,7 @@ class OrderController extends BaseController
     protected $estspk;
     protected $historyRev;
     protected $bsModel;
+    protected $DetailPlanningModel;
     protected $stokPdk;
     protected $curl;
 
@@ -60,6 +62,7 @@ class OrderController extends BaseController
         $this->estspk = new EstSpkModel();
         $this->historyRev = new HistoryRevisiModel();
         $this->bsModel = new BsModel();
+        $this->DetailPlanningModel = new DetailPlanningModel();
         $this->stokPdk = new StockPdk();
 
         if ($this->filters   = ['role' => ['capacity',  'planning', 'aps', 'god']] != session()->get('role')) {
@@ -427,6 +430,11 @@ class OrderController extends BaseController
     public function DetailOrderPerAreaPlan($area)
     {
         $tampilperdelivery = $this->orderModel->tampilPerarea($area);
+        foreach ($tampilperdelivery as &$id) {
+            $statusPlan = $this->DetailPlanningModel->getStatusPlanning($area, $id->mastermodel, $id->machinetypeid);
+            $id->status_plan = ($statusPlan && $statusPlan['status'] === 'aktif') ? 'Planned' : '';
+        }
+
         $product = $this->productModel->findAll();
         $booking = $data = [
             'role' => session()->get('role'),

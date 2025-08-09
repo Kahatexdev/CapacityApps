@@ -123,9 +123,9 @@
                 <div class="col-lg-4 col-sm-12 d-flex gap-2">
                     <button class="btn btn-info flex-grow-1" id="filter_data"><i class="fas fa-search"></i> Cari</button>
                     <button class="btn btn-secondary flex-grow-1" id="reset_data"><i class="fas fa-redo"></i> Reset</button>
-                    <button type="button" class="btn btn-success flex-grow-1" id="export_excel">
+                    <!-- <button type="button" class="btn btn-success flex-grow-1" id="export_excel">
                         <i class="fas fa-file-excel"></i> Excel
-                    </button>
+                    </button> -->
 
                 </div>
             </div>
@@ -163,7 +163,7 @@
                             output += `
                             <div class="result-card">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h5 class="badge bg-info">Cluster: ${item.nama_cluster} | No Model: ${item.no_model}</h5>
+                                    <h5 class="badge bg-info">No Model: ${item.no_model}</h5>
                                     <span class="badge bg-secondary">Jenis: ${item.item_type}</span>
                                 </div>
                                 <div class="row g-3">
