@@ -646,7 +646,7 @@ class MaterialController extends BaseController
                 if ($jenis == 'BENANG') {
                     $html .= '<select id="tanggal_pakai" name="tanggal_pakai" class="form-select" required>';
                     $html .= '<option value="' . $tomorrow . '">' . $tomorrow . '</option>';
-                    $html .= '<option value="' . $twoDays . '">' . $twoDays . '</option>';
+                    // $html .= '<option value="' . $twoDays . '">' . $twoDays . '</option>';
                     $html .= '</select>';
                 } elseif ($jenis == 'NYLON') {
                     $html .= '<input type="date" id="tanggal_pakai" name="tanggal_pakai" class="form-control" value="' . $tomorrow . '" required readonly>';
@@ -657,14 +657,15 @@ class MaterialController extends BaseController
 
             case 'Saturday':
                 if ($jenis == 'BENANG') {
-                    $html .= '<input type="date" id="tanggal_pakai" name="tanggal_pakai" class="form-control" value="' . $twoDays . '" required readonly>';
+                    $html .= '<input type="date" id="tanggal_pakai" name="tanggal_pakai" class="form-control" value="' . $tomorrow . '" required readonly>';
                 } elseif ($jenis == 'NYLON') {
                     $html .= '<select id="tanggal_pakai" name="tanggal_pakai" class="form-select" required>';
                     $html .= '<option value="' . $tomorrow . '">' . $tomorrow . '</option>';
-                    $html .= '<option value="' . $twoDays . '">' . $twoDays . '</option>';
+                    // $html .= '<option value="' . $twoDays . '">' . $twoDays . '</option>';
                     $html .= '</select>';
                 } elseif (in_array($jenis, ['SPANDEX', 'KARET'])) {
-                    $html .= '<input type="date" id="tanggal_pakai" name="tanggal_pakai" class="form-control" value="' . $threeDays . '" required readonly>';
+                    // $html .= '<input type="date" id="tanggal_pakai" name="tanggal_pakai" class="form-control" value="' . $threeDays . '" required readonly>';
+                    $html .= '<input type="date" id="tanggal_pakai" name="tanggal_pakai" class="form-control" value="000-00-00" required readonly>';
                 }
                 break;
 
