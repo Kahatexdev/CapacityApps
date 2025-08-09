@@ -497,7 +497,7 @@
 
             // Kirim data ke server untuk pencarian
             $.ajax({
-                url: 'http://172.23.44.14/MaterialSystem/public/api/getUpdateListPemesanan', // Ganti dengan URL endpoint
+                url: 'http://172.23.39.114/MaterialSystem/public/api/getUpdateListPemesanan', // Ganti dengan URL endpoint
                 method: 'POST',
                 data: {
                     area: area,
@@ -698,7 +698,7 @@
             });
             console.log(payload);
 
-            fetch('http://172.23.44.14/MaterialSystem/public/api/updateListPemesanan', {
+            fetch('http://172.23.39.114/MaterialSystem/public/api/updateListPemesanan', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -789,7 +789,7 @@
                 };
 
                 // Kirim data ke server menggunakan AJAX
-                fetch("http://172.23.44.14/MaterialSystem/public/api/kirimPemesanan", {
+                fetch("http://172.23.39.114/MaterialSystem/public/api/kirimPemesanan", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",

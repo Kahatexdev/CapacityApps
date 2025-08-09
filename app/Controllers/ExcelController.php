@@ -3542,7 +3542,7 @@ class ExcelController extends BaseController
     public function exportExcelRetur($area)
     {
 
-        $url = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area;
+        $url = 'http://172.23.39.114/MaterialSystem/public/api/listRetur/' . $area;
 
         $response = file_get_contents($url);
         log_message('debug', "API Response: " . $response);
@@ -3885,7 +3885,7 @@ class ExcelController extends BaseController
         $tglBuat = $this->request->getGet('tgl_buat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterPoTambahan"
+        $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/filterPoTambahan"
             . "?area=" . urlencode($area)
             . "&model=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);
@@ -5797,7 +5797,7 @@ class ExcelController extends BaseController
             //
             $order = $this->ApsPerstyleModel->getQtyArea($noModel) ?: [];
 
-            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
+            $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
             $material = @file_get_contents($apiUrl);
 
             // $models = [];
@@ -6136,7 +6136,7 @@ class ExcelController extends BaseController
         $tglBuat = $this->request->getGet('tglBuat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/listExportRetur/"
+        $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/listExportRetur/"
             . $area
             . "?noModel=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);

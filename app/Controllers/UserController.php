@@ -147,7 +147,7 @@ class UserController extends BaseController
             $month[] = date('F-Y', strtotime("first day of $i month"));
         }
 
-        $apiUrl = 'http://172.23.44.14/HumanResourceSystem/public/api/area/' . $area;
+        $apiUrl = 'http://172.23.39.114/HumanResourceSystem/public/api/area/' . $area;
 
         try {
             // Attempt to fetch the API response
@@ -302,7 +302,7 @@ class UserController extends BaseController
             $month[] = date('F-Y', strtotime("first day of $i month"));
         }
 
-        $apiUrl = 'http://172.23.44.14/HumanResourceSystem/public/api/area/' . $area;
+        $apiUrl = 'http://172.23.39.114/HumanResourceSystem/public/api/area/' . $area;
 
         try {
             // Attempt to fetch the API response
