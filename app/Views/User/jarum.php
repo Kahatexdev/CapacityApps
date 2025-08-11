@@ -136,7 +136,7 @@
 
         if (id) {
             // Panggil API menggunakan fetch
-            fetch(`http://172.23.39.117/HumanResourceSystem/public/api/karyawan/${id}`)
+            fetch(`http://172.23.44.14/HumanResourceSystem/public/api/karyawan/${id}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok ' + response.statusText);
