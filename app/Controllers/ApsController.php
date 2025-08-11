@@ -522,7 +522,7 @@ class ApsController extends BaseController
                     $maxMesin = $mc['mesin'];
                 }
             }
-            if (!$qtysisa) {
+            if (empty($qtysisa)) {
                 $this->DetailPlanningModel->delete($iddetail);
                 continue;
             } else {

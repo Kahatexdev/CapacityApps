@@ -1003,7 +1003,7 @@ class ApsPerstyleModel extends Model
             ->orderBy('delivery', 'asc')
             ->first();
 
-        return $result ?? ['qty' => 0, 'sisa' => 0];
+        return $result;
     }
     public function getQtyCancel($idaps)
     {

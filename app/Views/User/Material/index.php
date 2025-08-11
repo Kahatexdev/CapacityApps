@@ -721,6 +721,7 @@
 
             // Jika tabel tidak kosong, lanjutkan proses submit
             const formData = $(this).serializeArray();
+<<<<<<< HEAD
             console.log(invalidMachine + 'mc');
             if (invalidMachine) {
                 // Kalau ada jalan MC > 0 → simpan ke session dulu
@@ -743,6 +744,74 @@
                     },
                     error: function(xhr, status, error) {
                         Swal.fire("Error", "Gagal simpan ke session", "error");
+=======
+
+            $.ajax({
+                url: "<?= base_url($role . '/bahanBaku/simpanKeSession') ?>",
+                method: "POST",
+                data: formData,
+                success: function(response) {
+                    console.log(response);
+                    // Cek status dari Proses 1
+                    if (response.status === "success") {
+                        // Proses 2: Mengirim ke URL kedua
+                        $.ajax({
+                            url: "http://172.23.44.14/MaterialSystem/public/api/insertQtyCns",
+                            method: "POST",
+                            data: formData,
+                            success: function(secondResponse) {
+                                // Log respons server
+                                console.log("Response dari Proses 2:", secondResponse);
+
+                                // Periksa status respons dari Proses update qty cns & berat cns
+                                if (secondResponse.status === "success") {
+                                    // Kedua proses berhasil
+                                    Swal.fire({
+                                        title: "Berhasil",
+                                        text: "Data berhasil diupdate & disimpan ke list pemesanan.",
+                                        icon: "success",
+                                        // showConfirmButton: true,
+                                    }).then(() => {
+                                        location.reload(); // Refresh halaman setelah alert selesai
+                                    });
+                                } else if (secondResponse.status === "warning") {
+                                    // Proses 2 gagal
+                                    Swal.fire({
+                                        title: secondResponse.title,
+                                        text: secondResponse.message,
+                                        icon: secondResponse.status,
+                                        showConfirmButton: true,
+                                    });
+                                } else {
+                                    // Proses 2 gagal
+                                    Swal.fire({
+                                        title: "Error",
+                                        text: secondResponse.message || "Gagal update qty cns.",
+                                        icon: "error",
+                                        showConfirmButton: true,
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error(`AJAX Error: ${xhr.status} ${xhr.statusText}`);
+                                console.error("<?= $role ?>");
+                                Swal.fire({
+                                    title: "Gagal!",
+                                    text: "Gagal menyimpan data",
+                                    icon: "error",
+                                    confirmButtonText: "OK"
+                                });
+                            }
+                        });
+                    } else {
+                        // Proses 1 gagal
+                        Swal.fire({
+                            title: response.title,
+                            text: response.message || "Gagal menyimpan list pemesanan.",
+                            icon: "error",
+                            showConfirmButton: true,
+                        });
+>>>>>>> cc2e2a8651c3fbb3b34abc3933c4a25c54c3451e
                     }
                 });
             } else {
