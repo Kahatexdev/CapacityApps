@@ -1543,7 +1543,7 @@ class ProduksiController extends BaseController
         // Ambil data karyawan dari API
         foreach ($uniqueOperators as $operatorName) {
             $operatorEncoded = urlencode($operatorName);
-            $apiUrl = "http://172.23.44.14/HumanResourceSystem/public/api/getdataforbs/{$area}/{$operatorEncoded}";
+            $apiUrl = "http://172.23.39.117/HumanResourceSystem/public/api/getdataforbs/{$area}/{$operatorEncoded}";
             $response = @file_get_contents($apiUrl);
             log_message('debug', "Response API untuk operator '{$operatorName}': {$response}");
 

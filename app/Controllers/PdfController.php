@@ -87,7 +87,7 @@ class PdfController extends BaseController
         $tglBuat = $this->request->getGet('tgl_buat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterPoTambahan"
+        $apiUrl = "http://172.23.39.117/MaterialSystem/public/api/filterPoTambahan"
             . "?area=" . urlencode($area)
             . "&model=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);
@@ -724,7 +724,7 @@ class PdfController extends BaseController
     public function exportPemesanan($jenis, $area, $tgl_pakai)
     {
         // Ambil data berdasarkan area dan model
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/dataPemesananArea"
+        $apiUrl = "http://172.23.39.117/MaterialSystem/public/api/dataPemesananArea"
             . "?jenis=" . urlencode($jenis)
             . "&area=" . urlencode($area)
             . "&tgl_pakai=" . urlencode($tgl_pakai);
@@ -972,7 +972,7 @@ class PdfController extends BaseController
         $tglBuat = $this->request->getGet('tglBuat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/listExportRetur/"
+        $apiUrl = "http://172.23.39.117/MaterialSystem/public/api/listExportRetur/"
             . $area
             . "?noModel=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);
