@@ -472,37 +472,63 @@ class MaterialController extends BaseController
             'message' => 'Tidak ada data yang ditemukan atau dihapus'
         ]);
     }
+    private function fetchApiData(string $url)
+    {
+        try {
+            $response = @file_get_contents($url);
+            if ($response === false) {
+                throw new \Exception("Error fetching data from $url");
+            }
+            $data = json_decode($response, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception("Invalid JSON response from $url");
+            }
+            return $data;
+        } catch (\Exception $e) {
+            log_message('error', $e->getMessage());
+            return null;
+        }
+    }
+
     public function listPemesanan($area)
     {
-        function fetchApiData($url)
-        {
-            try {
-                $response = file_get_contents($url);
-                if ($response === false) {
-                    throw new \Exception("Error fetching data from $url");
-                }
-                $data = json_decode($response, true);
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    throw new \Exception("Invalid JSON response from $url");
-                }
-                return $data;
-            } catch (\Exception $e) {
-                error_log($e->getMessage());
-                return null;
-            }
-        }
+        // ambil filter dari query string (jika ada)
+        $tglPakai = $this->request->getGet('tgl_pakai');
+        $pdk      = $this->request->getGet('searchPdk');
 
-        $dataList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listPemesanan/$area");
-        if (!is_array($dataList)) {
-            die('Error: Invalid response format for listPemesanan API.');
+        $rawList = $this->fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listPemesanan/{$area}");
+        if (!is_array($rawList)) {
+            // handle error dengan baik
+            return redirect()->back()->with('error', 'Gagal mengambil data pemesanan.');
         }
+        // Filter RAW data dulu (mengurangi jumlah panggilan API untuk enrichment)
+        $filteredRaw = array_filter($rawList, function ($order) use ($tglPakai, $pdk) {
+            // jika kedua filter diberikan -> cari yang memenuhi KEDUA kondisi
+            if ($tglPakai && $pdk) {
+                return (isset($order['tgl_pakai']) && $order['tgl_pakai'] === $tglPakai)
+                    && (isset($order['no_model']) && stripos($order['no_model'], $pdk) !== false);
+            }
+            // jika hanya tglPakai
+            if ($tglPakai) {
+                return isset($order['tgl_pakai']) && $order['tgl_pakai'] === $tglPakai;
+            }
+            // jika hanya pdk/no_model (support partial search)
+            if ($pdk) {
+                return isset($order['no_model']) && stripos($order['no_model'], $pdk) !== false;
+            }
+            // jika tidak ada filter -> tampilkan semua
+            return true;
+        });
+
+        // reindex array
+        $dataList = array_values($filteredRaw);
 
         foreach ($dataList as $key => $order) {
             $dataList[$key]['ttl_kebutuhan_bb'] = 0;
             if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
                 $styleApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model='
                     . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
-                $styleList = fetchApiData($styleApiUrl);
+                $styleList = $this->fetchApiData($styleApiUrl);
 
                 if ($styleList) {
                     $totalRequirement = 0;
@@ -511,7 +537,7 @@ class MaterialController extends BaseController
                             $orderQty = $this->ApsPerstyleModel->getQtyOrder($style['no_model'], $style['style_size'], $area);
                             $tambahanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getKgTambahan?no_model='
                                 . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&style_size=' . urlencode($style['style_size']) . '&area=' . $area;
-                            $tambahan = fetchApiData($tambahanApiUrl);
+                            $tambahan = $this->fetchApiData($tambahanApiUrl);
                             $kgPoTambahan = $tambahan['ttl_keb_potambahan'] ?? 0;
                             log_message('info', 'inii :' . $kgPoTambahan);
                             if (isset($orderQty['qty'])) {
@@ -526,7 +552,7 @@ class MaterialController extends BaseController
 
                 $pengirimanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
                     . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
-                $pengiriman = fetchApiData($pengirimanApiUrl);
+                $pengiriman = $this->fetchApiData($pengirimanApiUrl);
                 $dataList[$key]['ttl_pengiriman'] = $pengiriman['kgs_out'] ?? 0;
 
                 // Hitung sisa jatah
@@ -584,10 +610,13 @@ class MaterialController extends BaseController
             'twoDays' => $twoDays,
             'threeDays' => $threeDays,
             'fourDays' => $fourDays,
+            'filter_tgl' => $tglPakai,
+            'filter_pdk' => $pdk,
         ];
 
         return view(session()->get('role') . '/Material/listPemesanan', $data);
     }
+
     public function stockBahanBaku($area)
     {
         $data = [
