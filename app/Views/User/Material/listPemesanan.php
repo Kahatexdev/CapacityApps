@@ -204,18 +204,18 @@
                                                     'Thursday' => [
                                                         'BENANG'  => [$tomorrow => '23:30:00'],
                                                         'NYLON'   => [$tomorrow => '23:30:00'],
-                                                        'SPANDEX' => [$twoDays  => '23:30:00', $fourDays => '24:00:00'],
-                                                        'KARET'   => [$twoDays  => '23:30:00', $fourDays => '24:00:00']
+                                                        'SPANDEX' => [$twoDays  => '23:30:00', $threeDays => '24:00:00'],
+                                                        'KARET'   => [$twoDays  => '23:30:00', $threeDays => '24:00:00']
                                                     ],
                                                     'Friday' => [
                                                         'BENANG'  => [$tomorrow => '23:30:00'],
                                                         'NYLON'   => [$tomorrow => '23:30:00'],
-                                                        'SPANDEX' => [$fourDays => '23:30:00'],
-                                                        'KARET'   => [$fourDays => '23:30:00']
+                                                        'SPANDEX' => [$threeDays => '23:30:00'],
+                                                        'KARET'   => [$threeDays => '23:30:00']
                                                     ],
                                                     'Saturday' => [
-                                                        'BENANG'  => [$threeDays  => '23:30:00'],
-                                                        'NYLON'   => [$threeDays => '23:30:00'],
+                                                        'BENANG'  => [$tomorrow  => '23:30:00'],
+                                                        'NYLON'   => [$tomorrow => '23:30:00'],
                                                         'SPANDEX' => [$threeDays => '00:00:00'],
                                                         'KARET'   => [$threeDays => '00:00:00']
                                                     ],

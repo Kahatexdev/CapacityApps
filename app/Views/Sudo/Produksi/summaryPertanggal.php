@@ -111,7 +111,8 @@
                                         // Pastikan $id['running'] tidak bernilai nol sebelum dibagi
                                         $rata2 = (is_numeric($id['ttl_jlmc']) && is_numeric($id['running']) && $id['running'] != 0) ? number_format($id['ttl_jlmc'] / $id['running'], 0) : 0;
                                         $target_normal_socks = 14;
-                                        $hitung_day_stop = (is_numeric($rata2) && $rata2 != 0) ? ($id['sisa'] / 24) / ($rata2 * $target_normal_socks) : 0;
+                                        $divider = ($id['machinetypeid'] === '240N') ? 12 : 24;
+                                        $hitung_day_stop = (is_numeric($rata2) && $rata2 != 0) ? ($id['sisa'] / $divider) / ($rata2 * $target_normal_socks) : 0;
                                         $day_stop = ($id['max_delivery'] > $today && $id['sisa'] > 0 && $rata2 != 0) ? date('Y-m-d', strtotime($today . ' + ' . round($hitung_day_stop) . ' days')) : '';
 
                                         $ttl_rata2 += is_numeric($rata2) ? $rata2 : 0;
@@ -122,10 +123,10 @@
                                             <td class="text-sm"><?= $id['mastermodel']; ?></td>
                                             <td class="text-sm"><?= $id['inisial']; ?></td>
                                             <td class="text-sm"><?= $id['size']; ?></td>
-                                            <td class="text-sm" style="text-align: center;"><?= number_format($id['qty'] / 24, 2); ?></td>
-                                            <td class="text-sm" style="text-align: center;"><?= number_format($id['plus_packing'] / 24, 2); ?></td>
-                                            <td class="text-sm" style="text-align: center;"><?= number_format($id['qty_produksi'] / 24, 2); ?></td>
-                                            <td class="text-sm" style="text-align: center;"><?= number_format($id['sisa'] / 24, 2); ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= number_format($id['qty'] / $divider, 2); ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= number_format($id['plus_packing'] / $divider, 2); ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= number_format($id['qty_produksi'] / $divider, 2); ?></td>
+                                            <td class="text-sm" style="text-align: center;"><?= number_format($id['sisa'] / $divider, 2); ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= is_numeric($rata2) ? number_format((float)$rata2, 0) : '0'; ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= $id['running']; ?></td>
                                             <td class="text-sm" style="text-align: center;"><?= $day_stop ?></td>
@@ -146,7 +147,7 @@
                                                 $totalProdPerModel[$tgl_produksi2] += $qty_produksi;
                                                 $totalJlMcPerModel[$tgl_produksi2] += $jl_mc;
                                                 ?>
-                                                <td class="text-sm" style="text-align: center;"><?= number_format($qty_produksi / 24, 2); ?></td>
+                                                <td class="text-sm" style="text-align: center;"><?= number_format($qty_produksi / $divider, 2); ?></td>
                                                 <td class="text-sm" style="text-align: center;"><?= $jl_mc; ?></td>
                                             <?php endforeach; ?>
                                         </tr>
@@ -154,15 +155,15 @@
                                             <tr>
                                                 <th colspan="4" style="text-align: center;">Total <?= $id['mastermodel'] ?></th>
                                                 <th style="text-align: right;">:</th>
-                                                <th style="text-align: center;"><?= number_format($ttl_qty / 24, 2); ?></th>
-                                                <th style="text-align: center;"><?= number_format($ttl_qty_plus / 24, 2); ?></th>
-                                                <th style="text-align: center;"><?= number_format($ttl_prod / 24, 2); ?></th>
-                                                <th style="text-align: center;"><?= number_format($ttl_sisa / 24, 2); ?></th>
+                                                <th style="text-align: center;"><?= number_format($ttl_qty / $divider, 2); ?></th>
+                                                <th style="text-align: center;"><?= number_format($ttl_qty_plus / $divider, 2); ?></th>
+                                                <th style="text-align: center;"><?= number_format($ttl_prod / $divider, 2); ?></th>
+                                                <th style="text-align: center;"><?= number_format($ttl_sisa / $divider, 2); ?></th>
                                                 <th style="text-align: center;"><?= number_format($ttl_rata2, 0); ?></th>
                                                 <th style="text-align: center;"></th>
                                                 <th style="text-align: center;"></th>
                                                 <?php foreach ($tglProdUnik as $tgl_produksi) : ?>
-                                                    <th style="text-align: center;"><?= number_format($totalProdPerModel[$tgl_produksi] / 24, 2); ?></th>
+                                                    <th style="text-align: center;"><?= number_format($totalProdPerModel[$tgl_produksi] / $divider, 2); ?></th>
                                                     <th style="text-align: center;"><?= $totalJlMcPerModel[$tgl_produksi]; ?></th>
                                                 <?php endforeach; ?>
                                             </tr>

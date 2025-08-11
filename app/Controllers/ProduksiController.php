@@ -789,6 +789,7 @@ class ProduksiController extends BaseController
 
         $totalShip = $this->orderModel->getTotalShipment($data);
         $totalProd = $this->orderModel->getdataSummaryPertgl($data);
+        // dd($totalProd);
         // Debugging to check if $totalShip is an array
         if (!is_array($totalShip)) {
             echo "Error: totalShip is not an array!";

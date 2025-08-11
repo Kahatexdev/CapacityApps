@@ -329,7 +329,7 @@ class OrderModel extends Model
         // Subquery untuk data_bs
         $builderBs = $this->db->table('data_bs');
         $subqueryBs = $builderBs
-            ->select('apsperstyle.idapsperstyle, SUM(data_bs.qty) AS bs_prod')
+            ->select('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.size, SUM(data_bs.qty) AS bs_prod')
             ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle', 'left')
             ->groupBy('apsperstyle.machinetypeid')
             ->groupBy('apsperstyle.mastermodel')
@@ -349,9 +349,10 @@ class OrderModel extends Model
 
         // Main query
         $mainQuery = $this->db->table('(' . $subquery1 . ') AS subquery')
-            ->select('subquery.kd_buyer_order, subquery.no_order, subquery.smv, subquery.idapsperstyle, subquery.machinetypeid, subquery.mastermodel, subquery.inisial, subquery.size, subquery.qty, subquery.sisa,  COALESCE(subquery.plus_packing, 0) AS plus_packing, COALESCE(produksi_subquery.running, 0) AS running, produksi_subquery.start_mc, subquery.max_delivery, COALESCE(produksi_subquery.qty_produksi, 0) AS qty_produksi, COALESCE(bs_prod_subquery.bs_prod, 0) AS bs_prod, COALESCE(produksi_subquery.jl_mc, 0) AS jl_mc, produksi_subquery.area')
+            ->select('subquery.kd_buyer_order, subquery.no_order, subquery.smv, subquery.machinetypeid, subquery.mastermodel, subquery.inisial, subquery.size, subquery.qty, subquery.sisa,  COALESCE(subquery.plus_packing, 0) AS plus_packing, COALESCE(produksi_subquery.running, 0) AS running, produksi_subquery.start_mc, subquery.max_delivery, COALESCE(produksi_subquery.qty_produksi, 0) AS qty_produksi, COALESCE(bs_prod_subquery.bs_prod, 0) AS bs_prod, COALESCE(produksi_subquery.jl_mc, 0) AS jl_mc, produksi_subquery.area')
             ->join('(' . $subquery2 . ') AS produksi_subquery', 'subquery.machinetypeid = produksi_subquery.machinetypeid AND subquery.mastermodel = produksi_subquery.mastermodel AND subquery.size = produksi_subquery.size', 'left')
-            ->join('(' . $subqueryBs . ') AS bs_prod_subquery', 'subquery.idapsperstyle = bs_prod_subquery.idapsperstyle', 'left');
+            ->join('(' . $subqueryBs . ') AS bs_prod_subquery', 'subquery.machinetypeid = bs_prod_subquery.machinetypeid AND subquery.mastermodel = bs_prod_subquery.mastermodel AND subquery.size = bs_prod_subquery.size', 'left');
+
         if (!empty($data['buyer'])) {
             $mainQuery->where('subquery.kd_buyer_order', $data['buyer']);
         }
@@ -361,7 +362,8 @@ class OrderModel extends Model
         if (!empty($data['jarum'])) {
             $mainQuery->like('subquery.machinetypeid', $data['jarum']);
         }
-        $mainQuery->groupBy('subquery.machinetypeid, subquery.mastermodel, subquery.size')
+        $mainQuery
+            ->groupBy('subquery.machinetypeid, subquery.mastermodel, subquery.size')
             ->orderBy('area, subquery.machinetypeid, subquery.mastermodel, subquery.size', 'ASC');
 
         return $mainQuery->get()->getResultArray();

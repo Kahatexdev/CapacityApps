@@ -1003,7 +1003,7 @@ class ApsPerstyleModel extends Model
             ->orderBy('delivery', 'asc')
             ->first();
 
-        return $result ?? ['qty' => 0, 'sisa' => 0];
+        return $result;
     }
     public function getQtyCancel($idaps)
     {
@@ -1170,7 +1170,7 @@ class ApsPerstyleModel extends Model
     }
     public function getSisaPerSize($area, $nomodel, $size)
     {
-        return $this->select('sum(sisa) as sisa')
+        return $this->select('sum(sisa) as sisa, sum(po_plus) as po_plus')
             ->where('factory', $area)
             ->where('mastermodel', $nomodel)
             ->whereIn('size', $size)
