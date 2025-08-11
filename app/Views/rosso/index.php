@@ -875,7 +875,7 @@
                 const resData = await response.json();
                 const selected = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked')).map(checkbox => checkbox.value);
                 if (response.ok) {
-                    fetch(`${BASE_URL}bahanBaku/hapusSession`, {
+                    fetch(`${BASE_URL}rosso/bahanBaku/hapusSession`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -893,13 +893,13 @@
                                         title: 'Success!',
                                         text: resData.message
                                     })
-                                    .then(() => window.location.href = `${BASE_URL}user/bahanBaku`);
+                                    .then(() => window.location.href = `${BASE_URL}rosso`);
                             } else {
                                 Swal.fire({
                                     icon: 'warning',
                                     title: 'Warning!',
                                     text: 'Data berhasil disimpan, tetapi session gagal dihapus.',
-                                }).then(() => window.location.href = `${BASE_URL}user/bahanBaku`);
+                                }).then(() => window.location.href = `${BASE_URL}rosso`);
                             }
                         })
                         .catch(error => {
