@@ -1,6 +1,45 @@
 <?php $this->extend($role . '/layout'); ?>
 
 <?php $this->section('content'); ?>
+
+<style>
+    .table-wrapper {
+        overflow-x: auto;
+        position: relative;
+    }
+
+    /* Freeze header */
+    .table-freeze thead th {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 2;
+    }
+
+    /* Freeze kolom */
+    .sticky-col {
+        position: sticky;
+        left: 0;
+        background: white;
+        z-index: 3;
+    }
+
+    .sticky-col-2 {
+        position: sticky;
+        left: 100px;
+        /* width kolom pertama */
+        background: white;
+        z-index: 3;
+    }
+
+    .sticky-col-3 {
+        position: sticky;
+        left: 200px;
+        /* width kolom pertama + kedua */
+        background: white;
+        z-index: 3;
+    }
+</style>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
         <script>
@@ -117,25 +156,31 @@
                     <div class="card">
                         <div class="card-body p-3">
                             <div class="row d-flex align-items-center justify-content-center">
+                              <div class="col-3 d-flex flex-column align-items-center">
+                                    <div class="numbers text-center">
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">No Model</p>
+                                        <h5 class="font-weight-bolder mb-0">${data['master']['no_model'] ?? '-' }</h5>
+                                    </div>
+                                </div>
                                 <div class="col-3 d-flex flex-column align-items-center">
                                     <div class="numbers text-center">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">Buyer</p>
                                         <h5 class="font-weight-bolder mb-0">${data['master']['kd_buyer_order']}</h5>
                                     </div>
                                 </div>
-                                <div class="col-3 d-flex flex-column align-items-center">
+                                <div class="col-2 d-flex flex-column align-items-center">
                                     <div class="numbers text-center">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">Delivery Awal</p>
                                         <h5 class="font-weight-bolder mb-0">${data['master']['delivery_awal']}</h5>
                                     </div>
                                 </div>
-                                <div class="col-3 d-flex flex-column align-items-center">
+                                <div class="col-2 d-flex flex-column align-items-center">
                                     <div class="numbers text-center">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">Delivery Akhir</p>
                                         <h5 class="font-weight-bolder mb-0">${data['master']['delivery_akhir']}</h5>
                                     </div>
                                 </div>
-                                <div class="col-3 d-flex flex-column align-items-center">
+                              <div class="col-2 d-flex flex-column align-items-center">
                                     <div class="numbers text-center">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">Start MC</p>
                                         <h5 class="font-weight-bolder mb-0">${data['master']['start_mc'] ?? '-' }</h5>
@@ -148,127 +193,133 @@
             </div>
         `;
 
-        let htmlCelup = `
-        <div class="card-body">
-<h5 class="mt-4">🧪 Status CELUP (Benang & Nylon)</h5>
-<table class="table table-bordered table-striped table-sm">
-    <thead class="table-light">
-        <tr>
-            <th>Jenis</th>
-            <th>Kode Warna</th>
-            <th>Warna</th>
-            <th>Status Celup</th>
-            <th>Qty PO</th>
-            <th>Qty Celup</th>
-            <th>Lot Celup</th>
-            <th>Tgl Schedule</th>
-            <th>Tgl Bon</th>
-            <th>Tgl Celup</th>
-            <th>Tgl Bongkar</th>
-            <th>Tgl Press/Oven</th>
-            <th>Tgl TL</th>
-            <th>Tgl Rajut Pagi</th>
-            <th>Serah Terima ACC</th>
-            <th>Tgl ACC KK</th>
-            <th>Tgl Kelos</th>
-            <th>Tgl Reject KK</th>
-            <th>Tgl Matching</th>
-            <th>Tgl Perbaikan</th>
-            <th>Ket Daily Cek</th>
-            <th>Stock Gbn (Kg)</th>
-        </tr>
-    </thead>
-    <tbody>
-    </div>
+        let htmlCelupHeader = `
+<div class="row my-4">
+    <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+        <div class="card">
+            <div class="card-body p-3">
+                <h5 class="mt-4">🧪 Status CELUP (Benang & Nylon)</h5>
+                <div class="table-wrapper" style="overflow-x:auto;">
+                    <table class="table table-bordered table-striped table-sm table-freeze">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="sticky-col">Jenis</th>
+                                <th class="sticky-col-2">Kode Warna</th>
+                                <th class="sticky-col-3">Warna</th>
+                                <th>Status Celup</th>
+                                <th>Qty PO</th>
+                                <th>Qty Celup</th>
+                                <th>Lot Celup</th>
+                                <th>Tgl Schedule</th>
+                                <th>Tgl Bon</th>
+                                <th>Tgl Celup</th>
+                                <th>Tgl Bongkar</th>
+                                <th>Tgl Press/Oven</th>
+                                <th>Tgl TL</th>
+                                <th>Tgl Rajut Pagi</th>
+                                <th>Serah Terima ACC</th>
+                                <th>Tgl ACC KK</th>
+                                <th>Tgl Kelos</th>
+                                <th>Tgl Reject KK</th>
+                                <th>Tgl Matching</th>
+                                <th>Tgl Perbaikan</th>
+                                <th>Ket Daily Cek</th>
+                                <th>Stock Gbn (Kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 `;
 
-        let htmlCovering = `
-        <div class="card-body">
-<h5 class="mt-4">🧵 Status COVERING (Spandex & Karet)</h5>
-<table class="table table-bordered table-striped table-sm">
-    <thead class="table-light">
-        <tr>
-            <th>Model</th>
-            <th>Jenis</th>
-            <th>Kode Warna</th>
-            <th>Warna</th>
-            <th>Status Covering</th>
-            <th>Keterangan</th>
-        </tr>
-    </thead>
-    <tbody>
-    </div>
+        let htmlCelupBody = "";
+
+        let htmlCoveringHeader = `
+<div class="row my-4">
+    <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+        <div class="card">
+            <div class="card-body p-3">
+                <h5 class="mt-4">🧵 Status COVERING (Spandex & Karet)</h5>
+                <div class="table-wrapper" style="overflow-x:auto;">
+                    <table class="table table-bordered table-striped table-sm table-freeze">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="sticky-col">Model</th>
+                                <th class="sticky-col-2">Jenis</th>
+                                <th class="sticky-col-3">Kode Warna</th>
+                                <th>Warna</th>
+                                <th>Status Covering</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 `;
 
+        let htmlCoveringBody = "";
+
+        // Loop data
         dataStatus.forEach(item => {
-            let statusClasses = {
+            const statusClasses = {
                 'done': 'bg-gradient-success text-white',
                 'retur': 'bg-gradient-warning text-dark',
             };
 
-            let statusClass = statusClasses[item.last_status] || 'bg-gradient-info text-white';
-            let statusCov = statusClasses[item.status] || 'bg-gradient-info text-white';
+            const statusClass = statusClasses[item?.last_status] || 'bg-gradient-info text-white';
+            const statusCov = statusClasses[item?.status] || 'bg-gradient-info text-white';
 
-            let keteranganBadge = '';
-            if (item.keterangan) {
-                item.keterangan.split(',').forEach(ket => {
-                    keteranganBadge += `<div>${ket.trim()}</div>`;
-                });
-            } else {
-                keteranganBadge = '-';
-            }
+            const keteranganBadge = item?.keterangan ?
+                item.keterangan.split(',').map(ket => `<div>${ket.trim()}</div>`).join('') :
+                '-';
 
-            let jenis = (item.jenis || '').toUpperCase();
+            const jenis = (item?.jenis || '').toUpperCase();
 
             if (['BENANG', 'NYLON'].includes(jenis)) {
-                htmlCelup += `
-            <tr>
-                <td>${item.item_type}</td>
-                <td>${item.kode_warna}</td>
-                <td>${item.color}</td>
-                <td><span class="badge ${statusClass} px-3 py-2">${item.last_status || '-'}</span></td>
-                <td>${parseFloat(item.qty_po).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</td>
-                <td>${parseFloat(item.kg_celup).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</td>
-                <td>${item.lot_celup || '-'}</td>
-                <td>${formatDate(item.tanggal_schedule)}</td>
-                <td>${formatDate(item.tanggal_bon)}</td>
-                <td>${formatDate(item.tanggal_celup)}</td>
-                <td>${formatDate(item.tanggal_bongkar)}</td>
-                <td>${formatDate(item.tanggal_press_oven)}</td>
-                <td>${formatDate(item.tanggal_tl)}</td>
-                <td>${formatDate(item.tanggal_rajut_pagi)}</td>
-                <td>${formatDate(item.serah_terima_acc)}</td>
-                <td>${formatDate(item.tanggal_acc)}</td>
-                <td>${formatDate(item.tanggal_kelos)}</td>
-                <td>${formatDate(item.tanggal_reject)}</td>
-                <td>${formatDate(item.tanggal_matching)}</td>
-                <td>${formatDate(item.tanggal_perbaikan)}</td>
-                <td>${item.ket_daily_cek || '-'}</td>
-                <td>${parseFloat(item.kg_stock).toLocaleString('id-ID', { minimumFractionDigits: 2 }) || '-'}</td>
-            </tr>
-        `;
+                htmlCelupBody += `
+<tr>
+    <td>${item.item_type}</td>
+    <td>${item.kode_warna}</td>
+    <td>${item.color}</td>
+    <td><span class="badge ${statusClass} px-3 py-2">${item.last_status || '-'}</span></td>
+    <td class="text-end">${formatNumber(item.qty_po)}</td>
+    <td class="text-end">${formatNumber(item.kg_celup)}</td>
+    <td>${item.lot_celup || '-'}</td>
+    <td>${formatDate(item.tanggal_schedule)}</td>
+    <td>${formatDate(item.tanggal_bon)}</td>
+    <td>${formatDate(item.tanggal_celup)}</td>
+    <td>${formatDate(item.tanggal_bongkar)}</td>
+    <td>${formatDate(item.tanggal_press_oven)}</td>
+    <td>${formatDate(item.tanggal_tl)}</td>
+    <td>${formatDate(item.tanggal_rajut_pagi)}</td>
+    <td>${formatDate(item.serah_terima_acc)}</td>
+    <td>${formatDate(item.tanggal_acc)}</td>
+    <td>${formatDate(item.tanggal_kelos)}</td>
+    <td>${formatDate(item.tanggal_reject)}</td>
+    <td>${formatDate(item.tanggal_matching)}</td>
+    <td>${formatDate(item.tanggal_perbaikan)}</td>
+    <td>${item.ket_daily_cek || '-'}</td>
+    <td class="text-end">${formatNumber(item.kg_stock)}</td>
+</tr>
+`;
             }
 
             if (['SPANDEX', 'KARET'].includes(jenis)) {
-                htmlCovering += `
-            <tr>
-                <td>${item.no_model}</td>
-                <td>${item.item_type}</td>
-                <td>${item.kode_warna}</td>
-                <td>${item.color}</td>
-                <td><span class="badge ${statusCov} px-3 py-2">${item.status || '-'}</span></td>
-                <td>${keteranganBadge}</td>
-            </tr>
-        `;
+                htmlCoveringBody += `
+<tr>
+    <td>${item?.no_model || '-'}</td>
+    <td>${item?.item_type || '-'}</td>
+    <td>${item?.kode_warna || '-'}</td>
+    <td>${item?.color || '-'}</td>
+    <td><span class="badge ${statusCov} px-3 py-2">${item?.status || '-'}</span></td>
+    <td>${keteranganBadge}</td>
+</tr>
+`;
             }
         });
 
-        htmlCelup += `</tbody></table>`;
-        htmlCovering += `</tbody></table>`;
+        // Tutup tabel
+        let htmlCelup = htmlCelupHeader + htmlCelupBody + `</tbody></table></div></div></div></div></div>`;
+        let htmlCovering = htmlCoveringHeader + htmlCoveringBody + `</tbody></table></div></div></div></div></div>`;
 
-        // Gabung dan render
+        // Render
         resultContainer.innerHTML += htmlCelup + htmlCovering;
-
     }
 
     // Fungsi untuk format tanggal agar tidak error
@@ -280,6 +331,14 @@
             day: '2-digit',
             month: 'short'
         });
+    }
+
+    function formatNumber(value) {
+        return value != null && !isNaN(value) ?
+            parseFloat(value).toLocaleString('id-ID', {
+                minimumFractionDigits: 2
+            }) :
+            '-';
     }
 </script>
 
