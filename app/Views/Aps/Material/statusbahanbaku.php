@@ -6,38 +6,49 @@
     .table-wrapper {
         overflow-x: auto;
         position: relative;
+        /* penting biar sticky posisi relatif ke wrapper */
     }
 
-    /* Freeze header */
-    .table-freeze thead th {
-        position: sticky;
-        top: 0;
+    .table-freeze th,
+    .table-freeze td {
+        white-space: nowrap;
         background: white;
-        z-index: 2;
+        /* biar gak transparan pas scroll */
+        z-index: 1;
     }
 
-    /* Freeze kolom */
-    .sticky-col {
+    /* Kolom pertama */
+    .table-freeze .sticky-col {
         position: sticky;
         left: 0;
+        z-index: 2;
         background: white;
-        z-index: 3;
     }
 
-    .sticky-col-2 {
+    /* Kolom kedua */
+    .table-freeze .sticky-col-2 {
         position: sticky;
-        left: 100px;
-        /* width kolom pertama */
+        left: 120px;
+        /* sesuaikan lebar kolom pertama */
+        z-index: 2;
         background: white;
-        z-index: 3;
     }
 
-    .sticky-col-3 {
+    /* Kolom ketiga */
+    .table-freeze .sticky-col-3 {
         position: sticky;
-        left: 200px;
-        /* width kolom pertama + kedua */
+        left: 240px;
+        /* lebar kolom pertama + kedua */
+        z-index: 2;
         background: white;
+    }
+
+    /* Header di sticky kolom */
+    .table-freeze thead th.sticky-col,
+    .table-freeze thead th.sticky-col-2,
+    .table-freeze thead th.sticky-col-3 {
         z-index: 3;
+        /* biar header di atas data */
     }
 </style>
 <div class="container-fluid py-4">
@@ -274,9 +285,9 @@
             if (['BENANG', 'NYLON'].includes(jenis)) {
                 htmlCelupBody += `
 <tr>
-    <td>${item.item_type}</td>
-    <td>${item.kode_warna}</td>
-    <td>${item.color}</td>
+    <td  class="sticky-col">${item.item_type}</td>
+    <td  class="sticky-col-2">${item.kode_warna}</td>
+    <td class="sticky-col-3">${item.color}</td>
     <td><span class="badge ${statusClass} px-3 py-2">${item.last_status || '-'}</span></td>
     <td class="text-end">${formatNumber(item.qty_po)}</td>
     <td class="text-end">${formatNumber(item.kg_celup)}</td>
