@@ -209,7 +209,7 @@
     <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
         <div class="card">
             <div class="card-body p-3">
-                <h5 class="mt-4">🧪 Status CELUP (Benang & Nylon)</h5>
+                <h5 class="mt-4">🧵 Status CELUP (Benang & Nylon)</h5>
                 <div class="table-wrapper" style="overflow-x:auto;">
                     <table class="table table-bordered table-striped table-sm table-freeze">
                         <thead class="table-light">
