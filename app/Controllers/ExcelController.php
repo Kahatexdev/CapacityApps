@@ -6160,7 +6160,7 @@ class ExcelController extends BaseController
             return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'message' => 'Data tidak valid dari API']);
         }
 
-        $delivery = $result[0]['delivery_akhir'];
+        $delivery = $result[0]['delivery_akhir'] ?? '';
         // Buat Excel
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -6510,7 +6510,8 @@ class ExcelController extends BaseController
             ->setVertical(Alignment::VERTICAL_CENTER);
         $sheet->getStyle('G6')->getFont()->setBold(true)->setSize(10);
 
-        $sheet->setCellValue('I6', ': ' . $result[0]['loss'] . '%');
+        $lossValue = isset($result[0]['loss']) ? $result[0]['loss'] . '%' : '';
+        $sheet->setCellValue('I6', ': ' . $lossValue);
         $sheet->getStyle('I6')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT)
             ->setVertical(Alignment::VERTICAL_CENTER);
         $sheet->getStyle('I6')->getFont()->setBold(true)->setSize(10);
@@ -6818,16 +6819,16 @@ class ExcelController extends BaseController
                 number_format($row['terima_kg'] - $row['kgs'], 2),
                 number_format($row['terima_kg'] / $row['kgs'], 2) * 100 . '%', // terima
                 number_format($row['sisa_bb_mc'], 2), // sisa mesin
-                $row['sisa_order_pcs'],
-                number_format($row['poplus_mc_kg'], 2),
-                $row['poplus_mc_cns'],
-                number_format($row['poplus_mc_kg'] / $row['kgs'], 2) * 100 . '%',
-                number_format($row['plus_pck_pcs'], 2),
-                number_format($row['plus_pck_kg'], 2),
-                $row['plus_pck_cns'],
-                number_format($row['plus_pck_kg'] / $row['kgs'], 2) * 100 . '%',
-                number_format($row['lebih_pakai_kg'], 2),
-                number_format($row['lebih_pakai_kg'] / $row['kgs'], 2) * 100 . '%',
+                $row['sisa_order_pcs'] == 0 ? '' : $row['sisa_order_pcs'],
+                $row['poplus_mc_kg'] == 0 ? '' : number_format($row['poplus_mc_kg'], 2),
+                $row['poplus_mc_cns'] == 0 ? '' : $row['poplus_mc_cns'],
+                ($row['poplus_mc_kg'] / $row['kgs']) == 0 ? '' : number_format($row['poplus_mc_kg'] / $row['kgs'], 2) * 100 . '%',
+                $row['plus_pck_pcs'] == 0 ? '' : number_format($row['plus_pck_pcs'], 2),
+                $row['plus_pck_kg'] == 0 ? '' : number_format($row['plus_pck_kg'], 2),
+                $row['plus_pck_cns'] == 0 ? '' : $row['plus_pck_cns'],
+                ($row['plus_pck_kg'] / $row['kgs']) == 0 ? '' : number_format($row['plus_pck_kg'] / $row['kgs'], 2) * 100 . '%',
+                $row['lebih_pakai_kg'] == 0 ? '' : number_format($row['lebih_pakai_kg'], 2),
+                ($row['lebih_pakai_kg'] / $row['kgs']) == 0 ? '' : number_format($row['lebih_pakai_kg'] / $row['kgs'], 2) * 100 . '%',
                 $retur_kg_psn,        // Z
                 $retur_persen_psn,    // AA
                 $retur_kg_po,         // AB
@@ -6932,5 +6933,12 @@ class ExcelController extends BaseController
         header("Content-Disposition: attachment; filename=\"$filename\"");
         $writer->save('php://output');
         exit;
+    }
+    function fmt($value, $decimals = 2, $suffix = '')
+    {
+        if ((float)$value == 0) {
+            return '';
+        }
+        return number_format($value, $decimals) . $suffix;
     }
 }

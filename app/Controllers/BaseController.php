@@ -13,7 +13,9 @@ use Psr\Log\LoggerInterface;
 use App\Models\DataMesinModel;
 use App\Models\EstSpkModel;
 use App\Models\MonthlyMcModel;
-
+use App\Models\PengaduanModel;
+use App\Models\UserModel;
+use App\Models\PengaduanReply;
 
 
 
@@ -32,12 +34,19 @@ abstract class BaseController extends Controller
     protected $jarumModel;
     protected $estspk;
     protected $globalModel;
-
+    protected $pengaduanModel;
+    protected $role;
+    protected $userModel;
+    protected $replyModel;
     public function __construct()
     {
         $this->jarumModel = new DataMesinModel();
         $this->estspk = new EstSpkModel();
         $this->globalModel = new MonthlyMcModel();
+        $this->pengaduanModel = new PengaduanModel();
+        $this->userModel = new UserModel();
+        $this->role = session()->get('role');
+        $this->replyModel = new PengaduanReply();
     }
     /**
      * Instance of the main Request object.

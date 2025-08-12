@@ -4,7 +4,7 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class EditTabelUser extends Migration
+class AddRoleTabelUser extends Migration
 {
     public function up()
     {

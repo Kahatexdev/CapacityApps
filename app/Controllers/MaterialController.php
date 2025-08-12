@@ -129,7 +129,7 @@ class MaterialController extends BaseController
         $groupedData = [];
         foreach ($flattenData as $data) {
             // Gunakan separator untuk membentuk key unik
-            $groupKey = $data['tgl_pakai'] . '|' . $data['no_model'] . '|' . $data['item_type'] . '|' . $data['kode_warna'] . '|' . $data['warna'];
+            $groupKey = $data['tgl_pakai'] . '|' . $data['no_model'] . '|' . $data['item_type'] . '|' . $data['kode_warna'] . '|' . $data['warna'] . '|' . $data['po_tambahan'];
             $groupedData[$groupKey][] = $data;
         }
         // dd ($groupedData);
@@ -394,7 +394,8 @@ class MaterialController extends BaseController
                         if (
                             isset($record['id_material'], $record['tgl_pakai'], $existingRecord['id_material'], $existingRecord['tgl_pakai']) &&
                             $record['id_material'] === $existingRecord['id_material'] &&
-                            $record['tgl_pakai'] === $existingRecord['tgl_pakai']
+                            $record['tgl_pakai'] === $existingRecord['tgl_pakai'] &&
+                            $record['po_tambahan'] === $existingRecord['po_tambahan']
                         ) {
                             // Tandai data sebagai duplikat
                             $isDuplicate = true;

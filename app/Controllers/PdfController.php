@@ -1048,8 +1048,9 @@ class PdfController extends BaseController
         $pdf->Cell(10, 5, 'Area', 0, 0, 'L');
         $pdf->Cell(75, 5, ': ' . $area, 0, 0, 'L');
 
+        $lossValue = isset($data[0]['loss']) ? $data[0]['loss'] . '%' : '';
         $pdf->Cell(20, 5, 'Loss F.Up', 0, 0, 'L');
-        $pdf->Cell(75, 5, ': ' . '', 0, 0, 'L');
+        $pdf->Cell(75, 5, ': ' . $lossValue, 0, 0, 'L');
 
         $pdf->Cell(24, 5, 'Tanggal Buat', 0, 0, 'L');
         $pdf->Cell(30, 5, ': ' . $tglBuat, 0, 1, 'L');
@@ -1059,7 +1060,7 @@ class PdfController extends BaseController
 
         $pdf->Cell(180, 5, '', 0, 0, 'L');
         $pdf->Cell(24, 5, 'Tgl. Export', 0, 0, 'L');
-        $pdf->Cell(40, 5, ': ' . '', 0, 1, 'L');
+        $pdf->Cell(40, 5, ': ' . $deliveryAkhir, 0, 1, 'L');
 
         //Simpan posisi awal Season & MaterialType
         function MultiCellFit($pdf, $w, $h, $txt, $border = 1, $align = 'C')
@@ -1240,16 +1241,16 @@ class PdfController extends BaseController
                 number_format($row['terima_kg'] - $row['kgs'], 2),
                 number_format($row['terima_kg'] / $row['kgs'], 2) * 100 . '%', // terima
                 number_format($row['sisa_bb_mc'], 2), // sisa mesin
-                $row['sisa_order_pcs'],
-                number_format($row['poplus_mc_kg'], 2),
-                $row['poplus_mc_cns'],
-                number_format($row['poplus_mc_kg'] / $row['kgs'], 2) * 100 . '%',
-                number_format($row['plus_pck_pcs'], 2),
-                number_format($row['plus_pck_kg'], 2),
-                $row['plus_pck_cns'],
-                number_format($row['plus_pck_kg'] / $row['kgs'], 2) * 100 . '%',
-                number_format($row['lebih_pakai_kg'], 2),
-                number_format($row['lebih_pakai_kg'] / $row['kgs'], 2) * 100 . '%',
+                $row['sisa_order_pcs'] == 0 ? '' : $row['sisa_order_pcs'],
+                $row['poplus_mc_kg'] == 0 ? '' : number_format($row['poplus_mc_kg'], 2),
+                $row['poplus_mc_cns'] == 0 ? '' : $row['poplus_mc_cns'],
+                ($row['poplus_mc_kg'] / $row['kgs']) == 0 ? '' : number_format($row['poplus_mc_kg'] / $row['kgs'], 2) * 100 . '%',
+                $row['plus_pck_pcs'] == 0 ? '' : number_format($row['plus_pck_pcs'], 2),
+                $row['plus_pck_kg'] == 0 ? '' : number_format($row['plus_pck_kg'], 2),
+                $row['plus_pck_cns'] == 0 ? '' : $row['plus_pck_cns'],
+                ($row['plus_pck_kg'] / $row['kgs']) == 0 ? '' : number_format($row['plus_pck_kg'] / $row['kgs'], 2) * 100 . '%',
+                $row['lebih_pakai_kg'] == 0 ? '' : number_format($row['lebih_pakai_kg'], 2),
+                ($row['lebih_pakai_kg'] / $row['kgs']) == 0 ? '' : number_format($row['lebih_pakai_kg'] / $row['kgs'], 2) * 100 . '%',
                 number_format($row['kgs_retur'], 2),
                 '',
                 '',
