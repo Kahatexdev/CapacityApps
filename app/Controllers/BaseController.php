@@ -15,7 +15,7 @@ use App\Models\EstSpkModel;
 use App\Models\MonthlyMcModel;
 use App\Models\PengaduanModel;
 use App\Models\UserModel;
-
+use App\Models\PengaduanReply;
 
 
 
@@ -37,7 +37,7 @@ abstract class BaseController extends Controller
     protected $pengaduanModel;
     protected $role;
     protected $userModel;
-
+    protected $replyModel;
     public function __construct()
     {
         $this->jarumModel = new DataMesinModel();
@@ -46,6 +46,7 @@ abstract class BaseController extends Controller
         $this->pengaduanModel = new PengaduanModel();
         $this->userModel = new UserModel();
         $this->role = session()->get('role');
+        $this->replyModel = new PengaduanReply();
     }
     /**
      * Instance of the main Request object.

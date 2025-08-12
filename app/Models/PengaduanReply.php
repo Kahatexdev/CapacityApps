@@ -3,21 +3,21 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
-use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
 
-class PengaduanModel extends Model
+class PengaduanReply extends Model
 {
-    protected $table            = 'pengaduan';
-    protected $primaryKey       = 'id_pengaduan';
+    protected $table            = 'pengaduan_reply';
+    protected $primaryKey       = 'id_reply';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields = ['username', 'target_role', 'isi', 'created_at', 'updated_at'];
+    protected $allowedFields = ['id_pengaduan', 'username', 'isi', 'created_at'];
+
     protected bool $allowEmptyInserts = false;
 
     // Dates
-    protected $useTimestamps = true;
+    protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -40,11 +40,10 @@ class PengaduanModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getPengaduan($username, $role)
+    public function getRepliesByPengaduan($id_pengaduan)
     {
-        return $this->where('username', $username)
-            ->orWhere('target_role', $role)
-            ->orderBy('created_at', 'DESC')
+        return $this->where('id_pengaduan', $id_pengaduan)
+            ->orderBy('created_at', 'ASC')
             ->findAll();
     }
 }

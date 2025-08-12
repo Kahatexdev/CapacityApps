@@ -8,56 +8,66 @@ class PengaduanTable extends Migration
 {
     public function up()
     {
+        // Tabel pengaduan utama
         $this->forge->addField([
-            'id' => [
-                'type'           => 'BIGINT',
-                'unsigned'       => true,
-                'auto_increment' => true,
-            ],
-            'parent_id' => [
-                'type'     => 'BIGINT',
+            'id_pengaduan' => [
+                'type' => 'INT',
                 'unsigned' => true,
-                'null'     => true,
+                'auto_increment' => true
             ],
-            'user_id' => [
-                'type'     => 'INT',
-                'unsigned' => true,
-                'null'     => false,
+            'username' => [ // identifier dari user pengadu
+                'type' => 'VARCHAR',
+                'constraint' => 50,
             ],
             'target_role' => [
-                'type'       => 'ENUM',
-                'constraint' => ['capacity', 'planning', 'aps', 'user', 'rosso', 'gbn', 'celup', 'sudo', 'monitoring', 'covering'],
-                'null'       => false,
+                'type' => 'VARCHAR',
+                'constraint' => 50,
             ],
             'isi' => [
                 'type' => 'TEXT',
-                'null' => false,
             ],
             'created_at' => [
-                'type'    => 'DATETIME',
-                'null'    => false,
-
+                'type' => 'DATETIME',
+                'null' => true
             ],
             'updated_at' => [
-                'type'    => 'DATETIME',
-                'null'    => false,
-
+                'type' => 'DATETIME',
+                'null' => true
             ],
         ]);
+        $this->forge->addKey('id_pengaduan', true);
+        $this->forge->createTable('pengaduan');
 
-        $this->forge->addKey('id', true);
-        $this->forge->addKey('parent_id');
-        $this->forge->addKey('user_id');
-        $this->forge->addKey('target_role');
-
-        $this->forge->addForeignKey('parent_id', 'pengaduan', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('user_id', 'user', 'id_user', 'CASCADE', 'CASCADE');
-
-        $this->forge->createTable('pengaduan', true);
+        // Tabel reply
+        $this->forge->addField([
+            'id_reply' => [
+                'type' => 'INT',
+                'unsigned' => true,
+                'auto_increment' => true
+            ],
+            'id_pengaduan' => [
+                'type' => 'INT',
+                'unsigned' => true,
+            ],
+            'username' => [ // identifier dari user yang reply
+                'type' => 'VARCHAR',
+                'constraint' => 50,
+            ],
+            'isi' => [
+                'type' => 'TEXT',
+            ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true
+            ],
+        ]);
+        $this->forge->addKey('id_reply', true);
+        $this->forge->createTable('pengaduan_reply');
     }
 
     public function down()
     {
-        $this->forge->dropTable('pengaduan', true);
+        $this->forge->dropTable('pengaduan_reply');
+        $this->forge->dropTable('pengaduan');
     }
 }
