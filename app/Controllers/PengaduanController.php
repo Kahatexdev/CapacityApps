@@ -9,6 +9,7 @@ use CodeIgniter\API\ResponseTrait;
 
 class PengaduanController extends BaseController
 {
+
     public function index()
     {
         // Misalnya user info disimpan di session saat login
@@ -79,7 +80,10 @@ class PengaduanController extends BaseController
             'isi'         => $isi
         ]);
 
-        return $this->respond(['status' => 'success', 'message' => 'Berhasil terkirim']);
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Berhasil terkirim'
+        ]);
     }
 
     public function Apireply($id_pengaduan)
@@ -94,7 +98,10 @@ class PengaduanController extends BaseController
             'created_at'   => date('Y-m-d H:i:s')
         ]);
 
-        return $this->respond(['status' => 'success', 'message' => 'Balasan terkirim']);
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Berhasil terkirim'
+        ]);
     }
 
 
