@@ -156,7 +156,7 @@
 
                                     <div class="col-md-8">
                                         <label class="form-label">Alasan Retur</label>
-                                        <textarea class="form-control" name="keterangan" rows="2" required></textarea>
+                                        <textarea class="form-control" name="keterangan" rows="2"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -532,8 +532,10 @@
         const form = e.target;
         const formData = new FormData(form);
         const submitBtn = document.getElementById('submitRetur');
-        const model = document.getElementById('modelText').value
-        const area = document.getElementById('areaText').value
+        const model = document.getElementById('modelText').value;
+        const area = document.getElementById('areaText').value;
+
+        // Disable tombol dan ubah teks
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
 
@@ -541,39 +543,40 @@
                 method: 'POST',
                 body: formData,
             })
-            .then(response => response.json())
-            .then(res => {
+            .then(res => res.json())
+            .then(data => {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Ajukan Retur';
 
-                if (res.status === 'success') {
+                if (data.status === 'success') {
                     Swal.fire({
                         icon: 'success',
                         title: 'Sukses!',
-                        text: res.message || 'Retur berhasil dikirim.',
+                        text: data.message || 'Retur berhasil dikirim.',
                     });
 
                     const modal = bootstrap.Modal.getInstance(document.getElementById('modalPengajuanRetur'));
-                    listRetur(model, area)
                     modal.hide();
                     form.reset();
                 } else {
                     Swal.fire({
                         icon: 'error',
                         title: 'Gagal!',
-                        text: res.message || 'Terjadi kesalahan saat mengirim.',
+                        text: data.message || 'Terjadi kesalahan saat mengirim.',
                     });
                 }
             })
             .catch(err => {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Ajukan Retur';
+
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
                     text: 'Terjadi kesalahan jaringan!',
                 });
-                console.error(err);
+
+                console.error('Fetch error:', err);
             });
     });
 </script>

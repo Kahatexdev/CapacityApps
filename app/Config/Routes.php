@@ -826,6 +826,9 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
 
     // chat
     $routes->get('chat', 'ChatController::pesan');
+
+    // pengaduan
+    $routes->get('pengaduan', 'PengaduanController::index');
 });
 
 // ie
@@ -893,3 +896,127 @@ $routes->group(
         $routes->get('generateFormRetur/(:any)', 'ExcelController::generateFormRetur/$1');
     }
 );
+
+//followup
+$routes->group('/followup', ['filter' => 'followup'], function ($routes) {
+
+    // booking
+    $routes->get('databooking', 'BookingController::bookingPlan');
+    $routes->get('databooking/(:any)', 'BookingController::bookingPerJarumPLan/$1');
+    $routes->get('databookingbulan/(:any)', 'BookingController::bookingPerBulanJarumPlan/$1');
+    $routes->get('databookingbulantampil/(:any)/(:any)/(:any)', 'BookingController::bookingPerBulanJarumTampilPlan/$1/$2/$3');
+    $routes->get('detailbooking/(:any)', 'BookingController::detailbookingPlan/$1');
+
+    //order
+    $routes->get('', 'FollowupController::index');
+    $routes->get('dataorder', 'FollowupController::order');
+    $routes->get('startStopMcByPdk', 'FollowupController::startStopMcByPdk');
+    $routes->get('blmAdaArea', 'OrderController::orderBlmAdaAreal');
+    $routes->get('orderPerjarum', 'OrderController::OrderPerJarumPlan');
+    $routes->get('orderPerArea', 'OrderController::orderPerAreaPlan');
+    $routes->get('statusOrder', 'OrderController::statusOrder');
+    $routes->get('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
+    $routes->post('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
+    $routes->get('progressdetail/(:any)/(:any)', 'ApsController::progressdetail/$1/$2');
+    $routes->get('detailPdk/(:any)/(:any)', 'OrderController::detailPdk/$1/$2');
+    $routes->get('detailModelPlanning/(:any)/(:any)', 'OrderController::detailModelPlanning/$1/$2');
+    $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'OrderController::detailmodeljarumPlan/$1/$2/$3');
+    $routes->get('semuaOrder', 'OrderController::semuaOrder');
+    $routes->post('exportDataOrder', 'ExcelController::exportDataOrder');
+    $routes->get('dataorderperjarum/(:any)', 'OrderController::DetailOrderPerJarumPlan/$1');
+    $routes->get('dataorderperarea/(:any)', 'OrderController::DetailOrderPerAreaPlan/$1');
+    $routes->post('updatedetailorder/(:any)', 'OrderController::updateorder/$1');
+    $routes->post('updatedetailjarum/(:any)', 'OrderController::updateorderjarumplan/$1');
+    $routes->post('deletedetailstyle/(:any)', 'OrderController::deletedetailstyle/$1');
+    $routes->post('deletedetailorder/(:any)', 'OrderController::deletedetailorder/$1');
+    $routes->post('deletedetailjarum/(:any)', 'OrderController::deletedetailmodeljarumplan/$1');
+    $routes->post('assignareal', 'FollowupController::assignareal');
+    $routes->post('splitarea', 'FollowupController::splitarea');
+    $routes->post('editarea', 'FollowupController::editarea');
+    $routes->post('editqtyarea', 'FollowupController::editqtyarea');
+    $routes->post('assignarealall', 'FollowupController::assignarealall');
+    $routes->post('recomendationarea', 'MesinController::recomendationarea');
+    $routes->post('tampilPerdelivery', 'OrderController::tampilPerdelivery');
+    $routes->get('orderPerbulan', 'OrderController::orderPerbulan');
+    $routes->get('orderPerMonth/(:any)/(:any)', 'OrderController::orderPerMonth/$1/$2');
+    $routes->post('inputhistoryrevise/(:any)', 'OrderController::inputHistory/$1');
+    $routes->get('pengajuanspk2', 'OrderController::spk2');
+    $routes->post('approveSpk2', 'OrderController::approveSpk2');
+    $routes->post('rejectSpk2', 'OrderController::rejectSpk2');
+    $routes->get('sisaOrder', 'OrderController::sisaOrder');
+    $routes->get('sisaOrder/(:any)', 'OrderController::sisaOrderBuyer/$1');
+    $routes->post('sisaOrder/(:any)', 'OrderController::sisaOrderBuyer/$1');
+    $routes->post('excelSisaOrderBuyer/(:any)', 'ExcelController::excelSisaOrderBuyer/$1');
+    $routes->get('sisaOrderArea', 'OrderController::sisaOrderArea');
+    $routes->get('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
+    $routes->post('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
+    $routes->post('excelSisaOrderArea', 'ExcelController::excelSisaOrderArea');
+    $routes->post('excelSisaOrderAllArea', 'ExcelController::excelSisaOrderAllArea');
+    $routes->post('saveRepeat', 'OrderController::saveRepeat');
+    $routes->get('flowProses', 'OrderController::flowProses');
+    $routes->post('semuaOrder/importFlowproses', 'OrderController::importFlowproses');
+
+    // mesin
+    $routes->get('datamesin', 'MesinController::indexPlan');
+    $routes->get('mesinPerJarum/(:any)', 'MesinController::mesinPerJarumPlan/$1');
+    $routes->get('mesinperarea/(:any)', 'MesinController::mesinperareaPlan/$1');
+    $routes->get('stockcylinder', 'MesinController::stockcylinderPlan');
+    $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarumPlan/$1/$2');
+    $routes->get('datamesinperarea/(:any)', 'MesinController::DetailMesinPerAreaPlan/$1');
+    $routes->post('capacityperarea/(:any)', 'MesinController::capacityperarea/$1');
+    $routes->post('deletemesinareal/(:any)', 'MesinController::deletemesinarealPlan/$1');
+    $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarumPlan/$1');
+    $routes->post('tambahmesinperarea', 'MesinController::inputmesinperareaPlan');
+    $routes->post('tambahmesinperjarum', 'MesinController::inputmesinperjarumPlan');
+    $routes->post('addcylinder', 'MesinController::inputcylinderPlan');
+    $routes->post('editcylinder/(:any)', 'MesinController::editcylinderPlan/$1');
+    $routes->post('deletecylinder/(:any)', 'MesinController::deletecylinderPlan/$1');
+    $routes->get('allmachine', 'MesinController::allmachinePlan');
+
+    // produksi
+    $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
+    $routes->get('dataprogress', 'ProduksiController::progressData');
+    $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
+    $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->post('importproduksi', 'ProduksiController::importproduksi');
+    $routes->get('produksi', 'ProduksiController::produksi');
+    $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+
+    //summary
+    $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
+    $routes->post('exportSummaryPerTod', 'SummaryController::excelSummaryPerTod');
+
+    //summary produksi
+    $routes->post('summaryProdPerTanggal', 'ProduksiController::summaryProdPerTanggal');
+    $routes->post('exportSummaryPerTgl', 'SummaryController::excelSummaryPerTgl');
+
+    //timter produksi
+    $routes->post('timterProduksi', 'ProduksiController::timterProduksi');
+    $routes->post('exportTimter', 'TimterController::excelTimter');
+    $routes->get('summaryPlanner/(:any)', 'SummaryController::summaryPlanner/$1');
+
+    //summary bs mc
+    $routes->post('exportSummaryBs', 'SummaryController::excelSummaryBs');
+
+    // deffect
+    $routes->get('datadeffect', 'DeffectController::datadeffect');
+    $routes->post('inputKode', 'DeffectController::inputKode');
+    $routes->post('viewDataBs', 'DeffectController::viewDataBs');
+
+    //bahanbakyu
+    $routes->get('stockbb', 'MaterialController::stockbb');
+    $routes->get('filterstockbahanbaku', 'MaterialController::filterStockBahanBaku');
+    $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
+    $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
+
+    //pph
+    $routes->get('pph/(:any)', 'MaterialController::pph/$1');
+    $routes->get('filterpph/(:any)', 'MaterialController::filterPph/$1');
+    $routes->get('tampilPerStyle/(:any)', 'MaterialController::tampilPerStyle/$1');
+    $routes->get('pphinisial/(:any)', 'MaterialController::pphinisial/$1');
+    $routes->get('pphPerhari/(:any)', 'MaterialController::pphPerhari/$1');
+    $routes->get('getDataPerhari/(:any)', 'MaterialController::getDataPerhari/$1');
+    $routes->get('excelPPHNomodel/(:any)/(:any)', 'ExcelPPHController::excelPPHNomodel/$1/$2');
+    $routes->get('excelPPHInisial/(:any)/(:any)', 'ExcelPPHController::excelPPHInisial/$1/$2');
+    $routes->get('excelPPHDays/(:any)/(:any)', 'ExcelPPHController::excelPPHDays/$1/$2');
+});
