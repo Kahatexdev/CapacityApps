@@ -98,7 +98,7 @@ error_reporting(E_ALL); ?>
                         </div>
 
                     </div>
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-lg-6">
                             <h6>Repeat Dari</h6>
                             <form action="<?= base_url($role . '/saveRepeat') ?>" method="post">
@@ -109,7 +109,7 @@ error_reporting(E_ALL); ?>
                                 </div>
                             </form>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="card-body">
