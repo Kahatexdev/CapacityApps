@@ -4,7 +4,7 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class AddRoleTabelUser extends Migration
+class AddRoleFuTabelUser extends Migration
 {
     public function up()
     {
@@ -12,7 +12,7 @@ class AddRoleTabelUser extends Migration
         $this->forge->modifyColumn('user', [
             'role' => [
                 'type' => 'ENUM',
-                'constraint' => ['capacity', 'planning', 'aps', 'user', 'god', 'sudo', 'ie', 'rosso'],
+                'constraint' => ['capacity', 'planning', 'aps', 'user', 'god', 'sudo', 'ie', 'rosso', 'followup'],
                 'default' => 'user',
             ],
         ]);
