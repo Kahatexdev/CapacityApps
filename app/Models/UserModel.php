@@ -69,4 +69,8 @@ class UserModel extends Model
         $query = $this->db->query($sql);
         return $query->getResultArray();
     }
+    public function getListRole()
+    {
+        return $this->select('DISTINCT(role) as role')->findAll();
+    }
 }
