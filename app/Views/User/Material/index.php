@@ -298,38 +298,38 @@
         poTambahanCheckbox.addEventListener('change', fetchNoModelData);
     });
     $(document).ready(function() {
-        const area = $('#area').val(); // Ambil nilai area dari input hidden
-        const poTambahanCheckbox = document.getElementById('po_tambahan');
+                const area = $('#area').val(); // Ambil nilai area dari input hidden
+                const poTambahanCheckbox = document.getElementById('po_tambahan');
 
-        // Inisialisasi Select2 di kolom no model
-        $('#no_model').select2({
-            width: '100%'
-        });
+                // Inisialisasi Select2 di kolom no model
+                $('#no_model').select2({
+                    width: '100%'
+                });
 
-        let row = 0;
-        let globalData = []; // Variabel global untuk menyimpan data AJAX
-        // Event ketika no model berubah
-        $('#no_model').change(function() {
-            const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
-            let noModel = $(this).val(); // Ambil value yang dipilih di select2
-            if (noModel) {
-                // ambil style size by model
-                $.ajax({
-                    url: '<?= base_url($role . '/getStyleSizeByNoModelPemesanan') ?>',
-                    type: "GET",
-                    data: {
-                        no_model: noModel,
-                        po_tambahan: poTambahanChecked,
-                        area: area
-                    }, // Kirim dalam format object
-                    dataType: "json",
-                    success: function(data) {
-                        globalData = data; // Simpan data di variabel global
-                        $('#detailContainer').empty();
-                        $('#detailBbCardsContainer').empty();
-                        $('#perstyleContainer').show();
+                let row = 0;
+                let globalData = []; // Variabel global untuk menyimpan data AJAX
+                // Event ketika no model berubah
+                $('#no_model').change(function() {
+                    const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
+                    let noModel = $(this).val(); // Ambil value yang dipilih di select2
+                    if (noModel) {
+                        // ambil style size by model
+                        $.ajax({
+                            url: '<?= base_url($role . '/getStyleSizeByNoModelPemesanan') ?>',
+                            type: "GET",
+                            data: {
+                                no_model: noModel,
+                                po_tambahan: poTambahanChecked,
+                                area: area
+                            }, // Kirim dalam format object
+                            dataType: "json",
+                            success: function(data) {
+                                globalData = data; // Simpan data di variabel global
+                                $('#detailContainer').empty();
+                                $('#detailBbCardsContainer').empty();
+                                $('#perstyleContainer').show();
 
-                        var cardHtml = `
+                                var cardHtml = `
                             <div class="table-responsive">
                                 <table id="header" class="table table-bordered table-striped">
                                     <thead>
@@ -385,19 +385,19 @@
                                 </table>
                             </div>
                         `;
-                        $('#detailBbCardsContainer').append(cardHtml);
-                    },
-                    error: function() {
-                        alert('Gagal mengambil data! Silakan coba lagi.');
+                                $('#detailBbCardsContainer').append(cardHtml);
+                            },
+                            error: function() {
+                                alert('Gagal mengambil data! Silakan coba lagi.');
+                            }
+                        });
                     }
                 });
-            }
-        });
 
-        // Event untuk menambah baris
-        $('#detailBbCardsContainer').on('click', '.add-row', function() {
-            row++;
-            let newRow = `
+                // Event untuk menambah baris
+                $('#detailBbCardsContainer').on('click', '.add-row', function() {
+                    row++;
+                    let newRow = `
                 <div class="table-responsive">
                     <table id="header" class="table table-bordered table-striped">
                         <thead>
@@ -453,151 +453,151 @@
                     </table>
                 </div>
             `;
-            // rowCount++;
-            $('#detailBbCardsContainer').append(newRow);
-        });
-
-        // kalkulasi ketika jl mc berubah
-        $('#detailBbCardsContainer').on('input', '.jalan-mc', function() {
-            const jalanMc = parseFloat($(this).val()) || 0; // Ambil nilai jalan_mc
-            const table = $(this).closest('.table-responsive').find('.material-usage'); // Temukan tabel terkait
-
-            // Perbarui semua baris di tabel terkait
-            table.find('tr').each(function() {
-                const row = $(this); // Ambil baris saat ini
-                const jalan_mc = parseFloat(row.find('.jalan_mc').val()) || 0; // Nilai Qty Cones
-                const qty = parseFloat(row.find('.qty_cns').val()) || 0; // Nilai Qty Cones
-                const berat = parseFloat(row.find('.qty_berat_cns').val()) || 0; // Nilai Berat Cones
-
-                // Hitung ulang Total Cones dan Total Berat Cones
-                const ttlCns = qty * jalanMc;
-                const ttlBeratCns = qty * berat * jalanMc;
-
-                // Perbarui nilai Total Cones dan Total Berat Cones
-                row.find('.jalan_mc').val(jalanMc);
-                row.find('.ttl_cns').val(ttlCns.toFixed(2));
-                row.find('.ttl_berat_cns').val(ttlBeratCns.toFixed(2));
-            });
-        });
-
-        // Event untuk menghapus baris
-        $('#detailBbCardsContainer').on('click', '.remove-row', function() {
-            $(this).closest('.table-responsive').remove(); // Cari elemen ".table-responsive" terdekat dan hapus
-        });
-
-        // Event untuk mengambil "Jalan MC" ketika "Style Size" berubah
-        $('#detailBbCardsContainer').on('change', '.style-size', function() {
-            let selectedStyleSize = $(this).val(); // Ambil nilai Style Size yang dipilih
-            let jalanMcInput = $(this).closest('tr').find('.jalan-mc'); // Cari input "Jalan MC" di baris yang sama
-            let qty = $(this).closest('tr').find('.qty'); // Cari input "Jalan MC" di baris yang sama
-            let gw = $(this).closest('tr').find('.gw'); // Cari input "Jalan MC" di baris yang sama
-            let inisial = $(this).closest('tr').find('.inisial'); // Cari input "Jalan MC" di baris yang sama
-            let tgl_pakai = $('#tgl_pakai').val(); // Ambil nilai No Model
-            let noModel = $('#no_model').val(); // Ambil nilai No Model
-            let area = $('#area').val(); // Ambil nilai No Model
-            // Cari elemen <tbody> "material-usage" yang terkait dengan baris ini
-            let table = $(this).closest('.table-responsive').find('.material-usage');
-
-            // Validasi untuk memastikan Style Size tidak duplikat di baris lain
-            let isDuplicate = false;
-            let currentElement = $(this); // Elemen yang memicu event 'change'
-            $('.style-size').each(function() {
-                // Bandingkan nilai elemen lain dengan nilai elemen saat ini
-                if ($(this).val() === selectedStyleSize && $(this).get(0) !== currentElement.get(0)) {
-                    isDuplicate = true;
-                    return false; // Hentikan iterasi jika duplikat ditemukan
-                }
-            });
-
-            if (isDuplicate) {
-                alert('Style Size sudah ada');
-                $(this).val(''); // Kosongkan dropdown Style Size
-                jalanMcInput.val(''); // Kosongkan input Jalan MC
-                qty.val(''); // Kosongkan input Jalan MC
-                gw.val(''); // Kosongkan input Jalan MC
-                inisial.val(''); // Kosongkan input Jalan MC
-                table.empty(); // Kosongkan tabel Material Usage
-                return; // Hentikan proses jika duplikat ditemukan
-            }
-
-            if (selectedStyleSize !== "" && selectedStyleSize !== null &&
-                noModel !== "" && noModel !== null &&
-                area !== "" && area !== null) {
-                // AJAX untuk mengambil Jalan MC
-                $.ajax({
-                    url: '<?= base_url($role . '/getJalanMc') ?>', // Ganti dengan URL endpoint Anda
-                    type: 'POST',
-                    data: {
-                        style_size: selectedStyleSize,
-                        no_model: noModel,
-                        area: area
-                    },
-                    dataType: "json",
-                    success: function(response) {
-
-                        jalanMcInput.val(response.jalan_mc); // Isi input "Jalan MC" dengan data dari server
-                    },
-                    error: function() {
-                        alert('Gagal mengambil data Jalan MC! Silakan coba lagi.');
-                    }
+                    // rowCount++;
+                    $('#detailBbCardsContainer').append(newRow);
                 });
 
-                $.ajax({
-                    url: '<?= base_url($role . '/getQty') ?>', // Ganti dengan URL endpoint Anda
-                    type: 'POST',
-                    data: {
-                        style_size: selectedStyleSize,
-                        no_model: noModel,
-                        area: area
-                    },
-                    dataType: "json",
-                    success: function(response) {
-                        console.log(response)
-                        qty.val(response.qty);
-                        inisial.val(response.inisial);
-                        const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
-                        if (poTambahanChecked == 1) {
-                            urlMu = `http://172.23.44.14/MaterialSystem/public/api/getMUPoTambahan?no_model=${encodeURIComponent(noModel)}&style_size=${encodeURIComponent(selectedStyleSize)}&area=${encodeURIComponent(area)}`;
-                        } else {
-                            urlMu = '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + encodeURIComponent(selectedStyleSize) + '/' + area + '/' + qty.val();
+                // kalkulasi ketika jl mc berubah
+                $('#detailBbCardsContainer').on('input', '.jalan-mc', function() {
+                    const jalanMc = parseFloat($(this).val()) || 0; // Ambil nilai jalan_mc
+                    const table = $(this).closest('.table-responsive').find('.material-usage'); // Temukan tabel terkait
+
+                    // Perbarui semua baris di tabel terkait
+                    table.find('tr').each(function() {
+                        const row = $(this); // Ambil baris saat ini
+                        const jalan_mc = parseFloat(row.find('.jalan_mc').val()) || 0; // Nilai Qty Cones
+                        const qty = parseFloat(row.find('.qty_cns').val()) || 0; // Nilai Qty Cones
+                        const berat = parseFloat(row.find('.qty_berat_cns').val()) || 0; // Nilai Berat Cones
+
+                        // Hitung ulang Total Cones dan Total Berat Cones
+                        const ttlCns = qty * jalanMc;
+                        const ttlBeratCns = qty * berat * jalanMc;
+
+                        // Perbarui nilai Total Cones dan Total Berat Cones
+                        row.find('.jalan_mc').val(jalanMc);
+                        row.find('.ttl_cns').val(ttlCns.toFixed(2));
+                        row.find('.ttl_berat_cns').val(ttlBeratCns.toFixed(2));
+                    });
+                });
+
+                // Event untuk menghapus baris
+                $('#detailBbCardsContainer').on('click', '.remove-row', function() {
+                    $(this).closest('.table-responsive').remove(); // Cari elemen ".table-responsive" terdekat dan hapus
+                });
+
+                // Event untuk mengambil "Jalan MC" ketika "Style Size" berubah
+                $('#detailBbCardsContainer').on('change', '.style-size', function() {
+                    let selectedStyleSize = $(this).val(); // Ambil nilai Style Size yang dipilih
+                    let jalanMcInput = $(this).closest('tr').find('.jalan-mc'); // Cari input "Jalan MC" di baris yang sama
+                    let qty = $(this).closest('tr').find('.qty'); // Cari input "Jalan MC" di baris yang sama
+                    let gw = $(this).closest('tr').find('.gw'); // Cari input "Jalan MC" di baris yang sama
+                    let inisial = $(this).closest('tr').find('.inisial'); // Cari input "Jalan MC" di baris yang sama
+                    let tgl_pakai = $('#tgl_pakai').val(); // Ambil nilai No Model
+                    let noModel = $('#no_model').val(); // Ambil nilai No Model
+                    let area = $('#area').val(); // Ambil nilai No Model
+                    // Cari elemen <tbody> "material-usage" yang terkait dengan baris ini
+                    let table = $(this).closest('.table-responsive').find('.material-usage');
+
+                    // Validasi untuk memastikan Style Size tidak duplikat di baris lain
+                    let isDuplicate = false;
+                    let currentElement = $(this); // Elemen yang memicu event 'change'
+                    $('.style-size').each(function() {
+                        // Bandingkan nilai elemen lain dengan nilai elemen saat ini
+                        if ($(this).val() === selectedStyleSize && $(this).get(0) !== currentElement.get(0)) {
+                            isDuplicate = true;
+                            return false; // Hentikan iterasi jika duplikat ditemukan
                         }
+                    });
 
-                        // Lakukan permintaan AJAX
+                    if (isDuplicate) {
+                        alert('Style Size sudah ada');
+                        $(this).val(''); // Kosongkan dropdown Style Size
+                        jalanMcInput.val(''); // Kosongkan input Jalan MC
+                        qty.val(''); // Kosongkan input Jalan MC
+                        gw.val(''); // Kosongkan input Jalan MC
+                        inisial.val(''); // Kosongkan input Jalan MC
+                        table.empty(); // Kosongkan tabel Material Usage
+                        return; // Hentikan proses jika duplikat ditemukan
+                    }
+
+                    if (selectedStyleSize !== "" && selectedStyleSize !== null &&
+                        noModel !== "" && noModel !== null &&
+                        area !== "" && area !== null) {
+                        // AJAX untuk mengambil Jalan MC
                         $.ajax({
-                            url: urlMu, // Ganti URL sesuai kebutuhan
-                            type: 'GET',
-                            dataType: 'json',
+                            url: '<?= base_url($role . '/getJalanMc') ?>', // Ganti dengan URL endpoint Anda
+                            type: 'POST',
+                            data: {
+                                style_size: selectedStyleSize,
+                                no_model: noModel,
+                                area: area
+                            },
+                            dataType: "json",
                             success: function(response) {
-                                console.log(response); // Debug data yang diterima
-                                table.empty(); // Hapus isi tabel sebelumnya
 
-                                // Jika response ada tetapi kosong
-                                if (response.status === 'empty') {
-                                    table.append(`
+                                jalanMcInput.val(response.jalan_mc); // Isi input "Jalan MC" dengan data dari server
+                            },
+                            error: function() {
+                                alert('Gagal mengambil data Jalan MC! Silakan coba lagi.');
+                            }
+                        });
+
+                        $.ajax({
+                            url: '<?= base_url($role . '/getQty') ?>', // Ganti dengan URL endpoint Anda
+                            type: 'POST',
+                            data: {
+                                style_size: selectedStyleSize,
+                                no_model: noModel,
+                                area: area
+                            },
+                            dataType: "json",
+                            success: function(response) {
+                                console.log(response)
+                                qty.val(response.qty);
+                                inisial.val(response.inisial);
+                                const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
+                                if (poTambahanChecked == 1) {
+                                    urlMu = `http://172.23.44.14/MaterialSystem/public/api/getMUPoTambahan?no_model=${encodeURIComponent(noModel)}&style_size=${encodeURIComponent(selectedStyleSize)}&area=${encodeURIComponent(area)}`;
+                                } else {
+                                    urlMu = '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + encodeURIComponent(selectedStyleSize) + '/' + area + '/' + qty.val();
+                                }
+
+                                // Lakukan permintaan AJAX
+                                $.ajax({
+                                    url: urlMu, // Ganti URL sesuai kebutuhan
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    success: function(response) {
+                                        console.log(response); // Debug data yang diterima
+                                        table.empty(); // Hapus isi tabel sebelumnya
+
+                                        // Jika response ada tetapi kosong
+                                        if (response.status === 'empty') {
+                                            table.append(`
                                         <tr>
                                             <td colspan="7" class="text-center text-danger fw-bold">Material Usage belum ada, hubungi Gbn</td>
                                         </tr>
                                     `);
-                                    return;
-                                }
-                                // Jika response berupa array dan kita hanya ingin data dari elemen pertama
-                                if (response && response.length > 0) {
-                                    // Ambil data inisial dan gw dari elemen pertama
-                                    let firstData = response[0];
-                                    gw.val(firstData.gw);
-                                }
+                                            return;
+                                        }
+                                        // Jika response berupa array dan kita hanya ingin data dari elemen pertama
+                                        if (response && response.length > 0) {
+                                            // Ambil data inisial dan gw dari elemen pertama
+                                            let firstData = response[0];
+                                            gw.val(firstData.gw);
+                                        }
 
 
-                                // Iterasi data yang diterima dari API dan tambahkan ke tabel
-                                response.forEach(function(item, index) {
-                                    const uniqueKey = `[${row}][${index}]`;
-                                    const total = (item.qty_cns * item.qty_berat_cns).toFixed(2);
-                                    const jalanMc = parseFloat(jalanMcInput.val()) || 0; // Ganti dengan input jalanMc yang sesuai
-                                    const totalCones = (item.qty_cns * jalanMc).toFixed(2);
-                                    const totalBeratCones = (total * jalanMc).toFixed(2);
-                                    const poTambahan = poTambahanChecked;
+                                        // Iterasi data yang diterima dari API dan tambahkan ke tabel
+                                        response.forEach(function(item, index) {
+                                            const uniqueKey = `[${row}][${index}]`;
+                                            const total = (item.qty_cns * item.qty_berat_cns).toFixed(2);
+                                            const jalanMc = parseFloat(jalanMcInput.val()) || 0; // Ganti dengan input jalanMc yang sesuai
+                                            const totalCones = (item.qty_cns * jalanMc).toFixed(2);
+                                            const totalBeratCones = (total * jalanMc).toFixed(2);
+                                            const poTambahan = poTambahanChecked;
 
-                                    table.append(`
+                                            table.append(`
                                             <tr>
                                                 // kolom hide
                                                 <input type="hidden" class="form-control text-center" name="items[${row}][${index}][tgl_pakai]" id="tgl_pakai" value="${tgl_pakai}" readonly>
@@ -641,543 +641,544 @@
                                                 <td></td>
                                             </tr>
                                         `);
-                                });
-                                // Tambahkan event listener untuk perhitungan otomatis
-                                table.on('input', '.qty_cns, .qty_berat_cns, .ttl_berat_cns', function() {
-                                    const row = $(this).closest('tr');
-                                    const qty = parseFloat(row.find('.qty_cns').val());
-                                    const berat = parseFloat(row.find('.qty_berat_cns').val());
-                                    const total = qty * berat;
-                                    row.find('.ttl').val(total.toFixed(2));
+                                        });
+                                        // Tambahkan event listener untuk perhitungan otomatis
+                                        table.on('input', '.qty_cns, .qty_berat_cns, .ttl_berat_cns', function() {
+                                            const row = $(this).closest('tr');
+                                            const qty = parseFloat(row.find('.qty_cns').val());
+                                            const berat = parseFloat(row.find('.qty_berat_cns').val());
+                                            const total = qty * berat;
+                                            row.find('.ttl').val(total.toFixed(2));
 
-                                    //Total Cones
-                                    const jalanMc = parseFloat(jalanMcInput.val());
-                                    const ttlCns = qty * jalanMc;
-                                    row.find('.ttl_cns').val(ttlCns);
+                                            //Total Cones
+                                            const jalanMc = parseFloat(jalanMcInput.val());
+                                            const ttlCns = qty * jalanMc;
+                                            row.find('.ttl_cns').val(ttlCns);
 
-                                    //Total Berat Cones
-                                    const totalBeratCns = total * jalanMc;
-                                    row.find('.ttl_berat_cns').val(totalBeratCns.toFixed(2));
-                                });
-                            },
-                            error: function() {
-                                table.empty().append(`
+                                            //Total Berat Cones
+                                            const totalBeratCns = total * jalanMc;
+                                            row.find('.ttl_berat_cns').val(totalBeratCns.toFixed(2));
+                                        });
+                                    },
+                                    error: function() {
+                                        table.empty().append(`
                                 <tr>
                                     <td colspan="7" class="text-center text-danger fw-bold">Gagal mengambil data Material Usage. Silakan coba lagi.</td>
                                 </tr>
                             `);
-                            }
-                        });
-                    },
-                    error: function() {
-                        alert('Gagal mengambil data Jalan MC! Silakan coba lagi.');
-                    }
-                });
-            } else {
-                jalanMcInput.val(''); // Kosongkan input "Jalan MC" jika tidak ada yang dipilih
-                table.empty(); // Hapus isi tabel sebelumnya
-            }
-        });
-        // Submit form untuk menyimpan ke session
-        $('#pemesananBbForm').submit(function(e) {
-            e.preventDefault();
-            $('.style-size').removeAttr('name');
-            $('.jalan-mc').removeAttr('name');
-            $('.qty').removeAttr('name');
-            $('.gw').removeAttr('name');
-            $('.inisial').removeAttr('name');
-            // Periksa apakah tabel Material Usage kosong
-            let isMaterialUsageEmpty = true;
-            $('.material-usage').each(function() {
-                if ($(this).find('tr').length > 0) {
-                    isMaterialUsageEmpty = false;
-                    return false; // Hentikan iterasi jika ada data
-                }
-            });
-
-            if (isMaterialUsageEmpty) {
-                Swal.fire({
-                    title: "Peringatan!",
-                    text: "Data Material Usage kosong. Tidak dapat menyimpan ke session.",
-                    icon: "warning",
-                    confirmButtonText: "OK"
-                });
-                return; // Hentikan proses submit jika tabel kosong
-            }
-
-            // 1) Validasi: Jalan MC tidak boleh kosong di tiap baris
-            let invalidMachine = false;
-            $('.material-usage').find('input.jalan_mc').each(function() {
-                const jm = parseFloat($(this).val()) || 0;
-                if (jm > 0) {
-                    invalidMachine = true;
-                    return false; // break .each
-                }
-            });
-            // if (invalidMachine) {
-            //     Swal.fire('Peringatan', 'Nilai Jalan MC tidak boleh kosong atau 0', 'warning');
-            //     return;
-            // }
-
-            // Jika tabel tidak kosong, lanjutkan proses submit
-            const formData = $(this).serializeArray();
-<<<<<<< HEAD
-            console.log(invalidMachine + 'mc');
-            if (invalidMachine) {
-                // Kalau ada jalan MC > 0 → simpan ke session dulu
-                $.ajax({
-                    url: "<?= base_url($role . '/bahanBaku/simpanKeSession') ?>",
-                    method: "POST",
-                    data: formData,
-                    success: function(response) {
-                        if (response.status === "success") {
-                            // Lanjut insert qty cns
-                            kirimQtyCns(formData);
-                        } else {
-                            Swal.fire({
-                                title: response.title,
-                                text: response.message || "Gagal menyimpan list pemesanan.",
-                                icon: "error",
-                                showConfirmButton: true,
-                            });
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        Swal.fire("Error", "Gagal simpan ke session", "error");
-=======
-
-            $.ajax({
-                url: "<?= base_url($role . '/bahanBaku/simpanKeSession') ?>",
-                method: "POST",
-                data: formData,
-                success: function(response) {
-                    console.log(response);
-                    // Cek status dari Proses 1
-                    if (response.status === "success") {
-                        // Proses 2: Mengirim ke URL kedua
-                        $.ajax({
-                            url: "http://172.23.44.14/MaterialSystem/public/api/insertQtyCns",
-                            method: "POST",
-                            data: formData,
-                            success: function(secondResponse) {
-                                // Log respons server
-                                console.log("Response dari Proses 2:", secondResponse);
-
-                                // Periksa status respons dari Proses update qty cns & berat cns
-                                if (secondResponse.status === "success") {
-                                    // Kedua proses berhasil
-                                    Swal.fire({
-                                        title: "Berhasil",
-                                        text: "Data berhasil diupdate & disimpan ke list pemesanan.",
-                                        icon: "success",
-                                        // showConfirmButton: true,
-                                    }).then(() => {
-                                        location.reload(); // Refresh halaman setelah alert selesai
-                                    });
-                                } else if (secondResponse.status === "warning") {
-                                    // Proses 2 gagal
-                                    Swal.fire({
-                                        title: secondResponse.title,
-                                        text: secondResponse.message,
-                                        icon: secondResponse.status,
-                                        showConfirmButton: true,
-                                    });
-                                } else {
-                                    // Proses 2 gagal
-                                    Swal.fire({
-                                        title: "Error",
-                                        text: secondResponse.message || "Gagal update qty cns.",
-                                        icon: "error",
-                                        showConfirmButton: true,
-                                    });
-                                }
-                            },
-                            error: function(xhr, status, error) {
-                                console.error(`AJAX Error: ${xhr.status} ${xhr.statusText}`);
-                                console.error("<?= $role ?>");
-                                Swal.fire({
-                                    title: "Gagal!",
-                                    text: "Gagal menyimpan data",
-                                    icon: "error",
-                                    confirmButtonText: "OK"
+                                    }
                                 });
+                            },
+                            error: function() {
+                                alert('Gagal mengambil data Jalan MC! Silakan coba lagi.');
                             }
                         });
                     } else {
-                        // Proses 1 gagal
-                        Swal.fire({
-                            title: response.title,
-                            text: response.message || "Gagal menyimpan list pemesanan.",
-                            icon: "error",
-                            showConfirmButton: true,
-                        });
->>>>>>> cc2e2a8651c3fbb3b34abc3933c4a25c54c3451e
+                        jalanMcInput.val(''); // Kosongkan input "Jalan MC" jika tidak ada yang dipilih
+                        table.empty(); // Hapus isi tabel sebelumnya
                     }
                 });
-            } else {
-                // Kalau semua jl mc = 0 → langsung insert qty cns tanpa simpan session
-                kirimQtyCns(formData);
-            }
-
-            function kirimQtyCns(formData) {
-                $.ajax({
-                    url: "http://172.23.44.14/MaterialSystem/public/api/insertQtyCns",
-                    method: "POST",
-                    data: formData,
-                    success: function(secondResponse) {
-                        console.log(formData);
-                        if (secondResponse.status === "success") {
-                            Swal.fire({
-                                title: "Berhasil",
-                                text: "Data berhasil disimpan.",
-                                icon: "success",
-                            }).then(() => location.reload());
-                        } else {
-                            Swal.fire({
-                                title: secondResponse.title || "Error",
-                                text: secondResponse.message || "Gagal update qty cns.",
-                                icon: secondResponse.status || "error",
-                                showConfirmButton: true,
+                // Submit form untuk menyimpan ke session
+                $('#pemesananBbForm').submit(function(e) {
+                            e.preventDefault();
+                            $('.style-size').removeAttr('name');
+                            $('.jalan-mc').removeAttr('name');
+                            $('.qty').removeAttr('name');
+                            $('.gw').removeAttr('name');
+                            $('.inisial').removeAttr('name');
+                            // Periksa apakah tabel Material Usage kosong
+                            let isMaterialUsageEmpty = true;
+                            $('.material-usage').each(function() {
+                                if ($(this).find('tr').length > 0) {
+                                    isMaterialUsageEmpty = false;
+                                    return false; // Hentikan iterasi jika ada data
+                                }
                             });
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        Swal.fire("Error", "Gagal insert qty cns", "error");
-                    }
-                });
-            }
 
-            // $.ajax({
-            //     url: "<?= base_url($role . '/bahanBaku/simpanKeSession') ?>",
-            //     method: "POST",
-            //     data: formData,
-            //     success: function(response) {
-            //         console.log(response);
-            //         // Cek status dari Proses 1
-            //         if (response.status === "success") {
-            //             // Proses 2: Mengirim ke URL kedua
-            //             $.ajax({
-            //                 url: "http://172.23.44.14/MaterialSystem/public/api/insertQtyCns",
-            //                 method: "POST",
-            //                 data: formData,
-            //                 success: function(secondResponse) {
-            //                     // Log respons server
-            //                     console.log("Response dari Proses 2:", secondResponse);
-
-            //                     // Periksa status respons dari Proses update qty cns & berat cns
-            //                     if (secondResponse.status === "success") {
-            //                         // Kedua proses berhasil
-            //                         Swal.fire({
-            //                             title: "Berhasil",
-            //                             text: "Data berhasil diupdate & disimpan ke list pemesanan.",
-            //                             icon: "success",
-            //                             // showConfirmButton: true,
-            //                         }).then(() => {
-            //                             location.reload(); // Refresh halaman setelah alert selesai
-            //                         });
-            //                     } else if (secondResponse.status === "warning") {
-            //                         // Proses 2 gagal
-            //                         Swal.fire({
-            //                             title: secondResponse.title,
-            //                             text: secondResponse.message,
-            //                             icon: secondResponse.status,
-            //                             showConfirmButton: true,
-            //                         });
-            //                     } else {
-            //                         // Proses 2 gagal
-            //                         Swal.fire({
-            //                             title: "Error",
-            //                             text: secondResponse.message || "Gagal update qty cns.",
-            //                             icon: "error",
-            //                             showConfirmButton: true,
-            //                         });
-            //                     }
-            //                 },
-            //                 error: function(xhr, status, error) {
-            //                     console.error(`AJAX Error: ${xhr.status} ${xhr.statusText}`);
-            //                     console.error("<?= $role ?>");
-            //                     Swal.fire({
-            //                         title: "Gagal!",
-            //                         text: "Gagal menyimpan data",
-            //                         icon: "error",
-            //                         confirmButtonText: "OK"
-            //                     });
-            //                 }
-            //             });
-            //         } else {
-            //             // Proses 1 gagal
-            //             Swal.fire({
-            //                 title: response.title,
-            //                 text: response.message || "Gagal menyimpan list pemesanan.",
-            //                 icon: "error",
-            //                 showConfirmButton: true,
-            //             });
-            //         }
-            //     },
-            //     error: function(xhr, status, error) {
-            //         console.error("AJAX Error: " + status + error);
-            //         console.error("<?= $role ?>");
-            //         Swal.fire({
-            //             title: "Gagal!",
-            //             text: "Gagal menyimpan data",
-            //             icon: "error",
-            //             confirmButtonText: "OK"
-            //         });
-            //     }
-            // });
-        });
-    });
-
-
-    // save data yang dipilih pemesanan ke database
-    // document.getElementById('submit-selected').addEventListener('click', function() {
-    //     const selected = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked')).map(checkbox => checkbox.value);
-
-    //     if (selected.length === 0) {
-    //         Swal.fire({
-    //             icon: 'warning',
-    //             title: 'Peringatan',
-    //             text: 'Pilih setidaknya satu data!',
-    //             confirmButtonText: 'OK'
-    //         });
-    //         return;
-    //     }
-
-    //     // Kirim data yang dipilih melalui fetch
-    //     const BASE_URL = "<?= base_url(); ?>";
-    //     const payload = {
-    //         selected
-    //     };
-    //     fetch('http://172.23.44.14/MaterialSystem/public/api/saveListPemesanan', {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             body: JSON.stringify(payload),
-    //         })
-    //         .then(async (response) => {
-    //             const resData = await response.json();
-    //             if (response.ok) {
-    //                 Swal.fire({
-    //                     icon: 'success',
-    //                     title: 'Sukses!',
-    //                     text: 'Data berhasil dikirim!',
-    //                 }).then(() => {
-    //                     location.reload(); // Refresh halaman setelah sukses
-    //                 });
-    //             } else {
-    //                 Swal.fire({
-    //                     icon: 'error',
-    //                     title: 'Error!',
-    //                     text: resData.message || 'Gagal mengirim data',
-    //                 });
-    //                 console.error('Response Data:', resData);
-    //             }
-    //         })
-    //         .catch((error) => {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: 'Error!',
-    //                 text: 'Terjadi kesalahan saat mengirim data',
-    //             });
-    //             console.error('Fetch Error:', error);
-    //         });
-    // });
-
-    document.getElementById('formPemesanan').addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        const form = event.target;
-        const formData = new FormData(form);
-        const BASE_URL = "<?= base_url(); ?>";
-
-        // Ambil data checkbox yang tercentang
-        const selectedCheckboxes = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked'));
-
-        // Jika tidak ada yang tercentang, tampilkan alert
-        if (selectedCheckboxes.length === 0) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Peringatan',
-                text: 'Pilih setidaknya satu data!',
-            });
-            return;
-        }
-
-        // Siapkan payload
-        const payload = {};
-
-        selectedCheckboxes.forEach((checkbox) => {
-            // Cari elemen terkait di baris yang sama
-            const row = checkbox.closest('tr');
-
-            // Ambil semua input dalam baris tersebut
-            const inputs = row.querySelectorAll('input');
-
-            inputs.forEach((input) => {
-                const key = input.name.replace(/\[\]$/, ''); // Hapus "[]"
-                if (!payload[key]) payload[key] = [];
-                payload[key].push(input.value);
-            });
-        });
-
-        console.log('inf : ' + payload);
-        fetch('http://172.23.44.14/MaterialSystem/public/api/saveListPemesanan', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-                // credentials: 'include', // Menyertakan cookie/session ID
-            })
-            .then(async (response) => {
-                const resData = await response.json();
-                const selected = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked')).map(checkbox => checkbox.value);
-                if (response.ok) {
-                    fetch('bahanBaku/hapusSession', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json', // Penting untuk memastikan JSON diproses
-                            },
-                            body: JSON.stringify({
-                                selected
-                            }),
-                        })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            if (data.status === 'success') {
-                                // Tampilkan SweetAlert setelah session berhasil dihapus
+                            if (isMaterialUsageEmpty) {
                                 Swal.fire({
-                                    icon: 'success',
-                                    title: 'Success!',
-                                    text: resData.message,
-                                }).then(() => {
-                                    // Redirect ke halaman yang diinginkan
-                                    window.location.href = `${BASE_URL}user/bahanBaku`; // Halaman tujuan setelah sukses
+                                    title: "Peringatan!",
+                                    text: "Data Material Usage kosong. Tidak dapat menyimpan ke session.",
+                                    icon: "warning",
+                                    confirmButtonText: "OK"
                                 });
-                            } else {
-                                console.error('Error saat menghapus session:', error);
-                                Swal.fire({
-                                    icon: 'warning',
-                                    title: 'Warning!',
-                                    text: 'Data berhasil disimpan, tetapi session gagal dihapus.',
-                                }).then(() => {
-                                    // Tetap redirect meskipun ada error saat menghapus session
-                                    window.location.href = `${BASE_URL}user/bahanBaku`;
-                                });
+                                return; // Hentikan proses submit jika tabel kosong
                             }
-                        })
-                        .catch((error) => {
-                            console.error('Error:', error);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Terjadi Kesalahan',
-                                text: 'Gagal menghapus session',
+
+                            // 1) Validasi: Jalan MC tidak boleh kosong di tiap baris
+                            let invalidMachine = false;
+                            $('.material-usage').find('input.jalan_mc').each(function() {
+                                const jm = parseFloat($(this).val()) || 0;
+                                if (jm > 0) {
+                                    invalidMachine = true;
+                                    return false; // break .each
+                                }
                             });
-                        });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: resData.message || 'Gagal menyimpan data',
-                    });
-                    console.error('Response Data:', resData);
-                }
-            })
-            .catch((error) => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: 'Terjadi kesalahan saat mengirim data',
-                });
-                console.error('Fetch Error:', error);
-            });
-    });
+                            // if (invalidMachine) {
+                            //     Swal.fire('Peringatan', 'Nilai Jalan MC tidak boleh kosong atau 0', 'warning');
+                            //     return;
+                            // }
 
-    window.onload = function() {
-        // Hitung tanggal 2 hari ke belakang dari hari ini
-        let today = new Date();
-        let twoDaysAgo = new Date(today);
-        twoDaysAgo.setDate(today.getDate() - 2);
-        // Format ke YYYY-MM-DD
-        let dd = String(twoDaysAgo.getDate()).padStart(2, '0');
-        let mm = String(twoDaysAgo.getMonth() + 1).padStart(2, '0'); // Januari = 0
-        let yyyy = twoDaysAgo.getFullYear();
-        let tgl_pakai = yyyy + '-' + mm + '-' + dd;
+                            // Jika tabel tidak kosong, lanjutkan proses submit
+                            const formData = $(this).serializeArray(); <<
+                            << << < HEAD
+                            console.log(invalidMachine + 'mc');
+                            if (invalidMachine) {
+                                // Kalau ada jalan MC > 0 → simpan ke session dulu
+                                $.ajax({
+                                        url: "<?= base_url($role . '/bahanBaku/simpanKeSession') ?>",
+                                        method: "POST",
+                                        data: formData,
+                                        success: function(response) {
+                                            if (response.status === "success") {
+                                                // Lanjut insert qty cns
+                                                kirimQtyCns(formData);
+                                            } else {
+                                                Swal.fire({
+                                                    title: response.title,
+                                                    text: response.message || "Gagal menyimpan list pemesanan.",
+                                                    icon: "error",
+                                                    showConfirmButton: true,
+                                                });
+                                            }
+                                        },
+                                        error: function(xhr, status, error) {
+                                            Swal.fire("Error", "Gagal simpan ke session", "error"); ===
+                                            === =
 
-        // ambil are
-        let area = document.getElementById('area').value; // Atau ambil dari variable lain
+                                            $.ajax({
+                                                    url: "<?= base_url($role . '/bahanBaku/simpanKeSession') ?>",
+                                                    method: "POST",
+                                                    data: formData,
+                                                    success: function(response) {
+                                                        console.log(response);
+                                                        // Cek status dari Proses 1
+                                                        if (response.status === "success") {
+                                                            // Proses 2: Mengirim ke URL kedua
+                                                            $.ajax({
+                                                                url: "http://172.23.44.14/MaterialSystem/public/api/insertQtyCns",
+                                                                method: "POST",
+                                                                data: formData,
+                                                                success: function(secondResponse) {
+                                                                    // Log respons server
+                                                                    console.log("Response dari Proses 2:", secondResponse);
 
-        $.ajax({
-            url: 'http://172.23.44.14/MaterialSystem/public/api/hapusOldPemesanan',
-            type: 'POST',
-            data: JSON.stringify({
-                area: area,
-                tgl_pakai: tgl_pakai
-            }),
-            dataType: 'json',
-            success: function(response) {
-                console.log('Response:', response);
-            },
-            error: function(xhr, status, error) {
-                console.error('Error:', xhr.responseText || error);
-            }
-        });
-    };
+                                                                    // Periksa status respons dari Proses update qty cns & berat cns
+                                                                    if (secondResponse.status === "success") {
+                                                                        // Kedua proses berhasil
+                                                                        Swal.fire({
+                                                                            title: "Berhasil",
+                                                                            text: "Data berhasil diupdate & disimpan ke list pemesanan.",
+                                                                            icon: "success",
+                                                                            // showConfirmButton: true,
+                                                                        }).then(() => {
+                                                                            location.reload(); // Refresh halaman setelah alert selesai
+                                                                        });
+                                                                    } else if (secondResponse.status === "warning") {
+                                                                        // Proses 2 gagal
+                                                                        Swal.fire({
+                                                                            title: secondResponse.title,
+                                                                            text: secondResponse.message,
+                                                                            icon: secondResponse.status,
+                                                                            showConfirmButton: true,
+                                                                        });
+                                                                    } else {
+                                                                        // Proses 2 gagal
+                                                                        Swal.fire({
+                                                                            title: "Error",
+                                                                            text: secondResponse.message || "Gagal update qty cns.",
+                                                                            icon: "error",
+                                                                            showConfirmButton: true,
+                                                                        });
+                                                                    }
+                                                                },
+                                                                error: function(xhr, status, error) {
+                                                                    console.error(`AJAX Error: ${xhr.status} ${xhr.statusText}`);
+                                                                    console.error("<?= $role ?>");
+                                                                    Swal.fire({
+                                                                        title: "Gagal!",
+                                                                        text: "Gagal menyimpan data",
+                                                                        icon: "error",
+                                                                        confirmButtonText: "OK"
+                                                                    });
+                                                                }
+                                                            });
+                                                        } else {
+                                                            // Proses 1 gagal
+                                                            Swal.fire({
+                                                                title: response.title,
+                                                                text: response.message || "Gagal menyimpan list pemesanan.",
+                                                                icon: "error",
+                                                                showConfirmButton: true,
+                                                            }); >>>
+                                                            >>> > cc2e2a8651c3fbb3b34abc3933c4a25c54c3451e
+                                                        }
+                                                    });
+                                            }
+                                            else {
+                                                // Kalau semua jl mc = 0 → langsung insert qty cns tanpa simpan session
+                                                kirimQtyCns(formData);
+                                            }
 
-    // Checkbox "Select All" functionality
-    document.getElementById('select-all').addEventListener('change', function() {
-        const checkboxes = document.querySelectorAll('.checkbox-pemesanan');
-        const isChecked = this.checked;
+                                            function kirimQtyCns(formData) {
+                                                $.ajax({
+                                                    url: "http://172.23.44.14/MaterialSystem/public/api/insertQtyCns",
+                                                    method: "POST",
+                                                    data: formData,
+                                                    success: function(secondResponse) {
+                                                        console.log(formData);
+                                                        if (secondResponse.status === "success") {
+                                                            Swal.fire({
+                                                                title: "Berhasil",
+                                                                text: "Data berhasil disimpan.",
+                                                                icon: "success",
+                                                            }).then(() => location.reload());
+                                                        } else {
+                                                            Swal.fire({
+                                                                title: secondResponse.title || "Error",
+                                                                text: secondResponse.message || "Gagal update qty cns.",
+                                                                icon: secondResponse.status || "error",
+                                                                showConfirmButton: true,
+                                                            });
+                                                        }
+                                                    },
+                                                    error: function(xhr, status, error) {
+                                                        Swal.fire("Error", "Gagal insert qty cns", "error");
+                                                    }
+                                                });
+                                            }
 
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = isChecked;
-        });
-    });
+                                            // $.ajax({
+                                            //     url: "<?= base_url($role . '/bahanBaku/simpanKeSession') ?>",
+                                            //     method: "POST",
+                                            //     data: formData,
+                                            //     success: function(response) {
+                                            //         console.log(response);
+                                            //         // Cek status dari Proses 1
+                                            //         if (response.status === "success") {
+                                            //             // Proses 2: Mengirim ke URL kedua
+                                            //             $.ajax({
+                                            //                 url: "http://172.23.44.14/MaterialSystem/public/api/insertQtyCns",
+                                            //                 method: "POST",
+                                            //                 data: formData,
+                                            //                 success: function(secondResponse) {
+                                            //                     // Log respons server
+                                            //                     console.log("Response dari Proses 2:", secondResponse);
 
-    // hapus session list pemesanan
-    document.getElementById('delete-selected').addEventListener('click', function() {
-        const selected = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked')).map(checkbox => checkbox.value);
+                                            //                     // Periksa status respons dari Proses update qty cns & berat cns
+                                            //                     if (secondResponse.status === "success") {
+                                            //                         // Kedua proses berhasil
+                                            //                         Swal.fire({
+                                            //                             title: "Berhasil",
+                                            //                             text: "Data berhasil diupdate & disimpan ke list pemesanan.",
+                                            //                             icon: "success",
+                                            //                             // showConfirmButton: true,
+                                            //                         }).then(() => {
+                                            //                             location.reload(); // Refresh halaman setelah alert selesai
+                                            //                         });
+                                            //                     } else if (secondResponse.status === "warning") {
+                                            //                         // Proses 2 gagal
+                                            //                         Swal.fire({
+                                            //                             title: secondResponse.title,
+                                            //                             text: secondResponse.message,
+                                            //                             icon: secondResponse.status,
+                                            //                             showConfirmButton: true,
+                                            //                         });
+                                            //                     } else {
+                                            //                         // Proses 2 gagal
+                                            //                         Swal.fire({
+                                            //                             title: "Error",
+                                            //                             text: secondResponse.message || "Gagal update qty cns.",
+                                            //                             icon: "error",
+                                            //                             showConfirmButton: true,
+                                            //                         });
+                                            //                     }
+                                            //                 },
+                                            //                 error: function(xhr, status, error) {
+                                            //                     console.error(`AJAX Error: ${xhr.status} ${xhr.statusText}`);
+                                            //                     console.error("<?= $role ?>");
+                                            //                     Swal.fire({
+                                            //                         title: "Gagal!",
+                                            //                         text: "Gagal menyimpan data",
+                                            //                         icon: "error",
+                                            //                         confirmButtonText: "OK"
+                                            //                     });
+                                            //                 }
+                                            //             });
+                                            //         } else {
+                                            //             // Proses 1 gagal
+                                            //             Swal.fire({
+                                            //                 title: response.title,
+                                            //                 text: response.message || "Gagal menyimpan list pemesanan.",
+                                            //                 icon: "error",
+                                            //                 showConfirmButton: true,
+                                            //             });
+                                            //         }
+                                            //     },
+                                            //     error: function(xhr, status, error) {
+                                            //         console.error("AJAX Error: " + status + error);
+                                            //         console.error("<?= $role ?>");
+                                            //         Swal.fire({
+                                            //             title: "Gagal!",
+                                            //             text: "Gagal menyimpan data",
+                                            //             icon: "error",
+                                            //             confirmButtonText: "OK"
+                                            //         });
+                                            //     }
+                                            // });
+                                        });
+                                });
 
-        if (selected.length === 0) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Peringatan',
-                text: 'Pilih setidaknya satu data!',
-                confirmButtonText: 'OK'
-            });
-            return;
-        }
 
-        if (confirm('Apakah Anda yakin ingin menghapus data yang dipilih?')) {
-            $.ajax({
-                url: '<?= base_url($role . "/bahanBaku/hapusSession") ?>',
-                type: 'POST',
-                contentType: 'application/json', // Tentukan format data sebagai JSON
-                data: JSON.stringify({
-                    selected
-                }), // Ubah data menjadi string JSON
-                success: function(response) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil',
-                        text: 'Data berhasil dihapus',
-                        confirmButtonText: 'OK'
-                    }).then(function() {
-                        location.reload(); // Refresh halaman setelah penghapusan
-                    });
-                },
-                error: function(xhr) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal menghapus data',
-                        text: 'Terjadi kesalahan: ' + xhr.responseText,
-                        confirmButtonText: 'OK'
-                    });
-                }
-            });
-        }
-    });
+                            // save data yang dipilih pemesanan ke database
+                            // document.getElementById('submit-selected').addEventListener('click', function() {
+                            //     const selected = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked')).map(checkbox => checkbox.value);
+
+                            //     if (selected.length === 0) {
+                            //         Swal.fire({
+                            //             icon: 'warning',
+                            //             title: 'Peringatan',
+                            //             text: 'Pilih setidaknya satu data!',
+                            //             confirmButtonText: 'OK'
+                            //         });
+                            //         return;
+                            //     }
+
+                            //     // Kirim data yang dipilih melalui fetch
+                            //     const BASE_URL = "<?= base_url(); ?>";
+                            //     const payload = {
+                            //         selected
+                            //     };
+                            //     fetch('http://172.23.44.14/MaterialSystem/public/api/saveListPemesanan', {
+                            //             method: 'POST',
+                            //             headers: {
+                            //                 'Content-Type': 'application/json',
+                            //             },
+                            //             body: JSON.stringify(payload),
+                            //         })
+                            //         .then(async (response) => {
+                            //             const resData = await response.json();
+                            //             if (response.ok) {
+                            //                 Swal.fire({
+                            //                     icon: 'success',
+                            //                     title: 'Sukses!',
+                            //                     text: 'Data berhasil dikirim!',
+                            //                 }).then(() => {
+                            //                     location.reload(); // Refresh halaman setelah sukses
+                            //                 });
+                            //             } else {
+                            //                 Swal.fire({
+                            //                     icon: 'error',
+                            //                     title: 'Error!',
+                            //                     text: resData.message || 'Gagal mengirim data',
+                            //                 });
+                            //                 console.error('Response Data:', resData);
+                            //             }
+                            //         })
+                            //         .catch((error) => {
+                            //             Swal.fire({
+                            //                 icon: 'error',
+                            //                 title: 'Error!',
+                            //                 text: 'Terjadi kesalahan saat mengirim data',
+                            //             });
+                            //             console.error('Fetch Error:', error);
+                            //         });
+                            // });
+
+                            document.getElementById('formPemesanan').addEventListener('submit', function(event) {
+                                event.preventDefault();
+
+                                const form = event.target;
+                                const formData = new FormData(form);
+                                const BASE_URL = "<?= base_url(); ?>";
+
+                                // Ambil data checkbox yang tercentang
+                                const selectedCheckboxes = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked'));
+
+                                // Jika tidak ada yang tercentang, tampilkan alert
+                                if (selectedCheckboxes.length === 0) {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'Peringatan',
+                                        text: 'Pilih setidaknya satu data!',
+                                    });
+                                    return;
+                                }
+
+                                // Siapkan payload
+                                const payload = {};
+
+                                selectedCheckboxes.forEach((checkbox) => {
+                                    // Cari elemen terkait di baris yang sama
+                                    const row = checkbox.closest('tr');
+
+                                    // Ambil semua input dalam baris tersebut
+                                    const inputs = row.querySelectorAll('input');
+
+                                    inputs.forEach((input) => {
+                                        const key = input.name.replace(/\[\]$/, ''); // Hapus "[]"
+                                        if (!payload[key]) payload[key] = [];
+                                        payload[key].push(input.value);
+                                    });
+                                });
+
+                                console.log('inf : ' + payload);
+                                fetch('http://172.23.44.14/MaterialSystem/public/api/saveListPemesanan', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify(payload),
+                                        // credentials: 'include', // Menyertakan cookie/session ID
+                                    })
+                                    .then(async (response) => {
+                                        const resData = await response.json();
+                                        const selected = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked')).map(checkbox => checkbox.value);
+                                        if (response.ok) {
+                                            fetch('bahanBaku/hapusSession', {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'Content-Type': 'application/json', // Penting untuk memastikan JSON diproses
+                                                    },
+                                                    body: JSON.stringify({
+                                                        selected
+                                                    }),
+                                                })
+                                                .then((response) => response.json())
+                                                .then((data) => {
+                                                    if (data.status === 'success') {
+                                                        // Tampilkan SweetAlert setelah session berhasil dihapus
+                                                        Swal.fire({
+                                                            icon: 'success',
+                                                            title: 'Success!',
+                                                            text: resData.message,
+                                                        }).then(() => {
+                                                            // Redirect ke halaman yang diinginkan
+                                                            window.location.href = `${BASE_URL}user/bahanBaku`; // Halaman tujuan setelah sukses
+                                                        });
+                                                    } else {
+                                                        console.error('Error saat menghapus session:', error);
+                                                        Swal.fire({
+                                                            icon: 'warning',
+                                                            title: 'Warning!',
+                                                            text: 'Data berhasil disimpan, tetapi session gagal dihapus.',
+                                                        }).then(() => {
+                                                            // Tetap redirect meskipun ada error saat menghapus session
+                                                            window.location.href = `${BASE_URL}user/bahanBaku`;
+                                                        });
+                                                    }
+                                                })
+                                                .catch((error) => {
+                                                    console.error('Error:', error);
+                                                    Swal.fire({
+                                                        icon: 'error',
+                                                        title: 'Terjadi Kesalahan',
+                                                        text: 'Gagal menghapus session',
+                                                    });
+                                                });
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Error!',
+                                                text: resData.message || 'Gagal menyimpan data',
+                                            });
+                                            console.error('Response Data:', resData);
+                                        }
+                                    })
+                                    .catch((error) => {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error!',
+                                            text: 'Terjadi kesalahan saat mengirim data',
+                                        });
+                                        console.error('Fetch Error:', error);
+                                    });
+                            });
+
+                            window.onload = function() {
+                                // Hitung tanggal 2 hari ke belakang dari hari ini
+                                let today = new Date();
+                                let twoDaysAgo = new Date(today);
+                                twoDaysAgo.setDate(today.getDate() - 2);
+                                // Format ke YYYY-MM-DD
+                                let dd = String(twoDaysAgo.getDate()).padStart(2, '0');
+                                let mm = String(twoDaysAgo.getMonth() + 1).padStart(2, '0'); // Januari = 0
+                                let yyyy = twoDaysAgo.getFullYear();
+                                let tgl_pakai = yyyy + '-' + mm + '-' + dd;
+
+                                // ambil are
+                                let area = document.getElementById('area').value; // Atau ambil dari variable lain
+
+                                $.ajax({
+                                    url: 'http://172.23.44.14/MaterialSystem/public/api/hapusOldPemesanan',
+                                    type: 'POST',
+                                    data: JSON.stringify({
+                                        area: area,
+                                        tgl_pakai: tgl_pakai
+                                    }),
+                                    dataType: 'json',
+                                    success: function(response) {
+                                        console.log('Response:', response);
+                                    },
+                                    error: function(xhr, status, error) {
+                                        console.error('Error:', xhr.responseText || error);
+                                    }
+                                });
+                            };
+
+                            // Checkbox "Select All" functionality
+                            document.getElementById('select-all').addEventListener('change', function() {
+                                const checkboxes = document.querySelectorAll('.checkbox-pemesanan');
+                                const isChecked = this.checked;
+
+                                checkboxes.forEach(checkbox => {
+                                    checkbox.checked = isChecked;
+                                });
+                            });
+
+                            // hapus session list pemesanan
+                            document.getElementById('delete-selected').addEventListener('click', function() {
+                                const selected = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked')).map(checkbox => checkbox.value);
+
+                                if (selected.length === 0) {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'Peringatan',
+                                        text: 'Pilih setidaknya satu data!',
+                                        confirmButtonText: 'OK'
+                                    });
+                                    return;
+                                }
+
+                                if (confirm('Apakah Anda yakin ingin menghapus data yang dipilih?')) {
+                                    $.ajax({
+                                        url: '<?= base_url($role . "/bahanBaku/hapusSession") ?>',
+                                        type: 'POST',
+                                        contentType: 'application/json', // Tentukan format data sebagai JSON
+                                        data: JSON.stringify({
+                                            selected
+                                        }), // Ubah data menjadi string JSON
+                                        success: function(response) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'Berhasil',
+                                                text: 'Data berhasil dihapus',
+                                                confirmButtonText: 'OK'
+                                            }).then(function() {
+                                                location.reload(); // Refresh halaman setelah penghapusan
+                                            });
+                                        },
+                                        error: function(xhr) {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Gagal menghapus data',
+                                                text: 'Terjadi kesalahan: ' + xhr.responseText,
+                                                confirmButtonText: 'OK'
+                                            });
+                                        }
+                                    });
+                                }
+                            });
 </script>
 
 <?php $this->endSection(); ?>
