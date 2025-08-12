@@ -826,6 +826,9 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
 
     // chat
     $routes->get('chat', 'ChatController::pesan');
+
+    // pengaduan
+    $routes->get('pengaduan', 'PengaduanController::index');
 });
 
 // ie
