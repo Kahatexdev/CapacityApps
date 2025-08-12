@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 use App\Models\DataMesinModel;
 use App\Models\EstSpkModel;
 use App\Models\MonthlyMcModel;
-use App\Models\pengaduanModel;
+use App\Models\PengaduanModel;
 use App\Models\UserModel;
 
 
@@ -43,7 +43,7 @@ abstract class BaseController extends Controller
         $this->jarumModel = new DataMesinModel();
         $this->estspk = new EstSpkModel();
         $this->globalModel = new MonthlyMcModel();
-        $this->pengaduanModel = new pengaduanModel();
+        $this->pengaduanModel = new PengaduanModel();
         $this->userModel = new UserModel();
         $this->role = session()->get('role');
     }
