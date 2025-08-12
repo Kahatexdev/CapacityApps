@@ -1,5 +1,56 @@
-<?php $this->extend('user/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
+
 <?php $this->section('content'); ?>
+
+<style>
+    .table-wrapper {
+        overflow-x: auto;
+        position: relative;
+        /* penting biar sticky posisi relatif ke wrapper */
+    }
+
+    .table-freeze th,
+    .table-freeze td {
+        white-space: nowrap;
+        background: white;
+        /* biar gak transparan pas scroll */
+        z-index: 1;
+    }
+
+    /* Kolom pertama */
+    .table-freeze .sticky-col {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        background: white;
+    }
+
+    /* Kolom kedua */
+    .table-freeze .sticky-col-2 {
+        position: sticky;
+        left: 120px;
+        /* sesuaikan lebar kolom pertama */
+        z-index: 2;
+        background: white;
+    }
+
+    /* Kolom ketiga */
+    .table-freeze .sticky-col-3 {
+        position: sticky;
+        left: 240px;
+        /* lebar kolom pertama + kedua */
+        z-index: 2;
+        background: white;
+    }
+
+    /* Header di sticky kolom */
+    .table-freeze thead th.sticky-col,
+    .table-freeze thead th.sticky-col-2,
+    .table-freeze thead th.sticky-col-3 {
+        z-index: 3;
+        /* biar header di atas data */
+    }
+</style>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
         <script>
@@ -116,25 +167,31 @@
                     <div class="card">
                         <div class="card-body p-3">
                             <div class="row d-flex align-items-center justify-content-center">
+                              <div class="col-3 d-flex flex-column align-items-center">
+                                    <div class="numbers text-center">
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">No Model</p>
+                                        <h5 class="font-weight-bolder mb-0">${data['master']['no_model'] ?? '-' }</h5>
+                                    </div>
+                                </div>
                                 <div class="col-3 d-flex flex-column align-items-center">
                                     <div class="numbers text-center">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">Buyer</p>
                                         <h5 class="font-weight-bolder mb-0">${data['master']['kd_buyer_order']}</h5>
                                     </div>
                                 </div>
-                                <div class="col-3 d-flex flex-column align-items-center">
+                                <div class="col-2 d-flex flex-column align-items-center">
                                     <div class="numbers text-center">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">Delivery Awal</p>
                                         <h5 class="font-weight-bolder mb-0">${data['master']['delivery_awal']}</h5>
                                     </div>
                                 </div>
-                                <div class="col-3 d-flex flex-column align-items-center">
+                                <div class="col-2 d-flex flex-column align-items-center">
                                     <div class="numbers text-center">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">Delivery Akhir</p>
                                         <h5 class="font-weight-bolder mb-0">${data['master']['delivery_akhir']}</h5>
                                     </div>
                                 </div>
-                                <div class="col-3 d-flex flex-column align-items-center">
+                              <div class="col-2 d-flex flex-column align-items-center">
                                     <div class="numbers text-center">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">Start MC</p>
                                         <h5 class="font-weight-bolder mb-0">${data['master']['start_mc'] ?? '-' }</h5>
@@ -147,120 +204,133 @@
             </div>
         `;
 
+        let htmlCelupHeader = `
+<div class="row my-4">
+    <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+        <div class="card">
+            <div class="card-body p-3">
+                <h5 class="mt-4">🧪 Status CELUP (Benang & Nylon)</h5>
+                <div class="table-wrapper" style="overflow-x:auto;">
+                    <table class="table table-bordered table-striped table-sm table-freeze">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="sticky-col">Jenis</th>
+                                <th class="sticky-col-2">Kode Warna</th>
+                                <th class="sticky-col-3">Warna</th>
+                                <th>Status Celup</th>
+                                <th>Qty PO</th>
+                                <th>Qty Celup</th>
+                                <th>Lot Celup</th>
+                                <th>Tgl Schedule</th>
+                                <th>Tgl Bon</th>
+                                <th>Tgl Celup</th>
+                                <th>Tgl Bongkar</th>
+                                <th>Tgl Press/Oven</th>
+                                <th>Tgl TL</th>
+                                <th>Tgl Rajut Pagi</th>
+                                <th>Serah Terima ACC</th>
+                                <th>Tgl ACC KK</th>
+                                <th>Tgl Kelos</th>
+                                <th>Tgl Reject KK</th>
+                                <th>Tgl Matching</th>
+                                <th>Tgl Perbaikan</th>
+                                <th>Ket Daily Cek</th>
+                                <th>Stock Gbn (Kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+`;
+
+        let htmlCelupBody = "";
+
+        let htmlCoveringHeader = `
+<div class="row my-4">
+    <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+        <div class="card">
+            <div class="card-body p-3">
+                <h5 class="mt-4">🧵 Status COVERING (Spandex & Karet)</h5>
+                <div class="table-wrapper" style="overflow-x:auto;">
+                    <table class="table table-bordered table-striped table-sm table-freeze">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="sticky-col">Model</th>
+                                <th class="sticky-col-2">Jenis</th>
+                                <th class="sticky-col-3">Kode Warna</th>
+                                <th>Warna</th>
+                                <th>Status Covering</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+`;
+
+        let htmlCoveringBody = "";
+
+        // Loop data
         dataStatus.forEach(item => {
-            let statusClasses = {
-                'done': 'bg-gradient-success',
-                'retur': 'bg-gradient-warning',
+            const statusClasses = {
+                'done': 'bg-gradient-success text-white',
+                'retur': 'bg-gradient-warning text-dark',
             };
 
-            let statusClass = statusClasses[item.last_status] || 'bg-gradient-info';
-            let statusCov = statusClasses[item.status] || 'bg-gradient-info';
+            const statusClass = statusClasses[item?.last_status] || 'bg-gradient-info text-white';
+            const statusCov = statusClasses[item?.status] || 'bg-gradient-info text-white';
 
-            let keteranganBadge = '';
-            if (item.keterangan) {
-                item.keterangan.split(',').forEach(ket => {
-                    keteranganBadge += `
-                    <div class="mb-1"><span>${ket.trim()}</span></div>`;
-                });
-            }
+            const keteranganBadge = item?.keterangan ?
+                item.keterangan.split(',').map(ket => `<div>${ket.trim()}</div>`).join('') :
+                '-';
 
-            // Ubah ke huruf besar agar konsisten
-            let jenis = (item.jenis || '').toUpperCase();
+            const jenis = (item?.jenis || '').toUpperCase();
 
-            // CELUP SECTION (jika BENANG)
-            let celupSection = '';
             if (['BENANG', 'NYLON'].includes(jenis)) {
-                celupSection = `
-                    <div class="mb-4 border-bottom pb-3">
-                        <h6 class="text-primary border-start border-4 ps-2 mb-3">🧪 Status CELUP</h6>
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <strong>Status:</strong>
-                            <span class="badge ${statusClass} px-3 py-2">${item.last_status}</span>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <p><strong>Qty PO:</strong> ${parseFloat(item.qty_po).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</p>
-                                <p><strong>Qty Celup:</strong> ${parseFloat(item.kg_celup).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</p>
-                                <p><strong>Lot Celup:</strong> ${item.lot_celup}</p>
-                                <p><strong>Start MC:</strong> ${formatDate(item.start_mc)}</p>
-                                <p><strong>Tgl Schedule:</strong> ${formatDate(item.tanggal_schedule)}</p>
-                            </div>
-                            <div class="col-md-3">
-                                <p><strong>Tgl Bon:</strong> ${formatDate(item.tanggal_bon)}</p>
-                                <p><strong>Tgl Celup:</strong> ${formatDate(item.tanggal_celup)}</p>
-                                <p><strong>Tgl Bongkar:</strong> ${formatDate(item.tanggal_bongkar)}</p>
-                                <p><strong>Tgl Press/Oven:</strong> ${formatDate(item.tanggal_press_oven)}</p>
-                                <p><strong>Tgl TL:</strong> ${formatDate(item.tanggal_tl)}</p>
-                            </div>
-                            <div class="col-md-3">
-                                <p><strong>Tgl Rajut Pagi:</strong> ${formatDate(item.tanggal_rajut_pagi)}</p>
-                                <p><strong>Serah Terima ACC:</strong> ${formatDate(item.serah_terima_acc)}</p>
-                                <p><strong>Tgl ACC KK:</strong> ${formatDate(item.tanggal_acc)}</p>
-                                <p><strong>Tgl Kelos:</strong> ${formatDate(item.tanggal_kelos)}</p>
-                                <p><strong>Tgl Reject KK:</strong> ${formatDate(item.tanggal_reject)}</p>
-                            </div>
-                            <div class="col-md-3">
-                                <p><strong>Tgl Matching:</strong> ${formatDate(item.tanggal_matching)}</p>
-                                <p><strong>Tgl Perbaikan:</strong> ${formatDate(item.tanggal_perbaikan)}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-3">
-                            <p><strong>Ket Daily Cek:</strong></p>
-                        </div>
-                        <div class="col-md-3">
-                            <p>${item.ket_daily_cek || '-'}</p>
-                        </div>
-                        <div class="col-md-3">
-                            <p><strong>Stock Gbn:</strong></p>
-                        </div>
-                        <div class="col-md-3">
-                            <p>${parseFloat(item.kg_stock).toLocaleString('id-ID', { minimumFractionDigits: 2 }) || '-'} Kg</p>
-                        </div>
-                    </div>
-                `;
+                htmlCelupBody += `
+<tr>
+    <td  class="sticky-col">${item.item_type}</td>
+    <td  class="sticky-col-2">${item.kode_warna}</td>
+    <td class="sticky-col-3">${item.color}</td>
+    <td><span class="badge ${statusClass} px-3 py-2">${item.last_status || '-'}</span></td>
+    <td class="text-end">${formatNumber(item.qty_po)}</td>
+    <td class="text-end">${formatNumber(item.kg_celup)}</td>
+    <td>${item.lot_celup || '-'}</td>
+    <td>${formatDate(item.tanggal_schedule)}</td>
+    <td>${formatDate(item.tanggal_bon)}</td>
+    <td>${formatDate(item.tanggal_celup)}</td>
+    <td>${formatDate(item.tanggal_bongkar)}</td>
+    <td>${formatDate(item.tanggal_press_oven)}</td>
+    <td>${formatDate(item.tanggal_tl)}</td>
+    <td>${formatDate(item.tanggal_rajut_pagi)}</td>
+    <td>${formatDate(item.serah_terima_acc)}</td>
+    <td>${formatDate(item.tanggal_acc)}</td>
+    <td>${formatDate(item.tanggal_kelos)}</td>
+    <td>${formatDate(item.tanggal_reject)}</td>
+    <td>${formatDate(item.tanggal_matching)}</td>
+    <td>${formatDate(item.tanggal_perbaikan)}</td>
+    <td>${item.ket_daily_cek || '-'}</td>
+    <td class="text-end">${formatNumber(item.kg_stock)}</td>
+</tr>
+`;
             }
 
-            // COVERING SECTION (jika KARET, NYLON, SPANDEX)
-            let coveringSection = '';
-            if (['KARET', 'SPANDEX'].includes(jenis)) {
-                coveringSection = `
-                    <div class="mb-3">
-                        <h6 class="text-success border-start border-4 ps-2 mb-3">🧵 Status COVERING</h6>
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <strong>Status:</strong>
-                            <span class="badge ${statusCov} px-3 py-2">${item.status || '-'}</span>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <strong>Keterangan:</strong><br/>
-                            </div>
-                            <div class="col-md-8">
-                                ${keteranganBadge || '<span class="text-muted">-</span>'}
-                            </div>
-                        </div>
-                    </div>
-                `;
+            if (['SPANDEX', 'KARET'].includes(jenis)) {
+                htmlCoveringBody += `
+<tr>
+    <td>${item?.no_model || '-'}</td>
+    <td>${item?.item_type || '-'}</td>
+    <td>${item?.kode_warna || '-'}</td>
+    <td>${item?.color || '-'}</td>
+    <td><span class="badge ${statusCov} px-3 py-2">${item?.status || '-'}</span></td>
+    <td>${keteranganBadge}</td>
+</tr>
+`;
             }
-
-
-            let card = `
-                <div class="card shadow-sm my-4">
-                    <div class="card-header bg-light">
-                        <h5 class="mb-0">Model: <strong>${item.no_model}</strong> | Jenis: ${item.item_type}</h5>
-                        <small>Kode Warna: ${item.kode_warna} | Warna: ${item.color}</small>
-                    </div>
-                    <div class="card-body">
-                        ${celupSection}
-                        ${coveringSection}
-                    </div>
-                </div>
-            `;
-
-            resultContainer.innerHTML += card;
         });
 
+        // Tutup tabel
+        let htmlCelup = htmlCelupHeader + htmlCelupBody + `</tbody></table></div></div></div></div></div>`;
+        let htmlCovering = htmlCoveringHeader + htmlCoveringBody + `</tbody></table></div></div></div></div></div>`;
+
+        // Render
+        resultContainer.innerHTML += htmlCelup + htmlCovering;
     }
 
     // Fungsi untuk format tanggal agar tidak error
@@ -272,6 +342,14 @@
             day: '2-digit',
             month: 'short'
         });
+    }
+
+    function formatNumber(value) {
+        return value != null && !isNaN(value) ?
+            parseFloat(value).toLocaleString('id-ID', {
+                minimumFractionDigits: 2
+            }) :
+            '-';
     }
 </script>
 
