@@ -159,7 +159,7 @@
                                                 $total_ttl_cns       += (float) $record['ttl_cns'];
                                                 $total_ttl_berat_cns += (float) $record['ttl_berat_cns'];
                                         ?>
-                                                <tr>
+                                                <tr data-group="<?= $groupKey; ?>">
                                                     <!-- kolom hide -->
                                                     <input type="hidden" name="role" value="<?= $role; ?>">
                                                     <input type="hidden" name="id_material[]" value="<?= $record['id_material']; ?>">
@@ -178,7 +178,7 @@
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="kode_warna[]" value="<?= $record['kode_warna']; ?>" readonly></td>
                                                     <td class="text-center"><input type="text" class="form-control text-center w-100" name="warna[]" value="<?= $record['warna']; ?>" readonly></td>
                                                     <td class="text-center"><input type="number" class="form-control text-center w-100" name="jalan_mc[]" value=<?= $record['jalan_mc']; ?> readonly></td>
-                                                    <td class="text-center"><input type="number" step="0.01" class="form-control text-center w-100" name="ttl_cns[]" value=<?= isset($record['ttl_cns']) ? $record['ttl_cns'] : 0 ?> readonly></td>
+                                                    <td class="text-center"><input type="number" class="form-control text-center w-100" name="ttl_cns[]" value=<?= isset($record['ttl_cns']) ? $record['ttl_cns'] : 0 ?> readonly></td>
                                                     <td class="text-center"><input type="number" step="0.01" class="form-control text-center w-100" name="ttl_berat_cns[]" value=<?= isset($record['ttl_berat_cns']) ? $record['ttl_berat_cns'] : 0 ?> readonly></td>
                                                     <!-- <td class="text-center"><input type="text" class="form-control text-center w-100" name="po_tambahan[]" value="<?= $record['po_tambahan']; ?>" readonly></td> -->
                                                     <td class="text-center">
@@ -195,18 +195,38 @@
                                             }
                                             // Dapatkan data grouping dari record pertama grup
                                             $first = $group[0];
+                                            $poTambahan = ($first['po_tambahan'] ?? '') == 1 ? '(+)' : '';
                                             ?>
                                             <!-- Baris subtotal dengan informasi grouping ditampilkan di kolom yang sesuai -->
-                                            <tr class="subtotal">
+                                            <tr class="subtotal" data-group="<?= $groupKey; ?>">
                                                 <!-- Kolom No dan Tanggal Pakai bisa dikosongkan atau diberi label Total -->
-                                                <td colspan="8" class="font-weight-bolder" style="text-align: right;">TOTAL <?= $first['no_model'] . ' / ' . $first['item_type'] . ' / ' . $first['kode_warna'] . ' / ' . $first['warna']; ?></td>
+                                                <td colspan="2"></td>
+                                                <td colspan="2" class="font-weight-bolder" style="text-align: right;">
+                                                    <input type="text" class="form-control" name="lot[]" placeholder="Lot">
+                                                </td>
+                                                <td colspan="3" class="font-weight-bolder" style="text-align: right;">
+                                                    <input type="text" class="form-control" name="keterangan[]" placeholder="Keterangan">
+                                                </td>
+                                                <td colspan="2" class="text-center font-weight-bolder">
+                                                    Stock Area
+                                                </td>
                                                 <td class="text-center font-weight-bolder">
+                                                    <input type="number" step="1" class="form-control stock-cns" name="stock_cns[]" placeholder="Cns">
+                                                </td>
+                                                <td class="text-center font-weight-bolder">
+                                                    <input type="number" step="0.01" class="form-control stock-kg" name="stock_kg[]" placeholder="Kg">
+                                                </td>
+                                            </tr>
+                                            <tr class="subtotal" data-group="<?= $groupKey; ?>">
+                                                <!-- Kolom No dan Tanggal Pakai bisa dikosongkan atau diberi label Total -->
+                                                <td colspan="8" class="font-weight-bolder" style="text-align: right;">TOTAL <?= $poTambahan . $first['no_model'] . ' / ' . $first['item_type'] . ' / ' . $first['kode_warna'] . ' / ' . $first['warna']; ?></td>
+                                                <td class="text-center font-weight-bolder total-jalan-mc">
                                                     <?= number_format($total_jalan_mc, 2) ?>
                                                 </td>
-                                                <td class="text-center font-weight-bolder">
-                                                    <?= number_format($total_ttl_cns, 2) ?>
+                                                <td class="text-center font-weight-bolder total-cns" data-total-awal="<?= $total_ttl_cns ?>">
+                                                    <?= $total_ttl_cns ?>
                                                 </td>
-                                                <td class="text-center font-weight-bolder">
+                                                <td class="text-center font-weight-bolder total-kg" data-total-awal="<?= $total_ttl_berat_cns ?>">
                                                     <?= number_format($total_ttl_berat_cns, 2) ?>
                                                 </td>
                                             </tr>
@@ -475,7 +495,7 @@
 
                 // Perbarui nilai Total Cones dan Total Berat Cones
                 row.find('.jalan_mc').val(jalanMc);
-                row.find('.ttl_cns').val(ttlCns.toFixed(2));
+                row.find('.ttl_cns').val(ttlCns);
                 row.find('.ttl_berat_cns').val(ttlBeratCns.toFixed(2));
             });
         });
@@ -593,7 +613,7 @@
                                     const uniqueKey = `[${row}][${index}]`;
                                     const total = (item.qty_cns * item.qty_berat_cns).toFixed(2);
                                     const jalanMc = parseFloat(jalanMcInput.val()) || 0; // Ganti dengan input jalanMc yang sesuai
-                                    const totalCones = (item.qty_cns * jalanMc).toFixed(2);
+                                    const totalCones = item.qty_cns * jalanMc;
                                     const totalBeratCones = (total * jalanMc).toFixed(2);
                                     const poTambahan = poTambahanChecked;
 
@@ -632,7 +652,7 @@
                                                 </td>
                                                 <td class="text-center">
                                                     Total Cones:
-                                                    <input type="number" step="0.01" class="form-control text-center ttl_cns" name="items[${row}][${index}][ttl_cns]" id="ttl_cns" value=${totalCones || 0} readonly>
+                                                    <input type="number" class="form-control text-center ttl_cns" name="items[${row}][${index}][ttl_cns]" id="ttl_cns" value=${totalCones || 0} readonly>
                                                 </td>
                                                 <td class="text-center">
                                                     Total Berat Cones:
@@ -719,9 +739,19 @@
             //     return;
             // }
 
+            // Set required pada tanggal pakai kalau ada jalan_mc > 0
+            if (invalidMachine) {
+                const pakaiBenangNylon = $('#tgl_pakai_benang_nylon').val().trim();
+                const pakaiSpandexKaret = $('#tgl_pakai_spandex_karet').val().trim();
+
+                if (pakaiBenangNylon === '' || pakaiSpandexKaret === '') {
+                    e.preventDefault(); // stop submit
+                    Swal.fire('Peringatan', 'Tanggal pakai wajib diisi', 'warning');
+                    return false;
+                }
+            }
             // Jika tabel tidak kosong, lanjutkan proses submit
             const formData = $(this).serializeArray();
-<<<<<<< HEAD
             console.log(invalidMachine + 'mc');
             if (invalidMachine) {
                 // Kalau ada jalan MC > 0 → simpan ke session dulu
@@ -744,74 +774,6 @@
                     },
                     error: function(xhr, status, error) {
                         Swal.fire("Error", "Gagal simpan ke session", "error");
-=======
-
-            $.ajax({
-                url: "<?= base_url($role . '/bahanBaku/simpanKeSession') ?>",
-                method: "POST",
-                data: formData,
-                success: function(response) {
-                    console.log(response);
-                    // Cek status dari Proses 1
-                    if (response.status === "success") {
-                        // Proses 2: Mengirim ke URL kedua
-                        $.ajax({
-                            url: "http://172.23.44.14/MaterialSystem/public/api/insertQtyCns",
-                            method: "POST",
-                            data: formData,
-                            success: function(secondResponse) {
-                                // Log respons server
-                                console.log("Response dari Proses 2:", secondResponse);
-
-                                // Periksa status respons dari Proses update qty cns & berat cns
-                                if (secondResponse.status === "success") {
-                                    // Kedua proses berhasil
-                                    Swal.fire({
-                                        title: "Berhasil",
-                                        text: "Data berhasil diupdate & disimpan ke list pemesanan.",
-                                        icon: "success",
-                                        // showConfirmButton: true,
-                                    }).then(() => {
-                                        location.reload(); // Refresh halaman setelah alert selesai
-                                    });
-                                } else if (secondResponse.status === "warning") {
-                                    // Proses 2 gagal
-                                    Swal.fire({
-                                        title: secondResponse.title,
-                                        text: secondResponse.message,
-                                        icon: secondResponse.status,
-                                        showConfirmButton: true,
-                                    });
-                                } else {
-                                    // Proses 2 gagal
-                                    Swal.fire({
-                                        title: "Error",
-                                        text: secondResponse.message || "Gagal update qty cns.",
-                                        icon: "error",
-                                        showConfirmButton: true,
-                                    });
-                                }
-                            },
-                            error: function(xhr, status, error) {
-                                console.error(`AJAX Error: ${xhr.status} ${xhr.statusText}`);
-                                console.error("<?= $role ?>");
-                                Swal.fire({
-                                    title: "Gagal!",
-                                    text: "Gagal menyimpan data",
-                                    icon: "error",
-                                    confirmButtonText: "OK"
-                                });
-                            }
-                        });
-                    } else {
-                        // Proses 1 gagal
-                        Swal.fire({
-                            title: response.title,
-                            text: response.message || "Gagal menyimpan list pemesanan.",
-                            icon: "error",
-                            showConfirmButton: true,
-                        });
->>>>>>> cc2e2a8651c3fbb3b34abc3933c4a25c54c3451e
                     }
                 });
             } else {
@@ -926,63 +888,29 @@
             //     }
             // });
         });
+
+        // untuk kalkulasi stock mc
+        $(document).on('input', '.stock-kg, .stock-cns', function() {
+            let $row = $(this).closest('tr.subtotal'); // Baris subtotal input stock
+            let $nextTotalRow = $row.next('.subtotal'); // Baris total group
+
+            // Ambil total awal dari atribut data
+            let totalCnsAwal = parseFloat($nextTotalRow.find('.total-cns').data('total-awal')) || 0;
+            let totalKgAwal = parseFloat($nextTotalRow.find('.total-kg').data('total-awal')) || 0;
+
+            // Ambil nilai input stock
+            let stockCns = parseFloat($row.find('.stock-cns').val()) || 0;
+            let stockKg = parseFloat($row.find('.stock-kg').val()) || 0;
+
+            // Hitung total setelah dikurangi stock
+            let sisaCns = totalCnsAwal - stockCns;
+            let sisaKg = totalKgAwal - stockKg;
+
+            // Update tampilan
+            $nextTotalRow.find('.total-cns').text(sisaCns.toFixed(0));
+            $nextTotalRow.find('.total-kg').text(sisaKg.toFixed(2));
+        });
     });
-
-
-    // save data yang dipilih pemesanan ke database
-    // document.getElementById('submit-selected').addEventListener('click', function() {
-    //     const selected = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked')).map(checkbox => checkbox.value);
-
-    //     if (selected.length === 0) {
-    //         Swal.fire({
-    //             icon: 'warning',
-    //             title: 'Peringatan',
-    //             text: 'Pilih setidaknya satu data!',
-    //             confirmButtonText: 'OK'
-    //         });
-    //         return;
-    //     }
-
-    //     // Kirim data yang dipilih melalui fetch
-    //     const BASE_URL = "<?= base_url(); ?>";
-    //     const payload = {
-    //         selected
-    //     };
-    //     fetch('http://172.23.44.14/MaterialSystem/public/api/saveListPemesanan', {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             body: JSON.stringify(payload),
-    //         })
-    //         .then(async (response) => {
-    //             const resData = await response.json();
-    //             if (response.ok) {
-    //                 Swal.fire({
-    //                     icon: 'success',
-    //                     title: 'Sukses!',
-    //                     text: 'Data berhasil dikirim!',
-    //                 }).then(() => {
-    //                     location.reload(); // Refresh halaman setelah sukses
-    //                 });
-    //             } else {
-    //                 Swal.fire({
-    //                     icon: 'error',
-    //                     title: 'Error!',
-    //                     text: resData.message || 'Gagal mengirim data',
-    //                 });
-    //                 console.error('Response Data:', resData);
-    //             }
-    //         })
-    //         .catch((error) => {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: 'Error!',
-    //                 text: 'Terjadi kesalahan saat mengirim data',
-    //             });
-    //             console.error('Fetch Error:', error);
-    //         });
-    // });
 
     document.getElementById('formPemesanan').addEventListener('submit', function(event) {
         event.preventDefault();
@@ -1004,22 +932,44 @@
             return;
         }
 
-        // Siapkan payload
         const payload = {};
 
         selectedCheckboxes.forEach((checkbox) => {
-            // Cari elemen terkait di baris yang sama
-            const row = checkbox.closest('tr');
+            const row = checkbox.closest('tr'); // Baris utama
+            const groupKey = row.dataset.group; // Ambil group dari row
 
-            // Ambil semua input dalam baris tersebut
-            const inputs = row.querySelectorAll('input');
+            // Cari subtotal yang sesuai group
+            const subtotalRow = document.querySelector(`tr.subtotal[data-group="${groupKey}"]`);
 
+            // Kalau subtotal nggak ada, skip baris ini
+            if (!subtotalRow) return;
+
+            // Ambil input dari baris ini + subtotal baris yang sama group-nya
+            const inputs = [
+                ...row.querySelectorAll('input, select, textarea'),
+                ...subtotalRow.querySelectorAll('input, select, textarea')
+            ];
+
+            // Masukkan ke payload per input name
             inputs.forEach((input) => {
-                const key = input.name.replace(/\[\]$/, ''); // Hapus "[]"
+                const key = input.name.replace(/\[\]$/, ''); // Hilangkan [] di name
                 if (!payload[key]) payload[key] = [];
                 payload[key].push(input.value);
             });
         });
+        // selectedCheckboxes.forEach((checkbox) => {
+        //     // Cari elemen terkait di baris yang sama
+        //     const row = checkbox.closest('tr');
+
+        //     // Ambil semua input dalam baris tersebut
+        //     const inputs = row.querySelectorAll('input');
+
+        //     inputs.forEach((input) => {
+        //         const key = input.name.replace(/\[\]$/, ''); // Hapus "[]"
+        //         if (!payload[key]) payload[key] = [];
+        //         payload[key].push(input.value);
+        //     });
+        // });
 
         console.log('inf : ' + payload);
         fetch('http://172.23.44.14/MaterialSystem/public/api/saveListPemesanan', {
