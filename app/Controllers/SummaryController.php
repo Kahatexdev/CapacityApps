@@ -2127,6 +2127,7 @@ class SummaryController extends BaseController
             foreach ($detailplan as $plan => $id) {
                 // Jika model berubah, tambahkan baris subtotal terlebih dahulu
                 if ($prevModel !== null && $prevModel !== $id['model']) {
+                    $subPlan = ($subtotalProduksi != 0 && $subtotalActMesin != 0) ? number_format($subtotalProduksi / $subtotalActMesin, 1) : 0;
 
                     $sheet->setCellValue('A' . $rowBody, 'SUBTOTAL');
                     $sheet->setCellValue('G' . $rowBody, $subPlan);

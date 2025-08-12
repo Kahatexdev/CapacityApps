@@ -334,7 +334,7 @@
             if (aggregateKeys.includes(key)) continue;
             const item = data[key];
             const kgsOutVal = parseFloat(item.kgs_out);
-            const validKgsOut = isNaN(kgsOutVal) ? 0 : kgsOutVal;
+            const validKgsOut = isNaN(kgsOutVal) ? 0 : kgsOutVal.toFixed(2);
 
             const pphVal = parseFloat(item.pph);
             const estimasiRaw = validKgsOut - (isNaN(pphVal) ? 0 : pphVal);
