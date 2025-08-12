@@ -97,9 +97,17 @@ error_reporting(E_ALL); ?>
                                                     <td><?= $list['factory'] ?></td>
                                                     <td><?= $list['production_unit'] ?></td>x
                                                     <td>
-
                                                         <button type=" button" class="btn btn-info btn-sm edit-btn" data-toggle="modal" data-target="#ModalEdit" data-id="<?= $list['idapsperstyle']; ?>" data-area="<?= $list['factory']; ?>" data-pdk="<?= $list['mastermodel']; ?>" data-deliv="<?= $list['delivery']; ?> " data-size="<?= $list['size']; ?>" data-jarum="<?= $jarum ?>">
                                                             Ubah Inisial
+                                                        </button>
+                                                        <button type="button"
+                                                            class="btn bg-gradient-info btn-sm"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#GWAktEdit"
+                                                            data-pdk="<?= $noModel ?>"
+                                                            data-size="<?= esc($list['size'] ?? ''); ?>"
+                                                            data-gw_aktual="<?= esc($list['gw_aktual'] ?? ''); ?>">
+                                                            GW Aktual
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -217,12 +225,190 @@ error_reporting(E_ALL); ?>
             </div>
         </div>
 
+        <!-- modal GW aktual -->
+        <div class="modal fade bd-example-modal-lg" id="GWAktEdit" tabindex="-1" aria-labelledby="GWAktEditLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="GWAktEditLabel">Input GW Aktual</h5>
+                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="http://172.23.44.14/MaterialSystem/public/api/saveGWAktual" method="get">
+                            <div id="confirmationMessage"></div>
+
+                            <div class="form-group mb-3">
+                                <label for="pdk" class="form-label">PDK</label>
+                                <input type="text" class="form-control" name="pdk" id="pdk" value="" readonly>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="size" class="form-label">Style Size</label>
+                                <input type="text" name="size" class="form-control" id="size" value="" readonly>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="gw_aktual" class="form-label">GW Aktual</label>
+                                <input type="number" step="0.1" min="0" name="gw_aktual" class="form-control" id="gw_aktual" value="" placeholder="Masukan GW Aktual">
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn bg-gradient-info">Simpan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
 
         <script>
             $(document).ready(function() {
                 $('#dataTable').DataTable();
 
+                // handler untuk modal GW Aktual (Bootstrap 5)
+                $('#GWAktEdit').on('show.bs.modal', function(event) {
+                    var button = $(event.relatedTarget); // button yang memicu modal
+                    var pdk = button.data('pdk') || '';
+                    var size = button.data('size') || '';
+                    var gw_aktual = button.data('gw_aktual') || '';
+
+                    // cek gw_aktual dari API
+                    fetch('http://172.23.44.14/MaterialSystem/public/api/getGWAktual?pdk=' + pdk + '&size=' + size)
+                        .then(function(response) {
+                            return response.json();
+                        })
+                        .then(function(data) {
+                            if (data && data.gw_aktual) {
+                                modal.find('input[name="gw_aktual"]').val(data.gw_aktual);
+                            }
+                        })
+                        .catch(function(error) {
+                            console.error('Error fetching GW Aktual:', error);
+                        });
+
+                    var modal = $(this);
+                    modal.find('input[name="pdk"]').val(pdk);
+                    modal.find('input[name="size"]').val(size);
+                    modal.find('input[name="gw_aktual"]').val(gw_aktual);
+
+                });
+
+                // Tangani submit form via AJAX/fetch
+                $('#GWAktEdit').on('submit', 'form', function(e) {
+                    e.preventDefault();
+
+                    var $form = $(this);
+                    var action = $form.attr('action');
+                    var method = ($form.attr('method') || 'GET').toUpperCase();
+
+                    // Disable tombol submit sementara
+                    var $submit = $form.find('button[type="submit"]');
+                    $submit.prop('disabled', true).text('Menyimpan...');
+
+                    // Ambil data form
+                    var formData = new FormData(this);
+
+                    // Untuk GET: ubah ke query string; untuk POST: kirim body
+                    var fetchOptions = {
+                        method: method,
+                        credentials: 'same-origin', // kirim cookie kalau perlu
+                        headers: {}
+                    };
+                    var url = action;
+
+                    if (method === 'GET') {
+                        // Buat query string
+                        var params = new URLSearchParams();
+                        for (var pair of formData.entries()) {
+                            params.append(pair[0], pair[1]);
+                        }
+                        url += (action.indexOf('?') === -1 ? '?' : '&') + params.toString();
+                    } else {
+                        // POST/PUT... kirim form data
+                        fetchOptions.body = formData;
+                        // jangan set Content-Type, biarkan browser atur multipart/form-data
+                    }
+
+                    fetch(url, fetchOptions)
+                        .then(function(resp) {
+                            // jika API mengembalikan JSON
+                            var ct = resp.headers.get('content-type') || '';
+                            if (ct.indexOf('application/json') !== -1) {
+                                return resp.json().then(function(json) {
+                                    return {
+                                        ok: resp.ok,
+                                        json: json
+                                    };
+                                });
+                            }
+                            return resp.text().then(function(text) {
+                                return {
+                                    ok: resp.ok,
+                                    text: text
+                                };
+                            });
+                        })
+                        .then(function(result) {
+                            var $msg = $form.find('#confirmationMessage');
+
+                            if (result.ok) {
+                                // tampilkan pesan sukses (coba ambil pesan dari json jika ada)
+                                var message = (result.json && (result.json.message || result.json.msg)) ||
+                                    (typeof result.text === 'string' && result.text) ||
+                                    'Berhasil disimpan.';
+                                $msg.html('<div class="alert alert-success small mb-2">' + message + '</div>');
+
+                                // tutup modal setelah 700ms
+                                setTimeout(function() {
+                                    // tutup modal menggunakan Bootstrap5 API
+                                    var modalEl = document.getElementById('GWAktEdit');
+                                    var bsModal = bootstrap.Modal.getInstance(modalEl);
+                                    if (!bsModal) bsModal = new bootstrap.Modal(modalEl);
+                                    bsModal.hide();
+
+                                    // coba reload DataTable kalau ada ajax
+                                    try {
+                                        if ($.fn.dataTable && $.fn.dataTable.isDataTable('#dataTable')) {
+                                            var table = $('#dataTable').DataTable();
+                                            if (table.ajax && typeof table.ajax.reload === 'function') {
+                                                table.ajax.reload(null, false); // false = tetap di halaman sekarang
+                                                return;
+                                            }
+                                        }
+                                    } catch (err) {
+                                        console.warn('DataTable reload gagal:', err);
+                                    }
+
+                                    // fallback: reload halaman
+                                    location.reload();
+                                }, 700);
+                            } else {
+                                // error dari server
+                                var errText = (result.json && (result.json.error || result.json.message)) ||
+                                    (typeof result.text === 'string' && result.text) ||
+                                    'Terjadi kesalahan saat menyimpan.';
+                                $msg.html('<div class="alert alert-danger small mb-2">' + errText + '</div>');
+                                $submit.prop('disabled', false).text('Simpan');
+                            }
+                        })
+                        .catch(function(err) {
+                            var $msg = $form.find('#confirmationMessage');
+                            $msg.html('<div class="alert alert-danger small mb-2">Error: ' + (err.message || err) + '</div>');
+                            $submit.prop('disabled', false).text('Simpan');
+                            console.error(err);
+                        });
+                });
+
+                // (opsional) Reset tombol saat modal ditutup
+                $('#GWAktEdit').on('hidden.bs.modal', function() {
+                    var $form = $(this).find('form');
+                    $form.find('button[type="submit"]').prop('disabled', false).text('Simpan');
+                });
+
+                // tetap simpan edit-btn handlermu jika ada modal edit lain
                 $('.edit-btn').click(function() {
                     var idAps = $(this).data('id');
                     var area = $(this).data('area');
@@ -230,7 +416,8 @@ error_reporting(E_ALL); ?>
                     var deliv = $(this).data('deliv');
                     var size = $(this).data('size');
                     var jarum = $(this).data('jarum');
-                    $('#editModal').modal('show'); // Show the modal
+
+                    $('#editModal').modal('show');
                     $('#editModal').find('input[name="area"]').val(area);
                     $('#editModal').find('input[name="id"]').val(idAps);
                     $('#editModal').find('input[name="pdk"]').val(pdk);
@@ -238,10 +425,8 @@ error_reporting(E_ALL); ?>
                     $('#editModal').find('input[name="size"]').val(size);
                     $('#editModal').find('input[name="jarum"]').val(jarum);
                 });
-
-
-
             });
+
             document.getElementById('selectAll').addEventListener('click', function(e) {
                 var checkboxes = document.querySelectorAll('.delivery-checkbox');
                 checkboxes.forEach(function(checkbox) {

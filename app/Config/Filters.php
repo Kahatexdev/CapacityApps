@@ -33,6 +33,7 @@ class Filters extends BaseConfig
         'ie' => \App\Filters\IEFilter::class,
         'cors' => \App\Filters\CorsFilter::class,
         'rosso' => \App\Filters\RossoFilter::class,
+        'followup' => \App\Filters\FollowUp::class,
 
     ];
 
@@ -97,6 +98,12 @@ class Filters extends BaseConfig
         ],
         'ie' => [
             'before' => ['ie/*'],
+        ],
+        'rosso' => [
+            'before' => ['rosso/*'],
+        ],
+        'followup' => [
+            'before' => ['followup/*'],
         ],
     ];
 }

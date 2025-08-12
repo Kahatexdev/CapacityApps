@@ -52,6 +52,9 @@ class AuthController extends BaseController
             case 'rosso':
                 return redirect()->to(base_url('/rosso'));
                 break;
+            case 'followup':
+                return redirect()->to(base_url('/followup'));
+                break;
             default:
                 return redirect()->to(base_url('/login'))->withInput()->with('error', 'Invalid username or password');
                 break;
