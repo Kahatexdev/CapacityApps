@@ -377,21 +377,21 @@ class ApsPerstyleModel extends Model
     }
     public function listOrderArea($area, $jarum)
     {
-        $today = date('Y-m-d', strtotime('+1 Days'));
-        $maxDeliv = date('Y-m-d', strtotime('+90 Days'));
+        $amonth = date('Y-m-d', strtotime('-30 Days'));
+        $maxDeliv = date('Y-m-d', strtotime('+150 Days'));
 
         return $this->select('mastermodel')
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
             ->where('sisa >', 0)
             ->where('delivery <', $maxDeliv)
-            ->where('delivery >', $today)
+            ->where('delivery >', $amonth)
             ->groupBy('mastermodel')
             ->findAll();
     }
     public function CapacityArea($pdk, $area, $jarum)
     {
-        $oneweek = date('Y-m-d', strtotime('today'));
+        $oneweek = date('Y-m-d', strtotime('30 days ago'));
         $data = $this->select('mastermodel,sum(qty) as qty, sum(sisa)as sisa,delivery,smv')
             ->where('mastermodel', $pdk)
             ->where('factory', $area)

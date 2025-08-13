@@ -1,4 +1,4 @@
-<?php $this->extend($role . '/statusbahanbaku/header'); ?>
+<?php $this->extend($role . '/layout'); ?>
 
 <?php $this->section('content'); ?>
 
@@ -144,6 +144,7 @@
     function displayData(data) {
         let resultContainer = document.getElementById('resultContainer');
         resultContainer.innerHTML = '';
+        let model = modelInput.value.trim();
 
         // console.log();
         // const dataStatus = [];
