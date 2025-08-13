@@ -458,4 +458,9 @@ class ApiController extends ResourceController
         // Return the data with a 200 status
         return $this->respond($startMc, ResponseInterface::HTTP_OK);
     }
+    public function getNotifAduan($role)
+    {
+        $countNotif = $pengaduanModel->countNotif($role);
+        return $this->respond($countNotif, ResponseInterface::HTTP_OK);
+    }
 }
