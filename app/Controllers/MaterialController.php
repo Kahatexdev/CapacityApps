@@ -1972,7 +1972,6 @@ class MaterialController extends BaseController
             'active6'         => '',
             'active7'         => '',
         ];
-        // return view($this->role . '/Material/report-datang-benang', $data);
         return view(session()->get('role') . '/Material/report-datang-benang', $data);
     }
     public function filterDatangBenang()
@@ -1990,5 +1989,28 @@ class MaterialController extends BaseController
         }
 
         return $this->response->setJSON($models);
+    }
+    public function reportPoBenang()
+    {
+        $data = [
+            'role'            => session()->get('role'),
+            'title'           => 'Report PO Benang',
+            'active1'         => '',
+            'active2'         => '',
+            'active3'         => '',
+            'active4'         => '',
+            'active5'         => '',
+            'active6'         => '',
+            'active7'         => '',
+        ];
+        return view(session()->get('role') . '/Material/report-po-benang', $data);
+    }
+    public function filterPoBenang()
+    {
+        $key = $this->request->getGet('key');
+
+        $data = $this->openPoModel->getFilterPoBenang($key);
+
+        return $this->response->setJSON($data);
     }
 }
