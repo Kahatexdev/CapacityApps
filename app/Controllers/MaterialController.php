@@ -1959,4 +1959,58 @@ class MaterialController extends BaseController
             'totalAllDelivery'  => $totalAllDelivery,
         ]);
     }
+    public function reportDatangBenang()
+    {
+        $data = [
+            'role'            => session()->get('role'),
+            'title'           => 'Stock Gudang Benang',
+            'active1'         => '',
+            'active2'         => '',
+            'active3'         => '',
+            'active4'         => '',
+            'active5'         => '',
+            'active6'         => '',
+            'active7'         => '',
+        ];
+        return view(session()->get('role') . '/Material/report-datang-benang', $data);
+    }
+    public function filterDatangBenang()
+    {
+        $key = $this->request->getGet('key');
+        $tanggalAwal = $this->request->getGet('tanggal_awal');
+        $tanggalAkhir = $this->request->getGet('tanggal_akhir');
+
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir;
+        $material = @file_get_contents($apiUrl);
+
+        // $models = [];
+        if ($material !== FALSE) {
+            $models = json_decode($material, true);
+        }
+
+        return $this->response->setJSON($models);
+    }
+    public function reportPoBenang()
+    {
+        $data = [
+            'role'            => session()->get('role'),
+            'title'           => 'Report PO Benang',
+            'active1'         => '',
+            'active2'         => '',
+            'active3'         => '',
+            'active4'         => '',
+            'active5'         => '',
+            'active6'         => '',
+            'active7'         => '',
+        ];
+        return view(session()->get('role') . '/Material/report-po-benang', $data);
+    }
+    public function filterPoBenang()
+    {
+        $key = $this->request->getGet('key');
+
+        $data = $this->openPoModel->getFilterPoBenang($key);
+
+        return $this->response->setJSON($data);
+    }
 }

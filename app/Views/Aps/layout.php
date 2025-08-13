@@ -397,6 +397,43 @@
                             <input type="text" class="form-control" placeholder="Type here...">
                         </div>
                     </div>
+                    <?php
+                    if ($title == "PPH") {
+                    ?>
+                        <ul class="navbar-nav justify-content-end">
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle text-body font-weight-bold px-2" id="navbarDropdownReports" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span class="d-lg-inline-block d-none ms-1">PPH</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4" aria-labelledby="navbarDropdownReports">
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/pph/' . $area) ?>">PPH Per Model</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/tampilPerStyle/' . $area) ?>">PPH Per Style</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/pphPerhari/' . $area) ?>">PPH Perhari </a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    <?php
+                    }
+                    ?>
+                    <?php
+                    if ($title == "Stock Gudang Benang") {
+                    ?>
+                        <ul class="navbar-nav justify-content-end">
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle text-body font-weight-bold px-2" id="navbarDropdownReports" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span class="d-lg-inline-block d-none ms-1">Report</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4" aria-labelledby="navbarDropdownReports">
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/reportDatangBenang/') ?>">Datang Benang</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/reportDatangNylon/') ?>">Datang Nylon</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    <?php
+                    }
+                    ?>
                     <ul class="navbar-nav  justify-content-end">
                         <li class="nav-item dropdown pe-2 d-flex align-items-center">
                             <a href="javascript:;" class="nav-link text-body p-0" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
