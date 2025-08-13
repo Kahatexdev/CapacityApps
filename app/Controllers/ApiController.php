@@ -19,6 +19,7 @@ use App\Models\LiburModel;
 use App\Models\BsModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\MonthlyMcModel;
+use App\Models\PengaduanModel;
 
 class ApiController extends ResourceController
 {
@@ -35,6 +36,7 @@ class ApiController extends ResourceController
     protected $areaModel;
     protected $bsModel;
     protected $globalModel;
+    protected $pengaduanModel;
 
     protected $validation;
     protected $format = 'json';
@@ -51,6 +53,7 @@ class ApiController extends ResourceController
         $this->areaModel = new AreaModel();
         $this->bsModel = new BsModel();
         $this->globalModel = new MonthlyMcModel();
+        $this->pengaduanModel = new PengaduanModel();
         $this->liburModel = new LiburModel();
         $this->validation = \Config\Services::validation();
     }
