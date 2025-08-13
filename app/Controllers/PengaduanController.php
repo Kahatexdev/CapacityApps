@@ -72,7 +72,7 @@ class PengaduanController extends BaseController
     }
     public function Apicreate()
     {
-        $username   = $this->request->getPost('username');
+        $username   = urldecode($this->request->getPost('username'));
         $targetRole = $this->request->getPost('target_role');
         $isi        = $this->request->getPost('isi');
 
@@ -90,7 +90,7 @@ class PengaduanController extends BaseController
 
     public function Apireply($id_pengaduan)
     {
-        $username = $this->request->getPost('username');
+        $username   = urldecode($this->request->getPost('username'));
         $isi      = $this->request->getPost('isi');
 
         $this->replyModel->save([
@@ -110,7 +110,8 @@ class PengaduanController extends BaseController
 
     public function Apipengaduan($username, $role)
     {
-        $pengaduan = $this->pengaduanModel->getPengaduan($username, $role);
+        $usernamedec   = urldecode($username);
+        $pengaduan = $this->pengaduanModel->getPengaduan($usernamedec, $role);
         // Ambil semua reply per pengaduan
         $reply = [];
         foreach ($pengaduan as $p) {
