@@ -34,6 +34,12 @@ class PengaduanTable extends Migration
                 'type' => 'DATETIME',
                 'null' => true
             ],
+            'replied' => [
+                'type'       => 'TINYINT',
+                'constraint' => 1,
+                'default'    => 0,
+                'null'       => false,
+            ],
         ]);
         $this->forge->addKey('id_pengaduan', true);
         $this->forge->createTable('pengaduan');

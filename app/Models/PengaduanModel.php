@@ -13,7 +13,7 @@ class PengaduanModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields = ['username', 'target_role', 'isi', 'created_at', 'updated_at'];
+    protected $allowedFields = ['username', 'target_role', 'isi', 'created_at', 'updated_at', 'replied'];
     protected bool $allowEmptyInserts = false;
 
     // Dates
@@ -42,9 +42,15 @@ class PengaduanModel extends Model
 
     public function getPengaduan($username, $role)
     {
-        return $this->where('username', $username)
-            ->orWhere('target_role', $role)
+        return $this->Where('target_role', $role)
+            ->orWhere('username', $username)
             ->orderBy('created_at', 'DESC')
             ->findAll();
+    }
+    public function countNotif($role)
+    {
+        return $this->where('target_role', $role)
+            ->where('replied', 0)
+            ->countAllResults();
     }
 }

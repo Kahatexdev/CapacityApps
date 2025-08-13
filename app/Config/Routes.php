@@ -67,6 +67,7 @@ $routes->group(
         $routes->get('pengaduan/(:any)/(:any)', 'PengaduanController::Apipengaduan/$1/$2');
         $routes->post('pengaduan/create', 'PengaduanController::Apicreate');
         $routes->post('pengaduan/reply/(:num)', 'PengaduanController::Apireply/$1');
+        $routes->get('getNotif/(:any)', 'ApiController::getNotifAduan/$1');
     }
 );
 

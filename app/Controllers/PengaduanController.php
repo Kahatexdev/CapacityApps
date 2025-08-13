@@ -4,9 +4,12 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\RESTful\ResourceController;
+use CodeIgniter\API\ResponseTrait;
 
 class PengaduanController extends BaseController
 {
+
     public function index()
     {
         // Misalnya user info disimpan di session saat login
@@ -62,12 +65,14 @@ class PengaduanController extends BaseController
             'isi'          => $isi,
             'created_at' => date('Y-m-d H:i:s')
         ]);
+        $setStat = $this->pengaduanModel->update($id_pengaduan, ['replied' => 1]);
+
 
         return redirect()->to($role . '/pengaduan')->withInput()->with('success', 'Balasan berhasil dikirin');
     }
     public function Apicreate()
     {
-        $username   = $this->request->getPost('username');
+        $username   = urldecode($this->request->getPost('username'));
         $targetRole = $this->request->getPost('target_role');
         $isi        = $this->request->getPost('isi');
 
@@ -77,12 +82,15 @@ class PengaduanController extends BaseController
             'isi'         => $isi
         ]);
 
-        return $this->respond(['status' => 'success', 'message' => 'Berhasil terkirim']);
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Berhasil terkirim'
+        ]);
     }
 
     public function Apireply($id_pengaduan)
     {
-        $username = $this->request->getPost('username');
+        $username   = urldecode($this->request->getPost('username'));
         $isi      = $this->request->getPost('isi');
 
         $this->replyModel->save([
@@ -91,14 +99,19 @@ class PengaduanController extends BaseController
             'isi'          => $isi,
             'created_at'   => date('Y-m-d H:i:s')
         ]);
+        $setStat = $this->pengaduanModel->update($id_pengaduan, ['replied' => 1]);
 
-        return $this->respond(['status' => 'success', 'message' => 'Balasan terkirim']);
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Berhasil terkirim'
+        ]);
     }
 
 
     public function Apipengaduan($username, $role)
     {
-        $pengaduan = $this->pengaduanModel->getPengaduan($username, $role);
+        $usernamedec   = urldecode($username);
+        $pengaduan = $this->pengaduanModel->getPengaduan($usernamedec, $role);
         // Ambil semua reply per pengaduan
         $reply = [];
         foreach ($pengaduan as $p) {
