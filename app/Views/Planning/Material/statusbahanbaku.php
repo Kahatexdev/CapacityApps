@@ -1,4 +1,4 @@
-<?php $this->extend($role . '/layout'); ?>
+<?php $this->extend($role . '/statusbahanbaku/header'); ?>
 
 <?php $this->section('content'); ?>
 
@@ -167,13 +167,13 @@
                     <div class="card">
                         <div class="card-body p-3">
                             <div class="row d-flex align-items-center justify-content-center">
-                              <div class="col-3 d-flex flex-column align-items-center">
+                              <div class="col-2 d-flex flex-column align-items-center">
                                     <div class="numbers text-center">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">No Model</p>
                                         <h5 class="font-weight-bolder mb-0">${data['master']['no_model'] ?? '-' }</h5>
                                     </div>
                                 </div>
-                                <div class="col-3 d-flex flex-column align-items-center">
+                                <div class="col-2 d-flex flex-column align-items-center">
                                     <div class="numbers text-center">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">Buyer</p>
                                         <h5 class="font-weight-bolder mb-0">${data['master']['kd_buyer_order']}</h5>
@@ -199,7 +199,8 @@
                                 </div>
                                 <div class="col-2 d-flex flex-column align-items-center">
                                     <div class="numbers text-center">
-                                      <a class="btn btn-success" href='http://172.23.44.14/MaterialSystem/public/api/apiexportGlobalReport/${model}'>Excel Bahan Baku</a>
+                                     <a class="btn btn-success" href='http://172.23.44.14/MaterialSystem/public/api/apiexportGlobalReport/${model}'>Excel Bahan Baku</a>
+
                                         
                                     </div>
                                 </div>
