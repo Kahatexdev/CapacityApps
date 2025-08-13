@@ -460,7 +460,7 @@ class ApiController extends ResourceController
     }
     public function getNotifAduan($role)
     {
-        $countNotif = $pengaduanModel->countNotif($role);
+        $countNotif = $this->pengaduanModel->countNotif($role);
         return $this->respond($countNotif, ResponseInterface::HTTP_OK);
     }
 }
