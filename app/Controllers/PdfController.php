@@ -746,6 +746,7 @@ class PdfController extends BaseController
         if ($response === false) {
             return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'message' => 'Curl error: ' . $error]);
         }
+        // dd($response);
 
         $data = json_decode($response, true);
 
@@ -827,6 +828,8 @@ class PdfController extends BaseController
             $totalKgsKirim    += floatval($row['kgs_out']);
             $totalConesKirim  += floatval($row['cns_out']);
             $totalKarungKirim += floatval($row['krg_out']);
+            $poTambahan = $row['po_tambahan'] == 1 ? "(+)" : "";
+            $ketGbn = $row['ket_gbn'] ? " / " . $row['ket_gbn'] : "";
 
             $rowHeight = 5;
             $heights = [];
@@ -856,7 +859,7 @@ class PdfController extends BaseController
             $pdf->SetXY($xStart, $yStart);
 
             $pdf->Cell(25, $rowHeight, $row['tgl_pesan'], 1, 0, 'C'); // tgl pesan
-            $pdf->Cell(15, $rowHeight, $row['no_model'], 1, 0, 'C'); // no model
+            $pdf->Cell(15, $rowHeight, $poTambahan . $row['no_model'], 1, 0, 'C'); // no model
 
             $xNow = $pdf->GetX();
             $rowItem = $heights['item_type'] / 5 > 1 ? 5 : $rowHeight;
@@ -905,7 +908,7 @@ class PdfController extends BaseController
 
             $xNow = $pdf->GetX();
             $rowKet = $heights['ket_area'] / 5 > 1 ? 5 : $rowHeight;
-            $pdf->MultiCell(37, $rowKet, $row['ket_area'], 1, 'C'); // keterangan
+            $pdf->MultiCell(37, $rowKet, $row['ket_area'] . $ketGbn, 1, 'C'); // keterangan
             $pdf->SetXY($xNow + 37, $yStart);
 
             $pdf->Ln($rowHeight); // Pindah ke baris berikutnya
