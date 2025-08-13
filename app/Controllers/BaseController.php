@@ -38,6 +38,7 @@ abstract class BaseController extends Controller
     protected $role;
     protected $userModel;
     protected $replyModel;
+    protected $countNotif;
     public function __construct()
     {
         $this->jarumModel = new DataMesinModel();
@@ -47,6 +48,7 @@ abstract class BaseController extends Controller
         $this->userModel = new UserModel();
         $this->role = session()->get('role');
         $this->replyModel = new PengaduanReply();
+        $this->countNotif = $this->pengaduanModel->countNotif($this->role);
     }
     /**
      * Instance of the main Request object.
