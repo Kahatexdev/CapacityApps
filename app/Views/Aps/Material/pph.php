@@ -1,4 +1,4 @@
-<?php $this->extend('planning/layout'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 <style>
     #loading {

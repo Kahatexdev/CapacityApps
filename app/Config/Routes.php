@@ -527,6 +527,10 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('filterstockbahanbaku', 'MaterialController::filterStockBahanBaku');
     $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
     $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
+    $routes->get('reportDatangBenang', 'MaterialController::reportDatangBenang');
+    $routes->get('filterDatangBenang', 'MaterialController::filterDatangBenang');
+    $routes->get('reportDatangNylon', 'MaterialController::reportDatangNylon');
+    $routes->get('exportDatangBenang', 'ExcelController::exportDatangBenang');
 
     //pph
     $routes->get('pph/(:any)', 'MaterialController::pph/$1');
