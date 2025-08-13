@@ -42,8 +42,8 @@ class PengaduanModel extends Model
 
     public function getPengaduan($username, $role)
     {
-        return $this->where('username', $username)
-            ->orWhere('target_role', $role)
+        return $this->Where('target_role', $role)
+            ->orWhere('username', $username)
             ->orderBy('created_at', 'DESC')
             ->findAll();
     }
