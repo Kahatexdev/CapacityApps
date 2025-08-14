@@ -67,6 +67,8 @@ class RossoController extends BaseController
                         'ttl_berat_cns'  => $row['ttl_berat_cns'] ?? 0,
                         'id_material'    => $row['id_material'] ?? '',
                         'po_tambahan'    => $row['po_tambahan'] ?? '0',
+                        'lot'            => $row['lot'] ?? '',
+                        'keterangan'     => $row['keterangan'] ?? '',
                     ];
                 }
             }
@@ -74,7 +76,7 @@ class RossoController extends BaseController
         // Lakukan sorting berdasarkan urutan kolom: tgl_pakai, no_model, style_size, item_type, kode_warna, dan warna
         usort($flattenData, function ($a, $b) {
             // Urutan field yang ingin dijadikan acuan sorting
-            $order = ['tgl_pakai', 'no_model', 'item_type', 'kode_warna', 'warna', 'style_size',];
+            $order = ['tgl_pakai', 'no_model', 'item_type', 'kode_warna', 'warna', 'style_size', 'lot', 'keterangan'];
             foreach ($order as $field) {
                 // Karena tgl_pakai dalam format YYYY-MM-DD bisa dibandingkan secara string
                 $cmp = strcmp($a[$field], $b[$field]);
