@@ -1,4 +1,4 @@
-<?php $this->extend($role . '/warehouse/header'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 
 <div class="container-fluid py-4">
@@ -7,7 +7,7 @@
     <div class="card card-frame">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 font-weight-bolder">Filter Global Stock Benang</h5>
+                <h5 class="mb-0 font-weight-bolder">Report Global Stock Benang</h5>
                 <button class="btn btn-secondary btn-block" id="btnInfo" style="padding: 5px 12px; font-size: 12px;" data-bs-toggle="modal" data-bs-target="#infoModal">
                     <i class="fas fa-info"></i>
                 </button>
@@ -15,7 +15,7 @@
             <div class="row mt-2">
                 <div class="col-md-4">
                     <label for="">Key</label>
-                    <input type="text" class="form-control" placeholder="No Model">
+                    <input type="text" id="keyInput" class="form-control" placeholder="No Model">
                 </div>
                 <div class="col-md-8">
                     <div class="form-group">
@@ -124,7 +124,7 @@
         });
 
         function loadData() {
-            let key = $('input[type="text"]').val().trim();
+            let key = $('#keyInput').val().trim();
 
             $.ajax({
                 url: "<?= base_url($role . '/warehouse/filterReportGlobalBenang') ?>",
@@ -215,7 +215,7 @@
         });
 
         $('#btnExport').click(function() {
-            let key = $('input[type="text"]').val();
+            let key = $('#keyInput').val().trim();
             window.location.href = "<?= base_url($role . '/warehouse/exportReportGlobalBenang') ?>?key=" + key;
         });
 
@@ -225,7 +225,7 @@
     // Fitur Reset
     $('#btnReset').click(function() {
         // Kosongkan input
-        $('input[type="text"]').val('');
+        let key = $('#keyInput').val('').trim();
 
         // Kosongkan tabel hasil pencarian
         $('#dataTable tbody').html('');

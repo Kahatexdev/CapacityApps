@@ -1,4 +1,4 @@
-<?php $this->extend($role . '/layout'); ?>
+<?php $this->extend($role . '/warehouse/header'); ?>
 <?php $this->section('content'); ?>
 
 <div class="container-fluid py-4">
@@ -7,7 +7,7 @@
     <div class="card card-frame">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 font-weight-bolder">Report Global All BB</h5>
+                <h5 class="mb-0 font-weight-bolder">Report Global Nylon</h5>
             </div>
             <div class="row mt-2">
                 <div class="col-md-3">
@@ -96,7 +96,7 @@
 
 
             $.ajax({
-                url: "<?= base_url($role . '/warehouse/filterReportGlobal') ?>",
+                url: "<?= base_url($role . '/warehouse/filterReportGlobalNylon') ?>",
                 type: "GET",
                 data: {
                     key: key
@@ -178,9 +178,10 @@
 
         $('#btnExport').click(function() {
             let key = $('input[type="text"]').val();
-            let tanggal_awal = $('input[type="date"]').eq(0).val();
-            let tanggal_akhir = $('input[type="date"]').eq(1).val();
-            window.location.href = "<?= base_url($role . '/warehouse/exportGlobalReport') ?>?key=" + key;
+            let jenis = 'NYLON';
+            window.location.href = "<?= base_url($role . '/warehouse/exportGlobalReport') ?>" +
+                "?key=" + encodeURIComponent(key) +
+                "&jenis=" + encodeURIComponent(jenis);
         });
 
         dataTable.clear().draw();

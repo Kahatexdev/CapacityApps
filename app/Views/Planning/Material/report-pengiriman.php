@@ -1,4 +1,4 @@
-<?php $this->extend($role . '/warehouse/header'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 
 <div class="container-fluid py-4">

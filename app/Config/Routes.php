@@ -381,14 +381,14 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('warehouse/reportDatangBenang', 'MaterialController::reportDatangBenang');
     $routes->get('warehouse/filterDatangBenang', 'MaterialController::filterDatangBenang');
     $routes->get('warehouse/exportDatangBenang', 'ExcelController::exportDatangBenang');
-    $routes->get('warehouse/getKeteranganDatang', 'MaterialController::getKeteranganDatang');
-    $routes->post('warehouse/updateKeteranganDatang', 'MaterialController::updateKeteranganDatang');
     $routes->get('warehouse/exportExcel', 'ExcelController::excelStockMaterial');
     $routes->get('warehouse/reportPengiriman', 'MaterialController::reportPengiriman');
     $routes->get('warehouse/filterPengiriman', 'MaterialController::filterPengiriman');
     $routes->get('warehouse/exportPengiriman', 'ExcelController::exportPengiriman');
     $routes->get('warehouse/reportGlobal', 'MaterialController::reportGlobal');
     $routes->get('warehouse/filterReportGlobal', 'MaterialController::filterReportGlobal');
+    $routes->get('warehouse/reportGlobalNylon', 'MaterialController::reportGlobalNylon');
+    $routes->get('warehouse/filterReportNylon', 'MaterialController::filterReportfilterReportNylon');
     $routes->get('warehouse/exportGlobalReport', 'ExcelController::exportGlobalReport');
     $routes->get('warehouse/reportGlobalStockBenang', 'MaterialController::reportGlobalStockBenang');
     $routes->get('warehouse/filterReportGlobalBenang', 'MaterialController::filterReportGlobalBenang');
