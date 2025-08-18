@@ -2044,7 +2044,6 @@ class MaterialController extends BaseController
         $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterPengiriman?key=' . urlencode($key) . '&tanggal_awal=' . urlencode($tanggalAwal) . '&tanggal_akhir=' . urlencode($tanggalAkhir);
         $material = @file_get_contents($apiUrl);
 
-        // $models = [];
         if ($material !== FALSE) {
             $models = json_decode($material, true);
         }
@@ -2070,15 +2069,15 @@ class MaterialController extends BaseController
     public function filterReportGlobal()
     {
         $key = $this->request->getGet('key');
+        $jenis = $this->request->getGet('jenis');
         log_message('debug', 'Received key: ' . $key);  // Log key yang diterima
         if (empty($key)) {
             return $this->response->setJSON(['error' => 'Key is missing']);
         }
 
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterReportGlobal?key=' . urlencode($key);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterReportGlobal?key=' . urlencode($key) . '&jenis=' . urlencode($jenis);
         $material = @file_get_contents($apiUrl);
 
-        // $models = [];
         if ($material !== FALSE) {
             $models = json_decode($material, true);
         }
@@ -2108,68 +2107,36 @@ class MaterialController extends BaseController
         return view(session()->get('role') . '/Material/report-global-benang', $data);
     }
 
-    public function filterReportGlobalBenang()
-    {
-        $key = $this->request->getGet('key');
-        $jenis = 'BENANG';
-
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterReportGlobalBenang?key=' . urlencode($key) . '&jenis=' . urlencode($jenis);
-        $material = @file_get_contents($apiUrl);
-
-        // $models = [];
-        if ($material !== FALSE) {
-            $models = json_decode($material, true);
-        }
-        // dd($data);
-        return $this->response->setJSON($models);
-    }
-
     public function reportGlobalNylon()
     {
         $data = [
-            'role' => $this->role,
-            'title' => 'Report Global',
-            'active' => $this->active
+            'role'            => session()->get('role'),
+            'title'           => 'Gudang Benang',
+            'active1'         => '',
+            'active2'         => '',
+            'active3'         => '',
+            'active4'         => '',
+            'active5'         => '',
+            'active6'         => '',
+            'active7'         => '',
         ];
-        return view($this->role . '/Material/report-global-nylon', $data);
-    }
-    public function filterReportGlobalNylon()
-    {
-        $key = $this->request->getGet('key');
-        $jenis = 'NYLON';
-
-        log_message('debug', 'Received key: ' . $key);  // Log key yang diterima
-        if (empty($key)) {
-            return $this->response->setJSON(['error' => 'Key is missing']);
-        }
-
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterReportGlobalNylon?key=' . urlencode($key) . '&jenis=' . urlencode($jenis);
-        $material = @file_get_contents($apiUrl);
-
-        // $models = [];
-        if ($material !== FALSE) {
-            $data = json_decode($material, true);
-        }
-
-        // $data = $this->masterOrderModel->getFilterReportGlobal($key, $jenis);
-        // Log data yang diterima dari model
-        log_message('debug', 'Query result: ' . print_r($data, true));
-
-        if (empty($data)) {
-            return $this->response->setJSON(['error' => 'No data found']);
-        }
-
-        return $this->response->setJSON($data);
+        return view(session()->get('role') . '/Material/report-global-nylon', $data);
     }
 
     public function reportSisaPakaiBenang()
     {
         $data = [
-            'active' => $this->active,
-            'title' => 'Report Sisa Pakai Benang',
-            'role' => $this->role,
+            'role'            => session()->get('role'),
+            'title'           => 'Gudang Benang',
+            'active1'         => '',
+            'active2'         => '',
+            'active3'         => '',
+            'active4'         => '',
+            'active5'         => '',
+            'active6'         => '',
+            'active7'         => '',
         ];
-        return view($this->role . '/warehouse/report-sisa-pakai-benang', $data);
+        return view(session()->get('role') . '/Material/report-sisa-pakai-benang', $data);
     }
 
     public function filterSisaPakaiBenang()
@@ -2177,6 +2144,7 @@ class MaterialController extends BaseController
         $delivery = $this->request->getGet('delivery');
         $noModel = $this->request->getGet('no_model');
         $kodeWarna = $this->request->getGet('kode_warna');
+
         $bulanMap = [
             'Januari' => 1,
             'Februari' => 2,
@@ -2192,7 +2160,13 @@ class MaterialController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $data = $this->stockModel->getFilterSisaPakaiBenang($bulan, $noModel, $kodeWarna);
+
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterSisaPakaiBenang?bulan=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $material = @file_get_contents($apiUrl);
+
+        if ($material !== FALSE) {
+            $data = json_decode($material, true);
+        }
 
         return $this->response->setJSON($data);
     }
@@ -2200,11 +2174,17 @@ class MaterialController extends BaseController
     public function reportSisaPakaiNylon()
     {
         $data = [
-            'active' => $this->active,
-            'title' => 'Report Sisa Pakai Nylon',
-            'role' => $this->role,
+            'role'            => session()->get('role'),
+            'title'           => 'Gudang Benang',
+            'active1'         => '',
+            'active2'         => '',
+            'active3'         => '',
+            'active4'         => '',
+            'active5'         => '',
+            'active6'         => '',
+            'active7'         => '',
         ];
-        return view($this->role . '/warehouse/report-sisa-pakai-nylon', $data);
+        return view(session()->get('role') . '/Material/report-sisa-pakai-nylon', $data);
     }
 
     public function filterSisaPakaiNylon()
@@ -2227,7 +2207,13 @@ class MaterialController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $data = $this->stockModel->getFilterSisaPakaiNylon($bulan, $noModel, $kodeWarna);
+
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterSisaPakaiNylon?bulan=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $material = @file_get_contents($apiUrl);
+
+        if ($material !== FALSE) {
+            $data = json_decode($material, true);
+        }
 
         return $this->response->setJSON($data);
     }
@@ -2235,11 +2221,17 @@ class MaterialController extends BaseController
     public function reportSisaPakaiSpandex()
     {
         $data = [
-            'active' => $this->active,
-            'title' => 'Report Sisa Pakai Spandex',
-            'role' => $this->role,
+            'role'            => session()->get('role'),
+            'title'           => 'Gudang Benang',
+            'active1'         => '',
+            'active2'         => '',
+            'active3'         => '',
+            'active4'         => '',
+            'active5'         => '',
+            'active6'         => '',
+            'active7'         => '',
         ];
-        return view($this->role . '/warehouse/report-sisa-pakai-spandex', $data);
+        return view(session()->get('role') . '/Material/report-sisa-pakai-spandex', $data);
     }
 
     public function filterSisaPakaiSpandex()
@@ -2262,7 +2254,13 @@ class MaterialController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $data = $this->stockModel->getFilterSisaPakaiSpandex($bulan, $noModel, $kodeWarna);
+
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterSisaPakaiSpandex?bulan=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $material = @file_get_contents($apiUrl);
+
+        if ($material !== FALSE) {
+            $data = json_decode($material, true);
+        }
 
         return $this->response->setJSON($data);
     }
@@ -2270,11 +2268,17 @@ class MaterialController extends BaseController
     public function reportSisaPakaiKaret()
     {
         $data = [
-            'active' => $this->active,
-            'title' => 'Report Sisa Pakai Karet',
-            'role' => $this->role,
+            'role'            => session()->get('role'),
+            'title'           => 'Gudang Benang',
+            'active1'         => '',
+            'active2'         => '',
+            'active3'         => '',
+            'active4'         => '',
+            'active5'         => '',
+            'active6'         => '',
+            'active7'         => '',
         ];
-        return view($this->role . '/warehouse/report-sisa-pakai-karet', $data);
+        return view(session()->get('role') . '/Material/report-sisa-pakai-karet', $data);
     }
 
     public function filterSisaPakaiKaret()
@@ -2297,7 +2301,13 @@ class MaterialController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $data = $this->stockModel->getFilterSisaPakaiKaret($bulan, $noModel, $kodeWarna);
+
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterSisaPakaiSpandex?bulan=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $material = @file_get_contents($apiUrl);
+
+        if ($material !== FALSE) {
+            $data = json_decode($material, true);
+        }
 
         return $this->response->setJSON($data);
     }

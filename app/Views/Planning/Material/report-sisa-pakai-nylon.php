@@ -1,4 +1,4 @@
-<?php $this->extend($role . '/warehouse/header'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 
 <div class="container-fluid py-4">
@@ -201,7 +201,14 @@
                         $('#dataTable tbody').html(html);
                         $('#btnExport').removeClass('d-none');
                     } else {
-                        $('#dataTable tbody').html('<tr><td colspan="26" class="text-center">Tidak ada data</td></tr>');
+                        let colCount = $('#dataTable thead th').length;
+                        $('#dataTable tbody').html(`
+                            <tr>
+                                <td colspan="${colCount}" class="text-center text-danger font-weight-bold">
+                                    ⚠ Tidak ada data ditemukan
+                                </td>
+                            </tr>
+                        `);
                         $('#btnExport').addClass('d-none');
                     }
 
