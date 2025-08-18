@@ -789,7 +789,8 @@
                                         icon: "success",
                                         // showConfirmButton: true,
                                     }).then(() => {
-                                        location.reload(); // Refresh halaman setelah alert selesai
+                                        window.location.href = "<?= base_url($role . '/listPemesanan/'. session()->get('username')) ?>";
+                                        
                                     });
                                 } else if (secondResponse.status === "warning") {
                                     // Proses 2 gagal
@@ -841,6 +842,28 @@
                     });
                 }
             });
+        });
+
+        // untuk kalkulasi stock mc
+        $(document).on('input', '.stock-kg, .stock-cns', function() {
+            let $row = $(this).closest('tr.subtotal'); // Baris subtotal input stock
+            let $nextTotalRow = $row.next('.subtotal'); // Baris total group
+
+            // Ambil total awal dari atribut data
+            let totalCnsAwal = parseFloat($nextTotalRow.find('.total-cns').data('total-awal')) || 0;
+            let totalKgAwal = parseFloat($nextTotalRow.find('.total-kg').data('total-awal')) || 0;
+
+            // Ambil nilai input stock
+            let stockCns = parseFloat($row.find('.stock-cns').val()) || 0;
+            let stockKg = parseFloat($row.find('.stock-kg').val()) || 0;
+
+            // Hitung total setelah dikurangi stock
+            let sisaCns = totalCnsAwal - stockCns;
+            let sisaKg = totalKgAwal - stockKg;
+
+            // Update tampilan
+            $nextTotalRow.find('.total-cns').text(sisaCns.toFixed(0));
+            $nextTotalRow.find('.total-kg').text(sisaKg.toFixed(2));
         });
     });
 
