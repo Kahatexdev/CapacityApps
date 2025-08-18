@@ -19,6 +19,14 @@
         position: static !important;
         z-index: auto !important;
     }
+
+    .retur-row .label-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 1.6rem;
+        margin-top: 0.25rem;
+    }
 </style>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -82,7 +90,7 @@
                         <div class="mb-3 row">
                             <div class="col-sm-6">
                                 <label class="col-form-label">No Model</label>
-                                <input type="text" class="form-control" name="model" value="" id="modelText" readonly>
+                                <input type="text" class="form-control" name="model" value="" id="modelText" readonly style="text-transform: uppercase;">
                             </div>
                             <div class="col-sm-6">
                                 <label class="col-form-label">Area</label>
@@ -119,30 +127,42 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="d-flex justify-content-between">
-
+                                <!-- Blok retur (pakai kelas retur-row). Taruh sekumpulan ini di dalam #listReturInputs -->
+                                <div class="row retur-row">
+                                    <div class="col-md-3">
+                                        <div class="label-row">
                                             <label class="form-label">Jml KGS</label>
                                             <label class="form-label" id="textMax">Max Retur</label>
                                         </div>
                                         <div class="input-group">
-                                            <input type="number" step="0.01" class="form-control" name="kgs" id="kgs" required>
+                                            <input type="number" step="0.01" class="form-control kgs-input" name="kgs[]" required>
                                             <span class="input-group-text text-bold">KG</span>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+
+                                    <div class="col-md-3">
                                         <label class="form-label">Jml Cones</label>
                                         <div class="input-group">
-                                            <input type="number" class="form-control" name="cones" required>
+                                            <input type="number" class="form-control cones-input" name="cones[]" required>
                                             <span class="input-group-text text-bold">CNS</span>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Jml Karung</label>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">No Karung</label>
                                         <div class="input-group">
-                                            <input type="number" class="form-control" name="karung">
-                                            <span class="input-group-text text-bold">KRG</span>
+                                            <input type="number" class="form-control karung-input" name="karung[]" required>
+                                            <!-- <span class="input-group-text text-bold">KRG</span> -->
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Action</label>
+                                        <div class="input-group">
+                                            <!-- type="button" supaya tidak submit form -->
+                                            <button type="button" class="btn btn-info w-100 btn-add-retur">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -578,6 +598,53 @@
 
                 console.error('Fetch error:', err);
             });
+    });
+
+    document.addEventListener('click', function(e) {
+        // tombol tambah
+        const addBtn = e.target.closest('.btn-add-retur');
+        if (addBtn) {
+            const container = document.getElementById('listReturInputs');
+            if (!container) return;
+
+            // baris yang diklik tombolnya
+            const currentRow = addBtn.closest('.retur-row') || container.querySelector('.retur-row');
+            if (!currentRow) return;
+
+            // clone baris (sibling, bukan child)
+            const clone = currentRow.cloneNode(true);
+
+            // kosongkan value input/textarea di clone
+            clone.querySelectorAll('input, textarea').forEach(i => i.value = '');
+
+            // ganti tombol add pada clone jadi tombol remove
+            const btnInClone = clone.querySelector('.btn-add-retur');
+            if (btnInClone) {
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'btn btn-danger w-100 btn-remove-retur';
+                removeBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                btnInClone.parentNode.replaceChild(removeBtn, btnInClone);
+            }
+
+            // masukkan clone SEBAGAI SIBLING setelah currentRow (bukan append ke dalam)
+            currentRow.parentNode.insertBefore(clone, currentRow.nextSibling);
+
+            // opsi: scroll ke clone
+            clone.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+            return;
+        }
+
+        // tombol hapus (event delegation)
+        const remove = e.target.closest('.btn-remove-retur');
+        if (remove) {
+            const item = remove.closest('.retur-row');
+            if (!item) return;
+            if (confirm('Hapus baris retur ini?')) item.remove();
+        }
     });
 </script>
 <?php $this->endSection(); ?>
