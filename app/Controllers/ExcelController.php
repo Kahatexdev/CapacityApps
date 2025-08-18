@@ -7298,7 +7298,9 @@ class ExcelController extends BaseController
     public function exportGlobalReport()
     {
         $key = $this->request->getGet('key');
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterReportGlobal?key=' . urlencode($key);
+        $jenis = $this->request->getGet('jenis');
+
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterReportGlobal?key=' . urlencode($key) . '&jenis=' . urlencode($jenis);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -7348,18 +7350,18 @@ class ExcelController extends BaseController
             $sheet->setCellValue('H' . $row, $item['color'] ?: '-'); // color
             $sheet->setCellValue('I' . $row, isset($item['loss']) ? number_format($item['loss'], 2, '.', '') : 0); // loss
             $sheet->setCellValue('J' . $row, isset($item['kgs']) ? number_format($item['kgs'], 2, '.', '') : 0); // qty po
-            $sheet->setCellValue('K' . $row, '-'); // qty po (+)
-            $sheet->setCellValue('L' . $row, isset($item['kgs_stock_awal']) ? number_format($item['kgs_stock_awal'], 2, '.', '') : 0); // stock awal
+            $sheet->setCellValue('K' . $row, isset($item['qty_poplus']) ? number_format($item['qty_poplus'], 2, '.', '') : 0); // qty po (+)
+            $sheet->setCellValue('L' . $row, isset($item['stock_awal']) ? number_format($item['stock_awal'], 2, '.', '') : 0); // stock awal
             $sheet->setCellValue('M' . $row, '-'); // stock opname
-            $sheet->setCellValue('N' . $row, isset($item['kgs_kirim']) ? number_format($item['kgs_kirim'], 2, '.', '') : 0); // datan solid
-            $sheet->setCellValue('O' . $row, '-'); // (+) datang solid
-            $sheet->setCellValue('P' . $row, '-'); // ganti retur
-            $sheet->setCellValue('Q' . $row, '-'); // datang lurex
-            $sheet->setCellValue('R' . $row, '-'); // (+) datang lurex
-            $sheet->setCellValue('S' . $row, '-'); // retur pb gbn
-            $sheet->setCellValue('T' . $row, isset($item['kgs_retur']) ? number_format($item['kgs_retur'], 2, '.', '') : 0); // retur bp area
-            $sheet->setCellValue('U' . $row, isset($item['kgs_out']) ? number_format($item['kgs_out'], 2, '.', '') : 0); // pakai area
-            $sheet->setCellValue('V' . $row, '-'); // pakai lain-lain
+            $sheet->setCellValue('N' . $row, isset($item['datang_solid']) ? number_format($item['datang_solid'], 2, '.', '') : 0); // datan solid
+            $sheet->setCellValue('O' . $row, isset($item['plus_datang_solid']) ? number_format($item['plus_datang_solid'], 2, '.', '') : 0); // (+) datang solid
+            $sheet->setCellValue('P' . $row, isset($item['ganti_retur']) ? number_format($item['ganti_retur'], 2, '.', '') : 0); // ganti retur
+            $sheet->setCellValue('Q' . $row, isset($item['datang_lurex']) ? number_format($item['datang_lurex'], 2, '.', '') : 0); // datang lurex
+            $sheet->setCellValue('R' . $row, isset($item['plud_datang_lurex']) ? number_format($item['plud_datang_lurex'], 2, '.', '') : 0); // (+) datang lurex
+            $sheet->setCellValue('S' . $row, isset($item['retur_pb_gbn']) ? number_format($item['retur_pb_gbn'], 2, '.', '') : 0); // retur pb gbn
+            $sheet->setCellValue('T' . $row, isset($item['retur_pb_area']) ? number_format($item['retur_pb_area'], 2, '.', '') : 0); // retur bp area
+            $sheet->setCellValue('U' . $row, isset($item['pakai_area']) ? number_format($item['pakai_area'], 2, '.', '') : 0); // pakai area
+            $sheet->setCellValue('V' . $row, isset($item['kgs_other_out']) ? number_format($item['kgs_other_out'], 2, '.', '') : 0); // pakai lain-lain
             $sheet->setCellValue('W' . $row, '-'); // retur stock
             $sheet->setCellValue('X' . $row, '-'); // retur titip
             $sheet->setCellValue('Y' . $row, '-'); // dipinjam
@@ -7368,8 +7370,8 @@ class ExcelController extends BaseController
             $sheet->setCellValue('AB' . $row, isset($item['kgs_in_out']) ? number_format($item['kgs_in_out'], 2, '.', '') : 0); // stock akhir
 
             // Tagihan GBN dan Jatah Area perhitungan
-            $tagihanGbn = isset($item['kgs']) ? $item['kgs'] - ($item['kgs_kirim'] + $item['kgs_stock_awal']) : 0;
-            $jatahArea = isset($item['kgs']) ? $item['kgs'] - $item['kgs_out'] : 0;
+            $tagihanGbn = isset($item['kgs']) ? $item['kgs'] + $item['qty_poplus'] - ($item['datang_solid'] + $item['plus_datang_solid'] + $item['stock_awal']) : 0;
+            $jatahArea = isset($item['kgs']) ? $item['kgs'] + $item['qty_poplus'] - $item['pakai_area'] : 0;
 
             // Format Tagihan GBN dan Jatah Area
             $sheet->setCellValue('AC' . $row, number_format($tagihanGbn, 2, '.', '')); // tagihan gbn

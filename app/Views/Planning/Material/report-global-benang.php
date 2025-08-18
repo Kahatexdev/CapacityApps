@@ -7,7 +7,7 @@
     <div class="card card-frame">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 font-weight-bolder">Report Global Stock Benang</h5>
+                <h5 class="mb-0 font-weight-bolder">Filter Global Stock Benang</h5>
                 <button class="btn btn-secondary btn-block" id="btnInfo" style="padding: 5px 12px; font-size: 12px;" data-bs-toggle="modal" data-bs-target="#infoModal">
                     <i class="fas fa-info"></i>
                 </button>
@@ -125,6 +125,147 @@
 
         function loadData() {
             let key = $('#keyInput').val().trim();
+            let jenis = 'BENANG';
+
+            // Validasi: Jika semua input kosong, tampilkan alert dan hentikan pencarian
+            if (key === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Oops...',
+                    text: 'Harap isi minimal salah satu kolom sebelum melakukan pencarian!',
+                });
+                return;
+            }
+
+
+            $.ajax({
+                url: "<?= base_url($role . '/warehouse/filterReportGlobalBenang') ?>",
+                type: "GET",
+                data: {
+                    key: key,
+                    jenis: jenis
+                },
+                dataType: "json",
+                success: function(response) {
+                    dataTable.clear().draw();
+
+                    if (response.length > 0) {
+                        $.each(response, function(index, item) {
+                            // konversi dulu ke Number, default 0
+                            const kgs = Number(item.kgs) || 0;
+                            const poTambahan = Number(item.qty_poplus) || 0;
+                            const kgsStockAwal = Number(item.stock_awal) || 0;
+                            const datangSolid = Number(item.datang_solid) || 0;
+                            const plusDatangSolid = Number(item.plus_datang_solid) || 0;
+                            const gantiRetur = Number(item.ganti_retur) || 0;
+                            const datangLurex = Number(item.datang_lurex) || 0;
+                            const plusDatangLurex = Number(item.plus_datang_lurex) || 0;
+                            const returPbGbn = Number(item.retur_pb_area) || 0;
+                            const returPbArea = Number(item.retur_pb_area) || 0;
+                            const pakaiArea = Number(item.pakai_area) || 0;
+                            const stockAkhir = Number(item.stock_akhir) || 0;
+                            const kgsOtherOut = Number(item.kgs_other_out) || 0;
+                            const loss = Number(item.loss) || 0;
+
+                            // perhitungan
+                            const tagihanGbn = kgs - (datangSolid + plusDatangSolid + kgsStockAwal);
+                            const jatahArea = kgs - pakaiArea;
+
+                            // fungsi bantu untuk format
+                            const fmt = v => v !== 0 ? v.toFixed(2) : '0';
+
+                            dataTable.row.add([
+                                index + 1,
+                                item.no_model || '-', // no model
+                                item.item_type || '-', // item type
+                                item.kode_warna || '-', //kode warna
+                                item.color || '-', // warna
+                                fmt(loss), // loss
+                                fmt(kgs), // qty po
+                                fmt(poTambahan), // qty po (+)
+                                fmt(kgsStockAwal), // stock awal
+                                '-', // stock opname
+                                fmt(datangSolid), // datang solid
+                                fmt(plusDatangSolid), // (+) datang solid
+                                fmt(gantiRetur), // ganti retur
+                                fmt(datangLurex), // datang lurex
+                                fmt(plusDatangLurex), // (+) datang lurex
+                                fmt(returPbGbn), // retur pb gbn
+                                fmt(returPbArea), // retur pb area
+                                fmt(pakaiArea), // pakai area 
+                                fmt(kgsOtherOut), // pakai lain-lain
+                                '-', // retur stock
+                                '-', // retur titip
+                                '-', // dipinjam
+                                '-', // pindah order
+                                '-', // pindah ke stock mati
+                                fmt(stockAkhir), // stock akhir
+                                fmt(tagihanGbn), // tagihan gbn
+                                fmt(jatahArea), // jatah area
+                            ]).draw(false);
+                        });
+
+                        $('#btnExport').removeClass('d-none'); // Munculkan tombol Export Excel
+                    } else {
+                        let colCount = $('#dataTable thead th').length;
+                        $('#dataTable tbody').html(`
+                            <tr>
+                                <td colspan="${colCount}" class="text-center text-danger font-weight-bold">
+                                    ⚠ Tidak ada data ditemukan
+                                </td>
+                            </tr>
+                        `);
+
+                        $('#btnExport').addClass('d-none'); // Sembunyikan jika tidak ada data
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", error);
+                }
+            });
+        }
+
+        $('#btnSearch').click(function() {
+            loadData();
+        });
+
+        $('#btnExport').click(function() {
+            let key = $('#keyInput').val();
+            let jenis = 'BENANG';
+            window.location.href = "<?= base_url($role . '/warehouse/exportGlobalReport') ?>" +
+                "?key=" + encodeURIComponent(key) +
+                "&jenis=" + encodeURIComponent(jenis);
+        });
+
+        dataTable.clear().draw();
+    });
+
+    // Fitur Reset
+    $('#btnReset').click(function() {
+        // Kosongkan input
+        $('#keyInput').val('');
+
+        // Kosongkan tabel hasil pencarian
+        $('#dataTable tbody').html('');
+
+        // Sembunyikan tombol Export Excel
+        $('#btnExport').addClass('d-none');
+    });
+</script>
+<!-- <script>
+    $(document).ready(function() {
+        let dataTable = $('#dataTable').DataTable({
+            "paging": true,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "responsive": true,
+            "processing": true,
+            "serverSide": false
+        });
+
+        function loadData() {
+            let key = $('input[type="text"]').val().trim();
 
             $.ajax({
                 url: "<?= base_url($role . '/warehouse/filterReportGlobalBenang') ?>",
@@ -215,8 +356,11 @@
         });
 
         $('#btnExport').click(function() {
-            let key = $('#keyInput').val().trim();
-            window.location.href = "<?= base_url($role . '/warehouse/exportReportGlobalBenang') ?>?key=" + key;
+            let key = $('input[type="text"]').val();
+            let jenis = 'BENANG';
+            window.location.href = "<?= base_url($role . '/warehouse/exportGlobalReport') ?>" +
+                "?key=" + encodeURIComponent(key) +
+                "&jenis=" + encodeURIComponent(jenis);
         });
 
         dataTable.clear().draw();
@@ -225,7 +369,7 @@
     // Fitur Reset
     $('#btnReset').click(function() {
         // Kosongkan input
-        let key = $('#keyInput').val('').trim();
+        $('input[type="text"]').val('');
 
         // Kosongkan tabel hasil pencarian
         $('#dataTable tbody').html('');
@@ -233,7 +377,7 @@
         // Sembunyikan tombol Export Excel
         $('#btnExport').addClass('d-none');
     });
-</script>
+</script> -->
 
 
 <?php $this->endSection(); ?>

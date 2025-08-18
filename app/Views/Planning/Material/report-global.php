@@ -12,7 +12,7 @@
             <div class="row mt-2">
                 <div class="col-md-3">
                     <label for="">No Model</label>
-                    <input type="text" class="form-control">
+                    <input type="text" id="keyInput" class="form-control">
                 </div>
                 <div class="col-md-3">
                     <label for="">Aksi</label><br>
@@ -82,7 +82,7 @@
         });
 
         function loadData() {
-            let key = $('input[type="text"]').val().trim();
+            let key = $('#keyInput').val().trim();
 
             // Validasi: Jika semua input kosong, tampilkan alert dan hentikan pencarian
             if (key === '') {
@@ -116,7 +116,7 @@
                             const gantiRetur = Number(item.ganti_retur) || 0;
                             const datangLurex = Number(item.datang_lurex) || 0;
                             const plusDatangLurex = Number(item.plus_datang_lurex) || 0;
-                            const returPbGbn = Number(item.retur_pb_area) || 0;
+                            const returPbGbn = Number(item.retur_pb_gbn) || 0;
                             const returPbArea = Number(item.retur_pb_area) || 0;
                             const pakaiArea = Number(item.pakai_area) || 0;
                             const stockAkhir = Number(item.stock_akhir) || 0;
@@ -163,6 +163,15 @@
 
                         $('#btnExport').removeClass('d-none'); // Munculkan tombol Export Excel
                     } else {
+                        let colCount = $('#dataTable thead th').length;
+                        $('#dataTable tbody').html(`
+                            <tr>
+                                <td colspan="${colCount}" class="text-center text-danger font-weight-bold">
+                                    ⚠ Tidak ada data ditemukan
+                                </td>
+                            </tr>
+                        `);
+
                         $('#btnExport').addClass('d-none'); // Sembunyikan jika tidak ada data
                     }
                 },
@@ -177,9 +186,7 @@
         });
 
         $('#btnExport').click(function() {
-            let key = $('input[type="text"]').val();
-            let tanggal_awal = $('input[type="date"]').eq(0).val();
-            let tanggal_akhir = $('input[type="date"]').eq(1).val();
+            let key = $('#keyInput').val().trim();
             window.location.href = "<?= base_url($role . '/warehouse/exportGlobalReport') ?>?key=" + key;
         });
 
@@ -190,7 +197,6 @@
     $('#btnReset').click(function() {
         // Kosongkan input
         $('input[type="text"]').val('');
-        $('input[type="date"]').val('');
 
         // Kosongkan tabel hasil pencarian
         $('#dataTable tbody').html('');
