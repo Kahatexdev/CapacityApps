@@ -175,28 +175,28 @@
                                                     // Aturan berdasarkan hari dan jenis produk:
                                                     $rules = [
                                                         'Thursday' => [
-                                                            'BENANG'  => [$tomorrow => '08:30:00'],
-                                                            'NYLON'   => [$tomorrow => '08:30:00'],
-                                                            'SPANDEX' => [$twoDays  => '08:30:00', $threeDays => '09:00:00'],
-                                                            'KARET'   => [$twoDays  => '08:30:00', $threeDays => '09:00:00']
+                                                            'BENANG'  => [$tomorrow => '23:30:00'],
+                                                            'NYLON'   => [$tomorrow => '23:30:00'],
+                                                            'SPANDEX' => [$twoDays  => '23:30:00', $threeDays => '24:00:00'],
+                                                            'KARET'   => [$twoDays  => '23:30:00', $threeDays => '24:00:00']
                                                         ],
                                                         'Friday' => [
-                                                            'BENANG'  => [$tomorrow => '08:30:00', $twoDays => '09:00:00'],
-                                                            'NYLON'   => [$tomorrow => '08:30:00'],
-                                                            'SPANDEX' => [$threeDays => '08:30:00'],
-                                                            'KARET'   => [$threeDays => '08:30:00']
+                                                            'BENANG'  => [$tomorrow => '23:30:00', $twoDays => '24:00:00'],
+                                                            'NYLON'   => [$tomorrow => '23:30:00'],
+                                                            'SPANDEX' => [$threeDays => '23:30:00'],
+                                                            'KARET'   => [$threeDays => '23:30:00']
                                                         ],
                                                         'Saturday' => [
-                                                            'BENANG'  => [$twoDays  => '08:30:00'],
-                                                            'NYLON'   => [$tomorrow => '08:30:00', $twoDays  => '09:00:00'],
-                                                            'SPANDEX' => [$threeDays => '08:30:00'],
-                                                            'KARET'   => [$threeDays => '08:30:00']
+                                                            'BENANG'  => [$twoDays  => '23:30:00'],
+                                                            'NYLON'   => [$tomorrow => '23:30:00', $twoDays  => '24:00:00'],
+                                                            'SPANDEX' => [$threeDays => '23:30:00'],
+                                                            'KARET'   => [$threeDays => '23:30:00']
                                                         ],
                                                         'default' => [
-                                                            'BENANG'  => [$tomorrow => '08:30:00'],
-                                                            'NYLON'   => [$tomorrow => '08:30:00'],
-                                                            'SPANDEX' => [$twoDays  => '08:30:00'],
-                                                            'KARET'   => [$twoDays  => '08:30:00']
+                                                            'BENANG'  => [$tomorrow => '23:30:00'],
+                                                            'NYLON'   => [$tomorrow => '23:30:00'],
+                                                            'SPANDEX' => [$twoDays  => '23:30:00'],
+                                                            'KARET'   => [$twoDays  => '23:30:00']
                                                         ]
                                                     ];
 
