@@ -1597,9 +1597,9 @@ class OrderController extends BaseController
         ];
         return view($role . '/Order/sisaOrderArea', $data);
     }
-    public function detailSisaOrderArea()
+    public function detailSisaOrderArea($ar)
     {
-        $ar = $this->request->getPost('area') ?: "";
+        // $ar = $this->request->getPost('area') ?: "";
         $role = session()->get('role');
         $month = $this->request->getPost('month');
         $yearss = $this->request->getPost('year');
