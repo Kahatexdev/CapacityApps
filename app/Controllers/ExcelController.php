@@ -30,6 +30,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use App\Models\EstSpkModel;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
+use DateTime;
 
 
 class ExcelController extends BaseController
@@ -7674,6 +7675,1493 @@ class ExcelController extends BaseController
 
         // Download
         $filename = 'Report_Global_' . $key . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+    public function exportReportSisaPakai()
+    {
+        $delivery = $this->request->getGet('delivery');
+        $noModel = $this->request->getGet('no_model');
+        $kodeWarna = $this->request->getGet('kode_warna');
+        $jenis = $this->request->getGet('jenis');
+        $bulanMap = [
+            'Januari' => 1,
+            'Februari' => 2,
+            'Maret' => 3,
+            'April' => 4,
+            'Mei' => 5,
+            'Juni' => 6,
+            'Juli' => 7,
+            'Agustus' => 8,
+            'September' => 9,
+            'Oktober' => 10,
+            'November' => 11,
+            'Desember' => 12
+        ];
+        $bulan = $bulanMap[$delivery] ?? null;
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterSisaPakai?bulan=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna) . '&jenis=' . urlencode($jenis);
+        $material = @file_get_contents($apiUrl);
+
+        if ($material !== FALSE) {
+            $data = json_decode($material, true);
+        }
+
+        // dd($data);
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->mergeCells('A1:Z1');
+        $sheet->setCellValue('A1', 'REPORT SISA PAKAI ' . $jenis);
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+        $sheet->getStyle('A1')->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // Buat header dengan sub-header
+        $sheet->mergeCells('A3:A4');  // NO
+        $sheet->mergeCells('B3:B4');  // TANGGAL PO
+        $sheet->mergeCells('C3:C4');  // FOLL UP
+        $sheet->mergeCells('D3:D4');  // NO MODEL
+        $sheet->mergeCells('E3:E4');  // NO ORDER
+        $sheet->mergeCells('F3:F4');  // AREA
+        $sheet->mergeCells('G3:G4');  // BUYER
+        $sheet->mergeCells('H3:H4');  // START MC
+        $sheet->mergeCells('I3:I4');  // DELIVERY AWAL
+        $sheet->mergeCells('J3:J4');  // DELIVERY AKHIR
+        $sheet->mergeCells('K3:K4');  // ORDER TYPE
+        $sheet->mergeCells('L3:L4');  // ITEM TYPE
+        $sheet->mergeCells('M3:M4');  // KODE WARNA
+        $sheet->mergeCells('N3:N4');  // WARNA
+        $sheet->mergeCells('Q3:Q4');  // PESAN KG
+
+        $sheet->setCellValue('A3', 'NO');
+        $sheet->setCellValue('B3', 'TANGGAL PO');
+        $sheet->setCellValue('C3', 'FOLL UP');
+        $sheet->setCellValue('D3', 'NO MODEL');
+        $sheet->setCellValue('E3', 'NO ORDER');
+        $sheet->setCellValue('F3', 'AREA');
+        $sheet->setCellValue('G3', 'BUYER');
+        $sheet->setCellValue('H3', 'START MC');
+        $sheet->setCellValue('I3', 'DELIVERY AWAL');
+        $sheet->setCellValue('J3', 'DELIVERY AKHIR');
+        $sheet->setCellValue('K3', 'ORDER TYPE');
+        $sheet->setCellValue('L3', 'ITEM TYPE');
+        $sheet->setCellValue('M3', 'KODE WARNA');
+        $sheet->setCellValue('N3', 'WARNA');
+        $sheet->setCellValue('Q3', 'PESAN KG');
+
+        // Stock Awal: Header + Sub-header
+        $sheet->mergeCells('O3:P3'); // STOCK AWAL
+        $sheet->setCellValue('O3', 'STOCK AWAL');
+        $sheet->setCellValue('O4', 'KG');
+        $sheet->setCellValue('P4', 'LOT');
+
+        // Po Tambahan Gbn: Header + Sub-header
+        $sheet->mergeCells('R3:U3');
+        $sheet->setCellValue('R3', 'PO TAMBAHAN GBN');
+        $sheet->setCellValue('R4', 'TGL TERIMA PO(+) GBN');
+        $sheet->setCellValue('S4', 'TGL PO(+) AREA');
+        $sheet->setCellValue('T4', 'DELIVERY PO(+)');
+        $sheet->setCellValue('U4', 'KG PO (+)');
+
+        // Pakai
+        $sheet->mergeCells('V3:V4');
+        $sheet->setCellValue('V3', 'PAKAI');
+
+        // (+) Pakai
+        $sheet->mergeCells('W3:W4');
+        $sheet->setCellValue('W3', '(+) PAKAI');
+
+        // Retur: Header + Sub-header
+        $sheet->mergeCells('X3:Y3');
+        $sheet->setCellValue('X3', 'RETUR');
+        $sheet->setCellValue('X4', 'KGS');
+        $sheet->setCellValue('Y4', 'LOT');
+
+        // Sisa
+        $sheet->mergeCells('Z3:Z4');
+        $sheet->setCellValue('Z3', 'SISA');
+
+        // Format semua header
+        $sheet->getStyle('A3:Z4')->getFont()->setBold(true);
+        $sheet->getStyle('A3:Z4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A3:Z4')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A3:Z4')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+        // Data
+        $row = 5;
+        $no = 1;
+        foreach ($data as $item) {
+            // dd($item);
+            $sisa = (($item['kgs_out'] ?? 0 + 0) - $item['kgs_retur'] - ($item['kg_po'] + 0));
+            // $sisa = (($item['kgs_out'] ?? 0 + $item['kgs_out_plus'] ?? 0) - $item['kgs_retur'] - ($item['kg_po'] + $item['kg_po_plus']));
+
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $item['lco_date']);
+            $sheet->setCellValue('C' . $row, $item['foll_up']);
+            $sheet->setCellValue('D' . $row, $item['no_model']);
+            $sheet->setCellValue('E' . $row, $item['no_order']);
+            $sheet->setCellValue('F' . $row, $item['area_out']);
+            $sheet->setCellValue('G' . $row, $item['buyer']);
+            $sheet->setCellValue('H' . $row, $item['start_mc'] ?? '');
+            $sheet->setCellValue('I' . $row, $item['delivery_awal']);
+            $sheet->setCellValue('J' . $row, $item['delivery_akhir']);
+            $sheet->setCellValue('K' . $row, $item['unit']);
+            $sheet->setCellValue('L' . $row, $item['item_type']);
+            $sheet->setCellValue('M' . $row, $item['kode_warna']);
+            $sheet->setCellValue('N' . $row, $item['color']);
+            $sheet->setCellValue('O' . $row, $item['kgs_stock_awal']);
+            $sheet->setCellValue('P' . $row, $item['lot_awal']);
+            $sheet->setCellValue('Q' . $row, $item['kg_po']);
+            $sheet->setCellValue('R' . $row, $item['tgl_terima_po_plus_gbn'] ?? '');
+            $sheet->setCellValue('S' . $row, $item['tgl_po_plus_area'] ?? '');
+            $sheet->setCellValue('T' . $row, $item['delivery_awal_plus'] ?? '');
+            $sheet->setCellValue('U' . $row, $item['kg_po_plus'] ?? 0);
+            $sheet->setCellValue('V' . $row, $item['kgs_out'] ?? 0);
+            $sheet->setCellValue('W' . $row, $item['kgs_out_plus'] ?? 0);
+            $sheet->setCellValue('X' . $row, $item['kgs_retur'] ?? 0);
+            $sheet->setCellValue('Y' . $row, $item['lot_retur'] ?? '');
+            $sheet->setCellValue('Z' . $row, $sisa ?? 0);
+            $row++;
+        }
+
+        // Border
+        $lastRow = $row - 1;
+        $sheet->getStyle("A5:Y{$lastRow}")
+            ->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->getStyle("A5:Y{$lastRow}")
+            ->getAlignment()
+            ->setVertical(Alignment::VERTICAL_CENTER);
+
+        $styleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+        $sheet->getStyle("A3:Z{$lastRow}")->applyFromArray($styleArray);
+
+        // Auto-size
+        foreach (range('A', 'Z') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Download
+        $filename = 'Report Sisa Pakai ' . $jenis . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+    public function exportHistoryPindahOrder()
+    {
+        $noModel   = $this->request->getGet('model')     ?? '';
+        $kodeWarna = $this->request->getGet('kode_warna') ?? '';
+
+        // 1) Ambil data
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterSisaPakai?no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $material = @file_get_contents($apiUrl);
+
+        if ($material !== FALSE) {
+            $dataPindah = json_decode($material, true);
+        }
+
+        // 2) Loop dan merge API result
+        foreach ($dataPindah as &$row) {
+            try {
+                $delivery = $this->ApsPerstyleModel->getDeliveryAwalAkhir($row['no_model_new']);
+                $row['delivery_awal']  = $delivery['delivery_awal']  ?? '-';
+                $row['delivery_akhir'] = $delivery['delivery_akhir'] ?? '-';
+            } catch (\Exception $e) {
+                $row['delivery_awal']  = '-';
+                $row['delivery_akhir'] = '-';
+            }
+        }
+        unset($row);
+
+        // dd($data);
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        if ($noModel && $kodeWarna) {
+            $judul = "REPORT HISTORY PINDAH ORDER $noModel DAN $kodeWarna";
+        } elseif ($noModel) {
+            $judul = "REPORT HISTORY PINDAH ORDER $noModel";
+        } elseif ($kodeWarna) {
+            $judul = "REPORT HISTORY PINDAH ORDER $kodeWarna";
+        } else {
+            $judul = "REPORT HISTORY PINDAH ORDER SEMUA DATA";
+        }
+
+        $sheet->mergeCells('A1:L1');
+        $sheet->setCellValue('A1', $judul);
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+        $sheet->getStyle('A1')->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // Buat header dengan sub-header
+
+        $sheet->setCellValue('A3', 'NO');
+        $sheet->setCellValue('B3', 'TANGGAL PO');
+        $sheet->setCellValue('C3', 'FOLL UP');
+        $sheet->setCellValue('D3', 'NO MODEL');
+        $sheet->setCellValue('E3', 'NO ORDER');
+        $sheet->setCellValue('F3', 'AREA');
+        $sheet->setCellValue('G3', 'BUYER');
+        $sheet->setCellValue('H3', 'START MC');
+        $sheet->setCellValue('I3', 'DELIVERY AWAL');
+        $sheet->setCellValue('J3', 'DELIVERY AKHIR');
+        $sheet->setCellValue('K3', 'ORDER TYPE');
+        $sheet->setCellValue('L3', 'ITEM TYPE');
+        $sheet->setCellValue('M3', 'KODE WARNA');
+        $sheet->setCellValue('N3', 'WARNA');
+        $sheet->setCellValue('Q3', 'PESAN KG');
+
+        // Stock Awal: Header + Sub-header
+        $sheet->mergeCells('O3:P3'); // STOCK AWAL
+        $sheet->setCellValue('O3', 'STOCK AWAL');
+        $sheet->setCellValue('O4', 'KG');
+        $sheet->setCellValue('P4', 'LOT');
+
+        // Po Tambahan Gbn: Header + Sub-header
+        $sheet->mergeCells('R3:U3');
+        $sheet->setCellValue('R3', 'PO TAMBAHAN GBN');
+        $sheet->setCellValue('R4', 'TGL TERIMA PO(+) GBN');
+        $sheet->setCellValue('S4', 'TGL PO(+) AREA');
+        $sheet->setCellValue('T4', 'DELIVERY PO(+)');
+        $sheet->setCellValue('U4', 'KG PO (+)');
+
+        // Pakai
+        $sheet->mergeCells('V3:V4');
+        $sheet->setCellValue('V3', 'PAKAI');
+
+        // (+) Pakai
+        $sheet->mergeCells('W3:W4');
+        $sheet->setCellValue('W3', '(+) PAKAI');
+
+        // Retur: Header + Sub-header
+        $sheet->mergeCells('X3:Y3');
+        $sheet->setCellValue('X3', 'RETUR');
+        $sheet->setCellValue('X4', 'KGS');
+        $sheet->setCellValue('Y4', 'LOT');
+
+        // Sisa
+        $sheet->mergeCells('Z3:Z4');
+        $sheet->setCellValue('Z3', 'SISA');
+
+        // Format semua header
+        $sheet->getStyle('A3:Z4')->getFont()->setBold(true);
+        $sheet->getStyle('A3:Z4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A3:Z4')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A3:Z4')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+        // Data
+        $row = 5;
+        $no = 1;
+        foreach ($data as $item) {
+            // dd($item);
+            $sisa = (($item['kgs_out'] ?? 0 + 0) - $item['kgs_retur'] - ($item['kg_po'] + 0));
+            // $sisa = (($item['kgs_out'] ?? 0 + $item['kgs_out_plus'] ?? 0) - $item['kgs_retur'] - ($item['kg_po'] + $item['kg_po_plus']));
+
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $item['lco_date']);
+            $sheet->setCellValue('C' . $row, $item['foll_up']);
+            $sheet->setCellValue('D' . $row, $item['no_model']);
+            $sheet->setCellValue('E' . $row, $item['no_order']);
+            $sheet->setCellValue('F' . $row, $item['area_out']);
+            $sheet->setCellValue('G' . $row, $item['buyer']);
+            $sheet->setCellValue('H' . $row, $item['start_mc'] ?? '');
+            $sheet->setCellValue('I' . $row, $item['delivery_awal']);
+            $sheet->setCellValue('J' . $row, $item['delivery_akhir']);
+            $sheet->setCellValue('K' . $row, $item['unit']);
+            $sheet->setCellValue('L' . $row, $item['item_type']);
+            $sheet->setCellValue('M' . $row, $item['kode_warna']);
+            $sheet->setCellValue('N' . $row, $item['color']);
+            $sheet->setCellValue('O' . $row, $item['kgs_stock_awal']);
+            $sheet->setCellValue('P' . $row, $item['lot_awal']);
+            $sheet->setCellValue('Q' . $row, $item['kg_po']);
+            $sheet->setCellValue('R' . $row, $item['tgl_terima_po_plus_gbn'] ?? '');
+            $sheet->setCellValue('S' . $row, $item['tgl_po_plus_area'] ?? '');
+            $sheet->setCellValue('T' . $row, $item['delivery_awal_plus'] ?? '');
+            $sheet->setCellValue('U' . $row, $item['kg_po_plus'] ?? 0);
+            $sheet->setCellValue('V' . $row, $item['kgs_out'] ?? 0);
+            $sheet->setCellValue('W' . $row, $item['kgs_out_plus'] ?? 0);
+            $sheet->setCellValue('X' . $row, $item['kgs_retur'] ?? 0);
+            $sheet->setCellValue('Y' . $row, $item['lot_retur'] ?? '');
+            $sheet->setCellValue('Z' . $row, $sisa ?? 0);
+            $row++;
+        }
+
+        // Border
+        $lastRow = $row - 1;
+        $sheet->getStyle("A5:Y{$lastRow}")
+            ->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->getStyle("A5:Y{$lastRow}")
+            ->getAlignment()
+            ->setVertical(Alignment::VERTICAL_CENTER);
+
+        $styleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+        $sheet->getStyle("A3:Z{$lastRow}")->applyFromArray($styleArray);
+
+        // Auto-size
+        foreach (range('A', 'Z') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Download
+        $filename = 'Report Sisa Pakai ' . $jenis . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+    public function exportReportBenang()
+    {
+        $tglAwal = $this->request->getGet('tanggal_awal');
+        $tglAkhir = $this->request->getGet('tanggal_akhir');
+        if (empty($tglAwal) && empty($tglAkhir)) {
+            $bulan = $this->request->getGet('bulan');
+            if (empty($bulan) || !preg_match('/^\d{4}\-\d{2}$/', $bulan)) {
+                return $this->response
+                    ->setStatusCode(400)
+                    ->setJSON(['error' => 'Parameter “bulan” harus dalam format YYYY-MM']);
+            }
+
+            $timestamp     = strtotime($bulan . '-01');
+            $tglAwal   = date('Y-m-01', $timestamp);
+            $tglAkhir  = date('Y-m-t', $timestamp);
+        }
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterBenangMingguan?tanggal_awal=' . urlencode($tglAwal) . '&tanggal_akhir=' . urlencode($tglAkhir);
+        $material = @file_get_contents($apiUrl);
+
+        if ($material !== FALSE) {
+            $data = json_decode($material, true);
+        }
+
+        // $data = $this->pemasukanModel->getFilterBenang($tglAwal, $tglAkhir);
+        $tanggal = $data[0]['tgl_input'];
+        $date = new DateTime($tanggal);
+        $angkaBulan = (int) $date->format('m');
+        $angkaTahun = (int) $date->format('Y');
+
+        $namaBulan = [
+            1 => 'Januari',
+            2 => 'Februari',
+            3 => 'Maret',
+            4 => 'April',
+            5 => 'Mei',
+            6 => 'Juni',
+            7 => 'Juli',
+            8 => 'Agustus',
+            9 => 'September',
+            10 => 'Oktober',
+            11 => 'November',
+            12 => 'Desember'
+        ];
+
+        $bulan = $namaBulan[$angkaBulan] . ' ' . $angkaTahun;
+
+        $groups = [
+            'COTTON' => [],
+            'ACRYLIC' => [],
+            'SPUN POLYESTER'   => [],
+            'COTTON X LUREX'   => [],
+            'ACRYLIC X LUREX'   => [],
+            'Surat Jalan Tidak Masuk'   => [], //Misty
+        ];
+
+        foreach ($data as $row) {
+            $it = strtoupper($row['item_type']);        // bahan_baku.jenis
+            $sj = strtoupper($row['no_surat_jalan']);   // datang.no_suratjalan
+
+            // 1) Surat Jalan Tidak Masuk
+            // jenis BUKAN Acrylic, BUKAN Lurex; SJ tidak diawali KWS, bukan '', bukan SL*, bukan SC*
+            if (
+                stripos($it, 'ACRYLIC') === false
+                && stripos($it, 'LUREX') === false
+                && stripos($sj, 'KWS') !== 0
+                && $sj !== ''
+                && stripos($sj, 'SL') !== 0
+                && stripos($sj, 'SC') !== 0
+            ) {
+                $groups['Surat Jalan Tidak Masuk'][] = $row;
+                continue;
+            }
+
+            // 2) Cotton
+            // bukan Lurex, bukan Polyester, bukan Spun, bukan ACR; SJ diawali KWS atau ''
+            if (
+                stripos($it, 'LUREX') === false
+                && stripos($it, 'POLYESTER') === false
+                && stripos($it, 'SPUN') === false
+                && stripos($it, 'ACR') === false
+                && (stripos($sj, 'KWS') === 0 || $sj === '')
+            ) {
+                $groups['COTTON'][] = $row;
+                continue;
+            }
+
+            // 3) Acrylic
+            // mengandung ACR; bukan Spun, bukan Polyester, bukan pola Lurex-Acr/Lurex-Acrylic
+            if (
+                stripos($it, 'ACR') !== false
+                && stripos($sj, 'KWS') !== false
+                && stripos($it, 'SPUN') === false
+                && stripos($it, 'POLYESTER') === false
+                && stripos($it, 'LUREX ACR') === false
+                && stripos($it, 'ACRYLIC LUREX') === false
+                && stripos($it, 'ACR LUREX') === false
+            ) {
+                $groups['ACRYLIC'][] = $row;
+                continue;
+            }
+
+            // 4) Spun Polyester
+            // bukan ACR, bukan Lurex; mengandung SPUN atau POLYESTER; SJ diawali KWS atau ''
+            if (
+                stripos($it, 'ACR') === false
+                && stripos($it, 'LUREX') === false
+                && (stripos($it, 'SPUN') !== false || stripos($it, 'POLYESTER') !== false)
+                && (stripos($sj, 'KWS') === 0 || $sj === '')
+            ) {
+                $groups['SPUN POLYESTER'][] = $row;
+                continue;
+            }
+
+            // 5) Cotton X Lurex
+            // bukan ACR; mengandung LUREX
+            if (
+                stripos($it, 'ACR') === false
+                && stripos($it, 'LUREX') !== false
+            ) {
+                $groups['COTTON X LUREX'][] = $row;
+                continue;
+            }
+
+            // 6) Acrylic X Lurex
+            // mengandung "ACRYLIC LUREX" atau "LUREX ACR"; SJ diawali KWS atau '' atau mengandung LRX
+            if (
+                (stripos($it, 'LUREX') !== false
+                    || stripos($it, 'LUREX ACR') !== false)
+                && (
+                    stripos($sj, 'KWS') === 0
+                    || $sj === ''
+                    || stripos($sj, 'LRX') !== false
+                )
+            ) {
+                $groups['ACRYLIC X LUREX'][] = $row;
+                continue;
+            }
+
+            // kalau tidak masuk salah satu, bisa skip atau taruh di default
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $firstSheet = true;
+        foreach ($groups as $title => $rows) {
+            if ($firstSheet) {
+                $sheet = $spreadsheet->getActiveSheet();
+                $firstSheet = false;
+            } else {
+                $sheet = $spreadsheet->createSheet();
+            }
+            $sheet->setTitle($title);
+            $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
+            $spreadsheet->getDefaultStyle()->getFont()->setSize(11);
+
+            // Header Form
+            $sheet->mergeCells('A1:D2');
+            $sheet->getColumnDimension('A')->setWidth(10);
+            $sheet->getColumnDimension('D')->setWidth(15);
+
+            // $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+            // $drawing->setName('Logo');
+            // $drawing->setDescription('Logo Perusahaan');
+            // $drawing->setPath('assets/img/logo-kahatex.png');
+            // $drawing->setCoordinates('C1');
+            // $drawing->setHeight(25);
+            // $drawing->setOffsetX(55);
+            // $drawing->setOffsetY(10);
+            // $drawing->setWorksheet($sheet);
+            $sheet->mergeCells('A3:D3');
+            $sheet->setCellValue('A3', 'PT. KAHATEX');
+            $sheet->getStyle('A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+            //Merge
+            $sheet->mergeCells('E1:O1');
+            $sheet->mergeCells('E2:O2');
+            $sheet->mergeCells('E3:O3');
+            $sheet->mergeCells('E4:O4');
+            $sheet->mergeCells('A4:D4');
+            $sheet->mergeCells('B5:O5');
+
+            $sheet->setCellValue('E1', 'FORMULIR');
+            $sheet->setCellValue('E2', 'DEPARTEMENT KAOS KAKI');
+            $sheet->setCellValue('E3', 'REKAP PENERIMAAN BENANG KAOS KAKI DARI DEPARTEMEN (KELOS WARNA)');
+            $sheet->setCellValue('A4', 'No. Dokumen');
+            $sheet->setCellValue('A5', 'Bulan : ');
+            $sheet->setCellValue('B5', $bulan);
+
+            // Buat header dengan sub-header
+            $sheet->mergeCells('A6:A7');  // NO
+            $sheet->mergeCells('B6:B7');  // NO SJ
+            $sheet->mergeCells('C6:C7');  // TANGGAL SJ
+            $sheet->mergeCells('D6:D7');  // TANGGAL PENERIMAAN
+            $sheet->mergeCells('E6:E7');  // JENIS BARANG
+            $sheet->mergeCells('F6:F7');  // KODE BENANG
+            $sheet->mergeCells('G6:G7');  // WARNA
+            $sheet->mergeCells('H6:H7');  // KODE WARNA
+            $sheet->mergeCells('I6:I7');  // L/M/D
+            $sheet->mergeCells('J6:J7');  // CONES
+            $sheet->mergeCells('M6:M7');  // HARGA PER KG (USD)
+            $sheet->mergeCells('N6:N7');  // TOTAL (USD)
+            $sheet->mergeCells('O6:O7');  // KETERANGAN
+            $sheet->mergeCells('P6:P7');  // DETAIL SJ
+            $sheet->mergeCells('Q6:Q7');  // KELOMPOK
+            $sheet->mergeCells('R6:R7');  // UKURAN
+            $sheet->mergeCells('S6:S7');  // WARNA DASAR
+            $sheet->mergeCells('T6:T7');  // NW
+
+            $sheet->setCellValue('A6', 'NO');
+            $sheet->setCellValue('B6', 'NO SJ');
+            $sheet->setCellValue('C6', 'TANGGAL SJ');
+            $sheet->setCellValue('D6', 'TANGGAL PENERIMAAN');
+            $sheet->setCellValue('E6', 'JENIS BARANG');
+            $sheet->setCellValue('F6', 'KODE BENANG');
+            $sheet->setCellValue('G6', 'WARNA');
+            $sheet->setCellValue('H6', 'KODE WARNA');
+            $sheet->setCellValue('I6', 'L/M/D');
+            $sheet->setCellValue('J6', 'CONES');
+            $sheet->setCellValue('M6', 'HARGA PER KG (USD)');
+            $sheet->setCellValue('N6', 'TOTAL (USD)');
+            $sheet->setCellValue('O6', 'KETERANGAN');
+            $sheet->setCellValue('P6', 'DETAIL SJ');
+            $sheet->setCellValue('Q6', 'KELOMPOK');
+            $sheet->setCellValue('R6', 'UKURAN');
+            $sheet->setCellValue('S6', 'WARNA DASAR');
+            $sheet->setCellValue('T6', 'NW');
+
+            // Stock Awal: Header + Sub-header
+            $sheet->mergeCells('K6:L6'); // STOCK AWAL
+            $sheet->setCellValue('K6', 'QTY (KG)');
+            $sheet->setCellValue('K7', 'GW');
+            $sheet->setCellValue('L7', 'NW');
+
+            // Format semua header
+            $sheet->getStyle('A6:O6')->getFont()->setBold(true);
+            $sheet->getStyle('A6:O6')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('A6:O6')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+            $sheet->getStyle('A6:O6')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+            $sheet->getStyle('A6:O6')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+            $styleArray = [
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
+                    ],
+                ],
+            ];
+            $sheet->getStyle("A1:O5")->applyFromArray($styleArray);
+            $sheet->getStyle('E1:O3')->getFont()->setSize(16);
+
+            $sheet->getStyle('A1:O4')->applyFromArray([
+                'font' => [
+                    'bold' => true,
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+            ]);
+
+            // Data
+            $row = 8;
+            $no = 1;
+            $groupTanggal = [];
+            foreach ($rows as $item) {
+                $tgl = $item['tgl_datang'];
+                $groupTanggal[$tgl][] = $item;
+            }
+
+            foreach ($groupTanggal as $tgl => $items) {
+                $subtotal = ['cones' => 0, 'gw' => 0, 'kgs_kirim' => 0, 'usd' => 0];
+
+                foreach ($items as $item) {
+                    $kgsKirim = $item['kgs_kirim'];
+                    $harga = $item['harga'];
+                    $totalUsd = $kgsKirim * $harga;
+
+                    $tgl = $item['tgl_datang'];
+                    $cones = (float)$item['cones'];
+                    $gw    = (float)$item['gw'];
+                    $kgs_kirim    = (float)$item['kgs_kirim'];
+                    $usd   = $kgs_kirim * (float)$item['harga'];
+                    $warnaDasar = $item['warna_dasar'] ?? null;
+
+                    $sheet->setCellValue('A' . $row, $no++);
+                    $sheet->setCellValue('B' . $row, $item['no_surat_jalan']);
+                    $sheet->setCellValue('C' . $row, $item['tgl_datang']);
+                    $sheet->setCellValue('D' . $row, $item['tgl_input']);
+                    $sheet->setCellValue('E' . $row, $item['item_type']);
+                    $sheet->setCellValue('F' . $row, $item['ukuran']);
+                    if ($title === 'COTTON') {
+                        $sheet->setCellValue('G' . $row, $item['warna'] . ' ' . ($item['kode_warna'] ?? ''));
+                    } else {
+                        $sheet->setCellValue('G' . $row, $item['warna']);
+                    }
+                    $sheet->setCellValue('H' . $row, $item['kode_warna'] ?? '');
+                    $sheet->setCellValue('I' . $row, $item['l_m_d']);
+                    $sheet->setCellValue('J' . $row, $item['cones'] ?? 0);
+                    $sheet->setCellValue('K' . $row, number_format($item['gw'], 2));
+                    $sheet->setCellValue('L' . $row, number_format($kgsKirim, 2));
+                    $sheet->setCellValue('M' . $row, number_format($harga, 2));
+                    $sheet->setCellValue('N' . $row, number_format($totalUsd, 2));
+                    $sheet->setCellValue('O' . $row, ''); // Keterangan
+                    $sheet->setCellValue('P' . $row, $item['detail_sj']);
+                    $sheet->setCellValue('Q' . $row, $item['jenis']);
+                    $sheet->setCellValue('R' . $row, $item['ukuran'] ?? '');
+                    if ($warnaDasar === null || $warnaDasar === 'Kode warna belum ada di database') {
+                        $sheet->setCellValue('S' . $row, 'Kode Warna Tidak Ada di Database');
+                        $sheet->getStyle('S' . $row)->getFont()->getColor()->setARGB(Color::COLOR_RED);
+                    } else {
+                        $sheet->setCellValue('S' . $row, $warnaDasar);
+                    }
+                    $sheet->setCellValue('T' . $row, $kgsKirim ?? 0);
+                    $row++;
+
+                    // Hitung subtotal
+                    $subtotal['cones'] += $cones;
+                    $subtotal['gw'] += $gw;
+                    $subtotal['kgs_kirim'] += $kgs_kirim;
+                    $subtotal['usd'] += $usd;
+                }
+
+                // Tulis total setelah data tanggal itu
+                $sheet->mergeCells("A{$row}:H{$row}");
+                $sheet->setCellValue("A{$row}", "TOTAL");
+                $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->setCellValue("J{$row}", $subtotal['cones']);
+                $sheet->setCellValue("K{$row}", number_format($subtotal['gw'], 2));
+                $sheet->setCellValue("L{$row}", number_format($subtotal['kgs_kirim'], 2));
+                $sheet->setCellValue("N{$row}", number_format($subtotal['usd'], 2));
+                $row++;
+            }
+
+            // Border
+            $lastRow = $row - 1;
+            $sheet->getStyle("A6:T{$lastRow}")
+                ->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+            $sheet->getStyle("A6:T{$lastRow}")
+                ->getAlignment()
+                ->setVertical(Alignment::VERTICAL_CENTER);
+
+            $sheet->getStyle("A6:O{$lastRow}")->applyFromArray($styleArray);
+
+            // Auto-size
+            foreach (range('A', 'T') as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+        }
+
+        // Download
+        if ($this->request->getGet('tanggal_awal') && $this->request->getGet('tanggal_akhir')) {
+            $filename = 'Report Benang Mingguan ' . $tglAwal . ' - ' . $tglAkhir . '.xlsx';
+        } else {
+            $filename = 'Report Benang Bulan ' . $bulan . '.xlsx';
+        }
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function exportReportSisaDatangBenang()
+    {
+        $delivery = $this->request->getGet('delivery');
+        $noModel = $this->request->getGet('no_model');
+        $kodeWarna = $this->request->getGet('kode_warna');
+        $bulanMap = [
+            'Januari' => 1,
+            'Februari' => 2,
+            'Maret' => 3,
+            'April' => 4,
+            'Mei' => 5,
+            'Juni' => 6,
+            'Juli' => 7,
+            'Agustus' => 8,
+            'September' => 9,
+            'Oktober' => 10,
+            'November' => 11,
+            'Desember' => 12
+        ];
+        $bulan = $bulanMap[$delivery] ?? null;
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangBenang?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $material = @file_get_contents($apiUrl);
+
+        if ($material !== FALSE) {
+            $data = json_decode($material, true);
+        }
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->mergeCells('A1:Z1');
+        $sheet->setCellValue('A1', 'REPORT SISA DATANG BENANG');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+        $sheet->getStyle('A1')->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // Buat header dengan sub-header
+        $sheet->mergeCells('A3:A4');  // NO
+        $sheet->mergeCells('B3:B4');  // TANGGAL PO
+        $sheet->mergeCells('C3:C4');  // FOLL UP
+        $sheet->mergeCells('D3:D4');  // NO MODEL
+        $sheet->mergeCells('E3:E4');  // NO ORDER
+        $sheet->mergeCells('F3:F4');  // AREA
+        $sheet->mergeCells('G3:G4');  // BUYER
+        $sheet->mergeCells('H3:H4');  // START MC
+        $sheet->mergeCells('I3:I4');  // DELIVERY AWAL
+        $sheet->mergeCells('J3:J4');  // DELIVERY AKHIR
+        $sheet->mergeCells('K3:K4');  // ORDER TYPE
+        $sheet->mergeCells('L3:L4');  // ITEM TYPE
+        $sheet->mergeCells('M3:M4');  // KODE WARNA
+        $sheet->mergeCells('N3:N4');  // WARNA
+        $sheet->mergeCells('Q3:Q4');  // PESAN KG
+
+        $sheet->setCellValue('A3', 'NO');
+        $sheet->setCellValue('B3', 'TANGGAL PO');
+        $sheet->setCellValue('C3', 'FOLL UP');
+        $sheet->setCellValue('D3', 'NO MODEL');
+        $sheet->setCellValue('E3', 'NO ORDER');
+        $sheet->setCellValue('F3', 'AREA');
+        $sheet->setCellValue('G3', 'BUYER');
+        $sheet->setCellValue('H3', 'START MC');
+        $sheet->setCellValue('I3', 'DELIVERY AWAL');
+        $sheet->setCellValue('J3', 'DELIVERY AKHIR');
+        $sheet->setCellValue('K3', 'ORDER TYPE');
+        $sheet->setCellValue('L3', 'ITEM TYPE');
+        $sheet->setCellValue('M3', 'KODE WARNA');
+        $sheet->setCellValue('N3', 'WARNA');
+        $sheet->setCellValue('Q3', 'PESAN KG');
+
+        // Stock Awal: Header + Sub-header
+        $sheet->mergeCells('O3:P3'); // STOCK AWAL
+        $sheet->setCellValue('O3', 'STOCK AWAL');
+        $sheet->setCellValue('O4', 'KG');
+        $sheet->setCellValue('P4', 'LOT');
+
+        // Po Tambahan Gbn: Header + Sub-header
+        $sheet->mergeCells('R3:U3');
+        $sheet->setCellValue('R3', 'PO TAMBAHAN GBN');
+        $sheet->setCellValue('R4', 'TGL TERIMA PO(+) GBN');
+        $sheet->setCellValue('S4', 'TGL PO(+) AREA');
+        $sheet->setCellValue('T4', 'DELIVERY PO(+)');
+        $sheet->setCellValue('U4', 'KG PO (+)');
+
+        // DATANG
+        $sheet->mergeCells('V3:V4');
+        $sheet->setCellValue('V3', 'DATANG');
+
+        // (+) DATANG
+        $sheet->mergeCells('W3:W4');
+        $sheet->setCellValue('W3', '(+) DATANG');
+
+        // Retur: Header + Sub-header
+        $sheet->mergeCells('X3:X4');
+        $sheet->setCellValue('X3', 'GANTI RETUR');
+
+        $sheet->mergeCells('Y3:Y4');
+        $sheet->setCellValue('Y3', 'RETUR');
+
+        // Sisa
+        $sheet->mergeCells('Z3:Z4');
+        $sheet->setCellValue('Z3', 'SISA');
+
+        // Format semua header
+        $sheet->getStyle('A3:Z4')->getFont()->setBold(true);
+        $sheet->getStyle('A3:Z4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A3:Z4')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A3:Z4')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+        // Data
+        $row = 5;
+        $no = 1;
+        foreach ($data as $item) {
+            $kgsAwal        = $item['kgs_stock_awal']  ?? 0;
+            $kgsDatang      = $item['kgs_datang']      ?? 0;
+            $kgsDatangPlus  = $item['kgs_datang_plus'] ?? 0;
+            $kgsRetur       = $item['kgs_retur']       ?? 0;
+            $kgPo           = $item['kg_po']           ?? 0;
+            $kgPoPlus       = $item['kg_po_plus']      ?? 0;
+            $qtyRetur       = $item['qty_retur']       ?? 0;
+
+            if ($kgsRetur > 0) {
+                $sisa = (($kgsAwal + $kgsDatang + $kgsDatangPlus + $kgsRetur) - ($kgPo - $kgPoPlus - $qtyRetur));
+            } else {
+                $sisa = (($kgsAwal + $kgsDatang + $kgsDatangPlus + $kgsRetur) - ($kgPo - $kgPoPlus));
+            }
+
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $item['lco_date']);
+            $sheet->setCellValue('C' . $row, $item['foll_up']);
+            $sheet->setCellValue('D' . $row, $item['no_model']);
+            $sheet->setCellValue('E' . $row, $item['no_order']);
+            $sheet->setCellValue('F' . $row, $item['area']);
+            $sheet->setCellValue('G' . $row, $item['buyer']);
+            $sheet->setCellValue('H' . $row, $item['start_mc'] ?? '');
+            $sheet->setCellValue('I' . $row, $item['delivery_awal']);
+            $sheet->setCellValue('J' . $row, $item['delivery_akhir']);
+            $sheet->setCellValue('K' . $row, $item['unit']);
+            $sheet->setCellValue('L' . $row, $item['item_type']);
+            $sheet->setCellValue('M' . $row, $item['kode_warna']);
+            $sheet->setCellValue('N' . $row, $item['color']);
+            $sheet->setCellValue('O' . $row, $item['kgs_stock_awal']);
+            $sheet->setCellValue('P' . $row, $item['lot_awal']);
+            $sheet->setCellValue('Q' . $row, $item['kg_po']);
+            $sheet->setCellValue('R' . $row, $item['tgl_terima_po_plus_gbn'] ?? '');
+            $sheet->setCellValue('S' . $row, $item['tgl_po_plus_area'] ?? '');
+            $sheet->setCellValue('T' . $row, $item['delivery_awal_plus'] ?? '');
+            $sheet->setCellValue('U' . $row, $item['kg_po_plus'] ?? 0);
+            $sheet->setCellValue('V' . $row, $item['kgs_datang'] ?? 0);
+            $sheet->setCellValue('W' . $row, $item['kgs_datang_plus'] ?? 0);
+            $sheet->setCellValue('X' . $row, $item['kgs_retur'] ?? 0);
+            $sheet->setCellValue('Y' . $row, $item['qty_retur'] ?? 0);
+            $sheet->setCellValue('Z' . $row, $sisa ?? 0);
+            $row++;
+        }
+
+        // Border
+        $lastRow = $row - 1;
+        $sheet->getStyle("A5:Z{$lastRow}")
+            ->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->getStyle("A5:Z{$lastRow}")
+            ->getAlignment()
+            ->setVertical(Alignment::VERTICAL_CENTER);
+
+        $styleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+        $sheet->getStyle("A3:Z{$lastRow}")->applyFromArray($styleArray);
+
+        // Auto-size
+        foreach (range('A', 'Z') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Download
+        $filename = 'Report Sisa Datang Benang' . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function exportReportSisaDatangNylon()
+    {
+        $delivery = $this->request->getGet('delivery');
+        $noModel = $this->request->getGet('no_model');
+        $kodeWarna = $this->request->getGet('kode_warna');
+        $bulanMap = [
+            'Januari' => 1,
+            'Februari' => 2,
+            'Maret' => 3,
+            'April' => 4,
+            'Mei' => 5,
+            'Juni' => 6,
+            'Juli' => 7,
+            'Agustus' => 8,
+            'September' => 9,
+            'Oktober' => 10,
+            'November' => 11,
+            'Desember' => 12
+        ];
+        $bulan = $bulanMap[$delivery] ?? null;
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangNylon?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $material = @file_get_contents($apiUrl);
+
+        if ($material !== FALSE) {
+            $data = json_decode($material, true);
+        }
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->mergeCells('A1:Z1');
+        $sheet->setCellValue('A1', 'REPORT SISA DATANG NYLON');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+        $sheet->getStyle('A1')->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // Buat header dengan sub-header
+        $sheet->mergeCells('A3:A4');  // NO
+        $sheet->mergeCells('B3:B4');  // TANGGAL PO
+        $sheet->mergeCells('C3:C4');  // FOLL UP
+        $sheet->mergeCells('D3:D4');  // NO MODEL
+        $sheet->mergeCells('E3:E4');  // NO ORDER
+        $sheet->mergeCells('F3:F4');  // AREA
+        $sheet->mergeCells('G3:G4');  // BUYER
+        $sheet->mergeCells('H3:H4');  // START MC
+        $sheet->mergeCells('I3:I4');  // DELIVERY AWAL
+        $sheet->mergeCells('J3:J4');  // DELIVERY AKHIR
+        $sheet->mergeCells('K3:K4');  // ORDER TYPE
+        $sheet->mergeCells('L3:L4');  // ITEM TYPE
+        $sheet->mergeCells('M3:M4');  // KODE WARNA
+        $sheet->mergeCells('N3:N4');  // WARNA
+        $sheet->mergeCells('Q3:Q4');  // PESAN KG
+
+        $sheet->setCellValue('A3', 'NO');
+        $sheet->setCellValue('B3', 'TANGGAL PO');
+        $sheet->setCellValue('C3', 'FOLL UP');
+        $sheet->setCellValue('D3', 'NO MODEL');
+        $sheet->setCellValue('E3', 'NO ORDER');
+        $sheet->setCellValue('F3', 'AREA');
+        $sheet->setCellValue('G3', 'BUYER');
+        $sheet->setCellValue('H3', 'START MC');
+        $sheet->setCellValue('I3', 'DELIVERY AWAL');
+        $sheet->setCellValue('J3', 'DELIVERY AKHIR');
+        $sheet->setCellValue('K3', 'ORDER TYPE');
+        $sheet->setCellValue('L3', 'ITEM TYPE');
+        $sheet->setCellValue('M3', 'KODE WARNA');
+        $sheet->setCellValue('N3', 'WARNA');
+        $sheet->setCellValue('Q3', 'PESAN KG');
+
+        // Stock Awal: Header + Sub-header
+        $sheet->mergeCells('O3:P3'); // STOCK AWAL
+        $sheet->setCellValue('O3', 'STOCK AWAL');
+        $sheet->setCellValue('O4', 'KG');
+        $sheet->setCellValue('P4', 'LOT');
+
+        // Po Tambahan Gbn: Header + Sub-header
+        $sheet->mergeCells('R3:U3');
+        $sheet->setCellValue('R3', 'PO TAMBAHAN GBN');
+        $sheet->setCellValue('R4', 'TGL TERIMA PO(+) GBN');
+        $sheet->setCellValue('S4', 'TGL PO(+) AREA');
+        $sheet->setCellValue('T4', 'DELIVERY PO(+)');
+        $sheet->setCellValue('U4', 'KG PO (+)');
+
+        // DATANG
+        $sheet->mergeCells('V3:V4');
+        $sheet->setCellValue('V3', 'DATANG');
+
+        // (+) DATANG
+        $sheet->mergeCells('W3:W4');
+        $sheet->setCellValue('W3', '(+) DATANG');
+
+        // Retur: Header + Sub-header
+        $sheet->mergeCells('X3:X4');
+        $sheet->setCellValue('X3', 'GANTI RETUR');
+
+        $sheet->mergeCells('Y3:Y4');
+        $sheet->setCellValue('Y3', 'RETUR');
+
+        // Sisa
+        $sheet->mergeCells('Z3:Z4');
+        $sheet->setCellValue('Z3', 'SISA');
+
+        // Format semua header
+        $sheet->getStyle('A3:Z4')->getFont()->setBold(true);
+        $sheet->getStyle('A3:Z4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A3:Z4')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A3:Z4')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+        // Data
+        $row = 5;
+        $no = 1;
+        foreach ($data as $item) {
+            $kgsAwal        = $item['kgs_stock_awal']  ?? 0;
+            $kgsDatang      = $item['kgs_datang']      ?? 0;
+            $kgsDatangPlus  = $item['kgs_datang_plus'] ?? 0;
+            $kgsRetur       = $item['kgs_retur']       ?? 0;
+            $kgPo           = $item['kg_po']           ?? 0;
+            $kgPoPlus       = $item['kg_po_plus']      ?? 0;
+            $qtyRetur       = $item['qty_retur']       ?? 0;
+
+            if ($kgsRetur > 0) {
+                $sisa = (($kgsAwal + $kgsDatang + $kgsDatangPlus + $kgsRetur) - ($kgPo - $kgPoPlus - $qtyRetur));
+            } else {
+                $sisa = (($kgsAwal + $kgsDatang + $kgsDatangPlus + $kgsRetur) - ($kgPo - $kgPoPlus));
+            }
+
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $item['lco_date']);
+            $sheet->setCellValue('C' . $row, $item['foll_up']);
+            $sheet->setCellValue('D' . $row, $item['no_model']);
+            $sheet->setCellValue('E' . $row, $item['no_order']);
+            $sheet->setCellValue('F' . $row, $item['area']);
+            $sheet->setCellValue('G' . $row, $item['buyer']);
+            $sheet->setCellValue('H' . $row, $item['start_mc'] ?? '');
+            $sheet->setCellValue('I' . $row, $item['delivery_awal']);
+            $sheet->setCellValue('J' . $row, $item['delivery_akhir']);
+            $sheet->setCellValue('K' . $row, $item['unit']);
+            $sheet->setCellValue('L' . $row, $item['item_type']);
+            $sheet->setCellValue('M' . $row, $item['kode_warna']);
+            $sheet->setCellValue('N' . $row, $item['color']);
+            $sheet->setCellValue('O' . $row, $item['kgs_stock_awal']);
+            $sheet->setCellValue('P' . $row, $item['lot_awal']);
+            $sheet->setCellValue('Q' . $row, $item['kg_po']);
+            $sheet->setCellValue('R' . $row, $item['tgl_terima_po_plus_gbn'] ?? '');
+            $sheet->setCellValue('S' . $row, $item['tgl_po_plus_area'] ?? '');
+            $sheet->setCellValue('T' . $row, $item['delivery_awal_plus'] ?? '');
+            $sheet->setCellValue('U' . $row, $item['kg_po_plus'] ?? 0);
+            $sheet->setCellValue('V' . $row, $item['kgs_datang'] ?? 0);
+            $sheet->setCellValue('W' . $row, $item['kgs_datang_plus'] ?? 0);
+            $sheet->setCellValue('X' . $row, $item['kgs_retur'] ?? 0);
+            $sheet->setCellValue('Y' . $row, $item['qty_retur'] ?? 0);
+            $sheet->setCellValue('Z' . $row, $sisa ?? 0);
+            $row++;
+        }
+
+        // Border
+        $lastRow = $row - 1;
+        $sheet->getStyle("A5:Z{$lastRow}")
+            ->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->getStyle("A5:Z{$lastRow}")
+            ->getAlignment()
+            ->setVertical(Alignment::VERTICAL_CENTER);
+
+        $styleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+        $sheet->getStyle("A3:Z{$lastRow}")->applyFromArray($styleArray);
+
+        // Auto-size
+        foreach (range('A', 'Z') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Download
+        $filename = 'Report Sisa Datang Nylon' . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function exportReportSisaDatangSpandex()
+    {
+        $delivery = $this->request->getGet('delivery');
+        $noModel = $this->request->getGet('no_model');
+        $kodeWarna = $this->request->getGet('kode_warna');
+        $bulanMap = [
+            'Januari' => 1,
+            'Februari' => 2,
+            'Maret' => 3,
+            'April' => 4,
+            'Mei' => 5,
+            'Juni' => 6,
+            'Juli' => 7,
+            'Agustus' => 8,
+            'September' => 9,
+            'Oktober' => 10,
+            'November' => 11,
+            'Desember' => 12
+        ];
+        $bulan = $bulanMap[$delivery] ?? null;
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangSpandex?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $material = @file_get_contents($apiUrl);
+
+        if ($material !== FALSE) {
+            $data = json_decode($material, true);
+        }
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->mergeCells('A1:Z1');
+        $sheet->setCellValue('A1', 'REPORT SISA DATANG SPANDEX');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+        $sheet->getStyle('A1')->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // Buat header dengan sub-header
+        $sheet->mergeCells('A3:A4');  // NO
+        $sheet->mergeCells('B3:B4');  // TANGGAL PO
+        $sheet->mergeCells('C3:C4');  // FOLL UP
+        $sheet->mergeCells('D3:D4');  // NO MODEL
+        $sheet->mergeCells('E3:E4');  // NO ORDER
+        $sheet->mergeCells('F3:F4');  // AREA
+        $sheet->mergeCells('G3:G4');  // BUYER
+        $sheet->mergeCells('H3:H4');  // START MC
+        $sheet->mergeCells('I3:I4');  // DELIVERY AWAL
+        $sheet->mergeCells('J3:J4');  // DELIVERY AKHIR
+        $sheet->mergeCells('K3:K4');  // ORDER TYPE
+        $sheet->mergeCells('L3:L4');  // ITEM TYPE
+        $sheet->mergeCells('M3:M4');  // KODE WARNA
+        $sheet->mergeCells('N3:N4');  // WARNA
+        $sheet->mergeCells('Q3:Q4');  // PESAN KG
+
+        $sheet->setCellValue('A3', 'NO');
+        $sheet->setCellValue('B3', 'TANGGAL PO');
+        $sheet->setCellValue('C3', 'FOLL UP');
+        $sheet->setCellValue('D3', 'NO MODEL');
+        $sheet->setCellValue('E3', 'NO ORDER');
+        $sheet->setCellValue('F3', 'AREA');
+        $sheet->setCellValue('G3', 'BUYER');
+        $sheet->setCellValue('H3', 'START MC');
+        $sheet->setCellValue('I3', 'DELIVERY AWAL');
+        $sheet->setCellValue('J3', 'DELIVERY AKHIR');
+        $sheet->setCellValue('K3', 'ORDER TYPE');
+        $sheet->setCellValue('L3', 'ITEM TYPE');
+        $sheet->setCellValue('M3', 'KODE WARNA');
+        $sheet->setCellValue('N3', 'WARNA');
+        $sheet->setCellValue('Q3', 'PESAN KG');
+
+        // Stock Awal: Header + Sub-header
+        $sheet->mergeCells('O3:P3'); // STOCK AWAL
+        $sheet->setCellValue('O3', 'STOCK AWAL');
+        $sheet->setCellValue('O4', 'KG');
+        $sheet->setCellValue('P4', 'LOT');
+
+        // Po Tambahan Gbn: Header + Sub-header
+        $sheet->mergeCells('R3:U3');
+        $sheet->setCellValue('R3', 'PO TAMBAHAN GBN');
+        $sheet->setCellValue('R4', 'TGL TERIMA PO(+) GBN');
+        $sheet->setCellValue('S4', 'TGL PO(+) AREA');
+        $sheet->setCellValue('T4', 'DELIVERY PO(+)');
+        $sheet->setCellValue('U4', 'KG PO (+)');
+
+        // DATANG
+        $sheet->mergeCells('V3:V4');
+        $sheet->setCellValue('V3', 'DATANG');
+
+        // (+) DATANG
+        $sheet->mergeCells('W3:W4');
+        $sheet->setCellValue('W3', '(+) DATANG');
+
+        // Retur: Header + Sub-header
+        $sheet->mergeCells('X3:X4');
+        $sheet->setCellValue('X3', 'GANTI RETUR');
+
+        $sheet->mergeCells('Y3:Y4');
+        $sheet->setCellValue('Y3', 'RETUR');
+
+        // Sisa
+        $sheet->mergeCells('Z3:Z4');
+        $sheet->setCellValue('Z3', 'SISA');
+
+        // Format semua header
+        $sheet->getStyle('A3:Z4')->getFont()->setBold(true);
+        $sheet->getStyle('A3:Z4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A3:Z4')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A3:Z4')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+        // Data
+        $row = 5;
+        $no = 1;
+        foreach ($data as $item) {
+            $kgsAwal        = $item['kgs_stock_awal']  ?? 0;
+            $kgsDatang      = $item['kgs_datang']      ?? 0;
+            $kgsDatangPlus  = $item['kgs_datang_plus'] ?? 0;
+            $kgsRetur       = $item['kgs_retur']       ?? 0;
+            $kgPo           = $item['kg_po']           ?? 0;
+            $kgPoPlus       = $item['kg_po_plus']      ?? 0;
+            $qtyRetur       = $item['qty_retur']       ?? 0;
+
+            if ($kgsRetur > 0) {
+                $sisa = (($kgsAwal + $kgsDatang + $kgsDatangPlus + $kgsRetur) - ($kgPo - $kgPoPlus - $qtyRetur));
+            } else {
+                $sisa = (($kgsAwal + $kgsDatang + $kgsDatangPlus + $kgsRetur) - ($kgPo - $kgPoPlus));
+            }
+
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $item['lco_date']);
+            $sheet->setCellValue('C' . $row, $item['foll_up']);
+            $sheet->setCellValue('D' . $row, $item['no_model']);
+            $sheet->setCellValue('E' . $row, $item['no_order']);
+            $sheet->setCellValue('F' . $row, $item['area']);
+            $sheet->setCellValue('G' . $row, $item['buyer']);
+            $sheet->setCellValue('H' . $row, $item['start_mc'] ?? '');
+            $sheet->setCellValue('I' . $row, $item['delivery_awal']);
+            $sheet->setCellValue('J' . $row, $item['delivery_akhir']);
+            $sheet->setCellValue('K' . $row, $item['unit']);
+            $sheet->setCellValue('L' . $row, $item['item_type']);
+            $sheet->setCellValue('M' . $row, $item['kode_warna']);
+            $sheet->setCellValue('N' . $row, $item['color']);
+            $sheet->setCellValue('O' . $row, $item['kgs_stock_awal']);
+            $sheet->setCellValue('P' . $row, $item['lot_awal']);
+            $sheet->setCellValue('Q' . $row, $item['kg_po']);
+            $sheet->setCellValue('R' . $row, $item['tgl_terima_po_plus_gbn'] ?? '');
+            $sheet->setCellValue('S' . $row, $item['tgl_po_plus_area'] ?? '');
+            $sheet->setCellValue('T' . $row, $item['delivery_awal_plus'] ?? '');
+            $sheet->setCellValue('U' . $row, $item['kg_po_plus'] ?? 0);
+            $sheet->setCellValue('V' . $row, $item['kgs_datang'] ?? 0);
+            $sheet->setCellValue('W' . $row, $item['kgs_datang_plus'] ?? 0);
+            $sheet->setCellValue('X' . $row, $item['kgs_retur'] ?? 0);
+            $sheet->setCellValue('Y' . $row, $item['qty_retur'] ?? 0);
+            $sheet->setCellValue('Z' . $row, $sisa ?? 0);
+            $row++;
+        }
+
+        // Border
+        $lastRow = $row - 1;
+        $sheet->getStyle("A5:Z{$lastRow}")
+            ->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->getStyle("A5:Z{$lastRow}")
+            ->getAlignment()
+            ->setVertical(Alignment::VERTICAL_CENTER);
+
+        $styleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+        $sheet->getStyle("A3:Z{$lastRow}")->applyFromArray($styleArray);
+
+        // Auto-size
+        foreach (range('A', 'Z') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Download
+        $filename = 'Report Sisa Datang Spandex' . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function exportReportSisaDatangKaret()
+    {
+        $delivery = $this->request->getGet('delivery');
+        $noModel = $this->request->getGet('no_model');
+        $kodeWarna = $this->request->getGet('kode_warna');
+        $bulanMap = [
+            'Januari' => 1,
+            'Februari' => 2,
+            'Maret' => 3,
+            'April' => 4,
+            'Mei' => 5,
+            'Juni' => 6,
+            'Juli' => 7,
+            'Agustus' => 8,
+            'September' => 9,
+            'Oktober' => 10,
+            'November' => 11,
+            'Desember' => 12
+        ];
+        $bulan = $bulanMap[$delivery] ?? null;
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangKaret?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $material = @file_get_contents($apiUrl);
+
+        if ($material !== FALSE) {
+            $data = json_decode($material, true);
+        }
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->mergeCells('A1:Z1');
+        $sheet->setCellValue('A1', 'REPORT SISA DATANG KARET');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+        $sheet->getStyle('A1')->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // Buat header dengan sub-header
+        $sheet->mergeCells('A3:A4');  // NO
+        $sheet->mergeCells('B3:B4');  // TANGGAL PO
+        $sheet->mergeCells('C3:C4');  // FOLL UP
+        $sheet->mergeCells('D3:D4');  // NO MODEL
+        $sheet->mergeCells('E3:E4');  // NO ORDER
+        $sheet->mergeCells('F3:F4');  // AREA
+        $sheet->mergeCells('G3:G4');  // BUYER
+        $sheet->mergeCells('H3:H4');  // START MC
+        $sheet->mergeCells('I3:I4');  // DELIVERY AWAL
+        $sheet->mergeCells('J3:J4');  // DELIVERY AKHIR
+        $sheet->mergeCells('K3:K4');  // ORDER TYPE
+        $sheet->mergeCells('L3:L4');  // ITEM TYPE
+        $sheet->mergeCells('M3:M4');  // KODE WARNA
+        $sheet->mergeCells('N3:N4');  // WARNA
+        $sheet->mergeCells('Q3:Q4');  // PESAN KG
+
+        $sheet->setCellValue('A3', 'NO');
+        $sheet->setCellValue('B3', 'TANGGAL PO');
+        $sheet->setCellValue('C3', 'FOLL UP');
+        $sheet->setCellValue('D3', 'NO MODEL');
+        $sheet->setCellValue('E3', 'NO ORDER');
+        $sheet->setCellValue('F3', 'AREA');
+        $sheet->setCellValue('G3', 'BUYER');
+        $sheet->setCellValue('H3', 'START MC');
+        $sheet->setCellValue('I3', 'DELIVERY AWAL');
+        $sheet->setCellValue('J3', 'DELIVERY AKHIR');
+        $sheet->setCellValue('K3', 'ORDER TYPE');
+        $sheet->setCellValue('L3', 'ITEM TYPE');
+        $sheet->setCellValue('M3', 'KODE WARNA');
+        $sheet->setCellValue('N3', 'WARNA');
+        $sheet->setCellValue('Q3', 'PESAN KG');
+
+        // Stock Awal: Header + Sub-header
+        $sheet->mergeCells('O3:P3'); // STOCK AWAL
+        $sheet->setCellValue('O3', 'STOCK AWAL');
+        $sheet->setCellValue('O4', 'KG');
+        $sheet->setCellValue('P4', 'LOT');
+
+        // Po Tambahan Gbn: Header + Sub-header
+        $sheet->mergeCells('R3:U3');
+        $sheet->setCellValue('R3', 'PO TAMBAHAN GBN');
+        $sheet->setCellValue('R4', 'TGL TERIMA PO(+) GBN');
+        $sheet->setCellValue('S4', 'TGL PO(+) AREA');
+        $sheet->setCellValue('T4', 'DELIVERY PO(+)');
+        $sheet->setCellValue('U4', 'KG PO (+)');
+
+        // DATANG
+        $sheet->mergeCells('V3:V4');
+        $sheet->setCellValue('V3', 'DATANG');
+
+        // (+) DATANG
+        $sheet->mergeCells('W3:W4');
+        $sheet->setCellValue('W3', '(+) DATANG');
+
+        // Retur: Header + Sub-header
+        $sheet->mergeCells('X3:X4');
+        $sheet->setCellValue('X3', 'GANTI RETUR');
+
+        $sheet->mergeCells('Y3:Y4');
+        $sheet->setCellValue('Y3', 'RETUR');
+
+        // Sisa
+        $sheet->mergeCells('Z3:Z4');
+        $sheet->setCellValue('Z3', 'SISA');
+
+        // Format semua header
+        $sheet->getStyle('A3:Z4')->getFont()->setBold(true);
+        $sheet->getStyle('A3:Z4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A3:Z4')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A3:Z4')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+        // Data
+        $row = 5;
+        $no = 1;
+        foreach ($data as $item) {
+            $kgsAwal        = $item['kgs_stock_awal']  ?? 0;
+            $kgsDatang      = $item['kgs_datang']      ?? 0;
+            $kgsDatangPlus  = $item['kgs_datang_plus'] ?? 0;
+            $kgsRetur       = $item['kgs_retur']       ?? 0;
+            $kgPo           = $item['kg_po']           ?? 0;
+            $kgPoPlus       = $item['kg_po_plus']      ?? 0;
+            $qtyRetur       = $item['qty_retur']       ?? 0;
+
+            if ($kgsRetur > 0) {
+                $sisa = (($kgsAwal + $kgsDatang + $kgsDatangPlus + $kgsRetur) - ($kgPo - $kgPoPlus - $qtyRetur));
+            } else {
+                $sisa = (($kgsAwal + $kgsDatang + $kgsDatangPlus + $kgsRetur) - ($kgPo - $kgPoPlus));
+            }
+
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $item['lco_date']);
+            $sheet->setCellValue('C' . $row, $item['foll_up']);
+            $sheet->setCellValue('D' . $row, $item['no_model']);
+            $sheet->setCellValue('E' . $row, $item['no_order']);
+            $sheet->setCellValue('F' . $row, $item['area']);
+            $sheet->setCellValue('G' . $row, $item['buyer']);
+            $sheet->setCellValue('H' . $row, $item['start_mc'] ?? '');
+            $sheet->setCellValue('I' . $row, $item['delivery_awal']);
+            $sheet->setCellValue('J' . $row, $item['delivery_akhir']);
+            $sheet->setCellValue('K' . $row, $item['unit']);
+            $sheet->setCellValue('L' . $row, $item['item_type']);
+            $sheet->setCellValue('M' . $row, $item['kode_warna']);
+            $sheet->setCellValue('N' . $row, $item['color']);
+            $sheet->setCellValue('O' . $row, $item['kgs_stock_awal']);
+            $sheet->setCellValue('P' . $row, $item['lot_awal']);
+            $sheet->setCellValue('Q' . $row, $item['kg_po']);
+            $sheet->setCellValue('R' . $row, $item['tgl_terima_po_plus_gbn'] ?? '');
+            $sheet->setCellValue('S' . $row, $item['tgl_po_plus_area'] ?? '');
+            $sheet->setCellValue('T' . $row, $item['delivery_awal_plus'] ?? '');
+            $sheet->setCellValue('U' . $row, $item['kg_po_plus'] ?? 0);
+            $sheet->setCellValue('V' . $row, $item['kgs_datang'] ?? 0);
+            $sheet->setCellValue('W' . $row, $item['kgs_datang_plus'] ?? 0);
+            $sheet->setCellValue('X' . $row, $item['kgs_retur'] ?? 0);
+            $sheet->setCellValue('Y' . $row, $item['qty_retur'] ?? 0);
+            $sheet->setCellValue('Z' . $row, $sisa ?? 0);
+            $row++;
+        }
+
+        // Border
+        $lastRow = $row - 1;
+        $sheet->getStyle("A5:Z{$lastRow}")
+            ->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->getStyle("A5:Z{$lastRow}")
+            ->getAlignment()
+            ->setVertical(Alignment::VERTICAL_CENTER);
+
+        $styleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+        $sheet->getStyle("A3:Z{$lastRow}")->applyFromArray($styleArray);
+
+        // Auto-size
+        foreach (range('A', 'Z') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Download
+        $filename = 'Report Sisa Datang Karet' . '.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$filename\"");
         header('Cache-Control: max-age=0');
