@@ -789,8 +789,8 @@
                                         icon: "success",
                                         // showConfirmButton: true,
                                     }).then(() => {
-                                        window.location.href = "<?= base_url($role . '/listPemesanan/'. session()->get('username')) ?>";
-                                        
+                                        window.location.href = "<?= base_url($role . '/pemesanan') ?>";
+
                                     });
                                 } else if (secondResponse.status === "warning") {
                                     // Proses 2 gagal

@@ -40,6 +40,14 @@
     <link href='<?= base_url('assets/calendar/fullcalendar/packages/daygrid/main.css') ?>' rel='stylesheet' />
 
     <!-- Bootstrap CSS -->
+    <style>
+        .custom-dropdown-wide {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr);
+            gap: .2rem .2rem;
+            min-width: 400px !important;
+        }
+    </style>
 
 </head>
 
@@ -417,17 +425,32 @@
                     }
                     ?>
                     <?php
-                    if ($title == "Stock Gudang Benang") {
+                    if ($title == "Gudang Benang") {
                     ?>
                         <ul class="navbar-nav justify-content-end">
                             <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle text-body font-weight-bold px-2" id="navbarDropdownReports" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <a href="#" class="nav-link dropdown-toggle text-body font-weight-bold px-2" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-file-alt"></i>
-                                    <span class="d-lg-inline-block d-none ms-1">Report</span>
+                                    <span class="d-lg-inline-block d-none ms-1">Reports</span>
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4" aria-labelledby="navbarDropdownReports">
-                                    <li><a class="dropdown-item" href="<?= base_url($role . '/reportDatangBenang/') ?>">Datang Benang</a></li>
-                                    <li><a class="dropdown-item" href="<?= base_url($role . '/reportDatangNylon/') ?>">Datang Nylon</a></li>
+                                <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4 custom-dropdown-wide" aria-labelledby="navbarDropdownMenuLink">
+                                    <li><a href="<?= base_url($role . '/warehouse/reportPoBenang') ?>" class="dropdown-item" href="#">PO Benang</a></li>
+                                    <li><a href="<?= base_url($role . '/warehouse/reportDatangBenang') ?>" class="dropdown-item" href="#">Datang Benang</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportPengiriman') ?>">Report Pengiriman</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportGlobal') ?>">Report Global All BB</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportGlobalStockBenang') ?>">Report Global Benang</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportGlobalNylon') ?>">Report Global Nylon</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportSisaPakaiBenang') ?>">Report Sisa Pakai Benang</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportSisaPakaiNylon') ?>">Report Sisa Pakai Nylon</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportSisaPakaiSpandex') ?>">Report Sisa Pakai Spandex</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportSisaPakaiKaret') ?>">Report Sisa Pakai Karet</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/historyPindahOrder') ?>">Report History Pindah Order</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportSisaDatangBenang') ?>">Report Sisa Datang Benang</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportSisaDatangNylon') ?>">Report Sisa Datang Nylon</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportSisaDatangSpandex') ?>">Report Sisa Datang Spandex</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportSisaDatangKaret') ?>">Report Sisa Datang Karet</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportBenangMingguan') ?>">Report Benang Mingguan</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportBenangBulanan') ?>">Report Benang Bulanan</a></li>
                                 </ul>
                             </li>
                         </ul>
