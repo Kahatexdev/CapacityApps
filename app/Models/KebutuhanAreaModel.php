@@ -60,4 +60,30 @@ class KebutuhanAreaModel extends Model
             ->where('jarum', $jarum)
             ->findAll();
     }
+    public function getJlMcPlanning($data)
+    {
+        return $this->select('
+                kebutuhan_area.id_pln_mc, 
+                detail_planning.id_detail_pln, 
+                estimated_planning.id_est_qty, 
+                tanggal_planning.id, 
+                kebutuhan_area.area, 
+                kebutuhan_area.jarum, 
+                detail_planning.model, 
+                estimated_planning.delivery, 
+                tanggal_planning.mesin
+            ')
+            ->join('detail_planning', 'detail_planning.id_pln_mc = kebutuhan_area.id_pln_mc', 'left')
+            ->join('estimated_planning', 'estimated_planning.id_detail_pln = detail_planning.id_detail_pln', 'left')
+            ->join('tanggal_planning', 'tanggal_planning.id_est_qty = estimated_planning.id_est_qty', 'left')
+            ->where([
+                'detail_planning.model'     => $data['model'],
+                'kebutuhan_area.jarum'      => $data['jarum'],
+                'kebutuhan_area.area'       => $data['area'],
+                'estimated_planning.delivery' => $data['delivery'],
+            ])
+            ->groupBy('estimated_planning.id_est_qty, tanggal_planning.mesin')
+            ->get()
+            ->getResultArray();
+    }
 }
