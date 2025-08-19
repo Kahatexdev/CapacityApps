@@ -1,4 +1,4 @@
-<?php $this->extend($role . '/warehouse/header'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 
 <div class="container-fluid py-4">
@@ -12,7 +12,7 @@
             <div class="row mt-2">
                 <div class="col-md-3">
                     <label for="">Key</label>
-                    <input type="text" class="form-control" placeholder="PDK / Item Type / Kode Warna dan Warna">
+                    <input type="text" id="keyInput" class="form-control" placeholder="PDK / Item Type / Kode Warna dan Warna">
                 </div>
                 <div class="col-md-3">
                     <label for="">Tanggal Awal (Tanggal Keluar)</label>
@@ -80,7 +80,7 @@
         });
 
         function loadData() {
-            let key = $('input[type="text"]').val().trim();
+            let key = $('#keyInput').val().trim();
             let tanggal_awal = $('input[type="date"]').eq(0).val().trim();
             let tanggal_akhir = $('input[type="date"]').eq(1).val().trim();
 
@@ -132,6 +132,15 @@
 
                         $('#btnExport').removeClass('d-none'); // Munculkan tombol Export Excel
                     } else {
+                        let colCount = $('#dataTable thead th').length;
+                        $('#dataTable tbody').html(`
+                            <tr>
+                                <td colspan="${colCount}" class="text-center text-danger font-weight-bold">
+                                    ⚠ Tidak ada data ditemukan
+                                </td>
+                            </tr>
+                        `);
+
                         $('#btnExport').addClass('d-none'); // Sembunyikan jika tidak ada data
                     }
                 },

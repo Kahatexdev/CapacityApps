@@ -452,7 +452,7 @@
                     }
                     ?>
                     <?php
-                    if ($title == "Stock Gudang Benang") {
+                    if ($title == "Gudang Benang") {
                     ?>
                         <ul class="navbar-nav justify-content-end">
                             <li class="nav-item dropdown">
@@ -465,8 +465,8 @@
                                     <li><a href="<?= base_url($role . '/warehouse/reportDatangBenang') ?>" class="dropdown-item" href="#">Datang Benang</a></li>
                                     <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportPengiriman') ?>">Report Pengiriman</a></li>
                                     <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportGlobal') ?>">Report Global All BB</a></li>
-                                    <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportGlobal') ?>">Report Global Nylon</a></li>
                                     <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportGlobalStockBenang') ?>">Report Global Benang</a></li>
+                                    <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportGlobalNylon') ?>">Report Global Nylon</a></li>
                                     <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportSisaPakaiBenang') ?>">Report Sisa Pakai Benang</a></li>
                                     <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportSisaPakaiNylon') ?>">Report Sisa Pakai Nylon</a></li>
                                     <li><a class="dropdown-item" href="<?= base_url($role . '/warehouse/reportSisaPakaiSpandex') ?>">Report Sisa Pakai Spandex</a></li>

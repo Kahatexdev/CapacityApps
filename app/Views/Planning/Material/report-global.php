@@ -1,4 +1,4 @@
-<?php $this->extend($role . '/warehouse/header'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 
 <div class="container-fluid py-4">
@@ -7,12 +7,12 @@
     <div class="card card-frame">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
-                <!-- <h5 class="mb-0 font-weight-bolder">Filter Pengiriman</h5> -->
+                <h5 class="mb-0 font-weight-bolder">Report Global All BB</h5>
             </div>
             <div class="row mt-2">
                 <div class="col-md-3">
                     <label for="">No Model</label>
-                    <input type="text" class="form-control">
+                    <input type="text" id="keyInput" class="form-control">
                 </div>
                 <div class="col-md-3">
                     <label for="">Aksi</label><br>
@@ -82,7 +82,7 @@
         });
 
         function loadData() {
-            let key = $('input[type="text"]').val().trim();
+            let key = $('#keyInput').val().trim();
 
             // Validasi: Jika semua input kosong, tampilkan alert dan hentikan pencarian
             if (key === '') {
@@ -109,17 +109,23 @@
                         $.each(response, function(index, item) {
                             // konversi dulu ke Number, default 0
                             const kgs = Number(item.kgs) || 0;
-                            const kgsStockAwal = Number(item.kgs_stock_awal) || 0;
-                            const kgsKirim = Number(item.kgs_kirim) || 0;
-                            const kgsRetur = Number(item.kgs_retur) || 0;
-                            const kgsOut = Number(item.kgs_out) || 0;
-                            const kgsInOut = Number(item.kgs_in_out) || 0;
+                            const poTambahan = Number(item.qty_poplus) || 0;
+                            const kgsStockAwal = Number(item.stock_awal) || 0;
+                            const datangSolid = Number(item.datang_solid) || 0;
+                            const plusDatangSolid = Number(item.plus_datang_solid) || 0;
+                            const gantiRetur = Number(item.ganti_retur) || 0;
+                            const datangLurex = Number(item.datang_lurex) || 0;
+                            const plusDatangLurex = Number(item.plus_datang_lurex) || 0;
+                            const returPbGbn = Number(item.retur_pb_gbn) || 0;
+                            const returPbArea = Number(item.retur_pb_area) || 0;
+                            const pakaiArea = Number(item.pakai_area) || 0;
+                            const stockAkhir = Number(item.stock_akhir) || 0;
                             const kgsOtherOut = Number(item.kgs_other_out) || 0;
                             const loss = Number(item.loss) || 0;
 
                             // perhitungan
-                            const tagihanGbn = kgs - (kgsKirim + kgsStockAwal);
-                            const jatahArea = kgs - kgsOut;
+                            const tagihanGbn = kgs - (datangSolid + plusDatangSolid + kgsStockAwal);
+                            const jatahArea = kgs - pakaiArea;
 
                             // fungsi bantu untuk format
                             const fmt = v => v !== 0 ? v.toFixed(2) : '0';
@@ -132,24 +138,24 @@
                                 item.color || '-', // warna
                                 fmt(loss), // loss
                                 fmt(kgs), // qty po
-                                '-', // qty po (+)
+                                fmt(poTambahan), // qty po (+)
                                 fmt(kgsStockAwal), // stock awal
                                 '-', // stock opname
-                                fmt(kgsKirim), // datang solid
-                                '-', // (+) datang solid
-                                '-', // ganti retur
-                                '-', // datang lurex
-                                '-', // (+) datang lurex
-                                '-', // retur pb gbn
-                                fmt(kgsRetur), // retur pb area
-                                fmt(kgsOut), // pakai area 
+                                fmt(datangSolid), // datang solid
+                                fmt(plusDatangSolid), // (+) datang solid
+                                fmt(gantiRetur), // ganti retur
+                                fmt(datangLurex), // datang lurex
+                                fmt(plusDatangLurex), // (+) datang lurex
+                                fmt(returPbGbn), // retur pb gbn
+                                fmt(returPbArea), // retur pb area
+                                fmt(pakaiArea), // pakai area 
                                 fmt(kgsOtherOut), // pakai lain-lain
                                 '-', // retur stock
                                 '-', // retur titip
                                 '-', // dipinjam
                                 '-', // pindah order
                                 '-', // pindah ke stock mati
-                                fmt(kgsInOut), // stock akhir
+                                fmt(stockAkhir), // stock akhir
                                 fmt(tagihanGbn), // tagihan gbn
                                 fmt(jatahArea), // jatah area
                             ]).draw(false);
@@ -157,6 +163,15 @@
 
                         $('#btnExport').removeClass('d-none'); // Munculkan tombol Export Excel
                     } else {
+                        let colCount = $('#dataTable thead th').length;
+                        $('#dataTable tbody').html(`
+                            <tr>
+                                <td colspan="${colCount}" class="text-center text-danger font-weight-bold">
+                                    ⚠ Tidak ada data ditemukan
+                                </td>
+                            </tr>
+                        `);
+
                         $('#btnExport').addClass('d-none'); // Sembunyikan jika tidak ada data
                     }
                 },
@@ -171,9 +186,7 @@
         });
 
         $('#btnExport').click(function() {
-            let key = $('input[type="text"]').val();
-            let tanggal_awal = $('input[type="date"]').eq(0).val();
-            let tanggal_akhir = $('input[type="date"]').eq(1).val();
+            let key = $('#keyInput').val().trim();
             window.location.href = "<?= base_url($role . '/warehouse/exportGlobalReport') ?>?key=" + key;
         });
 
@@ -184,7 +197,6 @@
     $('#btnReset').click(function() {
         // Kosongkan input
         $('input[type="text"]').val('');
-        $('input[type="date"]').val('');
 
         // Kosongkan tabel hasil pencarian
         $('#dataTable tbody').html('');

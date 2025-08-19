@@ -381,17 +381,17 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('warehouse/reportDatangBenang', 'MaterialController::reportDatangBenang');
     $routes->get('warehouse/filterDatangBenang', 'MaterialController::filterDatangBenang');
     $routes->get('warehouse/exportDatangBenang', 'ExcelController::exportDatangBenang');
-    $routes->get('warehouse/getKeteranganDatang', 'MaterialController::getKeteranganDatang');
-    $routes->post('warehouse/updateKeteranganDatang', 'MaterialController::updateKeteranganDatang');
     $routes->get('warehouse/exportExcel', 'ExcelController::excelStockMaterial');
     $routes->get('warehouse/reportPengiriman', 'MaterialController::reportPengiriman');
     $routes->get('warehouse/filterPengiriman', 'MaterialController::filterPengiriman');
     $routes->get('warehouse/exportPengiriman', 'ExcelController::exportPengiriman');
     $routes->get('warehouse/reportGlobal', 'MaterialController::reportGlobal');
     $routes->get('warehouse/filterReportGlobal', 'MaterialController::filterReportGlobal');
+    $routes->get('warehouse/reportGlobalNylon', 'MaterialController::reportGlobalNylon');
+    $routes->get('warehouse/filterReportNylon', 'MaterialController::filterReportGlobal');
     $routes->get('warehouse/exportGlobalReport', 'ExcelController::exportGlobalReport');
     $routes->get('warehouse/reportGlobalStockBenang', 'MaterialController::reportGlobalStockBenang');
-    $routes->get('warehouse/filterReportGlobalBenang', 'MaterialController::filterReportGlobalBenang');
+    $routes->get('warehouse/filterReportGlobalBenang', 'MaterialController::filterReportGlobal');
     $routes->get('warehouse/exportReportGlobalBenang', 'ExcelController::exportReportGlobalBenang');
     $routes->get('warehouse/reportSisaPakaiBenang', 'MaterialController::reportSisaPakaiBenang');
     $routes->get('warehouse/filterSisaPakaiBenang', 'MaterialController::filterSisaPakaiBenang');
@@ -1110,4 +1110,10 @@ $routes->group('/followup', ['filter' => 'followup'], function ($routes) {
     $routes->get('excelPPHNomodel/(:any)/(:any)', 'ExcelPPHController::excelPPHNomodel/$1/$2');
     $routes->get('excelPPHInisial/(:any)/(:any)', 'ExcelPPHController::excelPPHInisial/$1/$2');
     $routes->get('excelPPHDays/(:any)/(:any)', 'ExcelPPHController::excelPPHDays/$1/$2');
+
+    //sales
+    $routes->get('sales', 'SalesController::index2');
+    $routes->post('sales/position', 'SalesController::index');
+    $routes->post('exportsales', 'SalesController::exportExcelByJarum');
+    $routes->get('generatesales', 'SalesController::generateExcel');
 });

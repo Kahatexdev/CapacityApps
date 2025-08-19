@@ -12,7 +12,7 @@
             <div class="row mt-2">
                 <div class="col-md-9">
                     <label for="">Key</label>
-                    <input type="text" class="form-control" placeholder="No Model/Item Type/Kode Warna/Warna">
+                    <input type="text" id="keyInput" class="form-control" placeholder="No Model/Item Type/Kode Warna/Warna">
                 </div>
                 <div class="col-md-3">
                     <label for="">Aksi</label><br>
@@ -71,7 +71,8 @@
         });
 
         function loadData() {
-            let key = $('input[type="text"]').val().trim();
+            let key = $('#keyInput').val().trim();
+            // let key = $('input[type="text"]').val().trim();
 
             // Validasi
             if (key === '') {
@@ -118,6 +119,14 @@
 
                         $('#btnExport').removeClass('d-none'); // Munculkan tombol Export Excel
                     } else {
+                        let colCount = $('#dataTable thead th').length;
+                        $('#dataTable tbody').html(`
+                            <tr>
+                                <td colspan="${colCount}" class="text-center text-danger font-weight-bold">
+                                    ⚠ Tidak ada data ditemukan
+                                </td>
+                            </tr>
+                        `);
                         $('#btnExport').addClass('d-none'); // Sembunyikan jika tidak ada data
                     }
                 },

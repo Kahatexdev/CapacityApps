@@ -1,4 +1,4 @@
-<?php $this->extend($role . '/warehouse/header'); ?>
+<?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
 
 <div class="container-fluid py-4">
@@ -7,12 +7,12 @@
     <div class="card card-frame">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 font-weight-bolder">Filter Datang Benang</h5>
+                <h5 class="mb-0 font-weight-bolder">Report Datang Benang</h5>
             </div>
             <div class="row mt-2">
                 <div class="col-md-3">
                     <label for="">Key</label>
-                    <input type="text" class="form-control" placeholder="No Model/Item Type/Kode Warna/Warna" style="font-size: 11px;">
+                    <input type="text" id="keyInput" class="form-control" placeholder="No Model/Item Type/Kode Warna/Warna" style="font-size: 11px;">
                 </div>
                 <div class="col-md-3">
                     <label for="">Tanggal Awal (Tanggal Datang)</label>
@@ -111,7 +111,7 @@
         });
 
         function loadData() {
-            let key = $('input[type="text"]').val().trim();
+            let key = $('#keyInput').val().trim();
             let tanggal_awal = $('input[type="date"]').eq(0).val().trim();
             let tanggal_akhir = $('input[type="date"]').eq(1).val().trim();
 
@@ -175,6 +175,14 @@
 
                         $('#btnExport').removeClass('d-none'); // Munculkan tombol Export Excel
                     } else {
+                        let colCount = $('#dataTable thead th').length;
+                        $('#dataTable tbody').html(`
+                            <tr>
+                                <td colspan="${colCount}" class="text-center text-danger font-weight-bold">
+                                    ⚠ Tidak ada data ditemukan
+                                </td>
+                            </tr>
+                        `);
                         $('#btnExport').addClass('d-none'); // Sembunyikan jika tidak ada data
                     }
                 },
@@ -244,38 +252,6 @@
 
         // Sembunyikan tombol Export Excel
         $('#btnExport').addClass('d-none');
-    });
-    $('#btnSubmitKeterangan').on('click', function() {
-        const idBon = $('#modalIdBon').val();
-        const idOther = $('#modalIdOther').val();
-        const keterangan = $('#keteranganDatang').val();
-
-        $.ajax({
-            url: '<?= base_url($role . "/warehouse/updateKeteranganDatang") ?>',
-            type: 'POST',
-            data: {
-                id_bon: idBon,
-                id_other_bon: idOther,
-                keterangan: keterangan
-            },
-            success: function(res) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: 'Keterangan berhasil diperbarui.'
-                });
-
-                $('#modalUpdate').modal('hide');
-                loadData(); // Reload tabel
-            },
-            error: function(xhr) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal!',
-                    text: 'Terjadi kesalahan saat menyimpan.'
-                });
-            }
-        });
     });
 </script>
 

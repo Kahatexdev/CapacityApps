@@ -153,7 +153,7 @@
                                                 $total_ttl_cns       += (float) $record['ttl_cns'];
                                                 $total_ttl_berat_cns += (float) $record['ttl_berat_cns'];
                                         ?>
-                                                <tr>
+                                                <tr data-group="<?= $groupKey; ?>">
                                                     <!-- kolom hide -->
                                                     <input type="hidden" name="role" value="<?= $role; ?>">
                                                     <input type="hidden" name="id_material[]" value="<?= $record['id_material']; ?>">
@@ -191,16 +191,35 @@
                                             $first = $group[0];
                                             ?>
                                             <!-- Baris subtotal dengan informasi grouping ditampilkan di kolom yang sesuai -->
-                                            <tr class="subtotal">
+                                            <tr class="subtotal" data-group="<?= $groupKey; ?>">
+                                                <!-- Kolom No dan Tanggal Pakai bisa dikosongkan atau diberi label Total -->
+                                                <td colspan="2"></td>
+                                                <td colspan="2" class="font-weight-bolder" style="text-align: right;">
+                                                    <input type="text" class="form-control" name="lot[]" placeholder="Lot">
+                                                </td>
+                                                <td colspan="3" class="font-weight-bolder" style="text-align: right;">
+                                                    <input type="text" class="form-control" name="keterangan[]" placeholder="Keterangan">
+                                                </td>
+                                                <td colspan="2" class="text-center font-weight-bolder">
+                                                    Stock Area
+                                                </td>
+                                                <td class="text-center font-weight-bolder">
+                                                    <input type="number" step="1" class="form-control stock-cns" name="stock_cns[]" placeholder="Cns">
+                                                </td>
+                                                <td class="text-center font-weight-bolder">
+                                                    <input type="number" step="0.01" class="form-control stock-kg" name="stock_kg[]" placeholder="Kg">
+                                                </td>
+                                            </tr>
+                                            <tr class="subtotal" data-group="<?= $groupKey; ?>">
                                                 <!-- Kolom No dan Tanggal Pakai bisa dikosongkan atau diberi label Total -->
                                                 <td colspan="8" class="font-weight-bolder" style="text-align: right;">TOTAL <?= $first['no_model'] . ' / ' . $first['item_type'] . ' / ' . $first['kode_warna'] . ' / ' . $first['warna']; ?></td>
-                                                <td class="text-center font-weight-bolder">
+                                                <td class="text-center font-weight-bolder total-jalan-mc">
                                                     <?= number_format($total_jalan_mc, 2) ?>
                                                 </td>
-                                                <td class="text-center font-weight-bolder">
-                                                    <?= number_format($total_ttl_cns, 2) ?>
+                                                <td class="text-center font-weight-bolder total-cns" data-total-awal="<?= $total_ttl_cns ?>">
+                                                    <?= $total_ttl_cns ?>
                                                 </td>
-                                                <td class="text-center font-weight-bolder">
+                                                <td class="text-center font-weight-bolder total-kg" data-total-awal="<?= $total_ttl_berat_cns ?>">
                                                     <?= number_format($total_ttl_berat_cns, 2) ?>
                                                 </td>
                                             </tr>
@@ -770,7 +789,8 @@
                                         icon: "success",
                                         // showConfirmButton: true,
                                     }).then(() => {
-                                        location.reload(); // Refresh halaman setelah alert selesai
+                                        window.location.href = "<?= base_url($role . '/listPemesanan/'. session()->get('username')) ?>";
+                                        
                                     });
                                 } else if (secondResponse.status === "warning") {
                                     // Proses 2 gagal
@@ -823,6 +843,28 @@
                 }
             });
         });
+
+        // untuk kalkulasi stock mc
+        $(document).on('input', '.stock-kg, .stock-cns', function() {
+            let $row = $(this).closest('tr.subtotal'); // Baris subtotal input stock
+            let $nextTotalRow = $row.next('.subtotal'); // Baris total group
+
+            // Ambil total awal dari atribut data
+            let totalCnsAwal = parseFloat($nextTotalRow.find('.total-cns').data('total-awal')) || 0;
+            let totalKgAwal = parseFloat($nextTotalRow.find('.total-kg').data('total-awal')) || 0;
+
+            // Ambil nilai input stock
+            let stockCns = parseFloat($row.find('.stock-cns').val()) || 0;
+            let stockKg = parseFloat($row.find('.stock-kg').val()) || 0;
+
+            // Hitung total setelah dikurangi stock
+            let sisaCns = totalCnsAwal - stockCns;
+            let sisaKg = totalKgAwal - stockKg;
+
+            // Update tampilan
+            $nextTotalRow.find('.total-cns').text(sisaCns.toFixed(0));
+            $nextTotalRow.find('.total-kg').text(sisaKg.toFixed(2));
+        });
     });
 
     document.getElementById('formPemesanan').addEventListener('submit', function(event) {
@@ -845,18 +887,27 @@
             return;
         }
 
-        // Siapkan payload
         const payload = {};
 
         selectedCheckboxes.forEach((checkbox) => {
-            // Cari elemen terkait di baris yang sama
-            const row = checkbox.closest('tr');
+            const row = checkbox.closest('tr'); // Baris utama
+            const groupKey = row.dataset.group; // Ambil group dari row
 
-            // Ambil semua input dalam baris tersebut
-            const inputs = row.querySelectorAll('input');
+            // Cari subtotal yang sesuai group
+            const subtotalRow = document.querySelector(`tr.subtotal[data-group="${groupKey}"]`);
 
+            // Kalau subtotal nggak ada, skip baris ini
+            if (!subtotalRow) return;
+
+            // Ambil input dari baris ini + subtotal baris yang sama group-nya
+            const inputs = [
+                ...row.querySelectorAll('input, select, textarea'),
+                ...subtotalRow.querySelectorAll('input, select, textarea')
+            ];
+
+            // Masukkan ke payload per input name
             inputs.forEach((input) => {
-                const key = input.name.replace(/\[\]$/, ''); // Hapus "[]"
+                const key = input.name.replace(/\[\]$/, ''); // Hilangkan [] di name
                 if (!payload[key]) payload[key] = [];
                 payload[key].push(input.value);
             });
