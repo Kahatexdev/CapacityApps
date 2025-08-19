@@ -4868,13 +4868,21 @@ class ExcelController extends BaseController
                         'delivery' => $id['delivery'],
                     ];
                     $jlMc = 0;
+                    $jlMcPlan = 0;
                     $jlMcData = $this->produksiModel->getJlMc($dataOrder);
+                    $jlMcPlanning = $this->KebutuhanAreaModel->getJlMcPlanning($dataOrder);
 
                     // Pastikan data jl_mc ada
                     if ($jlMcData) {
                         // Loop untuk menjumlahkan jl_mc
                         foreach ($jlMcData as $mc) {
                             $jlMc += $mc['jl_mc'];
+                        }
+                    }
+                    if ($jlMcPlanning) {
+                        // Loop untuk menjumlahkan jl_mc
+                        foreach ($jlMcPlanning as $mcPlan) {
+                            $jlMcPlan += $mcPlan['mesin'];
                         }
                     }
 
@@ -4884,6 +4892,7 @@ class ExcelController extends BaseController
                         'prod' => $produksi,
                         'sisa' => $sisa,
                         'jlMc' => $jlMc,
+                        'jlMcPlan'  => $jlMcPlan,
                         'buyer' => $buyer,
                         'seam' => $seam,
                         'repeat' => $repeat,
@@ -4896,12 +4905,14 @@ class ExcelController extends BaseController
                             'totalProd' => 0,
                             'totalSisa' => 0,
                             'totalJlMc' => 0,
+                            'totalJlMcPlan' => 0,
                         ];
                     }
                     $totalPerWeek[$weekCount]['totalQty'] += $qty;
                     $totalPerWeek[$weekCount]['totalProd'] += $produksi;
                     $totalPerWeek[$weekCount]['totalSisa'] += $sisa;
                     $totalPerWeek[$weekCount]['totalJlMc'] += $jlMc;
+                    $totalPerWeek[$weekCount]['totalJlMcPlan'] += $jlMcPlan;
                 }
 
                 // Pindahkan ke minggu berikutnya
@@ -5074,7 +5085,7 @@ class ExcelController extends BaseController
 
         // looping week
         $col = 'G'; // Kolom awal week
-        $col2 = 'K'; // Kolom akhir week
+        $col2 = 'L'; // Kolom akhir week
 
         // Konversi huruf kolom ke nomor indeks kolom
         $col_index = Coordinate::columnIndexFromString($col);
@@ -5087,8 +5098,8 @@ class ExcelController extends BaseController
 
 
             // Tambahkan 2 pada indeks kolom
-            $col_index += 5;
-            $col2_index = $col_index + 4; // Tambahkan 1 pada indeks kedua kolom
+            $col_index += 6;
+            $col2_index = $col_index + 5; // Tambahkan 1 pada indeks kedua kolom
 
             // Konversi kembali dari nomor indeks kolom ke huruf kolom
             $col = Coordinate::stringFromColumnIndex($col_index);
@@ -5123,7 +5134,10 @@ class ExcelController extends BaseController
             $sheet->setCellValue($col4 . $row_header2, 'SISA');
             $sheet->getStyle($col4 . $row_header2)->applyFromArray($styleHeader);
             $col4++;
-            $sheet->setCellValue($col4 . $row_header2, 'JLN MC');
+            $sheet->setCellValue($col4 . $row_header2, 'JLN MC ACT');
+            $sheet->getStyle($col4 . $row_header2)->applyFromArray($styleHeader);
+            $col4++;
+            $sheet->setCellValue($col4 . $row_header2, 'JLN MC PLAN');
             $sheet->getStyle($col4 . $row_header2)->applyFromArray($styleHeader);
             $col4++;
         }
@@ -5251,9 +5265,9 @@ class ExcelController extends BaseController
                     // Loop menulis baris untuk jarum ini
                     for ($offset = 0; $offset < $totalRows; $offset++) {
                         for ($weekNum = 1; $weekNum <= $maxWeek; $weekNum++) {
-                            $baseColIndex = Coordinate::columnIndexFromString('G') + ($weekNum - 1) * 5;
+                            $baseColIndex = Coordinate::columnIndexFromString('G') + ($weekNum - 1) * 6;
                             $cols = [];
-                            for ($k = 0; $k < 5; $k++) {
+                            for ($k = 0; $k < 6; $k++) {
                                 $cols[] = Coordinate::stringFromColumnIndex($baseColIndex + $k);
                             }
                             if ($pointers[$weekNum] < count($weeks[$weekNum])) {
@@ -5264,6 +5278,7 @@ class ExcelController extends BaseController
                                 $prod = $data['prod'] ?? '';
                                 $sisa = $data['sisa'] ?? '';
                                 $jlMc = $data['jlMc'] ?? '';
+                                $jlMcPlan = $data['jlMcPlan'] ?? '';
                                 $sheet->setCellValue($cols[0] . $row, $del !== 0 ? $del : ($del === 0 ? 0 : ''));
                                 $sheet->getStyle($cols[0] . $row)->applyFromArray($styleBody);
                                 $sheet->setCellValue($cols[1] . $row, $qty !== 0 ? $qty : ($qty === 0 ? 0 : ''));
@@ -5274,6 +5289,8 @@ class ExcelController extends BaseController
                                 $sheet->getStyle($cols[3] . $row)->applyFromArray($styleBody);
                                 $sheet->setCellValue($cols[4] . $row, $jlMc !== 0 ? $jlMc : '-');
                                 $sheet->getStyle($cols[4] . $row)->applyFromArray($styleBody);
+                                $sheet->setCellValue($cols[5] . $row, $jlMcPlan !== 0 ? $jlMcPlan : '-');
+                                $sheet->getStyle($cols[5] . $row)->applyFromArray($styleBody);
                                 $pointers[$weekNum]++;
                             } else {
                                 foreach ($cols as $colLetter) {
@@ -5292,6 +5309,8 @@ class ExcelController extends BaseController
             }
             // Setelah selesai semua model di area, $row == $endRowArea + 1
         }
+        // dd($allData);
+
 
         // TOTAL
 
@@ -5299,10 +5318,12 @@ class ExcelController extends BaseController
         $sheet->setCellValue('B' . $row, '');
         $sheet->setCellValue('C' . $row, '');
         $sheet->setCellValue('D' . $row, '');
+        $sheet->setCellValue('E' . $row, '');
         $sheet->getStyle('A' . $row)->applyFromArray($styleHeader);
         $sheet->getStyle('B' . $row)->applyFromArray($styleHeader);
         $sheet->getStyle('C' . $row)->applyFromArray($styleHeader);
         $sheet->getStyle('D' . $row)->applyFromArray($styleHeader);
+        $sheet->getStyle('E' . $row)->applyFromArray($styleHeader);
         $col6 = 'E';
         for ($i = 1; $i <= $maxWeek; $i++) {
             $sheet->setCellValue($col6 . $row, '');
@@ -5318,6 +5339,9 @@ class ExcelController extends BaseController
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
             $col6++;
             $sheet->setCellValue($col6 . $row, isset($totalPerWeek[$i]['totalJlMc']) && $totalPerWeek[$i]['totalJlMc'] != 0 ? $totalPerWeek[$i]['totalJlMc'] : '-');
+            $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
+            $col6++;
+            $sheet->setCellValue($col6 . $row, isset($totalPerWeek[$i]['totalJlMcPlan']) && $totalPerWeek[$i]['totalJlMcPlan'] != 0 ? $totalPerWeek[$i]['totalJlMcPlan'] : '-');
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
             $col6++;
         }
