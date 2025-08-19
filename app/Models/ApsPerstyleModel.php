@@ -1291,7 +1291,7 @@ class ApsPerstyleModel extends Model
     }
     public function getDeliveryAwalAkhir($model)
     {
-        return $this->select('MIN(delivery) AS delivery_awal, MAX(delivery) AS delivery_akhir')
+        return $this->select('MIN(delivery) AS delivery_awal, MAX(delivery) AS delivery_akhir,production_unit as unit')
             ->where('mastermodel', $model)
             ->first();
     }
