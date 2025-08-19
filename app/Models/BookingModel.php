@@ -281,4 +281,45 @@ class BookingModel extends Model
             ->getResultArray();
         return $results;
     }
+    public function updateStatusBooking()
+    {
+        return $this->where('sisa_booking', 0)
+            ->where('status !=', 'cancel booking')
+            ->set('status', 'Habis')
+            ->update();
+    }
+    public function getDataBooking($validate)
+    {
+        $builder = $this->select('data_booking.*,master_product_type.product_type')
+            ->join('master_product_type', 'master_product_type.id_product_type=data_booking.id_product_type', 'left')
+            ->where('status !=', 'cancel booking');
+
+        if (!empty($validate['buyer'])) {
+            $builder->like('data_booking.kd_buyer_booking', $validate['buyer']);
+        }
+        if (!empty($validate['jarum'])) {
+            $builder->like('data_booking.needle', $validate['jarum']);
+        }
+        if (!empty($validate['tgl_booking']) && !empty($validate['tgl_booking_akhir'])) {
+            $builder->where('data_booking.tgl_terima_booking >=', $validate['tgl_booking']);
+            $builder->where('data_booking.tgl_terima_booking <=', $validate['tgl_booking_akhir']);
+        }
+        if (!empty($validate['tgl_booking']) && empty($validate['tgl_booking_akhir'])) {
+            $builder->where('data_booking.tgl_terima_booking', $validate['tgl_booking']);
+        }
+        if (empty($validate['tgl_booking']) && !empty($validate['tgl_booking_akhir'])) {
+            $builder->where('data_booking.tgl_terima_booking', $validate['tgl_booking_akhir']);
+        }
+
+        if (!empty($validate['awal'])) {
+            $builder->where('data_booking.delivery >=', $validate['awal']);
+        }
+
+        if (!empty($validate['akhir'])) {
+            $builder->where('data_booking.delivery <=', $validate['akhir']);
+        }
+        return $builder
+            ->orderBy('data_booking.tgl_terima_booking, data_booking.needle, data_booking.delivery', 'ASC')
+            ->findAll();
+    }
 }

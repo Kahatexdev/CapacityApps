@@ -264,6 +264,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('detailmodeljarum/(:any)/(:any)/(:any)', 'OrderController::detailmodeljarumPlan/$1/$2/$3');
     $routes->get('semuaOrder', 'OrderController::semuaOrder');
     $routes->post('exportDataOrder', 'ExcelController::exportDataOrder');
+    $routes->post('exportDataBooking', 'ExcelController::exportDataBooking');
     $routes->get('dataorderperjarum/(:any)', 'OrderController::DetailOrderPerJarumPlan/$1');
     $routes->get('dataorderperarea/(:any)', 'OrderController::DetailOrderPerAreaPlan/$1');
     $routes->post('updatedetailorder/(:any)', 'OrderController::updateorder/$1');
