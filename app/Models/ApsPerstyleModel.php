@@ -1013,7 +1013,7 @@ class ApsPerstyleModel extends Model
     }
     public function getStyleSize($noModel)
     {
-        return $this->select('size')
+        return $this->select('size,inisial')
             ->where('mastermodel', $noModel)
             ->groupBy('size')
             ->orderBy('size', 'ASC')
