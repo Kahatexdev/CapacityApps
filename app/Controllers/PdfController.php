@@ -836,7 +836,7 @@ class PdfController extends BaseController
 
             // hitung jumlah baris per kolom
             $heights = [
-                'item_type'     => ceil($pdf->GetStringWidth($row['item_type']) / 37) * $rowHeight,
+                'item_type'     => ceil($pdf->GetStringWidth($row['item_type']) / 35) * $rowHeight,
                 'color'         => ceil($pdf->GetStringWidth($row['color']) / 20) * $rowHeight,
                 'kode_warna'    => ceil($pdf->GetStringWidth($row['kode_warna']) / 25) * $rowHeight,
                 'lot_pesan'     => ceil($pdf->GetStringWidth($row['lot_pesan']) / 18) * $rowHeight,
