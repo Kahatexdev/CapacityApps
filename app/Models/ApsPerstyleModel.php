@@ -798,8 +798,6 @@ class ApsPerstyleModel extends Model
             // ->where('apsperstyle.mastermodel', 'DA2549')
             ->where('MONTH(apsperstyle.delivery)', date('m', strtotime($bulan))) // Filter bulan
             ->where('YEAR(apsperstyle.delivery)', date('Y', strtotime($bulan))) // Filter tahun
-            ->where('apsperstyle.mastermodel', 'ER1197')
-            ->orWhere('apsperstyle.mastermodel', 'GP0679')
             ->groupBy('apsperstyle.mastermodel')
             ->groupBy('apsperstyle.factory')
             ->groupBy('apsperstyle.machinetypeid')
