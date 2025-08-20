@@ -694,7 +694,7 @@
                             timerProgressBar: true
                         }).then(() => {
                             // Redirect ke halaman yang diinginkan
-                            window.location.href = `${BASE_URL}user/listPemesanan/${area}`; // Halaman tujuan setelah sukses
+                            window.location.href = `${BASE_URL}rosso/listPemesanan/${area}`; // Halaman tujuan setelah sukses
                         });
                     } else {
                         Swal.fire({
@@ -703,7 +703,7 @@
                             text: resData.message || 'Gagal menyimpan data',
                         }).then(() => {
                             // Redirect ke halaman yang diinginkan
-                            window.location.href = `${BASE_URL}user/listPemesanan/${area}`; // Halaman tujuan setelah sukses
+                            window.location.href = `${BASE_URL}rosso/listPemesanan/${area}`; // Halaman tujuan setelah sukses
                         });
                         console.error('Response Data:', resData);
                     }
