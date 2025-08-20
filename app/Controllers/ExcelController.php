@@ -5035,6 +5035,7 @@ class ExcelController extends BaseController
         $styleBody = [
             'alignment' => [
                 'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+                'vertical' => Alignment::VERTICAL_CENTER
             ],
             'borders' => [
                 'outline' => [
@@ -5148,41 +5149,51 @@ class ExcelController extends BaseController
         // Mulai di baris 5
         $row = 5;
         foreach ($allData as $area => $models) {
-            // 1. Hitung total baris di area
+            // Hitung total baris untuk AREA
             $rowsArea = 0;
             foreach ($models as $model => $jarums) {
+                $countjarums = count($jarums);
+                $rowsArea += $countjarums;
                 foreach ($jarums as $jarum => $weeks) {
+                    $maxCountWeek = 0;
                     foreach ($weeks as $weekEntries) {
-                        $rowsArea += count($weekEntries);
+                        $countWeek = count($weekEntries);
+                        if ($countWeek > $maxCountWeek) {
+                            $maxCountWeek = $countWeek - 1; // simpan yang paling besar
+                        }
                     }
+                    $rowsArea += $maxCountWeek; // tambah ke total per model
                 }
             }
-            if ($rowsArea === 0) {
-                continue;
-            }
+            // dd($rowsArea);
+            // if ($rowsArea === 0) {
+            //     continue;
+            // }
             $startRowArea = $row;
             $endRowArea = $startRowArea + $rowsArea - 1;
 
+            // dd($endRowArea);
             // Merge & tulis kolom B (area)
-            // $sheet->setCellValue('A' . $startRowArea, $buyer);
-            // $sheet->getStyle('A' . $startRowArea);
             $sheet->setCellValue('B' . $startRowArea, $area);
-            // $sheet->mergeCells('A' . $startRowArea . ':A' . $endRowArea);
-            // $sheet->getStyle('A' . $startRowArea . ':A' . $endRowArea)->applyFromArray($styleBody);
             $sheet->mergeCells('B' . $startRowArea . ':B' . $endRowArea);
             $sheet->getStyle('B' . $startRowArea . ':B' . $endRowArea)->applyFromArray($styleBody);
+            // dd($endRowArea);
 
             // 2. Loop per model
             foreach ($models as $model => $jarums) {
-                // Hitung rowsModel
                 $rowsModel = 0;
+                $counjarums = count($jarums);
+                $rowsModel += $counjarums;
+                // Hitung rowsModel
                 foreach ($jarums as $jarum => $weeks) {
+                    $maxCountWeek = 0;
                     foreach ($weeks as $weekEntries) {
-                        $rowsModel += count($weekEntries);
+                        $countWeek = count($weekEntries);
+                        if ($countWeek > $maxCountWeek) {
+                            $maxCountWeek = $countWeek - 1; // simpan yang paling besar
+                        }
                     }
-                }
-                if ($rowsModel === 0) {
-                    continue;
+                    $rowsModel += $maxCountWeek; // tambah ke total per model
                 }
                 $startRowModel = $row;
                 $endRowModel = $startRowModel + $rowsModel - 1;
@@ -5235,15 +5246,16 @@ class ExcelController extends BaseController
                 // 3. Loop per jarum
                 foreach ($jarums as $jarum => $weeks) {
                     // Hitung rowsJarum
-                    $rowsJarum = 0;
+                    $rowsJarum = 1;
                     foreach ($weeks as $weekEntries) {
-                        $rowsJarum += count($weekEntries);
-                    }
-                    if ($rowsJarum === 0) {
-                        continue;
+                        $countWeek = count($weekEntries);
+                        if ($countWeek > $rowsJarum) {
+                            $rowsJarum = $countWeek;
+                        }
                     }
                     $startRowJarum = $row;
                     $endRowJarum = $startRowJarum + $rowsJarum - 1;
+                    // dd($endRowJarum);
 
                     // Merge & tulis kolom D (jarum)
                     $sheet->setCellValue('F' . $startRowJarum, $jarum);
@@ -5320,12 +5332,14 @@ class ExcelController extends BaseController
         $sheet->setCellValue('C' . $row, '');
         $sheet->setCellValue('D' . $row, '');
         $sheet->setCellValue('E' . $row, '');
+        $sheet->setCellValue('F' . $row, '');
         $sheet->getStyle('A' . $row)->applyFromArray($styleHeader);
         $sheet->getStyle('B' . $row)->applyFromArray($styleHeader);
         $sheet->getStyle('C' . $row)->applyFromArray($styleHeader);
         $sheet->getStyle('D' . $row)->applyFromArray($styleHeader);
         $sheet->getStyle('E' . $row)->applyFromArray($styleHeader);
-        $col6 = 'E';
+        $sheet->getStyle('F' . $row)->applyFromArray($styleHeader);
+        $col6 = 'G';
         for ($i = 1; $i <= $maxWeek; $i++) {
             $sheet->setCellValue($col6 . $row, '');
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
