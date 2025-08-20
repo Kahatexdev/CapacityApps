@@ -167,6 +167,11 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <div class="col"><label>Delivery Po(+)</label>
+                        <input type="date" class="form-control delivery-po-plus" name="items[0][delivery_po_plus]" id="delivery-po-plus" required>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label for="exampleFormControlInput1">Keterangan</label>
                     <textarea class="form-control" name="keterangan" id="keterangan"></textarea>
                 </div>
@@ -633,8 +638,9 @@
                     const terima_kg = $(this).find('.terima').first().val(); // Ambil color utama
                     const poplus_mc_cns = $(this).find('.poplus-mc-cns').val();
                     const plus_pck_cns = $(this).find('.plus-pck-cns').val();
+                    const delivery_po_plus = $('#delivery-po-plus').val();
                     const keterangan = $('#keterangan').val();
-
+                    console.log(delivery_po_plus);
                     $(this).find('.size-block').each(function() {
                         formData.push({
                             no_model: no_model,
@@ -653,6 +659,7 @@
                             plus_pck_pcs: $(this).find('.plus-pck-pcs').val(),
                             plus_pck_kg: $(this).find('.plus-pck-kg').val(),
                             lebih_pakai_kg: $(this).find('.lebih-pakai').val(),
+                            delivery_po_plus: delivery_po_plus,
                             keterangan: keterangan
                         });
                     });
