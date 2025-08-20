@@ -780,7 +780,7 @@
                             // Redirect ke halaman yang diinginkan dengan filter
                             const tglPakai = new URLSearchParams(window.location.search).get('tgl_pakai') || '';
                             const searchPdk = new URLSearchParams(window.location.search).get('searchPdk') || '';
-                            window.location.href = `${BASE_URL}user/listPemesanan/${area}?tgl_pakai=${tglPakai}&searchPdk=${searchPdk}`;
+                            window.location.href = `${BASE_URL}rosso/listPemesanan/${area}?tgl_pakai=${tglPakai}&searchPdk=${searchPdk}`;
                         });
                     } else {
                         Swal.fire({
@@ -791,7 +791,7 @@
                             // Redirect ke halaman yang diinginkan
                             const tglPakai = new URLSearchParams(window.location.search).get('tgl_pakai') || '';
                             const searchPdk = new URLSearchParams(window.location.search).get('searchPdk') || '';
-                            window.location.href = `${BASE_URL}user/listPemesanan/${area}?tgl_pakai=${tglPakai}&searchPdk=${searchPdk}`;
+                            window.location.href = `${BASE_URL}rosso/listPemesanan/${area}?tgl_pakai=${tglPakai}&searchPdk=${searchPdk}`;
                         });
                         console.error('Response Data:', resData);
                     }
@@ -871,7 +871,7 @@
                                     const searchPdk = new URLSearchParams(window.location.search).get('searchPdk') || '';
                                     const BASE_URL = "<?= base_url(); ?>";
                                     const area = button.getAttribute("data-area");
-                                    window.location.href = `${BASE_URL}user/listPemesanan/${area}?tgl_pakai=${tglPakai}&searchPdk=${searchPdk}`;
+                                    window.location.href = `${BASE_URL}rosso/listPemesanan/${area}?tgl_pakai=${tglPakai}&searchPdk=${searchPdk}`;
                                 }
                             });
                         } else {
@@ -886,7 +886,7 @@
                                     const searchPdk = new URLSearchParams(window.location.search).get('searchPdk') || '';
                                     const BASE_URL = "<?= base_url(); ?>";
                                     const area = button.getAttribute("data-area");
-                                    window.location.href = `${BASE_URL}user/listPemesanan/${area}?tgl_pakai=${tglPakai}&searchPdk=${searchPdk}`;
+                                    window.location.href = `${BASE_URL}rosso/listPemesanan/${area}?tgl_pakai=${tglPakai}&searchPdk=${searchPdk}`;
                                 }
                             });
                         }
