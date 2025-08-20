@@ -738,7 +738,7 @@ class PdfController extends BaseController
         ]);
 
         $response = curl_exec($ch);
-        log_message('debug', 'Raw API response: ' . $response);
+        // log_message('debug', 'Raw API response: ' . $response);
 
         $error    = curl_error($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
