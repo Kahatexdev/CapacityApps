@@ -9184,4 +9184,177 @@ class ExcelController extends BaseController
         $writer->save('php://output');
         exit;
     }
+    public function exportDataBooking()
+    {
+        $buyer = $this->request->getPost('buyer');
+        $area = $this->request->getPost('area');
+        $jarum = $this->request->getPost('jarum');
+        $tglTurun = $this->request->getPost('tgl_booking');
+        $tglTurunAkhir = $this->request->getPost('tgl_booking_akhir') ?? '';
+        $awal = $this->request->getPost('awal');
+        $akhir = $this->request->getPost('akhir');
+        $yesterday = date('Y-m-d', strtotime('-2 day')); // DUA HARI KE BELAKANG
+
+        $validate = [
+            'buyer' => $buyer,
+            'area' => $area,
+            'jarum' => $jarum,
+            'tgl_booking' => $tglTurun,
+            'tgl_booking_akhir' => $tglTurunAkhir,
+            'awal' => $awal,
+            'akhir' => $akhir,
+        ];
+        $data = $this->bookingModel->getDataBooking($validate);
+        // dd($data);
+        // Buat file Excel
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $styleTitle = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FF000000'],
+                'size' => 15
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+        ];
+
+        // border
+        $styleHeader = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FFFFFFFF']
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID, // Jenis pengisian solid
+                'startColor' => ['argb' => 'FF67748e'], // Warna latar belakang biru tua (HEX)
+            ],
+        ];
+        $styleBody = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+
+        $sheet->setCellValue('A1', 'DATA BOOKING ');
+        $sheet->mergeCells('A1:M1');
+        $sheet->getStyle('A1:M1')->applyFromArray($styleTitle);
+        // Tulis header
+        $sheet->setCellValue('A3', 'TGL BOOKING');
+        $sheet->setCellValue('B3', 'NO Booking');
+        $sheet->setCellValue('C3', 'PRODUCT');
+        $sheet->setCellValue('D3', 'TYPE');
+        $sheet->setCellValue('E3', 'NO ORDER');
+        $sheet->setCellValue('F3', 'BUYER');
+        $sheet->setCellValue('G3', 'SEAM');
+        $sheet->setCellValue('H3', 'PRODUCTION UNIT');
+        $sheet->setCellValue('I3', 'AREA');
+        $sheet->setCellValue('J3', 'JARUM');
+        $sheet->setCellValue('K3', 'DELIVERY');
+        $sheet->setCellValue('L3', 'OPD');
+        $sheet->setCellValue('M3', 'QTY');
+        $sheet->setCellValue('N3', 'SISA');
+        $sheet->setCellValue('O3', 'DESCRIPTION');
+        $sheet->setCellValue('P3', 'KETERANGAN');
+        $sheet->getStyle('A3')->applyFromArray($styleHeader);
+        $sheet->getStyle('B3')->applyFromArray($styleHeader);
+        $sheet->getStyle('C3')->applyFromArray($styleHeader);
+        $sheet->getStyle('D3')->applyFromArray($styleHeader);
+        $sheet->getStyle('E3')->applyFromArray($styleHeader);
+        $sheet->getStyle('F3')->applyFromArray($styleHeader);
+        $sheet->getStyle('G3')->applyFromArray($styleHeader);
+        $sheet->getStyle('H3')->applyFromArray($styleHeader);
+        $sheet->getStyle('I3')->applyFromArray($styleHeader);
+        $sheet->getStyle('J3')->applyFromArray($styleHeader);
+        $sheet->getStyle('K3')->applyFromArray($styleHeader);
+        $sheet->getStyle('L3')->applyFromArray($styleHeader);
+        $sheet->getStyle('M3')->applyFromArray($styleHeader);
+        $sheet->getStyle('N3')->applyFromArray($styleHeader);
+        $sheet->getStyle('O3')->applyFromArray($styleHeader);
+        $sheet->getStyle('P3')->applyFromArray($styleHeader);
+
+
+        // Tulis data mulai dari baris 2
+        $row = 4;
+        $no = 1;
+
+        foreach ($data as $item) {
+
+            $kode = $item['product_type'] ?? '';
+
+            $pecah = explode('-', $kode);
+
+            $product = $pecah[0] ?? '';
+            $type    = $pecah[1] ?? '';
+
+            $sheet->setCellValue('A' . $row, $item['tgl_terima_booking']);
+            $sheet->setCellValue('B' . $row, $item['no_booking']);
+            $sheet->setCellValue('C' . $row, $product);
+            $sheet->setCellValue('D' . $row, $type);
+            $sheet->setCellValue('E' . $row, $item['no_order']);
+            $sheet->setCellValue('F' . $row, $item['kd_buyer_booking']);
+            $sheet->setCellValue('G' . $row, $item['seam']);
+            $sheet->setCellValue('H' . $row, 'BOOKING');
+            $sheet->setCellValue('I' . $row, 'BOOKING');
+            $sheet->setCellValue('J' . $row, $item['needle']);
+            $sheet->setCellValue('K' . $row, $item['delivery']);
+            $sheet->setCellValue('L' . $row, $item['opd']);
+            $sheet->setCellValue('M' . $row, number_format($item['qty_booking'] / 24, 2, '.', ''));
+            $sheet->setCellValue('N' . $row, number_format($item['sisa_booking'] / 24, 2, '.', ''));
+            $sheet->setCellValue('O' . $row, $item['desc']);
+            $sheet->setCellValue('P' . $row, $item['keterangan']);
+            // 
+            $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('C' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('D' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('E' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('F' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('G' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('H' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('I' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('J' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('K' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('L' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('M' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('N' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('O' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('P' . $row)->applyFromArray($styleBody);
+
+            $row++;
+        }
+
+        // Set lebar kolom agar menyesuaikan isi
+        foreach (range('A', 'P') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Buat writer dan output file Excel
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'Data Booking.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit;
+    }
 }

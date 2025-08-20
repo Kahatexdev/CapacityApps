@@ -744,7 +744,7 @@
 
             const form = event.target;
             const formData = new FormData(form);
-            const BASE_URL = "<?= base_url(); ?>";
+            const BASE_URL = "http://172.23.44.14/CapacityApps/public/";
 
             // Konversi FormData ke JSON tanpa "[]"
             const payload = {};

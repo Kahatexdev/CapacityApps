@@ -356,7 +356,6 @@
                                         <tr>
                                             <th width="450" class="text-center">Style Size</th>
                                             <th class="text-center">Gw</th>
-                                            <th class="text-center">Inisial</th>
                                             <th class="text-center">Jalan MC</th>
                                             <th class="text-center">Aksi</th>
                                         </tr>
@@ -366,14 +365,13 @@
                                             <td width="450">
                                                 <select class="form-control style-size" name="items[${row}][style_size]" required>
                                                     <option value="">Pilih Style Size</option>
-                                                    ${data.map(item => `<option value="${item.size}">${item.size}</option>`).join('')}
+                                                    ${data.map(item => `<option value="${item.size}">${item.inisial} || ${item.size}</option>`).join('')}
                                                 </select>
                                             </td>
                                             <td>
                                                 <input type="number" step="0.01" class="form-control gw" name="items[${row}][gw]" readonly>
-                                            </td>
-                                            <td>
-                                                <input type="text" class="form-control inisial" name="items[${row}][inisial]" readonly>
+                                            
+                                                <input type="hidden" class="form-control inisial" name="items[${row}][inisial]" readonly>
                                             </td>
                                             <td>
                                                 <input type="number" class="form-control jalan-mc" name="items[${row}][jalan_mc]">
@@ -424,7 +422,6 @@
                             <tr>
                                 <th width="450" class="text-center">Style Size</th>
                                 <th class="text-center">Gw</th>
-                                <th class="text-center">Inisial</th>
                                 <th class="text-center">Jalan MC</th>
                                 <th class="text-center">Aksi</th>
                             </tr>
@@ -434,14 +431,13 @@
                                 <td width="450">
                                     <select class="form-control style-size" name="items[${row}][style_size]" required>
                                         <option value="">Pilih Style Size</option>
-                                        ${globalData.map(item => `<option value="${item.size}">${item.size}</option>`).join('')}
+                                        ${globalData.map(item => `<option value="${item.size}">${item.inisial} || ${item.size}</option>`).join('')}
                                     </select>
                                 </td>
                                 <td>
                                     <input type="number" step="0.01" class="form-control gw" name="items[${row}][gw]" readonly>
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control inisial" name="items[${row}][inisial]" readonly>
+         
+                                    <input type="hidden" class="form-control inisial" name="items[${row}][inisial]" readonly>
                                 </td>
                                 <td>
                                     <input type="number" class="form-control jalan-mc" name="items[${row}][jalan_mc]">

@@ -1375,6 +1375,7 @@ class MaterialController extends BaseController
                 'plus_pck_kg'       => (float) ($item['plus_pck_kg'] ?? 0),
                 'plus_pck_cns'      => (float) ($item['plus_pck_cns'] ?? 0),
                 'lebih_pakai_kg'    => (float) ($item['lebih_pakai_kg'] ?? 0),
+                'delivery_po_plus'  => $item['delivery_po_plus'] ?? '',
                 'keterangan'        => $item['keterangan'] ?? '',
                 'admin'             => session()->get('username'),
                 'created_at'        => date('Y-m-d H:i:s'),
