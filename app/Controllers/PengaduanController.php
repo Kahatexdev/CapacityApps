@@ -122,6 +122,7 @@ class PengaduanController extends BaseController
             'pengaduan' => $pengaduan,
             'replies' => $reply
         ];
+        $week = date('Y-m-d', strtotime('-7 days'));
         $this->pengaduanModel->deleteAduanLama($week);
         return $this->response->setJSON($data);
     }
