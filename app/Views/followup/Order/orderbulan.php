@@ -10,7 +10,7 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
-                                    Data Order Per Vykab
+                                    Data Order Per Bulan
                                 </h5>
                             </div>
                         </div>

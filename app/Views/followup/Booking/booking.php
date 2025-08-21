@@ -14,14 +14,9 @@
                                 </h5>
                             </div>
                         </div>
+
                         <div class="col-6 text-end">
-
-                            <div class="col-6 text-end">
-                                <button type="button" class="btn btn-sm btn-success bg-gradient-success shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exportDataOrder"><i class="fas fa-file-export text-lg opacity-10" aria-hidden="true"></i> Excel</button>
-
-
-                            </div>
-
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-success shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exportDataOrder"><i class="fas fa-file-export text-lg opacity-10" aria-hidden="true"></i> Excel</button>
                         </div>
                     </div>
                 </div>

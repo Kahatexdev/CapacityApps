@@ -7,7 +7,7 @@
     <div class="card card-frame">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
-                <!-- <h5 class="mb-0 font-weight-bolder">Filter Pengiriman</h5> -->
+                <h5 class="mb-0 font-weight-bolder">Report Pengiriman</h5>
             </div>
             <div class="row mt-2">
                 <div class="col-md-2">
@@ -104,8 +104,8 @@
         });
 
         function loadData() {
-            let no_model = $('input[name="no_model"]').val().trim();
-            let kode_warna = $('input[name="kode_warna"]').val().trim();
+            let no_model = $('#no_model').val().trim();
+            let kode_warna = $('#kode_warna').val().trim();
 
             if (no_model === '' && kode_warna === '') {
                 Swal.fire({

@@ -2227,7 +2227,7 @@ class MaterialController extends BaseController
         $kodeWarna = $this->request->getGet('kode_warna') ?? '';
 
         // 1) Ambil data
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterSisaPakai?no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/historyPindahOrder?model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -2262,7 +2262,7 @@ class MaterialController extends BaseController
             'active5'         => '',
             'active6'         => '',
             'active7'         => '',
-            'history' => $dataPindah,
+            'history'         => $dataPindah,
         ]);
     }
 
