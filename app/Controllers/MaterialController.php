@@ -1475,7 +1475,7 @@ class MaterialController extends BaseController
             }
         }
 
-        $dataList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listPemesanan/$area");
+        $dataList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listReportPemesanan/$area");
         if (!is_array($dataList)) {
             die('Error: Invalid response format for listPemesanan API.');
         }
