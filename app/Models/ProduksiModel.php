@@ -205,16 +205,21 @@ class ProduksiModel extends Model
     {
         $yesterday = date('Y-m-d', strtotime('-2 day'));
 
-        $result = $this->select('produksi.tgl_produksi, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
+        $builder =  $this->select('produksi.tgl_produksi, apsperstyle.machinetypeid, apsperstyle.factory, apsperstyle.delivery, COUNT(DISTINCT produksi.no_mesin) AS jl_mc')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
             ->where('apsperstyle.production_unit !=', 'MJ')
-            ->where('apsperstyle.factory', $data['area'])
             ->where('apsperstyle.machinetypeid', $data['jarum'])
             ->where('apsperstyle.delivery', $data['delivery'])
-            ->where('produksi.tgl_produksi', $yesterday)
-            ->groupBy('apsperstyle.machinetypeid, apsperstyle.delivery, apsperstyle.factory')
-            ->orderBy('apsperstyle.machinetypeid')
-            ->findAll();
+            ->where('produksi.tgl_produksi', $yesterday);
+        // Filter area hanya jika tidak kosong
+        if (!empty($data['area'])) {
+            $builder->where('apsperstyle.factory', $data['area']);
+        }
+        $builder->groupBy('apsperstyle.machinetypeid')
+            ->groupBy('apsperstyle.delivery')
+            ->groupBy('apsperstyle.factory')
+            ->orderBy('apsperstyle.machinetypeid');
+        $result = $builder->findAll(); // Eksekusi query
         return $result;
     }
 
