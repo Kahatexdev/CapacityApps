@@ -899,7 +899,6 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     //timter produksi
     $routes->post('timterProduksi', 'ProduksiController::timterProduksi');
     $routes->post('exportTimter', 'TimterController::excelTimter');
-
     //summary bs mc
     $routes->post('exportSummaryBs', 'SummaryController::excelSummaryBs');
 
@@ -1144,6 +1143,8 @@ $routes->group('/followup', ['filter' => 'followup'], function ($routes) {
 
     // bs mesin
     $routes->get('bsmesin', 'FollowupController::bsmesin');
+    $routes->post('bsMesinByDate', 'FollowupController::bsMesinByDate');
+
 
     //bahanbakyu
     $routes->get('stockbb', 'MaterialController::stockbb');

@@ -1122,7 +1122,7 @@ class ApsPerstyleModel extends Model
     }
     public function getSizesByNoModelAndArea($nomodel, $area)
     {
-        return $this->select('size')
+        return $this->select('size, inisial')
             ->where('mastermodel', $nomodel)
             ->where('factory', $area)
             ->groupBy('size')
