@@ -810,4 +810,69 @@ class FollowupController extends BaseController
         // dd($dataMc);
         return view($role . '/Order/startStopMc', $data);
     }
+    public function bsmesin()
+    {
+        $dataPdk = $this->ApsPerstyleModel->getPdkProduksi();
+        $produksi = $this->produksiModel->getProduksiHarianArea();
+        $dataBuyer = $this->orderModel->getBuyer();
+        $dataArea = $this->jarumModel->getArea();
+        $dataJarum = $this->jarumModel->getJarum();
+        $area = session()->get('username');
+        $month = [];
+        for ($i = -3; $i <= 12; $i++) {
+            $month[] = date('F-Y', strtotime("first day of $i month"));
+        }
+
+        $apiUrl = 'http://172.23.44.14/HumanResourceSystem/public/api/area/' . $area;
+
+        try {
+            // Attempt to fetch the API response
+            $json = @file_get_contents($apiUrl);
+
+            // Check if the response is valid
+            if ($json === false) {
+                throw new \Exception('API request failed.');
+            }
+
+            // Decode the JSON response
+            $karyawan = json_decode($json, true);
+
+            // Validate if decoding was successful
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception('Invalid JSON response.');
+            }
+        } catch (\Exception $e) {
+            // Set default values in case of an error
+            $karyawan[] = [
+                'id_karyawan' => '-',
+                'nama_karyawan' => 'No Karyawan Data Found',
+            ];
+
+            // Log the error for debugging purposes (optional)
+            log_message('error', 'Error fetching API data: ' . $e->getMessage());
+        }
+
+        // Prepare data for the view
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'BS Mesin',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'targetProd' => 0,
+            'karyawan' => $karyawan,
+            'month' => $month,
+            'areas' => $area,
+            'pdk' => $dataPdk,
+            'produksi' => $produksi,
+            'buyer' => $dataBuyer,
+            'area' => $dataArea,
+            'jarum' => $dataJarum,
+        ];
+        return view(session()->get('role') . '/Bsmesin/bsmesin', $data);
+    }
 }

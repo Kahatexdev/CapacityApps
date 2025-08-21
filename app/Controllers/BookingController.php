@@ -70,6 +70,8 @@ class BookingController extends BaseController
             'active7' => '',
             'Jarum' => $dataJarum,
             'TotalMesin' => $totalMesin,
+            'buyer' => $this->orderModel->getBuyer(),
+
         ];
         return view(session()->get('role') . '/Booking/booking', $data);
     }

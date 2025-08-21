@@ -55,7 +55,7 @@ class PengaduanModel extends Model
     }
     public function deleteAduanLama($week)
     {
-        return $this->where('created_at >=', $week)
+        return $this->where('created_at <=', $week)
             ->delete();
     }
 }
