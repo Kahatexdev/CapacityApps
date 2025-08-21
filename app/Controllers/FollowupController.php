@@ -19,6 +19,7 @@ use App\Models\DetailPlanningModel;
 use App\Services\orderServices;
 use App\Models\MonthlyMcModel;
 use App\Models\EstimatedPlanningModel;
+use App\Models\BsMesinModel;
 
 class FollowupController extends BaseController
 {
@@ -36,6 +37,8 @@ class FollowupController extends BaseController
     protected $DetailPlanningModel;
     protected $EstimatedPlanningModel;
     protected $globalModel;
+    protected $dataMesinModel;
+    protected $bsMesinModel;
 
     public function __construct()
     {
@@ -51,6 +54,8 @@ class FollowupController extends BaseController
         $this->DetailPlanningModel = new DetailPlanningModel();
         $this->globalModel = new MonthlyMcModel();
         $this->EstimatedPlanningModel = new EstimatedPlanningModel();
+        $this->dataMesinModel = new DataMesinModel();
+        $this->bsMesinModel = new BsMesinModel();
 
         $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => ['followup']] != session()->get('role')) {
@@ -874,5 +879,66 @@ class FollowupController extends BaseController
             'jarum' => $dataJarum,
         ];
         return view(session()->get('role') . '/Bsmesin/bsmesin', $data);
+    }
+
+    public function bsMesinByDate()
+    {
+        // DataTables core params
+        $draw   = (int) $this->request->getPost('draw');
+        $start  = (int) $this->request->getPost('start');     // offset
+        $length = (int) $this->request->getPost('length');    // limit
+        $search = $this->request->getPost('search')['value'] ?? '';
+
+        // Custom filters
+        $filters = [
+            'awal' => $this->request->getPost('awal'),
+            'akhir' => $this->request->getPost('akhir'),
+            'area' => trim((string)$this->request->getPost('area')),
+            'pdk'  => trim((string)$this->request->getPost('pdk')),
+        ];
+
+        // Kolom untuk ordering (sesuaikan index dengan kolom di DataTables)
+        $columns = [
+            0 => 'area',
+            1 => 'tanggal_produksi',
+            2 => 'no_model',
+            3 => 'size',
+            4 => 'inisial',
+            5 => 'qty_pcs',   // alias SUM
+            6 => 'qty_gram',  // alias SUM
+        ];
+
+        $orderColIdx = (int)($this->request->getPost('order')[0]['column'] ?? 1);
+        $orderDir    = $this->request->getPost('order')[0]['dir'] ?? 'asc';
+        $orderCol    = $columns[$orderColIdx] ?? 'tanggal_produksi';
+        $orderDir    = in_array(strtolower($orderDir), ['asc', 'desc']) ? $orderDir : 'asc';
+
+        // Hitung total & filtered
+        $recordsTotal    = $this->bsMesinModel->getTotalCount($filters);
+        $recordsFiltered = $this->bsMesinModel->getFilteredCount($filters, $search);
+
+        // Ambil data page
+        $rows = $this->bsMesinModel->getPageData($filters, $search, $orderCol, $orderDir, $length, $start);
+
+        // Susun output sesuai urutan kolom DataTables di view
+        $data = [];
+        foreach ($rows as $r) {
+            $data[] = [
+                $r['area'],
+                $r['tanggal_produksi'],
+                $r['no_model'],
+                $r['size'],
+                $r['inisial'],
+                (int)($r['qty_pcs'] ?? 0),
+                (float)($r['qty_gram'] ?? 0),
+            ];
+        }
+
+        return $this->response->setJSON([
+            'draw'            => $draw,
+            'recordsTotal'    => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data'            => $data,
+        ]);
     }
 }

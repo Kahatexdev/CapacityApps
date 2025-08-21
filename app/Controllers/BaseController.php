@@ -16,6 +16,7 @@ use App\Models\MonthlyMcModel;
 use App\Models\PengaduanModel;
 use App\Models\UserModel;
 use App\Models\PengaduanReply;
+use App\Models\MachinesModel;
 
 
 
@@ -39,6 +40,7 @@ abstract class BaseController extends Controller
     protected $userModel;
     protected $replyModel;
     protected $countNotif;
+    protected $machinesModel;
     public function __construct()
     {
         $this->jarumModel = new DataMesinModel();
@@ -48,6 +50,7 @@ abstract class BaseController extends Controller
         $this->userModel = new UserModel();
         $this->role = session()->get('role');
         $this->replyModel = new PengaduanReply();
+        $this->machinesModel = new MachinesModel();
         $this->countNotif = $this->pengaduanModel->countNotif($this->role);
     }
     /**
