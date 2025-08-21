@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use DateTime;
 use App\Controllers\BaseController;
+use App\Database\Migrations\Machineplan;
 use App\Models\AksesModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\DataMesinModel;
@@ -13,6 +14,8 @@ use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use App\Models\CylinderModel;
+use App\Models\MachinesModel;
+
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 
@@ -27,6 +30,7 @@ class MesinController extends BaseController
     protected $ApsPerstyleModel;
     protected $cylinderModel;
     protected $aksesModel;
+    protected $machinesModel;
 
     public function __construct()
     {
@@ -38,6 +42,7 @@ class MesinController extends BaseController
         $this->orderModel = new OrderModel();
         $this->cylinderModel = new cylinderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
+        $this->machinesModel = new MachinesModel();
         if ($this->filters   = ['role' => ['capacity'], 'god', 'sudo'] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -454,6 +459,7 @@ class MesinController extends BaseController
         foreach ($tampilperarea as &$mc) {
             $mc['kapasitas'] = $mc['mesin_jalan'] * $mc['target'];
         }
+        $detailMc = $this->machinesModel->getDataMcArea($area);
         // dd($ProdMesin);
         unset($mc); // penting buat mencegah bug di loop selanjutnya
         $getPU = $this->jarumModel->getpu($area);
@@ -472,6 +478,7 @@ class MesinController extends BaseController
             'tampildata' => $tampilperarea,
             'capability' => $ProdMesin,
             'tanggal' => $newest,
+            'mesinDetail' => $detailMc,
         ];
         // dd($data);
 

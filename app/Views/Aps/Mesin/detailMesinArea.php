@@ -114,8 +114,88 @@
 
                 </div>
 
-
             </div>
+        </div>
+        <div class="card mt-2">
+            <div class="card-header">
+                <h4>Mesin Detail</h4>
+            </div>
+            <?php if ($mesinDetail): ?>
+                <div class="card-body p-3">
+
+                    <div class="row">
+                        <div class="table-responsive">
+                            <table id="dataTable2" class="display compact striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No MC</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Needle</th>
+
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Brand</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Dram</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Kode</th>
+
+                                        <th colspan=2 class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($mesinDetail as $mc) : ?>
+                                        <tr>
+                                            <td class="text-sm">
+                                                <?php if ($mc['status'] === 'idle') : ?>
+                                                    <span class="badge bg-info">Idle</span>
+                                                <?php elseif ($mc['status'] === 'running') : ?>
+                                                    <span class="badge bg-success">Running</span>
+                                                <?php elseif ($mc['status'] === 'breakdown') : ?>
+                                                    <span class="badge bg-danger">Breakdown</span>
+                                                <?php elseif ($mc['status'] === 'sample') : ?>
+                                                    <span class="badge bg-secondary">Sample</span>
+                                                <?php endif; ?>
+                                            </td>
+
+                                            <td class="text-sm"><?= $mc['no_mc']; ?></td>
+                                            <td class="text-sm"><?= $mc['jarum']; ?></td>
+                                            <td class="text-sm"><?= $mc['brand']; ?></td>
+                                            <td class="text-sm"><?= $mc['dram']; ?> </td>
+                                            <td class="text-sm"><?= $mc['kode']; ?> </td>
+
+
+                                            <td class="text-sm">
+                                                <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['id_data_mesin']; ?>" data-area="<?= $order['area']; ?>" data-total="<?= $order['total_mc']; ?>" data-jarum="<?= $order['jarum']; ?>" data-mc-jalan="<?= $order['mesin_jalan']; ?>" data-brand="<?= $order['brand']; ?>" data-pu="<?= $order['pu']; ?>">
+                                                    Edit
+                                                </button>
+                                            </td>
+
+                                            <td>
+                                                <button type="button" class="btn btn-danger btn-sm delete-btn" data-toggle="modal" data-target="#ModalDelete" data-id="<?= $order['id_data_mesin']; ?>">
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                                <tfoot>
+                                    <th></th>
+                                    <th>Total :</th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                </tfoot>
+                            </table>
+
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+
+                    </div>
+
+                </div>
+            <?php endif; ?>
         </div>
         <div class="row">
             <?= $this->renderSection('capacity'); ?>
@@ -353,6 +433,9 @@
                         // Update the footer cell for the percentage
                         $(api.column(5).footer()).html(mesinMatiFormatted);
                     },
+                });
+                $('#dataTable2').DataTable({
+
                 });
 
                 function numberWithDots(x) {
