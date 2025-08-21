@@ -290,4 +290,86 @@ class BsMesinModel extends Model
             ->where('tanggal_produksi <=', $akhir)
             ->delete();
     }
+
+    public function bsMesinByDate(array $filters = [], string $search = '')
+    {
+        $db = Database::connect();
+
+        $builder = $db->table($this->table)
+            ->select("
+                area,
+                tanggal_produksi,
+                no_model,
+                size,
+                inisial,
+                SUM(qty_pcs)  AS qty_pcs,
+                SUM(qty_gram) AS qty_gram
+            ");
+
+        // filter tanggal        
+        $builder->where('tanggal_produksi >=', $filters['awal'])
+                ->where('tanggal_produksi <=', $filters['akhir']);
+        // di model bsMesinByDate():
+        // if (!empty($filters['awal']) && !empty($filters['akhir'])) {
+        //     $builder->where('tanggal_produksi >=', $filters['awal'])
+        //         ->where('tanggal_produksi <=', $filters['akhir']);
+        // }
+        // exclude zero-date
+        $builder->where('tanggal_produksi <>', '0000-00-00');
+        // filter area & no_model
+        if (!empty($filters['area'])) $builder->like('area', $filters['area']);
+        if (!empty($filters['pdk']))  $builder->like('no_model', $filters['pdk']);
+
+        // global search (DataTables)
+        if ($search !== '') {
+            $builder->groupStart()
+                ->like('area', $search)
+                ->orLike('no_model', $search)
+                ->orLike('size', $search)
+                ->orLike('inisial', $search)
+                ->groupEnd();
+        }
+
+        $builder->groupBy(['area', 'no_model', 'size', 'tanggal_produksi', 'inisial']);
+        return $builder; // <= KEMBALIKAN BUILDER (BUKAN string)
+    }
+
+    public function getFilteredCount(array $filters = [], string $search = ''): int
+    {
+        $db      = Database::connect();
+        $builder = $this->bsMesinByDate($filters, $search);
+
+        // fromSubquery butuh BUILDER
+        $sub = $db->newQuery()->fromSubquery($builder, 't');
+        return (int) $sub->countAllResults();
+    }
+
+    public function getTotalCount(array $filters = []): int
+    {
+        $db      = Database::connect();
+        $builder = $this->bsMesinByDate($filters, ''); // tanpa search
+
+        $sub = $db->newQuery()->fromSubquery($builder, 't');
+        return (int) $sub->countAllResults();
+    }
+
+    public function getPageData(
+        array $filters = [],
+        string $search = '',
+        string $orderCol = 'tanggal_produksi',
+        string $orderDir = 'asc',
+        int $length = 10,
+        int $start = 0
+    ): array {
+        $db      = Database::connect();
+        $builder = $this->bsMesinByDate($filters, $search);
+
+        // Bungkus jadi subquery lalu order & limit
+        $page = $db->newQuery()->fromSubquery($builder, 't')
+            ->orderBy($orderCol, in_array(strtolower($orderDir), ['asc', 'desc']) ? $orderDir : 'asc')
+            ->limit($length, $start)
+            ->get();
+
+        return $page->getResultArray();
+    }
 }
