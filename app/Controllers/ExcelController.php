@@ -4869,13 +4869,21 @@ class ExcelController extends BaseController
                         'delivery' => $id['delivery'],
                     ];
                     $jlMc = 0;
+                    $jlMcPlan = 0;
                     $jlMcData = $this->produksiModel->getJlMc($dataOrder);
+                    $jlMcPlanning = $this->KebutuhanAreaModel->getJlMcPlanning($dataOrder);
 
                     // Pastikan data jl_mc ada
                     if ($jlMcData) {
                         // Loop untuk menjumlahkan jl_mc
                         foreach ($jlMcData as $mc) {
                             $jlMc += $mc['jl_mc'];
+                        }
+                    }
+                    if ($jlMcPlanning) {
+                        // Loop untuk menjumlahkan jl_mc
+                        foreach ($jlMcPlanning as $mcPlan) {
+                            $jlMcPlan += $mcPlan['mesin'];
                         }
                     }
 
@@ -4885,6 +4893,7 @@ class ExcelController extends BaseController
                         'prod' => $produksi,
                         'sisa' => $sisa,
                         'jlMc' => $jlMc,
+                        'jlMcPlan'  => $jlMcPlan,
                         'buyer' => $buyer,
                         'seam' => $seam,
                         'repeat' => $repeat,
@@ -4897,12 +4906,14 @@ class ExcelController extends BaseController
                             'totalProd' => 0,
                             'totalSisa' => 0,
                             'totalJlMc' => 0,
+                            'totalJlMcPlan' => 0,
                         ];
                     }
                     $totalPerWeek[$weekCount]['totalQty'] += $qty;
                     $totalPerWeek[$weekCount]['totalProd'] += $produksi;
                     $totalPerWeek[$weekCount]['totalSisa'] += $sisa;
                     $totalPerWeek[$weekCount]['totalJlMc'] += $jlMc;
+                    $totalPerWeek[$weekCount]['totalJlMcPlan'] += $jlMcPlan;
                 }
 
                 // Pindahkan ke minggu berikutnya
@@ -5024,6 +5035,7 @@ class ExcelController extends BaseController
         $styleBody = [
             'alignment' => [
                 'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+                'vertical' => Alignment::VERTICAL_CENTER
             ],
             'borders' => [
                 'outline' => [
@@ -5075,7 +5087,7 @@ class ExcelController extends BaseController
 
         // looping week
         $col = 'G'; // Kolom awal week
-        $col2 = 'K'; // Kolom akhir week
+        $col2 = 'L'; // Kolom akhir week
 
         // Konversi huruf kolom ke nomor indeks kolom
         $col_index = Coordinate::columnIndexFromString($col);
@@ -5088,8 +5100,8 @@ class ExcelController extends BaseController
 
 
             // Tambahkan 2 pada indeks kolom
-            $col_index += 5;
-            $col2_index = $col_index + 4; // Tambahkan 1 pada indeks kedua kolom
+            $col_index += 6;
+            $col2_index = $col_index + 5; // Tambahkan 1 pada indeks kedua kolom
 
             // Konversi kembali dari nomor indeks kolom ke huruf kolom
             $col = Coordinate::stringFromColumnIndex($col_index);
@@ -5124,7 +5136,10 @@ class ExcelController extends BaseController
             $sheet->setCellValue($col4 . $row_header2, 'SISA');
             $sheet->getStyle($col4 . $row_header2)->applyFromArray($styleHeader);
             $col4++;
-            $sheet->setCellValue($col4 . $row_header2, 'JLN MC');
+            $sheet->setCellValue($col4 . $row_header2, 'JLN MC ACT');
+            $sheet->getStyle($col4 . $row_header2)->applyFromArray($styleHeader);
+            $col4++;
+            $sheet->setCellValue($col4 . $row_header2, 'JLN MC PLAN');
             $sheet->getStyle($col4 . $row_header2)->applyFromArray($styleHeader);
             $col4++;
         }
@@ -5134,41 +5149,51 @@ class ExcelController extends BaseController
         // Mulai di baris 5
         $row = 5;
         foreach ($allData as $area => $models) {
-            // 1. Hitung total baris di area
+            // Hitung total baris untuk AREA
             $rowsArea = 0;
             foreach ($models as $model => $jarums) {
+                $countjarums = count($jarums);
+                $rowsArea += $countjarums;
                 foreach ($jarums as $jarum => $weeks) {
+                    $maxCountWeek = 0;
                     foreach ($weeks as $weekEntries) {
-                        $rowsArea += count($weekEntries);
+                        $countWeek = count($weekEntries);
+                        if ($countWeek > $maxCountWeek) {
+                            $maxCountWeek = $countWeek - 1; // simpan yang paling besar
+                        }
                     }
+                    $rowsArea += $maxCountWeek; // tambah ke total per model
                 }
             }
-            if ($rowsArea === 0) {
-                continue;
-            }
+            // dd($rowsArea);
+            // if ($rowsArea === 0) {
+            //     continue;
+            // }
             $startRowArea = $row;
             $endRowArea = $startRowArea + $rowsArea - 1;
 
+            // dd($endRowArea);
             // Merge & tulis kolom B (area)
-            // $sheet->setCellValue('A' . $startRowArea, $buyer);
-            // $sheet->getStyle('A' . $startRowArea);
             $sheet->setCellValue('B' . $startRowArea, $area);
-            // $sheet->mergeCells('A' . $startRowArea . ':A' . $endRowArea);
-            // $sheet->getStyle('A' . $startRowArea . ':A' . $endRowArea)->applyFromArray($styleBody);
             $sheet->mergeCells('B' . $startRowArea . ':B' . $endRowArea);
             $sheet->getStyle('B' . $startRowArea . ':B' . $endRowArea)->applyFromArray($styleBody);
+            // dd($endRowArea);
 
             // 2. Loop per model
             foreach ($models as $model => $jarums) {
-                // Hitung rowsModel
                 $rowsModel = 0;
+                $counjarums = count($jarums);
+                $rowsModel += $counjarums;
+                // Hitung rowsModel
                 foreach ($jarums as $jarum => $weeks) {
+                    $maxCountWeek = 0;
                     foreach ($weeks as $weekEntries) {
-                        $rowsModel += count($weekEntries);
+                        $countWeek = count($weekEntries);
+                        if ($countWeek > $maxCountWeek) {
+                            $maxCountWeek = $countWeek - 1; // simpan yang paling besar
+                        }
                     }
-                }
-                if ($rowsModel === 0) {
-                    continue;
+                    $rowsModel += $maxCountWeek; // tambah ke total per model
                 }
                 $startRowModel = $row;
                 $endRowModel = $startRowModel + $rowsModel - 1;
@@ -5221,15 +5246,16 @@ class ExcelController extends BaseController
                 // 3. Loop per jarum
                 foreach ($jarums as $jarum => $weeks) {
                     // Hitung rowsJarum
-                    $rowsJarum = 0;
+                    $rowsJarum = 1;
                     foreach ($weeks as $weekEntries) {
-                        $rowsJarum += count($weekEntries);
-                    }
-                    if ($rowsJarum === 0) {
-                        continue;
+                        $countWeek = count($weekEntries);
+                        if ($countWeek > $rowsJarum) {
+                            $rowsJarum = $countWeek;
+                        }
                     }
                     $startRowJarum = $row;
                     $endRowJarum = $startRowJarum + $rowsJarum - 1;
+                    // dd($endRowJarum);
 
                     // Merge & tulis kolom D (jarum)
                     $sheet->setCellValue('F' . $startRowJarum, $jarum);
@@ -5252,9 +5278,9 @@ class ExcelController extends BaseController
                     // Loop menulis baris untuk jarum ini
                     for ($offset = 0; $offset < $totalRows; $offset++) {
                         for ($weekNum = 1; $weekNum <= $maxWeek; $weekNum++) {
-                            $baseColIndex = Coordinate::columnIndexFromString('G') + ($weekNum - 1) * 5;
+                            $baseColIndex = Coordinate::columnIndexFromString('G') + ($weekNum - 1) * 6;
                             $cols = [];
-                            for ($k = 0; $k < 5; $k++) {
+                            for ($k = 0; $k < 6; $k++) {
                                 $cols[] = Coordinate::stringFromColumnIndex($baseColIndex + $k);
                             }
                             if ($pointers[$weekNum] < count($weeks[$weekNum])) {
@@ -5265,6 +5291,7 @@ class ExcelController extends BaseController
                                 $prod = $data['prod'] ?? '';
                                 $sisa = $data['sisa'] ?? '';
                                 $jlMc = $data['jlMc'] ?? '';
+                                $jlMcPlan = $data['jlMcPlan'] ?? '';
                                 $sheet->setCellValue($cols[0] . $row, $del !== 0 ? $del : ($del === 0 ? 0 : ''));
                                 $sheet->getStyle($cols[0] . $row)->applyFromArray($styleBody);
                                 $sheet->setCellValue($cols[1] . $row, $qty !== 0 ? $qty : ($qty === 0 ? 0 : ''));
@@ -5275,6 +5302,8 @@ class ExcelController extends BaseController
                                 $sheet->getStyle($cols[3] . $row)->applyFromArray($styleBody);
                                 $sheet->setCellValue($cols[4] . $row, $jlMc !== 0 ? $jlMc : '-');
                                 $sheet->getStyle($cols[4] . $row)->applyFromArray($styleBody);
+                                $sheet->setCellValue($cols[5] . $row, $jlMcPlan !== 0 ? $jlMcPlan : '-');
+                                $sheet->getStyle($cols[5] . $row)->applyFromArray($styleBody);
                                 $pointers[$weekNum]++;
                             } else {
                                 foreach ($cols as $colLetter) {
@@ -5293,6 +5322,8 @@ class ExcelController extends BaseController
             }
             // Setelah selesai semua model di area, $row == $endRowArea + 1
         }
+        // dd($allData);
+
 
         // TOTAL
 
@@ -5300,11 +5331,15 @@ class ExcelController extends BaseController
         $sheet->setCellValue('B' . $row, '');
         $sheet->setCellValue('C' . $row, '');
         $sheet->setCellValue('D' . $row, '');
+        $sheet->setCellValue('E' . $row, '');
+        $sheet->setCellValue('F' . $row, '');
         $sheet->getStyle('A' . $row)->applyFromArray($styleHeader);
         $sheet->getStyle('B' . $row)->applyFromArray($styleHeader);
         $sheet->getStyle('C' . $row)->applyFromArray($styleHeader);
         $sheet->getStyle('D' . $row)->applyFromArray($styleHeader);
-        $col6 = 'E';
+        $sheet->getStyle('E' . $row)->applyFromArray($styleHeader);
+        $sheet->getStyle('F' . $row)->applyFromArray($styleHeader);
+        $col6 = 'G';
         for ($i = 1; $i <= $maxWeek; $i++) {
             $sheet->setCellValue($col6 . $row, '');
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
@@ -5319,6 +5354,9 @@ class ExcelController extends BaseController
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
             $col6++;
             $sheet->setCellValue($col6 . $row, isset($totalPerWeek[$i]['totalJlMc']) && $totalPerWeek[$i]['totalJlMc'] != 0 ? $totalPerWeek[$i]['totalJlMc'] : '-');
+            $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
+            $col6++;
+            $sheet->setCellValue($col6 . $row, isset($totalPerWeek[$i]['totalJlMcPlan']) && $totalPerWeek[$i]['totalJlMcPlan'] != 0 ? $totalPerWeek[$i]['totalJlMcPlan'] : '-');
             $sheet->getStyle($col6 . $row)->applyFromArray($styleHeader);
             $col6++;
         }
@@ -9143,6 +9181,179 @@ class ExcelController extends BaseController
         header('Cache-Control: max-age=0');
 
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+    public function exportDataBooking()
+    {
+        $buyer = $this->request->getPost('buyer');
+        $area = $this->request->getPost('area');
+        $jarum = $this->request->getPost('jarum');
+        $tglTurun = $this->request->getPost('tgl_booking');
+        $tglTurunAkhir = $this->request->getPost('tgl_booking_akhir') ?? '';
+        $awal = $this->request->getPost('awal');
+        $akhir = $this->request->getPost('akhir');
+        $yesterday = date('Y-m-d', strtotime('-2 day')); // DUA HARI KE BELAKANG
+
+        $validate = [
+            'buyer' => $buyer,
+            'area' => $area,
+            'jarum' => $jarum,
+            'tgl_booking' => $tglTurun,
+            'tgl_booking_akhir' => $tglTurunAkhir,
+            'awal' => $awal,
+            'akhir' => $akhir,
+        ];
+        $data = $this->bookingModel->getDataBooking($validate);
+        // dd($data);
+        // Buat file Excel
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $styleTitle = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FF000000'],
+                'size' => 15
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+        ];
+
+        // border
+        $styleHeader = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FFFFFFFF']
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID, // Jenis pengisian solid
+                'startColor' => ['argb' => 'FF67748e'], // Warna latar belakang biru tua (HEX)
+            ],
+        ];
+        $styleBody = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+        ];
+
+        $sheet->setCellValue('A1', 'DATA BOOKING ');
+        $sheet->mergeCells('A1:M1');
+        $sheet->getStyle('A1:M1')->applyFromArray($styleTitle);
+        // Tulis header
+        $sheet->setCellValue('A3', 'TGL BOOKING');
+        $sheet->setCellValue('B3', 'NO Booking');
+        $sheet->setCellValue('C3', 'PRODUCT');
+        $sheet->setCellValue('D3', 'TYPE');
+        $sheet->setCellValue('E3', 'NO ORDER');
+        $sheet->setCellValue('F3', 'BUYER');
+        $sheet->setCellValue('G3', 'SEAM');
+        $sheet->setCellValue('H3', 'PRODUCTION UNIT');
+        $sheet->setCellValue('I3', 'AREA');
+        $sheet->setCellValue('J3', 'JARUM');
+        $sheet->setCellValue('K3', 'DELIVERY');
+        $sheet->setCellValue('L3', 'OPD');
+        $sheet->setCellValue('M3', 'QTY');
+        $sheet->setCellValue('N3', 'SISA');
+        $sheet->setCellValue('O3', 'DESCRIPTION');
+        $sheet->setCellValue('P3', 'KETERANGAN');
+        $sheet->getStyle('A3')->applyFromArray($styleHeader);
+        $sheet->getStyle('B3')->applyFromArray($styleHeader);
+        $sheet->getStyle('C3')->applyFromArray($styleHeader);
+        $sheet->getStyle('D3')->applyFromArray($styleHeader);
+        $sheet->getStyle('E3')->applyFromArray($styleHeader);
+        $sheet->getStyle('F3')->applyFromArray($styleHeader);
+        $sheet->getStyle('G3')->applyFromArray($styleHeader);
+        $sheet->getStyle('H3')->applyFromArray($styleHeader);
+        $sheet->getStyle('I3')->applyFromArray($styleHeader);
+        $sheet->getStyle('J3')->applyFromArray($styleHeader);
+        $sheet->getStyle('K3')->applyFromArray($styleHeader);
+        $sheet->getStyle('L3')->applyFromArray($styleHeader);
+        $sheet->getStyle('M3')->applyFromArray($styleHeader);
+        $sheet->getStyle('N3')->applyFromArray($styleHeader);
+        $sheet->getStyle('O3')->applyFromArray($styleHeader);
+        $sheet->getStyle('P3')->applyFromArray($styleHeader);
+
+
+        // Tulis data mulai dari baris 2
+        $row = 4;
+        $no = 1;
+
+        foreach ($data as $item) {
+
+            $kode = $item['product_type'] ?? '';
+
+            $pecah = explode('-', $kode);
+
+            $product = $pecah[0] ?? '';
+            $type    = $pecah[1] ?? '';
+
+            $sheet->setCellValue('A' . $row, $item['tgl_terima_booking']);
+            $sheet->setCellValue('B' . $row, $item['no_booking']);
+            $sheet->setCellValue('C' . $row, $product);
+            $sheet->setCellValue('D' . $row, $type);
+            $sheet->setCellValue('E' . $row, $item['no_order']);
+            $sheet->setCellValue('F' . $row, $item['kd_buyer_booking']);
+            $sheet->setCellValue('G' . $row, $item['seam']);
+            $sheet->setCellValue('H' . $row, 'BOOKING');
+            $sheet->setCellValue('I' . $row, 'BOOKING');
+            $sheet->setCellValue('J' . $row, $item['needle']);
+            $sheet->setCellValue('K' . $row, $item['delivery']);
+            $sheet->setCellValue('L' . $row, $item['opd']);
+            $sheet->setCellValue('M' . $row, number_format($item['qty_booking'] / 24, 2, '.', ''));
+            $sheet->setCellValue('N' . $row, number_format($item['sisa_booking'] / 24, 2, '.', ''));
+            $sheet->setCellValue('O' . $row, $item['desc']);
+            $sheet->setCellValue('P' . $row, $item['keterangan']);
+            // 
+            $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('C' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('D' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('E' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('F' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('G' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('H' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('I' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('J' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('K' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('L' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('M' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('N' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('O' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('P' . $row)->applyFromArray($styleBody);
+
+            $row++;
+        }
+
+        // Set lebar kolom agar menyesuaikan isi
+        foreach (range('A', 'P') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Buat writer dan output file Excel
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'Data Booking.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Cache-Control: max-age=0');
+
         $writer->save('php://output');
         exit;
     }

@@ -15,8 +15,10 @@ class PengaduanController extends BaseController
         // Misalnya user info disimpan di session saat login
         $username = session()->get('username');
         $role     = session()->get('role');
-
+        $week = date('Y-m-d', strtotime('-7 days'));
         $pengaduan = $this->pengaduanModel->getPengaduan($username, $role);
+        $this->pengaduanModel->deleteAduanLama($week);
+        $this->pengaduanModel->deleteReplyLama($week);
         // Ambil semua reply per pengaduan
         $reply = [];
         foreach ($pengaduan as $p) {
@@ -121,6 +123,9 @@ class PengaduanController extends BaseController
             'pengaduan' => $pengaduan,
             'replies' => $reply
         ];
+        $week = date('Y-m-d', strtotime('-7 days'));
+        $this->pengaduanModel->deleteAduanLama($week);
+        $this->pengaduanModel->deleteReplyLama($week);
         return $this->response->setJSON($data);
     }
 }

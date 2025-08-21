@@ -53,4 +53,9 @@ class PengaduanModel extends Model
             ->where('replied', 0)
             ->countAllResults();
     }
+    public function deleteAduanLama($week)
+    {
+        return $this->where('created_at <=', $week)
+            ->delete();
+    }
 }

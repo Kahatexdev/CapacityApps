@@ -693,7 +693,7 @@ class SummaryController extends BaseController
                     $detailPlan[$key]['mesin'] = $mesinTotal;
                     $detailPlan[$key]['product_type'] = $dataOrder['product_type'] ?? '';
                     $detailPlan[$key]['buyer'] = $dataOrder['kd_buyer_order'] ?? '';
-                    $detailPlan[$key]['produksi'] = $prod;
+                    $detailPlan[$key]['produksi'] = number_format(floor($prod * 100) / 100, 2);
                     $detailPlan[$key]['plan'] = (!empty($dp['smv']) && !empty($dp['precentage_target']))
                         ? number_format((3600 / $dp['smv']) * ($dp['precentage_target'] / 100), 2)
                         : 0;

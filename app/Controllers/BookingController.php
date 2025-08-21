@@ -56,6 +56,7 @@ class BookingController extends BaseController
     {
         $dataJarum = $this->jarumModel->getJarum();
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+        $this->bookingModel->updateStatusBooking();
 
         $data = [
             'role' => session()->get('role'),
@@ -69,6 +70,8 @@ class BookingController extends BaseController
             'active7' => '',
             'Jarum' => $dataJarum,
             'TotalMesin' => $totalMesin,
+            'buyer' => $this->orderModel->getBuyer(),
+
         ];
         return view(session()->get('role') . '/Booking/booking', $data);
     }
@@ -639,6 +642,7 @@ class BookingController extends BaseController
     {
         $dataJarum = $this->jarumModel->getJarum();
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
+        $this->bookingModel->updateStatusBooking();
 
         $data = [
             'role' => session()->get('role'),
@@ -651,6 +655,8 @@ class BookingController extends BaseController
             'active6' => '',
             'Jarum' => $dataJarum,
             'TotalMesin' => $totalMesin,
+            'buyer' => $this->orderModel->getBuyer(),
+
         ];
         return view(session()->get('role') . '/Booking/booking', $data);
     }

@@ -123,9 +123,9 @@
                 <div class="col-lg-4 col-sm-12 d-flex gap-2">
                     <button class="btn btn-info flex-grow-1" id="filter_data"><i class="fas fa-search"></i> Cari</button>
                     <button class="btn btn-secondary flex-grow-1" id="reset_data"><i class="fas fa-redo"></i> Reset</button>
-                    <!-- <button type="button" class="btn btn-success flex-grow-1" id="export_excel">
+                    <button type="button" class="btn btn-success flex-grow-1" id="export_excel">
                         <i class="fas fa-file-excel"></i> Excel
-                    </button> -->
+                    </button>
 
                 </div>
             </div>

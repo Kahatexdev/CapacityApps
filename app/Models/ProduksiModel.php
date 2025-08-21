@@ -306,7 +306,7 @@ class ProduksiModel extends Model
     }
     public function getProduksiByModelDelivery($data)
     {
-        $prod = $this->select('SUM(produksi.qty_produksi) AS produksi')
+        $prod = $this->select('SUM(produksi.qty_produksi/24) AS produksi')
             ->join('apsperstyle', 'produksi.idapsperstyle = apsperstyle.idapsperstyle', 'left')
             ->where('apsperstyle.production_unit !=', 'MJ')
             ->where('apsperstyle.factory', $data['area'])

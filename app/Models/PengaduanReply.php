@@ -46,4 +46,9 @@ class PengaduanReply extends Model
             ->orderBy('created_at', 'ASC')
             ->findAll();
     }
+    public function deleteReplyLama($week)
+    {
+        return $this->where('created_at <=', $week)
+            ->delete();
+    }
 }

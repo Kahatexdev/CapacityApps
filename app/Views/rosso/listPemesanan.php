@@ -483,7 +483,7 @@
                 },
                 dataType: 'json',
                 success: function(response) {
-                    console.log('Response:', response); // Debug response dari server
+                    // console.log('Response:', response); // Debug response dari server
                     if (response.status === 'success') {
                         // Ambil semua nilai lot dari response.data
                         let lotValues = response.data.map(item => item.lot);
@@ -513,7 +513,7 @@
                         let sisaCns = 0; // Total jalan_mc
 
                         response.data.forEach(function(item, index) {
-                            console.log(response);
+                            // console.log(response);
                             const jalanMc = parseFloat(item.jl_mc) || 0;
                             const totalCones = jalanMc * item.qty_cns;
                             const totalBeratCones = totalCones * item.qty_berat_cns;
@@ -660,7 +660,7 @@
 
             const form = event.target;
             const formData = new FormData(form);
-            const BASE_URL = "<?= base_url(); ?>";
+            const BASE_URL = "http://172.23.44.14/CapacityApps/public/";
 
             // Konversi FormData ke JSON tanpa "[]"
             const payload = {};
@@ -694,7 +694,7 @@
                             timerProgressBar: true
                         }).then(() => {
                             // Redirect ke halaman yang diinginkan
-                            window.location.href = `${BASE_URL}user/listPemesanan/${area}`; // Halaman tujuan setelah sukses
+                            window.location.href = `${BASE_URL}rosso/listPemesanan/${area}`; // Halaman tujuan setelah sukses
                         });
                     } else {
                         Swal.fire({
@@ -703,7 +703,7 @@
                             text: resData.message || 'Gagal menyimpan data',
                         }).then(() => {
                             // Redirect ke halaman yang diinginkan
-                            window.location.href = `${BASE_URL}user/listPemesanan/${area}`; // Halaman tujuan setelah sukses
+                            window.location.href = `${BASE_URL}rosso/listPemesanan/${area}`; // Halaman tujuan setelah sukses
                         });
                         console.error('Response Data:', resData);
                     }
