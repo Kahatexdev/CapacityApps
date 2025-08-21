@@ -1340,7 +1340,9 @@ class SummaryController extends BaseController
             'akhir' => $akhir,
         ];
 
+
         $summaryBsPertgl = $this->orderModel->getSummaryBsPertgl($data);
+        // dd($data, $summaryBsPertgl);
 
         // agar data tgl produksi menjadi unik
         $tgl_produksi = [];
@@ -1526,8 +1528,8 @@ class SummaryController extends BaseController
             $sheet->setCellValue('C' . $row, $id['mastermodel']);
             $sheet->setCellValue('D' . $row, $id['inisial']);
             $sheet->setCellValue('E' . $row, $id['size']);
-            $sheet->setCellValue('F' . $row, number_format($id['ttl_gram'], 2));
-            $sheet->setCellValue('G' . $row, number_format($id['ttl_pcs'], 2));
+            $sheet->setCellValue('F' . $row, number_format($id['ttl_gram'], 0));
+            $sheet->setCellValue('G' . $row, number_format($id['ttl_pcs'], 0));
             // 
             $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
@@ -1556,11 +1558,11 @@ class SummaryController extends BaseController
                 $totalGramPerModel[$tgl_prod2] += $qty_gram;
                 $totalPcsPerModel[$tgl_prod2] += $qty_pcs;
 
-                $sheet->setCellValue($col4 . $row, number_format($qty_gram, 2));
+                $sheet->setCellValue($col4 . $row, number_format($qty_gram, 0));
                 $sheet->getStyle($col4 . $row)->applyFromArray($styleBody);
                 $col4++;
 
-                $sheet->setCellValue($col4 . $row, $qty_pcs);
+                $sheet->setCellValue($col4 . $row, number_format($qty_pcs, 0));
                 $sheet->getStyle($col4 . $row)->applyFromArray($styleBody);
                 $col4++;
             }

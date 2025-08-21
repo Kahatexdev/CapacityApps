@@ -1142,6 +1142,9 @@ $routes->group('/followup', ['filter' => 'followup'], function ($routes) {
     $routes->post('inputKode', 'DeffectController::inputKode');
     $routes->post('viewDataBs', 'DeffectController::viewDataBs');
 
+    // bs mesin
+    $routes->get('bsmesin', 'FollowupController::bsmesin');
+
     //bahanbakyu
     $routes->get('stockbb', 'MaterialController::stockbb');
     $routes->get('filterstockbahanbaku', 'MaterialController::filterStockBahanBaku');

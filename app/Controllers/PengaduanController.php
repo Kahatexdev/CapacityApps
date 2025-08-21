@@ -18,6 +18,7 @@ class PengaduanController extends BaseController
         $week = date('Y-m-d', strtotime('-7 days'));
         $pengaduan = $this->pengaduanModel->getPengaduan($username, $role);
         $this->pengaduanModel->deleteAduanLama($week);
+        $this->pengaduanModel->deleteReplyLama($week);
         // Ambil semua reply per pengaduan
         $reply = [];
         foreach ($pengaduan as $p) {
@@ -124,6 +125,7 @@ class PengaduanController extends BaseController
         ];
         $week = date('Y-m-d', strtotime('-7 days'));
         $this->pengaduanModel->deleteAduanLama($week);
+        $this->pengaduanModel->deleteReplyLama($week);
         return $this->response->setJSON($data);
     }
 }
