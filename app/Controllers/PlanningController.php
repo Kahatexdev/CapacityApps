@@ -20,6 +20,7 @@ use App\Models\DetailPlanningModel;
 use App\Services\orderServices;
 use App\Models\MonthlyMcModel;
 use App\Models\EstimatedPlanningModel;
+use App\Models\MachinesModel;
 
 
 
@@ -40,6 +41,7 @@ class PlanningController extends BaseController
     protected $DetailPlanningModel;
     protected $EstimatedPlanningModel;
     protected $globalModel;
+    protected $machinesModel;
 
 
 
@@ -57,6 +59,7 @@ class PlanningController extends BaseController
         $this->DetailPlanningModel = new DetailPlanningModel();
         $this->globalModel = new MonthlyMcModel();
         $this->EstimatedPlanningModel = new EstimatedPlanningModel();
+        $this->machinesModel = new MachinesModel();
 
         $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => ['planning']] != session()->get('role')) {
@@ -815,5 +818,98 @@ class PlanningController extends BaseController
         ];
         // dd($dataMc);
         return view($role . '/Order/startStopMc', $data);
+    }
+
+    public function denahMesin($area)
+    {
+        $tanggal = $this->request->getGet('date') ?? '';
+
+        $rawLayout = $this->machinesModel->getMachineWithProduksi($tanggal, $area);
+
+        // Kelompokkan data berdasarkan no_mc, jarum, tgl_produksi
+        $grouped = [];
+
+        foreach ($rawLayout as $row) {
+            // $row adalah stdClass (karena model pakai getResult())
+            $key = $row->no_mc . '_' . $row->jarum . '_' . ($row->tgl_produksi ?? 'null');
+
+            if (!isset($grouped[$key])) {
+                $grouped[$key] = [
+                    'no_mc'        => $row->no_mc,
+                    'jarum'        => $row->jarum,
+                    'area'         => $row->area,
+                    'tgl_produksi' => $row->tgl_produksi,
+                    'status'       => $row->status,
+                    'mastermodel'  => [],
+                    'inisial'      => [],
+                    'id_produksi'  => [],
+                    'idapsperstyle' => [],
+                ];
+            }
+
+            if ($row->mastermodel && !in_array($row->mastermodel, $grouped[$key]['mastermodel'])) {
+                $grouped[$key]['mastermodel'][] = $row->mastermodel;
+            }
+
+            if ($row->inisial && !in_array($row->inisial, $grouped[$key]['inisial'])) {
+                $grouped[$key]['inisial'][] = $row->inisial;
+            }
+
+            if ($row->id_produksi && !in_array($row->id_produksi, $grouped[$key]['id_produksi'])) {
+                $grouped[$key]['id_produksi'][] = $row->id_produksi;
+            }
+
+            if ($row->idapsperstyle && !in_array($row->idapsperstyle, $grouped[$key]['idapsperstyle'])) {
+                $grouped[$key]['idapsperstyle'][] = $row->idapsperstyle;
+            }
+        }
+
+        // gabungkan mastermodel/inisial lalu konversi ke array (view kita pakai array)
+        $layout = array_map(function ($item) {
+            $item['mastermodel'] = implode(', ', $item['mastermodel']);
+            $item['inisial']     = implode(', ', $item['inisial']);
+            $item['id_produksi'] = implode(', ', $item['id_produksi']);
+            $item['idapsperstyle'] = implode(', ', $item['idapsperstyle']);
+            return (array)$item;
+        }, array_values($grouped));
+
+        $role = session()->get('role');
+
+        $data = [
+            'layout'  => $layout,
+            'tanggal' => $tanggal,
+            'area'    => $area,
+            'role'    => $role,
+        ];
+
+        // Jika request AJAX → kembalikan JSON { html: "<tr>...rows..." }
+        if ($this->request->isAJAX()) {
+            // partial path: Views/{role}/Planning/partials/denah_rows.php
+            $html = view($role . '/Planning/partials/denah_rows', $data);
+            return $this->response->setJSON(['html' => $html, 'tanggal' => $tanggal]);
+        }
+
+        // non-AJAX → render full page
+        return view($role . '/Planning/denahA1', array_merge($data, [
+            'title' => 'Denah Mesin',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => ''
+        ]));
+    }
+
+    public function detailDenah()
+    {
+        $idprod = $this->request->getGet('idprod');
+        $idaps  = $this->request->getGet('idaps');
+
+        // Model sudah fleksibel
+        $detail = $this->produksiModel->getDetailById($idprod, $idaps);
+
+        return $this->response->setJSON($detail);
     }
 }
