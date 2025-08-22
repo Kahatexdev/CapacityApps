@@ -504,13 +504,45 @@ class MesinController extends BaseController
             return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('error', 'Gagal Update Data');
         }
     }
+    public function updatemesinpernomor($idDataMesin)
+    {
+
+        $data = [
+            'jarum' => $this->request->getPost("jarum"),
+            'no_mc' => $this->request->getPost("no_mc"),
+            'brand' => $this->request->getPost("brand"),
+            'status' => $this->request->getPost("status"),
+            'kode' => $this->request->getPost("kode"),
+            'dram' => $this->request->getPost("dram"),
+        ];
+        $id = $idDataMesin;
+        $update = $this->machinesModel->update($id, $data);
+        $area = $this->request->getPost("area");
+        if ($update) {
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('success', 'Data Berhasil Di Update');
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('error', 'Gagal Update Data');
+        }
+    }
     public function deletemesinarealPlan($idDataMesin)
     {
+        $area = $this->request->getPost('area');
         $delete = $this->jarumModel->delete($idDataMesin);
         if ($delete) {
-            return redirect()->to(base_url(session()->get('role') . '/datamesinPlan'))->withInput()->with('success', 'Data Berhasil Di Hapus');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('success', 'Data Berhasil Di Hapus');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/datamesinPlan'))->withInput()->with('error', 'Gagal Hapus Data');
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('error', 'Gagal Hapus Data');
+        }
+    }
+    public function deletemesinpernomor($idDataMesin)
+    {
+        $area = $this->request->getPost('area');
+
+        $delete = $this->machinesModel->delete($idDataMesin);
+        if ($delete) {
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('success', 'Data Berhasil Di Hapus');
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('error', 'Gagal Hapus Data');
         }
     }
     public function inputmesinperjarumPlan()

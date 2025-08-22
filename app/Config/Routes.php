@@ -501,7 +501,9 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarumPlan/$1/$2');
     $routes->get('datamesinperarea/(:any)', 'MesinController::DetailMesinPerAreaPlan/$1');
     $routes->post('deletemesinareal/(:any)', 'MesinController::deletemesinarealPlan/$1');
+    $routes->post('deletemesinpernomor/(:any)', 'MesinController::deletemesinpernomor/$1');
     $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarumPlan/$1');
+    $routes->post('updatemesinpernomor/(:any)', 'MesinController::updatemesinpernomor/$1');
     $routes->post('tambahmesinperarea', 'MesinController::inputmesinperareaPlan');
     $routes->post('addcylinder', 'MesinController::inputcylinderPlan');
     $routes->post('editcylinder/(:any)', 'MesinController::editcylinderPlan/$1');

@@ -116,11 +116,11 @@
 
             </div>
         </div>
-        <div class="card mt-2">
-            <div class="card-header">
-                <h4>Mesin Detail</h4>
-            </div>
-            <?php if ($mesinDetail): ?>
+        <?php if ($mesinDetail): ?>
+            <div class="card mt-2">
+                <div class="card-header">
+                    <h4>Data mesin Per nomors</h4>
+                </div>
                 <div class="card-body p-3">
 
                     <div class="row">
@@ -162,13 +162,13 @@
 
 
                                             <td class="text-sm">
-                                                <button type="button" class="btn btn-success btn-sm edit-btn" data-toggle="modal" data-target="#EditModal" data-id="<?= $order['id_data_mesin']; ?>" data-area="<?= $order['area']; ?>" data-total="<?= $order['total_mc']; ?>" data-jarum="<?= $order['jarum']; ?>" data-mc-jalan="<?= $order['mesin_jalan']; ?>" data-brand="<?= $order['brand']; ?>" data-pu="<?= $order['pu']; ?>">
+                                                <button type="button" class="btn btn-success btn-sm edit-mc-btn" data-toggle="modal" data-target="#EditMcModal" data-id="<?= $mc['id']; ?>" data-area="<?= $mc['area']; ?>" data-jarum="<?= $mc['jarum']; ?>" data-brand="<?= $mc['brand']; ?>" data-dram="<?= $mc['dram']; ?>" data-status="<?= $mc['status']; ?>" data-no_mc="<?= $mc['no_mc']; ?>" data-kode="<?= $mc['kode']; ?>">
                                                     Edit
                                                 </button>
                                             </td>
 
                                             <td>
-                                                <button type="button" class="btn btn-danger btn-sm delete-btn" data-toggle="modal" data-target="#ModalDelete" data-id="<?= $order['id_data_mesin']; ?>">
+                                                <button type="button" class="btn btn-danger btn-sm delete-mc-btn" data-toggle="modal" data-target="#ModalDeleteMc" data-id="<?= $mc['id']; ?>">
                                                     Delete
                                                 </button>
                                             </td>
@@ -196,198 +196,286 @@
 
                 </div>
             <?php endif; ?>
-        </div>
-        <div class="row">
-            <?= $this->renderSection('capacity'); ?>
-        </div>
-        <div class="modal fade" id="ModalEdit" tabindex="-1" role="dialog" aria-labelledby="modalEdit" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Edit Data Machine</h5>
-                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="" method="post">
-                            <div class="row">
-                                <div class="col-lg-6 col-sm-6">
-                                    <div class="form-group">
-                                        <label for="tgl-bk" class="col-form-label">Area</label>
-                                        <input type="text" class="form-control" name="area" readonly>
-                                        <input type="hidden" name="id">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="tgl-bk" class="col-form-label">Needle</label>
-                                        <input type="text" class="form-control" name="jarum">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Brand</label>
-                                        <input type="text" name="brand" class="form-control">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Target</label>
-                                        <input type="number" name="targer" class="form-control">
-                                    </div>
-
-                                </div>
-                                <div class="col-lg-6 col-sm-12">
-
-                                    <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Total Machine</label>
-                                        <input type="text" name="total_mc" class="form-control">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Mesin Running</label>
-                                        <input type="text" name="mesin_jalan" class="form-control">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Mesin Not Running</label>
-                                        <input type="text" name="mesin_mati" class="form-control">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-form-label">Production Unit</label><br>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="production_unit" id="cj_radio" value="CJ">
-                                            <label class="form-check-label" for="cj_radio">CJ</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="production_unit" id="mj_radio" value="MJ">
-                                            <label class="form-check-label" for="mj_radio">MJ</label>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn bg-gradient-info">Edit</button>
-                    </div>
-                    </form>
-                </div>
             </div>
-        </div>
+            <div class="row">
+                <?= $this->renderSection('capacity'); ?>
+            </div>
+            <div class="modal fade" id="ModalEdit" tabindex="-1" role="dialog" aria-labelledby="modalEdit" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Edit Data Machine</h5>
+                            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="" method="post">
+                                <div class="row">
+                                    <div class="col-lg-6 col-sm-6">
+                                        <div class="form-group">
+                                            <label for="tgl-bk" class="col-form-label">Area</label>
+                                            <input type="text" class="form-control" name="area" readonly>
+                                            <input type="hidden" name="id">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="tgl-bk" class="col-form-label">Needle</label>
+                                            <input type="text" class="form-control" name="jarum">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="buyer" class="col-form-label">Brand</label>
+                                            <input type="text" name="brand" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="buyer" class="col-form-label">Target</label>
+                                            <input type="number" name="targer" class="form-control">
+                                        </div>
 
-        <div class="modal fade" id="modalTambah" tabindex="-1" role="dialog" aria-labelledby="modalTambah" aria-hidden="true">
-            <div class="modal-dialog   role=" document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Add Data Mesin</h5>
-                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="" method="post">
-                            <div class="row">
-                                <div class="col-lg-6 col-sm-6">
-                                    <div class="form-group">
-                                        <label for="tgl-bk" class="col-form-label">Area</label>
-                                        <input type="text" class="form-control" name="area" value=<?= $area ?>>
-                                        <input type="hidden" name="id">
                                     </div>
-                                    <div class="form-group">
-                                        <label for="tgl-bk" class="col-form-label">Needle</label>
-                                        <input type="text" class="form-control" name="jarum">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Brand</label>
-                                        <input type="text" name="brand" class="form-control">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Target</label>
-                                        <input type="number" name="targer" class="form-control">
+                                    <div class="col-lg-6 col-sm-12">
+
+                                        <div class="form-group">
+                                            <label for="buyer" class="col-form-label">Total Machine</label>
+                                            <input type="text" name="total_mc" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="buyer" class="col-form-label">Mesin Running</label>
+                                            <input type="text" name="mesin_jalan" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="buyer" class="col-form-label">Mesin Not Running</label>
+                                            <input type="text" name="mesin_mati" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-form-label">Production Unit</label><br>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="production_unit" id="cj_radio" value="CJ">
+                                                <label class="form-check-label" for="cj_radio">CJ</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="production_unit" id="mj_radio" value="MJ">
+                                                <label class="form-check-label" for="mj_radio">MJ</label>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
-                                <div class="col-lg-6 col-sm-12">
 
-                                    <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Total Machine</label>
-                                        <input type="text" name="total_mc" class="form-control">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Machine Running</label>
-                                        <input type="text" name="mesin_jalan" class="form-control">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Machine Not Running</label>
-                                        <input type="text" name="mesin_mati" class="form-control">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-form-label">Production Unit</label><br>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="production_unit" id="cj_radio" value="CJ">
-                                            <label class="form-check-label" for="cj_radio">CJ</label>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-info">Edit</button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="EditMcModal" tabindex="-1" role="dialog" aria-labelledby="EditMcModal" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Edit Data </h5>
+                            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="" method="post">
+                                <div class="row">
+                                    <div class="col-lg-6 col-sm-6">
+
+                                        <div class="form-group">
+                                            <label for="tgl-bk" class="col-form-label">No Mc</label>
+                                            <input type="hidden" class="form-control" name="area" value="<?= $area ?>">
+                                            <input type="text" class="form-control" name="no_mc">
                                         </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="production_unit" id="mj_radio" value="MJ">
-                                            <label class="form-check-label" for="mj_radio">MJ</label>
+                                        <div class="form-group">
+                                            <label for="tgl-bk" class="col-form-label">Jarum</label>
+                                            <input type="text" class="form-control" name="jarum">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="buyer" class="col-form-label">Brand</label>
+                                            <input type="text" name="brand" class="form-control">
+                                        </div>
+
+
+                                    </div>
+                                    <div class="col-lg-6 col-sm-12">
+                                        <div class="form-group">
+                                            <label for="tgl-bk" class="col-form-label">Dram</label>
+                                            <input type="text" class="form-control" name="dram">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="tgl-bk" class="col-form-label">kode</label>
+                                            <input type="text" class="form-control" name="kode">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="status" class="col-form-label">Status</label>
+                                            <select name="status" id="status" class="form-control">
+                                                <option value="idle">Idle</option>
+                                                <option value="running">Running</option>
+                                                <option value="breakdown">Breakdown</option>
+                                                <option value="sample">Sample</option>
+                                            </select>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-info">Edit</button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="modalTambah" tabindex="-1" role="dialog" aria-labelledby="modalTambah" aria-hidden="true">
+                <div class="modal-dialog   role=" document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Add Data Mesin</h5>
+                            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="" method="post">
+                                <div class="row">
+                                    <div class="col-lg-6 col-sm-6">
+                                        <div class="form-group">
+                                            <label for="tgl-bk" class="col-form-label">Area</label>
+                                            <input type="text" class="form-control" name="area" value=<?= $area ?>>
+                                            <input type="hidden" name="id">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="tgl-bk" class="col-form-label">Needle</label>
+                                            <input type="text" class="form-control" name="jarum">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="buyer" class="col-form-label">Brand</label>
+                                            <input type="text" name="brand" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="buyer" class="col-form-label">Target</label>
+                                            <input type="number" name="targer" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-sm-12">
+
+                                        <div class="form-group">
+                                            <label for="buyer" class="col-form-label">Total Machine</label>
+                                            <input type="text" name="total_mc" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="buyer" class="col-form-label">Machine Running</label>
+                                            <input type="text" name="mesin_jalan" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="buyer" class="col-form-label">Machine Not Running</label>
+                                            <input type="text" name="mesin_mati" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-form-label">Production Unit</label><br>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="production_unit" id="cj_radio" value="CJ">
+                                                <label class="form-check-label" for="cj_radio">CJ</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="production_unit" id="mj_radio" value="MJ">
+                                                <label class="form-check-label" for="mj_radio">MJ</label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
 
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-info">Add Data</button>
+                        </div>
+                        </form>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn bg-gradient-info">Add Data</button>
-                    </div>
-                    </form>
                 </div>
             </div>
-        </div>
 
-        <div class="modal fade  bd-example-modal-lg" id="ModalDelete" tabindex="-1" role="dialog" aria-labelledby="modaldelete" aria-hidden="true">
-            <div class="modal-dialog  modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Delete Machine in Area <?= $area ?></h5>
-                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
+            <div class="modal fade  bd-example-modal-lg" id="ModalDelete" tabindex="-1" role="dialog" aria-labelledby="modaldelete" aria-hidden="true">
+                <div class="modal-dialog  modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Delete Machine in Area <?= $area ?></h5>
+                            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="" method="post">
+                                <input type="text" name="id_data_mesin" id="" hidden value="">
+                                <input type="text" name="area" id="" hidden value="<?= $area ?>">
+
+                                Are you sure you want to delete ?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-danger">Delete</button>
+                        </div>
+                        </form>
                     </div>
-                    <div class="modal-body">
-                        <form action="" method="post">
-                            <input type="text" name="id_data_mesin" id="" hidden value="">
-                            Are you sure you want to delete ?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn bg-gradient-danger">Delete</button>
-                    </div>
-                    </form>
                 </div>
             </div>
-        </div>
-        <div class="modal fade  bd-example-modal-lg" id="ModalCapacity" tabindex="-1" role="dialog" aria-labelledby="modalCapacity" aria-hidden="true">
-            <div class="modal-dialog  modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Input Target</h5>
-                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
+            <div class="modal fade  bd-example-modal-lg" id="ModalDeleteMc" tabindex="-1" role="dialog" aria-labelledby="ModalDeleteMc" aria-hidden="true">
+                <div class="modal-dialog  modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Delete Machine</h5>
+                            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="" method="post">
+                                <input type="text" name="id" id="" hidden value="">
+                                <input type="text" name="area" id="" hidden value="<?= $area ?>">
+                                Are you sure you want to delete ?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-danger">Delete</button>
+                        </div>
+                        </form>
                     </div>
-                    <div class="modal-body">
-                        <form action="" method="post">
-                            <input type="text" name="jarum" id="jarum" class="form-control">
-                            <input type="number" name="target" id="target" class="form-control" placeholder="Masukan target">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn bg-gradient-info">Pilih</button>
-                    </div>
-                    </form>
                 </div>
             </div>
-        </div>
+            <div class="modal fade  bd-example-modal-lg" id="ModalCapacity" tabindex="-1" role="dialog" aria-labelledby="modalCapacity" aria-hidden="true">
+                <div class="modal-dialog  modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Input Target</h5>
+                            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="" method="post">
+                                <input type="text" name="jarum" id="jarum" class="form-control">
+                                <input type="number" name="target" id="target" class="form-control" placeholder="Masukan target">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-info">Pilih</button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
 
-        <!-- <script>
+            <!-- <script>
             function valildasi() {
                 let qty = parseInt(document.getElementById("qty").value);
                 let sisa = parseInt(document.getElementById("sisa").value);
@@ -398,98 +486,133 @@
                 }
             }
         </script> -->
-        <script>
-            $(document).ready(function() {
-                $('#dataTable').DataTable({
-                    "footerCallback": function(row, data, start, end, display) {
-                        var api = this.api();
+            <script>
+                $(document).ready(function() {
+                    $('#dataTable').DataTable({
+                        "footerCallback": function(row, data, start, end, display) {
+                            var api = this.api();
 
-                        var totalMesin = api.column(2, {
-                            page: 'current'
-                        }).data().reduce(function(a, b) {
-                            return parseInt(a) + parseInt(b);
-                        }, 0);
+                            var totalMesin = api.column(2, {
+                                page: 'current'
+                            }).data().reduce(function(a, b) {
+                                return parseInt(a) + parseInt(b);
+                            }, 0);
 
-                        // Calculate the total of the 5th column (Remaining Qty in dozens) - index 4
-                        var mesinJalan = api.column(4, {
-                            page: 'current'
-                        }).data().reduce(function(a, b) {
-                            return parseInt(a) + parseInt(b);
-                        }, 0);
+                            // Calculate the total of the 5th column (Remaining Qty in dozens) - index 4
+                            var mesinJalan = api.column(4, {
+                                page: 'current'
+                            }).data().reduce(function(a, b) {
+                                return parseInt(a) + parseInt(b);
+                            }, 0);
 
-                        var mesinMati = totalMesin - mesinJalan;
+                            var mesinMati = totalMesin - mesinJalan;
 
-                        // Format totalMesin and mesinJalan with " Mc" suffix and dots for thousands
-                        var totalMesinFormatted = numberWithDots(totalMesin) + " Mc";
-                        var mesinJalanFormatted = numberWithDots(mesinJalan) + " Mc";
-                        var mesinMatiFormatted = numberWithDots(mesinMati) + " Mc";
+                            // Format totalMesin and mesinJalan with " Mc" suffix and dots for thousands
+                            var totalMesinFormatted = numberWithDots(totalMesin) + " Mc";
+                            var mesinJalanFormatted = numberWithDots(mesinJalan) + " Mc";
+                            var mesinMatiFormatted = numberWithDots(mesinMati) + " Mc";
 
-                        // Update the footer cell for the total Qty
-                        $(api.column(2).footer()).html(totalMesinFormatted);
+                            // Update the footer cell for the total Qty
+                            $(api.column(2).footer()).html(totalMesinFormatted);
 
-                        // Update the footer cell for the total Mesin Jalan
-                        $(api.column(4).footer()).html(mesinJalanFormatted);
+                            // Update the footer cell for the total Mesin Jalan
+                            $(api.column(4).footer()).html(mesinJalanFormatted);
 
-                        // Update the footer cell for the percentage
-                        $(api.column(5).footer()).html(mesinMatiFormatted);
-                    },
-                });
-                $('#dataTable2').DataTable({
+                            // Update the footer cell for the percentage
+                            $(api.column(5).footer()).html(mesinMatiFormatted);
+                        },
+                    });
+                    $('#dataTable2').DataTable({
+                        order: [
+                            [2, 'asc']
+                        ],
+                        lengthMenu: [
+                            [100, -1],
+                            [100, "All"]
+                        ],
+                    });
 
-                });
-
-                function numberWithDots(x) {
-                    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                }
-
-                $('.btn-add').click(function() {
-                    $('#modalTambah').find('form').attr('action', '<?= base_url($role . '/tambahmesinperarea') ?>');
-
-                    $('#modalTambah').modal('show'); // Show the modal
-                });
-
-                $(document).on('click', '.edit-btn', function() {
-                    var id_data_mesin = $(this).data('id');
-                    var area = $(this).data('area');
-                    var jarum = $(this).data('jarum');
-                    var total_mc = $(this).data('total');
-                    var brand = $(this).data('brand');
-                    var mesin_jalan = $(this).data('mc-jalan');
-                    var pu = $(this).data('pu');
-                    var mesin_mati = total_mc - mesin_jalan;
-
-                    $('#ModalEdit').find('form').attr('action', '<?= base_url($role . '/updatemesinperjarum/') ?>' + id_data_mesin);
-                    $('#ModalEdit').find('input[name="id"]').val(id_data_mesin);
-                    $('#ModalEdit').find('input[name="area"]').val(area);
-                    $('#ModalEdit').find('input[name="jarum"]').val(jarum);
-                    $('#ModalEdit').find('input[name="total_mc"]').val(total_mc);
-                    $('#ModalEdit').find('input[name="brand"]').val(brand);
-                    $('#ModalEdit').find('input[name="mesin_jalan"]').val(mesin_jalan);
-                    $('#ModalEdit').find('input[name="mesin_mati"]').val(mesin_mati);
-                    if (pu === "CJ") {
-                        $('#cj_radio').prop('checked', true);
-                    } else if (pu === "MJ") {
-                        $('#mj_radio').prop('checked', true);
+                    function numberWithDots(x) {
+                        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
                     }
 
-                    $('#ModalEdit').modal('show'); // Show the modal
-                });
-                $(document).on('click', '.delete-btn', function() {
-                    var id = $(this).data('id');
-                    $('#ModalDelete').find('form').attr('action', '<?= base_url($role . '/deletemesinareal/') ?>' + id);
-                    $('#ModalDelete').find('input[name="id_data_mesin"]').val(id);
-                    $('#ModalDelete').modal('show'); // Show the modal
-                });
-                $(document).on('click', '.btn-capacity', function() {
-                    var area = $(this).data('area');
-                    var jarum = $(this).data('jarum');
-                    $('#ModalCapacity').find('form').attr('action', '<?= base_url($role . '/capacityperarea/' . $area) ?>');
-                    $('#ModalCapacity').find('input[name="jarum"]').val(jarum);
+                    $('.btn-add').click(function() {
+                        $('#modalTambah').find('form').attr('action', '<?= base_url($role . '/tambahmesinperarea') ?>');
 
-                    $('#ModalCapacity').modal('show'); // Show the modal
-                });
+                        $('#modalTambah').modal('show'); // Show the modal
+                    });
 
-            });
-        </script>
-        <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
-        <?php $this->endSection(); ?>
+                    $(document).on('click', '.edit-btn', function() {
+                        var id_data_mesin = $(this).data('id');
+                        var area = $(this).data('area');
+                        var jarum = $(this).data('jarum');
+                        var total_mc = $(this).data('total');
+                        var brand = $(this).data('brand');
+                        var mesin_jalan = $(this).data('mc-jalan');
+                        var pu = $(this).data('pu');
+                        var mesin_mati = total_mc - mesin_jalan;
+
+                        $('#ModalEdit').find('form').attr('action', '<?= base_url($role . '/updatemesinperjarum/') ?>' + id_data_mesin);
+                        $('#ModalEdit').find('input[name="id"]').val(id_data_mesin);
+                        $('#ModalEdit').find('input[name="area"]').val(area);
+                        $('#ModalEdit').find('input[name="jarum"]').val(jarum);
+                        $('#ModalEdit').find('input[name="total_mc"]').val(total_mc);
+                        $('#ModalEdit').find('input[name="brand"]').val(brand);
+                        $('#ModalEdit').find('input[name="mesin_jalan"]').val(mesin_jalan);
+                        $('#ModalEdit').find('input[name="mesin_mati"]').val(mesin_mati);
+                        if (pu === "CJ") {
+                            $('#cj_radio').prop('checked', true);
+                        } else if (pu === "MJ") {
+                            $('#mj_radio').prop('checked', true);
+                        }
+
+                        $('#ModalEdit').modal('show'); // Show the modal
+                    });
+                    $(document).on('click', '.edit-mc-btn', function() {
+                        var idMc = $(this).data('id');
+                        var no_mc = $(this).data('no_mc');
+                        var area = $(this).data('area');
+                        var jarum = $(this).data('jarum');
+                        var dram = $(this).data('dram');
+                        var status = $(this).data('status');
+                        var brand = $(this).data('brand');
+                        var kode = $(this).data('kode');
+
+                        $('#EditMcModal').find('form').attr('action', '<?= base_url($role . '/updatemesinpernomor/') ?>' + idMc);
+                        $('#EditMcModal').find('input[name="id"]').val(idMc);
+                        $('#EditMcModal').find('input[name="no_mc"]').val(no_mc);
+                        $('#EditMcModal').find('input[name="area"]').val(area);
+                        $('#EditMcModal').find('input[name="jarum"]').val(jarum);
+                        $('#EditMcModal').find('input[name="dram"]').val(dram);
+                        $('#EditMcModal').find('input[name="brand"]').val(brand);
+                        $('#EditMcModal').find('input[name="status"]').val(status);
+                        $('#EditMcModal').find('input[name="kode"]').val(kode);
+
+
+                        $('#EditMcModal').modal('show'); // Show the modal
+                    });
+                    $(document).on('click', '.delete-btn', function() {
+                        var id = $(this).data('id');
+                        $('#ModalDelete').find('form').attr('action', '<?= base_url($role . '/deletemesinareal/') ?>' + id);
+                        $('#ModalDelete').find('input[name="id_data_mesin"]').val(id);
+                        $('#ModalDelete').modal('show'); // Show the modal
+                    });
+                    $(document).on('click', '.delete-mc-btn', function() {
+                        var id = $(this).data('id');
+                        $('#ModalDeleteMc').find('form').attr('action', '<?= base_url($role . '/deletemesinpernomor/') ?>' + id);
+                        $('#ModalDeleteMc').find('input[name="id"]').val(id);
+                        $('#ModalDeleteMc').modal('show'); // Show the modal
+                    });
+                    $(document).on('click', '.btn-capacity', function() {
+                        var area = $(this).data('area');
+                        var jarum = $(this).data('jarum');
+                        $('#ModalCapacity').find('form').attr('action', '<?= base_url($role . '/capacityperarea/' . $area) ?>');
+                        $('#ModalCapacity').find('input[name="jarum"]').val(jarum);
+
+                        $('#ModalCapacity').modal('show'); // Show the modal
+                    });
+
+                });
+            </script>
+            <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+            <?php $this->endSection(); ?>
