@@ -7,7 +7,7 @@
     <div class="card card-frame">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 font-weight-bolder">Filter Pengiriman</h5>
+                <h5 class="mb-0 font-weight-bolder">Report Pengiriman</h5>
             </div>
             <div class="row mt-2">
                 <div class="col-md-3">
