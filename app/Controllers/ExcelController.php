@@ -3804,17 +3804,18 @@ class ExcelController extends BaseController
         $sheet->setCellValue('G3', 'NO ORDER');
         $sheet->setCellValue('H3', 'BUYER');
         $sheet->setCellValue('I3', 'SEAM');
-        $sheet->setCellValue('J3', 'PRODUCTION UNIT');
-        $sheet->setCellValue('K3', 'AREA');
-        $sheet->setCellValue('L3', 'JARUM');
-        $sheet->setCellValue('M3', 'INISIAL');
-        $sheet->setCellValue('N3', 'STYLE SIZE');
-        $sheet->setCellValue('O3', 'DELIVERY');
-        $sheet->setCellValue('P3', 'QTY');
-        $sheet->setCellValue('Q3', 'PRODUKSI');
-        $sheet->setCellValue('R3', 'SISA');
-        $sheet->setCellValue('S3', 'JLN MC');
-        $sheet->setCellValue('T3', 'DESCRIPTION');
+        $sheet->setCellValue('J3', 'SMV');
+        $sheet->setCellValue('K3', 'PRODUCTION UNIT');
+        $sheet->setCellValue('L3', 'AREA');
+        $sheet->setCellValue('M3', 'JARUM');
+        $sheet->setCellValue('N3', 'INISIAL');
+        $sheet->setCellValue('O3', 'STYLE SIZE');
+        $sheet->setCellValue('P3', 'DELIVERY');
+        $sheet->setCellValue('Q3', 'QTY');
+        $sheet->setCellValue('R3', 'PRODUKSI');
+        $sheet->setCellValue('S3', 'SISA');
+        $sheet->setCellValue('T3', 'JLN MC');
+        $sheet->setCellValue('U3', 'DESCRIPTION');
         $sheet->getStyle('A3')->applyFromArray($styleHeader);
         $sheet->getStyle('B3')->applyFromArray($styleHeader);
         $sheet->getStyle('C3')->applyFromArray($styleHeader);
@@ -3835,6 +3836,7 @@ class ExcelController extends BaseController
         $sheet->getStyle('R3')->applyFromArray($styleHeader);
         $sheet->getStyle('S3')->applyFromArray($styleHeader);
         $sheet->getStyle('T3')->applyFromArray($styleHeader);
+        $sheet->getStyle('U3')->applyFromArray($styleHeader);
 
         // Tulis data mulai dari baris 2
         $row = 4;
@@ -3858,17 +3860,18 @@ class ExcelController extends BaseController
             $sheet->setCellValue('G' . $row, $item['no_order']);
             $sheet->setCellValue('H' . $row, $item['kd_buyer_order']);
             $sheet->setCellValue('I' . $row, $item['seam']);
-            $sheet->setCellValue('J' . $row, $item['production_unit']);
-            $sheet->setCellValue('K' . $row, $item['factory']);
-            $sheet->setCellValue('L' . $row, $item['machinetypeid']);
-            $sheet->setCellValue('M' . $row, $item['inisial']);
-            $sheet->setCellValue('N' . $row, $item['size']);
-            $sheet->setCellValue('O' . $row, $item['delivery']);
-            $sheet->setCellValue('P' . $row, $item['qty_pcs']);
-            $sheet->setCellValue('Q' . $row, $item['qty_produksi']);
-            $sheet->setCellValue('R' . $row, $item['sisa_pcs']);
-            $sheet->setCellValue('S' . $row, $item['jl_mc']);
-            $sheet->setCellValue('T' . $row, $item['description']);
+            $sheet->setCellValue('J' . $row, $item['smv']);
+            $sheet->setCellValue('K' . $row, $item['production_unit']);
+            $sheet->setCellValue('L' . $row, $item['factory']);
+            $sheet->setCellValue('M' . $row, $item['machinetypeid']);
+            $sheet->setCellValue('N' . $row, $item['inisial']);
+            $sheet->setCellValue('O' . $row, $item['size']);
+            $sheet->setCellValue('P' . $row, $item['delivery']);
+            $sheet->setCellValue('Q' . $row, $item['qty_pcs']);
+            $sheet->setCellValue('R' . $row, $item['qty_produksi']);
+            $sheet->setCellValue('S' . $row, $item['sisa_pcs']);
+            $sheet->setCellValue('T' . $row, $item['jl_mc']);
+            $sheet->setCellValue('U' . $row, $item['description']);
             // 
             $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
@@ -3890,11 +3893,12 @@ class ExcelController extends BaseController
             $sheet->getStyle('R' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('S' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('T' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('U' . $row)->applyFromArray($styleBody);
             $row++;
         }
 
         // Set lebar kolom agar menyesuaikan isi
-        foreach (range('A', 'S') as $col) {
+        foreach (range('A', 'U') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
