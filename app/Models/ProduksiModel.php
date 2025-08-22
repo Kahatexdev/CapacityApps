@@ -550,4 +550,30 @@ class ProduksiModel extends Model
     {
         return $this->select('tgl_produksi')->where('area', $area)->orderBy('tgl_produksi', 'desc')->first();
     }
+
+    public function getDetailById($idprod, $idaps)
+    {
+        // Normalisasi input supaya selalu jadi array
+        if (!is_array($idprod)) {
+            $idprod = explode(',', str_replace(' ', '', $idprod));
+        }
+        if (!is_array($idaps)) {
+            $idaps = explode(',', str_replace(' ', '', $idaps));
+        }
+
+        $builder = $this->select('
+            produksi.tgl_produksi,
+            produksi.qty_produksi,
+            produksi.no_mesin,
+            produksi.area,
+            apsperstyle.mastermodel,
+            apsperstyle.size,
+            apsperstyle.inisial
+        ')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle', 'left')
+            ->whereIn('produksi.id_produksi', $idprod)
+            ->whereIn('apsperstyle.idapsperstyle', $idaps);
+
+        return $builder->get()->getResultArray();
+    }
 }

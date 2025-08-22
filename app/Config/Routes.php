@@ -517,6 +517,9 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetailAps/$1');
     $routes->get('getModelData', 'PlanningController::getModelData');
     $routes->post('pindahjarum/(:any)', 'PlanningController::pindahjarum/$1');
+    $routes->get('denah/(:any)', 'PlanningController::denahMesin/$1');
+    $routes->get('detailDenah', 'PlanningController::detailDenah');
+
 
 
     // produksi

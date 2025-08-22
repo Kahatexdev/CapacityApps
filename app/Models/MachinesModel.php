@@ -51,10 +51,56 @@ class MachinesModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getDataMcArea($area)
+    public function getDataMcArea(string $area): array
     {
+        if ($area === '') return [];
 
-        return $this->where('area', $area)
-            ->findAll();
+        return $this->select('no_mc, jarum, brand, dram, kode, tahun, area, status')
+            ->where('area', $area)
+            ->findAll(); // findAll() lebih ringkas daripada get()->getResultArray()
+    }
+
+    public function getMachineWithProduksi($tanggal, $area)
+    {
+        $db = \Config\Database::connect();
+
+        $sql = "
+            SELECT
+              machines.no_mc,
+              machines.jarum,
+              machines.area,
+              p.id_produksi,
+              p.idapsperstyle,
+              p.tgl_produksi,
+              p.mastermodel,
+              p.inisial,
+              CASE
+                WHEN p.tgl_produksi IS NULL THEN machines.status
+                ELSE 'running'
+              END AS status
+            FROM machines
+            LEFT JOIN (
+              SELECT 
+                produksi.no_mesin,
+                produksi.tgl_produksi,
+                produksi.area,
+                produksi.id_produksi,
+                produksi.idapsperstyle,
+                apsperstyle.mastermodel,
+                apsperstyle.inisial,
+                apsperstyle.machinetypeid
+              FROM produksi
+              LEFT JOIN apsperstyle
+                ON apsperstyle.idapsperstyle = produksi.idapsperstyle
+              WHERE produksi.tgl_produksi = ?
+                AND produksi.area = ?
+            ) p
+              ON machines.no_mc = p.no_mesin
+             AND machines.jarum = p.machinetypeid
+            WHERE machines.area = ?
+            ORDER BY machines.id ASC
+        ";
+
+        return $db->query($sql, [$tanggal, $area, $area])->getResult();
     }
 }
