@@ -7,7 +7,7 @@
     <div class="card card-frame">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 font-weight-bolder">Filter Sisa Pakai Karet</h5>
+                <h5 class="mb-0 font-weight-bolder">Report Sisa Pakai Karet</h5>
                 <button class="btn btn-secondary btn-block" id="btnInfo" style="padding: 5px 12px; font-size: 12px;" data-bs-toggle="modal" data-bs-target="#infoModal">
                     <i class="fas fa-info"></i>
                 </button>
