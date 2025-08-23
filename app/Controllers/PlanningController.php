@@ -822,7 +822,7 @@ class PlanningController extends BaseController
 
     public function denahMesin($area)
     {
-        $tanggal = $this->request->getGet('date') ?? '';
+        $tanggal = $this->request->getGet('date') ?? date('Y-m-d');
 
         $rawLayout = $this->machinesModel->getMachineWithProduksi($tanggal, $area);
 
