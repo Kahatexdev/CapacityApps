@@ -55,7 +55,7 @@ class MachinesModel extends Model
     {
         if ($area === '') return [];
 
-        return $this->select('no_mc, jarum, brand, dram, kode, tahun, area, status')
+        return $this->select('id,no_mc, jarum, brand, dram, kode, tahun, area, status')
             ->where('area', $area)
             ->findAll(); // findAll() lebih ringkas daripada get()->getResultArray()
     }
