@@ -17,43 +17,47 @@ $normUpper = function ($s) {
     return strtoupper($s);
 };
 $makeKey = function ($cell) use ($normUpper) {
-    $no = (int)($cell['no_mc'] ?? 0);
-    $jar = $normUpper($cell['jarum'] ?? '');
-    return "{$no}-{$jar}";
+    $idMC = (int)($cell['id'] ?? 0);
+    return "{$idMC}";
 };
 
 $colspanMapRaw = [
-    '159-TJ144' => 2,
-    '1-TJ120' => 2,
-    '3-TJ120' => 2,
-    '17-TJ120' => 2,
-    '160-TJ144' => 2,
-    '18-TJ120' => 2,
-    '3-TJ144' => 2,
-    '2-TJ144' => 2,
-    '1-TJ144' => 2,
-    '22-TJ144' => 2,
-    '23-TJ144' => 2,
-    '24-TJ144' => 2,
-    '27-TJ144' => 2,
-    '26-TJ144' => 2,
-    '25-TJ144' => 2,
-    '78-TJ144' => 2,
-    '79-TJ144' => 2,
-    '81-TJ144' => 2,
-    '80-TJ144' => 2,
-    '90-JC168' => 2
+    '1' => 2,
+    '15' => 2,
+    '25' => 2,
+    '41' => 2,
+    '55' => 2,
+    '81' => 2,
+    '95' => 2,
+    '25' => 2,
+    '26' => 2,
+    '27' => 2,
+    '65' => 2,
+    '66' => 2,
+    '67' => 2,
+    '105' => 2,
+    '106' => 2,
+    '107' => 2,
+    '188' => 2,
+    '189' => 2,
+    '214' => 2,
+    '215' => 2,
+    '216' => 2
 ];
+// GANTI seluruh blok build $colspanMap dengan ini:
 $colspanMap = [];
-foreach ($colspanMapRaw as $k => $v) {
-    $p = explode('-', $k, 2);
-    if (count($p) === 2) {
-        [$no, $jar] = $p;
-        $no = (int)$no;
-        $jar = strtoupper(trim($jar));
-        $colspanMap["{$no}-{$jar}"] = (int)$v;
+foreach ($colspanMapRaw as $key => $val) {
+    // support key bertipe "25" atau "25,26,27" (opsional)
+    foreach (preg_split('/\s*,\s*/', (string)$key) as $idStr) {
+        if ($idStr === '') continue;
+        $idMC = (int)$idStr;
+        if ($idMC > 0) {
+            $colspanMap[(string)$idMC] = (int)$val;
+        }
     }
 }
+
+// getSpan tetap sama
 $getSpan = function ($cell) use ($makeKey, $colspanMap) {
     $k = $makeKey($cell);
     return max(1, ($colspanMap[$k] ?? 1));
@@ -63,7 +67,8 @@ $leftRows = array_fill(0, $leftMaxRows, []);
 $centerRows = array_fill(0, $totalRows, []);
 $rightRows  = array_fill(0, $totalRows, []);
 
-$items = array_values($layout);
+// Pastikan $layout array agar array_values() aman
+$items = array_values(is_array($layout) ? $layout : []);
 for ($r = 0; $r < $totalRows && !empty($items); $r++) {
     if ($r < $leftMaxRows) {
         $used = 0;
@@ -115,6 +120,7 @@ $renderCellHtml = function ($item) {
         }
     }
 
+    $idMC = esc($c['id'] ?? '-');
     $no = esc($c['no_mc'] ?? '-');
     $jar = esc($c['jarum'] ?? '-');
     $master = esc($c['mastermodel'] ?? '-');

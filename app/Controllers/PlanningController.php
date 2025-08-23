@@ -838,6 +838,7 @@ class PlanningController extends BaseController
 
             if (!isset($grouped[$key])) {
                 $grouped[$key] = [
+                    'id'           => $row->id,
                     'no_mc'        => $row->no_mc,
                     'jarum'        => $row->jarum,
                     'area'         => $row->area,

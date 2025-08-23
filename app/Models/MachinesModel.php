@@ -66,6 +66,7 @@ class MachinesModel extends Model
 
         $sql = "
             SELECT
+              machines.id,
               machines.no_mc,
               machines.jarum,
               machines.area,

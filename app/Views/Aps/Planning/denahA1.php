@@ -881,7 +881,7 @@
         // Reset button — clear date and update URL (no trailing ?)
         elements.btnReset.on('click', function(e) {
             e.preventDefault();
-            elements.dateInput.val('');
+            elements.dateInput.val(new Date().toISOString().slice(0, 10));
             utils.updateUrl(''); // remove date param from URL immediately
             elements.form.trigger('submit');
         });
