@@ -759,45 +759,48 @@
                 $.ajax({
                     url: `${BASEURL}/${ROLE}/detailDenah`,
                     method: 'GET',
-                    // send as arrays so server will receive idprod[]=123&idprod[]=456
                     data: {
                         'idprod[]': idprods,
                         'idaps[]': idapss
                     },
-                    traditional: false, // jQuery default; keep it explicit if you change settings
-                    dataType: 'html',
-                    timeout: 20000,
-                    cache: false
-                }).done(function(modalContent) {
-                    // inject modalContent safely (use existing modal root)
-                    const $modalRoot = $('#modalDetailDenah');
-                    const $modalContent = $modalRoot.find('.modal-content');
-
-                    if (/<div[^>]+class=["']?modal-content["']?/i.test(modalContent)) {
-                        $modalContent.length ? $modalContent.replaceWith(modalContent) : $modalRoot.html(modalContent);
+                    dataType: 'json'
+                }).done(function(res) {
+                    let html = '';
+                    if (!res.length) {
+                        html = '<div class="alert alert-warning">Tidak ada data.</div>';
                     } else {
-                        if ($modalContent.length) {
-                            const $body = $modalContent.find('.modal-body');
-                            $body.length ? $body.html(modalContent) : $modalContent.html(modalContent);
-                        } else {
-                            $modalRoot.html(modalContent);
-                        }
+                        html = '<div class="accordion" id="denahAccordion">';
+                        res.forEach((row, i) => {
+                            html += `
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="heading-${i}">
+                <button class="accordion-button ${i ? 'collapsed' : ''}" 
+                        type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse-${i}">
+                  ${row.no_mesin || 'Mesin'} — ${row.mastermodel || ''}
+                </button>
+              </h2>
+              <div id="collapse-${i}" class="accordion-collapse collapse ${i ? '' : 'show'}"
+                   data-bs-parent="#denahAccordion">
+                <div class="accordion-body">
+                  <table class="table table-sm">
+                    <tr><th>Tanggal Produksi</th><td>${row.tgl_produksi || ''}</td></tr>
+                    <tr><th>Qty</th><td>${row.qty_produksi || ''}</td></tr>
+                    <tr><th>No Mesin</th><td>${row.no_mesin || ''}</td></tr>
+                    <tr><th>Area</th><td>${row.area || ''}</td></tr>
+                    <tr><th>Inisial</th><td>${row.inisial || ''}</td></tr>
+                  </table>
+                </div>
+              </div>
+            </div>`;
+                        });
+                        html += '</div>';
                     }
 
-                    try {
-                        const modalEl = document.getElementById('modalDetailDenah');
-                        const bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl, {
-                            backdrop: 'static'
-                        });
-                        bsModal.show();
-                    } catch (err) {
-                        try {
-                            $modalRoot.modal('show');
-                        } catch (e) {
-                            console.warn('Could not show modal', e);
-                        }
-                    }
-                }).fail(function(xhr, status, error) {
+                    $('#modalDetailDenah .modal-body').html(html);
+                    new bootstrap.Modal(document.getElementById('modalDetailDenah')).show();
+                })
+                .fail(function(xhr, status, error) {
                     console.error('Error fetching modal content', {
                         xhr,
                         status,
