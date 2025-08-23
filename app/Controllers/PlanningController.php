@@ -21,6 +21,7 @@ use App\Services\orderServices;
 use App\Models\MonthlyMcModel;
 use App\Models\EstimatedPlanningModel;
 use App\Models\MachinesModel;
+use App\Models\BsMesinModel;
 
 
 
@@ -42,6 +43,7 @@ class PlanningController extends BaseController
     protected $EstimatedPlanningModel;
     protected $globalModel;
     protected $machinesModel;
+    protected $bsMesinModel;
 
 
 
@@ -60,6 +62,7 @@ class PlanningController extends BaseController
         $this->globalModel = new MonthlyMcModel();
         $this->EstimatedPlanningModel = new EstimatedPlanningModel();
         $this->machinesModel = new MachinesModel();
+        $this->bsMesinModel = new BsMesinModel();
 
         $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => ['planning']] != session()->get('role')) {
@@ -822,7 +825,7 @@ class PlanningController extends BaseController
 
     public function denahMesin($area)
     {
-        $tanggal = $this->request->getGet('date') ?? '';
+        $tanggal = $this->request->getGet('date') ?? date('Y-m-d');
 
         $rawLayout = $this->machinesModel->getMachineWithProduksi($tanggal, $area);
 
@@ -907,8 +910,37 @@ class PlanningController extends BaseController
         $idprod = $this->request->getGet('idprod');
         $idaps  = $this->request->getGet('idaps');
 
-        // Model sudah fleksibel
+        if (!is_array($idprod)) {
+            $idprod = array_filter(array_map('trim', explode(',', (string)$idprod)), 'strlen');
+        }
+        if (!is_array($idaps)) {
+            $idaps = array_filter(array_map('trim', explode(',', (string)$idaps)), 'strlen');
+        }
+        if (empty($idprod) || empty($idaps)) {
+            return $this->response->setStatusCode(400)
+                ->setJSON(['error' => 'Parameter idprod dan idaps wajib diisi.']);
+        }
+
         $detail = $this->produksiModel->getDetailById($idprod, $idaps);
+
+        foreach ($detail as &$row) { // <- by reference
+            $bsMesin = $this->bsMesinModel->getBsMesinByProdandAps(
+                $row['tgl_produksi'],
+                $row['no_mesin'],
+                $row['area'],
+                $row['mastermodel'],
+                $row['size'],
+                $row['inisial']
+            );
+            if ($bsMesin) {
+                $row['bs_pcs']  = $bsMesin['qty_pcs'];
+                $row['bs_gram'] = $bsMesin['qty_gram'];
+            } else {
+                $row['bs_pcs']  = null;
+                $row['bs_gram'] = null;
+            }
+        }
+        unset($row); // good practice
 
         return $this->response->setJSON($detail);
     }

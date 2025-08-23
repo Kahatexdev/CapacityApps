@@ -372,4 +372,16 @@ class BsMesinModel extends Model
 
         return $page->getResultArray();
     }
+
+    public function getBsMesinByProdandAps($tgl,$noMc,$area,$model,$size,$inisial)
+    {
+        return $this->select('SUM(qty_pcs) AS qty_pcs, SUM(qty_gram) AS qty_gram')
+            ->where('tanggal_produksi', $tgl)
+            ->where('no_mesin', $noMc)
+            ->where('area', $area)
+            ->where('no_model', $model)
+            ->where('size', $size)
+            ->where('inisial', $inisial)
+            ->first(); // Ambil satu hasil
+    }
 }

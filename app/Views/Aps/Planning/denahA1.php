@@ -510,7 +510,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Detail Denah ()</h5>
+                <h5 class="modal-title">Detail Mesin <?= esc($details[0]['no_mesin'] ?? '') ?></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -533,10 +533,6 @@
                                                 <td><?= esc($row['tgl_produksi'] ?? '') ?></td>
                                             </tr>
                                             <tr>
-                                                <th>Qty</th>
-                                                <td><?= esc($row['qty_produksi'] ?? '') ?></td>
-                                            </tr>
-                                            <tr>
                                                 <th>No Mesin</th>
                                                 <td><?= esc($row['no_mesin'] ?? '') ?></td>
                                             </tr>
@@ -545,8 +541,28 @@
                                                 <td><?= esc($row['area'] ?? '') ?></td>
                                             </tr>
                                             <tr>
+                                                <th>PDK</th>
+                                                <td><?= esc($row['mastermodel'] ?? '') ?></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Size</th>
+                                                <td><?= esc($row['size'] ?? '') ?></td>
+                                            </tr>
+                                            <tr>
                                                 <th>Inisial</th>
                                                 <td><?= esc($row['inisial'] ?? '') ?></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Qty</th>
+                                                <td><?= esc($row['qty_produksi'] ?? '') ?></td>
+                                            </tr>
+                                            <tr>
+                                                <th>BS Pcs</th>
+                                                <td><?= number_format((float)($row['bs_pcs'] ?? 0), 2) ?></td>
+                                            </tr>
+                                            <tr>
+                                                <th>BS Gram</th>
+                                                <td><?= number_format((float)($row['bs_gram'] ?? '0'), 2) ?></td>
                                             </tr>
                                             <!-- tambahkan field lain sesuai kebutuhan -->
                                         </table>
@@ -785,10 +801,14 @@
                 <div class="accordion-body">
                   <table class="table table-sm">
                     <tr><th>Tanggal Produksi</th><td>${row.tgl_produksi || ''}</td></tr>
-                    <tr><th>Qty</th><td>${row.qty_produksi || ''}</td></tr>
                     <tr><th>No Mesin</th><td>${row.no_mesin || ''}</td></tr>
                     <tr><th>Area</th><td>${row.area || ''}</td></tr>
+                    <tr><th>PDK</th><td>${row.mastermodel || ''}</td></tr>
+                    <tr><th>Size</th><td>${row.size || ''}</td></tr>
                     <tr><th>Inisial</th><td>${row.inisial || ''}</td></tr>
+                    <tr><th>Qty</th><td>${row.qty_produksi || ''}</td></tr>
+                    <tr><th>BS Pcs</th><td>${parseFloat(row.bs_pcs || 0).toLocaleString('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td></tr>
+                    <tr><th>BS Gram</th><td>${parseFloat(row.bs_gram || 0).toLocaleString('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td></tr>
                   </table>
                 </div>
               </div>
