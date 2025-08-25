@@ -618,6 +618,172 @@ class MaterialController extends BaseController
         return view(session()->get('role') . '/Material/listPemesanan', $data);
     }
 
+    public function listPemesananCoba($area)
+    {
+        // ambil filter dari query string (jika ada)
+        $tglPakai = $this->request->getGet('tgl_pakai');
+        $pdk      = $this->request->getGet('searchPdk');
+
+        $rawList = $this->fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listPemesanan/{$area}");
+        if (!is_array($rawList)) {
+            // handle error dengan baik
+            return redirect()->back()->with('error', 'Gagal mengambil data pemesanan.');
+        }
+        // Filter RAW data dulu (mengurangi jumlah panggilan API untuk enrichment)
+        $filteredRaw = array_filter($rawList, function ($order) use ($tglPakai, $pdk) {
+            // jika kedua filter diberikan -> cari yang memenuhi KEDUA kondisi
+            if ($tglPakai && $pdk) {
+                return (isset($order['tgl_pakai']) && $order['tgl_pakai'] === $tglPakai)
+                    && (isset($order['no_model']) && stripos($order['no_model'], $pdk) !== false);
+            }
+            // jika hanya tglPakai
+            if ($tglPakai) {
+                return isset($order['tgl_pakai']) && $order['tgl_pakai'] === $tglPakai;
+            }
+            // jika hanya pdk/no_model (support partial search)
+            if ($pdk) {
+                return isset($order['no_model']) && stripos($order['no_model'], $pdk) !== false;
+            }
+            // jika tidak ada filter -> tampilkan semua
+            return true;
+        });
+
+        // reindex array
+        $dataList = array_values($filteredRaw);
+
+        foreach ($dataList as $key => $order) {
+            $dataList[$key]['ttl_kebutuhan_bb'] = 0;
+            if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
+                $styleApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model='
+                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
+                $styleList = $this->fetchApiData($styleApiUrl);
+
+                if ($styleList) {
+                    $totalRequirement = 0;
+                    foreach ($styleList as $style) {
+                        if (isset($style['no_model'], $style['style_size'], $style['gw'], $style['composition'], $style['loss'])) {
+                            $orderQty = $this->ApsPerstyleModel->getQtyOrder($style['no_model'], $style['style_size'], $area);
+                            $tambahanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getKgTambahan?no_model='
+                                . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&style_size=' . urlencode($style['style_size']) . '&area=' . $area;
+                            $tambahan = $this->fetchApiData($tambahanApiUrl);
+                            $kgPoTambahan = $tambahan['ttl_keb_potambahan'] ?? 0;
+                            log_message('info', 'inii :' . $kgPoTambahan);
+                            if (isset($orderQty['qty'])) {
+                                $requirement = ($orderQty['qty'] * $style['gw'] * ($style['composition'] / 100) * (1 + ($style['loss'] / 100)) / 1000) + $kgPoTambahan;
+                                $totalRequirement += $requirement;
+                                $dataList[$key]['qty'] = $orderQty['qty'];
+                            }
+                        }
+                    }
+                    $dataList[$key]['ttl_kebutuhan_bb'] = $totalRequirement;
+                }
+
+                $pengirimanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
+                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
+                $pengiriman = $this->fetchApiData($pengirimanApiUrl);
+                $dataList[$key]['ttl_pengiriman'] = $pengiriman['kgs_out'] ?? 0;
+
+                // Hitung sisa jatah
+                $dataList[$key]['sisa_jatah'] = $dataList[$key]['ttl_kebutuhan_bb'] - $dataList[$key]['ttl_pengiriman'];
+            }
+        }
+
+        // dd($dataList);
+
+        // ambil data libur hari kedepan untuk menentukan jadwal pemesanan
+        // ambil data libur hari kedepan untuk menentukan jadwal pemesanan
+        // $today = date('Y-m-d'); // ambil data hari ini
+        $today = '2025-09-04'; // ambil data hari ini
+        $dataLibur = $this->liburModel->getDataLiburForPemesanan($today);
+        // Ambil data tanggal libur menjadi array sederhana
+        $liburDates = array_column($dataLibur, 'tanggal'); // Ambil hanya kolom 'tanggal'
+
+        $day   = date('l', strtotime($today)); // ambil nama hari dari $today
+
+        function getNextNonHoliday($date, $liburDates)
+        {
+            while (in_array($date, $liburDates)) {
+                // Jika tanggal ada di daftar libur, tambahkan 1 hari
+                $date = date('Y-m-d', strtotime($date . ' +1 day'));
+            }
+            return $date;
+        }
+
+        // get range berdasarkan hari
+        $masterRangeApiUrl = 'http://172.23.39.118/MaterialSystem/public/api/getMasterRangePemesanan?day=' . urlencode($day) . '&area=' . urlencode($area);
+        // $masterRangeApiUrl = 'http://172.23.39.118/MaterialSystem/public/api/getMasterRangePemesanan?day=Thursday&area=' . urlencode($area);
+        $masterRangePemesanan = $this->fetchApiData($masterRangeApiUrl);
+
+        // Simpan hasil
+        $result = [
+            'benang'  => [],
+            'nylon'   => [],
+            'spandex' => [],
+            'karet'   => [],
+        ];
+
+        // Jam awal
+        $startTime = "08:30:00";
+        // Helper untuk generate jadwal
+        function generateRangeDates($today, $range, $liburDates, $startTime, $initialOffset = 1)
+        {
+            $result = [];
+            $currentDate = $today;
+
+            for ($i = 1; $i <= $range; $i++) {
+                // kalau loop pertama pakai initialOffset (bisa 1 atau 2)
+                // setelah itu selalu pakai offset 1
+                $offset = ($i === 1) ? $initialOffset : 1;
+
+                for ($j = 0; $j < $offset; $j++) {
+                    $currentDate = date('Y-m-d', strtotime($currentDate . " +1 day"));
+                    $currentDate = getNextNonHoliday($currentDate, $liburDates);
+                }
+
+                // waktu pemesanan bertambah 30 menit tiap looping
+                $time = date("H:i:s", strtotime($startTime . " +" . ($i - 1) * 30 . " minutes"));
+
+                $result[] = [
+                    'tgl_pakai'   => $currentDate,
+                    'batas_waktu' => $time
+                ];
+            }
+
+
+            return $result;
+        }
+
+        $result['benang']  = generateRangeDates($today, (int)$masterRangePemesanan['range_benang'], $liburDates, $startTime, 1);
+        $result['nylon']   = generateRangeDates($today, (int)$masterRangePemesanan['range_nylon'], $liburDates, $startTime, 1);
+        $result['spandex'] = generateRangeDates($today, (int)$masterRangePemesanan['range_spandex'], $liburDates, $startTime, 2);
+        $result['karet']   = generateRangeDates($today, (int)$masterRangePemesanan['range_karet'], $liburDates, $startTime, 2);
+
+
+        // Debug
+        dd($result);
+
+        $initial = date('Y-m-d', strtotime('+1 day')); // Mulai dari hari besok
+
+        $data = [
+            'role' => session()->get('role'),
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => 'active',
+            'active7' => '',
+            'area' => $area,
+            'title' => 'Bahan Baku',
+            'dataList' => $dataList,
+            'day' => $day,
+            'filter_tgl' => $tglPakai,
+            'filter_pdk' => $pdk,
+        ];
+
+        return view(session()->get('role') . '/Material/listPemesanan_coba', $data);
+    }
+
     public function stockBahanBaku($area)
     {
         $data = [
