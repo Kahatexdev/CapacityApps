@@ -172,7 +172,7 @@
 
                                             if ($id['sisa_jatah'] > 0) {
                                                 if ($ttl_kg_pesan <= $id['sisa_jatah']) {
-                                                    // Aturan berdasarkan hari dan jenis produk:
+                                                    // Aturan berdasarkan hari dan jenis produk libur total minggu
                                                     $rules = [
                                                         'Thursday' => [
                                                             'BENANG'  => [$tomorrow => '23:30:00'],
