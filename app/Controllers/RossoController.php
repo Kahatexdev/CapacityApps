@@ -486,6 +486,150 @@ class RossoController extends BaseController
 
         return view(session()->get('role') . '/listPemesanan', $data);
     }
+    public function listPemesananCoba($area)
+    {
+        function fetchApiData($url)
+        {
+            try {
+                $response = file_get_contents($url);
+                if ($response === false) {
+                    throw new \Exception("Error fetching data from $url");
+                }
+                $data = json_decode($response, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new \Exception("Invalid JSON response from $url");
+                }
+                return $data;
+            } catch (\Exception $e) {
+                error_log($e->getMessage());
+                return null;
+            }
+        }
+
+        $dataList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listPemesanan/$area");
+        if (!is_array($dataList)) {
+            die('Error: Invalid response format for listPemesanan API.');
+        }
+
+        foreach ($dataList as $key => $order) {
+            $dataList[$key]['ttl_kebutuhan_bb'] = 0;
+            if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
+                $styleApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model='
+                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
+                $styleList = fetchApiData($styleApiUrl);
+
+                if ($styleList) {
+                    $totalRequirement = 0;
+                    $totalKgs = 0;
+                    foreach ($styleList as $style) {
+                        if (isset($style['no_model'], $style['style_size'])) {
+                            $requirement = $style['kgs'];
+                            $totalRequirement += $requirement;
+                        }
+                    }
+                    $dataList[$key]['ttl_kebutuhan_bb'] = $totalRequirement;
+                }
+
+                $pengirimanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
+                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
+                $pengiriman = fetchApiData($pengirimanApiUrl);
+                $dataList[$key]['ttl_pengiriman'] = $pengiriman['kgs_out'] ?? 0;
+
+                // Hitung sisa jatah
+                $dataList[$key]['sisa_jatah'] = $dataList[$key]['ttl_kebutuhan_bb'] - $dataList[$key]['ttl_pengiriman'];
+            }
+        }
+
+        // dd($dataList);
+
+        // ambil data libur hari kedepan untuk menentukan jadwal pemesanan
+        $today = date('Y-m-d'); // ambil data hari ini
+        $dataLibur = $this->liburModel->getDataLiburForPemesanan($today);
+        // Ambil data tanggal libur menjadi array sederhana
+        $liburDates = array_column($dataLibur, 'tanggal'); // Ambil hanya kolom 'tanggal'
+
+        $day = date('l'); // ambil data hari ini
+        function getNextNonHoliday($date, $liburDates)
+        {
+            while (in_array($date, $liburDates)) {
+                // Jika tanggal ada di daftar libur, tambahkan 1 hari
+                $date = date('Y-m-d', strtotime($date . ' +1 day'));
+            }
+            return $date;
+        }
+
+        // Fetch master range
+        $masterRangeApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getMasterRangePemesanan?day='
+            . urlencode($day) . '&area=' . urlencode($area);
+
+        $masterRangePemesanan = fetchApiData($masterRangeApiUrl);
+
+        // Simpan hasil
+        $result = [
+            'benang'  => [],
+            'nylon'   => [],
+            'spandex' => [],
+            'karet'   => [],
+        ];
+
+        // Jam awal
+        $startTime = "23:30:00";
+        // Helper untuk generate jadwal
+        function generateRangeDates($today, $range, $liburDates, $startTime, $initialOffset = 1)
+        {
+            $result = [];
+            $currentDate = $today;
+
+            for ($i = 1; $i <= $range; $i++) {
+                // kalau loop pertama pakai initialOffset (bisa 1 atau 2)
+                // setelah itu selalu pakai offset 1
+                $offset = ($i === 1) ? $initialOffset : 1;
+
+                for ($j = 0; $j < $offset; $j++) {
+                    $currentDate = date('Y-m-d', strtotime($currentDate . " +1 day"));
+                    $currentDate = getNextNonHoliday($currentDate, $liburDates);
+                }
+
+                // waktu pemesanan bertambah 30 menit tiap looping
+                $time = date("H:i:s", strtotime($startTime . " +" . ($i - 1) * 30 . " minutes"));
+
+                $result[] = [
+                    'tgl_pakai'   => $currentDate,
+                    'batas_waktu' => $time
+                ];
+            }
+
+
+            return $result;
+        }
+
+        // Spandex & Karet → cek apakah hari ini Jumat atau Sabtu
+        $initialOffsetSpandex = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
+        $initialOffsetKaret   = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
+
+        $result['benang']  = generateRangeDates($today, (int)$masterRangePemesanan['range_benang'], $liburDates, $startTime, 1);
+        $result['nylon']   = generateRangeDates($today, (int)$masterRangePemesanan['range_nylon'], $liburDates, $startTime, 1);
+        $result['spandex'] = generateRangeDates($today, (int)$masterRangePemesanan['range_spandex'], $liburDates, $startTime, $initialOffsetSpandex);
+        $result['karet']   = generateRangeDates($today, (int)$masterRangePemesanan['range_karet'], $liburDates, $startTime, $initialOffsetKaret);
+
+        $data = [
+            'role' => session()->get('role'),
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => 'active',
+            'active7' => '',
+            'area' => $area,
+            'title' => 'Bahan Baku',
+            'dataList' => $dataList,
+            'day' => $day,
+            'result' => $result,
+        ];
+
+        return view(session()->get('role') . '/listPemesanan_coba', $data);
+    }
     public function getTanggalPakai()
     {
         $jenis = $this->request->getPost('jenis');

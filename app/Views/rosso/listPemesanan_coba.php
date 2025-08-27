@@ -1,141 +1,90 @@
-<?php $this->extend('user/layout'); ?>
+<?php $this->extend('rosso/layout'); ?>
 <?php $this->section('content'); ?>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
-<?php if (session()->getFlashdata('success')) : ?>
-    <script>
-        $(document).ready(function() {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: '<?= session()->getFlashdata('success') ?>',
+<div class="container-fluid py-4">
+    <?php if (session()->getFlashdata('success')) : ?>
+        <script>
+            $(document).ready(function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '<?= session()->getFlashdata('success') ?>',
+                });
             });
-        });
-    </script>
-<?php endif; ?>
+        </script>
+    <?php endif; ?>
 
-<?php if (session()->getFlashdata('error')) : ?>
-    <script>
-        $(document).ready(function() {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: '<?= session()->getFlashdata('error') ?>',
+    <?php if (session()->getFlashdata('error')) : ?>
+        <script>
+            $(document).ready(function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: '<?= session()->getFlashdata('error') ?>',
+                });
             });
-        });
-    </script>
-<?php endif; ?>
-<div class="row my-4">
-    <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
-        <div class="card">
-            <div class="card-body p-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="col-5">
-                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
-                        <h5 class="font-weight-bolder mb-0">
-                            List Pemesanan Bahan Baku <?= esc($area) ?>
-                        </h5>
-                    </div>
+        </script>
+    <?php endif; ?>
+    <div class="row my-4">
+        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between">
+                        <div class="numbers">
+                            <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
+                            <h5 class="font-weight-bolder mb-0">
+                                List Pemesanan Bahan Baku <?= $area ?>
+                            </h5>
+                        </div>
+                        <div>
+                            <button class="btn btn-info requestTimeButton" data-bs-toggle="modal" data-bs-target="#requestTimeModal">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="15">
+                                    <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com -->
+                                    <path d="M432 304c0 114.9-93.1 208-208 208S16 418.9 16 304c0-104 76.3-190.2 176-205.5V64h-28c-6.6 0-12-5.4-12-12V12c0-6.6 5.4-12 12-12h120c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-28v34.5c37.5 5.8 71.7 21.6 99.7 44.6l27.5-27.5c4.7-4.7 12.3-4.7 17 0l28.3 28.3c4.7 4.7 4.7 12.3 0 17l-29.4 29.4-.6 .6C419.7 223.3 432 262.2 432 304z" fill="#ffffff" />
 
-                    <div class="col-7 d-flex justify-content-end align-items-center">
-                        <form
-                            id="filterForm"
-                            class="row g-2 align-items-center me-3"
-                            method="get"
-                            action="<?= esc(base_url(esc($role) . '/listPemesanan/' . esc($area))) ?>"
-                            role="search">
-                            <div class="col-auto">
-                                <label for="dateInput" class="form-label mb-0 small">Tanggal Pakai</label>
-                                <input
-                                    type="date"
-                                    class="form-control"
-                                    id="dateInput"
-                                    name="tgl_pakai"
-                                    value="<?= esc($filter_tgl ?? date('Y-m-d')) ?>">
-                            </div>
+                                    <!-- Tanda plus putih besar dan sedikit turun -->
+                                    <line x1="224" y1="244" x2="224" y2="364" stroke="#17c1e8" stroke-width="50" stroke-linecap="round" />
+                                    <line x1="164" y1="304" x2="284" y2="304" stroke="#17c1e8" stroke-width="50" stroke-linecap="round" />
+                                </svg> Waktu
+                            </button>
+                            <!-- Modal Additional Time -->
+                            <div class="modal fade" id="requestTimeModal" tabindex="-1" aria-labelledby="requestTimeModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="requestTimeModalLabel">Pilih Jenis Benang</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <!-- Konten modal, misalnya formulir -->
+                                            <form action="<?= base_url($role . '/requestAdditionalTime') ?>" method="post">
+                                                <div class="mb-3">
+                                                    <select name="jenis" id="jenisBenang" class="form-select" required>
+                                                        <option value="">Pilih Jenis Benang</option>
+                                                        <option value="NYLON">NYLON</option>
+                                                    </select>
+                                                </div>
 
-                            <div class="col-auto">
-                                <label for="searchInput" class="form-label mb-0 small">PDK/No Model</label>
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="searchInput"
-                                    name="searchPdk"
-                                    placeholder="Search..."
-                                    value="<?= esc($filter_pdk ?? old('searchPdk')) ?>">
-                            </div>
-
-                            <div class="col-auto">
-                                <button type="submit" class="btn bg-gradient-info" aria-label="Filter">
-                                    <i class="fas fa-filter"></i> Filter
-                                </button>
-                            </div>
-                        </form>
-
-                        <button
-                            class="btn btn-info requestTimeButton"
-                            data-bs-toggle="modal"
-                            data-bs-target="#requestTimeModal"
-                            aria-controls="requestTimeModal"
-                            aria-expanded="false"
-                            type="button">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="15" aria-hidden="true" focusable="false">
-                                <!-- Font Awesome clock + custom plus -->
-                                <path d="M432 304c0 114.9-93.1 208-208 208S16 418.9 16 304c0-104 76.3-190.2 176-205.5V64h-28c-6.6 0-12-5.4-12-12V12c0-6.6 5.4-12 12-12h120c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-28v34.5c37.5 5.8 71.7 21.6 99.7 44.6l27.5-27.5c4.7-4.7 12.3-4.7 17 0l28.3 28.3c4.7 4.7 4.7 12.3 0 17l-29.4 29.4-.6 .6C419.7 223.3 432 262.2 432 304z" fill="#ffffff" />
-                                <line x1="224" y1="244" x2="224" y2="364" stroke="#17c1e8" stroke-width="50" stroke-linecap="round" />
-                                <line x1="164" y1="304" x2="284" y2="304" stroke="#17c1e8" stroke-width="50" stroke-linecap="round" />
-                            </svg>
-                            Waktu
-                        </button>
-
-                        <!-- Modal Additional Time (Bootstrap) -->
-                        <div class="modal fade" id="requestTimeModal" tabindex="-1" aria-labelledby="requestTimeModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="requestTimeModalLabel">Pilih Jenis Benang</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-
-                                    <div class="modal-body">
-                                        <form action="<?= esc(base_url(esc($role) . '/requestAdditionalTime')) ?>" method="post">
-                                            <div class="mb-3">
-                                                <select name="jenis" id="jenisBenang" class="form-select" required>
-                                                    <option value="">Pilih Jenis Benang</option>
-                                                    <option value="BENANG">BENANG</option>
-                                                    <option value="NYLON">NYLON</option>
-                                                    <option value="KARET">KARET</option>
-                                                    <option value="SPANDEX">SPANDEX</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="mb-3" id="tglPakai">
-                                                <!-- Konten tgl pakai dinamis (JS) -->
-                                            </div>
-                                            <div class="row g-2">
-                                                <div class="col-6">
+                                                <div class="mb-3" id="tglPakai">
+                                                    <!-- Konten tgl pakai dinamis (JS) -->
+                                                </div>
+                                                <div class="row g-2">
                                                     <button type="submit" class="btn btn-info w-100">Pilih</button>
                                                 </div>
-                                                <div class="col-6">
-                                                    <button type="reset" class="btn btn-warning w-100">Reset</button>
-                                                </div>
-                                            </div>
-                                        </form>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                            <!-- End Modal Additional Time -->
                         </div>
-                        <!-- End Modal -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-
-<div class="row my-4">
-    <div class="col-12">
+    <div class="row my-4">
         <div class="card">
             <div class="card-body p-3">
                 <div class="card-body">
@@ -211,6 +160,7 @@
                                         </td>
                                         <td class="text-xs">
                                             <?php
+                                            $show = "d-none";
                                             $show = "d-none";
                                             // $batasWaktu = '08:30:00';
                                             $batasWaktu = '23:30:00';
@@ -393,7 +343,7 @@
         //     $('.requestTimeButton').hide();
         // }
 
-        // // GET TGL PAKAI ADDITIONAL TIME
+        // GET TGL PAKAI ADDITIONAL TIME
         // $('#jenisBenang').on('change', function() {
         //     var jenis = $(this).val(); // Dapatkan nilai pilihan
         //     var tomorrow = $('#tomorrow').val();
@@ -426,7 +376,6 @@
         //         $('#tglPakai').html('');
         //     }
         // });
-        // lempar PHP array -> JS
         const result = <?= json_encode($result) ?>;
 
         const jenisSelect = document.getElementById('jenisBenang');
@@ -502,19 +451,8 @@
         // FILTER TABLE
         $('#example').DataTable({
             "order": [
-                [1, 'asc'], // Kolom kedua (tgl_pakai) diurutkan ascending
-                [2, 'asc'] // Kolom ketiga (no_model) diurutkan ascending
-            ],
-            "columnDefs": [{
-                    "orderable": true,
-                    "targets": [1, 2]
-                }, // Hanya kolom 2 dan 3 bisa sort
-                {
-                    "orderable": false,
-                    "targets": "_all"
-                } // Kolom lain disable sort
-            ],
-            "searching": false // Disable search/filter
+                [0, 'asc'] // Kolom pertama (indeks 0) diurutkan secara descending
+            ]
         });
         // END FILTER TABLE
 
@@ -546,7 +484,7 @@
                 },
                 dataType: 'json',
                 success: function(response) {
-                    console.log('Response:', response); // Debug response dari server
+                    // console.log('Response:', response); // Debug response dari server
                     if (response.status === 'success') {
                         // Ambil semua nilai lot dari response.data
                         let lotValues = response.data.map(item => item.lot);
@@ -576,7 +514,7 @@
                         let sisaCns = 0; // Total jalan_mc
 
                         response.data.forEach(function(item, index) {
-                            console.log(response);
+                            // console.log(response);
                             const jalanMc = parseFloat(item.jl_mc) || 0;
                             const totalCones = jalanMc * item.qty_cns;
                             const totalBeratCones = totalCones * item.qty_berat_cns;
@@ -756,10 +694,8 @@
                             timer: 1500, // 2 detik
                             timerProgressBar: true
                         }).then(() => {
-                            // Redirect ke halaman yang diinginkan dengan filter
-                            const tglPakai = new URLSearchParams(window.location.search).get('tgl_pakai') || '';
-                            const searchPdk = new URLSearchParams(window.location.search).get('searchPdk') || '';
-                            // window.location.href = `${BASE_URL}user/listPemesanan/${area}?tgl_pakai=${tglPakai}&searchPdk=${searchPdk}`;
+                            // Redirect ke halaman yang diinginkan
+                            window.location.href = `${BASE_URL}rosso/listPemesanan/${area}`; // Halaman tujuan setelah sukses
                         });
                     } else {
                         Swal.fire({
@@ -768,9 +704,7 @@
                             text: resData.message || 'Gagal menyimpan data',
                         }).then(() => {
                             // Redirect ke halaman yang diinginkan
-                            const tglPakai = new URLSearchParams(window.location.search).get('tgl_pakai') || '';
-                            const searchPdk = new URLSearchParams(window.location.search).get('searchPdk') || '';
-                            // window.location.href = `${BASE_URL}user/listPemesanan/${area}?tgl_pakai=${tglPakai}&searchPdk=${searchPdk}`;
+                            window.location.href = `${BASE_URL}rosso/listPemesanan/${area}`; // Halaman tujuan setelah sukses
                         });
                         console.error('Response Data:', resData);
                     }
@@ -845,12 +779,8 @@
                                 text: result.message,
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    // Refresh halaman setelah tombol OK ditekan dengan membawa parameter filter
-                                    const tglPakai = new URLSearchParams(window.location.search).get('tgl_pakai') || '';
-                                    const searchPdk = new URLSearchParams(window.location.search).get('searchPdk') || '';
-                                    const BASE_URL = "<?= base_url(); ?>";
-                                    const area = button.getAttribute("data-area");
-                                    window.location.href = `${BASE_URL}user/listPemesanan/${area}?tgl_pakai=${tglPakai}&searchPdk=${searchPdk}`;
+                                    // Refresh halaman setelah tombol OK ditekan
+                                    location.reload();
                                 }
                             });
                         } else {
@@ -860,12 +790,8 @@
                                 text: 'result.message',
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    // Refresh halaman setelah tombol OK ditekan dengan membawa parameter filter
-                                    const tglPakai = new URLSearchParams(window.location.search).get('tgl_pakai') || '';
-                                    const searchPdk = new URLSearchParams(window.location.search).get('searchPdk') || '';
-                                    const BASE_URL = "<?= base_url(); ?>";
-                                    const area = button.getAttribute("data-area");
-                                    window.location.href = `${BASE_URL}user/listPemesanan/${area}?tgl_pakai=${tglPakai}&searchPdk=${searchPdk}`;
+                                    // Refresh halaman setelah tombol OK ditekan
+                                    location.reload();
                                 }
                             });
                         }

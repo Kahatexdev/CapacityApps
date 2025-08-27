@@ -690,7 +690,7 @@ class MaterialController extends BaseController
 
         // ambil data libur hari kedepan untuk menentukan jadwal pemesanan
         $today = date('Y-m-d'); // ambil data hari ini
-        // $today = '2025-09-06'; // ambil data hari ini
+        // $today = '2025-09-04'; // ambil data hari ini
         $dataLibur = $this->liburModel->getDataLiburForPemesanan($today);
         // Ambil data tanggal libur menjadi array sederhana
         $liburDates = array_column($dataLibur, 'tanggal'); // Ambil hanya kolom 'tanggal'

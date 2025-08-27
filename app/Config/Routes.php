@@ -1013,7 +1013,8 @@ $routes->group(
         $routes->get('getMU/(:any)/(:any)/(:any)/(:any)', 'RossoController::getMU/$1/$2/$3/$4');
         $routes->post('bahanBaku/simpanKeSession', 'RossoController::savePemesananSession');
         $routes->post('bahanBaku/hapusSession', 'RossoController::deletePemesananSession');
-        $routes->get('listPemesanan/(:any)', 'RossoController::listPemesanan/$1');
+        // $routes->get('listPemesanan/(:any)', 'RossoController::listPemesanan/$1');
+        $routes->get('listPemesanan/(:any)', 'RossoController::listPemesananCoba/$1');
         $routes->post('requestAdditionalTime', 'MaterialController::requestAdditionalTime');
         $routes->post('requestAdditionalTime/getTanggalPakai', 'RossoController::getTanggalPakai');
         $routes->get('report_pemesanan/(:any)', 'RossoController::reportPemesanan/$1');
