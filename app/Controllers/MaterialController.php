@@ -688,12 +688,9 @@ class MaterialController extends BaseController
             }
         }
 
-        // dd($dataList);
-
         // ambil data libur hari kedepan untuk menentukan jadwal pemesanan
-        // ambil data libur hari kedepan untuk menentukan jadwal pemesanan
-        // $today = date('Y-m-d'); // ambil data hari ini
-        $today = '2025-09-04'; // ambil data hari ini
+        $today = date('Y-m-d'); // ambil data hari ini
+        // $today = '2025-09-04'; // ambil data hari ini
         $dataLibur = $this->liburModel->getDataLiburForPemesanan($today);
         // Ambil data tanggal libur menjadi array sederhana
         $liburDates = array_column($dataLibur, 'tanggal'); // Ambil hanya kolom 'tanggal'
@@ -710,8 +707,8 @@ class MaterialController extends BaseController
         }
 
         // get range berdasarkan hari
-        $masterRangeApiUrl = 'http://172.23.39.118/MaterialSystem/public/api/getMasterRangePemesanan?day=' . urlencode($day) . '&area=' . urlencode($area);
-        // $masterRangeApiUrl = 'http://172.23.39.118/MaterialSystem/public/api/getMasterRangePemesanan?day=Thursday&area=' . urlencode($area);
+        $masterRangeApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getMasterRangePemesanan?day=' . urlencode($day) . '&area=' . urlencode($area);
+        // $masterRangeApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getMasterRangePemesanan?day=Thursday&area=' . urlencode($area);
         $masterRangePemesanan = $this->fetchApiData($masterRangeApiUrl);
 
         // Simpan hasil
@@ -723,7 +720,7 @@ class MaterialController extends BaseController
         ];
 
         // Jam awal
-        $startTime = "08:30:00";
+        $startTime = "23:30:00";
         // Helper untuk generate jadwal
         function generateRangeDates($today, $range, $liburDates, $startTime, $initialOffset = 1)
         {
@@ -753,16 +750,14 @@ class MaterialController extends BaseController
             return $result;
         }
 
+        // Spandex & Karet → cek apakah hari ini Jumat atau Sabtu
+        $initialOffsetSpandex = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
+        $initialOffsetKaret   = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
+
         $result['benang']  = generateRangeDates($today, (int)$masterRangePemesanan['range_benang'], $liburDates, $startTime, 1);
         $result['nylon']   = generateRangeDates($today, (int)$masterRangePemesanan['range_nylon'], $liburDates, $startTime, 1);
-        $result['spandex'] = generateRangeDates($today, (int)$masterRangePemesanan['range_spandex'], $liburDates, $startTime, 2);
-        $result['karet']   = generateRangeDates($today, (int)$masterRangePemesanan['range_karet'], $liburDates, $startTime, 2);
-
-
-        // Debug
-        dd($result);
-
-        $initial = date('Y-m-d', strtotime('+1 day')); // Mulai dari hari besok
+        $result['spandex'] = generateRangeDates($today, (int)$masterRangePemesanan['range_spandex'], $liburDates, $startTime, $initialOffsetSpandex);
+        $result['karet']   = generateRangeDates($today, (int)$masterRangePemesanan['range_karet'], $liburDates, $startTime, $initialOffsetKaret);
 
         $data = [
             'role' => session()->get('role'),
@@ -779,6 +774,7 @@ class MaterialController extends BaseController
             'day' => $day,
             'filter_tgl' => $tglPakai,
             'filter_pdk' => $pdk,
+            'result' => $result,
         ];
 
         return view(session()->get('role') . '/Material/listPemesanan_coba', $data);

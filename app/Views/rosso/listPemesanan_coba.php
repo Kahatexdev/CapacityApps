@@ -58,25 +58,18 @@
                                         <div class="modal-body">
                                             <!-- Konten modal, misalnya formulir -->
                                             <form action="<?= base_url($role . '/requestAdditionalTime') ?>" method="post">
-                                                <input type="hidden" name="area" value="<?= $area ?>">
-                                                <input type="hidden" name="tomorrow" id="tomorrow" value="<?= $tomorrow ?>">
-                                                <input type="hidden" name="twoDays" id="twoDays" value="<?= $twoDays ?>">
-                                                <input type="hidden" name="threeDays" id="threeDays" value="<?= $threeDays ?>">
-                                                <input type="hidden" name="day" id="day" value="<?= $day ?>">
                                                 <div class="mb-3">
                                                     <select name="jenis" id="jenisBenang" class="form-select" required>
                                                         <option value="">Pilih Jenis Benang</option>
-                                                        <!-- <option value="BENANG">BENANG</option> -->
                                                         <option value="NYLON">NYLON</option>
-                                                        <!-- <option value="KARET">KARET</option> -->
-                                                        <!-- <option value="SPANDEX">SPANDEX</option> -->
                                                     </select>
                                                 </div>
-                                                <div class="mb-3" id="tglPakai">
 
+                                                <div class="mb-3" id="tglPakai">
+                                                    <!-- Konten tgl pakai dinamis (JS) -->
                                                 </div>
-                                                <div class="d-grid">
-                                                    <button type="submit" class="btn btn-info">Pilih</button>
+                                                <div class="row g-2">
+                                                    <button type="submit" class="btn btn-info w-100">Pilih</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -168,49 +161,26 @@
                                         <td class="text-xs">
                                             <?php
                                             $show = "d-none";
-                                            $batasWaktu = '08:30:00';
+                                            $show = "d-none";
+                                            // $batasWaktu = '08:30:00';
+                                            $batasWaktu = '23:30:00';
 
                                             if ($id['sisa_jatah'] > 0) {
                                                 if ($ttl_kg_pesan <= $id['sisa_jatah']) {
-                                                    // Aturan berdasarkan hari dan jenis produk libur total minggu
-                                                    $rules = [
-                                                        'Thursday' => [
-                                                            'BENANG'  => [$tomorrow => '23:30:00'],
-                                                            'NYLON'   => [$tomorrow => '23:30:00'],
-                                                            'SPANDEX' => [$twoDays  => '23:30:00', $threeDays => '24:00:00'],
-                                                            'KARET'   => [$twoDays  => '23:30:00', $threeDays => '24:00:00']
-                                                        ],
-                                                        'Friday' => [
-                                                            'BENANG'  => [$tomorrow => '23:30:00', $twoDays => '24:00:00'],
-                                                            'NYLON'   => [$tomorrow => '23:30:00'],
-                                                            'SPANDEX' => [$threeDays => '23:30:00'],
-                                                            'KARET'   => [$threeDays => '23:30:00']
-                                                        ],
-                                                        'Saturday' => [
-                                                            'BENANG'  => [$twoDays  => '23:30:00'],
-                                                            'NYLON'   => [$tomorrow => '23:30:00', $twoDays  => '24:00:00'],
-                                                            'SPANDEX' => [$threeDays => '23:30:00'],
-                                                            'KARET'   => [$threeDays => '23:30:00']
-                                                        ],
-                                                        'default' => [
-                                                            'BENANG'  => [$tomorrow => '23:30:00'],
-                                                            'NYLON'   => [$tomorrow => '23:30:00'],
-                                                            'SPANDEX' => [$twoDays  => '23:30:00'],
-                                                            'KARET'   => [$twoDays  => '23:30:00']
-                                                        ]
-                                                    ];
+                                                    // ambil jenis dalam huruf kecil: benang, nylon, spandex, karet
+                                                    $jenis = strtolower($id['jenis']);
 
-                                                    $currentRules = isset($rules[$day]) ? $rules[$day] : $rules['default'];
-
-                                                    if (isset($currentRules[$id['jenis']])) {
-                                                        foreach ($currentRules[$id['jenis']] as $tgl => $waktu) {
-                                                            if ($id['tgl_pakai'] == $tgl) {
+                                                    // cek di $result
+                                                    if (isset($result[$jenis])) {
+                                                        foreach ($result[$jenis] as $row) {
+                                                            // kalau tgl_pakai cocok
+                                                            if ($id['tgl_pakai'] == $row['tgl_pakai']) {
                                                                 $show = "";
 
                                                                 if ($id['status_kirim'] === 'request accept') {
-                                                                    $batasWaktu = $id['additional_time'];
+                                                                    $batasWaktu = $id['additional_time']; // override kalau request accept
                                                                 } else {
-                                                                    $batasWaktu = $waktu;
+                                                                    $batasWaktu = $row['batas_waktu'];
                                                                 }
                                                                 break;
                                                             }
@@ -374,36 +344,67 @@
         // }
 
         // GET TGL PAKAI ADDITIONAL TIME
-        $('#jenisBenang').on('change', function() {
-            var jenis = $(this).val(); // Dapatkan nilai pilihan
-            var tomorrow = $('#tomorrow').val();
-            var twoDays = $('#twoDays').val();
-            var threeDays = $('#threeDays').val();
-            var day = $('#day').val();
-            if (jenis) {
-                // Lakukan AJAX request
-                $.ajax({
-                    url: "<?= base_url($role . '/requestAdditionalTime/getTanggalPakai') ?>", // Endpoint untuk data
-                    type: "POST",
-                    data: {
-                        jenis: jenis,
-                        tomorrow: tomorrow,
-                        twoDays: twoDays,
-                        threeDays: threeDays,
-                        day: day
+        // $('#jenisBenang').on('change', function() {
+        //     var jenis = $(this).val(); // Dapatkan nilai pilihan
+        //     var tomorrow = $('#tomorrow').val();
+        //     var twoDays = $('#twoDays').val();
+        //     var threeDays = $('#threeDays').val();
+        //     var day = $('#day').val();
+        //     if (jenis) {
+        //         // Lakukan AJAX request
+        //         $.ajax({
+        //             url: "<?= base_url($role . '/requestAdditionalTime/getTanggalPakai') ?>", // Endpoint untuk data
+        //             type: "POST",
+        //             data: {
+        //                 jenis: jenis,
+        //                 tomorrow: tomorrow,
+        //                 twoDays: twoDays,
+        //                 threeDays: threeDays,
+        //                 day: day
 
-                    },
-                    success: function(response) {
-                        // Tampilkan response di elemen #tglPakai
-                        $('#tglPakai').html(response);
-                    },
-                    error: function() {
-                        alert('Terjadi kesalahan saat memuat data.');
-                    }
+        //             },
+        //             success: function(response) {
+        //                 // Tampilkan response di elemen #tglPakai
+        //                 $('#tglPakai').html(response);
+        //             },
+        //             error: function() {
+        //                 alert('Terjadi kesalahan saat memuat data.');
+        //             }
+        //         });
+        //     } else {
+        //         // Kosongkan elemen jika tidak ada pilihan
+        //         $('#tglPakai').html('');
+        //     }
+        // });
+        const result = <?= json_encode($result) ?>;
+
+        const jenisSelect = document.getElementById('jenisBenang');
+        const tglWrapper = document.getElementById('tglPakai'); // div kosong
+
+        jenisSelect.addEventListener('change', function() {
+            const jenis = this.value.toLowerCase();
+            tglWrapper.innerHTML = ''; // kosongkan dulu
+
+            if (result[jenis]) {
+                const select = document.createElement('select');
+                select.name = 'tgl_pakai';
+                select.id = 'tglPakaiSelect';
+                select.classList.add('form-select');
+                select.required = true;
+
+                const defaultOpt = document.createElement('option');
+                defaultOpt.value = '';
+                defaultOpt.textContent = 'Pilih Tanggal Pemakaian';
+                select.appendChild(defaultOpt);
+
+                result[jenis].forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item.tgl_pakai;
+                    opt.textContent = `${item.tgl_pakai}`;
+                    select.appendChild(opt);
                 });
-            } else {
-                // Kosongkan elemen jika tidak ada pilihan
-                $('#tglPakai').html('');
+
+                tglWrapper.appendChild(select);
             }
         });
         // END GET TGL PAKAI ADDITIONAL TIME
