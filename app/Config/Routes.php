@@ -104,7 +104,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('belumImport', 'OrderController::belumImport');
     $routes->get('dataorderperjarum/(:any)', 'OrderController::DetailOrderPerJarum/$1');
     $routes->get('dataorderperjarumbln/(:any)', 'OrderController::DetailOrderPerJarumBln/$1');
-    $routes->get('dataorderperjarumblndetail/(:any)/(:any)/(:any)', 'OrderController::DetailOrderPerJarumBlnDetail/$1/$2/$3');
+    $routes->get('dataorderperjarumblndetail/(:any)/(:any)/(:any)', 'OrderController::orderPerMonth/$1/$2/$3');
     $routes->post('updatedetailorder/(:any)', 'OrderController::updateorder/$1');
     $routes->post('updatedetailjarum/(:any)', 'OrderController::updateorderjarum/$1');
     $routes->post('deletedetailstyle/(:any)', 'OrderController::deletedetailstyle/$1');
@@ -836,7 +836,7 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('belumImport', 'OrderController::belumImport');
     $routes->get('dataorderperjarum/(:any)', 'OrderController::DetailOrderPerJarum/$1');
     $routes->get('dataorderperjarumbln/(:any)', 'OrderController::DetailOrderPerJarumBln/$1');
-    $routes->get('dataorderperjarumblndetail/(:any)/(:any)/(:any)', 'OrderController::DetailOrderPerJarumBlnDetail/$1/$2/$3');
+    $routes->get('dataorderperjarumblndetail/(:any)/(:any)/(:any)', 'OrderController::orderPerMonth/$1/$2/$3');
     $routes->post('updatedetailorder/(:any)', 'OrderController::updateorder/$1');
     $routes->post('updatedetailjarum/(:any)', 'OrderController::updateorderjarum/$1');
     $routes->post('deletedetailstyle/(:any)', 'OrderController::deletedetailstyle/$1');

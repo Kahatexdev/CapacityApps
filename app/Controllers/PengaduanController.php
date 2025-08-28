@@ -6,9 +6,20 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\API\ResponseTrait;
+use App\Models\PengaduanReply;
+use App\Models\PengaduanModel;
 
 class PengaduanController extends BaseController
 {
+    protected $replyModel;
+    protected $pengaduanModel;
+
+    public function __construct()
+    {
+        $this->pengaduanModel = new PengaduanModel();
+
+        $this->replyModel = new PengaduanReply();
+    }
 
     public function index()
     {
@@ -16,9 +27,10 @@ class PengaduanController extends BaseController
         $username = session()->get('username');
         $role     = session()->get('role');
         $week = date('Y-m-d', strtotime('-7 days'));
+
         $pengaduan = $this->pengaduanModel->getPengaduan($username, $role);
         $this->pengaduanModel->deleteAduanLama($week);
-        $this->pengaduanModel->deleteReplyLama($week);
+        $this->replyModel->deleteReplyLama($week);
         // Ambil semua reply per pengaduan
         $reply = [];
         foreach ($pengaduan as $p) {
@@ -125,7 +137,7 @@ class PengaduanController extends BaseController
         ];
         $week = date('Y-m-d', strtotime('-7 days'));
         $this->pengaduanModel->deleteAduanLama($week);
-        $this->pengaduanModel->deleteReplyLama($week);
+        $this->replyModel->deleteReplyLama($week);
         return $this->response->setJSON($data);
     }
 }

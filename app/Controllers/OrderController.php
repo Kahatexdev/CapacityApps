@@ -364,7 +364,8 @@ class OrderController extends BaseController
     public function DetailOrderPerJarumBlnDetail($bulan, $tahun, $jarum)
     {
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
-        $tampilperdelivery = $this->orderModel->tampilPerjarumBulan($bulan, $tahun, $jarum);
+        $tampilperdelivery = $this->ApsPerstyleModel->tampilPerjarumBulan($bulan, $tahun, $jarum);
+        // $tampilperdelivery = $this->orderModel->tampilPerjarumBulan($bulan, $tahun, $jarum);
         $product = $this->productModel->findAll();
         $booking = $data = [
             'role' => session()->get('role'),
@@ -2162,8 +2163,8 @@ class OrderController extends BaseController
         $qty = 0;
         $sisa = 0;
         foreach ($order as $der) {
-            $qty += round($der['qty'] / 24);
-            $sisa += round($der['sisa'] / 24);
+            $qty += round($der['qty']);
+            $sisa += round($der['sisa']);
         }
         $data = [
             'role' => session()->get('role'),
