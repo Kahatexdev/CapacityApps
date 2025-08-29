@@ -73,7 +73,8 @@ class OrderModel extends Model
             ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left')
             ->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left')
             // Filtering out records where no_model is not empty
-            ->where('no_model !=', '');
+            ->where('no_model !=', '')
+            ->where('qty >', 0);
 
         // Apply search filter if search value is provided
         if ($searchValue !== null) {
