@@ -35,6 +35,15 @@
     <link href='<?= base_url('assets/calendar/fullcalendar/packages/core/main.css') ?>' rel='stylesheet' />
     <link href='<?= base_url('assets/calendar/fullcalendar/packages/daygrid/main.css') ?>' rel='stylesheet' />
 
+    <style>
+        .custom-dropdown-wide {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr);
+            gap: .2rem .2rem;
+            min-width: 400px !important;
+        }
+    </style>
+
 </head>
 
 <body class="g-sidenav-show  bg-gray-100">

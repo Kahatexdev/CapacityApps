@@ -123,7 +123,7 @@ class ApsPerstyleModel extends Model
             ->where('machinetypeid', $cek['jarum'])
             ->where('delivery >=', $cek['start'])
             ->where('delivery <=', $cek['end'])
-            ->where('sisa >', 0)
+            ->where('sisa >=', 0)
             ->where('qty >', 0)
             ->groupBy('mastermodel,delivery')
             ->findAll();
@@ -1368,5 +1368,17 @@ class ApsPerstyleModel extends Model
             ->set('qty', $data['qty_akhir'])
             ->set('sisa', $data['qty_akhir'])
             ->update();
+    }
+    public function tampilPerjarumBulan($bulan, $tahun, $jarum)
+    {
+        $month = date('m', strtotime($bulan));
+        return $this->select(' round(SUM(apsperstyle.qty/24)) as qty, round(SUM(apsperstyle.sisa/24)) as sisa, apsperstyle.delivery, apsperstyle.no_order, apsperstyle.machinetypeid, ')
+            // ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel', 'left')
+            // ->join('master_product_type', 'master_product_type.id_product_type = data_model.id_product_type', 'left')
+            ->where('YEAR(delivery)', $tahun)
+            ->where('MONTH(delivery)', $month)
+            ->where('machinetypeid', $jarum)
+            ->groupBy('machinetypeid, delivery, mastermodel')
+            ->get()->getResult();
     }
 }
