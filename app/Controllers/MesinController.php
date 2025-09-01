@@ -504,24 +504,68 @@ class MesinController extends BaseController
             return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('error', 'Gagal Update Data');
         }
     }
-    public function updatemesinpernomor($idDataMesin)
+    public function mesinPernomor($jarum, $area)
     {
+        $mc = $this->machinesModel->mesinPerJarum($jarum, $area);
 
         $data = [
-            'jarum' => $this->request->getPost("jarum"),
-            'no_mc' => $this->request->getPost("no_mc"),
-            'brand' => $this->request->getPost("brand"),
-            'status' => $this->request->getPost("status"),
-            'kode' => $this->request->getPost("kode"),
-            'dram' => $this->request->getPost("dram"),
+            'role' => session()->get('role'),
+            'title' => 'Data Mesin',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'area' => $area,
+            'jarum' => $jarum,
+            'mesinDetail' => $mc
         ];
-        $id = $idDataMesin;
-        $update = $this->machinesModel->update($id, $data);
-        $area = $this->request->getPost("area");
-        if ($update) {
-            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('success', 'Data Berhasil Di Update');
-        } else {
-            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('error', 'Gagal Update Data');
+        return view(session()->get('role') . '/Mesin/mesinPerjarum', $data);
+    }
+    public function updatemesinpernomor($id)
+    {
+        $data = [
+            'no_mc' => $this->request->getPost('no_mc'),
+            'area'  => $this->request->getPost('area'),
+            'jarum' => $this->request->getPost('jarum'),
+            'dram'  => $this->request->getPost('dram'),
+            'brand' => $this->request->getPost('brand'),
+            'kode'  => $this->request->getPost('kode'),
+            'status' => $this->request->getPost('status'),
+        ];
+
+        $this->machinesModel->update($id, $data);
+
+        // balikin JSON buat AJAX
+        return $this->response->setJSON([
+            'success' => true,
+            'data' => [
+                'id'     => $id,
+                'no_mc'  => $data['no_mc'],
+                'area'   => $data['area'],
+                'jarum'  => $data['jarum'],
+                'brand'  => $data['brand'],
+                'dram'   => $data['dram'],
+                'kode'   => $data['kode'],
+                'status' => $data['status'],
+                'status_badge' => $this->renderStatusBadge($data['status']),
+            ]
+        ]);
+    }
+
+    private function renderStatusBadge($status)
+    {
+        switch ($status) {
+            case 'idle':
+                return '<span class="badge bg-info">Idle</span>';
+            case 'running':
+                return '<span class="badge bg-success">Running</span>';
+            case 'breakdown':
+                return '<span class="badge bg-danger">Breakdown</span>';
+            case 'sample':
+                return '<span class="badge bg-secondary">Sample</span>';
         }
     }
     public function deletemesinarealPlan($idDataMesin)
