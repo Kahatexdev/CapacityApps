@@ -43,6 +43,9 @@
                             <a href="<?= base_url($role . '/mesinperarea/' . $pu) ?>" class="btn bg-gradient-dark">
                                 <i class="fas fa-arrow-circle-left me-2 text-lg opacity-10"></i>
                                 Back</a>
+                            <?php if ($mesinDetail): ?>
+                                <a class="btn btn-info" href="<?= base_url($role . '/denah/' . $area); ?>" target="_blank">LAYOUT MC<i class="fas fa-th ms-2"></i></a>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -86,9 +89,9 @@
                                             </td>
 
                                             <td>
-                                                <button type="button" class="btn btn-danger btn-sm delete-btn" data-toggle="modal" data-target="#ModalDelete" data-id="<?= $order['id_data_mesin']; ?>">
-                                                    Delete
-                                                </button>
+                                                <a href="<?= base_url($role . "/mesinPernomor/" . $order['jarum'] . '/' . $area); ?>" class="btn btn-warning ">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -116,90 +119,7 @@
 
             </div>
         </div>
-        <div class="card mt-2">
-            <div class="card-header">
-                <div class="d-flex justify-content-between">
-                    <h4>Mesin Detail</h4>
-                    <a class="btn btn-info" href="<?= base_url($role . '/denah/' . $area); ?>" target="_blank">LAYOUT MC<i class="fas fa-th ms-2"></i></a>
-                </div>
-            </div>
-            <?php if ($mesinDetail): ?>
-                <div class="card-body p-3">
 
-                    <div class="row">
-                        <div class="table-responsive">
-                            <table id="dataTable2" class="display compact striped" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No MC</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Needle</th>
-
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Brand</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Dram</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Kode</th>
-
-                                        <th colspan=2 class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($mesinDetail as $mc) : ?>
-                                        <tr>
-                                            <td class="text-sm">
-                                                <?php if ($mc['status'] === 'idle') : ?>
-                                                    <span class="badge bg-info">Idle</span>
-                                                <?php elseif ($mc['status'] === 'running') : ?>
-                                                    <span class="badge bg-success">Running</span>
-                                                <?php elseif ($mc['status'] === 'breakdown') : ?>
-                                                    <span class="badge bg-danger">Breakdown</span>
-                                                <?php elseif ($mc['status'] === 'sample') : ?>
-                                                    <span class="badge bg-secondary">Sample</span>
-                                                <?php endif; ?>
-                                            </td>
-
-                                            <td class="text-sm"><?= $mc['no_mc']; ?></td>
-                                            <td class="text-sm"><?= $mc['jarum']; ?></td>
-                                            <td class="text-sm"><?= $mc['brand']; ?></td>
-                                            <td class="text-sm"><?= $mc['dram']; ?> </td>
-                                            <td class="text-sm"><?= $mc['kode']; ?> </td>
-
-
-                                            <td class="text-sm">
-                                                <button type="button" class="btn btn-success btn-sm edit-mc-btn" data-toggle="modal" data-target="#EditMcModal" data-id="<?= $mc['id']; ?>" data-area="<?= $mc['area']; ?>" data-jarum="<?= $mc['jarum']; ?>" data-brand="<?= $mc['brand']; ?>" data-dram="<?= $mc['dram']; ?>" data-status="<?= $mc['status']; ?>" data-no_mc="<?= $mc['no_mc']; ?>" data-kode="<?= $mc['kode']; ?>">
-                                                    Edit
-                                                </button>
-                                            </td>
-
-                                            <td>
-                                                <button type="button" class="btn btn-danger btn-sm delete-mc-btn" data-toggle="modal" data-target="#ModalDeleteMc" data-id="<?= $mc['id']; ?>">
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                                <tfoot>
-                                    <th></th>
-                                    <th>Total :</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                </tfoot>
-                            </table>
-
-                        </div>
-                    </div>
-
-                    <div class="card-footer">
-
-                    </div>
-
-                </div>
-            <?php endif; ?>
-        </div>
         <div class="row">
             <?= $this->renderSection('capacity'); ?>
         </div>
@@ -260,69 +180,6 @@
                                             <label class="form-check-label" for="mj_radio">MJ</label>
                                         </div>
                                     </div>
-
-                                </div>
-                            </div>
-
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn bg-gradient-info">Edit</button>
-                    </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="EditMcModal" tabindex="-1" role="dialog" aria-labelledby="EditMcModal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Edit Data </h5>
-                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="" method="post">
-                            <div class="row">
-                                <div class="col-lg-6 col-sm-6">
-
-                                    <div class="form-group">
-                                        <label for="tgl-bk" class="col-form-label">No Mc</label>
-                                        <input type="hidden" class="form-control" name="area" value="<?= $area ?>">
-                                        <input type="text" class="form-control" name="no_mc">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="tgl-bk" class="col-form-label">Jarum</label>
-                                        <input type="text" class="form-control" name="jarum">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="buyer" class="col-form-label">Brand</label>
-                                        <input type="text" name="brand" class="form-control">
-                                    </div>
-
-
-                                </div>
-                                <div class="col-lg-6 col-sm-12">
-                                    <div class="form-group">
-                                        <label for="tgl-bk" class="col-form-label">Dram</label>
-                                        <input type="text" class="form-control" name="dram">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="tgl-bk" class="col-form-label">kode</label>
-                                        <input type="text" class="form-control" name="kode">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="status" class="col-form-label">Status</label>
-                                        <select name="status" id="status" class="form-control">
-                                            <option value="idle">Idle</option>
-                                            <option value="running">Running</option>
-                                            <option value="breakdown">Breakdown</option>
-                                            <option value="sample">Sample</option>
-                                        </select>
-                                    </div>
-
 
                                 </div>
                             </div>
@@ -540,15 +397,7 @@
                         $(api.column(5).footer()).html(mesinMatiFormatted);
                     },
                 });
-                $('#dataTable2').DataTable({
-                    order: [
-                        [2, 'asc']
-                    ],
-                    lengthMenu: [
-                        [100, -1],
-                        [100, "All"]
-                    ],
-                });
+
 
                 function numberWithDots(x) {
                     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -586,29 +435,8 @@
 
                     $('#ModalEdit').modal('show'); // Show the modal
                 });
-                $(document).on('click', '.edit-mc-btn', function() {
-                    var idMc = $(this).data('id');
-                    var no_mc = $(this).data('no_mc');
-                    var area = $(this).data('area');
-                    var jarum = $(this).data('jarum');
-                    var dram = $(this).data('dram');
-                    var status = $(this).data('status');
-                    var brand = $(this).data('brand');
-                    var kode = $(this).data('kode');
-
-                    $('#EditMcModal').find('form').attr('action', '<?= base_url($role . '/updatemesinpernomor/') ?>' + idMc);
-                    $('#EditMcModal').find('input[name="id"]').val(idMc);
-                    $('#EditMcModal').find('input[name="no_mc"]').val(no_mc);
-                    $('#EditMcModal').find('input[name="area"]').val(area);
-                    $('#EditMcModal').find('input[name="jarum"]').val(jarum);
-                    $('#EditMcModal').find('input[name="dram"]').val(dram);
-                    $('#EditMcModal').find('input[name="brand"]').val(brand);
-                    $('#EditMcModal').find('input[name="status"]').val(status);
-                    $('#EditMcModal').find('input[name="kode"]').val(kode);
 
 
-                    $('#EditMcModal').modal('show'); // Show the modal
-                });
                 $(document).on('click', '.delete-btn', function() {
                     var id = $(this).data('id');
                     $('#ModalDelete').find('form').attr('action', '<?= base_url($role . '/deletemesinareal/') ?>' + id);

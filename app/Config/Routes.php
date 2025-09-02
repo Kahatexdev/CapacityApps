@@ -504,6 +504,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('deletemesinpernomor/(:any)', 'MesinController::deletemesinpernomor/$1');
     $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarumPlan/$1');
     $routes->post('updatemesinpernomor/(:any)', 'MesinController::updatemesinpernomor/$1');
+    $routes->get('mesinPernomor/(:any)/(:any)', 'MesinController::mesinPernomor/$1/$2');
     $routes->post('tambahmesinperarea', 'MesinController::inputmesinperareaPlan');
     $routes->post('addcylinder', 'MesinController::inputcylinderPlan');
     $routes->post('editcylinder/(:any)', 'MesinController::editcylinderPlan/$1');

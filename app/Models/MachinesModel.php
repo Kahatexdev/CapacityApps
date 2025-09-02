@@ -6,65 +6,65 @@ use CodeIgniter\Model;
 
 class MachinesModel extends Model
 {
-    protected $table            = 'machines';
-    protected $primaryKey       = 'id';
-    protected $useAutoIncrement = true;
-    protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
-    protected $protectFields    = true;
-    protected $allowedFields    = [
-        'no_mc',
-        'jarum',
-        'brand',
-        'dram',
-        'kode',
-        'tahun',
-        'area',
-        'status',
-        'created_at',
-        'updated_at'
-    ];
+  protected $table            = 'machines';
+  protected $primaryKey       = 'id';
+  protected $useAutoIncrement = true;
+  protected $returnType       = 'array';
+  protected $useSoftDeletes   = false;
+  protected $protectFields    = true;
+  protected $allowedFields    = [
+    'no_mc',
+    'jarum',
+    'brand',
+    'dram',
+    'kode',
+    'tahun',
+    'area',
+    'status',
+    'created_at',
+    'updated_at'
+  ];
 
-    protected bool $allowEmptyInserts = false;
+  protected bool $allowEmptyInserts = false;
 
-    // Dates
-    protected $useTimestamps = true;
-    protected $dateFormat    = 'datetime';
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    protected $deletedField  = 'deleted_at';
+  // Dates
+  protected $useTimestamps = true;
+  protected $dateFormat    = 'datetime';
+  protected $createdField  = 'created_at';
+  protected $updatedField  = 'updated_at';
+  protected $deletedField  = 'deleted_at';
 
-    // Validation
-    protected $validationRules      = [];
-    protected $validationMessages   = [];
-    protected $skipValidation       = false;
-    protected $cleanValidationRules = true;
+  // Validation
+  protected $validationRules      = [];
+  protected $validationMessages   = [];
+  protected $skipValidation       = false;
+  protected $cleanValidationRules = true;
 
-    // Callbacks
-    protected $allowCallbacks = true;
-    protected $beforeInsert   = [];
-    protected $afterInsert    = [];
-    protected $beforeUpdate   = [];
-    protected $afterUpdate    = [];
-    protected $beforeFind     = [];
-    protected $afterFind      = [];
-    protected $beforeDelete   = [];
-    protected $afterDelete    = [];
+  // Callbacks
+  protected $allowCallbacks = true;
+  protected $beforeInsert   = [];
+  protected $afterInsert    = [];
+  protected $beforeUpdate   = [];
+  protected $afterUpdate    = [];
+  protected $beforeFind     = [];
+  protected $afterFind      = [];
+  protected $beforeDelete   = [];
+  protected $afterDelete    = [];
 
-    public function getDataMcArea(string $area): array
-    {
-        if ($area === '') return [];
+  public function getDataMcArea(string $area): array
+  {
+    if ($area === '') return [];
 
-        return $this->select('id,no_mc, jarum, brand, dram, kode, tahun, area, status')
-            ->where('area', $area)
-            ->findAll(); // findAll() lebih ringkas daripada get()->getResultArray()
-    }
+    return $this->select('id,no_mc, jarum, brand, dram, kode, tahun, area, status')
+      ->where('area', $area)
+      ->findAll(); // findAll() lebih ringkas daripada get()->getResultArray()
+  }
 
-    public function getMachineWithProduksi($tanggal, $area)
-    {
-        $db = \Config\Database::connect();
+  public function getMachineWithProduksi($tanggal, $area)
+  {
+    $db = \Config\Database::connect();
 
-        $sql = "
+    $sql = "
             SELECT
               machines.id,
               machines.no_mc,
@@ -102,6 +102,12 @@ class MachinesModel extends Model
             ORDER BY machines.id ASC
         ";
 
-        return $db->query($sql, [$tanggal, $area, $area])->getResult();
-    }
+    return $db->query($sql, [$tanggal, $area, $area])->getResult();
+  }
+  public function mesinPerJarum($jarum, $area)
+  {
+    return $this->where('jarum', $jarum)
+      ->where('area', $area)
+      ->findAll();
+  }
 }

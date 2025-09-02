@@ -58,13 +58,12 @@ class PengaduanController extends BaseController
         $username   = session()->get('username');
         $targetRole = $this->request->getPost('target_role');
         $isi        = $this->request->getPost('isi');
-        $role = $this->role;
+        $role = session()->get('role');
         $this->pengaduanModel->save([
             'username'    => $username,
             'target_role' => $targetRole,
             'isi'         => $isi
         ]);
-
         return redirect()->to($role . '/pengaduan')->withInput()->with('success', 'Aduan Berhasil Di kirim');
     }
 
@@ -72,7 +71,8 @@ class PengaduanController extends BaseController
     {
         $username = session()->get('username');
         $isi      = $this->request->getPost('isi');
-        $role = $this->role;
+        $role = session()->get('role');
+
         $this->replyModel->save([
             'id_pengaduan' => $id_pengaduan,
             'username'     => $username,
