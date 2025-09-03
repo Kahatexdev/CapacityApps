@@ -38,6 +38,7 @@
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Area</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Qty Order</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">BS Stocklot</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">(+) Packing</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Qty Minta</th>
 
                                 </tr>
@@ -53,6 +54,7 @@
                                         <td class="text-center"><?= $row['area'] ?></td>
                                         <td class="text-center"><?= $row['qty_order'] ?> pcs</td>
                                         <td class="text-center"><?= $row['deffect'] ?> pcs</td>
+                                        <td class="text-center"><?= $row['plus_packing'] ?> pcs</td>
                                         <td class="text-center"><?= $row['qty'] ?> pcs</td>
                                     </tr>
                                 <?php endforeach; ?>

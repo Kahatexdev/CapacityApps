@@ -1147,7 +1147,7 @@ class ApsPerstyleModel extends Model
     }
     public function getQtyOrder($noModel, $styleSize, $area)
     {
-        return $this->select('SUM(qty) AS qty, inisial')
+        return $this->select('SUM(qty) AS qty, inisial, sum(po_plus) as po_plus')
             ->where('mastermodel', $noModel)
             ->where('size', $styleSize)
             ->where('factory', $area)
