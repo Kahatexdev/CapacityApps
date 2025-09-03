@@ -102,6 +102,10 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('orderPerjarum', 'OrderController::OrderPerJarum');
     $routes->get('orderPerjarumBln', 'OrderController::orderPerJarumBln');
     $routes->get('belumImport', 'OrderController::belumImport');
+    $routes->get('statusOrder', 'OrderController::statusOrder');
+    $routes->get('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
+    $routes->post('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
+    $routes->get('progressdetail/(:any)/(:any)', 'ApsController::progressdetail/$1/$2');
     $routes->get('dataorderperjarum/(:any)', 'OrderController::DetailOrderPerJarum/$1');
     $routes->get('dataorderperjarumbln/(:any)', 'OrderController::DetailOrderPerJarumBln/$1');
     $routes->get('dataorderperjarumblndetail/(:any)/(:any)/(:any)', 'OrderController::orderPerMonth/$1/$2/$3');
@@ -122,6 +126,10 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('cancelorder/(:any)', 'OrderController::cancelOrder/$1');
     $routes->get('cancelOrder', 'OrderController::getCancelOrder');
     $routes->get('detailCancelOrder/(:any)', 'OrderController::detailCancelOrder/$1');
+    $routes->get('sisaOrder', 'OrderController::sisaOrder');
+    $routes->get('sisaOrder/(:any)', 'OrderController::sisaOrderBuyer/$1');
+    $routes->post('sisaOrder/(:any)', 'OrderController::sisaOrderBuyer/$1');
+    $routes->post('excelSisaOrderBuyer/(:any)', 'ExcelController::excelSisaOrderBuyer/$1');
     $routes->get('sisaOrderArea', 'OrderController::sisaOrderArea');
     $routes->get('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
     $routes->post('sisaOrderArea/(:any)', 'OrderController::detailSisaOrderArea/$1');
