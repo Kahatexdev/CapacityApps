@@ -2219,7 +2219,7 @@ class OrderController extends BaseController
             $idaps = $this->ApsPerstyleModel->getIdApsForPph($area, $noModel, $styleSize);
             $idapsList = array_column($idaps, 'idapsperstyle');
             $spk['qty_order'] = $this->ApsPerstyleModel->getQtyOrder($noModel, $styleSize, $area)['qty'] ?? '-';
-            $spk['plus_packing'] = $this->ApsPerstyleModel->getQtyOrder($noModel, $styleSize, $area)['po_plu'] ?? '0';
+            $spk['plus_packing'] = $this->ApsPerstyleModel->getQtyOrder($noModel, $styleSize, $area)['po_plus'] ?? '0';
             $spk['deffect'] =  $this->bsModel->getBsPph($idapsList)['bs_setting'] ?? '-';
         }
         // dd($estimasiSpk);
