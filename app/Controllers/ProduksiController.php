@@ -1465,245 +1465,268 @@ class ProduksiController extends BaseController
             return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Data Gagal di hapus ❗');
         }
     }
+
     public function importbsmc()
     {
         $area = session()->get('username');
 
-        // Set execution time and memory limit
         ini_set('memory_limit', '512M');
         set_time_limit(180);
 
         $file = $this->request->getFile('excel_file');
-        if (!$file->isValid() || $file->hasMoved()) {
+        if (!$file || !$file->isValid() || $file->hasMoved()) {
             return redirect()->to(base_url(session()->get('role') . '/bsmesin'))
-                ->with('error', 'No data found in the Excel file');
+                ->with('error', 'File Excel tidak valid / sudah dipindahkan.');
         }
 
-        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
-        $worksheet   = $spreadsheet->getActiveSheet();
+        // ===== [A] LOAD EXCEL: read-only + rangeToArray =====
+        $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($file->getPathname());
+        $reader->setReadDataOnly(true);
+        // ReadFilter untuk batasi area baca (hemat CPU)
+        $reader->setReadFilter(new class implements \PhpOffice\PhpSpreadsheet\Reader\IReadFilter {
+            public function readCell(string $columnAddress, int $row, string $worksheetName = ''): bool
+            {
+                // Baca B1 untuk tanggal, dan baris >=6 hanya sampai kolom T
+                if ($row === 1 && $columnAddress === 'B') {
+                    return true;
+                }
+                if ($row >= 6 && $columnAddress <= 'T') {
+                    return true;
+                }
+                return false;
+            }
+        });
 
-        // Ambil nilai dari sel B1 dan hilangkan spasi ekstra
-        $tglProduksiRaw = trim($worksheet->getCell('B1')->getValue());
-        if (is_numeric($tglProduksiRaw)) {
-            // Konversi serial date Excel ke objek DateTime
-            $dateTime = Date::excelToDateTimeObject($tglProduksiRaw);
-            $tgl_produksi = $dateTime->format('Y-m-d');
+
+        $spreadsheet = $reader->load($file->getPathname());
+        $sheet       = $spreadsheet->getActiveSheet();
+        // dd ($sheet->toArray());
+        // Tanggal produksi di B1 (raw)
+        $tglRaw = trim((string)$sheet->getCell('B1')->getValue());
+        if (is_numeric($tglRaw)) {
+            $dateTime = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($tglRaw);
+            $tgl_produksi = $dateTime ? $dateTime->format('Y-m-d') : null;
         } else {
-            // Jika bukan serial number, kita lakukan parsing seperti sebelumnya
-            $tglProduksiFormatted = str_replace('.', '-', $tglProduksiRaw);
-            $dateTime = \DateTime::createFromFormat('d-m-Y', $tglProduksiFormatted);
+            $tglRaw = str_replace('.', '-', $tglRaw);
+            $dateTime = \DateTime::createFromFormat('d-m-Y', $tglRaw);
             $tgl_produksi = $dateTime ? $dateTime->format('Y-m-d') : null;
         }
+        if (!$tgl_produksi) {
+            return redirect()->back()->with('error', 'Tanggal produksi (B1) tidak valid.');
+        }
 
-        $startRow   = 6;
-        $batchSize  = 100;
-        $batchData  = [];
-        $allBatchData = [];
-        $allOperators = [];
-        $failedRows = [];
-        $db         = \Config\Database::connect();
+        // Range data: A6..T{maxRow}
+        $startRow = 6;
+        $maxRow   = $sheet->getHighestRow();
+        if ($maxRow < $startRow) {
+            return redirect()->back()->with('error', 'Tidak ada data pada sheet.');
+        }
+        // rangeToArray: raw values, tanpa format/rumus
+        $rows = $sheet->rangeToArray("A{$startRow}:T{$maxRow}", null, false, false, false);
+        // dd ($rows);
 
-        // Ambil semua data operator dari kolom F, G, H
-        foreach ($worksheet->getRowIterator($startRow) as $row) {
-            $rowIndex = $row->getRowIndex();
-            $cellIterator = $row->getCellIterator();
-            $cellIterator->setIterateOnlyExistingCells(false);
-
-            $rowData = ['role' => session()->get('role')];
-            foreach ($cellIterator as $cell) {
-                $rowData[] = $cell->getCalculatedValue();
-            }
-
-            // Ambil operator F (index 5), G (6), H (7)
-            for ($i = 5; $i <= 7; $i++) {
-                $operatorName = trim($rowData[$i] ?? '');
-                if (!empty($operatorName)) {
-                    $allOperators[] = $operatorName;
+        // ===== [B] 1x FETCH KARYAWAN per AREA -> MAP =====
+        $operatorMap = []; // nama_karyawan (trim) -> array data karyawan
+        try {
+            // Disarankan sediakan endpoint area-only (tanpa nama):
+            //   GET /api/getdataforbs/{area}
+            $apiUrl = "http://172.23.44.14/HumanResourceSystem/public/api/getdataforbs/{$area}";
+            $resp = @file_get_contents($apiUrl);
+            // dd ($resp);
+            if ($resp !== false) {
+                $list = json_decode($resp, true) ?: [];
+                foreach ($list as $k) {
+                    $nm = trim((string)($k['nama_karyawan'] ?? ''));
+                    if ($nm !== '') {
+                        $operatorMap[$nm] = $k;
+                    }
                 }
-            }
-
-            if (!empty($rowData)) {
-                $batchData[] = ['rowIndex' => $rowIndex, 'data' => $rowData];
-            }
-
-            if (count($batchData) >= $batchSize) {
-                $allBatchData[] = $batchData;
-                $batchData = [];
-            }
-        }
-
-        if (!empty($batchData)) {
-            $allBatchData[] = $batchData;
-        }
-
-        // Ambil data operator unik
-        $uniqueOperators = array_unique($allOperators);
-        $operatorDataMap = [];
-
-        // Ambil data karyawan dari API
-        foreach ($uniqueOperators as $operatorName) {
-            $operatorEncoded = urlencode($operatorName);
-            $apiUrl = "http://172.23.44.14/HumanResourceSystem/public/api/getdataforbs/{$area}/{$operatorEncoded}";
-            $response = @file_get_contents($apiUrl);
-            log_message('debug', "Response API untuk operator '{$operatorName}': {$response}");
-
-            if ($response === false) {
-                log_message('error', "Gagal mengakses API: {$apiUrl}");
-                $operatorDataMap[$operatorName] = null;
             } else {
-                // Mengubah response JSON menjadi array
-                $decodedResponse = json_decode($response, true);
+                log_message('error', "Gagal akses API area-only: {$apiUrl}");
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'HR API error: ' . $e->getMessage());
+        }
+        // dd ($operatorMap);
+        // Jika endpoint area-only belum ada, fallback partial: biarkan $operatorMap kosong,
+        // lalu id_karyawan akan null. (Atau: tambahkan blok fallback fetch-per-nama jika diperlukan.)
 
-                if (isset($decodedResponse[0]['nama_karyawan']) && isset($decodedResponse[0]['id_karyawan'])) {
-                    $operatorDataMap[$operatorName] = $decodedResponse[0];
-                } else {
-                    $operatorDataMap[$operatorName] = null;
+        // ===== [C] RAKIT DATA SEKALIAN -> INSERT BATCH / UPSERT =====
+        // Indeks kolom dari rangeToArray (A=0, B=1, C=2, ...)
+        $IDX_NO_MESIN = 1; // B
+        $IDX_NO_MODEL = 2; // C
+        $IDX_INISIAL  = 3; // D
+        $IDX_OP_A     = 5; // F
+        $IDX_OP_B     = 6; // G
+        $IDX_OP_C     = 7; // H
+
+        // Qty mapping (sesuaikan dengan struktur sheet)
+        $QTY_PCS = [0 => 9,  1 => 12, 2 => 15]; // J, M, P
+        $QTY_GRM = [0 => 17, 1 => 18, 2 => 19]; // R, S, T
+        $SHIFT   = [0 => 'A', 1 => 'B', 2 => 'C'];
+        $OP_COLS = [0 => $IDX_OP_A, 1 => $IDX_OP_B, 2 => $IDX_OP_C];
+
+        $today = date('Y-m-d H:i:s');
+        $failedRows = [];
+        $inserts = [];     // kumpulan row baru untuk di-upsert
+        $sizeCache = [];   // cache getSizes per "no_model|inisial"
+
+        // Loop semua baris sheet
+        foreach ($rows as $offset => $cols) {
+            $rowIndex = $startRow + $offset; // nomor baris asli di Excel
+            $noMesin  = trim((string)($cols[$IDX_NO_MESIN] ?? ''));
+            $noModel  = trim((string)($cols[$IDX_NO_MODEL] ?? ''));
+            $inisial  = trim((string)($cols[$IDX_INISIAL] ?? ''));
+
+            // Validasi minimal — jika tidak ada model/mesin, lanjut baris berikutnya
+            if ($noModel === '' || $noMesin === '') {
+                continue;
+            }
+
+            // Resolve size (cached)
+            $sizeKey = $noModel . '|' . $inisial;
+            // dd ($sizeKey);
+            if (!array_key_exists($sizeKey, $sizeCache)) {
+                $sz = $this->ApsPerstyleModel->getSizes($noModel, $inisial);
+                $sizeCache[$sizeKey] = (!empty($sz) && !empty($sz['size'])) ? $sz['size'] : null;
+            }
+            $size = $sizeCache[$sizeKey];
+            // dd ($size);
+
+            if (!$size) {
+                $failedRows[] = [
+                    'row'     => $rowIndex,
+                    'shift'   => null,
+                    'reason'  => "No Model/Inisial tidak ditemukan (model='{$noModel}', inisial='{$inisial}')"
+                ];
+                // tidak perlu stop seluruh proses, lanjut baris lain
+                continue;
+            }
+
+            // Tiga shift per baris (A/B/C)
+            for ($i = 0; $i < 3; $i++) {
+                $opName  = trim((string)($cols[$OP_COLS[$i]] ?? ''));
+                if ($opName === '') {
+                    continue; // tidak ada operator → skip
                 }
+
+                // Ambil qty (raw -> cast)
+                $qtyPcs  = (int)($cols[$QTY_PCS[$i]] ?? 0);
+                $qtyGram = (float)($cols[$QTY_GRM[$i]] ?? 0.0);
+
+                // [D] SKIP BARIS KOSONG SEDINI MUNGKIN
+                if ($qtyPcs === 0 && $qtyGram === 0.0) {
+                    continue;
+                }
+
+                // Ambil id_karyawan dari map (jika tidak ada, tetap null)
+                $idKaryawan = null;
+                if (isset($operatorMap[$opName]) && isset($operatorMap[$opName]['id_karyawan'])) {
+                    $idKaryawan = $operatorMap[$opName]['id_karyawan'];
+                }
+
+                $inserts[] = [
+                    'tanggal_produksi' => $tgl_produksi,
+                    'id_karyawan'      => $idKaryawan,     // bisa null
+                    'nama_karyawan'    => $opName,
+                    'shift'            => $SHIFT[$i],
+                    'area'             => $area,
+                    'no_model'         => $noModel,
+                    'size'             => $size,
+                    'inisial'          => $inisial,
+                    'no_mesin'         => $noMesin,
+                    'qty_pcs'          => $qtyPcs,
+                    'qty_gram'         => $qtyGram,
+                    'created_at'       => $today,
+                ];
             }
         }
-
-        // Proses semua batch dengan operator yang sudah ada datanya
-        foreach ($allBatchData as $batchData) {
-            $this->processBatchBsMc($batchData, $db, $failedRows, $area, $tgl_produksi, $operatorDataMap);
+        // dd ($inserts);
+        if (empty($inserts)) {
+            return redirect()->to(base_url(session()->get('role') . '/bsmesin'))
+                ->with('error', 'Tidak ada data valid untuk diimpor.');
         }
 
-        // Jika ada baris gagal, tampilkan pesan error
+        // ===== [E] UPSERT BATCH (chunked) =====
+        // Pastikan sudah ada UNIQUE KEY seperti:
+        // ALTER TABLE bs_mesin_mc
+        // ADD UNIQUE KEY uq_bs (tanggal_produksi, area, no_model, size, inisial, no_mesin, shift);
+        $db = \Config\Database::connect();
+        $db->transBegin();
+
+        try {
+            $chunkSize = 500; // sesuaikan
+            for ($i = 0; $i < count($inserts); $i += $chunkSize) {
+                $chunk = array_slice($inserts, $i, $chunkSize);
+
+                // Build upsert raw (MySQL)
+                // Kolom yang diinsert:
+                $cols = [
+                    'tanggal_produksi',
+                    'id_karyawan',
+                    'nama_karyawan',
+                    'shift',
+                    'area',
+                    'no_model',
+                    'size',
+                    'inisial',
+                    'no_mesin',
+                    'qty_pcs',
+                    'qty_gram',
+                    'created_at'
+                ];
+                $colList = implode(',', array_map(fn($c) => "`{$c}`", $cols));
+
+                // Placeholder values (?, ?, ..., ?)
+                $valuesPart = '(' . implode(',', array_fill(0, count($cols), '?')) . ')';
+                $valuesAll  = implode(',', array_fill(0, count($chunk), $valuesPart));
+
+                // ON DUPLICATE KEY UPDATE — hanya update qty & updated_at
+                $sql = "INSERT INTO `bs_mesin` ({$colList}) VALUES {$valuesAll}
+                    ON DUPLICATE KEY UPDATE
+                      `qty_pcs` = VALUES(`qty_pcs`),
+                      `qty_gram`= VALUES(`qty_gram`),
+                      `nama_karyawan` = VALUES(`nama_karyawan`),
+                      `id_karyawan`   = VALUES(`id_karyawan`),
+                      `updated_at` = VALUES(`created_at`)";
+
+                // Flatten bind
+                $bind = [];
+                foreach ($chunk as $r) {
+                    foreach ($cols as $c) {
+                        $bind[] = $r[$c] ?? null;
+                    }
+                }
+
+                $db->query($sql, $bind);
+            }
+
+            $db->transCommit();
+        } catch (\Throwable $e) {
+            $db->transRollback();
+            log_message('error', 'Import BS upsert gagal: ' . $e->getMessage());
+            return redirect()->to(base_url(session()->get('role') . '/bsmesin'))
+                ->with('error', 'Gagal mengimpor data (DB Error).');
+        }
+
+        // ===== [F] LAPORAN ERROR (jika ada) =====
         if (!empty($failedRows)) {
             $shiftToColumn = [
                 'A' => 'Kolom F (Operator Shift A)',
                 'B' => 'Kolom G (Operator Shift B)',
-                'C' => 'Kolom H (Operator Shift C)'
+                'C' => 'Kolom H (Operator Shift C)',
             ];
-
-            $failedDetails = array_map(function ($errorInfo) use ($shiftToColumn) {
-                $shiftColumn = $shiftToColumn[$errorInfo['error']] ?? $errorInfo['error'];
-                $message = "{$shiftColumn} baris ke {$errorInfo['row']}";
-                if (!empty($errorInfo['error'])) {
-                    $message .= " - " . $errorInfo['row'];
-                }
-                return $message;
+            $details = array_map(function ($e) use ($shiftToColumn) {
+                $where = $e['shift'] ? ($shiftToColumn[$e['shift']] ?? "Shift {$e['shift']}") : 'Baris';
+                return "{$where} baris ke {$e['row']} - {$e['reason']}";
             }, $failedRows);
 
             return redirect()->to(base_url(session()->get('role') . '/bsmesin'))
                 ->with('error', 'Beberapa data gagal diimpor:')
-                ->with('error_list', $failedDetails);
+                ->with('error_list', $details);
         }
 
         return redirect()->to(base_url(session()->get('role') . '/bsmesin'))
-            ->withInput()->with('success', 'Data Bs Mesin Berhasil di Import');
-    }
-
-    private function processBatchBsMc($batchData, $db, &$failedRows, $area, $tgl_produksi, $operatorDataMap)
-    {
-        $db->transStart();
-        $today = date('Y-m-d H:i:s');
-
-        // Mapping shift dan kolom qty berdasarkan indeks dalam array data
-        $shiftMapping   = [0 => 'A', 1 => 'B', 2 => 'C'];
-        $qtyPcsMapping  = [0 => 9, 1 => 12, 2 => 15];
-        $qtyGramMapping = [0 => 17, 1 => 18, 2 => 19];
-
-        // Loop untuk batch data
-        foreach ($batchData as $batchItem) {
-            $rowIndex = $batchItem['rowIndex'];
-            $data = $batchItem['data'];
-
-            // Iterasi berdasarkan operator (shift A, B, C)
-            for ($index = 0; $index < 3; $index++) {
-                $operatorIndex = 5 + $index;
-                $operatorName = trim($data[$operatorIndex] ?? '');
-                if (empty($operatorName)) {
-                    continue;
-                }
-
-                // Mencocokkan nama operator dengan nama_karyawan dari API
-                $id_karyawan = null;
-                if (isset($operatorDataMap[$operatorName])) {
-                    $operatorData = $operatorDataMap[$operatorName];
-                    if ($operatorData && isset($operatorData['id_karyawan'])) {
-                        $id_karyawan = $operatorData['id_karyawan'];
-                    }
-                }
-
-                // Jika tidak ditemukan, id_karyawan tetap null
-                // Bisa juga menambahkan log jika diperlukan
-                if (is_null($id_karyawan)) {
-                    log_message('info', "Operator {$operatorName} tidak ditemukan di API, ID Karyawan di-set null");
-                }
-
-                // Ambil shift yang sedang diproses
-                $shift = $shiftMapping[$index];
-                $qtyPcs = $data[$qtyPcsMapping[$index]] ?? 0;
-                $qtyGram = $data[$qtyGramMapping[$index]] ?? 0;
-
-                // Lewati proses insert jika qty tidak valid (nol atau kosong)
-                // if (((empty($qtyPcs) || $qtyPcs == 0) && (empty($qtyGram) || $qtyGram == 0))) {
-                //     continue;
-                // }
-
-                $noModel = $data[2];
-                $inisial = $data[3];
-                $sz = $this->ApsPerstyleModel->getSizes($noModel, $inisial);
-
-                // Jika model tidak ditemukan
-                if (empty($sz) || !isset($sz['size']) || empty($sz['size'])) {
-                    $failedRows[] = [
-                        'row'      => $rowIndex,
-                        'no_model' => $noModel,
-                        'inisial'  => $inisial,
-                        'error'    => "No Model atau Inisial tidak ditemukan untuk model: '{$noModel}', inisial: '{$inisial}'"
-                    ];
-                    continue;
-                }
-
-                $size = $sz['size'];
-                $noMesin = $data[1];
-
-                // Prepare data insert
-                $dataInsert = [
-                    'tanggal_produksi' => $tgl_produksi,
-                    'id_karyawan' => $id_karyawan,
-                    'nama_karyawan' => $operatorName,
-                    'shift' => $shift,
-                    'area' => $area,
-                    'no_model' => $noModel,
-                    'size' => $size,
-                    'inisial' => $inisial,
-                    'no_mesin' => $noMesin,
-                    'qty_pcs' => $qtyPcs,
-                    'qty_gram' => $qtyGram,
-                    'created_at' => $today,
-                ];
-
-                // Cek apakah data sudah ada
-                $existingBs = $this->bsMesinModel->existingData($dataInsert);
-                if (!$existingBs) {
-                    $result = $this->bsMesinModel->insert($dataInsert);
-                    if (!$result) {
-                        log_message('error', "Gagal insert data pada row {$rowIndex} untuk shift {$shift}");
-                        $failedRows[] = [
-                            'row'      => $rowIndex,
-                            'operator' => $operatorName,
-                            'shift'    => $shift,
-                            'error'    => 'Insert gagal'
-                        ];
-                    }
-                } else {
-                    $idbs = $existingBs['id_bsmc'];
-                    $result = $this->bsMesinModel->update($idbs, ['qty_pcs' => $dataInsert['qty_pcs'], 'qty_gram' => $dataInsert['qty_gram']]);
-                    if (!$result) {
-                        log_message('error', "Gagal update data pada row {$rowIndex} untuk shift {$shift}");
-                        $failedRows[] = [
-                            'row'      => $rowIndex,
-                            'operator' => $operatorName,
-                            'shift'    => $shift,
-                            'error'    => 'update gagal'
-                        ];
-                    }
-                }
-            }
-        }
-
-        $db->transComplete();
+            ->with('success', 'Data BS Mesin berhasil diimpor (optimized).');
     }
 }
