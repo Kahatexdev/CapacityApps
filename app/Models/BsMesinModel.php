@@ -147,7 +147,7 @@ class BsMesinModel extends Model
     }
     public function existingData($insert)
     {
-        $query = $this->select('*')
+        return $this->select('*')
             ->where('nama_karyawan', $insert['nama_karyawan'])
             ->where('shift', $insert['shift'])
             ->where('area', $insert['area'])
@@ -158,12 +158,12 @@ class BsMesinModel extends Model
             ->first(); // Pastikan panggilan get() dilakukan untuk menjalankan query
 
         // Jika query gagal, get() akan mengembalikan false
-        if ($query === false) {
-            log_message('error', 'Query failed in existingData(): ' . $this->db->getLastQuery());
-            return false;
-        }
+        // if ($query === false) {
+        //     log_message('error', 'Query failed in existingData(): ' . $this->db->getLastQuery());
+        //     return false;
+        // }
 
-        return $query;
+        // return $query;
     }
     public function getbsMesinDaily($filters)
     {

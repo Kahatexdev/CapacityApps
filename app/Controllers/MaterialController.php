@@ -1870,11 +1870,11 @@ class MaterialController extends BaseController
                 'max_loss'           => $pemesanan['max_loss'],
                 'tgl_pakai'          => $pemesanan['tgl_pakai'],
                 'id_total_pemesanan' => $pemesanan['id_total_pemesanan'],
-                'ttl_jl_mc'          => $pemesanan['ttl_jl_mc'],
-                'ttl_kg'             => number_format($pemesanan['ttl_kg'], 2),
-                'po_tambahan'        => $pemesanan['po_tambahan'],
-                'ttl_keb'            => number_format($pemesanan['ttl_keb'], 2),
-                'kg_out'             => number_format($pemesanan['kgs_out'], 2),
+                'ttl_jl_mc'          => (int)($pemesanan['ttl_jl_mc'] ?? 0),
+                'ttl_kg'             => (float)($pemesanan['ttl_kg'] ?? 0),   // ← JANGAN number_format di sini
+                'po_tambahan'        => (int)($pemesanan['po_tambahan'] ?? 0),
+                'ttl_keb'            => (float)$ttlKeb,                       // ← hasil hitung, mentah
+                'kg_out'             => (float)($pemesanan['kgs_out'] ?? 0),  // ← mentah
                 'lot_out'            => $pemesanan['lot_out'],
                 // field retur kosong
                 'tgl_retur'          => null,
@@ -1938,11 +1938,11 @@ class MaterialController extends BaseController
                 'ttl_jl_mc'          => null,
                 'ttl_kg'             => null,
                 'po_tambahan'        => null,
-                'ttl_keb'            => number_format($retur['ttl_keb'], 2),
-                'kg_out'             => null,
+                'ttl_keb'            => (float)$ttlKeb,                        // ← mentah
+                'kg_out'             => 0.0,                                   // ← angka 0
                 'lot_out'            => null,
                 'tgl_retur'          => $retur['tgl_retur'],
-                'kgs_retur'          => number_format($retur['kgs_retur'], 2),
+                'kgs_retur'          => (float)($retur['kgs_retur'] ?? 0),     // ← mentah
                 'lot_retur'          => $retur['lot_retur'],
                 'ket_gbn'            => $retur['keterangan_gbn'],
             ];

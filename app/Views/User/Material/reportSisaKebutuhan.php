@@ -119,12 +119,15 @@
                                             $sisa = 0;
                                         }
                                         // Hitung total sementara
-                                        $ttlKgPesan += floatval($id['ttl_kg']);
-                                        $ttlKgOut += floatval($id['kg_out']);
-                                        $ttlKgRetur += floatval($id['kgs_retur']);
+                                        // $ttlKgPesan += floatval($id['ttl_kg']);
+                                        // $ttlKgOut += floatval($id['kg_out']);
+                                        // $ttlKgRetur += floatval($id['kgs_retur']);
+                                        $ttlKgPesan += $id['ttl_kg'];
+                                        $ttlKgOut += $id['kg_out'];
+                                        $ttlKgRetur += $id['kgs_retur'];
                                         // Ambil ttl_keb satu kali per grup
                                         if (!isset($shownKebutuhan[$currentKey])) {
-                                            $ttlKebTotal = floatval($id['ttl_keb']); // Ambil hanya sekali
+                                            $ttlKebTotal = $id['ttl_keb']; // Ambil hanya sekali
                                             $shownKebutuhan[$currentKey] = true;
                                         }
                                         $sisa = $ttlKebTotal - $ttlKgOut + $ttlKgRetur;
