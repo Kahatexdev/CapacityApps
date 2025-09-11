@@ -1478,7 +1478,7 @@ class ProduksiController extends BaseController
             return redirect()->to(base_url(session()->get('role') . '/bsmesin'))
                 ->with('error', 'File Excel tidak valid / sudah dipindahkan.');
         }
-
+        // dd($file);
         // ===== [A] LOAD EXCEL: read-only + rangeToArray =====
         $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($file->getPathname());
         $reader->setReadDataOnly(true);
@@ -1503,6 +1503,7 @@ class ProduksiController extends BaseController
         // dd ($sheet->toArray());
         // Tanggal produksi di B1 (raw)
         $tglRaw = trim((string)$sheet->getCell('B1')->getValue());
+        // dd($tglRaw);
         if (is_numeric($tglRaw)) {
             $dateTime = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($tglRaw);
             $tgl_produksi = $dateTime ? $dateTime->format('Y-m-d') : null;
@@ -1523,7 +1524,7 @@ class ProduksiController extends BaseController
         }
         // rangeToArray: raw values, tanpa format/rumus
         $rows = $sheet->rangeToArray("A{$startRow}:T{$maxRow}", null, false, false, false);
-        // dd ($rows);
+        dd ($rows);
 
         // ===== [B] 1x FETCH KARYAWAN per AREA -> MAP =====
         $operatorMap = []; // nama_karyawan (trim) -> array data karyawan
