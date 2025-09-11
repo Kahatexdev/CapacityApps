@@ -1721,7 +1721,7 @@ class MaterialController extends BaseController
                 $kgPoTambahan = floatval(
                     $getPoPlus['ttl_keb_potambahan'] ?? 0
                 );
-                if ($qty > 0) {
+                if ($qty >= 0) {
                     $kebutuhan = (($qty * $data['gw'] * ($data['composition'] / 100)) * (1 + ($data['loss'] / 100)) / 1000) + $kgPoTambahan;
                     $pemesanan['ttl_keb'] = $ttlKeb;
                 }
@@ -1786,7 +1786,7 @@ class MaterialController extends BaseController
                     $getPoPlus['ttl_keb_potambahan'] ?? 0
                 );
 
-                if ($qty > 0) {
+                if ($qty >= 0) {
                     $kebutuhan = (($qty * $data['gw'] * ($data['composition'] / 100)) * (1 + ($data['loss'] / 100)) / 1000) + $kgPoTambahan;
                     $retur['ttl_keb'] = $ttlKeb;
                 }
