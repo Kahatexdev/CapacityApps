@@ -685,6 +685,11 @@
                     // Ambil area dari payload untuk menentukan URL redirect
                     const area = payload.area?.[0] || ''; // Pastikan 'area' ada atau gunakan default
                     if (resData.status == "success") {
+
+                        const jlMc = payload['items[0][jalan_mc]']?.[0] || payload['ttl_jl_mc']?.[0] || '';
+                        const ttlBerat = payload['items[0][ttl_berat_cns]']?.[0] || payload['ttl_kg_pesan']?.[0] || '';
+                        const ttlQty = payload['items[0][ttl_qty_cns]']?.[0] || payload['ttl_cns_pesan']?.[0] || '';
+
                         // Tampilkan SweetAlert setelah session berhasil dihapus
                         Swal.fire({
                             icon: 'success',
@@ -695,7 +700,25 @@
                             timerProgressBar: true
                         }).then(() => {
                             // Redirect ke halaman yang diinginkan
-                            window.location.href = `${BASE_URL}rosso/listPemesanan/${area}`; // Halaman tujuan setelah sukses
+                            let table = $('#example').DataTable();
+                            let row = table.rows().nodes().to$().filter(function() {
+                                return $(this).find('td:eq(1)').text().trim() == payload.tgl_pakai[0] &&
+                                    $(this).find('td:eq(2)').text().trim() == payload.no_model[0] &&
+                                    $(this).find('td:eq(3)').text().trim() == payload.item_type[0] &&
+                                    $(this).find('td:eq(4)').text().trim() == payload.kode_warna[0];
+                            });
+
+                            if (row.length) {
+                                // update kolom
+                                $(row).find('td:eq(7)').text(payload.ttl_jl_mc || '');
+                                $(row).find('td:eq(8)').text(payload.ttl_kg_pesan || '');
+                                $(row).find('td:eq(9)').text(payload.ttl_cns_pesan || '');
+                                $(row).find('td:eq(10)').text(payload.lot[0] || '');
+                                $(row).find('td:eq(11)').text(payload.keterangan[0] || '');
+                            }
+
+                            $('#updateListModal').modal('hide');
+                            // window.location.href = `${BASE_URL}rosso/listPemesanan/${area}`; // Halaman tujuan setelah sukses
                         });
                     } else {
                         Swal.fire({
@@ -704,7 +727,8 @@
                             text: resData.message || 'Gagal menyimpan data',
                         }).then(() => {
                             // Redirect ke halaman yang diinginkan
-                            window.location.href = `${BASE_URL}rosso/listPemesanan/${area}`; // Halaman tujuan setelah sukses
+
+                            // window.location.href = `${BASE_URL}rosso/listPemesanan/${area}`; // Halaman tujuan setelah sukses
                         });
                         console.error('Response Data:', resData);
                     }

@@ -775,9 +775,9 @@
 
                             if (row.length) {
                                 // update kolom
-                                $(row).find('td:eq(7)').text(jlMc || '');
-                                $(row).find('td:eq(8)').text(ttlBerat || '');
-                                $(row).find('td:eq(9)').text(ttlQty || '');
+                                $(row).find('td:eq(7)').text(payload.ttl_jl_mc || '');
+                                $(row).find('td:eq(8)').text(payload.ttl_kg_pesan || '');
+                                $(row).find('td:eq(9)').text(payload.ttl_cns_pesan || '');
                                 $(row).find('td:eq(10)').text(payload.lot[0] || '');
                                 $(row).find('td:eq(11)').text(payload.keterangan[0] || '');
                             }
