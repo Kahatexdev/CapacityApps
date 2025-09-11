@@ -69,7 +69,7 @@
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Qty Retur (Kg)</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Lot Retur</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Ket Gbn</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Sisa (Kirim - Kebutuhan - Retur)</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Sisa (Kebutuhan - Kirim + Retur)</th>
                                 </tr>
                             </thead>
                             <tbody>
