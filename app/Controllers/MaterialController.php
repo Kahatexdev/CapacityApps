@@ -326,8 +326,13 @@ class MaterialController extends BaseController
         // Hitung ttl_kebutuhan
         foreach ($data as $key => $item) {
             if (isset($qtyOrder, $item['composition'], $item['gw'], $item['loss'])) {
-                // Hitung ttl_keb untuk setiap item
-                $ttl_keb = $qtyOrder * $item['gw'] * ($item['composition'] / 100) * (1 + ($item['loss'] / 100)) / 1000;
+                if (isset($item['item_type']) && stripos($item['item_type'], 'JHT') !== false) {
+                    // Hitung ttl_keb untuk setiap item nylon jht
+                    $ttl_keb = $item['kgs'] ?? 0;
+                } else {
+                    // Hitung ttl_keb untuk setiap item
+                    $ttl_keb = $qtyOrder * $item['gw'] * ($item['composition'] / 100) * (1 + ($item['loss'] / 100)) / 1000;
+                }
 
                 // Tambahkan ttl_keb ke elemen saat ini
                 $data[$key]['ttl_keb'] = number_format($ttl_keb, 2);
@@ -523,7 +528,6 @@ class MaterialController extends BaseController
 
         // reindex array
         $dataList = array_values($filteredRaw);
-
         foreach ($dataList as $key => $order) {
             $dataList[$key]['ttl_kebutuhan_bb'] = 0;
             if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
@@ -542,7 +546,11 @@ class MaterialController extends BaseController
                             $kgPoTambahan = $tambahan['ttl_keb_potambahan'] ?? 0;
                             log_message('info', 'inii :' . $kgPoTambahan);
                             if (isset($orderQty['qty'])) {
-                                $requirement = ($orderQty['qty'] * $style['gw'] * ($style['composition'] / 100) * (1 + ($style['loss'] / 100)) / 1000) + $kgPoTambahan;
+                                if (isset($item['item_type']) && stripos($item['item_type'], 'JHT') !== false) {
+                                    $requirement = $style['kgs'];
+                                } else {
+                                    $requirement = ($orderQty['qty'] * $style['gw'] * ($style['composition'] / 100) * (1 + ($style['loss'] / 100)) / 1000) + $kgPoTambahan;
+                                }
                                 $totalRequirement += $requirement;
                                 $dataList[$key]['qty'] = $orderQty['qty'];
                             }
@@ -669,7 +677,11 @@ class MaterialController extends BaseController
                             $kgPoTambahan = $tambahan['ttl_keb_potambahan'] ?? 0;
                             log_message('info', 'inii :' . $kgPoTambahan);
                             if (isset($orderQty['qty'])) {
-                                $requirement = ($orderQty['qty'] * $style['gw'] * ($style['composition'] / 100) * (1 + ($style['loss'] / 100)) / 1000) + $kgPoTambahan;
+                                if (isset($style['item_type']) && stripos($style['item_type'], 'JHT') !== false) {
+                                    $requirement = $style['kgs'] ?? 0;
+                                } else {
+                                    $requirement = ($orderQty['qty'] * $style['gw'] * ($style['composition'] / 100) * (1 + ($style['loss'] / 100)) / 1000) + $kgPoTambahan;
+                                }
                                 $totalRequirement += $requirement;
                                 $dataList[$key]['qty'] = $orderQty['qty'];
                             }
