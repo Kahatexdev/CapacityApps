@@ -69,7 +69,7 @@
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Qty Retur (Kg)</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Lot Retur</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Ket Gbn</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Sisa (Kirim - Kebutuhan - Retur)</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Sisa (Kebutuhan - Kirim + Retur)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -119,12 +119,15 @@
                                             $sisa = 0;
                                         }
                                         // Hitung total sementara
-                                        $ttlKgPesan += floatval($id['ttl_kg']);
-                                        $ttlKgOut += floatval($id['kg_out']);
-                                        $ttlKgRetur += floatval($id['kgs_retur']);
+                                        // $ttlKgPesan += floatval($id['ttl_kg']);
+                                        // $ttlKgOut += floatval($id['kg_out']);
+                                        // $ttlKgRetur += floatval($id['kgs_retur']);
+                                        $ttlKgPesan += $id['ttl_kg'];
+                                        $ttlKgOut += $id['kg_out'];
+                                        $ttlKgRetur += $id['kgs_retur'];
                                         // Ambil ttl_keb satu kali per grup
                                         if (!isset($shownKebutuhan[$currentKey])) {
-                                            $ttlKebTotal = floatval($id['ttl_keb']); // Ambil hanya sekali
+                                            $ttlKebTotal = $id['ttl_keb']; // Ambil hanya sekali
                                             $shownKebutuhan[$currentKey] = true;
                                         }
                                         $sisa = $ttlKebTotal - $ttlKgOut + $ttlKgRetur;

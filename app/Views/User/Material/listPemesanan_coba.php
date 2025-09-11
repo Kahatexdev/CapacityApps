@@ -212,49 +212,52 @@
                                         <td class="text-xs">
                                             <?php
                                             $show = "d-none";
-                                            // $batasWaktu = '08:30:00';
-                                            $batasWaktu = '23:30:00';
-
-                                            if ($id['sisa_jatah'] > 0) {
+                                            $batasWaktu = '00:00:00';
+                                            // ambil jenis dalam huruf kecil: benang, nylon, spandex, karet 
+                                            $jenis = strtolower($id['jenis']);
+                                            // cek syarat tampil tombol 
+                                            $bolehTampil = false;
+                                            if ($id['sisa_jatah'] > 0 && $jenis != "nylon") {
                                                 if ($ttl_kg_pesan <= $id['sisa_jatah']) {
-                                                    // ambil jenis dalam huruf kecil: benang, nylon, spandex, karet
-                                                    $jenis = strtolower($id['jenis']);
-
-                                                    // cek di $result
-                                                    if (isset($result[$jenis])) {
-                                                        foreach ($result[$jenis] as $row) {
-                                                            // kalau tgl_pakai cocok
-                                                            if ($id['tgl_pakai'] == $row['tgl_pakai']) {
-                                                                $show = "";
-
-                                                                if ($id['status_kirim'] === 'request accept') {
-                                                                    $batasWaktu = $id['additional_time']; // override kalau request accept
-                                                                } else {
-                                                                    $batasWaktu = $row['batas_waktu'];
-                                                                }
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                            ?>
-                                                    <button type="button" id="sendBtn" class="btn btn-info text-xs <?= $show ?> send-btn" data-toggle="modal"
-                                                        data-area="<?= $area; ?>"
-                                                        data-tgl="<?= $id['tgl_pakai']; ?>"
-                                                        data-model="<?= $id['no_model']; ?>"
-                                                        data-item="<?= $id['item_type']; ?>"
-                                                        data-kode="<?= $id['kode_warna']; ?>"
-                                                        data-color="<?= $id['color']; ?>"
-                                                        data-waktu="<?= $batasWaktu; ?>"
-                                                        data-po-tambahan="<?= $id['po_tambahan']; ?>">
-                                                        <i class="fa fa-paper-plane fa-lg"></i>
-                                                    </button>
-                                            <?php
+                                                    $bolehTampil = true;
                                                 }
-                                            }  ?>
+                                            } elseif ($id['sisa_jatah'] < 0 && $jenis != "nylon") {
+                                                $bolehTampil = false;
+                                            } else {
+                                                $bolehTampil = true;
+                                            }
+                                            if ($bolehTampil && isset($result[$jenis])) {
+                                                foreach ($result[$jenis] as $row) {
+                                                    if ($id['tgl_pakai'] == $row['tgl_pakai']) {
+                                                        $batasWaktu = ($id['status_kirim'] === 'request accept')
+                                                            ? $id['additional_time']
+                                                            : $row['batas_waktu'];
+                                            ?>
+                                                        <button type="button" id="sendBtn"
+                                                            class="btn btn-info text-xs send-btn"
+                                                            data-toggle="modal"
+                                                            data-area="<?= $area; ?>"
+                                                            data-tgl="<?= $id['tgl_pakai']; ?>"
+                                                            data-model="<?= $id['no_model']; ?>"
+                                                            data-item="<?= $id['item_type']; ?>"
+                                                            data-kode="<?= $id['kode_warna']; ?>"
+                                                            data-color="<?= $id['color']; ?>"
+                                                            data-waktu="<?= $batasWaktu; ?>"
+                                                            data-po-tambahan="<?= $id['po_tambahan']; ?>">
+                                                            <i class="fa fa-paper-plane fa-lg"></i>
+                                                        </button>
+                                            <?php
+                                                        break; // keluar dari foreach
+                                                    }
+                                                }
+                                            }
+
+                                            ?>
                                         </td>
                                     </tr>
                                 <?php
-                                } ?>
+                                }
+                                ?>
                             </tbody>
                         </table>
                     </div>
