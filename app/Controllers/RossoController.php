@@ -573,7 +573,7 @@ class RossoController extends BaseController
         ];
 
         // Jam awal
-        $startTime = "23:30:00";
+        $startTime = "08:30:00";
         // Helper untuk generate jadwal
         function generateRangeDates($today, $range, $liburDates, $startTime, $initialOffset = 1)
         {

@@ -163,7 +163,7 @@
                                             $show = "d-none";
                                             $show = "d-none";
                                             // $batasWaktu = '08:30:00';
-                                            $batasWaktu = '23:30:00';
+                                            $batasWaktu = '00:00:00';
 
                                             // if ($id['sisa_jatah'] > 0) {
                                             if ($ttl_kg_pesan <= $id['sisa_jatah']) {
