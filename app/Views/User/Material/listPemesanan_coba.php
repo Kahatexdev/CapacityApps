@@ -99,6 +99,7 @@
 
                                     <div class="modal-body">
                                         <form action="<?= esc(base_url(esc($role) . '/requestAdditionalTime')) ?>" method="post">
+                                            <input type="hidden" name="area" value="<?= $area ?>">
                                             <div class="mb-3">
                                                 <select name="jenis" id="jenisBenang" class="form-select" required>
                                                     <option value="">Pilih Jenis Benang</option>

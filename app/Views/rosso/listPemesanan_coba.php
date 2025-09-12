@@ -58,6 +58,7 @@
                                         <div class="modal-body">
                                             <!-- Konten modal, misalnya formulir -->
                                             <form action="<?= base_url($role . '/requestAdditionalTime') ?>" method="post">
+                                                <input type="hidden" name="area" value="<?= $area ?>">
                                                 <div class="mb-3">
                                                     <select name="jenis" id="jenisBenang" class="form-select" required>
                                                         <option value="">Pilih Jenis Benang</option>
