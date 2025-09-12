@@ -758,10 +758,12 @@ class MaterialController extends BaseController
     {
         $area = $this->request->getPost('area');
         $jenis = $this->request->getPost('jenis');
-        $tanggal_pakai = $this->request->getPost('tanggal_pakai');
+        $tanggal_pakai = $this->request->getPost('tgl_pakai');
 
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
         $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/requestAdditionalTime/' . $area . '?jenis=' . urlencode($jenis) . '&tanggal_pakai=' . urlencode($tanggal_pakai);
+
+        dd($tanggal_pakai);
 
         try {
             // Mengambil respon dari API eksternal
