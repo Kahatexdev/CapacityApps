@@ -582,7 +582,6 @@ class MaterialController extends BaseController
         function getNextNonHoliday($date, $liburDates)
         {
             while (in_array($date, $liburDates)) {
-                // Jika tanggal ada di daftar libur, tambahkan 1 hari
                 $date = date('Y-m-d', strtotime($date . ' +1 day'));
             }
             return $date;
@@ -602,9 +601,9 @@ class MaterialController extends BaseController
         ];
 
         // Jam awal
-        $startTime = "23:30:00";
+        $startTime = "10:00:00";
         // Helper untuk generate jadwal
-        function generateRangeDates($today, $range, $liburDates, $startTime, $initialOffset = 1)
+        function generateRangeDates($today, $range, $liburDates, $startTime, $initialOffset)
         {
             $result = [];
             $currentDate = $today;
@@ -613,7 +612,6 @@ class MaterialController extends BaseController
                 // kalau loop pertama pakai initialOffset (bisa 1 atau 2)
                 // setelah itu selalu pakai offset 1
                 $offset = ($i === 1) ? $initialOffset : 1;
-
                 for ($j = 0; $j < $offset; $j++) {
                     $currentDate = date('Y-m-d', strtotime($currentDate . " +1 day"));
                     $currentDate = getNextNonHoliday($currentDate, $liburDates);
@@ -633,13 +631,18 @@ class MaterialController extends BaseController
         }
 
         // Spandex & Karet → cek apakah hari ini Jumat atau Sabtu
+        $initialOffsetBenang = ($day === 'Saturday') ? 2 : 1;
+        $initialOffsetNylon   = ($day === 'Saturday') ? 2 : 1;
         $initialOffsetSpandex = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
         $initialOffsetKaret   = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
+        // dd($initialOffsetBenang);
 
-        $result['benang']  = generateRangeDates($today, (int)$masterRangePemesanan['range_benang'], $liburDates, $startTime, 1);
-        $result['nylon']   = generateRangeDates($today, (int)$masterRangePemesanan['range_nylon'], $liburDates, $startTime, 1);
+        $result['benang']  = generateRangeDates($today, (int)$masterRangePemesanan['range_benang'], $liburDates, $startTime, $initialOffsetBenang);
+        $result['nylon']   = generateRangeDates($today, (int)$masterRangePemesanan['range_nylon'], $liburDates, $startTime, $initialOffsetNylon);
         $result['spandex'] = generateRangeDates($today, (int)$masterRangePemesanan['range_spandex'], $liburDates, $startTime, $initialOffsetSpandex);
         $result['karet']   = generateRangeDates($today, (int)$masterRangePemesanan['range_karet'], $liburDates, $startTime, $initialOffsetKaret);
+
+        dd($result['benang']);
 
         $data = [
             'role' => session()->get('role'),
