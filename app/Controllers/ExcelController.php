@@ -4587,7 +4587,7 @@ class ExcelController extends BaseController
                 $row['color'],
                 $row['item_type'],
                 $row['kode_warna'],
-                '',
+                $row['style_size'],
                 $row['composition'],
                 $row['gw'],
                 $row['qty_pcs'],
