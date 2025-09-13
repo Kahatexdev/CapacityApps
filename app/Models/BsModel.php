@@ -169,6 +169,10 @@ class BsModel extends Model
     }
     public function getBsPph($idaps)
     {
+        if (empty($idaps)) {
+            return ['bs_setting' => 0];
+        }
+
         $return = $this->select('SUM(qty) AS bs_setting')
             ->whereIn('idapsperstyle', $idaps)
             ->first();
