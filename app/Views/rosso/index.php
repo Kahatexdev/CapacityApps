@@ -79,10 +79,11 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label for="itemType">Area</label>
-                                    <select class="form-control" id="area" name="area" required>
+                                    <select class="form-control" id="area" name="area_mc" required>
                                         <option value="">Pilih Area</option>
                                     </select>
                                 </div>
+                                <input type="hidden" name="area" value="<?= $area ?>">
                             </div>
 
                             <div class="row g-3 mb-1" id="detailContainer">
@@ -756,11 +757,12 @@
 
             // Jika tabel tidak kosong, lanjutkan proses submit
             const formData = $(this).serializeArray();
-
+            console.log(formData); // Debug data yang akan dikirim
             $.ajax({
                 url: "<?= base_url($role . '/bahanBaku/simpanKeSession') ?>",
                 method: "POST",
                 data: formData,
+
                 success: function(response) {
                     console.log(response);
                     // Cek status dari Proses 1

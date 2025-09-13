@@ -1478,7 +1478,7 @@ class ProduksiController extends BaseController
             return redirect()->to(base_url(session()->get('role') . '/bsmesin'))
                 ->with('error', 'File Excel tidak valid / sudah dipindahkan.');
         }
-
+        // dd($file);
         // ===== [A] LOAD EXCEL: read-only + rangeToArray =====
         $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($file->getPathname());
         $reader->setReadDataOnly(true);
@@ -1503,6 +1503,7 @@ class ProduksiController extends BaseController
         // dd ($sheet->toArray());
         // Tanggal produksi di B1 (raw)
         $tglRaw = trim((string)$sheet->getCell('B1')->getValue());
+        // dd($tglRaw);
         if (is_numeric($tglRaw)) {
             $dateTime = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($tglRaw);
             $tgl_produksi = $dateTime ? $dateTime->format('Y-m-d') : null;
@@ -1522,7 +1523,7 @@ class ProduksiController extends BaseController
             return redirect()->back()->with('error', 'Tidak ada data pada sheet.');
         }
         // rangeToArray: raw values, tanpa format/rumus
-        $rows = $sheet->rangeToArray("A{$startRow}:T{$maxRow}", null, false, false, false);
+        $rows = $sheet->rangeToArray("A{$startRow}:T{$maxRow}", null, true, false, false);
         // dd ($rows);
 
         // ===== [B] 1x FETCH KARYAWAN per AREA -> MAP =====
@@ -1615,9 +1616,9 @@ class ProduksiController extends BaseController
                 $qtyGram = (float)($cols[$QTY_GRM[$i]] ?? 0.0);
 
                 // [D] SKIP BARIS KOSONG SEDINI MUNGKIN
-                if ($qtyPcs === 0 && $qtyGram === 0.0) {
-                    continue;
-                }
+                // if ($qtyPcs === 0 && $qtyGram === 0.0) {
+                //     continue;
+                // }
 
                 // Ambil id_karyawan dari map (jika tidak ada, tetap null)
                 $idKaryawan = null;
@@ -1680,16 +1681,16 @@ class ProduksiController extends BaseController
                 // Placeholder values (?, ?, ..., ?)
                 $valuesPart = '(' . implode(',', array_fill(0, count($cols), '?')) . ')';
                 $valuesAll  = implode(',', array_fill(0, count($chunk), $valuesPart));
-
-                // ON DUPLICATE KEY UPDATE — hanya update qty & updated_at
+                // dd($colList,$valuesPart, $valuesAll, $chunk);
+                // ON DUPLICATE KEY UPDATE — hanya update qty & updated_at  
                 $sql = "INSERT INTO `bs_mesin` ({$colList}) VALUES {$valuesAll}
                     ON DUPLICATE KEY UPDATE
                       `qty_pcs` = VALUES(`qty_pcs`),
                       `qty_gram`= VALUES(`qty_gram`),
                       `nama_karyawan` = VALUES(`nama_karyawan`),
                       `id_karyawan`   = VALUES(`id_karyawan`),
-                      `updated_at` = VALUES(`created_at`)";
-
+                      `update_at` = VALUES(`created_at`)";
+                // log_message('debug', 'query'.$sql);
                 // Flatten bind
                 $bind = [];
                 foreach ($chunk as $r) {
@@ -1697,6 +1698,7 @@ class ProduksiController extends BaseController
                         $bind[] = $r[$c] ?? null;
                     }
                 }
+                // dd($colList, $valuesPart, $valuesAll, $chunk,$bind);
 
                 $db->query($sql, $bind);
             }

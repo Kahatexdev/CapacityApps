@@ -326,8 +326,13 @@ class MaterialController extends BaseController
         // Hitung ttl_kebutuhan
         foreach ($data as $key => $item) {
             if (isset($qtyOrder, $item['composition'], $item['gw'], $item['loss'])) {
-                // Hitung ttl_keb untuk setiap item
-                $ttl_keb = $qtyOrder * $item['gw'] * ($item['composition'] / 100) * (1 + ($item['loss'] / 100)) / 1000;
+                if (isset($item['item_type']) && stripos($item['item_type'], 'JHT') !== false) {
+                    // Hitung ttl_keb untuk setiap item nylon jht
+                    $ttl_keb = $item['kgs'] ?? 0;
+                } else {
+                    // Hitung ttl_keb untuk setiap item
+                    $ttl_keb = $qtyOrder * $item['gw'] * ($item['composition'] / 100) * (1 + ($item['loss'] / 100)) / 1000;
+                }
 
                 // Tambahkan ttl_keb ke elemen saat ini
                 $data[$key]['ttl_keb'] = number_format($ttl_keb, 2);
@@ -542,134 +547,11 @@ class MaterialController extends BaseController
                             $kgPoTambahan = $tambahan['ttl_keb_potambahan'] ?? 0;
                             log_message('info', 'inii :' . $kgPoTambahan);
                             if (isset($orderQty['qty'])) {
-                                $requirement = ($orderQty['qty'] * $style['gw'] * ($style['composition'] / 100) * (1 + ($style['loss'] / 100)) / 1000) + $kgPoTambahan;
-                                $totalRequirement += $requirement;
-                                $dataList[$key]['qty'] = $orderQty['qty'];
-                            }
-                        }
-                    }
-                    $dataList[$key]['ttl_kebutuhan_bb'] = $totalRequirement;
-                }
-
-                $pengirimanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
-                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
-                $pengiriman = $this->fetchApiData($pengirimanApiUrl);
-                $dataList[$key]['ttl_pengiriman'] = $pengiriman['kgs_out'] ?? 0;
-
-                // Hitung sisa jatah
-                $dataList[$key]['sisa_jatah'] = $dataList[$key]['ttl_kebutuhan_bb'] - $dataList[$key]['ttl_pengiriman'];
-            }
-        }
-
-        // dd($dataList);
-
-        // ambil data libur hari kedepan untuk menentukan jadwal pemesanan
-        $today = date('Y-m-d'); // ambil data hari ini
-        $dataLibur = $this->liburModel->getDataLiburForPemesanan($today);
-        // Ambil data tanggal libur menjadi array sederhana
-        $liburDates = array_column($dataLibur, 'tanggal'); // Ambil hanya kolom 'tanggal'
-
-        $day = date('l'); // ambil data hari ini
-        function getNextNonHoliday($date, $liburDates)
-        {
-            while (in_array($date, $liburDates)) {
-                // Jika tanggal ada di daftar libur, tambahkan 1 hari
-                $date = date('Y-m-d', strtotime($date . ' +1 day'));
-            }
-            return $date;
-        }
-
-        $initialTomorrow = date('Y-m-d', strtotime('+1 day')); // Mulai dari hari besok
-        $tomorrow = getNextNonHoliday($initialTomorrow, $liburDates); // Dapatkan tanggal "tomorrow" yang valid (bukan libur)
-
-        // Untuk tanggal berikutnya, kita ambil 1 hari setelah tanggal "tomorrow" dan cek ulang
-        $initialTwoDays = date('Y-m-d', strtotime($tomorrow . ' +1 day'));
-        $twoDays = getNextNonHoliday($initialTwoDays, $liburDates);
-
-        // Untuk tanggal ketiga, ambil 1 hari setelah tanggal "twoDays" dan cek ulang
-        $initialthreeDay = date('Y-m-d', strtotime($twoDays . ' +1 day'));
-        $threeDays = getNextNonHoliday($initialthreeDay, $liburDates);
-
-        // Untuk tanggal keempat, ambil 1 hari setelah tanggal "threeDays" dan cek ulang
-        $initialFourDays = date('Y-m-d', strtotime($threeDays . ' +1 day'));
-        $fourDays        = getNextNonHoliday($initialFourDays, $liburDates);
-
-        $data = [
-            'role' => session()->get('role'),
-            'active1' => '',
-            'active2' => '',
-            'active3' => '',
-            'active4' => '',
-            'active5' => '',
-            'active6' => 'active',
-            'active7' => '',
-            'area' => $area,
-            'title' => 'Bahan Baku',
-            'dataList' => $dataList,
-            'day' => $day,
-            'tomorrow' => $tomorrow,
-            'twoDays' => $twoDays,
-            'threeDays' => $threeDays,
-            'fourDays' => $fourDays,
-            'filter_tgl' => $tglPakai,
-            'filter_pdk' => $pdk,
-        ];
-
-        return view(session()->get('role') . '/Material/listPemesanan', $data);
-    }
-
-    public function listPemesananCoba($area)
-    {
-        // ambil filter dari query string (jika ada)
-        $tglPakai = $this->request->getGet('tgl_pakai');
-        $pdk      = $this->request->getGet('searchPdk');
-
-        $rawList = $this->fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listPemesanan/{$area}");
-        if (!is_array($rawList)) {
-            // handle error dengan baik
-            return redirect()->back()->with('error', 'Gagal mengambil data pemesanan.');
-        }
-        // Filter RAW data dulu (mengurangi jumlah panggilan API untuk enrichment)
-        $filteredRaw = array_filter($rawList, function ($order) use ($tglPakai, $pdk) {
-            // jika kedua filter diberikan -> cari yang memenuhi KEDUA kondisi
-            if ($tglPakai && $pdk) {
-                return (isset($order['tgl_pakai']) && $order['tgl_pakai'] === $tglPakai)
-                    && (isset($order['no_model']) && stripos($order['no_model'], $pdk) !== false);
-            }
-            // jika hanya tglPakai
-            if ($tglPakai) {
-                return isset($order['tgl_pakai']) && $order['tgl_pakai'] === $tglPakai;
-            }
-            // jika hanya pdk/no_model (support partial search)
-            if ($pdk) {
-                return isset($order['no_model']) && stripos($order['no_model'], $pdk) !== false;
-            }
-            // jika tidak ada filter -> tampilkan semua
-            return true;
-        });
-
-        // reindex array
-        $dataList = array_values($filteredRaw);
-
-        foreach ($dataList as $key => $order) {
-            $dataList[$key]['ttl_kebutuhan_bb'] = 0;
-            if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
-                $styleApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model='
-                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
-                $styleList = $this->fetchApiData($styleApiUrl);
-
-                if ($styleList) {
-                    $totalRequirement = 0;
-                    foreach ($styleList as $style) {
-                        if (isset($style['no_model'], $style['style_size'], $style['gw'], $style['composition'], $style['loss'])) {
-                            $orderQty = $this->ApsPerstyleModel->getQtyOrder($style['no_model'], $style['style_size'], $area);
-                            $tambahanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getKgTambahan?no_model='
-                                . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&style_size=' . urlencode($style['style_size']) . '&area=' . $area;
-                            $tambahan = $this->fetchApiData($tambahanApiUrl);
-                            $kgPoTambahan = $tambahan['ttl_keb_potambahan'] ?? 0;
-                            log_message('info', 'inii :' . $kgPoTambahan);
-                            if (isset($orderQty['qty'])) {
-                                $requirement = ($orderQty['qty'] * $style['gw'] * ($style['composition'] / 100) * (1 + ($style['loss'] / 100)) / 1000) + $kgPoTambahan;
+                                if (isset($style['item_type']) && stripos($style['item_type'], 'JHT') !== false) {
+                                    $requirement = $style['kgs'] ?? 0;
+                                } else {
+                                    $requirement = ($orderQty['qty'] * $style['gw'] * ($style['composition'] / 100) * (1 + ($style['loss'] / 100)) / 1000) + $kgPoTambahan;
+                                }
                                 $totalRequirement += $requirement;
                                 $dataList[$key]['qty'] = $orderQty['qty'];
                             }
@@ -700,7 +582,6 @@ class MaterialController extends BaseController
         function getNextNonHoliday($date, $liburDates)
         {
             while (in_array($date, $liburDates)) {
-                // Jika tanggal ada di daftar libur, tambahkan 1 hari
                 $date = date('Y-m-d', strtotime($date . ' +1 day'));
             }
             return $date;
@@ -720,9 +601,9 @@ class MaterialController extends BaseController
         ];
 
         // Jam awal
-        $startTime = "23:30:00";
+        $startTime = "10:00:00";
         // Helper untuk generate jadwal
-        function generateRangeDates($today, $range, $liburDates, $startTime, $initialOffset = 1)
+        function generateRangeDates($today, $range, $liburDates, $startTime, $initialOffset)
         {
             $result = [];
             $currentDate = $today;
@@ -731,7 +612,6 @@ class MaterialController extends BaseController
                 // kalau loop pertama pakai initialOffset (bisa 1 atau 2)
                 // setelah itu selalu pakai offset 1
                 $offset = ($i === 1) ? $initialOffset : 1;
-
                 for ($j = 0; $j < $offset; $j++) {
                     $currentDate = date('Y-m-d', strtotime($currentDate . " +1 day"));
                     $currentDate = getNextNonHoliday($currentDate, $liburDates);
@@ -751,11 +631,14 @@ class MaterialController extends BaseController
         }
 
         // Spandex & Karet → cek apakah hari ini Jumat atau Sabtu
+        $initialOffsetBenang = ($day === 'Saturday') ? 2 : 1;
+        $initialOffsetNylon   = ($day === 'Saturday') ? 2 : 1;
         $initialOffsetSpandex = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
         $initialOffsetKaret   = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
+        // dd($initialOffsetBenang);
 
-        $result['benang']  = generateRangeDates($today, (int)$masterRangePemesanan['range_benang'], $liburDates, $startTime, 1);
-        $result['nylon']   = generateRangeDates($today, (int)$masterRangePemesanan['range_nylon'], $liburDates, $startTime, 1);
+        $result['benang']  = generateRangeDates($today, (int)$masterRangePemesanan['range_benang'], $liburDates, $startTime, $initialOffsetBenang);
+        $result['nylon']   = generateRangeDates($today, (int)$masterRangePemesanan['range_nylon'], $liburDates, $startTime, $initialOffsetNylon);
         $result['spandex'] = generateRangeDates($today, (int)$masterRangePemesanan['range_spandex'], $liburDates, $startTime, $initialOffsetSpandex);
         $result['karet']   = generateRangeDates($today, (int)$masterRangePemesanan['range_karet'], $liburDates, $startTime, $initialOffsetKaret);
 
@@ -876,7 +759,7 @@ class MaterialController extends BaseController
     {
         $area = $this->request->getPost('area');
         $jenis = $this->request->getPost('jenis');
-        $tanggal_pakai = $this->request->getPost('tanggal_pakai');
+        $tanggal_pakai = $this->request->getPost('tgl_pakai');
 
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
         $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/requestAdditionalTime/' . $area . '?jenis=' . urlencode($jenis) . '&tanggal_pakai=' . urlencode($tanggal_pakai);
@@ -1839,7 +1722,7 @@ class MaterialController extends BaseController
                 $kgPoTambahan = floatval(
                     $getPoPlus['ttl_keb_potambahan'] ?? 0
                 );
-                if ($qty > 0) {
+                if ($qty >= 0) {
                     $kebutuhan = (($qty * $data['gw'] * ($data['composition'] / 100)) * (1 + ($data['loss'] / 100)) / 1000) + $kgPoTambahan;
                     $pemesanan['ttl_keb'] = $ttlKeb;
                 }
@@ -1858,11 +1741,11 @@ class MaterialController extends BaseController
                 'max_loss'           => $pemesanan['max_loss'],
                 'tgl_pakai'          => $pemesanan['tgl_pakai'],
                 'id_total_pemesanan' => $pemesanan['id_total_pemesanan'],
-                'ttl_jl_mc'          => $pemesanan['ttl_jl_mc'],
-                'ttl_kg'             => number_format($pemesanan['ttl_kg'], 2),
-                'po_tambahan'        => $pemesanan['po_tambahan'],
-                'ttl_keb'            => number_format($pemesanan['ttl_keb'], 2),
-                'kg_out'             => number_format($pemesanan['kgs_out'], 2),
+                'ttl_jl_mc'          => (int)($pemesanan['ttl_jl_mc'] ?? 0),
+                'ttl_kg'             => (float)($pemesanan['ttl_kg'] ?? 0),   // ← JANGAN number_format di sini
+                'po_tambahan'        => (int)($pemesanan['po_tambahan'] ?? 0),
+                'ttl_keb'            => (float)$ttlKeb,                       // ← hasil hitung, mentah
+                'kg_out'             => (float)($pemesanan['kgs_out'] ?? 0),  // ← mentah
                 'lot_out'            => $pemesanan['lot_out'],
                 // field retur kosong
                 'tgl_retur'          => null,
@@ -1904,7 +1787,7 @@ class MaterialController extends BaseController
                     $getPoPlus['ttl_keb_potambahan'] ?? 0
                 );
 
-                if ($qty > 0) {
+                if ($qty >= 0) {
                     $kebutuhan = (($qty * $data['gw'] * ($data['composition'] / 100)) * (1 + ($data['loss'] / 100)) / 1000) + $kgPoTambahan;
                     $retur['ttl_keb'] = $ttlKeb;
                 }
@@ -1926,11 +1809,11 @@ class MaterialController extends BaseController
                 'ttl_jl_mc'          => null,
                 'ttl_kg'             => null,
                 'po_tambahan'        => null,
-                'ttl_keb'            => number_format($retur['ttl_keb'], 2),
-                'kg_out'             => null,
+                'ttl_keb'            => (float)$ttlKeb,                        // ← mentah
+                'kg_out'             => 0.0,                                   // ← angka 0
                 'lot_out'            => null,
                 'tgl_retur'          => $retur['tgl_retur'],
-                'kgs_retur'          => number_format($retur['kgs_retur'], 2),
+                'kgs_retur'          => (float)($retur['kgs_retur'] ?? 0),     // ← mentah
                 'lot_retur'          => $retur['lot_retur'],
                 'ket_gbn'            => $retur['keterangan_gbn'],
             ];

@@ -188,7 +188,7 @@ class UserController extends BaseController
             'active6' => '',
             'active7' => '',
             'targetProd' => 0,
-            'karyawan' => $karyawan,
+            // 'karyawan' => $karyawan,
             'month' => $month,
             'areas' => $area,
             'pdk' => $dataPdk,

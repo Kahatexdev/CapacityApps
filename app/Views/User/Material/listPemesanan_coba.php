@@ -99,6 +99,7 @@
 
                                     <div class="modal-body">
                                         <form action="<?= esc(base_url(esc($role) . '/requestAdditionalTime')) ?>" method="post">
+                                            <input type="hidden" name="area" value="<?= $area ?>">
                                             <div class="mb-3">
                                                 <select name="jenis" id="jenisBenang" class="form-select" required>
                                                     <option value="">Pilih Jenis Benang</option>
@@ -212,49 +213,52 @@
                                         <td class="text-xs">
                                             <?php
                                             $show = "d-none";
-                                            // $batasWaktu = '08:30:00';
-                                            $batasWaktu = '23:30:00';
-
-                                            if ($id['sisa_jatah'] > 0) {
+                                            $batasWaktu = '00:00:00';
+                                            // ambil jenis dalam huruf kecil: benang, nylon, spandex, karet 
+                                            $jenis = strtolower($id['jenis']);
+                                            // cek syarat tampil tombol 
+                                            $bolehTampil = false;
+                                            if ($id['sisa_jatah'] > 0 && $jenis != "nylon") {
                                                 if ($ttl_kg_pesan <= $id['sisa_jatah']) {
-                                                    // ambil jenis dalam huruf kecil: benang, nylon, spandex, karet
-                                                    $jenis = strtolower($id['jenis']);
-
-                                                    // cek di $result
-                                                    if (isset($result[$jenis])) {
-                                                        foreach ($result[$jenis] as $row) {
-                                                            // kalau tgl_pakai cocok
-                                                            if ($id['tgl_pakai'] == $row['tgl_pakai']) {
-                                                                $show = "";
-
-                                                                if ($id['status_kirim'] === 'request accept') {
-                                                                    $batasWaktu = $id['additional_time']; // override kalau request accept
-                                                                } else {
-                                                                    $batasWaktu = $row['batas_waktu'];
-                                                                }
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                            ?>
-                                                    <button type="button" id="sendBtn" class="btn btn-info text-xs <?= $show ?> send-btn" data-toggle="modal"
-                                                        data-area="<?= $area; ?>"
-                                                        data-tgl="<?= $id['tgl_pakai']; ?>"
-                                                        data-model="<?= $id['no_model']; ?>"
-                                                        data-item="<?= $id['item_type']; ?>"
-                                                        data-kode="<?= $id['kode_warna']; ?>"
-                                                        data-color="<?= $id['color']; ?>"
-                                                        data-waktu="<?= $batasWaktu; ?>"
-                                                        data-po-tambahan="<?= $id['po_tambahan']; ?>">
-                                                        <i class="fa fa-paper-plane fa-lg"></i>
-                                                    </button>
-                                            <?php
+                                                    $bolehTampil = true;
                                                 }
-                                            }  ?>
+                                            } elseif ($id['sisa_jatah'] < 0 && $jenis != "nylon") {
+                                                $bolehTampil = false;
+                                            } else {
+                                                $bolehTampil = true;
+                                            }
+                                            if ($bolehTampil && isset($result[$jenis])) {
+                                                foreach ($result[$jenis] as $row) {
+                                                    if ($id['tgl_pakai'] == $row['tgl_pakai']) {
+                                                        $batasWaktu = ($id['status_kirim'] === 'request accept')
+                                                            ? $id['additional_time']
+                                                            : $row['batas_waktu'];
+                                            ?>
+                                                        <button type="button" id="sendBtn"
+                                                            class="btn btn-info text-xs send-btn"
+                                                            data-toggle="modal"
+                                                            data-area="<?= $area; ?>"
+                                                            data-tgl="<?= $id['tgl_pakai']; ?>"
+                                                            data-model="<?= $id['no_model']; ?>"
+                                                            data-item="<?= $id['item_type']; ?>"
+                                                            data-kode="<?= $id['kode_warna']; ?>"
+                                                            data-color="<?= $id['color']; ?>"
+                                                            data-waktu="<?= $batasWaktu; ?>"
+                                                            data-po-tambahan="<?= $id['po_tambahan']; ?>">
+                                                            <i class="fa fa-paper-plane fa-lg"></i>
+                                                        </button>
+                                            <?php
+                                                        break; // keluar dari foreach
+                                                    }
+                                                }
+                                            }
+
+                                            ?>
                                         </td>
                                     </tr>
                                 <?php
-                                } ?>
+                                }
+                                ?>
                             </tbody>
                         </table>
                     </div>
@@ -747,6 +751,11 @@
                     // Ambil area dari payload untuk menentukan URL redirect
                     const area = payload.area?.[0] || ''; // Pastikan 'area' ada atau gunakan default
                     if (resData.status == "success") {
+
+                        const jlMc = payload['items[0][jalan_mc]']?.[0] || payload['ttl_jl_mc']?.[0] || '';
+                        const ttlBerat = payload['items[0][ttl_berat_cns]']?.[0] || payload['ttl_kg_pesan']?.[0] || '';
+                        const ttlQty = payload['items[0][ttl_qty_cns]']?.[0] || payload['ttl_cns_pesan']?.[0] || '';
+
                         // Tampilkan SweetAlert setelah session berhasil dihapus
                         Swal.fire({
                             icon: 'success',
@@ -759,6 +768,25 @@
                             // Redirect ke halaman yang diinginkan dengan filter
                             const tglPakai = new URLSearchParams(window.location.search).get('tgl_pakai') || '';
                             const searchPdk = new URLSearchParams(window.location.search).get('searchPdk') || '';
+
+                            let table = $('#example').DataTable();
+                            let row = table.rows().nodes().to$().filter(function() {
+                                return $(this).find('td:eq(1)').text().trim() == payload.tgl_pakai[0] &&
+                                    $(this).find('td:eq(2)').text().trim() == payload.no_model[0] &&
+                                    $(this).find('td:eq(3)').text().trim() == payload.item_type[0] &&
+                                    $(this).find('td:eq(4)').text().trim() == payload.kode_warna[0];
+                            });
+
+                            if (row.length) {
+                                // update kolom
+                                $(row).find('td:eq(7)').text(payload.ttl_jl_mc || '');
+                                $(row).find('td:eq(8)').text(payload.ttl_kg_pesan || '');
+                                $(row).find('td:eq(9)').text(payload.ttl_cns_pesan || '');
+                                $(row).find('td:eq(10)').text(payload.lot[0] || '');
+                                $(row).find('td:eq(11)').text(payload.keterangan[0] || '');
+                            }
+
+                            $('#updateListModal').modal('hide');
                             // window.location.href = `${BASE_URL}user/listPemesanan/${area}?tgl_pakai=${tglPakai}&searchPdk=${searchPdk}`;
                         });
                     } else {
