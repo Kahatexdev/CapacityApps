@@ -642,8 +642,6 @@ class MaterialController extends BaseController
         $result['spandex'] = generateRangeDates($today, (int)$masterRangePemesanan['range_spandex'], $liburDates, $startTime, $initialOffsetSpandex);
         $result['karet']   = generateRangeDates($today, (int)$masterRangePemesanan['range_karet'], $liburDates, $startTime, $initialOffsetKaret);
 
-        dd($result['benang']);
-
         $data = [
             'role' => session()->get('role'),
             'active1' => '',
