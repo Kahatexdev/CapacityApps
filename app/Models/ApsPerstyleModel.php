@@ -393,7 +393,7 @@ class ApsPerstyleModel extends Model
     {
         $amonth = date('Y-m-d', strtotime('-30 Days'));
         $maxDeliv = date('Y-m-d', strtotime('+150 Days'));
-        $data = $this->select('mastermodel,sum(qty/24) as qty, sum(sisa/24 )as sisa,delivery,smv')
+        $data = $this->select('mastermodel,round(sum(qty/24)) as qty, round(sum(sisa/24 ))as sisa,delivery,smv')
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
             ->where('sisa >', 0)
