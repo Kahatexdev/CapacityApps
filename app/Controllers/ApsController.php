@@ -1095,11 +1095,14 @@ class ApsController extends BaseController
             foreach ($mesin as $mc) {
                 $jum += $mc['mesin'];
             }
-            $dp['mesin'] = $jum;
-            $dp['qty'] = round($qtysisa['qty']);
-            $dp['sisa'] =
-                round($qtysisa['sisa']);
+            if ($qtysisa != null) {
+                $dp['mesin'] = $jum;
+                $dp['qty'] = round($qtysisa['qty']);
+                $dp['sisa'] =
+                    round($qtysisa['sisa']);
+            }
         }
+
 
         $mesinarea = $this->jarumModel->getMesinByArea($area, $jarum); //mesin yang dipakai semua mesin tanpa melibatkan head planning
         // $mesinplanning = $this->MesinPlanningModel->getMesinByArea($area,$jarum); //mesin yang dipilih oleh head planning di teruskan ke bagian aps

@@ -987,7 +987,13 @@ class ApsPerstyleModel extends Model
             ->groupBy('machinetypeid')
             ->orderBy('delivery', 'asc')
             ->first();
-
+        if (!$result) {
+            $result = [
+                'qty' => 0,
+                'sisa' => 0,
+                'delivery' => "0000-00-00"
+            ];
+        }
         return $result;
     }
     public function getQtyCancel($idaps)
