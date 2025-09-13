@@ -55,10 +55,13 @@
                             <h5 class="font-weight-bolder mb-0">
                                 List Returan <?= $area ?>
                             </h5>
+                            <p style="color: red; font-size: 12px;">*Filter tgl retur terlebih dahulu!</p>
                         </div>
                         <div class="col-5 d-flex align-items-center text-end gap-2">
                             <input type="hidden" class="form-control" id="area" value="<?= $area ?>">
+                            <label for="no_model">No Model</label>
                             <input type="text" class="form-control" id="no_model" value="" placeholder="No Model">
+                            <label for="tgl_po">Tgl Retur</label>
                             <input type="date" class="form-control" id="tgl_buat" value="" required>
                             <button id="searchFilter" class="btn btn-info ms-2"><i class="fas fa-search"></i> Filter</button>
                         </div>
