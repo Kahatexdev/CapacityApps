@@ -235,6 +235,7 @@
                                 <th>Tgl Matching</th>
                                 <th>Tgl Perbaikan</th>
                                 <th>Ket Daily Cek</th>
+                                <th>Ket Schedule</th>
                                 <th>Stock Gbn (Kg)</th>
                             </tr>
                         </thead>
@@ -306,6 +307,7 @@
     <td>${formatDate(item.tanggal_matching)}</td>
     <td>${formatDate(item.tanggal_perbaikan)}</td>
     <td>${item.ket_daily_cek || '-'}</td>
+    <td>${item.ket_schedule || '-'}</td>
     <td class="text-end">${formatNumber(item.kg_stock)}</td>
 </tr>
 `;
