@@ -424,7 +424,6 @@ class ApsPerstyleModel extends Model
                 'smv' => $d['smv']
             ];
         }
-        dd($order);
         return $order;
     }
     public function getIdBs($validate)

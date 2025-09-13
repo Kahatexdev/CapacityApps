@@ -649,7 +649,6 @@ class MesinController extends BaseController
         $maxCapacity = $this->jarumModel->maxCapacity($area, $jarum, $targetInput);
         // $listOrder = $this->ApsPerstyleModel->listOrderArea($area, $jarum);
         $capacity =  $this->ApsPerstyleModel->CapacityArea($area, $jarum);
-        dd($capacity);
 
         $orderWeek = [];
         $totalProduksi = 0;
