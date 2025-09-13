@@ -692,7 +692,6 @@ class MesinController extends BaseController
         $weeklyProduction = array_fill($startWeek, 12, 0);
         $weeklyMachines = array_fill($startWeek, 12, 0);
         $weeklySisa = array_fill($startWeek, 12, 0);
-        dd($capacity);
         foreach ($capacity as $row) {
             $pdk = $row['mastermodel'];
             $delivery = $row['delivery'];
