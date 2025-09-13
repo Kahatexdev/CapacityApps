@@ -20,6 +20,7 @@ use App\Models\DetailPlanningModel;
 use App\Models\TanggalPlanningModel;
 use App\Models\EstimatedPlanningModel;
 use App\Models\MesinPerStyle;
+use App\Models\MesinPernomor;
 use App\Models\AksesModel;/*  */
 use App\Services\orderServices;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -45,6 +46,7 @@ class ApsController extends BaseController
     protected $EstimatedPlanningModel;
     protected $orderServices;
     protected $MesinPerStyle;
+    protected $MesinPernomor;
 
     public function __construct()
     {
@@ -63,6 +65,7 @@ class ApsController extends BaseController
         $this->TanggalPlanningModel = new TanggalPlanningModel();
         $this->EstimatedPlanningModel = new EstimatedPlanningModel();
         $this->MesinPerStyle = new MesinPerStyle();
+        $this->MesinPernomor = new MesinPernomor();
         $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -1268,6 +1271,27 @@ class ApsController extends BaseController
                 }
             }
             return redirect()->back()->with('success', 'Data berhasil dihapus.');
+        }
+    }
+    public function getListMesinplan()
+    {
+        if ($this->request->isAJAX()) {
+            try {
+                $idAps = $this->request->getGet('idAps');
+                $idMc  = $this->request->getGet('idplan');
+
+                $mesin = $this->MesinPernomor->getListPlan($idAps, $idMc);
+
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'data'   => $mesin
+                ]);
+            } catch (\Exception $e) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => $e->getMessage()
+                ]);
+            }
         }
     }
 }

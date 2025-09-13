@@ -376,6 +376,17 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modalMC" tabindex="-1" aria-labelledby="modalMCLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalMCLabel">Detail Mesin</h5> <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="mcTable"> </div>
+                <div class="modal-footer"> <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> <button type="button" class="btn btn-info" data-bs-dismiss="modal">Simpan</button> </div>
+            </div>
+        </div>
+    </div>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             document.querySelectorAll(".btn-plan").forEach(button => {
@@ -414,7 +425,7 @@
                 <th>Sisa</th>
                 <th>Mesin</th>
                 <th>Keterangan</th>
-                <th>Material</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -433,8 +444,9 @@
                     <td>
                         <input type="text" class="form-control" value="${item.keterangan ?? ''}" name="keterangan[]">
                     </td>
+                   
                     <td>
-                        <button type="button" class="btn btn-info ml-auto btn-stock" data-style="${item.style}">Cek Stok</button>
+                        <button type="button" class="btn btn-info ml-auto btn-choose" data-style="${item.idAps}" data-plan="<?= $id_save ?>">Choose</button>
                     </td>
                 </tr>
             `).join('')}
@@ -448,7 +460,6 @@
         </tfoot>
     </table>
 `;
-
 
                                 document.querySelector(".planDetail").innerHTML = planHtml;
                                 document.querySelector(".planStyleCard").classList.toggle("d-none");
@@ -492,85 +503,7 @@
                 });
             });
         });
-        $(document).on('click', '.btn-stock', function() {
-            const style = $(this).data('style');
-            let model = <?= json_encode($pdk); ?>; // Ganti dengan nilai sebenarnya
 
-            $.ajax({
-                url: '<?= base_url($role . '/cekStokStyle') ?>', // Ganti dengan URL API yang benar
-                type: 'GET',
-                dataType: 'json',
-                data: {
-                    style: style,
-                    model: model
-                },
-                success: function(response) {
-                    if (response) {
-                        let tableStock = `
-        <table id="stock" class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Kode Benang</th>
-                    <th>Kode Warna</th>
-                    <th>Warna</th>
-                    <th>In</th>
-                    <th>Out</th>
-                    <th>Stock</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${response.map(item => `
-                    <tr>
-                        <td>${item.item_type}</td>
-                                           <td>${item.kode_warna} </td>
-                           <td>${item.color} </td>
-                           <td>${Number(item.masuk).toFixed(2)} kg</td>
-                <td>${Number(item.keluar).toFixed(2)} kg</td>
-                <td>${Number(item.stock).toFixed(2)} kg</td>
-                    
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
-          
-    `;
-
-                        document.getElementById("stockTable").innerHTML = tableStock;
-
-                        $('#stock').DataTable({
-                            paging: true, // Pagination aktif
-                            searching: true, // Bisa cari data
-                            ordering: true, // Bisa sort kolom
-                            lengthMenu: [
-                                [5, 10, 25, -1],
-                                [5, 10, 25, "All"]
-                            ], // Dropdown jumlah data
-                            language: {
-                                search: "Cari:",
-                                lengthMenu: "Tampilkan _MENU_ data",
-                                info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
-                                paginate: {
-                                    previous: "Sebelumnya",
-                                    next: "Berikutnya"
-                                }
-                            }
-                        });
-
-                        console.log('Data berhasil diambil:', response);
-                    } else {
-                        console.error('Error: Response format invalid.');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('AJAX Error:', error);
-                }
-            });
-
-            $('#modalStyle').text(style);
-
-
-            $('#modalStock').modal('show');
-        });
         $(document).ready(function() {
             $("#dataTable").DataTable().destroy();
 
@@ -606,6 +539,108 @@
                     }) + ' Dz');
                 }
             });
+        });
+
+        $(document).on('click', '.btn-choose', function() {
+            const style = $(this).data('style');
+            const idplan = $(this).data('plan');
+
+            $.ajax({
+                url: '<?= base_url($role . '/getListMesinplan') ?>',
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                    idAps: style,
+                    idplan: idplan
+                },
+                success: function(response) {
+                    let tableMesin = `
+            <table id="stock" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>No Mesin</th>
+                        <th>Start</th>
+                        <th>Stop</th>
+                        <th>Action</th>
+                        <th><button type="button" class="btn btn-info btn-addRow">+</button></th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+                    if (response.status === 'success' && response.data.length > 0) {
+                        tableMesin += response.data.map(item => `
+                    <tr>
+                        <td><input type="text" name="no_mc[]" class="form-control" value="${item.no_mc}"></td>
+                        <td><input type="date" name="start[]" class="form-control" value="${item.start}"></td>
+                        <td><input type="date" name="stop[]" class="form-control" value="${item.stop}"></td>
+                        <td><button type="button" class="btn btn-danger btn-deleteRow">Delete</button></td>
+                        <td></td>
+                    </tr>
+                `).join('');
+                    } else {
+                        tableMesin += `
+                    <tr>
+                        <td><input type="text" name="no_mc[]" class="form-control"></td>
+                        <td><input type="date" name="start[]" class="form-control"></td>
+                        <td><input type="date" name="stop[]" class="form-control"></td>
+                        <td><button type="button" class="btn btn-danger btn-deleteRow">Delete</button></td>
+                        <td></td>
+                    </tr>`;
+                    }
+
+                    tableMesin += `
+                </tbody>
+            </table>`;
+
+                    document.getElementById("mcTable").innerHTML = tableMesin;
+
+                    $('#stock').DataTable({
+                        paging: true,
+                        searching: true,
+                        ordering: true,
+                        destroy: true,
+                        lengthMenu: [
+                            [100],
+                            ["All"]
+                        ],
+                        language: {
+                            search: "Cari:",
+                            lengthMenu: "Tampilkan _MENU_ data",
+                            info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+                            paginate: {
+                                previous: "Sebelumnya",
+                                next: "Berikutnya"
+                            }
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', error);
+                }
+            });
+
+            $('#modalMC').modal('show');
+        });
+
+
+        // === ADD ROW ===
+        // === ADD ROW ===
+        $(document).on('click', '.btn-addRow', function() {
+            let table = $('#stock').DataTable();
+
+            table.row.add([
+                '<input type="text" name="no_mc[]" class="form-control">',
+                '<input type="date" name="start[]" class="form-control">',
+                '<input type="date" name="stop[]" class="form-control">',
+                '<button type="button" class="btn btn-danger btn-deleteRow">Delete</button>',
+                ''
+            ]).draw(false);
+        });
+
+        // === DELETE ROW ===
+        $(document).on('click', '.btn-deleteRow', function() {
+            let table = $('#stock').DataTable();
+            table.row($(this).closest('tr')).remove().draw(false);
         });
 
 

@@ -581,6 +581,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('summaryStopPlanner/(:any)', 'SummaryController::summaryStopPlanner/$1');
     $routes->post('deletePlanPdk', 'ApsController::deletePlanPdk');
     $routes->post('deletePlanAll', 'ApsController::deletePlanAll');
+    $routes->get('getListMesinplan', 'ApsController::getListMesinplan');
 
     // deffect
     $routes->get('datadeffect', 'DeffectController::datadeffect');

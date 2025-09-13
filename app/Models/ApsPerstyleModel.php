@@ -389,56 +389,42 @@ class ApsPerstyleModel extends Model
             ->groupBy('mastermodel')
             ->findAll();
     }
-    public function CapacityArea($pdk, $area, $jarum)
+    public function CapacityArea($area, $jarum)
     {
-        $oneweek = date('Y-m-d', strtotime('30 days ago'));
-        $data = $this->select('mastermodel,sum(qty) as qty, sum(sisa)as sisa,delivery,smv')
-            ->where('mastermodel', $pdk)
+        $amonth = date('Y-m-d', strtotime('-30 Days'));
+        $maxDeliv = date('Y-m-d', strtotime('+150 Days'));
+        $data = $this->select('mastermodel,sum(qty/24) as qty, sum(sisa/24 )as sisa,delivery,smv')
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
             ->where('sisa >', 0)
             ->where('qty >', 0)
-            ->where('delivery >', $oneweek)
-            ->groupBy('mastermodel,delivery')
+            ->where('delivery <', $maxDeliv)
+            ->where('delivery >', $amonth)
+            ->groupBy('delivery,mastermodel')
             ->get()
             ->getResultArray();
+        // dd($data);
+        $order = [];
+        foreach ($data as $d) {
+            $today = new DateTime(date('Y-m-d'));
+            $deliveryDate = new DateTime($d['delivery']); // Tanggal delivery terjauh
+            $diff = $today->diff($deliveryDate);
+            $hari = $diff->days - 7;
 
-        $qtyArray = array_column($data, 'qty');
-        $sisaArray = array_column($data, 'sisa');
-        $maxValue = max($sisaArray);
-        $indexMax = array_search($maxValue, $sisaArray);
-        $totalQty = 0;
-        $totalSisa = 0;
-        for ($i = 0; $i <= $indexMax; $i++) {
-            $totalSisa += $sisaArray[$i];
-            $totalQty += $qtyArray[$i];
+            $tglDeliv = new DateTime($d['delivery']); // Tanggal delivery terjauh
+            $beda = $today->diff($tglDeliv);
+            $hariTarget = $beda->days;
+
+            $order[] = [
+                'mastermodel' => $d['mastermodel'],
+                'sisa' => $d['sisa'],
+                'qty' => $d['qty'],
+                'delivery' => $d['delivery'],
+                'targetHari' => $hariTarget,
+                'smv' => $d['smv']
+            ];
         }
-        $totalQty = round($totalQty / 24);
-        $totalSisa = round($totalSisa / 24);
-
-        $deliveryTerjauh = end($data)['delivery'];
-        $today = new DateTime(date('Y-m-d'));
-        $deliveryDate = new DateTime($deliveryTerjauh); // Tanggal delivery terjauh
-        $diff = $today->diff($deliveryDate);
-        $hari = $diff->days - 7;
-
-        $deliveryMax = $data[$indexMax]['delivery'];
-        $tglDeliv = new DateTime($deliveryMax); // Tanggal delivery terjauh
-        $beda = $today->diff($tglDeliv);
-        $hariTarget = $beda->days;
-        $smvArray = array_column($data, 'smv');
-        $smvArray = array_map('intval', $smvArray);
-        $averageSmv = array_sum($smvArray) / count($smvArray);
-
-        $pdk = $data[$indexMax]['mastermodel'];
-        $order = [
-            'mastermodel' => $pdk,
-            'sisa' => $totalSisa,
-            'qty' => $totalQty,
-            'delivery' => $deliveryTerjauh,
-            'targetHari' => $hariTarget,
-            'smv' => $averageSmv
-        ];
+        dd($order);
         return $order;
     }
     public function getIdBs($validate)

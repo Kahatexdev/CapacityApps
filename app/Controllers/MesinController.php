@@ -647,12 +647,9 @@ class MesinController extends BaseController
         $jarum = $this->request->getPost('jarum');
         $listjarum = $this->jarumModel->getJarumByArea($area);
         $maxCapacity = $this->jarumModel->maxCapacity($area, $jarum, $targetInput);
-        $listOrder = $this->ApsPerstyleModel->listOrderArea($area, $jarum);
-        $capacity = [];
-        foreach ($listOrder as $order) {
-            $pdk = $order['mastermodel'];
-            $capacity[] = $this->ApsPerstyleModel->CapacityArea($pdk, $area, $jarum);
-        }
+        // $listOrder = $this->ApsPerstyleModel->listOrderArea($area, $jarum);
+        $capacity =  $this->ApsPerstyleModel->CapacityArea($area, $jarum);
+        dd($capacity);
 
         $orderWeek = [];
         $totalProduksi = 0;
@@ -696,7 +693,7 @@ class MesinController extends BaseController
         $weeklyProduction = array_fill($startWeek, 12, 0);
         $weeklyMachines = array_fill($startWeek, 12, 0);
         $weeklySisa = array_fill($startWeek, 12, 0);
-        // dd($capacity);
+        dd($capacity);
         foreach ($capacity as $row) {
             $pdk = $row['mastermodel'];
             $delivery = $row['delivery'];
