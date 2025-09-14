@@ -169,9 +169,16 @@
                             </thead>
                             <tbody>
                                 <?php if (!empty($message)) { ?>
-                                    <tr>
-                                        <td class="text-center" colspan="19"><?= $message ?></td>
-                                    </tr>
+                                    <?php
+                                    $colCount = 19; // set sesuai jumlah <th>
+                                    if (empty($dataList)) {
+                                        echo '<tr>';
+                                        for ($i = 0; $i < $colCount; $i++) {
+                                            echo '<td class="text-center">' . ($i === 0 ? $message : '') . '</td>';
+                                        }
+                                        echo '</tr>';
+                                    }
+                                    ?>
                                 <?php } elseif (empty($dataList)) { ?>
                                     <?php
                                     $colCount = 19; // set sesuai jumlah <th>
