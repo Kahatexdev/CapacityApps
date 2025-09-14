@@ -589,9 +589,10 @@ class MaterialController extends BaseController
         }
 
         // ambil data libur hari kedepan untuk menentukan jadwal pemesanan
-        $today = date('Y-m-d'); // ambil data hari ini
-        // $today = '2025-09-15'; // ambil data hari ini
+        // $today = date('Y-m-d'); // ambil data hari ini
+        $today = '2025-09-12'; // ambil data hari ini
         $dataLibur = $this->liburModel->getDataLiburForPemesanan($today);
+
         // Ambil data tanggal libur menjadi array sederhana
         $liburDates = array_column($dataLibur, 'tanggal'); // Ambil hanya kolom 'tanggal'
 
@@ -609,6 +610,7 @@ class MaterialController extends BaseController
         $masterRangeApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getMasterRangePemesanan?day=' .    ($day) . '&area=' . urlencode($area);
         // $masterRangeApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getMasterRangePemesanan?day=Thursday&area=' . urlencode($area);
         $masterRangePemesanan = $this->fetchApiData($masterRangeApiUrl);
+        // dd($masterRangeApiUrl);
 
         // Simpan hasil
         $result = [
@@ -793,9 +795,10 @@ class MaterialController extends BaseController
         $area = $this->request->getPost('area');
         $jenis = $this->request->getPost('jenis');
         $tanggal_pakai = $this->request->getPost('tgl_pakai');
+        $alasan = $this->request->getPost('alasan');
 
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/requestAdditionalTime/' . $area . '?jenis=' . urlencode($jenis) . '&tanggal_pakai=' . urlencode($tanggal_pakai);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/requestAdditionalTime/' . $area . '?jenis=' . urlencode($jenis) . '&tanggal_pakai=' . urlencode($tanggal_pakai) . '&alasan=' . urlencode($alasan);
 
         try {
             // Mengambil respon dari API eksternal

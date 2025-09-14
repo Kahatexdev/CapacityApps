@@ -109,7 +109,9 @@
                                                     <option value="SPANDEX">SPANDEX</option>
                                                 </select>
                                             </div>
-
+                                            <div class="mb-3" id="alasan">
+                                                <input type="text" class="form-control" required placeholder="alasan" name="alasan">
+                                            </div>
                                             <div class="mb-3" id="tglPakai">
                                                 <!-- Konten tgl pakai dinamis (JS) -->
                                             </div>
@@ -168,14 +170,21 @@
                             <tbody>
                                 <?php if (!empty($message)) { ?>
                                     <tr>
-                                        <td colspan="19" class="text-center"><?= $message ?></td>
+                                        <td class="text-center" colspan="19"><?= $message ?></td>
                                     </tr>
                                 <?php } elseif (empty($dataList)) { ?>
-                                    <tr>
-                                        <td colspan="19" class="text-center">Tidak ada data ditemukan.</td>
-                                    </tr>
-                                    <?php } else {
-                                    $no = 1;
+                                    <?php
+                                    $colCount = 19; // set sesuai jumlah <th>
+                                    if (empty($dataList)) {
+                                        echo '<tr>';
+                                        for ($i = 0; $i < $colCount; $i++) {
+                                            echo '<td class="text-center">' . ($i === 0 ? 'Tidak ada data ditemukan.' : '') . '</td>';
+                                        }
+                                        echo '</tr>';
+                                    }
+                                    ?>
+                                <?php } else { ?>
+                                    <?php $no = 1;
                                     foreach ($dataList as $key => $id) {
                                         $ttl_kg_pesan = number_format($id['qty_pesan'] - $id['qty_sisa'], 2);
                                         $ttl_cns_pesan = $id['cns_pesan'] - $id['cns_sisa'];
