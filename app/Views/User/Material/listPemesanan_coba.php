@@ -166,99 +166,104 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php
-                                $no = 1;
-                                foreach ($dataList as $key => $id) {
-                                    $ttl_kg_pesan = number_format($id['qty_pesan'] - $id['qty_sisa'], 2);
-                                    $ttl_cns_pesan = $id['cns_pesan'] - $id['cns_sisa'];
-                                ?>
+                                <?php if (!empty($message)) { ?>
                                     <tr>
-                                        <td class="text-xs text-start"><?= $no++; ?></td>
-                                        <td class="text-xs text-start"><?= $id['tgl_pakai']; ?></td>
-                                        <td class="text-xs text-start"><?= $id['no_model']; ?></td>
-                                        <td class="text-xs text-start"><?= $id['item_type']; ?></td>
-                                        <td class="text-xs text-start"><?= $id['kode_warna']; ?></td>
-                                        <td class="text-xs text-start"><?= $id['color']; ?></td>
-                                        <td class="text-xs text-start"><?= number_format($id['ttl_kebutuhan_bb'], 2); ?></td>
-                                        <td class="text-xs text-start"><?= $id['jl_mc']; ?></td>
-                                        <td class="text-xs text-start"><?= $ttl_kg_pesan; ?></td>
-                                        <td class="text-xs text-start"><?= $ttl_cns_pesan; ?></td>
-                                        <td class="text-xs text-start"><?= $id['lot']; ?></td>
-                                        <td class="text-xs text-start"><?= $id['keterangan']; ?></td>
-                                        <td class="text-xs text-start">
-                                            <?php if ($id['po_tambahan'] == 1): ?>
-                                                <i class="fas fa-check-square fa-2x" style="color: #6fbf73;"></i>
-                                            <?php else: ?>
-                                                <!-- Biarkan kosong -->
-                                            <?php endif; ?>
-                                        </td>
-                                        <td class=" text-xs text-start"><?= number_format($id['ttl_pengiriman'], 2); ?>
-                                        </td>
-                                        <td class="text-xs text-start"></td>
-                                        <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>"><?= number_format($id['sisa_jatah'], 2); ?></td>
-                                        <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>">
-                                            <?php if ($id['sisa_jatah'] > 0) {
-                                                if ($ttl_kg_pesan >= $id['sisa_jatah']) { ?>
-                                                    <span style="color: red;">Pemesanan Melebihi Jatah</span>
+                                        <td colspan="19" class="text-center"><?= $message ?></td>
+                                    </tr>
+                                <?php } elseif (empty($dataList)) { ?>
+                                    <tr>
+                                        <td colspan="19" class="text-center">Tidak ada data ditemukan.</td>
+                                    </tr>
+                                    <?php } else {
+                                    $no = 1;
+                                    foreach ($dataList as $key => $id) {
+                                        $ttl_kg_pesan = number_format($id['qty_pesan'] - $id['qty_sisa'], 2);
+                                        $ttl_cns_pesan = $id['cns_pesan'] - $id['cns_sisa'];
+                                    ?>
+                                        <tr>
+                                            <td class="text-xs text-start"><?= $no++; ?></td>
+                                            <td class="text-xs text-start"><?= $id['tgl_pakai']; ?></td>
+                                            <td class="text-xs text-start"><?= $id['no_model']; ?></td>
+                                            <td class="text-xs text-start"><?= $id['item_type']; ?></td>
+                                            <td class="text-xs text-start"><?= $id['kode_warna']; ?></td>
+                                            <td class="text-xs text-start"><?= $id['color']; ?></td>
+                                            <td class="text-xs text-start"><?= number_format($id['ttl_kebutuhan_bb'], 2); ?></td>
+                                            <td class="text-xs text-start"><?= $id['jl_mc']; ?></td>
+                                            <td class="text-xs text-start"><?= $ttl_kg_pesan; ?></td>
+                                            <td class="text-xs text-start"><?= $ttl_cns_pesan; ?></td>
+                                            <td class="text-xs text-start"><?= $id['lot']; ?></td>
+                                            <td class="text-xs text-start"><?= $id['keterangan']; ?></td>
+                                            <td class="text-xs text-start">
+                                                <?php if ($id['po_tambahan'] == 1): ?>
+                                                    <i class="fas fa-check-square fa-2x" style="color: #6fbf73;"></i>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class=" text-xs text-start"><?= number_format($id['ttl_pengiriman'], 2); ?></td>
+                                            <td class="text-xs text-start"><?= number_format($id['ttl_retur'], 2); ?></td>
+                                            <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>"><?= number_format($id['sisa_jatah'], 2); ?></td>
+                                            <td class="text-xs text-start" style="<?= $id['sisa_jatah'] < 0 ? 'color: red;' : ''; ?>">
+                                                <?php if ($id['sisa_jatah'] > 0) {
+                                                    if ($ttl_kg_pesan >= $id['sisa_jatah']) { ?>
+                                                        <span style="color: red;">Pemesanan Melebihi Jatah</span>
+                                                    <?php } ?>
+                                                <?php } else { ?>
+                                                    <span style="color: red;">Habis Jatah</span>
                                                 <?php } ?>
-                                            <?php } else { ?>
-                                                <span style="color: red;">Habis Jatah</span>
-                                            <?php } ?>
-                                        </td>
-                                        <td class="text-xs text-start">
-                                            <button type="button" class="btn btn-warning update-btn" data-toggle="modal" data-target="#updateListModal" data-area="<?= $area; ?>" data-tgl="<?= $id['tgl_pakai']; ?>" data-model="<?= $id['no_model']; ?>" data-item="<?= $id['item_type']; ?>" data-kode="<?= $id['kode_warna']; ?>" data-color="<?= $id['color']; ?>" data-po-tambahan="<?= $id['po_tambahan']; ?>">
-                                                <i class="fa fa-edit fa-lg"></i>
-                                            </button>
-                                        </td>
-                                        <td class="text-xs">
-                                            <?php
-                                            $show = "d-none";
-                                            $batasWaktu = '00:00:00';
-                                            // ambil jenis dalam huruf kecil: benang, nylon, spandex, karet 
-                                            $jenis = strtolower($id['jenis']);
-                                            // cek syarat tampil tombol 
-                                            $bolehTampil = false;
-                                            if ($id['sisa_jatah'] > 0 && $jenis != "nylon") {
-                                                if ($ttl_kg_pesan <= $id['sisa_jatah']) {
+                                            </td>
+                                            <td class="text-xs text-start">
+                                                <button type="button" class="btn btn-warning update-btn" data-toggle="modal" data-target="#updateListModal" data-area="<?= $area; ?>" data-tgl="<?= $id['tgl_pakai']; ?>" data-model="<?= $id['no_model']; ?>" data-item="<?= $id['item_type']; ?>" data-kode="<?= $id['kode_warna']; ?>" data-color="<?= $id['color']; ?>" data-po-tambahan="<?= $id['po_tambahan']; ?>">
+                                                    <i class="fa fa-edit fa-lg"></i>
+                                                </button>
+                                            </td>
+                                            <td class="text-xs">
+                                                <?php
+                                                $show = "d-none";
+                                                $batasWaktu = '00:00:00';
+                                                // ambil jenis dalam huruf kecil: benang, nylon, spandex, karet 
+                                                $jenis = strtolower($id['jenis']);
+                                                // cek syarat tampil tombol 
+                                                $bolehTampil = false;
+                                                if ($id['sisa_jatah'] > 0 && $jenis != "nylon") {
+                                                    if ($ttl_kg_pesan <= $id['sisa_jatah']) {
+                                                        $bolehTampil = true;
+                                                    }
+                                                } elseif ($id['sisa_jatah'] < 0 && $jenis != "nylon") {
+                                                    $bolehTampil = false;
+                                                } else {
                                                     $bolehTampil = true;
                                                 }
-                                            } elseif ($id['sisa_jatah'] < 0 && $jenis != "nylon") {
-                                                $bolehTampil = false;
-                                            } else {
-                                                $bolehTampil = true;
-                                            }
-                                            if ($bolehTampil && isset($result[$jenis])) {
-                                                foreach ($result[$jenis] as $row) {
-                                                    if ($id['tgl_pakai'] == $row['tgl_pakai']) {
-                                                        $batasWaktu = ($id['status_kirim'] === 'request accept')
-                                                            ? $id['additional_time']
-                                                            : $row['batas_waktu'];
-                                            ?>
-                                                        <button type="button" id="sendBtn"
-                                                            class="btn btn-info text-xs send-btn"
-                                                            data-toggle="modal"
-                                                            data-area="<?= $area; ?>"
-                                                            data-tgl="<?= $id['tgl_pakai']; ?>"
-                                                            data-model="<?= $id['no_model']; ?>"
-                                                            data-item="<?= $id['item_type']; ?>"
-                                                            data-kode="<?= $id['kode_warna']; ?>"
-                                                            data-color="<?= $id['color']; ?>"
-                                                            data-waktu="<?= $batasWaktu; ?>"
-                                                            data-po-tambahan="<?= $id['po_tambahan']; ?>">
-                                                            <i class="fa fa-paper-plane fa-lg"></i>
-                                                        </button>
-                                            <?php
-                                                        break; // keluar dari foreach
+                                                if ($bolehTampil && isset($result[$jenis])) {
+                                                    foreach ($result[$jenis] as $row) {
+                                                        if ($id['tgl_pakai'] == $row['tgl_pakai']) {
+                                                            $batasWaktu = ($id['status_kirim'] === 'request accept')
+                                                                ? $id['additional_time']
+                                                                : $row['batas_waktu'];
+                                                ?>
+                                                            <button type="button" id="sendBtn"
+                                                                class="btn btn-info text-xs send-btn"
+                                                                data-toggle="modal"
+                                                                data-area="<?= $area; ?>"
+                                                                data-tgl="<?= $id['tgl_pakai']; ?>"
+                                                                data-model="<?= $id['no_model']; ?>"
+                                                                data-item="<?= $id['item_type']; ?>"
+                                                                data-kode="<?= $id['kode_warna']; ?>"
+                                                                data-color="<?= $id['color']; ?>"
+                                                                data-waktu="<?= $batasWaktu; ?>"
+                                                                data-po-tambahan="<?= $id['po_tambahan']; ?>">
+                                                                <i class="fa fa-paper-plane fa-lg"></i>
+                                                            </button>
+                                                <?php
+                                                            break; // keluar dari foreach
+                                                        }
                                                     }
                                                 }
-                                            }
 
-                                            ?>
-                                        </td>
-                                    </tr>
+                                                ?>
+                                            </td>
+                                        </tr>
                                 <?php
-                                }
-                                ?>
+                                    }
+                                } ?>
                             </tbody>
                         </table>
                     </div>
