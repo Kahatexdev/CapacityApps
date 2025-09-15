@@ -1217,7 +1217,7 @@ class SummaryController extends BaseController
                     // Reset subtotal
                     $subtotalQty = $subtotalSisa = $subtotalProduksi = $subtotalActMesin = 0;
                 }
-
+                // dd($id);
                 // Isi data
                 $sheet->setCellValue('A' . $rowBody, $id['delivery']);
                 $sheet->setCellValue('B' . $rowBody, $id['buyer']);
@@ -1269,7 +1269,7 @@ class SummaryController extends BaseController
                 // Tambahkan nilai ke subtotal
                 $subtotalQty += $id['qty'];
                 $subtotalSisa += $id['sisa'];
-                $subtotalProduksi += $id['produksi'];
+                $subtotalProduksi += is_numeric($id['produksi']) ? floatval($id['produksi']) : 0;
                 $subtotalActMesin += $id['actMesin'];
                 $subPlan = ($subtotalProduksi != 0 && $subtotalActMesin != 0) ? number_format($subtotalProduksi / $subtotalActMesin, 1) : 0;
 
