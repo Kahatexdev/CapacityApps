@@ -59,6 +59,7 @@
                                             <!-- Konten modal, misalnya formulir -->
                                             <form action="<?= base_url($role . '/requestAdditionalTime') ?>" method="post">
                                                 <input type="hidden" name="area" value="<?= $area ?>">
+
                                                 <div class="mb-3">
                                                     <select name="jenis" id="jenisBenang" class="form-select" required>
                                                         <option value="">Pilih Jenis Benang</option>
@@ -69,6 +70,7 @@
                                                 <div class="mb-3" id="tglPakai">
                                                     <!-- Konten tgl pakai dinamis (JS) -->
                                                 </div>
+
                                                 <div class="row g-2">
                                                     <button type="submit" class="btn btn-info w-100">Pilih</button>
                                                 </div>
