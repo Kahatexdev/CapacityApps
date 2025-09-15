@@ -458,6 +458,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
 
     //summary pakai
     $routes->get('jatah_bahan_baku', 'MaterialController::jatahBahanBaku');
+    $routes->get('export_excel_jatah_bb', 'ExcelController::exportExcelJatahNoModel');
 
     // pengaduan
     $routes->get('pengaduan', 'PengaduanController::index');
@@ -771,6 +772,8 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('report/pdf/(:any)/(:any)/(:any)', 'PdfController::exportPemesanan/$1/$2/$3');
     $routes->get('stockbahanbaku/(:any)', 'MaterialController::stockBahanBaku/$1');
     $routes->get('filterstockbahanbaku/(:any)', 'MaterialController::filterStockBahanBaku/$1');
+    $routes->get('jatah_bahan_baku', 'MaterialController::jatahBahanBaku');
+    $routes->get('export_excel_jatah_bb', 'ExcelController::exportExcelJatahNoModel');
 
     //pph
     $routes->get('pph/(:any)', 'MaterialController::pph/$1');
