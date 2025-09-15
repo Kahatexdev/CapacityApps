@@ -1538,6 +1538,8 @@ class MaterialController extends BaseController
     }
     public function reportPemesanan($area)
     {
+        $tgl_pakai = '2025-09-06';
+        $tgl_pakai = $this->request->getGet('tgl_pakai');
         function fetchApiData($url)
         {
             try {
