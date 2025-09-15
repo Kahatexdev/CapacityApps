@@ -51,7 +51,7 @@
                                     class="form-control"
                                     id="dateInput"
                                     name="tgl_pakai"
-                                    value="<?= esc($filter_tgl ?? date('Y-m-d')) ?>">
+                                    value="">
                             </div>
 
                             <div class="col-auto">
