@@ -1218,7 +1218,7 @@ class SummaryController extends BaseController
                     // Reset subtotal
                     $subtotalQty = $subtotalSisa = $subtotalProduksi = $subtotalActMesin = 0;
                 }
-
+                // dd($id);
                 // Isi data
                 $sheet->setCellValue('A' . $rowBody, $id['delivery']);
                 $sheet->setCellValue('B' . $rowBody, $id['buyer']);

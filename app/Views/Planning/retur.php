@@ -13,6 +13,7 @@
         padding: 20px;
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        text-align: center;
     }
 
     .input-group-text {
@@ -124,6 +125,12 @@
     </div>
 
 </div>
+<div id="loading">
+    <div class="spinner-border text-dark" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Sedang memuat data...</p>
+</div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script type="text/javascript">
     // Inisialisasi DataTables (pastikan plugin DataTables sudah disertakan)
@@ -143,6 +150,15 @@
             info: true,
             autoWidth: false,
             responsive: true
+        });
+        // Saat form filter dikirim, tampilkan loader
+        $("form").on("submit", function() {
+            $("#loading").fadeIn();
+        });
+
+        // Opsional: jika page sudah selesai load, sembunyikan loader
+        $(window).on("load", function() {
+            $("#loading").fadeOut();
         });
     });
 </script>
