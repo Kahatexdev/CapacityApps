@@ -466,4 +466,10 @@ class ApiController extends ResourceController
         $countNotif = $this->pengaduanModel->countNotif($role);
         return $this->respond($countNotif, ResponseInterface::HTTP_OK);
     }
+    public function ExportPengaduan($idpengaduan)
+    {
+        $DataPengaduan = $this->pengaduanModel->where('id_pengaduan', $idpengaduan)->first();
+
+        return $this->respond($DataPengaduan, ResponseInterface::HTTP_OK);
+    }
 }
