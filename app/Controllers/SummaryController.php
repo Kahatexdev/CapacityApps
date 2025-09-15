@@ -651,6 +651,7 @@ class SummaryController extends BaseController
             $judulPlan = $this->kebutuhanAreaModel->getDataByAreaJrm($area, $jarum['jarum']);
 
             foreach ($judulPlan as $id) {
+
                 // Mendapatkan kebutuhan area berdasarkan ID
                 $kebutuhanArea = $this->kebutuhanAreaModel->where('id_pln_mc', $id['id_pln_mc'])->first();
 
@@ -1267,10 +1268,10 @@ class SummaryController extends BaseController
                 $sheet->getStyle('V' . $rowBody)->applyFromArray($styleBody);
 
                 // Tambahkan nilai ke subtotal
-                $subtotalQty += $id['qty'];
-                $subtotalSisa += $id['sisa'];
-                $subtotalProduksi += $id['produksi'];
-                $subtotalActMesin += $id['actMesin'];
+                $subtotalQty +=  (float)$id['qty'];
+                $subtotalSisa += (float)$id['sisa'];
+                $subtotalProduksi += (float)$id['produksi'];
+                $subtotalActMesin += (float)$id['actMesin'];
                 $subPlan = ($subtotalProduksi != 0 && $subtotalActMesin != 0) ? number_format($subtotalProduksi / $subtotalActMesin, 1) : 0;
 
                 // Simpan model saat ini sebagai prevModel untuk iterasi berikutnya
