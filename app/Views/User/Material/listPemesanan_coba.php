@@ -699,6 +699,7 @@
 
                                 const ttl_qty_cns = jalan_mc * qty_cns;
                                 const ttl_berat_cns = ttl_qty_cns * qty_berat_cns;
+                                // console.log(ttl_berat_cns);
 
                                 totalJalanMc += jalan_mc;
                                 totalQtyCns += ttl_qty_cns;

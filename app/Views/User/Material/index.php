@@ -640,7 +640,7 @@
                                                 </td>
                                                 <td class="text-center">
                                                     Berat Cones:
-                                                    <input type="number" step="0.1" class="form-control text-center qty_berat_cns" name="items[${row}][${index}][qty_berat_cns]" id="qty_berat_cns" value=${item.qty_berat_cns || 0}>
+                                                    <input type="number" step="0.1" class="form-control text-center qty_berat_cns" name="items[${row}][${index}][qty_berat_cns]" id="qty_berat_cns" value=${parseFloat(item.qty_berat_cns).toFixed(2)}>
                                                 </td>
                                                 <td class="text-center">
                                                     Total:
