@@ -621,7 +621,7 @@ class MaterialController extends BaseController
         ];
 
         // Jam awal
-        $startTime = "08:30:00";
+        $startTime = "09:00:00";
         // Helper untuk generate jadwal
         function generateRangeDates($today, $range, $liburDates, $startTime, $initialOffset)
         {
