@@ -4012,46 +4012,6 @@ class ExcelController extends BaseController
             ->setBottom(0.4)
             ->setLeft(0.4)
             ->setRight(0.2);
-        //Outline Border
-        // 1. Top double border dari A1 ke Q1
-        $sheet->getStyle('A1:AD1')->applyFromArray([
-            'borders' => [
-                'top' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
-                    'color' => ['rgb' => '000000'],
-                ],
-            ],
-        ]);
-
-        // 2. Right double border dari Q1 ke Q50
-        $sheet->getStyle('Q1:AD33')->applyFromArray([
-            'borders' => [
-                'right' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
-                    'color' => ['rgb' => '000000'],
-                ],
-            ],
-        ]);
-
-        // 3. Bottom double border dari A50 ke Q50
-        $sheet->getStyle('A33:AD33')->applyFromArray([
-            'borders' => [
-                'bottom' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
-                    'color' => ['rgb' => '000000'],
-                ],
-            ],
-        ]);
-
-        // 4. Left double border dari A1 ke A50
-        $sheet->getStyle('A1:A33')->applyFromArray([
-            'borders' => [
-                'left' => [
-                    'borderStyle' => Border::BORDER_DOUBLE,
-                    'color' => ['rgb' => '000000'],
-                ],
-            ],
-        ]);
 
         //Border Thin
         $sheet->getStyle('D1:D3')->applyFromArray([
@@ -4180,27 +4140,24 @@ class ExcelController extends BaseController
             ],
         ]);
 
-        // Aktifkan wrap text di A11:Q28
-        $sheet->getStyle('A11:AD28')->getAlignment()->setWrapText(true);
-
         // Lebar kolom (dalam pt) dan tinggi baris (dalam pt)
         $columnWidths = [
             'A' => 20,
             'B' => 20,
             'C' => 40,
-            'D' => 50,
+            'D' => 80,
             'E' => 50,
             'F' => 50,
             'G' => 50,
             'H' => 20,
-            'I' => 20,
-            'J' => 20,
+            'I' => 25,
+            'J' => 35,
             'K' => 40,
             'L' => 20,
             'M' => 20,
             'N' => 20,
             'O' => 40,
-            'P' => 20,
+            'P' => 25,
             'Q' => 20,
             'R' => 30,
             'S' => 20,
@@ -4561,15 +4518,17 @@ class ExcelController extends BaseController
         $no = 1;
         $firstRow = true;
         $sheet->getRowDimension($rowNum)->setRowHeight(18);
+        $subtotalKgs = 0;
+        $prevModel = null;
+        $prevKode = null;
 
         foreach ($result as $row) {
+            $currentModel = $row['no_model'];
+            $currentKode  = $row['kode_warna'];
             $sheet->mergeCells("A{$rowNum}:B{$rowNum}");
-            $retur_kg_psn = '';
-            $retur_kg_po = '';
-            $retur_persen_psn = '';
-            $retur_persen_po = '';
 
             $kgs = (float)$row['kgs'];
+            $subtotalKgs += $kgs;
             $terimaKg = (float)$row['terima_kg'];
             // $retur = (float)$row['kgs_retur'];
             $poplus_mc_kg = (float)$row['poplus_mc_kg'];
@@ -4581,6 +4540,38 @@ class ExcelController extends BaseController
             $persenPlusPck = ($kgs > 0) ? round(($row['plus_pck_kg'] / $kgs) * 100, 2) . '%' : '0%';
             $persenLebihPakai = ($kgs > 0) ? round(($row['lebih_pakai_kg'] / $kgs) * 100, 2) . '%' : '0%';
 
+            // 🚨 Cek apakah sudah ganti no_model atau kode_warna
+            if ($prevModel !== null && ($currentModel !== $prevModel || $currentKode !== $prevKode)) {
+                // Tulis subtotal ke bawah baris sebelumnya
+                $sheet->setCellValue("J{$rowNum}", "TOTAL");
+                $sheet->setCellValue("K{$rowNum}", number_format($subtotalKgs, 2));
+                $sheet->setCellValue("L{$rowNum}", number_format($terimaKg, 2));
+                $sheet->setCellValue("M{$rowNum}", number_format($terimaKg - $subtotalKgs, 2));
+                $sheet->setCellValue("N{$rowNum}", number_format($terimaKg / $subtotalKgs * 100, 2) . '%');
+                // Bold & style subtotal
+                $sheet->getStyle("J{$rowNum}:N{$rowNum}")->getFont()->setBold(true);
+                $sheet->getStyle("J{$rowNum}:N{$rowNum}")
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+                $sheet->getRowDimension($rowNum)->setRowHeight(20);
+                // 🎯 Tambahin cek nilai kolom L–S di baris TOTAL
+                for ($col = ord('L'); $col <= ord('S'); $col++) {
+                    $cell = chr($col) . ($rowNum);
+                    $rawValue = $sheet->getCell($cell)->getValue();
+
+                    $numericValue = (float)str_replace('%', '', $rawValue);
+
+                    if ($numericValue <= 0) {
+                        $sheet->getStyle($cell)
+                            ->getFont()
+                            ->getColor()
+                            ->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_WHITE);
+                    }
+                }
+                $rowNum++; // pindah baris setelah subtotal
+                $subtotalKgs = 0; // reset subtotal
+            }
+            $sheet->mergeCells("A{$rowNum}:B{$rowNum}");
             $sheet->fromArray([
                 $row['no_model'] ?? '',
                 '',
@@ -4593,9 +4584,9 @@ class ExcelController extends BaseController
                 $row['qty_pcs'],
                 $row['loss'],
                 $row['kgs'],
-                number_format($row['terima_kg'], 2),
-                number_format($row['terima_kg'] - $row['kgs'], 2),
-                $persenTerima, // terima
+                '', //terima
+                '', // plus atau minus
+                '', // terima
                 number_format($row['sisa_bb_mc'], 2), // sisa mesin
                 $row['sisa_order_pcs'] == 0 ? '' : $row['sisa_order_pcs'],
                 $row['poplus_mc_kg'] == 0 ? '' : number_format($row['poplus_mc_kg'], 2),
@@ -4607,16 +4598,16 @@ class ExcelController extends BaseController
                 $persenPlusPck,
                 $row['lebih_pakai_kg'] == 0 ? '' : number_format($row['lebih_pakai_kg'], 2),
                 $persenLebihPakai,
-                '',        // Z
+                '',    // Z
                 '',    // AA
-                '',         // AB
+                '',    // AB
                 '',
                 '',
             ], null, 'A' . $rowNum);
 
             // 🎯 Loop cek kolom L sampai S (ASCII 76 = L, 83 = S)
             for ($col = ord('L'); $col <= ord('S'); $col++) {
-                $cell = chr($col) . $rowNum;  // contoh: L11, M11, N11 ...
+                $cell = chr($col) . ($rowNum);  // contoh: L11, M11, N11 ...
                 $rawValue = $sheet->getCell($cell)->getValue();
 
                 // Buang simbol % biar bisa dicek angka
@@ -4632,10 +4623,23 @@ class ExcelController extends BaseController
             }
 
             $sheet->getRowDimension($rowNum)->setRowHeight(-1);
+            $prevModel = $currentModel;
+            $prevKode  = $currentKode;
             $rowNum++;
         }
 
         $lastRow = $rowNum - 1;
+        // Aktifkan wrap text di A11:Q28
+        $sheet->getStyle("A11:AD{$lastRow}")->getAlignment()->setWrapText(true);
+        // Style semua data
+        $sheet->getStyle("A11:AD" . ($rowNum - 1))->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+        ]);
 
         // Rata tengah semua isi tabel
         $sheet->getStyle("A11:AD{$lastRow}")->getAlignment()
@@ -4645,18 +4649,135 @@ class ExcelController extends BaseController
         $sheet->getStyle("A11:AD{$lastRow}")->getFont()
             ->setSize(10);
 
-        // Tambahkan border kiri double untuk kolom A
-        $sheet->getStyle("A11:A{$lastRow}")->applyFromArray([
+        $startRow = 11;               // data mulai dari row 11
+        $contentLastRow = $rowNum - 1; // baris terakhir yang terisi saat loop selesai
+
+        $sheet->mergeCells("A{$rowNum}:B{$rowNum}");
+        // 🚨 Setelah looping selesai, jangan lupa subtotal terakhir
+        if ($subtotalKgs > 0) {
+            $sheet->setCellValue("J{$rowNum}", "TOTAL");
+            $sheet->setCellValue("K{$rowNum}", number_format($subtotalKgs, 2));
+            $sheet->setCellValue("L{$rowNum}", number_format($terimaKg, 2));
+            $sheet->setCellValue("M{$rowNum}", number_format($terimaKg - $subtotalKgs, 2));
+            $sheet->setCellValue("N{$rowNum}", number_format($terimaKg / $subtotalKgs * 100, 2) . '%');
+            // Style untuk baris TOTAL terakhir
+            $sheet->getStyle("A{$rowNum}:AD{$rowNum}")->applyFromArray([
+                'font' => ['bold' => true, 'size' => 10],
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    'vertical'   => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                ],
+            ]);
+            $sheet->getRowDimension($rowNum)->setRowHeight(20);
+            // 🎯 Tambahin cek nilai kolom L–S di baris TOTAL
+            for ($col = ord('L'); $col <= ord('S'); $col++) {
+                $cell = chr($col) . ($rowNum);
+                $rawValue = $sheet->getCell($cell)->getValue();
+
+                $numericValue = (float)str_replace('%', '', $rawValue);
+
+                if ($numericValue <= 0) {
+                    $sheet->getStyle($cell)
+                        ->getFont()
+                        ->getColor()
+                        ->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_WHITE);
+                }
+            }
+            $lastRow = $rowNum;
+        }
+
+        // // Atur baris kosong setelah data sampai baris 28
+        // for ($i = $rowNum; $i <= 28; $i++) {
+        //     $sheet->mergeCells("A{$i}:B{$i}");
+        //     $sheet->getRowDimension($i)->setRowHeight(18); // Tetapkan tinggi tetap
+        // }
+
+        // Hitung jumlah baris isi tabel
+        $totalIsi = $lastRow - 10; // data mulai dari row 11
+
+        if ($totalIsi < 18) {
+            $ttdRow = 30;           // tanda tangan fix di baris 30
+            $doubleBorderRow = 33;  // double border sampai baris 33
+        } else {
+            $ttdRow = $lastRow + 2;      // default perhitungan
+            $doubleBorderRow = $ttdRow + 3;
+        }
+
+        //Tanda Tangan
+        $sheet->mergeCells("A{$ttdRow}:D{$ttdRow}");
+        $sheet->setCellValue("A{$ttdRow}", 'MANAJEMEN NS');
+        $sheet->getStyle("A{$ttdRow}:D{$ttdRow}")->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->mergeCells("E{$ttdRow}:F{$ttdRow}");
+        $sheet->setCellValue("E{$ttdRow}", 'KEPALA AREA');
+        $sheet->getStyle("E{$ttdRow}:F{$ttdRow}")->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->mergeCells("G{$ttdRow}:H{$ttdRow}");
+        $sheet->setCellValue("G{$ttdRow}", 'IE TEKNISI');
+        $sheet->getStyle("G{$ttdRow}:H{$ttdRow}")->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->mergeCells("I{$ttdRow}:K{$ttdRow}");
+        $sheet->setCellValue("I{$ttdRow}", 'PIC PACKING');
+        $sheet->getStyle("I{$ttdRow}:K{$ttdRow}")->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->mergeCells("L{$ttdRow}:N{$ttdRow}");
+        $sheet->setCellValue("L{$ttdRow}", 'PPC');
+        $sheet->getStyle("L{$ttdRow}:N{$ttdRow}")->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->mergeCells("O{$ttdRow}:Q{$ttdRow}");
+        $sheet->setCellValue("O{$ttdRow}", 'PPC');
+        $sheet->getStyle("O{$ttdRow}:Q{$ttdRow}")->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->mergeCells("R{$ttdRow}:T{$ttdRow}");
+        $sheet->setCellValue("R{$ttdRow}", 'PPC');
+        $sheet->getStyle("R{$ttdRow}:T{$ttdRow}")->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->mergeCells("U{$ttdRow}:W{$ttdRow}");
+        $sheet->setCellValue("U{$ttdRow}", 'GD BENANG');
+        $sheet->getStyle("U{$ttdRow}:W{$ttdRow}")->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->mergeCells("X{$ttdRow}:AA{$ttdRow}");
+        $sheet->setCellValue("X{$ttdRow}", 'MENGETAHUI');
+        $sheet->getStyle("X{$ttdRow}:AA{$ttdRow}")->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->mergeCells("AB{$ttdRow}:AD{$ttdRow}");
+        $sheet->setCellValue("AB{$ttdRow}", 'MENGETAHUI');
+        $sheet->getStyle("AB{$ttdRow}:AD{$ttdRow}")->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // Atur tinggi baris tanda tangan (5 baris ke bawah biar ada space untuk tanda tangan)
+        for ($i = $ttdRow; $i <= $ttdRow + 4; $i++) {
+            $sheet->getRowDimension($i)->setRowHeight(18);
+        }
+
+        //Outline Border
+        // 1. Top double border dari A1 ke Q1
+        $sheet->getStyle('A1:AD1')->applyFromArray([
             'borders' => [
-                'left' => [
+                'top' => [
                     'borderStyle' => Border::BORDER_DOUBLE,
                     'color' => ['rgb' => '000000'],
                 ],
             ],
         ]);
 
-        // Tambahkan border kanan double untuk kolom AD
-        $sheet->getStyle("AD11:AD{$lastRow}")->applyFromArray([
+        // 2. Right double border dari Q1 ke Q50
+        $sheet->getStyle("Q1:AD{$doubleBorderRow}")->applyFromArray([
             'borders' => [
                 'right' => [
                     'borderStyle' => Border::BORDER_DOUBLE,
@@ -4665,61 +4786,25 @@ class ExcelController extends BaseController
             ],
         ]);
 
-        // Atur baris kosong setelah data sampai baris 28
-        for ($i = $rowNum; $i <= 28; $i++) {
-            $sheet->mergeCells("A{$i}:B{$i}");
-            $sheet->getRowDimension($i)->setRowHeight(18); // Tetapkan tinggi tetap
-        }
+        // 3. Bottom double border dari A50 ke Q50
+        $sheet->getStyle("A{$doubleBorderRow}:AD{$doubleBorderRow}")->applyFromArray([
+            'borders' => [
+                'bottom' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+        ]);
 
-        //Tanda Tangan
-        $sheet->mergeCells('A30:D30');
-        $sheet->setCellValue('A30', 'MANAJEMEN NS');
-        $sheet->getStyle('A30:D30')->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->mergeCells('E30:F30');
-        $sheet->setCellValue('E30', 'KEPALA AREA');
-        $sheet->getStyle('E30:F30')->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->mergeCells('G30:H30');
-        $sheet->setCellValue('G30', 'IE TEKNISI');
-        $sheet->getStyle('G30:H30')->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->mergeCells('I30:K30');
-        $sheet->setCellValue('I30', 'PIC PACKING');
-        $sheet->getStyle('I30:K30')->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->mergeCells('L30:N30');
-        $sheet->setCellValue('L30', 'PPC');
-        $sheet->getStyle('L30:N30')->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->mergeCells('O30:Q30');
-        $sheet->setCellValue('O30', 'PPC');
-        $sheet->getStyle('O30:Q30')->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->mergeCells('R30:T30');
-        $sheet->setCellValue('R30', 'PPC');
-        $sheet->getStyle('R30:T30')->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->mergeCells('U30:W30');
-        $sheet->setCellValue('U30', 'GD BENANG');
-        $sheet->getStyle('U30:W30')->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->mergeCells('X30:AA30');
-        $sheet->setCellValue('X30', 'MENGETAHUI');
-        $sheet->getStyle('X30:AA30')->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->mergeCells('AB30:AD30');
-        $sheet->setCellValue('AB30', 'MENGETAHUI');
-        $sheet->getStyle('AB30:AD30')->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-        for ($i = 29; $i <= 33; $i++) {
-            $sheet->getRowDimension($i)->setRowHeight(18);
-        }
-
-        $sheet->getStyle("A11:AD28")->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
-            ->setVertical(Alignment::VERTICAL_CENTER);
+        // 4. Left double border dari A1 ke A50
+        $sheet->getStyle("A1:A{$doubleBorderRow}")->applyFromArray([
+            'borders' => [
+                'left' => [
+                    'borderStyle' => Border::BORDER_DOUBLE,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+        ]);
 
         // Set judul file dan header untuk download
         $filename = 'Po Tambahan Area ' . $area . ' Tgl ' . $tglBuat . '.xlsx';
