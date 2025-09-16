@@ -1538,7 +1538,7 @@ class MaterialController extends BaseController
     }
     public function reportPemesanan($area)
     {
-        $tgl_pakai = '2025-09-06';
+        // $tgl_pakai = '2025-09-06';
         $tgl_pakai = $this->request->getGet('tgl_pakai');
         function fetchApiData($url)
         {
@@ -1558,7 +1558,7 @@ class MaterialController extends BaseController
             }
         }
 
-        $dataList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listReportPemesanan/$area");
+        $dataList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listReportPemesanan/$area?tgl_pakai=" . urlencode($tgl_pakai));
         if (!is_array($dataList)) {
             die('Error: Invalid response format for listPemesanan API.');
         }
