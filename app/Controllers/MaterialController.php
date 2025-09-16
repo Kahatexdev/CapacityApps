@@ -512,7 +512,7 @@ class MaterialController extends BaseController
             $message = 'Silakan filter tanggal pakai atau no model terlebih dahulu.';
         } elseif (!empty($tglPakai) || !empty($pdk)) {
             $message = null;
-            $rawList = $this->fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listPemesanan/{$area}");
+            $rawList = $this->fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listPemesanan/{$area}?tgl_pakai=" . urlencode($tglPakai) . "&searchPdk=" . urlencode($pdk));
             if (!is_array($rawList)) {
                 // handle error dengan baik
                 return redirect()->back()->with('error', 'Gagal mengambil data pemesanan.');
