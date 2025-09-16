@@ -172,40 +172,38 @@ class MaterialController extends BaseController
 
         return view(session()->get('role') . '/Material/statusbahanbaku', $data);
     }
-    public function filterstatusbahanbaku($model)
+    public function filterstatusbahanbaku()
     {
         // Mengambil data master
-        $master = $this->orderModel->getStartMc($model);
-
-        // Mengambil nilai 'search' yang dikirim oleh frontend
+        $model = $this->request->getGet('model');
         $search = $this->request->getGet('search');
+        if (!empty($model)) {
+
+            $master = $this->orderModel->getStartMc($model);
+        } else {
+            $master = [
+                'kd_buyer_order' => '-',
+                'no_model'       => '-',
+                'delivery_awal'  => '-',  // MIN dari apsperstyle.delivery
+                'delivery_akhir' => '-',  // MAX dari apsperstyle.delivery
+                'start_mc'       => '-' // MIN dari tanggal_planning.start_mesin
+            ];
+        }
+        // Mengambil nilai 'search' yang dikirim oleh frontend
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/' . $model . '?search=' . urlencode($search);
+        $params = [
+            'model'  => $model ?? '',
+            'search' => $search ?? ''
+        ];
+
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/?' . http_build_query($params);
+
 
         // Mengambil data dari API eksternal
         $response = file_get_contents($apiUrl);
         $status = json_decode($response, true);
-        // Filter data berdasarkan 'no_model' jika ada keyword 'search'
-        if ($search) {
-            $status = array_filter($status, function ($item) use ($search) {
-                // Cek apakah pencarian ada di no_model terlebih dahulu
-                if (isset($item['no_model']) && strpos(strtolower($item['no_model']), strtolower($search)) !== false) {
-                    return true;
-                }
-                // Lanjutkan pencarian ke kode_warna, lot_celup, dan tanggal_schedule jika no_model tidak cocok
-                if (isset($item['kode_warna']) && strpos(strtolower($item['kode_warna']), strtolower($search)) !== false) {
-                    return true;
-                }
-                if (isset($item['lot_celup']) && strpos(strtolower($item['lot_celup']), strtolower($search)) !== false) {
-                    return true;
-                }
-                if (isset($item['tanggal_schedule']) && strpos(strtolower($item['tanggal_schedule']), strtolower($search)) !== false) {
-                    return true;
-                }
-                return false;
-            });
-        }
-        // Gabungkan data master dan status dalam satu array
+
+
         $responseData = [
             'master' => $master, // Data master dari getStartMc
             'status' => $status // Data status yang sudah difilter (gunakan array_values untuk mereset indeks array)

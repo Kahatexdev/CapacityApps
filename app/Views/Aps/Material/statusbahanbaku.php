@@ -196,9 +196,9 @@
                             </div>
                         </div>
                         <div class="col-6 d-flex align-items-center text-end gap-2">
-                            <input type="text" class="form-control" id="model" value="" placeholder="No Model" required>
+                            <input type="text" class="form-control" id="model" value="" placeholder="No Model">
                             <input type="text" class="form-control" id="filter" value="" placeholder="Kode Warna/Lot">
-                            <button id="filterButton" class="btn btn-info ms-2" disabled><i class="fas fa-search"></i></button>
+                            <button id="filterButton" class="btn btn-info ms-2"><i class="fas fa-search"></i></button>
                         </div>
 
                     </div>
@@ -222,7 +222,7 @@
 <script>
     function showLoading() {
         $('#loadingOverlay').addClass('active');
-        $('#btnSearch').prop('disabled', true);
+
         // show DataTables processing indicator if available
         try {
             dataTable.processing(true);
@@ -249,9 +249,7 @@
     const filterButton = document.getElementById('filterButton');
 
     // Aktifkan tombol saat field model tidak kosong
-    modelInput.addEventListener('input', function() {
-        filterButton.disabled = modelInput.value.trim() === '';
-    });
+
 
     filterButton.addEventListener('click', function() {
         let keyword = filterInput.value.trim();
@@ -260,7 +258,9 @@
         showLoading();
         updateProgress(0);
 
-        let apiUrl = `<?= base_url($role . '/filterstatusbahanbaku') ?>/${model}?search=${keyword}`;
+        let apiUrl = `<?= base_url($role . '/filterstatusbahanbaku') ?>/?model=${encodeURIComponent(model)}&search=${encodeURIComponent(keyword)}`;
+
+
 
         fetch(apiUrl)
             .then(response => response.json())
@@ -298,7 +298,11 @@
             return;
         }
 
-        resultContainer.innerHTML += `
+        if (data['master']['no_model'] == '-') {
+            headerData = '<p class="text-center text-muted"></p>';
+
+        } else {
+            headerData = `
             <div class="row my-4">
                 <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
                     <div class="card">
@@ -340,6 +344,7 @@
                 </div>
             </div>
         `;
+        }
 
         let htmlCelupHeader = `
 <div class="row my-4">
@@ -350,7 +355,8 @@
                 <div class="table-wrapper" style="overflow-x:auto;">
                     <table class="table table-bordered table-striped table-sm table-freeze">
                         <thead class="table-light">
-                            <tr>
+                            <tr>              
+                         ${data.master.no_model == '-' ? '<th class="sticky-col">No Model</th>' : ''}
                                 <th class="sticky-col">Jenis</th>
                                 <th class="sticky-col-2">Kode Warna</th>
                                 <th class="sticky-col-3">Warna</th>
@@ -415,19 +421,27 @@
 
             const keteranganBadge = item?.keterangan ?
                 item.keterangan.split(',').map(ket => `<div>${ket.trim()}</div>`).join('') :
-                '-';
+                '';
 
             const jenis = (item?.jenis || '').toUpperCase();
 
             if (['BENANG', 'NYLON'].includes(jenis)) {
                 htmlCelupBody += `
 <tr>
+${data.master.no_model === '-' 
+  ? `<td class="sticky-col">
+  ${item.po_plus === '1' ? '(+)' : ''}${item.no_model}
+</td>
+` 
+  : ''
+}
+
     <td  class="sticky-col">${item.item_type}</td>
     <td  class="sticky-col-2">${item.kode_warna}</td>
     <td class="sticky-col-3">${item.color}</td>
-    <td><span class="badge ${statusClass} px-3 py-2">${item.last_status || '-'}</span></td>
+    <td><span class="badge ${statusClass} px-3 py-2">${item.last_status || 'Belum Schedule'}</span></td>
     <td class="text-end">${formatNumber(item.qty_po)}</td>
-    <td class="text-end">${formatNumber(item.kg_celup)}</td>
+    <td class="text-end">  ${item.po_plus === '1' ? '(+)' : ''}  ${item.kg_celup||0}</td>
     <td>${item.lot_celup || '-'}</td>
     <td>${formatDate(item.tanggal_schedule)}</td>
     <td>${formatDate(item.tanggal_bon)}</td>
@@ -467,7 +481,7 @@
         let htmlCovering = htmlCoveringHeader + htmlCoveringBody + `</tbody></table></div></div></div></div></div>`;
 
         // Render
-        resultContainer.innerHTML += htmlCelup + htmlCovering;
+        resultContainer.innerHTML += headerData + htmlCelup + htmlCovering;
     }
 
     // Fungsi untuk format tanggal agar tidak error

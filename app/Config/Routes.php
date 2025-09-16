@@ -385,7 +385,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('stockbb', 'MaterialController::stockbb');
     $routes->get('filterstockbahanbaku', 'MaterialController::filterStockBahanBaku');
     $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
-    $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
+    $routes->get('filterstatusbahanbaku', 'MaterialController::filterstatusbahanbaku');
     $routes->get('warehouse/reportPoBenang', 'MaterialController::reportPoBenang');
     $routes->get('warehouse/filterPoBenang', 'MaterialController::filterPoBenang');
     $routes->get('warehouse/exportPoBenang', 'ExcelController::exportPoBenang');
@@ -584,6 +584,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('deletePlanPdk', 'ApsController::deletePlanPdk');
     $routes->post('deletePlanAll', 'ApsController::deletePlanAll');
     $routes->get('getListMesinplan', 'ApsController::getListMesinplan');
+    $routes->post('saveStartmesinBenang', 'ApsController::saveStartmesinBenang');
 
     // deffect
     $routes->get('datadeffect', 'DeffectController::datadeffect');
@@ -594,7 +595,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('stockbb', 'MaterialController::stockbb');
     $routes->get('filterstockbahanbaku', 'MaterialController::filterStockBahanBaku');
     $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
-    $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
+    $routes->get('filterstatusbahanbaku', 'MaterialController::filterstatusbahanbaku');
     $routes->get('exportDatangBenang', 'ExcelController::exportDatangBenang');
     $routes->get('warehouse/reportPoBenang', 'MaterialController::reportPoBenang');
     $routes->get('warehouse/filterPoBenang', 'MaterialController::filterPoBenang');
@@ -757,7 +758,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('bahanBaku', 'MaterialController::index');
     $routes->get('bahanBaku/getNomodel', 'MaterialController::getNomodel');
     $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
-    $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
+    $routes->get('filterstatusbahanbaku', 'MaterialController::filterstatusbahanbaku');
     $routes->post('getStyleSizeByNoModel', 'MaterialController::getStyleSizeByNoModel');
     $routes->get('getStyleSizeByNoModelPemesanan', 'MaterialController::getStyleSizeByNoModelPemesanan');
     $routes->post('getJalanMc', 'MaterialController::getJalanMcByModelSize');
@@ -1171,7 +1172,7 @@ $routes->group('/followup', ['filter' => 'followup'], function ($routes) {
     $routes->get('stockbb', 'MaterialController::stockbb');
     $routes->get('filterstockbahanbaku', 'MaterialController::filterStockBahanBaku');
     $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
-    $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
+    $routes->get('filterstatusbahanbaku', 'MaterialController::filterstatusbahanbaku');
     $routes->get('warehouse/reportPoBenang', 'MaterialController::reportPoBenang');
     $routes->get('warehouse/filterPoBenang', 'MaterialController::filterPoBenang');
     $routes->get('warehouse/exportPoBenang', 'ExcelController::exportPoBenang');
