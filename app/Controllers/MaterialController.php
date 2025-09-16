@@ -1757,11 +1757,13 @@ class MaterialController extends BaseController
                 $getPoPlus     = json_decode($poPlusResponse, true);
 
 
-                $kgPoTambahan = floatval(
-                    $getPoPlus['ttl_keb_potambahan'] ?? 0
-                );
+                $kgPoTambahan = floatval($getPoPlus['ttl_keb_potambahan'] ?? 0);
                 if ($qty >= 0) {
-                    $kebutuhan = (($qty * $data['gw'] * ($data['composition'] / 100)) * (1 + ($data['loss'] / 100)) / 1000) + $kgPoTambahan;
+                    if (isset($pemesanan['item_type']) && stripos($pemesanan['item_type'], 'JHT') !== false) {
+                        $kebutuhan = $data['kgs'] ?? 0;
+                    } else {
+                        $kebutuhan = (($qty * $data['gw'] * ($data['composition'] / 100)) * (1 + ($data['loss'] / 100)) / 1000) + $kgPoTambahan;
+                    }
                     $pemesanan['ttl_keb'] = $ttlKeb;
                 }
                 $ttlKeb += $kebutuhan;
@@ -1826,7 +1828,11 @@ class MaterialController extends BaseController
                 );
 
                 if ($qty >= 0) {
-                    $kebutuhan = (($qty * $data['gw'] * ($data['composition'] / 100)) * (1 + ($data['loss'] / 100)) / 1000) + $kgPoTambahan;
+                    if (isset($pemesanan['item_type']) && stripos($pemesanan['item_type'], 'JHT') !== false) {
+                        $kebutuhan = $data['kgs'] ?? 0;
+                    } else {
+                        $kebutuhan = (($qty * $data['gw'] * ($data['composition'] / 100)) * (1 + ($data['loss'] / 100)) / 1000) + $kgPoTambahan;
+                    }
                     $retur['ttl_keb'] = $ttlKeb;
                 }
                 $ttlKeb += $kebutuhan;
