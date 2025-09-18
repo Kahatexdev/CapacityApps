@@ -31,7 +31,7 @@
 #--------------------------------------------------------------------
 
 database.default.hostname = localhost
-database.default.database = material_system
+database.default.database = capacity_system
 database.default.username = root
 database.default.password = 
 database.default.DBDriver = MySQLi
