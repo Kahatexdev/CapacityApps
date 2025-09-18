@@ -20,8 +20,7 @@
 # APP
 #--------------------------------------------------------------------
 
-app.baseURL = 'http://localhost:8080/'
-
+ app.baseURL = 'http://localhost:8080/'
 # If you have trouble with `.`, you could also use `_`.
 # app_baseURL = ''
 # app.forceGlobalSecureRequests = false
@@ -32,9 +31,9 @@ app.baseURL = 'http://localhost:8080/'
 #--------------------------------------------------------------------
 
 database.default.hostname = localhost
-database.default.database = capacity_system
-database.default.username = harfa
-database.default.password = 2001
+database.default.database = material_system
+database.default.username = root
+database.default.password = 
 database.default.DBDriver = MySQLi
 database.default.DBPrefix =
 database.default.port = 3306

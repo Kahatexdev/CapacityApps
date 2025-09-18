@@ -69,6 +69,9 @@ $routes->group(
         $routes->post('pengaduan/reply/(:num)', 'PengaduanController::Apireply/$1');
         $routes->get('getNotif/(:any)', 'ApiController::getNotifAduan/$1');
         $routes->get('ExportPengaduan/(:num)', 'ApiController::ExportPengaduan/$1');
+
+
+        $routes->get('getQtyOrderBulk', 'ApiController::getQtyOrderBulk');
     }
 );
 

@@ -1372,4 +1372,24 @@ class ApsPerstyleModel extends Model
             ->groupBy('machinetypeid, delivery, mastermodel')
             ->get()->getResult();
     }
+
+    public function getQtyBySizes(string $noModel, string $area, array $sizes): array
+    {
+        if (empty($sizes)) return [];
+        return $this->select('size, SUM(qty) AS qty, SUM(po_plus) AS po_plus, MIN(inisial) AS inisial')
+            ->where('mastermodel', $noModel)
+            ->where('factory', $area)
+            ->whereIn('size', $sizes)
+            ->groupBy('size')
+            ->findAll();
+    }
+
+    public function getQtyAllSizes(string $noModel, string $area): array
+    {
+        return $this->select('size, SUM(qty) AS qty, SUM(po_plus) AS po_plus, MIN(inisial) AS inisial')
+            ->where('mastermodel', $noModel)
+            ->where('factory', $area)
+            ->groupBy('size')
+            ->findAll();
+    }
 }
