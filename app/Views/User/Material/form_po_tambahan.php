@@ -175,12 +175,12 @@
 
                 </div>
                 <div class="form-group">
-                    <div class="col"><label>Total Kg</label>
+                    <div class="col"><label>Total Tambahan Kg</label>
                         <input type="number" class="form-control total-kg" name="items[0][total_kg_po]" readonly required>
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col"><label>Total Cones</label>
+                    <div class="col"><label>Total Tambahan Cones</label>
                         <input type="number" class="form-control total-cns" name="items[0][total_cns_po]" readonly required>
                     </div>
                 </div>
@@ -427,7 +427,7 @@
 
                     // hitung qty po kg
                     const qtyPoKg = gw > 0 ?
-                        qtyOrderVal * composition * gw / 100 / 1000 :
+                        qtyOrderVal * composition * gw / 100 / 1000 * (1 + (loss / 100)) :
                         0;
                     $template.find('.po-kg-perstyle').val(qtyPoKg.toFixed(2));
 
