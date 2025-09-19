@@ -249,7 +249,7 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>(+) Pcs<br>Packing</label>
-                                    <input type="number" class="form-control plus-pck-pcs">
+                                    <input type="number" class="form-control plus-pck-pcs" readonly>
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -437,8 +437,8 @@
                         rawBruto * composition * gw / 100 / 1000 :
                         0;
 
-                    // 3) Hitung lebih-pakai = brutoKg - kgMu, minimal 0
-                    const lebih = Math.max(0, brutoKg - kgMu);
+                    // 3) Hitung lebih-pakai = brutoKg - qtyPoKg, minimal 0
+                    const lebih = Math.max(0, brutoKg - qtyPoKg);
 
                     $template.find('.lebih-pakai').val(lebih.toFixed(2));
 
