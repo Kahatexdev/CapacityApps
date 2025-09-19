@@ -1364,10 +1364,13 @@ class MaterialController extends BaseController
         $styleSize = array_unique($styleSize);
 
         // Ambil SISA dan QTY PO PLUS per style_size
+        $qtyOrderList = [];
         $sisaOrderList = [];
         $poPlusList = [];
         foreach ($styleSize as $style) {
             $sisa = $this->ApsPerstyleModel->getSisaPerSize($area, $noModel, [$style]);
+            $qtyPcs = is_array($sisa) ? $sisa['qty'] ?? 0 : ($sisa->qty ?? 0);
+            $qtyOrderList[$style] = (float)$qtyPcs;
             $sisaPcs = is_array($sisa) ? $sisa['sisa'] ?? 0 : ($sisa->sisa ?? 0);
             $sisaOrderList[$style] = (float)$sisaPcs;
             $poPlusPcs = is_array($sisa) ? $sisa['po_plus'] ?? 0 : ($sisa->po_plus ?? 0);
@@ -1416,6 +1419,7 @@ class MaterialController extends BaseController
         return $this->response->setJSON([
             'item_types' => $itemTypes,
             'material' => $materialData,
+            'qty_order' => $qtyOrderList,
             'sisa_order' => $sisaOrderList,
             'bs_mesin' => $bsMesinList,
             'bs_setting' => $bsSettingList,

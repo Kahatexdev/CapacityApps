@@ -120,10 +120,28 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6">
+                                <!-- PO Kg -->
+                                <div class="form-group">
+                                    <div class="col"><label>PO (Kg)</label>
+                                        <input type="text" class="form-control po-kg" name="items[0][po_kg]" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
                                 <!-- Terima -->
                                 <div class="form-group">
                                     <div class="col"><label>Terima (Kg)</label>
                                         <input type="text" class="form-control terima" name="items[0][terima]" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- Sisa Jatah (Kg)     -->
+                                <div class="form-group">
+                                    <div class="col"><label>Sisa Jatah (Kg)</label>
+                                        <input type="text" class="form-control sisa-jatah" name="items[0][sisa_jatah]" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -202,6 +220,8 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
+                                    <input type="hidden" class="form-control qty-order" name="items[0][qty_order]" readonly>
+                                    <input type="hidden" class="form-control po-kg-perstyle" name="items[0][po_kg_perstyle]" readonly>
                                     <label>Sisa<br>Order</label>
                                     <input type="text" class="form-control sisa-order" name="items[0][sisa_order]" readonly>
                                 </div>
@@ -305,6 +325,7 @@
                         });
 
                         $row.data('material', materialData);
+                        $row.data('qtyOrder', json.qty_order);
                         $row.data('sisaOrder', json.sisa_order);
                         $row.data('bsMesin', json.bs_mesin);
                         $row.data('bsSetting', json.bs_setting);
@@ -369,6 +390,7 @@
                 const modelCode = $row.find('.select-no-model option:selected').data('no-model');
 
                 const materialData = $row.data('material');
+                const qtyOrderMap = $row.data('qtyOrder') || {};
                 const sisaOrderMap = $row.data('sisaOrder') || {};
                 const bsMesinMap = $row.data('bsMesin') || {};
                 const bsSettingMap = $row.data('bsSetting') || {};
@@ -395,12 +417,21 @@
 
                     $template.find('.color').val(size || '');
                     $template.find('.kg-mu').val(parseFloat(style.kg_mu || 0).toFixed(2));
+                    const qtyOrderVal = (parseFloat(qtyOrderMap[size]) || 0);
+                    $template.find('.qty-order').val(qtyOrderVal);
                     const sisaOrderVal = (parseFloat(sisaOrderMap[size]) || 0) - (parseFloat(plusPckMap[size]) || 0);
                     $template.find('.sisa-order').val(sisaOrderVal);
                     $template.find('.bs-mesin').val(((bsMesinMap[size] || 0) / 1000).toFixed(2)); // Convert gram to kg
                     $template.find('.bs-setting').val(bsSettingMap[size] || 0);
                     $template.find('.plus-pck-pcs').val(plusPckMap[size] || 0);
 
+                    // hitung qty po kg
+                    const qtyPoKg = gw > 0 ?
+                        qtyOrderVal * composition * gw / 100 / 1000 :
+                        0;
+                    $template.find('.po-kg-perstyle').val(qtyPoKg.toFixed(2));
+
+                    // bruto kg    
                     const rawBruto = parseFloat(brutoMap[size] || 0);
                     const brutoKg = gw > 0 ?
                         rawBruto * composition * gw / 100 / 1000 :
@@ -436,6 +467,8 @@
 
                     hitungPoplusMc($template, $row);
                 });
+                hitungPoKg();
+                hitungSisaJatah();
             });
 
             // Fungsi untuk hitung total Cns PO
@@ -489,7 +522,17 @@
                     sisaMcTotal += val;
                 });
 
-                const total = (plusPckTotal + poplusMcTotal) - sisaMcTotal;
+                const baseTotal = (plusPckTotal + poplusMcTotal) - sisaMcTotal;
+                const sisaJatah = parseFloat($('.sisa-jatah').val()) || 0;
+
+                let total;
+                if (sisaJatah < 0) {
+                    // kalau minus → tambahkan nilai negatif itu (base + (-x))
+                    total = baseTotal + sisaJatah;
+                } else {
+                    // kalau nol/positif → kurangi
+                    total = baseTotal - sisaJatah;
+                }
 
                 $('.total-kg').val(total.toFixed(2));
             }
@@ -497,6 +540,49 @@
             // Saat nilai sisa-mc-kg berubah, hitung ulang total
             $(document).on('input', '.sisa-mc-kg', function() {
                 hitungTotalKg();
+            });
+            $(document).on('input', '.sisa-jatah', function() {
+                hitungTotalKg();
+            });
+
+            // hitung Qty PO Kg All Style
+            function hitungPoKg() {
+                let poKgPerstyle = 0;
+
+                $('.po-kg-perstyle').each(function() {
+                    const val = parseFloat($(this).val()) || 0;
+                    poKgPerstyle += val;
+                });
+
+                const total = poKgPerstyle;
+
+                $('.po-kg').val(total.toFixed(2));
+            }
+
+            // Saat nilai po-kg-perstyle berubah, hitung ulang total
+            $(document).on("input", ".po-kg-perstyle", function() {
+                hitungPoKg();
+            });
+
+            // Fungsi untuk hitung sisa jatah
+            function hitungSisaJatah() {
+                const poKg = parseFloat($('.po-kg').val()) || 0;
+                const terima = parseFloat($('.terima').val()) || 0;
+
+                const sisa = poKg - terima;
+
+                $('.sisa-jatah').val(sisa.toFixed(2));
+
+                hitungTotalKg();
+            }
+            // Saat total po-kg dihitung ulang → update sisa jatah juga
+            $(document).on('input', '.po-kg', function() {
+                hitungSisaJatah();
+            });
+
+            // Saat nilai terima berubah → update sisa jatah juga
+            $(document).on('input', '.terima', function() {
+                hitungSisaJatah();
             });
 
             // Saat user mengisi PO Pcs, hitung otomatis Plus Pck Kg
@@ -579,16 +665,16 @@
                     0;
 
                 // 3) efficiency: pastikan pembagi ≠ 0
-                // const denom = brutoKg + bsMesin;
-                // const eff = denom > 0 ?
-                //     ((brutoKg - stKg) / denom) * 100 :
-                //     0;
+                const denom = brutoKg + bsMesin;
+                const eff = denom > 0 ?
+                    ((brutoKg - stKg) / denom) * 100 :
+                    0;
 
                 // 4) newKeb & estPoPlusMc
-                // const newKeb = eff > 0 ? sisaKg / eff * 100 : 0;
-                // const estPoPlusMc = Math.max(0, newKeb - sisaKg);
+                const newKeb = eff > 0 ? sisaKg / eff * 100 : 0;
+                const estPoPlusMc = Math.max(0, newKeb - sisaKg);
                 // GANTI JADI:
-                const estPoPlusMc = Math.max(0, sisaKg);
+                // const estPoPlusMc = Math.max(0, sisaKg);
 
 
                 console.log({
@@ -606,10 +692,9 @@
                     estPoPlusMc
                 });
 
-                $row.find('.poplus-mc-kg').val(estPoPlusMc.toFixed(2));
+                $row.find('.poplus-mc-kg').val(sisaKg.toFixed(2));
                 hitungTotalKg();
             }
-
 
             hitungTotalKg();
 
