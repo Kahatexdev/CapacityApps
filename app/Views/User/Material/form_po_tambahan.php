@@ -656,7 +656,7 @@
 
                 // 1) stKg & sisaKeb (kg terpakai untuk setting & order)
                 const stKg = bsSetting * composition * gw / 100 / 1000;
-                const sisaKg = sisaOrder * composition * gw / 100 / 1000;
+                const sisaKg = sisaOrder * composition * gw / 100 / 1000 * (1 + (loss / 100));
 
                 // 2) brutoKg: rawBruto * comp * gw /100/1000
                 const rawBruto = parseFloat(brutoMap[styleSize]) || 0;
