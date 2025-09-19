@@ -579,14 +579,17 @@
                     0;
 
                 // 3) efficiency: pastikan pembagi ≠ 0
-                const denom = brutoKg + bsMesin;
-                const eff = denom > 0 ?
-                    ((brutoKg - stKg) / denom) * 100 :
-                    0;
+                // const denom = brutoKg + bsMesin;
+                // const eff = denom > 0 ?
+                //     ((brutoKg - stKg) / denom) * 100 :
+                //     0;
 
                 // 4) newKeb & estPoPlusMc
-                const newKeb = eff > 0 ? sisaKg / eff * 100 : 0;
-                const estPoPlusMc = Math.max(0, newKeb - sisaKg);
+                // const newKeb = eff > 0 ? sisaKg / eff * 100 : 0;
+                // const estPoPlusMc = Math.max(0, newKeb - sisaKg);
+                // GANTI JADI:
+                const estPoPlusMc = Math.max(0, sisaKg);
+
 
                 console.log({
                     sisaOrder,

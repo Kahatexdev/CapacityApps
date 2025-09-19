@@ -41,7 +41,7 @@
                             <input type="hidden" class="form-control" id="area" value="<?= $area ?>">
                             <label for="no_model">No Model</label>
                             <input type="text" class="form-control" id="no_model" value="" placeholder="No Model">
-                            <label for="tgl_po">Tgl Retur</label>
+                            <label for="tgl_po">Tgl Po Tambahan</label>
                             <input type="date" class="form-control" id="tgl_po" value="" required>
                             <button id="searchFilter" class="btn btn-info ms-2"><i class="fas fa-search"></i> Filter</button>
                             <button class="btn btn-info ms-2">
