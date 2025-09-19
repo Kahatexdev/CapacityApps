@@ -90,7 +90,6 @@ class MaterialController extends BaseController
         $logged_in = true;
         // $noModel = $this->DetailPlanningModel->getNoModelAktif($area);
         $pemesananBb = session()->get('pemesananBb');
-        // dd ($pemesananBb);
         // Kita "flatten" data sehingga tiap baris tersimpan sebagai record tunggal
         $flattenData = [];
 
@@ -172,40 +171,38 @@ class MaterialController extends BaseController
 
         return view(session()->get('role') . '/Material/statusbahanbaku', $data);
     }
-    public function filterstatusbahanbaku($model)
+    public function filterstatusbahanbaku()
     {
         // Mengambil data master
-        $master = $this->orderModel->getStartMc($model);
-
-        // Mengambil nilai 'search' yang dikirim oleh frontend
+        $model = $this->request->getGet('model');
         $search = $this->request->getGet('search');
+        if (!empty($model)) {
+
+            $master = $this->orderModel->getStartMc($model);
+        } else {
+            $master = [
+                'kd_buyer_order' => '-',
+                'no_model'       => '-',
+                'delivery_awal'  => '-',  // MIN dari apsperstyle.delivery
+                'delivery_akhir' => '-',  // MAX dari apsperstyle.delivery
+                'start_mc'       => '-' // MIN dari tanggal_planning.start_mesin
+            ];
+        }
+        // Mengambil nilai 'search' yang dikirim oleh frontend
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/' . $model . '?search=' . urlencode($search);
+        $params = [
+            'model'  => $model ?? '',
+            'search' => $search ?? ''
+        ];
+
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/?' . http_build_query($params);
+
 
         // Mengambil data dari API eksternal
         $response = file_get_contents($apiUrl);
         $status = json_decode($response, true);
-        // Filter data berdasarkan 'no_model' jika ada keyword 'search'
-        if ($search) {
-            $status = array_filter($status, function ($item) use ($search) {
-                // Cek apakah pencarian ada di no_model terlebih dahulu
-                if (isset($item['no_model']) && strpos(strtolower($item['no_model']), strtolower($search)) !== false) {
-                    return true;
-                }
-                // Lanjutkan pencarian ke kode_warna, lot_celup, dan tanggal_schedule jika no_model tidak cocok
-                if (isset($item['kode_warna']) && strpos(strtolower($item['kode_warna']), strtolower($search)) !== false) {
-                    return true;
-                }
-                if (isset($item['lot_celup']) && strpos(strtolower($item['lot_celup']), strtolower($search)) !== false) {
-                    return true;
-                }
-                if (isset($item['tanggal_schedule']) && strpos(strtolower($item['tanggal_schedule']), strtolower($search)) !== false) {
-                    return true;
-                }
-                return false;
-            });
-        }
-        // Gabungkan data master dan status dalam satu array
+
+
         $responseData = [
             'master' => $master, // Data master dari getStartMc
             'status' => $status // Data status yang sudah difilter (gunakan array_values untuk mereset indeks array)
@@ -512,7 +509,7 @@ class MaterialController extends BaseController
             $message = 'Silakan filter tanggal pakai atau no model terlebih dahulu.';
         } elseif (!empty($tglPakai) || !empty($pdk)) {
             $message = null;
-            $rawList = $this->fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listPemesanan/{$area}");
+            $rawList = $this->fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listPemesanan/{$area}?tgl_pakai=" . urlencode($tglPakai) . "&searchPdk=" . urlencode($pdk));
             if (!is_array($rawList)) {
                 // handle error dengan baik
                 return redirect()->back()->with('error', 'Gagal mengambil data pemesanan.');
@@ -640,7 +637,7 @@ class MaterialController extends BaseController
                     $currentDate = getNextNonHoliday($currentDate, $liburDates);
                 }
 
-                // kalau hari ini Minggu → pakai 00:00:00
+                // kalau hari ini Minggu â†’ pakai 00:00:00
                 if ($isSunday) {
                     $time = "00:00:00";
                 } else {
@@ -656,14 +653,14 @@ class MaterialController extends BaseController
             return $result;
         }
 
-        // Spandex & Karet → cek apakah hari ini Jumat atau Sabtu
+        // Spandex & Karet â†’ cek apakah hari ini Jumat atau Sabtu
         if ($day === 'Sunday') {
             $initialOffsetBenang  = 0;
             $initialOffsetNylon   = 0;
             $initialOffsetSpandex = 0;
             $initialOffsetKaret   = 0;
         } else {
-            // Spandex & Karet → cek apakah hari ini Jumat atau Sabtu
+            // Spandex & Karet â†’ cek apakah hari ini Jumat atau Sabtu
             $initialOffsetBenang  = ($day === 'Saturday') ? 2 : 1;
             $initialOffsetNylon   = ($day === 'Saturday') ? 2 : 1;
             $initialOffsetSpandex = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
@@ -1538,8 +1535,8 @@ class MaterialController extends BaseController
     }
     public function reportPemesanan($area)
     {
-        $tgl_pakai = '2025-09-06';
-        $tgl_pakai = $this->request->getGet('tgl_pakai');
+        // $tgl_pakai = '2025-09-06';
+        $tgl_pakai = $this->request->getGet('tgl_pakai') ?? date('Y-m-d');
         function fetchApiData($url)
         {
             try {
@@ -1558,7 +1555,7 @@ class MaterialController extends BaseController
             }
         }
 
-        $dataList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listReportPemesanan/$area");
+        $dataList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listReportPemesanan/" . $area . "/" . urlencode($tgl_pakai));
         if (!is_array($dataList)) {
             die('Error: Invalid response format for listPemesanan API.');
         }
@@ -1757,11 +1754,13 @@ class MaterialController extends BaseController
                 $getPoPlus     = json_decode($poPlusResponse, true);
 
 
-                $kgPoTambahan = floatval(
-                    $getPoPlus['ttl_keb_potambahan'] ?? 0
-                );
+                $kgPoTambahan = floatval($getPoPlus['ttl_keb_potambahan'] ?? 0);
                 if ($qty >= 0) {
-                    $kebutuhan = (($qty * $data['gw'] * ($data['composition'] / 100)) * (1 + ($data['loss'] / 100)) / 1000) + $kgPoTambahan;
+                    if (isset($pemesanan['item_type']) && stripos($pemesanan['item_type'], 'JHT') !== false) {
+                        $kebutuhan = $data['kgs'] ?? 0;
+                    } else {
+                        $kebutuhan = (($qty * $data['gw'] * ($data['composition'] / 100)) * (1 + ($data['loss'] / 100)) / 1000) + $kgPoTambahan;
+                    }
                     $pemesanan['ttl_keb'] = $ttlKeb;
                 }
                 $ttlKeb += $kebutuhan;
@@ -1780,10 +1779,10 @@ class MaterialController extends BaseController
                 'tgl_pakai'          => $pemesanan['tgl_pakai'],
                 'id_total_pemesanan' => $pemesanan['id_total_pemesanan'],
                 'ttl_jl_mc'          => (int)($pemesanan['ttl_jl_mc'] ?? 0),
-                'ttl_kg'             => (float)($pemesanan['ttl_kg'] ?? 0),   // ← JANGAN number_format di sini
+                'ttl_kg'             => (float)($pemesanan['ttl_kg'] ?? 0),   // â† JANGAN number_format di sini
                 'po_tambahan'        => (int)($pemesanan['po_tambahan'] ?? 0),
-                'ttl_keb'            => (float)$ttlKeb,                       // ← hasil hitung, mentah
-                'kg_out'             => (float)($pemesanan['kgs_out'] ?? 0),  // ← mentah
+                'ttl_keb'            => (float)$ttlKeb,                       // â† hasil hitung, mentah
+                'kg_out'             => (float)($pemesanan['kgs_out'] ?? 0),  // â† mentah
                 'lot_out'            => $pemesanan['lot_out'],
                 // field retur kosong
                 'tgl_retur'          => null,
@@ -1826,7 +1825,11 @@ class MaterialController extends BaseController
                 );
 
                 if ($qty >= 0) {
-                    $kebutuhan = (($qty * $data['gw'] * ($data['composition'] / 100)) * (1 + ($data['loss'] / 100)) / 1000) + $kgPoTambahan;
+                    if (isset($pemesanan['item_type']) && stripos($pemesanan['item_type'], 'JHT') !== false) {
+                        $kebutuhan = $data['kgs'] ?? 0;
+                    } else {
+                        $kebutuhan = (($qty * $data['gw'] * ($data['composition'] / 100)) * (1 + ($data['loss'] / 100)) / 1000) + $kgPoTambahan;
+                    }
                     $retur['ttl_keb'] = $ttlKeb;
                 }
                 $ttlKeb += $kebutuhan;
@@ -1847,11 +1850,11 @@ class MaterialController extends BaseController
                 'ttl_jl_mc'          => null,
                 'ttl_kg'             => null,
                 'po_tambahan'        => null,
-                'ttl_keb'            => (float)$ttlKeb,                        // ← mentah
-                'kg_out'             => 0.0,                                   // ← angka 0
+                'ttl_keb'            => (float)$ttlKeb,                        // â† mentah
+                'kg_out'             => 0.0,                                   // â† angka 0
                 'lot_out'            => null,
                 'tgl_retur'          => $retur['tgl_retur'],
-                'kgs_retur'          => (float)($retur['kgs_retur'] ?? 0),     // ← mentah
+                'kgs_retur'          => (float)($retur['kgs_retur'] ?? 0),     // â† mentah
                 'lot_retur'          => $retur['lot_retur'],
                 'ket_gbn'            => $retur['keterangan_gbn'],
             ];
@@ -2024,7 +2027,7 @@ class MaterialController extends BaseController
             $totalPo = $this->ApsPerstyleModel->totalPo($noModel)['totalPo'] ?? 0;
         }
 
-        // Render full page—AJAX akan mengambil ulang #table-container saja
+        // Render full pageâ€”AJAX akan mengambil ulang #table-container saja
         return view(session()->get('role') . '/Material/jatahBahanBaku', [
             'role'            => session()->get('role'),
             'title'           => 'Jatah Bahan Baku',
@@ -2604,7 +2607,7 @@ class MaterialController extends BaseController
         if (empty($bulan) || !preg_match('/^\d{4}\-\d{2}$/', $bulan)) {
             return $this->response
                 ->setStatusCode(400)
-                ->setJSON(['error' => 'Parameter “bulan” harus dalam format YYYY-MM']);
+                ->setJSON(['error' => 'Parameter â€œbulanâ€ harus dalam format YYYY-MM']);
         }
 
         $timestamp     = strtotime($bulan . '-01');

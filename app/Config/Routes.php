@@ -68,6 +68,10 @@ $routes->group(
         $routes->post('pengaduan/create', 'PengaduanController::Apicreate');
         $routes->post('pengaduan/reply/(:num)', 'PengaduanController::Apireply/$1');
         $routes->get('getNotif/(:any)', 'ApiController::getNotifAduan/$1');
+        $routes->get('ExportPengaduan/(:num)', 'ApiController::ExportPengaduan/$1');
+
+
+        $routes->get('getQtyOrderBulk', 'ApiController::getQtyOrderBulk');
     }
 );
 
@@ -384,7 +388,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('stockbb', 'MaterialController::stockbb');
     $routes->get('filterstockbahanbaku', 'MaterialController::filterStockBahanBaku');
     $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
-    $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
+    $routes->get('filterstatusbahanbaku', 'MaterialController::filterstatusbahanbaku');
     $routes->get('warehouse/reportPoBenang', 'MaterialController::reportPoBenang');
     $routes->get('warehouse/filterPoBenang', 'MaterialController::filterPoBenang');
     $routes->get('warehouse/exportPoBenang', 'ExcelController::exportPoBenang');
@@ -458,6 +462,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
 
     //summary pakai
     $routes->get('jatah_bahan_baku', 'MaterialController::jatahBahanBaku');
+    $routes->get('export_excel_jatah_bb', 'ExcelController::exportExcelJatahNoModel');
 
     // pengaduan
     $routes->get('pengaduan', 'PengaduanController::index');
@@ -582,6 +587,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('deletePlanPdk', 'ApsController::deletePlanPdk');
     $routes->post('deletePlanAll', 'ApsController::deletePlanAll');
     $routes->get('getListMesinplan', 'ApsController::getListMesinplan');
+    $routes->post('saveStartmesinBenang', 'ApsController::saveStartmesinBenang');
 
     // deffect
     $routes->get('datadeffect', 'DeffectController::datadeffect');
@@ -592,7 +598,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('stockbb', 'MaterialController::stockbb');
     $routes->get('filterstockbahanbaku', 'MaterialController::filterStockBahanBaku');
     $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
-    $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
+    $routes->get('filterstatusbahanbaku', 'MaterialController::filterstatusbahanbaku');
     $routes->get('exportDatangBenang', 'ExcelController::exportDatangBenang');
     $routes->get('warehouse/reportPoBenang', 'MaterialController::reportPoBenang');
     $routes->get('warehouse/filterPoBenang', 'MaterialController::filterPoBenang');
@@ -755,7 +761,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('bahanBaku', 'MaterialController::index');
     $routes->get('bahanBaku/getNomodel', 'MaterialController::getNomodel');
     $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
-    $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
+    $routes->get('filterstatusbahanbaku', 'MaterialController::filterstatusbahanbaku');
     $routes->post('getStyleSizeByNoModel', 'MaterialController::getStyleSizeByNoModel');
     $routes->get('getStyleSizeByNoModelPemesanan', 'MaterialController::getStyleSizeByNoModelPemesanan');
     $routes->post('getJalanMc', 'MaterialController::getJalanMcByModelSize');
@@ -771,6 +777,8 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('report/pdf/(:any)/(:any)/(:any)', 'PdfController::exportPemesanan/$1/$2/$3');
     $routes->get('stockbahanbaku/(:any)', 'MaterialController::stockBahanBaku/$1');
     $routes->get('filterstockbahanbaku/(:any)', 'MaterialController::filterStockBahanBaku/$1');
+    $routes->get('jatah_bahan_baku', 'MaterialController::jatahBahanBaku');
+    $routes->get('export_excel_jatah_bb', 'ExcelController::exportExcelJatahNoModel');
 
     //pph
     $routes->get('pph/(:any)', 'MaterialController::pph/$1');
@@ -1167,7 +1175,7 @@ $routes->group('/followup', ['filter' => 'followup'], function ($routes) {
     $routes->get('stockbb', 'MaterialController::stockbb');
     $routes->get('filterstockbahanbaku', 'MaterialController::filterStockBahanBaku');
     $routes->get('statusbahanbaku', 'MaterialController::statusbahanbaku');
-    $routes->get('filterstatusbahanbaku/(:any)', 'MaterialController::filterstatusbahanbaku/$1');
+    $routes->get('filterstatusbahanbaku', 'MaterialController::filterstatusbahanbaku');
     $routes->get('warehouse/reportPoBenang', 'MaterialController::reportPoBenang');
     $routes->get('warehouse/filterPoBenang', 'MaterialController::filterPoBenang');
     $routes->get('warehouse/exportPoBenang', 'ExcelController::exportPoBenang');

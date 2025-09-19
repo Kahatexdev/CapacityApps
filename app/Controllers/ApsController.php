@@ -754,6 +754,7 @@ class ApsController extends BaseController
         $jarum =  $kebutuhanArea['jarum'];
         // $detailplan = $this->DetailPlanningModel->getDetailPlanning($id); //get data model with detail quantity,model etc.
         $pdk = $this->DetailPlanningModel->detailPdk($id);
+        $startMc = $this->orderModel->startMcBenang($pdk['model']);
         $listDeliv = $this->ApsPerstyleModel->getDetailPerDeliv($pdk, $area);
         $listPlanning = $this->EstimatedPlanningModel->listPlanning($id);
         // dd($listPlanning);
@@ -778,7 +779,8 @@ class ApsController extends BaseController
             'mesin' => $mesin,
             'id_pln' => $idutama,
             'id_save' => $id,
-            'judul' => $judul
+            'judul' => $judul,
+            'startMc' => $startMc,
         ];
         return view(session()->get('role') . '/Planning/operationPlanning', $data);
     }
@@ -1295,6 +1297,17 @@ class ApsController extends BaseController
                     'message' => $e->getMessage()
                 ]);
             }
+        }
+    }
+    public function saveStartmesinBenang()
+    {
+        $tgl = $this->request->getPost('startMesin');
+        $model = $this->request->getPost('model');
+        $update = $this->orderModel->updateStartMc($model, $tgl);
+        if ($update) {
+            return redirect()->back()->with('success', 'Start mesin disimpan.');
+        } else {
+            return redirect()->back()->with('error', 'Data Gagal disimpan.');
         }
     }
 }

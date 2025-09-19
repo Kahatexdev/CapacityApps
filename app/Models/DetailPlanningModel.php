@@ -129,11 +129,18 @@ class DetailPlanningModel extends Model
     }
     public function reqstartmc($model)
     {
-        return $this->select('tanggal_planning.date as start_mc')
-            ->join('tanggal_planning', 'tanggal_planning.id_detail_pln = detail_planning.id_detail_pln')
-            ->where('detail_planning.model', $model)
-            ->where('detail_planning.status', 'aktif')
-            ->first();
+        $dm = $this->db->table('data_model')
+            ->select('start_mc')->where('no_model', $model)->get()
+            ->getRowArray();
+        if (empty($dm['start_mc'])) {
+            return $this->select('tanggal_planning.date as start_mc')
+                ->join('tanggal_planning', 'tanggal_planning.id_detail_pln = detail_planning.id_detail_pln')
+                ->where('detail_planning.model', $model)
+                ->where('detail_planning.status', 'aktif')
+                ->first();
+        } else {
+            return $dm;
+        }
     }
     public function getNoModelAktif($area)
     {

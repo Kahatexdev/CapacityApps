@@ -637,17 +637,30 @@ class OrderModel extends Model
 
     public function getStartMc($model)
     {
-        return $this->select('data_model.kd_buyer_order, data_model.no_model, 
+        $data = $this->select('data_model.kd_buyer_order, data_model.no_model, 
                       MIN(apsperstyle.delivery) AS delivery_awal, 
                       MAX(apsperstyle.delivery) AS delivery_akhir, 
-                      COALESCE(MIN(tanggal_planning.start_mesin), NULL) AS start_mc')
+                      data_model.start_mc')
             ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left')
-            ->join('detail_planning', 'detail_planning.model = data_model.no_model', 'left')
-            ->join('estimated_planning', 'estimated_planning.id_detail_pln = detail_planning.id_detail_pln', 'left')
-            ->join('tanggal_planning', 'tanggal_planning.id_est_qty = estimated_planning.id_est_qty', 'left')
             ->where('data_model.no_model', $model)
             ->first();
+
+        if (empty($data['start_mc'])) {
+            $dp = $this->db->table('detail_planning')
+                ->select('MIN(tanggal_planning.start_mesin) AS start_mc')
+                ->join('estimated_planning', 'estimated_planning.id_detail_pln = detail_planning.id_detail_pln', 'left')
+                ->join('tanggal_planning', 'tanggal_planning.id_est_qty = estimated_planning.id_est_qty', 'left')
+                ->where('detail_planning.model', $model)
+                ->get()
+                ->getRowArray();
+
+
+            $data['start_mc'] = $dp['start_mc'] ?? null;
+        }
+
+        return $data;
     }
+
 
     public function getDataBuyer($noModel)
     {
@@ -690,5 +703,17 @@ class OrderModel extends Model
 
         $query = $builder->get();
         return $query->getRow();  // langsung ambil satu baris
+    }
+    public function startMcBenang($pdk)
+    {
+        return $this->select('start_mc')
+            ->where('no_model', $pdk)
+            ->first()['start_mc'];
+    }
+    public function updateStartMc($model, $tgl)
+    {
+        return $this->where('no_model', $model)
+            ->set('start_mc', $tgl)
+            ->update();
     }
 }
