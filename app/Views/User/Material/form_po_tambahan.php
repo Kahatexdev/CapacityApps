@@ -724,6 +724,7 @@
                     const color = $(this).find('.color').first().val(); // Ambil color utama
                     const sisa_bb_mc = $(this).find('.sisa-mc-kg').val();
                     const terima_kg = $(this).find('.terima').first().val(); // Ambil color utama
+                    const sisa_jatah = $(this).find('.sisa-jatah').first().val(); // Ambil color utama
                     const poplus_mc_cns = $(this).find('.poplus-mc-cns').val();
                     const plus_pck_cns = $(this).find('.plus-pck-cns').val();
                     const delivery_po_plus = $('#delivery-po-plus').val();
@@ -737,6 +738,7 @@
                             color: color,
                             sisa_bb_mc: sisa_bb_mc,
                             terima_kg: terima_kg,
+                            sisa_jatah: sisa_jatah,
                             poplus_mc_cns: poplus_mc_cns,
                             plus_pck_cns: plus_pck_cns,
                             style_size: $(this).find('.style-size-hidden').val(),
@@ -747,6 +749,8 @@
                             plus_pck_pcs: $(this).find('.plus-pck-pcs').val(),
                             plus_pck_kg: $(this).find('.plus-pck-kg').val(),
                             lebih_pakai_kg: $(this).find('.lebih-pakai').val(),
+                            total_kg_po: $(this).find('.total-kg').val(),
+                            total_cns_po: $(this).find('.total-cns').val(),
                             delivery_po_plus: delivery_po_plus,
                             keterangan: keterangan
                         });
