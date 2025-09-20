@@ -527,14 +527,26 @@ class RossoController extends BaseController
             return $result;
         }
 
-        // Spandex & Karet → cek apakah hari ini Jumat atau Sabtu
-        $initialOffsetSpandex = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
-        $initialOffsetKaret   = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
+        // Spandex & Karet â†’ cek apakah hari ini Jumat atau Sabtu
+        if ($day === 'Sunday') {
+            $initialOffsetBenang  = 0;
+            $initialOffsetNylon   = 0;
+            $initialOffsetSpandex = 0;
+            $initialOffsetKaret   = 0;
+        } else {
+            // Spandex & Karet â†’ cek apakah hari ini Jumat atau Sabtu
+            $initialOffsetBenang  = ($day === 'Saturday') ? 2 : 1;
+            $initialOffsetNylon   = ($day === 'Saturday') ? 2 : 1;
+            $initialOffsetSpandex = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
+            $initialOffsetKaret   = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
+        }
+        // dd($initialOffsetBenang);
 
-        $result['benang']  = generateRangeDates($today, (int)$masterRangePemesanan['range_benang'], $liburDates, $startTime, 1);
-        $result['nylon']   = generateRangeDates($today, (int)$masterRangePemesanan['range_nylon'], $liburDates, $startTime, 1);
+        $result['benang']  = generateRangeDates($today, (int)$masterRangePemesanan['range_benang'], $liburDates, $startTime, $initialOffsetBenang);
+        $result['nylon']   = generateRangeDates($today, (int)$masterRangePemesanan['range_nylon'], $liburDates, $startTime, $initialOffsetNylon);
         $result['spandex'] = generateRangeDates($today, (int)$masterRangePemesanan['range_spandex'], $liburDates, $startTime, $initialOffsetSpandex);
         $result['karet']   = generateRangeDates($today, (int)$masterRangePemesanan['range_karet'], $liburDates, $startTime, $initialOffsetKaret);
+
 
         $data = [
             'role' => session()->get('role'),
