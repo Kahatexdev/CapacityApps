@@ -171,27 +171,26 @@
                         </div>
                         <div class="row populate-size-wrapper">
                         </div>
+                        <div class="form-group">
+                            <div class="col"><label>Total Tambahan Kg</label>
+                                <input type="number" class="form-control total-kg" name="items[0][total_kg_po]" readonly required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col"><label>Total Tambahan Cones</label>
+                                <input type="number" class="form-control total-cns" name="items[0][total_cns_po]" readonly required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col"><label>Delivery Po(+)</label>
+                                <input type="date" class="form-control delivery-po-plus" name="items[0][delivery_po_plus]" id="delivery-po-plus" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleFormControlInput1">Keterangan</label>
+                            <textarea class="form-control" name="keterangan" id="keterangan"></textarea>
+                        </div>
                     </div>
-
-                </div>
-                <div class="form-group">
-                    <div class="col"><label>Total Tambahan Kg</label>
-                        <input type="number" class="form-control total-kg" name="items[0][total_kg_po]" readonly required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col"><label>Total Tambahan Cones</label>
-                        <input type="number" class="form-control total-cns" name="items[0][total_cns_po]" readonly required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col"><label>Delivery Po(+)</label>
-                        <input type="date" class="form-control delivery-po-plus" name="items[0][delivery_po_plus]" id="delivery-po-plus" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="exampleFormControlInput1">Keterangan</label>
-                    <textarea class="form-control" name="keterangan" id="keterangan"></textarea>
                 </div>
 
                 <button type="button" class="btn btn-info w-100" id="btn-save">Save</button>
@@ -314,7 +313,7 @@
                 if (!modelCode) return;
 
                 loading.classList.remove('d-none');
-                fetch(`${base}/${role}/poTambahanDetail/${modelCode}/${area}`)
+                fetch(`${base}${role}/poTambahanDetail/${modelCode}/${area}`)
                     .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
                     .then(json => {
                         const itemTypes = json.item_types;
@@ -729,6 +728,8 @@
                     const plus_pck_cns = $(this).find('.plus-pck-cns').val();
                     const delivery_po_plus = $('#delivery-po-plus').val();
                     const keterangan = $('#keterangan').val();
+                    const total_kg_po = $(this).find('.total-kg').val();
+                    const total_cns_po = $(this).find('.total-cns').val();
                     console.log(delivery_po_plus);
                     $(this).find('.size-block').each(function() {
                         formData.push({
@@ -749,8 +750,8 @@
                             plus_pck_pcs: $(this).find('.plus-pck-pcs').val(),
                             plus_pck_kg: $(this).find('.plus-pck-kg').val(),
                             lebih_pakai_kg: $(this).find('.lebih-pakai').val(),
-                            total_kg_po: $(this).find('.total-kg').val(),
-                            total_cns_po: $(this).find('.total-cns').val(),
+                            total_kg_po: total_kg_po,
+                            total_cns_po: total_cns_po,
                             delivery_po_plus: delivery_po_plus,
                             keterangan: keterangan
                         });
