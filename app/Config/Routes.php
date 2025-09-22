@@ -674,6 +674,11 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('jatah_bahan_baku', 'MaterialController::jatahBahanBaku');
     $routes->get('export_excel_jatah_bb', 'ExcelController::exportExcelJatahNoModel');
 
+    //pemesanan
+    $routes->get('report_pemesanan/(:any)', 'MaterialController::reportPemesanan/$1');
+    $routes->post('filterTglPakai/(:any)', 'MaterialController::filterTglPakai/$1');
+    $routes->get('report/pdf/(:any)/(:any)/(:any)', 'PdfController::exportPemesanan/$1/$2/$3');
+
     // pengaduan
     $routes->get('pengaduan', 'PengaduanController::index');
     $routes->post('pengaduan/create', 'PengaduanController::create');

@@ -1,4 +1,4 @@
-<?php $this->extend('User/layout'); ?>
+<?php $this->extend('aps/layout'); ?>
 <?php $this->section('content'); ?>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <div class="container-fluid py-4">
@@ -30,14 +30,21 @@
             <div class="card">
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between">
-                        <div class="col-6">
+                        <div class="col-5">
                             <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                             <h5 class="font-weight-bolder mb-0">
-                                Report Pemesanan Bahan Baku <?= $area ?>
+                                Report Pemesanan Bahan Baku
                             </h5>
                             <p class="text-sm mb-0 text-capitalize font-weight-bold text-danger">*Filter Tanggal Pakai</p>
                         </div>
-                        <div class="col-6 d-flex align-items-center text-end gap-2">
+                        <div class="col-7 d-flex align-items-center text-end gap-2">
+                            <label for="area">Area</label>
+                            <select name="area" id="area" class="form-control">
+                                <option value="">Pilih Area</option>
+                                <?php foreach ($areas as $ar) : ?>
+                                    <option value="<?= $ar ?>"><?= $ar ?></option>
+                                <?php endforeach ?>
+                            </select>
                             <label for="tgl_awal">Dari</label>
                             <input type="date" class="form-control" id="tgl_awal" value="" required>
                             <label for="tgl_akhir">Sampai</label>
@@ -109,7 +116,7 @@
 </script>
 <script type="text/javascript">
     $(document).ready(function() {
-        const area = '<?= $area ?>';
+        const area = $('#area').val();
         // base URL tanpa jenis dan params
         const basePdf = "<?= base_url("$role/report/pdf") ?>";
 
@@ -139,7 +146,8 @@
                 orderable: false,
                 searchable: false,
                 render: (data, type, row) => {
-                    return `<a href="${pdfUrl(jenis, area, row.tgl_pakai)}" target="_blank">
+                    const areaNow = $('#area').val(); //
+                    return `<a href="${pdfUrl(jenis, areaNow, row.tgl_pakai)}" target="_blank">
                   <i class="fas fa-file-pdf"></i>
                 </a>`;
                 }
@@ -161,19 +169,21 @@
                 b = $('#tgl_akhir').val();
             $('#filterButton').prop('disabled', !(a && b));
         }
-        $('#tgl_awal, #tgl_akhir').on('change', toggleFilterButton);
+        $('#tgl_awal, #tgl_akhir, #area').on('change', toggleFilterButton);
 
         // klik filter -> ambil data
         $('#filterButton').on('click', () => {
             const tglAwal = $('#tgl_awal').val(),
-                tglAkhir = $('#tgl_akhir').val();
+                tglAkhir = $('#tgl_akhir').val(),
+                area = $('#area').val();
 
             $.ajax({
                 url: '<?= base_url("$role/filterTglPakai/$area") ?>',
                 method: 'POST',
                 data: {
                     tgl_awal: tglAwal,
-                    tgl_akhir: tglAkhir
+                    tgl_akhir: tglAkhir,
+                    area: area
                 },
                 dataType: 'json',
                 success: data => {

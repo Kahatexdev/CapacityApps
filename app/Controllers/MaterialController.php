@@ -1522,6 +1522,7 @@ class MaterialController extends BaseController
     }
     public function filterTglPakai($area)
     {
+        $area = $this->request->getPost('area') ?? $area;
         $tgl_awal = $this->request->getPost('tgl_awal');
         $tgl_akhir = $this->request->getPost('tgl_akhir');
 
@@ -1542,6 +1543,15 @@ class MaterialController extends BaseController
     }
     public function reportPemesanan($area)
     {
+        $areas = $this->areaModel->getArea();
+        // Filter agar 'name' yang mengandung 'Gedung' tidak ikut
+        $filteredArea = array_filter($areas, function ($item) {
+            return stripos($item['name'], 'Gedung') === false; // Cek jika 'Gedung' tidak ada di 'name'
+        });
+
+        // Ambil hanya field 'name'
+        $result = array_column($filteredArea, 'name');
+
         // $tgl_pakai = '2025-09-06';
         $tgl_pakai = $this->request->getGet('tgl_pakai') ?? date('Y-m-d');
         function fetchApiData($url)
@@ -1644,6 +1654,7 @@ class MaterialController extends BaseController
             'tomorrow' => $tomorrow,
             'twoDays' => $twoDays,
             'threeDays' => $threeDays,
+            'areas' => $result,
         ];
 
         return view(session()->get('role') . '/Material/reportPemesanan', $data);
