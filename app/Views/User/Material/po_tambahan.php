@@ -242,7 +242,7 @@
                 item.qty_pcs || 0,
                 item.kgs || 0,
                 item.terima_kg || 0,
-                item.sisa_bb_mc || 0,
+                item.ttl_sisa_bb_dimc || 0,
                 item.sisa_order_pcs || 0,
                 item.bs_mesin_kg || 0,
                 item.bs_st_pcs || 0,
