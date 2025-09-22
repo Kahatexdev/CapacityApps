@@ -678,6 +678,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('report_pemesanan/(:any)', 'MaterialController::reportPemesanan/$1');
     $routes->post('filterTglPakai/(:any)', 'MaterialController::filterTglPakai/$1');
     $routes->get('report/pdf/(:any)/(:any)/(:any)', 'PdfController::exportPemesanan/$1/$2/$3');
+    $routes->get('sisaKebutuhanArea/(:any)', 'MaterialController::sisaKebutuhanArea/$1');
 
     // pengaduan
     $routes->get('pengaduan', 'PengaduanController::index');

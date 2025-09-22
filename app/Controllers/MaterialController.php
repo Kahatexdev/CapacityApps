@@ -1725,7 +1725,15 @@ class MaterialController extends BaseController
     public function sisaKebutuhanArea($area)
     {
         $noModel = $this->request->getGet('filter_model') ?? '';
+        $area = $this->request->getGet('filter_area') ?? $area;
+        $areas = $this->areaModel->getArea();
+        // Filter agar 'name' yang mengandung 'Gedung' tidak ikut
+        $filteredArea = array_filter($areas, function ($item) {
+            return stripos($item['name'], 'Gedung') === false; // Cek jika 'Gedung' tidak ada di 'name'
+        });
 
+        // Ambil hanya field 'name'
+        $result = array_column($filteredArea, 'name');
         // Initialize dataPemesanan as empty by default
         $dataPemesanan = [];
         $dataRetur = [];
@@ -1915,6 +1923,7 @@ class MaterialController extends BaseController
             'active6' => 'active',
             'active7' => '',
             'area' => $area,
+            'areas' => $result,
             'noModel' => $noModel,
             'title' => "Bahan Baku",
             'dataPemesanan' => $mergedData,
