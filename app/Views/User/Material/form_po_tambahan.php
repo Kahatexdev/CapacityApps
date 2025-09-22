@@ -149,7 +149,7 @@
                                 <!-- Sisa BB di Mesin (Kg) -->
                                 <div class="form-group">
                                     <label>Sisa BB di Mesin (Kg)</label>
-                                    <input type="number" class="form-control sisa-mc-kg" name="items[0][sisa_mc_kg]">
+                                    <input type="number" class="form-control sisa-mc-kg" name="items[0][sisa_mc_kg]" required>
                                 </div>
                             </div>
                         </div>
@@ -158,14 +158,14 @@
                                 <!-- (+) Mesin (Cns) -->
                                 <div class="form-group">
                                     <label>(+) Mesin (Cns)</label>
-                                    <input type="number" class="form-control poplus-mc-cns" name="items[0][poplus_mc_cns]">
+                                    <input type="number" class="form-control poplus-mc-cns" name="items[0][poplus_mc_cns]" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <!-- (+) Packing (Cns) -->
                                 <div class="form-group">
                                     <label>(+) Packing (Cns)</label>
-                                    <input type="number" class="form-control plus-pck-cns" name="items[0][plus_pck_cns]">
+                                    <input type="number" class="form-control plus-pck-cns" name="items[0][plus_pck_cns]" required>
                                 </div>
                             </div>
                         </div>
