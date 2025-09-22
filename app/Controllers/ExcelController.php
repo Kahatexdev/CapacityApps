@@ -4529,7 +4529,7 @@ class ExcelController extends BaseController
 
             $kgs = (float)$row['kgs'];
             $subtotalKgs += $kgs;
-            $terimaKg = (float)$row['terima_kg'];
+            $terimaKg = (float)$row['ttl_terima_kg'];
             $sisaBBMc = (float)$row['ttl_sisa_bb_dimc'];
             $poplus_mc_cns = (float)$row['poplus_mc_cns'];
             $plus_pck_cns = (float)$row['plus_pck_cns'];
@@ -4551,9 +4551,13 @@ class ExcelController extends BaseController
                 $sheet->setCellValue("L{$rowNum}", number_format($terimaKg, 2));
                 $sheet->setCellValue("M{$rowNum}", number_format($terimaKg - $subtotalKgs, 2));
                 $sheet->setCellValue("N{$rowNum}", number_format($terimaKg / $subtotalKgs * 100, 2) . '%');
+                $sheet->setCellValue("O{$rowNum}", number_format($sisaBBMc, 2));
+                $sheet->setCellValue("R{$rowNum}", $poplus_mc_cns);
+                $sheet->setCellValue("V{$rowNum}", $plus_pck_cns);
+
                 // Bold & style subtotal
-                $sheet->getStyle("J{$rowNum}:N{$rowNum}")->getFont()->setBold(true);
-                $sheet->getStyle("J{$rowNum}:N{$rowNum}")
+                $sheet->getStyle("J{$rowNum}:AD{$rowNum}")->getFont()->setBold(true);
+                $sheet->getStyle("J{$rowNum}:AD{$rowNum}")
                     ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
                 $sheet->getRowDimension($rowNum)->setRowHeight(20);
