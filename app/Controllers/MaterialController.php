@@ -1446,8 +1446,9 @@ class MaterialController extends BaseController
                 'kode_warna'        => $item['kode_warna'] ?? '',
                 'color'             => $item['color'] ?? '',
                 'style_size'        => $item['style_size'] ?? '',
-                'terima_kg'         => (float) ($item['terima_kg'] ?? 0),
-                'sisa_bb_mc'        => (float) ($item['sisa_bb_mc'] ?? 0),
+                'ttl_terima_kg'     => (float) ($item['terima_kg'] ?? 0),
+                'ttl_sisa_jatah'    => (float) ($item['sisa_jatah'] ?? 0),
+                'ttl_sisa_bb_dimc'  => (float) ($item['sisa_bb_mc'] ?? 0),
                 'sisa_order_pcs'    => (float) ($item['sisa_order_pcs'] ?? 0),
                 'bs_mesin_kg'       => (float) ($item['bs_mesin_kg'] ?? 0),
                 'bs_st_pcs'         => (float) ($item['bs_st_pcs'] ?? 0),
@@ -1457,6 +1458,8 @@ class MaterialController extends BaseController
                 'plus_pck_kg'       => (float) ($item['plus_pck_kg'] ?? 0),
                 'plus_pck_cns'      => (float) ($item['plus_pck_cns'] ?? 0),
                 'lebih_pakai_kg'    => (float) ($item['lebih_pakai_kg'] ?? 0),
+                'ttl_tambahan_kg'   => (float) ($item['total_kg_po'] ?? 0),
+                'ttl_tambahan_cns'  => (float) ($item['total_cns_po'] ?? 0),
                 'delivery_po_plus'  => $item['delivery_po_plus'] ?? '',
                 'keterangan'        => $item['keterangan'] ?? '',
                 'admin'             => session()->get('username'),
@@ -1519,6 +1522,7 @@ class MaterialController extends BaseController
     }
     public function filterTglPakai($area)
     {
+        $area = $this->request->getPost('area') ?? $area;
         $tgl_awal = $this->request->getPost('tgl_awal');
         $tgl_akhir = $this->request->getPost('tgl_akhir');
 
@@ -1539,6 +1543,15 @@ class MaterialController extends BaseController
     }
     public function reportPemesanan($area)
     {
+        $areas = $this->areaModel->getArea();
+        // Filter agar 'name' yang mengandung 'Gedung' tidak ikut
+        $filteredArea = array_filter($areas, function ($item) {
+            return stripos($item['name'], 'Gedung') === false; // Cek jika 'Gedung' tidak ada di 'name'
+        });
+
+        // Ambil hanya field 'name'
+        $result = array_column($filteredArea, 'name');
+
         // $tgl_pakai = '2025-09-06';
         $tgl_pakai = $this->request->getGet('tgl_pakai') ?? date('Y-m-d');
         function fetchApiData($url)
@@ -1641,6 +1654,7 @@ class MaterialController extends BaseController
             'tomorrow' => $tomorrow,
             'twoDays' => $twoDays,
             'threeDays' => $threeDays,
+            'areas' => $result,
         ];
 
         return view(session()->get('role') . '/Material/reportPemesanan', $data);
@@ -1711,7 +1725,15 @@ class MaterialController extends BaseController
     public function sisaKebutuhanArea($area)
     {
         $noModel = $this->request->getGet('filter_model') ?? '';
+        $area = $this->request->getGet('filter_area') ?? $area;
+        $areas = $this->areaModel->getArea();
+        // Filter agar 'name' yang mengandung 'Gedung' tidak ikut
+        $filteredArea = array_filter($areas, function ($item) {
+            return stripos($item['name'], 'Gedung') === false; // Cek jika 'Gedung' tidak ada di 'name'
+        });
 
+        // Ambil hanya field 'name'
+        $result = array_column($filteredArea, 'name');
         // Initialize dataPemesanan as empty by default
         $dataPemesanan = [];
         $dataRetur = [];
@@ -1903,6 +1925,7 @@ class MaterialController extends BaseController
             'active6' => 'active',
             'active7' => '',
             'area' => $area,
+            'areas' => $result,
             'noModel' => $noModel,
             'title' => "Bahan Baku",
             'dataPemesanan' => $mergedData,

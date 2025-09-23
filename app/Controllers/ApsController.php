@@ -845,6 +845,10 @@ class ApsController extends BaseController
         $libur = $this->liburModel->findAll();
         $holidayDates = array_column($libur, 'tanggal');
 
+        $cekOrderModel = $this->orderModel->startMcBenang($model);
+        if (empty($cekOrderModel)) {
+            $this->orderModel->updateStartMc($model, $start);
+        }
         $dataestqty = [
             'id_detail_pln' => $id_save,
             'Est_qty' => $est,

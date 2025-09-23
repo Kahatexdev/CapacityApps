@@ -149,7 +149,7 @@
                                 <!-- Sisa BB di Mesin (Kg) -->
                                 <div class="form-group">
                                     <label>Sisa BB di Mesin (Kg)</label>
-                                    <input type="number" class="form-control sisa-mc-kg" name="items[0][sisa_mc_kg]">
+                                    <input type="number" class="form-control sisa-mc-kg" name="items[0][sisa_mc_kg]" required>
                                 </div>
                             </div>
                         </div>
@@ -158,40 +158,39 @@
                                 <!-- (+) Mesin (Cns) -->
                                 <div class="form-group">
                                     <label>(+) Mesin (Cns)</label>
-                                    <input type="number" class="form-control poplus-mc-cns" name="items[0][poplus_mc_cns]">
+                                    <input type="number" class="form-control poplus-mc-cns" name="items[0][poplus_mc_cns]" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <!-- (+) Packing (Cns) -->
                                 <div class="form-group">
                                     <label>(+) Packing (Cns)</label>
-                                    <input type="number" class="form-control plus-pck-cns" name="items[0][plus_pck_cns]">
+                                    <input type="number" class="form-control plus-pck-cns" name="items[0][plus_pck_cns]" required>
                                 </div>
                             </div>
                         </div>
                         <div class="row populate-size-wrapper">
                         </div>
+                        <div class="form-group">
+                            <div class="col"><label>Total Tambahan Kg</label>
+                                <input type="number" class="form-control total-kg" name="items[0][total_kg_po]" readonly required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col"><label>Total Tambahan Cones</label>
+                                <input type="number" class="form-control total-cns" name="items[0][total_cns_po]" readonly required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col"><label>Delivery Po(+)</label>
+                                <input type="date" class="form-control delivery-po-plus" name="items[0][delivery_po_plus]" id="delivery-po-plus" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleFormControlInput1">Keterangan</label>
+                            <textarea class="form-control" name="keterangan" id="keterangan"></textarea>
+                        </div>
                     </div>
-
-                </div>
-                <div class="form-group">
-                    <div class="col"><label>Total Tambahan Kg</label>
-                        <input type="number" class="form-control total-kg" name="items[0][total_kg_po]" readonly required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col"><label>Total Tambahan Cones</label>
-                        <input type="number" class="form-control total-cns" name="items[0][total_cns_po]" readonly required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col"><label>Delivery Po(+)</label>
-                        <input type="date" class="form-control delivery-po-plus" name="items[0][delivery_po_plus]" id="delivery-po-plus" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="exampleFormControlInput1">Keterangan</label>
-                    <textarea class="form-control" name="keterangan" id="keterangan"></textarea>
                 </div>
 
                 <button type="button" class="btn btn-info w-100" id="btn-save">Save</button>
@@ -314,7 +313,7 @@
                 if (!modelCode) return;
 
                 loading.classList.remove('d-none');
-                fetch(`${base}/${role}/poTambahanDetail/${modelCode}/${area}`)
+                fetch(`${base}${role}/poTambahanDetail/${modelCode}/${area}`)
                     .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
                     .then(json => {
                         const itemTypes = json.item_types;
@@ -724,10 +723,13 @@
                     const color = $(this).find('.color').first().val(); // Ambil color utama
                     const sisa_bb_mc = $(this).find('.sisa-mc-kg').val();
                     const terima_kg = $(this).find('.terima').first().val(); // Ambil color utama
+                    const sisa_jatah = $(this).find('.sisa-jatah').first().val(); // Ambil color utama
                     const poplus_mc_cns = $(this).find('.poplus-mc-cns').val();
                     const plus_pck_cns = $(this).find('.plus-pck-cns').val();
                     const delivery_po_plus = $('#delivery-po-plus').val();
                     const keterangan = $('#keterangan').val();
+                    const total_kg_po = $(this).find('.total-kg').val();
+                    const total_cns_po = $(this).find('.total-cns').val();
                     console.log(delivery_po_plus);
                     $(this).find('.size-block').each(function() {
                         formData.push({
@@ -737,6 +739,7 @@
                             color: color,
                             sisa_bb_mc: sisa_bb_mc,
                             terima_kg: terima_kg,
+                            sisa_jatah: sisa_jatah,
                             poplus_mc_cns: poplus_mc_cns,
                             plus_pck_cns: plus_pck_cns,
                             style_size: $(this).find('.style-size-hidden').val(),
@@ -747,6 +750,8 @@
                             plus_pck_pcs: $(this).find('.plus-pck-pcs').val(),
                             plus_pck_kg: $(this).find('.plus-pck-kg').val(),
                             lebih_pakai_kg: $(this).find('.lebih-pakai').val(),
+                            total_kg_po: total_kg_po,
+                            total_cns_po: total_cns_po,
                             delivery_po_plus: delivery_po_plus,
                             keterangan: keterangan
                         });

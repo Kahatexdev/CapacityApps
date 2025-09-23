@@ -4529,7 +4529,10 @@ class ExcelController extends BaseController
 
             $kgs = (float)$row['kgs'];
             $subtotalKgs += $kgs;
-            $terimaKg = (float)$row['terima_kg'];
+            $terimaKg = (float)$row['ttl_terima_kg'];
+            $sisaBBMc = (float)$row['ttl_sisa_bb_dimc'];
+            $poplus_mc_cns = (float)$row['poplus_mc_cns'];
+            $plus_pck_cns = (float)$row['plus_pck_cns'];
             // $retur = (float)$row['kgs_retur'];
             $poplus_mc_kg = (float)$row['poplus_mc_kg'];
             $plus_pck_kg = (float)$row['plus_pck_kg'];
@@ -4548,9 +4551,13 @@ class ExcelController extends BaseController
                 $sheet->setCellValue("L{$rowNum}", number_format($terimaKg, 2));
                 $sheet->setCellValue("M{$rowNum}", number_format($terimaKg - $subtotalKgs, 2));
                 $sheet->setCellValue("N{$rowNum}", number_format($terimaKg / $subtotalKgs * 100, 2) . '%');
+                $sheet->setCellValue("O{$rowNum}", number_format($sisaBBMc, 2));
+                $sheet->setCellValue("R{$rowNum}", $poplus_mc_cns);
+                $sheet->setCellValue("V{$rowNum}", $plus_pck_cns);
+
                 // Bold & style subtotal
-                $sheet->getStyle("J{$rowNum}:N{$rowNum}")->getFont()->setBold(true);
-                $sheet->getStyle("J{$rowNum}:N{$rowNum}")
+                $sheet->getStyle("J{$rowNum}:AD{$rowNum}")->getFont()->setBold(true);
+                $sheet->getStyle("J{$rowNum}:AD{$rowNum}")
                     ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
                 $sheet->getRowDimension($rowNum)->setRowHeight(20);
@@ -4587,14 +4594,14 @@ class ExcelController extends BaseController
                 '', //terima
                 '', // plus atau minus
                 '', // terima
-                number_format($row['sisa_bb_mc'], 2), // sisa mesin
+                '', // sisa mesin
                 $row['sisa_order_pcs'] == 0 ? '' : $row['sisa_order_pcs'],
                 $row['poplus_mc_kg'] == 0 ? '' : number_format($row['poplus_mc_kg'], 2),
-                $row['poplus_mc_cns'] == 0 ? '' : $row['poplus_mc_cns'],
+                '',
                 $persenPoplus,
                 $row['plus_pck_pcs'] == 0 ? '' : number_format($row['plus_pck_pcs'], 2),
                 $row['plus_pck_kg'] == 0 ? '' : number_format($row['plus_pck_kg'], 2),
-                $row['plus_pck_cns'] == 0 ? '' : $row['plus_pck_cns'],
+                '',
                 $persenPlusPck,
                 $row['lebih_pakai_kg'] == 0 ? '' : number_format($row['lebih_pakai_kg'], 2),
                 $persenLebihPakai,
@@ -4660,6 +4667,9 @@ class ExcelController extends BaseController
             $sheet->setCellValue("L{$rowNum}", number_format($terimaKg, 2));
             $sheet->setCellValue("M{$rowNum}", number_format($terimaKg - $subtotalKgs, 2));
             $sheet->setCellValue("N{$rowNum}", number_format($terimaKg / $subtotalKgs * 100, 2) . '%');
+            $sheet->setCellValue("O{$rowNum}", number_format($sisaBBMc, 2));
+            $sheet->setCellValue("R{$rowNum}", $poplus_mc_cns);
+            $sheet->setCellValue("V{$rowNum}", $plus_pck_cns);
             // Style untuk baris TOTAL terakhir
             $sheet->getStyle("A{$rowNum}:AD{$rowNum}")->applyFromArray([
                 'font' => ['bold' => true, 'size' => 10],

@@ -42,19 +42,20 @@
                 </div>
                 <div class="card-body p-3" id="planningField">
                     <div class="row">
-                        <form action="<?= base_url($role . '/saveStartmesinBenang'); ?>" method="post" class="d-flex flex-wrap">
+
+
+                        <h6 for=" model-data" class="form-control-label">Start Mesin Untuk Schedule Celup : <?= $startMc ?> </label>
+
+                            <!-- <form action="<?= base_url($role . '/saveStartmesinBenang'); ?>" method="post" class="d-flex flex-wrap">
                             <div class="col-lg-3 col-sm-6">
                                 <div class="form-group">
-                                    <input class="form-control" type="text" name="model" value="<?= $pdk ?>" readonly hidden>
 
-                                    <label for=" model-data" class="form-control-label">Start Mesin Untuk Schedule Celup</label>
-                                    <input class="form-control" type="date" name="startMesin" value="<?= $startMc ?>">
                                 </div>
                             </div>
                             <div class="col-lg-1 col-sm-3 d-flex align-items-end">
                                 <button type="submit" class="btn btn-info w-100">Simpan</button>
                             </div>
-                        </form>
+                        </form> -->
                     </div>
 
 
