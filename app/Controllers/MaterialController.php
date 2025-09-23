@@ -1826,7 +1826,7 @@ class MaterialController extends BaseController
             $urlStyle = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model=' . $retur['no_model']
                 . '&item_type=' . urlencode($retur['item_type'])
                 . '&kode_warna=' . urlencode($retur['kode_warna'])
-                . '&warna=' . urlencode($retur['color']);
+                . '&warna=' . urlencode($retur['warna']);
 
             $styleResponse = file_get_contents($urlStyle);
             $getStyle      = json_decode($styleResponse, true);
