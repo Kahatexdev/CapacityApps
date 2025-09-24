@@ -540,7 +540,7 @@ class MaterialController extends BaseController
                 $dataList[$key]['ttl_kebutuhan_bb'] = 0;
                 if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
                     $styleApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model='
-                        . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
+                        . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&warna=' . urlencode($order['color']);
                     $styleList = $this->fetchApiData($styleApiUrl);
 
                     if ($styleList) {
@@ -1581,7 +1581,7 @@ class MaterialController extends BaseController
             $dataList[$key]['ttl_kebutuhan_bb'] = 0;
             if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
                 $styleApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model='
-                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
+                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&warna=' . urlencode($order['color']);
                 $styleList = fetchApiData($styleApiUrl);
 
                 if ($styleList) {
@@ -1758,7 +1758,8 @@ class MaterialController extends BaseController
             // ambil data styleSize by bb
             $urlStyle = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model=' . $pemesanan['no_model']
                 . '&item_type=' . urlencode($pemesanan['item_type'])
-                . '&kode_warna=' . urlencode($pemesanan['kode_warna']);
+                . '&kode_warna=' . urlencode($pemesanan['kode_warna'])
+                . '&warna=' . urlencode($pemesanan['color']);
 
             $styleResponse = file_get_contents($urlStyle);
             $getStyle     = json_decode($styleResponse, true);
@@ -1824,7 +1825,8 @@ class MaterialController extends BaseController
             // ambil data styleSize by bb
             $urlStyle = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model=' . $retur['no_model']
                 . '&item_type=' . urlencode($retur['item_type'])
-                . '&kode_warna=' . urlencode($retur['kode_warna']);
+                . '&kode_warna=' . urlencode($retur['kode_warna'])
+                . '&warna=' . urlencode($retur['warna']);
 
             $styleResponse = file_get_contents($urlStyle);
             $getStyle      = json_decode($styleResponse, true);
