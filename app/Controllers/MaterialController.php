@@ -195,7 +195,7 @@ class MaterialController extends BaseController
             'search' => $search ?? ''
         ];
 
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/statusbahanbaku/?' . http_build_query($params);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/?' . http_build_query($params);
 
 
         // Mengambil data dari API eksternal
@@ -215,7 +215,7 @@ class MaterialController extends BaseController
     public function cekBahanBaku($id, $idpln)
     {
         $model = $this->DetailPlanningModel->detailPdk($id);
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/cekBahanBaku/' . $model['model'];
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/cekBahanBaku/' . $model['model'];
         // Ambil data dari API
         $response = file_get_contents($apiUrl);
         $status = json_decode($response, true);
@@ -242,7 +242,7 @@ class MaterialController extends BaseController
     public function cekStok()
     {
         $model = $this->request->getGet('model');
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/cekStok/' . $model;
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/cekStok/' . $model;
         $response = file_get_contents($apiUrl);
         $stok = json_decode($response, true);
 
@@ -253,7 +253,7 @@ class MaterialController extends BaseController
         $model = $this->request->getGet('model');
         $styleSize = $this->request->getGet('style');
         $style = urlencode($styleSize);
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/cekStok/' . $model . '/' . $style;
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/cekStok/' . $model . '/' . $style;
         $response = file_get_contents($apiUrl);
         $stok = json_decode($response, true);
 
@@ -286,7 +286,7 @@ class MaterialController extends BaseController
     public function getMU($model, $styleSize, $area, $qtyOrder)
     {
         $styleSize = urlencode($styleSize);  // Encode styleSize
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/getMU/' . $model . '/' . $styleSize . '/' . $area;
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getMU/' . $model . '/' . $styleSize . '/' . $area;
         $response = file_get_contents($apiUrl);  // Mendapatkan response dari API
         // if ($response === FALSE) {
         //     die('Error occurred while fetching data.');
@@ -509,7 +509,7 @@ class MaterialController extends BaseController
             $message = 'Silakan filter tanggal pakai atau no model terlebih dahulu.';
         } elseif (!empty($tglPakai) || !empty($pdk)) {
             $message = null;
-            $rawList = $this->fetchApiData("http://127.0.0.1/MaterialSystem/public/api/listPemesanan/{$area}?tgl_pakai=" . urlencode($tglPakai) . "&searchPdk=" . urlencode($pdk));
+            $rawList = $this->fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listPemesanan/{$area}?tgl_pakai=" . urlencode($tglPakai) . "&searchPdk=" . urlencode($pdk));
             if (!is_array($rawList)) {
                 // handle error dengan baik
                 return redirect()->back()->with('error', 'Gagal mengambil data pemesanan.');
@@ -539,7 +539,7 @@ class MaterialController extends BaseController
             foreach ($dataList as $key => $order) {
                 $dataList[$key]['ttl_kebutuhan_bb'] = 0;
                 if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
-                    $styleApiUrl = 'http://127.0.0.1/MaterialSystem/public/api/getStyleSizeByBb?no_model='
+                    $styleApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model='
                         . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&warna=' . urlencode($order['color']);
                     $styleList = $this->fetchApiData($styleApiUrl);
 
@@ -548,7 +548,7 @@ class MaterialController extends BaseController
                         foreach ($styleList as $style) {
                             if (isset($style['no_model'], $style['style_size'], $style['gw'], $style['composition'], $style['loss'])) {
                                 $orderQty = $this->ApsPerstyleModel->getQtyOrder($style['no_model'], $style['style_size'], $area);
-                                $tambahanApiUrl = 'http://127.0.0.1/MaterialSystem/public/api/getKgTambahan?no_model='
+                                $tambahanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getKgTambahan?no_model='
                                     . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&style_size=' . urlencode($style['style_size']) . '&area=' . $area;
                                 $tambahan = $this->fetchApiData($tambahanApiUrl);
                                 $kgPoTambahan = $tambahan['ttl_keb_potambahan'] ?? 0;
@@ -568,13 +568,13 @@ class MaterialController extends BaseController
                     }
 
                     // penerimaan benang
-                    $pengirimanApiUrl = 'http://127.0.0.1/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
+                    $pengirimanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
                         . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
                     $pengiriman = $this->fetchApiData($pengirimanApiUrl);
                     $dataList[$key]['ttl_pengiriman'] = $pengiriman['kgs_out'] ?? 0;
 
                     // retur
-                    $returApiUrl = 'http://127.0.0.1/MaterialSystem/public/api/getTotalRetur?area=' . $area . '&no_model='
+                    $returApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getTotalRetur?area=' . $area . '&no_model='
                         . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
                     $retur = $this->fetchApiData($returApiUrl);
                     $dataList[$key]['ttl_retur'] = $retur['kgs_retur'] ?? 0;
@@ -604,8 +604,8 @@ class MaterialController extends BaseController
         }
 
         // get range berdasarkan hari
-        $masterRangeApiUrl = 'http://127.0.0.1/MaterialSystem/public/api/getMasterRangePemesanan?day=' .    ($day) . '&area=' . urlencode($area);
-        // $masterRangeApiUrl = 'http://127.0.0.1/MaterialSystem/public/api/getMasterRangePemesanan?day=Thursday&area=' . urlencode($area);
+        $masterRangeApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getMasterRangePemesanan?day=' .    ($day) . '&area=' . urlencode($area);
+        // $masterRangeApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getMasterRangePemesanan?day=Thursday&area=' . urlencode($area);
         $masterRangePemesanan = $this->fetchApiData($masterRangeApiUrl);
         // dd($masterRangeApiUrl);
 
@@ -718,7 +718,7 @@ class MaterialController extends BaseController
         $warna = $this->request->getGet('warna');
 
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/stockbahanbaku/' . $area . '?noModel=' . urlencode($noModel) . '&warna=' . urlencode($warna);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/stockbahanbaku/' . $area . '?noModel=' . urlencode($noModel) . '&warna=' . urlencode($warna);
 
         // Mengambil data dari API eksternal
         $response = file_get_contents($apiUrl);
@@ -795,7 +795,7 @@ class MaterialController extends BaseController
         $alasan = $this->request->getPost('alasan');
 
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/requestAdditionalTime/' . $area . '?jenis=' . urlencode($jenis) . '&tanggal_pakai=' . urlencode($tanggal_pakai) . '&alasan=' . urlencode($alasan);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/requestAdditionalTime/' . $area . '?jenis=' . urlencode($jenis) . '&tanggal_pakai=' . urlencode($tanggal_pakai) . '&alasan=' . urlencode($alasan);
 
         try {
             // Mengambil respon dari API eksternal
@@ -850,7 +850,7 @@ class MaterialController extends BaseController
         $noModel = $this->request->getGet('model') ?? '';
 
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
 
         // Mengambil data dari API eksternal
         $response = file_get_contents($apiUrl);
@@ -1006,7 +1006,7 @@ class MaterialController extends BaseController
         $noModel = $this->request->getGet('model') ?? '';
 
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
 
         // Mengambil data dari API eksternal
         $response = file_get_contents($apiUrl);
@@ -1141,7 +1141,7 @@ class MaterialController extends BaseController
         foreach ($data as $prod) {
             $key = $prod['mastermodel'] . '-' . $prod['size'];
 
-            $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/pphperhari?model=' . urlencode($prod['mastermodel']) . '&size=' . urlencode($prod['size']);
+            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pphperhari?model=' . urlencode($prod['mastermodel']) . '&size=' . urlencode($prod['size']);
 
             // Mengambil data dari API eksternal
             $response = @file_get_contents($apiUrl);
@@ -1316,7 +1316,7 @@ class MaterialController extends BaseController
     public function poTambahanDetail($noModel, $area)
     {
         $detail = [];
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/poTambahanDetail/' . $noModel . '/' . $area;
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/poTambahanDetail/' . $noModel . '/' . $area;
 
         // Mengambil data dari API eksternal
         $response = @file_get_contents($apiUrl);
@@ -1471,7 +1471,7 @@ class MaterialController extends BaseController
         log_message('debug', 'ITEMS untuk dikirim ke API: ' . json_encode($items));
 
         $payload = ['items' => $items];
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/savePoTambahan';
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/savePoTambahan';
 
         $ch = curl_init($apiUrl);
         curl_setopt_array($ch, [
@@ -1497,7 +1497,7 @@ class MaterialController extends BaseController
     {
         $noModel = $this->request->getGet('model');
         $tglBuat = $this->request->getGet('tglBuat');
-        $apiUrl = "http://127.0.0.1/MaterialSystem/public/api/filterPoTambahan"
+        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterPoTambahan"
             . "?area=" . urlencode($area)
             . "&tglBuat=" . urlencode($tglBuat)
             . "&model=" . urlencode($noModel);
@@ -1527,7 +1527,7 @@ class MaterialController extends BaseController
         $tgl_akhir = $this->request->getPost('tgl_akhir');
 
         // Ambil data dari model sesuai range tanggal
-        $apiUrl = "http://127.0.0.1/MaterialSystem/public/api/filterTglPakai/"
+        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterTglPakai/"
             . $area
             . "?awal=" . urlencode($tgl_awal)
             . "&akhir=" . urlencode($tgl_akhir);
@@ -1572,7 +1572,7 @@ class MaterialController extends BaseController
             }
         }
 
-        $dataList = fetchApiData("http://127.0.0.1/MaterialSystem/public/api/listReportPemesanan/" . $area . "/" . urlencode($tgl_pakai));
+        $dataList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listReportPemesanan/" . $area . "/" . urlencode($tgl_pakai));
         if (!is_array($dataList)) {
             die('Error: Invalid response format for listPemesanan API.');
         }
@@ -1580,7 +1580,7 @@ class MaterialController extends BaseController
         foreach ($dataList as $key => $order) {
             $dataList[$key]['ttl_kebutuhan_bb'] = 0;
             if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
-                $styleApiUrl = 'http://127.0.0.1/MaterialSystem/public/api/getStyleSizeByBb?no_model='
+                $styleApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model='
                     . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&warna=' . urlencode($order['color']);
                 $styleList = fetchApiData($styleApiUrl);
 
@@ -1599,7 +1599,7 @@ class MaterialController extends BaseController
                     $dataList[$key]['ttl_kebutuhan_bb'] = $totalRequirement;
                 }
 
-                $pengirimanApiUrl = 'http://127.0.0.1/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
+                $pengirimanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
                     . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
                 $pengiriman = fetchApiData($pengirimanApiUrl);
                 $dataList[$key]['ttl_pengiriman'] = $pengiriman['kgs_out'] ?? 0;
@@ -1667,7 +1667,7 @@ class MaterialController extends BaseController
         // Logika untuk menentukan data berdasarkan status PO Tambahan
         if ($poTambahan == 1) {
             // Jika search ada, panggil API eksternal dengan query parameter 'search'
-            $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/getNoModelByPoTambahan?area=' . $area;
+            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getNoModelByPoTambahan?area=' . $area;
 
             try {
                 $response = file_get_contents($apiUrl);
@@ -1699,7 +1699,7 @@ class MaterialController extends BaseController
         // Logika untuk menentukan data berdasarkan status PO Tambahan
         if ($poTambahan == 1) {
             // Jika search ada, panggil API eksternal dengan query parameter 'search'
-            $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/getStyleSizeByPoTambahan?no_model=' . $noModel . '&area=' . $area;
+            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByPoTambahan?no_model=' . $noModel . '&area=' . $area;
 
             try {
                 $response = file_get_contents($apiUrl);
@@ -1740,11 +1740,11 @@ class MaterialController extends BaseController
 
         if (!empty($area) && !empty($noModel)) {
 
-            $pemesananUrl  = 'http://127.0.0.1/MaterialSystem/public/api/getPemesananByAreaModel?area=' . $area . '&no_model=' . urlencode($noModel);
+            $pemesananUrl  = 'http://172.23.44.14/MaterialSystem/public/api/getPemesananByAreaModel?area=' . $area . '&no_model=' . urlencode($noModel);
             $pemesananResponse = file_get_contents($pemesananUrl);
             $dataPemesanan   = json_decode($pemesananResponse, true);
 
-            $returUrl  = 'http://127.0.0.1/MaterialSystem/public/api/getReturByAreaModel?area=' . $area . '&no_model=' . urlencode($noModel);
+            $returUrl  = 'http://172.23.44.14/MaterialSystem/public/api/getReturByAreaModel?area=' . $area . '&no_model=' . urlencode($noModel);
             $returResponse = file_get_contents($returUrl);
             $dataRetur     = json_decode($returResponse, true);
         }
@@ -1756,7 +1756,7 @@ class MaterialController extends BaseController
         // Tambahkan semua data pemesanan ke mergedData
         foreach ($dataPemesanan as $key => $pemesanan) {
             // ambil data styleSize by bb
-            $urlStyle = 'http://127.0.0.1/MaterialSystem/public/api/getStyleSizeByBb?no_model=' . $pemesanan['no_model']
+            $urlStyle = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model=' . $pemesanan['no_model']
                 . '&item_type=' . urlencode($pemesanan['item_type'])
                 . '&kode_warna=' . urlencode($pemesanan['kode_warna'])
                 . '&warna=' . urlencode($pemesanan['color']);
@@ -1773,7 +1773,7 @@ class MaterialController extends BaseController
                 $qty         = (intval($qtyData['qty']) ?? 0);
 
                 // Ambil kg po tambahan
-                $PoPlus = 'http://127.0.0.1/MaterialSystem/public/api/getKgPoTambahan?no_model=' . $pemesanan['no_model']
+                $PoPlus = 'http://172.23.44.14/MaterialSystem/public/api/getKgPoTambahan?no_model=' . $pemesanan['no_model']
                     . '&item_type=' . urlencode($pemesanan['item_type'])
                     . '&area=' . $area;
 
@@ -1823,7 +1823,7 @@ class MaterialController extends BaseController
         // Tambahkan semua data retur ke mergedData (data pemesanan diset null)
         foreach ($dataRetur as $retur) {
             // ambil data styleSize by bb
-            $urlStyle = 'http://127.0.0.1/MaterialSystem/public/api/getStyleSizeByBb?no_model=' . $retur['no_model']
+            $urlStyle = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model=' . $retur['no_model']
                 . '&item_type=' . urlencode($retur['item_type'])
                 . '&kode_warna=' . urlencode($retur['kode_warna'])
                 . '&warna=' . urlencode($retur['warna']);
@@ -1840,7 +1840,7 @@ class MaterialController extends BaseController
                 $qty     = (intval($qtyData['qty']) ?? 0);
 
                 // Ambil kg po tambahan
-                $PoPlus = 'http://127.0.0.1/MaterialSystem/public/api/getKgPoTambahan?no_model=' . $retur['no_model']
+                $PoPlus = 'http://172.23.44.14/MaterialSystem/public/api/getKgPoTambahan?no_model=' . $retur['no_model']
                     . '&item_type=' . urlencode($retur['item_type'])
                     . '&area=' . $area;
 
@@ -1952,7 +1952,7 @@ class MaterialController extends BaseController
             //
             $order = $this->ApsPerstyleModel->getQtyArea($noModel) ?: [];
 
-            $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
+            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
             $material = @file_get_contents($apiUrl);
 
             // $models = [];
@@ -2096,7 +2096,7 @@ class MaterialController extends BaseController
         $tanggalAwal = $this->request->getGet('tanggal_awal');
         $tanggalAkhir = $this->request->getGet('tanggal_akhir');
 
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir;
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir;
         $material = @file_get_contents($apiUrl);
 
         // $models = [];
@@ -2125,7 +2125,7 @@ class MaterialController extends BaseController
     {
         $key = $this->request->getGet('key');
 
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/filterPoBenang?key=' . urlencode($key);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterPoBenang?key=' . urlencode($key);
         $material = @file_get_contents($apiUrl);
 
         // $models = [];
@@ -2157,7 +2157,7 @@ class MaterialController extends BaseController
         $tanggalAwal = $this->request->getGet('tanggal_awal');
         $tanggalAkhir = $this->request->getGet('tanggal_akhir');
 
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/filterPengiriman?key=' . urlencode($key) . '&tanggal_awal=' . urlencode($tanggalAwal) . '&tanggal_akhir=' . urlencode($tanggalAkhir);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterPengiriman?key=' . urlencode($key) . '&tanggal_awal=' . urlencode($tanggalAwal) . '&tanggal_akhir=' . urlencode($tanggalAkhir);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -2191,7 +2191,7 @@ class MaterialController extends BaseController
             return $this->response->setJSON(['error' => 'Key is missing']);
         }
 
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/filterReportGlobal?key=' . urlencode($key) . '&jenis=' . urlencode($jenis);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterReportGlobal?key=' . urlencode($key) . '&jenis=' . urlencode($jenis);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -2278,7 +2278,7 @@ class MaterialController extends BaseController
         ];
         $bulan = $bulanMap[$delivery] ?? null;
 
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/filterSisaPakai?bulan=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna) . '&jenis=' . urlencode($jenis);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterSisaPakai?bulan=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna) . '&jenis=' . urlencode($jenis);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -2342,7 +2342,7 @@ class MaterialController extends BaseController
         $kodeWarna = $this->request->getGet('kode_warna') ?? '';
 
         // 1) Ambil data
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/historyPindahOrder?model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/historyPindahOrder?model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -2402,7 +2402,7 @@ class MaterialController extends BaseController
         ];
         $bulan = $bulanMap[$delivery] ?? null;
 
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/reportSisaDatangBenang?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangBenang?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -2452,7 +2452,7 @@ class MaterialController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/reportSisaDatangNylon?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangNylon?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -2503,7 +2503,7 @@ class MaterialController extends BaseController
         ];
         $bulan = $bulanMap[$delivery] ?? null;
 
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/reportSisaDatangSpandex?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangSpandex?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -2554,7 +2554,7 @@ class MaterialController extends BaseController
         ];
         $bulan = $bulanMap[$delivery] ?? null;
 
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/reportSisaDatangKaret?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangKaret?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -2605,7 +2605,7 @@ class MaterialController extends BaseController
         $tanggalAwal = $this->request->getGet('tanggal_awal');
         $tanggalAkhir = $this->request->getGet('tanggal_akhir');
 
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/filterBenangMingguan?tanggal_awal=' . urlencode($tanggalAwal) . '&tanggal_akhir=' . urlencode($tanggalAkhir);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterBenangMingguan?tanggal_awal=' . urlencode($tanggalAwal) . '&tanggal_akhir=' . urlencode($tanggalAkhir);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -2643,7 +2643,7 @@ class MaterialController extends BaseController
         $tanggalAwal   = date('Y-m-01', $timestamp);
         $tanggalAkhir  = date('Y-m-t', $timestamp);
         // $data = $this->pemasukanModel->getFilterBenang($tanggalAwal, $tanggalAkhir);
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/filterBenangBulanan?tanggal_awal=' . urlencode($tanggalAwal) . '&tanggal_akhir=' . urlencode($tanggalAkhir);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterBenangBulanan?tanggal_awal=' . urlencode($tanggalAwal) . '&tanggal_akhir=' . urlencode($tanggalAkhir);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
