@@ -79,7 +79,7 @@ class PengaduanController extends BaseController
             'isi'          => $isi,
             'created_at' => date('Y-m-d H:i:s')
         ]);
-        $setStat = $this->pengaduanModel->update($id_pengaduan, ['replied' => 1]);
+        $setStat = $this->pengaduanModel->update($id_pengaduan, ['replied' => 1, 'updated_at' => date('Y-m-d H:i:s')]);
 
 
         return redirect()->to($role . '/pengaduan')->withInput()->with('success', 'Balasan berhasil dikirin');
@@ -113,7 +113,7 @@ class PengaduanController extends BaseController
             'isi'          => $isi,
             'created_at'   => date('Y-m-d H:i:s')
         ]);
-        $setStat = $this->pengaduanModel->update($id_pengaduan, ['replied' => 1]);
+        $setStat = $this->pengaduanModel->update($id_pengaduan, ['replied' => 1, 'updated_at' => date('Y-m-d H:i:s')]);
 
         return $this->response->setJSON([
             'status'  => 'success',

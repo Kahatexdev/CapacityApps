@@ -44,7 +44,7 @@ class PengaduanModel extends Model
     {
         return $this->Where('target_role', $role)
             ->orWhere('username', $username)
-            ->orderBy('created_at', 'DESC')
+            ->orderBy('updated_at', 'DESC')
             ->findAll();
     }
     public function countNotif($role)
