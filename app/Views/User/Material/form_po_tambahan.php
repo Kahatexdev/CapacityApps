@@ -169,7 +169,18 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Container untuk style size  -->
                         <div class="row populate-size-wrapper">
+                        </div>
+                        <div class="form-group row">
+                            <!-- Loss Aktual -->
+                            <div class="col-md-6"><label>Loss Aktual</label>
+                                <input type="number" class="form-control loss-aktual" name="items[0][loss_aktual]" readonly required>
+                            </div>
+                            <!-- Loss Tambahan -->
+                            <div class="col-md-6"><label>Loss Tambahan</label>
+                                <input type="number" class="form-control loss-tambahan" name="items[0][loss_tambahan]">
+                            </div>
                         </div>
                         <div class="form-group">
                             <div class="col"><label>Total Tambahan Kg</label>
@@ -177,16 +188,19 @@
                             </div>
                         </div>
                         <div class="form-group">
+                            <!-- Total Tambahan Cones -->
                             <div class="col"><label>Total Tambahan Cones</label>
                                 <input type="number" class="form-control total-cns" name="items[0][total_cns_po]" readonly required>
                             </div>
                         </div>
                         <div class="form-group">
+                            <!-- Delivery Po(+) -->
                             <div class="col"><label>Delivery Po(+)</label>
                                 <input type="date" class="form-control delivery-po-plus" name="items[0][delivery_po_plus]" id="delivery-po-plus" required>
                             </div>
                         </div>
                         <div class="form-group">
+                            <!-- Keterangan -->
                             <label for="exampleFormControlInput1">Keterangan</label>
                             <textarea class="form-control" name="keterangan" id="keterangan"></textarea>
                         </div>
@@ -214,13 +228,13 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Pesanan<br>Kgs</label>
-                                    <input type="text" class="form-control kg-mu" readonly>
+                                    <!-- <input type="text" class="form-control kg-mu" readonly> -->
+                                    <input type="text" class="form-control po-kg-perstyle" name="items[0][po_kg_perstyle]" readonly>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <input type="hidden" class="form-control qty-order" name="items[0][qty_order]" readonly>
-                                    <input type="hidden" class="form-control po-kg-perstyle" name="items[0][po_kg_perstyle]" readonly>
                                     <label>Sisa<br>Order</label>
                                     <input type="text" class="form-control sisa-order" name="items[0][sisa_order]" readonly>
                                 </div>
@@ -308,7 +322,7 @@
                 let loading = document.getElementById('loading-spinner');
                 const $ss = $row.find('.item-type').empty().append('<option value="">Pilih Kode Benang</option>').trigger('change');
                 $row.find('.item-type, .kode-warna').empty().append('<option value="">Pilih Item Type</option>').trigger('change');
-                $row.find('.color, .kg-mu, .kg-po, .pcs-po').val('');
+                $row.find('.color, .po-kg-perstyle, .kg-po, .pcs-po').val('');
 
                 if (!modelCode) return;
 
@@ -413,9 +427,10 @@
                     const composition = parseFloat(style.composition || 0);
                     const loss = parseFloat(style.loss || 0);
                     const gw = parseFloat(style.gw || 0);
+                    const gwAktual = parseFloat(style.gw_aktual || 0);
 
                     $template.find('.color').val(size || '');
-                    $template.find('.kg-mu').val(parseFloat(style.kg_mu || 0).toFixed(2));
+                    // $template.find('.kg-mu').val(parseFloat(style.kg_mu || 0).toFixed(2));
                     const qtyOrderVal = (parseFloat(qtyOrderMap[size]) || 0);
                     $template.find('.qty-order').val(qtyOrderVal);
                     const sisaOrderVal = (parseFloat(sisaOrderMap[size]) || 0) - (parseFloat(plusPckMap[size]) || 0);
@@ -424,16 +439,25 @@
                     $template.find('.bs-setting').val(bsSettingMap[size] || 0);
                     $template.find('.plus-pck-pcs').val(plusPckMap[size] || 0);
 
+                    const gwFinal = gwAktual > 0 ? gwAktual : gw;
+
                     // hitung qty po kg
-                    const qtyPoKg = gw > 0 ?
-                        qtyOrderVal * composition * gw / 100 / 1000 * (1 + (loss / 100)) :
+                    const qtyPoKg = gwFinal > 0 ?
+                        qtyOrderVal * composition * gwFinal / 100 / 1000 * (1 + (loss / 100)) :
                         0;
                     $template.find('.po-kg-perstyle').val(qtyPoKg.toFixed(2));
 
+                    const sisaOrderKg = gwFinal > 0 ?
+                        sisaOrderVal * composition * gwFinal / 100 / 1000 * (1 + (globalLossAktual / 100)) :
+                        0;
+                    console.log('sisa : ',
+                        sisaOrderKg);
+                    $template.find('.poplus-mc-kg').val(sisaOrderKg.toFixed(2));
+
                     // bruto kg    
                     const rawBruto = parseFloat(brutoMap[size] || 0);
-                    const brutoKg = gw > 0 ?
-                        rawBruto * composition * gw / 100 / 1000 :
+                    const brutoKg = gwFinal > 0 ?
+                        rawBruto * composition * gwFinal / 100 / 1000 :
                         0;
 
                     // 3) Hitung lebih-pakai = brutoKg - qtyPoKg, minimal 0
@@ -442,10 +466,10 @@
                     $template.find('.lebih-pakai').val(lebih.toFixed(2));
 
                     const rawPlusPck = parseFloat(plusPckMap[size] || 0);
-                    const pluspck = gw > 0 ?
-                        rawPlusPck * composition * gw / 100 / 1000 :
+                    const pluspck = gwFinal > 0 ?
+                        rawPlusPck * composition * gwFinal / 100 / 1000 :
                         0;
-                    const kgPlusPck = pluspck * (1 + (loss / 100));
+                    const kgPlusPck = pluspck * (1 + (globalLossAktual / 100));
 
                     $template.find('.plus-pck-pcs').val(rawPlusPck);
                     $template.find('.plus-pck-kg').val(kgPlusPck.toFixed(2));
@@ -464,10 +488,12 @@
                     const $col = $('<div class="col-md-4 mb-3"></div>').append($template);
                     $wrapper.append($col);
 
-                    hitungPoplusMc($template, $row);
                 });
                 hitungPoKg();
                 hitungSisaJatah();
+
+                const lossAktual = $row.find('.loss-aktual').val();
+                console.log("Loss Aktual (baru dihitung):", lossAktual);
             });
 
             // Fungsi untuk hitung total Cns PO
@@ -500,7 +526,7 @@
                 hitungTotalCns();
             });
 
-            // Fungsi untuk hitung total KG PO
+            // Fungsi untuk hitung total KG PO(+)
             function hitungTotalKg() {
                 let plusPckTotal = 0;
                 let poplusMcTotal = 0;
@@ -537,30 +563,81 @@
             }
 
             // Saat nilai sisa-mc-kg berubah, hitung ulang total
-            $(document).on('input', '.sisa-mc-kg', function() {
-                hitungTotalKg();
-            });
-            $(document).on('input', '.sisa-jatah', function() {
+            $(document).on('input', '.sisa-mc-kg, .sisa-jatah, .loss-aktual', function() {
                 hitungTotalKg();
             });
 
-            // hitung Qty PO Kg All Style
+            let globalLossAktual = 0; // variabel global
+            let lastLossAktual = 0;
+
+            // Hitung Qty PO Kg All Style + Loss Aktual
             function hitungPoKg() {
-                let poKgPerstyle = 0;
+                let totalPoKg = 0;
 
+                // jumlahkan semua po-kg-perstyle
                 $('.po-kg-perstyle').each(function() {
                     const val = parseFloat($(this).val()) || 0;
-                    poKgPerstyle += val;
+                    totalPoKg += val;
                 });
 
-                const total = poKgPerstyle;
+                // update total PO Kg
+                $('.po-kg').val(totalPoKg.toFixed(2));
 
-                $('.po-kg').val(total.toFixed(2));
+                // hitung total BS (mesin + setting)
+                let totalBs = 0;
+                $('.bs-mesin').each(function() {
+                    totalBs += parseFloat($(this).val()) || 0;
+                });
+                // konversi bs-setting (pcs) -> kg per row
+                $('.kebutuhan-item').each(function() {
+                    const bsSettingPcs = parseFloat($(this).find('.bs-setting').val()) || 0;
+
+                    // ambil composition & gw/gwAktual dari row
+                    const composition = parseFloat($(this).data('composition')) || 0;
+                    const gw = parseFloat($(this).data('gw')) || 0;
+                    const gwAktual = parseFloat($(this).data('gwAktual')) || 0;
+                    const gwFinal = gwAktual > 0 ? gwAktual : gw;
+
+                    const bsSettingKg = gwFinal > 0 ?
+                        bsSettingPcs * composition * gwFinal / 100 / 1000 :
+                        0;
+
+                    totalBs += bsSettingKg;
+                });
+
+                // hitung Loss Aktual %
+                let lossAktual = 0;
+                if (totalPoKg > 0) {
+                    lossAktual = (totalBs / totalPoKg) * 100;
+                }
+
+                lastLossAktual = lossAktual; // simpan untuk dipakai fungsi lain
+                $('.loss-aktual').val(lossAktual.toFixed(2));
+
+                // update global sekalian
+                updateGlobalLossAktual();
             }
 
-            // Saat nilai po-kg-perstyle berubah, hitung ulang total
-            $(document).on("input", ".po-kg-perstyle", function() {
-                hitungPoKg();
+            // Saat ada perubahan, hitung ulang
+            $(document).on("change", ".po-kg-perstyle, .bs-mesin, .bs-setting, .loss-aktual", function() {
+                reRenderSemua();
+                // hitungPoKg();
+            });
+
+            // Hitung Global Loss (gabungan lossAktual + lossTambahan)
+            function updateGlobalLossAktual() {
+                const lossTambahanRaw = $('.loss-tambahan').val();
+                const lossTambahan = parseFloat(lossTambahanRaw) || 0;
+
+                if (lossTambahanRaw === "" || lossTambahan === 0) {
+                    globalLossAktual = lastLossAktual;
+                } else {
+                    globalLossAktual = lastLossAktual + lossTambahan;
+                }
+            }
+
+            $(document).on("input", ".loss-tambahan", function() {
+                updateGlobalLossAktual();
             });
 
             // Fungsi untuk hitung sisa jatah
@@ -617,7 +694,7 @@
                 }
 
                 const pluspck = pcs * composition * gw / 100 / 1000;
-                const kgPlusPck = pluspck * (1 + (loss / 100));
+                const kgPlusPck = pluspck * (1 + (globalLossAktual / 100));
 
                 $row.find('.plus-pck-kg').val(kgPlusPck.toFixed(2));
 
@@ -625,77 +702,27 @@
                 hitungTotalKg();
             });
 
-            // Fungsi Untuk Menghitung Po Tambahan Mesin Kg
-            function hitungPoplusMc($row, $wrapper) {
-                const sisaOrder = parseFloat($row.find('.sisa-order').val()) || 0;
-                const bsMesin = parseFloat($row.find('.bs-mesin').val()) || 0;
-                const bsSetting = parseFloat($row.find('.bs-setting').val()) || 0;
-
-                const itemType = $wrapper.find('.item-type').val();
-                const kodeWarna = $wrapper.find('.kode-warna').val();
-                const modelCode = $wrapper.find('.select-no-model option:selected').data('no-model');
-                const styleSize = $row.find('.style-size-hidden').val();
-
-                const mat = $wrapper.data('material') || {};
-                const brutoMap = $wrapper.data('bruto') || {};
-
-                // ambil composition, gw, loss
-                let composition = 0,
-                    gw = 0,
-                    loss = 0;
-                if (mat[itemType] && mat[itemType].kode_warna[kodeWarna]) {
-                    const styleList = mat[itemType].kode_warna[kodeWarna].style_size || [];
-                    const match = styleList.find(s => s.no_model === modelCode && s.style_size === styleSize);
-                    if (match) {
-                        composition = parseFloat(match.composition) || 0;
-                        gw = parseFloat(match.gw) || 0;
-                        loss = parseFloat(match.loss) || 0;
+            // Fungsi untuk render ulang semua perhitungan
+            function reRenderSemua() {
+                $('.kebutuhan-item').each(function() {
+                    const $row = $(this);
+                    // trigger ulang kode warna agar semua size-block dihitung ulang
+                    const kodeWarna = $row.find('.kode-warna').val();
+                    if (kodeWarna) {
+                        $row.find('.kode-warna').trigger('change');
                     }
-                }
-
-                // 1) stKg & sisaKeb (kg terpakai untuk setting & order)
-                const stKg = bsSetting * composition * gw / 100 / 1000;
-                const sisaKg = sisaOrder * composition * gw / 100 / 1000 * (1 + (loss / 100));
-
-                // 2) brutoKg: rawBruto * comp * gw /100/1000
-                const rawBruto = parseFloat(brutoMap[styleSize]) || 0;
-                const brutoKg = gw > 0 ?
-                    rawBruto * composition * gw / 100 / 1000 :
-                    0;
-
-                // 3) efficiency: pastikan pembagi ≠ 0
-                const denom = brutoKg + bsMesin;
-                const eff = denom > 0 ?
-                    ((brutoKg - stKg) / denom) * 100 :
-                    0;
-
-                // 4) newKeb & estPoPlusMc
-                const newKeb = eff > 0 ? sisaKg / eff * 100 : 0;
-                const estPoPlusMc = Math.max(0, newKeb - sisaKg);
-                // GANTI JADI:
-                // const estPoPlusMc = Math.max(0, sisaKg);
-
-
-                console.log({
-                    sisaOrder,
-                    bsMesin,
-                    bsSetting,
-                    composition,
-                    gw,
-                    loss,
-                    stKg,
-                    sisaKg,
-                    brutoKg,
-                    eff,
-                    newKeb,
-                    estPoPlusMc
                 });
 
-                $row.find('.poplus-mc-kg').val(sisaKg.toFixed(2));
+                // setelah render ulang, hitung ulang loss & total
+                hitungPoKg();
+                hitungSisaJatah();
                 hitungTotalKg();
             }
 
-            hitungTotalKg();
+            // Saat nilai loss-tambahan berubah → re-render semua
+            $(document).on('input', '.loss-tambahan', function() {
+                reRenderSemua();
+            });
 
             //Delete Row Size
             $(document).on('click', '.remove-size-row', function(e) {

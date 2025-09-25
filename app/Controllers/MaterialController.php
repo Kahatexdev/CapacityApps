@@ -1329,6 +1329,7 @@ class MaterialController extends BaseController
         }
 
         $materialData = json_decode($response, true);
+        log_message('info', 'material data : ' . json_encode($materialData));
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             log_message('error', 'JSON tidak valid: ' . json_last_error_msg());
@@ -1786,7 +1787,7 @@ class MaterialController extends BaseController
                     if (isset($pemesanan['item_type']) && stripos($pemesanan['item_type'], 'JHT') !== false) {
                         $kebutuhan = $data['kgs'] ?? 0;
                     } else {
-                        $kebutuhan = (($qty * $data['gw'] * ($data['composition'] / 100)) * (1 + ($data['loss'] / 100)) / 1000) + $kgPoTambahan;
+                        $kebutuhan = (($qty * $data['gw'] * $data['composition'] / 100 / 1000) * (1 + ($data['loss'] / 100))) + $kgPoTambahan;
                     }
                     $pemesanan['ttl_keb'] = $ttlKeb;
                 }
@@ -1856,7 +1857,7 @@ class MaterialController extends BaseController
                     if (isset($pemesanan['item_type']) && stripos($pemesanan['item_type'], 'JHT') !== false) {
                         $kebutuhan = $data['kgs'] ?? 0;
                     } else {
-                        $kebutuhan = (($qty * $data['gw'] * ($data['composition'] / 100)) * (1 + ($data['loss'] / 100)) / 1000) + $kgPoTambahan;
+                        $kebutuhan = (($qty * $data['gw'] * $data['composition'] / 100 / 1000) * (1 + ($data['loss'] / 100))) + $kgPoTambahan;
                     }
                     $retur['ttl_keb'] = $ttlKeb;
                 }
