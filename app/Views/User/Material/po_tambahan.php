@@ -92,7 +92,7 @@
                                     <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">(+)Packing (Pcs)</th>
                                     <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">(+)Packing (Kg)</th>
                                     <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">(+)Packing (Cns)</th>
-                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Lebih Pakai(Kg)</th>
+                                    <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Ttl Tambahan(Kg)</th>
                                     <th class="text-uppercase text-center text-dark text-xxs font-weight-bolder opacity-7 ps-2">Keterangan</th>
                                 </tr>
                             </thead>
@@ -251,7 +251,8 @@
                 item.plus_pck_pcs || 0,
                 item.plus_pck_kg || 0,
                 item.plus_pck_cns || 0,
-                item.lebih_pakai_kg || 0,
+                // item.lebih_pakai_kg || 0,
+                item.ttl_tambahan_kg || 0,
                 item.keterangan || '',
             ]);
         });

@@ -332,7 +332,7 @@
                     .then(json => {
                         const itemTypes = json.item_types;
                         const materialData = json.material;
-
+                        console.log('madetial : ', materialData);
                         itemTypes.forEach(row => {
                             $ss.append(`<option value="${row.item_type}">${row.item_type}</option>`);
                         });

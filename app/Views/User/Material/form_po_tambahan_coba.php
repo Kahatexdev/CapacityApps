@@ -271,12 +271,12 @@
                                     <input type="text" class="form-control plus-pck-kg" name="items[0][plus_pck_kg]" readonly required>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <!-- <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Lebih<br>Pakai(Kg)</label>
                                     <input type="text" class="form-control lebih-pakai" readonly>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                         <div class="row">
                             <div class="col-md-12 d-flex align-items-end">
@@ -438,6 +438,7 @@
                 $template.find('.bs-setting').val(bsSettingMap[size] || 0);
                 $template.find('.plus-pck-pcs').val(plusPckMap[size] || 0);
 
+
                 const gwFinal = gwAktual > 0 ? gwAktual : gw;
 
                 // qty po kg (already final because itu independent dari globalLossAktual)
@@ -462,11 +463,26 @@
                 // jangan finalize .plus-pck-kg atau .poplus-mc-kg di sini
                 $template.find('.plus-pck-pcs').val(rawPlusPck);
 
+                // ✅ simpan BASE untuk bs-mesin
+                const rawBsMesin = parseFloat(bsMesinMap[size] || 0);
+                const bsMesinKg = composition > 0 ?
+                    ((rawBsMesin / 1000) * (composition / 100)) : 0;
+                console.log('rawBsMesin:', rawBsMesin);
+                console.log('bsMesinKg:', bsMesinKg);
+                $template.find('.bs-mesin').data("bsMesinKg", bsMesinKg);
+
+                // ✅ simpan BASE untuk bs-setting juga (tanpa loss, PCS → KG)
+                const rawBsSetting = parseFloat(bsSettingMap[size] || 0);
+                const bsSettingKg = gwFinal > 0 ?
+                    rawBsSetting * composition * gwFinal / 100 / 1000 :
+                    0;
+                $template.find('.bs-setting').data("bsSettingKg", bsSettingKg);
+
                 // other fields
-                const rawBruto = parseFloat(brutoMap[size] || 0);
-                const brutoKg = gwFinal > 0 ? rawBruto * composition * gwFinal / 100 / 1000 : 0;
-                const lebih = Math.max(0, brutoKg - qtyPoKg);
-                $template.find('.lebih-pakai').val(lebih.toFixed(2));
+                // const rawBruto = parseFloat(brutoMap[size] || 0);
+                // const brutoKg = gwFinal > 0 ? rawBruto * composition * gwFinal / 100 / 1000 : 0;
+                // const lebih = Math.max(0, brutoKg - qtyPoKg);
+                // $template.find('.lebih-pakai').val(lebih.toFixed(2));
 
                 $template.find('.label-style-size').text(size);
                 $template.find('.style-size-hidden').val(size);
@@ -500,7 +516,6 @@
             hitungSisaJatah();
             hitungTotalKg();
         });
-
 
         // Fungsi untuk hitung total Cns PO
         function hitungTotalCns() {
@@ -559,7 +574,8 @@
             let total;
             if (sisaJatah < 0) {
                 // kalau minus → tambahkan nilai negatif itu (base + (-x))
-                total = baseTotal + sisaJatah;
+                // total = baseTotal + (sisaJatah);
+                total = baseTotal;
             } else {
                 // kalau nol/positif → kurangi
                 total = baseTotal - sisaJatah;
@@ -592,23 +608,13 @@
             // hitung total BS (mesin + setting)
             let totalBs = 0;
             $('.bs-mesin').each(function() {
-                totalBs += parseFloat($(this).val()) || 0;
+                const kg = parseFloat($(this).data('bsMesinKg')) || 0;
+                totalBs += kg;
             });
-            // konversi bs-setting (pcs) -> kg per row
-            $('.kebutuhan-item').each(function() {
-                const bsSettingPcs = parseFloat($(this).find('.bs-setting').val()) || 0;
-
-                // ambil composition & gw/gwAktual dari row
-                const composition = parseFloat($(this).data('composition')) || 0;
-                const gw = parseFloat($(this).data('gw')) || 0;
-                const gwAktual = parseFloat($(this).data('gwAktual')) || 0;
-                const gwFinal = gwAktual > 0 ? gwAktual : gw;
-
-                const bsSettingKg = gwFinal > 0 ?
-                    bsSettingPcs * composition * gwFinal / 100 / 1000 :
-                    0;
-
-                totalBs += bsSettingKg;
+            // setting pakai hasil per size
+            $('.bs-setting').each(function() {
+                const kg = parseFloat($(this).data('bsSettingKg')) || 0;
+                totalBs += kg;
             });
 
             // hitung Loss Aktual %
@@ -761,6 +767,8 @@
                 const keterangan = $('#keterangan').val();
                 const total_kg_po = $(this).find('.total-kg').val();
                 const total_cns_po = $(this).find('.total-cns').val();
+                const loss_aktual = $(this).find('.loss-aktual').val();
+                const loss_tambahan = $(this).find('.loss-tambahan').val();
                 console.log(delivery_po_plus);
                 $(this).find('.size-block').each(function() {
                     formData.push({
@@ -780,11 +788,13 @@
                         poplus_mc_kg: $(this).find('.poplus-mc-kg').val(),
                         plus_pck_pcs: $(this).find('.plus-pck-pcs').val(),
                         plus_pck_kg: $(this).find('.plus-pck-kg').val(),
-                        lebih_pakai_kg: $(this).find('.lebih-pakai').val(),
+                        // lebih_pakai_kg: $(this).find('.lebih-pakai').val(),
                         total_kg_po: total_kg_po,
                         total_cns_po: total_cns_po,
                         delivery_po_plus: delivery_po_plus,
-                        keterangan: keterangan
+                        keterangan: keterangan,
+                        loss_aktual: loss_aktual,
+                        loss_tambahan: loss_tambahan
                     });
                 });
             });

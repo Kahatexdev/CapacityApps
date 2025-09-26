@@ -1395,6 +1395,10 @@ class MaterialController extends BaseController
                 'no_model' => $noModel
             ];
             $idaps = $this->ApsPerstyleModel->getIdForBs($validate);
+            if (!is_array($idaps) || empty($idaps)) {
+                $bsSettingList[$style] = 0;
+                continue;
+            }
             $bsSetting = $this->bsModel->getTotalBsSet($idaps);
             $bsSettingList[$style] = isset($bsSetting['qty']) ? (int)$bsSetting['qty'] : 0;
         }
@@ -1458,11 +1462,13 @@ class MaterialController extends BaseController
                 'plus_pck_pcs'      => (float) ($item['plus_pck_pcs'] ?? 0),
                 'plus_pck_kg'       => (float) ($item['plus_pck_kg'] ?? 0),
                 'plus_pck_cns'      => (float) ($item['plus_pck_cns'] ?? 0),
-                'lebih_pakai_kg'    => (float) ($item['lebih_pakai_kg'] ?? 0),
+                // 'lebih_pakai_kg'    => (float) ($item['lebih_pakai_kg'] ?? 0),
                 'ttl_tambahan_kg'   => (float) ($item['total_kg_po'] ?? 0),
                 'ttl_tambahan_cns'  => (float) ($item['total_cns_po'] ?? 0),
                 'delivery_po_plus'  => $item['delivery_po_plus'] ?? '',
                 'keterangan'        => $item['keterangan'] ?? '',
+                'loss_aktual'       => (float) ($item['loss_aktual'] ?? 0),
+                'loss_tambahan'     => (float) ($item['loss_tambahan'] ?? 0),
                 'admin'             => session()->get('username'),
                 'created_at'        => date('Y-m-d H:i:s'),
             ];

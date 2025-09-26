@@ -4536,12 +4536,13 @@ class ExcelController extends BaseController
             // $retur = (float)$row['kgs_retur'];
             $poplus_mc_kg = (float)$row['poplus_mc_kg'];
             $plus_pck_kg = (float)$row['plus_pck_kg'];
+            $ttl_tambahan_kg = (float)$row['ttl_tambahan_kg'];
 
             // Hitung persentase (hindari bagi 0)
             $persenTerima = ($kgs > 0) ? round(($terimaKg / $kgs) * 100, 2) . '%' : '0%';
-            $persenPoplus = ($kgs > 0) ? round(($row['poplus_mc_kg'] / $kgs) * 100, 2) . '%' : '0%';
-            $persenPlusPck = ($kgs > 0) ? round(($row['plus_pck_kg'] / $kgs) * 100, 2) . '%' : '0%';
-            $persenLebihPakai = ($kgs > 0) ? round(($row['lebih_pakai_kg'] / $kgs) * 100, 2) . '%' : '0%';
+            $persenPoplus = ($kgs > 0) ? round(($poplus_mc_kg / $kgs) * 100, 2) . '%' : '0%';
+            $persenPlusPck = ($kgs > 0) ? round(($plus_pck_kg / $kgs) * 100, 2) . '%' : '0%';
+            $persenTtlTambahan = ($kgs > 0) ? round(($ttl_tambahan_kg / $kgs) * 100, 2) . '%' : '0%';
 
             // 🚨 Cek apakah sudah ganti no_model atau kode_warna
             if ($prevModel !== null && ($currentModel !== $prevModel || $currentKode !== $prevKode)) {
@@ -4554,6 +4555,8 @@ class ExcelController extends BaseController
                 $sheet->setCellValue("O{$rowNum}", number_format($sisaBBMc, 2));
                 $sheet->setCellValue("R{$rowNum}", $poplus_mc_cns);
                 $sheet->setCellValue("V{$rowNum}", $plus_pck_cns);
+                $sheet->setCellValue("X{$rowNum}", $ttl_tambahan_kg);
+                $sheet->setCellValue("Y{$rowNum}", $persenTtlTambahan);
 
                 // Bold & style subtotal
                 $sheet->getStyle("J{$rowNum}:AD{$rowNum}")->getFont()->setBold(true);
@@ -4603,8 +4606,8 @@ class ExcelController extends BaseController
                 $row['plus_pck_kg'] == 0 ? '' : number_format($row['plus_pck_kg'], 2),
                 '',
                 $persenPlusPck,
-                $row['lebih_pakai_kg'] == 0 ? '' : number_format($row['lebih_pakai_kg'], 2),
-                $persenLebihPakai,
+                '',
+                '',
                 '',    // Z
                 '',    // AA
                 '',    // AB
@@ -4670,6 +4673,8 @@ class ExcelController extends BaseController
             $sheet->setCellValue("O{$rowNum}", number_format($sisaBBMc, 2));
             $sheet->setCellValue("R{$rowNum}", $poplus_mc_cns);
             $sheet->setCellValue("V{$rowNum}", $plus_pck_cns);
+            $sheet->setCellValue("X{$rowNum}", $ttl_tambahan_kg);
+            $sheet->setCellValue("Y{$rowNum}", $persenTtlTambahan);
             // Style untuk baris TOTAL terakhir
             $sheet->getStyle("A{$rowNum}:AD{$rowNum}")->applyFromArray([
                 'font' => ['bold' => true, 'size' => 10],
