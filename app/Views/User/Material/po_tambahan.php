@@ -35,10 +35,13 @@
                             <h5 class="font-weight-bolder mb-0">
                                 List PO Tambahan <?= $area ?>
                             </h5>
+                            <p style="color: red; font-size: 12px;">*Filter tgl po tambahan terlebih dahulu!</p>
                         </div>
                         <div class="col-5 d-flex align-items-center text-end gap-2">
                             <input type="hidden" class="form-control" id="area" value="<?= $area ?>">
+                            <label for="no_model">No Model</label>
                             <input type="text" class="form-control" id="no_model" value="" placeholder="No Model">
+                            <label for="tgl_po">Tgl Po Tambahan</label>
                             <input type="date" class="form-control" id="tgl_po" value="" required>
                             <button id="searchFilter" class="btn btn-info ms-2"><i class="fas fa-search"></i> Filter</button>
                             <button class="btn btn-info ms-2">
@@ -238,8 +241,8 @@
                 item.color || '',
                 item.qty_pcs || 0,
                 item.kgs || 0,
-                item.terima_kg || 0,
-                item.sisa_bb_mc || 0,
+                item.ttl_terima_kg || 0,
+                item.ttl_sisa_bb_dimc || 0,
                 item.sisa_order_pcs || 0,
                 item.bs_mesin_kg || 0,
                 item.bs_st_pcs || 0,

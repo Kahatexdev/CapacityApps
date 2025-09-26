@@ -3,17 +3,25 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
-use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
 
-class PengaduanModel extends Model
+class MesinPernomor extends Model
 {
-    protected $table            = 'pengaduan';
-    protected $primaryKey       = 'id_pengaduan';
+    protected $table            = 'mesin_pernomor';
+    protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields = ['username', 'target_role', 'isi', 'created_at', 'updated_at', 'replied'];
+    protected $allowedFields    = [
+        'id_mesin',
+        'id_detail_plan',
+        'idapsperstyle',
+        'start_mesin',
+        'stop_mesin',
+        'created_at',
+        'updated_at'
+    ];
+
     protected bool $allowEmptyInserts = false;
 
     // Dates
@@ -40,22 +48,8 @@ class PengaduanModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getPengaduan($username, $role)
+    public function getListPlan($idAps, $idplan)
     {
-        return $this->Where('target_role', $role)
-            ->orWhere('username', $username)
-            ->orderBy('updated_at', 'DESC')
-            ->findAll();
-    }
-    public function countNotif($role)
-    {
-        return $this->where('target_role', $role)
-            ->where('replied', 0)
-            ->countAllResults();
-    }
-    public function deleteAduanLama($week)
-    {
-        return $this->where('created_at <=', $week)
-            ->delete();
+        return $this->where('idapsperstyle', $idAps)->where('id_detail_plan', $idplan)->findAll();
     }
 }

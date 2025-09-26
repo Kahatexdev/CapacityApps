@@ -20,6 +20,7 @@ use App\Models\DetailPlanningModel;
 use App\Models\TanggalPlanningModel;
 use App\Models\EstimatedPlanningModel;
 use App\Models\MesinPerStyle;
+use App\Models\MesinPernomor;
 use App\Models\AksesModel;/*  */
 use App\Services\orderServices;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -45,6 +46,7 @@ class ApsController extends BaseController
     protected $EstimatedPlanningModel;
     protected $orderServices;
     protected $MesinPerStyle;
+    protected $MesinPernomor;
 
     public function __construct()
     {
@@ -63,6 +65,7 @@ class ApsController extends BaseController
         $this->TanggalPlanningModel = new TanggalPlanningModel();
         $this->EstimatedPlanningModel = new EstimatedPlanningModel();
         $this->MesinPerStyle = new MesinPerStyle();
+        $this->MesinPernomor = new MesinPernomor();
         $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -751,6 +754,7 @@ class ApsController extends BaseController
         $jarum =  $kebutuhanArea['jarum'];
         // $detailplan = $this->DetailPlanningModel->getDetailPlanning($id); //get data model with detail quantity,model etc.
         $pdk = $this->DetailPlanningModel->detailPdk($id);
+        $startMc = $this->orderModel->startMcBenang($pdk['model']);
         $listDeliv = $this->ApsPerstyleModel->getDetailPerDeliv($pdk, $area);
         $listPlanning = $this->EstimatedPlanningModel->listPlanning($id);
         // dd($listPlanning);
@@ -775,7 +779,8 @@ class ApsController extends BaseController
             'mesin' => $mesin,
             'id_pln' => $idutama,
             'id_save' => $id,
-            'judul' => $judul
+            'judul' => $judul,
+            'startMc' => $startMc,
         ];
         return view(session()->get('role') . '/Planning/operationPlanning', $data);
     }
@@ -840,6 +845,10 @@ class ApsController extends BaseController
         $libur = $this->liburModel->findAll();
         $holidayDates = array_column($libur, 'tanggal');
 
+        $cekOrderModel = $this->orderModel->startMcBenang($model);
+        if (empty($cekOrderModel)) {
+            $this->orderModel->updateStartMc($model, $start);
+        }
         $dataestqty = [
             'id_detail_pln' => $id_save,
             'Est_qty' => $est,
@@ -1092,11 +1101,14 @@ class ApsController extends BaseController
             foreach ($mesin as $mc) {
                 $jum += $mc['mesin'];
             }
-            $dp['mesin'] = $jum;
-            $dp['qty'] = round($qtysisa['qty']);
-            $dp['sisa'] =
-                round($qtysisa['sisa']);
+            if ($qtysisa != null) {
+                $dp['mesin'] = $jum;
+                $dp['qty'] = round($qtysisa['qty']);
+                $dp['sisa'] =
+                    round($qtysisa['sisa']);
+            }
         }
+
 
         $mesinarea = $this->jarumModel->getMesinByArea($area, $jarum); //mesin yang dipakai semua mesin tanpa melibatkan head planning
         // $mesinplanning = $this->MesinPlanningModel->getMesinByArea($area,$jarum); //mesin yang dipilih oleh head planning di teruskan ke bagian aps
@@ -1268,6 +1280,38 @@ class ApsController extends BaseController
                 }
             }
             return redirect()->back()->with('success', 'Data berhasil dihapus.');
+        }
+    }
+    public function getListMesinplan()
+    {
+        if ($this->request->isAJAX()) {
+            try {
+                $idAps = $this->request->getGet('idAps');
+                $idMc  = $this->request->getGet('idplan');
+
+                $mesin = $this->MesinPernomor->getListPlan($idAps, $idMc);
+
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'data'   => $mesin
+                ]);
+            } catch (\Exception $e) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => $e->getMessage()
+                ]);
+            }
+        }
+    }
+    public function saveStartmesinBenang()
+    {
+        $tgl = $this->request->getPost('startMesin');
+        $model = $this->request->getPost('model');
+        $update = $this->orderModel->updateStartMc($model, $tgl);
+        if ($update) {
+            return redirect()->back()->with('success', 'Start mesin disimpan.');
+        } else {
+            return redirect()->back()->with('error', 'Data Gagal disimpan.');
         }
     }
 }

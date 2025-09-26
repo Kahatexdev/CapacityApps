@@ -381,6 +381,10 @@ class RossoController extends BaseController
 
     public function listPemesanan($area)
     {
+        // ambil filter dari query string (jika ada)
+        $tglPakai = $this->request->getGet('tgl_pakai');
+        $pdk      = $this->request->getGet('searchPdk');
+
         function fetchApiData($url)
         {
             try {
@@ -399,37 +403,64 @@ class RossoController extends BaseController
             }
         }
 
-        $dataList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listPemesanan/$area");
-        if (!is_array($dataList)) {
-            die('Error: Invalid response format for listPemesanan API.');
-        }
-
-        foreach ($dataList as $key => $order) {
-            $dataList[$key]['ttl_kebutuhan_bb'] = 0;
-            if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
-                $styleApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model='
-                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
-                $styleList = fetchApiData($styleApiUrl);
-
-                if ($styleList) {
-                    $totalRequirement = 0;
-                    $totalKgs = 0;
-                    foreach ($styleList as $style) {
-                        if (isset($style['no_model'], $style['style_size'])) {
-                            $requirement = $style['kgs'];
-                            $totalRequirement += $requirement;
-                        }
-                    }
-                    $dataList[$key]['ttl_kebutuhan_bb'] = $totalRequirement;
+        // kalau dua-duanya kosong, langsung return kosong
+        if (empty($tglPakai) && empty($pdk)) {
+            $dataList = []; // ga usah load dari API
+            $message = 'Silakan filter tanggal pakai atau no model terlebih dahulu.';
+        } else {
+            $rawList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listPemesanan/$area");
+            if (!is_array($rawList)) {
+                die('Error: Invalid response format for listPemesanan API.');
+            }
+            // Filter RAW data dulu (mengurangi jumlah panggilan API untuk enrichment)
+            $filteredRaw = array_filter($rawList, function ($order) use ($tglPakai, $pdk) {
+                // jika kedua filter diberikan -> cari yang memenuhi KEDUA kondisi
+                if ($tglPakai && $pdk) {
+                    return (isset($order['tgl_pakai']) && $order['tgl_pakai'] === $tglPakai)
+                        && (isset($order['no_model']) && stripos($order['no_model'], $pdk) !== false);
                 }
+                // jika hanya tglPakai
+                if ($tglPakai) {
+                    return isset($order['tgl_pakai']) && $order['tgl_pakai'] === $tglPakai;
+                }
+                // jika hanya pdk/no_model (support partial search)
+                if ($pdk) {
+                    return isset($order['no_model']) && stripos($order['no_model'], $pdk) !== false;
+                }
+                // jika tidak ada filter -> tampilkan semua
+                return true;
+            });
 
-                $pengirimanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
-                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
-                $pengiriman = fetchApiData($pengirimanApiUrl);
-                $dataList[$key]['ttl_pengiriman'] = $pengiriman['kgs_out'] ?? 0;
+            // reindex array
+            $dataList = array_values($filteredRaw);
 
-                // Hitung sisa jatah
-                $dataList[$key]['sisa_jatah'] = $dataList[$key]['ttl_kebutuhan_bb'] - $dataList[$key]['ttl_pengiriman'];
+            foreach ($dataList as $key => $order) {
+                $dataList[$key]['ttl_kebutuhan_bb'] = 0;
+                if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
+                    $styleApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model='
+                        . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&warna=' . urlencode($order['color']);
+                    $styleList = fetchApiData($styleApiUrl);
+
+                    if ($styleList) {
+                        $totalRequirement = 0;
+                        $totalKgs = 0;
+                        foreach ($styleList as $style) {
+                            if (isset($style['no_model'], $style['style_size'])) {
+                                $requirement = $style['kgs'];
+                                $totalRequirement += $requirement;
+                            }
+                        }
+                        $dataList[$key]['ttl_kebutuhan_bb'] = $totalRequirement;
+                    }
+
+                    $pengirimanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
+                        . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
+                    $pengiriman = fetchApiData($pengirimanApiUrl);
+                    $dataList[$key]['ttl_pengiriman'] = $pengiriman['kgs_out'] ?? 0;
+
+                    // Hitung sisa jatah
+                    $dataList[$key]['sisa_jatah'] = $dataList[$key]['ttl_kebutuhan_bb'] - $dataList[$key]['ttl_pengiriman'];
+                }
             }
         }
 
@@ -496,14 +527,26 @@ class RossoController extends BaseController
             return $result;
         }
 
-        // Spandex & Karet → cek apakah hari ini Jumat atau Sabtu
-        $initialOffsetSpandex = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
-        $initialOffsetKaret   = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
+        // Spandex & Karet â†’ cek apakah hari ini Jumat atau Sabtu
+        if ($day === 'Sunday') {
+            $initialOffsetBenang  = 0;
+            $initialOffsetNylon   = 0;
+            $initialOffsetSpandex = 0;
+            $initialOffsetKaret   = 0;
+        } else {
+            // Spandex & Karet â†’ cek apakah hari ini Jumat atau Sabtu
+            $initialOffsetBenang  = ($day === 'Saturday') ? 2 : 1;
+            $initialOffsetNylon   = ($day === 'Saturday') ? 2 : 1;
+            $initialOffsetSpandex = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
+            $initialOffsetKaret   = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
+        }
+        // dd($initialOffsetBenang);
 
-        $result['benang']  = generateRangeDates($today, (int)$masterRangePemesanan['range_benang'], $liburDates, $startTime, 1);
-        $result['nylon']   = generateRangeDates($today, (int)$masterRangePemesanan['range_nylon'], $liburDates, $startTime, 1);
+        $result['benang']  = generateRangeDates($today, (int)$masterRangePemesanan['range_benang'], $liburDates, $startTime, $initialOffsetBenang);
+        $result['nylon']   = generateRangeDates($today, (int)$masterRangePemesanan['range_nylon'], $liburDates, $startTime, $initialOffsetNylon);
         $result['spandex'] = generateRangeDates($today, (int)$masterRangePemesanan['range_spandex'], $liburDates, $startTime, $initialOffsetSpandex);
         $result['karet']   = generateRangeDates($today, (int)$masterRangePemesanan['range_karet'], $liburDates, $startTime, $initialOffsetKaret);
+
 
         $data = [
             'role' => session()->get('role'),
@@ -657,7 +700,7 @@ class RossoController extends BaseController
             $dataList[$key]['ttl_kebutuhan_bb'] = 0;
             if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
                 $styleApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model='
-                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
+                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&warna=' . urlencode($order['color']);
                 $styleList = fetchApiData($styleApiUrl);
 
                 if ($styleList) {
@@ -762,7 +805,8 @@ class RossoController extends BaseController
             // ambil data styleSize by bb
             $urlStyle = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model=' . $pemesanan['no_model']
                 . '&item_type=' . urlencode($pemesanan['item_type'])
-                . '&kode_warna=' . urlencode($pemesanan['kode_warna']);
+                . '&kode_warna=' . urlencode($pemesanan['kode_warna'])
+                . '&warna=' . urlencode($pemesanan['color']);
 
             $styleResponse = file_get_contents($urlStyle);
             $getStyle     = json_decode($styleResponse, true);
@@ -809,7 +853,8 @@ class RossoController extends BaseController
             // ambil data styleSize by bb
             $urlStyle = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model=' . $retur['no_model']
                 . '&item_type=' . urlencode($retur['item_type'])
-                . '&kode_warna=' . urlencode($retur['kode_warna']);
+                . '&kode_warna=' . urlencode($retur['kode_warna'])
+                . '&warna=' . urlencode($retur['color']);
 
             $styleResponse = file_get_contents($urlStyle);
             $getStyle      = json_decode($styleResponse, true);

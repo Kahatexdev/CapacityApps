@@ -466,4 +466,42 @@ class ApiController extends ResourceController
         $countNotif = $this->pengaduanModel->countNotif($role);
         return $this->respond($countNotif, ResponseInterface::HTTP_OK);
     }
+    public function ExportPengaduan($idpengaduan)
+    {
+        $DataPengaduan = $this->pengaduanModel->where('id_pengaduan', $idpengaduan)->first();
+
+        return $this->respond($DataPengaduan, ResponseInterface::HTTP_OK);
+    }
+    public function getQtyOrderBulk()
+    {
+        $noModel = $this->request->getGet('no_model');
+        $area    = $this->request->getGet('area');
+        // kirim style_sizes=XS,S,M,L,XL (comma separated) — optional.
+        $sizesQs = trim((string) $this->request->getGet('style_size'));
+        $sizes   = $sizesQs !== '' ? array_filter(array_map('trim', explode(',', $sizesQs))) : [];
+
+        if (!$noModel || !$area) {
+            return $this->respond(['message' => 'Param no_model & area wajib'], 400);
+        }
+
+        // kalau sizes kosong, ambil semua size utk model+area (lebih simpel)
+        $rows = empty($sizes)
+            ? $this->ApsPerstyleModel->getQtyAllSizes($noModel, $area)
+            : $this->ApsPerstyleModel->getQtyBySizes($noModel, $area, $sizes);
+
+        // kembalikan map: size => {qty, po_plus, inisial}
+        $out = [];
+        foreach ($rows as $r) {
+            $sz = (string) $r['size'];
+            $out[$sz] = [
+                'qty'     => (int) ($r['qty'] ?? 0),
+                'po_plus' => (int) ($r['po_plus'] ?? 0),
+                'inisial' => (string) ($r['inisial'] ?? ''),
+            ];
+        }
+        if (empty($out)) {
+            return $this->respond(['message' => 'Data tidak ditemukan'], 404);
+        }
+        return $this->respond($out, 200);
+    }
 }

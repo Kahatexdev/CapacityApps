@@ -389,56 +389,41 @@ class ApsPerstyleModel extends Model
             ->groupBy('mastermodel')
             ->findAll();
     }
-    public function CapacityArea($pdk, $area, $jarum)
+    public function CapacityArea($area, $jarum)
     {
-        $oneweek = date('Y-m-d', strtotime('30 days ago'));
-        $data = $this->select('mastermodel,sum(qty) as qty, sum(sisa)as sisa,delivery,smv')
-            ->where('mastermodel', $pdk)
+        $amonth = date('Y-m-d', strtotime('-30 Days'));
+        $maxDeliv = date('Y-m-d', strtotime('+150 Days'));
+        $data = $this->select('mastermodel,round(sum(qty/24)) as qty, round(sum(sisa/24 ))as sisa,delivery,smv')
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
             ->where('sisa >', 0)
             ->where('qty >', 0)
-            ->where('delivery >', $oneweek)
-            ->groupBy('mastermodel,delivery')
+            ->where('delivery <', $maxDeliv)
+            ->where('delivery >', $amonth)
+            ->groupBy('delivery,mastermodel')
             ->get()
             ->getResultArray();
+        // dd($data);
+        $order = [];
+        foreach ($data as $d) {
+            $today = new DateTime(date('Y-m-d'));
+            $deliveryDate = new DateTime($d['delivery']); // Tanggal delivery terjauh
+            $diff = $today->diff($deliveryDate);
+            $hari = $diff->days - 7;
 
-        $qtyArray = array_column($data, 'qty');
-        $sisaArray = array_column($data, 'sisa');
-        $maxValue = max($sisaArray);
-        $indexMax = array_search($maxValue, $sisaArray);
-        $totalQty = 0;
-        $totalSisa = 0;
-        for ($i = 0; $i <= $indexMax; $i++) {
-            $totalSisa += $sisaArray[$i];
-            $totalQty += $qtyArray[$i];
+            $tglDeliv = new DateTime($d['delivery']); // Tanggal delivery terjauh
+            $beda = $today->diff($tglDeliv);
+            $hariTarget = $beda->days;
+
+            $order[] = [
+                'mastermodel' => $d['mastermodel'],
+                'sisa' => $d['sisa'],
+                'qty' => $d['qty'],
+                'delivery' => $d['delivery'],
+                'targetHari' => $hariTarget,
+                'smv' => $d['smv']
+            ];
         }
-        $totalQty = round($totalQty / 24);
-        $totalSisa = round($totalSisa / 24);
-
-        $deliveryTerjauh = end($data)['delivery'];
-        $today = new DateTime(date('Y-m-d'));
-        $deliveryDate = new DateTime($deliveryTerjauh); // Tanggal delivery terjauh
-        $diff = $today->diff($deliveryDate);
-        $hari = $diff->days - 7;
-
-        $deliveryMax = $data[$indexMax]['delivery'];
-        $tglDeliv = new DateTime($deliveryMax); // Tanggal delivery terjauh
-        $beda = $today->diff($tglDeliv);
-        $hariTarget = $beda->days;
-        $smvArray = array_column($data, 'smv');
-        $smvArray = array_map('intval', $smvArray);
-        $averageSmv = array_sum($smvArray) / count($smvArray);
-
-        $pdk = $data[$indexMax]['mastermodel'];
-        $order = [
-            'mastermodel' => $pdk,
-            'sisa' => $totalSisa,
-            'qty' => $totalQty,
-            'delivery' => $deliveryTerjauh,
-            'targetHari' => $hariTarget,
-            'smv' => $averageSmv
-        ];
         return $order;
     }
     public function getIdBs($validate)
@@ -526,7 +511,7 @@ class ApsPerstyleModel extends Model
             ->where('size', $validate['style'])
             ->where('factory', $validate['area'])
             ->where('qty >', 0)
-            ->where('qty != sisa')
+            // ->where('qty != sisa')
             ->orderBy('sisa', 'ASC') // Mengurutkan berdasarkan 'sisa' dari yang terkecil
             ->first(); // Mengambil data pertama (yang terkecil)
 
@@ -1002,7 +987,13 @@ class ApsPerstyleModel extends Model
             ->groupBy('machinetypeid')
             ->orderBy('delivery', 'asc')
             ->first();
-
+        if (!$result) {
+            $result = [
+                'qty' => 0,
+                'sisa' => 0,
+                'delivery' => "0000-00-00"
+            ];
+        }
         return $result;
     }
     public function getQtyCancel($idaps)
@@ -1170,7 +1161,7 @@ class ApsPerstyleModel extends Model
     }
     public function getSisaPerSize($area, $nomodel, $size)
     {
-        return $this->select('sum(sisa) as sisa, sum(po_plus) as po_plus')
+        return $this->select('sum(qty) as qty, sum(sisa) as sisa, sum(po_plus) as po_plus')
             ->where('factory', $area)
             ->where('mastermodel', $nomodel)
             ->whereIn('size', $size)
@@ -1380,5 +1371,25 @@ class ApsPerstyleModel extends Model
             ->where('machinetypeid', $jarum)
             ->groupBy('machinetypeid, delivery, mastermodel')
             ->get()->getResult();
+    }
+
+    public function getQtyBySizes(string $noModel, string $area, array $sizes): array
+    {
+        if (empty($sizes)) return [];
+        return $this->select('size, SUM(qty) AS qty, SUM(po_plus) AS po_plus, MIN(inisial) AS inisial')
+            ->where('mastermodel', $noModel)
+            ->where('factory', $area)
+            ->whereIn('size', $sizes)
+            ->groupBy('size')
+            ->findAll();
+    }
+
+    public function getQtyAllSizes(string $noModel, string $area): array
+    {
+        return $this->select('size, SUM(qty) AS qty, SUM(po_plus) AS po_plus, MIN(inisial) AS inisial')
+            ->where('mastermodel', $noModel)
+            ->where('factory', $area)
+            ->groupBy('size')
+            ->findAll();
     }
 }

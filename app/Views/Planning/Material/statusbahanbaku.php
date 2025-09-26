@@ -43,10 +43,18 @@
         background: white;
     }
 
+    .table-freeze .sticky-col-4 {
+        position: sticky;
+        left: 320px;
+        /* lebar kolom pertama + kedua */
+        z-index: 2;
+        background: white;
+    }
+
     /* Header di sticky kolom */
     .table-freeze thead th.sticky-col,
     .table-freeze thead th.sticky-col-2,
-    .table-freeze thead th.sticky-col-3 {
+    .table-freeze thead th.sticky-col-3 .table-freeze thead th.sticky-col-4 {
         z-index: 3;
         /* biar header di atas data */
     }
@@ -196,9 +204,9 @@
                             </div>
                         </div>
                         <div class="col-6 d-flex align-items-center text-end gap-2">
-                            <input type="text" class="form-control" id="model" value="" placeholder="No Model" required>
+                            <input type="text" class="form-control" id="model" value="" placeholder="No Model">
                             <input type="text" class="form-control" id="filter" value="" placeholder="Kode Warna/Lot">
-                            <button id="filterButton" class="btn btn-info ms-2" disabled><i class="fas fa-search"></i></button>
+                            <button id="filterButton" class="btn btn-info ms-2"><i class="fas fa-search"></i></button>
                         </div>
 
                     </div>
@@ -222,7 +230,7 @@
 <script>
     function showLoading() {
         $('#loadingOverlay').addClass('active');
-        $('#btnSearch').prop('disabled', true);
+
         // show DataTables processing indicator if available
         try {
             dataTable.processing(true);
@@ -249,9 +257,7 @@
     const filterButton = document.getElementById('filterButton');
 
     // Aktifkan tombol saat field model tidak kosong
-    modelInput.addEventListener('input', function() {
-        filterButton.disabled = modelInput.value.trim() === '';
-    });
+
 
     filterButton.addEventListener('click', function() {
         let keyword = filterInput.value.trim();
@@ -260,7 +266,9 @@
         showLoading();
         updateProgress(0);
 
-        let apiUrl = `<?= base_url($role . '/filterstatusbahanbaku') ?>/${model}?search=${keyword}`;
+        let apiUrl = `<?= base_url($role . '/filterstatusbahanbaku') ?>/?model=${encodeURIComponent(model)}&search=${encodeURIComponent(keyword)}`;
+
+
 
         fetch(apiUrl)
             .then(response => response.json())
@@ -281,7 +289,6 @@
     function displayData(data) {
         let resultContainer = document.getElementById('resultContainer');
         resultContainer.innerHTML = '';
-        let model = modelInput.value.trim();
 
         // console.log();
         // const dataStatus = [];
@@ -299,19 +306,23 @@
             return;
         }
 
-        resultContainer.innerHTML += `
+        if (data['master']['no_model'] == '-') {
+            headerData = '<p class="text-center text-muted"></p>';
+
+        } else {
+            headerData = `
             <div class="row my-4">
                 <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
                     <div class="card">
                         <div class="card-body p-3">
                             <div class="row d-flex align-items-center justify-content-center">
-                              <div class="col-2 d-flex flex-column align-items-center">
+                              <div class="col-3 d-flex flex-column align-items-center">
                                     <div class="numbers text-center">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">No Model</p>
                                         <h5 class="font-weight-bolder mb-0">${data['master']['no_model'] ?? '-' }</h5>
                                     </div>
                                 </div>
-                                <div class="col-2 d-flex flex-column align-items-center">
+                                <div class="col-3 d-flex flex-column align-items-center">
                                     <div class="numbers text-center">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">Buyer</p>
                                         <h5 class="font-weight-bolder mb-0">${data['master']['kd_buyer_order']}</h5>
@@ -335,19 +346,13 @@
                                         <h5 class="font-weight-bolder mb-0">${data['master']['start_mc'] ?? '-' }</h5>
                                     </div>
                                 </div>
-                                <div class="col-2 d-flex flex-column align-items-center">
-                                    <div class="numbers text-center">
-                                     <a class="btn btn-success" href='http://172.23.44.14/MaterialSystem/public/api/apiexportGlobalReport/${model}'>Excel Bahan Baku</a>
-
-                                        
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         `;
+        }
 
         let htmlCelupHeader = `
 <div class="row my-4">
@@ -358,11 +363,12 @@
                 <div class="table-wrapper" style="overflow-x:auto;">
                     <table class="table table-bordered table-striped table-sm table-freeze">
                         <thead class="table-light">
-                            <tr>
+                            <tr>              
+                         ${data.master.no_model == '-' ? '<th class="sticky-col">No Model</th>' : ''}
                                 <th class="sticky-col">Jenis</th>
                                 <th class="sticky-col-2">Kode Warna</th>
                                 <th class="sticky-col-3">Warna</th>
-                                <th>Status Celup</th>
+                                <th class="sticky-col-4">Status Celup</th>
                                 <th>Qty PO</th>
                                 <th>Qty Celup</th>
                                 <th>Lot Celup</th>
@@ -423,19 +429,27 @@
 
             const keteranganBadge = item?.keterangan ?
                 item.keterangan.split(',').map(ket => `<div>${ket.trim()}</div>`).join('') :
-                '-';
+                '';
 
             const jenis = (item?.jenis || '').toUpperCase();
 
             if (['BENANG', 'NYLON'].includes(jenis)) {
                 htmlCelupBody += `
 <tr>
+${data.master.no_model === '-' 
+  ? `<td class="sticky-col">
+  ${item.po_plus === '1' ? '(+)' : ''}${item.no_model}
+</td>
+` 
+  : ''
+}
+
     <td  class="sticky-col">${item.item_type}</td>
     <td  class="sticky-col-2">${item.kode_warna}</td>
     <td class="sticky-col-3">${item.color}</td>
-    <td><span class="badge ${statusClass} px-3 py-2">${item.last_status || '-'}</span></td>
+    <td class="sticky-col-4"><span class="badge ${statusClass} px-3 py-2">${item.last_status || 'Belum Schedule'}</span></td>
     <td class="text-end">${formatNumber(item.qty_po)}</td>
-    <td class="text-end">${formatNumber(item.kg_celup)}</td>
+    <td class="text-end">  ${item.po_plus === '1' ? '(+)' : ''}  ${item.kg_celup||0}</td>
     <td>${item.lot_celup || '-'}</td>
     <td>${formatDate(item.tanggal_schedule)}</td>
     <td>${formatDate(item.tanggal_bon)}</td>
@@ -475,7 +489,7 @@
         let htmlCovering = htmlCoveringHeader + htmlCoveringBody + `</tbody></table></div></div></div></div></div>`;
 
         // Render
-        resultContainer.innerHTML += htmlCelup + htmlCovering;
+        resultContainer.innerHTML += headerData + htmlCelup + htmlCovering;
     }
 
     // Fungsi untuk format tanggal agar tidak error
