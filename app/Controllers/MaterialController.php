@@ -1302,7 +1302,7 @@ class MaterialController extends BaseController
             'area' => $area,
             'role' => session()->get('role'),
         ];
-        return view(session()->get('role') . '/Material/form_po_tambahan', $data);
+        return view(session()->get('role') . '/Material/form_po_tambahan_coba', $data);
     }
     public function getStyleSize($area, $noModel)
     {
