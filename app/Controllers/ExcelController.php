@@ -3945,7 +3945,32 @@ class ExcelController extends BaseController
             return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'message' => 'Data tidak valid dari API']);
         }
 
+        $qtyOrderList = [];
+
+        foreach ($result as $item) {
+            $style = $item['style_size'];
+            $noModel = $item['no_model'];  // ambil langsung dari API
+            $area = $item['admin'];        // atau sesuai kolom factory di DB
+
+            // Ambil qty dari DB lokal
+            $qty = $this->ApsPerstyleModel->getSisaPerSize($area, $noModel, [$style]);
+            $qtyOrderList[$style] = is_array($qty) ? ($qty['qty'] ?? 0) : ($qty->qty ?? 0);
+        }
+
+        // Gabungkan ke response
+        foreach ($result as $i => $row) {
+            $style = $row['style_size'];
+            $qty_order = isset($qtyOrderList[$style]) ? (float)$qtyOrderList[$style] : 0;
+            $composition = (float)$row['composition'] ?? 0;
+            $gw = (float)$row['gw'] ?? 0;
+            $loss = (float)$row['loss'] ?? 0;
+
+            $result[$i]['qty_order'] = $qty_order;
+            $result[$i]['kg_po'] = ($qty_order * $composition * $gw / 100 / 1000) * (1 + ($loss / 100));
+        }
+
         $delivery = $result[0]['delivery_akhir'] ?? '';
+
         // Buat Excel
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -4515,48 +4540,53 @@ class ExcelController extends BaseController
 
         // Isi tabel
         $rowNum = 11;
-        $no = 1;
-        $firstRow = true;
         $sheet->getRowDimension($rowNum)->setRowHeight(18);
-        $subtotalKgs = 0;
+
         $prevModel = null;
         $prevKode = null;
+        $prevItemType = null;
+        $totalKgPo = 0;
+        $totalTerimaKg = 0;
+        $totalSisaBBMc = 0;
+        $totalTambahanMcCns = 0;
+        $totalTambahanPckCns = 0;
+        $totalTambahanKg = 0;
 
         foreach ($result as $row) {
-            $currentModel = $row['no_model'];
-            $currentKode  = $row['kode_warna'];
             $sheet->mergeCells("A{$rowNum}:B{$rowNum}");
 
-            $kgs = (float)$row['kgs'];
-            $subtotalKgs += $kgs;
-            $terimaKg = (float)$row['ttl_terima_kg'];
-            $sisaBBMc = (float)$row['ttl_sisa_bb_dimc'];
-            $poplus_mc_cns = (float)$row['poplus_mc_cns'];
-            $plus_pck_cns = (float)$row['plus_pck_cns'];
-            // $retur = (float)$row['kgs_retur'];
-            $poplus_mc_kg = (float)$row['poplus_mc_kg'];
-            $plus_pck_kg = (float)$row['plus_pck_kg'];
-            $ttl_tambahan_kg = (float)$row['ttl_tambahan_kg'];
+            $currentModel = $row['no_model'];
+            $currentItem  = $row['item_type'];
+            $currentKode  = $row['kode_warna'];
 
-            // Hitung persentase (hindari bagi 0)
-            $persenTerima = ($kgs > 0) ? round(($terimaKg / $kgs) * 100, 2) . '%' : '0%';
-            $persenPoplus = ($kgs > 0) ? round(($poplus_mc_kg / $kgs) * 100, 2) . '%' : '0%';
-            $persenPlusPck = ($kgs > 0) ? round(($plus_pck_kg / $kgs) * 100, 2) . '%' : '0%';
-            $persenTtlTambahan = ($kgs > 0) ? round(($ttl_tambahan_kg / $kgs) * 100, 2) . '%' : '0%';
+            $tambahanMcKg = (float)$row['poplus_mc_kg']  ?? 0;
+            $tambahanPckKg = (float)$row['plus_pck_kg']  ?? 0;
+            $kg_po         = (float)($row['kg_po'] ?? 0);
+            $terimaKg      = (float)($row['ttl_terima_kg'] ?? 0);
+            $sisaBBMc      = (float)($row['ttl_sisa_bb_dimc'] ?? 0);
+            $tambahanMcKg  = (float)($row['poplus_mc_kg'] ?? 0);
+            $tambahanPckKg = (float)($row['plus_pck_kg'] ?? 0);
+            $totalTambahanRow = (float)($row['ttl_tambahan_kg'] ?? 0);
+            $tambahanMcCns = (float)($row['poplus_mc_cns'] ?? 0);
+            $tambahanPckCns = (float)($row['plus_pck_cns'] ?? 0);
 
-            // 🚨 Cek apakah sudah ganti no_model atau kode_warna
-            if ($prevModel !== null && ($currentModel !== $prevModel || $currentKode !== $prevKode)) {
+            // persentase per baris
+            $persenPoplus  = ($kg_po > 0) ? round(($tambahanMcKg / $kg_po) * 100, 2) . '%' : '0%';
+            $persenPlusPck = ($kg_po > 0) ? round(($tambahanPckKg / $kg_po) * 100, 2) . '%' : '0%';
+
+            // 🚨 Cek apakah sudah ganti no_model, item_type, atau kode_warna
+            if ($prevModel !== null && ($currentModel !== $prevModel || $currentKode !== $prevKode || $currentItem !== $prevItemType)) {
                 // Tulis subtotal ke bawah baris sebelumnya
                 $sheet->setCellValue("J{$rowNum}", "TOTAL");
-                $sheet->setCellValue("K{$rowNum}", number_format($subtotalKgs, 2));
-                $sheet->setCellValue("L{$rowNum}", number_format($terimaKg, 2));
-                $sheet->setCellValue("M{$rowNum}", number_format($terimaKg - $subtotalKgs, 2));
-                $sheet->setCellValue("N{$rowNum}", number_format($terimaKg / $subtotalKgs * 100, 2) . '%');
-                $sheet->setCellValue("O{$rowNum}", number_format($sisaBBMc, 2));
-                $sheet->setCellValue("R{$rowNum}", $poplus_mc_cns);
-                $sheet->setCellValue("V{$rowNum}", $plus_pck_cns);
-                $sheet->setCellValue("X{$rowNum}", $ttl_tambahan_kg);
-                $sheet->setCellValue("Y{$rowNum}", $persenTtlTambahan);
+                $sheet->setCellValue("K{$rowNum}", number_format($totalKgPo, 2));
+                $sheet->setCellValue("L{$rowNum}", number_format($totalTerimaKg, 2));
+                $sheet->setCellValue("M{$rowNum}", number_format($totalTerimaKg - $totalKgPo, 2));
+                $sheet->setCellValue("N{$rowNum}", ($totalKgPo > 0) ? number_format(($totalTerimaKg / $totalKgPo) * 100, 2) . '%' : '0%');
+                $sheet->setCellValue("O{$rowNum}", number_format($totalSisaBBMc, 2));
+                $sheet->setCellValue("R{$rowNum}", $totalTambahanMcCns);
+                $sheet->setCellValue("V{$rowNum}", $totalTambahanPckCns);
+                $sheet->setCellValue("X{$rowNum}", $totalTambahanKg);
+                $sheet->setCellValue("Y{$rowNum}", ($totalKgPo > 0) ? round(($totalTambahanKg / $totalKgPo) * 100, 2) . '%' : '0%');
 
                 // Bold & style subtotal
                 $sheet->getStyle("J{$rowNum}:AD{$rowNum}")->getFont()->setBold(true);
@@ -4579,7 +4609,14 @@ class ExcelController extends BaseController
                     }
                 }
                 $rowNum++; // pindah baris setelah subtotal
-                $subtotalKgs = 0; // reset subtotal
+
+                // reset subtotal
+                $totalKgPo = 0;
+                $totalTerimaKg = 0;
+                $totalSisaBBMc = 0;
+                $totalTambahanMcCns = 0;
+                $totalTambahanPckCns = 0;
+                $totalTambahanKg = 0;
             }
             $sheet->mergeCells("A{$rowNum}:B{$rowNum}");
             $sheet->fromArray([
@@ -4591,9 +4628,9 @@ class ExcelController extends BaseController
                 $row['style_size'],
                 $row['composition'],
                 $row['gw'],
-                $row['qty_pcs'],
+                $row['qty_order'],
                 $row['loss'],
-                $row['kgs'],
+                number_format($kg_po, 2),
                 '', //terima
                 '', // plus atau minus
                 '', // terima
@@ -4633,8 +4670,19 @@ class ExcelController extends BaseController
             }
 
             $sheet->getRowDimension($rowNum)->setRowHeight(-1);
+
+            // akumulasi subtotal per grup
+            $totalKgPo                  += $kg_po;
+            $totalTerimaKg              = $terimaKg;
+            $totalSisaBBMc              = $sisaBBMc;
+            $totalTambahanKg            = $totalTambahanRow;
+            $totalTambahanMcCns         = $tambahanMcCns;
+            $totalTambahanPckCns        = $tambahanPckCns;
+
             $prevModel = $currentModel;
-            $prevKode  = $currentKode;
+            $prevKode = $currentKode;
+            $prevItemType = $currentItem;
+
             $rowNum++;
         }
 
@@ -4664,17 +4712,17 @@ class ExcelController extends BaseController
 
         $sheet->mergeCells("A{$rowNum}:B{$rowNum}");
         // 🚨 Setelah looping selesai, jangan lupa subtotal terakhir
-        if ($subtotalKgs > 0) {
+        if ($totalKgPo > 0) {
             $sheet->setCellValue("J{$rowNum}", "TOTAL");
-            $sheet->setCellValue("K{$rowNum}", number_format($subtotalKgs, 2));
-            $sheet->setCellValue("L{$rowNum}", number_format($terimaKg, 2));
-            $sheet->setCellValue("M{$rowNum}", number_format($terimaKg - $subtotalKgs, 2));
-            $sheet->setCellValue("N{$rowNum}", number_format($terimaKg / $subtotalKgs * 100, 2) . '%');
-            $sheet->setCellValue("O{$rowNum}", number_format($sisaBBMc, 2));
-            $sheet->setCellValue("R{$rowNum}", $poplus_mc_cns);
-            $sheet->setCellValue("V{$rowNum}", $plus_pck_cns);
-            $sheet->setCellValue("X{$rowNum}", $ttl_tambahan_kg);
-            $sheet->setCellValue("Y{$rowNum}", $persenTtlTambahan);
+            $sheet->setCellValue("K{$rowNum}", number_format($totalKgPo, 2));
+            $sheet->setCellValue("L{$rowNum}", number_format($totalTerimaKg, 2));
+            $sheet->setCellValue("M{$rowNum}", number_format($totalTerimaKg - $totalKgPo, 2));
+            $sheet->setCellValue("N{$rowNum}", ($totalKgPo > 0) ? number_format(($totalTerimaKg / $totalKgPo) * 100, 2) . '%' : '0%');
+            $sheet->setCellValue("O{$rowNum}", number_format($totalSisaBBMc, 2));
+            $sheet->setCellValue("R{$rowNum}", $totalTambahanMcCns);
+            $sheet->setCellValue("V{$rowNum}", $totalTambahanPckCns);
+            $sheet->setCellValue("X{$rowNum}", $totalTambahanKg);
+            $sheet->setCellValue("Y{$rowNum}", ($totalKgPo > 0) ? round(($totalTambahanKg / $totalKgPo) * 100, 2) . '%' : '0%');
             // Style untuk baris TOTAL terakhir
             $sheet->getStyle("A{$rowNum}:AD{$rowNum}")->applyFromArray([
                 'font' => ['bold' => true, 'size' => 10],
