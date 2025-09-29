@@ -169,18 +169,40 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <!-- Loss Aktual -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Loss Aktual</label>
+                                    <input type="number" class="form-control loss-aktual" name="items[0][loss_aktual]" readonly required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <!-- Loss Tambahan -->
+                                <div class="form-group">
+                                    <label>Loss Tambahan</label>
+                                    <input type="number" class="form-control loss-tambahan" name="items[0][loss_tambahan]">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- Delivery Po(+) -->
+                                <div class="form-group">
+                                    <label>Delivery Po(+)</label>
+                                    <input type="date" class="form-control delivery-po-plus" name="items[0][delivery_po_plus]" id="delivery-po-plus" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <!-- Keterangan -->
+                                <div class="form-group">
+                                    <label for="exampleFormControlInput1">Keterangan</label>
+                                    <input type="text" class="form-control" name="keterangan" id="keterangan">
+                                </div>
+                            </div>
+                        </div>
                         <!-- Container untuk style size  -->
                         <div class="row populate-size-wrapper">
-                        </div>
-                        <div class="form-group row">
-                            <!-- Loss Aktual -->
-                            <div class="col-md-6"><label>Loss Aktual</label>
-                                <input type="number" class="form-control loss-aktual" name="items[0][loss_aktual]" readonly required>
-                            </div>
-                            <!-- Loss Tambahan -->
-                            <div class="col-md-6"><label>Loss Tambahan</label>
-                                <input type="number" class="form-control loss-tambahan" name="items[0][loss_tambahan]">
-                            </div>
                         </div>
                         <div class="form-group">
                             <div class="col"><label>Total Tambahan Kg</label>
@@ -192,17 +214,6 @@
                             <div class="col"><label>Total Tambahan Cones</label>
                                 <input type="number" class="form-control total-cns" name="items[0][total_cns_po]" readonly required>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <!-- Delivery Po(+) -->
-                            <div class="col"><label>Delivery Po(+)</label>
-                                <input type="date" class="form-control delivery-po-plus" name="items[0][delivery_po_plus]" id="delivery-po-plus" required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <!-- Keterangan -->
-                            <label for="exampleFormControlInput1">Keterangan</label>
-                            <textarea class="form-control" name="keterangan" id="keterangan"></textarea>
                         </div>
                     </div>
                 </div>
@@ -802,7 +813,7 @@
             console.log(formData); // Debug sebelum submit
 
             $.ajax({
-                url: base + '/' + role + '/savePoTambahan/' + area,
+                url: base + role + '/savePoTambahan/' + area,
                 method: 'POST',
                 data: JSON.stringify(formData),
                 contentType: 'application/json',
