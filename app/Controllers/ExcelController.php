@@ -4552,6 +4552,8 @@ class ExcelController extends BaseController
         $totalTambahanPckCns = 0;
         $totalTambahanKg = 0;
 
+        $groupStartRow = $rowNum;
+
         foreach ($result as $row) {
             $sheet->mergeCells("A{$rowNum}:B{$rowNum}");
 
@@ -4576,6 +4578,8 @@ class ExcelController extends BaseController
 
             // 🚨 Cek apakah sudah ganti no_model, item_type, atau kode_warna
             if ($prevModel !== null && ($currentModel !== $prevModel || $currentKode !== $prevKode || $currentItem !== $prevItemType)) {
+                $sheet->mergeCells("AD{$groupStartRow}:AD" . ($rowNum - 1));
+
                 // Tulis subtotal ke bawah baris sebelumnya
                 $sheet->setCellValue("J{$rowNum}", "TOTAL");
                 $sheet->setCellValue("K{$rowNum}", number_format($totalKgPo, 2));
@@ -4609,6 +4613,7 @@ class ExcelController extends BaseController
                     }
                 }
                 $rowNum++; // pindah baris setelah subtotal
+                $groupStartRow = $rowNum;
 
                 // reset subtotal
                 $totalKgPo = 0;
@@ -4649,7 +4654,7 @@ class ExcelController extends BaseController
                 '',    // AA
                 '',    // AB
                 '',
-                '',
+                $row['ket_area'],
             ], null, 'A' . $rowNum);
 
             // 🎯 Loop cek kolom L sampai S (ASCII 76 = L, 83 = S)
@@ -4685,6 +4690,8 @@ class ExcelController extends BaseController
 
             $rowNum++;
         }
+        // ✅ Merge grup terakhir
+        $sheet->mergeCells("AD{$groupStartRow}:AD" . ($rowNum - 1));
 
         $lastRow = $rowNum - 1;
         // Aktifkan wrap text di A11:Q28

@@ -253,7 +253,7 @@
                 item.plus_pck_cns || 0,
                 // item.lebih_pakai_kg || 0,
                 item.ttl_tambahan_kg || 0,
-                item.keterangan || '',
+                item.ket_area || '',
             ]);
         });
 
