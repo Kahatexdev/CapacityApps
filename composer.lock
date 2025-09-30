@@ -392,8 +392,7 @@
       },
       "require": {
         "ext-mbstring": "*",
-        "ext-zlib": "*",
-        "php-64bit": "^8.3"
+        "ext-zlib": "*"
       },
       "require-dev": {
         "brianium/paratest": "^7.7",
