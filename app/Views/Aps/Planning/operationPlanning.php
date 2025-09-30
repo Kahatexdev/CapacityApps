@@ -399,21 +399,35 @@
         <div class="modal-dialog modal-dialog-scrollable modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalMCLabel">Detail Mesin</h5> <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="modalMCLabel">Detail Mesin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body" id="mcTable"> </div>
-                <div class="modal-footer"> <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> <button type="button" class="btn btn-info" data-bs-dismiss="modal">Simpan</button> </div>
+                <form id="formMesin"> <!-- Form supaya bisa submit -->
+                    <div id="hiddenFields"></div>
+                    <input type="hidden" value="<?= $area ?>" name="area">
+                    <input type="hidden" value="<?= $jarum ?>" name="jarum">
+                    <div class="modal-body" id="mcTable">
+                        <!-- Table akan diinject via JS -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-info">Simpan</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+
     <script>
+        const jarum = <?= json_encode($jarum); ?>;
+        const area = <?= json_encode($area); ?>;
+        const pdk = <?= json_encode($pdk); ?>;
+        let timer;
         document.addEventListener("DOMContentLoaded", function() {
             document.querySelectorAll(".btn-plan").forEach(button => {
                 button.addEventListener("click", function() {
                     let planStyleCard = document.querySelector(".planStyleCard");
-                    const jarum = <?= json_encode($jarum); ?>;
-                    const area = <?= json_encode($area); ?>;
-                    const pdk = <?= json_encode($pdk); ?>;
+
                     $.ajax({
                         url: '<?= base_url("aps/getPlanStyle") ?>',
                         type: 'GET',
@@ -563,7 +577,10 @@
         $(document).on('click', '.btn-choose', function() {
             const style = $(this).data('style');
             const idplan = $(this).data('plan');
-
+            $('#hiddenFields').html(`
+        <input type="hidden" name="idaps" value="${style}">
+        <input type="hidden" name="idplan" value="${idplan}">
+    `);
             $.ajax({
                 url: '<?= base_url($role . '/getListMesinplan') ?>',
                 type: 'GET',
@@ -584,14 +601,19 @@
                         <th><button type="button" class="btn btn-info btn-addRow">+</button></th>
                     </tr>
                 </thead>
-                <tbody>`;
+                <tbody>
+                 
+                `;
 
                     if (response.status === 'success' && response.data.length > 0) {
                         tableMesin += response.data.map(item => `
                     <tr>
-                        <td><input type="text" name="no_mc[]" class="form-control" value="${item.no_mc}"></td>
-                        <td><input type="date" name="start[]" class="form-control" value="${item.start}"></td>
-                        <td><input type="date" name="stop[]" class="form-control" value="${item.stop}"></td>
+                        <td><input type="hidden" name="id[]" class="form-control " value="${item.id}">
+                        <small class="text-danger feedback"></small>
+                       <input type="text" name="no_mc[]" class="form-control cek-mesin" value="${item.no_mc}">
+                        </td>
+                        <td><input type="date" name="start[]" class="form-control" value="${item.start_mesin}"></td>
+                        <td><input type="date" name="stop[]" class="form-control" value="${item.stop_mesin}"></td>
                         <td><button type="button" class="btn btn-danger btn-deleteRow">Delete</button></td>
                         <td></td>
                     </tr>
@@ -599,7 +621,9 @@
                     } else {
                         tableMesin += `
                     <tr>
-                        <td><input type="text" name="no_mc[]" class="form-control"></td>
+                        <td><input type="hidden" name="id[]" class="form-control">
+                         <small class="text-danger feedback"></small>
+                       <input type="text" name="no_mc[]" class="form-control cek-mesin">
                         <td><input type="date" name="start[]" class="form-control"></td>
                         <td><input type="date" name="stop[]" class="form-control"></td>
                         <td><button type="button" class="btn btn-danger btn-deleteRow">Delete</button></td>
@@ -648,7 +672,7 @@
             let table = $('#stock').DataTable();
 
             table.row.add([
-                '<input type="text" name="no_mc[]" class="form-control">',
+                ' <small class="text-danger feedback"></small> <input type="text" name="no_mc[]" class="form-control cek-mesin">',
                 '<input type="date" name="start[]" class="form-control">',
                 '<input type="date" name="stop[]" class="form-control">',
                 '<button type="button" class="btn btn-danger btn-deleteRow">Delete</button>',
@@ -659,10 +683,107 @@
         // === DELETE ROW ===
         $(document).on('click', '.btn-deleteRow', function() {
             let table = $('#stock').DataTable();
-            table.row($(this).closest('tr')).remove().draw(false);
+            let row = $(this).closest('tr');
+            let idVal = row.find('input[name="id[]"]').val();
+            let idaps = $('input[name="idaps"]').val(); // hidden field di form
+            let idplan = $('input[name="idplan"]').val(); // hidden field di form
+
+            if (idVal && idVal.trim() !== '') {
+                // sudah tersimpan → hapus ke database
+                $.ajax({
+                    url: '<?= base_url($role . "/deleteMesinPernomor") ?>',
+                    type: 'POST',
+                    data: {
+                        id: idVal,
+                        idaps: idaps,
+                        idplan: idplan
+                    },
+                    success: function(res) {
+                        if (res.status === 'success') {
+                            $('.btn-plan').click();
+                            table.row(row).remove().draw(false);
+                            $('.btn-plan').click();
+                        } else {
+                            console.error('Gagal hapus di database:', res);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('❌ Delete Error:', error);
+                    }
+                });
+            } else {
+                // ❗ belum tersimpan → hapus baris lokal saja
+                table.row(row).remove().draw(false);
+            }
         });
 
 
+        $(document).on('input', '.cek-mesin', function() {
+            clearTimeout(timer);
+            let input = $(this);
+            let no_mc = input.val().trim();
+            let feedback = input.siblings('.feedback');
+
+            if (no_mc.length === 0) {
+                feedback.text('');
+                return;
+            }
+
+            // 🔥 debounce biar gak spam request
+            timer = setTimeout(function() {
+                $.ajax({
+                    url: '<?= site_url('aps/checkAvailable') ?>',
+                    method: 'POST',
+                    data: {
+                        no_mc: no_mc,
+                        jarum: jarum,
+                        area: area
+                    },
+                    dataType: 'json',
+                    success: function(res) {
+                        if (res.ada) {
+                            feedback.text('❌ Jarum ini tidak ada no mc ini')
+                                .removeClass('text-success')
+                                .addClass('text-danger');
+
+                        } else {
+                            feedback.text('✅ Mesin tersedia')
+                                .removeClass('text-danger')
+                                .addClass('text-success');
+                        }
+                    },
+                    error: function() {
+                        feedback.text('⚠️ Error cek mesin').addClass('text-danger');
+                    }
+                });
+            }, 1000); // delay 400ms
+        });
+
+
+        $('#formMesin').on('submit', function(e) {
+            e.preventDefault();
+
+            let formData = $(this).serialize();
+            console.log('🚀 Data yang dikirim:', formData); // 🔥 Cek disini
+
+            $.ajax({
+                url: '<?= base_url($role . '/savePlanningPernomor') ?>',
+                type: 'POST',
+                data: formData,
+                success: function(res) {
+                    console.log('✅ Response server:', res); // 🔥 Cek response
+                    $('.btn-plan').click();
+                    alert('Data berhasil disimpan!');
+                    $('#modalMC').modal('hide');
+                    $('.btn-plan').click();
+                },
+                error: function(xhr, status, error) {
+                    console.error('❌ Error Save:', error);
+                    console.log('Response Text:', xhr.responseText); // cek detail error
+                    alert('Gagal simpan data');
+                }
+            });
+        });
 
         function editPlan(no) {
             let button = document.getElementById('editPlan-' + no);
@@ -960,7 +1081,7 @@
             let listPlanningEmpty = document.getElementById('list-planning-empty').value === 'true';
 
             // Ambil nilai remainingQty dari input dengan ID 'remaining-qty'
-            var remainingQty = parseFloat(document.querySelector('[id="remaining-qty"]').value) || 0;
+            var remainingQty = parseFloat(document.querySelector('[id="remaining-qty" ]').value) || 0;
 
             // Jika listPlanning kosong, set unplanned-qty langsung dengan remainingQty
             if (listPlanningEmpty) {

@@ -21,6 +21,7 @@ use App\Models\TanggalPlanningModel;
 use App\Models\EstimatedPlanningModel;
 use App\Models\MesinPerStyle;
 use App\Models\MesinPernomor;
+use App\Models\MachinesModel;
 use App\Models\AksesModel;/*  */
 use App\Services\orderServices;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -47,6 +48,7 @@ class ApsController extends BaseController
     protected $orderServices;
     protected $MesinPerStyle;
     protected $MesinPernomor;
+    protected $machinesModel;
 
     public function __construct()
     {
@@ -66,6 +68,7 @@ class ApsController extends BaseController
         $this->EstimatedPlanningModel = new EstimatedPlanningModel();
         $this->MesinPerStyle = new MesinPerStyle();
         $this->MesinPernomor = new MesinPernomor();
+        $this->machinesModel = new MachinesModel();
         $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -1290,7 +1293,10 @@ class ApsController extends BaseController
                 $idMc  = $this->request->getGet('idplan');
 
                 $mesin = $this->MesinPernomor->getListPlan($idAps, $idMc);
-
+                foreach ($mesin as &$row) {
+                    $row['start_mesin'] = date('Y-m-d', strtotime($row['start_mesin']));
+                    $row['stop_mesin']  = date('Y-m-d', strtotime($row['stop_mesin']));
+                }
                 return $this->response->setJSON([
                     'status' => 'success',
                     'data'   => $mesin
@@ -1313,5 +1319,95 @@ class ApsController extends BaseController
         } else {
             return redirect()->back()->with('error', 'Data Gagal disimpan.');
         }
+    }
+    public function savePlanningPernomor()
+    {
+        if ($this->request->isAJAX()) {
+            try {
+                $area   = $this->request->getPost('area');
+                $jarum  = $this->request->getPost('jarum');
+                $no_mc  = $this->request->getPost('no_mc'); // array
+                $idaps  = $this->request->getPost('idaps');
+                $idplan = $this->request->getPost('idplan');
+                $start  = $this->request->getPost('start'); // array
+                $stop   = $this->request->getPost('stop');  // array
+                $id     = $this->request->getPost('id');    // array
+
+                $jumlah = count($no_mc);
+
+                foreach ($no_mc as $i => $mc) {
+                    $idmc = $this->machinesModel
+                        ->where('no_mc', $mc)
+                        ->where('jarum', $jarum)
+                        ->where('area', $area)
+                        ->first();
+
+                    $data = [
+                        'id_mesin'       => $idmc['id'],
+                        'id_detail_plan' => $idplan,
+                        'idapsperstyle'  => $idaps,
+                        'start_mesin'    => $start[$i] ?? null,
+                        'stop_mesin'     => $stop[$i] ?? null,
+                    ];
+
+                    // ✅ cek id per-baris
+                    if (empty($id[$i])) {
+                        $this->MesinPernomor->insert($data);
+                    } else {
+                        $this->MesinPernomor->update($id[$i], $data);
+                    }
+                }
+
+                // ✅ update jumlah mesin
+                $this->MesinPerStyle
+                    ->where('idapsperstyle', $idaps)
+                    ->set('mesin', $jumlah)
+                    ->update();
+
+                return $this->response->setJSON([
+                    'status'  => 'success',
+                    'message' => 'Data berhasil disimpan'
+                ]);
+            } catch (\Exception $e) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => $e->getMessage()
+                ]);
+            }
+        }
+    }
+    public function deleteMesinPernomor()
+    {
+        $id    = $this->request->getPost('id');
+        $idaps = $this->request->getPost('idaps');
+        $idplan = $this->request->getPost('idplan');
+
+
+        if ($this->MesinPernomor->delete($id)) {
+            $data = $this->MesinPernomor->hitung($idaps, $idplan);
+            $jumlah = $data['jumlah'] ?? 0;
+            $this->MesinPerStyle
+                ->where('idapsperstyle', $idaps)
+                ->set('mesin', $jumlah)
+                ->update();
+            return $this->response->setJSON(['status' => 'success']);
+        }
+        return $this->response->setJSON(['status' => 'error']);
+    }
+    public function checkAvailable()
+    {
+        $no_mc = $this->request->getPost('no_mc');
+        $jarum = $this->request->getPost('jarum');
+        $area  = $this->request->getPost('area');
+
+        $exists = $this->machinesModel
+            ->where('no_mc', $no_mc)
+            ->where('jarum', $jarum)
+            ->where('area', $area)
+            ->countAllResults();
+
+        return $this->response->setJSON([
+            'ada' => $exists == 0
+        ]);
     }
 }

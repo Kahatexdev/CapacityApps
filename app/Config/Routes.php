@@ -588,6 +588,9 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('deletePlanAll', 'ApsController::deletePlanAll');
     $routes->get('getListMesinplan', 'ApsController::getListMesinplan');
     $routes->post('saveStartmesinBenang', 'ApsController::saveStartmesinBenang');
+    $routes->post('savePlanningPernomor', 'ApsController::savePlanningPernomor');
+    $routes->post('deleteMesinPernomor', 'ApsController::deleteMesinPernomor');
+    $routes->post('checkAvailable', 'ApsController::checkAvailable');
 
     // deffect
     $routes->get('datadeffect', 'DeffectController::datadeffect');
