@@ -177,7 +177,7 @@
 
             // Validasi sederhana
             if (!tgl || !model) {
-                alert('Tolong Isi Tgl Retur Terlebih Dahulu !');
+                alert('Tolong Isi No Model & Tgl Retur Terlebih Dahulu !');
                 return;
             }
             //pakai method GET
