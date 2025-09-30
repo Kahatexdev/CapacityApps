@@ -50,6 +50,15 @@ class MesinPernomor extends Model
 
     public function getListPlan($idAps, $idplan)
     {
-        return $this->where('idapsperstyle', $idAps)->where('id_detail_plan', $idplan)->findAll();
+        return $this->select('mesin_pernomor.id, machines.no_mc,start_mesin,stop_mesin')
+            ->join('machines', 'machines.id = mesin_pernomor.id_mesin', 'left')
+            ->where('idapsperstyle', $idAps)->where('id_detail_plan', $idplan)->findAll();
+    }
+    public function hitung($idaps, $idplan)
+    {
+        return $this->selectCount('id_mesin', 'jumlah')
+            ->where('id_detail_plan', $idplan)
+            ->where('idapsperstyle', $idaps)
+            ->first();
     }
 }
