@@ -176,7 +176,7 @@
             const tgl = $('#tgl_buat').val();
 
             // Validasi sederhana
-            if (!tgl) {
+            if (!tgl || !model) {
                 alert('Tolong Isi Tgl Retur Terlebih Dahulu !');
                 return;
             }

@@ -6278,7 +6278,7 @@ class ExcelController extends BaseController
 
     public function generateFormRetur($area)
     {
-        $noModel = $this->request->getGet('noModel');
+        $noModel = $this->request->getGet('model');
         $tglBuat = $this->request->getGet('tglBuat');
 
         // Ambil data berdasarkan area dan model
@@ -6306,7 +6306,78 @@ class ExcelController extends BaseController
             return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'message' => 'Data tidak valid dari API']);
         }
 
-        $delivery = $result[0]['delivery_akhir'] ?? '';
+        $dataRetur = $result['dataRetur'];
+        $material = $result['material'];
+
+        // Buat index material per style
+        $materialIndex = [];
+        foreach ($material as $item) {
+            $key = $item['no_model'] . '|' . $item['item_type'] . '|' . $item['kode_warna'] . '|' . $item['style_size'];
+            $materialIndex[$key] = $item;
+        }
+
+        // log_message('info', 'Material Index: ' . print_r($materialIndex, true));
+
+        // Ambil qty per style dari material
+        $qtyOrderList = [];
+        $kgPoList = [];
+        foreach ($material as $item) {
+            $keyStyle = $item['no_model'] . '|' . $item['item_type'] . '|' . $item['kode_warna'] . '|' . $item['style_size'];
+
+            $qty = $this->ApsPerstyleModel->getSisaPerSize($area, $item['no_model'], [$item['style_size']]);
+            $qty_order = is_array($qty) ? ($qty['qty'] ?? 0) : ($qty->qty ?? 0);
+            $qtyOrderList[$keyStyle] = $qty_order;
+
+            $composition = (float)$item['composition'] ?? 0;
+            $gw = (float)$item['gw'] ?? 0;
+            $loss = (float)$item['loss'] ?? 0;
+
+            // Hitung kg_po
+            $kgPoList[$keyStyle] = ($qty_order * $composition * $gw / 100 / 1000) * (1 + ($loss / 100));
+        }
+
+        // Group per no_model|item_type|kode_warna
+        $grouped = [];
+        foreach ($dataRetur as $row) {
+            $keyGroup = $row['no_model'] . '|' . $row['item_type'] . '|' . $row['kode_warna'];
+
+            // Cari semua style yang match group ini
+            $matchingKeys = [];
+            foreach ($materialIndex as $k => $m) {
+                if (
+                    $m['no_model'] === $row['no_model']
+                    && $m['item_type'] === $row['item_type']
+                    && $m['kode_warna'] === $row['kode_warna']
+                ) {
+                    $matchingKeys[] = $k;
+                }
+            }
+
+            // Sum qty_order dan kg_po untuk group ini
+            $qty_order_sum = 0;
+            $kg_po_sum = 0;
+            $loss_value = 0;
+            foreach ($matchingKeys as $index => $k) {
+                $qty_order_sum += $qtyOrderList[$k] ?? 0;
+                $kg_po_sum += $kgPoList[$k] ?? 0;
+                if ($index === 0) {
+                    $loss_value = (float)($materialIndex[$k]['loss'] ?? 0);
+                }
+            }
+
+            // Masukkan ke $row
+            $row['qty_order'] = $qty_order_sum;
+            $row['kg_po'] = $kg_po_sum;
+            $row['loss'] = $loss_value;
+
+            // Simpan di array final
+            $grouped[$keyGroup] = $row;
+        }
+
+        // Gunakan $dataReturGrouped untuk loop di Excel
+        $dataReturGrouped = array_values($grouped);
+
+        $delivery = $dataReturGrouped[0]['delivery_akhir'] ?? '';
         // Buat Excel
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -6923,7 +6994,7 @@ class ExcelController extends BaseController
         $firstRow = true;
         $sheet->getRowDimension($rowNum)->setRowHeight(18);
 
-        foreach ($result as $row) {
+        foreach ($dataReturGrouped as $row) {
             $sheet->mergeCells("A{$rowNum}:B{$rowNum}");
             $retur_kg_psn = '';
             $retur_kg_po = '';
@@ -6956,11 +7027,11 @@ class ExcelController extends BaseController
                 $row['item_type'],
                 $row['kode_warna'],
                 '',
-                $row['composition'],
-                $row['gw'],
-                $row['qty_pcs'],
-                $row['loss'],
-                $row['kgs'],
+                $row['composition'] ?? '',       // G
+                $row['gw'] ?? '',                // H
+                $row['qty_order'] ?? 0,          // I -> Qty / Pcs
+                $row['loss'] ?? '',              // J
+                $row['kg_po'] ?? 0,
                 number_format($row['terima_kg'], 2),
                 number_format($row['terima_kg'] - $row['kgs'], 2),
                 number_format($row['terima_kg'] / $row['kgs'], 2) * 100 . '%', // terima
@@ -6973,8 +7044,8 @@ class ExcelController extends BaseController
                 $row['plus_pck_kg'] == 0 ? '' : number_format($row['plus_pck_kg'], 2),
                 $row['plus_pck_cns'] == 0 ? '' : $row['plus_pck_cns'],
                 ($row['plus_pck_kg'] / $row['kgs']) == 0 ? '' : number_format($row['plus_pck_kg'] / $row['kgs'], 2) * 100 . '%',
-                $row['lebih_pakai_kg'] == 0 ? '' : number_format($row['lebih_pakai_kg'], 2),
-                ($row['lebih_pakai_kg'] / $row['kgs']) == 0 ? '' : number_format($row['lebih_pakai_kg'] / $row['kgs'], 2) * 100 . '%',
+                $row['ttl_tambahan_kg'] == 0 ? '' : number_format($row['ttl_tambahan_kg'], 2),
+                ($row['ttl_tambahan_kg'] / $row['kgs']) == 0 ? '' : number_format($row['ttl_tambahan_kg'] / $row['kgs'], 2) * 100 . '%',
                 $retur_kg_psn,        // Z
                 $retur_persen_psn,    // AA
                 $retur_kg_po,         // AB
