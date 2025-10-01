@@ -504,4 +504,19 @@ class ApiController extends ResourceController
         }
         return $this->respond($out, 200);
     }
+    public function getNoModel()
+    {
+        $model = $this->ApsPerstyleModel->getNoModel();
+        return $this->response->setJSON($model);
+    }
+    public function getSisaPerSize($area, $noModel, $style)
+    {
+        $sisa = $this->ApsPerstyleModel->getSisaPerSize($area, $noModel, [$style]);
+        return $this->response->setJSON($sisa);
+    }
+    public function getBsMesin($area, $noModel, $style)
+    {
+        $bs = $this->BsMesinModel->getBsMesin($area, $noModel, [$style]);
+        return $this->response->setJSON($bs);
+    }
 }
