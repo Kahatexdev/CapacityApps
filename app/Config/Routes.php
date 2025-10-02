@@ -327,6 +327,8 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('editcylinder/(:any)', 'MesinController::editcylinderPlan/$1');
     $routes->post('deletecylinder/(:any)', 'MesinController::deletecylinderPlan/$1');
     $routes->get('allmachine', 'MesinController::allmachinePlan');
+    $routes->get('denah/(:any)', 'PlanningController::denahMesin/$1');
+    $routes->get('detailDenah', 'PlanningController::detailDenah');
 
     //planning
     $routes->get('dataplanning', 'PlanningController::listplanning');
@@ -717,6 +719,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('prosesInputProdManual', 'ProduksiController::inputProduksiManual');
     // data order
     $routes->get('dataorderperarea/(:any)', 'OrderController::DetailOrderPerAreaPlan/$1');
+    $routes->get('formatImportInisial', 'ExcelController::formatImportInisial/$1');
     $routes->get('detailPdk/(:any)/(:any)', 'OrderController::pdkDetail/$1/$2');
     $routes->post('inputinisial', 'UserController::inputinisial');
     $routes->get('statusorder/(:any)', 'OrderController::statusOrderArea/$1');

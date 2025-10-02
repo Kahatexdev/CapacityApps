@@ -19,6 +19,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\UserModel;
 use App\Models\BsMesinModel;
 use App\Models\MonthlyMcModel;
+use App\Models\MachinesModel;
 
 use DateTime;
 
@@ -39,6 +40,7 @@ class GodController extends BaseController
     protected $BsModel;
     protected $BsMesinModel;
     protected $MonthlyMcModel;
+    protected $machinesModel;
 
 
     public function __construct()
@@ -57,6 +59,7 @@ class GodController extends BaseController
         $this->BsModel = new BsModel();
         $this->BsMesinModel = new BsMesinModel();
         $this->MonthlyMcModel = new MonthlyMcModel();
+        $this->machinesModel = new MachinesModel();
 
         if ($this->filters   = ['role' => ['capacity', 'planning', 'god', session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -1031,7 +1034,7 @@ class GodController extends BaseController
         $bulan = $this->request->getGet('bulan');
         $tahun = $this->request->getGet('tahun');
         $area = $this->request->getGet('area');
-
+        $detailMc = $this->machinesModel->checkExist($area);
         if (!$bulan || !$tahun) {
             return $this->response->setJSON(['error' => 'Bulan dan Tahun wajib diisi']);
         }
@@ -1078,7 +1081,7 @@ class GodController extends BaseController
             }
 
             // Kirim bulk ke API
-            $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/getGwBulk';
+            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getGwBulk';
             $options = [
                 'http' => [
                     'method'  => 'POST',
@@ -1141,7 +1144,8 @@ class GodController extends BaseController
                 'targetday' => $targetMonth['total_output'],
                 'targetOutput' => $targetMonth['total_output'] * (int)$jumhari,
                 'hari' => $jumhari,
-                'planmc' => $targetMonth['mesin']
+                'planmc' => $targetMonth['mesin'],
+                'mesinDetail' => $detailMc
             ];
 
             return $this->response->setJSON($data);
@@ -1184,7 +1188,7 @@ class GodController extends BaseController
                 ];
             }
             // Kirim bulk ke API
-            $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/getGwBulk';
+            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getGwBulk';
             $options = [
                 'http' => [
                     'method'  => 'POST',

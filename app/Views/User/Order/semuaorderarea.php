@@ -17,7 +17,7 @@
                         <div>
 
 
-
+                            <a href="<?= base_url($role . '/formatImportInisial') ?>" class="btn btn-success bg-gradient-success shadow text-center border-radius-md">Format Import Inisial</a>
                             <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-success bg-gradient-success shadow text-center border-radius-md">
                                 Import Inisial
                             </button>

@@ -28,39 +28,53 @@
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
             <div class="card">
                 <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-6">
+                    <div class="row align-items-center">
+                        <!-- LEFT TITLE -->
+                        <div class="col-md-6 mb-2 mb-md-0">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Socks System</p>
-                                <h5 class="font-weight-bolder mb-0">
+                                <p class="text-sm mb-0 text-capitalize fw-bold">Socks System</p>
+                                <h5 class="fw-bolder mb-0">
                                     Key Performance Indicator Monthly
                                 </h5>
                             </div>
                         </div>
-                        <div class="col-6 text-end">
-                            <div>
-                                Filters:
 
-                                <select id="filter-area" class="form-control d-inline w-auto">
+                        <!-- RIGHT FILTERS + BUTTON -->
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-md-end align-items-center gap-2 flex-wrap">
+                                <label class="fw-semibold mb-0 me-1">Filters:</label>
+
+                                <!-- Area -->
+                                <select id="filter-area" class="form-select w-auto">
                                     <?php foreach ($area as $ar): ?>
-                                        <option value="<?= $ar ?>"><?= $ar ?></option>
+                                        <option value="<?= esc($ar) ?>"><?= esc($ar) ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <select id="filter-bulan" class="form-control d-inline w-auto">
+
+                                <!-- Bulan -->
+                                <select id="filter-bulan" class="form-select w-auto">
                                     <option value="">Semua Bulan</option>
                                     <?php for ($i = 1; $i <= 12; $i++): ?>
-                                        <option value="<?= str_pad($i, 2, '0', STR_PAD_LEFT) ?>"><?= date("F", mktime(0, 0, 0, $i, 1)) ?></option>
+                                        <option value="<?= str_pad($i, 2, '0', STR_PAD_LEFT) ?>">
+                                            <?= date('F', mktime(0, 0, 0, $i, 1)) ?>
+                                        </option>
                                     <?php endfor; ?>
                                 </select>
-                                <select id="filter-tahun" class="form-control d-inline w-auto">
+
+                                <!-- Tahun -->
+                                <select id="filter-tahun" class="form-select w-auto">
                                     <option value="">Semua Tahun</option>
-                                    <?php for ($i = date("Y") - 5; $i <= date("Y"); $i++): ?>
+                                    <?php for ($i = date('Y') - 5; $i <= date('Y'); $i++): ?>
                                         <option value="<?= $i ?>"><?= $i ?></option>
                                     <?php endfor; ?>
                                 </select>
+
+                                <!-- Tombol Layout MC -->
+                                <div id="layoutMc"></div>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
 
@@ -339,12 +353,11 @@
             data: {
                 bulan: bulan,
                 tahun: tahun,
-
                 area: area
             },
             dataType: "json",
             success: function(response) {
-                dashboard(response);
+                dashboard(response, area);
             }
         });
     }
@@ -402,7 +415,7 @@
 
 
 
-    function dashboard(data) {
+    function dashboard(data, area) {
         let deffect = parseFloat(data.deffect).toFixed(2); // Format 2 desimal
         let output = parseInt(data.output / 24).toLocaleString(); // Bagi 2, format angka
         let pph = parseInt(data.targetOutput).toLocaleString(); // Format angka
@@ -414,7 +427,7 @@
         let productivity = data.productivity;
         let planMc = data.planmc;
         let targetday = parseInt(data.targetday).toLocaleString();
-
+        const layoutMc = document.getElementById('layoutMc')
         document.getElementById('deffectRate').textContent = `${deffect}%`;
         document.getElementById('output').textContent = `${output} dz`;
         document.getElementById('pph').textContent = `${pph} dz`;
@@ -443,6 +456,21 @@
 
         // Tentukan warna progress bar berdasarkan percent
         let progressColor = percent < 100 ? "bg-gradient-info" : (percent == 100 ? "bg-gradient-success" : "bg-gradient-danger");
+        // misalnya area sudah ada di JS
+        if (data.mesinDetail) {
+            const layoutUrl = <?= json_encode(base_url($role . '/denah/')) ?>;
+            const urel = layoutUrl + encodeURIComponent(area);
+
+            layoutMc.innerHTML = `
+        <a class="btn btn-info" href="${urel}" target="_blank">
+            LAYOUT MC<i class="fas fa-th ms-2"></i>
+        </a>
+    `;
+        } else {
+            // hapus tombol jika tidak ada data
+            layoutMc.innerHTML = '';
+        }
+
 
         progres.innerHTML = `
         <div class="progress-info">

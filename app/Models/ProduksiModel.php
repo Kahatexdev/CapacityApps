@@ -576,4 +576,11 @@ class ProduksiModel extends Model
 
         return $builder->get()->getResultArray();
     }
+    public function cekProduksi($area, $tanggal)
+    {
+        return $this->where('area', $area)
+            ->where('tgl_produksi', $tanggal)
+            ->limit(1)
+            ->countAllResults() > 0;
+    }
 }

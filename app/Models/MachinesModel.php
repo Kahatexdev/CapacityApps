@@ -110,4 +110,50 @@ class MachinesModel extends Model
       ->where('area', $area)
       ->findAll();
   }
+  public function checkExist(string $area): bool
+  {
+    // misal kolom area namanya `area`
+    return $this->where('area', $area)
+      ->limit(1)
+      ->countAllResults() > 0;
+  }
+  public function getMachinesPlan($tanggal, $area)
+  {
+    $db = \Config\Database::connect();
+
+    $sql = "
+        SELECT
+            m.id,
+            m.no_mc,
+            m.jarum,
+            m.area,
+            p.mastermodel,
+            p.inisial,
+            p.idapsperstyle,
+            CASE
+                WHEN p.mastermodel IS NULL THEN m.status
+                ELSE 'running'
+            END AS status
+        FROM machines m
+        LEFT JOIN (
+            SELECT 
+                mp.id_mesin,
+                aps.machinetypeid,
+                aps.mastermodel,
+                aps.inisial,
+                aps.idapsperstyle
+            FROM mesin_pernomor mp
+            LEFT JOIN apsperstyle aps
+                ON aps.idapsperstyle = mp.idapsperstyle
+            WHERE DATE(?) BETWEEN DATE(mp.start_mesin) AND DATE(mp.stop_mesin)
+              AND aps.factory = ?
+        ) p
+            ON m.id   = p.id_mesin
+           AND m.jarum  = p.machinetypeid
+        WHERE m.area = ?
+        ORDER BY m.id ASC
+    ";
+
+    return $db->query($sql, [$tanggal, $area, $area])->getResult();
+  }
 }
