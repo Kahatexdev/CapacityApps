@@ -826,48 +826,78 @@ class PlanningController extends BaseController
     public function denahMesin($area)
     {
         $tanggal = $this->request->getGet('date') ?? date('Y-m-d');
+        $cekProd = $this->produksiModel->cekProduksi($area, $tanggal);
+        if ($cekProd) {
+            $rawLayout = $this->machinesModel->getMachineWithProduksi($tanggal, $area);
+            $grouped = [];
 
-        $rawLayout = $this->machinesModel->getMachineWithProduksi($tanggal, $area);
+            foreach ($rawLayout as $row) {
+                // $row adalah stdClass (karena model pakai getResult())
+                $key = $row->no_mc . '_' . $row->jarum . '_' . ($row->tgl_produksi ?? 'null');
 
-        // Kelompokkan data berdasarkan no_mc, jarum, tgl_produksi
-        $grouped = [];
+                if (!isset($grouped[$key])) {
+                    $grouped[$key] = [
+                        'id'           => $row->id,
+                        'no_mc'        => $row->no_mc,
+                        'jarum'        => $row->jarum,
+                        'area'         => $row->area,
+                        'tgl_produksi' => $row->tgl_produksi,
+                        'status'       => $row->status,
+                        'mastermodel'  => [],
+                        'inisial'      => [],
+                        'id_produksi'  => [],
+                        'idapsperstyle' => [],
+                    ];
+                }
 
-        foreach ($rawLayout as $row) {
-            // $row adalah stdClass (karena model pakai getResult())
-            $key = $row->no_mc . '_' . $row->jarum . '_' . ($row->tgl_produksi ?? 'null');
+                if ($row->mastermodel && !in_array($row->mastermodel, $grouped[$key]['mastermodel'])) {
+                    $grouped[$key]['mastermodel'][] = $row->mastermodel;
+                }
 
-            if (!isset($grouped[$key])) {
-                $grouped[$key] = [
-                    'id'           => $row->id,
-                    'no_mc'        => $row->no_mc,
-                    'jarum'        => $row->jarum,
-                    'area'         => $row->area,
-                    'tgl_produksi' => $row->tgl_produksi,
-                    'status'       => $row->status,
-                    'mastermodel'  => [],
-                    'inisial'      => [],
-                    'id_produksi'  => [],
-                    'idapsperstyle' => [],
-                ];
+                if ($row->inisial && !in_array($row->inisial, $grouped[$key]['inisial'])) {
+                    $grouped[$key]['inisial'][] = $row->inisial;
+                }
+
+                if ($row->id_produksi && !in_array($row->id_produksi, $grouped[$key]['id_produksi'])) {
+                    $grouped[$key]['id_produksi'][] = $row->id_produksi;
+                }
+
+                if ($row->idapsperstyle && !in_array($row->idapsperstyle, $grouped[$key]['idapsperstyle'])) {
+                    $grouped[$key]['idapsperstyle'][] = $row->idapsperstyle;
+                }
             }
+        } else {
 
-            if ($row->mastermodel && !in_array($row->mastermodel, $grouped[$key]['mastermodel'])) {
-                $grouped[$key]['mastermodel'][] = $row->mastermodel;
-            }
+            $dataPlan = $this->machinesModel->getMachinesPlan($tanggal, $area);
+            $grouped = [];
 
-            if ($row->inisial && !in_array($row->inisial, $grouped[$key]['inisial'])) {
-                $grouped[$key]['inisial'][] = $row->inisial;
-            }
+            foreach ($dataPlan as $row) {
+                // $row adalah stdClass (karena model pakai getResult())
+                $key = $row->no_mc . '_' . $row->jarum . '_';
 
-            if ($row->id_produksi && !in_array($row->id_produksi, $grouped[$key]['id_produksi'])) {
-                $grouped[$key]['id_produksi'][] = $row->id_produksi;
-            }
+                if (!isset($grouped[$key])) {
+                    $grouped[$key] = [
+                        'id'           => $row->id,
+                        'no_mc'        => $row->no_mc,
+                        'jarum'        => $row->jarum,
+                        'area'         => $row->area,
+                        'status'       => $row->status,
+                        'mastermodel'  => [],
+                        'inisial'      => [],
+                        'id_produksi'      => [],
+                        'idapsperstyle'      => [],
+                    ];
+                }
 
-            if ($row->idapsperstyle && !in_array($row->idapsperstyle, $grouped[$key]['idapsperstyle'])) {
-                $grouped[$key]['idapsperstyle'][] = $row->idapsperstyle;
+                if ($row->mastermodel && !in_array($row->mastermodel, $grouped[$key]['mastermodel'])) {
+                    $grouped[$key]['mastermodel'][] = $row->mastermodel;
+                }
+
+                if ($row->inisial && !in_array($row->inisial, $grouped[$key]['inisial'])) {
+                    $grouped[$key]['inisial'][] = $row->inisial;
+                }
             }
         }
-
         // gabungkan mastermodel/inisial lalu konversi ke array (view kita pakai array)
         $layout = array_map(function ($item) {
             $item['mastermodel'] = implode(', ', $item['mastermodel']);

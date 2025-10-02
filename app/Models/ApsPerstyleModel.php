@@ -569,7 +569,7 @@ class ApsPerstyleModel extends Model
 
     public function getTotalOrderWeek($cek)
     {
-        return $this->select('machinetypeid, SUM(qty) AS qty, SUM(sisa) AS sisa, delivery')
+        return $this->select('machinetypeid, SUM(qty) AS qty, SUM(IF(sisa > 0, sisa, 0)) AS sisa, delivery')
             ->where('production_unit', 'CJ')
             ->where('machinetypeid', $cek['jarum'])
             ->where('delivery>=', $cek['start'])

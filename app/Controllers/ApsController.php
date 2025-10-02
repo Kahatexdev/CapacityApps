@@ -119,6 +119,7 @@ class ApsController extends BaseController
     {
         $pdk = [];
         $pdkProg = $this->ApsPerstyleModel->getProgressDetail($model, $area);
+
         $today = date('Y-m-d');
 
         // Grup by mastermodel dan machinetypeid (jarum)

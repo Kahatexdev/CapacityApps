@@ -9475,4 +9475,61 @@ class ExcelController extends BaseController
         $writer->save('php://output');
         exit;
     }
+    public function formatImportInisial()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $styleTitle = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FF000000'],
+                'size' => 15
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+        ];
+        $styleHeader = [
+            'font' => [
+                'bold' => true, // Tebalkan teks
+                'color' => ['argb' => 'FFFFFFFF']
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER, // Alignment rata tengah
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN, // Gaya garis tipis
+                    'color' => ['argb' => 'FF000000'],    // Warna garis hitam
+                ],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID, // Jenis pengisian solid
+                'startColor' => ['argb' => 'FF67748e'], // Warna latar belakang biru tua (HEX)
+            ],
+        ];
+
+        $sheet->setCellValue('A1', 'Format Import Inisial');
+        $sheet->mergeCells('A1:C1');
+        $sheet->getStyle('A1:C1')->applyFromArray($styleTitle);
+        // Tulis header
+        $sheet->setCellValue('A3', 'PDK');
+        $sheet->setCellValue('B3', 'Style Size');
+        $sheet->setCellValue('C3', 'Inisial');
+        $sheet->getStyle('A3')->applyFromArray($styleHeader);
+        $sheet->getStyle('B3')->applyFromArray($styleHeader);
+        $sheet->getStyle('C3')->applyFromArray($styleHeader);
+
+        // Buat writer dan output file Excel
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'Format Import Inisial.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit;
+    }
 }
