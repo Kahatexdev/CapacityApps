@@ -6302,6 +6302,7 @@ class ExcelController extends BaseController
         }
 
         $result = json_decode($response, true);
+        // dd($result);
         if (!is_array($result)) {
             return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'message' => 'Data tidak valid dari API']);
         }
@@ -7001,7 +7002,7 @@ class ExcelController extends BaseController
             $retur_persen_psn = '';
             $retur_persen_po = '';
 
-            $kgs = (float)$row['kgs'];
+            $kgs = (float)$row['kg_po'];
             $retur = (float)$row['kgs_retur'];
             $poplus_mc_kg = (float)$row['poplus_mc_kg'];
             $plus_pck_kg = (float)$row['plus_pck_kg'];
@@ -7033,19 +7034,19 @@ class ExcelController extends BaseController
                 $row['loss'] ?? '',              // J
                 $row['kg_po'] ?? 0,
                 number_format($row['terima_kg'], 2),
-                number_format($row['terima_kg'] - $row['kgs'], 2),
-                number_format($row['terima_kg'] / $row['kgs'], 2) * 100 . '%', // terima
+                number_format($row['terima_kg'] - $row['kg_po'], 2),
+                number_format($row['terima_kg'] / $row['kg_po'], 2) * 100 . '%', // terima
                 number_format($row['sisa_bb_mc'], 2), // sisa mesin
                 $row['sisa_order_pcs'] == 0 ? '' : $row['sisa_order_pcs'],
                 $row['poplus_mc_kg'] == 0 ? '' : number_format($row['poplus_mc_kg'], 2),
                 $row['poplus_mc_cns'] == 0 ? '' : $row['poplus_mc_cns'],
-                ($row['poplus_mc_kg'] / $row['kgs']) == 0 ? '' : number_format($row['poplus_mc_kg'] / $row['kgs'], 2) * 100 . '%',
+                ($row['poplus_mc_kg'] / $row['kg_po']) == 0 ? '' : number_format($row['poplus_mc_kg'] / $row['kg_po'], 2) * 100 . '%',
                 $row['plus_pck_pcs'] == 0 ? '' : number_format($row['plus_pck_pcs'], 2),
                 $row['plus_pck_kg'] == 0 ? '' : number_format($row['plus_pck_kg'], 2),
                 $row['plus_pck_cns'] == 0 ? '' : $row['plus_pck_cns'],
-                ($row['plus_pck_kg'] / $row['kgs']) == 0 ? '' : number_format($row['plus_pck_kg'] / $row['kgs'], 2) * 100 . '%',
+                ($row['plus_pck_kg'] / $row['kg_po']) == 0 ? '' : number_format($row['plus_pck_kg'] / $row['kg_po'], 2) * 100 . '%',
                 $row['ttl_tambahan_kg'] == 0 ? '' : number_format($row['ttl_tambahan_kg'], 2),
-                ($row['ttl_tambahan_kg'] / $row['kgs']) == 0 ? '' : number_format($row['ttl_tambahan_kg'] / $row['kgs'], 2) * 100 . '%',
+                ($row['ttl_tambahan_kg'] / $row['kg_po']) == 0 ? '' : number_format($row['ttl_tambahan_kg'] / $row['kg_po'], 2) * 100 . '%',
                 $retur_kg_psn,        // Z
                 $retur_persen_psn,    // AA
                 $retur_kg_po,         // AB
