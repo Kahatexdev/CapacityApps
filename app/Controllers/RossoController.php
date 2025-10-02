@@ -673,6 +673,7 @@ class RossoController extends BaseController
     }
     public function reportPemesanan($area)
     {
+        $tglPakai = DATE('Y-m-d');
         function fetchApiData($url)
         {
             try {
@@ -691,10 +692,12 @@ class RossoController extends BaseController
             }
         }
 
-        $dataList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listReportPemesanan/$area");
+        $dataList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listReportPemesanan/$area/$tglPakai");
+        error_log("Response from listPemesanan API: " . print_r($dataList, true));
         if (!is_array($dataList)) {
             die('Error: Invalid response format for listPemesanan API.');
         }
+
 
         foreach ($dataList as $key => $order) {
             $dataList[$key]['ttl_kebutuhan_bb'] = 0;

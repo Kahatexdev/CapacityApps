@@ -72,6 +72,11 @@ $routes->group(
 
 
         $routes->get('getQtyOrderBulk', 'ApiController::getQtyOrderBulk');
+
+        //po tambahan
+        $routes->get('getNoModel', 'ApiController::getNoModel');
+        $routes->get('getSisaPerSize/(:any)/(:any)/(:any)', 'ApiController::getSisaPerSize/$1/$2/$3');
+        $routes->get('getBsMesin/(:any)/(:any)/(:any)', 'ApiController::getBsMesin/$1/$2/$3');
     }
 );
 
