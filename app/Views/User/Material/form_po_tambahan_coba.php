@@ -289,11 +289,11 @@
                                 </div>
                             </div> -->
                         </div>
-                        <div class="row">
+                        <!-- <div class="row">
                             <div class="col-md-12 d-flex align-items-end">
                                 <button class="btn btn-danger remove-size-row w-100"><i class="fa fa-trash"></i></button>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 
