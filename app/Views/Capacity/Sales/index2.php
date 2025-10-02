@@ -24,6 +24,7 @@
             });
         </script>
     <?php endif; ?>
+
     <div class="row my-4">
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
             <div class="card">
@@ -88,6 +89,36 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="row">
+        <?php foreach ($result as $res): ?>
+            <div class="col-xl-2 col-sm-6 mb-xl-0 mb-4">
+                <div class="card shadow-sm border-0 rounded-3">
+                    <div class="card-body p-3">
+                        <div class="text-center">
+                            <!-- Judul Bulan -->
+                            <h6 class="fw-bold text-primary mb-3">
+                                <?= strftime('%b %Y', strtotime($res['month'] . '-01')); ?>
+                            </h6>
+
+                            <!-- Data Order -->
+                            <p class="mb-1 text-muted">
+                                <span class="fw-semibold">Confirm Order:</span>
+                                <?= number_format($res['confirm_order']); ?> dz
+                            </p>
+                            <p class="mb-1 text-muted">
+                                <span class="fw-semibold">Sisa Order:</span>
+                                <?= number_format($res['sisa_order']); ?> dz
+                            </p>
+                            <p class="mb-0 text-muted">
+                                <span class="fw-semibold">Sisa Booking:</span>
+                                <?= number_format($res['sisa_booking']); ?> dz
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach ?>
     </div>
 </div>
 

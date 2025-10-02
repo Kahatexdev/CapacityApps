@@ -322,4 +322,11 @@ class BookingModel extends Model
             ->orderBy('data_booking.tgl_terima_booking, data_booking.needle, data_booking.delivery', 'ASC')
             ->findAll();
     }
+    public function getSisaBookingMonth($month)
+    {
+        return $this->select('ROUND(SUM(sisa_booking/24)) AS sisa_booking')
+            ->where("DATE_FORMAT(delivery, '%Y-%m')", $month)
+            ->where('status !=', 'cancel booking')
+            ->first() ?? ['sisa_booking' => 0];
+    }
 }

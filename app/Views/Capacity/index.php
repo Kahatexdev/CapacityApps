@@ -24,6 +24,7 @@
             });
         </script>
     <?php endif; ?>
+
     <div class="row my-4">
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
             <div class="card">
@@ -224,6 +225,8 @@
         </div>
 
     </div>
+
+
     <div class="row my-3">
         <div class="col-lg-12">
             <div class="card z-index-2">
