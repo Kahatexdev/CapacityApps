@@ -15,7 +15,7 @@ class ApsPerstyleModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['idapsperstyle', 'machinetypeid', 'mastermodel', 'size', 'delivery', 'qty', 'sisa', 'seam', 'factory', 'production_unit', 'smv', 'no_order', 'country', 'color', 'po_plus', 'inisial'];
+    protected $allowedFields    = ['idapsperstyle', 'machinetypeid', 'mastermodel', 'size', 'delivery', 'qty', 'sisa', 'seam','process_routes', 'factory', 'production_unit', 'smv', 'no_order', 'country', 'color', 'po_plus', 'inisial'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -1209,6 +1209,9 @@ class ApsPerstyleModel extends Model
         if (!empty($validate['seam'])) {
             $builder->like('apsperstyle.seam', $validate['seam']);
         }
+        if (!empty($validate['process_routes'])) {
+            $builder->like('apsperstyle.process_routes', $validate['process_routes']);
+        }
 
         if (!empty($validate['tglTurun']) && !empty($validate['tglTurunAkhir'])) {
             $builder->where('data_model.created_at >=', $validate['tglTurun']);
@@ -1391,5 +1394,15 @@ class ApsPerstyleModel extends Model
             ->where('factory', $area)
             ->groupBy('size')
             ->findAll();
+    }
+    public function getTotalOrderMonth($month)
+    {
+        return $this->select('
+            SUM(qty/24) AS qty, 
+            SUM(CASE WHEN sisa > 0 THEN sisa/24 ELSE 0 END) AS sisa
+        ')
+            ->where('production_unit', 'CJ')
+            ->where("DATE_FORMAT(delivery, '%Y-%m')", $month)
+            ->first() ?? ['qty' => 0, 'sisa' => 0];
     }
 }

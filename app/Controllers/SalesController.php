@@ -2349,6 +2349,24 @@ class SalesController extends BaseController
         $dataJarum = $this->jarumModel->getAliasJrm(); // data all jarum
         $currentMonth = new \DateTime(); // Membuat objek DateTime untuk tanggal saat ini
         $thisMonth = $currentMonth->format('F-Y'); // Mengambil nama bulan dan tahun saat ini
+        // List 6 bulan dari bulan sekarang
+        $months = [];
+        for ($i = 0; $i < 6; $i++) {
+            $months[] = date('Y-m', strtotime("+$i month"));
+        }
+
+        $result = [];
+        foreach ($months as $month) {
+            $Orders = $this->ApsPerstyleModel->getTotalOrderMonth($month);
+            $booking = $this->bookingModel->getSisaBookingMonth($month);
+            // dd($Orders);
+            $result[] = [
+                'month'         => $month,
+                'sisa_booking'  => $booking['sisa_booking'] ?? 0,
+                'confirm_order' => $Orders['qty'] ?? 0,
+                'sisa_order'    => $Orders['sisa'] ?? 0
+            ];
+        }
         // $next = clone $currentMonth; // Mengkloning objek DateTime untuk menghindari perubahan pada objek asli
         // $next->modify('+1 month'); // Menambahkan satu bulan
         // $nextMonth = $next->format('F-Y');
@@ -2413,6 +2431,7 @@ class SalesController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
+            'result' => $result,
             'dataJarum' => $dataJarum,
             'thisMonth' => $thisMonth,
             // 'nextMonth' => $nextMonth,

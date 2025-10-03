@@ -65,6 +65,7 @@ class OrderModel extends Model
                         master_product_type.product_type, 
                         data_model.description, 
                         data_model.seam, 
+                        apsperstyle.process_routes, 
                         data_model.leadtime, 
                         ROUND(SUM(apsperstyle.qty/24), 0) AS qty, 
                         ROUND(SUM(apsperstyle.sisa/24), 0) AS sisa, 

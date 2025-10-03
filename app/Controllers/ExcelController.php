@@ -3711,6 +3711,7 @@ class ExcelController extends BaseController
         $jarum = $this->request->getPost('jarum');
         $pdk = $this->request->getPost('pdk');
         $seam = $this->request->getPost('seam');
+        $processRoutes = $this->request->getPost('process_routes');
         $tglTurun = $this->request->getPost('tgl_turun_order');
         $tglTurunAkhir = $this->request->getPost('tgl_turun_order_akhir') ?? '';
         $awal = $this->request->getPost('awal');
@@ -3723,6 +3724,7 @@ class ExcelController extends BaseController
             'jarum' => $jarum,
             'pdk' => $pdk,
             'seam' => $seam,
+            'process_routes' => $processRoutes,
             'tglTurun' => $tglTurun,
             'tglTurunAkhir' => $tglTurunAkhir,
             'awal' => $awal,
@@ -3805,18 +3807,20 @@ class ExcelController extends BaseController
         $sheet->setCellValue('G3', 'NO ORDER');
         $sheet->setCellValue('H3', 'BUYER');
         $sheet->setCellValue('I3', 'SEAM');
-        $sheet->setCellValue('J3', 'SMV');
-        $sheet->setCellValue('K3', 'PRODUCTION UNIT');
-        $sheet->setCellValue('L3', 'AREA');
-        $sheet->setCellValue('M3', 'JARUM');
-        $sheet->setCellValue('N3', 'INISIAL');
-        $sheet->setCellValue('O3', 'STYLE SIZE');
-        $sheet->setCellValue('P3', 'DELIVERY');
-        $sheet->setCellValue('Q3', 'QTY');
-        $sheet->setCellValue('R3', 'PRODUKSI');
-        $sheet->setCellValue('S3', 'SISA');
-        $sheet->setCellValue('T3', 'JLN MC');
-        $sheet->setCellValue('U3', 'DESCRIPTION');
+        $sheet->setCellValue('J3', 'PROCESS ROUTES');
+        $sheet->setCellValue('K3', 'SMV');
+        $sheet->setCellValue('L3', 'PRODUCTION UNIT');
+        $sheet->setCellValue('M3', 'AREA');
+        $sheet->setCellValue('N3', 'JARUM');
+        $sheet->setCellValue('O3', 'INISIAL');
+        $sheet->setCellValue('P3', 'STYLE SIZE');
+        $sheet->setCellValue('Q3', 'DELIVERY');
+        $sheet->setCellValue('R3', 'QTY');
+        $sheet->setCellValue('S3', 'PRODUKSI');
+        $sheet->setCellValue('T3', 'SISA');
+        $sheet->setCellValue('U3', 'JLN MC');
+        $sheet->setCellValue('V3', 'COLOR');
+        $sheet->setCellValue('W3', 'DESCRIPTION');
         $sheet->getStyle('A3')->applyFromArray($styleHeader);
         $sheet->getStyle('B3')->applyFromArray($styleHeader);
         $sheet->getStyle('C3')->applyFromArray($styleHeader);
@@ -3838,6 +3842,8 @@ class ExcelController extends BaseController
         $sheet->getStyle('S3')->applyFromArray($styleHeader);
         $sheet->getStyle('T3')->applyFromArray($styleHeader);
         $sheet->getStyle('U3')->applyFromArray($styleHeader);
+        $sheet->getStyle('V3')->applyFromArray($styleHeader);
+        $sheet->getStyle('W3')->applyFromArray($styleHeader);
 
         // Tulis data mulai dari baris 2
         $row = 4;
@@ -3861,18 +3867,20 @@ class ExcelController extends BaseController
             $sheet->setCellValue('G' . $row, $item['no_order']);
             $sheet->setCellValue('H' . $row, $item['kd_buyer_order']);
             $sheet->setCellValue('I' . $row, $item['seam']);
-            $sheet->setCellValue('J' . $row, $item['smv']);
-            $sheet->setCellValue('K' . $row, $item['production_unit']);
-            $sheet->setCellValue('L' . $row, $item['factory']);
-            $sheet->setCellValue('M' . $row, $item['machinetypeid']);
-            $sheet->setCellValue('N' . $row, $item['inisial']);
-            $sheet->setCellValue('O' . $row, $item['size']);
-            $sheet->setCellValue('P' . $row, $item['delivery']);
-            $sheet->setCellValue('Q' . $row, $item['qty_pcs']);
-            $sheet->setCellValue('R' . $row, $item['qty_produksi']);
-            $sheet->setCellValue('S' . $row, $item['sisa_pcs']);
-            $sheet->setCellValue('T' . $row, $item['jl_mc']);
-            $sheet->setCellValue('U' . $row, $item['description']);
+            $sheet->setCellValue('J' . $row, $item['process_routes']);
+            $sheet->setCellValue('K' . $row, $item['smv']);
+            $sheet->setCellValue('L' . $row, $item['production_unit']);
+            $sheet->setCellValue('M' . $row, $item['factory']);
+            $sheet->setCellValue('N' . $row, $item['machinetypeid']);
+            $sheet->setCellValue('O' . $row, $item['inisial']);
+            $sheet->setCellValue('P' . $row, $item['size']);
+            $sheet->setCellValue('Q' . $row, $item['delivery']);
+            $sheet->setCellValue('R' . $row, $item['qty_pcs']);
+            $sheet->setCellValue('S' . $row, $item['qty_produksi']);
+            $sheet->setCellValue('T' . $row, $item['sisa_pcs']);
+            $sheet->setCellValue('U' . $row, $item['jl_mc']);
+            $sheet->setCellValue('V' . $row, $item['color']);
+            $sheet->setCellValue('W' . $row, $item['description']);
             // 
             $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
@@ -3895,6 +3903,8 @@ class ExcelController extends BaseController
             $sheet->getStyle('S' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('T' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('U' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('V' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('W' . $row)->applyFromArray($styleBody);
             $row++;
         }
 

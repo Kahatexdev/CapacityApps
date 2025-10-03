@@ -578,9 +578,9 @@ class UserController extends BaseController
                 return redirect()->to(base_url(session()->get('role') . '/produksi'))->with('error', $errorMessage);
             }
 
-            return redirect()->to(base_url(session()->get('role') . '/dataorder'))->withInput()->with('success', 'Data Berhasil di Import');
+            return redirect()->to(base_url(session()->get('role') . '/dataorderperarea/' . session()->get('username')))->withInput()->with('success', 'Data Berhasil di Import');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/dataorder'))->with('error', 'No data found in the Excel file');
+            return redirect()->to(base_url(session()->get('role') . '/dataorderperarea/' . session()->get('username')))->with('error', 'No data found in the Excel file');
         }
     }
     private function processBatchnew($batchData, $db, &$failedRows)
