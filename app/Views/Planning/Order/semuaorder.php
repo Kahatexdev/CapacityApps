@@ -90,8 +90,8 @@
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Desc</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Seam</th>
-                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Leadtime</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Process Routes</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Leadtime</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Area</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty (dz)</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa (dz)</th>
