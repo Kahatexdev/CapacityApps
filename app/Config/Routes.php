@@ -75,8 +75,10 @@ $routes->group(
 
         //po tambahan
         $routes->get('getNoModel', 'ApiController::getNoModel');
-        $routes->get('getSisaPerSize/(:any)/(:any)/(:any)', 'ApiController::getSisaPerSize/$1/$2/$3');
-        $routes->get('getBsMesin/(:any)/(:any)/(:any)', 'ApiController::getBsMesin/$1/$2/$3');
+        $routes->get('getSisaPerSize/(:any)/(:any)', 'ApiController::getSisaPerSize/$1/$2');
+        $routes->get('getBsMesin/(:any)/(:any)', 'ApiController::getBsMesin/$1/$2');
+        $routes->get('getBsSetting', 'ApiController::getBsSetting');
+        $routes->get('getDataBruto', 'ApiController::getDataBruto');
     }
 );
 

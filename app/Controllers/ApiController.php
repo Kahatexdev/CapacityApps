@@ -509,14 +509,88 @@ class ApiController extends ResourceController
         $model = $this->ApsPerstyleModel->getNoModel();
         return $this->response->setJSON($model);
     }
-    public function getSisaPerSize($area, $noModel, $style)
+    public function getSisaPerSize($area, $noModel)
     {
-        $sisa = $this->ApsPerstyleModel->getSisaPerSize($area, $noModel, [$style]);
-        return $this->response->setJSON($sisa);
+        $styles = $this->request->getGet('styles'); // ambil array styles[]
+        if (empty($styles) || !is_array($styles)) {
+            return $this->response->setStatusCode(400)->setJSON(['error' => 'styles required']);
+        }
+
+        $sisaList = [];
+        foreach ($styles as $style) {
+            $sisa = $this->ApsPerstyleModel->getSisaPerSize($area, $noModel, [$style]);
+            $sisaList[$style] = $sisa ?? ['qty' => 0, 'sisa' => 0, 'po_plus' => 0];
+        }
+
+        return $this->response->setJSON($sisaList);
     }
-    public function getBsMesin($area, $noModel, $style)
+
+    public function getBsMesin($area, $noModel)
     {
-        $bs = $this->BsMesinModel->getBsMesin($area, $noModel, [$style]);
-        return $this->response->setJSON($bs);
+        $styles = $this->request->getGet('styles'); // ambil array styles[]
+        if (empty($styles) || !is_array($styles)) {
+            return $this->response->setStatusCode(400)->setJSON(['error' => 'styles required']);
+        }
+
+        $bsList = [];
+        foreach ($styles as $style) {
+            $bs = $this->BsMesinModel->getBsMesin($area, $noModel, [$style]);
+            $bsList[$style] = is_array($bs) && isset($bs['bs_gram']) ? (float)$bs['bs_gram'] : 0;
+        }
+
+        return $this->response->setJSON($bsList);
+    }
+
+    public function getBsSetting()
+    {
+        $area = $this->request->getGet('area');
+        $noModel = $this->request->getGet('no_model');
+        $styles = $this->request->getGet('styles'); // array of styles
+
+        if (empty($area) || empty($noModel) || empty($styles) || !is_array($styles)) {
+            return $this->response->setStatusCode(400)->setJSON(['error' => 'area, no_model, dan styles dibutuhkan']);
+        }
+
+        $bsSettingList = [];
+        foreach ($styles as $style) {
+            $validate = [
+                'area' => $area,
+                'style' => $style,
+                'no_model' => $noModel
+            ];
+
+            $idaps = $this->ApsPerstyleModel->getIdForBs($validate);
+            $bsSetting = $this->bsModel->getTotalBsSet($idaps);
+
+            $bsSettingList[$style] = isset($bsSetting['qty']) ? (int)$bsSetting['qty'] : 0;
+        }
+
+        return $this->response->setJSON($bsSettingList);
+    }
+
+    public function getDataBruto()
+    {
+        $area = $this->request->getGet('area');
+        $noModel = $this->request->getGet('no_model');
+        $styles = $this->request->getGet('styles'); // array of styles
+
+        // Debug: cek data yang diterima
+        log_message('debug', 'getDataBruto - area: ' . $area);
+        log_message('debug', 'getDataBruto - no_model: ' . $noModel);
+        log_message('debug', 'getDataBruto - styles: ' . print_r($styles, true));
+
+        if (empty($area) || empty($noModel) || empty($styles) || !is_array($styles)) {
+            return $this->response->setStatusCode(400)->setJSON(['error' => 'area, no_model, dan styles dibutuhkan']);
+        }
+
+        $brutoList = [];
+        foreach ($styles as $style) {
+            $prod = $this->orderModel->getDataBruto($area, $noModel, [$style]);
+            $brutoList[$style] = isset($prod['bruto']) ? (float)$prod['bruto'] : 0;
+        }
+
+        log_message('debug', 'getDataBruto - brutoList: ' . print_r($brutoList, true));
+
+        return $this->response->setJSON($brutoList);
     }
 }
