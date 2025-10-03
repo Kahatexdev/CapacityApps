@@ -1395,4 +1395,14 @@ class ApsPerstyleModel extends Model
             ->groupBy('size')
             ->findAll();
     }
+    public function getTotalOrderMonth($month)
+    {
+        return $this->select('
+            SUM(qty/24) AS qty, 
+            SUM(CASE WHEN sisa > 0 THEN sisa/24 ELSE 0 END) AS sisa
+        ')
+            ->where('production_unit', 'CJ')
+            ->where("DATE_FORMAT(delivery, '%Y-%m')", $month)
+            ->first() ?? ['qty' => 0, 'sisa' => 0];
+    }
 }

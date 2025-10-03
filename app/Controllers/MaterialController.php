@@ -548,24 +548,35 @@ class MaterialController extends BaseController
                         foreach ($styleList as $style) {
                             if (isset($style['no_model'], $style['style_size'], $style['gw'], $style['composition'], $style['loss'])) {
                                 $orderQty = $this->ApsPerstyleModel->getQtyOrder($style['no_model'], $style['style_size'], $area);
-                                $tambahanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getKgTambahan?no_model='
-                                    . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&style_size=' . urlencode($style['style_size']) . '&area=' . $area;
-                                $tambahan = $this->fetchApiData($tambahanApiUrl);
-                                $kgPoTambahan = $tambahan['ttl_keb_potambahan'] ?? 0;
-                                log_message('info', 'inii :' . $kgPoTambahan);
+                                // $tambahanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getKgTambahan?no_model='
+                                //     . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&style_size=' . urlencode($style['style_size']) . '&area=' . $area;
+                                // $tambahan = $this->fetchApiData($tambahanApiUrl);
+                                // $kgPoTambahan = $tambahan['ttl_keb_potambahan'] ?? 0;
+                                // log_message('info', 'inii :' . $kgPoTambahan);
                                 if (isset($orderQty['qty'])) {
                                     if (isset($style['item_type']) && stripos($style['item_type'], 'JHT') !== false) {
                                         $requirement = $style['kgs'] ?? 0;
                                     } else {
-                                        $requirement = ($orderQty['qty'] * $style['gw'] * ($style['composition'] / 100) * (1 + ($style['loss'] / 100)) / 1000) + $kgPoTambahan;
+                                        // $requirement = ($orderQty['qty'] * $style['gw'] * ($style['composition'] / 100) * (1 + ($style['loss'] / 100)) / 1000) + $kgPoTambahan;
+                                        $requirement = ($orderQty['qty'] * $style['gw'] * ($style['composition'] / 100) * (1 + ($style['loss'] / 100)) / 1000);
                                     }
                                     $totalRequirement += $requirement;
                                     $dataList[$key]['qty'] = $orderQty['qty'];
                                 }
                             }
                         }
-                        $dataList[$key]['ttl_kebutuhan_bb'] = $totalRequirement;
                     }
+                    $tambahanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getKgTambahan?no_model='
+                        . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&area=' . $area;
+                    $tambahan = $this->fetchApiData($tambahanApiUrl);
+                    // dd($tambahan);
+                    $kgPoTambahan = $tambahan['ttl_keb_potambahan'] ?? 0;
+                    log_message('info', 'inii :' . $kgPoTambahan);
+
+                    // Tambahkan kgPoTambahan ke total kebutuhan
+                    $totalRequirement += $kgPoTambahan;
+                    $dataList[$key]['ttl_kebutuhan_bb'] = $totalRequirement;
+
 
                     // penerimaan benang
                     $pengirimanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
@@ -1803,27 +1814,42 @@ class MaterialController extends BaseController
                 $qtyData = $this->ApsPerstyleModel->getQtyOrder($noModel, $data['style_size'], $area);
                 $qty         = (intval($qtyData['qty']) ?? 0);
 
-                // Ambil kg po tambahan
-                $PoPlus = 'http://172.23.44.14/MaterialSystem/public/api/getKgPoTambahan?no_model=' . $pemesanan['no_model']
-                    . '&item_type=' . urlencode($pemesanan['item_type'])
-                    . '&area=' . $area;
+                // // Ambil kg po tambahan
+                // $PoPlus = 'http://172.23.44.14/MaterialSystem/public/api/getKgPoTambahan?no_model=' . $pemesanan['no_model']
+                //     . '&item_type=' . urlencode($pemesanan['item_type'])
+                //     . '&area=' . $area;
 
-                $poPlusResponse = file_get_contents($PoPlus);
-                $getPoPlus     = json_decode($poPlusResponse, true);
+                // $poPlusResponse = file_get_contents($PoPlus);
+                // $getPoPlus     = json_decode($poPlusResponse, true);
 
 
-                $kgPoTambahan = floatval($getPoPlus['ttl_keb_potambahan'] ?? 0);
+                // $kgPoTambahan = floatval($getPoPlus['ttl_keb_potambahan'] ?? 0);
+
                 if ($qty >= 0) {
                     if (isset($pemesanan['item_type']) && stripos($pemesanan['item_type'], 'JHT') !== false) {
                         $kebutuhan = $data['kgs'] ?? 0;
                     } else {
-                        $kebutuhan = (($qty * $data['gw'] * $data['composition'] / 100 / 1000) * (1 + ($data['loss'] / 100))) + $kgPoTambahan;
+                        // $kebutuhan = (($qty * $data['gw'] * $data['composition'] / 100 / 1000) * (1 + ($data['loss'] / 100))) + $kgPoTambahan;
+                        $kebutuhan = (($qty * $data['gw'] * $data['composition'] / 100 / 1000) * (1 + ($data['loss'] / 100)));
                     }
                     $pemesanan['ttl_keb'] = $ttlKeb;
                 }
+
                 $ttlKeb += $kebutuhan;
                 $ttlQty += $qty;
             }
+            // Ambil kg po tambahan
+            $PoPlus = 'http://172.23.44.14/MaterialSystem/public/api/getKgTambahan?no_model=' . $pemesanan['no_model']
+                . '&item_type=' . urlencode($pemesanan['item_type'])
+                . '&kode_warna=' . urlencode($pemesanan['kode_warna'])
+                . '&area=' . $area;
+
+            $getPoPlus = $this->fetchApiData($PoPlus);
+            // dd($getPoPlus);
+            $kgPoTambahan = floatval($getPoPlus['ttl_keb_potambahan'] ?? 0);
+
+
+            $ttlKeb += $kgPoTambahan;
             $pemesanan['qty']     = $ttlQty; // ttl qty pcs
             $pemesanan['ttl_keb'] = $ttlKeb; // ttl kebutuhan bb
 
@@ -1870,33 +1896,46 @@ class MaterialController extends BaseController
                 $qtyData = $this->ApsPerstyleModel->getQtyOrder($noModel, $data['style_size'], $area);
                 $qty     = (intval($qtyData['qty']) ?? 0);
 
-                // Ambil kg po tambahan
-                $PoPlus = 'http://172.23.44.14/MaterialSystem/public/api/getKgPoTambahan?no_model=' . $retur['no_model']
-                    . '&item_type=' . urlencode($retur['item_type'])
-                    . '&area=' . $area;
+                // // Ambil kg po tambahan
+                // $PoPlus = 'http://172.23.44.14/MaterialSystem/public/api/getKgPoTambahan?no_model=' . $retur['no_model']
+                //     . '&item_type=' . urlencode($retur['item_type'])
+                //     . '&area=' . $area;
 
-                $poPlusResponse = file_get_contents($PoPlus);
-                $getPoPlus     = json_decode($poPlusResponse, true);
+                // $poPlusResponse = file_get_contents($PoPlus);
+                // $getPoPlus     = json_decode($poPlusResponse, true);
 
 
-                $kgPoTambahan = floatval(
-                    $getPoPlus['ttl_keb_potambahan'] ?? 0
-                );
+                // $kgPoTambahan = floatval(
+                //     $getPoPlus['ttl_keb_potambahan'] ?? 0
+                // );
 
                 if ($qty >= 0) {
                     if (isset($pemesanan['item_type']) && stripos($pemesanan['item_type'], 'JHT') !== false) {
                         $kebutuhan = $data['kgs'] ?? 0;
                     } else {
-                        $kebutuhan = (($qty * $data['gw'] * $data['composition'] / 100 / 1000) * (1 + ($data['loss'] / 100))) + $kgPoTambahan;
+                        // $kebutuhan = (($qty * $data['gw'] * $data['composition'] / 100 / 1000) * (1 + ($data['loss'] / 100))) + $kgPoTambahan;
+                        $kebutuhan = (($qty * $data['gw'] * $data['composition'] / 100 / 1000) * (1 + ($data['loss'] / 100)));
                     }
                     $retur['ttl_keb'] = $ttlKeb;
                 }
                 $ttlKeb += $kebutuhan;
                 $ttlQty += $qty;
             }
+
+            // // Ambil kg po tambahan
+            $PoPlus = 'http://172.23.44.14/MaterialSystem/public/api/getKgTambahan?no_model=' . $retur['no_model']
+                . '&item_type=' . urlencode($retur['item_type'])
+                . '&kode_warna=' . urlencode($retur['kode_warna'])
+                . '&area=' . $area;
+
+            $poPlusResponse = file_get_contents($PoPlus);
+            $getPoPlus     = json_decode($poPlusResponse, true);
+
+            $kgPoTambahan = floatval($getPoPlus['ttl_keb_potambahan'] ?? 0);
+
+            $ttlKeb += $kgPoTambahan;
             $retur['qty']     = $ttlQty; // ttl qty pcs
             $retur['ttl_keb'] = $ttlKeb; // ttl kebutuhan bb
-
 
             $mergedData[] = [
                 'no_model'           => $retur['no_model'],
