@@ -91,6 +91,7 @@
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Desc</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Seam</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Leadtime</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Process Routes</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Area</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty (dz)</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa (dz)</th>
@@ -222,6 +223,10 @@
                         <div class="form-group">
                             <label for="pdk" class="col-form-label">Seam</label>
                             <input type="text" class="form-control" name="seam">
+                        </div>
+                        <div class="form-group">
+                            <label for="pdk" class="col-form-label">Process Routes</label>
+                            <input type="text" class="form-control" name="process_routes">
                         </div>
                         <div class="form-group">
                             <label for="tgl_turun_order" class="col-form-label">Tgl Turun Order Dari</label>
@@ -358,6 +363,9 @@
                     },
                     {
                         "data": "seam"
+                    },
+                    {
+                        "data": "process_routes"
                     },
                     {
                         "data": "leadtime"
