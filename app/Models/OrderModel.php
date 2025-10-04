@@ -65,6 +65,7 @@ class OrderModel extends Model
                         master_product_type.product_type, 
                         data_model.description, 
                         data_model.seam, 
+                        apsperstyle.process_routes, 
                         data_model.leadtime, 
                         ROUND(SUM(apsperstyle.qty/24), 0) AS qty, 
                         ROUND(SUM(apsperstyle.sisa/24), 0) AS sisa, 
@@ -715,5 +716,19 @@ class OrderModel extends Model
         return $this->where('no_model', $model)
             ->set('start_mc', $tgl)
             ->update();
+    }
+
+    public function getDataBruto($area, $nomodel, $size)
+    {
+        return $this->select('apsperstyle.machinetypeid, apsperstyle.factory, data_model.no_model, apsperstyle.size, apsperstyle.inisial, (SELECT SUM(qty) FROM apsperstyle AS a WHERE a.mastermodel = data_model.no_model AND a.factory = apsperstyle.factory AND a.size = apsperstyle.size) AS qty, 
+        (SELECT SUM(sisa) FROM apsperstyle AS a WHERE a.mastermodel = data_model.no_model AND a.factory = apsperstyle.factory AND a.size = apsperstyle.size) AS sisa, (SELECT SUM(po_plus) FROM apsperstyle AS a WHERE a.mastermodel = data_model.no_model AND a.factory = apsperstyle.factory AND a.size = apsperstyle.size) AS po_plus, COALESCE(SUM(produksi.qty_produksi), 0) AS bruto')
+            ->join('apsperstyle', 'apsperstyle.mastermodel=data_model.no_model', 'left')
+            ->join('produksi', 'apsperstyle.idapsperstyle=produksi.idapsperstyle', 'left')
+            ->where('apsperstyle.factory', $area)
+            ->where('data_model.no_model', $nomodel)
+            ->whereIn('apsperstyle.size', $size)
+            ->groupBy('apsperstyle.size')
+            ->orderBy('apsperstyle.inisial', 'ASC')
+            ->findAll();
     }
 }

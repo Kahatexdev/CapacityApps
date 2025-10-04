@@ -129,7 +129,6 @@ class OrderController extends BaseController
         $role = session()->get('role');
         $dataBuyer = $this->orderModel->getBuyer();
         $dataArea = $this->jarumModel->getArea();
-
         $product = $this->productModel->findAll();
         $data = [
             'role' => session()->get('role'),
@@ -749,6 +748,7 @@ class OrderController extends BaseController
                             ];
                             $idProduct = $this->productModel->getId($prodtype);
 
+                            $seam = $row[23];
                             $leadtime = $row[24];
                             $processRoute = $row[25];
                             $lcoDate = $row[26];
@@ -766,7 +766,8 @@ class OrderController extends BaseController
                                 'sisa' => $qty,
                                 'country' => $country,
                                 'color' => $color,
-                                'seam' => $processRoute,
+                                'seam' => $seam,
+                                'process_routes' => $processRoute,
                                 'smv' => $sam,
                                 'production_unit' => 'PU Belum Dipilih',
                                 'factory' => 'Belum Ada Area'
@@ -775,7 +776,7 @@ class OrderController extends BaseController
                             $updateData = [
                                 'kd_buyer_order' => $custCode,
                                 'id_product_type' => $idProduct,
-                                'seam' => $processRoute,
+                                'seam' => $seam,
                                 'leadtime' => $leadtime,
                                 'description' => $description
                             ];
