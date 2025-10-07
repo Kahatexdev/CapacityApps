@@ -1885,6 +1885,7 @@ class OrderController extends BaseController
                     $idProduct = $this->productModel->getId($prodtype);
 
                     $leadtime = $row[24];
+                    $seam = $row[23];
                     $processRoute = $row[25];
                     $lcoDate = $row[26];
                     $rlcoDate = str_replace('/', '-', (substr($lcoDate, -10)));
@@ -1901,7 +1902,8 @@ class OrderController extends BaseController
                         'sisa' => $qty,
                         'country' => $country,
                         'color' => $color,
-                        'seam' => $processRoute,
+                        'seam' => $seam,
+                        'process_route' => $processRoute,
                         'smv' => $sam,
                         'production_unit' => 'PU Belum Dipilih',
                         'factory' => 'Belum Ada Area'
