@@ -1,5 +1,17 @@
 <?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
+<style>
+    .modal-xl {
+        max-width: 95% !important;
+        /* hampir full screen */
+    }
+
+    .modal-body {
+        max-height: 70vh;
+        /* biar scroll vertikal */
+        overflow-y: auto;
+    }
+</style>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
         <script>
@@ -396,19 +408,23 @@
         </div>
     </div>
     <div class="modal fade" id="modalMC" tabindex="-1" aria-labelledby="modalMCLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable"> <!-- ganti lg jadi xl -->
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalMCLabel">Detail Mesin</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="formMesin"> <!-- Form supaya bisa submit -->
+                <form id="formMesin">
                     <div id="hiddenFields"></div>
                     <input type="hidden" value="<?= $area ?>" name="area">
                     <input type="hidden" value="<?= $jarum ?>" name="jarum">
+
                     <div class="modal-body" id="mcTable">
-                        <!-- Table akan diinject via JS -->
+                        <div class="table-responsive" style="max-height:70vh; overflow-y:auto;">
+                            <!-- Table akan diinject via JS -->
+                        </div>
                     </div>
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-info">Simpan</button>
@@ -417,6 +433,7 @@
             </div>
         </div>
     </div>
+
 
     <script>
         const jarum = <?= json_encode($jarum); ?>;

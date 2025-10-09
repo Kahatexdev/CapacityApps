@@ -565,17 +565,17 @@ class MaterialController extends BaseController
                                 }
                             }
                         }
-                    }
-                    $tambahanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getKgTambahan?no_model='
-                        . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&area=' . $area;
-                    $tambahan = $this->fetchApiData($tambahanApiUrl);
-                    // dd($tambahan);
-                    $kgPoTambahan = $tambahan['ttl_keb_potambahan'] ?? 0;
-                    log_message('info', 'inii :' . $kgPoTambahan);
+                        $tambahanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getKgTambahan?no_model='
+                            . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&area=' . $area;
+                        $tambahan = $this->fetchApiData($tambahanApiUrl);
+                        // dd($tambahan);
+                        $kgPoTambahan = $tambahan['ttl_keb_potambahan'] ?? 0;
+                        log_message('info', 'inii :' . $kgPoTambahan);
 
-                    // Tambahkan kgPoTambahan ke total kebutuhan
-                    $totalRequirement += $kgPoTambahan;
-                    $dataList[$key]['ttl_kebutuhan_bb'] = $totalRequirement;
+                        // Tambahkan kgPoTambahan ke total kebutuhan
+                        $totalRequirement += $kgPoTambahan;
+                        $dataList[$key]['ttl_kebutuhan_bb'] = $totalRequirement;
+                    }
 
 
                     // penerimaan benang
