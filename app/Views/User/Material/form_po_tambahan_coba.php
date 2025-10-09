@@ -459,9 +459,11 @@
                 $template.find('.po-kg-perstyle').val(qtyPoKg.toFixed(2));
 
                 // simpan BASE untuk poplus (tanpa loss)
-                const baseSisaOrderKg = gwFinal > 0 ?
-                    sisaOrderVal * composition * gwFinal / 100 / 1000 :
-                    0;
+                let baseSisaOrderKg = 0;
+
+                if (gwFinal > 0 && sisaOrderVal > 0) {
+                    baseSisaOrderKg = (sisaOrderVal * composition * gwFinal) / 100 / 1000;
+                }
                 $template.find('.poplus-mc-kg').data("baseSisaOrderKg", baseSisaOrderKg);
 
                 // simpan BASE untuk plus-pck juga (tanpa loss)

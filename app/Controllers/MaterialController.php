@@ -1486,7 +1486,7 @@ class MaterialController extends BaseController
         }, $json);
 
         // Log isi items ke log file
-        log_message('debug', 'ITEMS untuk dikirim ke API: ' . json_encode($items));
+        // log_message('debug', 'ITEMS untuk dikirim ke API: ' . json_encode($items));
 
         $payload = ['items' => $items];
         $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/savePoTambahan';

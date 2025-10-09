@@ -593,4 +593,11 @@ class ApiController extends ResourceController
 
         return $this->response->setJSON($brutoList);
     }
+
+    public function getFilterArea()
+    {
+        $model = $this->request->getGet('no_model');
+        $area = $this->ApsPerstyleModel->getFilterArea($model);
+        return $this->response->setJSON($area);
+    }
 }

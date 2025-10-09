@@ -79,6 +79,8 @@ $routes->group(
         $routes->get('getBsMesin/(:any)/(:any)', 'ApiController::getBsMesin/$1/$2');
         $routes->get('getBsSetting', 'ApiController::getBsSetting');
         $routes->get('getDataBruto', 'ApiController::getDataBruto');
+        $routes->get('getFilterArea', 'ApiController::getFilterArea');
+
     }
 );
 
