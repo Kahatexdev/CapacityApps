@@ -207,7 +207,6 @@ class OrderModel extends Model
         $builder->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left');
         $builder->where('monthname(delivery)', $bulan);
         $builder->where('year(delivery)', $tahun);
-        $builder->where('machinetypeid', 'jc120');
         $builder->where('production_unit !=', 'MJ');
         $builder->orderby('created_at', 'desc');
         $builder->orderby('no_model', 'asc');

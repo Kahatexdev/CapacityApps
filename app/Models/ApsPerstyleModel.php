@@ -1405,4 +1405,11 @@ class ApsPerstyleModel extends Model
             ->where("DATE_FORMAT(delivery, '%Y-%m')", $month)
             ->first() ?? ['qty' => 0, 'sisa' => 0];
     }
+    public function getFilterArea($model)
+    {
+        return $this->select('factory AS area')
+            ->where('mastermodel', $model)
+            ->groupBy('factory')
+            ->findAll();
+    }
 }
