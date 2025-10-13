@@ -15,7 +15,7 @@ class ApsPerstyleModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['idapsperstyle', 'machinetypeid', 'mastermodel', 'size', 'delivery', 'qty', 'sisa', 'seam','process_routes', 'factory', 'production_unit', 'smv', 'no_order', 'country', 'color', 'po_plus', 'inisial'];
+    protected $allowedFields    = ['idapsperstyle', 'machinetypeid', 'mastermodel', 'size', 'delivery', 'qty', 'sisa', 'seam', 'process_routes', 'factory', 'production_unit', 'smv', 'no_order', 'country', 'color', 'po_plus', 'inisial'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -1048,9 +1048,10 @@ class ApsPerstyleModel extends Model
             YEAR(delivery) AS year
         FROM apsperstyle
         WHERE production_unit != 'MJ'
+        AND DATE_FORMAT(delivery, '%Y-%m') >= DATE_FORMAT(CURDATE(), '%Y-%m')
         GROUP BY DATE_FORMAT(delivery, '%Y-%m')
         ORDER BY MIN(delivery) ASC
-    ");
+        ");
 
         $result = $query->getResultArray();
         $data = [];
