@@ -37,6 +37,7 @@ class ApiController extends ResourceController
     protected $bsModel;
     protected $globalModel;
     protected $pengaduanModel;
+    protected $productType;
 
     protected $validation;
     protected $format = 'json';
@@ -600,5 +601,12 @@ class ApiController extends ResourceController
         $model = $this->request->getGet('no_model');
         $area = $this->ApsPerstyleModel->getFilterArea($model);
         return $this->response->setJSON($area);
+    }
+    public function getProductType()
+    {
+        $jarum = $this->request->getGet('jarum');
+
+        $data = $this->productModel->getTypePerjarum($jarum);
+        return $this->response->setJSON($data);
     }
 }

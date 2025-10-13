@@ -48,7 +48,7 @@
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <form id="inputCancel" action="<?= base_url($role . '/exportDataBooking'); ?>" method="POST">
+                <form id="inputCancel" action="<?= base_url($role . '/inputCancelBooking'); ?>" method="POST">
                     <div class="modal-body align-items-center">
                         <div class="form-group">
                             <label for="buyer" class="col-form-label">Buyer</label>
@@ -80,6 +80,14 @@
                         <div class="form-group">
                             <label for="tgl_turun_order" class="col-form-label">Delivery</label>
                             <input type="date" class="form-control" name="delivery">
+                        </div>
+                        <div class="form-group">
+                            <label for="qty" class="col-form-label">Qty Cancel</label>
+                            <input type="number" class="form-control" name="qty">
+                        </div>
+                        <div class="form-group">
+                            <label for="alasan" class="col-form-label">Alasan Cancel</label>
+                            <input type="text" class="form-control" name="alasan">
                         </div>
 
                     </div>
@@ -321,7 +329,7 @@
                     $prodType.empty().append('<option value="">-- Pilih Product Type --</option>');
                     if (response.length > 0) {
                         $.each(response, function(i, item) {
-                            $prodType.append(`<option value="${item.prod_type}">${item.prod_type}</option>`);
+                            $prodType.append(`<option value="${item.id_product_type}">${item.product_type}</option>`);
                         });
                     } else {
                         $prodType.append('<option value="">Tidak ada data</option>');

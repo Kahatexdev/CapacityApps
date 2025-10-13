@@ -905,4 +905,40 @@ class BookingController extends BaseController
             }
         }
     }
+    public function inputCancelBooking()
+    {
+        $data = [
+            'tgl_terima_booking' => $this->request->getPost('delivery'),
+            'kd_buyer_booking' => $this->request->getPost('buyer'),
+            'id_product_type' => $this->request->getPost('prodType'),
+            'no_order' => 'Manual Cancel Booking',
+            'no_booking' => 'Manual Cancel Booking',
+            'desc' => 'Manual Cancel Booking',
+            'opd' => $this->request->getPost('delivery'),
+            'delivery' => $this->request->getPost('delivery'),
+            'qty_booking' => $this->request->getPost('qty'),
+            'sisa_booking' => $this->request->getPost('qty'),
+            'leadtime' => 0,
+            'needle' => $this->request->getPost('jarum'),
+            'seam' => '-',
+            'status' => 'Cancel Booking',
+            'ref_id' => 0,
+            'created_at' => date('Y-m-d'),
+            'updated_at' => date('Y-m-d'),
+            'keterangan' => 'Manual Cancel Booking',
+        ];
+        $insert = $this->bookingModel->insert($data);
+        $insertId = $this->bookingModel->getInsertID();
+        $cancelData = [
+            'id_booking' => $insertId,
+            'qty_cancel' => $this->request->getPost('qty'),
+            'alasan' => $this->request->getPost('alasan'),
+        ];
+        $insertCancel = $this->cancelModel->insert($cancelData);
+        if ($insertCancel) {
+            return redirect()->to(base_url(session()->get('role') . '/databooking'))->with('success', 'Data  berhasil disimpan ');
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/databooking'))->with('error', 'Data  gagal disimpan ');
+        }
+    }
 }

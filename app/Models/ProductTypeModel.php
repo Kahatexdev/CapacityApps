@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use PhpParser\Node\Expr\FuncCall;
 
 class ProductTypeModel extends Model
 {
@@ -81,5 +82,9 @@ class ProductTypeModel extends Model
     public function getKonversi($jarum)
     {
         return $this->select('konversi, jarum')->where('jarum', $jarum)->where('product_type', 'NS-PS')->orWhere('product_type', 'GL-PL')->groupBy('jarum')->findAll();
+    }
+    public function getTypePerjarum($jarum)
+    {
+        return $this->select('id_product_type,product_type')->where('jarum', $jarum)->findAll();
     }
 }
