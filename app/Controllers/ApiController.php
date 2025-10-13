@@ -506,7 +506,8 @@ class ApiController extends ResourceController
     }
     public function getNoModel()
     {
-        $model = $this->ApsPerstyleModel->getNoModel();
+        $area    = $this->request->getGet('area');
+        $model = $this->ApsPerstyleModel->getModelArea($area);
         return $this->response->setJSON($model);
     }
     public function getSisaPerSize($area, $noModel)
