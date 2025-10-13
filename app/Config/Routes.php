@@ -108,6 +108,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('allbooking', 'BookingController::allbooking');
     $routes->post('transferQty', 'BookingController::transferQty');
     $routes->post('exportDataBooking', 'ExcelController::exportDataBooking');
+    $routes->post('inputCancelBooking', 'BookingController::inputCancelBooking');
 
     // order
     $routes->get('dataorder', 'OrderController::order');
