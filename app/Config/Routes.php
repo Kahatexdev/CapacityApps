@@ -81,6 +81,8 @@ $routes->group(
         $routes->get('getDataBruto', 'ApiController::getDataBruto');
         $routes->get('getFilterArea', 'ApiController::getFilterArea');
 
+        // proftype
+        $routes->get('getProductType', 'ApiController::getProductType');
     }
 );
 

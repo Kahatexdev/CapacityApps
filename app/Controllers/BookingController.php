@@ -55,6 +55,7 @@ class BookingController extends BaseController
     public function booking()
     {
         $dataJarum = $this->jarumModel->getJarum();
+
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $this->bookingModel->updateStatusBooking();
 
