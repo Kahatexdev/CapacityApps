@@ -79,7 +79,7 @@ $makeKey = function ($cell) use ($normUpper) {
 $colspanMapRaw = $colspanMapRaw ?? [
     // contoh: '25,26,27' => 2
     // '885,923,961,994,,995' => 4,
-    '962,995' => 6,
+    '662,695' => 6,
 ];
 $colspanMap = [];
 foreach ($colspanMapRaw as $key => $val) {
