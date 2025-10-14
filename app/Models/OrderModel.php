@@ -219,46 +219,54 @@ class OrderModel extends Model
     }
     public function tampilPerBulanByJarum($bulan, $tahun)
     {
-        $yesterday = date('Y-m-d', strtotime('-5 day'));
-
-        // Subquery: hitung mesin unik per idapsperstyle untuk tanggal yg dimaksud
-        $subquery = $this->db->table('produksi')
-            ->select('idapsperstyle, COUNT(DISTINCT no_mesin) AS total_mc')
-            ->where('DATE(tgl_produksi)', $yesterday)
-            ->groupBy('idapsperstyle')
-            ->getCompiledSelect();
+        $yesterday = date('Y-m-d', strtotime('-1 day'));
 
         $builder = $this->db->table('apsperstyle aps');
         $builder->select("
-        
-            ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' THEN aps.qty ELSE 0 END), 0) AS qty_tj,
-            ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' THEN aps.sisa ELSE 0 END), 0) AS sisa_tj,
-            ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' AND (aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%') THEN aps.qty/24 ELSE 0 END), 0) AS qty_autolink_tj, 
-            ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' AND (aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%') THEN aps.sisa/24 ELSE 0 END), 0) AS qty_autolink_tj, 
+            ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' THEN aps.qty/24 ELSE 0 END), 0) AS qty_tj,
+            ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_tj,
+            ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' AND (aps.seam LIKE '%AUTOLINK%' OR aps.seam LIKE '%AUTO LINK%') THEN aps.qty/24 ELSE 0 END), 0) AS qty_autolink_tj, 
+            ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' AND (aps.seam LIKE '%AUTOLINK%' OR aps.seam LIKE '%AUTO LINK%') THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_autolink_tj, 
+            ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' AND (aps.seam LIKE 'ROSSO%' OR aps.seam LIKE 'RS%') THEN aps.qty/24 ELSE 0 END), 0) AS qty_rosso_tj, 
+            ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' AND (aps.seam LIKE 'ROSSO%' OR aps.seam LIKE 'RS%') THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_rosso_tj, 
             
             ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' THEN aps.qty/24 ELSE 0 END), 0) AS qty_jc,
             ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_jc,
-            ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%') THEN aps.qty/24 ELSE 0 END), 0) AS qty_autolink_tj, 
-            ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%') THEN aps.sisa/24 ELSE 0 END), 0) AS qty_autolink_tj, 
-
-            --ROUND(SUM(CASE WHEN aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%' THEN aps.qty/24 ELSE 0 END), 0) AS qty_autolink,
-            --ROUND(SUM(CASE WHEN aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%' THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_autolink,
-
-            ROUND(SUM(CASE WHEN aps.seam LIKE '%ROSSO%' OR aps.seam LIKE '%RS%' THEN aps.qty/24 ELSE 0 END), 0) AS qty_rosso,
-            ROUND(SUM(CASE WHEN aps.seam LIKE '%ROSSO%' OR aps.seam LIKE '%RS%' THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_rosso,
-
-            -- actual MC: gunakan SUM(prod.total_mc) via LEFT JOIN ke subquery (prod.total_mc = mesin unik per idapsperstyle)
-            SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' THEN COALESCE(prod.total_mc,0) ELSE 0 END) AS actual_mc_tj,
-            SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' THEN COALESCE(prod.total_mc,0) ELSE 0 END) AS actual_mc_jc,
-            SUM(CASE WHEN (aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%') THEN COALESCE(prod.total_mc,0) ELSE 0 END) AS actual_mc_autolink,
-            SUM(CASE WHEN (aps.seam LIKE '%ROSSO%' OR aps.seam LIKE '%RS%') THEN COALESCE(prod.total_mc,0) ELSE 0 END) AS actual_mc_rosso
+            ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%') THEN aps.qty/24 ELSE 0 END), 0) AS qty_autolink_jc, 
+            ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%') THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_autolink_jc, 
+            ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam LIKE 'ROSSO%' OR aps.seam LIKE 'RS%') THEN aps.qty/24 ELSE 0 END), 0) AS qty_rosso_jc, 
+            ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam LIKE 'ROSSO%' OR aps.seam LIKE 'RS%') THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_rosso_jc,
         ");
-        $builder->join("($subquery) AS prod", 'prod.idapsperstyle = aps.idapsperstyle', 'left');
         $builder->where('MONTHNAME(aps.delivery)', $bulan);
         $builder->where('YEAR(aps.delivery)', $tahun);
+        $builder->where('aps.qty >', 0);
         $builder->where('aps.production_unit !=', 'MJ');
 
-        return $builder->get()->getRowArray();
+        $result = $builder->get()->getRowArray(); // Simpan hasil query
+
+        // Menambahkan langkah untuk query kedua
+        $builder2 = $this->db->table('produksi prod');
+        $builder2->select("
+            COUNT(DISTINCT CASE WHEN aps.machinetypeid LIKE 'TJ%' THEN prod.no_mesin ELSE NULL END) AS actual_tj,
+            COUNT(DISTINCT CASE WHEN aps.machinetypeid LIKE 'TJ%' AND (aps.seam LIKE '%AUTOLINK%' OR aps.seam LIKE '%AUTO LINK%') THEN prod.no_mesin ELSE NULL END) AS actual_autolink_tj,
+            COUNT(DISTINCT CASE WHEN aps.machinetypeid LIKE 'TJ%' AND (aps.seam LIKE 'ROSSO%' OR aps.seam LIKE 'RS%') THEN prod.no_mesin ELSE NULL END) AS actual_rosso_tj,
+            COUNT(DISTINCT CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' THEN prod.no_mesin ELSE NULL END) AS actual_jc,
+            COUNT(DISTINCT CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam LIKE '%AUTOLINK%' OR aps.seam LIKE '%AUTO LINK%') THEN prod.no_mesin ELSE NULL END) AS actual_autolink_jc,
+            COUNT(DISTINCT CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam LIKE 'ROSSO%' OR aps.seam LIKE 'RS%') THEN prod.no_mesin ELSE NULL END) AS actual_rosso_jc
+        ");
+        $builder2->join('apsperstyle aps', 'aps.idapsperstyle = prod.idapsperstyle', 'left');
+        $builder2->where('prod.tgl_produksi', $yesterday); // Pastikan tanggalnya sesuai
+        $builder2->where('MONTHNAME(aps.delivery)', $bulan); // Periksa bulan dan tahun yang sesuai
+        $builder2->where('YEAR(aps.delivery)', $tahun);
+        $builder2->where('aps.production_unit !=', 'MJ');
+        $builder->where('aps.qty >', 0);
+
+        $result2 = $builder2->get()->getRowArray(); // Simpan hasil query kedua
+
+        // Gabungkan hasil dari dua query
+        $finalResult = array_merge($result, $result2);
+
+        return $finalResult;
     }
     public function tampilPerarea($area)
     {

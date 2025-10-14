@@ -273,27 +273,37 @@ class OrderController extends BaseController
         $bulan = $this->ApsPerstyleModel->getMonthName();
         foreach ($bulan as $key => &$id) {
             $order = $this->orderModel->tampilPerBulanByJarum($id['bulan'], $id['tahun']);
+
+            // byJarum TJ
+            $id['qtyTj'] = $order['qty_rosso_tj'] + $order['qty_autolink_tj'];
+            $id['sisaTj'] = $order['sisa_rosso_tj'] + $order['sisa_autolink_tj'];
+            $id['actualTj'] = $order['actual_rosso_tj'] + $order['actual_autolink_tj'];
+            // rosso TJ
+            $id['qtyRossoTj'] = $order['qty_rosso_tj'];
+            $id['sisaRossoTj'] = $order['sisa_rosso_tj'];
+            $id['actualRossoTj'] = $order['actual_rosso_tj'];
+            // autolink TJ
+            $id['qtyAutolinkTj'] = $order['qty_autolink_tj'];
+            $id['sisaAutolinkTj'] = $order['sisa_autolink_tj'];
+            $id['actualAutolinkTj'] = $order['actual_autolink_tj'];
+
+            // byJarum JC
+            $id['qtyJc'] = $order['qty_rosso_jc'] + $order['qty_autolink_jc'];
+            $id['sisaJc'] = $order['sisa_rosso_jc'] + $order['sisa_autolink_jc'];
+            $id['actualJc'] = $order['actual_rosso_jc'] + $order['actual_autolink_jc'];
+            // rosso TJ
+            $id['qtyRossoJc'] = $order['qty_rosso_jc'];
+            $id['sisaRossoJc'] = $order['sisa_rosso_jc'];
+            $id['actualRossoJc'] = $order['actual_rosso_jc'];
+            // autolink TJ
+            $id['qtyAutolinkJc'] = $order['qty_autolink_jc'];
+            $id['sisaAutolinkJc'] = $order['sisa_autolink_jc'];
+            $id['actualAutolinkJc'] = $order['actual_autolink_jc'];
+
+            // all
             $id['qtyAll'] = $order['qty_tj'] + $order['qty_jc'];
             $id['sisaAll'] = $order['sisa_tj'] + $order['sisa_jc'];
-
-            // byJarum
-            // TJ
-            $id['qtyTj'] = $order['qty_tj'];
-            $id['sisaTj'] = $order['sisa_tj'];
-            $id['actualRunningTj'] = $order['actual_mc_tj'];
-            // JC
-            $id['qtyJc'] = $order['qty_jc'];
-            $id['sisaJc'] = $order['sisa_jc'];
-            $id['actualRunningJc'] = $order['actual_mc_jc'];
-            // bySeam
-            // Autolink
-            $id['qtyAutolink'] = $order['qty_autolink'];
-            $id['sisaAutolink'] = $order['sisa_autolink'];
-            $id['actualRunningAutolink'] = $order['actual_mc_autolink'];
-            // Rosso
-            $id['qtyRosso'] = $order['qty_rosso'];
-            $id['sisaRosso'] = $order['sisa_rosso'];
-            $id['actualRunningRosso'] = $order['actual_mc_rosso'];
+            $id['actAll'] = $order['actual_tj'] + $order['actual_jc'];
         }
         $data = [
             'role' => session()->get('role'),

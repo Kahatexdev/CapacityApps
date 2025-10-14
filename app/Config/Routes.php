@@ -154,7 +154,8 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('saveRepeat', 'orderController::saveRepeat');
     $routes->post('excelSisaOrderAllArea', 'ExcelController::excelSisaOrderAllArea');
     $routes->post('importStokOrder', 'OrderController::importStokOrder');
-
+    $routes->get('orderPerbulan', 'OrderController::orderPerbulan');
+    $routes->get('orderPerMonth/(:any)/(:any)', 'OrderController::orderPerMonth/$1/$2');
 
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
@@ -339,6 +340,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('editcylinder/(:any)', 'MesinController::editcylinderPlan/$1');
     $routes->post('deletecylinder/(:any)', 'MesinController::deletecylinderPlan/$1');
     $routes->get('allmachine', 'MesinController::allmachinePlan');
+    // $routes->get('denah', 'PlanningController::denahMesin');
     $routes->get('denah/(:any)', 'PlanningController::denahMesin/$1');
     $routes->get('detailDenah', 'PlanningController::detailDenah');
 
@@ -911,7 +913,8 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->post('importinisial', 'UserController::importinisial');
     $routes->get('flowProses', 'OrderController::flowProses');
     $routes->post('exportDataOrder', 'ExcelController::exportDataOrder');
-
+    $routes->get('orderPerbulan', 'OrderController::orderPerbulan');
+    $routes->get('orderPerMonth/(:any)/(:any)', 'OrderController::orderPerMonth/$1/$2');
 
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
@@ -1005,6 +1008,9 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('pengaduan', 'PengaduanController::index');
     $routes->post('pengaduan/create', 'PengaduanController::create');
     $routes->post('pengaduan/reply/(:num)', 'PengaduanController::reply/$1');
+    
+    
+    $routes->post('importMesin', 'GodController::importMesin');
 });
 
 // ie
