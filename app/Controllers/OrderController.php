@@ -273,15 +273,11 @@ class OrderController extends BaseController
         $bulan = $this->ApsPerstyleModel->getMonthName();
         foreach ($bulan as $key => &$id) {
             $order = $this->orderModel->tampilPerBulanByJarum($id['bulan'], $id['tahun']);
-            // all
-            $id['qtyAll'] = $order['qty_tj'] + $order['qty_jc'];
-            $id['sisaAll'] = $order['sisa_tj'] + $order['sisa_jc'];
-            $id['actAll'] = $order['actual_tj'] + $order['actual_jc'];
 
             // byJarum TJ
-            $id['qtyTj'] = $order['qty_tj'];
-            $id['sisaTj'] = $order['sisa_tj'];
-            $id['actualTj'] = $order['actual_tj'];
+            $id['qtyTj'] = $order['qty_rosso_tj'] + $order['qty_autolink_tj'];
+            $id['sisaTj'] = $order['sisa_rosso_tj'] + $order['sisa_autolink_tj'];
+            $id['actualTj'] = $order['actual_rosso_tj'] + $order['actual_autolink_tj'];
             // rosso TJ
             $id['qtyRossoTj'] = $order['qty_rosso_tj'];
             $id['sisaRossoTj'] = $order['sisa_rosso_tj'];
@@ -292,9 +288,9 @@ class OrderController extends BaseController
             $id['actualAutolinkTj'] = $order['actual_autolink_tj'];
 
             // byJarum JC
-            $id['qtyJc'] = $order['qty_jc'];
-            $id['sisaJc'] = $order['sisa_jc'];
-            $id['actualJc'] = $order['actual_jc'];
+            $id['qtyJc'] = $order['qty_rosso_jc'] + $order['qty_autolink_jc'];
+            $id['sisaJc'] = $order['sisa_rosso_jc'] + $order['sisa_autolink_jc'];
+            $id['actualJc'] = $order['actual_rosso_jc'] + $order['actual_autolink_jc'];
             // rosso TJ
             $id['qtyRossoJc'] = $order['qty_rosso_jc'];
             $id['sisaRossoJc'] = $order['sisa_rosso_jc'];
@@ -303,6 +299,11 @@ class OrderController extends BaseController
             $id['qtyAutolinkJc'] = $order['qty_autolink_jc'];
             $id['sisaAutolinkJc'] = $order['sisa_autolink_jc'];
             $id['actualAutolinkJc'] = $order['actual_autolink_jc'];
+
+            // all
+            $id['qtyAll'] = $id['qtyTj'] + $id['qtyJc'];
+            $id['sisaAll'] = $id['sisaTj'] + $id['sisaJc'];
+            $id['actAll'] = $id['actualTj'] + $id['actualJc'];
         }
         $data = [
             'role' => session()->get('role'),
