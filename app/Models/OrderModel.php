@@ -235,7 +235,7 @@ class OrderModel extends Model
             ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%') THEN aps.qty/24 ELSE 0 END), 0) AS qty_autolink_jc, 
             ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%') THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_autolink_jc, 
             ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam NOT LIKE '%AUTOLINK%' OR aps.seam NOT LIKE '%AUTO LINK%') THEN aps.qty/24 ELSE 0 END), 0) AS qty_rosso_jc, 
-            ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam NOT LIKE '%AUTOLINK%' OR aps.seam NOT LIKE '%AUTO LINK%'), 0) AS sisa_rosso_jc,
+            ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam NOT LIKE '%AUTOLINK%' OR aps.seam NOT LIKE '%AUTO LINK%') THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_rosso_jc,
         ");
         $builder->where('MONTHNAME(aps.delivery)', $bulan);
         $builder->where('YEAR(aps.delivery)', $tahun);
