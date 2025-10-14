@@ -1,4 +1,4 @@
-<style>
+<!-- <style>
     .empty-span {
         background: repeating-linear-gradient(90deg,
                 rgba(148, 163, 184, .25),
@@ -25,7 +25,7 @@
     /* table {
         table-layout: fixed;
     } */
-</style>
+</style> -->
 
 <?php
 // ======================== SETTINGS ========================
