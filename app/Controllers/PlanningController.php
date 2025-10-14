@@ -825,6 +825,7 @@ class PlanningController extends BaseController
 
     public function denahMesin($area)
     {
+        // dd($area);
         $tanggal = $this->request->getGet('date') ?? date('Y-m-d');
         $cekProd = $this->produksiModel->cekProduksi($area, $tanggal);
         if ($cekProd) {
@@ -915,16 +916,35 @@ class PlanningController extends BaseController
             'area'    => $area,
             'role'    => $role,
         ];
-
+        // dd($data);
         // Jika request AJAX → kembalikan JSON { html: "<tr>...rows..." }
         if ($this->request->isAJAX()) {
-            // partial path: Views/{role}/Planning/partials/denah_rows.php
-            $html = view($role . '/Planning/partials/denah_rows', $data);
+            // dd ($area);
+            switch ($area) {
+                case 'KK1A':
+                    $html = view($role . '/Planning/partials/denah_rowsA1', $data);
+                    break;
+                case 'KK1B':
+                    $html = view($role . '/Planning/partials/denah_rowsB1', $data);
+                    break;
+                case 'KK5G':
+                    $html = view($role . '/Planning/partials/denah_rows5G', $data);
+                    break;
+                case 'KK7K':
+                    $html = view($role . '/Planning/partials/denah_rows7K', $data);
+                    break;
+                case 'KK7L':
+                    $html = view($role . '/Planning/partials/denah_rows7L', $data);
+                    break;
+                default:
+                    $html = view($role . '/Planning/partials/denah_rows', $data);
+                    break;
+            }
             return $this->response->setJSON(['html' => $html, 'tanggal' => $tanggal]);
         }
 
         // non-AJAX → render full page
-        return view($role . '/Planning/denahA1', array_merge($data, [
+        return view($role . '/Planning/denah', array_merge($data, [
             'title' => 'Denah Mesin',
             'active1' => '',
             'active2' => '',
