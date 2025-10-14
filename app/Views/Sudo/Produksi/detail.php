@@ -68,16 +68,19 @@
                                         <input type="date" class="form-control text-secondary" name="tgl_produksi_sampai" id="tgl_produksi_sampai">
                                     </div>
                                     <div class="col-md-2 mb-2">
-                                        <input type="text" class="form-control" name="no_model" id="no_model" placeholder="No Model">
+                                        <input type="text" class="form-control" name="no_model" id="filter_no_model" placeholder="No Model">
                                     </div>
                                     <div class="col-md-2 mb-2">
-                                        <input type="text" class="form-control" name="no_box" id="no_box" placeholder="No Box">
+                                        <input type="text" class="form-control" name="no_box" id="filter_no_box" placeholder="No Box">
                                     </div>
                                     <div class="col-md-2 mb-2">
-                                        <input type="text" class="form-control" name="no_label" id="no_label" placeholder="No Label">
+                                        <input type="text" class="form-control" name="no_label" id="filter_no_label" placeholder="No Label">
                                     </div>
                                     <div class="col-md-1 text-end">
                                         <button type="submit" class="btn bg-gradient-success">FILTER</button>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn bg-gradient-success" id="btnExport"><i class="fas fa-file-excel"></i></button>
                                     </div>
                                 </div>
                             </form>
@@ -219,6 +222,21 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
+        // 1. Isi input filter dari query string agar saat reload, nilai tetap tampil
+        const params = new URLSearchParams(window.location.search);
+        $('#tgl_produksi').val(params.get('tgl_produksi') || '');
+        $('#tgl_produksi_sampai').val(params.get('tgl_produksi_sampai') || '');
+        $('#filter_no_model').val(params.get('no_model') || '');
+        $('#filter_no_box').val(params.get('no_box') || '');
+        $('#filter_no_label').val(params.get('no_label') || '');
+
+        // 2. Tombol Export
+        $('#btnExport').click(function() {
+            let currentQuery = window.location.search; // ambil query string filter saat ini
+            window.location.href = "<?= base_url('sudo/detailproduksi_export/' . $area) ?>" + currentQuery;
+        });
+
+        // 3. Inisialisasi DataTable
         $('#dataTable').DataTable({
             "order": [
                 [0, "desc"]

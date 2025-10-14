@@ -9542,4 +9542,95 @@ class ExcelController extends BaseController
         $writer->save('php://output');
         exit;
     }
+
+    public function exportDetailProduksi($area)
+    {
+        $bulan = $this->request->getGet('bulan');
+        $tglProduksi = $this->request->getGet('tgl_produksi') ?? null;
+        $tglProduksiSampai = $this->request->getGet('tgl_produksi_sampai') ?? null;
+        $noModel = $this->request->getGet('no_model') ?? null;
+        $size = $this->request->getGet('size') ?? null;
+        $noBox = $this->request->getGet('no_box') ?? null;
+        $noLabel = $this->request->getGet('no_label') ?? null;
+
+        $produksi = [];
+
+        if ($bulan || $tglProduksi || $noModel || $size) {
+            $produksi = $this->produksiModel->getProduksi($area, $bulan, $tglProduksi, $tglProduksiSampai, $noModel, $size, $noBox, $noLabel);
+            // dd($produksi);
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $title = 'Data Produksi ' . $area;
+        $sheet->mergeCells('A1:I1');
+        $sheet->setCellValue('A1', $title);
+
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // === Header Kolom di Baris 3 === //
+        $sheet->setCellValue('A3', 'No');
+        $sheet->setCellValue('B3', 'Tgl Produksi');
+        $sheet->setCellValue('C3', 'No Model');
+        $sheet->setCellValue('D3', 'Style Size');
+        $sheet->setCellValue('E3', 'Delivery');
+        $sheet->setCellValue('F3', 'No Mc');
+        $sheet->setCellValue('G3', 'No Box');
+        $sheet->setCellValue('H3', 'No Label');
+        $sheet->setCellValue('I3', 'Qty Produksi (Pcs)');
+
+        // === Isi Data mulai dari baris ke-3 === //
+        $row = 4;
+        $no = 1;
+        foreach ($produksi as $data) {
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $data['tgl_produksi']);
+            $sheet->setCellValue('C' . $row, $data['mastermodel']);
+            $sheet->setCellValue('D' . $row, $data['size']);
+            $sheet->setCellValue('E' . $row, $data['delivery']);
+            $sheet->setCellValue('F' . $row, $data['no_mesin']);
+            $sheet->setCellValue('G' . $row, $data['no_box']);
+            $sheet->setCellValue('H' . $row, $data['no_label']);
+            $sheet->setCellValue('I' . $row, $data['qty_produksi']);
+            $row++;
+        }
+
+        // === Auto Size Kolom A - M === //
+        foreach (range('A', 'I') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // === Tambahkan Border (A2:M[row - 1]) === //
+        $styleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+
+        $lastDataRow = $row - 1;
+
+        $sheet->getStyle("A3:I{$lastDataRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("A3:I{$lastDataRow}")->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $sheet->getStyle("A3:I{$lastDataRow}")->applyFromArray($styleArray);
+
+        // Styling Header
+        $headerRange = 'A3:I3';
+        $sheet->getStyle($headerRange)->getFont()->setBold(true);
+        $sheet->getStyle($headerRange)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle($headerRange)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
+        $filename = 'Data_Produksi_' . $area . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
 }

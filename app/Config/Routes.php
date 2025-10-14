@@ -932,6 +932,7 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->post('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->get('updatebs', 'ProduksiController::updatebs');
     $routes->get('hapus-produksi/(:any)', 'ProduksiController::deleteProduksi/$1');
+    $routes->get('detailproduksi_export/(:any)', 'ExcelController::exportDetailProduksi/$1');
 
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
     $routes->get('bssetting', 'UserController::bssetting');
