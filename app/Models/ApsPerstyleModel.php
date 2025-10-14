@@ -1402,7 +1402,7 @@ class ApsPerstyleModel extends Model
             SUM(qty/24) AS qty, 
             SUM(CASE WHEN sisa > 0 THEN sisa/24 ELSE 0 END) AS sisa
         ')
-            ->where('production_unit', 'CJ')
+            ->where('production_unit !=', 'MJ')
             ->where("DATE_FORMAT(delivery, '%Y-%m')", $month)
             ->first() ?? ['qty' => 0, 'sisa' => 0];
     }

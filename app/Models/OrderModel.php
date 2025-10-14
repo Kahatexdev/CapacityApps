@@ -239,6 +239,7 @@ class OrderModel extends Model
         ");
         $builder->where('MONTHNAME(aps.delivery)', $bulan);
         $builder->where('YEAR(aps.delivery)', $tahun);
+        $builder->where('aps.qty >', 0);
         $builder->where('aps.production_unit !=', 'MJ');
 
         $result = $builder->get()->getRowArray(); // Simpan hasil query
@@ -258,6 +259,7 @@ class OrderModel extends Model
         $builder2->where('MONTHNAME(aps.delivery)', $bulan); // Periksa bulan dan tahun yang sesuai
         $builder2->where('YEAR(aps.delivery)', $tahun);
         $builder2->where('aps.production_unit !=', 'MJ');
+        $builder->where('aps.qty >', 0);
 
         $result2 = $builder2->get()->getRowArray(); // Simpan hasil query kedua
 
