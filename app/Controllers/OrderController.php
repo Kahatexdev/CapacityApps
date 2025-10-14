@@ -301,9 +301,9 @@ class OrderController extends BaseController
             $id['actualAutolinkJc'] = $order['actual_autolink_jc'];
 
             // all
-            $id['qtyAll'] = $id['qtyTj'] + $id['qtyJc'];
-            $id['sisaAll'] = $id['sisaTj'] + $id['sisaJc'];
-            $id['actAll'] = $id['actualTj'] + $id['actualJc'];
+            $id['qtyAll'] = $order['qty_tj'] + $order['qty_jc'];
+            $id['sisaAll'] = $order['sisa_tj'] + $order['sisa_jc'];
+            $id['actAll'] = $order['actual_tj'] + $order['actual_jc'];
         }
         $data = [
             'role' => session()->get('role'),
