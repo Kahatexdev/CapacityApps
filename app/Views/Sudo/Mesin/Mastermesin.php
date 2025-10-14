@@ -183,7 +183,7 @@
             </a>
         </div>
 
-        <div class="col-xl-6 col-sm-6 mb-xl-0 mb-4 mt-2">
+        <!-- <div class="col-xl-6 col-sm-6 mb-xl-0 mb-4 mt-2">
             <form action="<?= base_url('sudo/importMesin') ?>" method="post" enctype="multipart/form-data">
                 <div class="card">
                     <div class="card-body p-3">
@@ -202,7 +202,7 @@
                     </div>
                 </div>
             </form>
-        </div>
+        </div> -->
 
 
     </div>
