@@ -471,11 +471,40 @@
                             </div>
                         </div>
 
+                        <?php
+                        // Normalize & map area → partial name (without .php)
+                        $areaKey = strtoupper($area ?? '');
+                        $partialMap = [
+                            'KK1A' => 'denah_rowsA1',
+                            'KK1B' => 'denah_rowsB1',
+                            'KK5G' => 'denah_rows5G',
+                            'KK7K' => 'denah_rows7K',
+                            'KK7L' => 'denah_rows7L',
+                            // add more mappings here...
+                        ];
+                        $partialName = $partialMap[$areaKey] ?? 'denah_rows'; // default fallback
+
+                        $viewPath = $role . '/Planning/partials/' . $partialName;
+                        $fullFile = APPPATH . 'Views/' . $viewPath . '.php';
+                        // dd ($fullFile);
+                        // Fallback if the file doesn't exist
+                        if (!is_file($fullFile)) {
+                            log_message('error', 'Partial not found: ' . $fullFile);
+                            $viewPath = $role . '/Planning/partials/denah_rows';
+                        }
+                        ?>
+
                         <table class="table table-bordered mb-0" id="denah-table">
                             <tbody id="denah-rows">
-                                <?= view($role . '/Planning/partials/denah_rows', ['layout' => $layout]) ?>
+                                <?= view($viewPath, [
+                                    'layout'   => $layout,
+                                    'tanggal'  => $tanggal ?? null,
+                                    'area'     => $area ?? null,
+                                    'role'     => $role ?? null,
+                                ]) ?>
                             </tbody>
                         </table>
+
                     </div>
                 </div>
 
@@ -773,21 +802,21 @@
                 const ROLE = '<?= $role ?>';
 
                 $.ajax({
-                    url: `${BASEURL}/${ROLE}/detailDenah`,
-                    method: 'GET',
-                    data: {
-                        'idprod[]': idprods,
-                        'idaps[]': idapss
-                    },
-                    dataType: 'json'
-                }).done(function(res) {
-                    let html = '';
-                    if (!res.length) {
-                        html = '<div class="alert alert-warning">Tidak ada data.</div>';
-                    } else {
-                        html = '<div class="accordion" id="denahAccordion">';
-                        res.forEach((row, i) => {
-                            html += `
+                        url: `${BASEURL}/${ROLE}/detailDenah`,
+                        method: 'GET',
+                        data: {
+                            'idprod[]': idprods,
+                            'idaps[]': idapss
+                        },
+                        dataType: 'json'
+                    }).done(function(res) {
+                        let html = '';
+                        if (!res.length) {
+                            html = '<div class="alert alert-warning">Tidak ada data.</div>';
+                        } else {
+                            html = '<div class="accordion" id="denahAccordion">';
+                            res.forEach((row, i) => {
+                                html += `
             <div class="accordion-item">
               <h2 class="accordion-header" id="heading-${i}">
                 <button class="accordion-button ${i ? 'collapsed' : ''}" 
@@ -813,23 +842,23 @@
                 </div>
               </div>
             </div>`;
-                        });
-                        html += '</div>';
-                    }
+                            });
+                            html += '</div>';
+                        }
 
-                    $('#modalDetailDenah .modal-body').html(html);
-                    new bootstrap.Modal(document.getElementById('modalDetailDenah')).show();
-                })
-                .fail(function(xhr, status, error) {
-                    console.error('Error fetching modal content', {
-                        xhr,
-                        status,
-                        error
+                        $('#modalDetailDenah .modal-body').html(html);
+                        new bootstrap.Modal(document.getElementById('modalDetailDenah')).show();
+                    })
+                    .fail(function(xhr, status, error) {
+                        console.error('Error fetching modal content', {
+                            xhr,
+                            status,
+                            error
+                        });
+                        utils.showToast('Gagal memuat detail. Coba lagi.', 'error');
+                    }).always(function() {
+                        $btn.data('loading', false);
                     });
-                    utils.showToast('Gagal memuat detail. Coba lagi.', 'error');
-                }).always(function() {
-                    $btn.data('loading', false);
-                });
             });
         }
 

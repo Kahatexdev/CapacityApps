@@ -1293,4 +1293,124 @@ class GodController extends BaseController
             return $this->response->setJSON(['error' => $e->getMessage()]);
         }
     }
+
+    public function importMesin()
+    {
+        $file = $this->request->getFile('file');
+        // dd($file);
+        if (!$file || !$file->isValid()) {
+            return redirect()->back()->with('error', 'File tidak valid.');
+        }
+
+        $ext = strtolower($file->getClientExtension());
+        if (!in_array($ext, ['xls', 'xlsx', 'csv'])) {
+            return redirect()->back()->with('error', 'Format harus .xls/.xlsx/.csv');
+        }
+
+        try {
+            // Baca spreadsheet
+            $spreadsheet = IOFactory::load($file->getTempName());
+            $sheet = $spreadsheet->getSheet(0); // sheet pertama: "mesin"
+            $rows  = $sheet->toArray(null, true, true, true);
+
+            // Validasi header
+            $header = array_map('trim', $rows[1] ?? []);
+            $expected = ['no_mc', 'jarum', 'brand', 'dram', 'kode', 'tahun', 'status','area'];
+            $mapIndex = []; // peta kolom -> index
+            foreach ($header as $idx => $name) {
+                $name = strtolower($name);
+                if (in_array($name, $expected)) {
+                    $mapIndex[$name] = $idx; // ex: 'A','B',...
+                }
+            }
+            foreach ($expected as $col) {
+                if (!isset($mapIndex[$col])) {
+                    return redirect()->back()->with('error', "Header kolom '$col' tidak ditemukan.");
+                }
+            }
+
+            $model = new MachinesModel();
+            $db = \Config\Database::connect();
+
+            // Kumpulkan data
+            $data = [];
+            $now  = date('Y-m-d H:i:s');
+            $rowCount = count($rows);
+
+            for ($i = 2; $i <= $rowCount; $i++) {
+                $r = $rows[$i];
+
+                // Ambil per kolom pakai map index
+                $no_mc  = (int) trim((string)($r[$mapIndex['no_mc']] ?? ''));
+                $jarum  = trim((string)($r[$mapIndex['jarum']] ?? ''));
+                $brand  = trim((string)($r[$mapIndex['brand']] ?? ''));
+                $dram   = trim((string)($r[$mapIndex['dram']] ?? ''));
+                $kode   = trim((string)($r[$mapIndex['kode']] ?? ''));
+                $tahun  = (int) trim((string)($r[$mapIndex['tahun']] ?? '0'));
+                $status = trim((string)($r[$mapIndex['status']] ?? 'idle'));
+                $area = trim((string)($r[$mapIndex['area']] ?? ''));
+
+                // Skip baris kosong
+                if ($no_mc === 0 && $jarum === '' && $brand === '' && $kode === '') continue;
+
+                // Validasi minimal
+                if ($no_mc <= 0 || $jarum === '' || $brand === '' || $kode === '' || $tahun <= 0) {
+                    return redirect()->back()->with('error', "Baris #$i tidak valid. Cek no_mc/jarum/brand/kode/tahun.");
+                }
+
+                $data[] = [
+                    'no_mc'      => $no_mc,
+                    'jarum'      => $jarum,
+                    'brand'      => $brand,
+                    'dram'       => ($dram === '' ? null : $dram),
+                    'kode'       => $kode,
+                    'tahun'      => $tahun,
+                    'status'     => ($status === '' ? 'idle' : $status),
+                    'area'       => $area,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
+            // dd ($data);
+            if (empty($data)) {
+                return redirect()->back()->with('error', 'Tidak ada data yang bisa diimport.');
+            }
+
+            // === STRATEGI IMPORT ===
+            // Opsi A (cepat & aman): upsert pakai ON DUPLICATE KEY (butuh UNIQUE no_mc)
+            // Jika MySQL, kita pakai query mentah sekali dorong per-chunk.
+
+            $builder = $db->table('machines');
+            $chunks = array_chunk($data, 500);
+
+            foreach ($chunks as $chunk) {
+                // Build "INSERT ... ON DUPLICATE KEY UPDATE ..."
+                $cols = ['no_mc', 'jarum', 'brand', 'dram', 'kode', 'tahun', 'status', 'area','created_at', 'updated_at'];
+                $placeholders = '(' . rtrim(str_repeat('?,', count($cols)), ',') . ')';
+                $valuesSql = implode(',', array_fill(0, count($chunk), $placeholders));
+
+                $sql = "INSERT INTO machines (" . implode(',', $cols) . ") VALUES $valuesSql
+                        ON DUPLICATE KEY UPDATE
+                            jarum=VALUES(jarum),
+                            brand=VALUES(brand),
+                            dram=VALUES(dram),
+                            kode=VALUES(kode),
+                            tahun=VALUES(tahun),
+                            status=VALUES(status),
+                            area=VALUES(area),
+                            updated_at=VALUES(updated_at)";
+
+                $binds = [];
+                foreach ($chunk as $row) {
+                    foreach ($cols as $c) $binds[] = $row[$c] ?? null;
+                }
+
+                $db->query($sql, $binds);
+            }
+
+            return redirect()->back()->with('success', 'Import selesai: ' . count($data) . ' baris diproses.');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'Gagal import: ' . $e->getMessage());
+        }
+    }
 }

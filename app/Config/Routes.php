@@ -340,6 +340,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('editcylinder/(:any)', 'MesinController::editcylinderPlan/$1');
     $routes->post('deletecylinder/(:any)', 'MesinController::deletecylinderPlan/$1');
     $routes->get('allmachine', 'MesinController::allmachinePlan');
+    // $routes->get('denah', 'PlanningController::denahMesin');
     $routes->get('denah/(:any)', 'PlanningController::denahMesin/$1');
     $routes->get('detailDenah', 'PlanningController::detailDenah');
 
@@ -1006,6 +1007,9 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('pengaduan', 'PengaduanController::index');
     $routes->post('pengaduan/create', 'PengaduanController::create');
     $routes->post('pengaduan/reply/(:num)', 'PengaduanController::reply/$1');
+    
+    
+    $routes->post('importMesin', 'GodController::importMesin');
 });
 
 // ie
