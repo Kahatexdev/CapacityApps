@@ -15,7 +15,9 @@
                             </div>
                         </div>
                         <div class="col-8 text-end">
-
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#inputCancel">
+                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Input Cancel Booking
+                            </button>
                             <a href="<?= base_url($role . '/cancelBooking') ?>" class="btn btn-sm btn-warning bg-gradient-warning shadow text-center border-radius-md">
                                 Summary Cancel Booking
                             </a>
@@ -35,6 +37,66 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+    <div class="modal fade" id="inputCancel" tabindex="-1" role="dialog" aria-labelledby="inputCancel" aria-hidden="true">
+        <div class="modal-dialog " role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Cancel Data Booking</h5>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <form id="inputCancel" action="<?= base_url($role . '/inputCancelBooking'); ?>" method="POST">
+                    <div class="modal-body align-items-center">
+                        <div class="form-group">
+                            <label for="buyer" class="col-form-label">Buyer</label>
+                            <select class="form-control" id="buyer" name="buyer">
+                                <option></option>
+                                <?php foreach ($buyer as $buy) : ?>
+                                    <option><?= $buy['kd_buyer_order'] ?></option>
+                                <?php endforeach ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="jarum" class="col-form-label">Jarum</label>
+                            <select class="form-control" id="jarum" name="jarum">
+                                <option></option>
+                                <?php foreach ($TotalMesin as $jr) : ?>
+                                    <option value="<?= $jr['jarum'] ?>"><?= $jr['jarum'] ?></option>
+                                <?php endforeach ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="prodType" class="col-form-label">Product Type</label>
+                            <select class="form-control" id="prodType" name="prodType">
+                                <option></option>
+
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tgl_turun_order" class="col-form-label">Delivery</label>
+                            <input type="date" class="form-control" name="delivery">
+                        </div>
+                        <div class="form-group">
+                            <label for="qty" class="col-form-label">Qty Cancel</label>
+                            <input type="number" class="form-control" name="qty">
+                        </div>
+                        <div class="form-group">
+                            <label for="alasan" class="col-form-label">Alasan Cancel</label>
+                            <input type="text" class="form-control" name="alasan">
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-info">Generate</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
     <div class="modal fade" id="exportDataOrder" tabindex="-1" role="dialog" aria-labelledby="exportDataOrder" aria-hidden="true">
@@ -229,4 +291,59 @@
 
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+<div class="form-group">
+    <label for="jarum" class="col-form-label">Jarum</label>
+    <select class="form-control" id="jarum" name="jarum">
+        <option value="">-- Pilih Jarum --</option>
+        <?php foreach ($TotalMesin as $jr) : ?>
+            <option value="<?= esc($jr['jarum']) ?>"><?= esc($jr['jarum']) ?></option>
+        <?php endforeach; ?>
+    </select>
+</div>
+
+<div class="form-group">
+    <label for="prodType" class="col-form-label">Product Type</label>
+    <select class="form-control" id="prodType" name="prodType">
+        <option value="">-- Pilih Product Type --</option>
+    </select>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $('#jarum').on('change', function() {
+        const jarum = $(this).val();
+        const baseUrl = '<?= base_url("api/getProductType") ?>';
+        const $prodType = $('#prodType');
+
+        $prodType.prop('disabled', true).html('<option>Loading...</option>');
+
+        if (jarum) {
+            $.ajax({
+                url: baseUrl,
+                type: 'GET',
+                data: {
+                    jarum: jarum
+                },
+                dataType: 'json',
+                success: function(response) {
+                    $prodType.empty().append('<option value="">-- Pilih Product Type --</option>');
+                    if (response.length > 0) {
+                        $.each(response, function(i, item) {
+                            $prodType.append(`<option value="${item.id_product_type}">${item.product_type}</option>`);
+                        });
+                    } else {
+                        $prodType.append('<option value="">Tidak ada data</option>');
+                    }
+                    $prodType.prop('disabled', false);
+                },
+                error: function() {
+                    $prodType.html('<option value="">Error mengambil data</option>').prop('disabled', true);
+                }
+            });
+        } else {
+            $prodType.html('<option value="">-- Pilih Product Type --</option>').prop('disabled', true);
+        }
+    });
+</script>
+
 <?php $this->endSection(); ?>

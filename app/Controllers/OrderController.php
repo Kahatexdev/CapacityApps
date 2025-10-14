@@ -271,6 +271,30 @@ class OrderController extends BaseController
     public function orderPerbulan()
     {
         $bulan = $this->ApsPerstyleModel->getMonthName();
+        foreach ($bulan as $key => &$id) {
+            $order = $this->orderModel->tampilPerBulanByJarum($id['bulan'], $id['tahun']);
+            $id['qtyAll'] = $order['qty_tj'] + $order['qty_jc'];
+            $id['sisaAll'] = $order['sisa_tj'] + $order['sisa_jc'];
+
+            // byJarum
+            // TJ
+            $id['qtyTj'] = $order['qty_tj'];
+            $id['sisaTj'] = $order['sisa_tj'];
+            $id['actualRunningTj'] = $order['actual_mc_tj'];
+            // JC
+            $id['qtyJc'] = $order['qty_jc'];
+            $id['sisaJc'] = $order['sisa_jc'];
+            $id['actualRunningJc'] = $order['actual_mc_jc'];
+            // bySeam
+            // Autolink
+            $id['qtyAutolink'] = $order['qty_autolink'];
+            $id['sisaAutolink'] = $order['sisa_autolink'];
+            $id['actualRunningAutolink'] = $order['actual_mc_autolink'];
+            // Rosso
+            $id['qtyRosso'] = $order['qty_rosso'];
+            $id['sisaRosso'] = $order['sisa_rosso'];
+            $id['actualRunningRosso'] = $order['actual_mc_rosso'];
+        }
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Order Perbulan',

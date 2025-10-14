@@ -217,6 +217,49 @@ class OrderModel extends Model
 
         return $builder->get()->getResultArray();
     }
+    public function tampilPerBulanByJarum($bulan, $tahun)
+    {
+        $yesterday = date('Y-m-d', strtotime('-5 day'));
+
+        // Subquery: hitung mesin unik per idapsperstyle untuk tanggal yg dimaksud
+        $subquery = $this->db->table('produksi')
+            ->select('idapsperstyle, COUNT(DISTINCT no_mesin) AS total_mc')
+            ->where('DATE(tgl_produksi)', $yesterday)
+            ->groupBy('idapsperstyle')
+            ->getCompiledSelect();
+
+        $builder = $this->db->table('apsperstyle aps');
+        $builder->select("
+        
+            ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' THEN aps.qty ELSE 0 END), 0) AS qty_tj,
+            ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' THEN aps.sisa ELSE 0 END), 0) AS sisa_tj,
+            ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' AND (aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%') THEN aps.qty/24 ELSE 0 END), 0) AS qty_autolink_tj, 
+            ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' AND (aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%') THEN aps.sisa/24 ELSE 0 END), 0) AS qty_autolink_tj, 
+            
+            ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' THEN aps.qty/24 ELSE 0 END), 0) AS qty_jc,
+            ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_jc,
+            ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%') THEN aps.qty/24 ELSE 0 END), 0) AS qty_autolink_tj, 
+            ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%') THEN aps.sisa/24 ELSE 0 END), 0) AS qty_autolink_tj, 
+
+            --ROUND(SUM(CASE WHEN aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%' THEN aps.qty/24 ELSE 0 END), 0) AS qty_autolink,
+            --ROUND(SUM(CASE WHEN aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%' THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_autolink,
+
+            ROUND(SUM(CASE WHEN aps.seam LIKE '%ROSSO%' OR aps.seam LIKE '%RS%' THEN aps.qty/24 ELSE 0 END), 0) AS qty_rosso,
+            ROUND(SUM(CASE WHEN aps.seam LIKE '%ROSSO%' OR aps.seam LIKE '%RS%' THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_rosso,
+
+            -- actual MC: gunakan SUM(prod.total_mc) via LEFT JOIN ke subquery (prod.total_mc = mesin unik per idapsperstyle)
+            SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' THEN COALESCE(prod.total_mc,0) ELSE 0 END) AS actual_mc_tj,
+            SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' THEN COALESCE(prod.total_mc,0) ELSE 0 END) AS actual_mc_jc,
+            SUM(CASE WHEN (aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%') THEN COALESCE(prod.total_mc,0) ELSE 0 END) AS actual_mc_autolink,
+            SUM(CASE WHEN (aps.seam LIKE '%ROSSO%' OR aps.seam LIKE '%RS%') THEN COALESCE(prod.total_mc,0) ELSE 0 END) AS actual_mc_rosso
+        ");
+        $builder->join("($subquery) AS prod", 'prod.idapsperstyle = aps.idapsperstyle', 'left');
+        $builder->where('MONTHNAME(aps.delivery)', $bulan);
+        $builder->where('YEAR(aps.delivery)', $tahun);
+        $builder->where('aps.production_unit !=', 'MJ');
+
+        return $builder->get()->getRowArray();
+    }
     public function tampilPerarea($area)
     {
         $twomonth = date('Y-m-d', strtotime('60 days ago'));
