@@ -20,6 +20,35 @@
                             <button id="approve-btn" class="btn btn-info">Approve</button>
                         </div>
                     </div>
+                    <!-- FILTER -->
+                    <form method="get" class="mt-4">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-3">
+                                <label class="form-label text-xs mb-1">Tanggal Dibuat</label>
+                                <input type="date" name="tgl_buat" class="form-control form-control-sm" value="<?= $_GET['tgl_buat'] ?? '' ?>">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-xs mb-1">No Model</label>
+                                <input type="text" name="no_model" class="form-control form-control-sm" placeholder="Masukkan No Model" value="<?= $_GET['no_model'] ?? '' ?>">
+                            </div>
+
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary btn-sm w-100">Filter</button>
+                            </div>
+
+                            <div class="col-md-2">
+                                <a href="<?= base_url($role . '/pengajuanspk2') ?>" class="btn btn-secondary btn-sm w-100">Reset</a>
+                            </div>
+
+                            <div class="col-md-2">
+                                <a href="<?= base_url($role . '/export_excel_pengajuanspk2?tgl_buat=' . ($_GET['tgl_buat'] ?? '') . '&no_model=' . ($_GET['no_model'] ?? '')) ?>"
+                                    class="btn btn-success btn-sm w-100">
+                                    Export Excel
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+
                 </div>
             </div>
         </div>

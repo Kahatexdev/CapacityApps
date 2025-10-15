@@ -28,6 +28,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\{Border, Alignment, Fill};
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use App\Models\EstSpkModel;
+use App\Models\BsModel;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use DateTime;
@@ -54,6 +55,7 @@ class ExcelController extends BaseController
     protected $EstimatedPlanningModel;
     protected $orderServices;
     protected $estspk;
+    protected $bsModel;
 
 
     public function __construct()
@@ -74,6 +76,7 @@ class ExcelController extends BaseController
         $this->EstimatedPlanningModel = new EstimatedPlanningModel();
         $this->orderServices = new orderServices();
         $this->estspk = new EstSpkModel();
+        $this->bsModel = new BsModel();
 
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -9625,6 +9628,100 @@ class ExcelController extends BaseController
         $sheet->getStyle($headerRange)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
         $filename = 'Data_Produksi_' . $area . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function exportPengajuanSPK2()
+    {
+        // Ambil filter dari input GET
+        $tgl = $this->request->getGet('tgl_buat');
+        $noModel = $this->request->getGet('no_model');
+
+        $estimasiSpk = $this->estspk->getData($tgl, $noModel);
+        foreach ($estimasiSpk as &$spk) {
+            $noModel = $spk['model'];
+            $styleSize = $spk['style'];
+            $area = $spk['area'];
+            $idaps = $this->ApsPerstyleModel->getIdApsForPph($area, $noModel, $styleSize);
+            $idapsList = array_column($idaps, 'idapsperstyle');
+            $spk['qty_order'] = $this->ApsPerstyleModel->getQtyOrder($noModel, $styleSize, $area)['qty'] ?? '-';
+            $spk['plus_packing'] = $this->ApsPerstyleModel->getQtyOrder($noModel, $styleSize, $area)['po_plus'] ?? '0';
+            $spk['deffect'] =  $this->bsModel->getBsPph($idapsList)['bs_setting'] ?? '-';
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $title = 'Data Pengajuan SPK2';
+        $sheet->mergeCells('A1:J1');
+        $sheet->setCellValue('A1', $title);
+
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // === Header Kolom di Baris 3 === //
+        $sheet->setCellValue('A3', 'No');
+        $sheet->setCellValue('B3', 'Tgl Dibuat');
+        $sheet->setCellValue('C3', 'Jam');
+        $sheet->setCellValue('D3', 'No Model');
+        $sheet->setCellValue('E3', 'Style');
+        $sheet->setCellValue('F3', 'Area');
+        $sheet->setCellValue('G3', 'Qty Order (Pcs)');
+        $sheet->setCellValue('H3', 'BS Stocklot');
+        $sheet->setCellValue('I3', 'Qty (+)Packing (Pcs)');
+        $sheet->setCellValue('J3', 'Qty Minta (Pcs)');
+
+        // === Isi Data mulai dari baris ke-3 === //
+        $row = 4;
+        $no = 1;
+        foreach ($estimasiSpk as $data) {
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $data['tgl_buat']);
+            $sheet->setCellValue('C' . $row, $data['jam']);
+            $sheet->setCellValue('D' . $row, $data['model']);
+            $sheet->setCellValue('E' . $row, $data['style']);
+            $sheet->setCellValue('F' . $row, $data['area']);
+            $sheet->setCellValue('G' . $row, $data['qty_order']);
+            $sheet->setCellValue('H' . $row, $data['deffect']);
+            $sheet->setCellValue('I' . $row, $data['plus_packing']);
+            $sheet->setCellValue('J' . $row, $data['qty']);
+            $row++;
+        }
+
+        // === Auto Size Kolom A - M === //
+        foreach (range('A', 'J') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // === Tambahkan Border (A2:M[row - 1]) === //
+        $styleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+
+        $lastDataRow = $row - 1;
+
+        $sheet->getStyle("A3:J{$lastDataRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("A3:J{$lastDataRow}")->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $sheet->getStyle("A3:J{$lastDataRow}")->applyFromArray($styleArray);
+
+        // Styling Header
+        $headerRange = 'A3:J3';
+        $sheet->getStyle($headerRange)->getFont()->setBold(true);
+        $sheet->getStyle($headerRange)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle($headerRange)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
+        $filename = 'Data_Pengajuan_SPK2.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$filename\"");
         header('Cache-Control: max-age=0');
