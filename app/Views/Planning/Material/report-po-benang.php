@@ -137,8 +137,7 @@
                     <thead>
                         <tr>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Waktu Input</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tanggal PO</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tanggal</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Foll Up</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Model</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Order</th>
@@ -245,12 +244,11 @@
                         $.each(response, function(index, item) {
                             dataTable.row.add([
                                 index + 1,
-                                item.created_at,
-                                item.tgl_po,
+                                item.tgl_input,
                                 item.foll_up,
                                 item.no_model,
                                 item.no_order,
-                                item.keterangan,
+                                item.memo,
                                 item.buyer,
                                 item.delivery_awal,
                                 item.delivery_akhir,

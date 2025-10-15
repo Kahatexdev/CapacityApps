@@ -2169,7 +2169,7 @@ class MaterialController extends BaseController
         $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir;
         $material = @file_get_contents($apiUrl);
 
-        // $models = [];
+        $models = [];
         if ($material !== FALSE) {
             $models = json_decode($material, true);
         }
@@ -2198,7 +2198,7 @@ class MaterialController extends BaseController
         $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterPoBenang?key=' . urlencode($key);
         $material = @file_get_contents($apiUrl);
 
-        // $models = [];
+        $models = [];
         if ($material !== FALSE) {
             $models = json_decode($material, true);
         }

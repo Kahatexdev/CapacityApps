@@ -112,7 +112,7 @@
     <div class="card card-frame">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 font-weight-bolder">Report PO Benang</h5>
+                <h5 class="mb-0 font-weight-bolder">Filter PO Benang</h5>
             </div>
             <div class="row mt-2">
                 <div class="col-md-9">
@@ -137,8 +137,7 @@
                     <thead>
                         <tr>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Waktu Input</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tanggal PO</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tanggal</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Foll Up</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Model</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Order</th>
@@ -245,12 +244,11 @@
                         $.each(response, function(index, item) {
                             dataTable.row.add([
                                 index + 1,
-                                item.created_at,
-                                item.tgl_po,
+                                item.tgl_input,
                                 item.foll_up,
                                 item.no_model,
                                 item.no_order,
-                                item.keterangan,
+                                item.memo,
                                 item.buyer,
                                 item.delivery_awal,
                                 item.delivery_akhir,
