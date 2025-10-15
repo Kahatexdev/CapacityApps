@@ -2722,4 +2722,20 @@ class MaterialController extends BaseController
 
         return $this->response->setJSON($data);
     }
+
+    public function reportKebutuhanBahanBaku()
+    {
+        $data = [
+            'role'            => session()->get('role'),
+            'title'           => 'Material System',
+            'active1'         => '',
+            'active2'         => '',
+            'active3'         => '',
+            'active4'         => '',
+            'active5'         => '',
+            'active6'         => '',
+            'active7'         => '',
+        ];
+        return view(session()->get('role') . '/Material/report-kebutuhan-bb', $data);
+    }
 }
