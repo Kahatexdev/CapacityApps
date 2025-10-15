@@ -1,4 +1,4 @@
-<!-- <style>
+<style>
     .empty-span {
         background: repeating-linear-gradient(90deg,
                 rgba(148, 163, 184, .25),
@@ -16,7 +16,7 @@
         background: transparent;
         width: 6px;
     }
-</style> -->
+</style>
 
 <?php
 /* --- SETTINGS & OFFSETS --- */
