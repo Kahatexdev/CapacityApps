@@ -11,9 +11,14 @@ $rightMaxRows  = 10;
 
 $totalRows     = $leftMaxRows;
 
-// Baris pemisah (TR) setelah index baris ke-… (0-based)
+// Baris pemisah (TR) setelah index baris ke-â€¦ (0-based)
 $sectionRows = [
     // misal: 4 => 'LORONG'
+    0 => 'LORONG 5',
+    2 => 'LORONG 4',
+    4 => 'LORONG 3',
+    6 => 'LORONG 2',
+    8 => 'LORONG 1'
 ];
 
 // ======================== UTIL ============================
@@ -247,7 +252,7 @@ for ($r = 0; $r < $totalRows; $r++) {
 
     echo '</tr>';
 
-    // ===== TR PEMISAH (LORONG …) =====
+    // ===== TR PEMISAH (LORONG â€¦) =====
     if (isset($sectionRows[$r])) {
         $label = $sectionRows[$r];
         echo '<tr class="lorong-sep">
