@@ -2169,7 +2169,7 @@ class MaterialController extends BaseController
         $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir;
         $material = @file_get_contents($apiUrl);
 
-        // $models = [];
+        $models = [];
         if ($material !== FALSE) {
             $models = json_decode($material, true);
         }
@@ -2198,7 +2198,7 @@ class MaterialController extends BaseController
         $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterPoBenang?key=' . urlencode($key);
         $material = @file_get_contents($apiUrl);
 
-        // $models = [];
+        $models = [];
         if ($material !== FALSE) {
             $models = json_decode($material, true);
         }
@@ -2721,5 +2721,21 @@ class MaterialController extends BaseController
         }
 
         return $this->response->setJSON($data);
+    }
+
+    public function reportKebutuhanBahanBaku()
+    {
+        $data = [
+            'role'            => session()->get('role'),
+            'title'           => 'Material System',
+            'active1'         => '',
+            'active2'         => '',
+            'active3'         => '',
+            'active4'         => '',
+            'active5'         => '',
+            'active6'         => '',
+            'active7'         => '',
+        ];
+        return view(session()->get('role') . '/Material/report-kebutuhan-bb', $data);
     }
 }

@@ -227,15 +227,15 @@ class OrderModel extends Model
             ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_tj,
             ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' AND (aps.seam LIKE '%AUTOLINK%' OR aps.seam LIKE '%AUTO LINK%') THEN aps.qty/24 ELSE 0 END), 0) AS qty_autolink_tj, 
             ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' AND (aps.seam LIKE '%AUTOLINK%' OR aps.seam LIKE '%AUTO LINK%') THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_autolink_tj, 
-            ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' AND (aps.seam LIKE 'ROSSO%' OR aps.seam LIKE 'RS%') THEN aps.qty/24 ELSE 0 END), 0) AS qty_rosso_tj, 
-            ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' AND (aps.seam LIKE 'ROSSO%' OR aps.seam LIKE 'RS%') THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_rosso_tj, 
+            ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' AND (aps.seam NOT LIKE '%AUTOLINK%' and aps.seam NOT LIKE '%AUTO LINK%') THEN aps.qty/24 ELSE 0 END), 0) AS qty_rosso_tj, 
+            ROUND(SUM(CASE WHEN aps.machinetypeid LIKE 'TJ%' AND (aps.seam NOT LIKE '%AUTOLINK%' and aps.seam NOT LIKE '%AUTO LINK%') THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_rosso_tj, 
             
             ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' THEN aps.qty/24 ELSE 0 END), 0) AS qty_jc,
             ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_jc,
             ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%') THEN aps.qty/24 ELSE 0 END), 0) AS qty_autolink_jc, 
             ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam LIKE 'AUTOLINK%' OR aps.seam LIKE 'AUTO LINK%') THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_autolink_jc, 
-            ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam LIKE 'ROSSO%' OR aps.seam LIKE 'RS%') THEN aps.qty/24 ELSE 0 END), 0) AS qty_rosso_jc, 
-            ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam LIKE 'ROSSO%' OR aps.seam LIKE 'RS%') THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_rosso_jc,
+            ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam NOT LIKE '%AUTOLINK%' and aps.seam NOT LIKE '%AUTO LINK%') THEN aps.qty/24 ELSE 0 END), 0) AS qty_rosso_jc, 
+            ROUND(SUM(CASE WHEN aps.machinetypeid NOT LIKE 'TJ%' AND (aps.seam NOT LIKE '%AUTOLINK%' and aps.seam NOT LIKE '%AUTO LINK%') THEN aps.sisa/24 ELSE 0 END), 0) AS sisa_rosso_jc,
         ");
         $builder->where('MONTHNAME(aps.delivery)', $bulan);
         $builder->where('YEAR(aps.delivery)', $tahun);

@@ -7295,12 +7295,11 @@ class ExcelController extends BaseController
             $sheet->fromArray([
                 [
                     $index + 1,
-                    $item['created_at'],
-                    $item['tgl_po'],
+                    $item['tgl_input'],
                     $item['foll_up'],
                     $item['no_model'],
                     $item['no_order'],
-                    $item['keterangan'],
+                    $item['memo'],
                     $item['buyer'],
                     $item['delivery_awal'],
                     $item['delivery_akhir'],

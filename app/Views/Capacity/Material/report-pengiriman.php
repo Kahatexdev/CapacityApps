@@ -112,12 +112,20 @@
     <div class="card card-frame">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 font-weight-bolder">Filter PO Benang</h5>
+                <h5 class="mb-0 font-weight-bolder">Filter Pengiriman</h5>
             </div>
             <div class="row mt-2">
-                <div class="col-md-9">
+                <div class="col-md-3">
                     <label for="">Key</label>
-                    <input type="text" id="keyInput" class="form-control" placeholder="No Model/Item Type/Kode Warna/Warna">
+                    <input type="text" id="keyInput" class="form-control" placeholder="PDK / Item Type / Kode Warna dan Warna">
+                </div>
+                <div class="col-md-3">
+                    <label for="">Tanggal Awal (Tanggal Keluar)</label>
+                    <input type="date" class="form-control">
+                </div>
+                <div class="col-md-3">
+                    <label for="">Tanggal Akhir (Tanggal Keluar)</label>
+                    <input type="date" class="form-control">
                 </div>
                 <div class="col-md-3">
                     <label for="">Aksi</label><br>
@@ -137,20 +145,22 @@
                     <thead>
                         <tr>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tanggal</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Foll Up</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Model</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Order</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Keterangan</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Buyer</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Area</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Delivery Awal</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Delivery Akhir</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Order Type</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Item Type</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Jenis</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Kode Warna</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Warna</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">KG Pesan</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Kgs Pesan</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tanggal Keluar</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Kgs Kirim</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Cones Kirim</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Karung Kirim</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">LOT Kirim</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nama Cluster</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Keterangan</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Admin</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -200,24 +210,27 @@
 
         function loadData() {
             let key = $('#keyInput').val().trim();
-            // let key = $('input[type="text"]').val().trim();
+            let tanggal_awal = $('input[type="date"]').eq(0).val().trim();
+            let tanggal_akhir = $('input[type="date"]').eq(1).val().trim();
 
-            // Validasi
-            if (key === '') {
+            // Validasi: Jika semua input kosong, tampilkan alert dan hentikan pencarian
+            if (key === '' && tanggal_awal === '' && tanggal_akhir === '') {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Oops...',
-                    text: 'Isi dulu key nya besti sebelum melakukan pencarian!',
+                    text: 'Harap isi minimal salah satu kolom sebelum melakukan pencarian!',
                 });
                 return;
             }
 
 
             $.ajax({
-                url: "<?= base_url($role . '/warehouse/filterPoBenang') ?>",
+                url: "<?= base_url($role . '/warehouse/filterPengiriman') ?>",
                 type: "GET",
                 data: {
-                    key: key
+                    key: key,
+                    tanggal_awal: tanggal_awal,
+                    tanggal_akhir: tanggal_akhir
                 },
                 dataType: "json",
                 beforeSend: function() {
@@ -244,20 +257,22 @@
                         $.each(response, function(index, item) {
                             dataTable.row.add([
                                 index + 1,
-                                item.tgl_input,
-                                item.foll_up,
                                 item.no_model,
-                                item.no_order,
-                                item.memo,
-                                item.buyer,
+                                item.area_out,
                                 item.delivery_awal,
                                 item.delivery_akhir,
-                                item.unit,
                                 item.item_type,
-                                item.jenis,
                                 item.kode_warna,
                                 item.color,
-                                item.kg_po
+                                item.kgs_pesan,
+                                item.tgl_out,
+                                item.kgs_pakai,
+                                item.cones_pakai,
+                                item.krg_pakai,
+                                item.lot_pakai,
+                                item.nama_cluster,
+                                item.keterangan_gbn,
+                                item.admin
                             ]).draw(false);
                         });
 
@@ -271,6 +286,7 @@
                                 </td>
                             </tr>
                         `);
+
                         $('#btnExport').addClass('d-none'); // Sembunyikan jika tidak ada data
                     }
                 },
@@ -290,7 +306,9 @@
 
         $('#btnExport').click(function() {
             let key = $('input[type="text"]').val();
-            window.location.href = "<?= base_url($role . '/warehouse/exportPoBenang') ?>?key=" + key;
+            let tanggal_awal = $('input[type="date"]').eq(0).val();
+            let tanggal_akhir = $('input[type="date"]').eq(1).val();
+            window.location.href = "<?= base_url($role . '/warehouse/exportPengiriman') ?>?key=" + key + "&tanggal_awal=" + tanggal_awal + "&tanggal_akhir=" + tanggal_akhir;
         });
 
         dataTable.clear().draw();
@@ -300,6 +318,7 @@
     $('#btnReset').click(function() {
         // Kosongkan input
         $('input[type="text"]').val('');
+        $('input[type="date"]').val('');
 
         // Kosongkan tabel hasil pencarian
         $('#dataTable tbody').html('');

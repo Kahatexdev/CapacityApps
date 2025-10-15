@@ -112,12 +112,12 @@
     <div class="card card-frame">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 font-weight-bolder">Filter PO Benang</h5>
+                <h5 class="mb-0 font-weight-bolder">Report Global Nylon</h5>
             </div>
             <div class="row mt-2">
-                <div class="col-md-9">
-                    <label for="">Key</label>
-                    <input type="text" id="keyInput" class="form-control" placeholder="No Model/Item Type/Kode Warna/Warna">
+                <div class="col-md-3">
+                    <label for="">No Model</label>
+                    <input type="text" id="keyInput" class="form-control">
                 </div>
                 <div class="col-md-3">
                     <label for="">Aksi</label><br>
@@ -137,20 +137,32 @@
                     <thead>
                         <tr>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tanggal</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Foll Up</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Model</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Order</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Keterangan</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Buyer</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Delivery Awal</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Delivery Akhir</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Order Type</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Item Type</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Jenis</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Kode Warna</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Warna</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">KG Pesan</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Loss</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Qty PO</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Qty PO(+)</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Stock Awal</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Stock Opname</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Datang Solid</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">(+) Datang Solid</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Ganti Retur</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Datang Lurex</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">(+) Datang Lurex</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Retur PB GBN</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Retur PB Area</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Pakai Area</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Pakai Lain-Lain</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Retur Stock</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Retur Titip</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Dipinjam</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Pindah Order</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Pindah Ke Stock Mati</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Stock Akhir</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tagihan GBN</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Jatah Area</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -200,24 +212,25 @@
 
         function loadData() {
             let key = $('#keyInput').val().trim();
-            // let key = $('input[type="text"]').val().trim();
+            let jenis = 'NYLON';
 
-            // Validasi
+            // Validasi: Jika semua input kosong, tampilkan alert dan hentikan pencarian
             if (key === '') {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Oops...',
-                    text: 'Isi dulu key nya besti sebelum melakukan pencarian!',
+                    text: 'Harap isi minimal salah satu kolom sebelum melakukan pencarian!',
                 });
                 return;
             }
 
 
             $.ajax({
-                url: "<?= base_url($role . '/warehouse/filterPoBenang') ?>",
+                url: "<?= base_url($role . '/warehouse/filterReportGlobal') ?>",
                 type: "GET",
                 data: {
-                    key: key
+                    key: key,
+                    jenis: jenis
                 },
                 dataType: "json",
                 beforeSend: function() {
@@ -242,22 +255,57 @@
 
                     if (response.length > 0) {
                         $.each(response, function(index, item) {
+                            // konversi dulu ke Number, default 0
+                            const kgs = Number(item.kgs) || 0;
+                            const poTambahan = Number(item.qty_poplus) || 0;
+                            const kgsStockAwal = Number(item.stock_awal) || 0;
+                            const datangSolid = Number(item.datang_solid) || 0;
+                            const plusDatangSolid = Number(item.plus_datang_solid) || 0;
+                            const gantiRetur = Number(item.ganti_retur) || 0;
+                            const datangLurex = Number(item.datang_lurex) || 0;
+                            const plusDatangLurex = Number(item.plus_datang_lurex) || 0;
+                            const returPbGbn = Number(item.retur_pb_area) || 0;
+                            const returPbArea = Number(item.retur_pb_area) || 0;
+                            const pakaiArea = Number(item.pakai_area) || 0;
+                            const stockAkhir = Number(item.stock_akhir) || 0;
+                            const kgsOtherOut = Number(item.kgs_other_out) || 0;
+                            const loss = Number(item.loss) || 0;
+
+                            // perhitungan
+                            const tagihanGbn = kgs - (datangSolid + plusDatangSolid + kgsStockAwal);
+                            const jatahArea = kgs - pakaiArea;
+
+                            // fungsi bantu untuk format
+                            const fmt = v => v !== 0 ? v.toFixed(2) : '0';
+
                             dataTable.row.add([
                                 index + 1,
-                                item.tgl_input,
-                                item.foll_up,
-                                item.no_model,
-                                item.no_order,
-                                item.memo,
-                                item.buyer,
-                                item.delivery_awal,
-                                item.delivery_akhir,
-                                item.unit,
-                                item.item_type,
-                                item.jenis,
-                                item.kode_warna,
-                                item.color,
-                                item.kg_po
+                                item.no_model || '-', // no model
+                                item.item_type || '-', // item type
+                                item.kode_warna || '-', //kode warna
+                                item.color || '-', // warna
+                                fmt(loss), // loss
+                                fmt(kgs), // qty po
+                                fmt(poTambahan), // qty po (+)
+                                fmt(kgsStockAwal), // stock awal
+                                '-', // stock opname
+                                fmt(datangSolid), // datang solid
+                                fmt(plusDatangSolid), // (+) datang solid
+                                fmt(gantiRetur), // ganti retur
+                                fmt(datangLurex), // datang lurex
+                                fmt(plusDatangLurex), // (+) datang lurex
+                                fmt(returPbGbn), // retur pb gbn
+                                fmt(returPbArea), // retur pb area
+                                fmt(pakaiArea), // pakai area 
+                                fmt(kgsOtherOut), // pakai lain-lain
+                                '-', // retur stock
+                                '-', // retur titip
+                                '-', // dipinjam
+                                '-', // pindah order
+                                '-', // pindah ke stock mati
+                                fmt(stockAkhir), // stock akhir
+                                fmt(tagihanGbn), // tagihan gbn
+                                fmt(jatahArea), // jatah area
                             ]).draw(false);
                         });
 
@@ -271,6 +319,7 @@
                                 </td>
                             </tr>
                         `);
+
                         $('#btnExport').addClass('d-none'); // Sembunyikan jika tidak ada data
                     }
                 },
@@ -289,8 +338,11 @@
         });
 
         $('#btnExport').click(function() {
-            let key = $('input[type="text"]').val();
-            window.location.href = "<?= base_url($role . '/warehouse/exportPoBenang') ?>?key=" + key;
+            let key = $('#keyInput').val();
+            let jenis = 'NYLON';
+            window.location.href = "<?= base_url($role . '/warehouse/exportGlobalReport') ?>" +
+                "?key=" + encodeURIComponent(key) +
+                "&jenis=" + encodeURIComponent(jenis);
         });
 
         dataTable.clear().draw();

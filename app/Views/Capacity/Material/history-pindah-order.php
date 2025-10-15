@@ -112,17 +112,24 @@
     <div class="card card-frame">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 font-weight-bolder">Filter PO Benang</h5>
+                <h5 class="mb-0 font-weight-bolder">Report History Pindah Order</h5>
             </div>
             <div class="row mt-2">
-                <div class="col-md-9">
-                    <label for="">Key</label>
-                    <input type="text" id="keyInput" class="form-control" placeholder="No Model/Item Type/Kode Warna/Warna">
+                <div class="col-md-2">
+                    <label for="">No Model</label>
+                    <input type="text" class="form-control" name="no_model" id="no_model">
                 </div>
                 <div class="col-md-3">
+                    <label for="">Kode Warna</label>
+                    <input type="text" class="form-control" name="kode_warna" id="kode_warna">
+                </div>
+                <div class="col-md-7">
                     <label for="">Aksi</label><br>
                     <button class="btn btn-info btn-block" id="btnSearch"><i class="fas fa-search"></i></button>
                     <button class="btn btn-danger" id="btnReset"><i class="fas fa-redo-alt"></i></button>
+                    <!-- selalu tampil -->
+                    <!-- <button id="btnExportAll" class="btn btn-success btn-block"><i class="fas fa-file-excel"></i> Export All</button> -->
+                    <button class="btn btn-primary" id="btnExportAll"><i class="fas fa-file-excel"></i></button>
                     <button class="btn btn-primary d-none" id="btnExport"><i class="fas fa-file-excel"></i></button>
                 </div>
             </div>
@@ -137,24 +144,21 @@
                     <thead>
                         <tr>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tanggal</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Foll Up</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Model</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Order</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Keterangan</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Buyer</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Delivery Awal</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Delivery Akhir</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Order Type</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Item Type</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Jenis</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Kode Warna</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Warna</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">KG Pesan</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Qty</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Cones</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Lot</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Cluster</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Keterangan</th>
                         </tr>
                     </thead>
                     <tbody>
-
+                        <!--  -->
                     </tbody>
                 </table>
             </div>
@@ -165,13 +169,13 @@
 <script>
     $(document).ready(function() {
         let dataTable = $('#dataTable').DataTable({
-            "paging": true,
-            "searching": false,
-            "ordering": true,
-            "info": true,
-            "responsive": true,
-            "processing": true,
-            "serverSide": false
+            paging: true,
+            searching: false,
+            ordering: true,
+            info: true,
+            responsive: true,
+            processing: true,
+            serverSide: false
         });
 
         function showLoading() {
@@ -198,26 +202,55 @@
             $('#progressText').text(percent + '%');
         }
 
-        function loadData() {
-            let key = $('#keyInput').val().trim();
-            // let key = $('input[type="text"]').val().trim();
+        // Ambil data awal pas page load
+        loadDefaultData();
 
-            // Validasi
-            if (key === '') {
+        $('#btnSearch').click(function() {
+            loadData();
+        });
+
+        $('#btnExportAll').click(function() {
+            window.location.href = "<?= base_url("$role/warehouse/exportHistoryPindahOrder") ?>";
+        });
+
+        $('#btnExport').click(function() {
+            const m = $('#no_model').val().trim();
+            const k = $('#kode_warna').val().trim();
+            window.location.href = "<?= base_url("$role/warehouse/exportHistoryPindahOrder") ?>" +
+                "?model=" + encodeURIComponent(m) +
+                "&kode_warna=" + encodeURIComponent(k);
+        });
+
+        $('#btnReset').click(function() {
+            $('#no_model').val('');
+            $('#kode_warna').val('');
+            $('input[type="date"]').val('');
+
+            loadDefaultData();
+
+            $('#btnExportAll').removeClass('d-none');
+            $('#btnExport').addClass('d-none');
+        });
+
+        function loadData() {
+            let no_model = $('#no_model').val().trim();
+            let kode_warna = $('#kode_warna').val().trim();
+
+            if (no_model === '' && kode_warna === '') {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Oops...',
-                    text: 'Isi dulu key nya besti sebelum melakukan pencarian!',
+                    text: 'Harap isi minimal salah satu kolom sebelum melakukan pencarian!',
                 });
                 return;
             }
 
-
             $.ajax({
-                url: "<?= base_url($role . '/warehouse/filterPoBenang') ?>",
+                url: "<?= base_url($role . '/warehouse/historyPindahOrder') ?>",
                 type: "GET",
                 data: {
-                    key: key
+                    model: no_model,
+                    kode_warna: kode_warna
                 },
                 dataType: "json",
                 beforeSend: function() {
@@ -239,29 +272,27 @@
                 },
                 success: function(response) {
                     dataTable.clear().draw();
-
                     if (response.length > 0) {
                         $.each(response, function(index, item) {
                             dataTable.row.add([
                                 index + 1,
-                                item.tgl_input,
-                                item.foll_up,
-                                item.no_model,
-                                item.no_order,
-                                item.memo,
-                                item.buyer,
+                                item.no_model_old || '-',
                                 item.delivery_awal,
                                 item.delivery_akhir,
-                                item.unit,
-                                item.item_type,
-                                item.jenis,
-                                item.kode_warna,
-                                item.color,
-                                item.kg_po
+                                item.item_type || '-',
+                                item.kode_warna || '-',
+                                item.warna || '-',
+                                item.kgs,
+                                item.cns,
+                                item.lot,
+                                item.cluster_old,
+                                item.created_at + ' ' + item.keterangan + ' ke ' + item.no_model_new + ' kode ' + item.kode_warna
                             ]).draw(false);
                         });
 
-                        $('#btnExport').removeClass('d-none'); // Munculkan tombol Export Excel
+                        // Atur tombol export
+                        $('#btnExportAll').addClass('d-none'); // Hilangkan tombol export all
+                        $('#btnExport').removeClass('d-none');
                     } else {
                         let colCount = $('#dataTable thead th').length;
                         $('#dataTable tbody').html(`
@@ -271,7 +302,8 @@
                                 </td>
                             </tr>
                         `);
-                        $('#btnExport').addClass('d-none'); // Sembunyikan jika tidak ada data
+                        $('#btnExportAll').addClass('d-none'); // Hilangkan tombol export all
+                        $('#btnExport').removeClass('d-none');
                     }
                 },
                 error: function(xhr, status, error) {
@@ -282,30 +314,38 @@
                     setTimeout(() => hideLoading(), 400); // kasih jeda biar animasi progress keliatan
                 }
             });
+        };
+
+        function loadDefaultData() {
+            $.ajax({
+                url: "<?= base_url($role . '/warehouse/historyPindahOrder') ?>",
+                type: "GET",
+                dataType: "json",
+                success: function(response) {
+                    dataTable.clear().draw();
+
+                    $.each(response, function(index, item) {
+                        dataTable.row.add([
+                            index + 1,
+                            item.no_model_old || '-',
+                            item.delivery_awal,
+                            item.delivery_akhir,
+                            item.item_type || '-',
+                            item.kode_warna || '-',
+                            item.warna || '-',
+                            item.kgs,
+                            item.cns,
+                            item.lot,
+                            item.cluster_old,
+                            item.created_at + ' ' + item.keterangan + ' ke ' + item.no_model_new + ' kode ' + item.kode_warna
+                        ]).draw(false);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", error);
+                }
+            });
         }
-
-        $('#btnSearch').click(function() {
-            loadData();
-        });
-
-        $('#btnExport').click(function() {
-            let key = $('input[type="text"]').val();
-            window.location.href = "<?= base_url($role . '/warehouse/exportPoBenang') ?>?key=" + key;
-        });
-
-        dataTable.clear().draw();
-    });
-
-    // Fitur Reset
-    $('#btnReset').click(function() {
-        // Kosongkan input
-        $('input[type="text"]').val('');
-
-        // Kosongkan tabel hasil pencarian
-        $('#dataTable tbody').html('');
-
-        // Sembunyikan tombol Export Excel
-        $('#btnExport').addClass('d-none');
     });
 </script>
 
