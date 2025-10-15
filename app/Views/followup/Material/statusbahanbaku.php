@@ -43,10 +43,18 @@
         background: white;
     }
 
+    .table-freeze .sticky-col-4 {
+        position: sticky;
+        left: 320px;
+        /* lebar kolom pertama + kedua */
+        z-index: 2;
+        background: white;
+    }
+
     /* Header di sticky kolom */
     .table-freeze thead th.sticky-col,
     .table-freeze thead th.sticky-col-2,
-    .table-freeze thead th.sticky-col-3 {
+    .table-freeze thead th.sticky-col-3 .table-freeze thead th.sticky-col-4 {
         z-index: 3;
         /* biar header di atas data */
     }
@@ -360,7 +368,7 @@
                                 <th class="sticky-col">Jenis</th>
                                 <th class="sticky-col-2">Kode Warna</th>
                                 <th class="sticky-col-3">Warna</th>
-                                <th>Status Celup</th>
+                                <th class="sticky-col-4">Status Celup</th>
                                 <th>Qty PO</th>
                                 <th>Qty Celup</th>
                                 <th>Lot Celup</th>
@@ -439,7 +447,7 @@ ${data.master.no_model === '-'
     <td  class="sticky-col">${item.item_type}</td>
     <td  class="sticky-col-2">${item.kode_warna}</td>
     <td class="sticky-col-3">${item.color}</td>
-    <td><span class="badge ${statusClass} px-3 py-2">${item.last_status || 'Belum Schedule'}</span></td>
+    <td class="sticky-col-4"><span class="badge ${statusClass} px-3 py-2">${item.last_status || 'Belum Schedule'}</span></td>
     <td class="text-end">${formatNumber(item.qty_po)}</td>
     <td class="text-end">  ${item.po_plus === '1' ? '(+)' : ''}  ${item.kg_celup||0}</td>
     <td>${item.lot_celup || '-'}</td>
