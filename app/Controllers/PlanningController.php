@@ -825,32 +825,26 @@ class PlanningController extends BaseController
 
     public function denahMesin($area)
     {
-        // dd($area);
         $tanggal = $this->request->getGet('date') ?? date('Y-m-d');
         $cekProd = $this->produksiModel->cekProduksi($area, $tanggal);
-        // helper untuk bikin key mesin yang konsisten
+
         $makeKey = function ($row) {
-            // utamakan id mesin kalau ada
-            if (isset($row->id) && $row->id) {
-                return 'MCID:' . (int)$row->id;
-            }
-            // fallback aman
+            if (isset($row->id) && $row->id) return 'MCID:' . (int)$row->id;
             return 'MC:' . (string)$row->no_mc . '|' . (string)$row->jarum;
         };
+
         if ($cekProd) {
             $rawLayout = $this->machinesModel->getMachineWithProduksi($tanggal, $area);
             $grouped = [];
-
             foreach ($rawLayout as $row) {
-                $key = $makeKey($row); // ⬅️ bukan pakai tgl_produksi lagi
-
+                $key = $makeKey($row);
                 if (!isset($grouped[$key])) {
                     $grouped[$key] = [
                         'id'            => $row->id,
                         'no_mc'         => $row->no_mc,
                         'jarum'         => $row->jarum,
                         'area'          => $row->area,
-                        'tgl_produksi'  => $row->tgl_produksi, // info, tapi bukan bagian key
+                        'tgl_produksi'  => $row->tgl_produksi,
                         'status'        => $row->status,
                         'mastermodel'   => [],
                         'inisial'       => [],
@@ -858,7 +852,6 @@ class PlanningController extends BaseController
                         'idapsperstyle' => [],
                     ];
                 }
-
                 if ($row->mastermodel && !in_array($row->mastermodel, $grouped[$key]['mastermodel'], true)) {
                     $grouped[$key]['mastermodel'][] = $row->mastermodel;
                 }
@@ -875,10 +868,8 @@ class PlanningController extends BaseController
         } else {
             $dataPlan = $this->machinesModel->getMachinesPlan($tanggal, $area);
             $grouped = [];
-
             foreach ($dataPlan as $row) {
-                $key = $makeKey($row); // ⬅️ sama
-
+                $key = $makeKey($row);
                 if (!isset($grouped[$key])) {
                     $grouped[$key] = [
                         'id'            => $row->id,
@@ -888,11 +879,10 @@ class PlanningController extends BaseController
                         'status'        => $row->status,
                         'mastermodel'   => [],
                         'inisial'       => [],
-                        'id_produksi'   => [],   // siapkan supaya konsisten (walau kosong)
+                        'id_produksi'   => [],
                         'idapsperstyle' => [],
                     ];
                 }
-
                 if ($row->mastermodel && !in_array($row->mastermodel, $grouped[$key]['mastermodel'], true)) {
                     $grouped[$key]['mastermodel'][] = $row->mastermodel;
                 }
@@ -902,7 +892,6 @@ class PlanningController extends BaseController
             }
         }
 
-        // gabungkan mastermodel/inisial lalu konversi ke array (view kita pakai array)
         $layout = array_map(function ($item) {
             $item['mastermodel']   = implode(', ', $item['mastermodel']);
             $item['inisial']       = implode(', ', $item['inisial']);
@@ -912,56 +901,20 @@ class PlanningController extends BaseController
         }, array_values($grouped));
 
         usort($layout, function ($a, $b) {
-            // numeric compare by id
             $na = (int)($a['id'] ?? 0);
             $nb = (int)($b['id'] ?? 0);
             if ($na !== $nb) return $na <=> $nb;
-
-            // tie-breaker by jarum (string)
-            $ja = (string)($a['jarum'] ?? '');
-            $jb = (string)($b['jarum'] ?? '');
-            return strnatcasecmp($ja, $jb);
+            return strnatcasecmp((string)($a['jarum'] ?? ''), (string)($b['jarum'] ?? ''));
         });
 
+        $role = session()->get('role') ?? 'Planning';
 
-        $role = session()->get('role');
-
-        $data = [
+        return view($role . '/Planning/denah', [
             'layout'  => $layout,
             'tanggal' => $tanggal,
             'area'    => $area,
             'role'    => $role,
-        ];
-        // dd($data);
-        // Jika request AJAX → kembalikan JSON { html: "<tr>...rows..." }
-        if ($this->request->isAJAX()) {
-            // dd ($area);
-            switch ($area) {
-                case 'KK1A':
-                    $html = view($role . '/Planning/partials/denah_rowsA1', $data);
-                    break;
-                case 'KK1B':
-                    $html = view($role . '/Planning/partials/denah_rowsB1', $data);
-                    break;
-                case 'KK5G':
-                    $html = view($role . '/Planning/partials/denah_rows5G', $data);
-                    break;
-                case 'KK7K':
-                    $html = view($role . '/Planning/partials/denah_rows7K', $data);
-                    break;
-                case 'KK7L':
-                    $html = view($role . '/Planning/partials/denah_rows7L', $data);
-                    break;
-                default:
-                    $html = view($role . '/Planning/partials/denah_rows', $data);
-                    break;
-            }
-            return $this->response->setJSON(['html' => $html, 'tanggal' => $tanggal]);
-        }
-
-        // non-AJAX → render full page
-        return view($role . '/Planning/denah', array_merge($data, [
-            'title' => 'Denah Mesin',
+            'title'   => 'Denah Mesin',
             'active1' => '',
             'active2' => '',
             'active3' => '',
@@ -969,8 +922,9 @@ class PlanningController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => ''
-        ]));
+        ]);
     }
+
 
     public function detailDenah()
     {

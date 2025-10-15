@@ -406,44 +406,27 @@
                                 <span class="input-group-text bg-white" id="calendar-addon">
                                     <i class="far fa-calendar-alt text-info" aria-hidden="true"></i>
                                 </span>
-                                <input
-                                    type="date"
-                                    name="date"
-                                    id="denah-date"
-                                    class="form-control"
-                                    value="<?= esc($tanggal ?? ''); ?>"
-                                    aria-label="Pilih tanggal"
+                                <input type="date" name="date" id="denah-date" class="form-control"
+                                    value="<?= esc($tanggal ?? '') ?>" aria-label="Pilih tanggal"
                                     aria-describedby="calendar-addon">
                             </div>
 
                             <div class="btn-group" role="group" aria-label="Filter actions">
-                                <button
-                                    class="btn btn-info d-flex align-items-center justify-content-center gap-2"
-                                    type="submit"
-                                    id="btn-denah-search"
-                                    style="min-width: 100px;">
-                                    <span class="btn-text">
-                                        <i class="fas fa-search"></i> Cari
-                                    </span>
-                                    <span class="btn-spinner d-none" aria-hidden="true">
-                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Loading...</span>
-                                    </span>
+                                <button class="btn btn-info d-flex align-items-center justify-content-center gap-2"
+                                    type="submit" id="btn-denah-search" style="min-width: 100px;">
+                                    <i class="fas fa-search"></i> Cari
                                 </button>
 
-                                <button
-                                    class="btn btn-outline-secondary"
-                                    type="button"
-                                    id="btn-denah-reset"
-                                    title="Reset filter"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="bottom">
+                                <!-- RESET jadi link biasa tanpa JS -->
+                                <a class="btn btn-outline-secondary" id="btn-denah-reset"
+                                    href="<?= current_url() ?>">
                                     <i class="fas fa-undo"></i>
                                     <span class="d-none d-sm-inline ms-1">Reset</span>
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>
