@@ -1,23 +1,3 @@
-<style>
-    .empty-span {
-        background: repeating-linear-gradient(90deg,
-                rgba(148, 163, 184, .25),
-                rgba(148, 163, 184, .25) 4px,
-                transparent 4px,
-                transparent 8px);
-        padding: 0;
-    }
-
-    .left-pad {
-        background: transparent;
-    }
-
-    .empty-cell {
-        background: transparent;
-        width: 6px;
-    }
-</style>
-
 <?php
 /* --- SETTINGS & OFFSETS --- */
 $leftMaxRows     = $leftMaxRows     ?? 15;
@@ -398,4 +378,3 @@ for ($r = 0; $r < $totalRows; $r++) {
 
     echo '</tr>';
 }
-?>

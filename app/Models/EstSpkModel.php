@@ -51,13 +51,21 @@ class EstSpkModel extends Model
             ->first();
     }
 
-    public function getData()
+    public function getData($tgl = null, $noModel = null)
     {
-        return $this->select('estimasi_spk.*, DATE(created_at) AS tgl_buat, TIME(created_at) as jam')
-            ->where('status', 'sudah')
+        $builder = $this->select('estimasi_spk.*, DATE(created_at) AS tgl_buat, TIME(created_at) as jam')
+            ->where('status', 'sudah');
+        if (!empty($tgl)) {
+            $builder->like('created_at', $tgl);
+        }
+        if (!empty($noModel)) {
+            $builder->where('model', $noModel);
+        }
+        return $builder
             ->orderBy('created_at', 'ASC')
             ->findAll();
     }
+
     public function getHistory($area, $lastmonth)
     {
         return $this->where('area', $area)

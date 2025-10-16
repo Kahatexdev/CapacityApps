@@ -2252,7 +2252,11 @@ class OrderController extends BaseController
     }
     public function spk2()
     {
-        $estimasiSpk = $this->estspk->getData();
+        // Ambil filter dari input GET
+        $tgl = $this->request->getGet('tgl_buat');
+        $noModel = $this->request->getGet('no_model');
+
+        $estimasiSpk = $this->estspk->getData($tgl, $noModel);
         foreach ($estimasiSpk as &$spk) {
             $noModel = $spk['model'];
             $styleSize = $spk['style'];

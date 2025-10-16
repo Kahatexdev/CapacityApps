@@ -706,7 +706,7 @@
                 url: url,
                 type: 'GET',
                 data: formData,
-                dataType: 'text', // request as text first to be tolerant to non-json responses
+                dataType: 'html', // request as text first to be tolerant to non-json responses
                 timeout: config.ajaxTimeout,
                 beforeSend() {
                     utils.showButtonLoading();
@@ -717,11 +717,11 @@
 
         // Handle replacement of table body from different possible server responses
         function replaceTbodyFromResponse(responseText, selectedDate) {
-            // try JSON first (some servers return JSON string)
+            // 1) Coba JSON { html: "<tr>...</tr>" }
             let parsed;
             try {
                 parsed = JSON.parse(responseText);
-            } catch (err) {
+            } catch (_) {
                 parsed = null;
             }
 
@@ -729,33 +729,38 @@
             if (parsed && parsed.html) {
                 html = parsed.html;
             } else {
-                // server returned raw HTML — try to extract <tbody> content
-                const tbodyMatch = /<tbody[^>]*>([\s\S]*?)<\/tbody>/i.exec(responseText);
-                if (tbodyMatch && tbodyMatch[1]) {
-                    html = tbodyMatch[1];
-                    // wrap with <tbody> in case we need complete rows
-                    html = html;
+                // 2) Parse DOM & ambil #denah-rows (bukan <tbody> pertama)
+                const $temp = $('<div>').html(responseText);
+
+                // Prefer exact target tbody by id
+                let $target = $temp.find('#denah-rows');
+                if ($target.length) {
+                    html = $target.html();
                 } else {
-                    // fallback: use whole response (useful if controller returns only rows)
-                    html = responseText;
+                    // Fallback: ambil tbody yang berada di dalam #denah-table
+                    $target = $temp.find('#denah-table tbody').first();
+                    if ($target.length) {
+                        html = $target.html();
+                    } else {
+                        // Fallback terakhir: tbody pertama di dokumen
+                        const $firstTbody = $temp.find('tbody').first();
+                        html = $firstTbody.length ? $firstTbody.html() : responseText;
+                    }
                 }
             }
 
-            // if html empty -> show warning
             if (!html || html.trim() === '') {
                 utils.showToast('Data tidak ditemukan', 'warning');
                 return false;
             }
 
-            // animate replacement
+            // Animasi replace
             elements.tbody.stop(true, true).fadeOut(150, function() {
                 $(this).html(html).fadeIn(150, function() {
-                    // after inserted, reinitialize any plugins/listeners
                     reinitAfterDomUpdate();
                 });
             });
 
-            // success toast
             utils.updateUrl(selectedDate);
             utils.showToast(
                 selectedDate ?
@@ -766,6 +771,7 @@
 
             return true;
         }
+
 
         // re-init tooltips and attach delegated listeners for .cell
         function reinitAfterDomUpdate() {
