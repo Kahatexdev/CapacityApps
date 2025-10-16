@@ -1963,7 +1963,12 @@ class OrderController extends BaseController
                         $id = $existingAps['idapsperstyle'];
                         $qtyLama = $existingAps['qty'];
                         $qtyBaru = $qty + $qtyLama;
-                        $this->ApsPerstyleModel->update($id, ['qty' => $qtyBaru]);
+                        $update = [
+                            'qty' => $qtyBaru,
+                            'seam' => $seam,
+                            'process_route' => $processRoute,
+                        ];
+                        $this->ApsPerstyleModel->update($id, $update);
                     }
                     $this->orderModel->update($idModel, $updateData);
                     // }
