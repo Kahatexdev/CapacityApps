@@ -29,6 +29,7 @@ use PhpOffice\PhpSpreadsheet\Style\{Border, Alignment, Fill};
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use App\Models\EstSpkModel;
 use App\Models\BsModel;
+use App\Models\AreaMachineModel;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use DateTime;
@@ -56,6 +57,7 @@ class ExcelController extends BaseController
     protected $orderServices;
     protected $estspk;
     protected $bsModel;
+    protected $areaMachineModel;
 
 
     public function __construct()
@@ -77,6 +79,7 @@ class ExcelController extends BaseController
         $this->orderServices = new orderServices();
         $this->estspk = new EstSpkModel();
         $this->bsModel = new BsModel();
+        $this->areaMachineModel = new AreaMachineModel();
 
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -9736,6 +9739,161 @@ class ExcelController extends BaseController
         $tglProduksi = $this->request->getGet('tgl_produksi');
 
         $dataProduksi = $this->produksiModel->getDataProduksi($area, $tglProduksi);
+        // Ambil semua mastermodel unik yang tidak null
+        $masterModels = [];
+        $sizes = [];
+        if (!empty($dataProduksi)) {
+            foreach ($dataProduksi as $row) {
+                if (!empty($row['mastermodel'])) {
+                    $masterModels[$row['mastermodel']] = true; // key unik
+                }
+                if (!empty($row['size'])) { // pakai field 'size' sesuai select
+                    $sizes[$row['size']] = true;
+                }
+            }
+        }
+        // Konversi key menjadi array
+        $masterModels = array_keys($masterModels);
+        $sizes = array_keys($sizes);
+
+        $dataSmv = [];
+        if (!empty($masterModels)) {
+            // Ambil data SMV untuk semua mastermodel unik
+            $dataSmv = $this->ApsPerstyleModel->getDataSmv($masterModels, $sizes);
+        }
+
+        // 1️⃣ Kelompokkan SMV per mastermodel + machinetypeid
+        $smvPerMachineModel = [];
+        foreach ($dataSmv as $row) {
+            $key = $row['mastermodel'] . '|' . $row['machinetypeid'];
+            if (!empty($row['smv']) && $row['smv'] > 0) {
+                $smvPerMachineModel[$key][] = floatval($row['smv']);
+            }
+        }
+
+        // 2️⃣ Hitung rata-rata SMV per kombinasi mastermodel|machinetypeid
+        $avgSmvPerMachineModel = [];
+        foreach ($smvPerMachineModel as $key => $values) {
+            $avgSmvPerMachineModel[$key] = array_sum($values) / count($values);
+        }
+
+        // 3️⃣ Hitung jumlah mesin unik per mastermodel|machinetypeid dari data produksi
+        $machineCount = [];
+        foreach ($dataProduksi as $row) {
+            $key = $row['mastermodel'] . '|' . $row['machinetypeid'];
+            $noMesin = $row['no_mesin'];
+            if (!empty($noMesin)) {
+                $machineCount[$key][$noMesin] = true;
+            }
+        }
+
+        // 4️⃣ Hitung target final
+        $finalTarget = [];
+        foreach ($avgSmvPerMachineModel as $key => $avgSmv) {
+            // rumus target dasar: (86400 / smv) * 0.85 / 24
+            // → bisa disesuaikan sesuai formula kamu
+            $targetPerMachine = round((86400 / $avgSmv) * 0.85 / 24);
+            // $targetPerMachine = 14.13;
+
+            // kalikan dengan jumlah mesin
+            $countMesin = isset($machineCount[$key]) ? count($machineCount[$key]) : 1;
+
+            $finalTarget[$key] = $targetPerMachine * $countMesin;
+        }
+
+        // 5️⃣ DATA TOTAL PER JARUM (MACHINE TYPE) → PER MASTER MODEL
+        // ===================== DATA TOTAL PER JARUM (MACHINE TYPE) → PER MASTER MODEL ======================
+        $dataPerJarumPerModel = [];
+
+        // Loop data produksi
+        foreach ($dataProduksi as $row) {
+            $machineType = $row['machinetypeid'] ?? null;
+            $model = $row['mastermodel'] ?? null;
+            $qtyProduksi = !empty($row['qty_produksi']) ? intval($row['qty_produksi']) / 24 : 0;
+            $noMesin = $row['no_mesin'] ?? null;
+
+            if (empty($machineType) || empty($model)) continue;
+
+            // Inisialisasi level machine type
+            if (!isset($dataPerJarumPerModel[$machineType])) {
+                $dataPerJarumPerModel[$machineType] = [];
+            }
+
+            // Inisialisasi level mastermodel
+            if (!isset($dataPerJarumPerModel[$machineType][$model])) {
+                $keyTarget = $model . '|' . $machineType; // untuk ambil target
+                $dataPerJarumPerModel[$machineType][$model] = [
+                    'machinetypeid' => $machineType,
+                    'mastermodel' => $model,
+                    'total_produksi' => 0,
+                    'machineCount' => 0,
+                    'target' => $finalTarget[$keyTarget] ?? 0,
+                    'mesin' => [], // catat mesin unik
+                ];
+            }
+
+            // Tambah total produksi
+            $dataPerJarumPerModel[$machineType][$model]['total_produksi'] += $qtyProduksi;
+
+            // Catat mesin unik
+            if (!empty($noMesin)) {
+                $dataPerJarumPerModel[$machineType][$model]['mesin'][$noMesin] = true;
+            }
+        }
+
+        // Hitung machineCount, rata per mesin, dan produktivitas
+        foreach ($dataPerJarumPerModel as $machineType => &$models) {
+            foreach ($models as $model => &$info) {
+                $info['machineCount'] = count($info['mesin']);
+                $info['rata_per_mesin'] = $info['machineCount'] > 0
+                    ? round($info['total_produksi'] / $info['machineCount'], 2)
+                    : 0;
+                $info['productivity'] = $info['target'] > 0
+                    ? round(($info['total_produksi'] / $info['target']) * 100, 2)
+                    : 0;
+
+                // Hapus mesin unik agar rapi
+                unset($info['mesin']);
+            }
+            unset($models);
+        }
+        unset($info);
+
+        // ============= HITUNG TOTAL ALL ===============
+        $ttlMcArray = $this->areaMachineModel->getTotalMc($area);
+        $ttlMc = isset($ttlMcArray['total_mc']) ? intval($ttlMcArray['total_mc']) : 0;
+
+        // Inisialisasi total keseluruhan
+        $totalMcOn = 0;
+        $totalProduksi = 0;
+        $totalTarget = 0;
+
+        // Loop seluruh kombinasi machineType -> model
+        foreach ($dataPerJarumPerModel as $machineType => $models) {
+            foreach ($models as $info) {
+                $totalMcOn += $info['machineCount'];         // jumlah mesin aktif
+                $totalProduksi += $info['total_produksi'];   // sum produksi
+                $totalTarget += $info['target'];             // sum target
+            }
+        }
+
+        // Hitung Mc Off
+        $totalMcOff = $ttlMc - $totalMcOn;
+
+        // Hitung Efficiency / Productivity Keseluruhan
+        $totalEfficiency = ($totalTarget > 0)
+            ? round(($totalProduksi / $totalTarget) * 100, 2)
+            : 0;
+
+        // Buat array totalAll
+        $totalAll = [
+            'ttlMcAll'   => $ttlMc,         // semua mesin area
+            'ttlMcOn'    => $totalMcOn,     // mesin aktif
+            'ttlMcOff'   => $totalMcOff,    // mesin tidak aktif
+            'totalProd'  => $totalProduksi,
+            'totalTarget' => $totalTarget,
+            'efficiency' => $totalEfficiency
+        ];
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -9760,6 +9918,7 @@ class ExcelController extends BaseController
             $grouped[$model][] = $row;
         }
 
+        // dd($dataProduksi, $grouped, $dataSmv, $machineCount, $finalTarget, $dataPerJarumPerModel, $totalAll);
         // ===== CONFIG & VAR =====
         $startColumns = ['A', 'H', 'O']; // blok 1,2,3
         $rowsPerBlockFirstPage = 49;
@@ -9820,7 +9979,7 @@ class ExcelController extends BaseController
             );
         };
 
-        // ================ START ISI DATA ================
+        // ================ START ISI DATA PER NO MC================
         foreach ($grouped as $model => $items) {
             $currentLimit = ($page === 1) ? $rowsPerBlockFirstPage : $rowsPerBlockOtherPages;
             $colStart = $startColumns[$currentBlock];
@@ -9953,12 +10112,168 @@ class ExcelController extends BaseController
             }
         }
 
-        // ===== AUTO WIDTH =====
-        foreach (range('A', 'T') as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
+        // ===================== TOTAL DATA PER JARUM PER MODEL ======================
+        // Spasi dulu biar gak nempel ke tabel sebelumnya
+        $currentRow = $baseRow + max($rowInBlock) + 3;
+
+        $headerTotal = ['JRM', 'PDK', 'TARGET', 'PROD', 'MC', 'RATA2', 'PRODUCTIVITY%'];
+
+        // Style dasar header
+        $styleHeaderTotal = [
+            'font' => ['bold' => true],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN],
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['argb' => 'FFD9E1F2'],
+            ],
+        ];
+
+        // Style isi tabel total
+        $styleIsiTotal = [
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN],
+            ],
+        ];
+
+        foreach ($dataPerJarumPerModel as $machinetypeid => $models) {
+            // Header tabel
+            $sheet->fromArray($headerTotal, null, "A{$currentRow}");
+            $sheet->getStyle("A{$currentRow}:G{$currentRow}")->applyFromArray($styleHeaderTotal);
+            $sheet->getRowDimension($currentRow)->setRowHeight(24);
+            $currentRow++;
+
+            $startDataRow = $currentRow; // untuk rumus total nanti
+
+            // Isi data per model
+            foreach ($models as $model => $info) {
+                $sheet->setCellValue("A{$currentRow}", $machinetypeid); // JRM
+                $sheet->setCellValue("B{$currentRow}", $model); // PDK
+                $sheet->setCellValue("C{$currentRow}", $info['target']); // TARGET
+                $sheet->setCellValue("D{$currentRow}", $info['total_produksi']); // PROD
+                $sheet->setCellValue("E{$currentRow}", $info['machineCount']); // MC
+                $sheet->setCellValue("F{$currentRow}", $info['rata_per_mesin']); // RATA2
+                $sheet->setCellValue("G{$currentRow}", $info['productivity']); // PRODUCTIVITY%
+
+                $sheet->getStyle("A{$currentRow}:G{$currentRow}")->applyFromArray($styleIsiTotal);
+                $sheet->getRowDimension($currentRow)->setRowHeight(22);
+                $currentRow++;
+            }
+
+            $endDataRow = $currentRow - 1;
+
+            // Baris TOTAL
+            $sheet->setCellValue("A{$currentRow}", "TOTAL");
+            $sheet->mergeCells("A{$currentRow}:B{$currentRow}");
+
+            // SUM kolom numerik
+            $sheet->setCellValue("C{$currentRow}", "=SUM(C{$startDataRow}:C{$endDataRow})");
+            $sheet->setCellValue("D{$currentRow}", "=SUM(D{$startDataRow}:D{$endDataRow})");
+            $sheet->setCellValue("E{$currentRow}", "=SUM(E{$startDataRow}:E{$endDataRow})");
+
+            // AVERAGE kolom rata2 dan productivity
+            $sheet->setCellValue("F{$currentRow}", "=AVERAGE(F{$startDataRow}:F{$endDataRow})");
+            $sheet->setCellValue("G{$currentRow}", "=AVERAGE(G{$startDataRow}:G{$endDataRow})");
+
+            // Style total baris
+            $sheet->getStyle("A{$currentRow}:G{$currentRow}")->applyFromArray([
+                'font' => ['bold' => true],
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN],
+                ],
+                'fill' => [
+                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'startColor' => ['argb' => 'FFD9D9D9'],
+                ],
+            ]);
+
+            $sheet->getRowDimension($currentRow)->setRowHeight(24);
+            $currentRow += 3; // jarak antar tabel
         }
-        $sheet->getColumnDimension('G')->setWidth(2);
-        $sheet->getColumnDimension('N')->setWidth(2);
+
+        $currentRow += 3;
+
+        // =================== TOTAL SEMUA NYA ================
+        // Judul box total besar
+        $sheet->setCellValue("H{$currentRow}", "TTL MC ON");
+        $sheet->setCellValue("J{$currentRow}", "=SUM(E{$baseRow}:E{$currentRow})"); // atau sesuaikan range sebenarnya
+        $currentRow++;
+
+        $sheet->setCellValue("H{$currentRow}", "TTL MC OFF");
+        $sheet->setCellValue("J{$currentRow}", "-");
+        $currentRow++;
+
+        $sheet->setCellValue("H{$currentRow}", "PRODUKSI");
+        $sheet->setCellValue("J{$currentRow}", "=SUM(D{$baseRow}:D{$currentRow})");
+        $currentRow++;
+
+        $sheet->setCellValue("H{$currentRow}", "TARGET");
+        $sheet->setCellValue("J{$currentRow}", "=SUM(C{$baseRow}:C{$currentRow})");
+        $currentRow++;
+
+        $sheet->setCellValue("H{$currentRow}", "EFF");
+        $sheet->setCellValue("J{$currentRow}", "=J" . ($currentRow - 1) . "/J" . ($currentRow - 2)); // Target / Produksi (atau sesuaikan logika)
+        $currentRow++;
+
+        // Terapkan border di sekitar box (H sampai N)
+        $sheet->getStyle("H" . ($currentRow - 5) . ":N" . ($currentRow - 1))->applyFromArray([
+            'borders' => [
+                'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN],
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+            'font' => [
+                'bold' => true,
+            ],
+        ]);
+
+        // ===== AUTO WIDTH =====
+        // foreach (range('A', 'T') as $col) {
+        //     $sheet->getColumnDimension($col)->setAutoSize(true);
+        // }
+        // $sheet->getColumnDimension('G')->setWidth(2);
+        // $sheet->getColumnDimension('N')->setWidth(2);
+        // lebar kolom
+        $columnWidths = [
+            'A' => 10,
+            'B' => 10,
+            'C' => 5,
+            'D' => 5,
+            'E' => 5,
+            'F' => 10,
+            'G' => 3,
+            'H' => 10,
+            'I' => 10,
+            'J' => 5,
+            'K' => 5,
+            'L' => 5,
+            'M' => 10,
+            'N' => 3,
+            'O' => 10,
+            'P' => 10,
+            'Q' => 5,
+            'R' => 5,
+            'S' => 5,
+            'T' => 10
+        ];
+        foreach ($columnWidths as $c => $w) {
+            $sheet->getColumnDimension($c)->setWidth($w);
+        }
 
         // ===== PAGE SETUP A4 =====
         $sheet->getPageSetup()
