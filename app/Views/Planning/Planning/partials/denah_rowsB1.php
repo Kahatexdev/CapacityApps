@@ -1,23 +1,3 @@
-<!-- <style>
-    .empty-span {
-        background: repeating-linear-gradient(90deg,
-                rgba(148, 163, 184, .25),
-                rgba(148, 163, 184, .25) 4px,
-                transparent 4px,
-                transparent 8px);
-        padding: 0;
-    }
-
-    .left-pad {
-        background: transparent;
-    }
-
-    .empty-cell {
-        background: transparent;
-        width: 6px;
-    }
-</style> -->
-
 <?php
 /* --- SETTINGS & OFFSETS --- */
 $leftMaxRows     = $leftMaxRows     ?? 15;
@@ -94,7 +74,7 @@ $getSpan = function ($cell) use ($makeKey, $colspanMap) {
     return max(1, ($colspanMap[$k] ?? 1));
 };
 
-/* cap dinamis per section & baris (r1 = 1-based “global”) */
+/* cap dinamis per section & baris (r1 = 1-based â€œglobalâ€) */
 $rowCap = function (string $section, int $r1) use (
     $leftCapTop,
     $leftCapAfter,
@@ -102,10 +82,10 @@ $rowCap = function (string $section, int $r1) use (
     $centerCapAfter,
     $rightCapTop,
     $rightCapAfter,
-    $centerOffsetRows,   // ⬅️ tambahkan
-    $centerMaxRows,      // ⬅️ tambahkan
-    $centerBottomRows,   // ⬅️ tambahkan
-    $centerCapBottom     // ⬅️ tambahkan
+    $centerOffsetRows,   // â¬…ï¸ tambahkan
+    $centerMaxRows,      // â¬…ï¸ tambahkan
+    $centerBottomRows,   // â¬…ï¸ tambahkan
+    $centerCapBottom     // â¬…ï¸ tambahkan
 ) {
     $after = ($r1 > THRESHOLD_ROW);
 
@@ -146,7 +126,7 @@ foreach ($emptyBlocks as $blk) {
     $cls  = trim((string)($blk['class'] ?? 'empty-span'));
     if (!in_array($a, ['left', 'center', 'right'], true) || $row <= 0) continue;
 
-    // ⬇️ tambahkan at_col (opsional; 0 = prepend di paling kiri area)
+    // â¬‡ï¸ tambahkan at_col (opsional; 0 = prepend di paling kiri area)
     $at   = max(0, (int)($blk['at_col'] ?? 0));
 
     $emptyIdx[$a][$row] = ['span' => $span, 'class' => $cls, 'at_col' => $at];
@@ -181,7 +161,7 @@ for ($r = 0; $r < $totalRows; $r++) {
         // row relatif untuk center (1-based)
         $centerRowRel = $r - $centerOffsetRows + 1;
 
-        // ⬇️ paksa 2 baris terakhir center = 9 kolom
+        // â¬‡ï¸ paksa 2 baris terakhir center = 9 kolom
         if ($centerRowRel >= ($centerMaxRows - $centerBottomRows + 1)) {
             $capC = $centerCapBottom; // 9
         }
@@ -288,7 +268,7 @@ for ($r = 0; $r < $totalRows; $r++) {
         echo '<td class="left-pad" colspan="' . esc($capL - $used) . '"></td>';
     }
 
-    /* ---------- GUTTER kiri–tengah ---------- */
+    /* ---------- GUTTER kiriâ€“tengah ---------- */
     if ($r === 0) echo '<td class="empty-cell" rowspan="' . esc($totalRows) . '"></td>';
 
     /* ---------- CENTER ---------- */
@@ -300,7 +280,7 @@ for ($r = 0; $r < $totalRows; $r++) {
     $centerRowRel = ($r >= $centerOffsetRows) ? ($r - $centerOffsetRows + 1) : 0;
     $centerActive = ($r >= $centerOffsetRows && $centerRowRel >= 1 && $centerRowRel <= $centerMaxRows);
 
-    // ⬇️ paksa 2 baris terakhir center = 9 kolom saat render
+    // â¬‡ï¸ paksa 2 baris terakhir center = 9 kolom saat render
     if ($centerActive && $centerRowRel >= ($centerMaxRows - $centerBottomRows + 1)) {
         $capC = $centerCapBottom; // 9
     }
@@ -361,7 +341,7 @@ for ($r = 0; $r < $totalRows; $r++) {
 
 
 
-    /* ---------- GUTTER kanan–tengah ---------- */
+    /* ---------- GUTTER kananâ€“tengah ---------- */
     if ($r === 0) echo '<td class="empty-cell" rowspan="' . esc($totalRows) . '"></td>';
 
     /* ---------- RIGHT ---------- */
