@@ -9729,4 +9729,252 @@ class ExcelController extends BaseController
         $writer->save('php://output');
         exit;
     }
+
+    public function dataProduksi()
+    {
+        $area = $this->request->getGet('area');
+        $tglProduksi = $this->request->getGet('tgl_produksi');
+
+        $dataProduksi = $this->produksiModel->getDataProduksi($area, $tglProduksi);
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // ===== HEADER UTAMA (hanya di page pertama) =====
+        $title = 'PRODUKSI MC ' . $area;
+        $sheet->mergeCells('A1:G1');
+        $sheet->setCellValue('A1', $title);
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+        $tanggal = 'TANGGAL ' . strtoupper(date('d F Y', strtotime($tglProduksi)));
+        $sheet->mergeCells('N1:T1');
+        $sheet->setCellValue('N1', $tanggal);
+        $sheet->getStyle('N1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('N1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
+        // ===== GROUP DATA BERDASAR MASTER MODEL =====
+        $grouped = [];
+        foreach ($dataProduksi as $row) {
+            $model = $row['mastermodel'];
+            $grouped[$model][] = $row;
+        }
+
+        // ===== CONFIG & VAR =====
+        $startColumns = ['A', 'H', 'O']; // blok 1,2,3
+        $rowsPerBlockFirstPage = 49;
+        $rowsPerBlockOtherPages = 51;
+        $headers = ['JRM', 'NO MC', 'A', 'B', 'C', 'TOTAL'];
+
+        $currentRow = 3;
+
+        // ===== HELPER FUNCTION UNTUK HEADER BLOK =====
+        $writeHeaderBlock = function ($sheet, $colStart, $row, $headers) {
+            foreach ($headers as $i => $header) {
+                $sheet->setCellValue(chr(ord($colStart) + $i) . $row, $header);
+            }
+
+            $colEnd = chr(ord($colStart) + count($headers) - 1);
+            $range = $colStart . $row . ':' . $colEnd . $row;
+
+            $sheet->getStyle($range)->applyFromArray([
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
+                    ],
+                ],
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                ],
+                'font' => [
+                    'bold' => true,
+                ],
+            ]);
+
+            $sheet->getRowDimension($row)->setRowHeight(26);
+        };
+
+        // tulis header awal untuk semua blok
+        foreach ($startColumns as $colStart) {
+            $writeHeaderBlock($sheet, $colStart, $currentRow, $headers);
+        }
+
+        $baseRow = $currentRow + 1; // baris pertama setelah header
+        $page = 1;
+        $currentBlock = 0; // 0..2
+        $rowInBlock = [0, 0, 0];
+
+        // untuk tracking border per blok
+        $blockStartRow = [null, null, null];
+        $blockEndRow = [null, null, null];
+
+        // helper untuk pasang border per blok
+        $applyBorders = function ($sheet, $startCol, $endCol, $startRow, $endRow) {
+            if ($startRow === null || $endRow === null) return;
+            if ($endRow < $startRow) return;
+            $range = $startCol . $startRow . ':' . $endCol . $endRow;
+            $sheet->getStyle($range)->getBorders()->getAllBorders()->setBorderStyle(
+                \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
+            );
+        };
+
+        // ================ START ISI DATA ================
+        foreach ($grouped as $model => $items) {
+            $currentLimit = ($page === 1) ? $rowsPerBlockFirstPage : $rowsPerBlockOtherPages;
+            $colStart = $startColumns[$currentBlock];
+
+            if ($blockStartRow[$currentBlock] === null) {
+                $blockStartRow[$currentBlock] = $baseRow;
+            }
+
+            // cek limit, pindah blok/page jika perlu
+            if ($rowInBlock[$currentBlock] + 2 > $currentLimit) {
+                $sCol = $startColumns[$currentBlock];
+                $eCol = chr(ord($sCol) + 5);
+                $blockEndRow[$currentBlock] = $baseRow + $rowInBlock[$currentBlock] - 1;
+                $applyBorders($sheet, $sCol, $eCol, $blockStartRow[$currentBlock], $blockEndRow[$currentBlock]);
+
+                $currentBlock++;
+                if ($currentBlock > 2) {
+                    // page break
+                    $lastFilled = $baseRow + max($rowInBlock) - 1;
+                    $sheet->setBreak('A' . ($lastFilled), \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::BREAK_ROW);
+
+                    $currentBlock = 0;
+                    $baseRow = $baseRow + max($rowInBlock);
+                    $rowInBlock = [0, 0, 0];
+                    $blockStartRow = [null, null, null];
+                    $blockEndRow = [null, null, null];
+                    $page++;
+
+                    // tulis header baru di halaman berikutnya
+                    foreach ($startColumns as $colStartHeader) {
+                        $writeHeaderBlock($sheet, $colStartHeader, $baseRow, $headers);
+                    }
+
+                    $baseRow++; // data mulai setelah header
+                    $blockStartRow[$currentBlock] = $baseRow;
+                    $colStart = $startColumns[$currentBlock];
+                } else {
+                    $colStart = $startColumns[$currentBlock];
+                    if ($blockStartRow[$currentBlock] === null) {
+                        $blockStartRow[$currentBlock] = $baseRow;
+                    }
+                }
+            }
+
+            // ===== MASTER MODEL ROW =====
+            $rowModel = $baseRow + $rowInBlock[$currentBlock];
+            $colEnd = chr(ord($colStart) + 5);
+            $sheet->mergeCells($colStart . $rowModel . ':' . $colEnd . $rowModel);
+            $sheet->setCellValue($colStart . $rowModel, $model);
+            $sheet->getRowDimension($rowModel)->setRowHeight(22);
+
+            $sheet->getStyle($colStart . $rowModel . ':' . $colEnd . $rowModel)->applyFromArray([
+                'font' => ['bold' => true],
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                ],
+                'fill' => [
+                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'startColor' => ['argb' => 'FFD9D9D9'],
+                ],
+                'borders' => [
+                    'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN],
+                ],
+            ]);
+
+            $rowInBlock[$currentBlock]++;
+
+            // ===== ISI ITEM =====
+            foreach ($items as $item) {
+                if ($rowInBlock[$currentBlock] + 1 > $currentLimit) {
+                    // tutup blok
+                    $sCol = $startColumns[$currentBlock];
+                    $eCol = chr(ord($sCol) + 5);
+                    $blockEndRow[$currentBlock] = $baseRow + $rowInBlock[$currentBlock] - 1;
+                    $applyBorders($sheet, $sCol, $eCol, $blockStartRow[$currentBlock], $blockEndRow[$currentBlock]);
+
+                    $currentBlock++;
+                    if ($currentBlock > 2) {
+                        $lastFilled = $baseRow + max($rowInBlock) - 1;
+                        $sheet->setBreak('A' . ($lastFilled), \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::BREAK_ROW);
+
+                        $currentBlock = 0;
+                        $baseRow = $baseRow + max($rowInBlock);
+                        $rowInBlock = [0, 0, 0];
+                        $blockStartRow = [null, null, null];
+                        $blockEndRow = [null, null, null];
+                        $page++;
+
+                        foreach ($startColumns as $colStartHeader) {
+                            $writeHeaderBlock($sheet, $colStartHeader, $baseRow, $headers);
+                        }
+
+                        $baseRow++;
+                        $blockStartRow[$currentBlock] = $baseRow;
+                        $colStart = $startColumns[$currentBlock];
+                    } else {
+                        $colStart = $startColumns[$currentBlock];
+                        if ($blockStartRow[$currentBlock] === null) {
+                            $blockStartRow[$currentBlock] = $baseRow + $rowInBlock[$currentBlock];
+                        }
+                    }
+                }
+
+                $rowNow = $baseRow + $rowInBlock[$currentBlock];
+                $sheet->setCellValue($colStart . $rowNow, $item['machinetypeid']);
+                $sheet->setCellValue(chr(ord($colStart) + 1) . $rowNow, $item['no_mesin']);
+                $sheet->setCellValue(chr(ord($colStart) + 2) . $rowNow, $item['shift_a']);
+                $sheet->setCellValue(chr(ord($colStart) + 3) . $rowNow, $item['shift_b']);
+                $sheet->setCellValue(chr(ord($colStart) + 4) . $rowNow, $item['shift_c']);
+                $sheet->setCellValue(chr(ord($colStart) + 5) . $rowNow, $item['qty_produksi']);
+                $sheet->getRowDimension($rowNow)->setRowHeight(22);
+
+                $rowInBlock[$currentBlock]++;
+            }
+
+            // update block end row
+            $blockEndRow[$currentBlock] = $baseRow + $rowInBlock[$currentBlock] - 1;
+        }
+
+        // ===== PASANG BORDER AKHIR =====
+        for ($i = 0; $i < 3; $i++) {
+            if ($blockStartRow[$i] !== null) {
+                if ($blockEndRow[$i] === null) {
+                    $blockEndRow[$i] = $baseRow + $rowInBlock[$i] - 1;
+                }
+                $sCol = $startColumns[$i];
+                $eCol = chr(ord($sCol) + 5);
+                $applyBorders($sheet, $sCol, $eCol, $blockStartRow[$i], $blockEndRow[$i]);
+            }
+        }
+
+        // ===== AUTO WIDTH =====
+        foreach (range('A', 'T') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+        $sheet->getColumnDimension('G')->setWidth(2);
+        $sheet->getColumnDimension('N')->setWidth(2);
+
+        // ===== PAGE SETUP A4 =====
+        $sheet->getPageSetup()
+            ->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_A4)
+            ->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_PORTRAIT)
+            ->setFitToWidth(1)
+            ->setFitToHeight(0);
+
+        // ===== OUTPUT =====
+        $filename = 'Data_Produksi_' . date('Ymd', strtotime($tglProduksi)) . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
 }

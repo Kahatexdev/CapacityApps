@@ -583,4 +583,22 @@ class ProduksiModel extends Model
             ->limit(1)
             ->countAllResults() > 0;
     }
+
+    public function getDataProduksi($area, $tglProduksi)
+    {
+        return $this->select('apsperstyle.mastermodel, apsperstyle.machinetypeid, data_model.kd_buyer_order, produksi.area, produksi.tgl_produksi, produksi.no_mesin, produksi.shift_a, produksi.shift_b, produksi.shift_c, produksi.qty_produksi')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle=produksi.idapsperstyle', 'left')
+            ->join('data_model', 'apsperstyle.mastermodel=data_model.no_model', 'left')
+            ->where('produksi.area', $area)
+            ->where('produksi.tgl_produksi', $tglProduksi)
+            ->groupBy('data_model.kd_buyer_order')
+            ->groupBy('apsperstyle.mastermodel')
+            ->groupBy('apsperstyle.machinetypeid')
+            ->groupBy('produksi.no_mesin')
+            ->orderBy('data_model.kd_buyer_order', 'ASC')
+            ->orderBy('apsperstyle.mastermodel', 'ASC')
+            ->orderBy('apsperstyle.machinetypeid', 'ASC')
+            ->orderBy('produksi.no_mesin', 'ASC')
+            ->findAll();
+    }
 }
