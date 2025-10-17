@@ -1936,7 +1936,7 @@ class OrderController extends BaseController
                         'country' => $country,
                         'color' => $color,
                         'seam' => $seam,
-                        'process_route' => $processRoute,
+                        'process_routes' => $processRoute,
                         'smv' => $sam,
                         'production_unit' => 'PU Belum Dipilih',
                         'factory' => 'Belum Ada Area'
@@ -1966,7 +1966,7 @@ class OrderController extends BaseController
                         $update = [
                             'qty' => $qtyBaru,
                             'seam' => $seam,
-                            'process_route' => $processRoute,
+                            'process_routes' => $processRoute,
                         ];
                         $this->ApsPerstyleModel->update($id, $update);
                     }
@@ -2442,7 +2442,7 @@ class OrderController extends BaseController
         $delivery = $this->request->getGet('delivery')   ?? '';
         // dd($model);
         // Full URL including path:
-        $url = 'http://172.23.44.14/KHTEXT/public/api/flowproses';
+        $url = 'http://127.0.0.1/KHTEXT/public/api/flowproses';
 
         /** @var \CodeIgniter\HTTP\CURLRequest $client */
         $client = \Config\Services::curlrequest([
@@ -2640,7 +2640,7 @@ class OrderController extends BaseController
                 'http_errors' => false,  // penting: CI4 tidak akan throw exception meski status 500
             ]);
             try {
-                $response = $client->post('http://172.23.44.14/KHTEXT/public/api/saveFlowProses', [
+                $response = $client->post('http://127.0.0.1/KHTEXT/public/api/saveFlowProses', [
                     'json'        => $payload,
                     'http_errors' => false,   // supaya tidak otomatis throw
                 ]);

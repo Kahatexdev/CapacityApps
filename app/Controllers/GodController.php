@@ -1081,7 +1081,7 @@ class GodController extends BaseController
             }
 
             // Kirim bulk ke API
-            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getGwBulk';
+            $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/getGwBulk';
             $options = [
                 'http' => [
                     'method'  => 'POST',
@@ -1188,7 +1188,7 @@ class GodController extends BaseController
                 ];
             }
             // Kirim bulk ke API
-            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getGwBulk';
+            $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/getGwBulk';
             $options = [
                 'http' => [
                     'method'  => 'POST',
@@ -1315,7 +1315,7 @@ class GodController extends BaseController
 
             // Validasi header
             $header = array_map('trim', $rows[1] ?? []);
-            $expected = ['no_mc', 'jarum', 'brand', 'dram', 'kode', 'tahun', 'status','area'];
+            $expected = ['no_mc', 'jarum', 'brand', 'dram', 'kode', 'tahun', 'status', 'area'];
             $mapIndex = []; // peta kolom -> index
             foreach ($header as $idx => $name) {
                 $name = strtolower($name);
@@ -1385,7 +1385,7 @@ class GodController extends BaseController
 
             foreach ($chunks as $chunk) {
                 // Build "INSERT ... ON DUPLICATE KEY UPDATE ..."
-                $cols = ['no_mc', 'jarum', 'brand', 'dram', 'kode', 'tahun', 'status', 'area','created_at', 'updated_at'];
+                $cols = ['no_mc', 'jarum', 'brand', 'dram', 'kode', 'tahun', 'status', 'area', 'created_at', 'updated_at'];
                 $placeholders = '(' . rtrim(str_repeat('?,', count($cols)), ',') . ')';
                 $valuesSql = implode(',', array_fill(0, count($chunk), $placeholders));
 
