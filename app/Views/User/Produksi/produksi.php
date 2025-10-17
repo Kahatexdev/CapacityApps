@@ -47,6 +47,7 @@
                                     <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#summaryPertgl">Produksi Pertanggal</a></li>
                                     <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#summaryTOD">Produksi Global</a></li>
                                     <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#timter">Timter</a></li>
+                                    <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#dataProduksi">Daily Produksi</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -57,7 +58,39 @@
         </div>
 
     </div>
-
+    <div class="modal fade" id="dataProduksi" tabindex="-1" role="dialog" aria-labelledby="timter" aria-hidden="true">
+        <div class="modal-dialog " role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Data Produksi</h5>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <form action="<?= base_url($role . '/generateDataProduksi'); ?>" method="GET">
+                    <div class="modal-body align-items-center">
+                        <div class="form-group">
+                            <label for="area" class="col-form-label">Area</label>
+                            <select class="form-control" id="area" name="area" required>
+                                <option></option>
+                                <?php foreach ($area as $ar) : ?>
+                                    <option><?= $ar ?></option>
+                                <?php endforeach ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tgl_produksi" class="col-form-label">Tanggal Produksi</label>
+                            <input type="date" class="form-control" name="tgl_produksi" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-info">Generate</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <div class="row">
         <?php if (session()->getFlashdata('success')) : ?>
             <script>

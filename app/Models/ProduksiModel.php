@@ -586,7 +586,7 @@ class ProduksiModel extends Model
 
     public function getDataProduksi($area, $tglProduksi)
     {
-        return $this->select('apsperstyle.mastermodel, apsperstyle.machinetypeid, data_model.kd_buyer_order, produksi.area, produksi.tgl_produksi, produksi.no_mesin, produksi.shift_a, produksi.shift_b, produksi.shift_c, produksi.qty_produksi')
+        return $this->select('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.size, apsperstyle.inisial, data_model.kd_buyer_order, produksi.area, produksi.tgl_produksi, produksi.no_mesin, produksi.shift_a, produksi.shift_b, produksi.shift_c, produksi.qty_produksi')
             ->join('apsperstyle', 'apsperstyle.idapsperstyle=produksi.idapsperstyle', 'left')
             ->join('data_model', 'apsperstyle.mastermodel=data_model.no_model', 'left')
             ->where('produksi.area', $area)

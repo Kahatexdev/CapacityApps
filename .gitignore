@@ -1,25 +1,162 @@
+# =========================
+# OS / File System Junk
+# =========================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# =========================
+# Environment & Secrets
+# =========================
+# Simpan contoh-nya saja (commit .env.example)
 .env
-*/config/development
-*/logs/log-*.php
-!*/logs/index.html
-*/cache/*
-!system/cache/*
-!*/cache/index.html
-!*/cache/.htaccess
+.env.*
+!.env.example
 
-writable/*
-writable/log/*
-composer.lock
-composer.json
+# CI4: kalau kamu menyimpan kredensial di file Config lokal,
+# ignore hanya file "local" (biarkan file default-nya tetap di-repo).
+app/Config/*local.php
 
-.env
-user_guide_src/build/*
-user_guide_src/cilexer/build/*
-user_guide_src/cilexer/dist/*
-user_guide_src/cilexer/pycilexer.egg-info/*
+# (Opsional) Jika benar-benar mau keep App/Database di luar VCS, biarkan baris ini.
+# Lebih direkomendasikan: commit App.php & Database.php TANPA rahasia dan ambil rahasia dari .env
+app/Config/App.php
+app/Config/Database.php
 
-#codeigniter 3
-application/logs/*
-!application/logs/index.html
-!application/logs/.htaccess
+# Vagrant / VM
+.vagrant
+Vagrantfile
+
+# Docker override lokal
+docker-compose.override.yml
+
+# =========================
+# Dependencies & Build Artifacts
+# =========================
+# Composer
 /vendor/
+composer.phar
+
+# Node (jika pakai Tailwind/asset pipeline)
+node_modules/
+.npm/
+.pnpm-store/
+/.pnp.*
+.pnpm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs (sesuaikan folder kamu)
+public/build/
+public/assets/build/
+
+# =========================
+# CI4 Writable runtime
+# =========================
+# Cache
+writable/cache/**
+!writable/cache/.gitkeep
+!writable/cache/index.html
+
+# Logs
+writable/logs/**
+!writable/logs/.gitkeep
+!writable/logs/index.html
+
+# Sessions
+writable/session/**
+!writable/session/.gitkeep
+!writable/session/index.html
+
+# Uploads (CI4)
+writable/uploads/**
+!writable/uploads/.gitkeep
+!writable/uploads/index.html
+
+# Debugbar
+writable/debugbar/**
+!writable/debugbar/.gitkeep
+
+# (Jika kamu taruh upload di public/)
+public/uploads/**
+!public/uploads/.gitkeep
+
+# Error log php
+php_errors.log
+
+# =========================
+# User Guide / Docs build (CI4)
+# =========================
+user_guide_src/build/**
+user_guide_src/cilexer/build/**
+user_guide_src/cilexer/dist/**
+user_guide_src/cilexer/pycilexer.egg-info/**
+
+# =========================
+# Tests / Coverage
+# =========================
+tests/coverage*
+.phpunit.result.cache
+coverage/
+phpunit
+phpunit*.xml
+!phpunit.xml.dist
+
+# =========================
+# IDE / Editor
+# =========================
+# JetBrains
+.idea/
+*.iml
+
+# NetBeans
+nbproject/
+build/
+nbbuild/
+dist/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+.nb-gradle/
+
+# Sublime
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
+.phpintel
+
+# VS Code
+.vscode/
+
+# =========================
+# Misc
+# =========================
+/results/
+/api/
+
+# Database dumps / local DBs
+*.sql
+*.sql.gz
+*.sqlite
+*.sqlite3
