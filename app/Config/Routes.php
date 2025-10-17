@@ -464,6 +464,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
     $routes->get('produksi', 'ProduksiController::produksi');
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->get('generateDataProduksi', 'ExcelController::dataProduksi');
 
 
     //summary
@@ -845,6 +846,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('get-area', 'ProduksiController::getArea');
     $routes->post('get-size', 'ProduksiController::getSize');
     $routes->post('prosesInputProdManual', 'ProduksiController::inputProduksiManual');
+    $routes->get('generateDataProduksi', 'ExcelController::dataProduksi');
 
     //summary
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
