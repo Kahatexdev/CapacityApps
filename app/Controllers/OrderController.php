@@ -1936,7 +1936,7 @@ class OrderController extends BaseController
                         'country' => $country,
                         'color' => $color,
                         'seam' => $seam,
-                        'process_route' => $processRoute,
+                        'process_routes' => $processRoute,
                         'smv' => $sam,
                         'production_unit' => 'PU Belum Dipilih',
                         'factory' => 'Belum Ada Area'
@@ -1966,7 +1966,7 @@ class OrderController extends BaseController
                         $update = [
                             'qty' => $qtyBaru,
                             'seam' => $seam,
-                            'process_route' => $processRoute,
+                            'process_routes' => $processRoute,
                         ];
                         $this->ApsPerstyleModel->update($id, $update);
                     }
