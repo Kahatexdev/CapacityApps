@@ -943,6 +943,12 @@ class PlanningController extends BaseController
                 case 'KK1B':
                     $html = view($role . '/Planning/partials/denah_rowsB1', $data);
                     break;
+                case 'KK2A':
+                    $html = view($role . '/Planning/partials/denah_rowsKK2', $data);
+                    break;
+                case 'KK2B':
+                    $html = view($role . '/Planning/partials/denah_rowsKK2', $data);
+                    break;
                 case 'KK5G':
                     $html = view($role . '/Planning/partials/denah_rows5G', $data);
                     break;
@@ -951,6 +957,12 @@ class PlanningController extends BaseController
                     break;
                 case 'KK7L':
                     $html = view($role . '/Planning/partials/denah_rows7L', $data);
+                    break;
+                case 'KK8D':
+                    $html = view($role . '/Planning/partials/denah_rows8D', $data);
+                    break;
+                case 'KK9D':
+                    $html = view($role . '/Planning/partials/denah_rows9D', $data);
                     break;
                 default:
                     $html = view($role . '/Planning/partials/denah_rows', $data);
