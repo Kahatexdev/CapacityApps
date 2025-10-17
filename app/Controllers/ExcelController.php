@@ -9918,7 +9918,6 @@ class ExcelController extends BaseController
             $grouped[$model][] = $row;
         }
 
-        // dd($dataProduksi, $grouped, $dataSmv, $machineCount, $finalTarget, $dataPerJarumPerModel, $totalAll);
         // ===== CONFIG & VAR =====
         $startColumns = ['A', 'H', 'O']; // blok 1,2,3
         $rowsPerBlockFirstPage = 49;
@@ -9952,84 +9951,42 @@ class ExcelController extends BaseController
                 ],
             ]);
 
-            $sheet->getRowDimension($row)->setRowHeight(26);
+            $sheet->getRowDimension($row)->setRowHeight(38);
         };
 
-        // tulis header awal untuk semua blok
-        foreach ($startColumns as $colStart) {
-            $writeHeaderBlock($sheet, $colStart, $currentRow, $headers);
-        }
-
-        $baseRow = $currentRow + 1; // baris pertama setelah header
+        // ===== VAR INISIAL =====
+        $baseRow = $currentRow;
         $page = 1;
-        $currentBlock = 0; // 0..2
+        $currentBlock = 0;
         $rowInBlock = [0, 0, 0];
-
-        // untuk tracking border per blok
         $blockStartRow = [null, null, null];
         $blockEndRow = [null, null, null];
 
-        // helper untuk pasang border per blok
+        // ===== HELPER UNTUK BORDER BLOK =====
         $applyBorders = function ($sheet, $startCol, $endCol, $startRow, $endRow) {
             if ($startRow === null || $endRow === null) return;
             if ($endRow < $startRow) return;
             $range = $startCol . $startRow . ':' . $endCol . $endRow;
-            $sheet->getStyle($range)->getBorders()->getAllBorders()->setBorderStyle(
-                \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
-            );
+            $sheet->getStyle($range)->getBorders()->getAllBorders()
+                ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
         };
 
-        // ================ START ISI DATA PER NO MC================
+        // ================ START ISI DATA PER MODEL ================
         foreach ($grouped as $model => $items) {
             $currentLimit = ($page === 1) ? $rowsPerBlockFirstPage : $rowsPerBlockOtherPages;
             $colStart = $startColumns[$currentBlock];
 
+            // Jika blok belum digunakan, tulis header dulu
             if ($blockStartRow[$currentBlock] === null) {
-                $blockStartRow[$currentBlock] = $baseRow;
-            }
-
-            // cek limit, pindah blok/page jika perlu
-            if ($rowInBlock[$currentBlock] + 2 > $currentLimit) {
-                $sCol = $startColumns[$currentBlock];
-                $eCol = chr(ord($sCol) + 5);
-                $blockEndRow[$currentBlock] = $baseRow + $rowInBlock[$currentBlock] - 1;
-                $applyBorders($sheet, $sCol, $eCol, $blockStartRow[$currentBlock], $blockEndRow[$currentBlock]);
-
-                $currentBlock++;
-                if ($currentBlock > 2) {
-                    // page break
-                    $lastFilled = $baseRow + max($rowInBlock) - 1;
-                    $sheet->setBreak('A' . ($lastFilled), \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::BREAK_ROW);
-
-                    $currentBlock = 0;
-                    $baseRow = $baseRow + max($rowInBlock);
-                    $rowInBlock = [0, 0, 0];
-                    $blockStartRow = [null, null, null];
-                    $blockEndRow = [null, null, null];
-                    $page++;
-
-                    // tulis header baru di halaman berikutnya
-                    foreach ($startColumns as $colStartHeader) {
-                        $writeHeaderBlock($sheet, $colStartHeader, $baseRow, $headers);
-                    }
-
-                    $baseRow++; // data mulai setelah header
-                    $blockStartRow[$currentBlock] = $baseRow;
-                    $colStart = $startColumns[$currentBlock];
-                } else {
-                    $colStart = $startColumns[$currentBlock];
-                    if ($blockStartRow[$currentBlock] === null) {
-                        $blockStartRow[$currentBlock] = $baseRow;
-                    }
-                }
+                $writeHeaderBlock($sheet, $colStart, $baseRow, $headers);
+                $blockStartRow[$currentBlock] = $baseRow + 1; // baris pertama data
             }
 
             // ===== MASTER MODEL ROW =====
-            $rowModel = $baseRow + $rowInBlock[$currentBlock];
+            $rowModel = $blockStartRow[$currentBlock] + $rowInBlock[$currentBlock];
             $colEnd = chr(ord($colStart) + 5);
             $sheet->mergeCells($colStart . $rowModel . ':' . $colEnd . $rowModel);
             $sheet->setCellValue($colStart . $rowModel, $model);
-            $sheet->getRowDimension($rowModel)->setRowHeight(22);
 
             $sheet->getStyle($colStart . $rowModel . ':' . $colEnd . $rowModel)->applyFromArray([
                 'font' => ['bold' => true],
@@ -10045,67 +10002,76 @@ class ExcelController extends BaseController
                     'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN],
                 ],
             ]);
-
+            $sheet->getRowDimension($rowModel)->setRowHeight(24.5);
             $rowInBlock[$currentBlock]++;
 
             // ===== ISI ITEM =====
             foreach ($items as $item) {
-                if ($rowInBlock[$currentBlock] + 1 > $currentLimit) {
-                    // tutup blok
+                if ($rowInBlock[$currentBlock] >= $currentLimit) {
+                    // Tutup blok dan pindah
                     $sCol = $startColumns[$currentBlock];
                     $eCol = chr(ord($sCol) + 5);
-                    $blockEndRow[$currentBlock] = $baseRow + $rowInBlock[$currentBlock] - 1;
+                    $blockEndRow[$currentBlock] = $blockStartRow[$currentBlock] + $rowInBlock[$currentBlock] - 1;
                     $applyBorders($sheet, $sCol, $eCol, $blockStartRow[$currentBlock], $blockEndRow[$currentBlock]);
 
                     $currentBlock++;
+
                     if ($currentBlock > 2) {
-                        $lastFilled = $baseRow + max($rowInBlock) - 1;
-                        $sheet->setBreak('A' . ($lastFilled), \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::BREAK_ROW);
+                        // Page break
+                        $lastFilled = max($blockEndRow);
+                        $sheet->setBreak('A' . $lastFilled, \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::BREAK_ROW);
+
+                        $page++;
+                        $currentLimit = ($page === 1) ? $rowsPerBlockFirstPage : $rowsPerBlockOtherPages;
 
                         $currentBlock = 0;
-                        $baseRow = $baseRow + max($rowInBlock);
                         $rowInBlock = [0, 0, 0];
                         $blockStartRow = [null, null, null];
                         $blockEndRow = [null, null, null];
-                        $page++;
+                        $baseRow = $lastFilled + 2;
+                    }
 
-                        foreach ($startColumns as $colStartHeader) {
-                            $writeHeaderBlock($sheet, $colStartHeader, $baseRow, $headers);
-                        }
-
-                        $baseRow++;
-                        $blockStartRow[$currentBlock] = $baseRow;
-                        $colStart = $startColumns[$currentBlock];
-                    } else {
-                        $colStart = $startColumns[$currentBlock];
-                        if ($blockStartRow[$currentBlock] === null) {
-                            $blockStartRow[$currentBlock] = $baseRow + $rowInBlock[$currentBlock];
-                        }
+                    // Header blok baru
+                    $colStart = $startColumns[$currentBlock];
+                    if ($blockStartRow[$currentBlock] === null) {
+                        $writeHeaderBlock($sheet, $colStart, $baseRow, $headers);
+                        $blockStartRow[$currentBlock] = $baseRow + 1;
                     }
                 }
 
-                $rowNow = $baseRow + $rowInBlock[$currentBlock];
+                // Tulis data
+                $rowNow = $blockStartRow[$currentBlock] + $rowInBlock[$currentBlock];
                 $sheet->setCellValue($colStart . $rowNow, $item['machinetypeid']);
                 $sheet->setCellValue(chr(ord($colStart) + 1) . $rowNow, $item['no_mesin']);
                 $sheet->setCellValue(chr(ord($colStart) + 2) . $rowNow, $item['shift_a']);
                 $sheet->setCellValue(chr(ord($colStart) + 3) . $rowNow, $item['shift_b']);
                 $sheet->setCellValue(chr(ord($colStart) + 4) . $rowNow, $item['shift_c']);
                 $sheet->setCellValue(chr(ord($colStart) + 5) . $rowNow, $item['qty_produksi']);
-                $sheet->getRowDimension($rowNow)->setRowHeight(22);
+                $sheet->getRowDimension($rowNow)->setRowHeight(24.5);
+
+                // Style rata tengah + border untuk isi tabel
+                $sheet->getStyle($colStart . $rowNow . ':' . chr(ord($colStart) + 5) . $rowNow)->applyFromArray([
+                    'alignment' => [
+                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                        'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                    ],
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => 'FF000000'],
+                        ],
+                    ],
+                ]);
 
                 $rowInBlock[$currentBlock]++;
             }
 
-            // update block end row
-            $blockEndRow[$currentBlock] = $baseRow + $rowInBlock[$currentBlock] - 1;
+            $blockEndRow[$currentBlock] = $blockStartRow[$currentBlock] + $rowInBlock[$currentBlock] - 1;
         }
 
         // ===== PASANG BORDER AKHIR =====
         for ($i = 0; $i < 3; $i++) {
-            if ($blockStartRow[$i] !== null) {
-                if ($blockEndRow[$i] === null) {
-                    $blockEndRow[$i] = $baseRow + $rowInBlock[$i] - 1;
-                }
+            if ($blockStartRow[$i] !== null && $blockEndRow[$i] !== null) {
                 $sCol = $startColumns[$i];
                 $eCol = chr(ord($sCol) + 5);
                 $applyBorders($sheet, $sCol, $eCol, $blockStartRow[$i], $blockEndRow[$i]);
@@ -10146,46 +10112,67 @@ class ExcelController extends BaseController
         ];
 
         foreach ($dataPerJarumPerModel as $machinetypeid => $models) {
-            // Header tabel
-            $sheet->fromArray($headerTotal, null, "A{$currentRow}");
-            $sheet->getStyle("A{$currentRow}:G{$currentRow}")->applyFromArray($styleHeaderTotal);
-            $sheet->getRowDimension($currentRow)->setRowHeight(24);
+
+            // HEADER TABEL
+            $sheet->fromArray(['JRM', 'PDK', 'TARGET', '', 'PROD', '', 'MC', '', 'RATA2', 'PRODUCTIVITY%', ''], null, "A{$currentRow}");
+
+            $sheet->mergeCells("C{$currentRow}:D{$currentRow}"); // TARGET
+            $sheet->mergeCells("E{$currentRow}:F{$currentRow}"); // PROD
+            $sheet->mergeCells("G{$currentRow}:H{$currentRow}"); // MC
+            $sheet->mergeCells("J{$currentRow}:K{$currentRow}"); // PRODUCTIVITY%
+
+            $sheet->getStyle("A{$currentRow}:K{$currentRow}")->applyFromArray($styleHeaderTotal);
+            $sheet->getRowDimension($currentRow)->setRowHeight(26);
             $currentRow++;
 
-            $startDataRow = $currentRow; // untuk rumus total nanti
+            $startDataRow = $currentRow;
 
-            // Isi data per model
+            // ISI DATA
             foreach ($models as $model => $info) {
-                $sheet->setCellValue("A{$currentRow}", $machinetypeid); // JRM
-                $sheet->setCellValue("B{$currentRow}", $model); // PDK
-                $sheet->setCellValue("C{$currentRow}", $info['target']); // TARGET
-                $sheet->setCellValue("D{$currentRow}", $info['total_produksi']); // PROD
-                $sheet->setCellValue("E{$currentRow}", $info['machineCount']); // MC
-                $sheet->setCellValue("F{$currentRow}", $info['rata_per_mesin']); // RATA2
-                $sheet->setCellValue("G{$currentRow}", $info['productivity']); // PRODUCTIVITY%
+                $sheet->setCellValue("A{$currentRow}", $machinetypeid);
+                $sheet->setCellValue("B{$currentRow}", $model);
 
-                $sheet->getStyle("A{$currentRow}:G{$currentRow}")->applyFromArray($styleIsiTotal);
-                $sheet->getRowDimension($currentRow)->setRowHeight(22);
+                $sheet->setCellValue("C{$currentRow}", $info['target']);
+                $sheet->mergeCells("C{$currentRow}:D{$currentRow}");
+
+                $sheet->setCellValue("E{$currentRow}", $info['total_produksi']);
+                $sheet->mergeCells("E{$currentRow}:F{$currentRow}");
+
+                $sheet->setCellValue("G{$currentRow}", $info['machineCount']);
+                $sheet->mergeCells("G{$currentRow}:H{$currentRow}");
+
+                $sheet->setCellValue("I{$currentRow}", $info['rata_per_mesin']);
+
+                $sheet->setCellValue("J{$currentRow}", $info['productivity']);
+                $sheet->mergeCells("J{$currentRow}:K{$currentRow}");
+
+                $sheet->getStyle("A{$currentRow}:K{$currentRow}")->applyFromArray($styleIsiTotal);
+                $sheet->getRowDimension($currentRow)->setRowHeight(26);
+
                 $currentRow++;
             }
 
             $endDataRow = $currentRow - 1;
 
-            // Baris TOTAL
+            // TOTAL BARIS
             $sheet->setCellValue("A{$currentRow}", "TOTAL");
             $sheet->mergeCells("A{$currentRow}:B{$currentRow}");
 
-            // SUM kolom numerik
             $sheet->setCellValue("C{$currentRow}", "=SUM(C{$startDataRow}:C{$endDataRow})");
-            $sheet->setCellValue("D{$currentRow}", "=SUM(D{$startDataRow}:D{$endDataRow})");
+            $sheet->mergeCells("C{$currentRow}:D{$currentRow}");
+
             $sheet->setCellValue("E{$currentRow}", "=SUM(E{$startDataRow}:E{$endDataRow})");
+            $sheet->mergeCells("E{$currentRow}:F{$currentRow}");
 
-            // AVERAGE kolom rata2 dan productivity
-            $sheet->setCellValue("F{$currentRow}", "=AVERAGE(F{$startDataRow}:F{$endDataRow})");
-            $sheet->setCellValue("G{$currentRow}", "=AVERAGE(G{$startDataRow}:G{$endDataRow})");
+            $sheet->setCellValue("G{$currentRow}", "=SUM(G{$startDataRow}:G{$endDataRow})");
+            $sheet->mergeCells("G{$currentRow}:H{$currentRow}");
 
-            // Style total baris
-            $sheet->getStyle("A{$currentRow}:G{$currentRow}")->applyFromArray([
+            $sheet->setCellValue("I{$currentRow}", "=AVERAGE(I{$startDataRow}:I{$endDataRow})");
+
+            $sheet->setCellValue("J{$currentRow}", "=AVERAGE(J{$startDataRow}:J{$endDataRow})");
+            $sheet->mergeCells("J{$currentRow}:K{$currentRow}");
+
+            $sheet->getStyle("A{$currentRow}:K{$currentRow}")->applyFromArray([
                 'font' => ['bold' => true],
                 'alignment' => [
                     'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
@@ -10200,38 +10187,58 @@ class ExcelController extends BaseController
                 ],
             ]);
 
-            $sheet->getRowDimension($currentRow)->setRowHeight(24);
-            $currentRow += 3; // jarak antar tabel
+            $sheet->getRowDimension($currentRow)->setRowHeight(26);
+
+            $currentRow += 3;
         }
 
         $currentRow += 3;
 
-        // =================== TOTAL SEMUA NYA ================
-        // Judul box total besar
-        $sheet->setCellValue("H{$currentRow}", "TTL MC ON");
-        $sheet->setCellValue("J{$currentRow}", "=SUM(E{$baseRow}:E{$currentRow})"); // atau sesuaikan range sebenarnya
+        // =================== TOTAL SEMUANYA =================
+        $startRow = $currentRow; // simpan awal posisi box
+
+        // TTL MC ON
+        $sheet->mergeCells("I{$currentRow}:J{$currentRow}");
+        $sheet->setCellValue("I{$currentRow}", "TTL MC ON");
+        $sheet->mergeCells("K{$currentRow}:L{$currentRow}");
+        $sheet->setCellValue("K{$currentRow}", ":" . $totalAll['ttlMcOn']);
         $currentRow++;
 
-        $sheet->setCellValue("H{$currentRow}", "TTL MC OFF");
-        $sheet->setCellValue("J{$currentRow}", "-");
+        // TTL MC OFF
+        $sheet->mergeCells("I{$currentRow}:J{$currentRow}");
+        $sheet->setCellValue("I{$currentRow}", "TTL MC OFF");
+        $sheet->mergeCells("K{$currentRow}:L{$currentRow}");
+        $sheet->setCellValue("K{$currentRow}", ":" . $totalAll['ttlMcOff']);
         $currentRow++;
 
-        $sheet->setCellValue("H{$currentRow}", "PRODUKSI");
-        $sheet->setCellValue("J{$currentRow}", "=SUM(D{$baseRow}:D{$currentRow})");
+        // PRODUKSI
+        $sheet->mergeCells("I{$currentRow}:J{$currentRow}");
+        $sheet->setCellValue("I{$currentRow}", "PRODUKSI");
+        $sheet->mergeCells("K{$currentRow}:L{$currentRow}");
+        $sheet->setCellValue("K{$currentRow}", ":" . $totalAll['totalProd']);
         $currentRow++;
 
-        $sheet->setCellValue("H{$currentRow}", "TARGET");
-        $sheet->setCellValue("J{$currentRow}", "=SUM(C{$baseRow}:C{$currentRow})");
+        // TARGET
+        $sheet->mergeCells("I{$currentRow}:J{$currentRow}");
+        $sheet->setCellValue("I{$currentRow}", "TARGET");
+        $sheet->mergeCells("K{$currentRow}:L{$currentRow}");
+        $sheet->setCellValue("K{$currentRow}", ":" . $totalAll['totalTarget']);
         $currentRow++;
 
-        $sheet->setCellValue("H{$currentRow}", "EFF");
-        $sheet->setCellValue("J{$currentRow}", "=J" . ($currentRow - 1) . "/J" . ($currentRow - 2)); // Target / Produksi (atau sesuaikan logika)
+        // EFF
+        $sheet->mergeCells("I{$currentRow}:J{$currentRow}");
+        $sheet->setCellValue("I{$currentRow}", "EFF");
+        $sheet->mergeCells("K{$currentRow}:L{$currentRow}");
+        $sheet->setCellValue("K{$currentRow}", ":" . $totalAll['efficiency'] . "%");
         $currentRow++;
 
-        // Terapkan border di sekitar box (H sampai N)
-        $sheet->getStyle("H" . ($currentRow - 5) . ":N" . ($currentRow - 1))->applyFromArray([
+        // Terapkan border hanya di pinggir kotak
+        $sheet->getStyle("I{$startRow}:L" . ($currentRow - 1))->applyFromArray([
             'borders' => [
-                'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN],
+                'outline' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => '000000'],
+                ],
             ],
             'alignment' => [
                 'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
@@ -10242,34 +10249,28 @@ class ExcelController extends BaseController
             ],
         ]);
 
-        // ===== AUTO WIDTH =====
-        // foreach (range('A', 'T') as $col) {
-        //     $sheet->getColumnDimension($col)->setAutoSize(true);
-        // }
-        // $sheet->getColumnDimension('G')->setWidth(2);
-        // $sheet->getColumnDimension('N')->setWidth(2);
-        // lebar kolom
+        // LEBAR KOLOM
         $columnWidths = [
-            'A' => 10,
-            'B' => 10,
-            'C' => 5,
-            'D' => 5,
-            'E' => 5,
-            'F' => 10,
+            'A' => 9,
+            'B' => 9,
+            'C' => 7,
+            'D' => 7,
+            'E' => 7,
+            'F' => 9,
             'G' => 3,
-            'H' => 10,
-            'I' => 10,
-            'J' => 5,
-            'K' => 5,
-            'L' => 5,
-            'M' => 10,
+            'H' => 9,
+            'I' => 9,
+            'J' => 7,
+            'K' => 7,
+            'L' => 7,
+            'M' => 9,
             'N' => 3,
-            'O' => 10,
-            'P' => 10,
-            'Q' => 5,
-            'R' => 5,
-            'S' => 5,
-            'T' => 10
+            'O' => 9,
+            'P' => 9,
+            'Q' => 7,
+            'R' => 7,
+            'S' => 7,
+            'T' => 9
         ];
         foreach ($columnWidths as $c => $w) {
             $sheet->getColumnDimension($c)->setWidth($w);
