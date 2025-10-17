@@ -28,7 +28,7 @@
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Timter Produksi
                             </button>
                             <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#dataProduksi">
-                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Data Produksi
+                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Produksi Harian
                             </button>
                         </div>
                     </div>
