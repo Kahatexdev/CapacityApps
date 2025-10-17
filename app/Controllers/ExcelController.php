@@ -10348,16 +10348,21 @@ class ExcelController extends BaseController
             }
         }
 
+        // Konversi ke jumlah unik (count)
+        foreach ($machineCount as $key => $listMesin) {
+            $machineCount[$key] = count($listMesin);
+        }
+
         // 4️⃣ Hitung target final
         $finalTarget = [];
         foreach ($avgSmvPerMachineModel as $key => $avgSmv) {
             // rumus target dasar: (86400 / smv) * 0.85 / 24
-            // → bisa disesuaikan sesuai formula kamu
             $targetPerMachine = round((86400 / $avgSmv) * 0.85 / 24);
             // $targetPerMachine = 14.13;
 
             // kalikan dengan jumlah mesin
-            $countMesin = isset($machineCount[$key]) ? count($machineCount[$key]) : 1;
+            // $countMesin = isset($machineCount[$key]) ? count($machineCount[$key]) : 1;
+            $countMesin = isset($machineCount[$key]) ? $machineCount[$key] : 1;
 
             $finalTarget[$key] = $targetPerMachine * $countMesin;
         }
@@ -10425,18 +10430,29 @@ class ExcelController extends BaseController
         $ttlMc = isset($ttlMcArray['total_mc']) ? intval($ttlMcArray['total_mc']) : 0;
 
         // Inisialisasi total keseluruhan
-        $totalMcOn = 0;
+        // $totalMcOn = 0;
         $totalProduksi = 0;
         $totalTarget = 0;
 
         // Loop seluruh kombinasi machineType -> model
         foreach ($dataPerJarumPerModel as $machineType => $models) {
             foreach ($models as $info) {
-                $totalMcOn += $info['machineCount'];         // jumlah mesin aktif
+                // $totalMcOn += $info['machineCount'];         // jumlah mesin aktif
                 $totalProduksi += $info['total_produksi'];   // sum produksi
                 $totalTarget += $info['target'];             // sum target
             }
         }
+
+        $uniqueMesin = [];
+
+        foreach ($dataProduksi as $row) {
+            $noMesin = $row['no_mesin'] ?? null;
+            if (!empty($noMesin)) {
+                $uniqueMesin[$noMesin] = true; // pakai associative biar otomatis unik
+            }
+        }
+
+        $totalMcOn = count($uniqueMesin);
 
         // Hitung Mc Off
         $totalMcOff = $ttlMc - $totalMcOn;
@@ -10455,7 +10471,7 @@ class ExcelController extends BaseController
             'totalTarget' => $totalTarget,
             'efficiency' => $totalEfficiency
         ];
-
+        // dd($dataPerJarumPerModel, $totalAll);
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
