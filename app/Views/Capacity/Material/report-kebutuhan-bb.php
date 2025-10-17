@@ -129,7 +129,7 @@
             }
 
             $.ajax({
-                url: "http://127.0.0.1/MaterialSystem/public/api/filterReportKebutuhanBahanBaku",
+                url: "http://172.23.44.14/MaterialSystem/public/api/filterReportKebutuhanBahanBaku",
                 type: "GET",
                 data: {
                     jenis: jenis,
@@ -187,7 +187,7 @@
             let jenis = $('#jenis').val().trim();
             let tanggal_awal = $('#tglAwal').val().trim();
             let tanggal_akhir = $('#tglAkhir').val().trim();
-            window.location.href = "http://127.0.0.1/MaterialSystem/public/api/excelReportKebutuhanBahanBaku?jenis=" + jenis + "&tanggal_awal=" + tanggal_awal + "&tanggal_akhir=" + tanggal_akhir;
+            window.location.href = "http://172.23.44.14/MaterialSystem/public/api/excelReportKebutuhanBahanBaku?jenis=" + jenis + "&tanggal_awal=" + tanggal_awal + "&tanggal_akhir=" + tanggal_akhir;
         });
 
         dataTable.clear().draw();
