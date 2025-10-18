@@ -477,9 +477,13 @@
                         $partialMap = [
                             'KK1A' => 'denah_rowsA1',
                             'KK1B' => 'denah_rowsB1',
+                            'KK2A' => 'denah_rowsKK2',
+                            'KK2B' => 'denah_rowsKK2',
                             'KK5G' => 'denah_rows5G',
                             'KK7K' => 'denah_rows7K',
                             'KK7L' => 'denah_rows7L',
+                            'KK8D' => 'denah_rows8D',
+                            'KK9D' => 'denah_rows9D',
                             // add more mappings here...
                         ];
                         $partialName = $partialMap[$areaKey] ?? 'denah_rows'; // default fallback
@@ -706,7 +710,7 @@
                 url: url,
                 type: 'GET',
                 data: formData,
-                dataType: 'html', // request as text first to be tolerant to non-json responses
+                dataType: 'text', // request as text first to be tolerant to non-json responses
                 timeout: config.ajaxTimeout,
                 beforeSend() {
                     utils.showButtonLoading();
@@ -717,11 +721,11 @@
 
         // Handle replacement of table body from different possible server responses
         function replaceTbodyFromResponse(responseText, selectedDate) {
-            // 1) Coba JSON { html: "<tr>...</tr>" }
+            // try JSON first (some servers return JSON string)
             let parsed;
             try {
                 parsed = JSON.parse(responseText);
-            } catch (_) {
+            } catch (err) {
                 parsed = null;
             }
 
@@ -729,38 +733,33 @@
             if (parsed && parsed.html) {
                 html = parsed.html;
             } else {
-                // 2) Parse DOM & ambil #denah-rows (bukan <tbody> pertama)
-                const $temp = $('<div>').html(responseText);
-
-                // Prefer exact target tbody by id
-                let $target = $temp.find('#denah-rows');
-                if ($target.length) {
-                    html = $target.html();
+                // server returned raw HTML — try to extract <tbody> content
+                const tbodyMatch = /<tbody[^>]*>([\s\S]*?)<\/tbody>/i.exec(responseText);
+                if (tbodyMatch && tbodyMatch[1]) {
+                    html = tbodyMatch[1];
+                    // wrap with <tbody> in case we need complete rows
+                    html = html;
                 } else {
-                    // Fallback: ambil tbody yang berada di dalam #denah-table
-                    $target = $temp.find('#denah-table tbody').first();
-                    if ($target.length) {
-                        html = $target.html();
-                    } else {
-                        // Fallback terakhir: tbody pertama di dokumen
-                        const $firstTbody = $temp.find('tbody').first();
-                        html = $firstTbody.length ? $firstTbody.html() : responseText;
-                    }
+                    // fallback: use whole response (useful if controller returns only rows)
+                    html = responseText;
                 }
             }
 
+            // if html empty -> show warning
             if (!html || html.trim() === '') {
                 utils.showToast('Data tidak ditemukan', 'warning');
                 return false;
             }
 
-            // Animasi replace
+            // animate replacement
             elements.tbody.stop(true, true).fadeOut(150, function() {
                 $(this).html(html).fadeIn(150, function() {
+                    // after inserted, reinitialize any plugins/listeners
                     reinitAfterDomUpdate();
                 });
             });
 
+            // success toast
             utils.updateUrl(selectedDate);
             utils.showToast(
                 selectedDate ?
@@ -771,7 +770,6 @@
 
             return true;
         }
-
 
         // re-init tooltips and attach delegated listeners for .cell
         function reinitAfterDomUpdate() {

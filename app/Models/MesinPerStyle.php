@@ -12,7 +12,7 @@ class MesinPerStyle extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_mesin_perinisial', 'idapsperstyle', 'mesin', 'keterangan'];
+    protected $allowedFields    = ['id_mesin_perinisial', 'idapsperstyle', 'mesin', 'pps', 'keterangan'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -44,7 +44,7 @@ class MesinPerStyle extends Model
 
     public function getMesin($idAps)
     {
-        return $this->select('mesin,keterangan')
+        return $this->select('mesin,keterangan,pps')
             ->where('idapsperstyle', $idAps)
             ->first();
     }

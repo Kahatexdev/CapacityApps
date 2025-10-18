@@ -1,5 +1,32 @@
 <?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
+
+<!-- swall alert
+ -->
+<?php if (session()->getFlashdata('success')) : ?>
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '<?= session()->getFlashdata('success') ?>',
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false
+        });
+    </script>
+<?php endif; ?>
+<?php if (session()->getFlashdata('error')) : ?>
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: '<?= session()->getFlashdata('error') ?>',
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false
+        });
+    </script>
+<?php endif; ?>
 <div class="container-fluid py-4">
     <div class="row my-4">
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
@@ -183,26 +210,7 @@
             </a>
         </div>
 
-        <!-- <div class="col-xl-6 col-sm-6 mb-xl-0 mb-4 mt-2">
-            <form action="<?= base_url('sudo/importMesin') ?>" method="post" enctype="multipart/form-data">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-
-                            <div class="col-12">
-                                <div class="numbers">
-                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Import Data Machine</p>
-                                    <h5 class="font-weight-bolder mb-0">
-                                    </h5>
-                                    <input type="file" name="file" class="form-control" required>
-                                    <button type="submit" class="btn btn-info btn-sm mt-2">Import</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div> -->
+        
 
 
     </div>
