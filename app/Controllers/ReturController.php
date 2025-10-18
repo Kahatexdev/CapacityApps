@@ -184,18 +184,18 @@ class ReturController extends BaseController
             $loss = $items['loss'];
 
             // Dapatkan data produksi (sesuai fungsi model)
-            $prod = $this->orderModel->getDataPph($area, $noModel, $styleSize);
+            $prod = $this->orderModel->getDataPph($items['area'], $noModel, $styleSize);
             $prod = is_array($prod) ? $prod : [];
 
             // Ambil data dari model APS dan BS Setting
-            $idaps = $this->ApsPerstyleModel->getIdApsForPph($area, $noModel, $styleSize);
+            $idaps = $this->ApsPerstyleModel->getIdApsForPph($items['area'], $noModel, $styleSize);
             $idapsList = array_column($idaps, 'idapsperstyle');
             if (!empty($idapsList)) {
                 $bsSettingData = $this->bsModel->getBsPph($idapsList);
             } else {
                 $bsSettingData = ['bs_setting' => 0];
             }
-            $bsMesinData = $this->BsMesinModel->getBsMesinPph($area, $noModel, $styleSize);
+            $bsMesinData = $this->BsMesinModel->getBsMesinPph($items['area'], $noModel, $styleSize);
             $bsMesin = $bsMesinData['bs_gram'] ?? 0;
 
             // Hitung bruto dan PPH
