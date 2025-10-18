@@ -185,7 +185,7 @@ class ReturController extends BaseController
 
             // Dapatkan data produksi (sesuai fungsi model)
             $prod = $this->orderModel->getDataPph($area, $noModel, $styleSize);
-            $prod = is_array($prod) ? $prod : [];
+            $prod = is_array($prod) ? $prod : ['qty' => 0];
 
             // Ambil data dari model APS dan BS Setting
             $idaps = $this->ApsPerstyleModel->getIdApsForPph($area, $noModel, $styleSize);
@@ -233,7 +233,7 @@ class ReturController extends BaseController
             // Tambahkan semua field yang diperlukan ke dalam array pphInisial
             $pphInisial[] = [
                 'no_model'     => $noModel,
-                'area'         => $items['area'],
+                'area'         => $area,
                 'style_size'   => $items['style_size'],
                 'inisial'      => $prod['inisial'] ?? null,
                 'item_type'    => $items['item_type'],
@@ -291,7 +291,7 @@ class ReturController extends BaseController
             if (!isset($result[$key])) {
                 $result[$key] = [
                     'no_model'  => $item['no_model'],
-                    'area'      => $item['area'],
+                    'area'      => $area,
                     'item_type' => $item['item_type'],
                     'kode_warna' => $item['kode_warna'],
                     'warna'     => $item['color'],

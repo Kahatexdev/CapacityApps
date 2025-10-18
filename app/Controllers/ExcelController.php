@@ -10657,6 +10657,103 @@ class ExcelController extends BaseController
                 $rowInBlock[$currentBlock]++;
             }
 
+            // Jika sisa baris kurang dari 2, pindah blok dulu
+            if ($rowInBlock[$currentBlock] + 2 > $currentLimit) {
+
+                // Tutup blok sekarang
+                $sCol = $startColumns[$currentBlock];
+                $eCol = chr(ord($sCol) + 6);
+                $blockEndRow[$currentBlock] = $blockStartRow[$currentBlock] + $rowInBlock[$currentBlock] - 1;
+                $applyBorders($sheet, $sCol, $eCol, $blockStartRow[$currentBlock], $blockEndRow[$currentBlock]);
+
+                $currentBlock++;
+
+                if ($currentBlock > 2) {
+                    // Page break
+                    $lastFilled = max($blockEndRow);
+                    $sheet->setBreak('A' . $lastFilled, \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::BREAK_ROW);
+
+                    $page++;
+                    $currentLimit = ($page === 1) ? $rowsPerBlockFirstPage : $rowsPerBlockOtherPages;
+
+                    $currentBlock = 0;
+                    $rowInBlock = [0, 0, 0];
+                    $blockStartRow = [null, null, null];
+                    $blockEndRow = [null, null, null];
+                    $baseRow = $lastFilled + 2;
+                }
+
+                // Header blok baru
+                $colStart = $startColumns[$currentBlock];
+                if ($blockStartRow[$currentBlock] === null) {
+                    $writeHeaderBlock($sheet, $colStart, $baseRow, $headers);
+                    $blockStartRow[$currentBlock] = $baseRow + 1;
+                }
+            }
+
+            // === Tambah Baris TOTAL & RATA-RATA ===
+            $totalRow = $blockStartRow[$currentBlock] + $rowInBlock[$currentBlock];
+
+            // Hitung sum kolom dan count mesin
+            $sumA = $sumB = $sumC = $sumTotal = 0;
+            $uniqueMc = [];
+
+            foreach ($items as $it) {
+                $sumA += $it['shift_a'];
+                $sumB += $it['shift_b'];
+                $sumC += $it['shift_c'];
+                $sumTotal += $it['qty_produksi'];
+                $uniqueMc[$it['no_mesin']] = true;
+            }
+
+            $countMc = count($uniqueMc);
+
+            // Tulis baris TOTAL
+            $sheet->setCellValue($colStart . $totalRow, "TOTAL");
+            $sheet->mergeCells($colStart . $totalRow . ':' . chr(ord($colStart) + 1) . $totalRow);
+
+            $sheet->setCellValue(chr(ord($colStart) + 2) . $totalRow, $countMc);
+            $sheet->setCellValue(chr(ord($colStart) + 3) . $totalRow, $sumA);
+            $sheet->setCellValue(chr(ord($colStart) + 4) . $totalRow, $sumB);
+            $sheet->setCellValue(chr(ord($colStart) + 5) . $totalRow, $sumC);
+            $sheet->setCellValue(chr(ord($colStart) + 6) . $totalRow, $sumTotal);
+            $sheet->getRowDimension($totalRow)->setRowHeight(29);
+
+            $sheet->getStyle($colStart . $totalRow . ':' . chr(ord($colStart) + 6) . $totalRow)->applyFromArray([
+                'font' => ['bold' => true],
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN],
+                ],
+            ]);
+
+            $rowInBlock[$currentBlock]++;
+
+            // Tambah baris RATA-RATA
+            $avgRow = $blockStartRow[$currentBlock] + $rowInBlock[$currentBlock];
+            $avg = $countMc > 0 ? round($sumTotal / $countMc, 2) : 0;
+
+            $sheet->setCellValue($colStart . $avgRow, "RATA-RATA");
+            $sheet->mergeCells($colStart . $avgRow . ':' . chr(ord($colStart) + 5) . $avgRow);
+            $sheet->setCellValue(chr(ord($colStart) + 6) . $avgRow, $avg);
+            $sheet->getRowDimension($avgRow)->setRowHeight(29);
+
+            $sheet->getStyle($colStart . $avgRow . ':' . chr(ord($colStart) + 6) . $avgRow)->applyFromArray([
+                'font' => ['italic' => true],
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN],
+                ],
+            ]);
+
+            $rowInBlock[$currentBlock]++;
+
             $blockEndRow[$currentBlock] = $blockStartRow[$currentBlock] + $rowInBlock[$currentBlock] - 1;
         }
 

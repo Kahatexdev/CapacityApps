@@ -264,6 +264,27 @@
             </div>
         </div>
 
+        <div class="col-xl-6 col-sm-6 mb-xl-0 mb-4 mt-2">
+            <form action="<?= base_url('sudo/importMesin') ?>" method="post" enctype="multipart/form-data">
+                <div class="card">
+                    <div class="card-body p-3">
+                        <div class="row">
+
+                            <div class="col-12">
+                                <div class="numbers">
+                                    <p class="text-md mb-0 text-capitalize font-weight-bold">Import Data Machine</p>
+                                    <h5 class="font-weight-bolder mb-0">
+                                    </h5>
+                                    <input type="file" name="file" class="form-control" required>
+                                    <button type="submit" class="btn btn-info btn-sm mt-2">Import</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
         <!-- <script>
             function valildasi() {
                 let qty = parseInt(document.getElementById("qty").value);
