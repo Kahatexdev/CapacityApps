@@ -468,6 +468,7 @@
     <table id="planTable" class="table table-bordered">
         <thead>
             <tr>
+                <th>PPS</th>
                 <th>Inisial</th>
                 <th>Style</th>
                 <th>Warna</th>
@@ -481,6 +482,7 @@
         <tbody>
             ${response.data.map(item => `
                 <tr>
+                    <td>   <input type="date" class="form-control pps" value="${item.pps}" name="pps[]"></td>
                     <td>${item.inisial}</td>
                     <td>${item.style}
                         <input type="hidden" value="${item.idAps}" name="idAps[]">
