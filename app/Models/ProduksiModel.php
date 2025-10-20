@@ -594,10 +594,12 @@ class ProduksiModel extends Model
             ->groupBy('data_model.kd_buyer_order')
             ->groupBy('apsperstyle.mastermodel')
             ->groupBy('apsperstyle.machinetypeid')
+            ->groupBy('apsperstyle.size')
             ->groupBy('produksi.no_mesin')
             ->orderBy('data_model.kd_buyer_order', 'ASC')
             ->orderBy('apsperstyle.mastermodel', 'ASC')
             ->orderBy('apsperstyle.machinetypeid', 'ASC')
+            ->orderBy('apsperstyle.inisial', 'ASC')
             ->orderBy('produksi.no_mesin', 'ASC')
             ->findAll();
     }

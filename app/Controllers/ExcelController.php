@@ -10747,6 +10747,11 @@ class ExcelController extends BaseController
                 $sheet->setCellValue('A' . $rowNow, $item['machinetypeid']);
                 $sheet->setCellValue('B' . $rowNow, $item['inisial'] ?? '-');
                 $sheet->setCellValue('C' . $rowNow, $item['no_mesin']);
+                // SIMPAN POSISI CELL UNTUK CEK DUPLIKAT
+                $noMc = $item['no_mesin'];
+                if (!empty($noMc)) {
+                    $noMesinMap[$noMc][] = ['col' => 'C', 'row' => $rowNow];
+                }
                 $sheet->setCellValue('D' . $rowNow, number_format($item['shift_a'] / 24, 2));
                 $sheet->setCellValue('E' . $rowNow, number_format($item['shift_b'] / 24, 2));
                 $sheet->setCellValue('F' . $rowNow, number_format($item['shift_c'] / 24, 2));
