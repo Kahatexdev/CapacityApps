@@ -268,10 +268,16 @@
                             const stockAkhir = Number(item.stock_akhir) || 0;
                             const kgsOtherOut = Number(item.kgs_other_out) || 0;
                             const loss = Number(item.loss) || 0;
+                            const returStock = Number(item.retur_stock) || 0;
+                            const returTitip = Number(item.retur_titip) || 0;
+                            const dipinjam = Number(item.dipinjam) || 0;
+                            const pindahOrder = Number(item.pindah_order) || 0;
+                            const returCelup = Number(item.retur_celup) || 0;
 
                             // perhitungan
                             const tagihanGbn = kgs - (datangSolid + plusDatangSolid + kgsStockAwal);
                             const jatahArea = kgs - pakaiArea;
+                            // const jatah_area = $id['kgs_pakai_area'] - $id['retur_area'] - $id['retur_stock_area'] - $id['retur_titip_area'] - $id['kg_psn'] - $id['kg_psn_tambahan'];
 
                             // fungsi bantu untuk format
                             const fmt = v => v !== 0 ? v.toFixed(2) : '0';
@@ -292,14 +298,14 @@
                                 fmt(gantiRetur), // ganti retur
                                 fmt(datangLurex), // datang lurex
                                 fmt(plusDatangLurex), // (+) datang lurex
-                                fmt(returPbGbn), // retur pb gbn
+                                fmt(returCelup), // retur pb gbn
                                 fmt(returPbArea), // retur pb area
                                 fmt(pakaiArea), // pakai area 
                                 fmt(kgsOtherOut), // pakai lain-lain
-                                '-', // retur stock
-                                '-', // retur titip
-                                '-', // dipinjam
-                                '-', // pindah order
+                                fmt(returStock), // retur stock
+                                fmt(returTitip), // retur titip
+                                fmt(dipinjam), // dipinjam
+                                fmt(pindahOrder), // pindah order
                                 '-', // pindah ke stock mati
                                 fmt(stockAkhir), // stock akhir
                                 fmt(tagihanGbn), // tagihan gbn
@@ -309,15 +315,6 @@
 
                         $('#btnExport').removeClass('d-none'); // Munculkan tombol Export Excel
                     } else {
-                        let colCount = $('#dataTable thead th').length;
-                        $('#dataTable tbody').html(`
-                            <tr>
-                                <td colspan="${colCount}" class="text-center text-danger font-weight-bold">
-                                    ⚠ Tidak ada data ditemukan
-                                </td>
-                            </tr>
-                        `);
-
                         $('#btnExport').addClass('d-none'); // Sembunyikan jika tidak ada data
                     }
                 },

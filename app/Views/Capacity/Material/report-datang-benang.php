@@ -154,31 +154,29 @@
                 <table id="dataTable" class="display text-center text-uppercase" style="width:100%">
                     <thead>
                         <tr>
-                            <th class="text-center text-uppercase">No</th>
-                            <th class="text-center text-uppercase">Foll Up</th>
-                            <th class="text-center text-uppercase">No Model</th>
-                            <th class="text-center text-uppercase">No Order</th>
-                            <th class="text-center text-uppercase">Buyer</th>
-                            <th class="text-center text-uppercase">Delivery Awal</th>
-                            <th class="text-center text-uppercase">Delivery Akhir</th>
-                            <th class="text-center text-uppercase">Order Type</th>
-                            <th class="text-center text-uppercase">Item Type</th>
-                            <th class="text-center text-uppercase">Kode Warna</th>
-                            <th class="text-center text-uppercase">Warna</th>
-                            <th class="text-center text-uppercase">KG Pesan</th>
-                            <th class="text-center text-uppercase">Tanggal Datang</th>
-                            <th class="text-center text-uppercase">Kgs Datang</th>
-                            <th class="text-center text-uppercase">Cones Datang</th>
-                            <th class="text-center text-uppercase">LOT Datang</th>
-                            <th class="text-center text-uppercase">No Surat Jalan</th>
-                            <th class="text-center text-uppercase">LMD</th>
-                            <th class="text-center text-uppercase">GW</th>
-                            <th class="text-center text-uppercase">Harga</th>
-                            <th class="text-center text-uppercase">Nama Cluster</th>
-                            <th class="text-center text-uppercase">Po Tambahan</th>
-                            <th class="text-center text-uppercase">Keterangan</th>
-                            <th class="text-center text-uppercase">Admin</th>
-                            <th class="text-center text-uppercase">Update</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Foll Up</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Model</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Order</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Buyer</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Delivery Awal</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Delivery Akhir</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Order Type</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Item Type</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Kode Warna</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Warna</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">KG Pesan</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tanggal Datang</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Kgs Datang</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Cones Datang</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">LOT Datang</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Surat Jalan</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">LMD</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">GW</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Harga</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nama Cluster</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Keterangan</th>
+                            <!-- <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Update</th> -->
                         </tr>
                     </thead>
                     <tbody>
@@ -332,13 +330,12 @@
                                 item.nama_cluster,
                                 poPlus,
                                 item.keterangan,
-                                item.admin,
-                                `<button class="btn btn-warning btn-update" 
-                                    data-id_bon="${item.id_bon || ''}" 
-                                    data-id_other="${item.id_other_bon || ''}" 
-                                    title="Update">
-                                    <i class="fa fa-edit"></i>
-                                </button>`
+                                // `<button class="btn btn-warning btn-update" 
+                                //     data-id_bon="${item.id_bon || ''}" 
+                                //     data-id_other="${item.id_other_bon || ''}" 
+                                //     title="Update">
+                                //     <i class="fa fa-edit"></i>
+                                // </button>`
                             ]).draw(false);
                         });
 
