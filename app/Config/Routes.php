@@ -754,6 +754,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('warehouse/reportBenangBulanan', 'MaterialController::reportBenangBulanan');
     $routes->get('warehouse/filterBenangBulanan', 'MaterialController::filterBenangBulanan');
     $routes->get('warehouse/exportReportBenangBulanan', 'ExcelController::exportReportBenang');
+    $routes->get('warehouse/reportKebutuhanBahanBaku', 'MaterialController::reportKebutuhanBahanBaku');
 
     //pph
     $routes->get('pph/(:any)', 'MaterialController::pph/$1');
@@ -1095,8 +1096,8 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('pengaduan', 'PengaduanController::index');
     $routes->post('pengaduan/create', 'PengaduanController::create');
     $routes->post('pengaduan/reply/(:num)', 'PengaduanController::reply/$1');
-    
-    
+
+
     $routes->post('importMesin', 'GodController::importMesin');
 });
 
