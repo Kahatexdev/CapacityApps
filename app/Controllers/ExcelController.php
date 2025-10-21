@@ -8935,9 +8935,8 @@ class ExcelController extends BaseController
         $row = 5;
         $no = 1;
         foreach ($data as $item) {
-            // dd($item);
-            $sisa = (($item['kgs_out'] ?? 0 + 0) - $item['kgs_retur'] - ($item['kg_po'] + 0));
-            // $sisa = (($item['kgs_out'] ?? 0 + $item['kgs_out_plus'] ?? 0) - $item['kgs_retur'] - ($item['kg_po'] + $item['kg_po_plus']));
+            // $sisa = (($item['kgs_out'] ?? 0 + 0) - $item['kgs_retur'] - ($item['kg_po'] + 0));
+            $sisa = number_format((($item['kgs_out'] ?? 0) + ($item['kgs_out_plus'] ?? 0)) - ($item['kgs_retur'] ?? 0) - (($item['kg_pesan'] ?? 0) + ($item['kg_po_plus'] ?? 0)), 2, '.', '');
 
             $sheet->setCellValue('A' . $row, $no++);
             $sheet->setCellValue('B' . $row, $item['lco_date']);
@@ -8953,16 +8952,22 @@ class ExcelController extends BaseController
             $sheet->setCellValue('L' . $row, $item['item_type']);
             $sheet->setCellValue('M' . $row, $item['kode_warna']);
             $sheet->setCellValue('N' . $row, $item['color']);
-            $sheet->setCellValue('O' . $row, $item['kgs_stock_awal']);
+            $sheet->setCellValue('O' . $row, number_format($item['kgs_stock_awal'], 2, '.', ''));
             $sheet->setCellValue('P' . $row, $item['lot_awal']);
-            $sheet->setCellValue('Q' . $row, $item['kg_po']);
+            $sheet->setCellValue('Q' . $row, number_format($item['kg_pesan'] ?? 0, 2, '.', ''));
             $sheet->setCellValue('R' . $row, $item['tgl_terima_po_plus_gbn'] ?? '');
             $sheet->setCellValue('S' . $row, $item['tgl_po_plus_area'] ?? '');
             $sheet->setCellValue('T' . $row, $item['delivery_awal_plus'] ?? '');
-            $sheet->setCellValue('U' . $row, $item['kg_po_plus'] ?? 0);
-            $sheet->setCellValue('V' . $row, $item['kgs_out'] ?? 0);
-            $sheet->setCellValue('W' . $row, $item['kgs_out_plus'] ?? 0);
-            $sheet->setCellValue('X' . $row, $item['kgs_retur'] ?? 0);
+            $sheet->setCellValue('U' . $row, number_format($item['kg_po_plus'] ?? 0, 2, '.', ''));
+            if (in_array(strtoupper($jenis), ['BENANG', 'NYLON'])) {
+                $sheet->setCellValue('V' . $row, number_format($item['kgs_out'] ?? 0, 2, '.', ''));
+                $sheet->setCellValue('W' . $row, number_format($item['kgs_out_plus'] ?? 0, 2, '.', ''));
+            } else {
+                // Untuk SPANDEX/KARET
+                $sheet->setCellValue('V' . $row, number_format($item['kgs_out_spandex_karet'] ?? 0, 2, '.', ''));
+                $sheet->setCellValue('W' . $row, number_format($item['kgs_out_spandex_karet_plus'] ?? 0, 2, '.', ''));
+            }
+            $sheet->setCellValue('X' . $row, number_format($item['kgs_retur'] ?? 0, 2, '.', ''));
             $sheet->setCellValue('Y' . $row, $item['lot_retur'] ?? '');
             $sheet->setCellValue('Z' . $row, $sisa ?? 0);
             $row++;
@@ -9654,18 +9659,18 @@ class ExcelController extends BaseController
             $sheet->setCellValue('L' . $row, $item['item_type']);
             $sheet->setCellValue('M' . $row, $item['kode_warna']);
             $sheet->setCellValue('N' . $row, $item['color']);
-            $sheet->setCellValue('O' . $row, $item['kgs_stock_awal']);
+            $sheet->setCellValue('O' . $row, number_format($item['kgs_stock_awal'], 2));
             $sheet->setCellValue('P' . $row, $item['lot_awal']);
-            $sheet->setCellValue('Q' . $row, $item['kg_po']);
+            $sheet->setCellValue('Q' . $row, number_format($item['kg_po'], 2));
             $sheet->setCellValue('R' . $row, $item['tgl_terima_po_plus_gbn'] ?? '');
             $sheet->setCellValue('S' . $row, $item['tgl_po_plus_area'] ?? '');
             $sheet->setCellValue('T' . $row, $item['delivery_awal_plus'] ?? '');
-            $sheet->setCellValue('U' . $row, $item['kg_po_plus'] ?? 0);
-            $sheet->setCellValue('V' . $row, $item['kgs_datang'] ?? 0);
-            $sheet->setCellValue('W' . $row, $item['kgs_datang_plus'] ?? 0);
-            $sheet->setCellValue('X' . $row, $item['kgs_retur'] ?? 0);
-            $sheet->setCellValue('Y' . $row, $item['qty_retur'] ?? 0);
-            $sheet->setCellValue('Z' . $row, $sisa ?? 0);
+            $sheet->setCellValue('U' . $row, number_format($item['kg_po_plus'] ?? 0, 2));
+            $sheet->setCellValue('V' . $row, number_format($item['kgs_datang'] ?? 0, 2));
+            $sheet->setCellValue('W' . $row, number_format($item['kgs_datang_plus'] ?? 0, 2));
+            $sheet->setCellValue('X' . $row, number_format($item['kgs_retur'] ?? 0, 2));
+            $sheet->setCellValue('Y' . $row, number_format($item['qty_retur'] ?? 0, 2));
+            $sheet->setCellValue('Z' . $row, number_format($sisa ?? 0, 2));
             $row++;
         }
 
@@ -9845,18 +9850,18 @@ class ExcelController extends BaseController
             $sheet->setCellValue('L' . $row, $item['item_type']);
             $sheet->setCellValue('M' . $row, $item['kode_warna']);
             $sheet->setCellValue('N' . $row, $item['color']);
-            $sheet->setCellValue('O' . $row, $item['kgs_stock_awal']);
+            $sheet->setCellValue('O' . $row, number_format($item['kgs_stock_awal'], 2));
             $sheet->setCellValue('P' . $row, $item['lot_awal']);
-            $sheet->setCellValue('Q' . $row, $item['kg_po']);
+            $sheet->setCellValue('Q' . $row, number_format($item['kg_po'], 2));
             $sheet->setCellValue('R' . $row, $item['tgl_terima_po_plus_gbn'] ?? '');
             $sheet->setCellValue('S' . $row, $item['tgl_po_plus_area'] ?? '');
             $sheet->setCellValue('T' . $row, $item['delivery_awal_plus'] ?? '');
-            $sheet->setCellValue('U' . $row, $item['kg_po_plus'] ?? 0);
-            $sheet->setCellValue('V' . $row, $item['kgs_datang'] ?? 0);
-            $sheet->setCellValue('W' . $row, $item['kgs_datang_plus'] ?? 0);
-            $sheet->setCellValue('X' . $row, $item['kgs_retur'] ?? 0);
-            $sheet->setCellValue('Y' . $row, $item['qty_retur'] ?? 0);
-            $sheet->setCellValue('Z' . $row, $sisa ?? 0);
+            $sheet->setCellValue('U' . $row, number_format($item['kg_po_plus'] ?? 0, 2));
+            $sheet->setCellValue('V' . $row, number_format($item['kgs_datang'] ?? 0, 2));
+            $sheet->setCellValue('W' . $row, number_format($item['kgs_datang_plus'] ?? 0, 2));
+            $sheet->setCellValue('X' . $row, number_format($item['kgs_retur'] ?? 0, 2));
+            $sheet->setCellValue('Y' . $row, number_format($item['qty_retur'] ?? 0, 2));
+            $sheet->setCellValue('Z' . $row, number_format($sisa ?? 0, 2));
             $row++;
         }
 
@@ -10036,18 +10041,18 @@ class ExcelController extends BaseController
             $sheet->setCellValue('L' . $row, $item['item_type']);
             $sheet->setCellValue('M' . $row, $item['kode_warna']);
             $sheet->setCellValue('N' . $row, $item['color']);
-            $sheet->setCellValue('O' . $row, $item['kgs_stock_awal']);
+            $sheet->setCellValue('O' . $row, number_format($item['kgs_stock_awal'], 2));
             $sheet->setCellValue('P' . $row, $item['lot_awal']);
-            $sheet->setCellValue('Q' . $row, $item['kg_po']);
+            $sheet->setCellValue('Q' . $row, number_format($item['kg_po'], 2));
             $sheet->setCellValue('R' . $row, $item['tgl_terima_po_plus_gbn'] ?? '');
             $sheet->setCellValue('S' . $row, $item['tgl_po_plus_area'] ?? '');
             $sheet->setCellValue('T' . $row, $item['delivery_awal_plus'] ?? '');
-            $sheet->setCellValue('U' . $row, $item['kg_po_plus'] ?? 0);
-            $sheet->setCellValue('V' . $row, $item['kgs_datang'] ?? 0);
-            $sheet->setCellValue('W' . $row, $item['kgs_datang_plus'] ?? 0);
-            $sheet->setCellValue('X' . $row, $item['kgs_retur'] ?? 0);
-            $sheet->setCellValue('Y' . $row, $item['qty_retur'] ?? 0);
-            $sheet->setCellValue('Z' . $row, $sisa ?? 0);
+            $sheet->setCellValue('U' . $row, number_format($item['kg_po_plus'] ?? 0, 2));
+            $sheet->setCellValue('V' . $row, number_format($item['kgs_datang'] ?? 0, 2));
+            $sheet->setCellValue('W' . $row, number_format($item['kgs_datang_plus'] ?? 0, 2));
+            $sheet->setCellValue('X' . $row, number_format($item['kgs_retur'] ?? 0, 2));
+            $sheet->setCellValue('Y' . $row, number_format($item['qty_retur'] ?? 0, 2));
+            $sheet->setCellValue('Z' . $row, number_format($sisa ?? 0, 2));
             $row++;
         }
 
@@ -10227,18 +10232,18 @@ class ExcelController extends BaseController
             $sheet->setCellValue('L' . $row, $item['item_type']);
             $sheet->setCellValue('M' . $row, $item['kode_warna']);
             $sheet->setCellValue('N' . $row, $item['color']);
-            $sheet->setCellValue('O' . $row, $item['kgs_stock_awal']);
+            $sheet->setCellValue('O' . $row, number_format($item['kgs_stock_awal'], 2));
             $sheet->setCellValue('P' . $row, $item['lot_awal']);
-            $sheet->setCellValue('Q' . $row, $item['kg_po']);
+            $sheet->setCellValue('Q' . $row, number_format($item['kg_po'], 2));
             $sheet->setCellValue('R' . $row, $item['tgl_terima_po_plus_gbn'] ?? '');
             $sheet->setCellValue('S' . $row, $item['tgl_po_plus_area'] ?? '');
             $sheet->setCellValue('T' . $row, $item['delivery_awal_plus'] ?? '');
-            $sheet->setCellValue('U' . $row, $item['kg_po_plus'] ?? 0);
-            $sheet->setCellValue('V' . $row, $item['kgs_datang'] ?? 0);
-            $sheet->setCellValue('W' . $row, $item['kgs_datang_plus'] ?? 0);
-            $sheet->setCellValue('X' . $row, $item['kgs_retur'] ?? 0);
-            $sheet->setCellValue('Y' . $row, $item['qty_retur'] ?? 0);
-            $sheet->setCellValue('Z' . $row, $sisa ?? 0);
+            $sheet->setCellValue('U' . $row, number_format($item['kg_po_plus'] ?? 0, 2));
+            $sheet->setCellValue('V' . $row, number_format($item['kgs_datang'] ?? 0, 2));
+            $sheet->setCellValue('W' . $row, number_format($item['kgs_datang_plus'] ?? 0, 2));
+            $sheet->setCellValue('X' . $row, number_format($item['kgs_retur'] ?? 0, 2));
+            $sheet->setCellValue('Y' . $row, number_format($item['qty_retur'] ?? 0, 2));
+            $sheet->setCellValue('Z' . $row, number_format($sisa ?? 0, 2));
             $row++;
         }
 
