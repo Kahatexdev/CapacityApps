@@ -1413,4 +1413,13 @@ class ApsPerstyleModel extends Model
             ->groupBy('factory')
             ->findAll();
     }
+    public function getDataSmv($mastermodels, $sizes)
+    {
+        $data = $this->select('machinetypeid,mastermodel, size, smv')
+            ->whereIn('mastermodel', $mastermodels)
+            // ->whereIn('size', $sizes)
+            ->findAll();
+
+        return $data;
+    }
 }

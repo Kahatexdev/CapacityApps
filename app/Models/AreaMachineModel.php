@@ -47,4 +47,8 @@ class AreaMachineModel extends Model
     {
         return $this->where('id_monthly_mc', $idGloblal)->findAll();
     }
+    public function getTotalMc($area)
+    {
+        return $this->select('total_mc')->where('area', $area)->first();
+    }
 }

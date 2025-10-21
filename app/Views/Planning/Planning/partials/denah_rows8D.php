@@ -1,24 +1,23 @@
 <?php
 // ======================== SETTINGS ========================
-$leftCap       = 15;  // 15 kolom mesin per baris
-$leftMaxRows   = 10;   // 10 baris untuk KK7K
+$leftCap       = 30;  // 30 kolom mesin per baris
+$leftMaxRows   = 9;   // 9 baris untuk KK7K
 
 $centerCap     = 0;   // nonaktif
-$centerMaxRows = 10;
+$centerMaxRows = 0;
 
-$rightCap      = 15;   // nonaktif
-$rightMaxRows  = 10;
+$rightCap      = 0;   // nonaktif
+$rightMaxRows  = 0;
 
 $totalRows     = $leftMaxRows;
 
-// Baris pemisah (TR) setelah index baris ke-â€¦ (0-based)
+// Baris pemisah (TR) setelah index baris ke-… (0-based)
 $sectionRows = [
     // misal: 4 => 'LORONG'
-    0 => 'LORONG 5',
-    2 => 'LORONG 4',
-    4 => 'LORONG 3',
-    6 => 'LORONG 2',
-    8 => 'LORONG 1'
+    -1 => 'LONATI',
+    3 => 'AUROA',
+    5 => 'MEKANIK',
+    8 => 'DAKONG',
 ];
 
 // ======================== UTIL ============================
@@ -35,7 +34,7 @@ $makeKey = function ($cell) use ($normUpper) {
 
 // (opsional) atur colspan per item id
 $colspanMapRaw = [
-    // '25' => 2,
+    // '2026' => 2,
 ];
 $colspanMap = [];
 foreach ($colspanMapRaw as $key => $val) {
@@ -59,7 +58,12 @@ $items = array_values(is_array($layout) ? $layout : []);
 
 // ====== Aturan colspan kosong per row (after_cols) =======
 $rowColspanLeft = [
-    // 8 => ['span' => 29, 'class' => 'empty-span', 'after_cols' => 0],
+    0 => ['span' => 1, 'class' => 'empty-span', 'after_cols' => 29],
+    3 => ['span' => 2, 'class' => 'empty-span', 'after_cols' => 29],
+    4 => ['span' => 1, 'class' => 'empty-span', 'after_cols' => 29],
+    6 => ['span' => 10, 'class' => 'empty-span', 'after_cols' => 20],
+    7 => ['span' => 10, 'class' => 'empty-span', 'after_cols' => 20],
+    8 => ['span' => 10, 'class' => 'empty-span', 'after_cols' => 20],
 ];
 $rowColspanCenter = [];
 $rowColspanRight  = [];
@@ -157,6 +161,15 @@ $totalColsPerRow =
     ($hasRight  ? $rightCap  : 0) +
     $gutters;
 
+if (isset($sectionRows[-1])) {
+    echo '<tr class="lorong-sep">
+            <td colspan="' . esc($totalColsPerRow) . '" class="text-center fw-bold">'
+        . esc($sectionRows[-1]) .
+        '</td>
+          </tr>';
+    // Kalau mau, bisa di-unset supaya tidak dipakai lagi di bawah
+    // unset($sectionRows[-1]);
+}
 // --------------- loop render ---------------
 for ($r = 0; $r < $totalRows; $r++) {
     echo '<tr>';
@@ -252,7 +265,7 @@ for ($r = 0; $r < $totalRows; $r++) {
 
     echo '</tr>';
 
-    // ===== TR PEMISAH (LORONG â€¦) =====
+    // ===== TR PEMISAH (LORONG …) =====
     if (isset($sectionRows[$r])) {
         $label = $sectionRows[$r];
         echo '<tr class="lorong-sep">

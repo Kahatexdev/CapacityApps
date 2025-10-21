@@ -477,9 +477,13 @@
                         $partialMap = [
                             'KK1A' => 'denah_rowsA1',
                             'KK1B' => 'denah_rowsB1',
+                            'KK2A' => 'denah_rowsKK2',
+                            'KK2B' => 'denah_rowsKK2',
                             'KK5G' => 'denah_rows5G',
                             'KK7K' => 'denah_rows7K',
                             'KK7L' => 'denah_rows7L',
+                            'KK8D' => 'denah_rows8D',
+                            'KK9D' => 'denah_rows9D',
                             // add more mappings here...
                         ];
                         $partialName = $partialMap[$areaKey] ?? 'denah_rows'; // default fallback

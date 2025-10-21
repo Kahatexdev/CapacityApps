@@ -1297,6 +1297,7 @@ class GodController extends BaseController
     public function importMesin()
     {
         $file = $this->request->getFile('file');
+        // dd ($file);
         // dd($file);
         if (!$file || !$file->isValid()) {
             return redirect()->back()->with('error', 'File tidak valid.');
@@ -1354,7 +1355,7 @@ class GodController extends BaseController
                 if ($no_mc === 0 && $jarum === '' && $brand === '' && $kode === '') continue;
 
                 // Validasi minimal
-                if ($no_mc <= 0 || $jarum === '' || $brand === '' || $kode === '' || $tahun <= 0) {
+                if ($no_mc <= 0 || $jarum === '' || $brand === '' || $kode === '' || $tahun < 0) {
                     return redirect()->back()->with('error', "Baris #$i tidak valid. Cek no_mc/jarum/brand/kode/tahun.");
                 }
 

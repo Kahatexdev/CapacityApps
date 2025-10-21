@@ -1936,7 +1936,7 @@ class OrderController extends BaseController
                         'country' => $country,
                         'color' => $color,
                         'seam' => $seam,
-                        'process_route' => $processRoute,
+                        'process_routes' => $processRoute,
                         'smv' => $sam,
                         'production_unit' => 'PU Belum Dipilih',
                         'factory' => 'Belum Ada Area'
@@ -1963,7 +1963,12 @@ class OrderController extends BaseController
                         $id = $existingAps['idapsperstyle'];
                         $qtyLama = $existingAps['qty'];
                         $qtyBaru = $qty + $qtyLama;
-                        $this->ApsPerstyleModel->update($id, ['qty' => $qtyBaru]);
+                        $update = [
+                            'qty' => $qtyBaru,
+                            'seam' => $seam,
+                            'process_routes' => $processRoute,
+                        ];
+                        $this->ApsPerstyleModel->update($id, $update);
                     }
                     $this->orderModel->update($idModel, $updateData);
                     // }
@@ -2247,7 +2252,11 @@ class OrderController extends BaseController
     }
     public function spk2()
     {
-        $estimasiSpk = $this->estspk->getData();
+        // Ambil filter dari input GET
+        $tgl = $this->request->getGet('tgl_buat');
+        $noModel = $this->request->getGet('no_model');
+
+        $estimasiSpk = $this->estspk->getData($tgl, $noModel);
         foreach ($estimasiSpk as &$spk) {
             $noModel = $spk['model'];
             $styleSize = $spk['style'];

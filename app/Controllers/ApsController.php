@@ -1193,6 +1193,7 @@ class ApsController extends BaseController
                         'sisa' => round($jc['sisa'] / 24) ?? null,
                         'mesin' => $mesin['mesin'] ?? null,
                         'keterangan' => $mesin['keterangan'] ?? null,
+                        'pps' => $mesin['pps'] ?? null,
                     ];
                 }
                 usort($return, function ($a, $b) {

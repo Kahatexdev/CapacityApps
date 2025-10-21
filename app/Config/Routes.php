@@ -396,6 +396,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('orderPerMonth/(:any)/(:any)', 'OrderController::orderPerMonth/$1/$2');
     $routes->post('inputhistoryrevise/(:any)', 'OrderController::inputHistory/$1');
     $routes->get('pengajuanspk2', 'OrderController::spk2');
+    $routes->get('export_excel_pengajuanspk2', 'ExcelController::exportPengajuanSPK2');
     $routes->post('approveSpk2', 'OrderController::approveSpk2');
     $routes->post('rejectSpk2', 'OrderController::rejectSpk2');
     $routes->get('sisaOrder', 'OrderController::sisaOrder');
@@ -463,6 +464,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
     $routes->get('produksi', 'ProduksiController::produksi');
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->get('generateDataProduksi', 'ExcelController::dataProduksi');
 
 
     //summary
@@ -649,6 +651,8 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('importproduksi', 'ProduksiController::importproduksi');
     $routes->get('produksi', 'ProduksiController::produksi');
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
+    $routes->get('generateDataProduksi', 'ExcelController::dataProduksi');
+
 
     //summary
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
@@ -843,6 +847,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('get-area', 'ProduksiController::getArea');
     $routes->post('get-size', 'ProduksiController::getSize');
     $routes->post('prosesInputProdManual', 'ProduksiController::inputProduksiManual');
+    $routes->get('generateDataProduksi', 'ExcelController::dataProduksi');
 
     //summary
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
