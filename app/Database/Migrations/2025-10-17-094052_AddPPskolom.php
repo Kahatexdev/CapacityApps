@@ -8,18 +8,99 @@ class AddPPskolom extends Migration
 {
     public function up()
     {
-        $fields = [
-            'pps' => [
-                'type' => 'date',
-                'null' => true,
-                'after' => 'mesin'
+        $this->forge->addField([
+            'id_pps' => [
+                'type'           => 'INT',
+                'constraint'     => 11,
+                'auto_increment' => true,
             ],
-        ];
-        $this->forge->addColumn('mesin_perinisial', $fields);
+            'id_mesin_perinisial' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned' => true,
+            ],
+            'material_status' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 255,
+                'null'       => true,
+            ],
+            'pps_status' => [
+                'type'       => 'ENUM',
+                'constraint' => ['planning', 'process', 'hold', 'declined', 'approved'],
+                'default'    => 'planning',
+            ],
+            'priority' => [
+                'type'       => 'ENUM',
+                'constraint' => ['low', 'normal', 'high'],
+                'default'    => 'normal',
+            ],
+            'mechanic' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 255,
+                'null'       => true,
+            ],
+            'notes' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 255,
+                'null'       => true,
+            ],
+            'history' => [
+                'type'       => 'TEXT',
+                'null'       => true,
+            ],
+            'coor' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 255,
+                'null'       => true,
+            ],
+            'start_mc' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'start_pps_plan' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'stop_pps_plan' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'start_pps_act' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'stop_pps_act' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'acc_qad' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'acc_mr' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'acc_fu' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+        ]);
+
+        $this->forge->addKey('id_pps', true);
+        $this->forge->createTable('pps');
     }
 
     public function down()
     {
-        $this->forge->dropColumn('mesin_perinisial', 'pps');
+        $this->forge->dropTable('pps');
     }
 }

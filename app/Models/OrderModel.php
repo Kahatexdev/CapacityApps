@@ -781,4 +781,11 @@ class OrderModel extends Model
             ->orderBy('apsperstyle.inisial', 'ASC')
             ->findAll();
     }
+    public function getModelData($pdk)
+    {
+        return $this->select('no_model, kd_buyer_order as buyer,master_product_type.product_type as product_type, seam,')
+            ->join('master_product_type', 'master_product_type.id_product_type = data_model.id_product_type', 'left')
+            ->where('data_model.no_model', $pdk)
+            ->first();
+    }
 }

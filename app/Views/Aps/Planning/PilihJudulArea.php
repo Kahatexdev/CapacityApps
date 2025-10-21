@@ -33,7 +33,7 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <h5>Planning Area </h5>
-
+                        <a href="<?= base_url($role . '/pps') ?>" class="btn btn-success"> PPS</a>
                     </div>
                 </div>
                 <div class="card-body">

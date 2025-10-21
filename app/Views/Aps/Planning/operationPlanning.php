@@ -684,8 +684,6 @@
             $('#modalMC').modal('show');
         });
 
-
-        // === ADD ROW ===
         // === ADD ROW ===
         $(document).on('click', '.btn-addRow', function() {
             let table = $('#stock').DataTable();
