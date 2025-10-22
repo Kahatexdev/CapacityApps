@@ -112,7 +112,7 @@ error_reporting(E_ALL); ?>
                                                 <td class="text-center">
 
                                                     <?php
-                                                    $statuses = ['planning', 'process', 'hold', 'declined', 'approved'];
+                                                    $statuses = ['planning', 'process', 'perbaikan', 'hold', 'declined', 'approved'];
                                                     $current = !empty($pps['pps_status']) ? $pps['pps_status'] : 'planning';
                                                     ?>
                                                     <select name="status[]" class="form-control status-select" style="font-weight:bold;">
@@ -223,6 +223,7 @@ error_reporting(E_ALL); ?>
                     const colors = {
                         planning: '#3498db', // biru
                         process: '#f1c40f', // kuning
+                        perbaikan: '#f8a50cff', // kuning
                         hold: '#e74c3c', // merah
                         declined: '#c0392b', // merah tua
                         approved: '#2ecc71' // hijau

@@ -26,7 +26,7 @@ class AddPPskolom extends Migration
             ],
             'pps_status' => [
                 'type'       => 'ENUM',
-                'constraint' => ['planning', 'process', 'hold', 'declined', 'approved'],
+                'constraint' => ['planning', 'process', 'hold', 'declined', 'approved', 'perbaikan'],
                 'default'    => 'planning',
             ],
             'priority' => [
