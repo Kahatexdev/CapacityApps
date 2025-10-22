@@ -585,9 +585,9 @@
 
             let total;
             if (sisaJatah < 0) {
-                // kalau minus → tambahkan nilai negatif itu (base + (-x))
-                // total = baseTotal + (sisaJatah);
-                total = baseTotal;
+                // kalau minus → tambahkan nilai negatif itu (base - (-x))
+                total = baseTotal - (sisaJatah);
+                // total = baseTotal;
             } else {
                 // kalau nol/positif → kurangi
                 total = baseTotal - sisaJatah;
