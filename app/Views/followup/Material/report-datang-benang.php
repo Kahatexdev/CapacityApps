@@ -166,7 +166,7 @@
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Harga</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nama Cluster</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Keterangan</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Update</th>
+                            <!-- <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Update</th> -->
                         </tr>
                     </thead>
                     <tbody>
@@ -310,12 +310,12 @@
                                 item.harga,
                                 item.nama_cluster,
                                 item.keterangan,
-                                `<button class="btn btn-warning btn-update" 
-                                    data-id_bon="${item.id_bon || ''}" 
-                                    data-id_other="${item.id_other_bon || ''}" 
-                                    title="Update">
-                                    <i class="fa fa-edit"></i>
-                                </button>`
+                                // `<button class="btn btn-warning btn-update" 
+                                //     data-id_bon="${item.id_bon || ''}" 
+                                //     data-id_other="${item.id_other_bon || ''}" 
+                                //     title="Update">
+                                //     <i class="fa fa-edit"></i>
+                                // </button>`
                             ]).draw(false);
                         });
 

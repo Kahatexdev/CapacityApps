@@ -1422,4 +1422,27 @@ class ApsPerstyleModel extends Model
 
         return $data;
     }
+    public function getPpsData($masterModel)
+    {
+
+        if (empty($masterModel)) {
+            return [];
+        }
+
+        return $this->select('
+            apsperstyle.idapsperstyle,
+            apsperstyle.mastermodel,
+            apsperstyle.size,
+            apsperstyle.inisial,
+            apsperstyle.color,
+            apsperstyle.qty,
+            apsperstyle.sisa,
+            mesin_perinisial.id_mesin_perinisial as imp,
+            pps.*
+        ')
+            ->join('mesin_perinisial', 'mesin_perinisial.idapsperstyle = apsperstyle.idapsperstyle', 'left')
+            ->join('pps', 'pps.id_mesin_perinisial = mesin_perinisial.id_mesin_perinisial', 'left')
+            ->where('apsperstyle.mastermodel', $masterModel)
+            ->findAll();
+    }
 }

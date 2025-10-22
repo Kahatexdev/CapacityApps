@@ -449,12 +449,11 @@
                 $template.find('.bs-setting').val(bsSettingMap[size] || 0);
                 $template.find('.plus-pck-pcs').val(plusPckMap[size] || 0);
 
-
                 const gwFinal = gwAktual > 0 ? gwAktual : gw;
 
-                // qty po kg (already final because itu independent dari globalLossAktual)
-                const qtyPoKg = gwFinal > 0 ?
-                    qtyOrderVal * composition * gwFinal / 100 / 1000 * (1 + (parseFloat(style.loss || 0) / 100)) :
+                // qty po kg pakai gw asli
+                const qtyPoKg = gw > 0 ?
+                    qtyOrderVal * composition * gw / 100 / 1000 * (1 + (parseFloat(style.loss || 0) / 100)) :
                     0;
                 $template.find('.po-kg-perstyle').val(qtyPoKg.toFixed(2));
 

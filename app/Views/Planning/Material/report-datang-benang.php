@@ -2,7 +2,6 @@
 <?php $this->section('content'); ?>
 
 <div class="container-fluid py-4">
-
     <style>
         /* Overlay transparan */
         #loadingOverlay {
@@ -90,7 +89,6 @@
             transition: width .3s ease;
         }
     </style>
-
     <!-- overlay -->
     <div id="loadingOverlay">
         <div class="loader-wrap">
@@ -114,12 +112,12 @@
     <div class="card card-frame">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 font-weight-bolder">Filter Datang Benang</h5>
+                <h5 class="mb-0 font-weight-bolder">Report Datang Benang</h5>
             </div>
             <div class="row mt-2">
                 <div class="col-md-3">
                     <label for="">Key</label>
-                    <input type="text" class="form-control" id="key" placeholder="No Model/Item Type/Kode Warna/Warna/Lot" style="font-size: 11px;">
+                    <input type="text" id="keyInput" class="form-control" placeholder="No Model/Item Type/Kode Warna/Warna" style="font-size: 11px;">
                 </div>
                 <div class="col-md-3">
                     <label for="">Tanggal Awal (Tanggal Datang)</label>
@@ -129,15 +127,7 @@
                     <label for="">Tanggal Akhir (Tanggal Datang)</label>
                     <input type="date" class="form-control">
                 </div>
-                <div class="col-md-1 d-flex align-items-center">
-                    <div class="form-check mb-0">
-                        <label class="form-check-label" for="po_plus">
-                            PO(+)
-                        </label>
-                        <input class="form-check-input" type="checkbox" id="po_plus">
-                    </div>
-                </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <label for="">Aksi</label><br>
                     <button class="btn btn-info btn-block" id="btnSearch"><i class="fas fa-search"></i></button>
                     <button class="btn btn-danger" id="btnReset"><i class="fas fa-redo-alt"></i></button>
@@ -151,34 +141,32 @@
     <div class="card mt-4">
         <div class="card-body">
             <div class="table-responsive">
-                <table id="dataTable" class="display text-center text-uppercase" style="width:100%">
+                <table id="dataTable" class="display text-center text-uppercase text-xs font-bolder" style="width:100%">
                     <thead>
                         <tr>
-                            <th class="text-center text-uppercase">No</th>
-                            <th class="text-center text-uppercase">Foll Up</th>
-                            <th class="text-center text-uppercase">No Model</th>
-                            <th class="text-center text-uppercase">No Order</th>
-                            <th class="text-center text-uppercase">Buyer</th>
-                            <th class="text-center text-uppercase">Delivery Awal</th>
-                            <th class="text-center text-uppercase">Delivery Akhir</th>
-                            <th class="text-center text-uppercase">Order Type</th>
-                            <th class="text-center text-uppercase">Item Type</th>
-                            <th class="text-center text-uppercase">Kode Warna</th>
-                            <th class="text-center text-uppercase">Warna</th>
-                            <th class="text-center text-uppercase">KG Pesan</th>
-                            <th class="text-center text-uppercase">Tanggal Datang</th>
-                            <th class="text-center text-uppercase">Kgs Datang</th>
-                            <th class="text-center text-uppercase">Cones Datang</th>
-                            <th class="text-center text-uppercase">LOT Datang</th>
-                            <th class="text-center text-uppercase">No Surat Jalan</th>
-                            <th class="text-center text-uppercase">LMD</th>
-                            <th class="text-center text-uppercase">GW</th>
-                            <th class="text-center text-uppercase">Harga</th>
-                            <th class="text-center text-uppercase">Nama Cluster</th>
-                            <th class="text-center text-uppercase">Po Tambahan</th>
-                            <th class="text-center text-uppercase">Keterangan</th>
-                            <th class="text-center text-uppercase">Admin</th>
-                            <th class="text-center text-uppercase">Update</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Foll Up</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Model</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Order</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Buyer</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Delivery Awal</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Delivery Akhir</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Order Type</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Item Type</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Kode Warna</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Warna</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">KG Pesan</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tanggal Datang</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Kgs Datang</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Cones Datang</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">LOT Datang</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Surat Jalan</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">LMD</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">GW</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Harga</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nama Cluster</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Keterangan</th>
+                            <!-- <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Update</th> -->
                         </tr>
                     </thead>
                     <tbody>
@@ -219,7 +207,7 @@
     $(document).ready(function() {
         let dataTable = $('#dataTable').DataTable({
             "paging": true,
-            "searching": true,
+            "searching": false,
             "ordering": true,
             "info": true,
             "responsive": true,
@@ -252,20 +240,12 @@
         }
 
         function loadData() {
-            let key = $('input[type="text"]').val().trim();
+            let key = $('#keyInput').val().trim();
             let tanggal_awal = $('input[type="date"]').eq(0).val().trim();
             let tanggal_akhir = $('input[type="date"]').eq(1).val().trim();
-            let po_plus = $('#po_plus').is(':checked') ? 1 : 0;
-            // Log data yang akan dikirim
-            let dataToSend = {
-                key: key,
-                tanggal_awal: tanggal_awal,
-                tanggal_akhir: tanggal_akhir,
-                po_plus: po_plus
-            };
-            console.log('Data yang dikirim ke server:', dataToSend);
+
             // Validasi: Jika semua input kosong, tampilkan alert dan hentikan pencarian
-            if (key === '' && tanggal_awal === '' && tanggal_akhir === '' && po_plus === 0) {
+            if (key === '' && tanggal_awal === '' && tanggal_akhir === '') {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Oops...',
@@ -274,14 +254,14 @@
                 return;
             }
 
+
             $.ajax({
                 url: "<?= base_url($role . '/warehouse/filterDatangBenang') ?>",
                 type: "GET",
                 data: {
                     key: key,
                     tanggal_awal: tanggal_awal,
-                    tanggal_akhir: tanggal_akhir,
-                    po_plus: po_plus
+                    tanggal_akhir: tanggal_akhir
                 },
                 dataType: "json",
                 beforeSend: function() {
@@ -307,7 +287,6 @@
 
                     if (response.length > 0) {
                         $.each(response, function(index, item) {
-                            let poPlus = (item.po_plus === "1") ? "Ya" : "";
                             dataTable.row.add([
                                 index + 1,
                                 item.foll_up,
@@ -321,24 +300,22 @@
                                 item.kode_warna,
                                 item.warna,
                                 parseFloat(item.kgs_material ?? 0).toFixed(2),
-                                item.tgl_datang,
+                                item.tgl_masuk,
                                 parseFloat(item.kgs_kirim ?? 0).toFixed(2),
                                 item.cones_kirim,
                                 item.lot_kirim,
                                 item.no_surat_jalan,
                                 item.l_m_d,
-                                parseFloat(item.gw_kirim ?? 0).toFixed(2),
+                                item.gw_kirim,
                                 item.harga,
                                 item.nama_cluster,
-                                poPlus,
                                 item.keterangan,
-                                item.admin,
-                                `<button class="btn btn-warning btn-update" 
-                                    data-id_bon="${item.id_bon || ''}" 
-                                    data-id_other="${item.id_other_bon || ''}" 
-                                    title="Update">
-                                    <i class="fa fa-edit"></i>
-                                </button>`
+                                // `<button class="btn btn-warning btn-update" 
+                                //     data-id_bon="${item.id_bon || ''}" 
+                                //     data-id_other="${item.id_other_bon || ''}" 
+                                //     title="Update">
+                                //     <i class="fa fa-edit"></i>
+                                // </button>`
                             ]).draw(false);
                         });
 
@@ -352,7 +329,6 @@
                                 </td>
                             </tr>
                         `);
-
                         $('#btnExport').addClass('d-none'); // Sembunyikan jika tidak ada data
                     }
                 },
@@ -409,8 +385,7 @@
             let key = $('input[type="text"]').val();
             let tanggal_awal = $('input[type="date"]').eq(0).val();
             let tanggal_akhir = $('input[type="date"]').eq(1).val();
-            let po_plus = $('#po_plus').is(':checked') ? 1 : 0;
-            window.location.href = "<?= base_url($role . '/warehouse/exportDatangBenang') ?>?key=" + key + "&tanggal_awal=" + tanggal_awal + "&tanggal_akhir=" + tanggal_akhir + "&po_plus=" + po_plus;
+            window.location.href = "<?= base_url($role . '/warehouse/exportDatangBenang') ?>?key=" + key + "&tanggal_awal=" + tanggal_awal + "&tanggal_akhir=" + tanggal_akhir;
         });
 
         dataTable.clear().draw();
@@ -427,46 +402,6 @@
 
         // Sembunyikan tombol Export Excel
         $('#btnExport').addClass('d-none');
-    });
-    $('#btnSubmitKeterangan').on('click', function() {
-        const idBon = $('#modalIdBon').val();
-        const idOther = $('#modalIdOther').val();
-        const keterangan = $('#keteranganDatang').val();
-
-        $.ajax({
-            url: '<?= base_url($role . "/warehouse/updateKeteranganDatang") ?>',
-            type: 'POST',
-            data: {
-                id_bon: idBon,
-                id_other_bon: idOther,
-                keterangan: keterangan
-            },
-            success: function(res) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: 'Keterangan berhasil diperbarui.'
-                });
-
-                $('#modalUpdate').modal('hide');
-                loadData(); // Reload tabel
-            },
-            error: function(xhr) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal!',
-                    text: 'Terjadi kesalahan saat menyimpan.'
-                });
-            }
-        });
-    });
-
-    // Trigger pencarian saat tombol Enter ditekan di input apa pun
-    $('#key, input[type="date"]').on('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault(); // Hindari form submit default (jika ada form)
-            $('#btnSearch').click(); // Trigger tombol Search
-        }
     });
 </script>
 

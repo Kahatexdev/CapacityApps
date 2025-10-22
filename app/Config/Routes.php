@@ -542,6 +542,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('warehouse/reportBenangBulanan', 'MaterialController::reportBenangBulanan');
     $routes->get('warehouse/filterBenangBulanan', 'MaterialController::filterBenangBulanan');
     $routes->get('warehouse/exportReportBenangBulanan', 'ExcelController::exportReportBenang');
+    $routes->get('warehouse/reportKebutuhanBahanBaku', 'MaterialController::reportKebutuhanBahanBaku');
 
     //pph
     $routes->get('pph/(:any)', 'MaterialController::pph/$1');
@@ -698,6 +699,10 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('savePlanningPernomor', 'ApsController::savePlanningPernomor');
     $routes->post('deleteMesinPernomor', 'ApsController::deleteMesinPernomor');
     $routes->post('checkAvailable', 'ApsController::checkAvailable');
+    $routes->get('pps', 'ApsController::pps');
+    $routes->get('ppsDetail/(:any)', 'ApsController::ppsDetail/$1');
+    $routes->post('updatePps', 'ApsController::updatePps');
+
 
     // deffect
     $routes->get('datadeffect', 'DeffectController::datadeffect');
@@ -758,6 +763,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('warehouse/reportBenangBulanan', 'MaterialController::reportBenangBulanan');
     $routes->get('warehouse/filterBenangBulanan', 'MaterialController::filterBenangBulanan');
     $routes->get('warehouse/exportReportBenangBulanan', 'ExcelController::exportReportBenang');
+    $routes->get('warehouse/reportKebutuhanBahanBaku', 'MaterialController::reportKebutuhanBahanBaku');
 
     //pph
     $routes->get('pph/(:any)', 'MaterialController::pph/$1');
@@ -1347,6 +1353,7 @@ $routes->group('/followup', ['filter' => 'followup'], function ($routes) {
     $routes->get('warehouse/reportBenangBulanan', 'MaterialController::reportBenangBulanan');
     $routes->get('warehouse/filterBenangBulanan', 'MaterialController::filterBenangBulanan');
     $routes->get('warehouse/exportReportBenangBulanan', 'ExcelController::exportReportBenang');
+    $routes->get('warehouse/reportKebutuhanBahanBaku', 'MaterialController::reportKebutuhanBahanBaku');
 
     //pph
     $routes->get('pph/(:any)', 'MaterialController::pph/$1');
