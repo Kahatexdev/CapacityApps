@@ -175,4 +175,30 @@ class DetailPlanningModel extends Model
             ->where('detail_planning.jarum', $jarum)
             ->first();
     }
+    public function getPpsData(array $area)
+    {
+        // Ambil semua id_pln_mc berdasarkan area
+        $builder = $this->db->table('kebutuhan_area');
+        $results = $builder->select('id_pln_mc')
+            ->whereIn('area', $area)
+            ->get()
+            ->getResultArray();
+
+        $pdk = [];
+
+        foreach ($results as $row) {
+            $data = $this->select('model')
+                ->where('id_pln_mc', $row['id_pln_mc'])
+                ->where('status', 'aktif')
+                ->groupBy('model')
+                ->findAll();
+
+            // Ambil semua model aktif dan masukkan ke array $pdk
+            foreach ($data as $d) {
+                $pdk[] = $d['model'];
+            }
+        }
+        // dd($pdk);
+        return $pdk;
+    }
 }

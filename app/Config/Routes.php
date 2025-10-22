@@ -699,6 +699,10 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->post('savePlanningPernomor', 'ApsController::savePlanningPernomor');
     $routes->post('deleteMesinPernomor', 'ApsController::deleteMesinPernomor');
     $routes->post('checkAvailable', 'ApsController::checkAvailable');
+    $routes->get('pps', 'ApsController::pps');
+    $routes->get('ppsDetail/(:any)', 'ApsController::ppsDetail/$1');
+    $routes->post('updatePps', 'ApsController::updatePps');
+
 
     // deffect
     $routes->get('datadeffect', 'DeffectController::datadeffect');

@@ -12,7 +12,7 @@ class MesinPerStyle extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_mesin_perinisial', 'idapsperstyle', 'mesin', 'pps', 'keterangan'];
+    protected $allowedFields    = ['id_mesin_perinisial', 'idapsperstyle', 'mesin', 'id_pps', 'keterangan'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -44,10 +44,16 @@ class MesinPerStyle extends Model
 
     public function getMesin($idAps)
     {
-        return $this->select('mesin,keterangan,pps')
-            ->where('idapsperstyle', $idAps)
+        return $this->select('
+            mesin_perinisial.mesin,
+            mesin_perinisial.keterangan,
+            IFNULL(pps.start_pps_plan, NULL) AS pps
+        ')
+            ->join('pps', 'mesin_perinisial.id_mesin_perinisial = pps.id_mesin_perinisial', 'left')
+            ->where('mesin_perinisial.idapsperstyle', $idAps)
             ->first();
     }
+
     public function getJalanMc($noModel, $styleSize, $area)
     {
         return $this->select('SUM(mesin_perinisial.mesin) AS jalan_mc')

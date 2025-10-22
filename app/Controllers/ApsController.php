@@ -23,6 +23,7 @@ use App\Models\MesinPerStyle;
 use App\Models\MesinPernomor;
 use App\Models\MachinesModel;
 use App\Models\AksesModel;/*  */
+use App\Models\PpsModel;/*  */
 use App\Services\orderServices;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
@@ -49,6 +50,7 @@ class ApsController extends BaseController
     protected $MesinPerStyle;
     protected $MesinPernomor;
     protected $machinesModel;
+    protected $ppsModel;
 
     public function __construct()
     {
@@ -69,6 +71,7 @@ class ApsController extends BaseController
         $this->MesinPerStyle = new MesinPerStyle();
         $this->MesinPernomor = new MesinPernomor();
         $this->machinesModel = new MachinesModel();
+        $this->ppsModel = new PpsModel();
         $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -766,7 +769,7 @@ class ApsController extends BaseController
         $mesin = $this->jarumModel->getMesinByArea($area, $jarum);
         $data = [
             'role' => session()->get('role'),
-            'title' => 'Data Order',
+            'title' => 'Data Planningan',
             'active1' => '',
             'active2' => '',
             'active3' => '',
@@ -1193,7 +1196,7 @@ class ApsController extends BaseController
                         'sisa' => round($jc['sisa'] / 24) ?? null,
                         'mesin' => $mesin['mesin'] ?? null,
                         'keterangan' => $mesin['keterangan'] ?? null,
-                        'pps' => $mesin['pps'] ?? null,
+                        'pps' => isset($mesin['pps']) ? date('Y-m-d', strtotime($mesin['pps'])) : null,
                     ];
                 }
                 usort($return, function ($a, $b) {
@@ -1217,30 +1220,63 @@ class ApsController extends BaseController
         $request = $this->request;
         $idAps = $request->getPost('idAps');
         $mesin = $request->getPost('mesin');
+        $pps = $request->getPost('pps');
+        // dd($pps);
         $keterangan = $request->getPost('keterangan');
         if (!empty($idAps) && is_array($idAps)) {
             foreach ($idAps as $key => $id_apsperstyle) {
 
                 $jumlah_mesin = $mesin[$key] ?? 0;
                 $desc = $keterangan[$key] ?? '';
-
+                $tgl = $pps[$key] ?? null;
                 // Cek apakah data sudah ada di tabel
-                $existing = $this->MesinPerStyle->where('idapsperstyle', $id_apsperstyle)
+                $existing = $this->MesinPerStyle
+                    ->where('idapsperstyle', $id_apsperstyle)
                     ->first();
                 // dd($existing);
-
                 if ($existing) {
-                    // Jika data sudah ada, lakukan update
+                    // Jika data sudah ada
+                    $cekPps = $this->ppsModel
+                        ->where('id_mesin_perinisial', $existing['id_mesin_perinisial'])
+                        ->first();
+
+                    if ($cekPps) {
+                        // Update PPS jika sudah ada
+                        $this->ppsModel->update($cekPps['id_pps'], [
+                            'start_pps_plan' => $tgl,
+                        ]);
+                    } else {
+                        // Insert PPS baru jika belum ada
+                        // dd($existing['id_mesin_perinisial']);
+                        $this->ppsModel->insert([
+                            'id_mesin_perinisial' => $existing['id_mesin_perinisial'],
+                            'start_pps_plan'    => $tgl,
+                            'pps_status'        => 'planning',
+                        ]);
+                    }
+                    // Update data mesin_perstyle
                     $this->MesinPerStyle->update($existing['id_mesin_perinisial'], [
-                        'mesin' => $jumlah_mesin,
-                        'keterangan' => $desc
+                        'mesin'      => $jumlah_mesin,
+                        'keterangan' => $desc,
+                        'pps'        => $tgl,
                     ]);
                 } else {
-                    // Jika belum ada, lakukan insert
+                    // Jika belum ada, lakukan insert baru
                     $this->MesinPerStyle->insert([
                         'idapsperstyle' => $id_apsperstyle,
-                        'mesin' => $jumlah_mesin,
-                        'keterangan' => $desc
+                        'mesin'         => $jumlah_mesin,
+                        'keterangan'    => $desc,
+                        'pps'           => $tgl,
+                    ]);
+
+                    $getId = $this->MesinPerStyle->getInsertID();
+
+                    // Tambahkan PPS baru
+                    dd('getid=>', $getId);
+                    $this->ppsModel->insert([
+                        'id_mesin_perisinial' => $getId,
+                        'start_pps_plan'    => $tgl,
+                        'pps_status'        => 'planning',
                     ]);
                 }
             }
@@ -1411,5 +1447,108 @@ class ApsController extends BaseController
         return $this->response->setJSON([
             'ada' => $exists == 0
         ]);
+    }
+    public function pps()
+    {
+        $userId = session()->get('id_user');
+        $area = $this->aksesModel->aksesData($userId);
+        $getPdk = $this->DetailPlanningModel->getPpsData($area);
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'area' => $area,
+            'pdk' => $getPdk,
+        ];
+        return view(session()->get('role') . '/Planning/Listpps', $data);
+    }
+    public function ppsDetail($pdk)
+    {
+        $modelData = $this->orderModel->getModelData($pdk);
+        $ppsData = $this->ApsPerstyleModel->getPpsData($pdk);
+        // dd($ppsData);
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'ppsData' => $ppsData,
+            'modelData' => $modelData,
+            'role' => session()->get('role')
+        ];
+        return view(session()->get('role') . '/Planning/ppsDetail', $data);
+    }
+    public function updatePps()
+    {
+        $post = $this->request->getPost();
+        $ids            = $post['id_pps'] ?? [];
+        $imp            = $post['imp'] ?? [];
+        $priority       = $post['priority'] ?? [];
+        $status         = $post['status'] ?? [];
+        $mechanic       = $post['mechanic'] ?? [];
+        $coor           = $post['coor'] ?? [];
+        $start_mc       = $post['start_mc'] ?? [];
+        $start_pps_plan = $post['start_pps_plan'] ?? [];
+        $stop_pps_plan  = $post['stop_pps_plan'] ?? [];
+        $start_pps_act  = $post['start_pps_act'] ?? [];
+        $stop_pps_act   = $post['stop_pps_act'] ?? [];
+        $acc_qad        = $post['acc_qad'] ?? [];
+        $acc_mr         = $post['acc_mr'] ?? [];
+        $acc_fu         = $post['acc_fu'] ?? [];
+        $notes          = $post['notes'] ?? [];
+        $history        = $post['history'] ?? [];
+
+        $updateData = [];
+        $insertData = [];
+
+        foreach ($imp as $i => $impValue) {
+            $row = [
+                'id_mesin_perinisial'       => $impValue ?? null,
+                'priority'       => $priority[$i] ?? 'low',
+                'pps_status'     => $status[$i] ?? 'planning',
+                'mechanic'       => $mechanic[$i] ?? null,
+                'coor'           => $coor[$i] ?? null,
+                'start_mc'       => $start_mc[$i] ?? null,
+                'start_pps_plan' => $start_pps_plan[$i] ?? null,
+                'stop_pps_plan'  => $stop_pps_plan[$i] ?? null,
+                'start_pps_act'  => $start_pps_act[$i] ?? null,
+                'stop_pps_act'   => $stop_pps_act[$i] ?? null,
+                'acc_qad'        => $acc_qad[$i] ?? null,
+                'acc_mr'         => $acc_mr[$i] ?? null,
+                'acc_fu'         => $acc_fu[$i] ?? null,
+                'notes'          => $notes[$i] ?? null,
+                'history'        => $history[$i] ?? null,
+            ];
+
+            // Kalau ada id_pps → update, kalau kosong → insert
+            if (!empty($ids[$i])) {
+                $row['id_pps'] = $ids[$i];
+                $updateData[] = $row;
+            } else {
+                $insertData[] = $row;
+            }
+        }
+
+        // Eksekusi batch
+        if (!empty($updateData)) {
+            $this->ppsModel->updateBatch($updateData, 'id_pps');
+        }
+
+        if (!empty($insertData)) {
+            $this->ppsModel->insertBatch($insertData);
+        }
+
+        return redirect()->back()->with('success', 'Data PPS berhasil disimpan!');
     }
 }
