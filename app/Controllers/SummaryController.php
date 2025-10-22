@@ -691,7 +691,7 @@ class SummaryController extends BaseController
                     $mesinTotal = array_sum(array_column($this->tanggalPlanningModel->totalMcSumamryPlanner($dp['id_est_qty']), 'mesin'));
 
                     // Ambil data bahan baku
-                    $bbUrl = "http://172.23.39.118/MaterialSystem/public/api/getBBForSummaryPlanner?" . "no_model=" . urlencode($noModel) . "&area=" . urlencode($area);
+                    $bbUrl = "http://172.23.44.14/MaterialSystem/public/api/getBBForSummaryPlanner?" . "no_model=" . urlencode($noModel) . "&area=" . urlencode($area);
                     $bbData = @file_get_contents($bbUrl);
                     $bahanBaku = $bbData ? json_decode($bbData, true) : [];
 
@@ -2436,7 +2436,7 @@ class SummaryController extends BaseController
                     $mesinTotal = array_sum(array_column($this->tanggalPlanningModel->totalMcSumamryPlanner($dp['id_est_qty']), 'mesin'));
 
                     // Ambil data bahan baku
-                    $bbUrl = "http://172.23.39.118/MaterialSystem/public/api/getBBForSummaryPlanner?" . "no_model=" . urlencode($noModel);
+                    $bbUrl = "http://172.23.44.14/MaterialSystem/public/api/getBBForSummaryPlanner?" . "no_model=" . urlencode($noModel);
                     $bbData = @file_get_contents($bbUrl);
                     $bahanBaku = $bbData ? json_decode($bbData, true) : [];
 
