@@ -1166,6 +1166,7 @@ class ApsPerstyleModel extends Model
             ->where('factory', $area)
             ->where('mastermodel', $nomodel)
             ->whereIn('size', $size)
+            ->where('qty >', 0)
             ->first(); // Ambil satu hasil
     }
 
