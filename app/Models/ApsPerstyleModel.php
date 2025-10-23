@@ -517,13 +517,42 @@ class ApsPerstyleModel extends Model
 
         return $builder;
     }
+    // public function getStyle($pdk)
+    // {
+    //     return $this->select('idapsperstyle, mastermodel, size,sum(qty) as qty, sum(po_plus) as po_plus, inisial')
+    //         ->where('mastermodel', $pdk)
+    //         ->groupBy('size')
+    //         ->orderBy('inisial')
+    //         ->findAll();
+    // }
+
     public function getStyle($pdk)
     {
-        return $this->select('idapsperstyle, mastermodel, size,sum(qty) as qty, sum(po_plus) as po_plus, inisial')
+        // Subquery 1: total qty & po_plus per size (semua delivery)
+        $subTotal = $this->db->table('apsperstyle')
+            ->select('size, SUM(qty) AS qty, SUM(po_plus) AS po_plus')
             ->where('mastermodel', $pdk)
-            ->groupBy('size')
-            ->orderBy('inisial')
-            ->findAll();
+            ->groupBy('size');
+
+        // Subquery 2: ambil idapsperstyle & delivery tertinggi per size
+        $subMax = $this->db->table('apsperstyle')
+            ->select('size, MAX(delivery) AS max_delivery')
+            ->where('mastermodel', $pdk)
+            ->groupBy('size');
+
+        // Join subquery 2 ke tabel utama untuk ambil id dari delivery terakhir
+        $latest = $this->db->table('apsperstyle a')
+            ->select('a.idapsperstyle, a.mastermodel, a.size, a.inisial, a.delivery')
+            ->join("({$subMax->getCompiledSelect()}) m", 'a.size = m.size AND a.delivery = m.max_delivery', 'inner', false)
+            ->where('a.mastermodel', $pdk);
+
+        // Join hasil total + hasil latest
+        return $this->db->table("({$latest->getCompiledSelect()}) latest")
+            ->select('latest.idapsperstyle, latest.mastermodel, latest.size, latest.inisial, latest.delivery, total.qty, total.po_plus')
+            ->join("({$subTotal->getCompiledSelect()}) total", 'total.size = latest.size', 'inner', false)
+            ->orderBy('latest.inisial')
+            ->get()
+            ->getResultArray();
     }
 
     public function ambilSisaOrder($ar, $bulan, $jarum)
