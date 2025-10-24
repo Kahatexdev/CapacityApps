@@ -1196,15 +1196,26 @@ class ApsController extends BaseController
                         'sisa' => round($jc['sisa'] / 24) ?? null,
                         'mesin' => $mesin['mesin'] ?? null,
                         'keterangan' => $mesin['keterangan'] ?? null,
-                        'pps' => isset($mesin['pps']) ? date('Y-m-d', strtotime($mesin['pps'])) : null,
+                        'material_status' => $mesin['material_status'] ?? 'not ready',
+                        'priority' => $mesin['priority'] ?? 'low',
+                        'start' => $mesin['start_pps_plan'] ?? null,
+                        'stop' => $mesin['stop_pps_plan'] ?? null,
                     ];
                 }
                 usort($return, function ($a, $b) {
                     return strcmp($a['inisial'], $b['inisial']);
                 });
+                $startStop = null;
+                if (!empty($return)) {
+                    $startStop = [
+                        'start' => $return[0]['start'],
+                        'stop'  => $return[0]['stop'],
+                    ];
+                }
                 return $this->response->setJSON([
                     'status' => 'success',
-                    'data' => $return // Replace with your data
+                    'data' => $return, // Replace with your data
+                    'start_stop' => $startStop
                 ]);
             } catch (\Exception $e) {
                 return $this->response->setJSON([
@@ -1223,12 +1234,17 @@ class ApsController extends BaseController
         $pps = $request->getPost('pps');
         // dd($pps);
         $keterangan = $request->getPost('keterangan');
+        $priority = $request->getPost('priority');
+        $material = $request->getPost('material');
+        $start = $request->getPost('start_pps') ?? null;
+        $stop = $request->getPost('stop_pps') ?? null;
         if (!empty($idAps) && is_array($idAps)) {
             foreach ($idAps as $key => $id_apsperstyle) {
 
                 $jumlah_mesin = $mesin[$key] ?? 0;
                 $desc = $keterangan[$key] ?? '';
-                $tgl = $pps[$key] ?? null;
+                $prio = $priority[$key] ?? '';
+                $mat = $material[$key] ?? '';
                 // Cek apakah data sudah ada di tabel
                 $existing = $this->MesinPerStyle
                     ->where('idapsperstyle', $id_apsperstyle)
@@ -1243,14 +1259,13 @@ class ApsController extends BaseController
                     if ($cekPps) {
                         // Update PPS jika sudah ada
                         $this->ppsModel->update($cekPps['id_pps'], [
-                            'start_pps_plan' => $tgl,
+                            'pps_status'        => 'planning',
                         ]);
                     } else {
                         // Insert PPS baru jika belum ada
                         // dd($existing['id_mesin_perinisial']);
                         $this->ppsModel->insert([
                             'id_mesin_perinisial' => $existing['id_mesin_perinisial'],
-                            'start_pps_plan'    => $tgl,
                             'pps_status'        => 'planning',
                         ]);
                     }
@@ -1258,7 +1273,11 @@ class ApsController extends BaseController
                     $this->MesinPerStyle->update($existing['id_mesin_perinisial'], [
                         'mesin'      => $jumlah_mesin,
                         'keterangan' => $desc,
-                        'pps'        => $tgl,
+                        'start_pps_plan'    => $start,
+                        'stop_pps_plan'    => $stop,
+                        'material_status'    => $mat,
+                        'priority'    => $prio,
+                        'admin'    => session()->get('username'),
                     ]);
                 } else {
                     // Jika belum ada, lakukan insert baru
@@ -1266,16 +1285,18 @@ class ApsController extends BaseController
                         'idapsperstyle' => $id_apsperstyle,
                         'mesin'         => $jumlah_mesin,
                         'keterangan'    => $desc,
-                        'pps'           => $tgl,
+                        'start_pps_plan'    => $start,
+                        'stop_pps_plan'    => $stop,
+                        'material_status'    => $mat,
+                        'priority'    => $prio,
+                        'admin'    => session()->get('username'),
                     ]);
 
                     $getId = $this->MesinPerStyle->getInsertID();
 
                     // Tambahkan PPS baru
-                    dd('getid=>', $getId);
                     $this->ppsModel->insert([
                         'id_mesin_perisinial' => $getId,
-                        'start_pps_plan'    => $tgl,
                         'pps_status'        => 'planning',
                     ]);
                 }
@@ -1453,6 +1474,42 @@ class ApsController extends BaseController
         $userId = session()->get('id_user');
         $area = $this->aksesModel->aksesData($userId);
         $getPdk = $this->DetailPlanningModel->getPpsData($area);
+        $result = [];
+
+        foreach ($getPdk as $pdk) {
+            $ppsData = $this->ApsPerstyleModel->getPpsData($pdk); // array of arrays
+            $rowNum = count($ppsData);
+
+
+            if ($rowNum == 0) continue; // skip kalau ga ada data
+
+            // hitung yang approved
+            $done = 0;
+            foreach ($ppsData as $pps) {
+                if (isset($pps['pps_status']) && $pps['pps_status'] === 'approved') {
+                    $done++;
+                }
+            }
+            $matDone = 0;
+            foreach ($ppsData as $pps) {
+                if (isset($pps['material_status']) && $pps['material_status'] === 'complete') {
+                    $matDone++;
+                }
+            }
+
+            $result[] = [
+                'pdk' => $pdk,
+                'start' => isset($ppsData[0]['start_pps_plan']) ? date('Y-m-d', strtotime($ppsData[0]['start_pps_plan'])) : null,
+                'stop'  => isset($ppsData[0]['stop_pps_plan']) ? date('Y-m-d', strtotime($ppsData[0]['stop_pps_plan'])) : null,
+                'progress' => $rowNum > 0 ? $done / $rowNum * 100 : 0,
+                'material' => $rowNum > 0 ? $matDone / $rowNum * 100 : 0,
+            ];
+        }
+        // urutkan dari progress terbesar ke terkecil
+        usort($result, function ($a, $b) {
+            return $b['material'] <=> $a['material'];
+        });
+
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Order',
@@ -1464,7 +1521,7 @@ class ApsController extends BaseController
             'active6' => '',
             'active7' => '',
             'area' => $area,
-            'pdk' => $getPdk,
+            'pdk' => $result,
         ];
         return view(session()->get('role') . '/Planning/Listpps', $data);
     }
@@ -1494,13 +1551,9 @@ class ApsController extends BaseController
         $post = $this->request->getPost();
         $ids            = $post['id_pps'] ?? [];
         $imp            = $post['imp'] ?? [];
-        $priority       = $post['priority'] ?? [];
         $status         = $post['status'] ?? [];
         $mechanic       = $post['mechanic'] ?? [];
         $coor           = $post['coor'] ?? [];
-        $start_mc       = $post['start_mc'] ?? [];
-        $start_pps_plan = $post['start_pps_plan'] ?? [];
-        $stop_pps_plan  = $post['stop_pps_plan'] ?? [];
         $start_pps_act  = $post['start_pps_act'] ?? [];
         $stop_pps_act   = $post['stop_pps_act'] ?? [];
         $acc_qad        = $post['acc_qad'] ?? [];
@@ -1508,20 +1561,16 @@ class ApsController extends BaseController
         $acc_fu         = $post['acc_fu'] ?? [];
         $notes          = $post['notes'] ?? [];
         $history        = $post['history'] ?? [];
+        $admin        = session()->get('username');
 
         $updateData = [];
         $insertData = [];
-
         foreach ($imp as $i => $impValue) {
             $row = [
                 'id_mesin_perinisial'       => $impValue ?? null,
-                'priority'       => $priority[$i] ?? 'low',
                 'pps_status'     => $status[$i] ?? 'planning',
                 'mechanic'       => $mechanic[$i] ?? null,
                 'coor'           => $coor[$i] ?? null,
-                'start_mc'       => $start_mc[$i] ?? null,
-                'start_pps_plan' => $start_pps_plan[$i] ?? null,
-                'stop_pps_plan'  => $stop_pps_plan[$i] ?? null,
                 'start_pps_act'  => $start_pps_act[$i] ?? null,
                 'stop_pps_act'   => $stop_pps_act[$i] ?? null,
                 'acc_qad'        => $acc_qad[$i] ?? null,
@@ -1529,8 +1578,8 @@ class ApsController extends BaseController
                 'acc_fu'         => $acc_fu[$i] ?? null,
                 'notes'          => $notes[$i] ?? null,
                 'history'        => $history[$i] ?? null,
+                'admin'        => $admin,
             ];
-
             // Kalau ada id_pps → update, kalau kosong → insert
             if (!empty($ids[$i])) {
                 $row['id_pps'] = $ids[$i];

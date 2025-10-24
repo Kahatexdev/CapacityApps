@@ -51,25 +51,57 @@ error_reporting(E_ALL); ?>
                                 <thead>
                                     <tr>
                                         <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Model</th>
+                                        <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Start PPS</th>
+                                        <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Stop PPS</th>
+                                        <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">PPS Progress %</th>
+                                        <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Material Progress %</th>
 
                                         <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($pdk as $order) : ?>
+                                    <?php foreach ($pdk as $pps) :
+                                        // tentuin warna badge progress
+                                        $progress = round($pps['progress'] * 100); // pastikan persen 0-100
+                                        if ($progress <= 25) {
+                                            $badgeClass = 'bg-danger';
+                                        } elseif ($progress <= 50) {
+                                            $badgeClass = 'bg-warning';
+                                        } elseif ($progress <= 75) {
+                                            $badgeClass = 'bg-primary';
+                                        } else {
+                                            $badgeClass = 'bg-success';
+                                        }
+
+                                        // warna badge material juga bisa sama logikanya
+                                        $material = round($pps['material']);
+                                        if ($material <= 25) {
+                                            $badgeMaterial = 'bg-danger';
+                                        } elseif ($material <= 50) {
+                                            $badgeMaterial = 'bg-warning';
+                                        } elseif ($material <= 75) {
+                                            $badgeMaterial = 'bg-primary';
+                                        } else {
+                                            $badgeMaterial = 'bg-success';
+                                        }
+                                    ?>
                                         <tr>
-                                            <td class="text-center"><?= htmlspecialchars($order); ?></td>
-
+                                            <td class="text-center"><?= $pps['pdk']; ?></td>
+                                            <td class="text-center"><?= $pps['start']; ?></td>
+                                            <td class="text-center"><?= $pps['stop']; ?></td>
                                             <td class="text-center">
-
-                                                <a href="<?= base_url($role . '/ppsDetail/' . $order) ?>" class="btn btn-primary">Detail</a>
-
-
+                                                <span class="badge <?= $badgeClass ?>"><?= $progress; ?>%</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge <?= $badgeMaterial ?>"><?= $material; ?>%</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="<?= base_url($role . '/ppsDetail/' . $pps['pdk']) ?>" class="btn btn-primary">Detail</a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
-
                                 </tbody>
+
                             </table>
                         </div>
                     </div>

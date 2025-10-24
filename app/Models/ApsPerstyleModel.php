@@ -1126,6 +1126,7 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $pdk)
             ->where('factory', $area)
             ->where('machinetypeid', $jarum)
+            ->where('qty >', 0)
             ->groupBy('size,machinetypeid')
             ->findAll();
     }
@@ -1437,11 +1438,13 @@ class ApsPerstyleModel extends Model
             apsperstyle.color,
             apsperstyle.qty,
             apsperstyle.sisa,
-            mesin_perinisial.id_mesin_perinisial as imp,
-            pps.*
+            mesin_perinisial.*,
+            pps.*,
+            data_model.start_mc
         ')
             ->join('mesin_perinisial', 'mesin_perinisial.idapsperstyle = apsperstyle.idapsperstyle', 'left')
             ->join('pps', 'pps.id_mesin_perinisial = mesin_perinisial.id_mesin_perinisial', 'left')
+            ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel', 'left')
             ->where('apsperstyle.mastermodel', $masterModel)
             ->findAll();
     }

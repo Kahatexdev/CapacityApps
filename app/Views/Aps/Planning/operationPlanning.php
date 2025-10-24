@@ -336,15 +336,15 @@
     <div class="row mt-4 planStyleCard d-none">
         <div class="col-md-12">
             <div class="card  ">
-                <div class="card-header">
-                    <h4 class="text-header headerPlan">
-                        Plan Machine
-                    </h4>
-                    <div class="row headerText">
-
-                    </div>
-                </div>
                 <form action="<?= base_url($role . '/savePlanStyle') ?>" method="post">
+                    <div class="card-header">
+                        <h4 class="text-header headerPlan">
+                            Plan Machine
+                        </h4>
+                        <div class="row headerText">
+
+                        </div>
+                    </div>
                     <div class="card-body planDetail">
                     </div>
                     <div class="card-footer">
@@ -456,33 +456,73 @@
 
                         },
                         success: function(response) {
+                            console.log(response)
                             if (response) {
-                                console.log(response)
                                 document.querySelector(".headerPlan").textContent = 'Plan Mesin perStyle ' + pdk;
+
+                                const start = response.start_stop?.start ? response.start_stop.start.split(' ')[0] : '';
+                                const stop = response.start_stop?.stop ? response.start_stop.stop.split(' ')[0] : '';
                                 document.querySelector(".headerText").innerHTML = `
-                                    <div class="col-md-12">
-                                      
-                                    </div>
-                                `;
+    <div class="col-md-12 d-flex align-items-center gap-3 mt-2">
+        <label class="fw-bold">Start PPS:</label>
+        <input type="date" name="start_pps" class="form-control form-control w-auto" value="${start}"><br>
+        <label class="fw-bold ms-3">Stop PPS:</label>
+        <input type="date" name="stop_pps" class="form-control form-control w-auto" value="${stop}">
+    </div>
+`;
+                                const priorities = {
+                                    low: '#3498db', // biru
+                                    normal: '#f1c40f', // kuning
+                                    high: '#2ecc71' // hijau
+                                };
+
+                                const statuses = {
+                                    'not ready': '#e74c3c', // merah
+                                    complete: '#2ecc71' // hijau
+                                };
                                 let planHtml = `
-    <table id="planTable" class="table table-bordered">
-        <thead>
-            <tr>
-                <th>PPS</th>
-                <th>Inisial</th>
-                <th>Style</th>
-                <th>Warna</th>
-                <th>Qty</th>
-                <th>Sisa</th>
-                <th>Mesin</th>
-                <th>Keterangan</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            ${response.data.map(item => `
+        <table id="planTable" class="table table-bordered">
+            <thead>
                 <tr>
-                    <td>   <input type="date" class="form-control pps" value="${item.pps}" name="pps[]"></td>
+                    <th>Priority</th>
+                    <th>Material Status</th>
+                    <th>Inisial</th>
+                    <th>Style</th>
+                    <th>Warna</th>
+                    <th>Qty</th>
+                    <th>Sisa</th>
+                    <th>Mesin</th>
+                    <th>Keterangan</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            
+               ${response.data.map(item => {
+            const priorityVal = item.priority.toLowerCase();
+            const materialVal = item.material_status.toLowerCase();
+            return `
+            <tr>
+                <td class="text-center">
+                    <select name="priority[]" class="form-control priority-select" style="font-weight:bold; background-color:${priorities[priorityVal] ?? '#fff'}; color:white;">
+                        ${Object.keys(priorities).map(p => `
+                            <option value="${p}" ${priorityVal === p ? 'selected' : ''}>
+                                ${p.charAt(0).toUpperCase() + p.slice(1)}
+                            </option>
+                        `).join('')}
+                    </select>
+                </td>
+                <td class="text-center">
+                    <select name="material[]" class="form-control status-select" style="font-weight:bold; background-color:${statuses[materialVal] ?? '#fff'}; color:white;">
+                        ${Object.keys(statuses).map(s => `
+                            <option value="${s}" ${materialVal === s ? 'selected' : ''}>
+                                ${s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                            </option>
+                        `).join('')}
+                    </select>
+                </td>
+
+
                     <td>${item.inisial}</td>
                     <td>${item.style}
                         <input type="hidden" value="${item.idAps}" name="idAps[]">
@@ -501,7 +541,7 @@
                         <button type="button" class="btn btn-info ml-auto btn-choose" data-style="${item.idAps}" data-plan="<?= $id_save ?>">Choose</button>
                     </td>
                 </tr>
-            `).join('')}
+            `;}).join('')}
         </tbody>
         <tfoot>
             <tr>
@@ -549,11 +589,36 @@
                         },
                         error: function(xhr, status, error) {
                             console.error('AJAX Error:', error);
+
                         }
                     });
 
                 });
             });
+        });
+
+        function applySelectColor(select) {
+            const val = select.value.toLowerCase();
+            if (select.classList.contains('status-select')) {
+                select.style.backgroundColor = val === 'complete' ? '#28a745' : '#f39c12'; // green or yellow
+                select.style.color = 'white';
+            } else if (select.classList.contains('priority-select')) {
+                select.style.backgroundColor =
+                    val === 'high' ? '#e74c3c' :
+                    val === 'normal' ? '#f1c40f' :
+                    '#3498db'; // red, yellow, blue
+                select.style.color = 'white';
+            }
+        }
+
+        // apply color saat load
+        document.querySelectorAll('.status-select, .priority-select').forEach(applySelectColor);
+
+        // apply color saat user ganti
+        document.addEventListener('change', (e) => {
+            if (e.target.classList.contains('status-select') || e.target.classList.contains('priority-select')) {
+                applySelectColor(e.target);
+            }
         });
 
         $(document).ready(function() {

@@ -19,20 +19,10 @@ class AddPPskolom extends Migration
                 'constraint' => 11,
                 'unsigned' => true,
             ],
-            'material_status' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 255,
-                'null'       => true,
-            ],
             'pps_status' => [
                 'type'       => 'ENUM',
                 'constraint' => ['planning', 'process', 'hold', 'declined', 'approved', 'perbaikan'],
                 'default'    => 'planning',
-            ],
-            'priority' => [
-                'type'       => 'ENUM',
-                'constraint' => ['low', 'normal', 'high'],
-                'default'    => 'normal',
             ],
             'mechanic' => [
                 'type'       => 'VARCHAR',
@@ -53,18 +43,7 @@ class AddPPskolom extends Migration
                 'constraint' => 255,
                 'null'       => true,
             ],
-            'start_mc' => [
-                'type' => 'DATETIME',
-                'null' => true,
-            ],
-            'start_pps_plan' => [
-                'type' => 'DATETIME',
-                'null' => true,
-            ],
-            'stop_pps_plan' => [
-                'type' => 'DATETIME',
-                'null' => true,
-            ],
+
             'start_pps_act' => [
                 'type' => 'DATETIME',
                 'null' => true,
@@ -92,6 +71,11 @@ class AddPPskolom extends Migration
             'updated_at' => [
                 'type' => 'DATETIME',
                 'null' => true,
+            ],
+            'admin' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 255,
+                'null'       => true,
             ],
         ]);
 

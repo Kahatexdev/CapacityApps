@@ -14,21 +14,17 @@ class PpsModel extends Model
     protected $protectFields    = true;
     protected $allowedFields = [
         'id_mesin_perinisial',
-        'material_status',
-        'pps_status',
-        'priority',
         'mechanic',
         'notes',
         'history',
         'coor',
-        'start_mc',
-        'start_pps_plan',
-        'stop_pps_plan',
+        'pps_status',
         'start_pps_act',
         'stop_pps_act',
         'acc_mr',
         'acc_qad',
         'acc_fu',
+        'admin',
     ];
 
     protected bool $allowEmptyInserts = false;
