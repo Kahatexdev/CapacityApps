@@ -151,7 +151,7 @@
                                     <div class="col-md-3">
                                         <label class="form-label">No Karung</label>
                                         <div class="input-group">
-                                            <input type="number" class="form-control karung-input" name="karung[]" required>
+                                            <input type="number" class="form-control karung-input" name="karung[]" value="1" readonly>
                                             <!-- <span class="input-group-text text-bold">KRG</span> -->
                                         </div>
                                     </div>
@@ -616,8 +616,8 @@
             // clone baris (sibling, bukan child)
             const clone = currentRow.cloneNode(true);
 
-            // kosongkan value input/textarea di clone
-            clone.querySelectorAll('input, textarea').forEach(i => i.value = '');
+            // kosongkan value input selain no karung
+            clone.querySelectorAll('input:not(.karung-input), textarea').forEach(i => i.value = '');
 
             // ganti tombol add pada clone jadi tombol remove
             const btnInClone = clone.querySelector('.btn-add-retur');
@@ -632,6 +632,9 @@
             // masukkan clone SEBAGAI SIBLING setelah currentRow (bukan append ke dalam)
             currentRow.parentNode.insertBefore(clone, currentRow.nextSibling);
 
+            // update nomor karung
+            updateKarungNumbers();
+
             // opsi: scroll ke clone
             clone.scrollIntoView({
                 behavior: 'smooth',
@@ -645,7 +648,16 @@
         if (remove) {
             const item = remove.closest('.retur-row');
             if (!item) return;
-            if (confirm('Hapus baris retur ini?')) item.remove();
+            if (confirm('Hapus baris retur ini?')) {
+                item.remove();
+                updateKarungNumbers();
+            }
+        }
+        // 🔢 fungsi untuk update nomor karung
+        function updateKarungNumbers() {
+            document.querySelectorAll('#listReturInputs .karung-input').forEach((input, index) => {
+                input.value = index + 1;
+            });
         }
     });
 </script>
