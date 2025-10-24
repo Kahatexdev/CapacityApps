@@ -492,6 +492,38 @@ class MaterialController extends BaseController
             return null;
         }
     }
+    private function fetchApiData2(string $url)
+    {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 10,          // batas waktu 10 detik
+            CURLOPT_CONNECTTIMEOUT => 5,    // batas waktu koneksi
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_MAXREDIRS => 3,
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/json'
+            ],
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlErr  = curl_error($ch);
+        curl_close($ch);
+
+        if ($response === false || $httpCode !== 200) {
+            log_message('error', "fetchApiData gagal: $url (HTTP $httpCode, cURL error: $curlErr)");
+            return null;
+        }
+
+        $data = json_decode($response, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            log_message('error', "JSON rusak dari API: $url. Response: $response");
+            return null;
+        }
+
+        return $data;
+    }
 
     public function listPemesanan($area)
     {
@@ -548,11 +580,6 @@ class MaterialController extends BaseController
                         foreach ($styleList as $style) {
                             if (isset($style['no_model'], $style['style_size'], $style['gw'], $style['composition'], $style['loss'])) {
                                 $orderQty = $this->ApsPerstyleModel->getQtyOrder($style['no_model'], $style['style_size'], $area);
-                                // $tambahanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getKgTambahan?no_model='
-                                //     . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&style_size=' . urlencode($style['style_size']) . '&area=' . $area;
-                                // $tambahan = $this->fetchApiData($tambahanApiUrl);
-                                // $kgPoTambahan = $tambahan['ttl_keb_potambahan'] ?? 0;
-                                // log_message('info', 'inii :' . $kgPoTambahan);
                                 if (isset($orderQty['qty'])) {
                                     if (isset($style['item_type']) && stripos($style['item_type'], 'JHT') !== false) {
                                         $requirement = $style['kgs'] ?? 0;
@@ -577,11 +604,12 @@ class MaterialController extends BaseController
                         $dataList[$key]['ttl_kebutuhan_bb'] = $totalRequirement;
                     }
 
-
                     // penerimaan benang
                     $pengirimanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
                         . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
                     $pengiriman = $this->fetchApiData($pengirimanApiUrl);
+                    log_message('info', "[API CHECK] URL=$pengirimanApiUrl");
+                    log_message('info', "[API RESULT] " . json_encode($pengiriman));
                     $dataList[$key]['ttl_pengiriman'] = $pengiriman['kgs_out'] ?? 0;
 
                     // retur
@@ -598,7 +626,7 @@ class MaterialController extends BaseController
 
         // ambil data libur hari kedepan untuk menentukan jadwal pemesanan
         $today = date('Y-m-d'); // ambil data hari ini
-        // $today = '2025-09-12'; // ambil data hari ini
+        // $today = '2025-10-25'; // ambil data hari ini
         $dataLibur = $this->liburModel->getDataLiburForPemesanan($today);
 
         // Ambil data tanggal libur menjadi array sederhana
@@ -616,9 +644,7 @@ class MaterialController extends BaseController
 
         // get range berdasarkan hari
         $masterRangeApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getMasterRangePemesanan?day=' .    ($day) . '&area=' . urlencode($area);
-        // $masterRangeApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getMasterRangePemesanan?day=Thursday&area=' . urlencode($area);
         $masterRangePemesanan = $this->fetchApiData($masterRangeApiUrl);
-        // dd($masterRangeApiUrl);
 
         // Simpan hasil
         $result = [
@@ -671,13 +697,17 @@ class MaterialController extends BaseController
             $initialOffsetSpandex = 0;
             $initialOffsetKaret   = 0;
         } else {
-            // Spandex & Karet â†’ cek apakah hari ini Jumat atau Sabtu
-            $initialOffsetBenang  = ($day === 'Saturday') ? 2 : 1;
-            $initialOffsetNylon   = ($day === 'Saturday') ? 2 : 1;
-            $initialOffsetSpandex = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
-            $initialOffsetKaret   = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
+            // JANGAN DI HAPUS
+            // apakah hari ini Jumat atau Sabtu 
+            // $initialOffsetBenang  = ($day === 'Saturday') ? 2 : 1;
+            // $initialOffsetNylon   = ($day === 'Saturday') ? 2 : 1;
+            // $initialOffsetSpandex = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
+            // $initialOffsetKaret   = ($day === 'Friday' || $day === 'Saturday') ? 3 : 2;
+            $initialOffsetBenang  = 1;
+            $initialOffsetNylon   = 1;
+            $initialOffsetSpandex = ($day === 'Friday') ? 3 : (($day === 'Saturday') ? 0 : 2); // untuk libur hari minggu
+            $initialOffsetKaret   = ($day === 'Friday') ? 3 : (($day === 'Saturday') ? 0 : 2); // untuk libur hari minggu
         }
-        // dd($initialOffsetBenang);
 
         $result['benang']  = generateRangeDates($today, (int)$masterRangePemesanan['range_benang'], $liburDates, $startTime, $initialOffsetBenang);
         $result['nylon']   = generateRangeDates($today, (int)$masterRangePemesanan['range_nylon'], $liburDates, $startTime, $initialOffsetNylon);

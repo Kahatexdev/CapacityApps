@@ -1164,57 +1164,122 @@ class ProduksiController extends BaseController
         ];
         return view($role . '/detailplus', $data);
     }
+    // public function updatepo()
+    // {
+    //     $pdk = $this->request->getPost('pdk');
+    //     $ids = $this->request->getPost('id');
+    //     $pos = $this->request->getPost('po');
+    //     $role = session()->get('role');
+
+    //     $this->db->transStart();
+
+    //     try {
+    //         foreach ($ids as $key => $id) {
+    //             $po = isset($pos[$key]) ? $pos[$key] : 0;
+
+    //             // Pastikan nilai PO valid
+    //             if (!is_numeric($po) || $po < 0) {
+    //                 throw new \Exception('Nilai PO tidak valid.');
+    //             }
+
+    //             // Update kolom po_plus pada tabel apsperstyle
+    //             $updatePoPlus = $this->ApsPerstyleModel->set('po_plus', $po, false)
+    //                 ->where('idapsperstyle', $id)
+    //                 ->update();
+    //             if (!$updatePoPlus) {
+    //                 throw new \Exception('Gagal mengupdate po tambahan untuk ID: ' . $id);
+    //             }
+
+    //             // Update kolom sisa pada tabel apsperstyle
+    //             $updateOrderResult = $this->ApsPerstyleModel->set('sisa', 'sisa + ' . $po, false)
+    //                 ->where('idapsperstyle', $id)
+    //                 ->update();
+
+    //             if (!$updateOrderResult) {
+    //                 throw new \Exception('Gagal mengupdate data order untuk ID: ' . $id);
+    //             }
+    //         }
+
+    //         // Selesaikan transaksi
+    //         $this->db->transComplete();
+
+    //         // Cek apakah transaksi sukses
+    //         if ($this->db->transStatus() === false) {
+    //             throw new \Exception('Terjadi kesalahan saat menyimpan data.');
+    //         }
+
+    //         return redirect()->back()->with('success', 'Data berhasil diupdate');
+    //     } catch (\Exception $e) {
+    //         // Rollback transaksi jika terjadi error
+    //         $this->db->transRollback();
+
+    //         // Redirect dengan pesan error
+    //         return redirect()->to($role . '/viewModelPlusPacking/' . $pdk)->with('error', 'Error: ' . $e->getMessage());
+    //     }
+    // }
     public function updatepo()
     {
-        $pdk = $this->request->getPost('pdk');
-        $ids = $this->request->getPost('id');
-        $pos = $this->request->getPost('po');
+        $pdk  = $this->request->getPost('pdk');
+        $ids  = $this->request->getPost('id');
+        $pos  = $this->request->getPost('po');
         $role = session()->get('role');
 
         $this->db->transStart();
 
         try {
             foreach ($ids as $key => $id) {
-                $po = isset($pos[$key]) ? $pos[$key] : 0;
+                $newPo = isset($pos[$key]) ? (int)$pos[$key] : 0;
 
-                // Pastikan nilai PO valid
-                if (!is_numeric($po) || $po < 0) {
-                    throw new \Exception('Nilai PO tidak valid.');
+                // Ambil nilai po_plus lama dari database
+                $oldData = $this->ApsPerstyleModel
+                    ->select('po_plus')
+                    ->where('idapsperstyle', $id)
+                    ->first();
+
+                $oldPo = isset($oldData['po_plus']) ? (int)$oldData['po_plus'] : 0;
+
+                // 🔹 Skip update jika nilai tidak berubah
+                if ($newPo === $oldPo) {
+                    continue;
                 }
 
-                // Update kolom po_plus pada tabel apsperstyle
-                $updatePoPlus = $this->ApsPerstyleModel->set('po_plus', $po, false)
+                // 🔹 Update hanya jika ada perubahan
+                $updatePoPlus = $this->ApsPerstyleModel
+                    ->set('po_plus', $newPo, false)
                     ->where('idapsperstyle', $id)
                     ->update();
+
                 if (!$updatePoPlus) {
-                    throw new \Exception('Gagal mengupdate po tambahan untuk ID: ' . $id);
+                    throw new \Exception('Gagal mengupdate po_plus untuk ID: ' . $id);
                 }
 
-                // Update kolom sisa pada tabel apsperstyle
-                $updateOrderResult = $this->ApsPerstyleModel->set('sisa', 'sisa + ' . $po, false)
-                    ->where('idapsperstyle', $id)
-                    ->update();
+                // 🔹 Jika kamu memang mau update sisa juga (sesuai logikamu sebelumnya)
+                //    disarankan bukan sisa + po baru, tapi sesuaikan dengan perubahan
+                //    (selisih perubahan saja)
+                $selisih = $newPo - $oldPo;
+                if ($selisih != 0) {
+                    $updateSisa = $this->ApsPerstyleModel
+                        ->set('sisa', 'sisa + ' . $selisih, false)
+                        ->where('idapsperstyle', $id)
+                        ->update();
 
-                if (!$updateOrderResult) {
-                    throw new \Exception('Gagal mengupdate data order untuk ID: ' . $id);
+                    if (!$updateSisa) {
+                        throw new \Exception('Gagal mengupdate sisa untuk ID: ' . $id);
+                    }
                 }
             }
 
-            // Selesaikan transaksi
             $this->db->transComplete();
 
-            // Cek apakah transaksi sukses
             if ($this->db->transStatus() === false) {
                 throw new \Exception('Terjadi kesalahan saat menyimpan data.');
             }
 
             return redirect()->back()->with('success', 'Data berhasil diupdate');
         } catch (\Exception $e) {
-            // Rollback transaksi jika terjadi error
             $this->db->transRollback();
-
-            // Redirect dengan pesan error
-            return redirect()->to($role . '/viewModelPlusPacking/' . $pdk)->with('error', 'Error: ' . $e->getMessage());
+            return redirect()->to($role . '/viewModelPlusPacking/' . $pdk)
+                ->with('error', 'Error: ' . $e->getMessage());
         }
     }
     public function updateproduksi()

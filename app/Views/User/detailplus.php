@@ -40,16 +40,20 @@
                     <th colspan="2"> PO (+)</th>
                 </thead>
                 <tbody>
-                    <?php foreach ($style as $st) : ?>
+                    <?php foreach ($style as $st) :
+                        $poDz = ceil($st['po_plus'] / 24);
+                        $isReadonly = $st['po_plus'] > 0 ? 'readonly' : '';
+                    ?>
                         <tr>
                             <td><?= $st['inisial'] ?></td>
                             <td><?= $st['size'] ?></td>
                             <td><?= ceil($st['qty'] / 24) ?> dz</td>
                             <td>
-                                <input type="number" class="PoDz" name="PoDz[]" onchange="toPcs(this)" value="<?= ceil($st['po_plus'] / 24) ?>"> dz
+                                <input type="number" class="PoDz" name="PoDz[]" onchange="toPcs(this)" value="<?= $poDz ?>"
+                                    <?= $isReadonly ?>> dz
                             </td>
                             <td>
-                                <input type="number" class="form po" name="po[]" value="<?= $st['po_plus'] ?>"> pcs
+                                <input type="number" class="form po" name="po[]" value="<?= $st['po_plus'] ?>" <?= $isReadonly ?>> pcs
                                 <input type="hidden" class="form" name="id[]" value="<?= $st['idapsperstyle'] ?>">
                             </td>
                         </tr>
