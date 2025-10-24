@@ -646,6 +646,8 @@ class SummaryController extends BaseController
         $dataPlan = $this->kebutuhanAreaModel->getDataByAreaGroupJrm($area);
         $allDetailPlans = [];
 
+        // Siapkan array kosong sebelum foreach
+        $allModels = [];
         foreach ($dataPlan as $jarum) {
             // Mengambil data berdasarkan area dan jarum tertentu
             $judulPlan = $this->kebutuhanAreaModel->getDataByAreaJrm($area, $jarum['jarum']);
@@ -667,6 +669,10 @@ class SummaryController extends BaseController
                 foreach ($detailPlan as $key => $dp) {
                     // Ambil data terkait model dan mesin
                     $noModel = $dp['model'];
+
+                    // Simpan model ke array (nanti akan dihapus duplikatnya)
+                    $allModels[] = $noModel;
+
                     $data = [
                         'area' => $area,
                         'model' => $noModel,
@@ -690,74 +696,17 @@ class SummaryController extends BaseController
                     // Menghitung total mesin
                     $mesinTotal = array_sum(array_column($this->tanggalPlanningModel->totalMcSumamryPlanner($dp['id_est_qty']), 'mesin'));
 
-                    // Ambil data bahan baku
-                    $bbUrl = "http://172.23.44.14/MaterialSystem/public/api/getBBForSummaryPlanner?" . "no_model=" . urlencode($noModel) . "&area=" . urlencode($area);
-                    $bbData = @file_get_contents($bbUrl);
-                    $bahanBaku = $bbData ? json_decode($bbData, true) : [];
-
-                    // --- Siapkan array untuk bahan baku per model ---
-                    $bb = [];
-                    $totalQty = 0;
-                    $totalKebutuhan = 0;
-
-                    if (!empty($bahanBaku['data'])) {
-                        foreach ($bahanBaku['data'] as $dataBb) {
-                            // Key unik untuk grup per jenis bahan
-                            $keyBB = $dataBb['item_type'] . '|' . $dataBb['kode_warna'] . '|' . $dataBb['color'];
-
-                            // Inisialisasi grup
-                            if (!isset($bb[$keyBB])) {
-                                $bb[$keyBB] = [
-                                    'item_type'     => $dataBb['item_type'],
-                                    'kode_warna'    => $dataBb['kode_warna'],
-                                    'color'         => $dataBb['color'],
-                                    'ttl_qty'       => 0,
-                                    'ttl_kebutuhan' => 0,
-                                ];
-                            }
-
-                            // Ambil qty order dari APS per style
-                            $orderQty = $this->ApsPerstyleModel->getQtyOrder($noModel, $dataBb['style_size'], $area);
-                            $qty = intval($orderQty['qty'] ?? 0);
-
-                            // Hitung kebutuhan bahan baku
-                            if ($qty >= 0) {
-                                if (isset($dataBb['item_type']) && stripos($dataBb['item_type'], 'JHT') !== false) {
-                                    $kebutuhan = $dataBb['kgs'] ?? 0;
-                                } else {
-                                    $kebutuhan = (($qty * $dataBb['gw'] * $dataBb['composition'] / 100 / 1000) *
-                                        (1 + ($dataBb['loss'] / 100)));
-                                }
-
-                                // Akumulasi per grup
-                                $bb[$keyBB]['ttl_qty']       += $qty;
-                                $bb[$keyBB]['ttl_kebutuhan'] += $kebutuhan;
-
-                                // Akumulasi total keseluruhan
-                                $totalQty       += $qty;
-                                $totalKebutuhan += $kebutuhan;
-                            }
-                        }
-
-                        // Hapus bahan baku yang ttl_kebutuhan = 0 (antisipasi kalau masih ada sisa 0)
-                        $bb = array_filter($bb, function ($item) {
-                            return $item['ttl_kebutuhan'] > 0;
-                        });
-                        // Ubah jadi array numerik biar mudah di-loop di view
-                        $bb = array_values($bb);
-                    }
-
                     // Memodifikasi data dalam array secara langsung
                     $detailPlan[$key]['mesin'] = $mesinTotal;
                     $detailPlan[$key]['product_type'] = $dataOrder['product_type'] ?? '';
                     $detailPlan[$key]['buyer'] = $dataOrder['kd_buyer_order'] ?? '';
-                    $detailPlan[$key]['produksi'] = number_format(floor($prod * 100) / 100, 2);
+                    $detailPlan[$key]['produksi'] = round(floor($prod * 100) / 100, 2);
                     $detailPlan[$key]['plan'] = (!empty($dp['smv']) && !empty($dp['precentage_target']))
                         ? number_format((3600 / $dp['smv']) * ($dp['precentage_target'] / 100), 2)
                         : 0;
                     $detailPlan[$key]['actMesin'] = $actMesin['jl_mc'] ?? 0;
                     $detailPlan[$key]['jarum'] = $jarum; // Pastikan jarum di-set
-                    $detailPlan[$key]['bahan_baku'] = $bb;
+                    // $detailPlan[$key]['bahan_baku'] = $bb;
                 }
 
                 // Gabungkan detailPlan berdasarkan jarum tanpa duplikasi
@@ -772,36 +721,85 @@ class SummaryController extends BaseController
 
         // Mengurutkan data di dalam setiap grup jarum berdasarkan model
         foreach ($allDetailPlans as $jarum => &$plans) {
-            // usort($plans, function ($a, $b) {
-            //     $modelA = (string) ($a['model'] ?? '');
-            //     $modelB = (string) ($b['model'] ?? '');
-            //     return $modelA <=> $modelB;
-            // });
             usort($plans, fn($a, $b) => strcmp($a['model'] ?? '', $b['model'] ?? ''));
         }
 
-        // === Kelompokkan bahan baku agar tidak duplikat per model ===
+        // Ambil data bahan baku
+        $allModels = array_values(array_unique($allModels));
+        $modelsParam = implode(',', $allModels);
+        $bbUrl = "http://172.23.44.14/MaterialSystem/public/api/getBBForSummaryPlanner?" . "no_model=" . urlencode($modelsParam);
+        $bbData = @file_get_contents($bbUrl);
+        $bahanBaku = $bbData ? json_decode($bbData, true) : [];
+
+        $dataBBbyModel = []; // hasil akhir: [no_model => [data group by]]
+        $area = $area ?? ''; // pastikan ada area jika dipakai di getQtyOrder
+
+        if (!empty($bahanBaku['data'])) {
+            // loop tiap model
+            foreach ($bahanBaku['data'] as $noModel => $listBB) {
+                $bb = [];
+                $totalQty = 0;
+                $totalKebutuhan = 0;
+
+                foreach ($listBB as $dataBb) {
+                    // Key unik untuk grup per jenis bahan
+                    $keyBB = $noModel . '|' . $dataBb['item_type'] . '|' . $dataBb['kode_warna'] . '|' . $dataBb['color'];
+
+                    // Inisialisasi grup
+                    if (!isset($bb[$keyBB])) {
+                        $bb[$keyBB] = [
+                            'item_type'     => $dataBb['item_type'],
+                            'kode_warna'    => $dataBb['kode_warna'],
+                            'color'         => $dataBb['color'],
+                            'ttl_qty'       => 0,
+                            'ttl_kebutuhan' => 0,
+                        ];
+                    }
+
+                    // Ambil qty order dari APS per style
+                    $orderQty = $this->ApsPerstyleModel->getQtyOrder($noModel, $dataBb['style_size'], $area);
+                    $qty = intval($orderQty['qty'] ?? 0);
+
+                    // Hitung kebutuhan bahan baku
+                    if ($qty >= 0) {
+                        if (isset($dataBb['item_type']) && stripos($dataBb['item_type'], 'JHT') !== false) {
+                            $kebutuhan = $dataBb['kgs'] ?? 0;
+                        } else {
+                            $kebutuhan = (($qty * $dataBb['gw'] * $dataBb['composition'] / 100 / 1000) *
+                                (1 + ($dataBb['loss'] / 100)));
+                        }
+
+                        // Akumulasi per grup
+                        $bb[$keyBB]['ttl_qty']       += $qty;
+                        $bb[$keyBB]['ttl_kebutuhan'] += $kebutuhan;
+
+                        // Akumulasi total keseluruhan
+                        $totalQty       += $qty;
+                        $totalKebutuhan += $kebutuhan;
+                    }
+                }
+
+                // Hapus bahan baku yang ttl_kebutuhan = 0
+                $bb = array_filter($bb, fn($item) => $item['ttl_kebutuhan'] > 0);
+
+                // Simpan hasil akhir ke model bersangkutan
+                $dataBBbyModel[$noModel] = array_values($bb);
+            }
+        }
+
+        // === Loop untuk masukkan ke allDetailPlans ===
         foreach ($allDetailPlans as $jarum => &$plans) {
             if (!is_array($plans)) continue;
 
-            $uniqueBB = []; // Simpan bahan baku unik per model
-
-            // Loop untuk kumpulkan bahan baku
+            $uniqueBB = [];
             foreach ($plans as &$plan) {
-                if (isset($plan['model'], $plan['bahan_baku']) && is_array($plan['bahan_baku'])) {
-                    $model = $plan['model'];
-
-                    // Simpan bahan baku per model jika belum pernah ditambahkan
-                    if (!isset($uniqueBB[$model])) {
-                        $uniqueBB[$model] = $plan['bahan_baku'];
-                    }
-
-                    // Hapus bahan baku dari tiap baris detail agar tidak berulang
-                    unset($plan['bahan_baku']);
+                $model = $plan['model'] ?? null;
+                if ($model && isset($dataBBbyModel[$model])) {
+                    $uniqueBB[$model] = $dataBBbyModel[$model];
                 }
+                unset($plan['bahan_baku']);
             }
 
-            // Simpan daftar bahan baku unik di akhir grup jarum
             $plans['bahan_baku'] = $uniqueBB;
         }
         unset($plans);
@@ -1304,7 +1302,7 @@ class SummaryController extends BaseController
 
                     // --- subtotal (langsung di bawah bahan baku)
                     $subPlan = ($subtotalProduksi != 0 && $subtotalActMesin != 0)
-                        ? number_format($subtotalProduksi / $subtotalActMesin, 1)
+                        ? round($subtotalProduksi / $subtotalActMesin, 1)
                         : 0;
 
                     $sheet->setCellValue("A{$rowBody}", 'SUBTOTAL');
