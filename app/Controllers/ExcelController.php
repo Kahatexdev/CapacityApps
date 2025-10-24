@@ -3580,7 +3580,7 @@ class ExcelController extends BaseController
     public function exportExcelRetur($area)
     {
 
-        $url = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area;
+        $url = 'http://172.23.39.114/MaterialSystem/public/api/listRetur/' . $area;
 
         $response = file_get_contents($url);
         log_message('debug', "API Response: " . $response);
@@ -3937,7 +3937,7 @@ class ExcelController extends BaseController
         $tglBuat = $this->request->getGet('tgl_buat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterPoTambahan"
+        $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/filterPoTambahan"
             . "?area=" . urlencode($area)
             . "&model=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);
@@ -5959,7 +5959,7 @@ class ExcelController extends BaseController
             //
             $order = $this->ApsPerstyleModel->getQtyArea($noModel) ?: [];
 
-            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
+            $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
             $material = @file_get_contents($apiUrl);
 
             // $models = [];
@@ -6298,7 +6298,7 @@ class ExcelController extends BaseController
     //     $tglBuat = $this->request->getGet('tglBuat');
 
     //     // Ambil data berdasarkan area dan model
-    //     $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/listExportRetur/"
+    //     $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/listExportRetur/"
     //         . $area
     //         . "?noModel=" . urlencode($noModel)
     //         . "&tglBuat=" . urlencode($tglBuat);
@@ -7176,7 +7176,7 @@ class ExcelController extends BaseController
         $tglBuat = $this->request->getGet('tglBuat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/listExportRetur/"
+        $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/listExportRetur/"
             . $area
             . "?noModel=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);
@@ -7505,7 +7505,7 @@ class ExcelController extends BaseController
         }
 
         // Tulis Header Form
-        $this->renderHeaderFormRetur($sheet, $area, $tglBuat, $delivery, $result, $styleHeader);
+        $this->renderHeaderFormRetur($sheet, $area, $tglBuat, $delivery, $dataReturGrouped, $styleHeader);
 
         // Isi tabel Start
         $rowNum = 11;
@@ -7562,7 +7562,7 @@ class ExcelController extends BaseController
 
                     // tambahkan header form baru di halaman berikutnya
                     $rowNum += 2; // jarak sedikit
-                    $this->renderHeaderFormRetur($sheet, $area, $tglBuat, $delivery, $result, $$styleHeader);
+                    $this->renderHeaderFormRetur($sheet, $area, $tglBuat, $delivery, $dataReturGrouped, $$styleHeader);
 
                     $rowNum = 11; // header form kamu mengisi baris 1–10
                     $currentPageRowCount = 0;
@@ -7825,6 +7825,34 @@ class ExcelController extends BaseController
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER);
 
+        $startKet = $lastTT + 2;
+
+        // BARIS KETERANGAN BS
+        // $sheet->mergeCells("A{$startKet}:C{$startKet}");
+        // $sheet->setCellValue("A{$startKet}", 'BS SETTING(KG)');
+
+        // $sheet->setCellValue("D{$startKet}", ':');
+
+        // $sheet->setCellValue("E{$startKet}", 'BS MESIN(KG)');
+
+        // $sheet->setCellValue("F{$startKet}", ':');
+
+        // $sheet->mergeCells("G{$startKet}:H{$startKet}");
+        // $sheet->setCellValue("G{$startKet}", 'TOTAL BS(%)');
+
+        // $sheet->setCellValue("I{$startKet}", ':');
+
+        // $sheet->setCellValue("K{$startKet}", 'RETUR(KG)');
+
+        // $sheet->mergeCells("L{$startKet}:M{$startKet}");
+        // $sheet->setCellValue("L{$startKet}", ':');
+
+        // $sheet->mergeCells("O{$startKet}:P{$startKet}");
+        // $sheet->setCellValue("O{$startKet}", 'RETUR(%)');
+
+        // $sheet->mergeCells("Q{$startKet}:R{$startKet}");
+        // $sheet->setCellValue("Q{$startKet}", ':');
+
         // Output Excel
         $filename = 'FORM RETUR ' . $area . '.xlsx';
         $writer = new Xlsx($spreadsheet);
@@ -7834,7 +7862,7 @@ class ExcelController extends BaseController
         exit;
     }
 
-    private function renderHeaderFormRetur($sheet, $area, $tglBuat, $delivery, $result, $styleHeader)
+    private function renderHeaderFormRetur($sheet, $area, $tglBuat, $delivery, $dataReturGrouped, $styleHeader)
     {
         // Header Form Start
         $sheet->mergeCells('A1:D2');
@@ -7900,7 +7928,9 @@ class ExcelController extends BaseController
             ->setVertical(Alignment::VERTICAL_CENTER);
         $sheet->getStyle('G6')->getFont()->setBold(true)->setSize(10);
 
-        $lossValue = isset($result[0]['loss']) ? $result[0]['loss'] . '%' : '';
+        $lossValue = isset($dataReturGrouped[0]['details'][0]['loss'])
+            ? $dataReturGrouped[0]['details'][0]['loss'] . '%'
+            : '';
         $sheet->setCellValue('I6', ': ' . $lossValue);
         $sheet->getStyle('I6')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT)
             ->setVertical(Alignment::VERTICAL_CENTER);
@@ -8169,7 +8199,7 @@ class ExcelController extends BaseController
         $tanggalAwal = $this->request->getGet('tanggal_awal');
         $tanggalAkhir = $this->request->getGet('tanggal_akhir');
 
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir;
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir;
         $material = @file_get_contents($apiUrl);
 
         // $models = [];
@@ -8261,7 +8291,7 @@ class ExcelController extends BaseController
     {
         $key = $this->request->getGet('key');
 
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterPoBenang?key=' . urlencode($key);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/filterPoBenang?key=' . urlencode($key);
         $material = @file_get_contents($apiUrl);
 
         // $models = [];
@@ -8348,7 +8378,7 @@ class ExcelController extends BaseController
         $tanggalAwal = $this->request->getGet('tanggal_awal');
         $tanggalAkhir = $this->request->getGet('tanggal_akhir');
 
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterPengiriman?key=' . urlencode($key) . '&tanggal_awal=' . urlencode($tanggalAwal) . '&tanggal_akhir=' . urlencode($tanggalAkhir);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/filterPengiriman?key=' . urlencode($key) . '&tanggal_awal=' . urlencode($tanggalAwal) . '&tanggal_akhir=' . urlencode($tanggalAkhir);
         $material = @file_get_contents($apiUrl);
 
         // $models = [];
@@ -8528,7 +8558,7 @@ class ExcelController extends BaseController
         $key = $this->request->getGet('key');
         $jenis = $this->request->getGet('jenis');
 
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterReportGlobal?key=' . urlencode($key) . '&jenis=' . urlencode($jenis);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/filterReportGlobal?key=' . urlencode($key) . '&jenis=' . urlencode($jenis);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -8877,7 +8907,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterSisaPakai?bulan=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna) . '&jenis=' . urlencode($jenis);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/filterSisaPakai?bulan=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna) . '&jenis=' . urlencode($jenis);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -9049,7 +9079,7 @@ class ExcelController extends BaseController
         $kodeWarna = $this->request->getGet('kode_warna') ?? '';
 
         // 1) Ambil data
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/historyPindahOrder?model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/historyPindahOrder?model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -9203,7 +9233,7 @@ class ExcelController extends BaseController
             $tglAwal   = date('Y-m-01', $timestamp);
             $tglAkhir  = date('Y-m-t', $timestamp);
         }
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterBenangMingguan?tanggal_awal=' . urlencode($tglAwal) . '&tanggal_akhir=' . urlencode($tglAkhir);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/filterBenangMingguan?tanggal_awal=' . urlencode($tglAwal) . '&tanggal_akhir=' . urlencode($tglAkhir);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -9574,7 +9604,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangBenang?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/reportSisaDatangBenang?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -9765,7 +9795,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangNylon?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/reportSisaDatangNylon?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -9956,7 +9986,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangSpandex?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/reportSisaDatangSpandex?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -10147,7 +10177,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangKaret?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/reportSisaDatangKaret?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
