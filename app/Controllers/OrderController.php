@@ -1682,6 +1682,8 @@ class OrderController extends BaseController
         $data = $this->ApsPerstyleModel->getAreaOrder($ar, $bulan);
         $allData = [];
         $totalPerWeek = [];
+        $weekCount = 0;
+        $week = [];
 
         foreach ($data as $id) {
             $mastermodel = $id['mastermodel'];
@@ -1825,7 +1827,7 @@ class OrderController extends BaseController
             }
         }
 
-        $maxWeekCount = $weekCount - 1;
+        $maxWeekCount = max(0, $weekCount - 1);
 
         $data = [
             'role' => $role,
