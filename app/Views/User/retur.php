@@ -493,17 +493,19 @@
 
         const uniqueLots = new Set(); // untuk simpan lot_kirim unik
 
-        for (const key of data) {
-            if (!uniqueLots.has(key.lot_kirim)) {
-                uniqueLots.add(key.lot_kirim);
-
-                const opt = document.createElement('option');
-                opt.value = key.lot_kirim;
-                opt.textContent = `${key.lot_kirim}`;
-                option.appendChild(opt);
+        for (const item of data) {
+            if (Array.isArray(item.lot_kirim)) {
+                for (const lot of item.lot_kirim) {
+                    if (!uniqueLots.has(lot)) {
+                        uniqueLots.add(lot);
+                        const opt = document.createElement('option');
+                        opt.value = lot;
+                        opt.textContent = lot;
+                        option.appendChild(opt);
+                    }
+                }
             }
         }
-
     }
 
     function maxRetur(data) {
