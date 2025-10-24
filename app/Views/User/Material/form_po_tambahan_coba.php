@@ -241,6 +241,7 @@
                                     <label>Pesanan<br>Kgs</label>
                                     <!-- <input type="text" class="form-control kg-mu" readonly> -->
                                     <input type="text" class="form-control po-kg-perstyle" name="items[0][po_kg_perstyle]" readonly>
+                                    <input type="hidden" class="form-control po-kg-perstyle-tanpa-loss" name="items[0][po_kg_perstyle_tanpa_loss]" readonly>
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -334,7 +335,7 @@
             let loading = document.getElementById('loading-spinner');
             const $ss = $row.find('.item-type').empty().append('<option value="">Pilih Kode Benang</option>').trigger('change');
             $row.find('.item-type, .kode-warna').empty().append('<option value="">Pilih Item Type</option>').trigger('change');
-            $row.find('.color, .po-kg-perstyle, .kg-po, .pcs-po').val('');
+            $row.find('.color, .po-kg-perstyle, .po-kg-perstyle-tanpa-loss, .kg-po, .pcs-po').val('');
 
             if (!modelCode) return;
 
@@ -456,6 +457,12 @@
                     qtyOrderVal * composition * gw / 100 / 1000 * (1 + (parseFloat(style.loss || 0) / 100)) :
                     0;
                 $template.find('.po-kg-perstyle').val(qtyPoKg.toFixed(2));
+
+                // qty po kg tanpa loss
+                const poKgTanpaLoss = gw > 0 ?
+                    qtyOrderVal * composition * gw / 100 / 1000 :
+                    0;
+                $template.find('.po-kg-perstyle-tanpa-loss').val(poKgTanpaLoss.toFixed(2));
 
                 // simpan BASE untuk poplus (tanpa loss)
                 let baseSisaOrderKg = 0;
@@ -607,11 +614,18 @@
         // Hitung Qty PO Kg All Style + Loss Aktual
         function hitungPoKg() {
             let totalPoKg = 0;
+            let totalPoKgTanpaLoss = 0;
 
             // jumlahkan semua po-kg-perstyle
             $('.po-kg-perstyle').each(function() {
                 const val = parseFloat($(this).val()) || 0;
                 totalPoKg += val;
+            });
+
+            // jumlahkan semua po-kg-perstyle-tanpa-loss
+            $('.po-kg-perstyle-tanpa-loss').each(function() {
+                const val = parseFloat($(this).val()) || 0;
+                totalPoKgTanpaLoss += val;
             });
 
             // update total PO Kg
@@ -632,7 +646,7 @@
             // hitung Loss Aktual %
             let lossAktual = 0;
             if (totalPoKg > 0) {
-                lossAktual = (totalBs / totalPoKg) * 100;
+                lossAktual = (totalBs / totalPoKgTanpaLoss) * 100;
             }
 
             lastLossAktual = lossAktual; // simpan untuk dipakai fungsi lain
