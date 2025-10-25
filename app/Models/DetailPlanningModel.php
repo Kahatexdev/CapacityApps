@@ -186,19 +186,21 @@ class DetailPlanningModel extends Model
 
         $pdk = [];
 
+        $pdk = [];
+
         foreach ($results as $row) {
             $data = $this->select('model')
                 ->where('id_pln_mc', $row['id_pln_mc'])
                 ->where('status', 'aktif')
-                ->groupBy('model')
                 ->findAll();
 
-            // Ambil semua model aktif dan masukkan ke array $pdk
             foreach ($data as $d) {
-                $pdk[] = $d['model'];
+                if (!in_array($d['model'], $pdk)) {
+                    $pdk[] = $d['model'];
+                }
             }
         }
-        // dd($pdk);
+
         return $pdk;
     }
 }

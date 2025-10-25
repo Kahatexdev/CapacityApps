@@ -2,6 +2,19 @@
 error_reporting(E_ALL); ?>
 <?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
+<style>
+    td {
+        min-width: 120px;
+        /* atur sesuai kebutuhan */
+    }
+
+    td select.form-control,
+    td input.form-control,
+    td textarea.form-control {
+        width: 150px;
+        /* supaya input & select punya lebar tetap */
+    }
+</style>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
         <script>
@@ -72,6 +85,7 @@ error_reporting(E_ALL); ?>
                                 <table id="dataTable" class="display compact striped" style="width:100%">
                                     <thead>
                                         <tr>
+                                            <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Material</th>
                                             <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Priority</th>
                                             <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
                                             <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Inisial</th>
@@ -94,6 +108,16 @@ error_reporting(E_ALL); ?>
                                     <tbody>
                                         <?php foreach ($ppsData as $pps) : ?>
                                             <tr>
+                                                <?php
+                                                $materialStatus = $pps['material_status'] ?? '';
+                                                $inputClass = 'form-control'; // default
+                                                if (strtolower($materialStatus) === 'complete') {
+                                                    $inputClass .= ' bg-success text-white'; // hijau & teks putih
+                                                }
+                                                ?>
+                                                <td class="text-center">
+                                                    <input type="text" name="" readonly value="<?= htmlspecialchars($materialStatus); ?>" class="<?= $inputClass; ?>">
+                                                </td>
                                                 <td class="text-center">
                                                     <?php
                                                     $currentPriority = $pps['priority'] ?? 'low'; // default ke low kalau kosong/null
@@ -125,7 +149,7 @@ error_reporting(E_ALL); ?>
                                                 </td>
 
                                                 <td class="text-center"><?= htmlspecialchars($pps['inisial']); ?></td>
-                                                <td class="text-center"> <input type="hidden" name="imp[]" id="" value="<?= $pps['imp']; ?>"> <input type="hidden" name="id_pps[]" id="" value="<?= $pps['id_pps']; ?>">
+                                                <td class="text-center"> <input type="hidden" name="imp[]" id="" value="<?= $pps['id_mesin_perinisial']; ?>"> <input type="hidden" name="id_pps[]" id="" value="<?= $pps['id_pps']; ?>">
                                                     <?= htmlspecialchars($pps['size']); ?></td>
                                                 <td class="text-center"> <input type="text" name="mechanic[]" value="<?= $pps['mechanic']; ?>" class="form-control"></td>
                                                 <td class="text-center"> <input type="text" name="coor[]" value="<?= $pps['coor']; ?>" class="form-control"></td>
@@ -203,6 +227,7 @@ error_reporting(E_ALL); ?>
             function test() {
                 console.log('tes')
             }
+
             document.querySelectorAll('.priority-select').forEach(sel => {
                 const setColor = () => {
                     const colors = {
