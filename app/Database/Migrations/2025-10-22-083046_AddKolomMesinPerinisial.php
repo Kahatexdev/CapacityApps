@@ -39,6 +39,10 @@ class AddKolomMesinPerinisial extends Migration
 
     public function down()
     {
-        $this->forge->dropColumn('mesin_perinisial', 'material_status',  'priority', 'start_pps_plan', 'stop_pps_plan', 'admin');
+        $this->forge->dropColumn('mesin_perinisial', 'material_status');
+        $this->forge->dropColumn('mesin_perinisial',   'priority');
+        $this->forge->dropColumn('mesin_perinisial', 'start_pps_plan');
+        $this->forge->dropColumn('mesin_perinisial',  'stop_pps_plan');
+        $this->forge->dropColumn('mesin_perinisial',  'admin');
     }
 }
