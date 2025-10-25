@@ -62,7 +62,7 @@ error_reporting(E_ALL); ?>
                                 <tbody>
                                     <?php foreach ($pdk as $pps) :
                                         // tentuin warna badge progress
-                                        $progress = round($pps['progress'] * 100); // pastikan persen 0-100
+                                        $progress = round($pps['progress']); // pastikan persen 0-100
                                         if ($progress <= 25) {
                                             $badgeClass = 'bg-danger';
                                         } elseif ($progress <= 50) {

@@ -1480,7 +1480,6 @@ class ApsController extends BaseController
             $ppsData = $this->ApsPerstyleModel->getPpsData($pdk); // array of arrays
             $rowNum = count($ppsData);
 
-
             if ($rowNum == 0) continue; // skip kalau ga ada data
 
             // hitung yang approved
@@ -1504,6 +1503,7 @@ class ApsController extends BaseController
                 'progress' => $rowNum > 0 ? $done / $rowNum * 100 : 0,
                 'material' => $rowNum > 0 ? $matDone / $rowNum * 100 : 0,
             ];
+            // dd($result);
         }
         // urutkan dari progress terbesar ke terkecil
         usort($result, function ($a, $b) {
