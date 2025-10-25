@@ -630,7 +630,12 @@
             }
 
             // masukkan clone SEBAGAI SIBLING setelah currentRow (bukan append ke dalam)
-            currentRow.parentNode.insertBefore(clone, currentRow.nextSibling);
+            // currentRow.parentNode.insertBefore(clone, currentRow.nextSibling);
+
+            // 🟩 cari baris retur terakhir dan tambahkan di bawahnya
+            const allRows = container.querySelectorAll('.retur-row');
+            const lastRow = allRows[allRows.length - 1];
+            lastRow.after(clone); // <== ini bagian pentingnya
 
             // update nomor karung
             updateKarungNumbers();
