@@ -7627,10 +7627,6 @@ class ExcelController extends BaseController
             $ttl_tambahan_kg = (float)($group['ttl_tambahan_kg'] ?? 0);
             $total_kgs_retur = (float)($group['total_kgs_retur'] ?? 0);
 
-            // Hitung selisih
-            $selisih = $terima_kg - $total_kg_po;
-            $persen_terima = $total_kg_po > 0 ? ($terima_kg / $total_kg_po) * 100 : 0;
-
             foreach ($group['details'] as $detail) {
                 $style_size  = $detail['style_size'] ?? '';
                 $composition = $detail['composition'] ?? 0;
@@ -7702,6 +7698,10 @@ class ExcelController extends BaseController
                 $sheet->getRowDimension($rowNum)->setRowHeight(-1);
                 $rowNum++;
             }
+
+            // Hitung selisih
+            $selisih = $terima_kg - $total_kg_po;
+            $persen_terima = $total_kg_po > 0 ? ($terima_kg / $total_kg_po) * 100 : 0;
 
             // Hitung hasil total group
             $persen_total = $total_kg_po > 0 ? ($terima_kg / $total_kg_po) * 100 : 0;
