@@ -105,6 +105,21 @@
         </div>
     </div>
 
+    <div id="loadingOverlay" style="
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    text-align: center;
+    color: white;
+    font-size: 20px;
+    padding-top: 20%;
+">
+        <i class="fas fa-spinner fa-spin"></i> Sedang memproses...
+    </div>
+
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script type="text/javascript">
@@ -158,7 +173,23 @@
                 window.location = `${basePdf}${area}?model=${model}&tglBuat=${tgl}`;
             });
             $('#generateExcelBtn').off('click').on('click', () => {
-                window.location = `${baseExcel}${area}?model=${model}&tglBuat=${tgl}`;
+                // window.location = `${baseExcel}${area}?model=${model}&tglBuat=${tgl}`;
+                $('#loadingOverlay').show();
+
+                const url = `${baseExcel}${area}?model=${model}&tglBuat=${tgl}`;
+
+                // paksa browser download
+                window.location = url;
+
+                // cek cookie setiap 500ms
+                const interval = setInterval(function() {
+                    if (document.cookie.indexOf('downloadComplete=true') !== -1) {
+                        $('#loadingOverlay').hide();
+                        clearInterval(interval);
+                        // hapus cookie supaya next download bisa dipakai lagi
+                        document.cookie = "downloadComplete=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                    }
+                }, 500);
             });
             $('#exportExcelBtn').attr(
                 'href',

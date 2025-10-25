@@ -3583,7 +3583,7 @@ class ExcelController extends BaseController
     public function exportExcelRetur($area)
     {
 
-        $url = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area;
+        $url = 'http://172.23.39.114/MaterialSystem/public/api/listRetur/' . $area;
 
         $response = file_get_contents($url);
         log_message('debug', "API Response: " . $response);
@@ -3940,7 +3940,7 @@ class ExcelController extends BaseController
         $tglBuat = $this->request->getGet('tgl_buat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterPoTambahan"
+        $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/filterPoTambahan"
             . "?area=" . urlencode($area)
             . "&model=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);
@@ -5964,7 +5964,7 @@ class ExcelController extends BaseController
             //
             $order = $this->ApsPerstyleModel->getQtyArea($noModel) ?: [];
 
-            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
+            $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
             $material = @file_get_contents($apiUrl);
 
             // $models = [];
@@ -6303,7 +6303,7 @@ class ExcelController extends BaseController
     //     $tglBuat = $this->request->getGet('tglBuat');
 
     //     // Ambil data berdasarkan area dan model
-    //     $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/listExportRetur/"
+    //     $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/listExportRetur/"
     //         . $area
     //         . "?noModel=" . urlencode($noModel)
     //         . "&tglBuat=" . urlencode($tglBuat);
@@ -7181,7 +7181,7 @@ class ExcelController extends BaseController
         $tglBuat = $this->request->getGet('tglBuat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/listExportRetur/"
+        $apiUrl = "http://172.23.39.114/MaterialSystem/public/api/listExportRetur/"
             . $area
             . "?noModel=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);
@@ -7268,80 +7268,114 @@ class ExcelController extends BaseController
         }
 
         // --- Group per no_model|item_type|kode_warna ---
+        // --- Group per no_model|item_type|kode_warna ---
         $grouped = [];
+
         foreach ($dataRetur as $row) {
             $keyGroup = $row['no_model'] . '|' . $row['item_type'] . '|' . $row['kode_warna'];
 
-            // Cari semua style yang match group ini
-            $matchingKeys = [];
-            foreach ($materialIndex as $k => $m) {
-                if (
-                    $m['no_model'] === $row['no_model']
-                    && $m['item_type'] === $row['item_type']
-                    && $m['kode_warna'] === $row['kode_warna']
-                ) {
-                    $matchingKeys[] = $k;
+            // === INISIALISASI GRUP HANYA SEKALI ===
+            if (!isset($grouped[$keyGroup])) {
+                // Cari semua style yang match group ini
+                $matchingKeys = [];
+                foreach ($materialIndex as $k => $m) {
+                    if (
+                        $m['no_model'] === $row['no_model'] &&
+                        $m['item_type'] === $row['item_type'] &&
+                        $m['kode_warna'] === $row['kode_warna']
+                    ) {
+                        $matchingKeys[] = $k;
+                    }
                 }
-            }
 
-            // Kumpulkan detail per style_size
-            $details = [];
-            $total_bs_mesin_dz = 0;
-            $total_bs_mesin_kg = 0;
-            $total_bs_setting_dz = 0;
-            $total_bs_setting_kg = 0;
-            foreach ($matchingKeys as $k) {
-                $mat = $materialIndex[$k];
-                $qty_order = $qtyOrderList[$k] ?? 0;
-                $kg_po = $kgPoList[$k] ?? 0;
-                $loss_value = (float)($mat['loss'] ?? 0);
+                // Kumpulkan detail per style_size
+                $details = [];
+                $total_bs_mesin_dz = 0;
+                $total_bs_mesin_kg = 0;
+                $total_bs_setting_dz = 0;
+                $total_bs_setting_kg = 0;
 
-                $bs_mesin_gr = $bsMesinGrList[$k] ?? 0;
-                $bs_mesin_dz = $bsMesinDzList[$k] ?? 0;
-                $bs_mesin_kg = $bsMesinKgList[$k] ?? 0;
-                $bs_setting = $bsSettingList[$k] ?? 0;
-                $bs_setting_kg = $bsSettingKgList[$k] ?? 0;
+                foreach ($matchingKeys as $k) {
+                    $mat = $materialIndex[$k];
+                    $qty_order = $qtyOrderList[$k] ?? 0;
+                    $kg_po = $kgPoList[$k] ?? 0;
+                    $loss_value = (float)($mat['loss'] ?? 0);
 
-                // Akumulasi total per kode warna
-                $total_bs_mesin_dz += (float)$bs_mesin_dz;
-                $total_bs_mesin_kg += (float)$bs_mesin_kg;
-                $total_bs_setting_dz += (float)$bs_setting / 24; // ubah ke dz
-                $total_bs_setting_kg += (float)$bs_setting_kg;
+                    $bs_mesin_gr = $bsMesinGrList[$k] ?? 0;
+                    $bs_mesin_dz = $bsMesinDzList[$k] ?? 0;
+                    $bs_mesin_kg = $bsMesinKgList[$k] ?? 0;
+                    $bs_setting = $bsSettingList[$k] ?? 0;
+                    $bs_setting_kg = $bsSettingKgList[$k] ?? 0;
 
-                $details[] = [
-                    'style_size' => $mat['style_size'] ?? '',
-                    'composition' => (float)($mat['composition'] ?? 0),
-                    'gw' => (float)($mat['gw'] ?? 0),
-                    'qty_order' => $qty_order,
-                    'kg_po' => $kg_po,
-                    'loss' => $loss_value,
-                    'bs_mesin_gr' => $bs_mesin_gr,
-                    'bs_mesin_dz' => $bs_mesin_dz,
-                    'bs_mesin_kg' => $bs_mesin_kg,
-                    'bs_setting' => $bs_setting,
-                    'bs_setting_kg' => $bs_setting_kg,
+                    // Akumulasi total per kode warna
+                    $total_bs_mesin_dz += (float)$bs_mesin_dz;
+                    $total_bs_mesin_kg += (float)$bs_mesin_kg;
+                    $total_bs_setting_dz += (float)$bs_setting / 24;
+                    $total_bs_setting_kg += (float)$bs_setting_kg;
+
+                    $details[] = [
+                        'style_size' => $mat['style_size'] ?? '',
+                        'composition' => (float)($mat['composition'] ?? 0),
+                        'gw' => (float)($mat['gw'] ?? 0),
+                        'qty_order' => $qty_order,
+                        'kg_po' => $kg_po,
+                        'loss' => $loss_value,
+                        'bs_mesin_gr' => $bs_mesin_gr,
+                        'bs_mesin_dz' => $bs_mesin_dz,
+                        'bs_mesin_kg' => $bs_mesin_kg,
+                        'bs_setting' => $bs_setting,
+                        'bs_setting_kg' => $bs_setting_kg,
+                    ];
+                }
+
+                // --- Simpan grup utama ---
+                $grouped[$keyGroup] = [
+                    'no_model'       => $row['no_model'],
+                    'item_type'      => $row['item_type'],
+                    'kode_warna'     => $row['kode_warna'],
+                    'color'          => $row['color'] ?? '',
+                    'kategori'       => $row['kategori'] ?? '',
+                    'terima_kg'      => (float)($row['terima_kg'] ?? 0),
+                    'sisa_bb_mc'     => (float)($row['sisa_bb_mc'] ?? 0),
+                    'poplus_mc_kg'   => (float)($row['poplus_mc_kg'] ?? 0),
+                    'plus_pck_kg'    => (float)($row['plus_pck_kg'] ?? 0),
+                    'ttl_tambahan_kg' => (float)($row['ttl_tambahan_kg'] ?? 0),
+                    'total_kgs_retur' => 0,
+                    'total_cns_retur' => 0,
+                    'total_krg_retur' => 0,
+                    'total_bs_mesin_dz'   => $total_bs_mesin_dz,
+                    'total_bs_mesin_kg'   => $total_bs_mesin_kg,
+                    'total_bs_setting_dz' => $total_bs_setting_dz,
+                    'total_bs_setting_kg' => $total_bs_setting_kg,
+                    'details'        => $details,
+                    'detail_lot'     => []
                 ];
             }
 
-            // Simpan ke dalam grup (tambah kolom dari $dataRetur)
-            $grouped[$keyGroup] = [
-                'no_model'       => $row['no_model'],
-                'item_type'      => $row['item_type'],
-                'kode_warna'     => $row['kode_warna'],
-                'color'          => $row['color'] ?? '',
-                'kategori'       => $row['kategori'] ?? '',
-                'terima_kg'      => (float)($row['terima_kg'] ?? 0),
-                'sisa_bb_mc'     => (float)($row['sisa_bb_mc'] ?? 0),
-                'poplus_mc_kg'   => (float)($row['poplus_mc_kg'] ?? 0),
-                'plus_pck_kg'    => (float)($row['plus_pck_kg'] ?? 0),
-                'ttl_tambahan_kg' => (float)($row['ttl_tambahan_kg'] ?? 0),
-                'kgs_retur'      => (float)($row['kgs_retur'] ?? 0), // ⬅️ tambahkan ini
-                'total_bs_mesin_dz'   => $total_bs_mesin_dz,
-                'total_bs_mesin_kg'   => $total_bs_mesin_kg,
-                'total_bs_setting_dz' => $total_bs_setting_dz,
-                'total_bs_setting_kg' => $total_bs_setting_kg,
-                'details'        => $details
-            ];
+            // === AKUMULASI TOTAL RETUR ===
+            $grouped[$keyGroup]['total_kgs_retur'] += (float)($row['kgs_retur'] ?? 0);
+            $grouped[$keyGroup]['total_cns_retur'] += (float)($row['cns_retur'] ?? 0);
+            $grouped[$keyGroup]['total_krg_retur'] += (float)($row['krg_retur'] ?? 0);
+
+            // === DETAIL LOT ===
+            $lotKey = trim($row['lot_retur'] ?? '');
+            if (!isset($grouped[$keyGroup]['detail_lot'][$lotKey])) {
+                $grouped[$keyGroup]['detail_lot'][$lotKey] = [
+                    'lot_retur' => $lotKey,
+                    'kgs_retur' => 0,
+                    'cns_retur' => 0,
+                    'krg_retur' => 0,
+                ];
+            }
+
+            $grouped[$keyGroup]['detail_lot'][$lotKey]['kgs_retur'] += (float)$row['kgs_retur'];
+            $grouped[$keyGroup]['detail_lot'][$lotKey]['cns_retur'] += (float)$row['cns_retur'];
+            $grouped[$keyGroup]['detail_lot'][$lotKey]['krg_retur'] += (float)$row['krg_retur'];
+        }
+
+        // Biar rapi, ubah detail_lot jadi array numerik
+        foreach ($grouped as &$g) {
+            $g['detail_lot'] = array_values($g['detail_lot']);
         }
 
         // Gunakan $dataReturGrouped untuk loop di Excel
@@ -7588,6 +7622,17 @@ class ExcelController extends BaseController
             $total_plus_pck_kg = 0;
             $total_ttl_tambahan_kg = 0;
 
+            $terima_kg   = (float)($group['terima_kg'] ?? 0);
+            $sisa_bb_mc  = (float)($group['sisa_bb_mc'] ?? 0);
+            $poplus_mc_kg = (float)($group['poplus_mc_kg'] ?? 0);
+            $plus_pck_kg  = (float)($group['plus_pck_kg'] ?? 0);
+            $ttl_tambahan_kg = (float)($group['ttl_tambahan_kg'] ?? 0);
+            $total_kgs_retur = (float)($group['total_kgs_retur'] ?? 0);
+
+            // Hitung selisih
+            $selisih = $terima_kg - $total_kg_po;
+            $persen_terima = $total_kg_po > 0 ? ($terima_kg / $total_kg_po) * 100 : 0;
+
             foreach ($group['details'] as $detail) {
                 $style_size  = $detail['style_size'] ?? '';
                 $composition = $detail['composition'] ?? 0;
@@ -7596,23 +7641,12 @@ class ExcelController extends BaseController
                 $loss        = (float)($detail['loss'] ?? 0);
                 $kg_po       = (float)($detail['kg_po'] ?? 0);
 
-                $terima_kg   = (float)($group['terima_kg'] ?? 0);
-                $sisa_bb_mc  = (float)($group['sisa_bb_mc'] ?? 0);
-                $poplus_mc_kg = (float)($group['poplus_mc_kg'] ?? 0);
-                $plus_pck_kg  = (float)($group['plus_pck_kg'] ?? 0);
-                $ttl_tambahan_kg = (float)($group['ttl_tambahan_kg'] ?? 0);
-                $kgs_retur = (float)($group['kgs_retur'] ?? 0);
-
                 // Tambahkan ke total
                 $total_qty_order     += $qty_order;
                 $total_kg_po         += $kg_po;
                 $total_poplus_mc_kg  += $poplus_mc_kg;
                 $total_plus_pck_kg   += $plus_pck_kg;
                 $total_ttl_tambahan_kg += $ttl_tambahan_kg;
-
-                // Hitung selisih
-                $selisih = $terima_kg - $total_kg_po;
-                $persen_terima = $total_kg_po > 0 ? ($terima_kg / $total_kg_po) * 100 : 0;
 
                 // Format hanya jika > 0
                 $fmt = fn($v, $dec = 2) => ($v && $v != 0) ? number_format($v, $dec) : '';
@@ -7673,27 +7707,27 @@ class ExcelController extends BaseController
 
             // Hitung hasil total group
             $persen_total = $total_kg_po > 0 ? ($terima_kg / $total_kg_po) * 100 : 0;
-            $persen_retur = $total_kg_po > 0 ? ($kgs_retur / $total_kg_po) * 100 : 0;
+            $persen_retur = $total_kg_po > 0 ? ($total_kgs_retur / $total_kg_po) * 100 : 0;
 
             $fmt = fn($v, $dec = 2) => ($v && $v != 0) ? number_format($v, $dec) : '';
 
             $retur_kg_psn = $retur_persen_psn = $retur_kg_po = $retur_persen_po = 0;
             // Cek logika penempatan kgs_retur dan persennya
-            if (($poplus_mc_kg + $plus_pck_kg) == 0) {
+            if (($total_ttl_tambahan_kg) == 0) {
                 // Jika tidak ada tambahan (mesin & packing), maka hitung % dari PSN
-                if ($kgs_retur > 0) {
-                    $retur_kg_psn = number_format($kgs_retur, 2);
+                if ($total_kgs_retur > 0) {
+                    $retur_kg_psn = number_format($total_kgs_retur, 2);
                     if ($total_kg_po > 0) {
-                        $retur_persen_psn = number_format(($kgs_retur / $total_kg_po) * 100, 2) . '%';
+                        $retur_persen_psn = number_format(($total_kgs_retur / $total_kg_po) * 100, 2) . '%';
                     }
                 }
             } else {
                 // Jika ada tambahan, maka hitung % dari PO(+)
-                if ($kgs_retur > 0) {
-                    $retur_kg_po = number_format($kgs_retur, 2);
+                if ($total_kgs_retur > 0) {
+                    $retur_kg_po = number_format($total_kgs_retur, 2);
                     $totalPO = $total_kg_po + $poplus_mc_kg + $plus_pck_kg;
                     if ($totalPO > 0) {
-                        $retur_persen_po = number_format(($kgs_retur / $totalPO) * 100, 2) . '%';
+                        $retur_persen_po = number_format(($total_kgs_retur / $totalPO) * 100, 2) . '%';
                     }
                 }
             }
@@ -7755,7 +7789,30 @@ class ExcelController extends BaseController
             $mergeEnd = $rowNum - 1;
 
             $sheet->mergeCells("AD{$mergeStart}:AD{$mergeEnd}");
-            $sheet->setCellValue("AD{$mergeStart}", $kategori . '. (BS MC= ' . number_format($total_bs_mesin_dz, 2) . 'DZ / ' . number_format($total_bs_mesin_kg, 2) . 'KG, BS ST= ' . number_format($total_bs_setting_dz, 2) . 'DZ / ' . number_format($total_bs_setting_kg, 2) . 'KG');
+            // === Gabungkan keterangan lama dengan detail lot retur ===
+            $keteranganText = $kategori . '. (BS MC= ' . number_format($total_bs_mesin_dz, 2) .
+                'DZ / ' . number_format($total_bs_mesin_kg, 2) .
+                'KG, BS ST= ' . number_format($total_bs_setting_dz, 2) .
+                'DZ / ' . number_format($total_bs_setting_kg, 2) . 'KG)';
+
+            // 🔹 Tambahkan data lot retur (kalau ada)
+            if (!empty($group['detail_lot'])) {
+                $lotDetailsText = [];
+                foreach ($group['detail_lot'] as $lot) {
+                    $lotName = $lot['lot_retur'] ?? '';
+                    $kgsLot  = (float)($lot['kgs_retur'] ?? 0);
+                    if ($lotName !== '' && $kgsLot > 0) {
+                        $lotDetailsText[] = "{$lotName}=" . number_format($kgsLot, 2) . "KG";
+                    }
+                }
+
+                if (!empty($lotDetailsText)) {
+                    $keteranganText .= ', ' . implode(', ', $lotDetailsText);
+                }
+            }
+
+            // Set ke kolom AD (gabungkan tanpa menghapus keterangan lama)
+            $sheet->setCellValue("AD{$mergeStart}", $keteranganText);
 
             // Rata tengah
             $sheet->getStyle("AD{$mergeStart}:AD{$mergeEnd}")
@@ -7924,6 +7981,7 @@ class ExcelController extends BaseController
         $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$filename\"");
+        setcookie("downloadComplete", "true", time() + 60, "/");
         $writer->save('php://output');
         exit;
     }
@@ -8265,7 +8323,7 @@ class ExcelController extends BaseController
         $tanggalAwal = $this->request->getGet('tanggal_awal');
         $tanggalAkhir = $this->request->getGet('tanggal_akhir');
 
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir;
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir;
         $material = @file_get_contents($apiUrl);
 
         // $models = [];
@@ -8357,7 +8415,7 @@ class ExcelController extends BaseController
     {
         $key = $this->request->getGet('key');
 
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterPoBenang?key=' . urlencode($key);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/filterPoBenang?key=' . urlencode($key);
         $material = @file_get_contents($apiUrl);
 
         // $models = [];
@@ -8444,7 +8502,7 @@ class ExcelController extends BaseController
         $tanggalAwal = $this->request->getGet('tanggal_awal');
         $tanggalAkhir = $this->request->getGet('tanggal_akhir');
 
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterPengiriman?key=' . urlencode($key) . '&tanggal_awal=' . urlencode($tanggalAwal) . '&tanggal_akhir=' . urlencode($tanggalAkhir);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/filterPengiriman?key=' . urlencode($key) . '&tanggal_awal=' . urlencode($tanggalAwal) . '&tanggal_akhir=' . urlencode($tanggalAkhir);
         $material = @file_get_contents($apiUrl);
 
         // $models = [];
@@ -8624,7 +8682,7 @@ class ExcelController extends BaseController
         $key = $this->request->getGet('key');
         $jenis = $this->request->getGet('jenis');
 
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterReportGlobal?key=' . urlencode($key) . '&jenis=' . urlencode($jenis);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/filterReportGlobal?key=' . urlencode($key) . '&jenis=' . urlencode($jenis);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -8973,7 +9031,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterSisaPakai?bulan=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna) . '&jenis=' . urlencode($jenis);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/filterSisaPakai?bulan=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna) . '&jenis=' . urlencode($jenis);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -9145,7 +9203,7 @@ class ExcelController extends BaseController
         $kodeWarna = $this->request->getGet('kode_warna') ?? '';
 
         // 1) Ambil data
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/historyPindahOrder?model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/historyPindahOrder?model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -9299,7 +9357,7 @@ class ExcelController extends BaseController
             $tglAwal   = date('Y-m-01', $timestamp);
             $tglAkhir  = date('Y-m-t', $timestamp);
         }
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterBenangMingguan?tanggal_awal=' . urlencode($tglAwal) . '&tanggal_akhir=' . urlencode($tglAkhir);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/filterBenangMingguan?tanggal_awal=' . urlencode($tglAwal) . '&tanggal_akhir=' . urlencode($tglAkhir);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -9670,7 +9728,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangBenang?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/reportSisaDatangBenang?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -9861,7 +9919,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangNylon?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/reportSisaDatangNylon?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -10052,7 +10110,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangSpandex?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/reportSisaDatangSpandex?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -10243,7 +10301,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangKaret?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = 'http://172.23.39.114/MaterialSystem/public/api/reportSisaDatangKaret?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
