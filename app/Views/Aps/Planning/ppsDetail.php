@@ -289,7 +289,7 @@ error_reporting(E_ALL); ?>
             document.querySelectorAll('.priority-select').forEach(sel => {
                 const setColor = () => {
                     const colors = {
-                        low: '#f5dd08ff',
+                        low: '#db8606ff',
                         normal: '#18ee05ff',
                         high: '#dc3545'
                     };
@@ -305,7 +305,7 @@ error_reporting(E_ALL); ?>
                 const setColor = () => {
                     const colors = {
                         planning: '#3498db', // biru
-                        process: '#f1c40f', // kuning
+                        process: '#b1a006ff', // kuning
                         perbaikan: '#f8a50cff', // kuning
                         hold: '#e74c3c', // merah
                         declined: '#c0392b', // merah tua
