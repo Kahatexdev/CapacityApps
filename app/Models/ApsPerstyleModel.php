@@ -456,7 +456,7 @@ class ApsPerstyleModel extends Model
     }
     public function getSisaPerStyleArea($model, $area)
     {
-        $result = $this->select('mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,smv,inisial')
+        $result = $this->select('mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,smv,inisial,color')
             ->where('mastermodel', $model)
             ->where('factory', $area)
             // ->where('sisa >=', 0)

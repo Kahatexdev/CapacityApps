@@ -65,7 +65,7 @@ error_reporting(E_ALL); ?>
                     <?php foreach ($order as $style => $val): ?>
                         <div class="row mt-3">
                             <div class="d-flex justify-content-between align-item-center">
-                                <h5> <span class='badge  badge-pill badge-lg bg-gradient-info'> <?= $style ?> </span></h5>
+                                <h5> <span class='badge  badge-pill badge-lg bg-info'> <?= $style ?> </span></h5>
                                 <h5> <span class='badge  badge-pill badge-lg bg-gradient-info'>Qty Order <?= round($val['totalQty'] / 24) ?> dz</span></h5>
 
                             </div>
