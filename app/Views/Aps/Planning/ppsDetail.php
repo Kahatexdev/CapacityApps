@@ -171,9 +171,9 @@ error_reporting(E_ALL); ?>
 
                                                 <td class="text-center"><input type="text" name="mechanic[]" value="<?= $pps['mechanic']; ?>" class="form-control"></td>
                                                 <td class="text-center"><input type="text" name="coor[]" value="<?= $pps['coor']; ?>" class="form-control"></td>
-                                                <td class="text-center"><input type="date" name="start_mc[]" value="<?= formatDate($pps['start_mc']); ?>" class="form-control"></td>
-                                                <td class="text-center"><input type="date" name="start_pps_plan[]" value="<?= formatDate($pps['start_pps_plan']); ?>" class="form-control"></td>
-                                                <td class="text-center"><input type="date" name="stop_pps_plan[]" value="<?= formatDate($pps['stop_pps_plan']); ?>" class="form-control"></td>
+                                                <td class="text-center"><input type="date" name="start_mc[]" readonly value="<?= formatDate($pps['start_mc']); ?>" class="form-control"></td>
+                                                <td class="text-center"><input type="date" name="start_pps_plan[]" readonly value="<?= formatDate($pps['start_pps_plan']); ?>" class="form-control"></td>
+                                                <td class="text-center"><input type="date" name="stop_pps_plan[]" readonly value="<?= formatDate($pps['stop_pps_plan']); ?>" class="form-control"></td>
                                                 <td class="text-center"><input type="date" name="start_pps_act[]" value="<?= formatDate($pps['start_pps_act']); ?>" class="form-control"></td>
                                                 <td class="text-center"><input type="date" name="stop_pps_act[]" value="<?= formatDate($pps['stop_pps_act']); ?>" class="form-control"></td>
                                                 <td class="text-center"><input type="date" name="acc_qad[]" value="<?= formatDate($pps['acc_qad']); ?>" class="form-control"></td>
