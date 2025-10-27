@@ -236,6 +236,22 @@
 
                         <!-- Form Fields -->
                         <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Composition(%)</label>
+                                    <input type="text" class="form-control composition-hidden" value="" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Gw Aktual</label>
+                                    <input type="text" class="form-control gw-hidden" value="" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Fields -->
+                        <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Pesanan<br>Kgs</label>
@@ -466,6 +482,10 @@
                 const gwAktual = parseFloat(style.gw_aktual || 0);
                 const gwFinal = gwAktual > 0 ? gwAktual : gw;
 
+                // set hidden values AWAL (important: gwFinal sudah terdefinisi)
+                $template.find('.composition-hidden').val(composition.toFixed(2));
+                $template.find('.gw-hidden').val(gwFinal);
+
                 $template.find('.color').val(size || '');
 
                 // === Ambil nilai per map sesuai style size ===
@@ -507,7 +527,7 @@
 
                 // === BS Mesin & Setting dalam KG ===
                 const bsMesinKg = composition > 0 ?
-                    ((bsMesinVal / 1000) * (composition / 100)) : 0;
+                    (bsMesinVal / 1000) : 0;
                 const bsSettingKg = gwFinal > 0 ?
                     bsSettingVal * composition * gwFinal / 100 / 1000 : 0;
 
@@ -645,15 +665,21 @@
 
             // hitung total BS (mesin + setting)
             let totalBs = 0;
-            $('.bs-mesin').each(function() {
+            $('.bs-mesin').each(function(index) {
                 const kg = parseFloat($(this).data('bsMesinKg')) || 0;
+                console.log(`Baris ${index + 1}: BS Mesin = ${kg.toFixed(4)} kg`);
                 totalBs += kg;
             });
             // setting pakai hasil per size
-            $('.bs-setting').each(function() {
+            $('.bs-setting').each(function(index) {
                 const kg = parseFloat($(this).data('bsSettingKg')) || 0;
+                console.log(`Baris ${index + 1}: BS Setting = ${kg.toFixed(4)} kg`);
                 totalBs += kg;
             });
+
+            // === Tambahkan log di sini ===
+            console.log('Total BS (mesin + setting):', totalBs.toFixed(2));
+            console.log('Total PO KG Tanpa Loss:', totalPoKgTanpaLoss.toFixed(2));
 
             // hitung Loss Aktual %
             let lossAktual = 0;
@@ -663,6 +689,8 @@
 
             lastLossAktual = lossAktual; // simpan untuk dipakai fungsi lain
             $('.loss-aktual').val(lossAktual.toFixed(2));
+
+            console.log('Last Loss Aktual:', lastLossAktual.toFixed(2));
 
             updateGlobalLossAktual();
         }
