@@ -1,5 +1,25 @@
 <?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
+<style>
+    .dropdown-menu {
+        background-color: #f8f9fa;
+        /* abu muda biar kontras */
+        border: 1px solid #ccc;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .dropdown-menu .dropdown-item {
+        color: #212529;
+    }
+
+    .dropdown-menu .dropdown-item:hover {
+        background-color: #198754;
+        /* warna hijau Bootstrap */
+        color: #fff;
+    }
+</style>
+
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
         <script>
@@ -31,10 +51,26 @@
 
             <div class="card">
                 <div class="card-header">
-                    <div class="d-flex justify-content-between">
-                        <h5>Planning Area </h5>
-                        <a href="<?= base_url($role . '/pps') ?>" class="btn btn-success"> PPS</a>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>Planning Area</h5>
+                        <div class="btn-group">
+                            <a href="<?= base_url($role . '/pps') ?>" class="btn btn-success">PPS</a>
+
+                            <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                Export PPS
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <?php foreach ($area as $a): ?>
+                                    <li>
+                                        <a class="dropdown-item" href="<?= base_url($role . '/exportPps/' . $a) ?>">
+                                            <?= strtoupper($a) ?>
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
                     </div>
+
                 </div>
                 <div class="card-body">
                     <!-- <form id="planningForm" method="POST">

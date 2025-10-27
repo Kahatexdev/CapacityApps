@@ -1529,7 +1529,8 @@ class ApsController extends BaseController
     {
         $modelData = $this->orderModel->getModelData($pdk);
         $ppsData = $this->ApsPerstyleModel->getPpsData($pdk);
-        // dd($ppsData);
+
+
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Order',
@@ -1561,7 +1562,7 @@ class ApsController extends BaseController
         $acc_fu         = $post['acc_fu'] ?? [];
         $notes          = $post['notes'] ?? [];
         $admin          = session()->get('username');
-
+        // dd($post);
         $updateData = [];
         $insertData = [];
 
@@ -1570,7 +1571,7 @@ class ApsController extends BaseController
             if (!empty($ids[$i])) {
                 $oldData = $this->ppsModel->find($ids[$i]);
             }
-
+            // dd($imp);
             $row = [
                 'id_mesin_perinisial' => $impValue ?? null,
                 'pps_status'           => $status[$i] ?? 'planning',
@@ -1583,7 +1584,7 @@ class ApsController extends BaseController
                 'acc_fu'               => $acc_fu[$i] ?? null,
                 'admin'                => $admin,
             ];
-
+            // dd($row);
             // --- Update existing record ---
             if ($oldData) {
                 $newStatus = $status[$i] ?? 'planning';
@@ -1618,10 +1619,10 @@ class ApsController extends BaseController
                 $insertData[] = $row;
             }
         }
-
         if (!empty($updateData)) {
             $this->ppsModel->updateBatch($updateData, 'id_pps');
         }
+        // dd($insertData);
 
         if (!empty($insertData)) {
             $this->ppsModel->insertBatch($insertData);

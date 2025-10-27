@@ -96,6 +96,7 @@
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty (dz)</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa (dz)</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Delivery</th>
+                                <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Repeat</th>
                                 <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
                             </tr>
                         </thead>
@@ -410,6 +411,9 @@
                             }
                             return data;
                         }
+                    },
+                    {
+                        "data": "repeat"
                     },
                     {
                         "data": null,

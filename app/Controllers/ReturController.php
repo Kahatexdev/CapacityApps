@@ -338,6 +338,7 @@ class ReturController extends BaseController
         $kgsArr   = isset($postData['kgs']) ? (array)$postData['kgs'] : [];
         $conesArr = isset($postData['cones']) ? (array)$postData['cones'] : [];
         $krgArr   = isset($postData['karung']) ? (array)$postData['karung'] : [];
+        $lotArr   = isset($postData['lotRetur']) ? (array)$postData['lotRetur'] : [];
 
         // count berdasarkan jumlah karung
         $count = count($krgArr);
@@ -375,6 +376,7 @@ class ReturController extends BaseController
             $kgsVal   = isset($kgsArr[$i]) ? (float)$kgsArr[$i] : 0;
             $conesVal = isset($conesArr[$i]) ? (int)$conesArr[$i] : 0;
             $krgVal   = $krgArr[$i] ?? null; // ini adalah identifier/nomor karung
+            $lotVal   = $lotArr[$i] ?? null; // ini adalah identifier/nomor karung
 
             if ($krgVal === null) {
                 $errors[] = "Index $i: no karung kosong, dilewatkan.";
@@ -391,7 +393,7 @@ class ReturController extends BaseController
                 'kgs_retur'       => $kgsVal,
                 'cns_retur'       => $conesVal,
                 'krg_retur'       => $krgVal,
-                'lot_retur'       => $postData['lotRetur'] ?? null,
+                'lot_retur'       => $lotVal,
                 'kategori'        => $postData['kategori_retur'] ?? null,
                 'keterangan_area' => $postData['keterangan'] ?? ''
             ];

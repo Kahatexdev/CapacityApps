@@ -451,10 +451,10 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('detailplnmc/(:any)', 'ApsController::detailplanmc/$1');
     $routes->get('kalenderMesin/(:any)', 'ApsController::kalenderMesin/$1');
     $routes->get('planningpage/(:any)/(:any)', 'ApsController::planningpage/$1/$2');
-
-
-
-
+    $routes->get('pps', 'ApsController::pps');
+    $routes->get('ppsDetail/(:any)', 'ApsController::ppsDetail/$1');
+    $routes->post('updatePps', 'ApsController::updatePps');
+    $routes->get('exportPps/(:any)', 'excelController::exportPps/$1');
 
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
@@ -702,6 +702,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('pps', 'ApsController::pps');
     $routes->get('ppsDetail/(:any)', 'ApsController::ppsDetail/$1');
     $routes->post('updatePps', 'ApsController::updatePps');
+    $routes->get('exportPps/(:any)', 'excelController::exportPps/$1');
 
 
     // deffect
@@ -840,6 +841,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('exportEstimasispk', 'ExcelController::exportEstimasispk');
     $routes->post('importinisial', 'UserController::importinisial');
     $routes->get('progressdetail/(:any)/(:any)', 'ApsController::progressdetail/$1/$2');
+    $routes->post('exportDataOrder', 'ExcelController::exportDataOrder');
 
 
     // $routes->post('importproduksi', 'ProduksiController::importproduksi');

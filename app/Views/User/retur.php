@@ -140,7 +140,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <label class="form-label">Jml Cones</label>
                                         <div class="input-group">
                                             <input type="number" class="form-control cones-input" name="cones[]" required>
@@ -148,15 +148,21 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <label class="form-label">No Karung</label>
                                         <div class="input-group">
                                             <input type="number" class="form-control karung-input" name="karung[]" value="1" readonly>
                                             <!-- <span class="input-group-text text-bold">KRG</span> -->
                                         </div>
                                     </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Lot Retur</label>
+                                        <select class="form-select select-lot-retur" name="lotRetur[]" id="lotRetur" required>
 
-                                    <div class="col-md-3">
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-1">
                                         <label class="form-label">Action</label>
                                         <div class="input-group">
                                             <!-- type="button" supaya tidak submit form -->
@@ -167,14 +173,14 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <!-- <div class="col-md-4">
                                         <label class="form-label">Lot Retur</label>
                                         <select class="form-select select-lot-retur" name="lotRetur" id="lotRetur" required>
 
                                         </select>
-                                    </div>
+                                    </div> -->
 
-                                    <div class="col-md-8">
+                                    <div class="col-md-12">
                                         <label class="form-label">Alasan Retur</label>
                                         <textarea class="form-control" name="keterangan" rows="2"></textarea>
                                     </div>
@@ -294,6 +300,14 @@
             const loading = document.getElementById('loading');
             const info = document.getElementById('info');
 
+            // 🔹 1. Hancurkan DataTable lama (kalau sudah ada)
+            if ($.fn.DataTable.isDataTable('#dataTableRetur')) {
+                $('#dataTableRetur').DataTable().clear().destroy();
+            }
+
+            // 🔹 2. Reset isi modal supaya kosong lagi
+            resetModalRetur();
+
             loading.style.display = 'block';
             info.style.display = 'none';
 
@@ -318,6 +332,45 @@
 
                 }
             });
+
+            function resetModalRetur() {
+                const form = $('#formPengajuanRetur');
+                const listReturInputs = $('#listReturInputs');
+
+                // 🔹 Reset seluruh form ke keadaan default
+                form.trigger('reset');
+
+                // 🔹 Ambil elemen pertama (baris retur pertama)
+                const firstRow = listReturInputs.find('.retur-row').first();
+
+                // 🔹 Hapus semua retur-row kecuali yang pertama
+                listReturInputs.find('.retur-row:not(:first)').remove();
+
+                // 🔹 Bersihkan semua input/select/textarea di baris pertama
+                firstRow.find('input:not(.karung-input), textarea').val('');
+                firstRow.find('select').each(function() {
+                    // biar select kategori tetap muncul
+                    const name = $(this).attr('name');
+                    if (name === 'kategori_retur[]') {
+                        $(this).val(''); // tetap reset ke "Pilih Kategori"
+                    } else {
+                        $(this).empty(); // kosongkan select dinamis seperti item_type, lot
+                    }
+                });
+                firstRow.find('.karung-input').val(1);
+
+                // 🔹 Pastikan tombol "Tambah" aktif dan "Hapus" disembunyikan
+                firstRow.find('.btn-remove-retur').remove();
+                if (!firstRow.find('.btn-add-retur').length) {
+                    firstRow.find('.col-action').html(`
+                    <button type="button" class="btn btn-info w-100 btn-add-retur">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                `);
+                } else {
+                    firstRow.find('.btn-add-retur').show();
+                }
+            }
         });
     });
     $(document).on('click', '.btnRetur', function() {

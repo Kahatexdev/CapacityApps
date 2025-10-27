@@ -62,11 +62,13 @@ class OrderModel extends Model
                         apsperstyle.no_order, 
                         apsperstyle.machinetypeid, 
                         apsperstyle.factory, 
+                        apsperstyle.color as color, 
                         master_product_type.product_type, 
                         data_model.description, 
                         data_model.seam, 
                         apsperstyle.process_routes, 
                         data_model.leadtime, 
+                        data_model.repeat_from as repeat, 
                         ROUND(SUM(apsperstyle.qty/24), 0) AS qty, 
                         ROUND(SUM(apsperstyle.sisa/24), 0) AS sisa, 
                         apsperstyle.delivery')

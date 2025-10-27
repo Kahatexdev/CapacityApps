@@ -456,7 +456,7 @@ class ApsPerstyleModel extends Model
     }
     public function getSisaPerStyleArea($model, $area)
     {
-        $result = $this->select('mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,smv,inisial')
+        $result = $this->select('mastermodel,size,sum(qty) as qty,sum(sisa) as sisa,smv,inisial,color')
             ->where('mastermodel', $model)
             ->where('factory', $area)
             // ->where('sisa >=', 0)
@@ -1453,10 +1453,10 @@ class ApsPerstyleModel extends Model
 
         return $data;
     }
-    public function getPpsData($masterModel)
+    public function getPpsData($pdk)
     {
 
-        if (empty($masterModel)) {
+        if (empty($pdk)) {
             return [];
         }
 
@@ -1475,7 +1475,7 @@ class ApsPerstyleModel extends Model
             ->join('mesin_perinisial', 'mesin_perinisial.idapsperstyle = apsperstyle.idapsperstyle', 'left')
             ->join('pps', 'pps.id_mesin_perinisial = mesin_perinisial.id_mesin_perinisial', 'left')
             ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel', 'left')
-            ->where('apsperstyle.mastermodel', $masterModel)
+            ->where('apsperstyle.mastermodel', $pdk)
             ->groupBy('apsperstyle.size')
             ->findAll();
     }
