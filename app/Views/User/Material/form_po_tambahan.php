@@ -180,7 +180,7 @@
                             <div class="col-md-6">
                                 <!-- Loss Tambahan -->
                                 <div class="form-group">
-                                    <label>Loss Tambahan</label>
+                                    <label>Loss Tambahan </label>
                                     <input type="number" class="form-control loss-tambahan" name="items[0][loss_tambahan]">
                                 </div>
                             </div>
