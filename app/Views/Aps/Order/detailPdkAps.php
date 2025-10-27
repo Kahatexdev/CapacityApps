@@ -35,6 +35,7 @@ error_reporting(E_ALL); ?>
                         <div class="col-auto">
                             <h5>
                                 Detail Data Model <?= esc($noModel) ?>
+
                             </h5>
                         </div>
                         <div class="col-auto">
@@ -44,6 +45,15 @@ error_reporting(E_ALL); ?>
                                 <button type="submit" class="btn bg-gradient-success"> <i class="fas fa-file-excel"></i> Export</button>
                                 <a href="<?= base_url($role . '/dataorder') ?>" class="btn bg-gradient-info">Kembali</a>
                             </form>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-auto">
+                            <span>
+                                Repeat from : <h5><?= $repeat ?>
+                                </h5>
+                            </span>
+
                         </div>
                     </div>
 
