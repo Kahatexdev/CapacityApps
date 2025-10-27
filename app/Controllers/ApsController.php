@@ -1560,36 +1560,65 @@ class ApsController extends BaseController
         $acc_mr         = $post['acc_mr'] ?? [];
         $acc_fu         = $post['acc_fu'] ?? [];
         $notes          = $post['notes'] ?? [];
-        $history        = $post['history'] ?? [];
-        $admin        = session()->get('username');
+        $admin          = session()->get('username');
 
         $updateData = [];
         $insertData = [];
+
         foreach ($imp as $i => $impValue) {
-            $row = [
-                'id_mesin_perinisial'       => $impValue ?? null,
-                'pps_status'     => $status[$i] ?? 'planning',
-                'mechanic'       => $mechanic[$i] ?? null,
-                'coor'           => $coor[$i] ?? null,
-                'start_pps_act'  => $start_pps_act[$i] ?? null,
-                'stop_pps_act'   => $stop_pps_act[$i] ?? null,
-                'acc_qad'        => $acc_qad[$i] ?? null,
-                'acc_mr'         => $acc_mr[$i] ?? null,
-                'acc_fu'         => $acc_fu[$i] ?? null,
-                'notes'          => $notes[$i] ?? null,
-                'history'        => $history[$i] ?? null,
-                'admin'        => $admin,
-            ];
-            // Kalau ada id_pps → update, kalau kosong → insert
+            $oldData = null;
             if (!empty($ids[$i])) {
+                $oldData = $this->ppsModel->find($ids[$i]);
+            }
+
+            $row = [
+                'id_mesin_perinisial' => $impValue ?? null,
+                'pps_status'           => $status[$i] ?? 'planning',
+                'mechanic'             => $mechanic[$i] ?? null,
+                'coor'                 => $coor[$i] ?? null,
+                'start_pps_act'        => $start_pps_act[$i] ?? null,
+                'stop_pps_act'         => $stop_pps_act[$i] ?? null,
+                'acc_qad'              => $acc_qad[$i] ?? null,
+                'acc_mr'               => $acc_mr[$i] ?? null,
+                'acc_fu'               => $acc_fu[$i] ?? null,
+                'admin'                => $admin,
+            ];
+
+            // --- Update existing record ---
+            if ($oldData) {
+                $newStatus = $status[$i] ?? 'planning';
+                $oldStatus = $oldData['pps_status'] ?? 'planning';
+                $history = $oldData['history'] ?? '';
+                $timeNow = date('Y-m-d H:i:s');
+
+                // Kalau status berubah → tulis ke history
+                if ($newStatus !== $oldStatus) {
+                    $history .= "\n[{$timeNow}] {$admin}: Status changed from '{$oldStatus}' to '{$newStatus}'";
+                }
+
+                // Kalau ada notes → tulis juga ke history
+                if (!empty(trim($notes[$i] ?? ''))) {
+                    $noteText = trim($notes[$i]);
+                    $history .= "\n[{$timeNow}] {$admin} Note: {$noteText} ";
+                }
+
+                $row['history'] = trim($history);
                 $row['id_pps'] = $ids[$i];
                 $updateData[] = $row;
+
+                // --- Insert new record ---
             } else {
+                $timeNow = date('Y-m-d H:i:s');
+                $history = "[{$timeNow}] Created by {$admin}";
+                if (!empty(trim($notes[$i] ?? ''))) {
+                    $history .= "\n[{$timeNow}] {$admin} Note: " . trim($notes[$i]);
+                }
+
+                $row['history'] = $history;
                 $insertData[] = $row;
             }
         }
 
-        // Eksekusi batch
         if (!empty($updateData)) {
             $this->ppsModel->updateBatch($updateData, 'id_pps');
         }
