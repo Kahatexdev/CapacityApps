@@ -186,8 +186,6 @@ class DetailPlanningModel extends Model
 
         $pdk = [];
 
-        $pdk = [];
-
         foreach ($results as $row) {
             $data = $this->select('model')
                 ->where('id_pln_mc', $row['id_pln_mc'])
@@ -200,7 +198,6 @@ class DetailPlanningModel extends Model
                 }
             }
         }
-
         return $pdk;
     }
 }
