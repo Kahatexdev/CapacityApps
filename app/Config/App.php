@@ -17,7 +17,7 @@ class App extends BaseConfig
      * E.g., http://example.com/
      */
     // public $baseURL = 'http://localhost:8080/';
-    public $baseURL = 'http://172.23.39.114/CapacityApps/public/';
+    public $baseURL = 'http://172.23.44.14/CapacityApps/public/';
 
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
