@@ -467,6 +467,8 @@ class OrderController extends BaseController
             $statusPlan = $this->DetailPlanningModel->getStatusPlanning($area, $id->mastermodel, $id->machinetypeid);
             $id->status_plan = ($statusPlan && $statusPlan['status'] === 'aktif') ? 'Planned' : '';
         }
+        $dataBuyer = $this->orderModel->getBuyer();
+        $dataArea = $this->jarumModel->getArea();
 
         $product = $this->productModel->findAll();
         $booking = $data = [
@@ -479,7 +481,9 @@ class OrderController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
+            'buyer' => $dataBuyer,
             'area' => $area,
+            'listArea' => $dataArea,
             'tampildata' => $tampilperdelivery,
             'product' => $product,
 
@@ -2484,7 +2488,7 @@ class OrderController extends BaseController
         $sisaPerStyle = [];
         foreach ($pdk as $perStyle) {
             $style = $perStyle['size'];
-            $sisaPerStyle[$style . '||' . $perStyle['inisial']] = $this->ApsPerstyleModel->getSisaPerStyle($noModel, $style);
+            $sisaPerStyle[$perStyle['inisial'] . '|' . $style . '||'  . $perStyle['color']] = $this->ApsPerstyleModel->getSisaPerStyle($noModel, $style);
         }
         foreach ($sisaPerStyle as $style => $list) {
             $totalqty = 0;

@@ -180,7 +180,7 @@
                             <div class="col-md-6">
                                 <!-- Loss Tambahan -->
                                 <div class="form-group">
-                                    <label>Loss Tambahan</label>
+                                    <label>Loss Tambahan </label>
                                     <input type="number" class="form-control loss-tambahan" name="items[0][loss_tambahan]">
                                 </div>
                             </div>
@@ -233,6 +233,22 @@
                             </div>
                         </div>
                         <hr class="mb-3" style="border-color: #6c757d;">
+
+                        <!-- Form Fields -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Composition(%)</label>
+                                    <input type="text" class="form-control composition-hidden" value="" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Gw Aktual</label>
+                                    <input type="text" class="form-control gw-hidden" value="" readonly>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Form Fields -->
                         <div class="row">
@@ -430,76 +446,95 @@
             const detail = materialData[itemType].kode_warna[kodeWarna];
             const allStyleSizes = (detail.style_size || []).filter(s => s.no_model === modelCode);
 
-            const $wrapper = $row.find('.populate-size-wrapper').empty();
+            // === 1) GROUP BY style_size ===
+            const groupedSizes = {};
 
-            // 1) Buat map style_size unik + sum qty
-            const styleSizeMap = {};
             allStyleSizes.forEach(style => {
                 const size = style.style_size;
-                if (!styleSizeMap[size]) {
-                    styleSizeMap[size] = {
-                        composition: parseFloat(style.composition || 0),
-                        gw: parseFloat(style.gw || 0),
-                        gwAktual: parseFloat(style.gw_aktual || 0),
-                        loss: parseFloat(style.loss || 0),
-                        qtyOrder: parseFloat(qtyOrderMap[size]) || 0,
-                        sisaOrder: (parseFloat(sisaOrderMap[size]) || 0) - (parseFloat(plusPckMap[size]) || 0),
-                        plusPck: parseFloat(plusPckMap[size]) || 0,
-                        bsMesin: parseFloat(bsMesinMap[size] || 0),
-                        bsSetting: parseFloat(bsSettingMap[size] || 0),
+
+                if (!groupedSizes[size]) {
+                    groupedSizes[size] = {
+                        ...style
                     };
+                    groupedSizes[size].composition = parseFloat(style.composition || 0);
+                    groupedSizes[size].gw = parseFloat(style.gw || 0);
+                    groupedSizes[size].gw_aktual = parseFloat(style.gw_aktual || 0);
+                    groupedSizes[size].loss = parseFloat(style.loss || 0);
                 } else {
-                    // jika sudah ada, sum qty
-                    styleSizeMap[size].qtyOrder += parseFloat(qtyOrderMap[size]) || 0;
-                    styleSizeMap[size].sisaOrder += (parseFloat(sisaOrderMap[size]) || 0) - (parseFloat(plusPckMap[size]) || 0);
-                    styleSizeMap[size].plusPck += parseFloat(plusPckMap[size] || 0);
+                    groupedSizes[size].composition += parseFloat(style.composition || 0);
+                    groupedSizes[size].gw = parseFloat(style.gw || 0);
+                    groupedSizes[size].gw_aktual = parseFloat(style.gw_aktual || 0);
+                    groupedSizes[size].loss = parseFloat(style.loss || 0);
                 }
             });
 
-            // 2) Render size-block per style_size unik
-            Object.keys(styleSizeMap).forEach((size, i) => {
-                const style = styleSizeMap[size];
+            const mergedSizes = Object.values(groupedSizes);
+
+            // === 2) HAPUS ISI LAMA & LOOPING HASIL GABUNG ===
+            const $wrapper = $row.find('.populate-size-wrapper').empty();
+
+            mergedSizes.forEach((style, i) => {
                 const $template = $('#populateSizeTemplate').clone().removeAttr('id').removeClass('d-none');
 
-                const gwFinal = style.gwAktual > 0 ? style.gwAktual : style.gw;
+                const size = style.style_size;
+                const composition = parseFloat(style.composition || 0);
+                const gw = parseFloat(style.gw || 0);
+                const gwAktual = parseFloat(style.gw_aktual || 0);
+                const gwFinal = gwAktual > 0 ? gwAktual : gw;
+
+                // set hidden values AWAL (important: gwFinal sudah terdefinisi)
+                $template.find('.composition-hidden').val(composition.toFixed(2));
+                $template.find('.gw-hidden').val(gwFinal);
 
                 $template.find('.color').val(size || '');
-                $template.find('.qty-order').val(style.qtyOrder);
-                $template.find('.sisa-order').val(style.sisaOrder);
-                $template.find('.bs-mesin').val((style.bsMesin / 1000).toFixed(2));
-                $template.find('.bs-setting').val(style.bsSetting);
-                $template.find('.plus-pck-pcs').val(style.plusPck);
 
-                // qty po kg pakai gw asli
-                const qtyPoKg = style.gw > 0 ?
-                    style.qtyOrder * style.composition * style.gw / 100 / 1000 * (1 + (style.loss / 100)) :
+                // === Ambil nilai per map sesuai style size ===
+                const qtyOrderVal = (parseFloat(qtyOrderMap[size]) || 0);
+                const sisaOrderVal = (parseFloat(sisaOrderMap[size]) || 0) - (parseFloat(plusPckMap[size]) || 0);
+                const bsMesinVal = (parseFloat(bsMesinMap[size]) || 0);
+                const bsSettingVal = (parseFloat(bsSettingMap[size]) || 0);
+                const plusPckVal = (parseFloat(plusPckMap[size]) || 0);
+
+                // === Tampilkan nilai ke field ===
+                $template.find('.qty-order').val(qtyOrderVal);
+                $template.find('.sisa-order').val(sisaOrderVal);
+                $template.find('.bs-mesin').val((bsMesinVal / 1000).toFixed(2));
+                $template.find('.bs-setting').val(bsSettingVal);
+                $template.find('.plus-pck-pcs').val(plusPckVal);
+
+                // === Hitung Qty PO KG & Tanpa Loss ===
+                const qtyPoKg = gw > 0 ?
+                    qtyOrderVal * composition * gw / 100 / 1000 * (1 + (parseFloat(style.loss || 0) / 100)) :
                     0;
+                const poKgTanpaLoss = gw > 0 ?
+                    qtyOrderVal * composition * gw / 100 / 1000 :
+                    0;
+
                 $template.find('.po-kg-perstyle').val(qtyPoKg.toFixed(2));
-
-                // qty po kg tanpa loss
-                const poKgTanpaLoss = style.gw > 0 ?
-                    style.qtyOrder * style.composition * style.gw / 100 / 1000 :
-                    0;
                 $template.find('.po-kg-perstyle-tanpa-loss').val(poKgTanpaLoss.toFixed(2));
 
-                // base poplus-mc-kg & plus-pck-kg
-                const baseSisaOrderKg = gwFinal > 0 && style.sisaOrder > 0 ?
-                    (style.sisaOrder * style.composition * gwFinal) / 100 / 1000 :
-                    0;
+                // === Simpan base sisa order untuk PO+ ===
+                let baseSisaOrderKg = 0;
+                if (gwFinal > 0 && sisaOrderVal > 0) {
+                    baseSisaOrderKg = (sisaOrderVal * composition * gwFinal) / 100 / 1000;
+                }
                 $template.find('.poplus-mc-kg').data("baseSisaOrderKg", baseSisaOrderKg);
 
+                // === Simpan base untuk plus-pck ===
                 const basePlusPckKg = gwFinal > 0 ?
-                    style.plusPck * style.composition * gwFinal / 100 / 1000 :
-                    0;
+                    plusPckVal * composition * gwFinal / 100 / 1000 : 0;
                 $template.find('.plus-pck-kg').data("basePlusPckKg", basePlusPckKg);
 
-                // simpan base BS
-                const bsMesinKg = style.composition > 0 ? ((style.bsMesin / 1000) * (style.composition / 100)) : 0;
-                $template.find('.bs-mesin').data("bsMesinKg", bsMesinKg);
+                // === BS Mesin & Setting dalam KG ===
+                const bsMesinKg = composition > 0 ?
+                    (bsMesinVal / 1000) : 0;
+                const bsSettingKg = gwFinal > 0 ?
+                    bsSettingVal * composition * gwFinal / 100 / 1000 : 0;
 
-                const bsSettingKg = gwFinal > 0 ? style.bsSetting * style.composition * gwFinal / 100 / 1000 : 0;
+                $template.find('.bs-mesin').data("bsMesinKg", bsMesinKg);
                 $template.find('.bs-setting').data("bsSettingKg", bsSettingKg);
 
+                // === Label dan Name Index ===
                 $template.find('.label-style-size').text(size);
                 $template.find('.style-size-hidden').val(size);
 
@@ -514,10 +549,10 @@
                 $wrapper.append($col);
             });
 
-            // 3) Hitung Po Kg → set lastLossAktual & globalLossAktual
-            hitungPoKg();
+            // 2) Setelah semua base tersimpan: update globalLossAktual dulu
+            hitungPoKg(); // ini akan men-set lastLossAktual & globalLossAktual via updateGlobalLossAktual()
 
-            // 4) Finalize poplus-mc-kg & plus-pck-kg berdasarkan base × (1 + globalLossAktual/100)
+            // 3) Finalize poplus-mc-kg & plus-pck-kg berdasarkan base × (1 + globalLossAktual/100)
             $('.poplus-mc-kg').each(function() {
                 const base = $(this).data("baseSisaOrderKg") || 0;
                 $(this).val((base * (1 + (globalLossAktual / 100))).toFixed(2));
@@ -528,7 +563,7 @@
                 $(this).val((base * (1 + (globalLossAktual / 100))).toFixed(2));
             });
 
-            // 5) Update sisa & total
+            // 4) Sekarang update sisa & total (pakai nilai final yg baru)
             hitungSisaJatah();
             hitungTotalKg();
         });
@@ -630,15 +665,21 @@
 
             // hitung total BS (mesin + setting)
             let totalBs = 0;
-            $('.bs-mesin').each(function() {
+            $('.bs-mesin').each(function(index) {
                 const kg = parseFloat($(this).data('bsMesinKg')) || 0;
+                console.log(`Baris ${index + 1}: BS Mesin = ${kg.toFixed(4)} kg`);
                 totalBs += kg;
             });
             // setting pakai hasil per size
-            $('.bs-setting').each(function() {
+            $('.bs-setting').each(function(index) {
                 const kg = parseFloat($(this).data('bsSettingKg')) || 0;
+                console.log(`Baris ${index + 1}: BS Setting = ${kg.toFixed(4)} kg`);
                 totalBs += kg;
             });
+
+            // === Tambahkan log di sini ===
+            console.log('Total BS (mesin + setting):', totalBs.toFixed(2));
+            console.log('Total PO KG Tanpa Loss:', totalPoKgTanpaLoss.toFixed(2));
 
             // hitung Loss Aktual %
             let lossAktual = 0;
@@ -648,6 +689,8 @@
 
             lastLossAktual = lossAktual; // simpan untuk dipakai fungsi lain
             $('.loss-aktual').val(lossAktual.toFixed(2));
+
+            console.log('Last Loss Aktual:', lastLossAktual.toFixed(2));
 
             updateGlobalLossAktual();
         }

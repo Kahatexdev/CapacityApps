@@ -35,6 +35,7 @@ error_reporting(E_ALL); ?>
                         <div class="col-auto">
                             <h5>
                                 Detail Data Model <?= esc($noModel) ?>
+
                             </h5>
                         </div>
                         <div class="col-auto">
@@ -46,6 +47,15 @@ error_reporting(E_ALL); ?>
                             </form>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-auto">
+                            <span>
+                                Repeat from : <h5><?= $repeat ?>
+                                </h5>
+                            </span>
+
+                        </div>
+                    </div>
 
 
 
@@ -55,7 +65,7 @@ error_reporting(E_ALL); ?>
                     <?php foreach ($order as $style => $val): ?>
                         <div class="row mt-3">
                             <div class="d-flex justify-content-between align-item-center">
-                                <h5> <span class='badge  badge-pill badge-lg bg-gradient-info'> <?= $style ?> </span></h5>
+                                <h5> <span class='badge  badge-pill badge-lg bg-info'> <?= $style ?> </span></h5>
                                 <h5> <span class='badge  badge-pill badge-lg bg-gradient-info'>Qty Order <?= round($val['totalQty'] / 24) ?> dz</span></h5>
 
                             </div>

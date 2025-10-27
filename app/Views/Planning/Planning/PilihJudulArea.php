@@ -1,5 +1,25 @@
 <?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
+<style>
+    .dropdown-menu {
+        background-color: #f8f9fa;
+        /* abu muda biar kontras */
+        border: 1px solid #ccc;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .dropdown-menu .dropdown-item {
+        color: #212529;
+    }
+
+    .dropdown-menu .dropdown-item:hover {
+        background-color: #198754;
+        /* warna hijau Bootstrap */
+        color: #fff;
+    }
+</style>
+
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
         <script>
@@ -31,10 +51,26 @@
 
             <div class="card">
                 <div class="card-header">
-                    <div class="d-flex justify-content-between">
-                        <h5>Planning Area </h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>Planning Area</h5>
+                        <div class="btn-group">
+                            <a href="<?= base_url($role . '/pps') ?>" class="btn btn-success">PPS</a>
 
+                            <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                Export PPS
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <?php foreach ($area as $a): ?>
+                                    <li>
+                                        <a class="dropdown-item" href="<?= base_url($role . '/exportPps/' . $a) ?>">
+                                            <?= strtoupper($a) ?>
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
                     </div>
+
                 </div>
                 <div class="card-body">
                     <!-- <form id="planningForm" method="POST">
@@ -50,13 +86,13 @@
                                     <select class="form-control" id="area" name="area">
                                         <option value="">Pilih Area</option>
                                         <?php
-                                        // // foreach ($area as $area) {
-                                        //     echo "<option value=\"$area\">$area</option>";
-                                        // }
+                                        foreach ($area as $ar) : ?>
+                                            <option value="<?= $ar ?>"><?= $ar ?></option>
+                                        <?php endforeach
                                         ?>
                                     </select>
                                 </div>
-                                <div class="form-group">
+                                <div class=" form-group">
                                     <label for="jarum" class="form-control-label">Jarum</label>
                                     <select class="form-control" id="jarum" name="jarum">
                                         <option value="">Pilih Jarum</option>
@@ -67,8 +103,6 @@
                         </div>
                         <hr>
                         <div class="row">
-
-
 
                         </div>
                         <div class="row">
@@ -82,11 +116,11 @@
                     <div class="row">
                         <div class="col-lg-12 col-md-12">
                             <div class="row">
-                                <?php foreach ($area as $ar) { ?>
+                                <?php foreach ($area as $ar) : ?>
                                     <div class="col-3">
                                         <a href="<?= base_url($role . '/summaryPlanner/' . $ar) ?>" class="btn btn-info w-100">Summary Planner <?= $ar ?></a>
                                     </div>
-                                <?php } ?>
+                                <?php endforeach ?>
                             </div>
                         </div>
                     </div>
@@ -103,7 +137,7 @@
             <div class="card-body">
                 <table id="dataTable" class="display">
                     <thead>
-                        <th>Judul</th>
+
                         <th>Jarum</th>
                         <th>Area</th>
                         <th>Details</th>
@@ -113,7 +147,6 @@
                             <?php foreach ($order as $key => $val) : ?>
 
                                 <tr>
-                                    <td><?= $val['judul'] ?></td>
                                     <td><?= $val['jarum'] ?></td>
                                     <td><?= $val['area'] ?></td>
                                     <td>

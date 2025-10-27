@@ -31,6 +31,10 @@ use App\Models\EstSpkModel;
 use App\Models\BsModel;
 use App\Models\AreaMachineModel;
 use App\Models\BsMesinModel;
+use App\Models\MesinPerStyle;
+use App\Models\MesinPernomor;
+use App\Models\MachinesModel;
+use App\Models\PpsModel;/*  */
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use DateTime;
@@ -60,6 +64,10 @@ class ExcelController extends BaseController
     protected $bsModel;
     protected $areaMachineModel;
     protected $BsMesinModel;
+    protected $MesinPerStyle;
+    protected $MesinPernomor;
+    protected $machinesModel;
+    protected $ppsModel;
 
 
     public function __construct()
@@ -83,7 +91,10 @@ class ExcelController extends BaseController
         $this->bsModel = new BsModel();
         $this->areaMachineModel = new AreaMachineModel();
         $this->BsMesinModel = new BsMesinModel();
-
+        $this->MesinPerStyle = new MesinPerStyle();
+        $this->MesinPernomor = new MesinPernomor();
+        $this->machinesModel = new MachinesModel();
+        $this->ppsModel = new PpsModel();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -12221,5 +12232,108 @@ class ExcelController extends BaseController
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
+    }
+    public function exportPps($area)
+    {
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle("PPS Area " . strtoupper($area));
+
+        // Header row
+        $headers = [
+            'No.',
+            'No. Model',
+            'Buyer',
+            'Category',
+            'Style & Size',
+            'Seam',
+            'P.T',
+            'Material Status',
+            'Priority',
+            'Mechanic',
+            'Coor PPS',
+            'Start Production',
+            'Planning to knitting PPS',
+            'Target to finish PPS',
+            'Actual Start PPS',
+            'Actual Finish PPS',
+            'PPS Status',
+            'Approval QAD',
+            'Approval MR',
+            'Approval FUP',
+            'Notes / Revise'
+        ];
+
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '1', $header);
+            $sheet->getStyle($col . '1')->getFont()->setBold(true);
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+            $col++;
+        }
+        if (!is_array($area)) {
+            $area = [$area];
+        }
+
+        $getPdk = $this->DetailPlanningModel->getPpsData($area);
+        $row = 2;
+        $no = 1;
+
+        foreach ($getPdk as $pdk) {
+            $modelData = $this->orderModel->getModelData($pdk);
+            $ppsData   = $this->ApsPerstyleModel->getPpsData($pdk);
+
+            foreach ($ppsData as $pps) {
+                $sheet->setCellValue("A{$row}", $no++);
+                $sheet->setCellValue("B{$row}", $modelData['no_model'] ?? '');
+                $sheet->setCellValue("C{$row}", $modelData['buyer'] ?? '');
+                $sheet->setCellValue("D{$row}", $modelData['product_type'] ?? '');
+                $sheet->setCellValue("E{$row}", $pps['size'] ?? '');
+                $sheet->setCellValue("F{$row}", $modelData['seam'] ?? '');
+                $sheet->setCellValue("G{$row}", $pps['inisial'] ?? '');
+                $sheet->setCellValue("H{$row}", ucfirst(strtolower($pps['material_status'] ?? '')));
+                $sheet->setCellValue("I{$row}", ucfirst(strtolower($pps['priority'] ?? '')));
+                $sheet->setCellValue("J{$row}", $pps['mechanic'] ?? '');
+                $sheet->setCellValue("K{$row}", $pps['coor'] ?? '');
+                $sheet->setCellValue("L{$row}", $this->formatDate($pps['start_mc'] ?? null));
+                $sheet->setCellValue("M{$row}",  $this->formatDate($pps['start_pps_plan'] ?? null));
+                $sheet->setCellValue("N{$row}",  $this->formatDate($pps['stop_pps_plan'] ?? null));
+                $sheet->setCellValue("O{$row}",  $this->formatDate($pps['start_pps_act'] ?? null));
+                $sheet->setCellValue("P{$row}",  $this->formatDate($pps['stop_pps_act'] ?? null));
+                $sheet->setCellValue("Q{$row}", ucfirst(strtolower($pps['pps_status'] ?? '')));
+                $sheet->setCellValue("R{$row}",  $this->formatDate($pps['acc_qad'] ?? null));
+                $sheet->setCellValue("S{$row}",  $this->formatDate($pps['acc_mr'] ?? null));
+                $sheet->setCellValue("T{$row}",  $this->formatDate($pps['acc_fu'] ?? null));
+                $sheet->setCellValue("U{$row}", $pps['history'] ?? '');
+
+                // 🟩 Highlighting logic
+                if (strtolower($pps['material_status'] ?? '') === 'complete') {
+                    $sheet->getStyle("H{$row}")->getFill()
+                        ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                        ->getStartColor()->setARGB('90EE90'); // light green
+                }
+                if (strtolower($pps['pps_status'] ?? '') === 'approved') {
+                    $sheet->getStyle("Q{$row}")->getFill()
+                        ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                        ->getStartColor()->setARGB('90EE90');
+                }
+
+                $row++;
+            }
+        }
+
+        $filename = "PPS_Export_"  . date('Ymd_His') . ".xlsx";
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment;filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    function formatDate($date)
+    {
+        return !empty($date) ? date('j-M-y', strtotime($date)) : '';
     }
 }
