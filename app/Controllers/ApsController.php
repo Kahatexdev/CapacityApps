@@ -1495,6 +1495,12 @@ class ApsController extends BaseController
                     $matDone++;
                 }
             }
+            $star = 0;
+            foreach ($ppsData as $pps) {
+                if (isset($pps['priority']) && $pps['priority'] === 'high') {
+                    $star++;
+                }
+            }
 
             $result[] = [
                 'pdk' => $pdk,
@@ -1502,14 +1508,21 @@ class ApsController extends BaseController
                 'stop'  => isset($ppsData[0]['stop_pps_plan']) ? date('Y-m-d', strtotime($ppsData[0]['stop_pps_plan'])) : null,
                 'progress' => $rowNum > 0 ? $done / $rowNum * 100 : 0,
                 'material' => $rowNum > 0 ? $matDone / $rowNum * 100 : 0,
+                'star' => $rowNum > 0 ? ($star / $rowNum) * 5 : 0,
+
             ];
-            // dd($result);
         }
+        // dd($result);
         // urutkan dari progress terbesar ke terkecil
         usort($result, function ($a, $b) {
+            // Urutkan berdasarkan star dulu (descending)
+            if ($a['star'] != $b['star']) {
+                return $b['star'] <=> $a['star'];
+            }
+
+            // Kalau star sama, urutkan berdasarkan material (descending)
             return $b['material'] <=> $a['material'];
         });
-
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Order',
