@@ -1503,6 +1503,7 @@ class ApsController extends BaseController
             }
 
             $result[] = [
+                'repeat' => $pps['repeat'],
                 'pdk' => $pdk,
                 'start' => isset($ppsData[0]['start_pps_plan']) ? date('Y-m-d', strtotime($ppsData[0]['start_pps_plan'])) : null,
                 'stop'  => isset($ppsData[0]['stop_pps_plan']) ? date('Y-m-d', strtotime($ppsData[0]['stop_pps_plan'])) : null,

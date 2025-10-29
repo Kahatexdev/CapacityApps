@@ -50,6 +50,7 @@ error_reporting(E_ALL); ?>
                             <table id="dataTable" class="display compact striped" style="width:100%">
                                 <thead>
                                     <tr>
+                                        <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Repeat</th>
                                         <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Priority</th>
                                         <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Model</th>
                                         <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Start PPS</th>
@@ -91,6 +92,7 @@ error_reporting(E_ALL); ?>
                                         }
                                     ?>
                                         <tr>
+                                            <td class="text-center"><?= htmlspecialchars($pps['repeat']); ?></td>
                                             <td class="text-center"><?= $starIcons ?: '-'; ?></td>
                                             <td class="text-center"><?= htmlspecialchars($pps['pdk']); ?></td>
                                             <td class="text-center"><?= htmlspecialchars($pps['start']); ?></td>

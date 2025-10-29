@@ -1470,7 +1470,8 @@ class ApsPerstyleModel extends Model
             apsperstyle.sisa,
             mesin_perinisial.*,
             pps.*,
-            data_model.start_mc
+            data_model.start_mc,
+            data_model.repeat_from as repeat,
         ')
             ->join('mesin_perinisial', 'mesin_perinisial.idapsperstyle = apsperstyle.idapsperstyle', 'left')
             ->join('pps', 'pps.id_mesin_perinisial = mesin_perinisial.id_mesin_perinisial', 'left')
