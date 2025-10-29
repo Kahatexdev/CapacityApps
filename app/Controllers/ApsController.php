@@ -1236,8 +1236,12 @@ class ApsController extends BaseController
         $keterangan = $request->getPost('keterangan');
         $priority = $request->getPost('priority');
         $material = $request->getPost('material');
-        $start = $request->getPost('start_pps') ?? null;
-        $stop = $request->getPost('stop_pps') ?? null;
+        $start = $request->getPost('start_pps');
+        $stop  = $request->getPost('stop_pps');
+
+        // Format biar aman ke DB (datetime)
+        $start = (!empty($start) && $start !== '0000-00-00') ? $start . ' 00:00:00' : null;
+        $stop  = (!empty($stop) && $stop !== '0000-00-00') ? $stop . ' 00:00:00' : null;
         if (!empty($idAps) && is_array($idAps)) {
             foreach ($idAps as $key => $id_apsperstyle) {
 
