@@ -1477,6 +1477,7 @@ class ApsPerstyleModel extends Model
             ->join('pps', 'pps.id_mesin_perinisial = mesin_perinisial.id_mesin_perinisial', 'left')
             ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel', 'left')
             ->where('apsperstyle.mastermodel', $pdk)
+            ->where('apsperstyle.qty >', 0)
             ->groupBy('apsperstyle.size')
             ->findAll();
     }
