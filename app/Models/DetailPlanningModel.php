@@ -179,7 +179,7 @@ class DetailPlanningModel extends Model
     {
         // Ambil semua id_pln_mc berdasarkan area
         $builder = $this->db->table('kebutuhan_area');
-        $results = $builder->select('id_pln_mc')
+        $results = $builder->select('id_pln_mc,area')
             ->whereIn('area', $area)
             ->get()
             ->getResultArray();
@@ -194,10 +194,14 @@ class DetailPlanningModel extends Model
 
             foreach ($data as $d) {
                 if (!in_array($d['model'], $pdk)) {
-                    $pdk[] = $d['model'];
+                    $pdk[] = [
+                        'model' => $d['model'],
+                        'area' => $row['area']
+                    ];
                 }
             }
         }
+        // dd($pdk);
         return $pdk;
     }
 }

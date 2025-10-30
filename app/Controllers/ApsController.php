@@ -1479,9 +1479,9 @@ class ApsController extends BaseController
         $area = $this->aksesModel->aksesData($userId);
         $getPdk = $this->DetailPlanningModel->getPpsData($area);
         $result = [];
-
         foreach ($getPdk as $pdk) {
-            $ppsData = $this->ApsPerstyleModel->getPpsData($pdk); // array of arrays
+            $ppsData = $this->ApsPerstyleModel->getPpsData($pdk['model'], $pdk['area']); // array of arrays
+            // dd($ppsData);
             $rowNum = count($ppsData);
 
             if ($rowNum == 0) continue; // skip kalau ga ada data
@@ -1508,12 +1508,13 @@ class ApsController extends BaseController
 
             $result[] = [
                 'repeat' => $pps['repeat'],
-                'pdk' => $pdk,
+                'pdk' => $pdk['model'],
                 'start' => isset($ppsData[0]['start_pps_plan']) ? date('Y-m-d', strtotime($ppsData[0]['start_pps_plan'])) : null,
                 'stop'  => isset($ppsData[0]['stop_pps_plan']) ? date('Y-m-d', strtotime($ppsData[0]['stop_pps_plan'])) : null,
                 'progress' => $rowNum > 0 ? $done / $rowNum * 100 : 0,
                 'material' => $rowNum > 0 ? $matDone / $rowNum * 100 : 0,
                 'star' => $rowNum > 0 ? ($star / $rowNum) * 5 : 0,
+                'factory' => $pps['factory'],
 
             ];
         }
@@ -1543,12 +1544,12 @@ class ApsController extends BaseController
         ];
         return view(session()->get('role') . '/Planning/Listpps', $data);
     }
-    public function ppsDetail($pdk)
+    public function ppsDetail($pdk, $area)
     {
         $modelData = $this->orderModel->getModelData($pdk);
-        $ppsData = $this->ApsPerstyleModel->getPpsData($pdk);
+        $ppsData = $this->ApsPerstyleModel->getPpsData($pdk, $area);
 
-
+        // dd($ppsData);
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Order',

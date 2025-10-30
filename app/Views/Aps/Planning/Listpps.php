@@ -104,7 +104,7 @@ error_reporting(E_ALL); ?>
                                                 <span class="badge <?= $badgeMaterial ?>"><?= $material; ?>%</span>
                                             </td>
                                             <td class="text-center">
-                                                <a href="<?= base_url($role . '/ppsDetail/' . $pps['pdk']) ?>" class="btn btn-primary">Detail</a>
+                                                <a href="<?= base_url($role . '/ppsDetail/' . $pps['pdk'] . '/' . $pps['factory']) ?>" class="btn btn-primary">Detail</a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
