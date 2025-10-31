@@ -1566,9 +1566,12 @@ class MaterialController extends BaseController
 
         $result = json_decode($response, true);
 
+        $dataPoTambahan = $result['dataPoTambahan'];
+        $dataRetur = $result['dataRetur'];
+
         $qtyOrderList = [];
 
-        foreach ($result as $item) {
+        foreach ($dataPoTambahan as $item) {
             $style = $item['style_size'];
             $noModel = $item['no_model'];  // ambil langsung dari API
             $area = $item['admin'];        // atau sesuai kolom factory di DB
@@ -1579,18 +1582,18 @@ class MaterialController extends BaseController
         }
 
         // Gabungkan ke response
-        foreach ($result as $i => $row) {
+        foreach ($dataPoTambahan as $i => $row) {
             $style = $row['style_size'];
             $qty_order = isset($qtyOrderList[$style]) ? (float)$qtyOrderList[$style] : 0;
             $composition = (float)$row['composition'] ?? 0;
             $gw = (float)$row['gw'] ?? 0;
             $loss = (float)$row['loss'] ?? 0;
 
-            $result[$i]['qty_order'] = $qty_order;
-            $result[$i]['kg_po'] = ($qty_order * $composition * $gw / 100 / 1000) * (1 + ($loss / 100));
+            $dataPoTambahan[$i]['qty_order'] = $qty_order;
+            $dataPoTambahan[$i]['kg_po'] = ($qty_order * $composition * $gw / 100 / 1000) * (1 + ($loss / 100));
         }
 
-        return $this->response->setStatusCode($httpCode)->setJSON($result);
+        return $this->response->setStatusCode($httpCode)->setJSON($dataPoTambahan);
     }
     public function filterTglPakai($area)
     {

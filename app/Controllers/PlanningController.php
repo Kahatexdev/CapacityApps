@@ -255,24 +255,29 @@ class PlanningController extends BaseController
         $pdk = $this->request->getPost('noModel');
         $deliv = $this->request->getPost('delivery');
         $jarum = $this->request->getPost('jarum');
+        $getData = $this->ApsPerstyleModel->where('idapsperstyle', $idaps)->first();
         $update = [
             'factory' => $this->request->getPost('area1'),
             'qty' => $this->request->getPost('qty1'),
             'sisa' => $this->request->getPost('qty1'),
         ];
         $insert = [
-            'machinetypeid' => $this->request->getPost('jarum'),
-            'no_order' => $this->request->getPost('order'),
-            'size' => $this->request->getPost('style'),
-            'country' => $this->request->getPost('country'),
-            'mastermodel' => $pdk,
-            'delivery' => $deliv,
+            'machinetypeid' => $getData['machinetypeid'],
+            'no_order' => $getData['no_order'],
+            'size' => $getData['size'],
+            'country' => $getData['country'],
+            'color' => $getData['color'],
+            'inisial' => $getData['inisial'],
+            'mastermodel' => $getData['mastermodel'],
+            'delivery' => $getData['delivery'],
+            'delivery' => $getData['delivery'],
+            'seam' => $getData['seam'],
+            'process_routes' => $getData['process_routes'],
+            'production_unit' => $getData['production_unit'],
+            'smv' => $getData['smv'],
             'qty' => $this->request->getPost('qty2'),
             'sisa' => $this->request->getPost('qty2'),
             'factory' => $this->request->getPost('area2'),
-            'production_unit' => "PU Belum Di Pilih",
-            'smv' => $this->request->getPost('smv'),
-            'seam' => $this->request->getPost('seam')
 
         ];
         $u = $this->ApsPerstyleModel->update($idaps, $update);
