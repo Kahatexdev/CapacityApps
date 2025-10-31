@@ -3736,7 +3736,7 @@ class ExcelController extends BaseController
         $tglTurunAkhir = $this->request->getPost('tgl_turun_order_akhir') ?? '';
         $awal = $this->request->getPost('awal');
         $akhir = $this->request->getPost('akhir');
-        $yesterday = date('Y-m-d', strtotime('-2 day')); // DUA HARI KE BELAKANG
+        // $yesterday = date('Y-m-d', strtotime('-2 day')); // DUA HARI KE BELAKANG
 
         $validate = [
             'buyer' => $buyer,
@@ -3750,22 +3750,88 @@ class ExcelController extends BaseController
             'awal' => $awal,
             'akhir' => $akhir,
         ];
-        $data = $this->ApsPerstyleModel->getDataOrder($validate);
-        foreach ($data as &$id) {
-            $key = [
-                'model' => $id['mastermodel'],
-                'size' => $id['size'],
-                'delivery' => $id['delivery'],
-                'machinetypeid' => $id['machinetypeid'],
-                'area' => $id['factory'],
-                'yesterday' => $yesterday
-            ];
-            // get data jl mc
-            $mc = $this->produksiModel->getJlMcByModel($key);
 
-            $id['jl_mc'] = $mc['jl_mc'] ?? '';
-            $id['qty_produksi'] = $mc['qty_produksi'] ?? '';
+        $data = $this->ApsPerstyleModel->getDataOrder($validate); // ambil data semua order sesuai yg di filter
+
+        // ✅ 2. Kelompokkan berdasarkan model + size dan kumpulkan idaps
+        $groupData = [];
+        foreach ($data as $row) {
+            $groupKey = $row['mastermodel'] . '-' . $row['size'];
+            $groupData[$groupKey]['idaps'][] = $row['idapsperstyle'];
+            $groupData[$groupKey]['info'] = [
+                'model' => $row['mastermodel'],
+                'size'  => $row['size'],
+            ];
         }
+
+        // ✅ 3. Ambil total produksi untuk semua grup (1x query)
+        $produksiRows = $this->produksiModel->getTotalProduksiGroup($area);
+
+        // mapping hasil produksi ke array model-size
+        $mapProduksi = [];
+        foreach ($produksiRows as $p) {
+            $mapProduksi[$p['model'] . '-' . $p['size']] = $p['total_qty'];
+        }
+
+        // dd($mapProduksi);
+
+        // ✅ 4. Ambil total BS untuk semua idaps sekaligus (1x query)
+        $bsRows = $this->bsModel->getTotalBsGroup($area);
+
+        // hitung total bs per grup model-size
+        $mapBs = [];
+        foreach ($bsRows as $b) {
+            $mapBs[$b['model'] . '-' . $b['size']] = $b['total_bs'];
+        }
+
+        // ✅ 5. Ambil total tambahan packing
+        $bsRows = $this->ApsPerstyleModel->getPoPlusPacking($area);
+
+        // hitung total po plus per grup model-size
+        $mapPoPlus = [];
+        foreach ($bsRows as $p) {
+            $mapPoPlus[$p['model'] . '-' . $p['size']] = $p['total_po_plus'];
+        }
+        // dd($mapPoPlus);
+
+
+        // ✅ 6. Gabungkan ke data utama, tampilkan hanya 1x per grup
+        $seen = [];
+        foreach ($data as &$id) {
+            $groupKey = $id['mastermodel'] . '-' . $id['size'];
+            if (!isset($seen[$groupKey])) {
+                $bruto = $mapProduksi[$groupKey] ?? 0;
+                $bs    = $mapBs[$groupKey] ?? 0;
+
+                $id['bruto_prod'] = $mapProduksi[$groupKey] ?? 0;
+                $id['bs_setting'] = $mapBs[$groupKey] ?? 0;
+                $id['netto_prod'] = $bruto - $bs;
+                $id['po_plus']    = $mapPoPlus[$groupKey] ?? 0;
+                $seen[$groupKey]  = true;
+            } else {
+                $id['bruto_prod'] = '';
+                $id['bs_setting'] = '';
+                $id['netto_prod'] = '';
+                $id['po_plus']    = '';
+            }
+        }
+        unset($id);
+
+        // foreach ($data as &$id) {
+        //     $key = [
+        //         'model' => $id['mastermodel'],
+        //         'size' => $id['size'],
+        //         'delivery' => $id['delivery'],
+        //         'machinetypeid' => $id['machinetypeid'],
+        //         'area' => $id['factory'],
+        //         'yesterday' => $yesterday
+        //     ];
+        //     // get data jl mc
+        //     $mc = $this->produksiModel->getJlMcByModel($key);
+
+        //     $id['jl_mc'] = $mc['jl_mc'] ?? '';
+        //     $id['qty_produksi'] = $mc['qty_produksi'] ?? '';
+        // }
         // dd($data);
         // Buat file Excel
         $spreadsheet = new Spreadsheet();
@@ -3836,11 +3902,13 @@ class ExcelController extends BaseController
         $sheet->setCellValue('P3', 'STYLE SIZE');
         $sheet->setCellValue('Q3', 'DELIVERY');
         $sheet->setCellValue('R3', 'QTY');
-        $sheet->setCellValue('S3', 'PRODUKSI');
-        $sheet->setCellValue('T3', 'SISA');
-        $sheet->setCellValue('U3', 'JLN MC');
-        $sheet->setCellValue('V3', 'COLOR');
-        $sheet->setCellValue('W3', 'DESCRIPTION');
+        $sheet->setCellValue('S3', 'SISA');
+        $sheet->setCellValue('T3', 'PRODUKSI (Bruto)');
+        $sheet->setCellValue('U3', 'PRODUKSI (Netto)');
+        $sheet->setCellValue('V3', 'BS SETTING');
+        $sheet->setCellValue('W3', 'PO PLUS PACKING');
+        $sheet->setCellValue('X3', 'COLOR');
+        $sheet->setCellValue('Y3', 'DESCRIPTION');
         $sheet->getStyle('A3')->applyFromArray($styleHeader);
         $sheet->getStyle('B3')->applyFromArray($styleHeader);
         $sheet->getStyle('C3')->applyFromArray($styleHeader);
@@ -3864,6 +3932,8 @@ class ExcelController extends BaseController
         $sheet->getStyle('U3')->applyFromArray($styleHeader);
         $sheet->getStyle('V3')->applyFromArray($styleHeader);
         $sheet->getStyle('W3')->applyFromArray($styleHeader);
+        $sheet->getStyle('X3')->applyFromArray($styleHeader);
+        $sheet->getStyle('Y3')->applyFromArray($styleHeader);
 
         // Tulis data mulai dari baris 2
         $row = 4;
@@ -3896,11 +3966,13 @@ class ExcelController extends BaseController
             $sheet->setCellValue('P' . $row, $item['size']);
             $sheet->setCellValue('Q' . $row, $item['delivery']);
             $sheet->setCellValue('R' . $row, $item['qty_pcs']);
-            $sheet->setCellValue('S' . $row, $item['qty_produksi']);
-            $sheet->setCellValue('T' . $row, $item['sisa_pcs']);
-            $sheet->setCellValue('U' . $row, $item['jl_mc']);
-            $sheet->setCellValue('V' . $row, $item['color']);
-            $sheet->setCellValue('W' . $row, $item['description']);
+            $sheet->setCellValue('S' . $row, $item['sisa_pcs']);
+            $sheet->setCellValue('T' . $row, $item['bruto_prod']);
+            $sheet->setCellValue('U' . $row, $item['netto_prod']);
+            $sheet->setCellValue('V' . $row, $item['bs_setting']);
+            $sheet->setCellValue('W' . $row, $item['po_plus']);
+            $sheet->setCellValue('X' . $row, $item['color']);
+            $sheet->setCellValue('Y' . $row, $item['description']);
             // 
             $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
@@ -3925,11 +3997,13 @@ class ExcelController extends BaseController
             $sheet->getStyle('U' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('V' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('W' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('X' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('Y' . $row)->applyFromArray($styleBody);
             $row++;
         }
 
         // Set lebar kolom agar menyesuaikan isi
-        foreach (range('A', 'U') as $col) {
+        foreach (range('A', 'Y') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
