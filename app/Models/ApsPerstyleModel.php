@@ -1453,31 +1453,35 @@ class ApsPerstyleModel extends Model
 
         return $data;
     }
-    public function getPpsData($pdk)
+    public function getPpsData($pdk, $area)
     {
-
         if (empty($pdk)) {
             return [];
         }
-
-        return $this->select('
-            apsperstyle.idapsperstyle,
-            apsperstyle.mastermodel,
-            apsperstyle.size,
-            apsperstyle.inisial,
-            apsperstyle.color,
-            apsperstyle.qty,
-            apsperstyle.sisa,
-            mesin_perinisial.*,
-            pps.*,
-            data_model.start_mc
-        ')
+        $builder = $this->select('
+        apsperstyle.idapsperstyle,
+        apsperstyle.mastermodel,
+        apsperstyle.size,
+        apsperstyle.inisial,
+        apsperstyle.color,
+        apsperstyle.qty,
+        apsperstyle.sisa,
+        apsperstyle.factory,
+        mesin_perinisial.*, pps.id_pps,
+  pps.pps_status, pps.mechanic, pps.notes,pps.coor,pps.start_pps_act,pps.stop_pps_act,pps.acc_qad,pps.acc_mr,pps.acc_fu,
+        data_model.start_mc,
+        data_model.repeat_from as repeat
+    ')
             ->join('mesin_perinisial', 'mesin_perinisial.idapsperstyle = apsperstyle.idapsperstyle', 'left')
             ->join('pps', 'pps.id_mesin_perinisial = mesin_perinisial.id_mesin_perinisial', 'left')
             ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel', 'left')
             ->where('apsperstyle.mastermodel', $pdk)
+            ->where('apsperstyle.qty >', 0)
+            ->where('apsperstyle.factory', $area)
             ->groupBy('apsperstyle.size')
+            ->groupBy('apsperstyle.factory')
             ->findAll();
+        return $builder;
     }
     public function getPoPlusPacking($area)
     {

@@ -452,7 +452,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('kalenderMesin/(:any)', 'ApsController::kalenderMesin/$1');
     $routes->get('planningpage/(:any)/(:any)', 'ApsController::planningpage/$1/$2');
     $routes->get('pps', 'ApsController::pps');
-    $routes->get('ppsDetail/(:any)', 'ApsController::ppsDetail/$1');
+    $routes->get('ppsDetail/(:any)/(:any)', 'ApsController::ppsDetail/$1/$2');
     $routes->post('updatePps', 'ApsController::updatePps');
     $routes->get('exportPps/(:any)', 'excelController::exportPps/$1');
 

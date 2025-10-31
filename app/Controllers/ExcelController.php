@@ -4049,9 +4049,37 @@ class ExcelController extends BaseController
             return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'message' => 'Data tidak valid dari API']);
         }
 
+        $dataPoTambahan = $result['dataPoTambahan'];
+        $dataRetur = $result['dataRetur'];
+
+        $returIndex = [];
+        foreach ($dataRetur as $retur) {
+            $key = $retur['no_model'] . '|' . $retur['item_type'] . '|' . $retur['kode_warna'] . '|' . $retur['color'];
+
+            // Kalau kombinasi belum ada, buat baru
+            if (!isset($returIndex[$key])) {
+                $returIndex[$key] = [
+                    'kgs_retur' => (float)$retur['kgs_retur'],
+                    'cns_retur' => (float)$retur['cns_retur'],
+                    'krg_retur' => (float)$retur['krg_retur'],
+                    'lot_retur' => $retur['lot_retur']
+                ];
+            } else {
+                // Jika ada lebih dari 1 retur untuk kombinasi yang sama → tambahkan nilainya
+                $returIndex[$key]['kgs_retur'] += (float)$retur['kgs_retur'];
+                $returIndex[$key]['cns_retur'] += (float)$retur['cns_retur'];
+                $returIndex[$key]['krg_retur'] += (float)$retur['krg_retur'];
+
+                // Gabungkan lot_retur (hindari duplikat sederhana)
+                if (strpos($returIndex[$key]['lot_retur'], $retur['lot_retur']) === false) {
+                    $returIndex[$key]['lot_retur'] .= ', ' . $retur['lot_retur'];
+                }
+            }
+        }
+
         $qtyOrderList = [];
 
-        foreach ($result as $item) {
+        foreach ($dataPoTambahan as $item) {
             $style = $item['style_size'];
             $noModel = $item['no_model'];  // ambil langsung dari API
             $area = $item['admin'];        // atau sesuai kolom factory di DB
@@ -4062,19 +4090,34 @@ class ExcelController extends BaseController
         }
 
         // Gabungkan ke response
-        foreach ($result as $i => $row) {
+        foreach ($dataPoTambahan as $i => $row) {
             $style = $row['style_size'];
             $qty_order = isset($qtyOrderList[$style]) ? (float)$qtyOrderList[$style] : 0;
             $composition = (float)$row['composition'] ?? 0;
             $gw = (float)$row['gw'] ?? 0;
             $loss = (float)$row['loss'] ?? 0;
 
-            $result[$i]['qty_order'] = $qty_order;
-            $result[$i]['kg_po'] = ($qty_order * $composition * $gw / 100 / 1000) * (1 + ($loss / 100));
+            $dataPoTambahan[$i]['qty_order'] = $qty_order;
+            $dataPoTambahan[$i]['kg_po'] = ($qty_order * $composition * $gw / 100 / 1000) * (1 + ($loss / 100));
+
+            // --- Cari dan masukkan data retur berdasarkan 4 key ---
+            $key = $row['no_model'] . '|' . $row['item_type'] . '|' . $row['kode_warna'] . '|' . $row['color'];
+            if (isset($returIndex[$key])) {
+                $dataPoTambahan[$i]['kgs_retur'] = $returIndex[$key]['kgs_retur'];
+                $dataPoTambahan[$i]['cns_retur'] = $returIndex[$key]['cns_retur'];
+                $dataPoTambahan[$i]['krg_retur'] = $returIndex[$key]['krg_retur'];
+                $dataPoTambahan[$i]['lot_retur'] = $returIndex[$key]['lot_retur'];
+            } else {
+                // Default 0 / kosong kalau tidak ada retur
+                $dataPoTambahan[$i]['kgs_retur'] = 0;
+                $dataPoTambahan[$i]['cns_retur'] = 0;
+                $dataPoTambahan[$i]['krg_retur'] = 0;
+                $dataPoTambahan[$i]['lot_retur'] = '';
+            }
         }
 
-        $delivery = $result[0]['delivery_akhir'] ?? '';
-
+        $delivery = $dataPoTambahan[0]['delivery_akhir'] ?? '';
+        // dd($dataPoTambahan, $dataRetur);
         // Buat Excel
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -4381,7 +4424,7 @@ class ExcelController extends BaseController
             ->setVertical(Alignment::VERTICAL_CENTER);
         $sheet->getStyle('G6')->getFont()->setBold(true)->setSize(10);
 
-        $lossValue = isset($result[0]['loss']) ? $result[0]['loss'] . '%' : '';
+        $lossValue = isset($dataPoTambahan[0]['loss']) ? $dataPoTambahan[0]['loss'] . '%' : '';
         $sheet->setCellValue('I6', ': ' . $lossValue);
         $sheet->getStyle('I6')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT)
             ->setVertical(Alignment::VERTICAL_CENTER);
@@ -4649,32 +4692,42 @@ class ExcelController extends BaseController
         $prevModel = null;
         $prevKode = null;
         $prevItemType = null;
+        $totalPcsPo = 0;
         $totalKgPo = 0;
         $totalTerimaKg = 0;
         $totalSisaBBMc = 0;
+        $totalTambahanMcPcs = 0;
+        $totalTambahanMcKg = 0;
         $totalTambahanMcCns = 0;
+        $totalTambahanPckPcs = 0;
+        $totalTambahanPckKg = 0;
         $totalTambahanPckCns = 0;
         $totalTambahanKg = 0;
+        $lastKgsRetur = 0;
 
         $groupStartRow = $rowNum;
 
-        foreach ($result as $row) {
+        foreach ($dataPoTambahan as $row) {
             $sheet->mergeCells("A{$rowNum}:B{$rowNum}");
 
             $currentModel = $row['no_model'];
             $currentItem  = $row['item_type'];
             $currentKode  = $row['kode_warna'];
 
-            $tambahanMcKg = (float)$row['poplus_mc_kg']  ?? 0;
-            $tambahanPckKg = (float)$row['plus_pck_kg']  ?? 0;
-            $kg_po         = (float)($row['kg_po'] ?? 0);
-            $terimaKg      = (float)($row['ttl_terima_kg'] ?? 0);
-            $sisaBBMc      = (float)($row['ttl_sisa_bb_dimc'] ?? 0);
-            $tambahanMcKg  = (float)($row['poplus_mc_kg'] ?? 0);
-            $tambahanPckKg = (float)($row['plus_pck_kg'] ?? 0);
-            $totalTambahanRow = (float)($row['ttl_tambahan_kg'] ?? 0);
-            $tambahanMcCns = (float)($row['poplus_mc_cns'] ?? 0);
-            $tambahanPckCns = (float)($row['plus_pck_cns'] ?? 0);
+            $tambahanMcKg       = (float)$row['poplus_mc_kg']  ?? 0;
+            $tambahanPckKg      = (float)$row['plus_pck_kg']  ?? 0;
+            $pcs_po             = (float)($row['qty_order'] ?? 0);
+            $kg_po              = (float)($row['kg_po'] ?? 0);
+            $terimaKg           = (float)($row['ttl_terima_kg'] ?? 0);
+            $sisaBBMc           = (float)($row['ttl_sisa_bb_dimc'] ?? 0);
+            $tambahanMcPcs      = (float)($row['sisa_order_pcs'] ?? 0);
+            $tambahanMcKg       = (float)($row['poplus_mc_kg'] ?? 0);
+            $tambahanMcCns      = (float)($row['poplus_mc_cns'] ?? 0);
+            $totalTambahanRow   = (float)($row['ttl_tambahan_kg'] ?? 0);
+            $tambahanPckPcs     = (float)($row['plus_pck_pcs'] ?? 0);
+            $tambahanPckKg      = (float)($row['plus_pck_kg'] ?? 0);
+            $tambahanPckCns     = (float)($row['plus_pck_cns'] ?? 0);
+            $kgsRetur           = (float)($row['kgs_retur'] ?? 0);
 
             // persentase per baris
             $persenPoplus  = ($kg_po > 0) ? round(($tambahanMcKg / $kg_po) * 100, 2) . '%' : '0%';
@@ -4685,17 +4738,26 @@ class ExcelController extends BaseController
                 $sheet->mergeCells("AD{$groupStartRow}:AD" . ($rowNum - 1));
 
                 // Tulis subtotal ke bawah baris sebelumnya
-                $sheet->mergeCells("I{$rowNum}:J{$rowNum}");
-                $sheet->setCellValue("I{$rowNum}", "TOTAL");
+                // $sheet->mergeCells("I{$rowNum}:J{$rowNum}");
+                // $sheet->setCellValue("I{$rowNum}", "TOTAL");
+                $sheet->setCellValue("I{$rowNum}", number_format($totalPcsPo, 2));
                 $sheet->setCellValue("K{$rowNum}", number_format($totalKgPo, 2));
                 $sheet->setCellValue("L{$rowNum}", number_format($totalTerimaKg, 2));
                 $sheet->setCellValue("M{$rowNum}", number_format($totalTerimaKg - $totalKgPo, 2));
-                $sheet->setCellValue("N{$rowNum}", ($totalKgPo > 0) ? number_format(($totalTerimaKg / $totalKgPo) * 100, 2) . '%' : '0%');
+                $sheet->setCellValue("N{$rowNum}", ($totalKgPo > 0) ? round(($totalTerimaKg / $totalKgPo) * 100, 0) . '%' : '');
                 $sheet->setCellValue("O{$rowNum}", number_format($totalSisaBBMc, 2));
+                $sheet->setCellValue("P{$rowNum}", $totalTambahanMcPcs);
+                $sheet->setCellValue("Q{$rowNum}", number_format($totalTambahanMcKg, 2));
                 $sheet->setCellValue("R{$rowNum}", $totalTambahanMcCns);
+                $sheet->setCellValue("S{$rowNum}", ($totalKgPo > 0) ? round(($totalTambahanMcKg / $totalKgPo) * 100, 2) . '%' : '');
+                $sheet->setCellValue("T{$rowNum}", $totalTambahanPckPcs);
+                $sheet->setCellValue("U{$rowNum}", number_format($totalTambahanPckKg, 2));
                 $sheet->setCellValue("V{$rowNum}", $totalTambahanPckCns);
+                $sheet->setCellValue("W{$rowNum}", ($totalKgPo > 0) ? round(($totalTambahanPckKg / $totalKgPo) * 100, 2) . '%' : '');
                 $sheet->setCellValue("X{$rowNum}", $totalTambahanKg);
-                $sheet->setCellValue("Y{$rowNum}", ($totalKgPo > 0) ? round(($totalTambahanKg / $totalKgPo) * 100, 2) . '%' : '0%');
+                $sheet->setCellValue("Y{$rowNum}", ($totalKgPo > 0) ? round(($totalTambahanKg / $totalKgPo) * 100, 2) . '%' : '');
+                $sheet->setCellValue("Z{$rowNum}", number_format($lastKgsRetur, 2));
+                $sheet->setCellValue("AA{$rowNum}", ($totalKgPo > 0) ? round(($lastKgsRetur / $totalKgPo) * 100, 2) . '%' : '');
 
                 // Bold & style subtotal
                 $sheet->getStyle("I{$rowNum}:AD{$rowNum}")->getFont()->setBold(true);
@@ -4704,10 +4766,12 @@ class ExcelController extends BaseController
 
                 $sheet->getRowDimension($rowNum)->setRowHeight(20);
                 // 🎯 Tambahin cek nilai kolom L–S di baris TOTAL
-                for ($col = ord('L'); $col <= ord('S'); $col++) {
-                    $cell = chr($col) . ($rowNum);
-                    $rawValue = $sheet->getCell($cell)->getValue();
+                $columns = range('L', 'Z'); // L–Z
+                $columns = array_merge($columns, ['AA', 'AB', 'AC']); // tambah kolom > Z
 
+                foreach ($columns as $col) {
+                    $cell = $col . $rowNum;
+                    $rawValue = $sheet->getCell($cell)->getValue();
                     $numericValue = (float)str_replace('%', '', $rawValue);
 
                     if ($numericValue <= 0) {
@@ -4721,10 +4785,15 @@ class ExcelController extends BaseController
                 $groupStartRow = $rowNum;
 
                 // reset subtotal
+                $totalPcsPo = 0;
                 $totalKgPo = 0;
                 $totalTerimaKg = 0;
                 $totalSisaBBMc = 0;
+                $totalTambahanMcPcs = 0;
+                $totalTambahanMcKg = 0;
                 $totalTambahanMcCns = 0;
+                $totalTambahanPckPcs = 0;
+                $totalTambahanPckKg = 0;
                 $totalTambahanPckCns = 0;
                 $totalTambahanKg = 0;
             }
@@ -4763,31 +4832,37 @@ class ExcelController extends BaseController
             ], null, 'A' . $rowNum);
 
             // 🎯 Loop cek kolom L sampai S (ASCII 76 = L, 83 = S)
-            for ($col = ord('L'); $col <= ord('S'); $col++) {
-                $cell = chr($col) . ($rowNum);  // contoh: L11, M11, N11 ...
-                $rawValue = $sheet->getCell($cell)->getValue();
+            $columns = range('L', 'Z'); // L–Z
+            $columns = array_merge($columns, ['AA', 'AB', 'AC']); // tambah kolom > Z
 
-                // Buang simbol % biar bisa dicek angka
+            foreach ($columns as $col) {
+                $cell = $col . $rowNum;
+                $rawValue = $sheet->getCell($cell)->getValue();
                 $numericValue = (float)str_replace('%', '', $rawValue);
 
-                // Pastikan numeric sebelum dibandingkan
                 if ($numericValue <= 0) {
                     $sheet->getStyle($cell)
                         ->getFont()
                         ->getColor()
-                        ->setARGB(Color::COLOR_WHITE);
+                        ->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_WHITE);
                 }
             }
 
             $sheet->getRowDimension($rowNum)->setRowHeight(-1);
 
             // akumulasi subtotal per grup
+            $totalPcsPo                 += $pcs_po;
             $totalKgPo                  += $kg_po;
-            $totalTerimaKg              = $terimaKg;
-            $totalSisaBBMc              = $sisaBBMc;
-            $totalTambahanKg            = $totalTambahanRow;
-            $totalTambahanMcCns         = $tambahanMcCns;
-            $totalTambahanPckCns        = $tambahanPckCns;
+            $totalTambahanMcPcs         += $tambahanMcPcs;
+            $totalTambahanMcKg          += $tambahanMcKg;
+            $totalTambahanMcCns         += $tambahanMcCns;
+            $totalTambahanPckPcs        += $tambahanPckPcs;
+            $totalTambahanPckKg         += $tambahanPckKg;
+            $totalTambahanPckCns        += $tambahanPckCns;
+            $totalTerimaKg               = $terimaKg;
+            $totalSisaBBMc               = $sisaBBMc;
+            $totalTambahanKg             = $totalTambahanRow;
+            $lastKgsRetur                = $kgsRetur;
 
             $prevModel = $currentModel;
             $prevKode = $currentKode;
@@ -4825,17 +4900,27 @@ class ExcelController extends BaseController
         $sheet->mergeCells("A{$rowNum}:B{$rowNum}");
         // 🚨 Setelah looping selesai, jangan lupa subtotal terakhir
         if ($totalKgPo > 0) {
-            $sheet->mergeCells("I{$rowNum}:J{$rowNum}");
-            $sheet->setCellValue("I{$rowNum}", "TOTAL");
+            // $sheet->mergeCells("I{$rowNum}:J{$rowNum}");
+            // $sheet->setCellValue("I{$rowNum}", "TOTAL");
+            $sheet->setCellValue("I{$rowNum}", number_format($totalPcsPo, 2));
             $sheet->setCellValue("K{$rowNum}", number_format($totalKgPo, 2));
             $sheet->setCellValue("L{$rowNum}", number_format($totalTerimaKg, 2));
             $sheet->setCellValue("M{$rowNum}", number_format($totalTerimaKg - $totalKgPo, 2));
-            $sheet->setCellValue("N{$rowNum}", ($totalKgPo > 0) ? number_format(($totalTerimaKg / $totalKgPo) * 100, 2) . '%' : '0%');
+            $sheet->setCellValue("N{$rowNum}", ($totalKgPo > 0) ? round((round($totalTerimaKg, 2) / round($totalKgPo, 2)) * 100, 2) . '%' : '');
             $sheet->setCellValue("O{$rowNum}", number_format($totalSisaBBMc, 2));
+            $sheet->setCellValue("P{$rowNum}", $totalTambahanMcPcs);
+            $sheet->setCellValue("Q{$rowNum}", number_format($totalTambahanMcKg, 2));
             $sheet->setCellValue("R{$rowNum}", $totalTambahanMcCns);
+            $sheet->setCellValue("S{$rowNum}", ($totalKgPo > 0) ? round((round($totalTambahanMcKg, 2) / round($totalKgPo, 2)) * 100, 2) . '%' : '');
+            $sheet->setCellValue("T{$rowNum}", $totalTambahanPckPcs);
+            $sheet->setCellValue("U{$rowNum}", number_format($totalTambahanPckKg, 2));
             $sheet->setCellValue("V{$rowNum}", $totalTambahanPckCns);
+            $sheet->setCellValue("W{$rowNum}", ($totalKgPo > 0) ? round((round($totalTambahanPckKg, 2) / round($totalKgPo, 2)) * 100, 2) . '%' : '');
             $sheet->setCellValue("X{$rowNum}", $totalTambahanKg);
-            $sheet->setCellValue("Y{$rowNum}", ($totalKgPo > 0) ? round(($totalTambahanKg / $totalKgPo) * 100, 2) . '%' : '0%');
+            $sheet->setCellValue("Y{$rowNum}", ($totalKgPo > 0) ? round((round($totalTambahanKg, 2) / round($totalKgPo, 2)) * 100, 2) . '%' : '');
+            $sheet->setCellValue("Z{$rowNum}", number_format($lastKgsRetur, 2));
+            $sheet->setCellValue("AA{$rowNum}", ($totalKgPo > 0) ? round((round($lastKgsRetur, 2) / round($totalKgPo, 2)) * 100, 2) . '%' : '');
+
             // Style untuk baris TOTAL terakhir
             $sheet->getStyle("A{$rowNum}:AD{$rowNum}")->applyFromArray([
                 'font' => ['bold' => true, 'size' => 10],
@@ -4852,10 +4937,12 @@ class ExcelController extends BaseController
             ]);
             $sheet->getRowDimension($rowNum)->setRowHeight(20);
             // 🎯 Tambahin cek nilai kolom L–S di baris TOTAL
-            for ($col = ord('L'); $col <= ord('S'); $col++) {
-                $cell = chr($col) . ($rowNum);
-                $rawValue = $sheet->getCell($cell)->getValue();
+            $columns = range('L', 'Z'); // L–Z
+            $columns = array_merge($columns, ['AA', 'AB', 'AC']); // tambah kolom > Z
 
+            foreach ($columns as $col) {
+                $cell = $col . $rowNum;
+                $rawValue = $sheet->getCell($cell)->getValue();
                 $numericValue = (float)str_replace('%', '', $rawValue);
 
                 if ($numericValue <= 0) {
@@ -7292,6 +7379,7 @@ class ExcelController extends BaseController
         }
 
         $dataRetur = $result['dataRetur'];
+        $dataPoTambahan = $result['dataPoTambahan'];
         $material = $result['material'];
 
         // Buat index material per style
@@ -7299,6 +7387,13 @@ class ExcelController extends BaseController
         foreach ($material as $item) {
             $key = $item['no_model'] . '|' . $item['item_type'] . '|' . $item['kode_warna'] . '|' . $item['style_size'];
             $materialIndex[$key] = $item;
+        }
+
+        // Buat index $dataPoTambahan per key style
+        $poTambahanIndex = [];
+        foreach ($dataPoTambahan as $item) {
+            $key = $item['no_model'] . '|' . $item['item_type'] . '|' . $item['kode_warna'] . '|' . $item['color'] . '|' . ($item['style_size'] ?? '');
+            $poTambahanIndex[$key] = $item;
         }
 
         // Ambil qty, kg_po, bs_mesin, bs_setting per style
@@ -7351,7 +7446,6 @@ class ExcelController extends BaseController
         }
 
         // --- Group per no_model|item_type|kode_warna ---
-        // --- Group per no_model|item_type|kode_warna ---
         $grouped = [];
 
         foreach ($dataRetur as $row) {
@@ -7378,6 +7472,17 @@ class ExcelController extends BaseController
                 $total_bs_setting_dz = 0;
                 $total_bs_setting_kg = 0;
 
+                // --- detail po plus per style_size ---
+                $total_sisa_order_pcs = 0;
+                $total_poplus_mc_kg = 0;
+                $total_poplus_mc_cns = 0;
+                $total_plus_pck_pcs = 0;
+                $total_plus_pck_kg = 0;
+                $total_plus_pck_cns = 0;
+                $total_ttl_sisa_bb_dimc = 0;
+                $total_ttl_tambahan_kg = 0;
+                $total_ttl_tambahan_cns = 0;
+
                 foreach ($matchingKeys as $k) {
                     $mat = $materialIndex[$k];
                     $qty_order = $qtyOrderList[$k] ?? 0;
@@ -7396,6 +7501,31 @@ class ExcelController extends BaseController
                     $total_bs_setting_dz += (float)$bs_setting / 24;
                     $total_bs_setting_kg += (float)$bs_setting_kg;
 
+                    // Merge PO tambahan per style_size
+                    $keyStyle = $mat['no_model'] . '|' . $mat['item_type'] . '|' . $mat['kode_warna'] . '|' . $row['color'] . '|' . $mat['style_size'];
+                    $po = $poTambahanIndex[$keyStyle] ?? [];
+
+                    $sisa_order_pcs   = (float)($po['sisa_order_pcs'] ?? 0);
+                    $poplus_mc_kg     = (float)($po['poplus_mc_kg'] ?? 0);
+                    $poplus_mc_cns    = (float)($po['poplus_mc_cns'] ?? 0);
+                    $plus_pck_pcs     = (float)($po['plus_pck_pcs'] ?? 0);
+                    $plus_pck_kg      = (float)($po['plus_pck_kg'] ?? 0);
+                    $plus_pck_cns     = (float)($po['plus_pck_cns'] ?? 0);
+                    $ttl_sisa_bb_dimc = (float)($po['ttl_sisa_bb_dimc'] ?? 0);
+                    $ttl_tambahan_kg  = (float)($po['ttl_tambahan_kg'] ?? 0);
+                    $ttl_tambahan_cns = (float)($po['ttl_tambahan_cns'] ?? 0);
+
+                    // akumulasi total group
+                    $total_sisa_order_pcs   += $sisa_order_pcs;
+                    $total_poplus_mc_kg     += $poplus_mc_kg;
+                    $total_poplus_mc_cns    += $poplus_mc_cns;
+                    $total_plus_pck_pcs     += $plus_pck_pcs;
+                    $total_plus_pck_kg      += $plus_pck_kg;
+                    $total_plus_pck_cns     += $plus_pck_cns;
+                    $total_ttl_sisa_bb_dimc += $ttl_sisa_bb_dimc;
+                    $total_ttl_tambahan_kg  += $ttl_tambahan_kg;
+                    $total_ttl_tambahan_cns += $ttl_tambahan_cns;
+
                     $details[] = [
                         'style_size' => $mat['style_size'] ?? '',
                         'composition' => (float)($mat['composition'] ?? 0),
@@ -7408,6 +7538,15 @@ class ExcelController extends BaseController
                         'bs_mesin_kg' => $bs_mesin_kg,
                         'bs_setting' => $bs_setting,
                         'bs_setting_kg' => $bs_setting_kg,
+                        'sisa_order_pcs' => $sisa_order_pcs,
+                        'poplus_mc_kg' => $poplus_mc_kg,
+                        'poplus_mc_cns' => $poplus_mc_cns,
+                        'plus_pck_pcs' => $plus_pck_pcs,
+                        'plus_pck_kg' => $plus_pck_kg,
+                        'plus_pck_cns' => $plus_pck_cns,
+                        'ttl_sisa_bb_dimc' => $ttl_sisa_bb_dimc,
+                        'ttl_tambahan_kg' => $ttl_tambahan_kg,
+                        'ttl_tambahan_cns' => $ttl_tambahan_cns
                     ];
                 }
 
@@ -7463,7 +7602,7 @@ class ExcelController extends BaseController
 
         // Gunakan $dataReturGrouped untuk loop di Excel
         $dataReturGrouped = array_values($grouped);
-        // dd($dataRetur, $dataReturGrouped, $kgPoList);
+        // dd($dataRetur, $dataPoTambahan, $dataReturGrouped, $kgPoList);
         $delivery = $dataReturGrouped[0]['delivery_akhir'] ?? '';
         // Buat Excel
         $spreadsheet = new Spreadsheet();
@@ -7701,14 +7840,13 @@ class ExcelController extends BaseController
             // Akumulasi total per group
             $total_qty_order = 0;
             $total_kg_po = 0;
+            $total_poplus_mc_pcs = 0;
             $total_poplus_mc_kg = 0;
             $total_plus_pck_kg = 0;
             $total_ttl_tambahan_kg = 0;
 
             $terima_kg   = (float)($group['terima_kg'] ?? 0);
             $sisa_bb_mc  = (float)($group['sisa_bb_mc'] ?? 0);
-            $poplus_mc_kg = (float)($group['poplus_mc_kg'] ?? 0);
-            $plus_pck_kg  = (float)($group['plus_pck_kg'] ?? 0);
             $ttl_tambahan_kg = (float)($group['ttl_tambahan_kg'] ?? 0);
             $total_kgs_retur = (float)($group['total_kgs_retur'] ?? 0);
 
@@ -7720,12 +7858,24 @@ class ExcelController extends BaseController
                 $loss        = (float)($detail['loss'] ?? 0);
                 $kg_po       = (float)($detail['kg_po'] ?? 0);
 
+                // PO Tambahan
+                $sisa_order_pcs   = (float)($detail['sisa_order_pcs'] ?? 0);
+                $poplus_mc_kg     = (float)($detail['poplus_mc_kg'] ?? 0);
+                $poplus_mc_cns    = (float)($detail['poplus_mc_cns'] ?? 0);
+                $plus_pck_pcs     = (float)($detail['plus_pck_pcs'] ?? 0);
+                $plus_pck_kg      = (float)($detail['plus_pck_kg'] ?? 0);
+                $plus_pck_cns     = (float)($detail['plus_pck_cns'] ?? 0);
+                $ttl_sisa_bb_dimc = (float)($detail['ttl_sisa_bb_dimc'] ?? 0);
+                $ttl_tambahan_kg  = (float)($detail['ttl_tambahan_kg'] ?? 0);
+                $ttl_tambahan_cns = (float)($detail['ttl_tambahan_cns'] ?? 0);
+
                 // Tambahkan ke total
                 $total_qty_order     += $qty_order;
                 $total_kg_po         += $kg_po;
+                $total_poplus_mc_pcs  += $sisa_order_pcs;
                 $total_poplus_mc_kg  += $poplus_mc_kg;
                 $total_plus_pck_kg   += $plus_pck_kg;
-                $total_ttl_tambahan_kg += $ttl_tambahan_kg;
+                $total_ttl_tambahan_kg = $ttl_tambahan_kg;
 
                 // Format hanya jika > 0
                 $fmt = fn($v, $dec = 2) => ($v && $v != 0) ? number_format($v, $dec) : '';
@@ -7745,36 +7895,36 @@ class ExcelController extends BaseController
 
                 // Tulis baris detail
                 $sheet->fromArray([
-                    $no_model,
-                    '',
-                    $color,
-                    $item_type,
-                    $kode_warna,
-                    $style_size,
-                    $fmt($composition, 2),
-                    $fmt($gw, 2),
-                    $fmt($qty_order, 0),
-                    $fmt($loss, 2),
-                    $fmt($kg_po, 2),
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '', // kolom berikut biarkan kosong
-                    '',
+                    $no_model, // A
+                    '', // B
+                    $color, // C
+                    $item_type, // D
+                    $kode_warna, // E
+                    $style_size, // F
+                    $fmt($composition, 2), // G
+                    $fmt($gw, 2), // H
+                    $fmt($qty_order, 0), // I
+                    $fmt($loss, 2), // J
+                    $fmt($kg_po, 2), // K
+                    '', // L
+                    '', // M
+                    '', // N
+                    '', // O
+                    $fmt($sisa_order_pcs, 0), // P
+                    $fmt($poplus_mc_kg, 2), // Q
+                    '', // R
+                    $fmt($poplus_mc_kg / $kg_po * 100, 2) . '%', // S
+                    $fmt($plus_pck_pcs, 0), // T
+                    $fmt($plus_pck_kg, 2), // U
+                    '', // V
+                    $fmt($plus_pck_kg / $kg_po * 100, 2) . '%', // W
+                    '', // X
+                    '', // Y
+                    '', // Z
+                    '', // AA
+                    '', // AB
+                    '', // AC
+                    '', // AD
                 ], null, 'A' . $rowNum);
 
                 // 🔹 Merge kolom A dan B
@@ -7786,31 +7936,29 @@ class ExcelController extends BaseController
 
             // Hitung selisih
             $selisih = $terima_kg - $total_kg_po;
-            $persen_terima = $total_kg_po > 0 ? ($terima_kg / $total_kg_po) * 100 : 0;
+            $persen_terima = $total_kg_po > 0 ? (round($terima_kg, 2) / round($total_kg_po, 2)) * 100 : 0;
+            $persen_tambahan = $total_kg_po > 0 ? (round($total_ttl_tambahan_kg, 2) / round($total_kg_po, 2)) * 100 : 0;
 
-            // Hitung hasil total group
-            $persen_total = $total_kg_po > 0 ? ($terima_kg / $total_kg_po) * 100 : 0;
-            $persen_retur = $total_kg_po > 0 ? ($total_kgs_retur / $total_kg_po) * 100 : 0;
-
-            $fmt = fn($v, $dec = 2) => ($v && $v != 0) ? number_format($v, $dec) : '';
+            // $fmt = fn($v, $dec = 2) => ($v && $v != 0) ? number_format($v, $dec) : '';
+            $fmt = fn($v, $dec = 2) => number_format((float)$v, $dec);
 
             $retur_kg_psn = $retur_persen_psn = $retur_kg_po = $retur_persen_po = 0;
             // Cek logika penempatan kgs_retur dan persennya
             if (($total_ttl_tambahan_kg) == 0) {
                 // Jika tidak ada tambahan (mesin & packing), maka hitung % dari PSN
                 if ($total_kgs_retur > 0) {
-                    $retur_kg_psn = number_format($total_kgs_retur, 2);
+                    $retur_kg_psn = round($total_kgs_retur, 2);
                     if ($total_kg_po > 0) {
-                        $retur_persen_psn = number_format(($total_kgs_retur / $total_kg_po) * 100, 2) . '%';
+                        $retur_persen_psn = round((round($total_kgs_retur, 2) / round($total_kg_po, 2)) * 100, 2) . '%';
                     }
                 }
             } else {
                 // Jika ada tambahan, maka hitung % dari PO(+)
                 if ($total_kgs_retur > 0) {
-                    $retur_kg_po = number_format($total_kgs_retur, 2);
-                    $totalPO = $total_kg_po + $poplus_mc_kg + $plus_pck_kg;
+                    $retur_kg_po = round($total_kgs_retur, 2);
+                    $totalPO = $total_kg_po + $total_ttl_tambahan_kg;
                     if ($totalPO > 0) {
-                        $retur_persen_po = number_format(($total_kgs_retur / $totalPO) * 100, 2) . '%';
+                        $retur_persen_po = round((round($total_kgs_retur, 2) / round($totalPO, 2)) * 100, 2) . '%';
                     }
                 }
             }
@@ -7830,18 +7978,18 @@ class ExcelController extends BaseController
                 $fmt($total_kg_po, 2), // K
                 $fmt($terima_kg, 2), // L
                 $fmt($selisih, 2), // M
-                $persen_terima ? number_format($persen_terima, 0) . '%' : '', // N
+                $persen_terima ? $fmt($persen_terima, 0) . '%' : '', // N
                 $fmt($sisa_bb_mc, 2), // O
-                '', // P
+                $fmt($total_poplus_mc_pcs, 0), // P
                 $fmt($total_poplus_mc_kg, 2), // Q
                 '', // R
-                '', // S
-                '', // T
+                ($total_kg_po > 0) ? $fmt((round($total_poplus_mc_kg, 2) / round($total_kg_po, 2)) * 100) . '%' : '', // S
+                $fmt($total_plus_pck_pcs, 2), // T
                 $fmt($total_plus_pck_kg, 2), // U
                 '', // V
-                '', // W
+                ($total_kg_po > 0) ? $fmt((round($total_plus_pck_kg, 2) / round($total_kg_po, 2)) * 100) . '%' : '', // W
                 $fmt($total_ttl_tambahan_kg, 2), // X
-                '', // Y
+                $persen_tambahan ? $fmt($persen_tambahan, 0) . '%' : '', // Y
                 $retur_kg_psn,      // Z
                 $retur_persen_psn,  // AA
                 $retur_kg_po,       // AB
@@ -7873,10 +8021,10 @@ class ExcelController extends BaseController
 
             $sheet->mergeCells("AD{$mergeStart}:AD{$mergeEnd}");
             // === Gabungkan keterangan lama dengan detail lot retur ===
-            $keteranganText = $kategori . '. (BS MC= ' . number_format($total_bs_mesin_dz, 2) .
-                'DZ / ' . number_format($total_bs_mesin_kg, 2) .
-                'KG, BS ST= ' . number_format($total_bs_setting_dz, 2) .
-                'DZ / ' . number_format($total_bs_setting_kg, 2) . 'KG)';
+            $keteranganText = $kategori . '. (BS MC= ' . round($total_bs_mesin_dz, 2) .
+                'DZ / ' . round($total_bs_mesin_kg, 2) .
+                'KG, BS ST= ' . round($total_bs_setting_dz, 2) .
+                'DZ / ' . round($total_bs_setting_kg, 2) . 'KG)';
 
             // 🔹 Tambahkan data lot retur (kalau ada)
             if (!empty($group['detail_lot'])) {
@@ -7885,7 +8033,7 @@ class ExcelController extends BaseController
                     $lotName = $lot['lot_retur'] ?? '';
                     $kgsLot  = (float)($lot['kgs_retur'] ?? 0);
                     if ($lotName !== '' && $kgsLot > 0) {
-                        $lotDetailsText[] = "{$lotName}=" . number_format($kgsLot, 2) . "KG";
+                        $lotDetailsText[] = "{$lotName}=" . round($kgsLot, 2) . "KG";
                     }
                 }
 

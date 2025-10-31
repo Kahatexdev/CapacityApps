@@ -525,9 +525,9 @@
                     plusPckVal * composition * gwFinal / 100 / 1000 : 0;
                 $template.find('.plus-pck-kg').data("basePlusPckKg", basePlusPckKg);
 
-                // === BS Mesin & Setting dalam KG ===
+                // === BS Mesin & Setting dalam KG ====
                 const bsMesinKg = composition > 0 ?
-                    (bsMesinVal / 1000) : 0;
+                    ((bsMesinVal / 1000) * (composition / 100)) : 0;
                 const bsSettingKg = gwFinal > 0 ?
                     bsSettingVal * composition * gwFinal / 100 / 1000 : 0;
 

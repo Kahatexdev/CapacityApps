@@ -88,6 +88,7 @@ error_reporting(E_ALL); ?>
                                             <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Material</th>
                                             <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Priority</th>
                                             <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
+                                            <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Color</th>
                                             <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Inisial</th>
                                             <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Style Size</th>
                                             <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Mekanik</th>
@@ -161,6 +162,15 @@ error_reporting(E_ALL); ?>
                                                         <?php endforeach; ?>
                                                     </select>
                                                 </td>
+
+                                                <td class="text-center">
+                                                    <?php
+                                                    $colors = explode('/', $pps['color'] ?? '');
+                                                    $firstTwo = array_slice($colors, 0, 2); // ambil dua pertama
+                                                    echo htmlspecialchars(trim(implode('/', $firstTwo))); // gabung lagi pakai '/'
+                                                    ?>
+                                                </td>
+
 
                                                 <td class="text-center"><?= htmlspecialchars($pps['inisial']); ?></td>
                                                 <td class="text-center">
