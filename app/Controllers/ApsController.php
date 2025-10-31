@@ -1549,7 +1549,6 @@ class ApsController extends BaseController
         $modelData = $this->orderModel->getModelData($pdk);
         $ppsData = $this->ApsPerstyleModel->getPpsData($pdk, $area);
 
-        // dd($ppsData);
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Order',
