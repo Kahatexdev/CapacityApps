@@ -1269,7 +1269,7 @@ class ApsPerstyleModel extends Model
             ->groupBy('apsperstyle.delivery')
             ->groupBy('apsperstyle.size')
             ->groupBy('apsperstyle.factory')
-            ->orderBy('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.delivery, apsperstyle.size', 'ASC')
+            ->orderBy('apsperstyle.mastermodel, apsperstyle.size, apsperstyle.machinetypeid, apsperstyle.delivery', 'ASC')
             ->findAll();
     }
     public function getQtyPcsByAreaByStyle($data)
@@ -1482,5 +1482,19 @@ class ApsPerstyleModel extends Model
             ->groupBy('apsperstyle.factory')
             ->findAll();
         return $builder;
+    }
+    public function getPoPlusPacking($area)
+    {
+        $builder = $this->select('mastermodel AS model, size, SUM(po_plus) AS total_po_plus')
+            ->where('apsperstyle.qty != 0');
+
+        if (!empty($params['area'])) {
+            $builder->where('apsperstyle.factory', $area);
+        }
+
+        // baru group by di akhir
+        $builder->groupBy('apsperstyle.mastermodel, apsperstyle.size');
+
+        return $builder->findAll();
     }
 }

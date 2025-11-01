@@ -603,4 +603,26 @@ class ProduksiModel extends Model
             ->orderBy('produksi.no_mesin', 'ASC')
             ->findAll();
     }
+    public function getTotalProduksiGroup($area)
+    {
+        $builder = $this->select('
+            apsperstyle.mastermodel AS model,
+            apsperstyle.size AS size,
+            SUM(produksi.qty_produksi) AS total_qty
+        ')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle', 'left')
+            ->join('data_model', 'apsperstyle.mastermodel =  data_model.no_model', 'left')
+            ->where('apsperstyle.qty != 0')
+            ->where('produksi.no_mesin !=', 'STOK PAKING')
+            ->where('produksi.tgl_produksi IS NOT NULL');
+
+        if (!empty($params['area'])) {
+            $builder->where('apsperstyle.factory', $area);
+        }
+
+        // baru group by di akhir
+        $builder->groupBy('apsperstyle.mastermodel, apsperstyle.size');
+
+        return $builder->findAll();
+    }
 }
