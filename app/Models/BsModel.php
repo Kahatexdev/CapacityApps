@@ -236,4 +236,15 @@ class BsModel extends Model
         // Ambil nilai `bs` saja, atau 0 kalau null
         return $result['bs'] ?? 0;
     }
+    public function getTotalBsGroup($area)
+    {
+        // Ambil total bs per idaps saja, tanpa join
+        $rows = $this->select('apsperstyle.mastermodel AS model, apsperstyle.size AS size, data_bs.idapsperstyle, SUM(data_bs.qty) AS total_bs')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle', 'left')
+            ->where('data_bs.area', $area)
+            ->groupBy('apsperstyle.mastermodel, apsperstyle.size')
+            ->findAll();
+
+        return $rows;
+    }
 }

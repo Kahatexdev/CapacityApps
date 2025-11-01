@@ -50,6 +50,8 @@ error_reporting(E_ALL); ?>
                             <table id="dataTable" class="display compact striped" style="width:100%">
                                 <thead>
                                     <tr>
+                                        <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Repeat</th>
+                                        <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Priority</th>
                                         <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Model</th>
                                         <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Start PPS</th>
                                         <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Stop PPS</th>
@@ -61,34 +63,40 @@ error_reporting(E_ALL); ?>
                                 </thead>
                                 <tbody>
                                     <?php foreach ($pdk as $pps) :
-                                        // tentuin warna badge progress
-                                        $progress = round($pps['progress']); // pastikan persen 0-100
-                                        if ($progress <= 25) {
-                                            $badgeClass = 'bg-danger';
-                                        } elseif ($progress <= 50) {
-                                            $badgeClass = 'bg-warning';
-                                        } elseif ($progress <= 75) {
-                                            $badgeClass = 'bg-primary';
-                                        } else {
-                                            $badgeClass = 'bg-success';
-                                        }
-
-                                        // warna badge material juga bisa sama logikanya
+                                        $progress = round($pps['progress']);
                                         $material = round($pps['material']);
-                                        if ($material <= 25) {
-                                            $badgeMaterial = 'bg-danger';
-                                        } elseif ($material <= 50) {
-                                            $badgeMaterial = 'bg-warning';
-                                        } elseif ($material <= 75) {
-                                            $badgeMaterial = 'bg-primary';
-                                        } else {
-                                            $badgeMaterial = 'bg-success';
+
+                                        // Tentuin warna progress
+                                        $badgeClass = match (true) {
+                                            $progress <= 25 => 'bg-danger',
+                                            $progress <= 50 => 'bg-warning',
+                                            $progress <= 75 => 'bg-primary',
+                                            default => 'bg-success',
+                                        };
+
+                                        // Tentuin warna material
+                                        $badgeMaterial = match (true) {
+                                            $material <= 25 => 'bg-danger',
+                                            $material <= 50 => 'bg-warning',
+                                            $material <= 75 => 'bg-primary',
+                                            default => 'bg-success',
+                                        };
+
+                                        // Generate bintang
+                                        $stars = floor($pps['star']); // ambil bagian bulatnya aja
+                                        $starIcons = str_repeat('<i class="fas fa-star text-warning"></i>', $stars);
+
+                                        // Tambah setengah bintang kalau desimalnya >= 0.5
+                                        if ($pps['star'] - $stars >= 0.5) {
+                                            $starIcons .= '<i class="fas fa-star-half-alt text-warning"></i>';
                                         }
                                     ?>
                                         <tr>
-                                            <td class="text-center"><?= $pps['pdk']; ?></td>
-                                            <td class="text-center"><?= $pps['start']; ?></td>
-                                            <td class="text-center"><?= $pps['stop']; ?></td>
+                                            <td class="text-center"><?= htmlspecialchars($pps['repeat']); ?></td>
+                                            <td class="text-center"><?= $starIcons ?: '-'; ?></td>
+                                            <td class="text-center"><?= htmlspecialchars($pps['pdk']); ?></td>
+                                            <td class="text-center"><?= htmlspecialchars($pps['start']); ?></td>
+                                            <td class="text-center"><?= htmlspecialchars($pps['stop']); ?></td>
                                             <td class="text-center">
                                                 <span class="badge <?= $badgeClass ?>"><?= $progress; ?>%</span>
                                             </td>
@@ -96,11 +104,12 @@ error_reporting(E_ALL); ?>
                                                 <span class="badge <?= $badgeMaterial ?>"><?= $material; ?>%</span>
                                             </td>
                                             <td class="text-center">
-                                                <a href="<?= base_url($role . '/ppsDetail/' . $pps['pdk']) ?>" class="btn btn-primary">Detail</a>
+                                                <a href="<?= base_url($role . '/ppsDetail/' . $pps['pdk'] . '/' . $pps['factory']) ?>" class="btn btn-primary">Detail</a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
+
 
                             </table>
                         </div>

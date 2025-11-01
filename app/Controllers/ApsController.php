@@ -1236,8 +1236,12 @@ class ApsController extends BaseController
         $keterangan = $request->getPost('keterangan');
         $priority = $request->getPost('priority');
         $material = $request->getPost('material');
-        $start = $request->getPost('start_pps') ?? null;
-        $stop = $request->getPost('stop_pps') ?? null;
+        $start = $request->getPost('start_pps');
+        $stop  = $request->getPost('stop_pps');
+
+        // Format biar aman ke DB (datetime)
+        $start = (!empty($start) && $start !== '0000-00-00') ? $start . ' 00:00:00' : null;
+        $stop  = (!empty($stop) && $stop !== '0000-00-00') ? $stop . ' 00:00:00' : null;
         if (!empty($idAps) && is_array($idAps)) {
             foreach ($idAps as $key => $id_apsperstyle) {
 
@@ -1475,9 +1479,9 @@ class ApsController extends BaseController
         $area = $this->aksesModel->aksesData($userId);
         $getPdk = $this->DetailPlanningModel->getPpsData($area);
         $result = [];
-
         foreach ($getPdk as $pdk) {
-            $ppsData = $this->ApsPerstyleModel->getPpsData($pdk); // array of arrays
+            $ppsData = $this->ApsPerstyleModel->getPpsData($pdk['model'], $pdk['area']); // array of arrays
+            // dd($ppsData);
             $rowNum = count($ppsData);
 
             if ($rowNum == 0) continue; // skip kalau ga ada data
@@ -1495,21 +1499,36 @@ class ApsController extends BaseController
                     $matDone++;
                 }
             }
+            $star = 0;
+            foreach ($ppsData as $pps) {
+                if (isset($pps['priority']) && $pps['priority'] === 'high') {
+                    $star++;
+                }
+            }
 
             $result[] = [
-                'pdk' => $pdk,
+                'repeat' => $pps['repeat'],
+                'pdk' => $pdk['model'],
                 'start' => isset($ppsData[0]['start_pps_plan']) ? date('Y-m-d', strtotime($ppsData[0]['start_pps_plan'])) : null,
                 'stop'  => isset($ppsData[0]['stop_pps_plan']) ? date('Y-m-d', strtotime($ppsData[0]['stop_pps_plan'])) : null,
                 'progress' => $rowNum > 0 ? $done / $rowNum * 100 : 0,
                 'material' => $rowNum > 0 ? $matDone / $rowNum * 100 : 0,
+                'star' => $rowNum > 0 ? ($star / $rowNum) * 5 : 0,
+                'factory' => $pps['factory'],
+
             ];
-            // dd($result);
         }
+        // dd($result);
         // urutkan dari progress terbesar ke terkecil
         usort($result, function ($a, $b) {
+            // Urutkan berdasarkan star dulu (descending)
+            if ($a['star'] != $b['star']) {
+                return $b['star'] <=> $a['star'];
+            }
+
+            // Kalau star sama, urutkan berdasarkan material (descending)
             return $b['material'] <=> $a['material'];
         });
-
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Order',
@@ -1525,11 +1544,10 @@ class ApsController extends BaseController
         ];
         return view(session()->get('role') . '/Planning/Listpps', $data);
     }
-    public function ppsDetail($pdk)
+    public function ppsDetail($pdk, $area)
     {
         $modelData = $this->orderModel->getModelData($pdk);
-        $ppsData = $this->ApsPerstyleModel->getPpsData($pdk);
-
+        $ppsData = $this->ApsPerstyleModel->getPpsData($pdk, $area);
 
         $data = [
             'role' => session()->get('role'),
