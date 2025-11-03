@@ -95,7 +95,7 @@ class ReturController extends BaseController
         // Ambil hanya field 'name'
         $result = array_column($filteredArea, 'name');
 
-        $url = 'http://172.23.39.114/MaterialSystem/public/api/getKategoriRetur';
+        $url = 'http://172.23.44.14/MaterialSystem/public/api/getKategoriRetur';
 
         $response = file_get_contents($url);
         log_message('debug', "API Response: " . $response);
@@ -116,7 +116,7 @@ class ReturController extends BaseController
                 'tipe_kategori' => $item['tipe_kategori']
             ];
         }
-        $listRetur = 'http://172.23.39.114/MaterialSystem/public/api/listRetur/' . $area;
+        $listRetur = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area;
         $res = file_get_contents($listRetur);
         $list = json_decode($res, true);
         $listRetur = $list['listRetur'] ?? [];
