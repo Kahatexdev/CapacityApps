@@ -23,6 +23,7 @@ class MesinPerStyle extends Model
         'start_pps_plan',
         'stop_pps_plan',
         'admin',
+        'repeat_from'
     ];
 
     protected bool $allowEmptyInserts = false;

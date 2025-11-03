@@ -762,6 +762,7 @@ class ApsController extends BaseController
         // $detailplan = $this->DetailPlanningModel->getDetailPlanning($id); //get data model with detail quantity,model etc.
         $pdk = $this->DetailPlanningModel->detailPdk($id);
         $startMc = $this->orderModel->startMcBenang($pdk['model']);
+        $repeat = $this->orderModel->getRepeat($pdk['model']) ?? '';
         $listDeliv = $this->ApsPerstyleModel->getDetailPerDeliv($pdk, $area);
         $listPlanning = $this->EstimatedPlanningModel->listPlanning($id);
         // dd($listPlanning);
@@ -788,6 +789,7 @@ class ApsController extends BaseController
             'id_save' => $id,
             'judul' => $judul,
             'startMc' => $startMc,
+            'repeat' => $repeat,
         ];
         return view(session()->get('role') . '/Planning/operationPlanning', $data);
     }
@@ -1200,6 +1202,7 @@ class ApsController extends BaseController
                         'priority' => $mesin['priority'] ?? 'low',
                         'start' => $mesin['start_pps_plan'] ?? null,
                         'stop' => $mesin['stop_pps_plan'] ?? null,
+                        'repeat' => $mesin['repeat_from'] ?? null,
                     ];
                 }
                 usort($return, function ($a, $b) {
@@ -1238,6 +1241,7 @@ class ApsController extends BaseController
         $material = $request->getPost('material');
         $start = $request->getPost('start_pps');
         $stop  = $request->getPost('stop_pps');
+        $repeat  = $request->getPost('repeat');
 
         // Format biar aman ke DB (datetime)
         $start = (!empty($start) && $start !== '0000-00-00') ? $start . ' 00:00:00' : null;
@@ -1249,6 +1253,7 @@ class ApsController extends BaseController
                 $desc = $keterangan[$key] ?? '';
                 $prio = $priority[$key] ?? '';
                 $mat = $material[$key] ?? '';
+                $rp = $repeat[$key] ?? '';
                 // Cek apakah data sudah ada di tabel
                 $existing = $this->MesinPerStyle
                     ->where('idapsperstyle', $id_apsperstyle)
@@ -1281,6 +1286,7 @@ class ApsController extends BaseController
                         'stop_pps_plan'    => $stop,
                         'material_status'    => $mat,
                         'priority'    => $prio,
+                        'repeat_from'    => $rp,
                         'admin'    => session()->get('username'),
                     ]);
                 } else {
@@ -1293,6 +1299,7 @@ class ApsController extends BaseController
                         'stop_pps_plan'    => $stop,
                         'material_status'    => $mat,
                         'priority'    => $prio,
+                        'repeat_from'    => $rp,
                         'admin'    => session()->get('username'),
                     ]);
 
