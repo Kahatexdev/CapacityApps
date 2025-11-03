@@ -99,6 +99,7 @@
                             <th class="text-center">Warna</th>
                             <th class="text-center">PO (Kg)</th>
                             <th class="text-center">PO+ (Kg)</th>
+                            <th class="text-center">BS (Kg)</th>
                             <th class="text-center">Kirim (Kg)</th>
                             <th class="text-center">Pakai (Kg)</th>
                             <th class="text-center">Lot Retur</th>
@@ -115,10 +116,12 @@
                                 <td><?= $ls['item_type'] ?></td>
                                 <td><?= $ls['kode_warna'] ?></td>
                                 <td><?= $ls['warna'] ?></td>
+                                <td><?= number_format($ls['total_kg_po'] ?? 0, 2) ?></td>
                                 <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td><?= number_format(($ls['total_bs_mc_kg'] ?? 0) + ($ls['total_bs_st_kg'] ?? 0), 2) ?></td>
+                                <td><?= number_format($ls['total_kgs_out'] ?? 0, 2) ?></td>
+                                <!-- Total Pakai KG (opsional, bisa disesuaikan rumusnya) -->
+                                <td><?= number_format(($ls['total_kg_po'] ?? 0) + ($ls['total_bs_mc_kg'] ?? 0) + ($ls['total_bs_st_kg'] ?? 0) - ($ls['total_kgs_out'] ?? 0), 2) ?></td>
                                 <td><?= $ls['lot_retur'] ?></td>
                                 <td><?= $ls['kgs_retur'] ?></td>
                                 <td><?= $ls['kategori'] ?></td>
