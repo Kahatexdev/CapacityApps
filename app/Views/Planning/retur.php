@@ -96,7 +96,11 @@
                             <th class="text-center">No Model</th>
                             <th class="text-center">Item Type</th>
                             <th class="text-center">Kode Warna</th>
-                            <th class="text-center"> Warna</th>
+                            <th class="text-center">Warna</th>
+                            <th class="text-center">PO (Kg)</th>
+                            <th class="text-center">PO+ (Kg)</th>
+                            <th class="text-center">Kirim (Kg)</th>
+                            <th class="text-center">Pakai (Kg)</th>
                             <th class="text-center">Lot Retur</th>
                             <th class="text-center">KG Retur</th>
                             <th class="text-center">Kategori</th>
@@ -111,6 +115,10 @@
                                 <td><?= $ls['item_type'] ?></td>
                                 <td><?= $ls['kode_warna'] ?></td>
                                 <td><?= $ls['warna'] ?></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
                                 <td><?= $ls['lot_retur'] ?></td>
                                 <td><?= $ls['kgs_retur'] ?></td>
                                 <td><?= $ls['kategori'] ?></td>
