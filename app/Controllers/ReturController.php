@@ -557,7 +557,7 @@ class ReturController extends BaseController
             $poPlusIndex = [];
             foreach ($poPlus as $plus) {
                 $key = $plus['no_model'] . '|' . $plus['item_type'] . '|' . $plus['kode_warna'];
-                $poPlusIndex[$key] = $plus['total_kgs_out'];
+                $poPlusIndex[$key] = $plus['ttl_tambahan_kg'];
             }
 
             // --- 3️⃣ Loop gabungkan data ke listRetur ---
