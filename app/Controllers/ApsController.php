@@ -1485,60 +1485,64 @@ class ApsController extends BaseController
         $userId = session()->get('id_user');
         $area = $this->aksesModel->aksesData($userId);
         $getPdk = $this->DetailPlanningModel->getPpsData($area);
-        $result = [];
+
+        $result = [];   // buat yang belum 100%
+        $doneList = []; // buat yang udah 100%
+
         foreach ($getPdk as $pdk) {
-            $ppsData = $this->ApsPerstyleModel->getPpsData($pdk['model'], $pdk['area']); // array of arrays
-            // dd($ppsData);
+            $ppsData = $this->ApsPerstyleModel->getPpsData($pdk['model'], $pdk['area']);
             $rowNum = count($ppsData);
+            if ($rowNum == 0) continue;
 
-            if ($rowNum == 0) continue; // skip kalau ga ada data
-
-            // hitung yang approved
+            // hitung status
             $done = 0;
-            foreach ($ppsData as $pps) {
-                if (isset($pps['pps_status']) && $pps['pps_status'] === 'approved') {
-                    $done++;
-                }
-            }
             $matDone = 0;
-            foreach ($ppsData as $pps) {
-                if (isset($pps['material_status']) && $pps['material_status'] === 'complete') {
-                    $matDone++;
-                }
-            }
             $star = 0;
+
             foreach ($ppsData as $pps) {
-                if (isset($pps['priority']) && $pps['priority'] === 'high') {
-                    $star++;
-                }
+                if (isset($pps['pps_status']) && $pps['pps_status'] === 'approved') $done++;
+                if (isset($pps['material_status']) && $pps['material_status'] === 'complete') $matDone++;
+                if (isset($pps['priority']) && $pps['priority'] === 'high') $star++;
             }
 
-            $result[] = [
-                'repeat' => $pps['repeat'],
-                'pdk' => $pdk['model'],
-                'start' => isset($ppsData[0]['start_pps_plan']) ? date('Y-m-d', strtotime($ppsData[0]['start_pps_plan'])) : null,
-                'stop'  => isset($ppsData[0]['stop_pps_plan']) ? date('Y-m-d', strtotime($ppsData[0]['stop_pps_plan'])) : null,
-                'progress' => $rowNum > 0 ? $done / $rowNum * 100 : 0,
-                'material' => $rowNum > 0 ? $matDone / $rowNum * 100 : 0,
-                'star' => $rowNum > 0 ? ($star / $rowNum) * 5 : 0,
-                'factory' => $pps['factory'],
+            // hitung progress
+            $progress = $rowNum > 0 ? $done / $rowNum * 100 : 0;
+            $material = $rowNum > 0 ? $matDone / $rowNum * 100 : 0;
+            $starValue = $rowNum > 0 ? ($star / $rowNum) * 5 : 0;
 
+            $item = [
+                'repeat'   => $pps['repeat'] ?? null,
+                'pdk'      => $pdk['model'],
+                'start'    => isset($ppsData[0]['start_pps_plan']) ? date('Y-m-d', strtotime($ppsData[0]['start_pps_plan'])) : null,
+                'stop'     => isset($ppsData[0]['stop_pps_plan']) ? date('Y-m-d', strtotime($ppsData[0]['stop_pps_plan'])) : null,
+                'progress' => $progress,
+                'material' => $material,
+                'star'     => $starValue,
+                'factory'  => $pps['factory'] ?? null,
             ];
+
+            // pisahkan antara yang done dan belum
+            if ($progress >= 100) {
+                $doneList[] = $item;
+            } else {
+                $result[] = $item;
+            }
         }
-        // dd($result);
-        // urutkan dari progress terbesar ke terkecil
+
+        // urutkan yang belum done
         usort($result, function ($a, $b) {
-            // Urutkan berdasarkan star dulu (descending)
             if ($a['star'] != $b['star']) {
                 return $b['star'] <=> $a['star'];
             }
-
-            // Kalau star sama, urutkan berdasarkan material (descending)
             return $b['material'] <=> $a['material'];
         });
+
+        // kalau mau yang done juga di-sort, tinggal aktifin ini:
+        // usort($doneList, fn($a, $b) => strcmp($a['pdk'], $b['pdk']));
+
         $data = [
-            'role' => session()->get('role'),
-            'title' => 'Data Order',
+            'role'    => session()->get('role'),
+            'title'   => 'Data Order',
             'active1' => '',
             'active2' => '',
             'active3' => '',
@@ -1546,11 +1550,15 @@ class ApsController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-            'area' => $area,
-            'pdk' => $result,
+            'area'    => $area,
+            'pdk'     => $result,     // yang belum selesai
+            'done'    => $doneList,   // yang progress 100%
         ];
+
         return view(session()->get('role') . '/Planning/Listpps', $data);
     }
+
+
     public function ppsDetail($pdk, $area)
     {
         $modelData = $this->orderModel->getModelData($pdk);
