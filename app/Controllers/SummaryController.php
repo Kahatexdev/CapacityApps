@@ -696,10 +696,6 @@ class SummaryController extends BaseController
                     // Menghitung total mesin
                     $mesinTotal = array_sum(array_column($this->tanggalPlanningModel->totalMcSumamryPlanner($dp['id_est_qty']), 'mesin'));
 
-                    // 🔹 Ambil data PPS (tapi cukup satu per model)
-                    $dataPps = $this->ApsPerstyleModel->getPpsData($noModel, $area);
-                    $firstPps = !empty($dataPps) ? $dataPps[0] : null;
-
                     // Memodifikasi data dalam array secara langsung
                     $detailPlan[$key]['mesin'] = $mesinTotal;
                     $detailPlan[$key]['product_type'] = $dataOrder['product_type'] ?? '';
@@ -710,7 +706,6 @@ class SummaryController extends BaseController
                         : 0;
                     $detailPlan[$key]['actMesin'] = $actMesin['jl_mc'] ?? 0;
                     $detailPlan[$key]['jarum'] = $jarum; // Pastikan jarum di-set
-                    $detailPlan[$key]['pps'] = $firstPps;
                     // $detailPlan[$key]['bahan_baku'] = $bb;
                 }
 
@@ -792,6 +787,42 @@ class SummaryController extends BaseController
             }
         }
 
+        // === Loop untuk masukkan data PPS per model ===
+        foreach ($allDetailPlans as $jarum => &$plans) {
+            if (!is_array($plans)) continue;
+
+            $uniquePps = [];
+
+            foreach ($plans as &$plan) {
+                $model = $plan['model'] ?? null;
+                if ($model && !isset($uniquePps[$model])) {
+                    $dataPps = $this->ApsPerstyleModel->getPpsData($model, $area);
+
+                    // 🔹 Filter data PPS berdasarkan machinetype_id yang sama dengan jarum sekarang
+                    $filtered = array_filter($dataPps, function ($row) use ($jarum) {
+                        return isset($row['machinetypeid']) && $row['machinetypeid'] == $jarum;
+                    });
+
+                    // 🔹 Ambil start_pps_plan paling awal dari hasil filter
+                    $earliest = null;
+                    if (!empty($filtered)) {
+                        $dates = array_filter(array_column($filtered, 'start_pps_plan'));
+                        if (!empty($dates)) {
+                            $earliest = min($dates);
+                        }
+                    }
+
+                    $uniquePps[$model] = $earliest;
+                }
+
+                unset($plan['pps']); // pastikan gak dobel di baris
+            }
+
+            // simpan hasil PPS unik di luar list plan
+            $plans['pps'] = $uniquePps;
+        }
+        unset($plans);
+
         // === Loop untuk masukkan ke allDetailPlans ===
         foreach ($allDetailPlans as $jarum => &$plans) {
             if (!is_array($plans)) continue;
@@ -809,7 +840,7 @@ class SummaryController extends BaseController
         }
         unset($plans);
 
-        dd($allDetailPlans);
+        // dd($allDetailPlans);
 
         $spreadsheet = new Spreadsheet();
         $sheets = 0;
@@ -1337,6 +1368,14 @@ class SummaryController extends BaseController
                     if (!empty($bahanBaku)) $pendingBB = $bahanBaku;
                 }
 
+                // --- Ambil data PPS dari struktur utama ---
+                $ppsValue = isset($detailplan['pps'][$model]) ? date('Y-m-d', strtotime($detailplan['pps'][$model])) : '';
+
+                // --- hanya tampilkan PPS di baris pertama model ---
+                if ($index > 0 && $prevModel === $model) {
+                    $ppsValue = '';
+                }
+
                 // --- tulis baris utama ---
                 $sheet->setCellValue("A{$rowBody}", $id['delivery'] ?? '');
                 $sheet->setCellValue("B{$rowBody}", $id['buyer'] ?? '');
@@ -1349,7 +1388,7 @@ class SummaryController extends BaseController
                 $sheet->setCellValue("I{$rowBody}", $id['qty'] ?? '');
                 $sheet->setCellValue("J{$rowBody}", $id['sisa'] ?? '');
                 $sheet->setCellValue("K{$rowBody}", $id['produksi'] ?? '');
-                $sheet->setCellValue("L{$rowBody}", '');
+                $sheet->setCellValue("L{$rowBody}", $ppsValue);
                 $sheet->setCellValue("M{$rowBody}", $id['mesin'] ?? '');
                 $sheet->setCellValue("N{$rowBody}", $id['start_date'] ?? '');
                 $sheet->setCellValue("O{$rowBody}", $id['stop_date'] ?? '');

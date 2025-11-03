@@ -1460,6 +1460,7 @@ class ApsPerstyleModel extends Model
         }
         $builder = $this->select('
         apsperstyle.idapsperstyle,
+        apsperstyle.machinetypeid,
         apsperstyle.mastermodel,
         apsperstyle.size,
         apsperstyle.inisial,
