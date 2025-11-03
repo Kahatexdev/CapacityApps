@@ -1470,6 +1470,7 @@ class ApsPerstyleModel extends Model
         apsperstyle.factory,
         mesin_perinisial.*, pps.id_pps,
   pps.pps_status, pps.mechanic, pps.notes,pps.coor,pps.start_pps_act,pps.stop_pps_act,pps.acc_qad,pps.acc_mr,pps.acc_fu,
+  pps.history,
         data_model.start_mc,
         data_model.repeat_from as repeat
     ')

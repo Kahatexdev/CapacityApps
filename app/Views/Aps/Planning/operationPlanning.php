@@ -439,6 +439,7 @@
         const jarum = <?= json_encode($jarum); ?>;
         const area = <?= json_encode($area); ?>;
         const pdk = <?= json_encode($pdk); ?>;
+        const repeat = <?= json_encode($repeat); ?>;
         let timer;
         document.addEventListener("DOMContentLoaded", function() {
             document.querySelectorAll(".btn-plan").forEach(button => {
@@ -463,12 +464,23 @@
                                 const start = response.start_stop?.start ? response.start_stop.start.split(' ')[0] : '';
                                 const stop = response.start_stop?.stop ? response.start_stop.stop.split(' ')[0] : '';
                                 document.querySelector(".headerText").innerHTML = `
-    <div class="col-md-12 d-flex align-items-center gap-3 mt-2">
-        <label class="fw-bold">Start PPS:</label>
-        <input type="date" name="start_pps" class="form-control form-control w-auto" value="${start}"><br>
-        <label class="fw-bold ms-3">Stop PPS:</label>
-        <input type="date" name="stop_pps" class="form-control form-control w-auto" value="${stop}">
-    </div>
+  <div class="col-md-12 d-flex align-items-start gap-3 mt-2">
+  <div class="d-flex flex-column">
+    <label class="fw-bold mb-1">PDK Repeat Dari:</label>
+    <input type="text" class="form-control w-auto" value="${repeat}" readonly>
+  </div>
+
+  <div class="d-flex flex-column">
+    <label class="fw-bold mb-1">Start PPS:</label>
+    <input type="date" name="start_pps" class="form-control w-auto" value="${start}">
+  </div>
+
+  <div class="d-flex flex-column">
+    <label class="fw-bold mb-1">Stop PPS:</label>
+    <input type="date" name="stop_pps" class="form-control w-auto" value="${stop}">
+  </div>
+</div>
+
 `;
                                 const priorities = {
                                     low: '#3498db', // biru
@@ -482,20 +494,23 @@
                                 };
                                 let planHtml = `
         <table id="planTable" class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Priority</th>
-                    <th>Material Status</th>
-                    <th>Inisial</th>
-                    <th>Style</th>
-                    <th>Warna</th>
-                    <th>Qty</th>
-                    <th>Sisa</th>
-                    <th>Mesin</th>
-                    <th>Keterangan</th>
-                    <th></th>
-                </tr>
-            </thead>
+        <thead>
+        <tr>
+        <th><input type="checkbox" id="selectAll"></th>
+        <th>Repeat </th>
+            <th>Priority</th>
+            <th>Material Status</th>
+            <th>Inisial</th>
+            <th>Style</th>
+            <th>Warna</th>
+            <th>Qty</th>
+            <th>Sisa</th>
+            <th>Mesin</th>
+            <th>Keterangan</th>
+            <th></th>
+        </tr>
+        </thead>
+
             <tbody>
             
                ${response.data.map(item => {
@@ -503,6 +518,12 @@
             const materialVal = item.material_status.toLowerCase();
             return `
             <tr>
+
+            <td><input type="checkbox" class="row-check"></td>
+            <td class="text-center">
+    <input type="text" name="repeat[]" class="form-control repeat-input" 
+           value="${item.repeat ?? ''}">
+</td>
                 <td class="text-center">
                     <select name="priority[]" class="form-control priority-select" style="font-weight:bold; background-color:${priorities[priorityVal] ?? '#fff'}; color:white;">
                         ${Object.keys(priorities).map(p => `
@@ -545,7 +566,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="5" class="text-right">Total Mesin</th>
+                <th colspan="9" class="text-right">Total Mesin</th>
                 <th id="totalMesin">0</th>
                 <th colspan="2"></th>
             </tr>
@@ -554,6 +575,75 @@
 `;
 
                                 document.querySelector(".planDetail").innerHTML = planHtml;
+                                // Tambah kontrol global
+                                const controlPanel = `
+   <div class="mb-2">
+  <div class="d-flex flex-wrap align-items-center gap-3">
+
+    <!-- Bulk Action Section -->
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <label class="fw-bold mb-0">Bulk Action:</label>
+      <select id="bulkField" class="form-control form-control-sm w-auto">
+        <option value="">-- Choose Field --</option>
+        <option value="priority">Priority</option>
+        <option value="material">Material Status</option>
+      </select>
+      <select id="bulkValue" class="form-control form-control-sm w-auto">
+        <option value="">-- Choose Value --</option>
+      </select>
+      <button id="applyBulk" class="btn btn-sm btn-primary">Apply</button>
+    </div>
+
+    <!-- Divider -->
+    <div class="vr mx-2 d-none d-md-block"></div>
+
+    <!-- Repeat Perstyle Section -->
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <label class="fw-bold mb-0">Repeat Perstyle:</label>
+      <input type="text" class="form-control form-control-sm w-auto bulk-repeat-input" placeholder="Enter repeat value">
+      <button type="button" id="checkRepeatAll" class="btn btn-sm btn-success">Apply Repeat</button>
+    </div>
+
+  </div>
+</div>
+
+`;
+
+
+                                $(".planDetail").prepend(controlPanel);
+
+                                // Dynamic isi dropdown value tergantung field
+                                $("#bulkField").on("change", function() {
+                                    const field = $(this).val();
+                                    const values = field === "priority" ? ["low", "normal", "high"] : ["not ready", "complete"];
+                                    $("#bulkValue").html(values.map(v => `<option value="${v}">${v}</option>`));
+                                });
+
+                                // Handle select all
+                                $("#selectAll").on("change", function() {
+                                    $("input.row-check").prop("checked", $(this).prop("checked"));
+                                });
+
+                                // Apply bulk action
+                                $("#applyBulk").on("click", function() {
+                                    const field = $("#bulkField").val();
+                                    const value = $("#bulkValue").val();
+                                    if (!field || !value) return alert("Please select both field and value!");
+
+                                    $("input.row-check:checked").each(function() {
+                                        const row = $(this).closest("tr");
+                                        const select = row.find(`select[name='${field}[]']`);
+                                        if (select.length) {
+                                            select.val(value).trigger("change"); // Update dropdown value
+                                            select.css("background-color",
+                                                field === "priority" ?
+                                                (value === "high" ? "#2ecc71" : value === "normal" ? "#f1c40f" : "#3498db") :
+                                                (value === "complete" ? "#2ecc71" : "#e74c3c")
+                                            );
+                                        }
+                                    });
+                                });
+
                                 document.querySelector(".planStyleCard").classList.toggle("d-none");
 
                                 // Hitung awal
@@ -583,6 +673,24 @@
                                         }
                                     }
                                 });
+                                // === APPLY TO ALL: Repeat ===
+                                // === APPLY TO ALL: Repeat ===
+                                document.getElementById('checkRepeatAll').addEventListener('click', function() {
+                                    const repeatValue = document.querySelector('.bulk-repeat-input').value.trim();
+
+                                    if (!repeatValue) {
+                                        alert("Please fill the repeat field first!");
+                                        return;
+                                    }
+
+                                    $("input.row-check:checked").each(function() {
+                                        const row = $(this).closest("tr");
+                                        const input = row.find(".repeat-input");
+                                        input.val(repeatValue);
+                                    });
+                                    document.querySelector('.bulk-repeat-input').value = '';
+                                });
+
                             } else {
                                 console.error('Error: Response format invalid.');
                             }
