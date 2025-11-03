@@ -787,6 +787,42 @@ class SummaryController extends BaseController
             }
         }
 
+        // === Loop untuk masukkan data PPS per model ===
+        foreach ($allDetailPlans as $jarum => &$plans) {
+            if (!is_array($plans)) continue;
+
+            $uniquePps = [];
+
+            foreach ($plans as &$plan) {
+                $model = $plan['model'] ?? null;
+                if ($model && !isset($uniquePps[$model])) {
+                    $dataPps = $this->ApsPerstyleModel->getPpsData($model, $area);
+
+                    // 🔹 Filter data PPS berdasarkan machinetype_id yang sama dengan jarum sekarang
+                    $filtered = array_filter($dataPps, function ($row) use ($jarum) {
+                        return isset($row['machinetypeid']) && $row['machinetypeid'] == $jarum;
+                    });
+
+                    // 🔹 Ambil start_pps_plan paling awal dari hasil filter
+                    $earliest = null;
+                    if (!empty($filtered)) {
+                        $dates = array_filter(array_column($filtered, 'start_pps_plan'));
+                        if (!empty($dates)) {
+                            $earliest = min($dates);
+                        }
+                    }
+
+                    $uniquePps[$model] = $earliest;
+                }
+
+                unset($plan['pps']); // pastikan gak dobel di baris
+            }
+
+            // simpan hasil PPS unik di luar list plan
+            $plans['pps'] = $uniquePps;
+        }
+        unset($plans);
+
         // === Loop untuk masukkan ke allDetailPlans ===
         foreach ($allDetailPlans as $jarum => &$plans) {
             if (!is_array($plans)) continue;
@@ -803,6 +839,8 @@ class SummaryController extends BaseController
             $plans['bahan_baku'] = $uniqueBB;
         }
         unset($plans);
+
+        // dd($allDetailPlans);
 
         $spreadsheet = new Spreadsheet();
         $sheets = 0;
@@ -906,7 +944,7 @@ class SummaryController extends BaseController
             ]);
 
             $sheet->setCellValue('B1', 'FORMULIR');
-            $sheet->mergeCells('B1:V1')->getStyle('B1:V1')->applyFromArray([
+            $sheet->mergeCells('B1:W1')->getStyle('B1:W1')->applyFromArray([
                 'font' => [
                     'bold' => true,
                     'size' => 16,
@@ -945,7 +983,7 @@ class SummaryController extends BaseController
             $sheet->getRowDimension('3')->setRowHeight($heightInPoints2);
 
             $sheet->setCellValue('B2', 'DEPARTEMEN PLANNING PRODUCTION CONTROL');
-            $sheet->mergeCells('B2:V2')->getStyle('B2:V2')->applyFromArray([
+            $sheet->mergeCells('B2:W2')->getStyle('B2:W2')->applyFromArray([
                 'font' => [
                     'bold' => true,
                     'size' => 12,
@@ -968,7 +1006,7 @@ class SummaryController extends BaseController
             ]);
 
             $sheet->setCellValue('B3', 'SCHEDULE AREA');
-            $sheet->mergeCells('B3:V3')->getStyle('B3:V3')->applyFromArray([
+            $sheet->mergeCells('B3:W3')->getStyle('B3:W3')->applyFromArray([
                 'font' => [
                     'bold' => true,
                     'size' => 12,
@@ -1026,7 +1064,7 @@ class SummaryController extends BaseController
             ]);
 
             $sheet->setCellValue('B4', ' FOR-PPC-096/REV-00/HAL_1/1');
-            $sheet->mergeCells('B4:O4')->getStyle('B4:O4')->applyFromArray([
+            $sheet->mergeCells('B4:P4')->getStyle('B4:P4')->applyFromArray([
                 'font' => [
                     'size' => 11,
                     'bold' => true,
@@ -1056,8 +1094,8 @@ class SummaryController extends BaseController
                 ],
             ]);
 
-            $sheet->setCellValue('P4', 'Tanggal Revisi ');
-            $sheet->mergeCells('P4:Q4')->getStyle('P4:Q4')->applyFromArray([
+            $sheet->setCellValue('Q4', 'Tanggal Revisi ');
+            $sheet->mergeCells('Q4:R4')->getStyle('Q4:R4')->applyFromArray([
                 'font' => [
                     'size' => 11,
                     'bold' => true,
@@ -1087,8 +1125,8 @@ class SummaryController extends BaseController
                 ],
             ]);
 
-            $sheet->setCellValue('R4', ' 14 Januari 2019');
-            $sheet->mergeCells('R4:V4')->getStyle('R4:V4')->applyFromArray([
+            $sheet->setCellValue('S4', ' 14 Januari 2019');
+            $sheet->mergeCells('S4:W4')->getStyle('S4:W4')->applyFromArray([
                 'font' => [
                     'size' => 11,
                     'bold' => true,
@@ -1119,7 +1157,7 @@ class SummaryController extends BaseController
             ]);
 
             $sheet->setCellValue('A5', ' SCHEDULE AREAL : ' . $area . ' (' . $key . ')');
-            $sheet->mergeCells('A5:O5')->getStyle('A5:O5')->applyFromArray([
+            $sheet->mergeCells('A5:P5')->getStyle('A5:P5')->applyFromArray([
                 'font' => [
                     'size' => 12,
                     'bold' => true,
@@ -1149,8 +1187,8 @@ class SummaryController extends BaseController
                 ],
             ]);
 
-            $sheet->setCellValue('P5', 'Tanggal : ' . $yesterday);
-            $sheet->mergeCells('P5:V5')->getStyle('P5:V5')->applyFromArray([
+            $sheet->setCellValue('Q5', 'Tanggal : ' . $yesterday);
+            $sheet->mergeCells('Q5:W5')->getStyle('Q5:W5')->applyFromArray([
                 'font' => [
                     'size' => 12,
                     'bold' => true,
@@ -1193,22 +1231,22 @@ class SummaryController extends BaseController
 
 
             $sheet->setCellValue('L' . $rowHeader, 'PLAN');
-            $sheet->mergeCells('L' . $rowHeader . ':N' . $rowHeader);
-            $sheet->getStyle('L' . $rowHeader . ':N' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->mergeCells('L' . $rowHeader . ':O' . $rowHeader);
+            $sheet->getStyle('L' . $rowHeader . ':O' . $rowHeader)->applyFromArray($styleHeader);
 
-            $sheet->setCellValue('O' . $rowHeader, 'ACTUAL JL MC');
-            $sheet->mergeCells('O' . $rowHeader . ':O' . ($rowHeader + 1));
-            $sheet->getStyle('O' . $rowHeader . ':O' . ($rowHeader + 1))->applyFromArray($styleHeader);
-            $sheet->getStyle('O' . $rowHeader . ':O' . ($rowHeader + 1))->getAlignment()->setWrapText(true);
-
-            $sheet->setCellValue('P' . $rowHeader, 'KETERANGAN');
+            $sheet->setCellValue('P' . $rowHeader, 'ACTUAL JL MC');
             $sheet->mergeCells('P' . $rowHeader . ':P' . ($rowHeader + 1));
             $sheet->getStyle('P' . $rowHeader . ':P' . ($rowHeader + 1))->applyFromArray($styleHeader);
             $sheet->getStyle('P' . $rowHeader . ':P' . ($rowHeader + 1))->getAlignment()->setWrapText(true);
 
-            $sheet->setCellValue('Q' . $rowHeader, 'BAHAN BAKU');
-            $sheet->mergeCells('Q' . $rowHeader . ':V' . $rowHeader);
-            $sheet->getStyle('Q' . $rowHeader . ':V' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->setCellValue('Q' . $rowHeader, 'KETERANGAN');
+            $sheet->mergeCells('Q' . $rowHeader . ':Q' . ($rowHeader + 1));
+            $sheet->getStyle('Q' . $rowHeader . ':Q' . ($rowHeader + 1))->applyFromArray($styleHeader);
+            $sheet->getStyle('Q' . $rowHeader . ':Q' . ($rowHeader + 1))->getAlignment()->setWrapText(true);
+
+            $sheet->setCellValue('R' . $rowHeader, 'BAHAN BAKU');
+            $sheet->mergeCells('R' . $rowHeader . ':W' . $rowHeader);
+            $sheet->getStyle('R' . $rowHeader . ':W' . $rowHeader)->applyFromArray($styleHeader);
 
             $rowHeader++;
             $sheet->setCellValue('A' . $rowHeader, 'DELIVERY');
@@ -1221,15 +1259,16 @@ class SummaryController extends BaseController
             $sheet->setCellValue('H' . $rowHeader, 'PLAN');
             $sheet->setCellValue('I' . $rowHeader, 'QUANTITY');
             $sheet->setCellValue('J' . $rowHeader, 'SISA QTY');
-            $sheet->setCellValue('L' . $rowHeader, 'MC');
-            $sheet->setCellValue('M' . $rowHeader, 'START');
-            $sheet->setCellValue('N' . $rowHeader, 'STOP');
-            $sheet->setCellValue('Q' . $rowHeader, 'WARNA');
-            $sheet->setCellValue('R' . $rowHeader, 'JENIS BENANG');
-            $sheet->setCellValue('S' . $rowHeader, 'KODE BENANG');
-            $sheet->setCellValue('T' . $rowHeader, 'PEMESANAN');
-            $sheet->setCellValue('U' . $rowHeader, 'LOT');
-            $sheet->setCellValue('V' . $rowHeader, 'QTY');
+            $sheet->setCellValue('L' . $rowHeader, 'START PPS');
+            $sheet->setCellValue('M' . $rowHeader, 'MC');
+            $sheet->setCellValue('N' . $rowHeader, 'START');
+            $sheet->setCellValue('O' . $rowHeader, 'STOP');
+            $sheet->setCellValue('P' . $rowHeader, 'WARNA');
+            $sheet->setCellValue('Q' . $rowHeader, 'JENIS BENANG');
+            $sheet->setCellValue('R' . $rowHeader, 'KODE BENANG');
+            $sheet->setCellValue('S' . $rowHeader, 'PEMESANAN');
+            $sheet->setCellValue('T' . $rowHeader, 'LOT');
+            $sheet->setCellValue('U' . $rowHeader, 'QTY');
 
             // style header
             $sheet->getStyle('A' . $rowHeader)->applyFromArray($styleHeader);
@@ -1254,6 +1293,7 @@ class SummaryController extends BaseController
             $sheet->getStyle('T' . $rowHeader)->applyFromArray($styleHeader);
             $sheet->getStyle('U' . $rowHeader)->applyFromArray($styleHeader);
             $sheet->getStyle('V' . $rowHeader)->applyFromArray($styleHeader);
+            $sheet->getStyle('W' . $rowHeader)->applyFromArray($styleHeader);
 
             $rowBody = $rowHeader + 1;
             $subtotalQty = $subtotalSisa = $subtotalProduksi = $subtotalActMesin = 0;
@@ -1286,12 +1326,12 @@ class SummaryController extends BaseController
                             $rowBody -= 1;
                         }
                         foreach ($pendingBB as $bb) {
-                            $sheet->setCellValue("Q{$rowBody}", $bb['color'] ?? '');
-                            $sheet->setCellValue("R{$rowBody}", $bb['item_type'] ?? '');
-                            $sheet->setCellValue("S{$rowBody}", $bb['kode_warna'] ?? '');
-                            $sheet->setCellValue("T{$rowBody}", isset($bb['ttl_kebutuhan']) ? round((float)$bb['ttl_kebutuhan'], 2) : '');
-                            $sheet->setCellValue("U{$rowBody}", '');
+                            $sheet->setCellValue("R{$rowBody}", $bb['color'] ?? '');
+                            $sheet->setCellValue("S{$rowBody}", $bb['item_type'] ?? '');
+                            $sheet->setCellValue("T{$rowBody}", $bb['kode_warna'] ?? '');
+                            $sheet->setCellValue("U{$rowBody}", isset($bb['ttl_kebutuhan']) ? round((float)$bb['ttl_kebutuhan'], 2) : '');
                             $sheet->setCellValue("V{$rowBody}", '');
+                            $sheet->setCellValue("W{$rowBody}", '');
                             foreach (range('A', 'V') as $col) {
                                 $sheet->getStyle("{$col}{$rowBody}")->applyFromArray($styleBody);
                             }
@@ -1328,6 +1368,14 @@ class SummaryController extends BaseController
                     if (!empty($bahanBaku)) $pendingBB = $bahanBaku;
                 }
 
+                // --- Ambil data PPS dari struktur utama ---
+                $ppsValue = isset($detailplan['pps'][$model]) ? date('Y-m-d', strtotime($detailplan['pps'][$model])) : '';
+
+                // --- hanya tampilkan PPS di baris pertama model ---
+                if ($index > 0 && $prevModel === $model) {
+                    $ppsValue = '';
+                }
+
                 // --- tulis baris utama ---
                 $sheet->setCellValue("A{$rowBody}", $id['delivery'] ?? '');
                 $sheet->setCellValue("B{$rowBody}", $id['buyer'] ?? '');
@@ -1340,10 +1388,11 @@ class SummaryController extends BaseController
                 $sheet->setCellValue("I{$rowBody}", $id['qty'] ?? '');
                 $sheet->setCellValue("J{$rowBody}", $id['sisa'] ?? '');
                 $sheet->setCellValue("K{$rowBody}", $id['produksi'] ?? '');
-                $sheet->setCellValue("L{$rowBody}", $id['mesin'] ?? '');
-                $sheet->setCellValue("M{$rowBody}", $id['start_date'] ?? '');
-                $sheet->setCellValue("N{$rowBody}", $id['stop_date'] ?? '');
-                $sheet->setCellValue("O{$rowBody}", $id['actMesin'] ?? '');
+                $sheet->setCellValue("L{$rowBody}", $ppsValue);
+                $sheet->setCellValue("M{$rowBody}", $id['mesin'] ?? '');
+                $sheet->setCellValue("N{$rowBody}", $id['start_date'] ?? '');
+                $sheet->setCellValue("O{$rowBody}", $id['stop_date'] ?? '');
+                $sheet->setCellValue("P{$rowBody}", $id['actMesin'] ?? '');
 
                 foreach (range('A', 'V') as $col) {
                     $sheet->getStyle("{$col}{$rowBody}")->applyFromArray($styleBody);

@@ -18,7 +18,7 @@ class OrderModel extends Model
     protected bool $allowEmptyInserts = false;
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -762,6 +762,12 @@ class OrderModel extends Model
         return $this->select('start_mc')
             ->where('no_model', $pdk)
             ->first()['start_mc'];
+    }
+    public function getRepeat($pdk)
+    {
+        return $this->select('repeat_from')
+            ->where('no_model', $pdk)
+            ->first()['repeat_from'];
     }
     public function updateStartMc($model, $tgl)
     {

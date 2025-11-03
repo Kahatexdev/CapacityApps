@@ -85,6 +85,7 @@ error_reporting(E_ALL); ?>
                                 <table id="dataTable" class="display compact striped" style="width:100%">
                                     <thead>
                                         <tr>
+                                            <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Repeat</th>
                                             <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Material</th>
                                             <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Priority</th>
                                             <th class="text-uppercase text-dark text-center text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
@@ -109,6 +110,8 @@ error_reporting(E_ALL); ?>
                                     <tbody>
                                         <?php foreach ($ppsData as $pps) : ?>
                                             <tr>
+                                                <td class="text-center"><input type="text" name="repeat[]" value="<?= $pps['repeat_from']; ?>" class="form-control" readonly></td>
+
                                                 <?php
                                                 // --- Material Status ---
                                                 $materialStatus = $pps['material_status'] ?? '';
