@@ -134,6 +134,25 @@ class UserController extends BaseController
         ];
         return view(session()->get('role') . '/bssetting', $data);
     }
+    public function perbaikanView()
+    {
+
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Dashboard',
+            'active1' => '',
+            'active3' => '',
+            'active2' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'targetProd' => 0,
+
+
+        ];
+        return view(session()->get('role') . '/perbaikanarea', $data);
+    }
     public function bsmesin()
     {
         $dataPdk = $this->ApsPerstyleModel->getPdkProduksi();

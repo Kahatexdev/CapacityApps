@@ -23,6 +23,9 @@ use App\Models\BsModel;
 use App\Models\BsMesinModel;
 use App\Models\AreaModel;
 use App\Models\MesinPerStyle;
+use App\Models\StockAreaModel;
+use App\Models\SupermarketModel;
+use App\Models\OutArea;
 use App\Services\orderServices;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
@@ -51,6 +54,9 @@ class MaterialController extends BaseController
     protected $bsModel;
     protected $BsMesinModel;
     protected $areaModel;
+    protected $stockArea;
+    protected $supermarketModel;
+    protected $outArea;
 
     public function __construct()
     {
@@ -73,6 +79,9 @@ class MaterialController extends BaseController
         $this->bsModel = new BsModel();
         $this->BsMesinModel = new BsMesinModel();
         $this->areaModel = new AreaModel();
+        $this->stockArea = new StockAreaModel();
+        $this->supermarketModel = new SupermarketModel();
+        $this->outArea = new OutArea();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -2773,6 +2782,17 @@ class MaterialController extends BaseController
     }
     public function stockarea($area)
     {
+        $stock = $this->stockArea->getStock($area);
+        $kapasitas = $this->supermarketModel->getKapasitas($area)['kapasitas'] ?? 0;
+        $terisi = 0;
+        if (!empty($stock)) {
+            foreach ($stock as $st) {
+                $terisi += (float) ($st['kgs_in_out'] ?? 0);
+            }
+        }
+
+        $sisaKapasitas = $kapasitas - $terisi;
+        // dd($stock);
         $data = [
             'role' => session()->get('role'),
             'title' => 'Stock Supermarket',
@@ -2782,9 +2802,71 @@ class MaterialController extends BaseController
             'targetProd' => 0,
             'produksiBulan' => 0,
             'produksiHari' => 0,
-            'area' => $area
+            'area' => $area,
+            'stock' => $stock,
+            'kapasitas' => $kapasitas,
+            'terisi' => $terisi,
+            'sisaKapasitas' => $sisaKapasitas
         ];
 
         return view(session()->get('role') . '/Material/stockarea', $data);
+    }
+    public function outStock()
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setStatusCode(400)->setJSON(['success' => false, 'message' => 'Invalid request']);
+        }
+
+        $idStock = $this->request->getPost('idStock');
+        $cnsOut  = (float) $this->request->getPost('cns');
+        $kgOut   = (float) $this->request->getPost('kg');
+
+        if (!$idStock || $cnsOut <= 0) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Data tidak valid']);
+        }
+
+        // ambil stok sekarang untuk validasi
+        $row = $this->stockArea->find($idStock);
+        if (!$row) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Stock tidak ditemukan']);
+        }
+
+        // validasi tidak boleh melebihi stok
+        $currentCns = (float) ($row['cns_in_out'] ?? 0);
+        if ($cnsOut > $currentCns) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Jumlah melebihi stok saat ini']);
+        }
+
+        // lakukan update dalam transaction
+        $db = \Config\Database::connect();
+        $db->transStart();
+        $dataInsert = [
+            'id_stock_area' => $idStock,
+            'kg_out' => $kgOut,
+            'cns_out' => $cnsOut,
+            'admin' => session()->get('username')
+        ];
+        $insert = $this->outArea->insert($dataInsert);
+        if (!$insert) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Gagal Mengeluarkan barang']);
+        }
+        $ok = $this->stockArea->decreaseStock($idStock, $cnsOut, $kgOut);
+
+        if ($db->transStatus() === false || !$ok) {
+            $db->transRollback();
+            return $this->response->setJSON(['success' => false, 'message' => 'Gagal update database']);
+        }
+
+        $db->transComplete();
+
+        // ambil data terbaru (sesuaikan area/filternya kalau perlu)
+        // asumsikan ada method getStock(area) — sesuaikan argumen area sesuai flow aplikasi
+        $area = $this->request->getPost('area') ?? null;
+        $stock = $this->stockArea->getStock($area);
+        $role = session()->get('role');
+        // render partial view sebagai HTML
+        $html = view($role . '/Material/partials/stock_result', ['stock' => $stock, 'role' => $role, 'area' => $area]);
+
+        return $this->response->setJSON(['success' => true, 'message' => 'Berhasil', 'html' => $html]);
     }
 }

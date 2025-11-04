@@ -14,6 +14,7 @@ use App\Models\LiburModel;
 use App\Models\DeffectModel;
 use App\Models\BsModel;
 use App\Models\BsMesinModel;
+use App\Models\PerbaikanAreaModel;
 
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Week;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -32,6 +33,7 @@ class DeffectController extends BaseController
     protected $deffectModel;
     protected $BsModel;
     protected $BsMesinModel;
+    protected $perbaikanModel;
     protected $db;
 
 
@@ -48,6 +50,7 @@ class DeffectController extends BaseController
         $this->liburModel = new LiburModel();
         $this->BsModel = new BsModel();
         $this->BsMesinModel = new BsMesinModel();
+        $this->perbaikanModel = new PerbaikanAreaModel();
 
         if ($this->filters   = ['role' => ['capaciity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -85,6 +88,31 @@ class DeffectController extends BaseController
             //'databs' => $databs
         ];
         return view(session()->get('role') . '/Deffect/databs', $data);
+    }
+    public function perbaikanArea()
+    {
+
+        $master = $this->deffectModel->findAll();
+        //$databs = $this->BsModel->getDataBs();
+        $dataBuyer = $this->orderModel->getBuyer();
+
+
+        $data = [
+            'role' => session()->get('role'),
+            'title' => session()->get('role') . ' System',
+            'active1' => 'active',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'kode' => $master,
+            'dataBuyer' => $dataBuyer,
+
+            //'databs' => $databs
+        ];
+        return view(session()->get('role') . '/Perbaikan/perbaikan', $data);
     }
     public function inputKode()
     {
@@ -239,5 +267,49 @@ class DeffectController extends BaseController
         } catch (\Exception $e) {
             return $this->response->setJSON(['error' => $e->getMessage()]);
         }
+    }
+    public function viewPerbaikan()
+    {
+        $master = $this->deffectModel->findAll();
+        $dataBuyer = $this->orderModel->getBuyer();
+
+        $awal = $this->request->getPost('awal');
+        $akhir = $this->request->getPost('akhir');
+        $pdk = $this->request->getPost('pdk');
+        $area = $this->request->getPost('area');
+        $buyer = $this->request->getPost('buyer');
+        // dd($buyer);
+        $theData = [
+            'awal' => $awal,
+            'akhir' => $akhir,
+            'pdk' => $pdk,
+            'area' => $area,
+            'buyer' => $buyer,
+        ];
+        $getData = $this->perbaikanModel->getDataPerbaikanFilter($theData);
+        $total = $this->perbaikanModel->totalPerbaikan($theData);
+        $chartData = $this->perbaikanModel->chartData($theData);
+        $data = [
+            'role' => session()->get('role'),
+            'title' => ' Data Perbaikan',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'kode' => $master,
+            'databs' => $getData,
+            'awal' => $awal,
+            'akhir' => $akhir,
+            'pdk' => $pdk,
+            'area' => $area,
+            'totalbs' => $total,
+            'chart' => $chartData,
+            'dataBuyer' => $dataBuyer,
+        ];
+
+        return view(session()->get('role') . '/Perbaikan/tabelperbaikan', $data);
     }
 }
