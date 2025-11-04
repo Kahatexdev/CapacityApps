@@ -169,6 +169,55 @@ class OrderController extends BaseController
 
         $data = array_slice($tampilperdelivery, $start, $length);
 
+        // 🔹 3. Ambil semua no_model unik dari hasil data
+        $models = array_unique(array_column($data, 'no_model'));
+
+        // 🔹 4. Hanya panggil API kalau memang ada model
+        if (!empty($models)) {
+            // 🔹 Siapkan body JSON
+            $postData = json_encode(['models' => $models]);
+
+            // 🔹 Siapkan konfigurasi untuk file_get_contents (POST JSON)
+            $options = [
+                'http' => [
+                    'method'  => 'POST',
+                    'header'  => "Content-Type: application/json\r\n",
+                    'content' => $postData,
+                    'timeout' => 10 // batas waktu 10 detik
+                ]
+            ];
+
+            $context = stream_context_create($options);
+
+            // 🔹 URL API target
+            $url = 'http://172.23.44.14/MaterialSystem/public/api/getTglScheduleBulk';
+
+            // 🔹 Eksekusi request ke API
+            $response = @file_get_contents($url, false, $context);
+
+            // 🔹 Logging untuk debug
+            // log_message('debug', "API Request to: {$url}");
+            // log_message('debug', "API Request Body: {$postData}");
+            log_message('debug', "API Response: {$response}");
+
+            // 🔹 Decode hasil response jadi array asosiatif
+            $scheduleMap = json_decode($response, true);
+
+            // Kalau array numerik, ubah jadi associative pakai no_model
+            if (is_array($scheduleMap) && array_is_list($scheduleMap) && isset($scheduleMap[0]['no_model'])) {
+                $scheduleMap = array_column($scheduleMap, null, 'no_model');
+            }
+
+            log_message('debug', 'scheduleMap isi setelah normalisasi: ' . json_encode($scheduleMap, JSON_PRETTY_PRINT));
+
+            foreach ($data as &$row) {
+                $noModel = $row->no_model ?? null;
+                $tglSchedule = $scheduleMap[$noModel]['tgl_schedule'] ?? null;
+                log_message('debug', "✅ schedule untuk {$noModel}: " . json_encode($tglSchedule));
+                $row->tgl_schedule = $tglSchedule;
+            }
+        }
+
         $recordsTotal = count($tampilperdelivery);
         $recordsFiltered = $recordsTotal;
 
