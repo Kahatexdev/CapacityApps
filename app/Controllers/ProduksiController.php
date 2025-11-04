@@ -15,6 +15,7 @@ use DateTime;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\BsModel;
 use App\Models\BsMesinModel;
+use App\Models\PerbaikanAreaModel;
 use CodeIgniter\Controller;
 use PhpParser\Node\Stmt\Else_;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -31,6 +32,7 @@ class ProduksiController extends BaseController
     protected $liburModel;
     protected $BsModel;
     protected $bsMesinModel;
+    protected $perbaikanModel;
     protected $db;
 
     public function __construct()
@@ -45,6 +47,7 @@ class ProduksiController extends BaseController
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         $this->BsModel = new BsModel();
         $this->bsMesinModel = new BsMesinModel();
+        $this->perbaikanModel = new PerbaikanAreaModel();
 
         if ($this->filters   = ['role' => [session()->get('role') . ''], 'role' => ['user'], 'role' => ['planning']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -1795,5 +1798,124 @@ class ProduksiController extends BaseController
 
         return redirect()->to(base_url(session()->get('role') . '/bsmesin'))
             ->with('success', 'Data BS Mesin berhasil diimpor (optimized).');
+    }
+    public function importPerbaikanArea()
+    {
+        $file = $this->request->getFile('excel_file');
+        ini_set('memory_limit', '512M');
+        set_time_limit(180);
+
+        $file = $this->request->getFile('excel_file');
+        if ($file->isValid() && !$file->hasMoved()) {
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
+            $worksheet = $spreadsheet->getActiveSheet();
+
+            $startRow = 18; // Ganti dengan nomor baris mulai
+            $batchSize = 100; // Ukuran batch
+            $batchData = [];
+            $failedRows = []; // Array untuk menyimpan informasi baris yang gagal
+            $db = \Config\Database::connect();
+
+            foreach ($worksheet->getRowIterator($startRow) as $row) {
+                $rowIndex = $row->getRowIndex();
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+                $data = ['role' => session()->get('role'),];
+                foreach ($cellIterator as $cell) {
+                    $data[] = $cell->getValue();
+                }
+
+                if (!empty($data)) {
+                    $batchData[] = ['rowIndex' => $rowIndex, 'data' => $data];
+                    // Process batch
+                    if (count($batchData) >= $batchSize) {
+                        $this->prossesPerbaikan($batchData, $db, $failedRows);
+                        $batchData = []; // Reset batch data
+                    }
+                }
+            }
+
+            // Process any remaining data
+            if (!empty($batchData)) {
+                $this->prossesPerbaikan($batchData, $db, $failedRows);
+            }
+
+            // Prepare notification message for failed rows
+            if (!empty($failedRows)) {
+                $failedRowsStr = implode(', ', $failedRows);
+                $errorMessage = "Baris berikut gagal diimpor: $failedRowsStr";
+                return redirect()->to(base_url(session()->get('role') . '/Perbaikan/perbaikan'))->with('error', $errorMessage);
+            }
+
+            return redirect()->to(base_url(session()->get('role') . '/Perbaikan/perbaikan'))->withInput()->with('success', 'Data Berhasil di Import');
+        } else {
+            return redirect()->to(base_url(session()->get('role') . '/Perbaikan/perbaikan'))->with('error', 'No data found in the Excel file');
+        }
+    }
+    private function prossesPerbaikan($batchData, $db, &$failedRows)
+    {
+        $db->transStart();
+        foreach ($batchData as $batchItem) {
+            $rowIndex = $batchItem['rowIndex'];
+            $data = $batchItem['data'];
+
+            try {
+                $no_model = $data[21];
+                $style = $data[4];
+                $area = $data[26];
+                $validate = [
+                    'no_model' => $no_model,
+                    'style' => $style,
+                    'area' => $area,
+                ];
+                $idAps = $this->ApsPerstyleModel->getIdForBs($validate);
+                if (!$idAps) {
+                    if ($data[0] == null) {
+                        break; // Skip empty rows
+                    } else {
+                        $failedRows[] = "style tidak ditemukan " . $rowIndex;
+                        continue;
+                    }
+                } else {
+                    $id = $idAps['idapsperstyle'];
+                    $sisaOrder = $idAps['sisa'];
+                    $qtyOrder = $idAps['qty'];
+                    $qtyerp = $data[12];
+                    $qty = str_replace('-', '', $qtyerp);
+                    $sisaQty = $sisaOrder + $qty;
+                    $tgl = $data[1];
+                    $date = new DateTime($tgl);
+                    $tglprod = $date->format('Y-m-d');
+                    $kodeDeffect =  substr($data[29] ?? '16A', 0, 3);
+
+                    // $strReplace = str_replace('.', '-', $tglprod);
+                    // $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
+
+
+                    $datainsert = [
+                        'tgl_perbaikan' => $tglprod,
+                        'idapsperstyle' => $id,
+                        'area' => $area,
+                        'no_label' => $data[22],
+                        'no_box' => $data[23],
+                        'qty' => $qty,
+                        'kode_deffect' => $kodeDeffect,
+
+                    ];
+                    $insert = $this->perbaikanModel->insert($datainsert);
+                    if ($insert) {
+
+                        continue;
+                    } else {
+
+                        $failedRows[] = "baris " . $rowIndex . "gagal Insert data, ada kolom yang kosong";
+                        continue;
+                    }
+                }
+            } catch (\Exception $e) {
+                $failedRows[] = $rowIndex;
+            }
+        }
+        $db->transComplete();
     }
 }
