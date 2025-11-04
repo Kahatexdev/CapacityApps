@@ -601,6 +601,7 @@ class ReturController extends BaseController
             $listRetur = [];
             $material  = [];
             $kirim     = [];
+            $poPlus     = [];
         }
 
         $data = [
@@ -629,9 +630,10 @@ class ReturController extends BaseController
         $listRetur = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area . '?noModel=' . $noModel . '&tglBuat=' . $tglBuat;
         $res = file_get_contents($listRetur);
         $list = json_decode($res, true);
+        $listRetur = $list['listRetur'] ?? [];
         // Kalau request-nya AJAX, _return_ JSON langsung
         if ($this->request->isAJAX()) {
-            return $this->response->setJSON($list);
+            return $this->response->setJSON($listRetur);
         }
 
         $data = [
@@ -646,7 +648,7 @@ class ReturController extends BaseController
             'active7' => '',
             'active8' => '',
             'area' => $area,
-            'list' => $list
+            'list' => $listRetur
         ];
         return view(session()->get('role') . '/listRetur', $data);
     }
