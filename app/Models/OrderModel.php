@@ -71,7 +71,8 @@ class OrderModel extends Model
                         data_model.repeat_from as repeat, 
                         ROUND(SUM(apsperstyle.qty/24), 0) AS qty, 
                         ROUND(SUM(apsperstyle.sisa/24), 0) AS sisa, 
-                        apsperstyle.delivery')
+                        apsperstyle.delivery,
+                        data_model.start_mc')
             // Joining the required tables
             ->join('apsperstyle', 'data_model.no_model = apsperstyle.mastermodel', 'left')
             ->join('master_product_type', 'data_model.id_product_type = master_product_type.id_product_type', 'left')

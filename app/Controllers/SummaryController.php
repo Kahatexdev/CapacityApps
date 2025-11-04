@@ -1263,12 +1263,12 @@ class SummaryController extends BaseController
             $sheet->setCellValue('M' . $rowHeader, 'MC');
             $sheet->setCellValue('N' . $rowHeader, 'START');
             $sheet->setCellValue('O' . $rowHeader, 'STOP');
-            $sheet->setCellValue('P' . $rowHeader, 'WARNA');
-            $sheet->setCellValue('Q' . $rowHeader, 'JENIS BENANG');
-            $sheet->setCellValue('R' . $rowHeader, 'KODE BENANG');
-            $sheet->setCellValue('S' . $rowHeader, 'PEMESANAN');
-            $sheet->setCellValue('T' . $rowHeader, 'LOT');
-            $sheet->setCellValue('U' . $rowHeader, 'QTY');
+            $sheet->setCellValue('R' . $rowHeader, 'WARNA');
+            $sheet->setCellValue('S' . $rowHeader, 'JENIS BENANG');
+            $sheet->setCellValue('T' . $rowHeader, 'KODE BENANG');
+            $sheet->setCellValue('U' . $rowHeader, 'PEMESANAN');
+            $sheet->setCellValue('V' . $rowHeader, 'LOT');
+            $sheet->setCellValue('W' . $rowHeader, 'QTY');
 
             // style header
             $sheet->getStyle('A' . $rowHeader)->applyFromArray($styleHeader);

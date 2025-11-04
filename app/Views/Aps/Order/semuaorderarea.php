@@ -82,6 +82,8 @@
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty (dz)</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Sisa (dz)</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Delivery</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">StartMc</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tgl Schedule</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Repeat</th>
                                         <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
                                     </tr>
@@ -279,7 +281,11 @@
                         "serverSide": true,
                         "ajax": {
                             url: '<?= base_url($role . '/tampilPerdelivery') ?>',
-                            type: 'POST'
+                            type: 'POST',
+                            dataSrc: function(json) {
+                                console.log("🧾 DataTables JSON diterima:", json);
+                                return json.data;
+                            }
                         },
                         "columns": [{
                                 "data": "created_at",
@@ -360,6 +366,58 @@
                                         return `${day}-${month}-${year}`;
                                     }
                                     return data;
+                                }
+                            },
+                            {
+                                "data": "start_mc",
+                                "render": function(data, type, row) {
+                                    if (!data) return data;
+
+                                    const startDate = new Date(data);
+                                    const day = ('0' + startDate.getDate()).slice(-2);
+                                    const month = startDate.toLocaleString('default', {
+                                        month: 'short'
+                                    });
+                                    const year = startDate.getFullYear();
+                                    const formatted = `${day}-${month}-${year}`;
+
+                                    // 🔹 Hitung selisih absolut hari antara start_mc dan tgl_schedule
+                                    if (row.tgl_schedule) {
+                                        const scheduleDate = new Date(row.tgl_schedule);
+                                        const diffDays = Math.abs((scheduleDate - startDate) / (1000 * 60 * 60 * 24));
+
+                                        if (diffDays < 7) {
+                                            return `<span style="color:red; font-weight:bold;" title="Jarak ${diffDays.toFixed(0)} hari">${formatted}</span>`;
+                                        }
+                                    }
+
+                                    return formatted;
+                                }
+                            },
+                            {
+                                "data": "tgl_schedule",
+                                "render": function(data, type, row) {
+                                    if (!data) return data;
+
+                                    const scheduleDate = new Date(data);
+                                    const day = ('0' + scheduleDate.getDate()).slice(-2);
+                                    const month = scheduleDate.toLocaleString('default', {
+                                        month: 'short'
+                                    });
+                                    const year = scheduleDate.getFullYear();
+                                    const formatted = `${day}-${month}-${year}`;
+
+                                    // 🔹 Hitung selisih absolut hari antara tgl_schedule dan start_mc
+                                    if (row.start_mc) {
+                                        const startDate = new Date(row.start_mc);
+                                        const diffDays = Math.abs((scheduleDate - startDate) / (1000 * 60 * 60 * 24));
+
+                                        if (diffDays < 7) {
+                                            return `<span style="color:red; font-weight:bold;" title="Jarak ${diffDays.toFixed(0)} hari">${formatted}</span>`;
+                                        }
+                                    }
+
+                                    return formatted;
                                 }
                             },
                             {
