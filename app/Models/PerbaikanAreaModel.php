@@ -42,26 +42,48 @@ class PerbaikanAreaModel extends Model
     protected $afterDelete    = [];
 
     public function getDataPerbaikanFilter($theData)
-    {
-        $this->select('apsperstyle.idapsperstyle, data_model.kd_buyer_order, apsperstyle.mastermodel, apsperstyle.size, perbaikan_area.*,sum(perbaikan_area.qty) as qty, master_deffect.Keterangan')
-            ->join('apsperstyle', 'apsperstyle.idapsperstyle = perbaikan_area.idapsperstyle')
-            ->join('master_deffect', 'master_deffect.kode_deffect = perbaikan_area.kode_deffect')
-            ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
-            ->where('tgl_perbaikan >=', $theData['awal'])
-            ->where('tgl_perbaikan <=', $theData['akhir']);
+{
+    $this->select('
+        apsperstyle.idapsperstyle,
+        data_model.kd_buyer_order,
+        apsperstyle.mastermodel,
+        apsperstyle.size,
+        perbaikan_area.tgl_perbaikan,
+        perbaikan_area.no_box,
+        perbaikan_area.no_label,
+        perbaikan_area.area,
+        perbaikan_area.kode_deffect,
+        master_deffect.Keterangan,
+        SUM(perbaikan_area.qty) AS qty
+    ')
+    ->join('apsperstyle', 'apsperstyle.idapsperstyle = perbaikan_area.idapsperstyle')
+    ->join('master_deffect', 'master_deffect.kode_deffect = perbaikan_area.kode_deffect')
+    ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
+    ->where('tgl_perbaikan >=', $theData['awal'])
+    ->where('tgl_perbaikan <=', $theData['akhir']);
 
-        if (!empty($theData['pdk'])) {
-            $this->where('apsperstyle.mastermodel', $theData['pdk']);
-        }
-        if (!empty($theData['area'])) {
-            $this->where('perbaikan_area.area', $theData['area']);
-        }
-        if (!empty($theData['buyer'])) {
-            $this->where('data_model.kd_buyer_order', $theData['buyer']);
-        }
+    if (!empty($theData['pdk'])) {
+        $this->where('apsperstyle.mastermodel', $theData['pdk']);
+    }
+    if (!empty($theData['area'])) {
+        $this->where('perbaikan_area.area', $theData['area']);
+    }
+    if (!empty($theData['buyer'])) {
+        $this->where('data_model.kd_buyer_order', $theData['buyer']);
+    }
 
-        $data = $this->groupBy('tgl_perbaikan, apsperstyle.size, perbaikan_area.kode_deffect')->findAll();
-        return $data;
+    $this->groupBy([
+        'perbaikan_area.tgl_perbaikan',
+        'perbaikan_area.no_box',
+        'perbaikan_area.no_label',
+        'perbaikan_area.area',
+        'apsperstyle.size',
+        'perbaikan_area.kode_deffect'
+    ]);
+
+    return $this->findAll();
+}
+
     }
     public function  totalPerbaikan($theData)
     {
