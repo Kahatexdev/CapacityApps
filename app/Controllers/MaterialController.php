@@ -2771,4 +2771,20 @@ class MaterialController extends BaseController
         ];
         return view(session()->get('role') . '/Material/report-kebutuhan-bb', $data);
     }
+    public function stockarea($area)
+    {
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Stock Supermarket',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'targetProd' => 0,
+            'produksiBulan' => 0,
+            'produksiHari' => 0,
+            'area' => $area
+        ];
+
+        return view(session()->get('role') . '/Material/stockarea', $data);
+    }
 }
