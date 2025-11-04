@@ -3603,6 +3603,7 @@ class ExcelController extends BaseController
             return $this->response->setJSON(["error" => "Gagal mengambil data dari API"]);
         }
         $data = json_decode($response, true);
+        $listRetur = $data['listRetur'] ?? [];
         if ($data === null) {
             log_message('error', "Gagal mendecode data dari API: $url");
             // return $this->response->setJSON(["error" => "Gagal mengolah data dari API"]);
@@ -3683,7 +3684,7 @@ class ExcelController extends BaseController
             $row = 4;
             $no = 1;
 
-            foreach ($data as $item) {
+            foreach ($listRetur as $item) {
                 $sheet->setCellValue('A' . $row, $no++);
                 $sheet->setCellValue('B' . $row, $item['tgl_retur']);
                 $sheet->setCellValue('C' . $row, $item['no_model']);
@@ -5769,7 +5770,7 @@ class ExcelController extends BaseController
         list($pdk, $factory) = explode('|', $selected);
 
         $data = $this->ApsPerstyleModel->getDataModel($factory, $pdk);
-        // dd($area, $pdk, $data);
+        // dd($factory, $pdk, $data);
         // Buat file Excel
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
