@@ -2811,10 +2811,17 @@ class MaterialController extends BaseController
 
         return view(session()->get('role') . '/Material/stockarea', $data);
     }
-    public function pemasukanStockArea($area)
+    public function inStock($area)
     {
-        $apiUrl = 'http://172.23.39.118/MaterialSystem/public/api/pengirimanGbnKeArea/$area';
-        $dataPengirimanGbn = @file_get_contents($apiUrl);
+        $tgl = $this->request->getGet('tgl');
+
+        $dataPengirimanGbn = [];
+
+        if ($tgl) {
+            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getListKirimArea/' . $area . '/' . $tgl;
+            $response = @file_get_contents($apiUrl);
+            $dataPengirimanGbn = json_decode($response, true) ?? [];
+        }
 
         $data = [
             'role' => session()->get('role'),
@@ -2825,7 +2832,9 @@ class MaterialController extends BaseController
             'targetProd' => 0,
             'produksiBulan' => 0,
             'produksiHari' => 0,
-            'area' => $area
+            'area' => $area,
+            'tgl' => $tgl,
+            'dataPengiriman' => $dataPengirimanGbn,
         ];
         return view(session()->get('role') . '/Material/pemasukanStockArea', $data);
     }
