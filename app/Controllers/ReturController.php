@@ -454,6 +454,7 @@ class ReturController extends BaseController
     public function listdataReturArea()
     {
         $area = $this->request->getGet('area') ?? '';
+        $tglRetur = $this->request->getGet('tgl_retur') ?? '';
 
         $areas = $this->areaModel->getArea();
         // Filter agar 'name' yang mengandung 'Gedung' tidak ikut
@@ -468,10 +469,21 @@ class ReturController extends BaseController
 
         // Kalau area dipilih, baru ambil data listRetur
         if (!empty($area)) {
-            $listRetur = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area;
-            $res = file_get_contents($listRetur);
-            if ($res !== false) {
-                $list = json_decode($res, true);
+            $listReturUrl = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area . '?tglBuat=' . $tglRetur;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $listReturUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            if ($httpCode === 200 && $response !== false) {
+                $list = json_decode($response, true);
+            } else {
+                log_message('error', "API listRetur gagal. URL: $listReturUrl | HTTP Code: $httpCode | Error: $error");
+                $list = []; // supaya tidak error di view
             }
         }
 
@@ -617,7 +629,8 @@ class ReturController extends BaseController
             'active8' => '',
             'area' => $area,
             'areas' => $result,
-            'list' => $listRetur
+            'list' => $listRetur,
+            'tglRetur' => $tglRetur
         ];
         return view(session()->get('role') . '/retur', $data);
     }

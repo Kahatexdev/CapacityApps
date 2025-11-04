@@ -50,7 +50,7 @@
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row d-flex align-items-center">
-                        <div class="col-10">
+                        <div class="col-8">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Material System</p>
                                 <h5 class="font-weight-bolder mb-0">
@@ -58,8 +58,11 @@
                                 </h5>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <form action="<?= base_url($role . '/retur') ?>" method="get" class="d-flex justify-content-end align-items-center gap-2">
+                        <div class="col-md-4">
+                            <form action="<?= base_url($role . '/retur') ?>" method="get" class="d-flex justify-content-end align-items-center gap-2" onsubmit="return validateFilter()">
+                                <label for="tgl_retur">Tgl Retur</label>
+                                <input type="date" class="form-control" name="tgl_retur" id="tgl_retur">
+                                <label for="area">Area</label>
                                 <select name="area" id="area" class="form-control">
                                     <option value="">Pilih Area</option>
                                     <?php foreach ($areas as $ar) : ?>
@@ -80,7 +83,7 @@
 
 
             <div class="d-flex align-items-center justify-content-between">
-                <h3 class="model-title mb-0">List Returan <?= $area ?></h3>
+                <h3 class="model-title mb-0">List Returan <?= $area ?> Tanggal <?= esc($tglRetur) ?></h3>
                 <div class="d-flex align-items-center gap-2">
                     <a href="<?= base_url($role . '/exportExcelRetur/' . $area) ?>" class="btn btn-success">
                         <i class="fas fa-file-excel"></i> Export Excel
@@ -96,7 +99,12 @@
                             <th class="text-center">No Model</th>
                             <th class="text-center">Item Type</th>
                             <th class="text-center">Kode Warna</th>
-                            <th class="text-center"> Warna</th>
+                            <th class="text-center">Warna</th>
+                            <th class="text-center">PO (Kg)</th>
+                            <th class="text-center">PO+ (Kg)</th>
+                            <th class="text-center">BS (Kg)</th>
+                            <th class="text-center">Kirim (Kg)</th>
+                            <th class="text-center">Pakai (Kg)</th>
                             <th class="text-center">Lot Retur</th>
                             <th class="text-center">KG Retur</th>
                             <th class="text-center">Kategori</th>
@@ -104,21 +112,43 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($list as $ls): ?>
+                        <?php if (empty($area) && empty($tglRetur)): ?>
+                            <!-- Sebelum filter -->
                             <tr>
-                                <td><?= $ls['tgl_retur'] ?></td>
-                                <td><?= $ls['no_model'] ?></td>
-                                <td><?= $ls['item_type'] ?></td>
-                                <td><?= $ls['kode_warna'] ?></td>
-                                <td><?= $ls['warna'] ?></td>
-                                <td><?= $ls['lot_retur'] ?></td>
-                                <td><?= $ls['kgs_retur'] ?></td>
-                                <td><?= $ls['kategori'] ?></td>
-                                <td><?= $ls['keterangan_gbn'] ?></td>
-
+                                <td colspan="14" class="text-center text-secondary fw-bold">
+                                    🟡 Silakan filter data terlebih dahulu untuk menampilkan daftar retur.
+                                </td>
                             </tr>
-                        <?php endforeach ?>
+                        <?php elseif (!empty($area) && !empty($tglRetur) && empty($list)): ?>
+                            <!-- Setelah filter tapi data kosong -->
+                            <tr>
+                                <td colspan="14" class="text-center text-danger fw-bold">
+                                    ❌ Data Retur area <?= esc($area) ?> &amp; Tgl retur <?= esc($tglRetur) ?> tidak ada!
+                                </td>
+                            </tr>
+                        <?php else: ?>
+                            <!-- Data ditemukan -->
+                            <?php foreach ($list as $ls): ?>
+                                <tr>
+                                    <td><?= $ls['tgl_retur'] ?></td>
+                                    <td><?= $ls['no_model'] ?></td>
+                                    <td><?= $ls['item_type'] ?></td>
+                                    <td><?= $ls['kode_warna'] ?></td>
+                                    <td><?= $ls['warna'] ?></td>
+                                    <td><?= round($ls['total_kg_po'] ?? 0, 2) ?></td>
+                                    <td><?= round($ls['ttl_tambahan_kg'] ?? 0, 2) ?></td>
+                                    <td><?= round(($ls['total_bs_mc_kg'] ?? 0) + ($ls['total_bs_st_kg'] ?? 0), 2) ?></td>
+                                    <td><?= round($ls['total_kgs_out'] ?? 0, 2) ?></td>
+                                    <td><?= round(($ls['total_kg_po'] ?? 0) + ($ls['total_bs_mc_kg'] ?? 0) + ($ls['total_bs_st_kg'] ?? 0) - ($ls['total_kgs_out'] ?? 0), 2) ?></td>
+                                    <td><?= $ls['lot_retur'] ?></td>
+                                    <td><?= $ls['kgs_retur'] ?></td>
+                                    <td><?= $ls['kategori'] ?></td>
+                                    <td><?= $ls['keterangan_gbn'] ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
+
                 </table>
             </div>
         </div>
@@ -136,12 +166,16 @@
     // Inisialisasi DataTables (pastikan plugin DataTables sudah disertakan)
     $(document).ready(function() {
         $('#dataTable').DataTable({
-            paging: true,
-            searching: true,
-            ordering: true,
-            info: true,
-            autoWidth: false,
-            responsive: true
+            if ($("#dataTableRetur tbody tr").length > 0) {
+                $('#dataTableRetur').DataTable({
+                    paging: true,
+                    searching: true,
+                    ordering: true,
+                    info: true,
+                    autoWidth: false,
+                    responsive: true
+                });
+            }
         });
         $('#dataTableRetur').DataTable({
             paging: true,
@@ -161,5 +195,26 @@
             $("#loading").fadeOut();
         });
     });
+
+    function validateFilter() {
+        const area = document.getElementById('area').value.trim();
+        const tgl = document.getElementById('tgl_retur').value.trim();
+
+        if (area === '' || tgl === '') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Filter Belum Lengkap!',
+                text: 'Silakan pilih Area dan Tanggal Retur terlebih dahulu.',
+                confirmButtonColor: '#17a2b8',
+                confirmButtonText: 'OK'
+            });
+            return false; // hentikan submit
+        }
+
+        // ✅ Tampilkan loading hanya kalau validasi lolos
+        $("#loading").fadeIn();
+        return true;
+    }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <?php $this->endSection(); ?>
