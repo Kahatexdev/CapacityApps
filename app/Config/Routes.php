@@ -910,6 +910,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
 
     $routes->get('stockarea/(:any)', 'MaterialController::stockarea/$1');
     $routes->get('pemasukanStockArea/(:any)', 'MaterialController::pemasukanStockArea/$1');
+    $routes->post('stockarea/outStock', 'MaterialController::outStock');
 
 
     //pph
@@ -1042,6 +1043,7 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
 
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
     $routes->get('bssetting', 'UserController::bssetting');
+
     $routes->post('importbssetting', 'ProduksiController::importbssetting');
     $routes->post('get-area', 'ProduksiController::getArea');
     $routes->post('get-size', 'ProduksiController::getSize');
@@ -1090,11 +1092,14 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
 
     // deffect
     $routes->get('datadeffect', 'DeffectController::datadeffect');
+    $routes->get('viewImportPerbaikan', 'UserController::perbaikanView');
     $routes->post('inputKode', 'DeffectController::inputKode');
     $routes->post('viewDataBs', 'DeffectController::viewDataBs');
     $routes->post('resetbspdk', 'DeffectController::resetbs');
     $routes->post('resetbsarea', 'DeffectController::resetbsarea');
-
+    $routes->get('perbaikanArea', 'DeffectController::perbaikanArea');
+    $routes->post('importperbaikanarea', 'ProduksiController::importPerbaikanArea');
+    $routes->post('viewPerbaikan', 'DeffectController::viewPerbaikan');
     //pluspacking
     $routes->get('viewModelPlusPacking/(:any)', 'ProduksiController::viewModelPlusPacking/$1');
     $routes->get('pluspacking', 'ProduksiController::pluspacking');
