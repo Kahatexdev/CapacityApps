@@ -95,7 +95,7 @@ class ReturController extends BaseController
         // Ambil hanya field 'name'
         $result = array_column($filteredArea, 'name');
 
-        $url = 'http://172.23.39.114/MaterialSystem/public/api/getKategoriRetur';
+        $url = 'http://172.23.44.14/MaterialSystem/public/api/getKategoriRetur';
 
         $response = file_get_contents($url);
         log_message('debug', "API Response: " . $response);
@@ -116,9 +116,10 @@ class ReturController extends BaseController
                 'tipe_kategori' => $item['tipe_kategori']
             ];
         }
-        $listRetur = 'http://172.23.39.114/MaterialSystem/public/api/listRetur/' . $area;
+        $listRetur = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area;
         $res = file_get_contents($listRetur);
         $list = json_decode($res, true);
+        $listRetur = $list['listRetur'] ?? [];
         $data = [
             'role' => session()->get('role'),
             'title' => 'Retur Bahan Baku',
@@ -133,7 +134,7 @@ class ReturController extends BaseController
             'area' => $area,
             'areas' => $result,
             'kategori' => $kategoriRetur,
-            'list' => $list
+            'list' => $listRetur
         ];
         return view(session()->get('role') . '/retur', $data);
     }
@@ -144,8 +145,8 @@ class ReturController extends BaseController
         $noModel = $this->request->getGet('model') ?? '';
 
 
-        $apiUrlPph = 'http://172.23.39.114/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
-        $apiUrlPengiriman = 'http://172.23.39.114/MaterialSystem/public/api/getPengirimanArea?noModel=' . urlencode($noModel);
+        $apiUrlPph = 'http://172.23.44.14/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
+        $apiUrlPengiriman = 'http://172.23.44.14/MaterialSystem/public/api/getPengirimanArea?noModel=' . urlencode($noModel);
 
         // Ambil data dari API PPH
         $responsePph = file_get_contents($apiUrlPph);
@@ -355,7 +356,7 @@ class ReturController extends BaseController
 
         // Ambil data material sekali
         try {
-            $materialUrl = 'http://172.23.39.114/MaterialSystem/public/api/cekMaterial/' . $postData['material'];
+            $materialUrl = 'http://172.23.44.14/MaterialSystem/public/api/cekMaterial/' . $postData['material'];
             $materialResponse = $client->get($materialUrl, ['headers' => ['Accept' => 'application/json']]);
             $materialData = json_decode($materialResponse->getBody(), true);
             if (!$materialData || !isset($materialData['item_type'])) {
@@ -399,7 +400,7 @@ class ReturController extends BaseController
             ];
 
             try {
-                $resp = $client->post('http://172.23.39.114/MaterialSystem/public/api/saveRetur', [
+                $resp = $client->post('http://172.23.44.14/MaterialSystem/public/api/saveRetur', [
                     'headers' => [
                         'Accept' => 'application/json',
                         'Content-Type' => 'application/json'
@@ -467,7 +468,7 @@ class ReturController extends BaseController
 
         // Kalau area dipilih, baru ambil data listRetur
         if (!empty($area)) {
-            $listRetur = 'http://172.23.39.114/MaterialSystem/public/api/listRetur/' . $area;
+            $listRetur = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area;
             $res = file_get_contents($listRetur);
             if ($res !== false) {
                 $list = json_decode($res, true);
@@ -478,6 +479,124 @@ class ReturController extends BaseController
             $listRetur = $list['listRetur'] ?? [];
             $material  = $list['material'] ?? [];
             $kirim     = $list['kirim'] ?? [];
+            $poPlus     = $list['poPlus'] ?? [];
+
+            // Siapkan list hasil hitungan per style
+            $qtyOrderList = [];
+            $kgPoList = [];
+            $bsMesinKgList = [];
+            $bsSettingKgList = [];
+
+            // mengambil data
+            foreach ($material as $item) {
+                $keyStyle = $item['no_model'] . '|' . $item['item_type'] . '|' . $item['kode_warna'] . '|' . $item['style_size'];
+                $style = $item['style_size'];
+                $noModel = $item['no_model'];
+
+                // --- Qty Order ---
+                $qty = $this->ApsPerstyleModel->getSisaPerSize($area, $noModel, [$style]);
+                $qty_order = is_array($qty) ? ($qty['qty'] ?? 0) : ($qty->qty ?? 0);
+                $qtyOrderList[$keyStyle] = $qty_order;
+
+                // --- Kg PO ---
+                $composition = (float)($item['composition'] ?? 0);
+                $gw = (float)($item['gw'] ?? 0);
+                $loss = (float)($item['loss'] ?? 0);
+                $kgPoList[$keyStyle] = ($qty_order * $composition * $gw / 100 / 1000) * (1 + ($loss / 100));
+
+                // --- BS MESIN ---
+                $bs = $this->BsMesinModel->getBsMesin($area, $noModel, [$style]);
+                $bsGram = is_array($bs) ? ($bs['bs_gram'] ?? 0) : ($bs->bs_gram ?? 0);
+                $bsMesinGrList[$keyStyle] = (float)$bsGram;
+                $bsMesinDzList[$keyStyle] = (float)$bsGram / $gw / 24;
+                $bsMesinKgList[$keyStyle] = (float)$bsGram / 1000;
+
+                // --- BS SETTING ---
+                $validate = [
+                    'area' => $area,
+                    'style' => $style,
+                    'no_model' => $noModel
+                ];
+                $idaps = $this->ApsPerstyleModel->getIdForBs($validate);
+                if (!is_array($idaps) || empty($idaps)) {
+                    $bsSettingList[$keyStyle] = 0;
+                } else {
+                    $bsSetting = $this->bsModel->getTotalBsSet($idaps);
+                    $bsPcs = is_array($bsSetting) ? ($bsSetting['qty'] ?? 0) : ($bsSetting->qty ?? 0);
+                    $bsSettingList[$keyStyle] = (float)$bsPcs;
+                    $bsSettingKgList[$keyStyle] = ($bsPcs * $composition * $gw / 100 / 1000);
+                }
+            }
+
+            // --- 1️⃣ Siapkan indeks untuk material berdasarkan 3 key ---
+            $materialIndex = [];
+            foreach ($material as $mat) {
+                $keyMaterial = $mat['no_model'] . '|' . $mat['item_type'] . '|' . $mat['kode_warna'];
+                $keyStyle = $mat['no_model'] . '|' . $mat['item_type'] . '|' . $mat['kode_warna'] . '|' . $mat['style_size'];
+                $materialIndex[$keyMaterial][] = [
+                    'style_size'  => $mat['style_size'],
+                    'composition' => $mat['composition'],
+                    'gw'          => $mat['gw'],
+                    'gw_aktual'   => $mat['gw_aktual'],
+                    'loss'        => $mat['loss'],
+                    'qty_order'    => $qtyOrderList[$keyStyle] ?? 0,
+                    'kg_po'        => $kgPoList[$keyStyle] ?? 0,
+                    'bs_mesin_kg'  => $bsMesinKgList[$keyStyle] ?? 0,
+                    'bs_setting_kg' => $bsSettingKgList[$keyStyle] ?? 0
+                ];
+            }
+
+            // --- 2️⃣ Siapkan indeks untuk kirim berdasarkan 3 key ---
+            $kirimIndex = [];
+            foreach ($kirim as $krm) {
+                $key = $krm['no_model'] . '|' . $krm['item_type'] . '|' . $krm['kode_warna'];
+                $kirimIndex[$key] = $krm['total_kgs_out'];
+            }
+
+            // --- 2️⃣ Siapkan indeks untuk kirim berdasarkan 3 key ---
+            $poPlusIndex = [];
+            foreach ($poPlus as $plus) {
+                $key = $plus['no_model'] . '|' . $plus['item_type'] . '|' . $plus['kode_warna'];
+                $poPlusIndex[$key] = $plus['ttl_tambahan_kg'];
+            }
+
+            // --- 3️⃣ Loop gabungkan data ke listRetur ---
+            foreach ($listRetur as &$retur) {
+                $noModel   = $retur['no_model']   ?? '';
+                $itemType  = $retur['item_type']  ?? '';
+                $kodeWarna = $retur['kode_warna'] ?? '';
+                $warna     = $retur['warna']      ?? '';
+
+                $keyMaterial = $noModel . '|' . $itemType . '|' . $kodeWarna;
+
+                // Default value
+                $retur['total_kgs_out'] = '';
+                $retur['detail'] = [];
+                $retur['total_qty_order'] = 0;
+                $retur['total_kg_po'] = 0;
+                $retur['total_bs_mc_kg'] = 0;
+                $retur['total_bs_st_kg'] = 0;
+
+                // Gabungkan data material (array detail)
+                if (isset($materialIndex[$keyMaterial])) {
+                    $retur['detail'] = $materialIndex[$keyMaterial];
+
+                    // 🔹 Hitung total
+                    foreach ($retur['detail'] as $d) {
+                        $retur['total_qty_order'] += $d['qty_order'] ?? 0;
+                        $retur['total_kg_po']     += $d['kg_po'] ?? 0;
+                        $retur['total_bs_mc_kg']  += $d['bs_mesin_kg'] ?? 0;
+                        $retur['total_bs_st_kg']  += $d['bs_setting_kg'] ?? 0;
+                    }
+                }
+
+                // Total kirim
+                $retur['total_kgs_out'] = $kirimIndex[$keyMaterial] ?? 0;
+            }
+            unset($retur);
+
+            // 🧾 Log hasil akhir listRetur (cek di writable/logs/)
+            log_message('debug', '=== HASIL GABUNGAN listRetur (with detail) === ' . print_r($listRetur, true));
         } else {
             $listRetur = [];
             $material  = [];
@@ -507,7 +626,7 @@ class ReturController extends BaseController
         $noModel = $this->request->getGet('noModel');
         $tglBuat = $this->request->getGet('tglBuat');
 
-        $listRetur = 'http://172.23.39.114/MaterialSystem/public/api/listRetur/' . $area . '?noModel=' . $noModel . '&tglBuat=' . $tglBuat;
+        $listRetur = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area . '?noModel=' . $noModel . '&tglBuat=' . $tglBuat;
         $res = file_get_contents($listRetur);
         $list = json_decode($res, true);
         // Kalau request-nya AJAX, _return_ JSON langsung

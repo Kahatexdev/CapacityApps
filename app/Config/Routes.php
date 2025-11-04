@@ -766,6 +766,8 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('warehouse/exportReportBenangBulanan', 'ExcelController::exportReportBenang');
     $routes->get('warehouse/reportKebutuhanBahanBaku', 'MaterialController::reportKebutuhanBahanBaku');
 
+
+
     //pph
     $routes->get('pph/(:any)', 'MaterialController::pph/$1');
     $routes->get('filterpph/(:any)', 'MaterialController::filterPph/$1');
@@ -905,6 +907,9 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('filterstockbahanbaku/(:any)', 'MaterialController::filterStockBahanBaku/$1');
     $routes->get('jatah_bahan_baku', 'MaterialController::jatahBahanBaku');
     $routes->get('export_excel_jatah_bb', 'ExcelController::exportExcelJatahNoModel');
+
+    $routes->get('stockarea/(:any)', 'MaterialController::stockarea/$1');
+
 
     //pph
     $routes->get('pph/(:any)', 'MaterialController::pph/$1');
