@@ -2790,7 +2790,7 @@ class MaterialController extends BaseController
                 $terisi += (float) ($st['kgs_in_out'] ?? 0);
             }
         }
-        $tgl = '2025-09-27';
+        $tgl = date('Y-m-d');
 
         $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/countKirimArea/' . $area . '/' . $tgl;
 
@@ -2827,7 +2827,7 @@ class MaterialController extends BaseController
     }
     public function inStock($area)
     {
-        $tgl = '2025-09-27';
+        $tgl = date('Y-m-d');
         // $tgl = $this->request->getGet('tgl') ?? date('Y-m-d');
 
         $dataPengirimanGbn = [];
