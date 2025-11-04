@@ -12,7 +12,7 @@ class StockAreaModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_pengeluaran', 'no_karung', 'no_model', 'item_type', 'kode_warna', 'warna', 'lot', 'kgs_in_out', 'cns_in_out', 'kgs_cns', 'admin', 'area'];
+    protected $allowedFields    = ['id_pengeluaran', 'no_karung', 'no_model', 'item_type', 'kode_warna', 'warna', 'lot', 'kgs_in_out', 'cns_in_out', 'kg_cns', 'admin', 'area'];
 
     protected bool $allowEmptyInserts = false;
 

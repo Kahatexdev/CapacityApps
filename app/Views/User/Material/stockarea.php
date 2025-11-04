@@ -121,8 +121,7 @@
                 <a href="<?= base_url($role . '/stockareaInStock/' . $area); ?>" class="btn btn-outline-info btn-sm position-relative">
                     Pemasukan
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        3
-                        <span class="visually-hidden">unread messages</span>
+                        <?= $notif ?>
                     </span>
                 </a>
             </div>
