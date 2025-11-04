@@ -1844,12 +1844,12 @@ class ProduksiController extends BaseController
             if (!empty($failedRows)) {
                 $failedRowsStr = implode(', ', $failedRows);
                 $errorMessage = "Baris berikut gagal diimpor: $failedRowsStr";
-                return redirect()->to(base_url(session()->get('role') . '/Perbaikan/perbaikan'))->with('error', $errorMessage);
+                return redirect()->to(base_url(session()->get('role') . '/perbaikanArea'))->with('error', $errorMessage);
             }
 
-            return redirect()->to(base_url(session()->get('role') . '/Perbaikan/perbaikan'))->withInput()->with('success', 'Data Berhasil di Import');
+            return redirect()->to(base_url(session()->get('role') . '/perbaikanArea'))->withInput()->with('success', 'Data Berhasil di Import');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/Perbaikan/perbaikan'))->with('error', 'No data found in the Excel file');
+            return redirect()->to(base_url(session()->get('role') . '/perbaikanArea'))->with('error', 'No data found in the Excel file');
         }
     }
     private function prossesPerbaikan($batchData, $db, &$failedRows)
