@@ -909,6 +909,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('export_excel_jatah_bb', 'ExcelController::exportExcelJatahNoModel');
 
     $routes->get('stockarea/(:any)', 'MaterialController::stockarea/$1');
+    $routes->get('pemasukanStockArea/(:any)', 'MaterialController::pemasukanStockArea/$1');
 
 
     //pph

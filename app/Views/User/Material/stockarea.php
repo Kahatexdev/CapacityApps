@@ -118,13 +118,13 @@
                 <h3 class="mb-4">Stock Supermarket <?= $area ?></h3>
             </div>
             <div class="col-md-6 text-end">
-                <button class="btn btn-outline-info btn-sm position-relative">
+                <a href="<?= base_url($role . '/pemasukanStockArea/' . $area); ?>" class="btn btn-outline-info btn-sm position-relative">
                     Pemasukan
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                         3
                         <span class="visually-hidden">unread messages</span>
                     </span>
-                </button>
+                </a>
             </div>
         </div>
         <div class="row align-items-center">

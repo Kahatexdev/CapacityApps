@@ -2787,4 +2787,22 @@ class MaterialController extends BaseController
 
         return view(session()->get('role') . '/Material/stockarea', $data);
     }
+    public function pemasukanStockArea($area)
+    {
+        $apiUrl = 'http://172.23.39.118/MaterialSystem/public/api/pengirimanGbnKeArea/$area';
+        $dataPengirimanGbn = @file_get_contents($apiUrl);
+
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Pemasukan Supermarket',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'targetProd' => 0,
+            'produksiBulan' => 0,
+            'produksiHari' => 0,
+            'area' => $area
+        ];
+        return view(session()->get('role') . '/Material/pemasukanStockArea', $data);
+    }
 }
