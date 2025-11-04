@@ -25,6 +25,7 @@ use App\Models\AreaModel;
 use App\Models\MesinPerStyle;
 use App\Models\StockAreaModel;
 use App\Models\SupermarketModel;
+use App\Models\OutArea;
 use App\Services\orderServices;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
@@ -55,6 +56,7 @@ class MaterialController extends BaseController
     protected $areaModel;
     protected $stockArea;
     protected $supermarketModel;
+    protected $outArea;
 
     public function __construct()
     {
@@ -79,6 +81,7 @@ class MaterialController extends BaseController
         $this->areaModel = new AreaModel();
         $this->stockArea = new StockAreaModel();
         $this->supermarketModel = new SupermarketModel();
+        $this->outArea = new OutArea();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -2837,7 +2840,16 @@ class MaterialController extends BaseController
         // lakukan update dalam transaction
         $db = \Config\Database::connect();
         $db->transStart();
-
+        $dataInsert = [
+            'id_stock_area' => $idStock,
+            'kg_out' => $kgOut,
+            'cns_out' => $cnsOut,
+            'admin' => session()->get('username')
+        ];
+        $insert = $this->outArea->insert($dataInsert);
+        if (!$insert) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Gagal Mengeluarkan barang']);
+        }
         $ok = $this->stockArea->decreaseStock($idStock, $cnsOut, $kgOut);
 
         if ($db->transStatus() === false || !$ok) {
