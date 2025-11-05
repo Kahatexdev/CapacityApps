@@ -162,35 +162,34 @@
     <p class="mt-2">Sedang memuat data...</p>
 </div>
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script type="text/javascript">
     // Inisialisasi DataTables (pastikan plugin DataTables sudah disertakan)
     $(document).ready(function() {
-        $('#dataTable').DataTable({
-            if ($("#dataTableRetur tbody tr").length > 0) {
-                $('#dataTableRetur').DataTable({
-                    paging: true,
-                    searching: true,
-                    ordering: true,
-                    info: true,
-                    autoWidth: false,
-                    responsive: true
-                });
-            }
-        });
-        $('#dataTableRetur').DataTable({
-            paging: true,
-            searching: true,
-            ordering: true,
-            info: true,
-            autoWidth: false,
-            responsive: true
-        });
-        // Saat form filter dikirim, tampilkan loader
+        const tableBody = $("#dataTableRetur tbody tr");
+
+        // ✅ Hanya aktifkan DataTables jika data benar-benar ada
+        const hasRealData = tableBody.length > 0 &&
+            !tableBody.first().find('td').text().includes('Silakan filter') &&
+            !tableBody.first().find('td').text().includes('tidak ada');
+
+        if (hasRealData) {
+            $('#dataTableRetur').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                responsive: true
+            });
+        }
+
+        // ❌ Hapus event fadeIn dari onsubmit (pindahkan ke validateFilter)
         $("form").on("submit", function() {
-            $("#loading").fadeIn();
+            // Jangan tampilkan loading di sini
         });
 
-        // Opsional: jika page sudah selesai load, sembunyikan loader
+        // ✅ Pastikan loading selalu mati ketika halaman selesai load
         $(window).on("load", function() {
             $("#loading").fadeOut();
         });
@@ -200,7 +199,11 @@
         const area = document.getElementById('area').value.trim();
         const tgl = document.getElementById('tgl_retur').value.trim();
 
+        // Jika area & tanggal kosong
         if (area === '' || tgl === '') {
+            // 🔒 Pastikan loading tidak muncul sama sekali
+            $("#loading").hide();
+
             Swal.fire({
                 icon: 'warning',
                 title: 'Filter Belum Lengkap!',
@@ -208,13 +211,13 @@
                 confirmButtonColor: '#17a2b8',
                 confirmButtonText: 'OK'
             });
+
             return false; // hentikan submit
         }
 
-        // ✅ Tampilkan loading hanya kalau validasi lolos
+        // ✅ Jika validasi lolos, baru tampilkan loading
         $("#loading").fadeIn();
         return true;
     }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <?php $this->endSection(); ?>
