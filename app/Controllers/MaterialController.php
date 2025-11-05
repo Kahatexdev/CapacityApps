@@ -2790,6 +2790,19 @@ class MaterialController extends BaseController
                 $terisi += (float) ($st['kgs_in_out'] ?? 0);
             }
         }
+        $tgl = date('Y-m-d');
+
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/countKirimArea/' . $area . '/' . $tgl;
+
+        // ambil data dari API
+        $response = @file_get_contents($apiUrl);
+        $countKirim = 0;
+
+        // kalau responsenya valid JSON dan punya key 'count'
+        if ($response !== false) {
+            $json = json_decode($response, true);
+            $countKirim = isset($json['count']) ? (int) $json['count'] : 0;
+        }
 
         $sisaKapasitas = $kapasitas - $terisi;
         // dd($stock);
@@ -2806,10 +2819,42 @@ class MaterialController extends BaseController
             'stock' => $stock,
             'kapasitas' => $kapasitas,
             'terisi' => $terisi,
-            'sisaKapasitas' => $sisaKapasitas
+            'sisaKapasitas' => $sisaKapasitas,
+            'notif' => $countKirim
         ];
 
         return view(session()->get('role') . '/Material/stockarea', $data);
+    }
+    public function inStock($area)
+    {
+        $tgl = date('Y-m-d');
+        // $tgl = $this->request->getGet('tgl') ?? date('Y-m-d');
+
+        $dataPengirimanGbn = [];
+
+        if ($tgl) {
+            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getListKirimArea/' . $area . '/' . $tgl;
+            $response = @file_get_contents($apiUrl);
+            $decoded = json_decode($response, true);
+
+            // Ambil hanya bagian 'data' kalau status success
+            $dataPengirimanGbn = $decoded['data'] ?? [];
+        }
+
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Pemasukan Supermarket',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'targetProd' => 0,
+            'produksiBulan' => 0,
+            'produksiHari' => 0,
+            'area' => $area,
+            'tgl' => $tgl,
+            'dataPengiriman' => $dataPengirimanGbn,
+        ];
+        return view(session()->get('role') . '/Material/inStockArea', $data);
     }
     public function outStock()
     {
@@ -2868,5 +2913,56 @@ class MaterialController extends BaseController
         $html = view($role . '/Material/partials/stock_result', ['stock' => $stock, 'role' => $role, 'area' => $area]);
 
         return $this->response->setJSON(['success' => true, 'message' => 'Berhasil', 'html' => $html]);
+    }
+    public function saveStock()
+    {
+        $cns = (float) $this->request->getPost('cns');
+        $kgs = (float) $this->request->getPost('kg');
+        $idPengeluaran = $this->request->getPost('id_pengeluaran');
+
+        // Hindari pembagian 0
+        $kgcns = ($cns > 0) ? ($kgs / $cns) : 0;
+
+        $data = [
+            'id_pengeluaran' => $idPengeluaran,
+            'no_karung'      => $this->request->getPost('no_karung'),
+            'area'           => $this->request->getPost('area'),
+            'no_model'       => $this->request->getPost('no_model'),
+            'item_type'      => $this->request->getPost('item_type'),
+            'lot'            => $this->request->getPost('lot_out'),
+            'kode_warna'     => $this->request->getPost('kode_warna'),
+            'warna'          => $this->request->getPost('warna'),
+            'cns_in_out'     => $cns,
+            'kgs_in_out'     => $kgs,
+            'kg_cns'         => $kgcns,
+            'created_at'     => date('Y-m-d H:i:s'),
+        ];
+
+        // Simpan ke DB terlebih dahulu
+        $this->stockArea->insert($data);
+
+        // Update status terima area di sistem material
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/updateTerimaArea/' . $idPengeluaran;
+
+        // Gunakan CURL biar bisa handle error
+        $ch = curl_init($apiUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        // Kalau API gagal (500 atau tidak ada response)
+        if ($httpCode !== 200) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Gagal update status ke sistem MaterialSystem.',
+                'api_code' => $httpCode,
+            ])->setStatusCode(500);
+        }
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Data berhasil diterima area dan status diperbarui.',
+        ]);
     }
 }
