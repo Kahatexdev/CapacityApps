@@ -195,8 +195,7 @@
 
                                 <div class="row mt-2">
                                     <button type="submit"
-                                        class="btn btn-outline-info btn-sm"
-                                        <?= ($dt['cns_out'] == 0 ? 'disabled' : '') ?>>
+                                        class="btn btn-outline-info btn-sm">
                                         Terima
                                     </button>
                                 </div>
