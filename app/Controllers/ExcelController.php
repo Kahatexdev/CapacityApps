@@ -12583,7 +12583,7 @@ class ExcelController extends BaseController
             return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'message' => 'Curl error: ' . $error]);
         }
 
-        $result = json_decode($response, true);
+        $result = json_decode($response);
         if (!is_array($result)) {
             return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'message' => 'Data tidak valid dari API']);
         }
