@@ -189,7 +189,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label for="">Kg Terima:</label>
-                                        <input type="number" name="kg" class="form-control kg-out" value="<?= $dt['kgs_out']; ?>">
+                                        <input type="number" name="kg" class="form-control kg-out" value="<?= $dt['kgs_out']; ?>" readonly>
                                     </div>
                                 </div>
 
