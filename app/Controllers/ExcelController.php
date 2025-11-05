@@ -12618,7 +12618,7 @@ class ExcelController extends BaseController
 
         // === Isi Data mulai dari baris ke-3 === //
         $row = 4;
-        foreach ($filteredData as $data) {
+        foreach ($result as $data) {
             if ($data->Kgs != 0 || $data->KgsStockAwal != 0) {
                 $sheet->setCellValue('A' . $row, $data->nama_cluster);
                 $sheet->setCellValue('B' . $row, $data->no_model);
