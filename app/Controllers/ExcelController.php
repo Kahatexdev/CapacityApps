@@ -3737,7 +3737,7 @@ class ExcelController extends BaseController
         $tglTurunAkhir = $this->request->getPost('tgl_turun_order_akhir') ?? '';
         $awal = $this->request->getPost('awal');
         $akhir = $this->request->getPost('akhir');
-        // $yesterday = date('Y-m-d', strtotime('-2 day')); // DUA HARI KE BELAKANG
+        $yesterday = date('Y-m-d', strtotime('-2 day')); // DUA HARI KE BELAKANG
 
         $validate = [
             'buyer' => $buyer,
@@ -3818,21 +3818,21 @@ class ExcelController extends BaseController
         }
         unset($id);
 
-        // foreach ($data as &$id) {
-        //     $key = [
-        //         'model' => $id['mastermodel'],
-        //         'size' => $id['size'],
-        //         'delivery' => $id['delivery'],
-        //         'machinetypeid' => $id['machinetypeid'],
-        //         'area' => $id['factory'],
-        //         'yesterday' => $yesterday
-        //     ];
-        //     // get data jl mc
-        //     $mc = $this->produksiModel->getJlMcByModel($key);
+        foreach ($data as &$id) {
+            $key = [
+                'model' => $id['mastermodel'],
+                'size' => $id['size'],
+                'delivery' => $id['delivery'],
+                'machinetypeid' => $id['machinetypeid'],
+                'area' => $id['factory'],
+                'yesterday' => $yesterday
+            ];
+            // get data jl mc
+            $mc = $this->produksiModel->getJlMcByModel($key);
 
-        //     $id['jl_mc'] = $mc['jl_mc'] ?? '';
-        //     $id['qty_produksi'] = $mc['qty_produksi'] ?? '';
-        // }
+            $id['jl_mc'] = $mc['jl_mc'] ?? '';
+            $id['qty_produksi'] = $mc['qty_produksi'] ?? '';
+        }
         // dd($data);
         // Buat file Excel
         $spreadsheet = new Spreadsheet();
@@ -3910,6 +3910,7 @@ class ExcelController extends BaseController
         $sheet->setCellValue('W3', 'PO PLUS PACKING');
         $sheet->setCellValue('X3', 'COLOR');
         $sheet->setCellValue('Y3', 'DESCRIPTION');
+        $sheet->setCellValue('Z3', 'Actual JL MC');
         $sheet->getStyle('A3')->applyFromArray($styleHeader);
         $sheet->getStyle('B3')->applyFromArray($styleHeader);
         $sheet->getStyle('C3')->applyFromArray($styleHeader);
@@ -3935,6 +3936,7 @@ class ExcelController extends BaseController
         $sheet->getStyle('W3')->applyFromArray($styleHeader);
         $sheet->getStyle('X3')->applyFromArray($styleHeader);
         $sheet->getStyle('Y3')->applyFromArray($styleHeader);
+        $sheet->getStyle('Z3')->applyFromArray($styleHeader);
 
         // Tulis data mulai dari baris 2
         $row = 4;
@@ -3974,6 +3976,7 @@ class ExcelController extends BaseController
             $sheet->setCellValue('W' . $row, $item['po_plus']);
             $sheet->setCellValue('X' . $row, $item['color']);
             $sheet->setCellValue('Y' . $row, $item['description']);
+            $sheet->setCellValue('Z' . $row, $item['jl_mc']);
             // 
             $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
@@ -4000,6 +4003,7 @@ class ExcelController extends BaseController
             $sheet->getStyle('W' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('X' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('Y' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('Z' . $row)->applyFromArray($styleBody);
             $row++;
         }
 
