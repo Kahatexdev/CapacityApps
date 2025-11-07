@@ -932,8 +932,8 @@ class MaterialController extends BaseController
                 if ($gw == 0) {
                     $pph = 0;
                 } else {
-
-                    $pph = ((($bruto + ($bsMesin / $gw)) * $comp * $gw) / 100) / 1000;
+                    // $pph = ((($bruto + ($bsMesin / $gw)) * $comp * $gw) / 100) / 1000;
+                    $pph = ((($bruto * $comp * $gw) / 100) / 1000) + ($bsMesin / 1000 * $comp / 100);
                 }
 
                 $ttl_kebutuhan = ($prod['qty'] * $comp * $gw / 100 / 1000) + ($loss / 100 * ($prod['qty'] * $comp * $gw / 100 / 1000));
@@ -1088,7 +1088,8 @@ class MaterialController extends BaseController
                 if ($gw == 0) {
                     $pph = 0;
                 } else {
-                    $pph = ((($bruto + ($bsMesin / $gw)) * $comp * $gw) / 100) / 1000;
+                    // $pph = ((($bruto + ($bsMesin / $gw)) * $comp * $gw) / 100) / 1000;
+                    $pph = ((($bruto * $comp * $gw) / 100) / 1000) + ($bsMesin / 1000 * $comp / 100);
                 }
                 $ttl_kebutuhan = ($prod['qty'] * $comp * $gw / 100 / 1000) + ($loss / 100 * ($prod['qty'] * $comp * $gw / 100 / 1000));
 
@@ -1227,8 +1228,8 @@ class MaterialController extends BaseController
                     if ($gw == 0) {
                         $pph = 0;
                     } else {
-
-                        $pph = ((($bruto + ($bs_mesin / $gw)) * $comp * $gw) / 100) / 1000;
+                        // $pph = ((($bruto + ($bs_mesin / $gw)) * $comp * $gw) / 100) / 1000;
+                        $pph = ((($bruto * $comp * $gw) / 100) / 1000) + ($bs_mesin / 1000 * $comp / 100);
                     }
 
                     $pphInisial[] = [

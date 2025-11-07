@@ -625,4 +625,19 @@ class ProduksiModel extends Model
 
         return $builder->findAll();
     }
+
+    public function getAllProd($idAps)
+    {
+        if (empty($idAps)) return [];
+        $result = $this->select('idapsperstyle, SUM(qty_produksi) as qty_produksi')
+            ->whereIn('idapsperstyle', $idAps)
+            ->groupBy('idapsperstyle')
+            ->findAll();
+
+        $index = [];
+        foreach ($result as $r) {
+            $index[$r['idapsperstyle']] = $r['qty_produksi'];
+        }
+        return $index;
+    }
 }

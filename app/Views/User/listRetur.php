@@ -77,7 +77,7 @@
             <div class="d-flex align-items-center justify-content-end mb-3 d-none" id="exportButtons">
                 <div class="d-flex gap-2">
                     <!-- <button id="generatePdfBtn" class="btn btn-danger"><i class="fas fa-file-pdf" target="_blank"></i> Export PDF</button> -->
-                    <button id="generateExcelBtn" class="btn bg-gradient-success"><i class="fas fa-file-excel"></i> Export Excel</button>
+                    <button id="generateExcelBtn" class="btn bg-gradient-success"><i class="fas fa-file-excel"></i> Generate Form Retur</button>
                     <!-- <a id="exportExcelBtn" href="#" class="btn btn-success">
                         <i class="fas fa-file-excel"></i> Export Excel
                     </a> -->
