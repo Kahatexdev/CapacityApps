@@ -543,6 +543,8 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('warehouse/filterBenangBulanan', 'MaterialController::filterBenangBulanan');
     $routes->get('warehouse/exportReportBenangBulanan', 'ExcelController::exportReportBenang');
     $routes->get('warehouse/reportKebutuhanBahanBaku', 'MaterialController::reportKebutuhanBahanBaku');
+    $routes->get('exportMaterialPDK', 'ExcelController::exportMaterialPDK');
+
 
     //pph
     $routes->get('pph/(:any)', 'MaterialController::pph/$1');
