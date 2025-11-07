@@ -226,7 +226,7 @@ class BsMesinModel extends Model
                 $unique[$key] = $row;
             }
         }
-        
+
         $prod = new \App\Models\ProduksiModel();
         $dbs = new \App\Models\ApsPerstyleModel();
 
@@ -311,7 +311,7 @@ class BsMesinModel extends Model
 
         // filter tanggal        
         $builder->where('tanggal_produksi >=', $filters['awal'])
-                ->where('tanggal_produksi <=', $filters['akhir']);
+            ->where('tanggal_produksi <=', $filters['akhir']);
         // di model bsMesinByDate():
         // if (!empty($filters['awal']) && !empty($filters['akhir'])) {
         //     $builder->where('tanggal_produksi >=', $filters['awal'])
@@ -376,7 +376,7 @@ class BsMesinModel extends Model
         return $page->getResultArray();
     }
 
-    public function getBsMesinByProdandAps($tgl,$noMc,$area,$model,$size,$inisial)
+    public function getBsMesinByProdandAps($tgl, $noMc, $area, $model, $size, $inisial)
     {
         return $this->select('SUM(qty_pcs) AS qty_pcs, SUM(qty_gram) AS qty_gram')
             ->where('tanggal_produksi', $tgl)
@@ -386,5 +386,20 @@ class BsMesinModel extends Model
             ->where('size', $size)
             ->where('inisial', $inisial)
             ->first(); // Ambil satu hasil
+    }
+    public function getAllBsMesin($area, $noModels, $sizes)
+    {
+        $result = $this->select('no_model, size, SUM(qty_gram) as bs_gram')
+            ->where('area', $area)
+            ->whereIn('no_model', $noModels)
+            ->whereIn('size', $sizes)
+            ->groupBy('no_model, size')
+            ->findAll();
+
+        $index = [];
+        foreach ($result as $r) {
+            $index[$r['no_model'] . '|' . $r['size']] = $r['bs_gram'];
+        }
+        return $index;
     }
 }
