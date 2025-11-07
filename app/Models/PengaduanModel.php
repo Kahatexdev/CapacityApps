@@ -48,8 +48,8 @@ class PengaduanModel extends Model
         // dd($endDate,$startDate);
         return $this->where('target_role', $role)
             ->where('username', $username)
-            ->orWhere('created_at >=', $startDate)
-            ->where('created_at <=', $endDate)
+            ->Where('created_at >=', $startDate)
+            ->orwhere('created_at <=', $endDate)
             ->orderBy('updated_at', 'DESC')
             ->findAll();
     }
