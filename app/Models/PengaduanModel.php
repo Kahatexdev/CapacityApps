@@ -46,10 +46,10 @@ class PengaduanModel extends Model
         $endDate   = date('Y-m-d 23:59:59');                     // hari ini jam 23:59:59
         $startDate = date('Y-m-d 00:00:00', strtotime('-6 days')); // 7 hari lalu jam 00:00:00
         // dd($endDate,$startDate);
-        return $this->where('target_role', $role)
-            ->where('username', $username)
+        return $this->Where('target_role', $role)
+            ->orWhere('username', $username)
             ->Where('created_at >=', $startDate)
-            ->orwhere('created_at <=', $endDate)
+            ->where('created_at <=', $endDate)
             ->orderBy('updated_at', 'DESC')
             ->findAll();
     }
