@@ -317,6 +317,8 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('warehouse/filterBenangBulanan', 'MaterialController::filterBenangBulanan');
     $routes->get('warehouse/exportReportBenangBulanan', 'ExcelController::exportReportBenang');
     $routes->get('warehouse/reportKebutuhanBahanBaku', 'MaterialController::reportKebutuhanBahanBaku');
+    $routes->get('exportMaterialPDK', 'ExcelController::exportMaterialPDK');
+
 
     //pph
     $routes->get('pph/(:any)', 'MaterialController::pph/$1');
@@ -767,6 +769,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('warehouse/filterBenangBulanan', 'MaterialController::filterBenangBulanan');
     $routes->get('warehouse/exportReportBenangBulanan', 'ExcelController::exportReportBenang');
     $routes->get('warehouse/reportKebutuhanBahanBaku', 'MaterialController::reportKebutuhanBahanBaku');
+    $routes->get('exportMaterialPDK', 'ExcelController::exportMaterialPDK');
 
 
 
@@ -1370,6 +1373,8 @@ $routes->group('/followup', ['filter' => 'followup'], function ($routes) {
     $routes->get('warehouse/filterBenangBulanan', 'MaterialController::filterBenangBulanan');
     $routes->get('warehouse/exportReportBenangBulanan', 'ExcelController::exportReportBenang');
     $routes->get('warehouse/reportKebutuhanBahanBaku', 'MaterialController::reportKebutuhanBahanBaku');
+    $routes->get('exportMaterialPDK', 'ExcelController::exportMaterialPDK');
+
 
     //pph
     $routes->get('pph/(:any)', 'MaterialController::pph/$1');
