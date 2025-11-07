@@ -20,6 +20,12 @@
         position: static !important;
         z-index: auto !important;
     }
+
+    /* Pastikan baris terakhir tetap punya border bawah */
+    .table-bordered th,
+    .table-bordered td {
+        border: 1px solid #dee2e6 !important;
+    }
 </style>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -139,7 +145,7 @@
                                     <td><?= round($ls['ttl_tambahan_kg'] ?? 0, 2) ?></td>
                                     <td><?= round(($ls['total_bs_mc_kg'] ?? 0) + ($ls['total_bs_st_kg'] ?? 0), 2) ?></td>
                                     <td><?= round($ls['total_kgs_out'] ?? 0, 2) ?></td>
-                                    <td><?= round(($ls['total_kg_po'] ?? 0) + ($ls['total_bs_mc_kg'] ?? 0) + ($ls['total_bs_st_kg'] ?? 0) - ($ls['total_kgs_out'] ?? 0), 2) ?></td>
+                                    <td><?= round(($ls['total_prod_kg'] ?? 0) + ($ls['total_bs_mc_kg'] ?? 0), 2) ?></td>
                                     <td><?= $ls['lot_retur'] ?></td>
                                     <td><?= $ls['kgs_retur'] ?></td>
                                     <td><?= $ls['kategori'] ?></td>

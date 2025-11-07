@@ -247,4 +247,18 @@ class BsModel extends Model
 
         return $rows;
     }
+    public function getAllTotalBsSet($idAps)
+    {
+        if (empty($idAps)) return [];
+        $result = $this->select('idapsperstyle, SUM(qty) as qty')
+            ->whereIn('idapsperstyle', $idAps)
+            ->groupBy('idapsperstyle')
+            ->findAll();
+
+        $index = [];
+        foreach ($result as $r) {
+            $index[$r['idapsperstyle']] = $r['qty'];
+        }
+        return $index;
+    }
 }
