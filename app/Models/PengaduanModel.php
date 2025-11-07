@@ -44,11 +44,11 @@ class PengaduanModel extends Model
     {
         // 7 hari terakhir termasuk hari ini
         $endDate   = date('Y-m-d 23:59:59');                     // hari ini jam 23:59:59
-        $startDate = date('Y-m-d 00:00:00', strtotime('-7 days')); // 7 hari lalu jam 00:00:00
-
+        $startDate = date('Y-m-d 00:00:00', strtotime('-6 days')); // 7 hari lalu jam 00:00:00
+        // dd($endDate,$startDate);
         return $this->where('target_role', $role)
             ->where('username', $username)
-            ->where('created_at >=', $startDate)
+            ->orWhere('created_at >=', $startDate)
             ->where('created_at <=', $endDate)
             ->orderBy('updated_at', 'DESC')
             ->findAll();
