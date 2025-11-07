@@ -253,7 +253,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="jarum" class="col-form-label">Jarum</label>
-                                <select class="form-control" id="jarum" name="jarum" required>
+                                <select class="form-control" id="jarum" name="jarum">
                                     <option></option>
                                     <option value="13">13</option>
                                     <option value="84">84</option>
