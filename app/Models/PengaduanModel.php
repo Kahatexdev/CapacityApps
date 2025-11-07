@@ -40,13 +40,20 @@ class PengaduanModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getPengaduan($username, $role)
+    public function getPengaduan(string $username, string $role)
     {
-        return $this->Where('target_role', $role)
-            ->orWhere('username', $username)
+        // 7 hari terakhir termasuk hari ini
+        $endDate   = date('Y-m-d 23:59:59');                     // hari ini jam 23:59:59
+        $startDate = date('Y-m-d 00:00:00', strtotime('-7 days')); // 7 hari lalu jam 00:00:00
+
+        return $this->where('target_role', $role)
+            ->where('username', $username)
+            ->where('created_at >=', $startDate)
+            ->where('created_at <=', $endDate)
             ->orderBy('updated_at', 'DESC')
             ->findAll();
     }
+
     public function countNotif($role)
     {
         return $this->where('target_role', $role)
