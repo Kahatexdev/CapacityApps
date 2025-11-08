@@ -658,6 +658,7 @@ class OrderModel extends Model
         }
 
         return $this->groupBy('
+        apsperstyle.factory, 
         apsperstyle.machinetypeid, 
         data_model.no_model, 
         apsperstyle.size, 

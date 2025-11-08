@@ -2826,6 +2826,29 @@ class MaterialController extends BaseController
 
         return view(session()->get('role') . '/Material/stockarea', $data);
     }
+    public function stocksupermarket()
+    {
+        $uid = session()->get('id_user');
+        $area = $this->aksesModel->aksesData($uid);
+        $stock = $this->stockArea->dataSupermarket($area);
+
+        // dd($stock);
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Stock Supermarket',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'stock' => $stock,
+
+        ];
+
+        return view(session()->get('role') . '/Material/stockarea', $data);
+    }
     public function inStock($area)
     {
         $tgl = date('Y-m-d');

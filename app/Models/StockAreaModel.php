@@ -54,4 +54,23 @@ class StockAreaModel extends Model
             ->set('kgs_in_out', "kgs_in_out - " . (float)$kgOut, false)
             ->update();
     }
+    public function dataSupermarket($area)
+    {
+        // Pastikan $area selalu array (dan escape otomatis)
+        if (empty($area)) {
+            return []; // atau bisa return null, tergantung kebutuhan
+        }
+
+        $subquery = $this->db->table('apsperstyle')
+            ->select('mastermodel, MAX(delivery) as last_delivery')
+            ->groupBy('mastermodel');
+
+        // Query utama
+        return $this->select('stock_area.*, apsperstyle.delivery')
+            ->join('(' . $subquery->getCompiledSelect() . ') as latest_delivery', 'latest_delivery.mastermodel = stock_area.no_model', 'left')
+            ->join('apsperstyle', 'apsperstyle.mastermodel = stock_area.no_model AND apsperstyle.delivery = latest_delivery.last_delivery', 'left')
+            ->whereIn('stock_area.area', (array)$area)
+            ->where('stock_area.cns_in_out >', 0)
+            ->findAll();
+    }
 }

@@ -76,4 +76,11 @@ class TanggalPlanningModel extends Model
             ->where('id_est_qty', $id_est_qty)
             ->findAll();
     }
+    public function startMcBenang($id_save)
+    {
+        return $this->select('date')
+            ->where('id_detail_pln', $id_save)
+            ->orderBy('date', 'ASC')
+            ->first();
+    }
 }
