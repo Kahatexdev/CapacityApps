@@ -206,7 +206,8 @@
                         <div class="col-6 d-flex align-items-center text-end gap-2">
                             <input type="text" class="form-control" id="model" value="" placeholder="No Model">
                             <input type="text" class="form-control" id="filter" value="" placeholder="Kode Warna/Lot">
-                            <button id="filterButton" class="btn btn-info ms-2"><i class="fas fa-search"></i></button>
+                            <button id="filterButton" class="btn btn-info ms-2"><i class="fas fa-search"></i>Search</button>
+                            <button id="exportButton" class="btn btn-success"><i class="fas fa-file-excel"></i>Excel</button>
                         </div>
 
                     </div>
@@ -255,10 +256,32 @@
     const modelInput = document.getElementById('model');
     const filterInput = document.getElementById('filter');
     const filterButton = document.getElementById('filterButton');
+    const exportButton = document.getElementById('exportButton');
+
+
+    // Tombol EXPORT EXCEL
+    exportButton.addEventListener('click', function() {
+        let model = modelInput.value.trim();
+        let search = filterInput.value.trim();
+
+        if (!model) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian',
+                text: 'No Model harus diisi terlebih dahulu sebelum export Excel!'
+            });
+            return;
+        }
+
+        // arahkan ke route CI4: exportMaterialPDK?model=...&search=...
+        const url = `<?= base_url($role . '/exportMaterialPDK') ?>?model=${encodeURIComponent(model)}&search=${encodeURIComponent(search)}`;
+
+        // trigger download
+        window.location.href = url;
+    });
+
 
     // Aktifkan tombol saat field model tidak kosong
-
-
     filterButton.addEventListener('click', function() {
         let keyword = filterInput.value.trim();
         let model = modelInput.value.trim();
@@ -283,7 +306,6 @@
                 setTimeout(() => hideLoading(), 400); // jeda agar progress bar terlihat
             });
     });
-
 
 
     function displayData(data) {

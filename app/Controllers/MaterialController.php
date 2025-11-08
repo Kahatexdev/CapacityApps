@@ -932,8 +932,8 @@ class MaterialController extends BaseController
                 if ($gw == 0) {
                     $pph = 0;
                 } else {
-
-                    $pph = ((($bruto + ($bsMesin / $gw)) * $comp * $gw) / 100) / 1000;
+                    // $pph = ((($bruto + ($bsMesin / $gw)) * $comp * $gw) / 100) / 1000;
+                    $pph = ((($bruto * $comp * $gw) / 100) / 1000) + ($bsMesin / 1000 * $comp / 100);
                 }
 
                 $ttl_kebutuhan = ($prod['qty'] * $comp * $gw / 100 / 1000) + ($loss / 100 * ($prod['qty'] * $comp * $gw / 100 / 1000));
@@ -1088,7 +1088,8 @@ class MaterialController extends BaseController
                 if ($gw == 0) {
                     $pph = 0;
                 } else {
-                    $pph = ((($bruto + ($bsMesin / $gw)) * $comp * $gw) / 100) / 1000;
+                    // $pph = ((($bruto + ($bsMesin / $gw)) * $comp * $gw) / 100) / 1000;
+                    $pph = ((($bruto * $comp * $gw) / 100) / 1000) + ($bsMesin / 1000 * $comp / 100);
                 }
                 $ttl_kebutuhan = ($prod['qty'] * $comp * $gw / 100 / 1000) + ($loss / 100 * ($prod['qty'] * $comp * $gw / 100 / 1000));
 
@@ -1227,8 +1228,8 @@ class MaterialController extends BaseController
                     if ($gw == 0) {
                         $pph = 0;
                     } else {
-
-                        $pph = ((($bruto + ($bs_mesin / $gw)) * $comp * $gw) / 100) / 1000;
+                        // $pph = ((($bruto + ($bs_mesin / $gw)) * $comp * $gw) / 100) / 1000;
+                        $pph = ((($bruto * $comp * $gw) / 100) / 1000) + ($bs_mesin / 1000 * $comp / 100);
                     }
 
                     $pphInisial[] = [
@@ -2821,6 +2822,29 @@ class MaterialController extends BaseController
             'terisi' => $terisi,
             'sisaKapasitas' => $sisaKapasitas,
             'notif' => $countKirim
+        ];
+
+        return view(session()->get('role') . '/Material/stockarea', $data);
+    }
+    public function stocksupermarket()
+    {
+        $uid = session()->get('id_user');
+        $area = $this->aksesModel->aksesData($uid);
+        $stock = $this->stockArea->dataSupermarket($area);
+
+        // dd($stock);
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Stock Supermarket',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'stock' => $stock,
+
         ];
 
         return view(session()->get('role') . '/Material/stockarea', $data);

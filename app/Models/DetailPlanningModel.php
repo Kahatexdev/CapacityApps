@@ -12,12 +12,12 @@ class DetailPlanningModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_detail_pln', 'id_pln_mc', 'model', 'smv', 'jarum', 'status'];
+    protected $allowedFields    = ['id_detail_pln', 'id_pln_mc', 'model', 'smv', 'jarum', 'status', 'create_plan', 'updated_at'];
 
     protected bool $allowEmptyInserts = false;
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';

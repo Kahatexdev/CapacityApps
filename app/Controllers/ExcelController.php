@@ -25,7 +25,7 @@ use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Week;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\{Border, Alignment, Fill};
+use PhpOffice\PhpSpreadsheet\Style\{Border, Alignment, Fill, NumberFormat};
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use App\Models\EstSpkModel;
 use App\Models\BsModel;
@@ -3604,18 +3604,152 @@ class ExcelController extends BaseController
     public function exportExcelRetur($area)
     {
 
-        $url = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area;
-
-        $response = file_get_contents($url);
-        log_message('debug', "API Response: " . $response);
-        if ($response === FALSE) {
-            // log_message('error', "API tidak bisa diakses: $url");
-            return $this->response->setJSON(["error" => "Gagal mengambil data dari API"]);
+        if (empty($area)) {
+            $area = $this->request->getGet('area') ?? '';
         }
-        $data = json_decode($response, true);
-        $listRetur = $data['listRetur'] ?? [];
-        if ($data === null) {
-            log_message('error', "Gagal mendecode data dari API: $url");
+        $tglRetur = $this->request->getGet('tgl_retur') ?? '';
+        // dd($area, $tglRetur);
+        $list = [];
+
+        // Kalau area dipilih, baru ambil data listRetur
+        if (!empty($area)) {
+            $listReturUrl = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area . '?tglBuat=' . $tglRetur;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $listReturUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            if ($httpCode === 200 && $response !== false) {
+                $list = json_decode($response, true);
+            } else {
+                log_message('error', "API listRetur gagal. URL: $listReturUrl | HTTP Code: $httpCode | Error: $error");
+                $list = []; // supaya tidak error di view
+            }
+        }
+
+        if (!empty($list)) {
+            $listRetur = $list['listRetur'] ?? [];
+            $material  = $list['material'] ?? [];
+            $kirim     = $list['kirim'] ?? [];
+            $poPlus    = $list['poPlus'] ?? [];
+
+            if (!empty($material)) {
+                // 🔹 Ambil semua key untuk query massal
+                $noModels = array_unique(array_column($material, 'no_model'));
+                $sizes = array_unique(array_column($material, 'style_size'));
+
+                // 🔹 Query massal (1x per jenis data)
+                $qtyOrderList = $this->ApsPerstyleModel->getAllSisaPerSize($area, $noModels, $sizes);
+                $bsMesinList  = $this->BsMesinModel->getAllBsMesin($area, $noModels, $sizes);
+                $idApsList    = $this->ApsPerstyleModel->getAllIdForBs($area, $noModels, $sizes);
+
+                // ambil semua id aps
+                $allIds = [];
+                foreach ($idApsList as $arr) {
+                    foreach ($arr as $id) $allIds[] = $id;
+                }
+
+                $bsSettingAll = $this->bsModel->getAllTotalBsSet($allIds);
+                $prodAll      = $this->produksiModel->getAllProd($allIds);
+
+                // 🔹 Siapkan hasil kalkulasi
+                $materialIndex = [];
+                foreach ($material as $item) {
+                    $noModel = $item['no_model'];
+                    $style   = $item['style_size'];
+                    $keyBase = $noModel . '|' . $item['item_type'] . '|' . $item['kode_warna'];
+                    $keyQty  = $noModel . '|' . $style;
+
+                    $composition = (float)($item['composition'] ?? 0);
+                    $gw = (float)($item['gw'] ?? 0);
+                    $loss = (float)($item['loss'] ?? 0);
+
+                    // --- ambil hasil dari array index ---
+                    $qty_order = $qtyOrderList[$keyQty] ?? 0;
+                    $bsGram = $bsMesinList[$keyQty] ?? 0;
+                    $idaps = $idApsList[$keyQty] ?? [];
+
+                    // BS Setting
+                    $bsSettingPcs = 0;
+                    $prodPcs = 0;
+                    foreach ($idaps as $id) {
+                        $bsSettingPcs += $bsSettingAll[$id] ?? 0;
+                        $prodPcs += $prodAll[$id] ?? 0;
+                    }
+
+                    // hitung konversi
+                    $kgPo = ($qty_order * $composition * $gw / 100 / 1000) * (1 + ($loss / 100));
+                    $prodKg = ($prodPcs * $composition * $gw / 100 / 1000);
+                    $bsSettingKg = ($bsSettingPcs * $composition * $gw / 100 / 1000);
+                    $bsMesinKg = $bsGram / 1000 * $composition / 100;
+
+                    $materialIndex[$keyBase][] = [
+                        'style_size'   => $style,
+                        'composition'  => $composition,
+                        'gw'           => $gw,
+                        'gw_aktual'    => $item['gw_aktual'],
+                        'loss'         => $loss,
+                        'qty_order'    => $qty_order,
+                        'prod_kg'        => $prodKg,
+                        'kg_po'        => $kgPo,
+                        'bs_mesin_kg'  => $bsMesinKg,
+                        'bs_setting_kg' => $bsSettingKg
+                    ];
+                }
+
+                // 🔹 Index data kirim & po tambahan
+                $kirimIndex = [];
+                foreach ($kirim as $krm) {
+                    $key = $krm['no_model'] . '|' . $krm['item_type'] . '|' . $krm['kode_warna'];
+                    $kirimIndex[$key] = $krm['total_kgs_out'];
+                }
+
+                $poPlusIndex = [];
+                foreach ($poPlus as $plus) {
+                    $key = $plus['no_model'] . '|' . $plus['item_type'] . '|' . $plus['kode_warna'];
+                    $poPlusIndex[$key] = $plus['ttl_tambahan_kg'];
+                }
+
+                // 🔹 Gabungkan semua ke listRetur
+                foreach ($listRetur as &$retur) {
+                    $noModel   = $retur['no_model'] ?? '';
+                    $itemType  = $retur['item_type'] ?? '';
+                    $kodeWarna = $retur['kode_warna'] ?? '';
+
+                    $keyMaterial = $noModel . '|' . $itemType . '|' . $kodeWarna;
+
+                    $retur['detail'] = $materialIndex[$keyMaterial] ?? [];
+                    $retur['total_qty_order'] = 0;
+                    $retur['total_kg_po'] = 0;
+                    $retur['total_bs_mc_kg'] = 0;
+                    $retur['total_bs_st_kg'] = 0;
+                    $retur['total_prod_kg'] = 0;
+
+                    foreach ($retur['detail'] as $d) {
+                        $retur['total_qty_order'] += $d['qty_order'] ?? 0;
+                        $retur['total_kg_po']     += $d['kg_po'] ?? 0;
+                        $retur['total_bs_mc_kg']  += $d['bs_mesin_kg'] ?? 0;
+                        $retur['total_bs_st_kg']  += $d['bs_setting_kg'] ?? 0;
+                        $retur['total_prod_kg']  += $d['prod_kg'] ?? 0;
+                    }
+
+                    $retur['total_kgs_out'] = $kirimIndex[$keyMaterial] ?? 0;
+                    $retur['total_po_plus']  = $poPlusIndex[$keyMaterial] ?? 0;
+                }
+                unset($retur);
+
+                log_message('debug', '=== HASIL OPTIMIZED listRetur === ' . print_r($listRetur, true));
+            }
+        } else {
+            log_message('warning', "⚠️ Tidak ada data listRetur untuk area: $area dan tanggal: $tglRetur");
+            $listRetur = [];
+        }
+        if ($listRetur === null) {
+            log_message('error', "Gagal mendecode data dari API: $listReturUrl");
             // return $this->response->setJSON(["error" => "Gagal mengolah data dari API"]);
         } else {
             // Buat file Excel
@@ -3666,8 +3800,8 @@ class ExcelController extends BaseController
             ];
 
             $sheet->setCellValue('A1', 'LIST RETUR ' . $area);
-            $sheet->mergeCells('A1:H1');
-            $sheet->getStyle('A1:H1')->applyFromArray($styleTitle);
+            $sheet->mergeCells('A1:O1');
+            $sheet->getStyle('A1:O1')->applyFromArray($styleTitle);
             // Tulis header
             $sheet->setCellValue('A3', 'NO');
             $sheet->setCellValue('B3', 'TANGGAL RETUR');
@@ -3675,10 +3809,15 @@ class ExcelController extends BaseController
             $sheet->setCellValue('D3', 'ITEM TYPE');
             $sheet->setCellValue('E3', 'KODE WARNA');
             $sheet->setCellValue('F3', 'WARNA');
-            $sheet->setCellValue('G3', 'LOT RETUR');
-            $sheet->setCellValue('H3', 'KG RETUR');
-            $sheet->setCellValue('I3', 'KATEGORI');
-            $sheet->setCellValue('J3', 'KETERANGAN GBN');
+            $sheet->setCellValue('G3', 'PO (KG)');
+            $sheet->setCellValue('H3', 'PO+ (KG)');
+            $sheet->setCellValue('I3', 'BS (KG)');
+            $sheet->setCellValue('J3', 'KIRIM (KG)');
+            $sheet->setCellValue('K3', 'PAKAI (KG)');
+            $sheet->setCellValue('L3', 'LOT RETUR');
+            $sheet->setCellValue('M3', 'KG RETUR');
+            $sheet->setCellValue('N3', 'KATEGORI');
+            $sheet->setCellValue('O3', 'KETERANGAN GBN');
             $sheet->getStyle('A3')->applyFromArray($styleHeader);
             $sheet->getStyle('B3')->applyFromArray($styleHeader);
             $sheet->getStyle('C3')->applyFromArray($styleHeader);
@@ -3689,6 +3828,11 @@ class ExcelController extends BaseController
             $sheet->getStyle('H3')->applyFromArray($styleHeader);
             $sheet->getStyle('I3')->applyFromArray($styleHeader);
             $sheet->getStyle('J3')->applyFromArray($styleHeader);
+            $sheet->getStyle('K3')->applyFromArray($styleHeader);
+            $sheet->getStyle('L3')->applyFromArray($styleHeader);
+            $sheet->getStyle('M3')->applyFromArray($styleHeader);
+            $sheet->getStyle('N3')->applyFromArray($styleHeader);
+            $sheet->getStyle('O3')->applyFromArray($styleHeader);
 
             // Tulis data mulai dari baris 2
             $row = 4;
@@ -3701,10 +3845,15 @@ class ExcelController extends BaseController
                 $sheet->setCellValue('D' . $row, $item['item_type']);
                 $sheet->setCellValue('E' . $row, $item['kode_warna']);
                 $sheet->setCellValue('F' . $row, $item['warna']);
-                $sheet->setCellValue('G' . $row, $item['lot_retur']);
-                $sheet->setCellValue('H' . $row, $item['kgs_retur']);
-                $sheet->setCellValue('I' . $row, $item['kategori']);
-                $sheet->setCellValue('J' . $row, $item['keterangan_gbn']);
+                $sheet->setCellValue('G' . $row, round($item['total_kg_po'] ?? 0, 2));
+                $sheet->setCellValue('H' . $row, round($item['ttl_tambahan_kg'] ?? 0, 2));
+                $sheet->setCellValue('I' . $row, round(($item['total_bs_mc_kg'] ?? 0) + ($item['total_bs_st_kg'] ?? 0), 2));
+                $sheet->setCellValue('J' . $row, round($item['total_kgs_out'] ?? 0, 2));
+                $sheet->setCellValue('K' . $row, round(($item['total_prod_kg'] ?? 0) + ($item['total_bs_mc_kg'] ?? 0), 2));
+                $sheet->setCellValue('L' . $row, $item['lot_retur']);
+                $sheet->setCellValue('M' . $row, $item['kgs_retur']);
+                $sheet->setCellValue('N' . $row, $item['kategori']);
+                $sheet->setCellValue('O' . $row, $item['keterangan_gbn']);
                 $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
                 $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
                 $sheet->getStyle('C' . $row)->applyFromArray($styleBody);
@@ -3715,11 +3864,16 @@ class ExcelController extends BaseController
                 $sheet->getStyle('H' . $row)->applyFromArray($styleBody);
                 $sheet->getStyle('I' . $row)->applyFromArray($styleBody);
                 $sheet->getStyle('J' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('K' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('L' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('M' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('N' . $row)->applyFromArray($styleBody);
+                $sheet->getStyle('O' . $row)->applyFromArray($styleBody);
                 $row++;
             }
 
             // Set lebar kolom agar menyesuaikan isi
-            foreach (range('A', 'J') as $col) {
+            foreach (range('A', 'O') as $col) {
                 $sheet->getColumnDimension($col)->setAutoSize(true);
             }
 
@@ -12678,6 +12832,194 @@ class ExcelController extends BaseController
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
+    }
+
+    public function exportMaterialPDK()
+    {
+        $noModel = $this->request->getGet('model') ?? null;
+        $search  = $this->request->getGet('search') ?? null;
+
+        if (!empty($noModel)) {
+
+            $master = $this->orderModel->getStartMc($noModel);
+        } else {
+            $master = [
+                'kd_buyer_order' => '-',
+                'no_model'       => '-',
+                'delivery_awal'  => '-',  // MIN dari apsperstyle.delivery
+                'delivery_akhir' => '-',  // MAX dari apsperstyle.delivery
+                'start_mc'       => '-' // MIN dari tanggal_planning.start_mesin
+            ];
+        }
+        // 1. Ambil data dari API
+        $params = [
+            'model'  => $noModel ?? '',
+            'search' => $search ?? ''
+        ];
+
+        $apiUrl = 'http://172.23.44.16/MaterialSystem/public/api/statusbahanbaku/?' . http_build_query($params);
+        $json   = @file_get_contents($apiUrl);
+
+        if ($json === false) {
+            return redirect()->back()->with('error', 'Gagal mengambil data dari API.');
+        }
+
+        $report = json_decode($json, true) ?? [];
+        $master = $master ?? [];
+        $status = $report ?? [];
+        // dd($report,$master,$status);
+        // 2. Buat Spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet       = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Material PDK ' . $noModel);
+
+        // Set default font
+        $spreadsheet->getDefaultStyle()->getFont()
+            ->setName('Calibri')
+            ->setSize(10);
+
+        $row = 1;
+
+        // 3. Judul besar
+        $sheet->setCellValue('A' . $row, 'LAPORAN STATUS BAHAN BAKU - MATERIAL PDK ' . $report[0]['no_model']);
+        $sheet->mergeCells('A' . $row . ':N' . $row);
+        $sheet->getStyle('A' . $row . ':N' . $row)->getFont()
+            ->setBold(true)
+            ->setSize(14);
+        $sheet->getStyle('A' . $row . ':N' . $row)->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+            ->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getRowDimension($row)->setRowHeight(24);
+
+        $row++;
+
+        // 3a. Info cetak
+        $sheet->setCellValue('A' . $row, 'Tanggal Cetak');
+        $sheet->setCellValue('B' . $row, date('d-m-Y H:i'));
+        $row += 2; // jarak ke blok master
+
+        // 4. Header utama (info master)
+        $startInfoRow = $row;
+
+        $sheet->setCellValue('A' . $row, 'Buyer');
+        $sheet->setCellValue('B' . $row, $master['kd_buyer_order'] ?? '');
+        $row++;
+
+        $sheet->setCellValue('A' . $row, 'No Model');
+        $sheet->setCellValue('B' . $row, $master['no_model'] ?? '');
+        $row++;
+
+        $sheet->setCellValue('A' . $row, 'Delivery Awal');
+        $sheet->setCellValue('B' . $row, $master['delivery_awal'] ?? '');
+        $row++;
+
+        $sheet->setCellValue('A' . $row, 'Delivery Akhir');
+        $sheet->setCellValue('B' . $row, $master['delivery_akhir'] ?? '');
+        $row++;
+
+        $sheet->setCellValue('A' . $row, 'Start MC');
+        $sheet->setCellValue('B' . $row, $master['start_mc'] ?? '');
+        $row += 2; // jarak 1 baris ke tabel detail
+
+        // Styling blok info master
+        $sheet->getStyle('A' . $startInfoRow . ':A' . ($row - 2))->getFont()->setBold(true);
+        $sheet->getStyle('A' . $startInfoRow . ':A' . ($row - 2))->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $sheet->getColumnDimension('A')->setWidth(16);
+        $sheet->getColumnDimension('B')->setWidth(30);
+
+        // 5. Header tabel detail
+        $headerRow = $row;
+
+        $sheet->setCellValue('A' . $headerRow, 'Item Type');
+        $sheet->setCellValue('B' . $headerRow, 'Kode Warna');
+        $sheet->setCellValue('C' . $headerRow, 'Color');
+        $sheet->setCellValue('D' . $headerRow, 'Jenis');
+        $sheet->setCellValue('E' . $headerRow, 'Qty PO (Kg)');
+        $sheet->setCellValue('F' . $headerRow, 'Total PO Tambahan');
+        $sheet->setCellValue('G' . $headerRow, 'Kg Celup');
+        $sheet->setCellValue('H' . $headerRow, 'Kg Stock');
+        $sheet->setCellValue('I' . $headerRow, 'Lot Urut');
+        $sheet->setCellValue('J' . $headerRow, 'Lot Celup');
+        $sheet->setCellValue('K' . $headerRow, 'Tgl Schedule');
+        $sheet->setCellValue('L' . $headerRow, 'Last Status');
+        $sheet->setCellValue('M' . $headerRow, 'Keterangan');
+        $sheet->setCellValue('N' . $headerRow, 'Admin');
+
+        // Styling header tabel
+        $headerRange = 'A' . $headerRow . ':N' . $headerRow;
+        $sheet->getStyle($headerRange)->getFont()->setBold(true);
+        $sheet->getStyle($headerRange)->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+            ->setVertical(Alignment::VERTICAL_CENTER)
+            ->setWrapText(true);
+        $sheet->getRowDimension($headerRow)->setRowHeight(22);
+        $sheet->getStyle($headerRange)->getFill()->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFE2EFDA'); // hijau muda ala Excel
+
+        $row = $headerRow + 1;
+
+        // 6. Isi data detail
+        foreach ($status as $item) {
+            $sheet->setCellValue('A' . $row, $item['item_type'] ?? '');
+            $sheet->setCellValue('B' . $row, $item['kode_warna'] ?? '');
+            $sheet->setCellValue('C' . $row, $item['color'] ?? '');
+            $sheet->setCellValue('D' . $row, $item['jenis'] ?? '');
+
+            // qty_po, kg_celup, kg_stock, total_po_tambahan → numeric 2 desimal
+            $sheet->setCellValue('E' . $row, (float) ($item['qty_po'] ?? 0));
+            $sheet->setCellValue('F' . $row, (float) ($item['total_po_tambahan'] ?? 0));
+            $sheet->setCellValue('G' . $row, (float) ($item['kg_celup'] ?? 0));
+            $sheet->setCellValue('H' . $row, (float) ($item['kg_stock'] ?? 0));
+            $sheet->setCellValue('I' . $row, $item['lot_urut'] ?? '');
+            $sheet->setCellValue('J' . $row, $item['lot_celup'] ?? '');
+            $sheet->setCellValue('K' . $row, $item['tanggal_schedule'] ?? '');
+            $sheet->setCellValue('L' . $row, $item['last_status'] ?? '');
+            $sheet->setCellValue('M' . $row, $item['keterangan'] ?? '');
+            $sheet->setCellValue('N' . $row, $item['admin'] ?? '');
+
+            $row++;
+        }
+
+        $lastRow = max($row - 1, $headerRow);
+
+        // 7. Auto-size kolom
+        foreach (range('A', 'N') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // 8. Format angka 2 desimal untuk kolom KG
+        if ($lastRow > $headerRow) {
+            $sheet->getStyle('E' . ($headerRow + 1) . ':E' . $lastRow)
+                ->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_00);
+            $sheet->getStyle('F' . ($headerRow + 1) . ':F' . $lastRow)
+                ->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_00);
+            $sheet->getStyle('G' . ($headerRow + 1) . ':G' . $lastRow)
+                ->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_00);
+            $sheet->getStyle('H' . ($headerRow + 1) . ':H' . $lastRow)
+                ->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_00);
+        }
+
+        // 9. Border di area tabel
+        $tableRange = 'A' . $headerRow . ':N' . $lastRow;
+        $sheet->getStyle($tableRange)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+        // 10. Freeze header tabel
+        $sheet->freezePane('A' . ($headerRow + 1));
+
+        // 11. Output sebagai download
+        $fileName = 'Material_PDK_' . ($noModel ?? '-') . '.xlsx';
+
+        return $this->response
+            ->setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            ->setHeader('Content-Disposition', 'attachment;filename="' . $fileName . '"')
+            ->setHeader('Cache-Control', 'max-age=0')
+            ->setBody((function () use ($spreadsheet) {
+                ob_start();
+                $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+                $writer->save('php://output');
+                return ob_get_clean();
+            })());
     }
     public function exportExcelPerbaikan()
     {

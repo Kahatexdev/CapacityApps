@@ -1499,4 +1499,37 @@ class ApsPerstyleModel extends Model
 
         return $builder->findAll();
     }
+    public function getAllSisaPerSize($area, $noModels, $sizes)
+    {
+        $result = $this->select('factory, mastermodel as no_model, size, SUM(qty) as qty')
+            ->where('factory', $area)
+            ->whereIn('mastermodel', $noModels)
+            ->whereIn('size', $sizes)
+            ->where('qty >', 0)
+            ->groupBy('factory, mastermodel, size')
+            ->findAll();
+
+        // bikin index biar cepat diakses
+        $index = [];
+        foreach ($result as $r) {
+            $index[$r['no_model'] . '|' . $r['size']] = $r['qty'];
+        }
+        return $index;
+    }
+    public function getAllIdForBs($area, $noModels, $sizes)
+    {
+        $result = $this->select('idapsperstyle, mastermodel as no_model, size')
+            ->where('factory', $area)
+            ->whereIn('mastermodel', $noModels)
+            ->whereIn('size', $sizes)
+            ->where('qty >', 0)
+            ->orderBy('sisa', 'ASC')
+            ->findAll();
+
+        $index = [];
+        foreach ($result as $r) {
+            $index[$r['no_model'] . '|' . $r['size']][] = $r['idapsperstyle'];
+        }
+        return $index;
+    }
 }

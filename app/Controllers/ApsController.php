@@ -854,10 +854,7 @@ class ApsController extends BaseController
         $libur = $this->liburModel->findAll();
         $holidayDates = array_column($libur, 'tanggal');
 
-        $cekOrderModel = $this->orderModel->startMcBenang($model);
-        if (empty($cekOrderModel)) {
-            $this->orderModel->updateStartMc($model, $start);
-        }
+
         $dataestqty = [
             'id_detail_pln' => $id_save,
             'Est_qty' => $est,
@@ -935,6 +932,27 @@ class ApsController extends BaseController
         }
 
         if ($formattedDate) {
+            $startMC = $this->TanggalPlanningModel->startMcBenang($id_save);
+            if ($startMC) {
+                // dd($startMC);
+                $this->orderModel->updateStartMc($model, $startMC);
+            } else {
+                $this->orderModel->updateStartMc($model, $start);
+            }
+            $tanggal = date('Y-m-d H:i:s');
+            $cek = $this->DetailPlanningModel->find($id_save);
+
+            if (!empty($cek['create_plan'])) {
+                // Kalau sudah pernah dibuat, update timestamp
+                $this->DetailPlanningModel->update($id_save, [
+                    'updated_at' => $tanggal
+                ]);
+            } else {
+                // Kalau belum ada create_plan, set create_plan sekarang
+                $this->DetailPlanningModel->update($id_save, [
+                    'create_plan' => $tanggal
+                ]);
+            }
             return redirect()->to(base_url(session()->get('role') . '/planningpage/' . $id_save . '/' . $id_pln))->withInput()->with('success', 'Data Berhasil Disimpan');
         } else {
             return redirect()->to(base_url(session()->get('role') . '/planningpage/' . $id_save . '/' . $id_pln))->withInput()->with('error', 'Data Gagal Disimpan');

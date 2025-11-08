@@ -20,6 +20,12 @@
         position: static !important;
         z-index: auto !important;
     }
+
+    /* Pastikan baris terakhir tetap punya border bawah */
+    .table-bordered th,
+    .table-bordered td {
+        border: 1px solid #dee2e6 !important;
+    }
 </style>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
@@ -85,7 +91,7 @@
             <div class="d-flex align-items-center justify-content-between">
                 <h3 class="model-title mb-0">List Returan <?= $area ?> Tanggal <?= esc($tglRetur) ?></h3>
                 <div class="d-flex align-items-center gap-2">
-                    <a href="<?= base_url($role . '/exportExcelRetur/' . $area) ?>" class="btn btn-success">
+                    <a href="<?= base_url($role . '/exportExcelRetur/' . $area . '?tgl_retur=' . $tglRetur) ?>" class="btn btn-success">
                         <i class="fas fa-file-excel"></i> Export Excel
                     </a>
 
@@ -139,7 +145,7 @@
                                     <td><?= round($ls['ttl_tambahan_kg'] ?? 0, 2) ?></td>
                                     <td><?= round(($ls['total_bs_mc_kg'] ?? 0) + ($ls['total_bs_st_kg'] ?? 0), 2) ?></td>
                                     <td><?= round($ls['total_kgs_out'] ?? 0, 2) ?></td>
-                                    <td><?= round(($ls['total_kg_po'] ?? 0) + ($ls['total_bs_mc_kg'] ?? 0) + ($ls['total_bs_st_kg'] ?? 0) - ($ls['total_kgs_out'] ?? 0), 2) ?></td>
+                                    <td><?= round(($ls['total_prod_kg'] ?? 0) + ($ls['total_bs_mc_kg'] ?? 0), 2) ?></td>
                                     <td><?= $ls['lot_retur'] ?></td>
                                     <td><?= $ls['kgs_retur'] ?></td>
                                     <td><?= $ls['kategori'] ?></td>
