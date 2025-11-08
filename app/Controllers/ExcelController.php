@@ -35,10 +35,18 @@ use App\Models\MesinPerStyle;
 use App\Models\MesinPernomor;
 use App\Models\MachinesModel;
 use App\Models\PpsModel;/*  */
+use App\Models\PerbaikanAreaModel;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Chart\DataSeries;
+use PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues;
+use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
+use PhpOffice\PhpSpreadsheet\Chart\Legend;
+use PhpOffice\PhpSpreadsheet\Chart\Title;
+use PhpOffice\PhpSpreadsheet\Chart\Chart;
+use PhpOffice\PhpSpreadsheet\Chart\Layout;
 
 
 class ExcelController extends BaseController
@@ -68,6 +76,7 @@ class ExcelController extends BaseController
     protected $MesinPernomor;
     protected $machinesModel;
     protected $ppsModel;
+    protected $perbaikanAreaModel;
 
 
     public function __construct()
@@ -95,6 +104,7 @@ class ExcelController extends BaseController
         $this->MesinPernomor = new MesinPernomor();
         $this->machinesModel = new MachinesModel();
         $this->ppsModel = new PpsModel();
+        $this->perbaikanAreaModel = new PerbaikanAreaModel();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -12666,6 +12676,432 @@ class ExcelController extends BaseController
         header('Cache-Control: max-age=0');
 
         $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+    public function exportExcelPerbaikan()
+    {
+        $awal  = $this->request->getPost('awal') ?? '';
+        $akhir = $this->request->getPost('akhir') ?? '';
+        $pdk   = $this->request->getPost('pdk') ?? '';
+        $area  = $this->request->getPost('area') ?? '';
+        $buyer = $this->request->getPost('buyer') ?? '';
+
+        $theData = [
+            'awal' => $awal,
+            'akhir' => $akhir,
+            'pdk' => $pdk,
+            'area' => $area,
+            'buyer' => $buyer,
+        ];
+        if (!$theData) {
+            return redirect()->back()->with('error', 'Tidak ada data untuk diexport!');
+        }
+
+        $getData = $this->perbaikanAreaModel->getDataPerbaikanFilter($theData);
+
+        // 1️⃣ GROUP BY AREA, KODE DEFFECT, DAN TANGGAL
+        $groupedData = [];
+
+        // Loop data mentah
+        foreach ($getData as $row) {
+            $area        = $row['area'];
+            $kode        = $row['kode_deffect'];
+            $tgl         = $row['tgl_perbaikan'];
+            $keterangan  = $row['Keterangan'];
+            $qty         = (int)$row['qty'];
+
+            // Inisialisasi array bertingkat
+            if (!isset($groupedData[$area])) {
+                $groupedData[$area] = [];
+            }
+
+            if (!isset($groupedData[$area][$kode])) {
+                $groupedData[$area][$kode] = [
+                    'Keterangan' => $keterangan,
+                    'Tanggal'    => []
+                ];
+            }
+
+            if (!isset($groupedData[$area][$kode]['Tanggal'][$tgl])) {
+                $groupedData[$area][$kode]['Tanggal'][$tgl] = 0;
+            }
+
+            // Tambahkan qty ke tanggal yang sesuai
+            $groupedData[$area][$kode]['Tanggal'][$tgl] += $qty;
+        }
+        // Setelah semua data terkumpul
+        ksort($groupedData); // urutkan area A-Z
+
+        // Kalau mau juga urutkan kode di dalam tiap area:
+        foreach ($groupedData as &$kodeList) {
+            ksort($kodeList);
+        }
+        unset($kodeList); // hapus referensi
+
+        // 2️⃣ KUMPULKAN SEMUA TANGGAL UNIK (buat header tabel nanti)
+        $tanggalList = [];
+        foreach ($getData as $row) {
+            $tanggalList[$row['tgl_perbaikan']] = true;
+        }
+        $tanggalList = array_keys($tanggalList);
+        sort($tanggalList); // biar tanggal urut
+
+        // dd($theData, $groupedData);
+
+
+        // excel dimulai
+        $spreadsheet = new Spreadsheet();
+
+        $sheetIndex = 0;
+        foreach ($groupedData as $areaName => $defects) {
+
+            // Buat sheet baru per area (kecuali sheet pertama)
+            if ($sheetIndex > 0) {
+                $spreadsheet->createSheet();
+            }
+            $sheet = $spreadsheet->setActiveSheetIndex($sheetIndex);
+            $sheet->setTitle(substr($areaName, 0, 31)); // Excel limit 31 char
+
+            // === Judul ===
+            $lastCol = chr(ord('C') + count($tanggalList));
+            $sheet->mergeCells("A1:{$lastCol}1");
+            $sheet->setCellValue('A1', 'DATA PERBAIKAN AREA ' . strtoupper($areaName));
+            $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+            $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+            // === Header ===
+            $sheet->setCellValue('A3', 'Kode Deffect');
+            $sheet->setCellValue('B3', 'Keterangan');
+
+            $col = 'C';
+            foreach ($tanggalList as $tgl) {
+                $sheet->setCellValue($col . '3', date('d-m-Y', strtotime($tgl)));
+                $col++;
+            }
+
+            // Tambah kolom Grand Total
+            $sheet->setCellValue($col . '3', 'Grand Total');
+
+            // Header Style
+            $headerRange = "A3:{$lastCol}3";
+            $sheet->getStyle($headerRange)->getFont()->setBold(true);
+            // $sheet->getStyle($headerRange)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('4472C4'); // biru
+            $sheet->getStyle($headerRange)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+            // === Isi Data ===
+            $rowNum = 4;
+            $totalPerTanggal = array_fill_keys($tanggalList, 0); // Untuk total bawah
+            $grandTotalSemua = 0;
+
+            foreach ($defects as $kode => $defData) {
+                $sheet->setCellValue('A' . $rowNum, $kode);
+                $sheet->setCellValue('B' . $rowNum, $defData['Keterangan']);
+
+                $col = 'C';
+                $totalPerKode = 0;
+                foreach ($tanggalList as $tgl) {
+                    $qty = $defData['Tanggal'][$tgl] ?? '';
+                    $sheet->setCellValue($col . $rowNum, $qty);
+                    // 
+                    $qtyRaw = $defData['Tanggal'][$tgl] ?? 0;
+                    $qty = is_numeric($qtyRaw) ? (int)$qtyRaw : 0;
+                    $totalPerTanggal[$tgl] += $qty;
+                    $totalPerKode += $qty;
+
+                    $col++;
+                }
+                // Kolom terakhir = Grand Total per kode defect
+                $sheet->setCellValue($col . $rowNum, $totalPerKode);
+                $sheet->getStyle($col . $rowNum)->getFont()->setBold(true);
+
+                $grandTotalSemua += $totalPerKode;
+                $rowNum++;
+            }
+            // === Tambahkan Baris Grand Total di Bawah ===
+            $sheet->setCellValue('A' . $rowNum, 'Grand Total');
+            $sheet->mergeCells("A{$rowNum}:B{$rowNum}");
+            $col = 'C';
+            foreach ($tanggalList as $tgl) {
+                $sheet->setCellValue($col . $rowNum, $totalPerTanggal[$tgl]);
+                $col++;
+            }
+            $sheet->setCellValue($col . $rowNum, $grandTotalSemua);
+
+
+            // Bold & Center Grand Total row
+            $grandRange = "A{$rowNum}:{$lastCol}{$rowNum}";
+            $sheet->getStyle($grandRange)->getFont()->setBold(true);
+            $sheet->getStyle($grandRange)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+            // === BORDER SEMUA KOLOM ===
+            $dataRange = "A3:{$lastCol}{$rowNum}";
+            $styleArray = [
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => '000000'],
+                    ],
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical'   => Alignment::VERTICAL_CENTER,
+                ],
+            ];
+            $sheet->getStyle($dataRange)->applyFromArray($styleArray);
+
+            // === AUTO SIZE ===
+            foreach (range('A', $lastCol) as $columnID) {
+                $sheet->getColumnDimension($columnID)->setAutoSize(true);
+            }
+
+            // === LAPORAN REWORK SECTION ===
+            $laporanStart = $rowNum + 2;
+
+            // Judul "LAPORAN REWORK"
+            $sheet->setCellValue("A{$laporanStart}", 'LAPORAN REWORK');
+            $sheet->mergeCells("A{$laporanStart}:C{$laporanStart}");
+            $sheet->getStyle("A{$laporanStart}")->getFont()->setBold(true)->setUnderline(true)->setSize(12);
+
+            // Header kecil PCS & DZ
+            $sheet->setCellValue("B" . ($laporanStart + 1), 'PCS');
+            $sheet->setCellValue("C" . ($laporanStart + 1), 'DZ');
+
+            // TOTAL PER BULAN
+            $sheet->setCellValue("A" . ($laporanStart + 2), 'TOTAL PER BULAN');
+            $sheet->setCellValue("B" . ($laporanStart + 2), $grandTotalSemua); // kosong untuk PCS
+            $sheet->setCellValue("C" . ($laporanStart + 2), round($grandTotalSemua / 24, 2));  // bisa isi hitungan nanti
+
+            // RATA RATA PER HARI
+            $avgPerHari = $grandTotalSemua / count($tanggalList);
+            $sheet->setCellValue("A" . ($laporanStart + 3), 'RATA RATA PER HARI');
+            $sheet->setCellValue("B" . ($laporanStart + 3), $avgPerHari);
+            $sheet->setCellValue("C" . ($laporanStart + 3), round($avgPerHari / 24, 2));
+
+            // Styling border & rata tengah
+            $sheet->getStyle("A{$laporanStart}:C" . ($laporanStart + 3))
+                ->getBorders()
+                ->getAllBorders()
+                ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+
+            $sheet->getStyle("A{$laporanStart}:C" . ($laporanStart + 3))
+                ->getAlignment()
+                ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)
+                ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
+            // Bold header baris pertama
+            $sheet->getStyle("A{$laporanStart}")->getFont()->setBold(true);
+
+
+            // === TOP 10 CHART DI BAWAH DATA ===
+            $chartStartRow = $laporanStart + 6;
+
+            // Judul bagian
+            $sheet->setCellValue("G{$chartStartRow}", 'TOP 10 KODE REWORK');
+            $sheet->mergeCells("G{$chartStartRow}:I{$chartStartRow}");
+            $sheet->getStyle("G{$chartStartRow}")->getFont()->setBold(true)->setSize(12);
+            $sheet->getStyle("G{$chartStartRow}")->getAlignment()
+                ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)
+                ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
+            // Header tabel di kanan
+            $sheet->setCellValue("G" . ($chartStartRow + 1), 'Kode');
+            $sheet->setCellValue("H" . ($chartStartRow + 1), 'Keterangan');
+            $sheet->setCellValue("I" . ($chartStartRow + 1), 'Total Qty');
+
+            // Hitung total per kode
+            $topData = [];
+            foreach ($defects as $kode => $val) {
+                $totalQty = array_sum($val['Tanggal']);
+                $topData[$kode] = [
+                    'Kode' => $kode,
+                    'Keterangan' => $val['Keterangan'],
+                    'Total' => $totalQty
+                ];
+            }
+
+            // Urutkan besar ke kecil, ambil 10
+            usort($topData, fn($a, $b) => $b['Total'] <=> $a['Total']);
+            $top10 = array_slice($topData, 0, 10);
+
+            // Isi tabel mulai kolom G ke kanan
+            $r = $chartStartRow + 2;
+            foreach ($top10 as $val) {
+                $sheet->setCellValue("G{$r}", $val['Kode']);
+                $sheet->setCellValue("H{$r}", $val['Keterangan']);
+                $sheet->setCellValue("I{$r}", $val['Total']);
+                $r++;
+            }
+
+            // Range label & value (untuk chart)
+            $labelRange = [new DataSeriesValues('String', "{$sheet->getTitle()}!H" . ($chartStartRow + 2) . ":H" . ($r - 1))];
+            $valueRange = [new DataSeriesValues('Number', "{$sheet->getTitle()}!I" . ($chartStartRow + 2) . ":I" . ($r - 1))];
+
+            $series = new DataSeries(
+                DataSeries::TYPE_DONUTCHART,
+                null,
+                range(0, count($valueRange) - 1),
+                [],
+                $labelRange,
+                $valueRange
+            );
+
+            $layout = new Layout();
+            $layout->setShowVal(true);
+            $layout->setShowPercent(true);
+
+            $plotArea = new PlotArea($layout, [$series]);
+            $legend = new Legend(Legend::POSITION_RIGHT, null, false);
+            $title = new Title('TOP 10 KODE REWORK');
+
+            $chart = new Chart(
+                'chart1',
+                $title,
+                $legend,
+                $plotArea
+            );
+
+            // === POSISI CHART DI KIRI ===
+            $chart->setTopLeftPosition('A' . ($chartStartRow + 1));
+            $chart->setBottomRightPosition('E' . ($chartStartRow + 20));
+            // hitung baris akhir
+            $endRow = $r - 1;
+
+            // Tambahkan chart
+            $sheet->addChart($chart);
+            // === BORDER + AUTOSIZE ===
+            $sheet->getStyle("G{$chartStartRow}:I{$endRow}")
+                ->getBorders()
+                ->getAllBorders()
+                ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+
+            foreach (range('G', 'H') as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+
+
+            // === CHART REPORT DATA BS PERHARI (PCS) ===
+            // === MULAI DARI SINI ===
+            $barStart = $chartStartRow + 22;
+
+            // Judul tabel
+            $sheet->setCellValue("G{$barStart}", "REPORT DATA BS PERHARI (PCS)");
+            $sheet->mergeCells("G{$barStart}:H{$barStart}");
+            $sheet->getStyle("G{$barStart}")->getFont()->setBold(true)->setSize(12);
+            $sheet->getStyle("G{$barStart}")->getAlignment()
+                ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)
+                ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
+            // Header tabel
+            $sheet->setCellValue("G" . ($barStart + 1), "Tanggal");
+            $sheet->setCellValue("H" . ($barStart + 1), "Total Qty");
+
+            // Isi data total per tanggal
+            $r = $barStart + 2;
+            foreach ($tanggalList as $tgl) {
+                $sheet->setCellValueExplicit("G{$r}", $tgl, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                $sheet->setCellValue("H{$r}", $totalPerTanggal[$tgl]);
+                $r++;
+            }
+
+            // Hitung rata-rata (hanya di kolom H)
+            $avgRow = $r;
+            $sheet->setCellValue("G{$avgRow}", "AVERAGE");
+            $sheet->setCellValue("H{$avgRow}", "=AVERAGE(H" . ($barStart + 2) . ":H" . ($r - 1) . ")");
+            $sheet->getStyle("G{$avgRow}:H{$avgRow}")->getFont()->setBold(true);
+
+            $barEnd = $r - 1; // baris terakhir data
+
+            // === RANGE DATA ===
+            // Kategori (vertikal axis) = tanggal
+            $labelRange = [
+                new DataSeriesValues(
+                    DataSeriesValues::DATASERIES_TYPE_STRING, // <-- label teks (tanggal)
+                    "'{$sheet->getTitle()}'!G" . ($barStart + 2) . ":G{$barEnd}"
+                )
+            ];
+
+            // Nilai (horizontal axis) = qty
+            $valueRange = [
+                new DataSeriesValues(
+                    DataSeriesValues::DATASERIES_TYPE_NUMBER, // <-- nilai numerik
+                    "'{$sheet->getTitle()}'!H" . ($barStart + 2) . ":H{$barEnd}"
+                )
+            ];
+
+            // === BAR CHART (horizontal, tanggal di vertikal, qty di horizontal) ===
+            $seriesBar = new DataSeries(
+                DataSeries::TYPE_BARCHART,              // 2D bar chart
+                DataSeries::GROUPING_CLUSTERED,         // Kelompokkan bar
+                range(0, count($valueRange) - 1),       // urutan seri
+                [new DataSeriesValues('String', "'{$sheet->getTitle()}'!H" . ($barStart + 1))], // legend
+                $labelRange,                            // kategori = tanggal (vertikal)
+                $valueRange                             // nilai = qty (horizontal)
+            );
+            $seriesBar->setPlotDirection(DataSeries::DIRECTION_COL); // horizontal bar ✅
+
+            // === LINE CHART untuk rata-rata ===
+            $valueAvgRange = [
+                new DataSeriesValues(
+                    'Number',
+                    "'{$sheet->getTitle()}'!H{$avgRow}",
+                    null,
+                    1
+                )
+            ];
+
+            $seriesAvg = new DataSeries(
+                DataSeries::TYPE_LINECHART,
+                null,
+                range(0, count($valueAvgRange) - 1),
+                [new DataSeriesValues('String', "'{$sheet->getTitle()}'!H{$avgRow}")],
+                $labelRange,
+                $valueAvgRange
+            );
+
+            // === PLOT AREA ===
+            $layout = new Layout();
+            $layout->setShowVal(true);
+            $plotArea = new PlotArea($layout, [$seriesBar, $seriesAvg]);
+
+            // === TITLE & LEGEND ===
+            $title = new Title("REPORT DATA BS PERHARI (PCS)");
+            $legend = new Legend(Legend::POSITION_BOTTOM, null, false);
+
+            // === CHART ===
+            $chart = new Chart(
+                'chart2',
+                $title,
+                $legend,
+                $plotArea
+            );
+
+            // Posisi chart di kiri (A–E)
+            $chart->setTopLeftPosition('A' . ($barStart + 1));
+            $chart->setBottomRightPosition('E' . ($barStart + 25));
+
+            $sheet->addChart($chart);
+
+            // === BORDER + AUTOSIZE ===
+            $sheet->getStyle("G{$barStart}:H{$avgRow}")
+                ->getBorders()
+                ->getAllBorders()
+                ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+
+            foreach (range('G', 'H') as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+            $sheetIndex++;
+        }
+
+        // === Output ke Excel ===
+        $writer = new Xlsx($spreadsheet);
+        $writer->setIncludeCharts(true); // wajib supaya chart muncul
+        $filename = 'Data Perbaikan ' . date('Ymd_His') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
         $writer->save('php://output');
         exit;
     }

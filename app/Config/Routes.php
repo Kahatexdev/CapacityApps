@@ -885,6 +885,11 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('exportSummaryBs', 'SummaryController::excelSummaryBs');
     $routes->get('exportBsMesinPerbulan/(:any)/(:any)', 'SummaryController::summaryBsMesinPerbulan/$1/$2');
 
+    // perbaikan
+    $routes->get('perbaikanArea', 'DeffectController::perbaikanArea');
+    $routes->post('viewPerbaikan', 'DeffectController::viewPerbaikan');
+    $routes->post('exportExcelPerbaikan', 'ExcelController::exportExcelPerbaikan');
+
     // bahanbaku
     $routes->get('bahanBaku', 'MaterialController::index');
     $routes->get('bahanBaku/getNomodel', 'MaterialController::getNomodel');
@@ -1101,6 +1106,7 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('perbaikanArea', 'DeffectController::perbaikanArea');
     $routes->post('importperbaikanarea', 'ProduksiController::importPerbaikanArea');
     $routes->post('viewPerbaikan', 'DeffectController::viewPerbaikan');
+    $routes->post('exportExcelPerbaikan', 'ExcelController::exportExcelPerbaikan');
     //pluspacking
     $routes->get('viewModelPlusPacking/(:any)', 'ProduksiController::viewModelPlusPacking/$1');
     $routes->get('pluspacking', 'ProduksiController::pluspacking');

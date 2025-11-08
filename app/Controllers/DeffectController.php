@@ -99,6 +99,7 @@ class DeffectController extends BaseController
 
         $data = [
             'role' => session()->get('role'),
+            'username' => session()->get('username'),
             'title' => session()->get('role') . ' System',
             'active1' => 'active',
             'active2' => '',
@@ -289,8 +290,10 @@ class DeffectController extends BaseController
         $getData = $this->perbaikanModel->getDataPerbaikanFilter($theData);
         $total = $this->perbaikanModel->totalPerbaikan($theData);
         $chartData = $this->perbaikanModel->chartData($theData);
+
         $data = [
             'role' => session()->get('role'),
+            'username' => session()->get('username'),
             'title' => ' Data Perbaikan',
             'active1' => '',
             'active2' => '',
@@ -308,6 +311,7 @@ class DeffectController extends BaseController
             'totalbs' => $total,
             'chart' => $chartData,
             'dataBuyer' => $dataBuyer,
+            'filter' => $theData,
         ];
 
         return view(session()->get('role') . '/Perbaikan/tabelperbaikan', $data);

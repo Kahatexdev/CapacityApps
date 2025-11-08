@@ -14,7 +14,7 @@
                                 </h5>
                             </div>
                         </div>
-                        <div class="col-8 text-end">
+                        <!-- <div class="col-8 text-end">
                             <a href="<?= base_url($role . '/viewImportPerbaikan') ?>" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Import Data
                             </a>
@@ -25,7 +25,7 @@
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Input Kode Deffect
                             </button>
 
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -82,7 +82,7 @@
                                                 <input type="date" name="akhir" class="form-control" required>
                                             </div>
                                         </div>
-                                        <div class="col-lg-2">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="buyer" class="col-form-label">Buyer</label>
                                                 <select class="select2 form-select" id="buyer" name="buyer">
@@ -93,13 +93,9 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-lg-2">
-                                            <div class="form-group">
-                                                <label for="area" class="col-form-label">Area</label>
-                                                <input type="text" name="area" class="form-control">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-2">
+                                        <!-- hidden area -->
+                                        <input type="hidden" name="area" class="form-control" value="<?= $username ?>">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="area" class="col-form-label">No Model</label>
                                                 <input type="text" name="pdk" class="form-control">
