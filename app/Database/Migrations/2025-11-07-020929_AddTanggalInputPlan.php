@@ -12,6 +12,9 @@ class AddTanggalInputPlan extends Migration
             'create_plan' => [
                 'type' => 'DATETIME',
             ],
+            'created_at' => [
+                'type' => 'DATETIME',
+            ],
             'updated_at' => [
                 'type' => 'DATETIME',
             ],
@@ -20,6 +23,7 @@ class AddTanggalInputPlan extends Migration
 
     public function down()
     {
+        $this->forge->dropColumn('detail_planning', 'created_at');
         $this->forge->dropColumn('detail_planning', 'create_plan');
         $this->forge->dropColumn('detail_planning', 'updated_at');
     }
