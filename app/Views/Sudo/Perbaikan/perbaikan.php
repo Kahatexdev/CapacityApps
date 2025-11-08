@@ -24,6 +24,9 @@
                             <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage2">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Input Kode Deffect
                             </button>
+                            <a href="<?= base_url($role . '/summaryGlobalPbArea') ?>" class="btn btn-sm btn-success bg-gradient-success shadow text-center border-radius-md">
+                                Summary Global
+                            </a>
 
                         </div>
                     </div>

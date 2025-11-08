@@ -316,4 +316,27 @@ class DeffectController extends BaseController
 
         return view(session()->get('role') . '/Perbaikan/tabelperbaikan', $data);
     }
+    public function summaryGlobalPbArea()
+    {
+        $master = $this->deffectModel->findAll();
+        $dataBuyer = $this->orderModel->getBuyer();
+
+        $data = [
+            'role' => session()->get('role'),
+            'username' => session()->get('username'),
+            'title' => session()->get('role') . ' System',
+            'active1' => 'active',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'kode' => $master,
+            'dataBuyer' => $dataBuyer,
+
+            //'databs' => $databs
+        ];
+        return view(session()->get('role') . '/Perbaikan/summaryGlobal', $data);
+    }
 }

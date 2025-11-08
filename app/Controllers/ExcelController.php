@@ -13106,8 +13106,8 @@ class ExcelController extends BaseController
             $sheet->setTitle(substr($areaName, 0, 31)); // Excel limit 31 char
 
             // === Judul ===
-            $lastCol = chr(ord('C') + count($tanggalList));
-            $sheet->mergeCells("A1:{$lastCol}1");
+            $lastCol = Coordinate::stringFromColumnIndex(2 + count($tanggalList));
+            $sheet->mergeCells("A1:B1");
             $sheet->setCellValue('A1', 'DATA PERBAIKAN AREA ' . strtoupper($areaName));
             $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
             $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
@@ -13124,6 +13124,7 @@ class ExcelController extends BaseController
 
             // Tambah kolom Grand Total
             $sheet->setCellValue($col . '3', 'Grand Total');
+            $lastCol = Coordinate::stringFromColumnIndex(3 + count($tanggalList));
 
             // Header Style
             $headerRange = "A3:{$lastCol}3";
