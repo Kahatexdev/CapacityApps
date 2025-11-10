@@ -364,10 +364,18 @@ class ApsPerstyleModel extends Model
     }
     public function getSisaOrder($idaps)
     {
-        $res = $this->select('sisa')->where('idapsperstyle', $idaps)->first();
-        $result = reset($res);
-        return $result;
+        $res = $this->select('sisa')
+            ->where('idapsperstyle', $idaps)
+            ->first();
+
+        // kalau gak ada hasil, return 0 atau null sesuai kebutuhan
+        if (!$res || !is_array($res)) {
+            return 0; // atau bisa null kalau kamu mau
+        }
+
+        return $res['sisa'] ?? 0;
     }
+
     public function resetProduksiArea($pr)
     {
         return $this->db->table($this->table)
