@@ -640,4 +640,18 @@ class ProduksiModel extends Model
         }
         return $index;
     }
+    public function getJlmcByMonth($theData)
+    {
+        $this->select('area, COUNT(DISTINCT no_mesin) AS total_mc, SUM(qty_produksi) AS qty_produksi');
+        // Filter berdasarkan bulan (misal "2025-10")
+        if (!empty($theData['bulan'])) {
+            $this->where("DATE_FORMAT(tgl_produksi, '%Y-%m')", $theData['bulan']);
+        }
+        // Filter area (kalau tidak kosong)
+        if (!empty($theData['area'])) {
+            $this->where('area', $theData['area']);
+        }
+        $this->groupBy('area');
+        return $this->findAll();
+    }
 }
