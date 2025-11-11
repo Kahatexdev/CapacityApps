@@ -24,9 +24,12 @@
                             <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage2">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Input Kode Deffect
                             </button>
-                            <a href="<?= base_url($role . '/summaryGlobalPbArea') ?>" class="btn btn-sm btn-success bg-gradient-success shadow text-center border-radius-md">
+                            <button type="button"
+                                class="btn btn-sm btn-success bg-gradient-success shadow text-center border-radius-md"
+                                data-bs-toggle="modal"
+                                data-bs-target="#summaryModal">
                                 Summary Global
-                            </a>
+                            </button>
 
                         </div>
                     </div>
@@ -202,6 +205,39 @@
                         <div class="modal-footer">
                             <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn bg-gradient-info">Input</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- modal sumamry global -->
+        <div class="modal fade" id="summaryModal" tabindex="-1" aria-labelledby="summaryModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-radius-lg">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="summaryModalLabel">Filter Data</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+                    <form action="<?= base_url($role . '/summaryGlobalPbArea'); ?>" method="POST">
+                        <div class="modal-body align-items-center">
+
+                            <div class="form-group">
+                                <label for="kode" class="col-form-label">Area</label>
+                                <input type="text" class="form-control" name="area">
+                            </div>
+                            <div class="form-group">
+                                <label for="keterangan" class="col-form-label">Bulan</label>
+                                <select name="bulan" id="bulan" class="form-select" required>
+                                    <option value="">-- Pilih Bulan --</option>
+                                    <?php foreach ($filterBulan as $b): ?>
+                                        <option value="<?= $b['value']; ?>"><?= $b['label']; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-success">Export</button>
                         </div>
                     </form>
                 </div>

@@ -83,6 +83,31 @@ class PerbaikanAreaModel extends Model
 
         return $this->findAll();
     }
+    public function getSummaryGlobalPerbaikan($theData)
+    {
+        $this->select('
+            perbaikan_area.tgl_perbaikan,
+            perbaikan_area.area,
+            SUM(perbaikan_area.qty) AS qty
+        ')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = perbaikan_area.idapsperstyle')
+            ->join('master_deffect', 'master_deffect.kode_deffect = perbaikan_area.kode_deffect')
+            ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel');
+
+        if (!empty($theData['bulan'])) {
+            $this->where("DATE_FORMAT(perbaikan_area.tgl_perbaikan, '%Y-%m')", $theData['bulan']);
+        }
+        if (!empty($theData['area'])) {
+            $this->where('perbaikan_area.area', $theData['area']);
+        }
+        $this->groupBy([
+            'perbaikan_area.tgl_perbaikan',
+            'perbaikan_area.area'
+        ]);
+        $this->orderBy('perbaikan_area.tgl_perbaikan', 'perbaikan_area.area');
+
+        return $this->findAll();
+    }
     public function  totalPerbaikan($theData)
     {
 
