@@ -71,6 +71,33 @@ class DeffectController extends BaseController
         //$databs = $this->BsModel->getDataBs();
         $dataBuyer = $this->orderModel->getBuyer();
 
+        $currentMonth = (int) date('n');
+        $currentYear  = (int) date('Y');
+
+        $namaBulan = [
+            1 => 'Januari',
+            2 => 'Februari',
+            3 => 'Maret',
+            4 => 'April',
+            5 => 'Mei',
+            6 => 'Juni',
+            7 => 'Juli',
+            8 => 'Agustus',
+            9 => 'September',
+            10 => 'Oktober',
+            11 => 'November',
+            12 => 'Desember'
+        ];
+
+        $bulanList = [];
+        for ($month = 1; $month <= 12; $month++) {
+            $bulanList[] = [
+                'value' => sprintf('%04d-%02d', $currentYear, $month), // contoh: 2025-01
+                'label' => $namaBulan[$month] . ' ' . $currentYear
+            ];
+        }
+
+
 
         $data = [
             'role' => session()->get('role'),
@@ -84,6 +111,7 @@ class DeffectController extends BaseController
             'active7' => '',
             'kode' => $master,
             'dataBuyer' => $dataBuyer,
+            'filterBulan' => $bulanList,
 
             //'databs' => $databs
         ];
@@ -184,6 +212,33 @@ class DeffectController extends BaseController
         $getData = $this->BsModel->getDataBsFilter($theData);
         $total = $this->BsModel->totalBs($theData);
         $chartData = $this->BsModel->chartData($theData);
+
+        $currentMonth = (int) date('n');
+        $currentYear  = (int) date('Y');
+
+        $namaBulan = [
+            1 => 'Januari',
+            2 => 'Februari',
+            3 => 'Maret',
+            4 => 'April',
+            5 => 'Mei',
+            6 => 'Juni',
+            7 => 'Juli',
+            8 => 'Agustus',
+            9 => 'September',
+            10 => 'Oktober',
+            11 => 'November',
+            12 => 'Desember'
+        ];
+
+        $bulanList = [];
+        for ($month = 1; $month <= 12; $month++) {
+            $bulanList[] = [
+                'value' => sprintf('%04d-%02d', $currentYear, $month), // contoh: 2025-01
+                'label' => $namaBulan[$month] . ' ' . $currentYear
+            ];
+        }
+
         $data = [
             'role' => session()->get('role'),
             'title' => ' Data BS',
@@ -203,6 +258,8 @@ class DeffectController extends BaseController
             'totalbs' => $total,
             'chart' => $chartData,
             'dataBuyer' => $dataBuyer,
+            'filter' => $theData,
+            'filterBulan' => $bulanList,
         ];
 
         return view(session()->get('role') . '/Deffect/bstabel', $data);

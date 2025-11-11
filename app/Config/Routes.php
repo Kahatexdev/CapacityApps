@@ -1118,6 +1118,8 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->post('viewPerbaikan', 'DeffectController::viewPerbaikan');
     $routes->post('exportExcelPerbaikan', 'ExcelController::exportExcelPerbaikan');
     $routes->post('summaryGlobalPbArea', 'ExcelController::summaryGlobalPbArea');
+    $routes->post('exportExcelDeffect', 'ExcelController::exportExcelDeffect');
+    $routes->post('summaryGlobalDeffectArea', 'ExcelController::summaryGlobalDeffectArea');
 
 
     //pluspacking

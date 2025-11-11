@@ -261,4 +261,29 @@ class BsModel extends Model
         }
         return $index;
     }
+    public function getSummaryGlobalDeffect($theData)
+    {
+        $this->select('
+            data_bs.tgl_instocklot,
+            data_bs.area,
+            SUM(data_bs.qty) AS qty
+        ')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle')
+            ->join('master_deffect', 'master_deffect.kode_deffect = data_bs.kode_deffect')
+            ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel');
+
+        if (!empty($theData['bulan'])) {
+            $this->where("DATE_FORMAT(data_bs.tgl_instocklot, '%Y-%m')", $theData['bulan']);
+        }
+        if (!empty($theData['area'])) {
+            $this->where('data_bs.area', $theData['area']);
+        }
+        $this->groupBy([
+            'data_bs.tgl_instocklot',
+            'data_bs.area'
+        ]);
+        $this->orderBy('data_bs.tgl_instocklot', 'data_bs.area');
+
+        return $this->findAll();
+    }
 }
