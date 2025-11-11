@@ -1898,6 +1898,7 @@ class ProduksiController extends BaseController
                         'area' => $area,
                         'no_label' => $data[22],
                         'no_box' => $data[23],
+                        'no_mc' => $data[25],
                         'qty' => $qty,
                         'kode_deffect' => $kodeDeffect,
 

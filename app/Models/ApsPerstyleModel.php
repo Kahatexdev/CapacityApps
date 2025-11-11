@@ -1159,13 +1159,15 @@ class ApsPerstyleModel extends Model
     }
     public function getPlanStyle($area, $pdk, $jarum)
     {
-        return $this->select('idapsperstyle,inisial, size, sum(qty) as qty, sum(sisa) as sisa, color')
+        $builder = $this->select('idapsperstyle,inisial, size, sum(qty) as qty, sum(sisa) as sisa, color')
             ->where('mastermodel', $pdk)
-            ->where('factory', $area)
             ->where('machinetypeid', $jarum)
-            ->where('qty >', 0)
-            ->groupBy('size,machinetypeid')
-            ->findAll();
+            ->where('qty >', 0);
+        if (!empty($area)) {
+            $builder->where('factory', $area);
+        }
+        $builder->groupBy('size,machinetypeid');
+        return $builder->findAll();
     }
     public function getSizes($nomodel, $inisial)
     {
@@ -1486,12 +1488,13 @@ class ApsPerstyleModel extends Model
             ->join('pps', 'pps.id_mesin_perinisial = mesin_perinisial.id_mesin_perinisial', 'left')
             ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel', 'left')
             ->where('apsperstyle.mastermodel', $pdk)
-            ->where('apsperstyle.qty >', 0)
-            ->where('apsperstyle.factory', $area)
-            ->groupBy('apsperstyle.size')
-            ->groupBy('apsperstyle.factory')
-            ->findAll();
-        return $builder;
+            ->where('apsperstyle.qty >', 0);
+        if (!empty($area)) {
+            $builder->where('apsperstyle.factory', $area);
+        }
+        $builder->groupBy('apsperstyle.size')
+            ->groupBy('apsperstyle.factory');
+        return $builder->findAll();
     }
     public function getPoPlusPacking($area)
     {

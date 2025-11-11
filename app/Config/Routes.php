@@ -441,6 +441,10 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('pickmachine/(:any)', 'PlanningController::pickmachine/$1');
     $routes->post('Savemesin/(:any)', 'PlanningController::savemachine/$1');
     $routes->post('viewdetail/(:any)', 'PlanningController::viewdetail/$1');
+    $routes->get('getModelData', 'PlanningController::getModelData');
+    $routes->post('pindahjarum/(:any)', 'PlanningController::pindahjarum/$1');
+    $routes->get('denah/(:any)', 'PlanningController::denahMesin/$1');
+    $routes->get('detailDenah', 'PlanningController::detailDenah');
 
     $routes->get('jalanmesin', 'PlanningController::jalanmesin');
     // $routes->get('jalanmesin/(:any)', 'PlanningController::jalanmesindetail/$1');
@@ -452,10 +456,25 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('updateMonthlyMc', 'PlanningJalanMcController::updateMonthlyMc');
     $routes->get('planningmesin', 'ApsController::planningmesin');
     $routes->get('detailplnmc/(:any)', 'ApsController::detailplanmc/$1');
-    $routes->get('kalenderMesin/(:any)', 'ApsController::kalenderMesin/$1');
+    $routes->get('fetchdetailorderarea', 'ApsController::fetchdetailorderarea');
     $routes->get('planningpage/(:any)/(:any)', 'ApsController::planningpage/$1/$2');
+    $routes->post('getDataLibur', 'ApsController::getDataLibur');
+    $routes->post('saveplanning', 'ApsController::saveplanning');
+    $routes->get('getMesinByDate/(:any)', 'ApsController::getMesinByDate/$1');
+    $routes->get('kalenderMesin/(:any)', 'ApsController::kalenderMesin/$1');
+    $routes->post('deleteplanmesin', 'ApsController::deleteplanmesin');
+    $routes->post('stopPlanning/(:any)', 'ApsController::stopPlanning/$1');
+    $routes->get('detailplanstop/(:any)', 'ApsController::detailplanstop/$1');
+    $routes->post('activePlanning/(:any)', 'ApsController::activePlanning/$1');
+    $routes->get('getPlanStyle', 'ApsController::getPlanStyle');
+    $routes->post('savePlanStyle', 'ApsController::savePlanStyle');
+    $routes->get('getListMesinplan', 'ApsController::getListMesinplan');
+    $routes->post('saveStartmesinBenang', 'ApsController::saveStartmesinBenang');
+    $routes->post('savePlanningPernomor', 'ApsController::savePlanningPernomor');
+    $routes->post('deleteMesinPernomor', 'ApsController::deleteMesinPernomor');
+    $routes->post('checkAvailable', 'ApsController::checkAvailable');
     $routes->get('pps', 'ApsController::pps');
-    $routes->get('ppsDetail/(:any)/(:any)', 'ApsController::ppsDetail/$1/$2');
+    $routes->get('ppsDetail/(:any)', 'ApsController::ppsDetail/$1');
     $routes->post('updatePps', 'ApsController::updatePps');
     $routes->get('exportPps/(:any)', 'excelController::exportPps/$1');
 
