@@ -898,6 +898,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('perbaikanArea', 'DeffectController::perbaikanArea');
     $routes->post('viewPerbaikan', 'DeffectController::viewPerbaikan');
     $routes->post('exportExcelPerbaikan', 'ExcelController::exportExcelPerbaikan');
+    $routes->post('summaryGlobalPbArea', 'ExcelController::summaryGlobalPbArea');
 
     // bahanbaku
     $routes->get('bahanBaku', 'MaterialController::index');

@@ -14,8 +14,14 @@
                                 </h5>
                             </div>
                         </div>
-                        <!-- <div class="col-8 text-end">
-                            <a href="<?= base_url($role . '/viewImportPerbaikan') ?>" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md">
+                        <div class="col-8 text-end">
+                            <button type="button"
+                                class="btn btn-sm btn-success bg-gradient-success shadow text-center border-radius-md"
+                                data-bs-toggle="modal"
+                                data-bs-target="#summaryModal">
+                                Summary Global
+                            </button>
+                            <!-- <a href="<?= base_url($role . '/viewImportPerbaikan') ?>" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Import Data
                             </a>
                             <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage">
@@ -23,9 +29,9 @@
                             </button>
                             <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage2">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Input Kode Deffect
-                            </button>
+                            </button> -->
 
-                        </div> -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -128,73 +134,31 @@
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="exampleModalMessage" tabindex="-1" role="dialog" aria-labelledby="exampleModalMessageTitle" aria-hidden="true">
-            <div class="modal-dialog " role="document">
-                <div class="modal-content">
+        <!-- modal sumamry global -->
+        <div class="modal fade" id="summaryModal" tabindex="-1" aria-labelledby="summaryModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-radius-lg">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Kode Deffect</h5>
-                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
+                        <h5 class="modal-title" id="summaryModalLabel">Filter Data</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                     </div>
-                    <div class="modal-body align-items-center">
-                        <div class="datatable">
-                            <table id="dataTable" class="display  striped" style="width:100%">
-                                <thead>
-
-                                    <tr>
-                                        <th>Kode</th>
-                                        <th>Keterangan</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-
-                                    <?php foreach ($kode as $df) : ?>
-                                        <tr>
-                                            <td><?= $df['kode_deffect'] ?></td>
-                                            <td><?= $df['Keterangan'] ?></td>
-                                            <td><a href="" class="btn btn-danger">Hapus</a></td>
-                                        </tr>
-                                    <?php endforeach ?>
-                                </tbody>
-
-                            </table>
-
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- modal summary produksi -->
-        <div class="modal fade" id="exampleModalMessage2" tabindex="-1" role="dialog" aria-labelledby="exampleModalMessageTitle" aria-hidden="true">
-            <div class="modal-dialog " role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Input Kode Deffect</h5>
-                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <form action="<?= base_url($role . '/inputKode'); ?>" method="POST">
+                    <form action="<?= base_url($role . '/summaryGlobalPbArea'); ?>" method="POST">
                         <div class="modal-body align-items-center">
 
+                            <input type="hidden" class="form-control" name="area" value="<?= $username ?>">
                             <div class="form-group">
-                                <label for="kode" class="col-form-label">Kode Deffect</label>
-                                <input type="text" class="form-control" name="kode" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="keterangan" class="col-form-label">Keterangan</label>
-                                <input type="text" class="form-control" name="keterangan" required>
+                                <label for="keterangan" class="col-form-label">Bulan</label>
+                                <select name="bulan" id="bulan" class="form-select" required>
+                                    <option value="">-- Pilih Bulan --</option>
+                                    <?php foreach ($filterBulan as $b): ?>
+                                        <option value="<?= $b['value']; ?>"><?= $b['label']; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn bg-gradient-info">Input</button>
+                            <button type="submit" class="btn bg-gradient-success">Export</button>
                         </div>
                     </form>
                 </div>
