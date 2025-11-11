@@ -1,5 +1,17 @@
 <?php $this->extend($role . '/layout'); ?>
 <?php $this->section('content'); ?>
+<style>
+    .modal-xl {
+        max-width: 95% !important;
+        /* hampir full screen */
+    }
+
+    .modal-body {
+        max-height: 70vh;
+        /* biar scroll vertikal */
+        overflow-y: auto;
+    }
+</style>
 <div class="container-fluid py-4">
     <?php if (session()->getFlashdata('success')) : ?>
         <script>
@@ -33,137 +45,178 @@
                         <h5>
                             Planning Order for area <?= $area ?> needle <?= $jarum ?> Total <?= $mesin ?> Machine
                         </h5>
-                        <a href="<?= base_url($role . '/detailplnmc/' . $id_pln) ?>" class="btn btn-secondary ml-auto">Back</a>
+                        <div class="div">
+                            <a href="<?= base_url($role . '/detailplnmc/' . $id_pln) ?>" class="btn btn-secondary ml-auto">Back</a>
+                        </div>
                     </div>
 
                 </div>
-                <div class="card-body p-3">
-                    <form action="<?= base_url($role . '/saveplanning'); ?>" method="post">
-                        <?php foreach ($planning as $key => $item) : ?>
-                            <div class="row">
-                                <div class="col-lg-6 col-sm-12">
-                                    <div class="form-group">
-                                        <label for="" class="form-control-label">No Model</label>
-                                        <input class="form-control" type="text" name="model" value="<?= $item['model'] ?>" readonly id="model-<?= $key ?>">
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-sm-12">
-                                    <div class="form-group">
-                                        <label for="" class="form-control-label">Delivery</label>
-                                        <?php
-                                        // Format delivery date to Y-m-d for input value
-                                        $deliveryDate = date('Y-m-d', strtotime($item['delivery']));
-                                        ?>
-                                        <input class="form-control" type="date" name="delivery" value="<?= $deliveryDate ?>" readonly id="delivery-<?= $key ?>">
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-sm-12">
-                                    <div class="form-group">
-                                        <label for="" class="form-control-label">Qty</label>
-                                        <input class="form-control" type="text" name="qty" value="<?= $item['qty'] ?>" readonly id="qty-<?= $key ?>">
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-sm-12">
-                                    <div class="form-group">
-                                        <label for="" class="form-control-label">Remaining Qty</label>
-                                        <input class="form-control" type="text" name="sisa" value="<?= $item['sisa'] ?>" readonly id="remaining-qty-<?= $key ?>">
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-sm-12">
-                                    <div class="form-group">
-                                        <label for="" class="form-control-label">Target 100%</label>
-                                        <input class="form-control" type="text" name="targetawal" value="<?= round(3600 / $item['smv'], 2) ?>" readonly id="target-100-<?= $key ?>">
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-sm-12">
-                                    <div class="form-group row">
-                                        <div class="col-lg-6 col-sm-12">
-                                            <label for="" class="form-control-label">Percentage</label>
-                                            <div class="input-group">
-                                                <input class="form-control" type="number" name="persen_target" value="80" readonly id="percentage-<?= $key ?>" required>
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text">%</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-sm-12">
-                                            <label for="" class="form-control-label"><span style="color: orange">Target Aktual</span></label>
-                                            <input class="form-control" type="text" name="target_akhir" value="" id="calculated-target-<?= $key ?>" oninput="updatePercentage(<?= $key ?>)">
-                                        </div>
-                                    </div>
-                                </div>
+                <div class="card-body p-3" id="planningField">
+                    <div class="row">
 
-                                <div class="col-lg-6 col-sm-12">
-                                    <div class="form-group row">
-                                        <div class="col-lg-6 col-sm-12">
-                                            <label for="" class="form-control-label">Start
-                                                <span id="available_machine" class="ml-2">(Available : 0)</span>
-                                            </label>
-                                            <div class="input-group">
-                                                <?php
-                                                // Get today's date
-                                                $todayDate = date('Y-m-d');
-                                                ?>
-                                                <input class="form-control" type="date" name="start_date" value="<?= $todayDate ?>" id="start-date-<?= $key ?>">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-sm-12">
-                                            <label for="" class="form-control-label">Stop</label>
-                                            <?php
-                                            // Calculate stop date 3 days before delivery
-                                            $stopDate = date('Y-m-d', strtotime('-3 days', strtotime($item['delivery'])));
-                                            ?>
-                                            <div class="input-group">
-                                                <input class="form-control stop-date" type="date" name="stop_date" value="<?= $stopDate ?>" id="stop-date-<?= $key ?>">
+
+                        <h6 for=" model-data" class="form-control-label">Start Mesin Untuk Schedule Celup : <?= $startMc ?> </label>
+
+                            <!-- <form action="<?= base_url($role . '/saveStartmesinBenang'); ?>" method="post" class="d-flex flex-wrap">
+                            <div class="col-lg-3 col-sm-6">
+                                <div class="form-group">
+
+                                </div>
+                            </div>
+                            <div class="col-lg-1 col-sm-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-info w-100">Simpan</button>
+                            </div>
+                        </form> -->
+                    </div>
+
+
+
+                    <form action="<?= base_url($role . '/saveplanning'); ?>" id="formPlanning" method="post">
+
+                        <input class="form-control" type="text" name="id_est" value="" readonly id="id-est" hidden>
+                        <div class="row">
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="" class="form-control-label">No Model</label>
+                                    <input class="form-control" type="text" name="model" value="<?= $pdk ?>" readonly id="model-data">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="" class="form-control-label">Delivery</label>
+
+                                    <select name="delivery" id="delivery" class="form-control">
+                                        <option value="null">Pilih Delivery</option>
+                                        <?php foreach ($listDeliv as $deliv): ?>
+                                            <option value="<?= $deliv['delivery'] ?>"> <?= $deliv['delivery'] ?></option>
+                                        <?php endforeach ?>
+                                    </select>
+
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="" class="form-control-label">Qty</label>
+                                    <input class="form-control" type="text" name="qty" value="" readonly id="qty">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="" class="form-control-label">Remaining Qty</label>
+                                    <input class="form-control" type="text" name="sisa" value="" readonly id="remaining-qty">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="" class="form-control-label">Target 100%</label>
+                                    <input class="form-control" type="text" name="targetawal" value="" readonly id="target-100">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="form-group row">
+                                    <div class="col-lg-6 col-sm-12">
+                                        <label for="" class="form-control-label">Percentage</label>
+                                        <div class="input-group">
+                                            <input class="form-control" type="number" name="persen_target" value="80" readonly id="percentage" required>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">%</span>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-6 col-sm-12">
-                                    <div class="form-group row">
-                                        <div class="col-lg-6 col-sm-12">
-                                            <div class="form-group">
-                                                <label for="" class="form-control-label"><span style="color: orange">Days</span> (Exclude Holidays)</label>
-                                                <input class="form-control days-count" type="number" name="days_count" readonly id="days-count-<?= $key ?>">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-sm-12">
-                                            <label for="" class="form-control-label">Holiday Count</label>
-                                            <div class="input-group">
-                                                <input class="form-control holiday-count" type="number" name="holiday_count" oninput="updateLibur()" id="holiday-count-<?= $key ?>">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-sm-12">
-                                    <div class="form-group row">
-                                        <div class="col-lg-6 col-sm-12">
-                                            <label for="" class="form-control-label">Unplanned Qty</label>
-                                            <div class="input-group">
-                                                <input class="form-control holiday-count" type="number" name="unplanned_qty" readonly id="unplanned-qty-<?= $key ?>">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-sm-12">
-                                            <label for="" class="form-control-label">
-                                                <span style="color: orange">Machines Usages</span>
-                                                <span id="machine_suggestion" class="ml-2">(Suggested: 0)</span>
-                                            </label>
-                                            <input class="form-control" type="number" id="machine_count" name="machine_usage" oninput="calculateEstimatedQty()" required>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-sm-12">
-                                    <div class="form-group">
-                                        <label for="" class="form-control-label">Estimated Qty <span style="color: orange">(Target x Days x Machine Usage)</span></label>
-                                        <input class="form-control estimated-qty" type="number" value="" name="estimated_qty" id="estimated-qty-<?= $key ?>" readonly>
+                                    <div class="col-lg-6 col-sm-12">
+                                        <label for="" class="form-control-label"><span style="color: orange">Target Aktual</span></label>
+                                        <input class="form-control" type="text" name="target_akhir" value="0" id="calculated-target" oninput="updatePercentage()">
                                     </div>
                                 </div>
                             </div>
-                        <?php endforeach ?>
+
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="form-group row">
+                                    <div class="col-lg-6 col-sm-12">
+                                        <label for="" class="form-control-label">Start
+                                            <span id="available_machine" class="ml-2">(Available : 0)</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <?php
+                                            // Get today's date
+                                            $todayDate = date('Y-m-d');
+                                            ?>
+                                            <input class="form-control" type="date" name="start_date" value="<?= $todayDate ?>" id="start-date">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-sm-12">
+                                        <label for="" class="form-control-label">Stop</label>
+
+                                        <div class="input-group">
+                                            <input class="form-control stop-date" type="date" name="stop_date" value="" id="stop-date">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="form-group row">
+                                    <div class="col-lg-6 col-sm-12">
+                                        <div class="form-group">
+                                            <label for="" class="form-control-label"><span style="color: orange">Days</span> (Exclude Holidays)</label>
+                                            <input class="form-control days-count" type="number" name="days_count" readonly id="days-count">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-sm-12">
+                                        <label for="" class="form-control-label">Holiday Count</label>
+                                        <div class="input-group">
+                                            <input class="form-control holiday-count" type="number" name="holiday_count" oninput="updateLibur()" id="holiday-count">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="form-group row">
+                                    <div class="col-lg-6 col-sm-12">
+                                        <label for="" class="form-control-label">Unplanned Qty</label>
+                                        <div class="input-group">
+                                            <input class="form-control holiday-count" type="number" name="unplanned_qty" readonly id="unplanned-qty">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-sm-12">
+                                        <label for="" class="form-control-label">
+                                            <span style="color: orange">Machines Usages</span>
+                                            <span id="machine_suggestion" class="ml-2">(Suggested: 0)</span>
+                                        </label>
+                                        <input class="form-control" type="number" id="machine_count" name="machine_usage" oninput="calculateEstimatedQty()" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="" class="form-control-label">Estimated Qty <span style="color: orange">(Target x Days x Machine Usage)</span></label>
+                                    <input class="form-control estimated-qty" type="number" value="" name="estimated_qty" id="estimated-qty" readonly>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label for="" class="form-control-label">Keterangan </label>
+                                    <input class="form-control " type="text" value="" name="keterangan" id="keterangan">
+                                </div>
+                            </div>
+                        </div>
+
 
                 </div>
 
-
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-12">
+                            <input type="hidden" name="id_save" value=<?= $id_save ?>>
+                            <input type="hidden" name="id_pln" value=<?= $id_pln ?>>
+                            <input type="hidden" name="mesin" value=<?= $mesin ?>>
+                            <input type="hidden" name="area" value=<?= $area ?>>
+                            <input type="hidden" name="jarum" value=<?= $jarum ?>>
+                            <input type="hidden" name="judul" value=<?= $judul ?>>
+                            <button type="submit" id="saveEditPlan" class="btn btn-primary btn-block d-none" style="width: 100%;">Edit Planning</button>
+                            <button type="submit" id="savePlan" class="btn btn-info btn-block" style="width: 100%;">Save Planning</button>
+                        </div>
+                    </div>
+                </div>
                 </form>
 
             </div>
@@ -172,11 +225,16 @@
     <div class="row mt-4">
         <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4 mt-2">
             <div class="card">
-                <div class="card-header">
-                    <?php foreach ($planning as $key => $items) : ?>
-                        <h5>
-                            Detail Planning for Model <?= $items['model'] ?> & Delivery <?= date('d-M-Y', strtotime($items['delivery'])); ?>
-                        <?php endforeach ?>
+                <div class="card-header  d-flex  justify-content-between">
+                    <h5>Detail Planning for Model <?= $pdk ?></h5>
+                    <button class="btn btn-warning btn-plan"
+                        data-pdk="<?= $pdk ?>"
+                        data-jarum="<?= $jarum ?>"
+                        data-area="<?= $area ?>">
+                        <span class="text-sm">
+                            Plan
+                        </span>
+                    </button>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -184,12 +242,14 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
+                                    <th>Delivery</th>
                                     <th>Start Machine</th>
                                     <th>Stop Machine</th>
                                     <th>Precentage of Target</th>
                                     <th>Target</th>
                                     <th>Days</th>
                                     <th>Machine</th>
+                                    <th>keterangan</th>
                                     <th>Estimated Production</th>
                                     <th>Action</th>
                                 </tr>
@@ -197,20 +257,48 @@
                             <tbody>
                                 <?php
                                 $no = 1;
-                                foreach ($listPlanning as $order) : ?>
+                                $totalEstQtyByDelivery = []; // To hold total Estimated Production per delivery
+                                $listPlanningEmpty = empty($listPlanning); // Check if $listPlanning is empty
+                                foreach ($listPlanning as $order) :
+                                    $delivery = $order['delivery'];
+                                    $estQty = $order['Est_qty']; // Estimated Production
+
+                                    // Sum Estimated Production per delivery
+                                    if (!isset($totalEstQtyByDelivery[$delivery])) {
+                                        $totalEstQtyByDelivery[$delivery] = 0;
+                                    }
+                                    $totalEstQtyByDelivery[$delivery] += $estQty;
+                                ?>
                                     <tr>
                                         <td style="text-align: center; vertical-align: middle;"><?= $no++; ?></td>
+                                        <input type="text" name="" id="estId-<?= $no ?>" value="<?= $order['id_est_qty'] ?>" hidden>
+                                        <input type="text" name="" id="detailId-<?= $no ?>" value="<?= $order['id_detail_pln'] ?>" hidden>
+                                        <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= date('d-M-Y', strtotime($order['delivery'])); ?></td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= date('d-M-Y', strtotime($order['start_date'])); ?></td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= date('d-M-Y', strtotime($order['stop_date'])); ?></td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= htmlspecialchars($order['precentage_target']); ?> %</td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= htmlspecialchars($order['target']); ?> Dz</td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= htmlspecialchars($order['hari']); ?> Days</td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= htmlspecialchars($order['mesin']); ?> Mc</td>
-                                        <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= number_format($order['Est_qty'], 0, '.', ','); ?> Dz</td>
+                                        <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= $order['keterangan']; ?> </td>
+                                        <td class="text-sm" style="text-align: center; vertical-align: middle;"><?= number_format($estQty, 0, '.', ','); ?> Dz</td>
                                         <td class="text-sm" style="text-align: center; vertical-align: middle;">
-                                            <button class="btn btn-danger btn-update" data-toggle="modal" data-target="#modalUpdate" data-start="<?= $order['start_date'] ?>"
+                                            <button class="btn btn-info btn-edit" id="editPlan-<?= $no ?>" onclick="editPlan(<?= $no ?>)"
+                                                data-start="<?= $order['start_date'] ?>"
+                                                data-stop="<?= $order['stop_date'] ?>"
+                                                data-delivery="<?= $order['delivery'] ?>"
+                                                data-targetActual="<?= $order['target'] ?>"
+                                                data-mc="<?= $order['mesin'] ?>"
+                                                data-days="<?= $order['hari']; ?>"
+                                                data-idEst="<?= $order['id_est_qty']; ?>">
+                                                Edit
+                                            </button>
+
+                                            <button class="btn btn-danger btn-update" data-toggle="modal" data-target="#modalUpdate"
+                                                data-start="<?= $order['start_date'] ?>"
                                                 data-idplan="<?= $order['id_detail_pln'] ?>"
                                                 data-idpl="<?= $id_pln ?>"
+                                                data-idest="<?= $order['id_est_qty']; ?>"
                                                 data-stop="<?= $order['stop_date'] ?>">
                                                 Hapus
                                             </button>
@@ -219,24 +307,65 @@
                                 <?php endforeach; ?>
                             </tbody>
                             <tfoot>
+                                <?php foreach ($totalEstQtyByDelivery as $delivery => $totalEstQty) : ?>
+                                    <tr>
+                                        <th colspan="9" style="text-align: right;">Total Estimated Production <?= htmlspecialchars($delivery) ?>:</th>
+                                        <th style="text-align: center; vertical-align: middle;" id="total-est-qty-<?= htmlspecialchars($delivery) ?>">
+                                            <?= number_format($totalEstQty ?? 0, 0, '.', ','); ?> Dz
+                                        </th>
+                                    </tr>
+                                <?php endforeach; ?>
                                 <tr>
-                                    <th colspan=" 7" style="text-align: right;">Total Estimated Production:</th>
-                                    <th id="total-est-qty" style="text-align: center; vertical-align: middle;"></th>
+                                    <th colspan="9" style="text-align: right;">Total Est Full Shipment :</th>
+                                    <th style="text-align: center; vertical-align: middle;" id="totalFull">
+                                        0 Dz
+                                    </th>
                                 </tr>
                             </tfoot>
+
+                            <!-- Add a hidden input or data attribute to pass the empty state -->
+                            <input type="hidden" id="list-planning-empty" value="<?= $listPlanningEmpty ? 'true' : 'false'; ?>">
+
                         </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <div class="row mt-4 planStyleCard d-none">
+        <div class="col-md-12">
+            <div class="card  ">
+                <form action="<?= base_url($role . '/savePlanStyle') ?>" method="post">
+                    <div class="card-header">
+                        <h4 class="text-header headerPlan">
+                            Plan Machine
+                        </h4>
+                        <div class="row headerText">
+
+                        </div>
+                    </div>
+                    <div class="card-body planDetail">
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+
+                            <button type="submit" class="btn btn-info "> Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal for Deleting -->
     <div class="modal fade" id="modalUpdate" tabindex="-1" role="dialog" aria-labelledby="modalUpdate" aria-hidden="true">
-        <div class="modal-dialog   role=" document">
+        <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Delete Plan Mesin</h5>
                     <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">Ã—</span>
+                        <span aria-hidden="true">×</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -244,17 +373,13 @@
                         <div class="row">
                             <div class="col-lg-12 col-sm-6">
                                 <div class="form-group">
-
-
+                                    <input type="text" name="id" hidden>
+                                    <input type="text" name="idpl" hidden>
+                                    <input type="text" name="idest" hidden>
                                     Anda yakin ingin menghapus?
                                 </div>
-
-
                             </div>
-
                         </div>
-
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -264,267 +389,998 @@
             </div>
         </div>
     </div>
+    <!-- cek stok -->
+    <div class="modal fade" id="modalStock" tabindex="-1" aria-labelledby="modalStockLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable  modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalStockLabel">Detail Stok</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="stockTable">
 
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalMC" tabindex="-1" aria-labelledby="modalMCLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable"> <!-- ganti lg jadi xl -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalMCLabel">Detail Mesin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formMesin">
+                    <div id="hiddenFields"></div>
+                    <input type="hidden" value="<?= $area ?>" name="area">
+                    <input type="hidden" value="<?= $jarum ?>" name="jarum">
+
+                    <div class="modal-body" id="mcTable">
+                        <div class="table-responsive" style="max-height:70vh; overflow-y:auto;">
+                            <!-- Table akan diinject via JS -->
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-info">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const jarum = <?= json_encode($jarum); ?>;
+        const area = <?= json_encode($area); ?>;
+        const pdk = <?= json_encode($pdk); ?>;
+        const repeat = <?= json_encode($repeat); ?>;
+        let timer;
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll(".btn-plan").forEach(button => {
+                button.addEventListener("click", function() {
+                    let planStyleCard = document.querySelector(".planStyleCard");
+
+                    $.ajax({
+                        url: '<?= base_url("planning/getPlanStyle") ?>',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {
+                            jarum: jarum,
+                            area: area,
+                            pdk: pdk,
+
+                        },
+                        success: function(response) {
+                            console.log(response)
+                            if (response) {
+                                document.querySelector(".headerPlan").textContent = 'Plan Mesin perStyle ' + pdk;
+
+                                const start = response.start_stop?.start ? response.start_stop.start.split(' ')[0] : '';
+                                const stop = response.start_stop?.stop ? response.start_stop.stop.split(' ')[0] : '';
+                                document.querySelector(".headerText").innerHTML = `
+  <div class="col-md-12 d-flex align-items-start gap-3 mt-2">
+  <div class="d-flex flex-column">
+    <label class="fw-bold mb-1">PDK Repeat Dari:</label>
+    <input type="text" class="form-control w-auto" value="${repeat}" readonly>
+  </div>
+
+  <div class="d-flex flex-column">
+    <label class="fw-bold mb-1">Start PPS:</label>
+    <input type="date" name="start_pps" class="form-control w-auto" value="${start}">
+  </div>
+
+  <div class="d-flex flex-column">
+    <label class="fw-bold mb-1">Stop PPS:</label>
+    <input type="date" name="stop_pps" class="form-control w-auto" value="${stop}">
+  </div>
 </div>
-<script>
-    $(document).ready(function() {
-        var table = $('#dataTable').DataTable({
-            // Add your DataTables options here if needed
-            "footerCallback": function(row, data, start, end, display) {
-                var api = this.api();
-                var total = api.column(7, {
-                    page: 'current'
-                }).data().reduce(function(acc, val) {
-                    var num = parseFloat(val.replace(/[^\d.-]/g, '')); // Extract numeric values
-                    return acc + (isNaN(num) ? 0 : num); // Add numeric values, treat NaN as 0
-                }, 0);
 
-                // Update the footer with the total sum
-                $('#total-est-qty').text(total.toLocaleString('en', {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0
-                }) + ' Dz');
+`;
+                                const priorities = {
+                                    low: '#3498db', // biru
+                                    normal: '#f1c40f', // kuning
+                                    high: '#2ecc71' // hijau
+                                };
+
+                                const statuses = {
+                                    'not ready': '#e74c3c', // merah
+                                    complete: '#2ecc71' // hijau
+                                };
+                                let planHtml = `
+        <table id="planTable" class="table table-bordered">
+        <thead>
+        <tr>
+        <th><input type="checkbox" id="selectAll"></th>
+        <th>Repeat </th>
+            <th>Priority</th>
+            <th>Material Status</th>
+            <th>Inisial</th>
+            <th>Style</th>
+            <th>Warna</th>
+            <th>Qty</th>
+            <th>Sisa</th>
+            <th>Mesin</th>
+            <th>Keterangan</th>
+            <th></th>
+        </tr>
+        </thead>
+
+            <tbody>
+            
+               ${response.data.map(item => {
+            const priorityVal = item.priority.toLowerCase();
+            const materialVal = item.material_status.toLowerCase();
+            return `
+            <tr>
+
+            <td><input type="checkbox" class="row-check"></td>
+            <td class="text-center">
+    <input type="text" name="repeat[]" class="form-control repeat-input" 
+           value="${item.repeat ?? ''}">
+</td>
+                <td class="text-center">
+                    <select name="priority[]" class="form-control priority-select" style="font-weight:bold; background-color:${priorities[priorityVal] ?? '#fff'}; color:white;">
+                        ${Object.keys(priorities).map(p => `
+                            <option value="${p}" ${priorityVal === p ? 'selected' : ''}>
+                                ${p.charAt(0).toUpperCase() + p.slice(1)}
+                            </option>
+                        `).join('')}
+                    </select>
+                </td>
+                <td class="text-center">
+                    <select name="material[]" class="form-control status-select" style="font-weight:bold; background-color:${statuses[materialVal] ?? '#fff'}; color:white;">
+                        ${Object.keys(statuses).map(s => `
+                            <option value="${s}" ${materialVal === s ? 'selected' : ''}>
+                                ${s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                            </option>
+                        `).join('')}
+                    </select>
+                </td>
+
+
+                    <td>${item.inisial}</td>
+                    <td>${item.style}
+                        <input type="hidden" value="${item.idAps}" name="idAps[]">
+                    </td>
+                   <td>${item.color ? (item.color.length > 15 ? item.color.substring(0, 15) + '...' : item.color) : '-'}</td>
+                   <td>${(jarum === '240N' || jarum === '240N-PL') ? (Number(item.qty) * 2).toFixed(2) : Number(item.qty).toFixed(2)} Dz</td>
+<td>${(jarum === '240N' || jarum === '240N-PL') ? (Number(item.sisa) * 2).toFixed(2) : Number(item.sisa).toFixed(2)} Dz</td>
+                    <td>
+                        <input type="number" class="form-control mesin-input" value="${item.mesin ?? '0'}" name="mesin[]">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" value="${item.keterangan ?? ''}" name="keterangan[]">
+                    </td>
+                   
+                    <td>
+                        <button type="button" class="btn btn-info ml-auto btn-choose" data-style="${item.idAps}" data-plan="<?= $id_save ?>">Choose</button>
+                    </td>
+                </tr>
+            `;}).join('')}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="9" class="text-right">Total Mesin</th>
+                <th id="totalMesin">0</th>
+                <th colspan="2"></th>
+            </tr>
+        </tfoot>
+    </table>
+`;
+
+                                document.querySelector(".planDetail").innerHTML = planHtml;
+                                // Tambah kontrol global
+                                const controlPanel = `
+   <div class="mb-2">
+  <div class="d-flex flex-wrap align-items-center gap-3">
+
+    <!-- Bulk Action Section -->
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <label class="fw-bold mb-0">Bulk Action:</label>
+      <select id="bulkField" class="form-control form-control-sm w-auto">
+        <option value="">-- Choose Field --</option>
+        <option value="priority">Priority</option>
+        <option value="material">Material Status</option>
+      </select>
+      <select id="bulkValue" class="form-control form-control-sm w-auto">
+        <option value="">-- Choose Value --</option>
+      </select>
+      <button id="applyBulk" class="btn btn-sm btn-primary">Apply</button>
+    </div>
+
+    <!-- Divider -->
+    <div class="vr mx-2 d-none d-md-block"></div>
+
+    <!-- Repeat Perstyle Section -->
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <label class="fw-bold mb-0">Repeat Perstyle:</label>
+      <input type="text" class="form-control form-control-sm w-auto bulk-repeat-input" placeholder="Enter repeat value">
+      <button type="button" id="checkRepeatAll" class="btn btn-sm btn-success">Apply Repeat</button>
+    </div>
+
+  </div>
+</div>
+
+`;
+
+
+                                $(".planDetail").prepend(controlPanel);
+
+                                // Dynamic isi dropdown value tergantung field
+                                $("#bulkField").on("change", function() {
+                                    const field = $(this).val();
+                                    const values = field === "priority" ? ["low", "normal", "high"] : ["not ready", "complete"];
+                                    $("#bulkValue").html(values.map(v => `<option value="${v}">${v}</option>`));
+                                });
+
+                                // Handle select all
+                                $("#selectAll").on("change", function() {
+                                    $("input.row-check").prop("checked", $(this).prop("checked"));
+                                });
+
+                                // Apply bulk action
+                                $("#applyBulk").on("click", function() {
+                                    const field = $("#bulkField").val();
+                                    const value = $("#bulkValue").val();
+                                    if (!field || !value) return alert("Please select both field and value!");
+
+                                    $("input.row-check:checked").each(function() {
+                                        const row = $(this).closest("tr");
+                                        const select = row.find(`select[name='${field}[]']`);
+                                        if (select.length) {
+                                            select.val(value).trigger("change"); // Update dropdown value
+                                            select.css("background-color",
+                                                field === "priority" ?
+                                                (value === "high" ? "#2ecc71" : value === "normal" ? "#f1c40f" : "#3498db") :
+                                                (value === "complete" ? "#2ecc71" : "#e74c3c")
+                                            );
+                                        }
+                                    });
+                                });
+
+                                document.querySelector(".planStyleCard").classList.toggle("d-none");
+
+                                // Hitung awal
+                                hitungTotalMesin();
+
+                                // Hitung ulang saat input mesin diubah
+                                document.querySelectorAll('.mesin-input').forEach(input => {
+                                    input.addEventListener('input', hitungTotalMesin);
+                                });
+
+                                // **Aktifkan DataTables setelah tabel dirender**
+                                $('#planTable').DataTable({
+                                    paging: true, // Pagination aktif
+                                    searching: true, // Bisa cari data
+                                    ordering: true, // Bisa sort kolom
+                                    lengthMenu: [
+                                        [25, -1],
+                                        [25, "All"]
+                                    ], // Dropdown jumlah data
+                                    language: {
+                                        search: "Cari:",
+                                        lengthMenu: "Tampilkan _MENU_ data",
+                                        info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+                                        paginate: {
+                                            previous: "Sebelumnya",
+                                            next: "Berikutnya"
+                                        }
+                                    }
+                                });
+                                // === APPLY TO ALL: Repeat ===
+                                // === APPLY TO ALL: Repeat ===
+                                document.getElementById('checkRepeatAll').addEventListener('click', function() {
+                                    const repeatValue = document.querySelector('.bulk-repeat-input').value.trim();
+
+                                    if (!repeatValue) {
+                                        alert("Please fill the repeat field first!");
+                                        return;
+                                    }
+
+                                    $("input.row-check:checked").each(function() {
+                                        const row = $(this).closest("tr");
+                                        const input = row.find(".repeat-input");
+                                        input.val(repeatValue);
+                                    });
+                                    document.querySelector('.bulk-repeat-input').value = '';
+                                });
+
+                            } else {
+                                console.error('Error: Response format invalid.');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('AJAX Error:', error);
+
+                        }
+                    });
+
+                });
+            });
+        });
+
+        function applySelectColor(select) {
+            const val = select.value.toLowerCase();
+            if (select.classList.contains('status-select')) {
+                select.style.backgroundColor = val === 'complete' ? '#28a745' : '#f39c12'; // green or yellow
+                select.style.color = 'white';
+            } else if (select.classList.contains('priority-select')) {
+                select.style.backgroundColor =
+                    val === 'high' ? '#e74c3c' :
+                    val === 'normal' ? '#f1c40f' :
+                    '#3498db'; // red, yellow, blue
+                select.style.color = 'white';
+            }
+        }
+
+        // apply color saat load
+        document.querySelectorAll('.status-select, .priority-select').forEach(applySelectColor);
+
+        // apply color saat user ganti
+        document.addEventListener('change', (e) => {
+            if (e.target.classList.contains('status-select') || e.target.classList.contains('priority-select')) {
+                applySelectColor(e.target);
             }
         });
-    });
 
-    function calculateTarget(key) {
-        var percentageInput = document.getElementById('percentage-' + key);
-        var target100Input = document.getElementById('target-100-' + key);
-        var target100 = parseFloat(target100Input.value);
-        var percentage = parseFloat(percentageInput.value) || 80; // Default 80% jika kosong atau tidak valid
+        $(document).ready(function() {
+            $("#dataTable").DataTable().destroy();
 
-        // Validasi persentase antara 50 dan 100, jika tidak, set ke 80%
-        if (isNaN(percentage) || percentage < 50 || percentage > 100) {
-            percentage = 80;
-            percentageInput.value = percentage; // Set persentase ke 80% sebagai default
-        }
+            var table = $('#dataTable').DataTable({
 
-        // Hitung target akhir
-        var calculatedTarget = (target100 * (percentage / 100)).toFixed(2);
-        document.getElementById('calculated-target-' + key).value = calculatedTarget;
+                "footerCallback": function(row, data, start, end, display) {
+                    var api = this.api();
 
-        fillMachineSuggestion();
-    }
+                    // Menghitung total Estimated Production per halaman
+                    var total = api.column(9, {
+                        page: 'current'
+                    }).data().reduce(function(acc, val) {
+                        var num = parseFloat(val.replace(/[^\d.-]/g, '')); // Ekstrak angka dari string
+                        return acc + (isNaN(num) ? 0 : num);
+                    }, 0);
 
-    // Tambahkan event listener untuk perubahan target_akhir
-    function updatePercentage(key) {
-        var target100Input = document.getElementById('target-100-' + key);
-        var target100 = parseFloat(target100Input.value);
-        var calculatedTargetInput = document.getElementById('calculated-target-' + key);
-        var calculatedTarget = parseFloat(calculatedTargetInput.value);
+                    // Update Total Estimated Production di halaman saat ini
+                    $(api.column(9).footer()).text(total.toLocaleString('en', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }) + ' Dz');
 
-        if (!isNaN(target100) && target100 > 0 && !isNaN(calculatedTarget)) {
-            var newPercentage = ((calculatedTarget / target100) * 100).toFixed(2);
+                    // Menghitung Grand Total dari seluruh halaman
+                    var grandTotal = api.column(9).data().reduce(function(acc, val) {
+                        var num = parseFloat(val.replace(/[^\d.-]/g, ''));
+                        return acc + (isNaN(num) ? 0 : num);
+                    }, 0);
 
-            // Update persentase di input persentase
-            document.getElementById('percentage-' + key).value = newPercentage;
-        }
-    }
-
-
-
-
-    $(document).on('click', '.btn-update', function() {
-        var idplan = $(this).data('idplan');
-
-        var idpl = $(this).data('idpl');
-        $('#modalUpdate').find('form').attr('action', '<?= base_url($role . '/deleteplanmesin') ?>');
-        $('#modalUpdate').find('input[name="id"]').val(idplan);
-        $('#modalUpdate').find('input[name="idpl"]').val(idpl);
-
-
-
-
-        $('#modalUpdate').modal('show'); // Show the modal
-    });
-
-    function initCalculations() {
-        var keys = <?= json_encode(array_keys($planning)) ?>;
-        keys.forEach(function(key) {
-            calculateTarget(key);
-        });
-        calculateDaysCount(function() {
-            fillUnplannedQty();
-            fillMachineSuggestion();
-            var startDate = document.querySelector('input[name="start_date"]').value;
-            updateAvailableMachines(startDate); // Call updateAvailableMachines with the start date
-        });
-    }
-
-    function calculateDaysCount(callback) {
-        var startDateString = document.querySelector('input[name="start_date"]').value;
-        var stopDateString = document.querySelector('.stop-date').value;
-        var startDate = new Date(startDateString);
-        var stopDate = new Date(stopDateString);
-        var isoStartDate = startDate.toISOString().split('T')[0];
-        var isoStopDate = stopDate.toISOString().split('T')[0];
-
-        $.ajax({
-            url: '<?php echo base_url("aps/getDataLibur") ?>',
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                startDate: isoStartDate,
-                endDate: isoStopDate
-            },
-            success: function(response) {
-                if (response.status == 'success') {
-                    var totalHolidays = response.total_libur;
-                    var totalDays = ((stopDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-                    if (totalDays < 1) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Invalid Dates',
-                            text: 'Stop date and start date are invalid.',
-                        }).then((result) => {
-                            var deliveryDate = new Date(document.getElementById('delivery-<?= $key ?>').value);
-                            var newStopDate = new Date(deliveryDate.getTime() - (3 * 24 * 60 * 60 * 1000)); // 3 days before delivery
-                            var newStartDate = new Date(newStopDate.getTime() - (7 * 24 * 60 * 60 * 1000)); // 7 days before delivery
-
-                            document.querySelector('.stop-date').value = newStopDate.toISOString().split('T')[0];
-                            document.querySelector('.start-date').value = newStartDate.toISOString().split('T')[0];
-                            calculateDaysCount(function() {
-                                fillMachineSuggestion();
-                                fillUnplannedQty();
-                            });
-                        });
-                    }
-                    var daysWithoutHolidays = totalDays - totalHolidays;
-
-                    document.querySelector('.days-count').value = daysWithoutHolidays;
-                    document.querySelector('.holiday-count').value = totalHolidays;
-
-                    calculateEstimatedQty();
-
-                    if (typeof callback === 'function') {
-                        callback();
-                    }
-                } else {
-                    console.error('Error: ' + response.message);
+                    // Update Grand Total
+                    $('#totalFull').text(grandTotal.toLocaleString('en', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }) + ' Dz');
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error('AJAX Error: ' + error);
+            });
+        });
+
+        $(document).on('click', '.btn-choose', function() {
+            const style = $(this).data('style');
+            const idplan = $(this).data('plan');
+            $('#hiddenFields').html(`
+        <input type="hidden" name="idaps" value="${style}">
+        <input type="hidden" name="idplan" value="${idplan}">
+    `);
+            $.ajax({
+                url: '<?= base_url($role . '/getListMesinplan') ?>',
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                    idAps: style,
+                    idplan: idplan
+                },
+                success: function(response) {
+                    let tableMesin = `
+            <table id="stock" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>No Mesin</th>
+                        <th>Start</th>
+                        <th>Stop</th>
+                        <th>Action</th>
+                        <th><button type="button" class="btn btn-info btn-addRow">+</button></th>
+                    </tr>
+                </thead>
+                <tbody>
+                 
+                `;
+
+                    if (response.status === 'success' && response.data.length > 0) {
+                        tableMesin += response.data.map(item => `
+                    <tr>
+                        <td><input type="hidden" name="id[]" class="form-control " value="${item.id}">
+                        <small class="text-danger feedback"></small>
+                       <input type="text" name="no_mc[]" class="form-control cek-mesin" value="${item.no_mc}">
+                        </td>
+                        <td><input type="date" name="start[]" class="form-control" value="${item.start_mesin}"></td>
+                        <td><input type="date" name="stop[]" class="form-control" value="${item.stop_mesin}"></td>
+                        <td><button type="button" class="btn btn-danger btn-deleteRow">Delete</button></td>
+                        <td></td>
+                    </tr>
+                `).join('');
+                    } else {
+                        tableMesin += `
+                    <tr>
+                        <td><input type="hidden" name="id[]" class="form-control">
+                         <small class="text-danger feedback"></small>
+                       <input type="text" name="no_mc[]" class="form-control cek-mesin">
+                        <td><input type="date" name="start[]" class="form-control"></td>
+                        <td><input type="date" name="stop[]" class="form-control"></td>
+                        <td><button type="button" class="btn btn-danger btn-deleteRow">Delete</button></td>
+                        <td></td>
+                    </tr>`;
+                    }
+
+                    tableMesin += `
+                </tbody>
+            </table>`;
+
+                    document.getElementById("mcTable").innerHTML = tableMesin;
+
+                    $('#stock').DataTable({
+                        paging: true,
+                        searching: true,
+                        ordering: true,
+                        destroy: true,
+                        lengthMenu: [
+                            [100],
+                            ["All"]
+                        ],
+                        language: {
+                            search: "Cari:",
+                            lengthMenu: "Tampilkan _MENU_ data",
+                            info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+                            paginate: {
+                                previous: "Sebelumnya",
+                                next: "Berikutnya"
+                            }
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', error);
+                }
+            });
+
+            $('#modalMC').modal('show');
+        });
+
+        // === ADD ROW ===
+        $(document).on('click', '.btn-addRow', function() {
+            let table = $('#stock').DataTable();
+
+            table.row.add([
+                ' <small class="text-danger feedback"></small> <input type="text" name="no_mc[]" class="form-control cek-mesin">',
+                '<input type="date" name="start[]" class="form-control">',
+                '<input type="date" name="stop[]" class="form-control">',
+                '<button type="button" class="btn btn-danger btn-deleteRow">Delete</button>',
+                ''
+            ]).draw(false);
+        });
+
+        // === DELETE ROW ===
+        $(document).on('click', '.btn-deleteRow', function() {
+            let table = $('#stock').DataTable();
+            let row = $(this).closest('tr');
+            let idVal = row.find('input[name="id[]"]').val();
+            let idaps = $('input[name="idaps"]').val(); // hidden field di form
+            let idplan = $('input[name="idplan"]').val(); // hidden field di form
+
+            if (idVal && idVal.trim() !== '') {
+                // sudah tersimpan → hapus ke database
+                $.ajax({
+                    url: '<?= base_url($role . "/deleteMesinPernomor") ?>',
+                    type: 'POST',
+                    data: {
+                        id: idVal,
+                        idaps: idaps,
+                        idplan: idplan
+                    },
+                    success: function(res) {
+                        if (res.status === 'success') {
+                            $('.btn-plan').click();
+                            table.row(row).remove().draw(false);
+                            $('.btn-plan').click();
+                        } else {
+                            console.error('Gagal hapus di database:', res);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('❌ Delete Error:', error);
+                    }
+                });
+            } else {
+                // ❗ belum tersimpan → hapus baris lokal saja
+                table.row(row).remove().draw(false);
             }
         });
-    }
 
-    function updateLibur() {
-        var startDateString = document.querySelector('input[name="start_date"]').value;
-        var stopDateString = document.querySelector('.stop-date').value;
-        var startDate = new Date(startDateString);
-        var stopDate = new Date(stopDateString);
-        var isoStartDate = startDate.toISOString().split('T')[0];
-        var isoStopDate = stopDate.toISOString().split('T')[0];
-        var totalDays = ((stopDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-        var holidays = document.querySelector('.holiday-count').value
-        var daysWithoutHolidays = totalDays - holidays;
 
-        document.querySelector('.days-count').value = daysWithoutHolidays;
-        document.querySelector('.holiday-count').value = holidays;
-        fillUnplannedQty()
-        fillMachineSuggestion();
+        $(document).on('input', '.cek-mesin', function() {
+            clearTimeout(timer);
+            let input = $(this);
+            let no_mc = input.val().trim();
+            let feedback = input.siblings('.feedback');
 
-    }
+            if (no_mc.length === 0) {
+                feedback.text('');
+                return;
+            }
 
-    function calculateEstimatedQty() {
-        var daysCount = parseFloat(document.querySelector('.days-count').value);
-        var machineCount = parseFloat(document.getElementById('machine_count').value);
-        var targetPercentageInput = document.querySelector('[id^="calculated-target-"]').value;
-        var targetPercentage = parseFloat(targetPercentageInput.split(' ')[0]);
+            // 🔥 debounce biar gak spam request
+            timer = setTimeout(function() {
+                $.ajax({
+                    url: '<?= site_url('planning/checkAvailable') ?>',
+                    method: 'POST',
+                    data: {
+                        no_mc: no_mc,
+                        jarum: jarum,
+                        area: area
+                    },
+                    dataType: 'json',
+                    success: function(res) {
+                        if (res.ada) {
+                            feedback.text('❌ Jarum ini tidak ada no mc ini')
+                                .removeClass('text-success')
+                                .addClass('text-danger');
 
-        if (!isNaN(daysCount) && !isNaN(machineCount) && !isNaN(targetPercentage)) {
-            var estimatedQty = daysCount * machineCount * targetPercentage;
-            document.querySelector('.estimated-qty').value = estimatedQty.toFixed(2);
+                        } else {
+                            feedback.text('✅ Mesin tersedia')
+                                .removeClass('text-danger')
+                                .addClass('text-success');
+                        }
+                    },
+                    error: function() {
+                        feedback.text('⚠️ Error cek mesin').addClass('text-danger');
+                    }
+                });
+            }, 1000); // delay 400ms
+        });
+
+
+        $('#formMesin').on('submit', function(e) {
+            e.preventDefault();
+
+            let formData = $(this).serialize();
+            console.log('🚀 Data yang dikirim:', formData); // 🔥 Cek disini
+
+            $.ajax({
+                url: '<?= base_url($role . '/savePlanningPernomor') ?>',
+                type: 'POST',
+                data: formData,
+                success: function(res) {
+                    console.log('✅ Response server:', res); // 🔥 Cek response
+                    $('.btn-plan').click();
+                    alert('Data berhasil disimpan!');
+                    $('#modalMC').modal('hide');
+                    $('.btn-plan').click();
+                },
+                error: function(xhr, status, error) {
+                    console.error('❌ Error Save:', error);
+                    console.log('Response Text:', xhr.responseText); // cek detail error
+                    alert('Gagal simpan data');
+                }
+            });
+        });
+
+        function editPlan(no) {
+            let button = document.getElementById('editPlan-' + no);
+
+            // var estId = document.getElementById('estId-' + no).value;
+            let estId = button.getAttribute('data-idEst');
+            let startMc = button.getAttribute('data-start');
+            let stopMc = button.getAttribute('data-stop');
+            let target = button.getAttribute('data-targetActual');
+            let deliv = button.getAttribute('data-delivery');
+            let days = button.getAttribute('data-day');
+            let mc = button.getAttribute('data-mc');
+            let saveButton = document.getElementById('savePlan');
+            let editButton = document.getElementById('saveEditPlan')
+
+            $('#planningField').find('form').attr('action', '<?= base_url($role . '/updatePlanning/') ?>' + estId);
+            const deliverySelect = $('#planningField').find('select[name="delivery"]');
+            deliverySelect.val(deliv); // Set nilai delivery
+            deliverySelect.trigger('change'); // Panggil event change secara manual
+            $('#planningField').find('input[name="id_est"]').val(estId);
+            $('#planningField').find('input[name="start_date"]').val(startMc);
+            $('#planningField').find('input[name="stop_date"]').val(stopMc);
+            $('#planningField').find('input[name="days_count"]').val(days);
+            $('#planningField').find('input[name="machine_usage"]').val(mc);
+
+            const targetField = $('#planningField').find('input[name="target_akhir"]');
+            targetField.val(target);
+
+            // Trigger input event to update percentage
+            const event = new Event('input', {
+                bubbles: true
+            });
+            targetField[0].dispatchEvent(event); // Pastikan targetField adalah elemen DOM, bukan objek jQuery
+
+            saveButton.classList.add('d-none');
+            editButton.classList.remove('d-none');
+
+
         }
-    }
 
-    function fillMachineSuggestion() {
-        var daysCount = parseFloat(document.querySelector('.days-count').value);
-        var targetPercentageInput = document.querySelector('[id^="calculated-target-"]').value;
-        var targetPercentage = parseFloat(targetPercentageInput.split(' ')[0]);
 
-        var remainingQty = parseFloat(document.querySelector('[id^="unplanned-qty-"]').value);
-        var machineSuggestion = remainingQty / daysCount / targetPercentage;
-        if (machineSuggestion < 0) {
-            machineSuggestion = 0; // Set machineSuggestion to 0
-        }
-        document.getElementById('machine_suggestion').innerText = "(Suggested: " + machineSuggestion.toFixed(2) + " Mc)";
+        $(document).on('change', '#delivery', function() {
+            $('#planningField').find('form').attr('action', '<?= base_url($role . '/saveplanning'); ?>');
+            const jarum = <?= json_encode($jarum); ?>;
+            const area = <?= json_encode($area); ?>;
+            const unplan = document.getElementById('unplanned-qty')
+            unplan.value = ''
+            const start = document.getElementById('start-date')
+            const deliv = this.value; // Ambil nilai yang dipilih dari select
+            const model = document.getElementById('model-data').value; // Ambil nilai dari input model
 
-    }
-
-    function fillUnplannedQty() {
-        var remainingQty = parseFloat(document.querySelector('[id^="remaining-qty-"]').value);
-        var totalEstQty = parseFloat(document.getElementById('total-est-qty').innerText.replace(/[^\d.-]/g, ''));
-        var unplannedQty = Math.ceil(remainingQty - totalEstQty);
-        document.getElementById('unplanned-qty-<?= $key ?>').value = unplannedQty.toFixed(2);
-
-        var saveButton = document.querySelector('button[type="submit"]');
-        if (unplannedQty <= 0) {
-            saveButton.disabled = true;
-            saveButton.textContent = 'Qty Has Been Planned Successfully';
-        } else {
-            saveButton.disabled = false;
+            // Konversi delivery menjadi objek Date
+            const deliveryDate = new Date(deliv);
+            var saveButton = document.getElementById('savePlan');
+            var saveButton = document.getElementById('savePlan');
+            var editButton = document.getElementById('saveEditPlan');
+            saveButton.disabled = false
             saveButton.textContent = 'Save Planning';
-        }
+            saveButton.classList.remove('d-none');
+            editButton.classList.add('d-none');
 
-    }
+            // Tentukan tanggal minimum (hari ini + 3 hari)
+            const today = new Date();
+            const minDate = new Date(today); // Salin tanggal hari ini
+            minDate.setDate(today.getDate() + 3); // Tambahkan 3 hari ke tanggal hari ini
+            start.value = today
+            // Validasi apakah delivery kurang dari tanggal minimum
+            if (deliveryDate < minDate) {
+                alert(`Delivery yang dipilih tidak valid. Silakan pilih tanggal delivery lebih dari tanggal ${minDate.toISOString().split('T')[0]}.`);
+                return; // Hentikan jika tidak valid
+            }
 
-    function updateAvailableMachines(date) {
-        $.ajax({
-            url: '<?= base_url("aps/getMesinByDate/") . $id_pln ?>', // Adjust the URL to pass the ID if needed
-            type: 'GET',
-            dataType: 'json',
-            data: {
-                date: date
-            },
-            success: function(response) {
-                if (response && response.available !== undefined) {
-                    // Calculate the reduced available machines value
-                    var reducedAvailableMachines = <?= $mesin ?> - response.available;
+            if (deliv !== "null") {
+                $.ajax({
+                    url: '<?= base_url("planning/getModelData") ?>',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        model: model,
+                        delivery: deliv,
+                        jarum: jarum,
+                        area: area
+                    },
+                    success: function(response) {
+                        if (response) {
+                            const stopDate = document.getElementById('stop-date');
+                            const target100 = document.getElementById('target-100');
+                            const qty = document.getElementById('qty');
+                            const remainingQty = document.getElementById('remaining-qty');
+                            const jarum = <?= json_encode($jarum) ?>;
 
-                    // Update the HTML element with the new value
-                    $('#available_machine').text("(Available : " + reducedAvailableMachines + ")");
-                } else {
-                    console.error('Error: Invalid response format.');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('AJAX Error: ' + error);
+                            if (stopDate && target100 && qty && remainingQty) {
+                                const formattedDate = new Date(deliv);
+                                formattedDate.setDate(formattedDate.getDate() - 7);
+
+                                stopDate.value = formattedDate.toISOString().split('T')[0];
+                                target100.value = response.smv;
+                                if (jarum === '240N' || jarum === '240N-PL') {
+                                    qty.value = response.qty * 2;
+                                    remainingQty.value = response.sisa * 2;
+                                } else {
+                                    qty.value = response.qty;
+                                    remainingQty.value = response.sisa;
+                                }
+
+
+                            } else {
+                                console.error('Error: One or more HTML elements not found.');
+                            }
+                        } else {
+                            console.error('Error: Response format invalid.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', error);
+                    }
+                });
+            } else {
+                alert('Silakan pilih delivery yang valid.');
             }
         });
-    }
 
-    document.querySelector('input[name="start_date"]').addEventListener('change', function() {
-        var startDate = this.value;
-        updateAvailableMachines(startDate);
-        calculateDaysCount(function() {
+
+
+        function calculateTarget() {
+            var percentageInput = document.getElementById('percentage');
+            var target100Input = document.getElementById('target-100');
+            var target100 = parseFloat(target100Input.value);
+            var percentage = parseFloat(percentageInput.value) || 80; // Default 80% jika kosong atau tidak valid
+
+            // Validasi persentase antara 50 dan 100, jika tidak, set ke 80%
+            if (isNaN(percentage) || percentage < 50 || percentage > 100) {
+                percentage = 80;
+                percentageInput.value = percentage; // Set persentase ke 80% sebagai default
+            }
+
+            // Hitung target akhir
+            var calculatedTarget = (target100 * (percentage / 100)).toFixed(2);
+            document.getElementById('calculated-target').value = calculatedTarget;
+
             fillMachineSuggestion();
-            fillUnplannedQty();
-        });
-    });
+        }
 
-    document.querySelector('.stop-date').addEventListener('change', function() {
-        calculateDaysCount(function() {
+        // Tambahkan event listener untuk perubahan target_akhir
+
+        function updatePercentage() {
+            var target100Input = document.getElementById('target-100');
+            var target100 = parseFloat(target100Input.value);
+            var calculatedTargetInput = document.getElementById('calculated-target');
+            var calculatedTarget = parseFloat(calculatedTargetInput.value);
+
+            if (!isNaN(target100) && target100 > 0 && !isNaN(calculatedTarget)) {
+                var newPercentage = ((calculatedTarget / target100) * 100).toFixed(2);
+
+                // Update persentase di input persentase
+                document.getElementById('percentage').value = newPercentage;
+            } else {
+                console.log('Invalid values for calculation');
+            }
+        }
+
+        $(document).on('click', '.btn-update', function() {
+            var idplan = $(this).data('idplan');
+
+            var idest = $(this).data('idest');
+            var idpl = $(this).data('idpl');
+            $('#modalUpdate').find('form').attr('action', '<?= base_url($role . '/deleteplanmesin') ?>');
+            $('#modalUpdate').find('input[name="id"]').val(idplan);
+            $('#modalUpdate').find('input[name="idpl"]').val(idpl);
+            $('#modalUpdate').find('input[name="idest"]').val(idest);
+
+
+
+
+            $('#modalUpdate').modal('show'); // Show the modal
+        });
+
+        function initCalculations() {
+
+            calculateDaysCount(function() {
+                fillUnplannedQty();
+                fillMachineSuggestion();
+                var startDate = document.querySelector('input[name="start_date"]').value;
+                updateAvailableMachines(startDate); // Call updateAvailableMachines with the start date
+            });
+        }
+
+        function calculateDaysCount(callback) {
+            var startDateString = document.querySelector('input[name="start_date"]').value;
+            var stopDateString = document.querySelector('.stop-date').value;
+            var startDate = new Date(startDateString);
+            var stopDate = new Date(stopDateString);
+            var isoStartDate = startDate.toISOString().split('T')[0];
+            var isoStopDate = stopDate.toISOString().split('T')[0];
+
+            $.ajax({
+                url: '<?php echo base_url("planning/getDataLibur") ?>',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    startDate: isoStartDate,
+                    endDate: isoStopDate
+                },
+                success: function(response) {
+                    if (response.status == 'success') {
+                        var totalHolidays = response.total_libur;
+                        var totalDays = ((stopDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+                        if (totalDays < 1) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Invalid Dates',
+                                text: 'Stop date and start date are invalid.',
+                            }).then((result) => {
+                                var deliveryDate = new Date(document.getElementById('delivery').value);
+                                var newStopDate = new Date(deliveryDate.getTime() - (3 * 24 * 60 * 60 * 1000)); // 3 days before delivery
+                                var newStartDate = new Date(newStopDate.getTime() - (7 * 24 * 60 * 60 * 1000)); // 7 days before delivery
+
+                                document.querySelector('.stop-date').value = newStopDate.toISOString().split('T')[0];
+                                document.querySelector('.start-date').value = newStartDate.toISOString().split('T')[0];
+                                calculateDaysCount(function() {
+                                    fillMachineSuggestion();
+                                    fillUnplannedQty();
+                                });
+                            });
+                        }
+                        var daysWithoutHolidays = totalDays - totalHolidays;
+
+                        document.querySelector('.days-count').value = daysWithoutHolidays;
+                        document.querySelector('.holiday-count').value = totalHolidays;
+
+                        calculateEstimatedQty();
+
+                        if (typeof callback === 'function') {
+                            callback();
+                        }
+                    } else {
+                        console.error('Error: ' + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error: ' + error);
+                }
+            });
+        }
+
+        function updateLibur() {
+            var startDateString = document.querySelector('input[name="start_date"]').value;
+            var stopDateString = document.querySelector('.stop-date').value;
+            var startDate = new Date(startDateString);
+            var stopDate = new Date(stopDateString);
+            var isoStartDate = startDate.toISOString().split('T')[0];
+            var isoStopDate = stopDate.toISOString().split('T')[0];
+            var totalDays = ((stopDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+            var holidays = document.querySelector('.holiday-count').value
+            var daysWithoutHolidays = totalDays - holidays;
+
+            document.querySelector('.days-count').value = daysWithoutHolidays;
+            document.querySelector('.holiday-count').value = holidays;
+            fillUnplannedQty()
             fillMachineSuggestion();
-            fillUnplannedQty();
+
+        }
+
+        function calculateEstimatedQty() {
+            var daysCount = parseFloat(document.querySelector('.days-count').value);
+            var machineCount = parseFloat(document.getElementById('machine_count').value);
+            var targetPercentageInput = document.querySelector('[id^="calculated-target"]').value;
+            var targetPercentage = parseFloat(targetPercentageInput.split(' ')[0]);
+
+            if (!isNaN(daysCount) && !isNaN(machineCount) && !isNaN(targetPercentage)) {
+                var estimatedQty = daysCount * machineCount * targetPercentage;
+                document.querySelector('.estimated-qty').value = estimatedQty.toFixed(2);
+            }
+        }
+
+        function fillMachineSuggestion() {
+            var daysCount = parseFloat(document.querySelector('.days-count').value);
+            var targetPercentageInput = document.querySelector('[id="calculated-target"]').value;
+            var targetPercentage = parseFloat(targetPercentageInput.split(' ')[0]);
+
+            var remainingQty = parseFloat(document.querySelector('[id^="unplanned-qty"]').value);
+            var machineSuggestion = remainingQty / daysCount / targetPercentage;
+            if (machineSuggestion < 0) {
+                machineSuggestion = 0; // Set machineSuggestion to 0
+            }
+            document.getElementById('machine_suggestion').innerText = "(Suggested: " + machineSuggestion.toFixed(2) + " Mc)";
+
+        }
+
+        function fillUnplannedQty() {
+            // Ambil nilai delivery dari input dengan ID 'delivery'
+            let deliv = document.getElementById('delivery').value.replace(/\s+/g, '-'); // Ganti spasi dengan '-'
+            console.log("Delivery Value:", deliv);
+
+            let listPlanningEmpty = document.getElementById('list-planning-empty').value === 'true';
+
+            // Ambil nilai remainingQty dari input dengan ID 'remaining-qty'
+            var remainingQty = parseFloat(document.querySelector('[id="remaining-qty" ]').value) || 0;
+
+            // Jika listPlanning kosong, set unplanned-qty langsung dengan remainingQty
+            if (listPlanningEmpty) {
+                document.getElementById('unplanned-qty').value = remainingQty.toFixed(2);
+                var saveButton = document.getElementById('savePlan');
+                saveButton.disabled = false;
+                saveButton.textContent = 'Save Planning';
+                return; // Keluar dari fungsi jika listPlanning kosong
+            }
+
+            // Cari elemen total-est-qty berdasarkan ID delivery
+            var totalEstQtyElem = document.getElementById('total-est-qty-' + deliv);
+
+            if (!totalEstQtyElem) {
+                document.getElementById('unplanned-qty').value = remainingQty.toFixed(2);
+                console.error('Element with ID total-est-qty-' + deliv + ' not found.');
+                return; // Keluar dari fungsi jika elemen tidak ditemukan
+            }
+
+            // Ambil nilai dari elemen dan parse sebagai angka
+            var totalEstQty = parseFloat(totalEstQtyElem.innerText.replace(/[^\d.-]/g, '')) || 0;
+
+            // Hitung Unplanned Qty
+            var unplannedQty = Math.ceil(remainingQty - totalEstQty);
+            document.getElementById('unplanned-qty').value = unplannedQty.toFixed(2);
+
+            // Ubah status tombol 'Save'
+            var saveButton = document.getElementById('savePlan');
+            if (unplannedQty <= 0) {
+                console.log(unplannedQty)
+                saveButton.disabled = true;
+                saveButton.textContent = 'Qty Has Been Planned Successfully';
+            } else {
+                saveButton.disabled = false;
+                saveButton.textContent = 'Save Planning';
+            }
+        }
+
+
+        function updateAvailableMachines(date) {
+            $.ajax({
+                url: '<?= base_url("planning/getMesinByDate/") . $id_pln ?>', // Adjust the URL to pass the ID if needed
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                    date: date
+                },
+                success: function(response) {
+                    if (response && response.available !== undefined) {
+                        // Calculate the reduced available machines value
+                        var reducedAvailableMachines = <?= $mesin ?> - response.available;
+
+                        // Update the HTML element with the new value
+                        $('#available_machine').text("(Available : " + reducedAvailableMachines + " )");
+                    } else {
+                        console.error('Error: Invalid response format.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error: ' + error);
+                }
+            });
+        }
+
+        document.querySelector(' input[name="start_date" ]').addEventListener('change', function() {
+            var startDate = this.value;
+            var unplan = document.getElementById('unplanned-qyt')
+            var saveButton = document.getElementById('savePlan');
+            updateAvailableMachines(startDate);
+            calculateDaysCount(function() {
+                fillMachineSuggestion();
+                fillUnplannedQty();
+                if (unplan.value > 0) {
+                    saveButton.disabled = false;
+                    saveButton.textContent = 'Save Planning';
+                } else {
+                    saveButton.disabled = true;
+                    saveButton.textContent = 'Qty Has Been Planned Successfully';
+                }
+            });
         });
-    });
 
-    var percentageInputs = document.querySelectorAll('input[name="persen_target"]');
-    percentageInputs.forEach(function(input) {
-        input.addEventListener('input', function() {
-            var key = input.id.split('-').pop();
-            calculateTarget(key);
+        document.querySelector('.stop-date').addEventListener('change', function() {
+            calculateDaysCount(function() {
+                fillMachineSuggestion();
+                fillUnplannedQty();
+            });
         });
 
-        input.addEventListener('blur', function() {
-            fillMachineSuggestion();
+        var percentageInputs = document.querySelectorAll('input[name="persen_target" ]');
+        percentageInputs.forEach(function(input) {
+            input.addEventListener('input', function() {
+
+                calculateTarget();
+            });
+
+            input.addEventListener('blur', function() {
+                fillMachineSuggestion();
+            });
         });
-    });
 
-    initCalculations();
-</script>
+        initCalculations();
 
-<?php $this->endSection(); ?>
+        function hitungTotalMesin() {
+            let total = 0;
+            document.querySelectorAll('.mesin-input').forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+            document.getElementById('totalMesin').textContent = total;
+        }
+    </script>
+
+    <?php $this->endSection(); ?>
