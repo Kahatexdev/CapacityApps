@@ -410,9 +410,11 @@ class UserController extends BaseController
     public function bsMesinPerbulan($area, $bulan)
     {
         $bsPerbulan = $this->BsMesinModel->bsMesinPerbulan($area, $bulan);
+        // $bsPerbulan = $this->BsMesinModel->bsMesinPerbulan2($area, $bulan);
         $totalBsGram = $this->BsMesinModel->totalGramPerbulan($area, $bulan);
         $totalBsPcs = $this->BsMesinModel->totalPcsPerbulan($area, $bulan);
         $chartData = $this->BsMesinModel->ChartPdk($area, $bulan);
+        // $totalProd = $this->productModel->produksiPerbulan($area, $bulan);
 
         // ambil 10 data teratas
         // Urutkan data berdasarkan totalGram dari besar ke kecil
