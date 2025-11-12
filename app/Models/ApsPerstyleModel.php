@@ -1543,4 +1543,13 @@ class ApsPerstyleModel extends Model
         }
         return $index;
     }
+    public function getSisaOrderAnomali()
+    {
+        return $this->select('mastermodel, factory, delivery, sum(qty) as qty, sum(sisa) as sisa')
+            ->where('sisa > qty')
+            ->where('qty >', 0)
+            ->where('factory !=', 'mj')
+            ->groupBy('mastermodel,factory,delivery')
+            ->findAll();
+    }
 }

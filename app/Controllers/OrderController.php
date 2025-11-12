@@ -2869,4 +2869,24 @@ class OrderController extends BaseController
                 ->with('error', 'Terjadi error saat memproses file: ' . $e->getMessage());
         }
     }
+    public function sisaOrderAnomali()
+    {
+        $role = session()->get('role');
+        $order = $this->ApsPerstyleModel->getSisaOrderAnomali();
+        // dd($order);
+        $data = [
+            'role' => $role,
+            'title' => 'Data Order',
+            'active1' => '',
+            'active2' => '',
+            'active3' => 'active',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'order' => $order,
+            'role' => $role
+        ];
+        return view($role . '/Order/sisaOrderAnomali', $data);
+    }
 }
