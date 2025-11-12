@@ -69,14 +69,56 @@
                                 </tbody>
                             </table>
                         </div>
-
-
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- <div class="row">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card pb-0">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5>BS Mesin bulan <?= $month ?></h5>
+                        <a href="<?= base_url($role . '/exportBsMesinPerbulan/' . $area . '/' . $month) ?>" class="btn btn-success">Export</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="dataTable0" class="display  striped" style="width:100%">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Nama</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">NO Mesin</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">No Model</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Style</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Pcs</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty Gram</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Area</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($dataBs as $bs) : ?>
+                                        <tr>
+                                            <td class="text-sm"><?= $bs['tanggal_produksi']; ?></td>
+                                            <td class="text-sm"><?= $bs['nama_karyawan']; ?></td>
+                                            <td class="text-sm"><?= $bs['no_mesin']; ?> </td>
+                                            <td class="text-sm"><?= $bs['no_model']; ?> </td>
+                                            <td class="text-sm"><?= $bs['size']; ?> </td>
+                                            <td class="text-sm"><?= $bs['qty_pcs']; ?> pcs</td>
+                                            <td class="text-sm"><?= $bs['qty_gram']; ?> gr</td>
+                                            <td class="text-sm"><?= $bs['area']; ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
     <div class="row">
         <div class="row">
             <div class="col-lg-12">
@@ -111,7 +153,6 @@
                                             <td class="text-sm"><?= $bs['qty_pcs']; ?> pcs</td>
                                             <td class="text-sm"><?= $bs['qty_gram']; ?> gr</td>
                                             <td class="text-sm"><?= $bs['area']; ?></td>
-
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -121,14 +162,10 @@
                 </div>
             </div>
         </div>
-
-
-
     </div>
-
-
-
 </div>
+
+
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script type="text/javascript">
     // AJAX form submission

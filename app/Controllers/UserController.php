@@ -413,6 +413,17 @@ class UserController extends BaseController
         $totalBsGram = $this->BsMesinModel->totalGramPerbulan($area, $bulan);
         $totalBsPcs = $this->BsMesinModel->totalPcsPerbulan($area, $bulan);
         $chartData = $this->BsMesinModel->ChartPdk($area, $bulan);
+
+        // ambil 10 data teratas
+        // Urutkan data berdasarkan totalGram dari besar ke kecil
+        usort($chartData, function ($a, $b) {
+            return $b['totalGram'] <=> $a['totalGram'];
+        });
+
+        // Ambil hanya 10 data teratas
+        $chartData = array_slice($chartData, 0, 10);
+
+        // dd($chartData);
         $data = [
             'role' => session()->get('role'),
             'area' => session()->get('username'),
