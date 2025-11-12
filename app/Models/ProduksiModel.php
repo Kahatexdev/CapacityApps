@@ -654,4 +654,20 @@ class ProduksiModel extends Model
         $this->groupBy('area');
         return $this->findAll();
     }
+    public function produksiPerbulan($area, $bulan)
+    {
+        $bulanDateTime = DateTime::createFromFormat('F-Y', $bulan);
+        $tahun = $bulanDateTime->format('Y'); // 2024
+        $bulanNumber = $bulanDateTime->format('m'); // 12
+        return $this->select('produksi.tgl_produksi, SUM(produksi.qty_produksi) AS qty_prod,  sum(bs_mesin.qty_pcs) as bsmc_pcs, sum(bs_mesin.qty_gram) as bsmc_gram, SUM(perbaikan_area.qty) AS qty_perbaikan')
+            ->join('apsperstyle', 'produksi.idapsperstyle=apsperstyle.idapsperstyle')
+            ->join('perbaikan_area', 'perbaikan_area.idapsperstyle=apsperstyle.idapsperstyle')
+            ->join('bs_mesin', 'bs_mesin.size=apsperstyle.size AND apsperstyle.mastermodel=bs_mesin.no_model')
+            ->where('produksi.area', $area)
+            ->where('bs_mesin.area', $area)
+            ->where('perbaikan.area', $area)
+            ->where('MONTH(tgl_produksi)', $bulanNumber) // Filter bulan
+            ->where('YEAR(tgl_produksi)', $tahun) // Filter bulan
+            ->first();
+    }
 }
