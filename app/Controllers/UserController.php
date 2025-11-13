@@ -409,23 +409,105 @@ class UserController extends BaseController
     }
     public function bsMesinPerbulan($area, $bulan)
     {
-        $bsPerbulan = $this->BsMesinModel->bsMesinPerbulan($area, $bulan);
-        // $bsPerbulan = $this->BsMesinModel->bsMesinPerbulan2($area, $bulan);
+        // $bsPerbulan = $this->BsMesinModel->bsMesinPerbulan($area, $bulan);
+        $bsPerbulan = $this->BsMesinModel->bsMesinPerbulan2($area, $bulan);
         $totalBsGram = $this->BsMesinModel->totalGramPerbulan($area, $bulan);
         $totalBsPcs = $this->BsMesinModel->totalPcsPerbulan($area, $bulan);
         $chartData = $this->BsMesinModel->ChartPdk($area, $bulan);
-        // $totalProd = $this->productModel->produksiPerbulan($area, $bulan);
 
-        // ambil 10 data teratas
+
+        // group data semua pdk dan size untuk ambil gw aktual / gw MU
+        $dataOrder = [];
+        foreach ($bsPerbulan as $item) {
+            $key = $item['no_model'] . '|' . $item['size'];
+            $dataOrder[$key] = [
+                'no_model' => $item['no_model'],
+                'size' => $item['size'],
+            ];
+        }
+        // Hapus key-nya, biar jadi array numerik lagi
+        $dataOrder = array_values($dataOrder);
+
+        // get data gw aktual / gw MU
+        $apiUrl = 'http://172.23.39.118/MaterialSystem/public/api/getAllGw';
+        // Kirim data ke API pakai CodeIgniter HTTP client
+        $dataGw = service('curlrequest')->post($apiUrl, [
+            'json' => $dataOrder
+        ]);
+        $responseBody = $dataGw->getBody();
+        $responseJson = json_decode($responseBody, true); // jadi array asosiatif
+        $dataGwList = $responseJson['data'] ?? []; // ambil bagian 'data'
+
+        // Data total START
+        $totalProd = $this->produksiModel->produksiPerbulan($area, $bulan, $dataGwList);
+        // Data total END
+
+        // Data bs perbulan START
+        // ambil gw untuk hitung bs gram ke pcs
+        foreach ($bsPerbulan as &$bs) {
+            $noModel = $bs['no_model'];
+            $size = $bs['size'];
+
+            $gwValue = 0;
+            foreach ($dataGwList as $gwItem) {
+                if (
+                    strtoupper($gwItem['no_model']) === strtoupper($noModel) &&
+                    strtoupper($gwItem['size']) === $size
+                ) {
+                    $gwValue = $gwItem['gw'];
+                    break; // langsung keluar loop kalau udah ketemu
+                }
+            }
+            if ($gwValue == 0) {
+                log_message('warning', "⚠️ GW tidak ditemukan untuk {$noModel} / {$size}");
+            }
+
+            $bsGram = $bs['qty_gram'] > 0 ? round($bs['qty_gram'] / $gwValue) : 0;
+            $bsPcs = $bs['qty_pcs'] + $bsGram;
+            $totalBsDz = round($bsPcs / 24);
+
+            // tambahkan gw ke data bs
+            $bs['totalBsMc'] = $bsPcs;
+        }
+        unset($bs); // good practice
+
+        // --- 🔽 Sekarang group berdasarkan nama_karyawan ---
+        $groupedByKaryawan = [];
+
+        foreach ($bsPerbulan as $row) {
+            $nama = $row['nama_karyawan']; // ganti sesuai nama kolom kamu
+            if (!isset($groupedByKaryawan[$nama])) {
+                $groupedByKaryawan[$nama] = [
+                    'nama_karyawan' => $nama,
+                    'totalBsMc' => 0,
+                    'totalQtyPcs' => 0,
+                    'totalQtyGram' => 0,
+                ];
+            }
+
+            $groupedByKaryawan[$nama]['totalBsMc'] += $row['totalBsMc'];
+            $groupedByKaryawan[$nama]['totalQtyPcs'] += $row['qty_pcs'];
+            $groupedByKaryawan[$nama]['totalQtyGram'] += $row['qty_gram'];
+        }
+
+        // ubah dari associative ke numerik array
+        $groupedByKaryawan = array_values($groupedByKaryawan);
+
+        // --- Urutkan dari yang terbanyak ---
+        usort($groupedByKaryawan, function ($a, $b) {
+            return $b['totalBsMc'] <=> $a['totalBsMc'];
+        });
+        // Data bs perbulan END
+
+        // Data Chart START
         // Urutkan data berdasarkan totalGram dari besar ke kecil
         usort($chartData, function ($a, $b) {
             return $b['totalGram'] <=> $a['totalGram'];
         });
-
         // Ambil hanya 10 data teratas
         $chartData = array_slice($chartData, 0, 10);
+        // Data Chart END
 
-        // dd($chartData);
         $data = [
             'role' => session()->get('role'),
             'area' => session()->get('username'),
@@ -437,11 +519,12 @@ class UserController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-            'dataBs' => $bsPerbulan,
+            'dataBs' => $groupedByKaryawan,
             'month' => $bulan,
             'totalbsgram' => $totalBsGram,
             'totalbspcs' => $totalBsPcs,
-            'chart' => $chartData
+            'chart' => $chartData,
+            'dataTotal' => $totalProd['final']
         ];
         return view(session()->get('role') . '/bsMesinPerbulan', $data);
     }

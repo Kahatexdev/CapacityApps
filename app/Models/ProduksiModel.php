@@ -4,6 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 use LDAP\Result;
+use DateTime;
 
 class ProduksiModel extends Model
 {
@@ -654,20 +655,175 @@ class ProduksiModel extends Model
         $this->groupBy('area');
         return $this->findAll();
     }
-    public function produksiPerbulan($area, $bulan)
+    public function produksiPerbulan($area, $bulan, $dataGwList)
     {
+        $db = \Config\Database::connect();
+
         $bulanDateTime = DateTime::createFromFormat('F-Y', $bulan);
         $tahun = $bulanDateTime->format('Y'); // 2024
         $bulanNumber = $bulanDateTime->format('m'); // 12
-        return $this->select('produksi.tgl_produksi, SUM(produksi.qty_produksi) AS qty_prod,  sum(bs_mesin.qty_pcs) as bsmc_pcs, sum(bs_mesin.qty_gram) as bsmc_gram, SUM(perbaikan_area.qty) AS qty_perbaikan')
-            ->join('apsperstyle', 'produksi.idapsperstyle=apsperstyle.idapsperstyle')
-            ->join('perbaikan_area', 'perbaikan_area.idapsperstyle=apsperstyle.idapsperstyle')
-            ->join('bs_mesin', 'bs_mesin.size=apsperstyle.size AND apsperstyle.mastermodel=bs_mesin.no_model')
-            ->where('produksi.area', $area)
-            ->where('bs_mesin.area', $area)
-            ->where('perbaikan.area', $area)
-            ->where('MONTH(tgl_produksi)', $bulanNumber) // Filter bulan
-            ->where('YEAR(tgl_produksi)', $tahun) // Filter bulan
-            ->first();
+        // === 1️⃣ PRODUKSI + PERBAIKAN per TANGGAL ===
+        $sqlProduksi = "
+            SELECT 
+                t.tanggal,
+                COALESCE(p.qty_prod, 0) AS qty_prod,
+                COALESCE(b.bsmc_pcs, 0) AS bsmc_pcs,
+                COALESCE(b.bsmc_gram, 0) AS bsmc_gram,
+                COALESCE(pa.qty_perbaikan, 0) AS qty_perbaikan
+            FROM (
+                SELECT tgl_produksi AS tanggal FROM produksi
+                WHERE area = :area:
+                  AND MONTH(tgl_produksi) = :bulan:
+                  AND YEAR(tgl_produksi) = :tahun:
+                UNION
+                SELECT tanggal_produksi FROM bs_mesin
+                WHERE area = :area:
+                  AND MONTH(tanggal_produksi) = :bulan:
+                  AND YEAR(tanggal_produksi) = :tahun:
+                UNION
+                SELECT tgl_perbaikan FROM perbaikan_area
+                WHERE area = :area:
+                  AND MONTH(tgl_perbaikan) = :bulan:
+                  AND YEAR(tgl_perbaikan) = :tahun:
+            ) AS t
+            LEFT JOIN (
+                SELECT tgl_produksi, SUM(qty_produksi) AS qty_prod
+                FROM produksi
+                WHERE area = :area:
+                  AND MONTH(tgl_produksi) = :bulan:
+                  AND YEAR(tgl_produksi) = :tahun:
+                GROUP BY tgl_produksi
+            ) AS p ON t.tanggal = p.tgl_produksi
+            LEFT JOIN (
+                SELECT tanggal_produksi, SUM(qty_pcs) AS bsmc_pcs, SUM(qty_gram) AS bsmc_gram
+                FROM bs_mesin
+                WHERE area = :area:
+                  AND MONTH(tanggal_produksi) = :bulan:
+                  AND YEAR(tanggal_produksi) = :tahun:
+                GROUP BY tanggal_produksi
+            ) AS b ON t.tanggal = b.tanggal_produksi
+            LEFT JOIN (
+                SELECT tgl_perbaikan, SUM(qty) AS qty_perbaikan
+                FROM perbaikan_area
+                WHERE area = :area:
+                  AND MONTH(tgl_perbaikan) = :bulan:
+                  AND YEAR(tgl_perbaikan) = :tahun:
+                GROUP BY tgl_perbaikan
+            ) AS pa ON t.tanggal = pa.tgl_perbaikan
+            ORDER BY t.tanggal
+        ";
+
+        $dataProduksi = $db->query($sqlProduksi, [
+            'area'  => $area,
+            'bulan' => $bulanNumber,
+            'tahun' => $tahun
+        ])->getResultArray();
+
+        // === 2️⃣ DATA BS MESIN per MODEL & SIZE ===
+        $sqlBs = "
+            SELECT 
+                tanggal_produksi,
+                no_model,
+                size,
+                SUM(qty_pcs) AS qty_pcs,
+                SUM(qty_gram) AS qty_gram
+            FROM bs_mesin
+            WHERE area = :area:
+            AND MONTH(tanggal_produksi) = :bulan:
+            AND YEAR(tanggal_produksi) = :tahun:
+            GROUP BY tanggal_produksi, no_model, size
+            ORDER BY tanggal_produksi, no_model, size
+        ";
+
+        $dataBs = $db->query($sqlBs, [
+            'area'  => $area,
+            'bulan' => $bulanNumber,
+            'tahun' => $tahun
+        ])->getResultArray();
+
+        // 2️⃣ Hitung totalBsMc per model+size
+        foreach ($dataBs as &$bs) {
+            $noModel = $bs['no_model'];
+            $size = $bs['size'];
+
+            $gwValue = 0;
+            foreach ($dataGwList as $gwItem) {
+                if (
+                    strtoupper($gwItem['no_model']) === strtoupper($noModel) &&
+                    strtoupper($gwItem['size']) === $size
+                ) {
+                    $gwValue = $gwItem['gw'];
+                    break;
+                }
+            }
+
+            if ($gwValue == 0) {
+                log_message('warning', "⚠️ GW tidak ditemukan untuk {$noModel} / {$size}");
+            }
+
+            $bsGram = $bs['qty_gram'] > 0 ? round($bs['qty_gram'] / $gwValue) : 0;
+            $bsPcs  = $bs['qty_pcs'] + $bsGram;
+            // $totalBsDz = round($bsPcs / 24);
+
+            $bs['totalBsMc'] = $bsPcs;
+        }
+        unset($bs);
+
+        // 3️⃣ Group berdasarkan tanggal_produksi
+        $groupedByTanggal = [];
+
+        foreach ($dataBs as $row) {
+            $tanggal = $row['tanggal_produksi'];
+            if (!isset($groupedByTanggal[$tanggal])) {
+                $groupedByTanggal[$tanggal] = [
+                    'tanggal_produksi' => $tanggal,
+                    'totalBsMc' => 0,
+                    'totalQtyPcs' => 0,
+                    'totalQtyGram' => 0,
+                ];
+            }
+
+            $groupedByTanggal[$tanggal]['totalBsMc']  += $row['totalBsMc'];
+            $groupedByTanggal[$tanggal]['totalQtyPcs'] += $row['qty_pcs'];
+            $groupedByTanggal[$tanggal]['totalQtyGram'] += $row['qty_gram'];
+        }
+
+        $bsPerTanggal = array_values($groupedByTanggal);
+
+        $mapBs = [];
+        foreach ($bsPerTanggal as $bs) {
+            $mapBs[$bs['tanggal_produksi']] = $bs;
+        }
+
+        $finalData = [];
+        foreach ($dataProduksi as $row) {
+            $tanggal = $row['tanggal'];
+
+            // ambil bs kalau ada
+            $bs = $mapBs[$tanggal] ?? [
+                'totalBsMc' => 0,
+                'persentase' => 0,
+            ];
+
+            $persentase = ($bs['totalBsMc'] + $row['qty_perbaikan']) / $row['qty_prod'] * 100;
+
+            $finalData[] = [
+                'tanggal'        => $tanggal,
+                'qty_prod'       => $row['qty_prod'],
+                'totalBsMc'      => $bs['totalBsMc'],
+                'qty_perbaikan'  => $row['qty_perbaikan'],
+                'persentase'     => $persentase,
+            ];
+        }
+
+        // urutkan hasil akhir berdasarkan tanggal
+        usort($finalData, fn($a, $b) => strcmp($a['tanggal'], $b['tanggal']));
+
+
+        return [
+            'final'    => $finalData,   // hasil gabungan produksi + bs + perbaikan per tanggal
+            'produksi' => $dataProduksi, // optional: kalau masih mau akses data mentahan
+            'bs'       => $groupedByTanggal,       // optional: kalau masih mau akses detail bs per model/size
+        ];
     }
 }

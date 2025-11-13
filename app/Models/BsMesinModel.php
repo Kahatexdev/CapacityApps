@@ -84,12 +84,11 @@ class BsMesinModel extends Model
         $bulanDateTime = DateTime::createFromFormat('F-Y', $bulan);
         $tahun = $bulanDateTime->format('Y'); // 2024
         $bulanNumber = $bulanDateTime->format('m'); // 12
-        return $this->select('nama_karyawan, sum(qty_pcs) as qty_pcs, sum(qty_gram) as qty_gram,no_model,size, no_mesin, tanggal_produksi,area')
+        return $this->select('nama_karyawan, sum(qty_pcs) as qty_pcs, sum(qty_gram) as qty_gram ,no_model ,size')
             ->where('MONTH(tanggal_produksi)', $bulanNumber) // Filter bulan
             ->where('YEAR(tanggal_produksi)', $tahun) // Filter bulan
             ->where('area', $area) // Filter area
-            ->groupBy('no_model, size, tanggal_produksi,no_mesin') // Kelompokkan berdasarkan karyawan dan tanggal
-            ->groupBy('nama_karyawan') // urutkan berdasarkan nama yg banyak bs nya
+            ->groupBy('nama_karyawan, no_model, size') // Kelompokkan berdasarkan karyawan dan tanggal
             ->findAll();
     }
     public function totalGramPerbulan($area, $bulan)
