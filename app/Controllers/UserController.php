@@ -429,7 +429,7 @@ class UserController extends BaseController
         $dataOrder = array_values($dataOrder);
 
         // get data gw aktual / gw MU
-        $apiUrl = 'http://172.23.39.118/MaterialSystem/public/api/getAllGw';
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getAllGw';
         // Kirim data ke API pakai CodeIgniter HTTP client
         $dataGw = service('curlrequest')->post($apiUrl, [
             'json' => $dataOrder
