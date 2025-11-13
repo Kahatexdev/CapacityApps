@@ -69,4 +69,20 @@ class MesinPerStyle extends Model
             ->where('apsperstyle.factory', $area)
             ->first();
     }
+    public function reqstartmc($model)
+    {
+        $dm = $this->select('MIN(start_pps_plan) AS start_mc')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle=mesin_perinisial.idapsperstyle')
+            ->where('mastermodel', $model)
+            ->first();
+        if (empty($dm['start_mc'])) {
+            return $this->db->table('data_model')
+                ->select('start_mc')->where('no_model', $model)->get()
+                ->getRowArray();
+        } else {
+            return [
+                'start_mc' => date('Y-m-d', strtotime($dm['start_mc']))
+            ];
+        }
+    }
 }

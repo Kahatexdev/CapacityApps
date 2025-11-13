@@ -20,6 +20,7 @@ use App\Models\BsModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\MonthlyMcModel;
 use App\Models\PengaduanModel;
+use App\Models\MesinPerStyle;
 
 class ApiController extends ResourceController
 {
@@ -38,6 +39,7 @@ class ApiController extends ResourceController
     protected $globalModel;
     protected $pengaduanModel;
     protected $productType;
+    protected $mesinPerStyle;
 
     protected $validation;
     protected $format = 'json';
@@ -56,6 +58,7 @@ class ApiController extends ResourceController
         $this->globalModel = new MonthlyMcModel();
         $this->pengaduanModel = new PengaduanModel();
         $this->liburModel = new LiburModel();
+        $this->mesinPerStyle = new MesinPerStyle();
         $this->validation = \Config\Services::validation();
     }
     public function index()
@@ -94,7 +97,9 @@ class ApiController extends ResourceController
     }
     public function reqstartmc($model)
     {
-        $startMc = $this->DetailPlanningModel->reqstartmc($model);
+        // $startMc = $this->DetailPlanningModel->reqstartmc($model);
+        $startMc = $this->mesinPerStyle->reqstartmc($model);
+        // log_message('info', 'StartMc data: ' . print_r($startMc, true));
         if (isset($startMc['error'])) {
             return $this->respond(['message' => $startMc['error']], 404);
         }
