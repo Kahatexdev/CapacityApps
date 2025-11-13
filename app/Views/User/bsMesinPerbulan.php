@@ -24,6 +24,45 @@
             });
         </script>
     <?php endif; ?>
+    <div class="row mt-3">
+        <div class="col-lg-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pb-0 d-flex justify-content-between align-items-center">
+                    <h5 class="text-dark fw-bold mb-0">
+                        <i class="ni ni-filter-alt text-info me-2"></i> Filter Data BS Mesin
+                    </h5>
+                </div>
+
+                <div class="card-body pt-3">
+                    <form action="<?= base_url($role . '/bsMesinPerbulan/' . $ar . '/' . $bulan) ?>" method="get" class="row g-3 align-items-end">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="buyer" class="form-label fw-semibold small mb-1">Buyer</label>
+                                <select class="form-select text-dark" id="buyer" name="buyer">
+                                    <option value="">Pilih Buyer</option>
+                                    <?php foreach ($buyerList as $b) : ?>
+                                        <option value="<?= $b['kd_buyer_order']; ?>"
+                                            <?= isset($buyerFilter) && $buyerFilter == $b['kd_buyer_order'] ? 'selected' : '' ?>>
+                                            <?= $b['kd_buyer_order']; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold small mb-1"> </label>
+                                <button type="submit" class="btn btn-info w-100">
+                                    <i class="fas fa-search me-1"></i> Tampilkan
+                                </button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col">
             <div class="card mt-2">

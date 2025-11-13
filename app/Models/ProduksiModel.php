@@ -655,9 +655,16 @@ class ProduksiModel extends Model
         $this->groupBy('area');
         return $this->findAll();
     }
-    public function produksiPerbulan($area, $bulan, $dataGwList)
+    public function produksiPerbulan($area, $bulan, $buyer, $dataGwList)
     {
         $db = \Config\Database::connect();
+
+        $buyerFilter = '';
+        // kalau buyer tidak kosong, tambahkan filter dan parameter
+        if (!empty($buyer)) {
+            $buyerFilter = ' AND dm.kd_buyer_order = :buyer:';
+            $params['buyer'] = $buyer;
+        }
 
         $bulanDateTime = DateTime::createFromFormat('F-Y', $bulan);
         $tahun = $bulanDateTime->format('Y'); // 2024
@@ -667,8 +674,6 @@ class ProduksiModel extends Model
             SELECT 
                 t.tanggal,
                 COALESCE(p.qty_prod, 0) AS qty_prod,
-                COALESCE(b.bsmc_pcs, 0) AS bsmc_pcs,
-                COALESCE(b.bsmc_gram, 0) AS bsmc_gram,
                 COALESCE(pa.qty_perbaikan, 0) AS qty_perbaikan
             FROM (
                 SELECT tgl_produksi AS tanggal FROM produksi
@@ -676,38 +681,31 @@ class ProduksiModel extends Model
                   AND MONTH(tgl_produksi) = :bulan:
                   AND YEAR(tgl_produksi) = :tahun:
                 UNION
-                SELECT tanggal_produksi FROM bs_mesin
-                WHERE area = :area:
-                  AND MONTH(tanggal_produksi) = :bulan:
-                  AND YEAR(tanggal_produksi) = :tahun:
-                UNION
                 SELECT tgl_perbaikan FROM perbaikan_area
                 WHERE area = :area:
                   AND MONTH(tgl_perbaikan) = :bulan:
                   AND YEAR(tgl_perbaikan) = :tahun:
             ) AS t
             LEFT JOIN (
-                SELECT tgl_produksi, SUM(qty_produksi) AS qty_prod
+                SELECT produksi.tgl_produksi, SUM(produksi.qty_produksi) AS qty_prod
                 FROM produksi
-                WHERE area = :area:
-                  AND MONTH(tgl_produksi) = :bulan:
-                  AND YEAR(tgl_produksi) = :tahun:
+                JOIN apsperstyle aps ON aps.idapsperstyle = produksi.idapsperstyle
+                JOIN data_model dm ON dm.no_model = aps.mastermodel
+                WHERE produksi.area = :area:
+                  AND MONTH(produksi.tgl_produksi) = :bulan:
+                  AND YEAR(produksi.tgl_produksi) = :tahun:
+                  $buyerFilter
                 GROUP BY tgl_produksi
             ) AS p ON t.tanggal = p.tgl_produksi
             LEFT JOIN (
-                SELECT tanggal_produksi, SUM(qty_pcs) AS bsmc_pcs, SUM(qty_gram) AS bsmc_gram
-                FROM bs_mesin
-                WHERE area = :area:
-                  AND MONTH(tanggal_produksi) = :bulan:
-                  AND YEAR(tanggal_produksi) = :tahun:
-                GROUP BY tanggal_produksi
-            ) AS b ON t.tanggal = b.tanggal_produksi
-            LEFT JOIN (
-                SELECT tgl_perbaikan, SUM(qty) AS qty_perbaikan
+                SELECT perbaikan_area.tgl_perbaikan, SUM(perbaikan_area.qty) AS qty_perbaikan
                 FROM perbaikan_area
-                WHERE area = :area:
-                  AND MONTH(tgl_perbaikan) = :bulan:
-                  AND YEAR(tgl_perbaikan) = :tahun:
+                JOIN apsperstyle aps ON aps.idapsperstyle = perbaikan_area.idapsperstyle
+                JOIN data_model dm ON dm.no_model = aps.mastermodel
+                WHERE perbaikan_area.area = :area:
+                  AND MONTH(perbaikan_area.tgl_perbaikan) = :bulan:
+                  AND YEAR(perbaikan_area.tgl_perbaikan) = :tahun:
+                  $buyerFilter
                 GROUP BY tgl_perbaikan
             ) AS pa ON t.tanggal = pa.tgl_perbaikan
             ORDER BY t.tanggal
@@ -716,29 +714,33 @@ class ProduksiModel extends Model
         $dataProduksi = $db->query($sqlProduksi, [
             'area'  => $area,
             'bulan' => $bulanNumber,
-            'tahun' => $tahun
+            'tahun' => $tahun,
+            'buyer' => $buyer
         ])->getResultArray();
 
         // === 2️⃣ DATA BS MESIN per MODEL & SIZE ===
         $sqlBs = "
             SELECT 
-                tanggal_produksi,
-                no_model,
-                size,
-                SUM(qty_pcs) AS qty_pcs,
-                SUM(qty_gram) AS qty_gram
+                bs_mesin.tanggal_produksi,
+                bs_mesin.no_model,
+                bs_mesin.size,
+                SUM(bs_mesin.qty_pcs) AS qty_pcs,
+                SUM(bs_mesin.qty_gram) AS qty_gram
             FROM bs_mesin
-            WHERE area = :area:
-            AND MONTH(tanggal_produksi) = :bulan:
-            AND YEAR(tanggal_produksi) = :tahun:
-            GROUP BY tanggal_produksi, no_model, size
-            ORDER BY tanggal_produksi, no_model, size
+            LEFT JOIN data_model dm ON dm.no_model=bs_mesin.no_model
+            WHERE bs_mesin.area = :area:
+            $buyerFilter
+            AND MONTH(bs_mesin.tanggal_produksi) = :bulan:
+            AND YEAR(bs_mesin.tanggal_produksi) = :tahun:
+            GROUP BY bs_mesin.tanggal_produksi, bs_mesin.no_model, bs_mesin.size
+            ORDER BY bs_mesin.tanggal_produksi, bs_mesin.no_model, bs_mesin.size
         ";
 
         $dataBs = $db->query($sqlBs, [
             'area'  => $area,
             'bulan' => $bulanNumber,
-            'tahun' => $tahun
+            'tahun' => $tahun,
+            'buyer' => $buyer
         ])->getResultArray();
 
         // 2️⃣ Hitung totalBsMc per model+size
@@ -805,7 +807,9 @@ class ProduksiModel extends Model
                 'persentase' => 0,
             ];
 
-            $persentase = ($bs['totalBsMc'] + $row['qty_perbaikan']) / $row['qty_prod'] * 100;
+            $persentase = ($row['qty_prod'] > 0)
+                ? (($bs['totalBsMc'] + $row['qty_perbaikan']) / $row['qty_prod']) * 100
+                : 0;
 
             $finalData[] = [
                 'tanggal'        => $tanggal,

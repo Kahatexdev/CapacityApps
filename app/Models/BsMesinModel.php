@@ -79,54 +79,82 @@ class BsMesinModel extends Model
             ->groupBy('no_model, size, tanggal_produksi,no_mesin') // Kelompokkan berdasarkan karyawan dan tanggal
             ->findAll();
     }
-    public function bsMesinPerbulan2($area, $bulan)
+    public function bsMesinPerbulan2($area, $bulan, $buyer)
     {
         $bulanDateTime = DateTime::createFromFormat('F-Y', $bulan);
         $tahun = $bulanDateTime->format('Y'); // 2024
         $bulanNumber = $bulanDateTime->format('m'); // 12
-        return $this->select('nama_karyawan, sum(qty_pcs) as qty_pcs, sum(qty_gram) as qty_gram ,no_model ,size')
-            ->where('MONTH(tanggal_produksi)', $bulanNumber) // Filter bulan
-            ->where('YEAR(tanggal_produksi)', $tahun) // Filter bulan
-            ->where('area', $area) // Filter area
-            ->groupBy('nama_karyawan, no_model, size') // Kelompokkan berdasarkan karyawan dan tanggal
-            ->findAll();
+        $builder = $this->select('bs_mesin.nama_karyawan, sum(bs_mesin.qty_pcs) as qty_pcs, sum(bs_mesin.qty_gram) as qty_gram , bs_mesin.no_model, bs_mesin.size')
+            ->join('data_model', 'data_model.no_model=bs_mesin.no_model', 'left')
+            ->where('MONTH(bs_mesin.tanggal_produksi)', $bulanNumber) // Filter bulan
+            ->where('YEAR(bs_mesin.tanggal_produksi)', $tahun) // Filter bulan
+            ->where('bs_mesin.area', $area);
+
+        // 🔽 Tambahkan filter buyer hanya jika tidak kosong
+        if (!empty($buyer)) {
+            $builder->where('data_model.kd_buyer_order', $buyer);
+        }
+
+        // ⬇️ Group by diletakkan paling akhir
+        $builder->groupBy('bs_mesin.nama_karyawan, bs_mesin.no_model, bs_mesin.size');
+
+        return $builder->findAll();
     }
-    public function totalGramPerbulan($area, $bulan)
+    public function totalGramPerbulan($area, $bulan, $buyer)
     {
         $bulanDateTime = DateTime::createFromFormat('F-Y', $bulan);
         $tahun = $bulanDateTime->format('Y'); // 2024
         $bulanNumber = $bulanDateTime->format('m'); // 12
-        $bs = $this->select('sum(qty_gram) as totalGram')
-            ->where('MONTH(tanggal_produksi)', $bulanNumber) // Filter bulan
-            ->where('YEAR(tanggal_produksi)', $tahun) // Filter bulan
-            ->where('area', $area) // Filter area
-            ->first();
+        $bs = $this->select('sum(bs_mesin.qty_gram) as totalGram')
+            ->join('data_model', 'data_model.no_model=bs_mesin.no_model', 'left')
+            ->where('MONTH(bs_mesin.tanggal_produksi)', $bulanNumber) // Filter bulan
+            ->where('YEAR(bs_mesin.tanggal_produksi)', $tahun) // Filter bulan
+            ->where('bs_mesin.area', $area);
+
+        // 🔽 Tambahkan filter buyer hanya jika tidak kosong
+        if (!empty($buyer)) {
+            $bs->where('data_model.kd_buyer_order', $buyer);
+        }
+
+        $bs = $bs->first(); // ambil hasil query
         $data = reset($bs);
         return $data;
     }
-    public function totalPcsPerbulan($area, $bulan)
+    public function totalPcsPerbulan($area, $bulan, $buyer)
     {
         $bulanDateTime = DateTime::createFromFormat('F-Y', $bulan);
         $tahun = $bulanDateTime->format('Y'); // 2024
         $bulanNumber = $bulanDateTime->format('m'); // 12
-        $bs = $this->select('sum(qty_pcs) as totalPcs')
-            ->where('MONTH(tanggal_produksi)', $bulanNumber) // Filter bulan
-            ->where('YEAR(tanggal_produksi)', $tahun) // Filter bulan
-            ->where('area', $area) // Filter area
-            ->first();
+        $bs = $this->select('sum(bs_mesin.qty_pcs) as totalPcs')
+            ->join('data_model', 'data_model.no_model=bs_mesin.no_model', 'left')
+            ->where('MONTH(bs_mesin.tanggal_produksi)', $bulanNumber) // Filter bulan
+            ->where('YEAR(bs_mesin.tanggal_produksi)', $tahun) // Filter bulan
+            ->where('bs_mesin.area', $area);
+        // 🔽 Tambahkan filter buyer hanya jika tidak kosong
+        if (!empty($buyer)) {
+            $bs->where('data_model.kd_buyer_order', $buyer);
+        }
+        $bs = $bs->first(); // ambil hasil query
+
         $data = reset($bs);
         return $data;
     }
-    public function ChartPdk($area, $bulan)
+    public function ChartPdk($area, $bulan, $buyer)
     {
         $bulanDateTime = DateTime::createFromFormat('F-Y', $bulan);
         $tahun = $bulanDateTime->format('Y'); // 2024
         $bulanNumber = $bulanDateTime->format('m'); // 12
-        $bs = $this->select('no_model, sum(qty_gram) as totalGram')
-            ->where('MONTH(tanggal_produksi)', $bulanNumber) // Filter bulan
-            ->where('YEAR(tanggal_produksi)', $tahun) // Filter bulan
-            ->where('area', $area) // Filter area
-            ->groupBy('no_model,area') // Filter area
+        $bs = $this->select('bs_mesin.no_model, sum(bs_mesin.qty_gram) as totalGram')
+            ->join('data_model', 'data_model.no_model=bs_mesin.no_model', 'left')
+            ->where('MONTH(bs_mesin.tanggal_produksi)', $bulanNumber) // Filter bulan
+            ->where('YEAR(bs_mesin.tanggal_produksi)', $tahun) // Filter bulan
+            ->where('bs_mesin.area', $area);
+
+        // 🔽 Tambahkan filter buyer hanya jika tidak kosong
+        if (!empty($buyer)) {
+            $bs->where('data_model.kd_buyer_order', $buyer);
+        }
+        $bs = $bs->groupBy('bs_mesin.no_model, bs_mesin.area')
             ->orderBy('totalGram', 'DESC')
             ->findAll();
         return $bs;

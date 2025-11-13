@@ -409,11 +409,13 @@ class UserController extends BaseController
     }
     public function bsMesinPerbulan($area, $bulan)
     {
+        $buyer = $this->request->getGet('buyer') ?? '';
         // $bsPerbulan = $this->BsMesinModel->bsMesinPerbulan($area, $bulan);
-        $bsPerbulan = $this->BsMesinModel->bsMesinPerbulan2($area, $bulan);
-        $totalBsGram = $this->BsMesinModel->totalGramPerbulan($area, $bulan);
-        $totalBsPcs = $this->BsMesinModel->totalPcsPerbulan($area, $bulan);
-        $chartData = $this->BsMesinModel->ChartPdk($area, $bulan);
+        $bsPerbulan = $this->BsMesinModel->bsMesinPerbulan2($area, $bulan, $buyer);
+        $totalBsGram = $this->BsMesinModel->totalGramPerbulan($area, $bulan, $buyer);
+        $totalBsPcs = $this->BsMesinModel->totalPcsPerbulan($area, $bulan, $buyer);
+        $chartData = $this->BsMesinModel->ChartPdk($area, $bulan, $buyer);
+        $buyerList = $this->orderModel->getBuyer();
 
 
         // group data semua pdk dan size untuk ambil gw aktual / gw MU
@@ -439,7 +441,7 @@ class UserController extends BaseController
         $dataGwList = $responseJson['data'] ?? []; // ambil bagian 'data'
 
         // Data total START
-        $totalProd = $this->produksiModel->produksiPerbulan($area, $bulan, $dataGwList);
+        $totalProd = $this->produksiModel->produksiPerbulan($area, $bulan, $buyer, $dataGwList);
         // Data total END
 
         // Data bs perbulan START
@@ -509,6 +511,8 @@ class UserController extends BaseController
         // Data Chart END
 
         $data = [
+            'ar' => $area,
+            'bulan' => $bulan,
             'role' => session()->get('role'),
             'area' => session()->get('username'),
             'title' => 'BS Mesin',
@@ -524,7 +528,9 @@ class UserController extends BaseController
             'totalbsgram' => $totalBsGram,
             'totalbspcs' => $totalBsPcs,
             'chart' => $chartData,
-            'dataTotal' => $totalProd['final']
+            'dataTotal' => $totalProd['final'],
+            'buyerList' => $buyerList,
+            'buyerFilter' => $buyer
         ];
         return view(session()->get('role') . '/bsMesinPerbulan', $data);
     }
