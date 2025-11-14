@@ -12303,8 +12303,17 @@ class ExcelController extends BaseController
                 $sheet->setCellValue('C' . $rowNow, $item['no_mesin']);
                 // SIMPAN POSISI CELL UNTUK CEK DUPLIKAT
                 $noMc = $item['no_mesin'];
-                if (!empty($noMc)) {
-                    $noMesinMap[$noMc][] = ['col' => 'C', 'row' => $rowNow];
+                $mcType = $item['machinetypeid'];
+                if (!empty($noMc) && !empty($mcType)) {
+                    // Key gabungan contoh: "MESIN-123|TYPE-A"
+                    $key = $noMc . '|' . $mcType;
+
+                    $noMesinMap[$key][] = [
+                        'col' => 'C',
+                        'row' => $rowNow,
+                        'no_mesin' => $noMc,
+                        'machinetypeid' => $mcType
+                    ];
                 }
                 $sheet->setCellValue('D' . $rowNow, number_format($item['shift_a'] / 24, 2));
                 $sheet->setCellValue('E' . $rowNow, number_format($item['shift_b'] / 24, 2));
@@ -12388,13 +12397,15 @@ class ExcelController extends BaseController
         }
 
         // 🆕 Setelah semua data ditulis, buat border miring untuk no_mesin yang sama
-        foreach ($noMesinMap as $noMc => $cells) {
-            if (count($cells) > 1 && !empty($noMc)) {
+        foreach ($noMesinMap as $key => $cells) {
+
+            // Jika baris lebih dari 1 untuk kombinasi yang sama → beri garis miring
+            if (count($cells) > 1) {
+
                 foreach ($cells as $cell) {
                     $sheet->getStyle($cell['col'] . $cell['row'])->applyFromArray([
                         'borders' => [
-                            // 'diagonalDirection' => \PhpOffice\PhpSpreadsheet\Style\Border::DIAGONAL_DOWN,
-                            'diagonalDirection' => 1, // 1 = up, 2 = down
+                            'diagonalDirection' => 1, // 1 = up-right ke bawah kiri
                             'diagonal' => [
                                 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                                 'color' => ['argb' => 'FF000000'],
