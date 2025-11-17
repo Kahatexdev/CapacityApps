@@ -145,6 +145,28 @@ class TimterController extends BaseController
                 }
             }
         }
+        $mesinCounter = [];
+
+        foreach ($uniqueData as $key => $data) {
+            foreach ($data['no_mesin'] as $noMesin => $detail) {
+                $counterKey = $data['machinetypeid'] . '-' . $noMesin;
+
+                if (!isset($mesinCounter[$counterKey])) {
+                    $mesinCounter[$counterKey] = 0;
+                }
+                $mesinCounter[$counterKey]++;
+            }
+        }
+
+        foreach ($uniqueData as $key => &$data) {
+            foreach ($data['no_mesin'] as $noMesin => &$detail) {
+
+                $counterKey = $data['machinetypeid'] . '-' . $noMesin;
+
+                // TRUE jika mesin muncul lebih dari 1 kali dalam machinetype yang sama
+                $detail['duplicate'] = $mesinCounter[$counterKey] > 1;
+            }
+        }
 
         // Buat spreadsheet
         $spreadsheet = new Spreadsheet();
@@ -949,6 +971,17 @@ class TimterController extends BaseController
                     $total_pcs = $rows['total_shift'] % 24;
 
                     $sheet->setCellValue('M' . $row, $noMc);
+                    // untuk tanda mc CO an
+                    // Tambahkan style diagonal untuk kolom M jika duplicate = true
+                    if (!empty($rows['duplicate']) && $rows['duplicate'] === true) {
+                        $sheet->getStyle('M' . $row)->getBorders()->applyFromArray([
+                            'diagonalDirection' => 1, // diagonal up-right
+                            'diagonal' => [
+                                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                                'color' => ['argb' => 'FF000000'],
+                            ],
+                        ]);
+                    }
                     $sheet->setCellValue('N' . $row, floor($shift_a / 24) > 0 ? floor($shift_a / 24) : '');
                     $sheet->setCellValue('O' . $row, $pcs_a > 0 ? $pcs_a : '');
                     $sheet->setCellValue('P' . $row, floor($shift_b / 24) > 0 ? floor($shift_b / 24) : '');
