@@ -1346,7 +1346,8 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $model)
             ->where('sisa >=', 0)
             ->where('qty >=', 0)
-            ->groupby('size,factory,delivery')
+            // ->groupby('size,factory,delivery')
+            ->groupby('delivery,factory,size')
             ->findAll();
         return $result;
     }
