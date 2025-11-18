@@ -12868,7 +12868,7 @@ class ExcelController extends BaseController
             'search' => $search ?? ''
         ];
 
-        $apiUrl = 'http://172.23.44.16/MaterialSystem/public/api/statusbahanbaku/?' . http_build_query($params);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/?' . http_build_query($params);
         $json   = @file_get_contents($apiUrl);
 
         if ($json === false) {
