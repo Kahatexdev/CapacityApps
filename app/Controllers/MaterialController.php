@@ -2989,4 +2989,95 @@ class MaterialController extends BaseController
             'message' => 'Data berhasil diterima area dan status diperbarui.',
         ]);
     }
+    public function stockareaFromMc($area)
+    {
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Pemasukan Supermarket',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'targetProd' => 0,
+            'produksiBulan' => 0,
+            'produksiHari' => 0,
+            'area' => $area
+        ];
+        return view(session()->get('role') . '/Material/inStockAreaFromMc', $data);
+    }
+    public function getNoModelList()
+    {
+        $search = $this->request->getGet('search');
+
+        log_message('debug', 'SEARCH INPUT: ' . $search);
+
+        $builder = $this->stockArea;
+        if ($search) {
+            $builder->like('no_model', $search);
+        }
+
+        $result = $builder->select('no_model, item_type, kode_warna, warna')
+            ->distinct()
+            ->get()
+            ->getResultArray();
+
+        log_message('debug', 'QUERY RESULT: ' . print_r($result, true));
+
+        return $this->response->setJSON($result);
+    }
+    public function getLotByList()
+    {
+        $no_model = $this->request->getGet('no_model');
+        $item_type = $this->request->getGet('item_type');
+        $kode_warna = $this->request->getGet('kode_warna');
+        $warna = $this->request->getGet('warna');
+
+        $result = $this->stockArea->select('MAX(id_stock_area) AS idstock, lot, kg_cns')
+            ->where('no_model', $no_model)
+            ->where('item_type', $item_type)
+            ->where('kode_warna', $kode_warna)
+            ->where('warna', $warna)
+            ->groupBy('lot')
+            ->get()
+            ->getResultArray();
+
+        log_message('debug', 'QUERY RESULT: ' . print_r($result, true));
+
+        return $this->response->setJSON($result);
+    }
+    public function saveStockareaFromMc()
+    {
+        // $no_models = $this->request->getPost('no_model');
+        // $lots = $this->request->getPost('lot');
+        $ids = $this->request->getPost('id');
+        // $kg_cns_list = $this->request->getPost('kg_cns');
+        $cones = $this->request->getPost('cones');
+        $kgs = $this->request->getPost('kg');
+
+        $updatedCount = 0;
+        foreach ($ids as $i => $id) {
+            $kgInput = $kgs[$i];
+            $conesInput = $cones[$i];
+
+            // update dengan menambahkan nilai baru
+            $updated = $this->stockArea
+                ->set('kgs_in_out', "kgs_in_out + {$kgInput}", false)
+                ->set('cns_in_out', "cns_in_out + {$conesInput}", false)
+                ->set('updated_at', date('Y-m-d H:i:s'))
+                ->where('id_stock_area', $id)
+                ->update();
+            if ($updated) $updatedCount++;
+        }
+
+        if ($updatedCount > 0) {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => "{$updatedCount} baris berhasil diperbarui"
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Tidak ada data yang disimpan'
+            ]);
+        }
+    }
 }
