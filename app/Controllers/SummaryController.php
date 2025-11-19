@@ -1453,7 +1453,7 @@ class SummaryController extends BaseController
 
         $uniqueData = [];
         foreach ($summaryBsPertgl as $item) {
-            $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'];
+            $key = $item['machinetypeid'] . '-' . $item['mastermodel'] . '-' . $item['size'] . '-' . $item['area'];
             if (!isset($uniqueData[$key])) {
                 $uniqueData[$key] = [
                     'area' => $item['area'],
@@ -1644,8 +1644,11 @@ class SummaryController extends BaseController
                 $qty_pcs = 0;
                 foreach ($summaryBsPertgl as $prod) {
                     if (
-                        $id['machinetypeid'] == $prod['machinetypeid'] && $id['mastermodel'] == $prod['mastermodel']
-                        && $id['size'] == $prod['size'] && $tgl_prod2 == $prod['tanggal_produksi']
+                        $id['machinetypeid'] == $prod['machinetypeid'] &&
+                        $id['mastermodel'] == $prod['mastermodel'] &&
+                        $id['size'] == $prod['size'] &&
+                        $id['area'] == $prod['area'] &&  // ← TAMBAHKAN INI!
+                        $tgl_prod2 == $prod['tanggal_produksi']
                     ) {
                         $qty_gram = $prod['qty_gram'];
                         $qty_pcs = $prod['qty_pcs'];

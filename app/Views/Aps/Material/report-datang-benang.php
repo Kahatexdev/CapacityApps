@@ -250,7 +250,7 @@
         }
 
         function loadData() {
-            let key = $('input[type="text"]').val().trim();
+            let key = $('#key').val().trim();
             let tanggal_awal = $('input[type="date"]').eq(0).val().trim();
             let tanggal_akhir = $('input[type="date"]').eq(1).val().trim();
             let po_plus = $('#po_plus').is(':checked') ? 1 : 0;
@@ -403,7 +403,7 @@
         });
 
         $('#btnExport').click(function() {
-            let key = $('input[type="text"]').val();
+            let key = $('#key').val();
             let tanggal_awal = $('input[type="date"]').eq(0).val();
             let tanggal_akhir = $('input[type="date"]').eq(1).val();
             let po_plus = $('#po_plus').is(':checked') ? 1 : 0;
@@ -416,7 +416,7 @@
     // Fitur Reset
     $('#btnReset').click(function() {
         // Kosongkan input
-        $('input[type="text"]').val('');
+        $('#key').val('');
         $('input[type="date"]').val('');
 
         // Kosongkan tabel hasil pencarian

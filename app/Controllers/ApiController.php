@@ -616,4 +616,19 @@ class ApiController extends ResourceController
         $data = $this->productModel->getTypePerjarum($jarum);
         return $this->response->setJSON($data);
     }
+    public function getQtyOrderPerArea()
+    {
+        $noModel = $this->request->getGet('model');
+
+        $data = [];
+        $qtyPerArea = $this->ApsPerstyleModel->getQtyArea($noModel) ?: [];
+        $totalPo = $this->ApsPerstyleModel->totalPo($noModel)['totalPo'] ?? 0;
+
+        $data = [
+            'qtyPerArea' => $qtyPerArea,
+            'totalPo' => $totalPo,
+        ];
+
+        return $this->response->setJSON($data);
+    }
 }
