@@ -111,18 +111,23 @@
     <?php endif; ?>
 
     <div class="card">
-        <div class="row align-items-center">
+        <div class="row align-items-center mb-4">
             <div class="col-md-6">
-
-
-                <h3 class="mb-4">Stock Supermarket <?= $area ?></h3>
+                <h3 class="mb-0">Stock Supermarket <?= $area ?></h3>
             </div>
-            <div class="col-md-6 text-end">
-                <a href="<?= base_url($role . '/stockareaInStock/' . $area); ?>" class="btn btn-outline-info btn-sm position-relative">
+
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                <a href="<?= base_url($role . '/stockareaInStock/' . $area); ?>"
+                    class="btn btn-outline-info btn-sm position-relative me-2">
                     Pemasukan
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                         <?= $notif ?>
                     </span>
+                </a>
+
+                <a href="<?= base_url($role . '/stockareaFromMc/' . $area); ?>"
+                    class="btn btn-outline-info btn-sm position-relative me-2">
+                    Retur dari MC
                 </a>
             </div>
         </div>
@@ -219,6 +224,7 @@
         <?php endforeach; ?>
     </div>
 </div>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const inputModel = document.querySelector('input[name="noModel"]');
@@ -368,8 +374,6 @@
         bindForms();
     });
 </script>
-
-
 
 <script>
     $(document).ready(function() {

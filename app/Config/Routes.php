@@ -948,6 +948,10 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('stockareaInStock/(:any)', 'MaterialController::inStock/$1');
     $routes->post('stockarea/outStock', 'MaterialController::outStock');
     $routes->post('stockarea/saveStock', 'MaterialController::saveStock');
+    $routes->get('stockareaFromMc/(:any)', 'MaterialController::stockareaFromMc/$1');
+    $routes->get('getNoModelList', 'MaterialController::getNoModelList');
+    $routes->get('getLotByList', 'MaterialController::getLotByList');
+    $routes->post('saveStockareaFromMc', 'MaterialController::saveStockareaFromMc');
 
 
     //pph

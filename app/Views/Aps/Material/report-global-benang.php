@@ -150,6 +150,7 @@
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Qty PO</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Qty PO(+)</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Stock Awal</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Lot Awal</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Stock Opname</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Datang Solid</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">(+)Datang Solid</th>
@@ -330,6 +331,7 @@
                                 fmt(kgs), // qty po
                                 fmt(poTambahan), // qty po (+)
                                 fmt(kgsStockAwal), // stock awal
+                                item.lot_awal || '-', // lot awal
                                 '-', // stock opname
                                 fmt(datangSolid), // datang solid
                                 fmt(plusDatangSolid), // (+) datang solid
