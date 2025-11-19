@@ -83,6 +83,8 @@ $routes->group(
 
         // proftype
         $routes->get('getProductType', 'ApiController::getProductType');
+
+        $routes->get('getQtyOrderPerArea', 'ApiController::getQtyOrderPerArea');
     }
 );
 

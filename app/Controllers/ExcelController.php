@@ -9081,13 +9081,33 @@ class ExcelController extends BaseController
     {
         $key = $this->request->getGet('key');
         $jenis = $this->request->getGet('jenis');
+        $base  = 'http://172.23.44.14/MaterialSystem/public/api/';
 
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterReportGlobal?key=' . urlencode($key) . '&jenis=' . urlencode($jenis);
-        $material = @file_get_contents($apiUrl);
+        // FUNGSINYA: ambil API sekali panggil
+        $getApi = function ($endpoint) use ($base, $key, $jenis) {
+            $url  = $base . $endpoint . '?key=' . $key . '&jenis=' . $jenis;
+            $resp = @file_get_contents($url);
+            return json_decode($resp, true);
+        };
 
-        if ($material !== FALSE) {
-            $data = json_decode($material, true);
-        }
+        // Semua endpoint lu masuk sini aja
+        $data = [
+            'material'            => $getApi('filterReportGlobal'),
+            'stockAwal'           => $getApi('getDataStockAwal'),
+            'datangSolid'         => $getApi('getDataDatangSolid'),
+            'datangSolidPlus'     => $getApi('getDataDatangSolidPlus'),
+            'gantiRetur'          => $getApi('getDataGantiRetur'),
+            'datangLurex'         => $getApi('getDataDatangLurex'),
+            'datangLurexPlus'     => $getApi('getDataDatangLurexPlus'),
+            'returGbn'            => $getApi('getDataReturGbn'),
+            'returArea'           => $getApi('getDataReturArea'),
+            'pakaiArea'           => $getApi('getDataPakaiArea'),
+            'pakaiLain'           => $getApi('getDataPakaiLain'),
+            'returStock'          => $getApi('getDataReturStock'),
+            'returTitip'          => $getApi('getDataReturTitip'),
+            'dipinjam'            => $getApi('getDataDipinjam'),
+            'dipindah'            => $getApi('getDataDipindah'),
+        ];
 
         $delivery = $this->ApsPerstyleModel->getDeliv($key);
         $totalDel  = count($delivery);
@@ -9115,7 +9135,7 @@ class ExcelController extends BaseController
         $row = 4;
         $no = 1;
         $delIndex = 0;
-        foreach ($data as $item) {
+        foreach ($data['material'] as $item) {
             // Format setiap nilai untuk memastikan nilai 0 dan angka dengan dua desimal
             $sheet->setCellValue('A' . $row, $no++);
             $sheet->setCellValue('B' . $row, $item['buyer'] ?: '-'); // BUYER
@@ -9201,23 +9221,20 @@ class ExcelController extends BaseController
             $newSheet->setTitle($name);
 
             // Hanya atur judul dan header jika nama sheet mengandung 'STOCK AWAL'
-            if (strpos($name, 'STOCK AWAL') !== false) {
-                // Judul
+            if ($name === 'STOCK AWAL ' . $key) {
                 $newSheet->mergeCells('A1:K1');
-                $newSheet->setCellValue('A1', 'REPORT STOCK AWAL ' . $key);
+                $newSheet->setCellValue('A1', 'REPORT HISTORY PINDAH ORDER KE ' . $key);
                 $newSheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
                 $newSheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
                 // Header
-                $headerStockAwal = ['No', 'No Model', 'Delivery', 'Item Type', 'Kode Warna', 'Warna', 'Qty', 'Cones', 'Lot', 'Cluster', 'Keterangan'];
+                $headerStockAwal = ['NO', 'NO MODEL', 'DELIVERY', 'ITEM TYPE', 'KODE WARNA', 'WARNA', 'QTY', 'CONES', 'LOT', 'CLUSTER', 'KETERANGAN'];
                 $col = 'A';
                 foreach ($headerStockAwal as $header) {
                     $newSheet->setCellValue($col . '3', $header);
                     $newSheet->getStyle($col . '3')->getFont()->setBold(true);
                     $col++;
                 }
-
-                // Tambahkan border untuk header A3:K3
                 $newSheet->getStyle('A3:K3')->applyFromArray([
                     'borders' => [
                         'allBorders' => [
@@ -9226,6 +9243,45 @@ class ExcelController extends BaseController
                         ],
                     ],
                 ]);
+
+                // Data
+                $row = 4;
+                $no = 1;
+                foreach ($data['stockAwal'] as $item) {
+                    $newSheet->setCellValue('A' . $row, $no++);
+                    $newSheet->setCellValue('B' . $row, $item['no_model_old'] ?: '-');
+                    $newSheet->setCellValue('C' . $row, '-');
+                    $newSheet->setCellValue('D' . $row, $item['item_type'] ?: '-');
+                    $newSheet->setCellValue('E' . $row, $item['kode_warna'] ?: '-');
+                    $newSheet->setCellValue('F' . $row, $item['warna'] ?: '-');
+                    $newSheet->setCellValue('G' . $row, isset($item['kgs']) ? number_format($item['kgs'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('H' . $row, isset($item['cns']) ? number_format($item['cns'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('I' . $row, $item['lot'] ?: '-');
+                    $newSheet->setCellValue('J' . $row, $item['nama_cluster'] ?: '-');
+                    $keterangan = $item['tgl_pindah'] . ' ' . $item['keterangan'] . ' ke ' . $item['no_model_new'] . ' kode ' . $item['kode_warna'] . ' (' . $item['admin'] . ')';
+                    $newSheet->setCellValue('K' . $row, $keterangan ?: '-');
+                    $row++;
+                }
+
+                $lastRow = $row - 1;
+                $newSheet->getStyle("A3:K{$lastRow}")->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => 'FF000000'],
+                        ],
+                    ],
+                ]);
+
+                foreach (range('A', 'Z') as $col) {
+                    $newSheet->getColumnDimension($col)->setAutoSize(true);
+                }
+
+                $footerRow = $lastRow + 2;
+                $newSheet->mergeCells("A{$footerRow}:K{$footerRow}");
+                $newSheet->setCellValue("A{$footerRow}", 'REPORT HISTORY PINDAH ORDER');
+                $newSheet->getStyle("A{$footerRow}")->getFont()->setBold(true)->setSize(10);
+                $newSheet->getStyle("A{$footerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             }
 
             // Hanya atur judul dan header jika nama sheet mengandung 'DATANG SOLID'
@@ -9254,6 +9310,47 @@ class ExcelController extends BaseController
                         ],
                     ],
                 ]);
+
+                $row = 4;
+                $no = 1;
+                foreach ($data['datangSolid'] as $item) {
+                    $newSheet->setCellValue('A' . $row, $no++);
+                    $newSheet->setCellValue('B' . $row, $item['no_model'] ?: '-');
+                    $newSheet->setCellValue('C' . $row, $item['item_type'] ?: '-');
+                    $newSheet->setCellValue('D' . $row, $item['kode_warna'] ?: '-');
+                    $newSheet->setCellValue('E' . $row, $item['warna'] ?: '-');
+                    $newSheet->setCellValue('F' . $row, $item['tgl_datang']);
+                    $newSheet->setCellValue('G' . $row, $item['nama_cluster']);
+                    $newSheet->setCellValue('H' . $row, isset($item['qty_datang']) ? number_format($item['qty_datang'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('I' . $row, isset($item['cns_datang']) ? number_format($item['cns_datang'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('J' . $row, $item['lot_datang'] ?: '-');
+                    $newSheet->setCellValue('K' . $row, $item['tgl_terima'] ?: '-');
+                    $newSheet->setCellValue('L' . $row, $item['no_surat_jalan'] ?: '-');
+                    $newSheet->setCellValue('M' . $row, $item['l_m_d'] ?: '-');
+                    $newSheet->setCellValue('N' . $row, $item['keterangan']);
+                    $newSheet->setCellValue('O' . $row, $item['admin'] ?: '-');
+                    $row++;
+                }
+
+                $lastRow = $row - 1;
+                $newSheet->getStyle("A3:O{$lastRow}")->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => 'FF000000'],
+                        ],
+                    ],
+                ]);
+
+                foreach (range('A', 'Z') as $col) {
+                    $newSheet->getColumnDimension($col)->setAutoSize(true);
+                }
+
+                $footerDatangSolid = $lastRow + 2;
+                $newSheet->mergeCells("A{$footerDatangSolid}:O{$footerDatangSolid}");
+                $newSheet->setCellValue("A{$footerDatangSolid}", 'REPORT DATANG SOLID');
+                $newSheet->getStyle("A{$footerDatangSolid}")->getFont()->setBold(true)->setSize(10);
+                $newSheet->getStyle("A{$footerDatangSolid}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             }
 
             // Hanya atur judul dan header jika nama sheet mengandung '(+) DATANG SOLID'
@@ -9282,6 +9379,48 @@ class ExcelController extends BaseController
                         ],
                     ],
                 ]);
+
+                $row = 4;
+                $no = 1;
+                foreach ($data['datangSolidPlus'] as $item) {
+                    $newSheet->setCellValue('A' . $row, $no++);
+                    $newSheet->setCellValue('B' . $row, $item['no_model'] ?: '-');
+                    $newSheet->setCellValue('C' . $row, $item['item_type'] ?: '-');
+                    $newSheet->setCellValue('D' . $row, $item['kode_warna'] ?: '-');
+                    $newSheet->setCellValue('E' . $row, $item['warna'] ?: '-');
+                    $newSheet->setCellValue('F' . $row, $item['qty_poplus']);
+                    $newSheet->setCellValue('G' . $row, $item['tgl_datang'] ?: '-');
+                    $newSheet->setCellValue('H' . $row, $item['nama_cluster']);
+                    $newSheet->setCellValue('I' . $row, isset($item['qty_datang']) ? number_format($item['qty_datang'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('J' . $row, isset($item['cns_datang']) ? number_format($item['cns_datang'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('K' . $row, $item['lot_datang'] ?: '-');
+                    $newSheet->setCellValue('L' . $row, $item['tgl_terima'] ?: '-');
+                    $newSheet->setCellValue('M' . $row, $item['no_surat_jalan'] ?: '-');
+                    $newSheet->setCellValue('N' . $row, $item['l_m_d'] ?: '-');
+                    $newSheet->setCellValue('O' . $row, $item['keterangan'] ?: '-');
+                    $newSheet->setCellValue('P' . $row, $item['admin'] ?: '-');
+                    $row++;
+                }
+
+                $lastRow = $row - 1;
+                $newSheet->getStyle("A3:P{$lastRow}")->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => 'FF000000'],
+                        ],
+                    ],
+                ]);
+
+                foreach (range('A', 'Z') as $col) {
+                    $newSheet->getColumnDimension($col)->setAutoSize(true);
+                }
+
+                $footerPlusDatangSolid = $lastRow + 2;
+                $newSheet->mergeCells("A{$footerPlusDatangSolid}:P{$footerPlusDatangSolid}");
+                $newSheet->setCellValue("A{$footerPlusDatangSolid}", 'REPORT (+)DATANG SOLID');
+                $newSheet->getStyle("A{$footerPlusDatangSolid}")->getFont()->setBold(true)->setSize(10);
+                $newSheet->getStyle("A{$footerPlusDatangSolid}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             }
 
             // Hanya atur judul dan header jika nama sheet mengandung 'GANTI RETUR'
@@ -9310,6 +9449,49 @@ class ExcelController extends BaseController
                         ],
                     ],
                 ]);
+
+                $row = 4;
+                $no = 1;
+                foreach ($data['gantiRetur'] as $item) {
+                    $newSheet->setCellValue('A' . $row, $no++);
+                    $newSheet->setCellValue('B' . $row, $item['no_model'] ?: '-');
+                    $newSheet->setCellValue('C' . $row, $item['item_type'] ?: '-');
+                    $newSheet->setCellValue('D' . $row, $item['kode_warna'] ?: '-');
+                    $newSheet->setCellValue('E' . $row, $item['warna'] ?: '-');
+                    $newSheet->setCellValue('F' . $row, $item['qty_poplus']);
+                    $newSheet->setCellValue('G' . $row, $item['tgl_datang'] ?: '-');
+                    $newSheet->setCellValue('H' . $row, $item['nama_cluster']);
+                    $newSheet->setCellValue('I' . $row, isset($item['qty_datang']) ? number_format($item['qty_datang'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('J' . $row, isset($item['cns_datang']) ? number_format($item['cns_datang'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('K' . $row, $item['lot_datang'] ?: '-');
+                    $newSheet->setCellValue('L' . $row, $item['tgl_terima'] ?: '-');
+                    $newSheet->setCellValue('M' . $row, $item['no_surat_jalan'] ?: '-');
+                    $newSheet->setCellValue('N' . $row, $item['l_m_d'] ?: '-');
+                    $newSheet->setCellValue('O' . $row, $item['keterangan'] ?: '-');
+                    $newSheet->setCellValue('P' . $row, $item['admin'] ?: '-');
+                    $newSheet->setCellValue('Q' . $row, 'GANTI RETUR');
+                    $row++;
+                }
+
+                $lastRow = $row - 1;
+                $newSheet->getStyle("A3:Q{$lastRow}")->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => 'FF000000'],
+                        ],
+                    ],
+                ]);
+
+                foreach (range('A', 'Z') as $col) {
+                    $newSheet->getColumnDimension($col)->setAutoSize(true);
+                }
+
+                $footerRow = $lastRow + 2;
+                $newSheet->mergeCells("A{$footerRow}:P{$footerRow}");
+                $newSheet->setCellValue("A{$footerRow}", 'REPORT GANTI RETUR');
+                $newSheet->getStyle("A{$footerRow}")->getFont()->setBold(true)->setSize(10);
+                $newSheet->getStyle("A{$footerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             }
 
             // Hanya atur judul dan header jika nama sheet mengandung 'DATANG LUREX'
@@ -9338,6 +9520,47 @@ class ExcelController extends BaseController
                         ],
                     ],
                 ]);
+
+                $row = 4;
+                $no = 1;
+                foreach ($data['datangLurex'] as $item) {
+                    $newSheet->setCellValue('A' . $row, $no++);
+                    $newSheet->setCellValue('B' . $row, $item['no_model'] ?: '-');
+                    $newSheet->setCellValue('C' . $row, $item['item_type'] ?: '-');
+                    $newSheet->setCellValue('D' . $row, $item['kode_warna'] ?: '-');
+                    $newSheet->setCellValue('E' . $row, $item['warna'] ?: '-');
+                    $newSheet->setCellValue('F' . $row, $item['tgl_datang']);
+                    $newSheet->setCellValue('G' . $row, $item['nama_cluster']);
+                    $newSheet->setCellValue('H' . $row, isset($item['qty_datang']) ? number_format($item['qty_datang'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('I' . $row, isset($item['cns_datang']) ? number_format($item['cns_datang'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('J' . $row, $item['lot_datang'] ?: '-');
+                    $newSheet->setCellValue('K' . $row, $item['tgl_terima'] ?: '-');
+                    $newSheet->setCellValue('L' . $row, $item['no_surat_jalan'] ?: '-');
+                    $newSheet->setCellValue('M' . $row, $item['l_m_d'] ?: '-');
+                    $newSheet->setCellValue('N' . $row, $item['keterangan']);
+                    $newSheet->setCellValue('O' . $row, $item['admin'] ?: '-');
+                    $row++;
+                }
+
+                $lastRow = $row - 1;
+                $newSheet->getStyle("A3:O{$lastRow}")->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => 'FF000000'],
+                        ],
+                    ],
+                ]);
+
+                foreach (range('A', 'Z') as $col) {
+                    $newSheet->getColumnDimension($col)->setAutoSize(true);
+                }
+
+                $footerRow = $lastRow + 2;
+                $newSheet->mergeCells("A{$footerRow}:O{$footerRow}");
+                $newSheet->setCellValue("A{$footerRow}", 'REPORT DATANG LUREX');
+                $newSheet->getStyle("A{$footerRow}")->getFont()->setBold(true)->setSize(10);
+                $newSheet->getStyle("A{$footerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             }
 
             // Hanya atur judul dan header jika nama sheet mengandung '(+) DATANG LUREX'
@@ -9366,6 +9589,48 @@ class ExcelController extends BaseController
                         ],
                     ],
                 ]);
+
+                $row = 4;
+                $no = 1;
+                foreach ($data['datangLurexPlus'] as $item) {
+                    $newSheet->setCellValue('A' . $row, $no++);
+                    $newSheet->setCellValue('B' . $row, $item['no_model'] ?: '-');
+                    $newSheet->setCellValue('C' . $row, $item['item_type'] ?: '-');
+                    $newSheet->setCellValue('D' . $row, $item['kode_warna'] ?: '-');
+                    $newSheet->setCellValue('E' . $row, $item['warna'] ?: '-');
+                    $newSheet->setCellValue('F' . $row, $item['qty_poplus']);
+                    $newSheet->setCellValue('G' . $row, $item['tgl_datang'] ?: '-');
+                    $newSheet->setCellValue('H' . $row, $item['nama_cluster']);
+                    $newSheet->setCellValue('I' . $row, isset($item['qty_datang']) ? number_format($item['qty_datang'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('J' . $row, isset($item['cns_datang']) ? number_format($item['cns_datang'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('K' . $row, $item['lot_datang'] ?: '-');
+                    $newSheet->setCellValue('L' . $row, $item['tgl_terima'] ?: '-');
+                    $newSheet->setCellValue('M' . $row, $item['no_surat_jalan'] ?: '-');
+                    $newSheet->setCellValue('N' . $row, $item['l_m_d'] ?: '-');
+                    $newSheet->setCellValue('O' . $row, $item['keterangan'] ?: '-');
+                    $newSheet->setCellValue('P' . $row, $item['admin'] ?: '-');
+                    $row++;
+                }
+
+                $lastRow = $row - 1;
+                $newSheet->getStyle("A3:P{$lastRow}")->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => 'FF000000'],
+                        ],
+                    ],
+                ]);
+
+                foreach (range('A', 'Z') as $col) {
+                    $newSheet->getColumnDimension($col)->setAutoSize(true);
+                }
+
+                $footerRow = $lastRow + 2;
+                $newSheet->mergeCells("A{$footerRow}:P{$footerRow}");
+                $newSheet->setCellValue("A{$footerRow}", 'REPORT (+)DATANG SOLID');
+                $newSheet->getStyle("A{$footerRow}")->getFont()->setBold(true)->setSize(10);
+                $newSheet->getStyle("A{$footerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             }
 
             // Hanya atur judul dan header jika nama sheet mengandung 'RETUR PERBAIKAN GBN'
@@ -9394,6 +9659,511 @@ class ExcelController extends BaseController
                         ],
                     ],
                 ]);
+
+                $row = 4;
+                $no = 1;
+                foreach ($data['returGbn'] as $item) {
+                    $newSheet->setCellValue('A' . $row, $no++);
+                    $newSheet->setCellValue('B' . $row, $item['no_model'] ?: '-');
+                    $newSheet->setCellValue('C' . $row, $item['item_type'] ?: '-');
+                    $newSheet->setCellValue('D' . $row, $item['kode_warna'] ?: '-');
+                    $newSheet->setCellValue('E' . $row, $item['warna'] ?: '-');
+                    $newSheet->setCellValue('F' . $row, $item['area_retur']);
+                    $newSheet->setCellValue('G' . $row, $item['tgl_retur'] ?: '-');
+                    $newSheet->setCellValue('H' . $row, $item['nama_cluster']);
+                    $newSheet->setCellValue('I' . $row, isset($item['kgs_retur']) ? number_format($item['kgs_retur'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('J' . $row, $item['cns_retur'] ?: 0);
+                    $newSheet->setCellValue('K' . $row, $item['krg_retur'] ?: 0);
+                    $newSheet->setCellValue('L' . $row, $item['lot_retur'] ?: '-');
+                    $newSheet->setCellValue('M' . $row, $item['kategori'] ?: '-');
+                    $newSheet->setCellValue('N' . $row, $item['keterangan_area'] ?: '-');
+                    $newSheet->setCellValue('O' . $row, $item['keterangan_gbn'] ?: '-');
+                    $row++;
+                }
+
+                $lastRow = $row - 1;
+                $newSheet->getStyle("A3:O{$lastRow}")->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => 'FF000000'],
+                        ],
+                    ],
+                ]);
+
+                foreach (range('A', 'Z') as $col) {
+                    $newSheet->getColumnDimension($col)->setAutoSize(true);
+                }
+
+                $footerRow = $lastRow + 2;
+                $newSheet->mergeCells("A{$footerRow}:O{$footerRow}");
+                $newSheet->setCellValue("A{$footerRow}", 'REPORT RETUR PERBAIKAN GBN');
+                $newSheet->getStyle("A{$footerRow}")->getFont()->setBold(true)->setSize(10);
+                $newSheet->getStyle("A{$footerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            }
+
+            if ($name === 'RETUR PERBAIKAN AREA ' . $key) {
+                // Judul
+                $newSheet->mergeCells('A1:O1');
+                $newSheet->setCellValue('A1', 'REPORT RETUR PERBAIKAN AREA ' . $key);
+                $newSheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+                $newSheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+                // Header
+                $headerReturArea = ['NO', 'NO MODEL', 'ITEM TYPE', 'KODE WARNA', 'WARNA', 'AREA', 'TGL RETUR', 'NAMA CLUSTER', 'QTY RETUR', 'CONES RETUR', 'KRG / PACK RETUR', 'LOT RETUR', 'KATEGORI', 'KET AREA', 'KET GBN'];
+                $col = 'A';
+                foreach ($headerReturArea as $header) {
+                    $newSheet->setCellValue($col . '3', $header);
+                    $newSheet->getStyle($col . '3')->getFont()->setBold(true);
+                    $col++;
+                }
+
+                $newSheet->getStyle('A3:O3')->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => '000000'],
+                        ],
+                    ],
+                ]);
+
+                $row = 4;
+                $no = 1;
+                foreach ($data['returArea'] as $item) {
+                    $newSheet->setCellValue('A' . $row, $no++);
+                    $newSheet->setCellValue('B' . $row, $item['no_model'] ?: '-');
+                    $newSheet->setCellValue('C' . $row, $item['item_type'] ?: '-');
+                    $newSheet->setCellValue('D' . $row, $item['kode_warna'] ?: '-');
+                    $newSheet->setCellValue('E' . $row, $item['warna'] ?: '-');
+                    $newSheet->setCellValue('F' . $row, $item['area_retur']);
+                    $newSheet->setCellValue('G' . $row, $item['tgl_retur'] ?: '-');
+                    $newSheet->setCellValue('H' . $row, isset($item['nama_cluster']) ? $item['nama_cluster'] : '-');
+                    $newSheet->setCellValue('I' . $row, isset($item['kgs_retur']) ? number_format($item['kgs_retur'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('J' . $row, $item['cns_retur'] ?: 0);
+                    $newSheet->setCellValue('K' . $row, $item['krg_retur'] ?: 0);
+                    $newSheet->setCellValue('L' . $row, $item['lot_retur'] ?: '-');
+                    $newSheet->setCellValue('M' . $row, $item['kategori'] ?: '-');
+                    $newSheet->setCellValue('N' . $row, $item['keterangan_area'] ?: '-');
+                    $newSheet->setCellValue('O' . $row, $item['keterangan_gbn'] ?: '-');
+                    $row++;
+                }
+
+                $lastRow = $row - 1;
+                $newSheet->getStyle("A3:O{$lastRow}")->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => 'FF000000'],
+                        ],
+                    ],
+                ]);
+
+                foreach (range('A', 'Z') as $col) {
+                    $newSheet->getColumnDimension($col)->setAutoSize(true);
+                }
+
+                $footerRow = $lastRow + 2;
+                $newSheet->mergeCells("A{$footerRow}:O{$footerRow}");
+                $newSheet->setCellValue("A{$footerRow}", 'REPORT RETUR PERBAIKAN AREA');
+                $newSheet->getStyle("A{$footerRow}")->getFont()->setBold(true)->setSize(10);
+                $newSheet->getStyle("A{$footerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            }
+
+            if ($name === 'PAKAI AREA ' . $key) {
+                // Judul
+                $newSheet->mergeCells('A1:N1');
+                $newSheet->setCellValue('A1', 'REPORT ORDER PAKAI AREA ' . $key);
+                $newSheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+                $newSheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+                // Header
+                $headerPakaiArea = ['NO', 'NO MODEL', 'ITEM TYPE', 'KODE WARNA', 'WARNA', 'AREA', 'TGL PAKAI', 'TAMBAHAN', 'NAMA CLUSTER', 'QTY PAKAI', 'CONES PAKAI', 'LOT PAKAI', 'KET GBN', 'ADMIN'];
+                $col = 'A';
+                foreach ($headerPakaiArea as $header) {
+                    $newSheet->setCellValue($col . '3', $header);
+                    $newSheet->getStyle($col . '3')->getFont()->setBold(true);
+                    $col++;
+                }
+
+                $newSheet->getStyle('A3:N3')->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => '000000'],
+                        ],
+                    ],
+                ]);
+
+                $row = 4;
+                $no = 1;
+                foreach ($data['pakaiArea'] as $item) {
+                    $newSheet->setCellValue('A' . $row, $no++);
+                    $newSheet->setCellValue('B' . $row, $item['no_model'] ?: '-');
+                    $newSheet->setCellValue('C' . $row, $item['item_type'] ?: '-');
+                    $newSheet->setCellValue('D' . $row, $item['kode_warna'] ?: '-');
+                    $newSheet->setCellValue('E' . $row, $item['warna'] ?: '-');
+                    $newSheet->setCellValue('F' . $row, $item['area_out']);
+                    $newSheet->setCellValue('G' . $row, $item['tgl_out'] ?: '-');
+                    $newSheet->setCellValue('H' . $row, $item['po_tambahan'] == '1' ? 'YA' : '');
+                    $newSheet->setCellValue('I' . $row, $item['nama_cluster']);
+                    $newSheet->setCellValue('J' . $row, isset($item['kgs_out']) ? number_format($item['kgs_out'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('K' . $row, $item['cns_out'] ?: 0);
+                    $newSheet->setCellValue('L' . $row, $item['krg_out'] ?: 0);
+                    $newSheet->setCellValue('M' . $row, $item['lot_out'] ?: '-');
+                    $newSheet->setCellValue('N' . $row, $item['admin'] ?: '-');
+                    $row++;
+                }
+
+                $lastRow = $row - 1;
+                $newSheet->getStyle("A3:N{$lastRow}")->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => 'FF000000'],
+                        ],
+                    ],
+                ]);
+
+                foreach (range('A', 'Z') as $col) {
+                    $newSheet->getColumnDimension($col)->setAutoSize(true);
+                }
+
+                $footerRow = $lastRow + 2;
+                $newSheet->mergeCells("A{$footerRow}:N{$footerRow}");
+                $newSheet->setCellValue("A{$footerRow}", 'REPORT ORDER PAKAI AREA');
+                $newSheet->getStyle("A{$footerRow}")->getFont()->setBold(true)->setSize(10);
+                $newSheet->getStyle("A{$footerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            }
+
+            if ($name === 'PAKAI LAIN-LAIN ' . $key) {
+                // Judul
+                $newSheet->mergeCells('A1:N1');
+                $newSheet->setCellValue('A1', 'REPORT ORDER PAKAI LAIN-LAIN ' . $key);
+                $newSheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+                $newSheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+                // Header
+                $headerPakaiLain = ['NO', 'NO MODEL', 'ITEM TYPE', 'KODE WARNA', 'WARNA', 'AREA', 'TGL PAKAI', 'TAMBAHAN', 'NAMA CLUSTER', 'QTY PAKAI', 'CONES PAKAI', 'LOT PAKAI', 'KET GBN', 'ADMIN'];
+                $col = 'A';
+                foreach ($headerPakaiLain as $header) {
+                    $newSheet->setCellValue($col . '3', $header);
+                    $newSheet->getStyle($col . '3')->getFont()->setBold(true);
+                    $col++;
+                }
+
+                $newSheet->getStyle('A3:N3')->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => '000000'],
+                        ],
+                    ],
+                ]);
+
+                $row = 4;
+                $no = 1;
+                foreach ($data['pakaiLain'] as $item) {
+                    $newSheet->setCellValue('A' . $row, $no++);
+                    $newSheet->setCellValue('B' . $row, $item['no_model'] ?: '-');
+                    $newSheet->setCellValue('C' . $row, $item['item_type'] ?: '-');
+                    $newSheet->setCellValue('D' . $row, $item['kode_warna'] ?: '-');
+                    $newSheet->setCellValue('E' . $row, $item['warna'] ?: '-');
+                    $newSheet->setCellValue('F' . $row, '-');
+                    $newSheet->setCellValue('G' . $row, $item['tgl_other_out'] ?: '-');
+                    $newSheet->setCellValue('H' . $row, $item['po_plus'] == '1' ? 'YA' : '');
+                    $newSheet->setCellValue('I' . $row, $item['nama_cluster']);
+                    $newSheet->setCellValue('J' . $row, isset($item['kgs_other_out']) ? number_format($item['kgs_other_out'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('K' . $row, $item['cns_other_out'] ?: 0);
+                    $newSheet->setCellValue('L' . $row, $item['krg_other_out'] ?: 0);
+                    $newSheet->setCellValue('M' . $row, $item['lot_other_out'] ?: '-');
+                    $newSheet->setCellValue('N' . $row, $item['admin'] ?: '-');
+                    $row++;
+                }
+
+                $lastRow = $row - 1;
+                $newSheet->getStyle("A3:N{$lastRow}")->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => 'FF000000'],
+                        ],
+                    ],
+                ]);
+
+                foreach (range('A', 'Z') as $col) {
+                    $newSheet->getColumnDimension($col)->setAutoSize(true);
+                }
+
+                $footerRow = $lastRow + 2;
+                $newSheet->mergeCells("A{$footerRow}:N{$footerRow}");
+                $newSheet->setCellValue("A{$footerRow}", 'REPORT ORDER PAKAI LAIN-LAIN');
+                $newSheet->getStyle("A{$footerRow}")->getFont()->setBold(true)->setSize(10);
+                $newSheet->getStyle("A{$footerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            }
+
+            if ($name === 'RETUR STOCK ' . $key) {
+                // Judul
+                $newSheet->mergeCells('A1:O1');
+                $newSheet->setCellValue('A1', 'REPORT RETUR STOCK ' . $key);
+                $newSheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+                $newSheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+                // Header
+                $headerReturStock = ['NO', 'NO MODEL', 'ITEM TYPE', 'KODE WARNA', 'WARNA', 'AREA', 'TGL RETUR', 'NAMA CLUSTER', 'QTY RETUR', 'CONES RETUR', 'KRG/PACK RETUR', 'LOT RETUR', 'KATEGORI', 'KET AREA', 'KET GBN'];
+                $col = 'A';
+                foreach ($headerReturStock as $header) {
+                    $newSheet->setCellValue($col . '3', $header);
+                    $newSheet->getStyle($col . '3')->getFont()->setBold(true);
+                    $col++;
+                }
+
+                $newSheet->getStyle('A3:O3')->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => '000000'],
+                        ],
+                    ],
+                ]);
+
+                $row = 4;
+                $no = 1;
+                foreach ($data['returStock'] as $item) {
+                    $newSheet->setCellValue('A' . $row, $no++);
+                    $newSheet->setCellValue('B' . $row, $item['no_model'] ?: '-');
+                    $newSheet->setCellValue('C' . $row, $item['item_type'] ?: '-');
+                    $newSheet->setCellValue('D' . $row, $item['kode_warna'] ?: '-');
+                    $newSheet->setCellValue('E' . $row, $item['warna'] ?: '-');
+                    $newSheet->setCellValue('F' . $row, $item['area_retur']);
+                    $newSheet->setCellValue('G' . $row, $item['tgl_retur'] ?: '-');
+                    $newSheet->setCellValue('H' . $row, isset($item['nama_cluster']) ? $item['nama_cluster'] : '-');
+                    $newSheet->setCellValue('I' . $row, isset($item['kgs_retur']) ? number_format($item['kgs_retur'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('J' . $row, $item['cns_retur'] ?: 0);
+                    $newSheet->setCellValue('K' . $row, $item['krg_retur'] ?: 0);
+                    $newSheet->setCellValue('L' . $row, $item['lot_retur'] ?: '-');
+                    $newSheet->setCellValue('M' . $row, $item['kategori'] ?: '-');
+                    $newSheet->setCellValue('N' . $row, $item['keterangan_area'] ?: '-');
+                    $newSheet->setCellValue('O' . $row, $item['keterangan_gbn'] ?: '-');
+                    $row++;
+                }
+
+                $lastRow = $row - 1;
+                $newSheet->getStyle("A3:O{$lastRow}")->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => 'FF000000'],
+                        ],
+                    ],
+                ]);
+
+                foreach (range('A', 'Z') as $col) {
+                    $newSheet->getColumnDimension($col)->setAutoSize(true);
+                }
+
+                $footerRow = $lastRow + 2;
+                $newSheet->mergeCells("A{$footerRow}:O{$footerRow}");
+                $newSheet->setCellValue("A{$footerRow}", 'REPORT RETUR STOCK');
+                $newSheet->getStyle("A{$footerRow}")->getFont()->setBold(true)->setSize(10);
+                $newSheet->getStyle("A{$footerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            }
+
+            if ($name === 'RETUR TITIP ' . $key) {
+                // Judul
+                $newSheet->mergeCells('A1:O1');
+                $newSheet->setCellValue('A1', 'REPORT RETUR TITIP ' . $key);
+                $newSheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+                $newSheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+                // Header
+                $headerReturStock = ['NO', 'NO MODEL', 'ITEM TYPE', 'KODE WARNA', 'WARNA', 'AREA', 'TGL RETUR', 'NAMA CLUSTER', 'QTY RETUR', 'CONES RETUR', 'KRG/PACK RETUR', 'LOT RETUR', 'KATEGORI', 'KET AREA', 'KET GBN'];
+                $col = 'A';
+                foreach ($headerReturStock as $header) {
+                    $newSheet->setCellValue($col . '3', $header);
+                    $newSheet->getStyle($col . '3')->getFont()->setBold(true);
+                    $col++;
+                }
+
+                $newSheet->getStyle('A3:O3')->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => '000000'],
+                        ],
+                    ],
+                ]);
+
+                $row = 4;
+                $no = 1;
+                foreach ($data['returTitip'] as $item) {
+                    $newSheet->setCellValue('A' . $row, $no++);
+                    $newSheet->setCellValue('B' . $row, $item['no_model'] ?: '-');
+                    $newSheet->setCellValue('C' . $row, $item['item_type'] ?: '-');
+                    $newSheet->setCellValue('D' . $row, $item['kode_warna'] ?: '-');
+                    $newSheet->setCellValue('E' . $row, $item['warna'] ?: '-');
+                    $newSheet->setCellValue('F' . $row, $item['area_retur']);
+                    $newSheet->setCellValue('G' . $row, $item['tgl_retur'] ?: '-');
+                    $newSheet->setCellValue('H' . $row, $item['nama_cluster']);
+                    $newSheet->setCellValue('I' . $row, isset($item['kgs_retur']) ? number_format($item['kgs_retur'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('J' . $row, $item['cns_retur'] ?: 0);
+                    $newSheet->setCellValue('K' . $row, $item['krg_retur'] ?: 0);
+                    $newSheet->setCellValue('L' . $row, $item['lot_retur'] ?: '-');
+                    $newSheet->setCellValue('M' . $row, $item['kategori'] ?: '-');
+                    $newSheet->setCellValue('N' . $row, $item['keterangan_area'] ?: '-');
+                    $newSheet->setCellValue('O' . $row, $item['keterangan_gbn'] ?: '-');
+                    $row++;
+                }
+
+                $lastRow = $row - 1;
+                $newSheet->getStyle("A3:O{$lastRow}")->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => 'FF000000'],
+                        ],
+                    ],
+                ]);
+
+                foreach (range('A', 'Z') as $col) {
+                    $newSheet->getColumnDimension($col)->setAutoSize(true);
+                }
+
+                $footerRow = $lastRow + 2;
+                $newSheet->mergeCells("A{$footerRow}:O{$footerRow}");
+                $newSheet->setCellValue("A{$footerRow}", 'REPORT RETUR TITIP');
+                $newSheet->getStyle("A{$footerRow}")->getFont()->setBold(true)->setSize(10);
+                $newSheet->getStyle("A{$footerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            }
+
+            if ($name === 'ORDER ' . $key . ' DIPINJAM') {
+                // Judul
+                $newSheet->mergeCells('A1:O1');
+                $newSheet->setCellValue('A1', 'REPORT ORDER ' . $key . ' DIPINJAM OLEH ORDER LAIN');
+                $newSheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+                $newSheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+                // Header
+                $headerReturStock = ['NO', 'NO MODEL', 'ITEM TYPE', 'KODE WARNA', 'WARNA', 'AREA', 'TGL PAKAI', 'TAMBAHAN', 'NAMA CLUSTER', 'QTY PAKAI', 'CONES PAKAI', 'LOT PAKAI', 'KET GBN', 'ADMIN', 'NOTE'];
+                $col = 'A';
+                foreach ($headerReturStock as $header) {
+                    $newSheet->setCellValue($col . '3', $header);
+                    $newSheet->getStyle($col . '3')->getFont()->setBold(true);
+                    $col++;
+                }
+
+                $newSheet->getStyle('A3:O3')->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => '000000'],
+                        ],
+                    ],
+                ]);
+
+                $row = 4;
+                $no = 1;
+                foreach ($data['dipinjam'] as $item) {
+                    $newSheet->setCellValue('A' . $row, $no++);
+                    $newSheet->setCellValue('B' . $row, $item['no_model_new'] ?: '-');
+                    $newSheet->setCellValue('C' . $row, $item['item_type'] ?: '-');
+                    $newSheet->setCellValue('D' . $row, $item['kode_warna'] ?: '-');
+                    $newSheet->setCellValue('E' . $row, $item['warna'] ?: '-');
+                    $newSheet->setCellValue('F' . $row, $item['area_out']);
+                    $newSheet->setCellValue('G' . $row, $item['tgl_pakai'] ?: '-');
+                    $newSheet->setCellValue('H' . $row, $item['po_tambahan'] == '1' ? 'YA' : '');
+                    $newSheet->setCellValue('I' . $row, $item['nama_cluster']);
+                    $newSheet->setCellValue('J' . $row, isset($item['kgs_out']) ? number_format($item['kgs_out'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('K' . $row, $item['cns_out'] ?: 0);
+                    $newSheet->setCellValue('L' . $row, $item['lot_out'] ?: 0);
+                    $newSheet->setCellValue('M' . $row, 'Pinjem dari order ' . $item['no_model_old'] . ' kode ' . $item['kode_warna'] . ' ' . $item['kgs_out'] . ' kg');
+                    $newSheet->setCellValue('N' . $row, $item['admin'] ?: '-');
+                    $newSheet->setCellValue('O' . $row, $item['keterangan'] . ' dari ' . $item['no_model_old'] . ' kode ' . $item['kode_warna'] . ' untuk ' . $item['no_model_new']);
+                    $row++;
+                }
+
+                $lastRow = $row - 1;
+                $newSheet->getStyle("A3:O{$lastRow}")->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => 'FF000000'],
+                        ],
+                    ],
+                ]);
+
+                foreach (range('A', 'Z') as $col) {
+                    $newSheet->getColumnDimension($col)->setAutoSize(true);
+                }
+
+                $footerRow = $lastRow + 2;
+                $newSheet->mergeCells("A{$footerRow}:O{$footerRow}");
+                $newSheet->setCellValue("A{$footerRow}", 'REPORT ORDER DIPINJAM');
+                $newSheet->getStyle("A{$footerRow}")->getFont()->setBold(true)->setSize(10);
+                $newSheet->getStyle("A{$footerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            }
+
+            // ========================= PINDAH ORDER =========================
+            if ($name === 'PINDAH ORDER ' . $key) {
+                // Judul
+                $newSheet->mergeCells('A1:K1');
+                $newSheet->setCellValue('A1', 'REPORT PINDAH ORDER ' . $key . ' KE ORDER LAIN');
+                $newSheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+                $newSheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+                // Header
+                $headerReturStock = ['NO', 'NO MODEL', 'DELIVERY', 'ITEM TYPE', 'KODE WARNA', 'WARNA', 'QTY', 'CONES', 'LOT', 'CLUSTER', 'KETERANGAN'];
+                $col = 'A';
+                foreach ($headerReturStock as $header) {
+                    $newSheet->setCellValue($col . '3', $header);
+                    $newSheet->getStyle($col . '3')->getFont()->setBold(true);
+                    $col++;
+                }
+
+                $newSheet->getStyle('A3:K3')->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => '000000'],
+                        ],
+                    ],
+                ]);
+
+                $row = 4;
+                $no = 1;
+                foreach ($data['dipindah'] as $item) {
+                    $newSheet->setCellValue('A' . $row, $no++);
+                    $newSheet->setCellValue('B' . $row, $item['no_model_old'] ?: '-');
+                    $newSheet->setCellValue('C' . $row, $delivery[0]['delivery'] ?: '-');
+                    $newSheet->setCellValue('D' . $row, $item['item_type'] ?: '-');
+                    $newSheet->setCellValue('E' . $row, $item['kode_warna'] ?: '-');
+                    $newSheet->setCellValue('F' . $row, $item['warna'] ?: '-');
+                    $newSheet->setCellValue('G' . $row, $item['kgs']);
+                    $newSheet->setCellValue('H' . $row, $item['cns']);
+                    $newSheet->setCellValue('I' . $row, $item['lot']);
+                    $newSheet->setCellValue('J' . $row, $item['nama_cluster']);
+                    $newSheet->setCellValue('K' . $row, $item['keterangan'] . ' dari ' . $item['no_model_old'] . ' kode ' . $item['kode_warna'] . ' untuk ' . $item['no_model_new']);
+                    $row++;
+                }
+
+                $lastRow = $row - 1;
+                $newSheet->getStyle("A3:K{$lastRow}")->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => 'FF000000'],
+                        ],
+                    ],
+                ]);
+
+                foreach (range('A', 'K') as $col) {
+                    $newSheet->getColumnDimension($col)->setAutoSize(true);
+                }
+
+                $footerRow = $lastRow + 2;
+                $newSheet->mergeCells("A{$footerRow}:O{$footerRow}");
+                $newSheet->setCellValue("A{$footerRow}", 'REPORT HISTORY PINDAH ORDER');
+                $newSheet->getStyle("A{$footerRow}")->getFont()->setBold(true)->setSize(10);
+                $newSheet->getStyle("A{$footerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             }
         }
 
@@ -12868,7 +13638,7 @@ class ExcelController extends BaseController
             'search' => $search ?? ''
         ];
 
-        $apiUrl = 'http://172.23.44.16/MaterialSystem/public/api/statusbahanbaku/?' . http_build_query($params);
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/?' . http_build_query($params);
         $json   = @file_get_contents($apiUrl);
 
         if ($json === false) {
