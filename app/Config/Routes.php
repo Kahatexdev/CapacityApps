@@ -85,6 +85,11 @@ $routes->group(
         $routes->get('getProductType', 'ApiController::getProductType');
 
         $routes->get('getQtyOrderPerArea', 'ApiController::getQtyOrderPerArea');
+
+
+        // APLIKASI WMS
+        $routes->get('getAllDataOrder', 'ApiController::getAllDataOrder');
+        $routes->get('getDetailOrder', 'ApiController::getDetailOrder');
     }
 );
 

@@ -631,4 +631,18 @@ class ApiController extends ResourceController
 
         return $this->response->setJSON($data);
     }
+    public function getAllDataOrder()
+    {
+        $order = $this->ApsPerstyleModel->getAllDataOrder();
+
+        return $this->response->setJSON($order);
+    }
+
+    public function getDetailOrder()
+    {
+        $noModel = $this->request->getGet('no_model');
+        $detailOrder = $this->ApsPerstyleModel->getDetailOrder($noModel);
+
+        return $this->response->setJSON($detailOrder);
+    }
 }
