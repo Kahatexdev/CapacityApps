@@ -70,6 +70,7 @@ class UserController extends BaseController
         $dataBuyer = $this->orderModel->getBuyer();
         $dataArea = $this->jarumModel->getArea();
         $dataJarum = $this->jarumModel->getJarum();
+
         $data = [
             'role' => session()->get('role'),
             'title' => 'Dashboard',
@@ -461,19 +462,17 @@ class UserController extends BaseController
                 }
             }
             if ($gwValue == 0) {
-                log_message('warning', "⚠️ GW tidak ditemukan untuk {$noModel} / {$size}");
+                log_message('warning', "âš ï¸ GW tidak ditemukan untuk {$noModel} / {$size}");
+            } else {
+                $bsGram = $bs['qty_gram'] > 0 ? round($bs['qty_gram'] / $gwValue) : 0;
+                $bsPcs  = $bs['qty_pcs'] + $bsGram;
+                // $totalBsDz = round($bsPcs / 24);
             }
-
-            $bsGram = $bs['qty_gram'] > 0 ? round($bs['qty_gram'] / $gwValue) : 0;
-            $bsPcs = $bs['qty_pcs'] + $bsGram;
-            $totalBsDz = round($bsPcs / 24);
-
-            // tambahkan gw ke data bs
             $bs['totalBsMc'] = $bsPcs;
         }
         unset($bs); // good practice
 
-        // --- 🔽 Sekarang group berdasarkan nama_karyawan ---
+        // --- ðŸ”½ Sekarang group berdasarkan nama_karyawan ---
         $groupedByKaryawan = [];
 
         foreach ($bsPerbulan as $row) {

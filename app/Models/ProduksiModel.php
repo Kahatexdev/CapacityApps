@@ -669,7 +669,7 @@ class ProduksiModel extends Model
         $bulanDateTime = DateTime::createFromFormat('F-Y', $bulan);
         $tahun = $bulanDateTime->format('Y'); // 2024
         $bulanNumber = $bulanDateTime->format('m'); // 12
-        // === 1️⃣ PRODUKSI + PERBAIKAN per TANGGAL ===
+        // === 1ï¸âƒ£ PRODUKSI + PERBAIKAN per TANGGAL ===
         $sqlProduksi = "
             SELECT 
                 t.tanggal,
@@ -718,7 +718,7 @@ class ProduksiModel extends Model
             'buyer' => $buyer
         ])->getResultArray();
 
-        // === 2️⃣ DATA BS MESIN per MODEL & SIZE ===
+        // === 2ï¸âƒ£ DATA BS MESIN per MODEL & SIZE ===
         $sqlBs = "
             SELECT 
                 bs_mesin.tanggal_produksi,
@@ -743,7 +743,7 @@ class ProduksiModel extends Model
             'buyer' => $buyer
         ])->getResultArray();
 
-        // 2️⃣ Hitung totalBsMc per model+size
+        // 2ï¸âƒ£ Hitung totalBsMc per model+size
         foreach ($dataBs as &$bs) {
             $noModel = $bs['no_model'];
             $size = $bs['size'];
@@ -760,18 +760,17 @@ class ProduksiModel extends Model
             }
 
             if ($gwValue == 0) {
-                log_message('warning', "⚠️ GW tidak ditemukan untuk {$noModel} / {$size}");
+                log_message('warning', "âš ï¸ GW tidak ditemukan untuk {$noModel} / {$size}");
+            } else {
+                $bsGram = $bs['qty_gram'] > 0 ? round($bs['qty_gram'] / $gwValue) : 0;
+                $bsPcs  = $bs['qty_pcs'] + $bsGram;
+                // $totalBsDz = round($bsPcs / 24);
             }
-
-            $bsGram = $bs['qty_gram'] > 0 ? round($bs['qty_gram'] / $gwValue) : 0;
-            $bsPcs  = $bs['qty_pcs'] + $bsGram;
-            // $totalBsDz = round($bsPcs / 24);
-
             $bs['totalBsMc'] = $bsPcs;
         }
         unset($bs);
 
-        // 3️⃣ Group berdasarkan tanggal_produksi
+        // 3ï¸âƒ£ Group berdasarkan tanggal_produksi
         $groupedByTanggal = [];
 
         foreach ($dataBs as $row) {
