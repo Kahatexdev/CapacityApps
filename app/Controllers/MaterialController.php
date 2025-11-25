@@ -1549,6 +1549,16 @@ class MaterialController extends BaseController
 
         $result = json_decode($response, true);
 
+        // Jika API balas error karena data duplikat
+        if (isset($result['status']) && $result['status'] === 'error') {
+            return $this->response
+                ->setStatusCode(400)
+                ->setJSON([
+                    'status'  => 'error',
+                    'message' => $result['message'] // kirim balik ke AJAX
+                ]);
+        }
+
         return $this->response->setStatusCode($httpCode)->setJSON($result);
     }
     public function filterPoTambahan($area)

@@ -395,6 +395,7 @@
                                 <th>Qty Celup</th>
                                 <th>Lot Celup</th>
                                 <th>Tgl Schedule</th>
+                                <th>Ket Daily Cek</th>
                                 <th>Tgl Bon</th>
                                 <th>Tgl Celup</th>
                                 <th>Tgl Bongkar</th>
@@ -407,7 +408,6 @@
                                 <th>Tgl Reject KK</th>
                                 <th>Tgl Matching</th>
                                 <th>Tgl Perbaikan</th>
-                                <th>Ket Daily Cek</th>
                                 <th>Stock Gbn (Kg)</th>
                             </tr>
                         </thead>
@@ -474,6 +474,7 @@ ${data.master.no_model === '-'
     <td class="text-end">  ${item.po_plus === '1' ? '(+)' : ''}  ${item.kg_celup||0}</td>
     <td>${item.lot_celup || '-'}</td>
     <td>${formatDate(item.tanggal_schedule)}</td>
+    <td>${item.ket_daily_cek || '-'}</td>
     <td>${formatDate(item.tanggal_bon)}</td>
     <td>${formatDate(item.tanggal_celup)}</td>
     <td>${formatDate(item.tanggal_bongkar)}</td>
@@ -486,7 +487,6 @@ ${data.master.no_model === '-'
     <td>${formatDate(item.tanggal_reject)}</td>
     <td>${formatDate(item.tanggal_matching)}</td>
     <td>${formatDate(item.tanggal_perbaikan)}</td>
-    <td>${item.ket_daily_cek || '-'}</td>
     <td class="text-end">${formatNumber(item.kg_stock)}</td>
 </tr>
 `;

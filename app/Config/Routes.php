@@ -85,6 +85,11 @@ $routes->group(
         $routes->get('getProductType', 'ApiController::getProductType');
 
         $routes->get('getQtyOrderPerArea', 'ApiController::getQtyOrderPerArea');
+
+
+        // APLIKASI WMS
+        $routes->get('getAllDataOrder', 'ApiController::getAllDataOrder');
+        $routes->get('getDetailOrder', 'ApiController::getDetailOrder');
     }
 );
 
@@ -478,7 +483,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('pps', 'ApsController::pps');
     $routes->get('ppsDetail/(:any)', 'ApsController::ppsDetail/$1');
     $routes->post('updatePps', 'ApsController::updatePps');
-    $routes->get('exportPps/(:any)', 'excelController::exportPps/$1');
+    $routes->get('exportPps/(:any)', 'ExcelController::exportPps/$1');
 
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
@@ -738,7 +743,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('pps', 'ApsController::pps');
     $routes->get('ppsDetail/(:any)', 'ApsController::ppsDetail/$1');
     $routes->post('updatePps', 'ApsController::updatePps');
-    $routes->get('exportPps/(:any)', 'excelController::exportPps/$1');
+    $routes->get('exportPps/(:any)', 'ExcelController::exportPps/$1');
 
 
     // deffect
