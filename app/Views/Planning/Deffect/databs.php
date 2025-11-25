@@ -145,13 +145,26 @@
                                         <input type="date" name="akhir" class="form-control" required>
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-lg-2">
                                     <div class="form-group">
                                         <label for="area" class="col-form-label">Area</label>
                                         <input type="text" name="area" class="form-control">
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                        <div class="form-group">
+                                            <label for="buyer" class="col-form-label">Buyer</label>
+                                            <select class="select2 form-select" id="buyer" name="buyer">
+                                                <option value="">Pilih Buyer</option>
+                                                <?php foreach ($dataBuyer as $buyer) : ?>
+                                                    <option value="<?= $buyer['kd_buyer_order']; ?>"><?= $buyer['kd_buyer_order']; ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
                                     <div class="form-group">
                                         <label for="area" class="col-form-label">No Model</label>
                                         <input type="text" name="pdk" class="form-control">
@@ -185,6 +198,15 @@
                 ]
             });
 
+        });
+
+        $(document).ready(function() {
+            $('.select2').select2({
+                theme: 'bootstrap-5', // Gunakan tema Bootstrap 5
+                width: '100%',
+                placeholder: "",
+                allowClear: true
+            });
         });
     </script>
 
