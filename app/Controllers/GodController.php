@@ -1049,11 +1049,7 @@ class GodController extends BaseController
             $month = date('F', mktime(0, 0, 0, $bulan, 10)); // 10 = tanggal dummy, bisa berapa aja yg valid
             $judul = $month . '-' . $tahun;
             $targetMonth = 0;
-            if (!empty($filters['area'])) {
-                $targetMonth = $this->MonthlyMcModel->getTargetArea($judul, $area); // area spesifik
-            } else {
-                $targetMonth = $this->MonthlyMcModel->getTarget($judul); // target keseluruhan
-            }
+            $targetMonth = $this->MonthlyMcModel->getTargetArea($judul, $area); // area spesifik
 
             $prodYesterday = $this->produksiModel->monthlyProd($filters);
             // $totalProd = $this->produksiModel->totalProdBulan($filters);
@@ -1064,6 +1060,7 @@ class GodController extends BaseController
             $direct = $this->produksiModel->directMonthly($filters);
             $target = $this->ApsPerstyleModel->monthlyTarget($filters);
             $hari = $this->produksiModel->hariProduksi($filters);
+            $jlMc = $this->produksiModel->getLatestMc($filters);
             $jumhari = $hari['hari'];
             $prodTotal = 0;
             $prodGr = 0;
@@ -1127,7 +1124,7 @@ class GodController extends BaseController
                 $quality = ($good / $prodTotal) * 100;
                 $prod = $target['qty'] - $target['sisa'];
                 $percentage =  ($prod / $target['qty']) * 100;
-                $productivity =  (($prodTotal / 24) / ($targetMonth['total_output'] * (int)$jumhari)) * 100;
+                $productivity = (($jlMc['prodYes']  / 24) / ($targetMonth['targetMc'] * $jlMc['mc'])) * 100;
             }
 
             $data = [
@@ -1145,7 +1142,10 @@ class GodController extends BaseController
                 'targetOutput' => $targetMonth['total_output'] * (int)$jumhari,
                 'hari' => $jumhari,
                 'planmc' => $targetMonth['mesin'],
-                'mesinDetail' => $detailMc
+                'actMc' => $jlMc['mc'] ?? 0,
+                'prodKemaren' => $jlMc['prodYes'] / 24 ?? 0,
+                'mesinDetail' => $detailMc,
+                'targetPermesin' => $targetMonth['targetMc']
             ];
 
             return $this->response->setJSON($data);

@@ -14,6 +14,7 @@ $routes->post('authverify', 'AuthController::login');
 // chart
 $routes->get('chart/getProductionData', 'ProduksiController::getProductionData');
 $routes->get('chart/getBsData', 'ProduksiController::getBsData');
+$routes->get('chart/getPerbaikan', 'DeffectController::getPerbaikan');
 $routes->get('chart/getBsMesin', 'DeffectController::getBsMesin');
 $routes->get('chart/dashboardData', 'GodController::dashboardData');
 $routes->get('chart/getDailyProd', 'GodController::getDailyProd');
