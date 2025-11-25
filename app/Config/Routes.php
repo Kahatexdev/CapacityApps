@@ -512,6 +512,16 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('inputKode', 'DeffectController::inputKode');
     $routes->post('viewDataBs', 'DeffectController::viewDataBs');
 
+    // bs mesin
+    $routes->get('bsmesin', 'UserController::bsmesin');
+    $routes->get('bsMesinPerbulan/(:any)/(:any)', 'UserController::bsMesinPerbulan/$1/$2');
+
+    // perbaikan
+    $routes->get('perbaikanArea', 'DeffectController::perbaikanArea');
+    $routes->post('viewPerbaikan', 'DeffectController::viewPerbaikan');
+    $routes->post('exportExcelPerbaikan', 'ExcelController::exportExcelPerbaikan');
+    $routes->post('summaryGlobalPbArea', 'ExcelController::summaryGlobalPbArea');
+
 
     //bahanbakyu
     $routes->get('stockbb', 'MaterialController::stockbb');
@@ -735,6 +745,16 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('datadeffect', 'DeffectController::datadeffect');
     $routes->post('inputKode', 'DeffectController::inputKode');
     $routes->post('viewDataBs', 'DeffectController::viewDataBs');
+
+    // bs mesin
+    $routes->get('bsmesin', 'UserController::bsmesin');
+    $routes->get('bsMesinPerbulan/(:any)/(:any)', 'UserController::bsMesinPerbulan/$1/$2');
+
+    // perbaikan
+    $routes->get('perbaikanArea', 'DeffectController::perbaikanArea');
+    $routes->post('viewPerbaikan', 'DeffectController::viewPerbaikan');
+    $routes->post('exportExcelPerbaikan', 'ExcelController::exportExcelPerbaikan');
+    $routes->post('summaryGlobalPbArea', 'ExcelController::summaryGlobalPbArea');
 
     //bahanbakyu
     $routes->get('stockbb', 'MaterialController::stockbb');
