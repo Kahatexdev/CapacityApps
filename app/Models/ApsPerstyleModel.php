@@ -1131,6 +1131,7 @@ class ApsPerstyleModel extends Model
     {
         $builder = $this->select('SUM(qty) as qty, SUM(sisa) as sisa')
             ->where('production_unit !=', 'MJ');
+            ->where('qty >', 0);
 
         if (!empty($filters['bulan'])) {
             $builder->where('MONTH(delivery)', $filters['bulan']);
