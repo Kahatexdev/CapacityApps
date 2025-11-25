@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use CodeIgniter\Cache\Handlers\WincacheHandler;
 use CodeIgniter\Model;
 use LDAP\Result;
 use DateTime;
@@ -828,5 +829,17 @@ class ProduksiModel extends Model
             'produksi' => $dataProduksi, // optional: kalau masih mau akses data mentahan
             'bs'       => $groupedByTanggal,       // optional: kalau masih mau akses detail bs per model/size
         ];
+    }
+    public function getLatestMc($filters)
+    {
+        $days = $this->select('tgl_produksi')
+            ->where('area', $filters['area'])
+            ->orderBy('tgl_produksi', 'DESC')
+            ->first();
+        $mc = $this->select('count(no_mesin) as mc, sum(qty_produksi) as prodYes')
+            ->where('tgl_produksi', $days['tgl_produksi'])
+            ->where('area', $filters['area'])
+            ->first();
+        return $mc;
     }
 }

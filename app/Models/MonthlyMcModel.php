@@ -61,7 +61,7 @@ class MonthlyMcModel extends Model
     }
     public function getTargetArea($judul, $area)
     {
-        return $this->select('area_machine.output as total_output, area_machine.planning_mc as mesin')
+        return $this->select('area_machine.output as total_output, area_machine.planning_mc as mesin, sum(area_machine.output/area_machine.planning_mc) as targetMc')
             ->join('area_machine', 'area_machine.id_monthly_mc=monthly_mc.id_monthly_mc', 'left')
             ->where('monthly_mc.judul', $judul)
             ->where('area_machine.area', $area)

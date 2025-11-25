@@ -1599,7 +1599,7 @@ class ProduksiController extends BaseController
         try {
             // Disarankan sediakan endpoint area-only (tanpa nama):
             //   GET /api/getdataforbs/{area}
-            $apiUrl = "http://172.23.44.14/HumanResourceSystem/public/api/getdataforbs/{$area}";
+            $apiUrl = "http://127.0.0.1/HumanResourceSystem/public/api/getdataforbs/{$area}";
             $resp = @file_get_contents($apiUrl);
             // dd ($resp);
             if ($resp !== false) {
