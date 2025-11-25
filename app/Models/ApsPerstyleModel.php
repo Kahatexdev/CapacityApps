@@ -1130,7 +1130,7 @@ class ApsPerstyleModel extends Model
     public function monthlyTarget($filters)
     {
         $builder = $this->select('SUM(qty) as qty, SUM(sisa) as sisa')
-            ->where('production_unit !=', 'MJ');
+            ->where('production_unit !=', 'MJ')
             ->where('qty >', 0);
 
         if (!empty($filters['bulan'])) {
