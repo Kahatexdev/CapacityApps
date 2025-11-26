@@ -727,7 +727,7 @@ class SummaryController extends BaseController
         // Ambil data bahan baku
         $allModels = array_values(array_unique($allModels));
         $modelsParam = implode(',', $allModels);
-        $bbUrl = "http://172.23.44.14/MaterialSystem/public/api/getBBForSummaryPlanner?" . "no_model=" . urlencode($modelsParam);
+        $bbUrl = "http://127.0.0.1/MaterialSystem/public/api/getBBForSummaryPlanner?" . "no_model=" . urlencode($modelsParam);
         $bbData = @file_get_contents($bbUrl);
         $bahanBaku = $bbData ? json_decode($bbData, true) : [];
 

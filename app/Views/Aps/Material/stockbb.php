@@ -273,7 +273,7 @@
             let warna = $.trim($('input[name="warna"]').val());
 
             $.ajax({
-                url: "http://172.23.44.14/MaterialSystem/public/api/warehouse/search",
+                url: "http://127.0.0.1/MaterialSystem/public/api/warehouse/search",
                 method: "POST",
                 dataType: "json",
                 data: {

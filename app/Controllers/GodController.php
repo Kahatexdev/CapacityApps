@@ -1049,8 +1049,7 @@ class GodController extends BaseController
             $month = date('F', mktime(0, 0, 0, $bulan, 10)); // 10 = tanggal dummy, bisa berapa aja yg valid
             $judul = $month . '-' . $tahun;
             $targetMonth = 0;
-            $targetMonth = $this->MonthlyMcModel->getTargetArea($judul, $area); // area spesifik
-
+            $targetMonth = $this->MonthlyMcModel->getTargetArea($judul, $area); // area spesifik    
             $prodYesterday = $this->produksiModel->monthlyProd($filters);
             // $totalProd = $this->produksiModel->totalProdBulan($filters);
             // return $this->response->setJSON($totalProd);
@@ -1078,7 +1077,7 @@ class GodController extends BaseController
             }
 
             // Kirim bulk ke API
-            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getGwBulk';
+            $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/getGwBulk';
             $options = [
                 'http' => [
                     'method'  => 'POST',
@@ -1188,7 +1187,7 @@ class GodController extends BaseController
                 ];
             }
             // Kirim bulk ke API
-            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getGwBulk';
+            $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/getGwBulk';
             $options = [
                 'http' => [
                     'method'  => 'POST',

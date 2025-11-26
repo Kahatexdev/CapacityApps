@@ -95,7 +95,7 @@ class ReturController extends BaseController
         // Ambil hanya field 'name'
         $result = array_column($filteredArea, 'name');
 
-        $url = 'http://172.23.44.14/MaterialSystem/public/api/getKategoriRetur';
+        $url = 'http://127.0.0.1/MaterialSystem/public/api/getKategoriRetur';
 
         $response = file_get_contents($url);
         log_message('debug', "API Response: " . $response);
@@ -116,7 +116,7 @@ class ReturController extends BaseController
                 'tipe_kategori' => $item['tipe_kategori']
             ];
         }
-        $listRetur = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area;
+        $listRetur = 'http://127.0.0.1/MaterialSystem/public/api/listRetur/' . $area;
         $res = file_get_contents($listRetur);
         $list = json_decode($res, true);
         $listRetur = $list['listRetur'] ?? [];
@@ -145,8 +145,8 @@ class ReturController extends BaseController
         $noModel = $this->request->getGet('model') ?? '';
 
 
-        $apiUrlPph = 'http://172.23.44.14/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
-        $apiUrlPengiriman = 'http://172.23.44.14/MaterialSystem/public/api/getPengirimanArea?noModel=' . urlencode($noModel);
+        $apiUrlPph = 'http://127.0.0.1/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
+        $apiUrlPengiriman = 'http://127.0.0.1/MaterialSystem/public/api/getPengirimanArea?noModel=' . urlencode($noModel);
 
         // Ambil data dari API PPH
         $responsePph = file_get_contents($apiUrlPph);
@@ -356,7 +356,7 @@ class ReturController extends BaseController
 
         // Ambil data material sekali
         try {
-            $materialUrl = 'http://172.23.44.14/MaterialSystem/public/api/cekMaterial/' . $postData['material'];
+            $materialUrl = 'http://127.0.0.1/MaterialSystem/public/api/cekMaterial/' . $postData['material'];
             $materialResponse = $client->get($materialUrl, ['headers' => ['Accept' => 'application/json']]);
             $materialData = json_decode($materialResponse->getBody(), true);
             if (!$materialData || !isset($materialData['item_type'])) {
@@ -400,7 +400,7 @@ class ReturController extends BaseController
             ];
 
             try {
-                $resp = $client->post('http://172.23.44.14/MaterialSystem/public/api/saveRetur', [
+                $resp = $client->post('http://127.0.0.1/MaterialSystem/public/api/saveRetur', [
                     'headers' => [
                         'Accept' => 'application/json',
                         'Content-Type' => 'application/json'
@@ -469,7 +469,7 @@ class ReturController extends BaseController
 
         // Kalau area dipilih, baru ambil data listRetur
         if (!empty($area)) {
-            $listReturUrl = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area . '?tglBuat=' . $tglRetur;
+            $listReturUrl = 'http://127.0.0.1/MaterialSystem/public/api/listRetur/' . $area . '?tglBuat=' . $tglRetur;
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $listReturUrl);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -628,7 +628,7 @@ class ReturController extends BaseController
         $noModel = $this->request->getGet('noModel');
         $tglBuat = $this->request->getGet('tglBuat');
 
-        $listRetur = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area . '?noModel=' . $noModel . '&tglBuat=' . $tglBuat;
+        $listRetur = 'http://127.0.0.1/MaterialSystem/public/api/listRetur/' . $area . '?noModel=' . $noModel . '&tglBuat=' . $tglBuat;
         $res = file_get_contents($listRetur);
         $list = json_decode($res, true);
         $listRetur = $list['listRetur'] ?? [];
