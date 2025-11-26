@@ -484,6 +484,7 @@
                             'KK7L' => 'denah_rows7L',
                             'KK8D' => 'denah_rows8D',
                             'KK9D' => 'denah_rows9D',
+                            'KK11M' => 'denah_rows11M',
                             // add more mappings here...
                         ];
                         $partialName = $partialMap[$areaKey] ?? 'denah_rows'; // default fallback

@@ -921,6 +921,9 @@ class PlanningController extends BaseController
                 case 'KK9D':
                     $html = view($role . '/Planning/partials/denah_rows9D', $data);
                     break;
+                case 'KK11M':
+                    $html = view($role . '/Planning/partials/denah_rows11M', $data);
+                    break;
                 default:
                     $html = view($role . '/Planning/partials/denah_rows', $data);
                     break;
