@@ -816,11 +816,6 @@
         //Save data
         $('#btn-save').on('click', function() {
             let formData = [];
-
-            // ⬅ Tambah di sini — disable button
-            let btn = $(this);
-            btn.prop("disabled", true).text("Saving...");
-
             let loading = document.getElementById('loading-spinner');
             loading.classList.remove('d-none')
 
@@ -899,27 +894,15 @@
                     }
                 },
                 error: function(xhr, status, error) {
-                    let res = xhr.responseJSON;
-
-                    if (res && res.status === 'error') {
-                        Swal.fire({
-                            title: 'Peringatan!',
-                            icon: 'warning',
-                            text: res.message, // pesan API
-                        });
-                    } else {
-                        Swal.fire({
-                            title: 'Error!',
-                            icon: 'error',
-                            text: 'Terjadi kesalahan saat menyimpan data.',
-                        });
-                    }
-
                     console.error(xhr.responseText);
+                    Swal.fire({
+                        title: 'Error!',
+                        icon: 'error',
+                        text: 'Terjadi kesalahan saat menyimpan data.',
+                    });
                 },
                 complete: function() {
                     loading.classList.add('d-none'); // Sembunyikan loading setelah selesai
-                    btn.prop("disabled", false).text("Save");
                 }
             });
         });
