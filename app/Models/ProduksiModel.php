@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use CodeIgniter\Cache\Handlers\WincacheHandler;
 use CodeIgniter\Model;
 use LDAP\Result;
 use DateTime;

@@ -1049,8 +1049,7 @@ class GodController extends BaseController
             $month = date('F', mktime(0, 0, 0, $bulan, 10)); // 10 = tanggal dummy, bisa berapa aja yg valid
             $judul = $month . '-' . $tahun;
             $targetMonth = 0;
-            $targetMonth = $this->MonthlyMcModel->getTargetArea($judul, $area); // area spesifik
-
+            $targetMonth = $this->MonthlyMcModel->getTargetArea($judul, $area); // area spesifik    
             $prodYesterday = $this->produksiModel->monthlyProd($filters);
             // $totalProd = $this->produksiModel->totalProdBulan($filters);
             // return $this->response->setJSON($totalProd);
