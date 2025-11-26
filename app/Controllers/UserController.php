@@ -196,6 +196,8 @@ class UserController extends BaseController
             log_message('error', 'Error fetching API data: ' . $e->getMessage());
         }
 
+        $listArea = $this->jarumModel->getArea();
+
         // Prepare data for the view
         $data = [
             'role' => session()->get('role'),
@@ -216,6 +218,7 @@ class UserController extends BaseController
             'buyer' => $dataBuyer,
             'area' => $dataArea,
             'jarum' => $dataJarum,
+            'listArea' => $listArea,
         ];
         return view(session()->get('role') . '/bsmesin', $data);
     }

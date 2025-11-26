@@ -836,10 +836,13 @@ class ProduksiModel extends Model
             ->where('area', $filters['area'])
             ->orderBy('tgl_produksi', 'DESC')
             ->first();
-        $mc = $this->select('count(no_mesin) as mc, sum(qty_produksi) as prodYes')
+
+        $mc = $this->select('COUNT(DISTINCT produksi.no_mesin, apsperstyle.machinetypeid) AS mc, sum(produksi.qty_produksi) as prodYes')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle=produksi.idapsperstyle', 'left')
             ->where('tgl_produksi', $days['tgl_produksi'])
             ->where('area', $filters['area'])
             ->first();
+
         return $mc;
     }
 }

@@ -200,8 +200,10 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Target/day</p>
-                                <h6 class="font-weight-bolder mb-0" id="targetday">
+                                <!-- <p class="text-sm mb-0 text-capitalize font-weight-bold">Target/day</p>
+                                <h6 class="font-weight-bolder mb-0" id="targetday"> -->
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Act Running Mc</p>
+                                <h6 class="font-weight-bolder mb-0" id="actRunningMc">
                                 </h6>
                                 <span class=" text-sm font-weight-bolder"></span>
                             </div>
@@ -319,9 +321,39 @@
 
     </div>
 
+    <div class="card mt-3">
+        <div class="card-header">
+            <h5>
+                <h5>
+                    Data Perbaikan Area
 
+                </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-6 col-md-8">
 
+                    <div class="chart">
+                        <canvas id="perbaikan-chart" class="chart-canvas" height="500"></canvas>
+                    </div>
 
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <table class="table-responsive mx-4">
+                        <thead>
+                            <tr>
+                                <th>Top 10 Perbaikan Area</th>
+                                <th>Jumlah</th>
+                            </tr>
+                        </thead>
+                        <tbody id="perbaikan">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -410,9 +442,21 @@
         });
     }
 
-
-
-
+    function fetchDataPerbaikan(bulan, tahun, area = "") {
+        $.ajax({
+            url: "<?= base_url('chart/getPerbaikan') ?>",
+            type: "GET",
+            data: {
+                bulan: bulan,
+                tahun: tahun,
+                area: area
+            },
+            dataType: "json",
+            success: function(response) {
+                updatePerbaikan(response);
+            }
+        });
+    }
 
 
     function dashboard(data, area) {
@@ -427,13 +471,15 @@
         let productivity = data.productivity;
         let planMc = data.planmc;
         let targetday = parseInt(data.targetday).toLocaleString();
+        let actRunningMc = parseInt(data.actMc).toLocaleString();
         const layoutMc = document.getElementById('layoutMc')
         document.getElementById('deffectRate').textContent = `${deffect}%`;
         document.getElementById('output').textContent = `${output} dz`;
         document.getElementById('pph').textContent = `${pph} dz`;
         document.getElementById('productivity').textContent = `${productivity} %`;
         document.getElementById('planmc').textContent = `${planMc} mc`;
-        document.getElementById('targetday').textContent = `${targetday} dz`;
+        // document.getElementById('targetday').textContent = `${targetday} dz`;
+        document.getElementById('actRunningMc').textContent = `${actRunningMc} mc`;
         const stats = document.getElementById('stats');
         const bg = document.getElementById('bground');
 
@@ -699,7 +745,106 @@
         });
     }
 
+    function updatePerbaikan(data) {
+        if (!data || !Array.isArray(data)) {
+            console.error("Invalid data provided to updateBs function.");
+            return;
+        }
 
+        let labels = data.map(item => item.Keterangan);
+        let values = data.map(item => item.qty);
+
+        // Warna yang diulang jika jumlah data lebih banyak dari warna yang tersedia
+        let chartColors = ['#845ec2', '#d65db1', '#ff6f91', '#ff9671', '#ffc75f', '#f9f871', '#008f7a', '#b39cd0', '#c34a36', '#4b4453', '#4ffbdf', '#936c00', '#c493ff', '#296073'];
+        let colors = data.map((_, index) => chartColors[index % chartColors.length]);
+
+        let ctxElement = document.getElementById("perbaikan-chart");
+        if (!ctxElement) {
+            console.error("Canvas element with ID 'perbaikan-chart' not found.");
+            return;
+        }
+
+        let ctx4 = ctxElement.getContext("2d");
+
+        let perbaikan = document.getElementById("perbaikan");
+        if (!perbaikan) {
+            console.error("Element with ID 'perbaikan' not found.");
+            return;
+        }
+
+        // Buat tabel dari data menggunakan JavaScript
+        perbaikan.innerHTML = data.slice(0, 10).map((ch, index) => {
+            let color = chartColors[index % chartColors.length]; // Ambil warna berdasarkan index
+            return `
+        <tr>
+            <td> <i class="ni ni-button-play" style="color: ${color};"></i> ${ch.Keterangan}</td>
+            <td>${ch.qty} Pcs</td>
+        </tr>
+    `;
+        }).join('');
+
+
+        // Hapus grafik lama sebelum menggambar yang baru
+        if (window.perbaikanChart) {
+            window.perbaikanChart.destroy();
+        }
+
+        // Buat grafik baru
+        window.perbaikanChart = new Chart(ctx4, {
+            type: "pie",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Projects",
+                    weight: 9,
+                    cutout: 0,
+                    tension: 0.9,
+                    pointRadius: 2,
+                    borderWidth: 2,
+                    backgroundColor: colors,
+                    data: values, // Perbaikan di sini (sebelumnya salah referensi ke `value`)
+                    fill: false
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            drawBorder: false,
+                            display: false,
+                            drawOnChartArea: false,
+                            drawTicks: false,
+                        },
+                        ticks: {
+                            display: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            drawBorder: false,
+                            display: false,
+                            drawOnChartArea: false,
+                            drawTicks: false,
+                        },
+                        ticks: {
+                            display: false,
+                        }
+                    },
+                },
+            },
+        });
+    }
 
 
 
@@ -719,6 +864,7 @@
         fetchData(bulan, tahun, area);
         fetchDataBs(bulan, tahun, area);
         fetchBsMesin(bulan, tahun, area);
+        fetchDataPerbaikan(bulan, tahun, area);
     }
 
     // Set default bulan & tahun saat halaman load

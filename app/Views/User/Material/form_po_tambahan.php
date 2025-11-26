@@ -451,18 +451,26 @@
 
             allStyleSizes.forEach(style => {
                 const size = style.style_size;
+                const gw = parseFloat(style.gw || 0);
+                const composition = parseFloat(style.composition || 0);
 
                 if (!groupedSizes[size]) {
                     groupedSizes[size] = {
                         ...style
                     };
-                    groupedSizes[size].composition = parseFloat(style.composition || 0);
-                    groupedSizes[size].gw = parseFloat(style.gw || 0);
+                    // isi awal
+                    groupedSizes[size].composition = gw > 0 ? composition : 0;
+                    groupedSizes[size].gw = gw;
                     groupedSizes[size].gw_aktual = parseFloat(style.gw_aktual || 0);
                     groupedSizes[size].loss = parseFloat(style.loss || 0);
                 } else {
-                    groupedSizes[size].composition += parseFloat(style.composition || 0);
-                    groupedSizes[size].gw = parseFloat(style.gw || 0);
+
+                    // hanya tambahkan composition kalau gw > 0
+                    if (gw > 0) {
+                        groupedSizes[size].composition += composition;
+                    }
+
+                    groupedSizes[size].gw = gw;
                     groupedSizes[size].gw_aktual = parseFloat(style.gw_aktual || 0);
                     groupedSizes[size].loss = parseFloat(style.loss || 0);
                 }

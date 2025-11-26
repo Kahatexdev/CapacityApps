@@ -1123,7 +1123,7 @@ class GodController extends BaseController
                 $quality = ($good / $prodTotal) * 100;
                 $prod = $target['qty'] - $target['sisa'];
                 $percentage =  ($prod / $target['qty']) * 100;
-                $productivity =  (($jlMc['prodYes']  / 24) / ($targetMonth['targetMc'] * $jlMc['mc'])) * 100;
+                $productivity = (($jlMc['prodYes']  / 24) / ($targetMonth['targetMc'] * $jlMc['mc'])) * 100;
             }
 
             $data = [
