@@ -167,7 +167,7 @@ class UserController extends BaseController
             $month[] = date('F-Y', strtotime("first day of $i month"));
         }
 
-        $apiUrl = 'http://127.0.0.1/HumanResourceSystem/public/api/area/' . $area;
+        $apiUrl = 'http://172.23.44.14/HumanResourceSystem/public/api/area/' . $area;
 
         try {
             // Attempt to fetch the API response
@@ -325,7 +325,7 @@ class UserController extends BaseController
             $month[] = date('F-Y', strtotime("first day of $i month"));
         }
 
-        $apiUrl = 'http://127.0.0.1/HumanResourceSystem/public/api/area/' . $area;
+        $apiUrl = 'http://172.23.44.14/HumanResourceSystem/public/api/area/' . $area;
 
         try {
             // Attempt to fetch the API response
@@ -435,7 +435,7 @@ class UserController extends BaseController
         $dataOrder = array_values($dataOrder);
 
         // get data gw aktual / gw MU
-        $apiUrl = 'http://127.0.0.1/MaterialSystem/public/api/getAllGw';
+        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getAllGw';
         // Kirim data ke API pakai CodeIgniter HTTP client
         $dataGw = service('curlrequest')->post($apiUrl, [
             'json' => $dataOrder

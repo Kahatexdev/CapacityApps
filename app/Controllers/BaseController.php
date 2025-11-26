@@ -41,6 +41,7 @@ abstract class BaseController extends Controller
     protected $replyModel;
     protected $countNotif;
     protected $machinesModel;
+    protected $urlMaterial;
     public function __construct()
     {
         $this->jarumModel = new DataMesinModel();
@@ -52,6 +53,7 @@ abstract class BaseController extends Controller
         $this->replyModel = new PengaduanReply();
         $this->machinesModel = new MachinesModel();
         $this->countNotif = $this->pengaduanModel->countNotif($this->role);
+        $this->urlMaterial = 'http://172.23.44.14/MaterialSystem/public/api/';
     }
     /**
      * Instance of the main Request object.
