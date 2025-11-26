@@ -13088,7 +13088,7 @@ class ExcelController extends BaseController
                 $sheet->setCellValue('D' . $rowNow, number_format($item['shift_a'] / 24, 2));
                 $sheet->setCellValue('E' . $rowNow, number_format($item['shift_b'] / 24, 2));
                 $sheet->setCellValue('F' . $rowNow, number_format($item['shift_c'] / 24, 2));
-                $sheet->setCellValue('G' . $rowNow, number_format($item['qty_produksi'], 2));
+                $sheet->setCellValue('G' . $rowNow, number_format($item['qty_produksi'] / 24, 2));
                 $sheet->getRowDimension($rowNow)->setRowHeight(29);
                 $sheet->getStyle('A' . $rowNow . ':G' . $rowNow)->applyFromArray([
                     'alignment' => ['horizontal' => 'center', 'vertical' => 'center'],
