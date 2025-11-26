@@ -174,7 +174,7 @@ class FollowupController extends BaseController
         $assign = $this->ApsPerstyleModel->asignarealall($data);
         $getDeliv = $this->ApsPerstyleModel->getDeliveryAwalAkhir($model);
         // Kirim ke API MaterialSystem dengan cURL
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/assignArea';
+        $apiUrl = $this->urlMaterial . 'assignArea';
         $postData = [
             'model' => $model,
             'area' => $area,
@@ -828,7 +828,7 @@ class FollowupController extends BaseController
             $month[] = date('F-Y', strtotime("first day of $i month"));
         }
 
-        $apiUrl = 'http://172.23.44.14/HumanResourceSystem/public/api/area/' . $area;
+        $apiUrl = $this->urlHris . '/area/' . $area;
 
         try {
             // Attempt to fetch the API response

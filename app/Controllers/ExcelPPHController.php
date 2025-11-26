@@ -45,7 +45,7 @@ class ExcelPPHController extends BaseController
     public function excelPPHNomodel($area, $model)
     {
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pph?model=' . urlencode($model);
+        $apiUrl = $this->urlMaterial . 'pph?model=' . urlencode($model);
 
         // Mengambil data dari API eksternal
         $response = file_get_contents($apiUrl);
@@ -309,7 +309,7 @@ class ExcelPPHController extends BaseController
     public function excelPPHInisial($area, $model)
     {
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pph?model=' . urlencode($model);
+        $apiUrl = $this->urlMaterial . 'pph?model=' . urlencode($model);
 
         // Mengambil data dari API eksternal
         $response = file_get_contents($apiUrl);
@@ -555,7 +555,7 @@ class ExcelPPHController extends BaseController
         foreach ($data as $prod) {
             $key = $prod['mastermodel'] . '-' . $prod['size'];
 
-            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pphperhari?model=' . urlencode($prod['mastermodel']) . '&size=' . urlencode($prod['size']);
+            $apiUrl = $this->urlMaterial . 'pphperhari?model=' . urlencode($prod['mastermodel']) . '&size=' . urlencode($prod['size']);
 
             // Mengambil data dari API eksternal
             $response = @file_get_contents($apiUrl);

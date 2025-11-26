@@ -380,7 +380,8 @@
         $('#modalPengajuanRetur').find('input[name="model"]').val(model);
 
         $.ajax({
-            url: "http://172.23.44.14/MaterialSystem/public/api/cekBahanBaku/" + model,
+            url: $this - > urlMaterial.
+            "cekBahanBaku/" + model,
             type: "GET",
             data: {
                 model: model
@@ -518,7 +519,8 @@
             option.appendChild(opt);
         }
         $.ajax({
-            url: "http://172.23.44.14/MaterialSystem/public/api/getPengirimanArea?noModel=" + model,
+            url: $this - > urlMaterial.
+            "getPengirimanArea?noModel=" + model,
             type: "GET",
             data: {
                 model: model

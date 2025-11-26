@@ -42,19 +42,9 @@ abstract class BaseController extends Controller
     protected $countNotif;
     protected $machinesModel;
     protected $urlMaterial;
-    public function __construct()
-    {
-        $this->jarumModel = new DataMesinModel();
-        $this->estspk = new EstSpkModel();
-        $this->globalModel = new MonthlyMcModel();
-        $this->pengaduanModel = new PengaduanModel();
-        $this->userModel = new UserModel();
-        $this->role = session()->get('role');
-        $this->replyModel = new PengaduanReply();
-        $this->machinesModel = new MachinesModel();
-        $this->countNotif = $this->pengaduanModel->countNotif($this->role);
-        $this->urlMaterial = 'http://172.23.44.14/MaterialSystem/public/api/';
-    }
+    protected $urlHris;
+    protected $urlTls;
+    public function __construct() {}
     /**
      * Instance of the main Request object.
      *
@@ -80,13 +70,26 @@ abstract class BaseController extends Controller
     /**
      * @return void
      */
-    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
-    {
-        // Do Not Edit This Line
+    public function initController(
+        RequestInterface $request,
+        ResponseInterface $response,
+        LoggerInterface $logger
+    ) {
         parent::initController($request, $response, $logger);
 
-        // Preload any models, libraries, etc, here.
+        $this->urlMaterial = 'http://172.23.44.14/MaterialSystem/public/api/';
+        $this->urlHris     = 'http://172.23.44.14/HumanResourceSystem/public/api/';
+        $this->urlTls    = 'http://172.23.44.14/KHTEXT/public/api/';
 
-        // E.g.: $this->session = \Config\Services::session();
+        $this->jarumModel   = new DataMesinModel();
+        $this->estspk       = new EstSpkModel();
+        $this->globalModel  = new MonthlyMcModel();
+        $this->pengaduanModel = new PengaduanModel();
+        $this->userModel    = new UserModel();
+        $this->replyModel   = new PengaduanReply();
+        $this->machinesModel = new MachinesModel();
+
+        $this->role = session()->get('role');
+        $this->countNotif = $this->pengaduanModel->countNotif($this->role);
     }
 }

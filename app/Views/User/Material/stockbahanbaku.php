@@ -143,7 +143,8 @@
             let warna = $.trim($('input[name="warna"]').val());
 
             $.ajax({
-                url: "http://172.23.44.14/MaterialSystem/public/api/warehouse/search",
+                url: $this - > urlMaterial.
+                "warehouse/search",
                 method: "POST",
                 dataType: "json",
                 data: {
@@ -207,7 +208,8 @@
             const warna = $('input[name="warna"]').val();
 
             const query = `?no_model=${encodeURIComponent(noModel)}&warna=${encodeURIComponent(warna)}`;
-            window.location.href = "http://172.23.44.14/MaterialSystem/public/api/warehouse/exportExcel" + query;
+            window.location.href = $this - > urlMaterial.
+            "warehouse/exportExcel" + query;
 
         });
 

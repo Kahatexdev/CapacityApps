@@ -1079,7 +1079,7 @@ class GodController extends BaseController
             }
 
             // Kirim bulk ke API
-            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getGwBulk';
+            $apiUrl = $this->urlMaterial . 'getGwBulk';
             $options = [
                 'http' => [
                     'method'  => 'POST',
@@ -1090,7 +1090,7 @@ class GodController extends BaseController
             $context = stream_context_create($options);
             $response = file_get_contents($apiUrl, false, $context);
             $gwData = json_decode($response, true);
-
+            dd($gwData);
             // Index ulang hasil bulk berdasarkan 'model_size' key
 
             $gwMap = [];
@@ -1194,7 +1194,7 @@ class GodController extends BaseController
                 ];
             }
             // Kirim bulk ke API
-            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getGwBulk';
+            $apiUrl = $this->urlMaterial . 'getGwBulk';
             $options = [
                 'http' => [
                     'method'  => 'POST',

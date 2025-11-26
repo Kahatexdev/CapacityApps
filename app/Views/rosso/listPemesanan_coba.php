@@ -532,7 +532,8 @@
 
             // Kirim data ke server untuk pencarian
             $.ajax({
-                url: 'http://172.23.44.14/MaterialSystem/public/api/getUpdateListPemesanan', // Ganti dengan URL endpoint
+                url: $this - > urlMaterial.
+                'getUpdateListPemesanan', // Ganti dengan URL endpoint
                 method: 'POST',
                 data: {
                     area: area,
@@ -733,14 +734,15 @@
             });
             console.log(payload);
 
-            fetch('http://172.23.44.14/MaterialSystem/public/api/updateListPemesanan', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload),
-                    // credentials: 'include', // Menyertakan cookie/session ID
-                })
+            fetch($this - > urlMaterial.
+                    'updateListPemesanan', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(payload),
+                        // credentials: 'include', // Menyertakan cookie/session ID
+                    })
                 .then(async (response) => {
                     const resData = await response.json();
                     // Ambil area dari payload untuk menentukan URL redirect
@@ -848,13 +850,14 @@
                 };
 
                 // Kirim data ke server menggunakan AJAX
-                fetch("http://172.23.44.14/MaterialSystem/public/api/kirimPemesanan", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(data),
-                    })
+                fetch($this - > urlMaterial.
+                        "kirimPemesanan", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(data),
+                        })
                     .then((response) => response.json())
                     .then((result) => {
                         if (result.status == "success") {
