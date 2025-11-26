@@ -13453,8 +13453,7 @@ class ExcelController extends BaseController
 
         foreach ($getPdk as $pdk) {
             $modelData = $this->orderModel->getModelData($pdk);
-            $ppsData   = $this->ApsPerstyleModel->getPpsData($pdk);
-
+            $ppsData   = $this->ApsPerstyleModel->getPpsData($pdk['model'], $pdk['area']);
             foreach ($ppsData as $pps) {
                 $sheet->setCellValue("A{$row}", $no++);
                 $sheet->setCellValue("B{$row}", $modelData['no_model'] ?? '');

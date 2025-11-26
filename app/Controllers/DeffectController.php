@@ -451,4 +451,21 @@ class DeffectController extends BaseController
         ];
         return view(session()->get('role') . '/Perbaikan/summaryGlobal', $data);
     }
+    public function getPerbaikan()
+    {
+        $bulan = $this->request->getGet('bulan');
+        $tahun = $this->request->getGet('tahun');
+        $area  = $this->request->getGet('area');
+
+        if (!$bulan || !$tahun) {
+            return $this->response->setJSON(['error' => 'Bulan dan Tahun wajib diisi']);
+        }
+
+        try {
+            $data = $this->perbaikanModel->chartDataByMonth($bulan, $tahun, $area);
+            return $this->response->setJSON($data);
+        } catch (\Exception $e) {
+            return $this->response->setJSON(['error' => $e->getMessage()]);
+        }
+    }
 }

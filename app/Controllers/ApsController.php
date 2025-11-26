@@ -1579,7 +1579,10 @@ class ApsController extends BaseController
 
     public function ppsDetail($pdk, $area = null)
     {
-        $modelData = $this->orderModel->getModelData($pdk);
+        $model = [
+            'model' => $pdk
+        ];
+        $modelData = $this->orderModel->getModelData($model);
         $ppsData = $this->ApsPerstyleModel->getPpsData($pdk, $area);
 
         $data = [
