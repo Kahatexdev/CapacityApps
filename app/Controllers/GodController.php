@@ -4,63 +4,17 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
-use App\Models\CancelModel;
-use App\Models\LiburModel;
-use App\Models\AksesModel;
-use App\Models\AreaModel;
-use App\Models\BsModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use App\Models\UserModel;
-use App\Models\BsMesinModel;
-use App\Models\MonthlyMcModel;
-use App\Models\MachinesModel;
 
 use DateTime;
 
 class GodController extends BaseController
 {
-    protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $cancelModel;
-    protected $liburModel;
-    protected $aksesModel;
-    protected $userModel;
-    protected $areaModel;
-    protected $BsModel;
-    protected $BsMesinModel;
-    protected $MonthlyMcModel;
-    protected $machinesModel;
+
 
 
     public function __construct()
     {
-
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->cancelModel = new cancelModel();
-        $this->aksesModel = new AksesModel();
-        $this->userModel = new UserModel();
-        $this->areaModel = new AreaModel();
-        $this->BsModel = new BsModel();
-        $this->BsMesinModel = new BsMesinModel();
-        $this->MonthlyMcModel = new MonthlyMcModel();
-        $this->machinesModel = new MachinesModel();
-
         if ($this->filters   = ['role' => ['capacity', 'planning', 'god', session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -1049,16 +1003,18 @@ class GodController extends BaseController
             $month = date('F', mktime(0, 0, 0, $bulan, 10)); // 10 = tanggal dummy, bisa berapa aja yg valid
             $judul = $month . '-' . $tahun;
             $targetMonth = 0;
-            $targetMonth = $this->MonthlyMcModel->getTargetArea($judul, $area); // area spesifik    
+            $targetMonth = $this->MonthlyMcModel->getTargetArea($judul, $area); // area spesifik
+
             $prodYesterday = $this->produksiModel->monthlyProd($filters);
             // $totalProd = $this->produksiModel->totalProdBulan($filters);
             // return $this->response->setJSON($totalProd);
 
-            $bs = $this->BsModel->bsMonthly($filters);
-            $bsMesin = $this->BsMesinModel->getTotalKgMonth($filters) ?? 0;
+            $bs = $this->bsModel->bsMonthly($filters);
+            $bsMesin = $this->bsMesinModel->getTotalKgMonth($filters) ?? 0;
             $direct = $this->produksiModel->directMonthly($filters);
             $target = $this->ApsPerstyleModel->monthlyTarget($filters);
             $hari = $this->produksiModel->hariProduksi($filters);
+            $jlMc = $this->produksiModel->getLatestMc($filters);
             $jlMc = $this->produksiModel->getLatestMc($filters);
             $jumhari = $hari['hari'];
             $prodTotal = 0;
@@ -1077,7 +1033,7 @@ class GodController extends BaseController
             }
 
             // Kirim bulk ke API
-            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getGwBulk';
+            $apiUrl = api_url('material') . 'getGwBulk';
             $options = [
                 'http' => [
                     'method'  => 'POST',
@@ -1088,7 +1044,7 @@ class GodController extends BaseController
             $context = stream_context_create($options);
             $response = file_get_contents($apiUrl, false, $context);
             $gwData = json_decode($response, true);
-
+            // dd($gwData);
             // Index ulang hasil bulk berdasarkan 'model_size' key
 
             $gwMap = [];
@@ -1124,6 +1080,7 @@ class GodController extends BaseController
                 $prod = $target['qty'] - $target['sisa'];
                 $percentage =  ($prod / $target['qty']) * 100;
                 $productivity = (($jlMc['prodYes']  / 24) / ($targetMonth['targetMc'] * $jlMc['mc'])) * 100;
+                $productivity = (($jlMc['prodYes']  / 24) / ($targetMonth['targetMc'] * $jlMc['mc'])) * 100;
             }
 
             $data = [
@@ -1141,6 +1098,10 @@ class GodController extends BaseController
                 'targetOutput' => $targetMonth['total_output'] * (int)$jumhari,
                 'hari' => $jumhari,
                 'planmc' => $targetMonth['mesin'],
+                'actMc' => $jlMc['mc'] ?? 0,
+                'prodKemaren' => $jlMc['prodYes'] / 24 ?? 0,
+                'mesinDetail' => $detailMc,
+                'targetPermesin' => $targetMonth['targetMc']
                 'actMc' => $jlMc['mc'] ?? 0,
                 'prodKemaren' => $jlMc['prodYes'] / 24 ?? 0,
                 'mesinDetail' => $detailMc,
@@ -1187,7 +1148,7 @@ class GodController extends BaseController
                 ];
             }
             // Kirim bulk ke API
-            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getGwBulk';
+            $apiUrl = api_url('material') . 'getGwBulk';
             $options = [
                 'http' => [
                     'method'  => 'POST',
@@ -1245,8 +1206,8 @@ class GodController extends BaseController
                 ];
 
                 if (!isset($summaryByTanggal[$tanggal])) {
-                    $bsMesinDaily = $this->BsMesinModel->bsTanggal($fill);
-                    $bsSetting = $this->BsModel->getBsPertanggal($fill);
+                    $bsMesinDaily = $this->bsMesinModel->bsTanggal($fill);
+                    $bsSetting = $this->bsModel->getBsPertanggal($fill);
                     $summaryByTanggal[$tanggal] = [
                         'prodTotal' => 0,
                         'prodGr' => 0,

@@ -15,12 +15,12 @@ use App\Models\ProduksiModel;
 use App\Models\BsMesinModel;
 use App\Models\DetailPlanningModel;
 use App\Models\AreaModel;
+use App\Models\MonthlyMcModel;
 use App\Models\LiburModel;
 use App\Models\BsModel;
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use App\Models\MonthlyMcModel;
 use App\Models\PengaduanModel;
 use App\Models\MesinPerStyle;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ApiController extends ResourceController
 {
@@ -52,7 +52,7 @@ class ApiController extends ResourceController
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         $this->DetailPlanningModel = new DetailPlanningModel();
-        $this->BsMesinModel = new BsMesinModel();
+        $this->bsMesinModel = new BsMesinModel();
         $this->areaModel = new AreaModel();
         $this->bsModel = new BsModel();
         $this->globalModel = new MonthlyMcModel();
@@ -67,17 +67,17 @@ class ApiController extends ResourceController
     }
     public function bsKaryawan($id)
     {
-        $bsData = $this->BsMesinModel->bsDataKaryawan($id);
+        $bsData = $this->bsMesinModel->bsDataKaryawan($id);
         return $this->respond($bsData, 200);
     }
     public function bsPeriode($start, $stop)
     {
-        $bsData = $this->BsMesinModel->bsPeriode($start, $stop);
+        $bsData = $this->bsMesinModel->bsPeriode($start, $stop);
         return $this->respond($bsData, 200);
     }
     public function bsDaily($start, $stop)
     {
-        $bsData = $this->BsMesinModel->bsDaily($start, $stop);
+        $bsData = $this->bsMesinModel->bsDaily($start, $stop);
         return $this->respond($bsData, 200);
     }
 
@@ -124,7 +124,7 @@ class ApiController extends ResourceController
         $idaps = $this->ApsPerstyleModel->getIdApsForPph($area, $model, $size);
         $idapsList = array_column($idaps, 'idapsperstyle');
         $bsSettingData = $this->bsModel->getBsPph($idapsList);
-        $bsMesinData = $this->BsMesinModel->getBsMesinPph($area, $model, $size);
+        $bsMesinData = $this->bsMesinModel->getBsMesinPph($area, $model, $size);
         $bsMesin = $bsMesinData['bs_gram'] ?? 0;
 
         $result = [
@@ -166,7 +166,7 @@ class ApiController extends ResourceController
             $sizes = array_column($produksi, 'size');
 
             // Fetch all bs_mesin data in one query
-            $bsMesinData = $this->BsMesinModel->getBsMesinHarian($mastermodels, $sizes, $tanggal, $area);
+            $bsMesinData = $this->bsMesinModel->getBsMesinHarian($mastermodels, $sizes, $tanggal, $area);
 
             // Create a lookup table for fast matching
             $bsMesinMap = [];
@@ -196,7 +196,7 @@ class ApiController extends ResourceController
     }
     public function prodBsDaily($area, $tanggal)
     {
-        $bsdata = $this->BsMesinModel->bsKary($area, $tanggal);
+        $bsdata = $this->bsMesinModel->bsKary($area, $tanggal);
         return $this->response->setJSON($bsdata);
     }
 
@@ -543,7 +543,7 @@ class ApiController extends ResourceController
 
         $bsList = [];
         foreach ($styles as $style) {
-            $bs = $this->BsMesinModel->getBsMesin($area, $noModel, [$style]);
+            $bs = $this->bsMesinModel->getBsMesin($area, $noModel, [$style]);
             $bsList[$style] = is_array($bs) && isset($bs['bs_gram']) ? (float)$bs['bs_gram'] : 0;
         }
 

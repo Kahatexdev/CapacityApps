@@ -714,6 +714,14 @@
     <script src="<?= base_url('assets/js/plugins/perfect-scrollbar.min.js') ?>"></script>
     <script src="<?= base_url('assets/js/plugins/smooth-scrollbar.min.js') ?>"></script>
     <script>
+        const MaterialUrl = "<?= $materialApiUrl ?>";
+        const HrisUrl = "<?= $hrisApiUrl ?>";
+        const TlsUrl = "<?= $tlsApiUrl ?>";
+    </script>
+    <script>
+        const MaterialUrl = "<?= $materialApiUrl ?>";
+    </script>
+    <script>
         var ctx = document.getElementById("chart-bars").getContext("2d");
 
         new Chart(ctx, {

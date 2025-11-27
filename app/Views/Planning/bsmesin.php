@@ -7,7 +7,7 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',
-                    html: '<?= session()->getFlashdata('success') ?>',
+                    text: '<?= session()->getFlashdata('success') ?>',
                 });
             });
         </script>
@@ -19,208 +19,168 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    html: `<?= session()->getFlashdata('error') ?> <br>
-                <?php if (session()->getFlashdata('error_list')): ?>
-                    <ul style="text-align: left; padding-left: 20px;">
-                        <?php foreach (session()->getFlashdata('error_list') as $item): ?>
-                            <li><?= esc($item) ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                <?php endif; ?>`
+                    text: '<?= session()->getFlashdata('error') ?>',
                 });
             });
         </script>
     <?php endif; ?>
-
-
-    <!-- <div class="row">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card pb-0">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5>Input BS Mesin</h5>
-                        <div class="d-flex gap-2 ms-auto">
-                            <a href="http://172.23.44.14/CapacityApps/public/templateExcel/Template Form Input BS MC.xlsx" target="_blank" class="btn btn-success"><i class="fa fa-download"></i> Download Template</a>
-                            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#importBs">Import</button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <form id="bsMesinForm">
-                            <div class="row">
-                                <div class="col-lg-3 col-sm-12">
-                                    <div class="form-group">
-                                        <label for="nama" class="form-control-label">Nama</label>
-                                        <select name="nama" id="nama" class="form-control" onchange="getInfo()">
-                                            <option value="" selected>Pilih Nama</option>
-                                            <?php if (!empty($karyawan) && is_array($karyawan)): ?>
-                                                <?php foreach ($karyawan as $kar): ?>
-                                                    <option value="<?= htmlspecialchars($kar['id_karyawan']); ?>">
-                                                        <?= htmlspecialchars($kar['nama_karyawan']); ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            <?php else: ?>
-                                                <option value="">No employees found</option>
-                                            <?php endif; ?>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 col-sm-12">
-                                    <div class="form-group">
-                                        <label for="kode_kartu" class="form-control-label">Kode Kartu</label>
-                                        <input type="hidden" class="form-control" id="nama_kar" name="namakar" value="">
-                                        <input type="text" class="form-control" id="kode_kartu" name="kode_kartu" placeholder="Masukkan Kode Kartu">
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-3 col-sm-12">
-                                    <div class="form-group">
-                                        <label for="shift" class="form-control-label">Shift</label>
-                                        <input class="form-control" type="text" id="shift" name="shift">
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 col-sm-12">
-                                    <div class="form-group">
-                                        <label for="tgl_prod" class="form-control-label">Tanggal Produksi</label>
-                                        <input class="form-control" type="date" id="tgl_prod" name="tgl_prod" required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="dynamicRowContainer">
-                                <div class="row" id="row_0">
-                                    <div class="col-lg-1 col-sm-12">
-                                        <div class="form-group">
-                                            <label for="no_mesin_0" class="form-control-label">No MC</label>
-                                            <input class="form-control" type="text" id="no_mesin_0" name="no_mesin[]" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2 col-sm-12">
-                                        <div class="form-group">
-                                            <label for="no_model_0" class="form-control-label">PDK</label> -->
-    <!--<input class="form-control" type="text" id="no_model_0" name="no_model[]" required> -->
-    <!--<select name="no_model[]" id="no_model_0" class="select2 form-select" onchange="getIn(0)" required>
-                                                <option value="" selected>Pilih No Model</option>
-                                                <?php if (!empty($pdk) && is_array($pdk)): ?>
-                                                    <?php foreach ($pdk as $pd): ?>
-                                                        <option value="<?= htmlspecialchars($pd['mastermodel']); ?>">
-                                                            <?= htmlspecialchars($pd['mastermodel']); ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                <?php else: ?>
-                                                    <option value="">No employees found</option>
-                                                <?php endif; ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2 col-sm-12">
-                                        <div class="form-group">
-                                            <label for="inisial_0" class="form-control-label">Inisial</label>
-                                            <select class="select2 form-select" id="inisial_0" name="inisial[]" onchange="getSize(0)" required>
-                                                <option value="" selected>Pilih inisial</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2 col-sm-12">
-                                        <div class="form-group">
-                                            <label for="size_0" class="form-control-label">Size</label>
-                                            <input class="form-control" type="text" id="size_0" name="size[]" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2 col-sm-12">
-                                        <div class="form-group">
-                                            <label for="gram_0" class="form-control-label">Qty (Gram)</label>
-                                            <input class="form-control" type="number" id="gram_0" name="gram[]" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2 col-sm-12">
-                                        <div class="form-group">
-                                            <label for="pcs_0" class="form-control-label">Qty (pcs)</label>
-                                            <input class="form-control" type="number" id="pcs_0" name="pcs[]" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-1 col-sm-12">
-                                        <div class="form-group">
-                                            <label for="" class="form-control-label"></label>
-                                            <button type="button" class="btn btn-info" onclick="addRow()">+</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row mt-3">
-                                <button type="button" class="btn btn-info" id="submitForm">Simpan</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
     <div class="row mt-3">
         <div class="col-lg-12">
-            <div class="card">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pb-0 d-flex justify-content-between align-items-center">
+                    <h5 class="text-dark fw-bold mb-0">
+                        <i class="ni ni-filter-alt text-info me-2"></i> Filter Data BS Mesin
+                    </h5>
+                </div>
+
+                <div class="card-body pt-3">
+                    <form action="<?= base_url($role . '/bsMesinPerbulan/' . $ar . '/' . $bulan) ?>" method="get" class="row g-3 align-items-end">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="buyer" class="form-label fw-semibold small mb-1">Buyer</label>
+                                <select class="form-select text-dark" id="buyer" name="buyer">
+                                    <option value="">Pilih Buyer</option>
+                                    <?php foreach ($buyerList as $b) : ?>
+                                        <option value="<?= $b['kd_buyer_order']; ?>"
+                                            <?= isset($buyerFilter) && $buyerFilter == $b['kd_buyer_order'] ? 'selected' : '' ?>>
+                                            <?= $b['kd_buyer_order']; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold small mb-1"> </label>
+                                <button type="submit" class="btn btn-info w-100">
+                                    <i class="fas fa-search me-1"></i> Tampilkan
+                                </button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card mt-2">
+                <div class="card-header">
+                    <h5>
+                        <h5>
+                            Data BS Mesin <?= $area ?> Bulan <?= $month ?>
+                        </h5>
+                        Total in BS Mesin : <?= $totalbsgram ?> gr (<?= $totalbspcs ?> pcs)
+                    </h5>
+                </div>
                 <div class="card-body">
-                    <div class=" d-flex justify-content-between">
+                    <div class="row">
+                        <div class="col-lg-8 col-md-8">
 
-                        <h4>
-                            BS Mesin Perbulan <?= $areas ?>
+                            <div class="chart">
+                                <canvas id="bs-chart" class="chart-canvas" height="500"></canvas>
+                            </div>
 
-                        </h4>
-                        <div>
+                        </div>
+                        <div class="col-lg-4 col-md-4">
+                            <table class="table-responsive">
+                                <thead>
+                                    <tr>
+                                        <th>Keterangan</th>
+                                        <th>Jumlah</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    // Array warna yang akan digunakan
+                                    $chartColors = ['#845ec2', '#d65db1', '#ff6f91', '#ff9671', '#ffc75f', '#f9f871', '#008f7a', '#b39cd0', '#c34a36', '#4b4453', '#4ffbdf', '#936c00', '#c493ff', '#296073'];
 
-                            <button type="button" class="btn btn-sm btn-danger bg-gradient-danger shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#deleteBs">
-                                <i class="fas fa-trash text-lg opacity-10" aria-hidden="true"></i> Delete BS MC
-                            </button>
-                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#summaryBS">
-                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary BS MC
-                            </button>
+                                    foreach ($chart as $index => $ch) :
+                                        // Ulangi warna jika index lebih besar dari jumlah warna yang tersedia
+                                        $color = $chartColors[$index % count($chartColors)];
+                                    ?>
+                                        <tr>
+                                            <td> <i class="ni ni-button-play" style="color: <?= $color ?>;"></i><?= $ch['no_model'] ?></td>
+                                            <td><?= $ch['totalGram'] ?> gr</td>
+                                        </tr>
+                                    <?php endforeach ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row mt-1">
-        <?php foreach ($month as $bln): ?>
-            <div class="col-lg-3 mt-2">
-                <button type="button"
-                    class="btn w-100 p-0 border-0 bg-transparent openAreaModal"
-                    data-bulan="<?= $bln ?>"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalAreaSelect">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="fas fa-calendar-alt text-lg opacity-10"></i> <b><?= $bln ?></b>
-                            </h5>
+
+    <div class="row mt-4">
+        <div class="col-lg-12">
+            <div class="card pb-0">
+                <div class="card-header d-flex justify-content-between">
+                    <h5>Total <?= $month ?></h5>
+                    <!-- <a href="<?= base_url($role . '/exportBsMesinPerbulan/' . $area . '/' . $month) ?>" class="btn btn-success">Export</a> -->
+                    <p class="text-danger">Rumus persentase (%) = (Bs Mesin + Perbaikan) / Produksi</p>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="dataTable1" class="display  striped" style="width:100%">
+                            <thead>
+                                <tr class="text-center">
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal Produksi</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Produksi (Pcs)</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Bs Mesin (Pcs)</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Perbaikan (Pcs)</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Persentase (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($dataTotal as $bs) : ?>
+                                    <tr>
+                                        <td class="text-sm"><?= $bs['tanggal']; ?></td>
+                                        <td class="text-sm"><?= $bs['qty_prod']; ?></td>
+                                        <td class="text-sm"><?= $bs['totalBsMc']; ?></td>
+                                        <td class="text-sm"><?= $bs['qty_perbaikan']; ?></td>
+                                        <td class="text-sm"><?= round($bs['persentase'], 2); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-lg-12">
+            <div class="card shadow-sm">
+                <div class="card pb-0">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5>BS Mesin bulan <?= $month ?></h5>
+                        <a href="<?= base_url($role . '/exportBsMesinPerbulan/' . $area . '/' . $month) ?>" class="btn btn-success">Export</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="dataTable0" class="display  striped" style="width:100%">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Nama</th>
+                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Total Bs (Dz)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($dataBs as $bs) : ?>
+                                        <tr>
+                                            <td class="text-sm"><?= $bs['nama_karyawan']; ?></td>
+                                            <td class="text-sm"><?= $bs['totalBsMc']; ?></td>
+
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                </button>
-            </div>
-        <?php endforeach ?>
-    </div>
-</div>
-
-<!-- modal bs mc perbulan -->
-<div class="modal fade" id="modalAreaSelect" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">Pilih Area</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="areaSelect">Area</label>
-                    <select id="areaSelect" class="form-select">
-                        <option value="">-- Pilih Area --</option>
-                        <?php foreach ($listArea as $ar): ?>
-                            <option value="<?= $ar; ?>"><?= $ar; ?></option>
-                        <?php endforeach ?>
-                    </select>
                 </div>
             </div>
 
@@ -235,32 +195,89 @@
 
 
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
-<!-- jQuery (Diperlukan oleh Select2) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+    // AJAX form submission
+    $(document).ready(function() {
+        $('#dataTable0').DataTable({
+            "order": []
+        });
+        $('#dataTable').DataTable({});
 
-<!-- Select2 JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+        $('#dataTable1').DataTable({
+            "order": []
+        });
+        $('#dataTable').DataTable({});
 
-<script>
-    let selectedBulan = "";
 
-    // Saat kartu diklik → simpan bulan
-    $(".openAreaModal").on("click", function() {
-        selectedBulan = $(this).data("bulan");
-    });
-
-    // Saat user klik "Lanjut"
-    $("#submitArea").on("click", function() {
-        const area = $("#areaSelect").val();
-
-        if (!area) {
-            Swal.fire("Error", "Pilih area terlebih dahulu", "error");
-            return;
-        }
-
-        // Redirect ke route sesuai pilihan
-        window.location.href = "<?= base_url($role . '/bsMesinPerbulan') ?>/" + area + "/" + selectedBulan;
     });
 </script>
+<script>
+    let data = <?php echo json_encode($chart); ?>;
+
+    let labels = data.map(item => item.no_model);
+    let value = data.map(item => item.totalGram);
+
+    // Warna yang diulang jika jumlah data lebih banyak dari warna yang tersedia
+    let chartColors = <?php echo json_encode($chartColors); ?>;
+    let colors = data.map((_, index) => chartColors[index % chartColors.length]);
+
+    var ctx4 = document.getElementById("bs-chart").getContext("2d");
+
+    new Chart(ctx4, {
+        type: "pie",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Projects",
+                weight: 9,
+                cutout: 0,
+                tension: 0.9,
+                pointRadius: 2,
+                borderWidth: 2,
+                backgroundColor: colors,
+                data: value,
+                fill: false
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false,
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
+            scales: {
+                y: {
+                    grid: {
+                        drawBorder: false,
+                        display: false,
+                        drawOnChartArea: false,
+                        drawTicks: false,
+                    },
+                    ticks: {
+                        display: false
+                    }
+                },
+                x: {
+                    grid: {
+                        drawBorder: false,
+                        display: false,
+                        drawOnChartArea: false,
+                        drawTicks: false,
+                    },
+                    ticks: {
+                        display: false,
+                    }
+                },
+            },
+        },
+    });
+</script>
+
 
 <?php $this->endSection(); ?>

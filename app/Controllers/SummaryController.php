@@ -4,17 +4,7 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
-use App\Models\LiburModel;
-use App\Models\DetailPlanningModel;
-use App\Models\TanggalPlanningModel;
-use App\Models\KebutuhanAreaModel;
-use App\Models\BsMesinModel;
+
 use LengthException;
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Week;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -28,33 +18,12 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
 class SummaryController extends BaseController
 {
-    protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $liburModel;
-    protected $detailPlanningModel;
-    protected $tanggalPlanningModel;
-    protected $kebutuhanAreaModel;
-    protected $BsMesinModel;
+
 
 
     public function __construct()
     {
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->liburModel = new LiburModel();
-        $this->detailPlanningModel = new DetailPlanningModel();
-        $this->tanggalPlanningModel = new TanggalPlanningModel();
-        $this->kebutuhanAreaModel = new KebutuhanAreaModel();
-        $this->BsMesinModel = new BsMesinModel();
+
 
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -727,7 +696,7 @@ class SummaryController extends BaseController
         // Ambil data bahan baku
         $allModels = array_values(array_unique($allModels));
         $modelsParam = implode(',', $allModels);
-        $bbUrl = "http://172.23.44.14/MaterialSystem/public/api/getBBForSummaryPlanner?" . "no_model=" . urlencode($modelsParam);
+        $bbUrl = api_url('material') . "getBBForSummaryPlanner?" . "no_model=" . urlencode($modelsParam);
         $bbData = @file_get_contents($bbUrl);
         $bahanBaku = $bbData ? json_decode($bbData, true) : [];
 
@@ -2370,7 +2339,7 @@ class SummaryController extends BaseController
     }
     public function summaryBsMesinPerbulan($area, $bulan)
     {
-        $bsPerbulan = $this->BsMesinModel->bsMesinPerbulan($area, $bulan);
+        $bsPerbulan = $this->bsMesinModel->bsMesinPerbulan($area, $bulan);
 
         // Buat spreadsheet
         $spreadsheet = new Spreadsheet();

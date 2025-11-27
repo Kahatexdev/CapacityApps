@@ -4,53 +4,16 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
-use App\Models\LiburModel;
-use App\Models\DeffectModel;
-use App\Models\BsModel;
-use App\Models\BsMesinModel;
-use App\Models\PerbaikanAreaModel;
-
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Week;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 
 class DeffectController extends BaseController
 {
-    protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $liburModel;
-    protected $deffectModel;
-    protected $BsModel;
-    protected $BsMesinModel;
-    protected $perbaikanModel;
-    protected $db;
 
 
     public function __construct()
     {
-        $this->db = \Config\Database::connect();
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->deffectModel = new DeffectModel();
-        $this->liburModel = new LiburModel();
-        $this->BsModel = new BsModel();
-        $this->BsMesinModel = new BsMesinModel();
-        $this->perbaikanModel = new PerbaikanAreaModel();
 
         if ($this->filters   = ['role' => ['capaciity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -68,7 +31,7 @@ class DeffectController extends BaseController
     {
 
         $master = $this->deffectModel->findAll();
-        //$databs = $this->BsModel->getDataBs();
+        //$databs = $this->bsModel->getDataBs();
         $dataBuyer = $this->orderModel->getBuyer();
 
         $currentMonth = (int) date('n');
@@ -121,7 +84,7 @@ class DeffectController extends BaseController
     {
 
         $master = $this->deffectModel->findAll();
-        //$databs = $this->BsModel->getDataBs();
+        //$databs = $this->bsModel->getDataBs();
         $dataBuyer = $this->orderModel->getBuyer();
 
         $currentMonth = (int) date('n');
@@ -209,9 +172,9 @@ class DeffectController extends BaseController
             'area' => $area,
             'buyer' => $buyer,
         ];
-        $getData = $this->BsModel->getDataBsFilter($theData);
-        $total = $this->BsModel->totalBs($theData);
-        $chartData = $this->BsModel->chartData($theData);
+        $getData = $this->bsModel->getDataBsFilter($theData);
+        $total = $this->bsModel->totalBs($theData);
+        $chartData = $this->bsModel->chartData($theData);
 
         $currentMonth = (int) date('n');
         $currentYear  = (int) date('Y');
@@ -272,7 +235,7 @@ class DeffectController extends BaseController
         $idaps = $this->ApsPerstyleModel->getIdAps($pdk);
         // Cek apakah $idaps tidak kosong
         if (!empty($idaps)) {
-            $qtyBs = $this->BsModel->getTotalBs($idaps);
+            $qtyBs = $this->bsModel->getTotalBs($idaps);
 
             foreach ($qtyBs as $idap) {
                 $bs = $idap['qty'];
@@ -281,7 +244,7 @@ class DeffectController extends BaseController
                 $this->ApsPerstyleModel->update($idap['idapsperstyle'], ['sisa' => $newSisa]);
             }
 
-            $this->BsModel->deleteSesuai($idaps);
+            $this->bsModel->deleteSesuai($idaps);
         } else {
             // Jika $idaps kosong, lakukan penanganan lain, misalnya logging atau redirect dengan pesan error
             return redirect()->to(base_url(session()->get('role') . '/datadeffect'))->withInput()->with('error', 'Tidak ada data yang ditemukan untuk di-reset.');
@@ -295,7 +258,7 @@ class DeffectController extends BaseController
         $awal = $this->request->getPost('awal');
         $akhir = $this->request->getPost('akhir');
 
-        $idaps = $this->BsModel->getDataForReset($area, $awal, $akhir);
+        $idaps = $this->bsModel->getDataForReset($area, $awal, $akhir);
         if (!empty($idaps)) {
             // Memulai transaksi
             $this->db->transBegin();
@@ -310,7 +273,7 @@ class DeffectController extends BaseController
                 $newOrder = $dataOrder - $qtyBs;
 
                 $updateOrder = $this->ApsPerstyleModel->update($id, ['sisa' => $newOrder]);
-                $this->BsModel->delete($idbs);
+                $this->bsModel->delete($idbs);
             }
 
             if ($this->db->transStatus() === FALSE || !empty($failedIds)) {
@@ -346,7 +309,7 @@ class DeffectController extends BaseController
                 'tahun' => $tahun,
                 'area'  => $area
             ];
-            $data = $this->BsMesinModel->getbsMesinDaily($filters);
+            $data = $this->bsMesinModel->getbsMesinDaily($filters);
 
             return $this->response->setJSON($data);
         } catch (\Exception $e) {
