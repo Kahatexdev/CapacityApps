@@ -4,63 +4,17 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
-use App\Models\CancelModel;
-use App\Models\LiburModel;
-use App\Models\AksesModel;
-use App\Models\AreaModel;
-use App\Models\BsModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use App\Models\UserModel;
-use App\Models\BsMesinModel;
-use App\Models\MonthlyMcModel;
-use App\Models\MachinesModel;
 
 use DateTime;
 
 class GodController extends BaseController
 {
-    protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $cancelModel;
-    protected $liburModel;
-    protected $aksesModel;
-    protected $userModel;
-    protected $areaModel;
-    protected $BsModel;
-    protected $BsMesinModel;
-    protected $MonthlyMcModel;
-    protected $machinesModel;
+
 
 
     public function __construct()
     {
-
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->cancelModel = new cancelModel();
-        $this->aksesModel = new AksesModel();
-        $this->userModel = new UserModel();
-        $this->areaModel = new AreaModel();
-        $this->BsModel = new BsModel();
-        $this->BsMesinModel = new BsMesinModel();
-        $this->MonthlyMcModel = new MonthlyMcModel();
-        $this->machinesModel = new MachinesModel();
-
         if ($this->filters   = ['role' => ['capacity', 'planning', 'god', session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -1055,8 +1009,8 @@ class GodController extends BaseController
             // $totalProd = $this->produksiModel->totalProdBulan($filters);
             // return $this->response->setJSON($totalProd);
 
-            $bs = $this->BsModel->bsMonthly($filters);
-            $bsMesin = $this->BsMesinModel->getTotalKgMonth($filters) ?? 0;
+            $bs = $this->bsModel->bsMonthly($filters);
+            $bsMesin = $this->bsMesinModel->getTotalKgMonth($filters) ?? 0;
             $direct = $this->produksiModel->directMonthly($filters);
             $target = $this->ApsPerstyleModel->monthlyTarget($filters);
             $hari = $this->produksiModel->hariProduksi($filters);
@@ -1079,7 +1033,7 @@ class GodController extends BaseController
             }
 
             // Kirim bulk ke API
-            $apiUrl = $this->urlMaterial . 'getGwBulk';
+            $apiUrl = api_url('material') . 'getGwBulk';
             $options = [
                 'http' => [
                     'method'  => 'POST',
@@ -1090,7 +1044,7 @@ class GodController extends BaseController
             $context = stream_context_create($options);
             $response = file_get_contents($apiUrl, false, $context);
             $gwData = json_decode($response, true);
-            dd($gwData);
+            // dd($gwData);
             // Index ulang hasil bulk berdasarkan 'model_size' key
 
             $gwMap = [];
@@ -1194,7 +1148,7 @@ class GodController extends BaseController
                 ];
             }
             // Kirim bulk ke API
-            $apiUrl = $this->urlMaterial . 'getGwBulk';
+            $apiUrl = api_url('material') . 'getGwBulk';
             $options = [
                 'http' => [
                     'method'  => 'POST',
@@ -1252,8 +1206,8 @@ class GodController extends BaseController
                 ];
 
                 if (!isset($summaryByTanggal[$tanggal])) {
-                    $bsMesinDaily = $this->BsMesinModel->bsTanggal($fill);
-                    $bsSetting = $this->BsModel->getBsPertanggal($fill);
+                    $bsMesinDaily = $this->bsMesinModel->bsTanggal($fill);
+                    $bsSetting = $this->bsModel->getBsPertanggal($fill);
                     $summaryByTanggal[$tanggal] = [
                         'prodTotal' => 0,
                         'prodGr' => 0,

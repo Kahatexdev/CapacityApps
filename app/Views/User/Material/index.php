@@ -573,7 +573,7 @@
                         inisial.val(response.inisial);
                         const poTambahanChecked = poTambahanCheckbox.checked ? 1 : 0;
                         if (poTambahanChecked == 1) {
-                            urlMu = `http://172.23.44.14/MaterialSystem/public/api/getMUPoTambahan?no_model=${encodeURIComponent(noModel)}&style_size=${encodeURIComponent(selectedStyleSize)}&area=${encodeURIComponent(area)}`;
+                            urlMu = MaterialUrl + `getMUPoTambahan?no_model=${encodeURIComponent(noModel)}&style_size=${encodeURIComponent(selectedStyleSize)}&area=${encodeURIComponent(area)}`;
                         } else {
                             urlMu = '<?= base_url($role . '/getMU') ?>/' + noModel + '/' + encodeURIComponent(selectedStyleSize) + '/' + area + '/' + qty.val();
                         }
@@ -779,8 +779,7 @@
 
             function kirimQtyCns(formData) {
                 $.ajax({
-                    url: $this - > urlMaterial.
-                    "insertQtyCns",
+                    url: MaterialUrl + "insertQtyCns",
                     method: "POST",
                     data: formData,
                     success: function(secondResponse) {
@@ -816,7 +815,7 @@
             //         if (response.status === "success") {
             //             // Proses 2: Mengirim ke URL kedua
             //             $.ajax({
-            //                 url: $this->urlMaterial . "insertQtyCns",
+            //                 url: MaterialUrl + "insertQtyCns",
             //                 method: "POST",
             //                 data: formData,
             //                 success: function(secondResponse) {
@@ -969,15 +968,14 @@
         // });
 
         console.log('inf : ' + payload);
-        fetch($this - > urlMaterial.
-                'saveListPemesanan', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload),
-                    // credentials: 'include', // Menyertakan cookie/session ID
-                })
+        fetch(MaterialUrl + 'saveListPemesanan', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+                // credentials: 'include', // Menyertakan cookie/session ID
+            })
             .then(async (response) => {
                 const resData = await response.json();
                 const selected = Array.from(document.querySelectorAll('.checkbox-pemesanan:checked')).map(checkbox => checkbox.value);
@@ -1057,8 +1055,7 @@
         let area = document.getElementById('area').value; // Atau ambil dari variable lain
 
         $.ajax({
-            url: $this - > urlMaterial.
-            'hapusOldPemesanan',
+            url: MaterialUrl + 'hapusOldPemesanan',
             type: 'POST',
             data: JSON.stringify({
                 area: area,

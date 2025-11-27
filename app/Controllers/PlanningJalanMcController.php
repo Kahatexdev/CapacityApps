@@ -5,16 +5,6 @@ namespace App\Controllers;
 use DateTime;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
-use App\Models\LiburModel;
-use App\Models\MonthlyMcModel;
-use App\Models\AreaMachineModel;
-use App\Models\DetailAreaMachineModel;
 use App\Services\orderServices;
 use LengthException;
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Week;
@@ -26,31 +16,12 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class PlanningJalanMcController extends BaseController
 {
-    protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $liburModel;
-    protected $globalModel;
-    protected $areaMcModel;
-    protected $detailAreaMc;
+
     protected $orderService;
 
     public function __construct()
     {
         $this->orderService = new orderServices();
-        $this->detailAreaMc = new DetailAreaMachineModel();
-        $this->areaMcModel = new AreaMachineModel();
-        $this->globalModel = new MonthlyMcModel();
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
         $this->liburModel = new LiburModel();
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));

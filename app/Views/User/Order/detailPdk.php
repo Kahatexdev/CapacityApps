@@ -234,7 +234,7 @@ error_reporting(E_ALL); ?>
                         <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form action=$this->urlMaterial . "saveGWAktual" method="get">
+                        <form action=MaterialUrl + "saveGWAktual" method="get">
                             <div id="confirmationMessage"></div>
 
                             <div class="form-group mb-3">
@@ -276,8 +276,7 @@ error_reporting(E_ALL); ?>
                     var gw_aktual = button.data('gw_aktual') || '';
 
                     // cek gw_aktual dari API
-                    fetch($this - > urlMaterial.
-                            'getGWAktual?pdk=' + pdk + '&size=' + size)
+                    fetch(MaterialUrl + 'getGWAktual?pdk=' + pdk + '&size=' + size)
                         .then(function(response) {
                             return response.json();
                         })

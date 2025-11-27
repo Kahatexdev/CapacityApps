@@ -130,8 +130,7 @@
             }
 
             $.ajax({
-                url: $this - > urlMaterial.
-                "filterReportKebutuhanBahanBaku",
+                url: MaterialUrl + "filterReportKebutuhanBahanBaku",
                 type: "GET",
                 data: {
                     jenis: jenis,
@@ -190,8 +189,7 @@
             let jenis = $('#jenis').val().trim();
             let tanggal_awal = $('#tglAwal').val().trim();
             let tanggal_akhir = $('#tglAkhir').val().trim();
-            window.location.href = $this - > urlMaterial.
-            "excelReportKebutuhanBahanBaku?jenis=" + jenis + "&tanggal_awal=" + tanggal_awal + "&tanggal_akhir=" + tanggal_akhir;
+            window.location.href = MaterialUrl + "excelReportKebutuhanBahanBaku?jenis=" + jenis + "&tanggal_awal=" + tanggal_awal + "&tanggal_akhir=" + tanggal_akhir;
         });
 
         dataTable.clear().draw();

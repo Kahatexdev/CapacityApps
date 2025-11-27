@@ -260,8 +260,7 @@
         $('#modalPengajuanRetur').find('input[name="model"]').val(model);
 
         $.ajax({
-            url: $this - > urlMaterial.
-            "cekBahanBaku/" + model,
+            url: MaterialUrl + "cekBahanBaku/" + model,
             type: "GET",
             data: {
                 model: model
@@ -402,8 +401,7 @@
             }
         }
         $.ajax({
-            url: $this - > urlMaterial.
-            "getPengirimanArea?noModel=" + model,
+            url: MaterialUrl + "getPengirimanArea?noModel=" + model,
             type: "GET",
             data: {
                 model: model

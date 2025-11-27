@@ -4,58 +4,17 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
-use App\Models\LiburModel;
-use App\Models\KebutuhanMesinModel;
-use App\Models\MesinPlanningModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
 use App\Models\DetailPlanningModel;
 use App\Services\orderServices;
-use App\Models\MonthlyMcModel;
-use App\Models\EstimatedPlanningModel;
-use App\Models\BsMesinModel;
 
 class FollowupController extends BaseController
 {
-    protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $liburModel;
-    protected $KebutuhanMesinModel;
-    protected $MesinPlanningModel;
     protected $orderServices;
-    protected $DetailPlanningModel;
-    protected $EstimatedPlanningModel;
-    protected $globalModel;
-    protected $dataMesinModel;
-    protected $bsMesinModel;
 
     public function __construct()
     {
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->liburModel = new LiburModel();
-        $this->KebutuhanMesinModel = new KebutuhanMesinModel();
-        $this->MesinPlanningModel = new MesinPlanningModel();
-        $this->DetailPlanningModel = new DetailPlanningModel();
-        $this->globalModel = new MonthlyMcModel();
-        $this->EstimatedPlanningModel = new EstimatedPlanningModel();
-        $this->dataMesinModel = new DataMesinModel();
-        $this->bsMesinModel = new BsMesinModel();
 
         $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => ['followup']] != session()->get('role')) {
@@ -174,7 +133,7 @@ class FollowupController extends BaseController
         $assign = $this->ApsPerstyleModel->asignarealall($data);
         $getDeliv = $this->ApsPerstyleModel->getDeliveryAwalAkhir($model);
         // Kirim ke API MaterialSystem dengan cURL
-        $apiUrl = $this->urlMaterial . 'assignArea';
+        $apiUrl = api_url('material') . 'assignArea';
         $postData = [
             'model' => $model,
             'area' => $area,
@@ -490,8 +449,8 @@ class FollowupController extends BaseController
 
         $monthlyData = [];
         $weekCount = 1; // Inisialisasi minggu
-        $LiburModel = new LiburModel();
-        $holidays = $LiburModel->findAll(); // Ambil data libur
+
+        $holidays = $this->liburModel->findAll(); // Ambil data libur
 
         while ($startDate <= $endDate) {
             // Tentukan akhir minggu (hari Minggu)
@@ -828,7 +787,7 @@ class FollowupController extends BaseController
             $month[] = date('F-Y', strtotime("first day of $i month"));
         }
 
-        $apiUrl = $this->urlHris . '/area/' . $area;
+        $apiUrl = api_url('hris') . '/area/' . $area;
 
         try {
             // Attempt to fetch the API response

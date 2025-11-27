@@ -4,18 +4,13 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\KebutuhanMesinModel;
 
 
 
 class KebutuhanMesin extends BaseController
 
 {
-    protected $kebMC;
-    public function __construct()
-    {
-        $this->kebMC = new KebutuhanMesinModel();
-    }
+    public function __construct() {}
     public function inputMesinBooking()
     {
         $desk = $this->request->getPost("deskripsi");

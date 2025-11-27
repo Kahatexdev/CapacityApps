@@ -4,20 +4,6 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
-use App\Models\LiburModel;
-use App\Models\KebutuhanMesinModel;
-use App\Models\KebutuhanAreaModel;
-use App\Models\MesinPlanningModel;
-use App\Models\DetailPlanningModel;
-use App\Models\TanggalPlanningModel;
-use App\Models\EstimatedPlanningModel;
-use App\Models\AksesModel;/*  */
 use App\Services\orderServices;
 use CodeIgniter\HTTP\RequestInterface;
 use LengthException;
@@ -27,15 +13,6 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\{Border, Alignment, Fill, NumberFormat};
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use App\Models\EstSpkModel;
-use App\Models\BsModel;
-use App\Models\AreaMachineModel;
-use App\Models\BsMesinModel;
-use App\Models\MesinPerStyle;
-use App\Models\MesinPernomor;
-use App\Models\MachinesModel;
-use App\Models\PpsModel;/*  */
-use App\Models\PerbaikanAreaModel;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use DateTime;
@@ -52,59 +29,12 @@ use PhpOffice\PhpSpreadsheet\Chart\Layout;
 class ExcelController extends BaseController
 {
 
-    protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $liburModel;
-    protected $KebutuhanMesinModel;
-    protected $KebutuhanAreaModel;
-    protected $MesinPlanningModel;
-    protected $aksesModel;
-    protected $DetailPlanningModel;
-    protected $TanggalPlanningModel;
-    protected $EstimatedPlanningModel;
-    protected $orderServices;
-    protected $estspk;
-    protected $bsModel;
-    protected $areaMachineModel;
-    protected $BsMesinModel;
-    protected $MesinPerStyle;
-    protected $MesinPernomor;
-    protected $machinesModel;
-    protected $ppsModel;
-    protected $perbaikanAreaModel;
+
 
 
     public function __construct()
     {
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->liburModel = new LiburModel();
-        $this->KebutuhanMesinModel = new KebutuhanMesinModel();
-        $this->KebutuhanAreaModel = new KebutuhanAreaModel();
-        $this->MesinPlanningModel = new MesinPlanningModel();
-        $this->aksesModel = new AksesModel();
-        $this->DetailPlanningModel = new DetailPlanningModel();
-        $this->TanggalPlanningModel = new TanggalPlanningModel();
-        $this->EstimatedPlanningModel = new EstimatedPlanningModel();
-        $this->orderServices = new orderServices();
-        $this->estspk = new EstSpkModel();
-        $this->bsModel = new BsModel();
-        $this->areaMachineModel = new AreaMachineModel();
-        $this->BsMesinModel = new BsMesinModel();
-        $this->MesinPerStyle = new MesinPerStyle();
-        $this->MesinPernomor = new MesinPernomor();
-        $this->machinesModel = new MachinesModel();
-        $this->ppsModel = new PpsModel();
-        $this->perbaikanAreaModel = new PerbaikanAreaModel();
+
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -3613,7 +3543,7 @@ class ExcelController extends BaseController
 
         // Kalau area dipilih, baru ambil data listRetur
         if (!empty($area)) {
-            $listReturUrl = $this->urlMaterial . 'listRetur/' . $area . '?tglBuat=' . $tglRetur;
+            $listReturUrl = api_url('material') . 'listRetur/' . $area . '?tglBuat=' . $tglRetur;
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $listReturUrl);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -3644,7 +3574,7 @@ class ExcelController extends BaseController
 
                 // 🔹 Query massal (1x per jenis data)
                 $qtyOrderList = $this->ApsPerstyleModel->getAllSisaPerSize($area, $noModels, $sizes);
-                $bsMesinList  = $this->BsMesinModel->getAllBsMesin($area, $noModels, $sizes);
+                $bsMesinList  = $this->bsMesinModel->getAllBsMesin($area, $noModels, $sizes);
                 $idApsList    = $this->ApsPerstyleModel->getAllIdForBs($area, $noModels, $sizes);
 
                 // ambil semua id aps
@@ -4194,7 +4124,7 @@ class ExcelController extends BaseController
         $tglBuat = $this->request->getGet('tgl_buat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = $this->urlMaterial . "filterPoTambahan"
+        $apiUrl = api_url('material') . "filterPoTambahan"
             . "?area=" . urlencode($area)
             . "&model=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);
@@ -6305,7 +6235,7 @@ class ExcelController extends BaseController
             //
             $order = $this->ApsPerstyleModel->getQtyArea($noModel) ?: [];
 
-            $apiUrl = $this->urlMaterial . 'pph?model=' . urlencode($noModel);
+            $apiUrl = api_url('material') . 'pph?model=' . urlencode($noModel);
             $material = @file_get_contents($apiUrl);
 
             // $models = [];
@@ -6644,7 +6574,7 @@ class ExcelController extends BaseController
     //     $tglBuat = $this->request->getGet('tglBuat');
 
     //     // Ambil data berdasarkan area dan model
-    //     $apiUrl = $this->urlMaterial . "listExportRetur/"
+    //     $apiUrl = api_url('material') . "listExportRetur/"
     //         . $area
     //         . "?noModel=" . urlencode($noModel)
     //         . "&tglBuat=" . urlencode($tglBuat);
@@ -7522,7 +7452,7 @@ class ExcelController extends BaseController
         $tglBuat = $this->request->getGet('tglBuat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = $this->urlMaterial . "listExportRetur/"
+        $apiUrl = api_url('material') . "listExportRetur/"
             . $area
             . "?noModel=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);
@@ -7591,7 +7521,7 @@ class ExcelController extends BaseController
             $kgPoList[$keyStyle] = ($qty_order * $composition * $gw / 100 / 1000) * (1 + ($loss / 100));
 
             // --- BS MESIN ---
-            $bs = $this->BsMesinModel->getBsMesin($area, $noModel, [$style]);
+            $bs = $this->bsMesinModel->getBsMesin($area, $noModel, [$style]);
             $bsGram = is_array($bs) ? ($bs['bs_gram'] ?? 0) : ($bs->bs_gram ?? 0);
             $bsMesinGrList[$keyStyle] = (float)$bsGram;
             $bsMesinDzList[$keyStyle] = (float)$bsGram / $gw / 24;
@@ -8723,7 +8653,7 @@ class ExcelController extends BaseController
         $tanggalAwal = $this->request->getGet('tanggal_awal');
         $tanggalAkhir = $this->request->getGet('tanggal_akhir');
 
-        $apiUrl = $this->urlMaterial . 'filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir;
+        $apiUrl = api_url('material') . 'filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir;
         $material = @file_get_contents($apiUrl);
 
         // $models = [];
@@ -8815,7 +8745,7 @@ class ExcelController extends BaseController
     {
         $key = $this->request->getGet('key');
 
-        $apiUrl = $this->urlMaterial . 'filterPoBenang?key=' . urlencode($key);
+        $apiUrl = api_url('material') . 'filterPoBenang?key=' . urlencode($key);
         $material = @file_get_contents($apiUrl);
 
         // $models = [];
@@ -8902,7 +8832,7 @@ class ExcelController extends BaseController
         $tanggalAwal = $this->request->getGet('tanggal_awal');
         $tanggalAkhir = $this->request->getGet('tanggal_akhir');
 
-        $apiUrl = $this->urlMaterial . 'filterPengiriman?key=' . urlencode($key) . '&tanggal_awal=' . urlencode($tanggalAwal) . '&tanggal_akhir=' . urlencode($tanggalAkhir);
+        $apiUrl = api_url('material') . 'filterPengiriman?key=' . urlencode($key) . '&tanggal_awal=' . urlencode($tanggalAwal) . '&tanggal_akhir=' . urlencode($tanggalAkhir);
         $material = @file_get_contents($apiUrl);
 
         // $models = [];
@@ -9081,7 +9011,7 @@ class ExcelController extends BaseController
     {
         $key = $this->request->getGet('key');
         $jenis = $this->request->getGet('jenis');
-        $base  = $this->urlMaterial . '';
+        $base  = api_url('material') . '';
 
         // FUNGSINYA: ambil API sekali panggil
         $getApi = function ($endpoint) use ($base, $key, $jenis) {
@@ -10201,7 +10131,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = $this->urlMaterial . 'filterSisaPakai?bulan=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna) . '&jenis=' . urlencode($jenis);
+        $apiUrl = api_url('material') . 'filterSisaPakai?bulan=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna) . '&jenis=' . urlencode($jenis);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -10373,7 +10303,7 @@ class ExcelController extends BaseController
         $kodeWarna = $this->request->getGet('kode_warna') ?? '';
 
         // 1) Ambil data
-        $apiUrl = $this->urlMaterial . 'historyPindahOrder?model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = api_url('material') . 'historyPindahOrder?model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -10527,7 +10457,7 @@ class ExcelController extends BaseController
             $tglAwal   = date('Y-m-01', $timestamp);
             $tglAkhir  = date('Y-m-t', $timestamp);
         }
-        $apiUrl = $this->urlMaterial . 'filterBenangMingguan?tanggal_awal=' . urlencode($tglAwal) . '&tanggal_akhir=' . urlencode($tglAkhir);
+        $apiUrl = api_url('material') . 'filterBenangMingguan?tanggal_awal=' . urlencode($tglAwal) . '&tanggal_akhir=' . urlencode($tglAkhir);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -10898,7 +10828,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = $this->urlMaterial . 'reportSisaDatangBenang?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = api_url('material') . 'reportSisaDatangBenang?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -11089,7 +11019,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = $this->urlMaterial . 'reportSisaDatangNylon?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = api_url('material') . 'reportSisaDatangNylon?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -11280,7 +11210,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = $this->urlMaterial . 'reportSisaDatangSpandex?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = api_url('material') . 'reportSisaDatangSpandex?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -11471,7 +11401,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = $this->urlMaterial . 'reportSisaDatangKaret?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = api_url('material') . 'reportSisaDatangKaret?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -13513,7 +13443,7 @@ class ExcelController extends BaseController
         $noModel = $this->request->getGet('no_model');
         $warna = $this->request->getGet('warna');
 
-        $apiUrl = $this->urlMaterial . "searchStock"
+        $apiUrl = api_url('material') . "searchStock"
             . "?no_model=" . urlencode($noModel)
             . "&warna=" . urlencode($warna);
 
@@ -13637,7 +13567,7 @@ class ExcelController extends BaseController
             'search' => $search ?? ''
         ];
 
-        $apiUrl = $this->urlMaterial . 'statusbahanbaku/?' . http_build_query($params);
+        $apiUrl = api_url('material') . 'statusbahanbaku/?' . http_build_query($params);
         $json   = @file_get_contents($apiUrl);
 
         if ($json === false) {

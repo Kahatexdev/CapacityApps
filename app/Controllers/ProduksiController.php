@@ -6,48 +6,21 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 
 use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use App\Models\BsModel;
-use App\Models\BsMesinModel;
-use App\Models\PerbaikanAreaModel;
 use CodeIgniter\Controller;
 use PhpParser\Node\Stmt\Else_;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class ProduksiController extends BaseController
 {
-    protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $liburModel;
-    protected $BsModel;
-    protected $bsMesinModel;
-    protected $perbaikanModel;
+
     protected $db;
 
     public function __construct()
     {
 
         $this->db = \Config\Database::connect();
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->BsModel = new BsModel();
-        $this->bsMesinModel = new BsMesinModel();
-        $this->perbaikanModel = new PerbaikanAreaModel();
 
         if ($this->filters   = ['role' => [session()->get('role') . ''], 'role' => ['user'], 'role' => ['planning']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -1108,7 +1081,7 @@ class ProduksiController extends BaseController
                         'kode_deffect' => $kodeDeffect,
 
                     ];
-                    $insert = $this->BsModel->insert($datainsert);
+                    $insert = $this->bsModel->insert($datainsert);
                     if ($insert) {
                         $updateBs = $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
                         if (!$updateBs) {
@@ -1167,59 +1140,7 @@ class ProduksiController extends BaseController
         ];
         return view($role . '/detailplus', $data);
     }
-    // public function updatepo()
-    // {
-    //     $pdk = $this->request->getPost('pdk');
-    //     $ids = $this->request->getPost('id');
-    //     $pos = $this->request->getPost('po');
-    //     $role = session()->get('role');
 
-    //     $this->db->transStart();
-
-    //     try {
-    //         foreach ($ids as $key => $id) {
-    //             $po = isset($pos[$key]) ? $pos[$key] : 0;
-
-    //             // Pastikan nilai PO valid
-    //             if (!is_numeric($po) || $po < 0) {
-    //                 throw new \Exception('Nilai PO tidak valid.');
-    //             }
-
-    //             // Update kolom po_plus pada tabel apsperstyle
-    //             $updatePoPlus = $this->ApsPerstyleModel->set('po_plus', $po, false)
-    //                 ->where('idapsperstyle', $id)
-    //                 ->update();
-    //             if (!$updatePoPlus) {
-    //                 throw new \Exception('Gagal mengupdate po tambahan untuk ID: ' . $id);
-    //             }
-
-    //             // Update kolom sisa pada tabel apsperstyle
-    //             $updateOrderResult = $this->ApsPerstyleModel->set('sisa', 'sisa + ' . $po, false)
-    //                 ->where('idapsperstyle', $id)
-    //                 ->update();
-
-    //             if (!$updateOrderResult) {
-    //                 throw new \Exception('Gagal mengupdate data order untuk ID: ' . $id);
-    //             }
-    //         }
-
-    //         // Selesaikan transaksi
-    //         $this->db->transComplete();
-
-    //         // Cek apakah transaksi sukses
-    //         if ($this->db->transStatus() === false) {
-    //             throw new \Exception('Terjadi kesalahan saat menyimpan data.');
-    //         }
-
-    //         return redirect()->back()->with('success', 'Data berhasil diupdate');
-    //     } catch (\Exception $e) {
-    //         // Rollback transaksi jika terjadi error
-    //         $this->db->transRollback();
-
-    //         // Redirect dengan pesan error
-    //         return redirect()->to($role . '/viewModelPlusPacking/' . $pdk)->with('error', 'Error: ' . $e->getMessage());
-    //     }
-    // }
     public function updatepo()
     {
         $pdk  = $this->request->getPost('pdk');
@@ -1312,7 +1233,7 @@ class ProduksiController extends BaseController
     public function updatebs()
     {
         $role = session()->get('role');
-        $data = $this->BsModel->updateBs();
+        $data = $this->bsModel->updateBs();
         $gagal = [];
         foreach ($data as $dt) {
             $id = $dt['idbs'];
@@ -1321,7 +1242,7 @@ class ProduksiController extends BaseController
             $deliv = $dt['delivery'];
 
             // Lakukan update dan simpan error jika gagal
-            $update = $this->BsModel->update($id, ['no_model' => $model, 'size' => $size, 'delivery' => $deliv]);
+            $update = $this->bsModel->update($id, ['no_model' => $model, 'size' => $size, 'delivery' => $deliv]);
             if (!$update) {
                 $gagal[] = "Gagal update model: $model, size: $size (ID: $id)";
             }
@@ -1376,7 +1297,7 @@ class ProduksiController extends BaseController
         }
 
         try {
-            $data = $this->BsModel->getBsPerhari($bulan, $tahun, $area);
+            $data = $this->bsModel->getBsPerhari($bulan, $tahun, $area);
             return $this->response->setJSON($data);
         } catch (\Exception $e) {
             return $this->response->setJSON(['error' => $e->getMessage()]);
@@ -1599,7 +1520,7 @@ class ProduksiController extends BaseController
         try {
             // Disarankan sediakan endpoint area-only (tanpa nama):
             //   GET /api/getdataforbs/{area}
-            $apiUrl = "http://172.23.44.14/HumanResourceSystem/public/api/getdataforbs/{$area}";
+            $apiUrl = api_url('hris') . "getdataforbs/{$area}";
             $resp = @file_get_contents($apiUrl);
             // dd ($resp);
             if ($resp !== false) {
@@ -1683,10 +1604,7 @@ class ProduksiController extends BaseController
                 $qtyPcs  = (int)($cols[$QTY_PCS[$i]] ?? 0);
                 $qtyGram = (float)($cols[$QTY_GRM[$i]] ?? 0.0);
 
-                // [D] SKIP BARIS KOSONG SEDINI MUNGKIN
-                // if ($qtyPcs === 0 && $qtyGram === 0.0) {
-                //     continue;
-                // }
+
 
                 // Ambil id_karyawan dari map (jika tidak ada, tetap null)
                 $idKaryawan = null;

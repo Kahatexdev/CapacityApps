@@ -4,23 +4,6 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
-use App\Models\LiburModel;
-use App\Models\KebutuhanMesinModel;
-use App\Models\KebutuhanAreaModel;
-use App\Models\MesinPlanningModel;
-use App\Models\DetailPlanningModel;
-use App\Models\TanggalPlanningModel;
-use App\Models\EstimatedPlanningModel;
-use App\Models\AksesModel;/*  */
-use App\Models\BsModel;
-use App\Models\BsMesinModel;
-use App\Models\MesinPerStyle;
 use App\Services\orderServices;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
@@ -139,46 +122,11 @@ class PDF extends FPDF
 
 class PdfController extends BaseController
 {
-    protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $liburModel;
-    protected $KebutuhanMesinModel;
-    protected $KebutuhanAreaModel;
-    protected $MesinPlanningModel;
-    protected $aksesModel;
-    protected $DetailPlanningModel;
-    protected $TanggalPlanningModel;
-    protected $EstimatedPlanningModel;
-    protected $MesinPerStyleModel;
     protected $orderServices;
-    protected $bsModel;
-    protected $BsMesinModel;
 
     public function __construct()
     {
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->liburModel = new LiburModel();
-        $this->KebutuhanMesinModel = new KebutuhanMesinModel();
-        $this->KebutuhanAreaModel = new KebutuhanAreaModel();
-        $this->MesinPlanningModel = new MesinPlanningModel();
-        $this->aksesModel = new AksesModel();
-        $this->DetailPlanningModel = new DetailPlanningModel();
-        $this->TanggalPlanningModel = new TanggalPlanningModel();
-        $this->EstimatedPlanningModel = new EstimatedPlanningModel();
-        $this->MesinPerStyleModel = new MesinPerStyle();
         $this->orderServices = new orderServices();
-        $this->bsModel = new BsModel();
-        $this->BsMesinModel = new BsMesinModel();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -197,7 +145,7 @@ class PdfController extends BaseController
         $tglBuat = $this->request->getGet('tgl_buat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = $this->urlMaterial . "filterPoTambahan"
+        $apiUrl = api_url('material') . "filterPoTambahan"
             . "?area=" . urlencode($area)
             . "&model=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);
@@ -834,7 +782,7 @@ class PdfController extends BaseController
     public function exportPemesanan($jenis, $area, $tgl_pakai)
     {
         // --- Ambil data dari API ---
-        $apiUrl = $this->urlMaterial . "dataPemesananArea"
+        $apiUrl = api_url('material') . "dataPemesananArea"
             . "?jenis=" . urlencode($jenis)
             . "&area=" . urlencode($area)
             . "&tgl_pakai=" . urlencode($tgl_pakai);
@@ -1121,7 +1069,7 @@ class PdfController extends BaseController
         $tglBuat = $this->request->getGet('tglBuat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = $this->urlMaterial . "listExportRetur/"
+        $apiUrl = api_url('material') . "listExportRetur/"
             . $area
             . "?noModel=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);

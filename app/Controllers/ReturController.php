@@ -6,72 +6,17 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\HTTP\CURLRequest;
 
-use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
-use App\Models\LiburModel;
-use App\Models\KebutuhanMesinModel;
-use App\Models\KebutuhanAreaModel;
-use App\Models\MesinPlanningModel;
-use App\Models\DetailPlanningModel;
-use App\Models\TanggalPlanningModel;
-use App\Models\EstimatedPlanningModel;
-use App\Models\AksesModel;/*  */
-use App\Models\BsModel;
-use App\Models\BsMesinModel;
-use App\Models\MesinPerStyle;
-use App\Models\AreaModel;
 use App\Services\orderServices;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
 
 class ReturController extends BaseController
 {
-    protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $liburModel;
-    protected $KebutuhanMesinModel;
-    protected $KebutuhanAreaModel;
-    protected $MesinPlanningModel;
-    protected $aksesModel;
-    protected $DetailPlanningModel;
-    protected $TanggalPlanningModel;
-    protected $EstimatedPlanningModel;
-    protected $MesinPerStyleModel;
-    protected $orderServices;
-    protected $bsModel;
-    protected $BsMesinModel;
-    protected $areaModel;
+
 
     public function __construct()
     {
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->liburModel = new LiburModel();
-        $this->KebutuhanMesinModel = new KebutuhanMesinModel();
-        $this->KebutuhanAreaModel = new KebutuhanAreaModel();
-        $this->MesinPlanningModel = new MesinPlanningModel();
-        $this->aksesModel = new AksesModel();
-        $this->DetailPlanningModel = new DetailPlanningModel();
-        $this->TanggalPlanningModel = new TanggalPlanningModel();
-        $this->EstimatedPlanningModel = new EstimatedPlanningModel();
-        $this->MesinPerStyleModel = new MesinPerStyle();
-        $this->orderServices = new orderServices();
-        $this->bsModel = new BsModel();
-        $this->BsMesinModel = new BsMesinModel();
-        $this->areaModel = new AreaModel();
+
 
         if ($this->filters   = ['role' => [session()->get('role') . ''], 'role' => ['user'], 'role' => ['planning']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -95,7 +40,7 @@ class ReturController extends BaseController
         // Ambil hanya field 'name'
         $result = array_column($filteredArea, 'name');
 
-        $url = $this->urlMaterial . 'getKategoriRetur';
+        $url = api_url('material') . 'getKategoriRetur';
 
         $response = file_get_contents($url);
         log_message('debug', "API Response: " . $response);
@@ -116,7 +61,7 @@ class ReturController extends BaseController
                 'tipe_kategori' => $item['tipe_kategori']
             ];
         }
-        $listRetur = $this->urlMaterial . 'listRetur/' . $area;
+        $listRetur = api_url('material') . 'listRetur/' . $area;
         $res = file_get_contents($listRetur);
         $list = json_decode($res, true);
         $listRetur = $list['listRetur'] ?? [];
@@ -145,8 +90,8 @@ class ReturController extends BaseController
         $noModel = $this->request->getGet('model') ?? '';
 
 
-        $apiUrlPph = $this->urlMaterial . 'pph?model=' . urlencode($noModel);
-        $apiUrlPengiriman = $this->urlMaterial . 'getPengirimanArea?noModel=' . urlencode($noModel);
+        $apiUrlPph = api_url('material') . 'pph?model=' . urlencode($noModel);
+        $apiUrlPengiriman = api_url('material') . 'getPengirimanArea?noModel=' . urlencode($noModel);
 
         // Ambil data dari API PPH
         $responsePph = file_get_contents($apiUrlPph);
@@ -196,7 +141,7 @@ class ReturController extends BaseController
             } else {
                 $bsSettingData = ['bs_setting' => 0];
             }
-            $bsMesinData = $this->BsMesinModel->getBsMesinPph($area, $noModel, $styleSize);
+            $bsMesinData = $this->bsMesinModel->getBsMesinPph($area, $noModel, $styleSize);
             $bsMesin = $bsMesinData['bs_gram'] ?? 0;
 
             // Hitung bruto dan PPH
@@ -356,7 +301,7 @@ class ReturController extends BaseController
 
         // Ambil data material sekali
         try {
-            $materialUrl = $this->urlMaterial . 'cekMaterial/' . $postData['material'];
+            $materialUrl = api_url('material') . 'cekMaterial/' . $postData['material'];
             $materialResponse = $client->get($materialUrl, ['headers' => ['Accept' => 'application/json']]);
             $materialData = json_decode($materialResponse->getBody(), true);
             if (!$materialData || !isset($materialData['item_type'])) {
@@ -400,7 +345,7 @@ class ReturController extends BaseController
             ];
 
             try {
-                $resp = $client->post($this->urlMaterial . 'saveRetur', [
+                $resp = $client->post(api_url('material') . 'saveRetur', [
                     'headers' => [
                         'Accept' => 'application/json',
                         'Content-Type' => 'application/json'
@@ -469,7 +414,7 @@ class ReturController extends BaseController
 
         // Kalau area dipilih, baru ambil data listRetur
         if (!empty($area)) {
-            $listReturUrl = $this->urlMaterial . 'listRetur/' . $area . '?tglBuat=' . $tglRetur;
+            $listReturUrl = api_url('material') . 'listRetur/' . $area . '?tglBuat=' . $tglRetur;
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $listReturUrl);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -500,7 +445,7 @@ class ReturController extends BaseController
 
                 // 🔹 Query massal (1x per jenis data)
                 $qtyOrderList = $this->ApsPerstyleModel->getAllSisaPerSize($area, $noModels, $sizes);
-                $bsMesinList  = $this->BsMesinModel->getAllBsMesin($area, $noModels, $sizes);
+                $bsMesinList  = $this->bsMesinModel->getAllBsMesin($area, $noModels, $sizes);
                 $idApsList    = $this->ApsPerstyleModel->getAllIdForBs($area, $noModels, $sizes);
 
                 // ambil semua id aps
@@ -628,7 +573,7 @@ class ReturController extends BaseController
         $noModel = $this->request->getGet('noModel');
         $tglBuat = $this->request->getGet('tglBuat');
 
-        $listRetur = $this->urlMaterial . 'listRetur/' . $area . '?noModel=' . $noModel . '&tglBuat=' . $tglBuat;
+        $listRetur = api_url('material') . 'listRetur/' . $area . '?noModel=' . $noModel . '&tglBuat=' . $tglBuat;
         $res = file_get_contents($listRetur);
         $list = json_decode($res, true);
         $listRetur = $list['listRetur'] ?? [];

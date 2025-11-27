@@ -470,8 +470,7 @@
 
             // Kirim data ke server untuk pencarian
             $.ajax({
-                url: $this - > urlMaterial.
-                'getUpdateListPemesanan', // Ganti dengan URL endpoint
+                url: MaterialUrl + 'getUpdateListPemesanan', // Ganti dengan URL endpoint
                 method: 'POST',
                 data: {
                     area: area,
@@ -672,15 +671,14 @@
             });
             console.log(payload);
 
-            fetch($this - > urlMaterial.
-                    'updateListPemesanan', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(payload),
-                        // credentials: 'include', // Menyertakan cookie/session ID
-                    })
+            fetch(MaterialUrl + 'updateListPemesanan', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                    // credentials: 'include', // Menyertakan cookie/session ID
+                })
                 .then(async (response) => {
                     const resData = await response.json();
                     // Ambil area dari payload untuk menentukan URL redirect
@@ -764,14 +762,13 @@
                 };
 
                 // Kirim data ke server menggunakan AJAX
-                fetch($this - > urlMaterial.
-                        "kirimPemesanan", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(data),
-                        })
+                fetch(MaterialUrl + "kirimPemesanan", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(data),
+                    })
                     .then((response) => response.json())
                     .then((result) => {
                         if (result.status == "success") {

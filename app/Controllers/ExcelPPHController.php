@@ -9,28 +9,14 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\{Border, Alignment, Fill};
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
-use App\Models\OrderModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
-use App\Models\BsModel;
-use App\Models\BsMesinModel;
+
 
 class ExcelPPHController extends BaseController
 {
-    protected $filters;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $productModel;
-    protected $bsModel;
-    protected $BsMesinModel;
+
 
     public function __construct()
     {
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->bsModel = new BsModel();
-        $this->BsMesinModel = new BsMesinModel();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -45,7 +31,7 @@ class ExcelPPHController extends BaseController
     public function excelPPHNomodel($area, $model)
     {
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = $this->urlMaterial . 'pph?model=' . urlencode($model);
+        $apiUrl = api_url('material') . 'pph?model=' . urlencode($model);
 
         // Mengambil data dari API eksternal
         $response = file_get_contents($apiUrl);
@@ -71,7 +57,7 @@ class ExcelPPHController extends BaseController
                 } else {
                     $bsSettingData = ['bs_setting' => 0]; // default kalau data kosong
                 }
-                $bsMesinData = $this->BsMesinModel->getBsMesinPph($area, $model, $styleSize);
+                $bsMesinData = $this->bsMesinModel->getBsMesinPph($area, $model, $styleSize);
                 $bsMesin = $bsMesinData['bs_gram'] ?? 0;
                 $bruto = $prod['bruto'] ?? 0;
                 if ($gw == 0) {
@@ -309,7 +295,7 @@ class ExcelPPHController extends BaseController
     public function excelPPHInisial($area, $model)
     {
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = $this->urlMaterial . 'pph?model=' . urlencode($model);
+        $apiUrl = api_url('material') . 'pph?model=' . urlencode($model);
 
         // Mengambil data dari API eksternal
         $response = file_get_contents($apiUrl);
@@ -335,7 +321,7 @@ class ExcelPPHController extends BaseController
                 } else {
                     $bsSettingData = ['bs_setting' => 0]; // default kalau data kosong
                 }
-                $bsMesinData = $this->BsMesinModel->getBsMesinPph($area, $model, $styleSize);
+                $bsMesinData = $this->bsMesinModel->getBsMesinPph($area, $model, $styleSize);
                 $bsMesin = $bsMesinData['bs_gram'] ?? 0;
                 $bruto = $prod['bruto'] ?? 0;
                 if ($gw == 0) {
@@ -533,7 +519,7 @@ class ExcelPPHController extends BaseController
             $sizes = array_column($data, 'size');
 
             // Fetch all bs_mesin data in one query
-            $bsMesinData = $this->BsMesinModel->getBsMesinHarian($mastermodels, $sizes, $tanggal, $area);
+            $bsMesinData = $this->bsMesinModel->getBsMesinHarian($mastermodels, $sizes, $tanggal, $area);
 
             // Create a lookup table for fast matching
             $bsMesinMap = [];
@@ -555,7 +541,7 @@ class ExcelPPHController extends BaseController
         foreach ($data as $prod) {
             $key = $prod['mastermodel'] . '-' . $prod['size'];
 
-            $apiUrl = $this->urlMaterial . 'pphperhari?model=' . urlencode($prod['mastermodel']) . '&size=' . urlencode($prod['size']);
+            $apiUrl = api_url('material') . 'pphperhari?model=' . urlencode($prod['mastermodel']) . '&size=' . urlencode($prod['size']);
 
             // Mengambil data dari API eksternal
             $response = @file_get_contents($apiUrl);

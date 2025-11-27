@@ -6,22 +6,8 @@ use App\Controllers\BaseController;
 use App\Database\Migrations\DataCancelOrder;
 use App\Database\Migrations\EstSpk;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\AreaModel;
-use App\Models\ProduksiModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use DateTime;
-use App\Models\HistorySmvModel;
-use App\Models\StockPdk;
-use App\Models\DataCancelOrderModel;
-use App\Models\EstSpkModel;
-use App\Models\HistoryRevisiModel;
-use App\Models\BsModel;
-use App\Models\DetailPlanningModel;
 use CodeIgniter\HTTP\Exceptions\HTTPException;
 use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\CURLRequest;
@@ -36,40 +22,21 @@ class OrderController extends BaseController
     protected $orderModel;
     protected $ApsPerstyleModel;
     protected $liburModel;
-    protected $roleSession;
     protected $historysmv;
-    protected $areaModel;
-    protected $cancelOrder;
     protected $estspk;
-    protected $historyRev;
     protected $bsModel;
     protected $DetailPlanningModel;
-    protected $stokPdk;
+    protected $areaModel;
+
     protected $curl;
 
     public function __construct()
     {
-        session();
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->historysmv = new HistorySmvModel();
-        $this->areaModel = new AreaModel();
-        $this->cancelOrder = new DataCancelOrderModel();
-        $this->estspk = new EstSpkModel();
-        $this->historyRev = new HistoryRevisiModel();
-        $this->bsModel = new BsModel();
-        $this->DetailPlanningModel = new DetailPlanningModel();
-        $this->stokPdk = new StockPdk();
 
         if ($this->filters   = ['role' => ['capacity',  'planning', 'aps', 'god']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
         $this->isLogedin();
-        $this->roleSession =  session()->get('role');
     }
     protected function isLogedin()
     {
@@ -190,7 +157,7 @@ class OrderController extends BaseController
             $context = stream_context_create($options);
 
             // 🔹 URL API target
-            $url = $this->urlMaterial . 'getTglScheduleBulk';
+            $url = api_url('material') . 'getTglScheduleBulk';
 
             // 🔹 Eksekusi request ke API
             $response = @file_get_contents($url, false, $context);
@@ -234,9 +201,7 @@ class OrderController extends BaseController
     {
         $searchTerm = $this->request->getPost('searchTerm');
 
-        $model = new \App\Models\ApsPerstyleModel(); // ganti sesuai model kamu
-
-        $result = $model->select('mastermodel, factory')
+        $result = $this->ApsPerstyleModel->select('mastermodel, factory')
             ->groupBy(['mastermodel', 'factory'])
             ->like('mastermodel', $searchTerm)
             ->limit(20)
@@ -370,8 +335,7 @@ class OrderController extends BaseController
 
     public function detailmodeljarum($noModel, $delivery, $jarum)
     {
-        $apsPerstyleModel = new ApsPerstyleModel(); // Create an instance of the model
-        $dataApsPerstyle = $apsPerstyleModel->detailModelJarum($noModel, $delivery, $jarum); // Call the model method
+        $dataApsPerstyle = $this->ApsPerstyleModel->detailModelJarum($noModel, $delivery, $jarum); // Call the model method
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Order',
@@ -392,10 +356,9 @@ class OrderController extends BaseController
     }
     public function detailmodeljarumPlan($noModel, $delivery, $jarum)
     {
-        $apsPerstyleModel = new ApsPerstyleModel(); // Create an instance of the model
-        $dataApsPerstyle = $apsPerstyleModel->detailModelJarum($noModel, $delivery, $jarum); // Call the model method
-        $area = new AreaModel();
-        $dataArea = $area->findALl();
+
+        $dataApsPerstyle = $this->ApsPerstyleModel->detailModelJarum($noModel, $delivery, $jarum); // Call the model method
+        $dataArea = $this->areaModel->findALl();
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Order',
@@ -2497,7 +2460,7 @@ class OrderController extends BaseController
         $delivery = $this->request->getGet('delivery')   ?? '';
         // dd($model);
         // Full URL including path:
-        $url = $this->urlTls . '/flowproses';
+        $url = api_url('tls') . '/flowproses';
 
         /** @var \CodeIgniter\HTTP\CURLRequest $client */
         $client = \Config\Services::curlrequest([
@@ -2695,7 +2658,7 @@ class OrderController extends BaseController
                 'http_errors' => false,  // penting: CI4 tidak akan throw exception meski status 500
             ]);
             try {
-                $response = $client->post($this->urlTls . '/saveFlowProses', [
+                $response = $client->post(api_url('tls') . '/saveFlowProses', [
                     'json'        => $payload,
                     'http_errors' => false,   // supaya tidak otomatis throw
                 ]);
