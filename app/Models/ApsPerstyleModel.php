@@ -817,6 +817,7 @@ class ApsPerstyleModel extends Model
             $builder->where('apsperstyle.factory', $ar);
         }
         $builder->where('apsperstyle.production_unit !=', 'MJ')
+            ->where('apsperstyle.qty > 0')
             // ->where('apsperstyle.mastermodel', 'DA2549')
             ->where('MONTH(apsperstyle.delivery)', date('m', strtotime($bulan))) // Filter bulan
             ->where('YEAR(apsperstyle.delivery)', date('Y', strtotime($bulan))) // Filter tahun
