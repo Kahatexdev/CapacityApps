@@ -234,7 +234,7 @@ error_reporting(E_ALL); ?>
                         <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form action=MaterialUrl + "saveGWAktual" method="get">
+                        <form action="<?= $materialApiUrl ?>" ."saveGWAktual" method="get">
                             <div id="confirmationMessage"></div>
 
                             <div class="form-group mb-3">
