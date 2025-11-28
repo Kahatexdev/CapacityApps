@@ -323,9 +323,11 @@ class PdfController extends BaseController
             'lebih_pakai'      => 0,
             'kgs_retur'      => 0,
         ];
+        $datas = array_filter($data['dataPoTambahan'], function ($row) {
+            return isset($row['kgs']) && $row['kgs'] > 0;
+        });
 
-
-        foreach ($data as $row) {
+        foreach ($datas as $row) {
             // bangun “key” unik untuk group
             $currentKey = implode('|', [
                 $row['no_model'],
