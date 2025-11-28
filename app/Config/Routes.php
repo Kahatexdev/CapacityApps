@@ -44,7 +44,7 @@ $routes->group(
         $routes->get('exportPlanningJlMc/(:any)', 'PlanningJalanMcController::excelPlanningJlMc/$1');
         $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
         $routes->get('retur/(:any)', 'ReturController::index/$1');
-        $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
+        // $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
         $routes->post('pengajuanRetur/(:any)', 'ReturController::pengajuanRetur/$1');
         $routes->get('getKategoriRetur', 'ReturController::getKategoriRetur');
         $routes->get('getKodeWarnaWarnaByItemType', 'ReturController::getKodeWarnaWarnaByItemType');
