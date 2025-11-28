@@ -32,7 +32,7 @@ class ApiController extends ResourceController
     protected $orderModel;
     protected $ApsPerstyleModel;
     protected $liburModel;
-    protected $BsMesinModel;
+    protected $bsMesinModel;
     protected $DetailPlanningModel;
     protected $areaModel;
     protected $bsModel;
