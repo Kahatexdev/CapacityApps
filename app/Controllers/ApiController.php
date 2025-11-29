@@ -623,10 +623,12 @@ class ApiController extends ResourceController
         $data = [];
         $qtyPerArea = $this->ApsPerstyleModel->getQtyArea($noModel) ?: [];
         $totalPo = $this->ApsPerstyleModel->totalPo($noModel)['totalPo'] ?? 0;
+        $qtyPdk = $this->ApsPerstyleModel->getPembagianModel($noModel) ?: [];
 
         $data = [
             'qtyPerArea' => $qtyPerArea,
             'totalPo' => $totalPo,
+            'qtyPdk' => $qtyPdk,
         ];
 
         return $this->response->setJSON($data);

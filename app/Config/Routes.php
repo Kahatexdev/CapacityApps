@@ -85,6 +85,7 @@ $routes->group(
         // proftype
         $routes->get('getProductType', 'ApiController::getProductType');
 
+        // jatah bahan baku
         $routes->get('getQtyOrderPerArea', 'ApiController::getQtyOrderPerArea');
 
 
