@@ -428,11 +428,11 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('mesinPerJarum/(:any)', 'MesinController::mesinPerJarumPlan/$1');
     $routes->get('mesinperarea/(:any)', 'MesinController::mesinperareaPlan/$1');
     $routes->get('stockcylinder', 'MesinController::stockcylinderPlan');
-    $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarumPlan/$1/$2');
+    $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarum/$1/$2');
     $routes->get('datamesinperarea/(:any)', 'MesinController::DetailMesinPerAreaPlan/$1');
     $routes->post('capacityperarea/(:any)', 'MesinController::capacityperarea/$1');
     $routes->post('deletemesinareal/(:any)', 'MesinController::deletemesinarealPlan/$1');
-    $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarumPlan/$1');
+    $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarum/$1');
     $routes->post('tambahmesinperarea', 'MesinController::inputmesinperareaPlan');
     $routes->post('tambahmesinperjarum', 'MesinController::inputmesinperjarumPlan');
     $routes->post('addcylinder', 'MesinController::inputcylinderPlan');
@@ -659,7 +659,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('mesinPerJarum/(:any)', 'MesinController::mesinPerJarumPlan/$1');
     $routes->get('mesinperarea', 'MesinController::mesinperareaAps');
     $routes->get('stockcylinder', 'MesinController::stockcylinderPlan');
-    $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarumPlan/$1/$2');
+    $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarum/$1/$2');
     $routes->get('datamesinperarea/(:any)', 'MesinController::DetailMesinPerAreaPlan/$1');
     $routes->post('deletemesinareal/(:any)', 'MesinController::deletemesinarealPlan/$1');
     $routes->post('deletemesinpernomor/(:any)', 'MesinController::deletemesinpernomor/$1');
