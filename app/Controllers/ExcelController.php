@@ -12120,7 +12120,7 @@ class ExcelController extends BaseController
     //     unset($info);
 
     //     // ============= HITUNG TOTAL ALL ===============
-    //     $ttlMcArray = $this->areaMachineModel->getTotalMc($area);
+    //     $ttlMcArray = $this->areaMcModel->getTotalMc($area);
     //     $ttlMc = isset($ttlMcArray['total_mc']) ? intval($ttlMcArray['total_mc']) : 0;
 
     //     // Inisialisasi total keseluruhan
@@ -12829,7 +12829,7 @@ class ExcelController extends BaseController
         unset($info);
 
         // ============= HITUNG TOTAL ALL ===============
-        $ttlMcArray = $this->areaMachineModel->getTotalMc($area);
+        $ttlMcArray = $this->areaMcModel->getTotalMc($area);
         $ttlMc = isset($ttlMcArray['total_mc']) ? intval($ttlMcArray['total_mc']) : 0;
 
         // Inisialisasi total keseluruhan

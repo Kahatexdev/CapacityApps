@@ -472,9 +472,9 @@ class MesinController extends BaseController
         $update = $this->jarumModel->update($id, $data);
         $area = $this->request->getPost("area");
         if ($update) {
-            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->back()->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->back()->withInput()->with('error', 'Gagal Update Data');
         }
     }
     public function mesinPernomor($jarum, $area)

@@ -51,6 +51,7 @@ use App\Models\StockPdk;
 use App\Models\DataCancelOrderModel;
 use App\Models\HistoryRevisiModel;
 use App\Models\PenggunaanJarum;
+use App\Models\DetailAreaMachineModel;
 
 /**
  * Class BaseController
@@ -98,7 +99,7 @@ abstract class BaseController extends Controller
     protected $bsModel;
     protected $bsMesinModel;
     protected $perbaikanModel;
-    protected $areaMachineModel;
+    protected $areaMcModel;
     protected $perbaikanAreaModel;
     protected $historysmv;
     protected $areaModel;
@@ -112,6 +113,7 @@ abstract class BaseController extends Controller
     protected $stokPdk;
     protected $PenggunaanJarumModel;
     protected $MesinPerStyleModel;
+    protected $detailAreaMc;
     protected $urlMaterial;
     protected $urlHris;
     protected $urlTls;
@@ -177,7 +179,7 @@ abstract class BaseController extends Controller
         $this->bsModel = new BsModel();
         $this->bsMesinModel = new BsMesinModel();
         $this->perbaikanModel = new PerbaikanAreaModel();
-        $this->areaMachineModel = new AreaMachineModel();
+        $this->areaMcModel = new AreaMachineModel();
         $this->perbaikanAreaModel = new PerbaikanAreaModel();
         $this->estspk = new EstSpkModel();
         $this->globalModel = new MonthlyMcModel();
@@ -196,7 +198,7 @@ abstract class BaseController extends Controller
         $this->MesinPerStyleModel = new MesinPerStyle();
         $this->pengaduanModel = new PengaduanModel();
         $this->replyModel = new PengaduanReply();
-
+        $this->detailAreaMc = new DetailAreaMachineModel();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }

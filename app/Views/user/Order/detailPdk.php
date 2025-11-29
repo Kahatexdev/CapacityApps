@@ -39,7 +39,7 @@ error_reporting(E_ALL); ?>
                         </div>
                         <div class="col-auto">
 
-                            <a href="<?= base_url($role . '/detailpdk/') ?>" class="btn bg-gradient-info">Kembali</a>
+                            <a href="<?= base_url($role . '/dataorderperarea/' . session()->get('username')) ?>" class="btn bg-gradient-info">Kembali</a>
                         </div>
                     </div>
 
@@ -234,7 +234,7 @@ error_reporting(E_ALL); ?>
                         <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form action="<?= $materialApiUrl ?>" ."saveGWAktual" method="get">
+                        <form action="<?= $materialApiUrl . 'saveGWAktual' ?>" method="get">
                             <div id="confirmationMessage"></div>
 
                             <div class="form-group mb-3">
@@ -424,13 +424,6 @@ error_reporting(E_ALL); ?>
                     $('#editModal').find('input[name="deliv"]').val(deliv);
                     $('#editModal').find('input[name="size"]').val(size);
                     $('#editModal').find('input[name="jarum"]').val(jarum);
-                });
-            });
-
-            document.getElementById('selectAll').addEventListener('click', function(e) {
-                var checkboxes = document.querySelectorAll('.delivery-checkbox');
-                checkboxes.forEach(function(checkbox) {
-                    checkbox.checked = e.target.checked;
                 });
             });
         </script>

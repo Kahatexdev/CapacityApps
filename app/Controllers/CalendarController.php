@@ -229,8 +229,8 @@ class CalendarController extends BaseController
         $jumlahHari = ($tgl_akhir - $tgl_awal) / (60 * 60 * 24);
 
         $startDate = new \DateTime($awal);
-        $LiburModel = $this->liburModel;;
-        $holidays = $LiburModel->findAll();
+
+        $holidays = $this->liburModel->findAll();
         $currentMonth = $startDate->format('F');
         $weekCount = 1; // Initialize week count for the first week of the month
         $monthlyData = [];

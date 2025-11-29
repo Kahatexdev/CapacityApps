@@ -67,7 +67,7 @@
                         </div>
                         <div class="col-6 d-flex align-items-center text-end gap-2">
                             <input type="hidden" class="form-control" id="area" value="<?= $area ?>">
-                            <input type="text" class="form-control" id="no_model" value="" placeholder="No Model">
+                            <input type="text" class="form-control" id="no_model" value="" placeholder="No Model" required>
                             <button id="searchModel" class="btn btn-info ms-2"><i class="fas fa-search"></i> Filter</button>
                             <button type="button" class="btn btn-warning ms-2 btnRetur d-none" id="btn-retur">
                                 <i class="fas fa-paper-plane"></i> Pengajuan Retur</button>
@@ -300,6 +300,15 @@
             const loading = document.getElementById('loading');
             const info = document.getElementById('info');
 
+            if (!model || model.trim() === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Oops...',
+                    text: 'NO MODEL/PDK TIDAK BOLEH KOSONG',
+                });
+
+                return; // ini tetap stop eksekusi function-mu
+            }
             // 🔹 1. Hancurkan DataTable lama (kalau sudah ada)
             if ($.fn.DataTable.isDataTable('#dataTableRetur')) {
                 $('#dataTableRetur').DataTable().clear().destroy();
