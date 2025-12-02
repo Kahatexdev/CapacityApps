@@ -90,8 +90,9 @@ $routes->group(
 
 
         // APLIKASI WMS
-        $routes->get('getAllDataOrder', 'ApiController::getAllDataOrder');
+        $routes->post('getAllDataOrder', 'ApiController::getAllDataOrder');
         $routes->get('getDetailOrder', 'ApiController::getDetailOrder');
+        $routes->get('getOrderStatus', 'ApiController::getOrderStatus');
     }
 );
 

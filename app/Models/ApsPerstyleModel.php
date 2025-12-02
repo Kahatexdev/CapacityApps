@@ -1556,10 +1556,11 @@ class ApsPerstyleModel extends Model
             ->groupBy('mastermodel,factory,delivery')
             ->findAll();
     }
-    public function getAllDataOrder()
+    public function getAllDataOrder($noModel)
     {
         return $this->select('data_model.kd_buyer_order, data_model.seam, data_model.description, apsperstyle.no_order, data_model.no_model, apsperstyle.factory, MIN(apsperstyle.delivery) AS delivery_awal, GROUP_CONCAT(DISTINCT apsperstyle.factory) AS list_factory, SUM(apsperstyle.qty) AS qty')
             ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
+            ->whereIn('apsperstyle.mastermodel', $noModel)
             ->where('apsperstyle.qty <>', 0)
             ->groupBy('apsperstyle.mastermodel')
             ->orderBy('data_model.kd_buyer_order, data_model.no_model', 'ASC')

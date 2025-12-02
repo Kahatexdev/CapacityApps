@@ -20,6 +20,7 @@ use App\Models\LiburModel;
 use App\Models\BsModel;
 use App\Models\PengaduanModel;
 use App\Models\MesinPerStyle;
+use App\Models\PerbaikanAreaModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ApiController extends ResourceController
@@ -40,6 +41,7 @@ class ApiController extends ResourceController
     protected $pengaduanModel;
     protected $productType;
     protected $mesinPerStyle;
+    protected $perbaikanAreaModel;
 
     protected $validation;
     protected $format = 'json';
@@ -59,6 +61,7 @@ class ApiController extends ResourceController
         $this->pengaduanModel = new PengaduanModel();
         $this->liburModel = new LiburModel();
         $this->mesinPerStyle = new MesinPerStyle();
+        $this->perbaikanAreaModel = new PerbaikanAreaModel();
         $this->validation = \Config\Services::validation();
     }
     public function index()
@@ -635,7 +638,10 @@ class ApiController extends ResourceController
     }
     public function getAllDataOrder()
     {
-        $order = $this->ApsPerstyleModel->getAllDataOrder();
+        $json = $this->request->getJSON(true); // array
+        $noModel = $json['no_model'] ?? [];
+
+        $order = $this->ApsPerstyleModel->getAllDataOrder($noModel);
 
         return $this->response->setJSON($order);
     }
@@ -646,5 +652,33 @@ class ApiController extends ResourceController
         $detailOrder = $this->ApsPerstyleModel->getDetailOrder($noModel);
 
         return $this->response->setJSON($detailOrder);
+    }
+
+    public function getOrderStatus()
+    {
+        $noModel = $this->request->getGet('no_model');
+
+        $dataOrder = $this->ApsPerstyleModel->getDetailOrder($noModel);
+
+        $idAps = $this->ApsPerstyleModel->getIdAps($noModel);
+
+        $produksi      = $this->produksiModel->getAllProd($idAps);
+        $bsStocklot = $this->bsModel->getAllTotalBsSet($idAps);
+        $perbaikan      = $this->perbaikanAreaModel->getAllPB($idAps);
+
+        $orderStatusIndex = [];
+
+        foreach ($dataOrder as $item) {
+            $size   = $item['size'];
+        }
+
+        return $this->response->setJSON([
+            'no_model'    => $noModel,
+            'dataOrder'   => $dataOrder,
+            'idAps'       => $idAps,
+            'produksi'    => $produksi,
+            'bsStocklot'  => $bsStocklot,
+            'perbaikan'   => $perbaikan
+        ]);
     }
 }
