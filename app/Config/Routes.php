@@ -44,7 +44,7 @@ $routes->group(
         $routes->get('exportPlanningJlMc/(:any)', 'PlanningJalanMcController::excelPlanningJlMc/$1');
         $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
         $routes->get('retur/(:any)', 'ReturController::index/$1');
-        $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
+        // $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
         $routes->post('pengajuanRetur/(:any)', 'ReturController::pengajuanRetur/$1');
         $routes->get('getKategoriRetur', 'ReturController::getKategoriRetur');
         $routes->get('getKodeWarnaWarnaByItemType', 'ReturController::getKodeWarnaWarnaByItemType');
@@ -71,6 +71,8 @@ $routes->group(
         $routes->get('getNotif/(:any)', 'ApiController::getNotifAduan/$1');
         $routes->get('ExportPengaduan/(:num)', 'ApiController::ExportPengaduan/$1');
 
+        // update supermarket area
+        $routes->post('repeatSupermarket', 'ApiController::repeatSupermarket');
 
         $routes->get('getQtyOrderBulk', 'ApiController::getQtyOrderBulk');
 
@@ -85,6 +87,7 @@ $routes->group(
         // proftype
         $routes->get('getProductType', 'ApiController::getProductType');
 
+        // jatah bahan baku
         $routes->get('getQtyOrderPerArea', 'ApiController::getQtyOrderPerArea');
 
 
@@ -428,11 +431,11 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('mesinPerJarum/(:any)', 'MesinController::mesinPerJarumPlan/$1');
     $routes->get('mesinperarea/(:any)', 'MesinController::mesinperareaPlan/$1');
     $routes->get('stockcylinder', 'MesinController::stockcylinderPlan');
-    $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarumPlan/$1/$2');
+    $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarum/$1/$2');
     $routes->get('datamesinperarea/(:any)', 'MesinController::DetailMesinPerAreaPlan/$1');
     $routes->post('capacityperarea/(:any)', 'MesinController::capacityperarea/$1');
     $routes->post('deletemesinareal/(:any)', 'MesinController::deletemesinarealPlan/$1');
-    $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarumPlan/$1');
+    $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarum/$1');
     $routes->post('tambahmesinperarea', 'MesinController::inputmesinperareaPlan');
     $routes->post('tambahmesinperjarum', 'MesinController::inputmesinperjarumPlan');
     $routes->post('addcylinder', 'MesinController::inputcylinderPlan');
@@ -659,7 +662,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('mesinPerJarum/(:any)', 'MesinController::mesinPerJarumPlan/$1');
     $routes->get('mesinperarea', 'MesinController::mesinperareaAps');
     $routes->get('stockcylinder', 'MesinController::stockcylinderPlan');
-    $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarumPlan/$1/$2');
+    $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarum/$1/$2');
     $routes->get('datamesinperarea/(:any)', 'MesinController::DetailMesinPerAreaPlan/$1');
     $routes->post('deletemesinareal/(:any)', 'MesinController::deletemesinarealPlan/$1');
     $routes->post('deletemesinpernomor/(:any)', 'MesinController::deletemesinpernomor/$1');

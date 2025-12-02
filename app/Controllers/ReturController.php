@@ -87,8 +87,7 @@ class ReturController extends BaseController
     public function dataRetur($area)
     {
         // Ambil nilai 'model' dari query parameter
-        $noModel = $this->request->getGet('model') ?? '';
-
+        $noModel = $this->request->getGet('model');
 
         $apiUrlPph = api_url('material') . 'pph?model=' . urlencode($noModel);
         $apiUrlPengiriman = api_url('material') . 'getPengirimanArea?noModel=' . urlencode($noModel);
@@ -264,7 +263,7 @@ class ReturController extends BaseController
             $result['bs_mesin']   += $res['bs_mesin'];
         }
 
-        log_message('debug', "Final Result: " . json_encode($result));
+        // log_message('debug', "Final Result: " . json_encode($result));
 
         return $this->response->setJSON($result);
     }

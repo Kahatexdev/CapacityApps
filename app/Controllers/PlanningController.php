@@ -454,8 +454,7 @@ class PlanningController extends BaseController
 
         $monthlyData = [];
         $weekCount = 1; // Inisialisasi minggu
-        $LiburModel = new LiburModel();
-        $holidays = $LiburModel->findAll(); // Ambil data libur
+        $holidays = $this->liburModel->findAll(); // Ambil data libur
 
         while ($startDate <= $endDate) {
             // Tentukan akhir minggu (hari Minggu)

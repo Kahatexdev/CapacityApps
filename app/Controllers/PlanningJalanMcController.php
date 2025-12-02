@@ -22,7 +22,6 @@ class PlanningJalanMcController extends BaseController
     public function __construct()
     {
         $this->orderService = new orderServices();
-        $this->liburModel = new LiburModel();
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }

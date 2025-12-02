@@ -612,19 +612,19 @@ class SummaryController extends BaseController
     public function summaryPlanner($area)
     {
         $yesterday = date('Y-m-d', strtotime('-1 day'));
-        $dataPlan = $this->kebutuhanAreaModel->getDataByAreaGroupJrm($area);
+        $dataPlan = $this->KebutuhanAreaModel->getDataByAreaGroupJrm($area);
         $allDetailPlans = [];
 
         // Siapkan array kosong sebelum foreach
         $allModels = [];
         foreach ($dataPlan as $jarum) {
             // Mengambil data berdasarkan area dan jarum tertentu
-            $judulPlan = $this->kebutuhanAreaModel->getDataByAreaJrm($area, $jarum['jarum']);
+            $judulPlan = $this->KebutuhanAreaModel->getDataByAreaJrm($area, $jarum['jarum']);
 
             foreach ($judulPlan as $id) {
 
                 // Mendapatkan kebutuhan area berdasarkan ID
-                $kebutuhanArea = $this->kebutuhanAreaModel->where('id_pln_mc', $id['id_pln_mc'])->first();
+                $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id['id_pln_mc'])->first();
 
                 // Jika 'jarum' kosong, lanjutkan ke iterasi berikutnya
                 if (empty($kebutuhanArea['jarum'])) continue;
@@ -632,7 +632,7 @@ class SummaryController extends BaseController
                 // Mengambil detail planning berdasarkan ID
                 $area = $kebutuhanArea['area'];
                 $jarum = $kebutuhanArea['jarum'];
-                $detailPlan = $this->detailPlanningModel->getDataPlanning2($id['id_pln_mc'], $area);
+                $detailPlan = $this->DetailPlanningModel->getDataPlanning2($id['id_pln_mc'], $area);
 
                 $seenCombinations = [];
                 foreach ($detailPlan as $key => $dp) {
@@ -663,7 +663,7 @@ class SummaryController extends BaseController
                     $prod = $this->produksiModel->getProduksiByModelDelivery($data); // Ambil data produksi
 
                     // Menghitung total mesin
-                    $mesinTotal = array_sum(array_column($this->tanggalPlanningModel->totalMcSumamryPlanner($dp['id_est_qty']), 'mesin'));
+                    $mesinTotal = array_sum(array_column($this->TanggalPlanningModel->totalMcSumamryPlanner($dp['id_est_qty']), 'mesin'));
 
                     // Memodifikasi data dalam array secara langsung
                     $detailPlan[$key]['mesin'] = $mesinTotal;
@@ -1678,16 +1678,16 @@ class SummaryController extends BaseController
     public function summaryStopPlanner($area)
     {
         $yesterday = date('Y-m-d', strtotime('-1 day'));
-        $dataPlan = $this->kebutuhanAreaModel->getDataByAreaGroupJrm($area);
+        $dataPlan = $this->KebutuhanAreaModel->getDataByAreaGroupJrm($area);
         $allDetailPlans = [];
 
         foreach ($dataPlan as $jarum) {
             // Mengambil data berdasarkan area dan jarum tertentu
-            $judulPlan = $this->kebutuhanAreaModel->getDataByAreaJrm($area, $jarum);
+            $judulPlan = $this->KebutuhanAreaModel->getDataByAreaJrm($area, $jarum);
 
             foreach ($judulPlan as $id) {
                 // Mendapatkan kebutuhan area berdasarkan ID
-                $kebutuhanArea = $this->kebutuhanAreaModel->where('id_pln_mc', $id['id_pln_mc'])->first();
+                $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id['id_pln_mc'])->first();
 
                 // Jika 'jarum' kosong, lanjutkan ke iterasi berikutnya
                 if (empty($kebutuhanArea['jarum'])) continue;
@@ -1695,7 +1695,7 @@ class SummaryController extends BaseController
                 // Mengambil detail planning berdasarkan ID
                 $area = $kebutuhanArea['area'];
                 $jarum = $kebutuhanArea['jarum'];
-                $detailPlan = $this->detailPlanningModel->getDetailPlanningStop($id['id_pln_mc']);
+                $detailPlan = $this->DetailPlanningModel->getDetailPlanningStop($id['id_pln_mc']);
 
                 foreach ($detailPlan as $key => $dp) {
                     // Ambil data terkait model dan mesin
@@ -1709,7 +1709,7 @@ class SummaryController extends BaseController
                     ]);
 
                     // Menghitung total mesin
-                    $mesinTotal = array_sum(array_column($this->tanggalPlanningModel->totalMc($dp['id_detail_pln']), 'mesin'));
+                    $mesinTotal = array_sum(array_column($this->TanggalPlanningModel->totalMc($dp['id_detail_pln']), 'mesin'));
 
                     // Memodifikasi data dalam array secara langsung
                     $detailPlan[$key]['mesin'] = $mesinTotal;
