@@ -71,6 +71,8 @@ $routes->group(
         $routes->get('getNotif/(:any)', 'ApiController::getNotifAduan/$1');
         $routes->get('ExportPengaduan/(:num)', 'ApiController::ExportPengaduan/$1');
 
+        // update supermarket area
+        $routes->post('repeatSupermarket', 'ApiController::repeatSupermarket');
 
         $routes->get('getQtyOrderBulk', 'ApiController::getQtyOrderBulk');
 
@@ -85,6 +87,7 @@ $routes->group(
         // proftype
         $routes->get('getProductType', 'ApiController::getProductType');
 
+        // jatah bahan baku
         $routes->get('getQtyOrderPerArea', 'ApiController::getQtyOrderPerArea');
 
 
