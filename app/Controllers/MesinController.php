@@ -788,6 +788,8 @@ class MesinController extends BaseController
             $mc['kapasitas'] = $mc['mesin_jalan'] * $mc['target'];
         }
         $getPU = $this->jarumModel->getpu($area);
+        $detailMc = $this->machinesModel->getDataMcArea($area);
+
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Mesin',
@@ -799,6 +801,7 @@ class MesinController extends BaseController
             'active6' => '',
             'active7' => '',
             'listjarum' => $listjarum,
+            'mesinDetail' => $detailMc,
             'area' => $area,
             'jarum' => $jarum,
             'max' => $maxCapacityPerWeek,
