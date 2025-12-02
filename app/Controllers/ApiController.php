@@ -20,6 +20,7 @@ use App\Models\LiburModel;
 use App\Models\BsModel;
 use App\Models\PengaduanModel;
 use App\Models\MesinPerStyle;
+use App\Models\StockAreaModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ApiController extends ResourceController
@@ -40,6 +41,7 @@ class ApiController extends ResourceController
     protected $pengaduanModel;
     protected $productType;
     protected $mesinPerStyle;
+    protected $stockArea;
 
     protected $validation;
     protected $format = 'json';
@@ -59,6 +61,7 @@ class ApiController extends ResourceController
         $this->pengaduanModel = new PengaduanModel();
         $this->liburModel = new LiburModel();
         $this->mesinPerStyle = new MesinPerStyle();
+        $this->stockArea = new StockAreaModel();
         $this->validation = \Config\Services::validation();
     }
     public function index()
@@ -646,5 +649,93 @@ class ApiController extends ResourceController
         $detailOrder = $this->ApsPerstyleModel->getDetailOrder($noModel);
 
         return $this->response->setJSON($detailOrder);
+    }
+
+    public function repeatSupermarket()
+    {
+        $json = $this->request->getJSON(true);
+        log_message('error', 'DEBUG_POST_REPEAT: ' . json_encode($json));
+
+        $db = \Config\Database::connect();
+        $db->transBegin(); // mulai transaksi
+
+        try {
+            $retur  = $json['retur']  ?? [];
+            $repeat = $json['repeat'] ?? [];
+            // VALIDASI
+            if (empty($repeat) || !is_array($repeat)) {
+                throw new \Exception("Data repeat tidak valid / tidak dikirim");
+            }
+
+            foreach ($repeat as $data => $r) {
+                $kg_cns = ($r['cns'] > 0) ? ($r['kgs'] / $r['cns']) : 0;
+                // insert data repeat
+                $dataRepeat = [
+                    'id_pengeluaran'    => $r['id_pengeluaran'],
+                    'no_karung'         => $r['no_karung'],
+                    'area'              => $r['area'],
+                    'no_model'          => $r['no_model'],
+                    'item_type'         => $r['item_type'],
+                    'kode_warna'        => $r['kode_warna'],
+                    'warna'             => $r['warna'],
+                    'lot'               => $r['lot'],
+                    'kgs_in_out'        => $r['kgs'],
+                    'cns_in_out'        => $r['cns'],
+                    'kg_cns'            => $kg_cns,
+                    'created_at'        => date('Y-m-d H:i:s'), // Waktu pemindahan
+                ];
+                if (!$this->stockArea->insert($dataRepeat)) {
+                    throw new \Exception("Gagal insert repeat area");
+                }
+            }
+
+            // UPDATE STOCK SUPERMARKET (SET 0)
+            $updateSupermarket = [
+                'kgs_in_out'    => 0,
+                'cns_in_out'    => 0,
+                'updated_at'    => date('Y-m-d H:i:s'), // Waktu pemindahan
+            ];
+            $updated = $this->stockArea
+                ->where('no_model', $retur['no_model'])
+                ->where('item_type', $retur['item_type'])
+                ->where('kode_warna', $retur['kode_warna'])
+                ->where('warna', $retur['warna'])
+                ->where('lot', $retur['lot'])
+                ->set($updateSupermarket)
+                ->update();
+
+
+            // jika query benar-benar gagal (error DB)
+            if ($updated === false) {
+                throw new \Exception("Gagal melakukan update database supermarket");
+            }
+
+            if ($this->stockArea->db()->affectedRows() < 1) {
+                // optional: log atau abaikan
+                log_message('info', 'Stock supermarket tidak ditemukan untuk update');
+            }
+
+            // Semua sukses → commit transaksi
+            $db->transCommit();
+
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => 'Repeat dan update supermarket berhasil'
+            ]);
+        } catch (\Throwable $e) {
+            // WAJIB rollback
+            if ($db->transStatus() === FALSE) {
+                $db->transRollback();
+            } else {
+                $db->transRollback();
+            }
+
+            log_message('error', 'RepeatSupermarket error: ' . $e->getMessage());
+
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ])->setStatusCode(500);
+        }
     }
 }
