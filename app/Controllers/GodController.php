@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Models\MachinesModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -1101,8 +1102,8 @@ class GodController extends BaseController
                 'actMc' => $jlMc['mc'] ?? 0,
                 'prodKemaren' => $jlMc['prodYes'] / 24 ?? 0,
                 'mesinDetail' => $detailMc,
-                'targetPermesin' => $targetMonth['targetMc']
-                'actMc' => $jlMc['mc'] ?? 0,
+                'targetPermesin' => $targetMonth['targetMc'],
+                // 'actMc' => $jlMc['mc'] ?? 0,
                 'prodKemaren' => $jlMc['prodYes'] / 24 ?? 0,
                 'mesinDetail' => $detailMc,
                 'targetPermesin' => $targetMonth['targetMc']
