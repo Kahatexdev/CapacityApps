@@ -331,6 +331,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('warehouse/reportKebutuhanBahanBaku', 'MaterialController::reportKebutuhanBahanBaku');
     $routes->get('exportMaterialPDK', 'ExcelController::exportMaterialPDK');
 
+    $routes->get('exportBsMesinPerbulan/(:any)/(:any)', 'SummaryController::summaryBsMesinPerbulan/$1/$2');
 
     //pph
     $routes->get('pph/(:any)', 'MaterialController::pph/$1');
@@ -503,6 +504,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     //summary
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
     $routes->post('exportSummaryPerTod', 'SummaryController::excelSummaryPerTod');
+    $routes->get('exportBsMesinPerbulan/(:any)/(:any)', 'SummaryController::summaryBsMesinPerbulan/$1/$2');
 
     //summary produksi
     $routes->post('summaryProdPerTanggal', 'ProduksiController::summaryProdPerTanggal');
