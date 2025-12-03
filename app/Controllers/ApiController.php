@@ -658,27 +658,61 @@ class ApiController extends ResourceController
     {
         $noModel = $this->request->getGet('no_model');
 
-        $dataOrder = $this->ApsPerstyleModel->getDetailOrder($noModel);
+        $dataOrder = $this->ApsPerstyleModel->getStatusOrder($noModel);
 
-        $idAps = $this->ApsPerstyleModel->getIdAps($noModel);
+        $idAps = array_column($dataOrder, 'idapsperstyle'); // ambil dr dataOrder
 
         $produksi      = $this->produksiModel->getAllProd($idAps);
         $bsStocklot = $this->bsModel->getAllTotalBsSet($idAps);
         $perbaikan      = $this->perbaikanAreaModel->getAllPB($idAps);
 
-        $orderStatusIndex = [];
+        $grouped = [];
 
-        foreach ($dataOrder as $item) {
-            $size   = $item['size'];
+        foreach ($dataOrder as $row) {
+            $id = $row['idapsperstyle'];
+            $key = $row['factory'] . '-' . $row['delivery'] . '-' . $row['size'];
+
+            if (!isset($grouped[$key])) {
+                $grouped[$key] = [
+                    'factory'   => $row['factory'],
+                    'delivery'  => $row['delivery'],
+                    'inisial'      => $row['inisial'],
+                    'size'      => $row['size'],
+                    'color'      => $row['color'],
+                    'countries'      => [], // jika ada lebih dari 1 country pakai koma aja, tampilin semua
+                    'qty_order' => 0,
+                    'sisa_order' => 0,
+                    'produksi'  => 0,
+                    'bs_stocklot' => 0,
+                    'perbaikan' => 0,
+                    'po_plus' => 0,
+                ];
+            }
+
+            // ==== COUNTRY (unique, multiple allowed) ====
+            $country = trim($row['country']);
+            if (!in_array($country, $grouped[$key]['countries'])) {
+                $grouped[$key]['countries'][] = $country;
+            }
+
+            // ==== SUM DATA ====
+            $grouped[$key]['qty_order']   += $row['qty'];
+            $grouped[$key]['sisa_order']  += $row['sisa'];
+            $grouped[$key]['po_plus']  += $row['po_plus'];
+            $grouped[$key]['produksi']    += $produksi[$id] ?? 0;
+            $grouped[$key]['bs_stocklot'] += $bsStocklot[$id] ?? 0;
+            $grouped[$key]['perbaikan']   += $perbaikan[$id] ?? 0;
         }
 
+        // === Convert country array → string ===
+        foreach ($grouped as &$g) {
+            $g['country'] = implode(', ', $g['countries']);
+            unset($g['countries']);
+        }
+        unset($g);
+
         return $this->response->setJSON([
-            'no_model'    => $noModel,
-            'dataOrder'   => $dataOrder,
-            'idAps'       => $idAps,
-            'produksi'    => $produksi,
-            'bsStocklot'  => $bsStocklot,
-            'perbaikan'   => $perbaikan
+            'orderStatus' => $grouped
         ]);
     }
 }
