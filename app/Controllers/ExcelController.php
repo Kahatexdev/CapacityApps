@@ -11645,7 +11645,7 @@ class ExcelController extends BaseController
         $sheet->getStyle('A1:M1')->applyFromArray($styleTitle);
         // Tulis header
         $sheet->setCellValue('A3', 'TGL BOOKING');
-        $sheet->setCellValue('B3', 'NO Booking');
+        $sheet->setCellValue('B3', 'NO BOOKING');
         $sheet->setCellValue('C3', 'PRODUCT');
         $sheet->setCellValue('D3', 'TYPE');
         $sheet->setCellValue('E3', 'NO ORDER');
@@ -11659,7 +11659,8 @@ class ExcelController extends BaseController
         $sheet->setCellValue('M3', 'QTY');
         $sheet->setCellValue('N3', 'SISA');
         $sheet->setCellValue('O3', 'DESCRIPTION');
-        $sheet->setCellValue('P3', 'KETERANGAN');
+        $sheet->setCellValue('P3', 'PROSES ROUTE');
+        $sheet->setCellValue('Q3', 'KETERANGAN');
         $sheet->getStyle('A3')->applyFromArray($styleHeader);
         $sheet->getStyle('B3')->applyFromArray($styleHeader);
         $sheet->getStyle('C3')->applyFromArray($styleHeader);
@@ -11676,6 +11677,7 @@ class ExcelController extends BaseController
         $sheet->getStyle('N3')->applyFromArray($styleHeader);
         $sheet->getStyle('O3')->applyFromArray($styleHeader);
         $sheet->getStyle('P3')->applyFromArray($styleHeader);
+        $sheet->getStyle('Q3')->applyFromArray($styleHeader);
 
 
         // Tulis data mulai dari baris 2
@@ -11706,7 +11708,8 @@ class ExcelController extends BaseController
             $sheet->setCellValue('M' . $row, number_format($item['qty_booking'] / 24, 2, '.', ''));
             $sheet->setCellValue('N' . $row, number_format($item['sisa_booking'] / 24, 2, '.', ''));
             $sheet->setCellValue('O' . $row, $item['desc']);
-            $sheet->setCellValue('P' . $row, $item['keterangan']);
+            $sheet->setCellValue('P' . $row, $item['proses_route']);
+            $sheet->setCellValue('Q' . $row, $item['keterangan']);
             // 
             $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
@@ -11724,12 +11727,13 @@ class ExcelController extends BaseController
             $sheet->getStyle('N' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('O' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('P' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('Q' . $row)->applyFromArray($styleBody);
 
             $row++;
         }
 
         // Set lebar kolom agar menyesuaikan isi
-        foreach (range('A', 'P') as $col) {
+        foreach (range('A', 'Q') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
