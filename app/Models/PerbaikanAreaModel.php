@@ -171,4 +171,18 @@ class PerbaikanAreaModel extends Model
             ->orderBy('qty', 'DESC')
             ->findAll();
     }
+    public function getAllPB($idAps)
+    {
+        if (empty($idAps)) return [];
+        $result = $this->select('idapsperstyle, SUM(qty) as qty')
+            ->whereIn('idapsperstyle', $idAps)
+            ->groupBy('idapsperstyle')
+            ->findAll();
+
+        $index = [];
+        foreach ($result as $r) {
+            $index[$r['idapsperstyle']] = $r['qty'];
+        }
+        return $index;
+    }
 }

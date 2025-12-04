@@ -21,6 +21,7 @@ use App\Models\BsModel;
 use App\Models\PengaduanModel;
 use App\Models\MesinPerStyle;
 use App\Models\StockAreaModel;
+use App\Models\PerbaikanAreaModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ApiController extends ResourceController
@@ -42,6 +43,7 @@ class ApiController extends ResourceController
     protected $productType;
     protected $mesinPerStyle;
     protected $stockArea;
+    protected $perbaikanAreaModel;
 
     protected $validation;
     protected $format = 'json';
@@ -62,6 +64,7 @@ class ApiController extends ResourceController
         $this->liburModel = new LiburModel();
         $this->mesinPerStyle = new MesinPerStyle();
         $this->stockArea = new StockAreaModel();
+        $this->perbaikanAreaModel = new PerbaikanAreaModel();
         $this->validation = \Config\Services::validation();
     }
     public function index()
@@ -638,7 +641,10 @@ class ApiController extends ResourceController
     }
     public function getAllDataOrder()
     {
-        $order = $this->ApsPerstyleModel->getAllDataOrder();
+        $json = $this->request->getJSON(true); // array
+        $noModel = $json['no_model'] ?? [];
+
+        $order = $this->ApsPerstyleModel->getAllDataOrder($noModel);
 
         return $this->response->setJSON($order);
     }
@@ -737,5 +743,67 @@ class ApiController extends ResourceController
                 'message' => $e->getMessage()
             ])->setStatusCode(500);
         }
+    }
+
+    public function getOrderStatus()
+    {
+        $noModel = $this->request->getGet('no_model');
+
+        $dataOrder = $this->ApsPerstyleModel->getStatusOrder($noModel);
+
+        $idAps = array_column($dataOrder, 'idapsperstyle'); // ambil dr dataOrder
+
+        $produksi      = $this->produksiModel->getAllProd($idAps);
+        $bsStocklot = $this->bsModel->getAllTotalBsSet($idAps);
+        $perbaikan      = $this->perbaikanAreaModel->getAllPB($idAps);
+
+        $grouped = [];
+
+        foreach ($dataOrder as $row) {
+            $id = $row['idapsperstyle'];
+            $key = $row['factory'] . '-' . $row['delivery'] . '-' . $row['size'];
+
+            if (!isset($grouped[$key])) {
+                $grouped[$key] = [
+                    'factory'   => $row['factory'],
+                    'delivery'  => $row['delivery'],
+                    'inisial'      => $row['inisial'],
+                    'size'      => $row['size'],
+                    'color'      => $row['color'],
+                    'countries'      => [], // jika ada lebih dari 1 country pakai koma aja, tampilin semua
+                    'qty_order' => 0,
+                    'sisa_order' => 0,
+                    'produksi'  => 0,
+                    'bs_stocklot' => 0,
+                    'perbaikan' => 0,
+                    'po_plus' => 0,
+                ];
+            }
+
+            // ==== COUNTRY (unique, multiple allowed) ====
+            $country = trim($row['country']);
+            if (!in_array($country, $grouped[$key]['countries'])) {
+                $grouped[$key]['countries'][] = $country;
+            }
+
+            // ==== SUM DATA ====
+            $grouped[$key]['qty_order']   += $row['qty'];
+            $grouped[$key]['sisa_order']  += $row['sisa'];
+            $grouped[$key]['po_plus']  += $row['po_plus'];
+            $grouped[$key]['produksi']    += $produksi[$id] ?? 0;
+            $grouped[$key]['bs_stocklot'] += $bsStocklot[$id] ?? 0;
+            $grouped[$key]['perbaikan']   += $perbaikan[$id] ?? 0;
+        }
+
+        // === Convert country array → string ===
+        foreach ($grouped as &$g) {
+            $g['country'] = implode(', ', $g['countries']);
+            unset($g['countries']);
+        }
+        unset($g);
+
+        return $this->response->setJSON([
+            'orderStatus' => $grouped
+        ]);
     }
 }
