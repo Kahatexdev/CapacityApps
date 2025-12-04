@@ -1600,4 +1600,12 @@ class ApsPerstyleModel extends Model
             ->get()
             ->getResultArray();
     }
+    public function getDataOrderFetch($listNoModel)
+    {
+        return $this->db->table('apsperstyle')
+            ->select('idapsperstyle, inisial, size, mastermodel')
+            ->whereIn('mastermodel', $listNoModel)
+            ->get()
+            ->getResultArray();
+    }
 }

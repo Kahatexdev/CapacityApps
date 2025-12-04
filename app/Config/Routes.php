@@ -95,6 +95,7 @@ $routes->group(
         $routes->post('getAllDataOrder', 'ApiController::getAllDataOrder');
         $routes->get('getDetailOrder', 'ApiController::getDetailOrder');
         $routes->get('getOrderStatus', 'ApiController::getOrderStatus');
+        $routes->get('getDataOrderFetch', 'ApiController::getDataOrderFetch');
     }
 );
 
