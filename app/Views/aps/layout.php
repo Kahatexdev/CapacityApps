@@ -718,9 +718,7 @@
         const HrisUrl = "<?= $hrisApiUrl ?>";
         const TlsUrl = "<?= $tlsApiUrl ?>";
     </script>
-    <script>
-        const MaterialUrl = "<?= $materialApiUrl ?>";
-    </script>
+
     <script>
         var ctx = document.getElementById("chart-bars").getContext("2d");
 

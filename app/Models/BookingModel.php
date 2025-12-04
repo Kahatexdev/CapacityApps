@@ -290,8 +290,9 @@ class BookingModel extends Model
     }
     public function getDataBooking($validate)
     {
-        $builder = $this->select('data_booking.*,master_product_type.product_type')
+        $builder = $this->select('data_booking.*,master_product_type.product_type, data_model.seam AS proses_route')
             ->join('master_product_type', 'master_product_type.id_product_type=data_booking.id_product_type', 'left')
+            ->join('data_model', 'data_model.id_booking=data_booking.id_booking', 'left')
             ->where('status !=', 'cancel booking');
 
         if (!empty($validate['buyer'])) {
