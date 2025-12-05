@@ -806,4 +806,36 @@ class ApiController extends ResourceController
             'orderStatus' => $grouped
         ]);
     }
+
+    public function getDataOrderFetch()
+    {
+        $startDate = date('Y-m-d', strtotime('90 days ago')); // Menggunakan format tanggal yang benar
+
+        // 1️⃣ Ambil semua no_model berdasarkan tanggal
+        $dataModel = $this->orderModel->getNoModel($startDate);
+
+        // kalau kosong
+        if (empty($dataModel)) {
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => 'No model ditemukan',
+                'data'    => []
+            ]);
+        }
+
+        // ambil daftar no_model dalam bentuk array
+        $listNoModel = array_column($dataModel, 'no_model');
+
+        // 2️⃣ Ambil detail APS berdasarkan list no_model
+        $detailModel = $this->ApsPerstyleModel->getDataOrderFetch($listNoModel);
+
+        // 3️⃣ Return JSON
+        return $this->response->setJSON([
+            'status' => 'success',
+            'data' => [
+                'models' => $dataModel,
+                'aps'    => $detailModel
+            ]
+        ]);
+    }
 }

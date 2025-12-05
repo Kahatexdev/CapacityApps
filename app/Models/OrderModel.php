@@ -798,4 +798,15 @@ class OrderModel extends Model
             ->where('data_model.no_model', $pdk['model'])
             ->first();
     }
+    public function getNoModel($startDate)
+    {
+        return $this->select('no_model, kd_buyer_order')
+            ->join('apsperstyle', 'apsperstyle.mastermodel=data_model.no_model', 'left')
+            ->where('created_at >=', $startDate)
+            ->where('apsperstyle.qty <>', 0)
+            ->groupBy('no_model')
+            ->orderBy('created_at', 'DESC')
+            ->get()
+            ->getResultArray();
+    }
 }

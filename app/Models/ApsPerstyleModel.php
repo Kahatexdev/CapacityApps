@@ -1591,12 +1591,15 @@ class ApsPerstyleModel extends Model
             ->where('apsperstyle.mastermodel', $noModel)
             ->where('apsperstyle.qty <>', 0)
             ->groupBy('apsperstyle.idapsperstyle')   // PENTING!
-            ->groupBy('apsperstyle.mastermodel')
-            ->groupBy('apsperstyle.factory')
-            ->groupBy('apsperstyle.machinetypeid')
-            ->groupBy('apsperstyle.size')
-            ->groupBy('apsperstyle.delivery')
             ->orderBy('apsperstyle.delivery, apsperstyle.machinetypeid, apsperstyle.inisial, apsperstyle.factory', 'ASC')
+            ->get()
+            ->getResultArray();
+    }
+    public function getDataOrderFetch($listNoModel)
+    {
+        return $this->db->table('apsperstyle')
+            ->select('idapsperstyle, inisial, size, mastermodel')
+            ->whereIn('mastermodel', $listNoModel)
             ->get()
             ->getResultArray();
     }
