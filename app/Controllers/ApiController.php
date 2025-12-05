@@ -809,7 +809,7 @@ class ApiController extends ResourceController
 
     public function getDataOrderFetch()
     {
-        $startDate = '2025-06-01 00:00:01';
+        $startDate = date('Y-m-d', strtotime('90 days ago')); // Menggunakan format tanggal yang benar
 
         // 1️⃣ Ambil semua no_model berdasarkan tanggal
         $dataModel = $this->orderModel->getNoModel($startDate);
