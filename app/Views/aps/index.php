@@ -34,7 +34,7 @@
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize fw-bold">Socks System</p>
                                 <h5 class="fw-bolder mb-0">
-                                    Key Performance Indicator Monthly
+                                    Key Performance Indicator <span id="tglProd"></span>
                                 </h5>
                             </div>
                         </div>
@@ -157,7 +157,7 @@
                         <div class="col-8">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Target</p>
-                                <h6 class="font-weight-bolder mb-0" id="pph">
+                                <h6 class="font-weight-bolder mb-0" id="target">
                                 </h6>
                                 <span class=" text-sm font-weight-bolder"></span>
                             </div>
@@ -461,7 +461,7 @@
 
     function dashboard(data, area) {
         let deffect = parseFloat(data.deffect).toFixed(2); // Format 2 desimal
-        let output = parseInt(data.output / 24).toLocaleString(); // Bagi 2, format angka
+        let output = Math.round(data.output / 24).toLocaleString(); // Bagi 2, format angka
         let pph = parseInt(data.targetOutput).toLocaleString(); // Format angka
         let qty = parseInt(data.qty).toLocaleString(); // Format angka
         let sisa = parseInt(data.sisa).toLocaleString(); // Format angka
@@ -470,16 +470,19 @@
         let qtyDz = parseInt(data.qty / 24).toLocaleString()
         let productivity = data.productivity;
         let planMc = data.planmc;
+        let tglProd = data.tglProd;
         let targetday = parseInt(data.targetday).toLocaleString();
         let actRunningMc = parseInt(data.actMc).toLocaleString();
+
         const layoutMc = document.getElementById('layoutMc')
         document.getElementById('deffectRate').textContent = `${deffect}%`;
         document.getElementById('output').textContent = `${output} dz`;
-        document.getElementById('pph').textContent = `${pph} dz`;
+        // document.getElementById('pph').textContent = `${pph} dz`;
         document.getElementById('productivity').textContent = `${productivity} %`;
         document.getElementById('planmc').textContent = `${planMc} mc`;
-        // document.getElementById('targetday').textContent = `${targetday} dz`;
+        document.getElementById('target').textContent = `${targetday} dz`;
         document.getElementById('actRunningMc').textContent = `${actRunningMc} mc`;
+        document.getElementById('tglProd').textContent = `${tglProd}`;
         const stats = document.getElementById('stats');
         const bg = document.getElementById('bground');
 
