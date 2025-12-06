@@ -38,7 +38,7 @@
                             </div>
                         </div>
                         <div class="col-4 text-end">
-                            <a href="<?= base_url($role . '') ?>" class="btn btn-info">Back</a>
+                            <a href="<?= base_url($role . '/statusorder/' . $area) ?>" class="btn btn-info">Back</a>
 
                         </div>
                     </div>

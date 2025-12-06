@@ -34,12 +34,12 @@ class KebutuhanMesin extends BaseController
             'deskripsi' => $this->request->getPost("deskripsi"),
             'sisa' => $this->request->getPost("sisa")
         ];
-        $exist = $this->kebMC->cekData($cek);
+        $exist = $this->kebMc->cekData($cek);
         if ($exist) {
-            $this->kebMC->update($exist['id'], $data);
+            $this->kebMc->update($exist['id'], $data);
             return redirect()->to(base_url(session()->get('role') . ''))->withInput()->with('success', 'Data ' . $this->request->getPost('judul') . ' Berhasil Di Perbarui');
         } else {
-            $insert = $this->kebMC->insert($data);
+            $insert = $this->kebMc->insert($data);
 
             if ($insert) {
                 return redirect()->to(base_url(session()->get('role') . ''))->withInput()->with('success', 'Data Berhasil Di input');

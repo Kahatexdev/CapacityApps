@@ -127,6 +127,14 @@
                     <label for="">Tanggal Akhir (Tanggal Datang)</label>
                     <input type="date" class="form-control">
                 </div>
+                <div class="col-md-1 d-flex align-items-center">
+                    <div class="form-check mb-0">
+                        <label class="form-check-label" for="po_plus">
+                            PO(+)
+                        </label>
+                        <input class="form-check-input" type="checkbox" id="po_plus">
+                    </div>
+                </div>
                 <div class="col-md-3">
                     <label for="">Aksi</label><br>
                     <button class="btn btn-info btn-block" id="btnSearch"><i class="fas fa-search"></i></button>
@@ -165,6 +173,7 @@
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">GW</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Harga</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nama Cluster</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Po Tambahan</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Keterangan</th>
                             <!-- <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Update</th> -->
                         </tr>
@@ -243,9 +252,10 @@
             let key = $('#keyInput').val().trim();
             let tanggal_awal = $('input[type="date"]').eq(0).val().trim();
             let tanggal_akhir = $('input[type="date"]').eq(1).val().trim();
+            let po_plus = $('#po_plus').is(':checked') ? 1 : 0;
 
             // Validasi: Jika semua input kosong, tampilkan alert dan hentikan pencarian
-            if (key === '' && tanggal_awal === '' && tanggal_akhir === '') {
+            if (key === '' && tanggal_awal === '' && tanggal_akhir === '' && po_plus === 0) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Oops...',
@@ -254,14 +264,14 @@
                 return;
             }
 
-
             $.ajax({
                 url: "<?= base_url($role . '/warehouse/filterDatangBenang') ?>",
                 type: "GET",
                 data: {
                     key: key,
                     tanggal_awal: tanggal_awal,
-                    tanggal_akhir: tanggal_akhir
+                    tanggal_akhir: tanggal_akhir,
+                    po_plus: po_plus
                 },
                 dataType: "json",
                 beforeSend: function() {
@@ -287,6 +297,7 @@
 
                     if (response.length > 0) {
                         $.each(response, function(index, item) {
+                            let poPlus = (item.po_plus === "1") ? "Ya" : "";
                             dataTable.row.add([
                                 index + 1,
                                 item.foll_up,
@@ -300,7 +311,7 @@
                                 item.kode_warna,
                                 item.warna,
                                 parseFloat(item.kgs_material ?? 0).toFixed(2),
-                                item.tgl_masuk,
+                                item.tgl_datang,
                                 parseFloat(item.kgs_kirim ?? 0).toFixed(2),
                                 item.cones_kirim,
                                 item.lot_kirim,
@@ -309,6 +320,7 @@
                                 item.gw_kirim,
                                 item.harga,
                                 item.nama_cluster,
+                                poPlus,
                                 item.keterangan,
                                 // `<button class="btn btn-warning btn-update" 
                                 //     data-id_bon="${item.id_bon || ''}" 
@@ -382,10 +394,11 @@
         });
 
         $('#btnExport').click(function() {
-            let key = $('input[type="text"]').val();
+            let key = $('#keyInput').val();
             let tanggal_awal = $('input[type="date"]').eq(0).val();
             let tanggal_akhir = $('input[type="date"]').eq(1).val();
-            window.location.href = "<?= base_url($role . '/warehouse/exportDatangBenang') ?>?key=" + key + "&tanggal_awal=" + tanggal_awal + "&tanggal_akhir=" + tanggal_akhir;
+            let po_plus = $('#po_plus').is(':checked') ? 1 : 0;
+            window.location.href = "<?= base_url($role . '/warehouse/exportDatangBenang') ?>?key=" + key + "&tanggal_awal=" + tanggal_awal + "&tanggal_akhir=" + tanggal_akhir + "&po_plus=" + po_plus;;
         });
 
         dataTable.clear().draw();
