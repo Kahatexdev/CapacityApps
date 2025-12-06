@@ -2375,11 +2375,16 @@ class MaterialController extends BaseController
 
     public function historyPindahOrder()
     {
-        $noModel   = $this->request->getGet('model')     ?? '';
+        $noModelOld   = $this->request->getGet('no_model_old') ?? '';
+        $noModelNew   = $this->request->getGet('no_model_new') ?? '';
         $kodeWarna = $this->request->getGet('kode_warna') ?? '';
 
         // 1) Ambil data
-        $apiUrl = api_url('material') . 'historyPindahOrder?model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = api_url('material') . 'historyPindahOrder'
+            . '?no_model_old=' . urlencode($noModelOld)
+            . '&no_model_new=' . urlencode($noModelNew)
+            . '&kode_warna='   . urlencode($kodeWarna);
+
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {

@@ -220,7 +220,7 @@
     $(document).ready(function() {
         let dataTable = $('#dataTable').DataTable({
             "paging": true,
-            "searching": false,
+            "searching": true,
             "ordering": true,
             "info": true,
             "responsive": true,
@@ -314,8 +314,8 @@
                             const loss = Number(item.loss) || 0;
 
                             // perhitungan
-                            const tagihanGbn = kgs - (datangSolid + plusDatangSolid + kgsStockAwal);
-                            const jatahArea = kgs - pakaiArea;
+                            const tagihanGbn = kgs + poTambahan - (datangSolid + plusDatangSolid + kgsStockAwal);
+                            const jatahArea = kgs + poTambahan - pakaiArea;
 
                             // fungsi bantu untuk format
                             const fmt = v => v !== 0 ? v.toFixed(2) : '0';
