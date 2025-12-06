@@ -4,17 +4,7 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
-use App\Models\LiburModel;
-use App\Models\DetailPlanningModel;
-use App\Models\TanggalPlanningModel;
-use App\Models\KebutuhanAreaModel;
-use App\Models\BsMesinModel;
+
 use LengthException;
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Week;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -28,33 +18,12 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
 class SummaryController extends BaseController
 {
-    protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $liburModel;
-    protected $detailPlanningModel;
-    protected $tanggalPlanningModel;
-    protected $kebutuhanAreaModel;
-    protected $BsMesinModel;
+
 
 
     public function __construct()
     {
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->liburModel = new LiburModel();
-        $this->detailPlanningModel = new DetailPlanningModel();
-        $this->tanggalPlanningModel = new TanggalPlanningModel();
-        $this->kebutuhanAreaModel = new KebutuhanAreaModel();
-        $this->BsMesinModel = new BsMesinModel();
+
 
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
@@ -643,19 +612,19 @@ class SummaryController extends BaseController
     public function summaryPlanner($area)
     {
         $yesterday = date('Y-m-d', strtotime('-1 day'));
-        $dataPlan = $this->kebutuhanAreaModel->getDataByAreaGroupJrm($area);
+        $dataPlan = $this->KebutuhanAreaModel->getDataByAreaGroupJrm($area);
         $allDetailPlans = [];
 
         // Siapkan array kosong sebelum foreach
         $allModels = [];
         foreach ($dataPlan as $jarum) {
             // Mengambil data berdasarkan area dan jarum tertentu
-            $judulPlan = $this->kebutuhanAreaModel->getDataByAreaJrm($area, $jarum['jarum']);
+            $judulPlan = $this->KebutuhanAreaModel->getDataByAreaJrm($area, $jarum['jarum']);
 
             foreach ($judulPlan as $id) {
 
                 // Mendapatkan kebutuhan area berdasarkan ID
-                $kebutuhanArea = $this->kebutuhanAreaModel->where('id_pln_mc', $id['id_pln_mc'])->first();
+                $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id['id_pln_mc'])->first();
 
                 // Jika 'jarum' kosong, lanjutkan ke iterasi berikutnya
                 if (empty($kebutuhanArea['jarum'])) continue;
@@ -663,7 +632,7 @@ class SummaryController extends BaseController
                 // Mengambil detail planning berdasarkan ID
                 $area = $kebutuhanArea['area'];
                 $jarum = $kebutuhanArea['jarum'];
-                $detailPlan = $this->detailPlanningModel->getDataPlanning2($id['id_pln_mc'], $area);
+                $detailPlan = $this->DetailPlanningModel->getDataPlanning2($id['id_pln_mc'], $area);
 
                 $seenCombinations = [];
                 foreach ($detailPlan as $key => $dp) {
@@ -694,7 +663,7 @@ class SummaryController extends BaseController
                     $prod = $this->produksiModel->getProduksiByModelDelivery($data); // Ambil data produksi
 
                     // Menghitung total mesin
-                    $mesinTotal = array_sum(array_column($this->tanggalPlanningModel->totalMcSumamryPlanner($dp['id_est_qty']), 'mesin'));
+                    $mesinTotal = array_sum(array_column($this->TanggalPlanningModel->totalMcSumamryPlanner($dp['id_est_qty']), 'mesin'));
 
                     // Memodifikasi data dalam array secara langsung
                     $detailPlan[$key]['mesin'] = $mesinTotal;
@@ -727,7 +696,7 @@ class SummaryController extends BaseController
         // Ambil data bahan baku
         $allModels = array_values(array_unique($allModels));
         $modelsParam = implode(',', $allModels);
-        $bbUrl = "http://172.23.44.14/MaterialSystem/public/api/getBBForSummaryPlanner?" . "no_model=" . urlencode($modelsParam);
+        $bbUrl = api_url('material') . "getBBForSummaryPlanner?" . "no_model=" . urlencode($modelsParam);
         $bbData = @file_get_contents($bbUrl);
         $bahanBaku = $bbData ? json_decode($bbData, true) : [];
 
@@ -1709,16 +1678,16 @@ class SummaryController extends BaseController
     public function summaryStopPlanner($area)
     {
         $yesterday = date('Y-m-d', strtotime('-1 day'));
-        $dataPlan = $this->kebutuhanAreaModel->getDataByAreaGroupJrm($area);
+        $dataPlan = $this->KebutuhanAreaModel->getDataByAreaGroupJrm($area);
         $allDetailPlans = [];
 
         foreach ($dataPlan as $jarum) {
             // Mengambil data berdasarkan area dan jarum tertentu
-            $judulPlan = $this->kebutuhanAreaModel->getDataByAreaJrm($area, $jarum);
+            $judulPlan = $this->KebutuhanAreaModel->getDataByAreaJrm($area, $jarum);
 
             foreach ($judulPlan as $id) {
                 // Mendapatkan kebutuhan area berdasarkan ID
-                $kebutuhanArea = $this->kebutuhanAreaModel->where('id_pln_mc', $id['id_pln_mc'])->first();
+                $kebutuhanArea = $this->KebutuhanAreaModel->where('id_pln_mc', $id['id_pln_mc'])->first();
 
                 // Jika 'jarum' kosong, lanjutkan ke iterasi berikutnya
                 if (empty($kebutuhanArea['jarum'])) continue;
@@ -1726,7 +1695,7 @@ class SummaryController extends BaseController
                 // Mengambil detail planning berdasarkan ID
                 $area = $kebutuhanArea['area'];
                 $jarum = $kebutuhanArea['jarum'];
-                $detailPlan = $this->detailPlanningModel->getDetailPlanningStop($id['id_pln_mc']);
+                $detailPlan = $this->DetailPlanningModel->getDetailPlanningStop($id['id_pln_mc']);
 
                 foreach ($detailPlan as $key => $dp) {
                     // Ambil data terkait model dan mesin
@@ -1740,7 +1709,7 @@ class SummaryController extends BaseController
                     ]);
 
                     // Menghitung total mesin
-                    $mesinTotal = array_sum(array_column($this->tanggalPlanningModel->totalMc($dp['id_detail_pln']), 'mesin'));
+                    $mesinTotal = array_sum(array_column($this->TanggalPlanningModel->totalMc($dp['id_detail_pln']), 'mesin'));
 
                     // Memodifikasi data dalam array secara langsung
                     $detailPlan[$key]['mesin'] = $mesinTotal;
@@ -2370,7 +2339,7 @@ class SummaryController extends BaseController
     }
     public function summaryBsMesinPerbulan($area, $bulan)
     {
-        $bsPerbulan = $this->BsMesinModel->bsMesinPerbulan($area, $bulan);
+        $bsPerbulan = $this->bsMesinModel->bsMesinPerbulan($area, $bulan);
 
         // Buat spreadsheet
         $spreadsheet = new Spreadsheet();

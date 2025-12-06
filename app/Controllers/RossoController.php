@@ -4,11 +4,6 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\LiburModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpParser\Node\Stmt\Return_;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -18,19 +13,9 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class RossoController extends BaseController
 {
-    protected $filters;
-    protected $bookingModel;
-    protected $productModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $liburModel;
     public function __construct()
     {
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->liburModel = new LiburModel();
+
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -120,7 +105,7 @@ class RossoController extends BaseController
         // Logika untuk menentukan data berdasarkan status PO Tambahan
         // if ($poTambahan == 1) {
         //     // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        //     $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getNoModelByPoTambahan?area=' . $area;
+        //     $apiUrl = api_url('material') . 'getNoModelByPoTambahan?area=' . $area;
 
         //     try {
         //         $response = file_get_contents($apiUrl);
@@ -154,7 +139,7 @@ class RossoController extends BaseController
         // Logika untuk menentukan data berdasarkan status PO Tambahan
         // if ($poTambahan == 1) {
         //     // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        //     $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByPoTambahan?no_model=' . $noModel . '&area=' . $area;
+        //     $apiUrl = api_url('material') . 'getStyleSizeByPoTambahan?no_model=' . $noModel . '&area=' . $area;
 
         //     try {
         //         $response = file_get_contents($apiUrl);
@@ -195,7 +180,7 @@ class RossoController extends BaseController
     public function getMU($model, $styleSize, $area, $qtyOrder)
     {
         $styleSize = urlencode($styleSize);  // Encode styleSize
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getMUForRosso/' . $model . '/' . $styleSize . '/' . $area;
+        $apiUrl = api_url('material') . 'getMUForRosso/' . $model . '/' . $styleSize . '/' . $area;
         $response = file_get_contents($apiUrl);  // Mendapatkan response dari API
         // if ($response === FALSE) {
         //     die('Error occurred while fetching data.');
@@ -408,7 +393,7 @@ class RossoController extends BaseController
             $dataList = []; // ga usah load dari API
             $message = 'Silakan filter tanggal pakai atau no model terlebih dahulu.';
         } else {
-            $rawList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listPemesanan/$area");
+            $rawList = fetchApiData(api_url('material') . "listPemesanan/$area");
             if (!is_array($rawList)) {
                 die('Error: Invalid response format for listPemesanan API.');
             }
@@ -437,7 +422,7 @@ class RossoController extends BaseController
             foreach ($dataList as $key => $order) {
                 $dataList[$key]['ttl_kebutuhan_bb'] = 0;
                 if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
-                    $styleApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model='
+                    $styleApiUrl = api_url('material') . 'getStyleSizeByBb?no_model='
                         . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&warna=' . urlencode($order['color']);
                     $styleList = fetchApiData($styleApiUrl);
 
@@ -453,7 +438,7 @@ class RossoController extends BaseController
                         $dataList[$key]['ttl_kebutuhan_bb'] = $totalRequirement;
                     }
 
-                    $pengirimanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
+                    $pengirimanApiUrl = api_url('material') . 'getTotalPengiriman?area=' . $area . '&no_model='
                         . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
                     $pengiriman = fetchApiData($pengirimanApiUrl);
                     $dataList[$key]['ttl_pengiriman'] = $pengiriman['kgs_out'] ?? 0;
@@ -483,7 +468,7 @@ class RossoController extends BaseController
         }
 
         // Fetch master range
-        $masterRangeApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getMasterRangePemesanan?day='
+        $masterRangeApiUrl = api_url('material') . 'getMasterRangePemesanan?day='
             . urlencode($day) . '&area=' . urlencode($area);
 
         $masterRangePemesanan = fetchApiData($masterRangeApiUrl);
@@ -636,7 +621,7 @@ class RossoController extends BaseController
         $tanggal_pakai = $this->request->getPost('tanggal_pakai');
 
         // Jika search ada, panggil API eksternal dengan query parameter 'search'
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/requestAdditionalTime/' . $area . '?jenis=' . urlencode($jenis) . '&tanggal_pakai=' . urlencode($tanggal_pakai);
+        $apiUrl = api_url('material') . 'requestAdditionalTime/' . $area . '?jenis=' . urlencode($jenis) . '&tanggal_pakai=' . urlencode($tanggal_pakai);
 
         try {
             // Mengambil respon dari API eksternal
@@ -661,7 +646,7 @@ class RossoController extends BaseController
         $tgl_akhir = $this->request->getPost('tgl_akhir');
 
         // Ambil data dari model sesuai range tanggal
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterTglPakai/"
+        $apiUrl = api_url('material') . "filterTglPakai/"
             . $area
             . "?awal=" . urlencode($tgl_awal)
             . "&akhir=" . urlencode($tgl_akhir);
@@ -696,7 +681,7 @@ class RossoController extends BaseController
             }
         }
 
-        $dataList = fetchApiData("http://172.23.44.14/MaterialSystem/public/api/listReportPemesanan/$area/$tglPakai");
+        $dataList = fetchApiData(api_url('material') . "listReportPemesanan/$area/$tglPakai");
         error_log("Response from listPemesanan API: " . print_r($dataList, true));
         if (!is_array($dataList)) {
             die('Error: Invalid response format for listPemesanan API.');
@@ -706,7 +691,7 @@ class RossoController extends BaseController
         foreach ($dataList as $key => $order) {
             $dataList[$key]['ttl_kebutuhan_bb'] = 0;
             if (isset($order['no_model'], $order['item_type'], $order['kode_warna'])) {
-                $styleApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model='
+                $styleApiUrl = api_url('material') . 'getStyleSizeByBb?no_model='
                     . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']) . '&warna=' . urlencode($order['color']);
                 $styleList = fetchApiData($styleApiUrl);
 
@@ -725,7 +710,7 @@ class RossoController extends BaseController
                     $dataList[$key]['ttl_kebutuhan_bb'] = $totalRequirement;
                 }
 
-                $pengirimanApiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getTotalPengiriman?area=' . $area . '&no_model='
+                $pengirimanApiUrl = api_url('material') . 'getTotalPengiriman?area=' . $area . '&no_model='
                     . $order['no_model'] . '&item_type=' . urlencode($order['item_type']) . '&kode_warna=' . urlencode($order['kode_warna']);
                 $pengiriman = fetchApiData($pengirimanApiUrl);
                 $dataList[$key]['ttl_pengiriman'] = $pengiriman['kgs_out'] ?? 0;
@@ -794,11 +779,11 @@ class RossoController extends BaseController
 
         if (!empty($area) && !empty($noModel)) {
 
-            $pemesananUrl  = 'http://172.23.44.14/MaterialSystem/public/api/getPemesananByAreaModel?area=' . $area . '&no_model=' . urlencode($noModel);
+            $pemesananUrl  = api_url('material') . 'getPemesananByAreaModel?area=' . $area . '&no_model=' . urlencode($noModel);
             $pemesananResponse = file_get_contents($pemesananUrl);
             $dataPemesanan   = json_decode($pemesananResponse, true);
 
-            $returUrl  = 'http://172.23.44.14/MaterialSystem/public/api/getReturByAreaModel?area=' . $area . '&no_model=' . urlencode($noModel);
+            $returUrl  = api_url('material') . 'getReturByAreaModel?area=' . $area . '&no_model=' . urlencode($noModel);
             $returResponse = file_get_contents($returUrl);
             $dataRetur     = json_decode($returResponse, true);
         }
@@ -810,7 +795,7 @@ class RossoController extends BaseController
         // Tambahkan semua data pemesanan ke mergedData
         foreach ($dataPemesanan as $key => $pemesanan) {
             // ambil data styleSize by bb
-            $urlStyle = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model=' . $pemesanan['no_model']
+            $urlStyle = api_url('material') . 'getStyleSizeByBb?no_model=' . $pemesanan['no_model']
                 . '&item_type=' . urlencode($pemesanan['item_type'])
                 . '&kode_warna=' . urlencode($pemesanan['kode_warna'])
                 . '&warna=' . urlencode($pemesanan['color']);
@@ -858,7 +843,7 @@ class RossoController extends BaseController
         // Tambahkan semua data retur ke mergedData (data pemesanan diset null)
         foreach ($dataRetur as $retur) {
             // ambil data styleSize by bb
-            $urlStyle = 'http://172.23.44.14/MaterialSystem/public/api/getStyleSizeByBb?no_model=' . $retur['no_model']
+            $urlStyle = api_url('material') . 'getStyleSizeByBb?no_model=' . $retur['no_model']
                 . '&item_type=' . urlencode($retur['item_type'])
                 . '&kode_warna=' . urlencode($retur['kode_warna'])
                 . '&warna=' . urlencode($retur['color']);
@@ -875,7 +860,7 @@ class RossoController extends BaseController
                 // $qty     = (intval($qtyData['qty']) ?? 0);
 
                 // Ambil kg po tambahan
-                $PoPlus = 'http://172.23.44.14/MaterialSystem/public/api/getKgPoTambahan?no_model=' . $retur['no_model']
+                $PoPlus = api_url('material') . 'getKgPoTambahan?no_model=' . $retur['no_model']
                     . '&item_type=' . urlencode($retur['item_type'])
                     . '&area=' . $area;
 

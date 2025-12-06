@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use CodeIgniter\Cache\Handlers\WincacheHandler;
 use CodeIgniter\Model;
 use LDAP\Result;
 use DateTime;
@@ -587,7 +588,7 @@ class ProduksiModel extends Model
 
     public function getDataProduksi($area, $tglProduksi)
     {
-        return $this->select('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.size, apsperstyle.inisial, data_model.kd_buyer_order, produksi.area, produksi.tgl_produksi, produksi.no_mesin, produksi.shift_a, produksi.shift_b, produksi.shift_c, produksi.qty_produksi')
+        return $this->select('apsperstyle.mastermodel, apsperstyle.machinetypeid, apsperstyle.size, apsperstyle.inisial, data_model.kd_buyer_order, produksi.area, produksi.tgl_produksi, produksi.no_mesin, SUM(produksi.shift_a) AS shift_a, SUM(produksi.shift_b) AS shift_b, SUM(produksi.shift_c) AS shift_c, SUM(produksi.qty_produksi) AS qty_produksi')
             ->join('apsperstyle', 'apsperstyle.idapsperstyle=produksi.idapsperstyle', 'left')
             ->join('data_model', 'apsperstyle.mastermodel=data_model.no_model', 'left')
             ->where('produksi.area', $area)
@@ -669,7 +670,7 @@ class ProduksiModel extends Model
         $bulanDateTime = DateTime::createFromFormat('F-Y', $bulan);
         $tahun = $bulanDateTime->format('Y'); // 2024
         $bulanNumber = $bulanDateTime->format('m'); // 12
-        // === 1️⃣ PRODUKSI + PERBAIKAN per TANGGAL ===
+        // === 1ï¸âƒ£ PRODUKSI + PERBAIKAN per TANGGAL ===
         $sqlProduksi = "
             SELECT 
                 t.tanggal,
@@ -718,7 +719,7 @@ class ProduksiModel extends Model
             'buyer' => $buyer
         ])->getResultArray();
 
-        // === 2️⃣ DATA BS MESIN per MODEL & SIZE ===
+        // === 2ï¸âƒ£ DATA BS MESIN per MODEL & SIZE ===
         $sqlBs = "
             SELECT 
                 bs_mesin.tanggal_produksi,
@@ -743,7 +744,7 @@ class ProduksiModel extends Model
             'buyer' => $buyer
         ])->getResultArray();
 
-        // 2️⃣ Hitung totalBsMc per model+size
+        // 2ï¸âƒ£ Hitung totalBsMc per model+size
         foreach ($dataBs as &$bs) {
             $noModel = $bs['no_model'];
             $size = $bs['size'];
@@ -760,18 +761,17 @@ class ProduksiModel extends Model
             }
 
             if ($gwValue == 0) {
-                log_message('warning', "⚠️ GW tidak ditemukan untuk {$noModel} / {$size}");
+                log_message('warning', "âš ï¸ GW tidak ditemukan untuk {$noModel} / {$size}");
+            } else {
+                $bsGram = $bs['qty_gram'] > 0 ? round($bs['qty_gram'] / $gwValue) : 0;
+                $bsPcs  = $bs['qty_pcs'] + $bsGram;
+                // $totalBsDz = round($bsPcs / 24);
             }
-
-            $bsGram = $bs['qty_gram'] > 0 ? round($bs['qty_gram'] / $gwValue) : 0;
-            $bsPcs  = $bs['qty_pcs'] + $bsGram;
-            // $totalBsDz = round($bsPcs / 24);
-
             $bs['totalBsMc'] = $bsPcs;
         }
         unset($bs);
 
-        // 3️⃣ Group berdasarkan tanggal_produksi
+        // 3ï¸âƒ£ Group berdasarkan tanggal_produksi
         $groupedByTanggal = [];
 
         foreach ($dataBs as $row) {
@@ -829,5 +829,20 @@ class ProduksiModel extends Model
             'produksi' => $dataProduksi, // optional: kalau masih mau akses data mentahan
             'bs'       => $groupedByTanggal,       // optional: kalau masih mau akses detail bs per model/size
         ];
+    }
+    public function getLatestMc($filters)
+    {
+        $days = $this->select('tgl_produksi')
+            ->where('area', $filters['area'])
+            ->orderBy('tgl_produksi', 'DESC')
+            ->first();
+
+        $mc = $this->select('COUNT(DISTINCT produksi.no_mesin, apsperstyle.machinetypeid) AS mc, sum(produksi.qty_produksi) as prodYes')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle=produksi.idapsperstyle', 'left')
+            ->where('tgl_produksi', $days['tgl_produksi'])
+            ->where('area', $filters['area'])
+            ->first();
+
+        return $mc;
     }
 }

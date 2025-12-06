@@ -4,20 +4,6 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
-use App\Models\LiburModel;
-use App\Models\KebutuhanMesinModel;
-use App\Models\KebutuhanAreaModel;
-use App\Models\MesinPlanningModel;
-use App\Models\DetailPlanningModel;
-use App\Models\TanggalPlanningModel;
-use App\Models\EstimatedPlanningModel;
-use App\Models\AksesModel;/*  */
 use App\Services\orderServices;
 use CodeIgniter\HTTP\RequestInterface;
 use LengthException;
@@ -27,15 +13,6 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\{Border, Alignment, Fill, NumberFormat};
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use App\Models\EstSpkModel;
-use App\Models\BsModel;
-use App\Models\AreaMachineModel;
-use App\Models\BsMesinModel;
-use App\Models\MesinPerStyle;
-use App\Models\MesinPernomor;
-use App\Models\MachinesModel;
-use App\Models\PpsModel;/*  */
-use App\Models\PerbaikanAreaModel;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use DateTime;
@@ -52,59 +29,12 @@ use PhpOffice\PhpSpreadsheet\Chart\Layout;
 class ExcelController extends BaseController
 {
 
-    protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $liburModel;
-    protected $KebutuhanMesinModel;
-    protected $KebutuhanAreaModel;
-    protected $MesinPlanningModel;
-    protected $aksesModel;
-    protected $DetailPlanningModel;
-    protected $TanggalPlanningModel;
-    protected $EstimatedPlanningModel;
-    protected $orderServices;
-    protected $estspk;
-    protected $bsModel;
-    protected $areaMachineModel;
-    protected $BsMesinModel;
-    protected $MesinPerStyle;
-    protected $MesinPernomor;
-    protected $machinesModel;
-    protected $ppsModel;
-    protected $perbaikanAreaModel;
+
 
 
     public function __construct()
     {
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->liburModel = new LiburModel();
-        $this->KebutuhanMesinModel = new KebutuhanMesinModel();
-        $this->KebutuhanAreaModel = new KebutuhanAreaModel();
-        $this->MesinPlanningModel = new MesinPlanningModel();
-        $this->aksesModel = new AksesModel();
-        $this->DetailPlanningModel = new DetailPlanningModel();
-        $this->TanggalPlanningModel = new TanggalPlanningModel();
-        $this->EstimatedPlanningModel = new EstimatedPlanningModel();
-        $this->orderServices = new orderServices();
-        $this->estspk = new EstSpkModel();
-        $this->bsModel = new BsModel();
-        $this->areaMachineModel = new AreaMachineModel();
-        $this->BsMesinModel = new BsMesinModel();
-        $this->MesinPerStyle = new MesinPerStyle();
-        $this->MesinPernomor = new MesinPernomor();
-        $this->machinesModel = new MachinesModel();
-        $this->ppsModel = new PpsModel();
-        $this->perbaikanAreaModel = new PerbaikanAreaModel();
+
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -3613,7 +3543,7 @@ class ExcelController extends BaseController
 
         // Kalau area dipilih, baru ambil data listRetur
         if (!empty($area)) {
-            $listReturUrl = 'http://172.23.44.14/MaterialSystem/public/api/listRetur/' . $area . '?tglBuat=' . $tglRetur;
+            $listReturUrl = api_url('material') . 'listRetur/' . $area . '?tglBuat=' . $tglRetur;
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $listReturUrl);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -3644,7 +3574,7 @@ class ExcelController extends BaseController
 
                 // 🔹 Query massal (1x per jenis data)
                 $qtyOrderList = $this->ApsPerstyleModel->getAllSisaPerSize($area, $noModels, $sizes);
-                $bsMesinList  = $this->BsMesinModel->getAllBsMesin($area, $noModels, $sizes);
+                $bsMesinList  = $this->bsMesinModel->getAllBsMesin($area, $noModels, $sizes);
                 $idApsList    = $this->ApsPerstyleModel->getAllIdForBs($area, $noModels, $sizes);
 
                 // ambil semua id aps
@@ -4194,7 +4124,7 @@ class ExcelController extends BaseController
         $tglBuat = $this->request->getGet('tgl_buat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/filterPoTambahan"
+        $apiUrl = api_url('material') . "filterPoTambahan"
             . "?area=" . urlencode($area)
             . "&model=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);
@@ -6305,7 +6235,7 @@ class ExcelController extends BaseController
             //
             $order = $this->ApsPerstyleModel->getQtyArea($noModel) ?: [];
 
-            $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/pph?model=' . urlencode($noModel);
+            $apiUrl = api_url('material') . 'pph?model=' . urlencode($noModel);
             $material = @file_get_contents($apiUrl);
 
             // $models = [];
@@ -6644,7 +6574,7 @@ class ExcelController extends BaseController
     //     $tglBuat = $this->request->getGet('tglBuat');
 
     //     // Ambil data berdasarkan area dan model
-    //     $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/listExportRetur/"
+    //     $apiUrl = api_url('material') . "listExportRetur/"
     //         . $area
     //         . "?noModel=" . urlencode($noModel)
     //         . "&tglBuat=" . urlencode($tglBuat);
@@ -7522,7 +7452,7 @@ class ExcelController extends BaseController
         $tglBuat = $this->request->getGet('tglBuat');
 
         // Ambil data berdasarkan area dan model
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/listExportRetur/"
+        $apiUrl = api_url('material') . "listExportRetur/"
             . $area
             . "?noModel=" . urlencode($noModel)
             . "&tglBuat=" . urlencode($tglBuat);
@@ -7591,7 +7521,7 @@ class ExcelController extends BaseController
             $kgPoList[$keyStyle] = ($qty_order * $composition * $gw / 100 / 1000) * (1 + ($loss / 100));
 
             // --- BS MESIN ---
-            $bs = $this->BsMesinModel->getBsMesin($area, $noModel, [$style]);
+            $bs = $this->bsMesinModel->getBsMesin($area, $noModel, [$style]);
             $bsGram = is_array($bs) ? ($bs['bs_gram'] ?? 0) : ($bs->bs_gram ?? 0);
             $bsMesinGrList[$keyStyle] = (float)$bsGram;
             $bsMesinDzList[$keyStyle] = (float)$bsGram / $gw / 24;
@@ -8722,8 +8652,10 @@ class ExcelController extends BaseController
         $key = $this->request->getGet('key');
         $tanggalAwal = $this->request->getGet('tanggal_awal');
         $tanggalAkhir = $this->request->getGet('tanggal_akhir');
+        $poPlus = $this->request->getGet('po_plus');
 
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir;
+        $apiUrl = api_url('material') . 'filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir . '&po_plus=' . $poPlus;
+
         $material = @file_get_contents($apiUrl);
 
         // $models = [];
@@ -8737,22 +8669,28 @@ class ExcelController extends BaseController
 
         // Judul
         $sheet->setCellValue('A1', 'Datang Benang');
-        $sheet->mergeCells('A1:U1'); // Menggabungkan sel untuk judul
+        $sheet->mergeCells('A1:V1'); // Menggabungkan sel untuk judul
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         // Header
-        $header = ["No", "Foll Up", "No Model", "No Order", "Buyer", "Delivery Awal", "Delivery Akhir", "Order Type", "Item Type", "Kode Warna", "Warna", "KG Pesan", "Tanggal Datang", "Kgs Datang", "Cones Datang", "LOT Datang", "No Surat Jalan", "LMD", "GW", "Harga", "Nama Cluster"];
+        $header = ["No", "Foll Up", "No Model", "No Order", "Buyer", "Delivery Awal", "Delivery Akhir", "Order Type", "Item Type", "Kode Warna", "Warna", "KG Pesan", "Tanggal Datang", "Kgs Datang", "Cones Datang", "LOT Datang", "No Surat Jalan", "LMD", "GW", "Harga", "Nama Cluster", "Po Tambahan"];
         $sheet->fromArray([$header], NULL, 'A3');
 
         // Styling Header
-        $sheet->getStyle('A3:U3')->getFont()->setBold(true);
-        $sheet->getStyle('A3:U3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A3:U3')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A3:V3')->getFont()->setBold(true);
+        $sheet->getStyle('A3:V3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A3:V3')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
         // Data
         $row = 4;
         foreach ($data as $index => $item) {
+            $getPoPlus = $item['po_plus'];
+            if ($getPoPlus == 1) {
+                $poPlus = 'YA';
+            } else {
+                $poPlus = '';
+            }
             $sheet->fromArray([
                 [
                     $index + 1,
@@ -8767,7 +8705,7 @@ class ExcelController extends BaseController
                     $item['kode_warna'],
                     $item['warna'],
                     number_format($item['kgs_material'], 2),
-                    $item['tgl_masuk'],
+                    $item['tgl_datang'],
                     number_format($item['kgs_kirim'], 2),
                     $item['cones_kirim'],
                     $item['lot_kirim'],
@@ -8775,7 +8713,8 @@ class ExcelController extends BaseController
                     $item['l_m_d'],
                     number_format($item['gw_kirim'], 2),
                     number_format($item['harga'], 2),
-                    $item['nama_cluster']
+                    $item['nama_cluster'],
+                    $poPlus,
                 ]
             ], NULL, 'A' . $row);
             $row++;
@@ -8790,16 +8729,16 @@ class ExcelController extends BaseController
                 ],
             ],
         ];
-        $sheet->getStyle('A3:U' . ($row - 1))->applyFromArray($styleArray);
+        $sheet->getStyle('A3:V' . ($row - 1))->applyFromArray($styleArray);
 
         // Set auto width untuk setiap kolom
-        foreach (range('A', 'U') as $column) {
+        foreach (range('A', 'V') as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
 
         // Set isi tabel agar rata tengah
-        $sheet->getStyle('A4:U' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A4:U' . ($row - 1))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A4:V' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A4:V' . ($row - 1))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
         $writer = new Xlsx($spreadsheet);
         $fileName = 'Report_Datang_Benang_' . date('Y-m-d') . '.xlsx';
@@ -8815,7 +8754,7 @@ class ExcelController extends BaseController
     {
         $key = $this->request->getGet('key');
 
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterPoBenang?key=' . urlencode($key);
+        $apiUrl = api_url('material') . 'filterPoBenang?key=' . urlencode($key);
         $material = @file_get_contents($apiUrl);
 
         // $models = [];
@@ -8902,7 +8841,7 @@ class ExcelController extends BaseController
         $tanggalAwal = $this->request->getGet('tanggal_awal');
         $tanggalAkhir = $this->request->getGet('tanggal_akhir');
 
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterPengiriman?key=' . urlencode($key) . '&tanggal_awal=' . urlencode($tanggalAwal) . '&tanggal_akhir=' . urlencode($tanggalAkhir);
+        $apiUrl = api_url('material') . 'filterPengiriman?key=' . urlencode($key) . '&tanggal_awal=' . urlencode($tanggalAwal) . '&tanggal_akhir=' . urlencode($tanggalAkhir);
         $material = @file_get_contents($apiUrl);
 
         // $models = [];
@@ -9081,7 +9020,7 @@ class ExcelController extends BaseController
     {
         $key = $this->request->getGet('key');
         $jenis = $this->request->getGet('jenis');
-        $base  = 'http://172.23.44.14/MaterialSystem/public/api/';
+        $base  = api_url('material') . '';
 
         // FUNGSINYA: ambil API sekali panggil
         $getApi = function ($endpoint) use ($base, $key, $jenis) {
@@ -9628,7 +9567,7 @@ class ExcelController extends BaseController
 
                 $footerRow = $lastRow + 2;
                 $newSheet->mergeCells("A{$footerRow}:P{$footerRow}");
-                $newSheet->setCellValue("A{$footerRow}", 'REPORT (+)DATANG SOLID');
+                $newSheet->setCellValue("A{$footerRow}", 'REPORT (+) DATANG LUREX');
                 $newSheet->getStyle("A{$footerRow}")->getFont()->setBold(true)->setSize(10);
                 $newSheet->getStyle("A{$footerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             }
@@ -9663,21 +9602,22 @@ class ExcelController extends BaseController
                 $row = 4;
                 $no = 1;
                 foreach ($data['returGbn'] as $item) {
+                    // dd($data['returGbn']);
                     $newSheet->setCellValue('A' . $row, $no++);
-                    $newSheet->setCellValue('B' . $row, $item['no_model'] ?: '-');
-                    $newSheet->setCellValue('C' . $row, $item['item_type'] ?: '-');
-                    $newSheet->setCellValue('D' . $row, $item['kode_warna'] ?: '-');
-                    $newSheet->setCellValue('E' . $row, $item['warna'] ?: '-');
-                    $newSheet->setCellValue('F' . $row, $item['area_retur']);
-                    $newSheet->setCellValue('G' . $row, $item['tgl_retur'] ?: '-');
-                    $newSheet->setCellValue('H' . $row, $item['nama_cluster']);
-                    $newSheet->setCellValue('I' . $row, isset($item['kgs_retur']) ? number_format($item['kgs_retur'], 2, '.', '') : 0);
-                    $newSheet->setCellValue('J' . $row, $item['cns_retur'] ?: 0);
-                    $newSheet->setCellValue('K' . $row, $item['krg_retur'] ?: 0);
-                    $newSheet->setCellValue('L' . $row, $item['lot_retur'] ?: '-');
-                    $newSheet->setCellValue('M' . $row, $item['kategori'] ?: '-');
-                    $newSheet->setCellValue('N' . $row, $item['keterangan_area'] ?: '-');
-                    $newSheet->setCellValue('O' . $row, $item['keterangan_gbn'] ?: '-');
+                    $newSheet->setCellValue('B' . $row, $item['no_model'] ?? '-');
+                    $newSheet->setCellValue('C' . $row, $item['item_type'] ?? '-');
+                    $newSheet->setCellValue('D' . $row, $item['kode_warna'] ?? '-');
+                    $newSheet->setCellValue('E' . $row, $item['warna'] ?? '-');
+                    $newSheet->setCellValue('F' . $row, 'GUDANG BENANG');
+                    $newSheet->setCellValue('G' . $row, $item['tgl_retur'] ?? '-');
+                    $newSheet->setCellValue('H' . $row, $item['cluster_old']);
+                    $newSheet->setCellValue('I' . $row, isset($item['kgs']) ? number_format($item['kgs'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('J' . $row, $item['cns'] ?? 0);
+                    $newSheet->setCellValue('K' . $row, $item['krg'] ?? 0);
+                    $newSheet->setCellValue('L' . $row, $item['lot'] ?? '-');
+                    $newSheet->setCellValue('M' . $row, $item['nama_kategori'] ?? '-');
+                    $newSheet->setCellValue('N' . $row, $item['keterangan_area'] ?? '-');
+                    $newSheet->setCellValue('O' . $row, $item['keterangan_gbn'] ?? '-');
                     $row++;
                 }
 
@@ -10132,11 +10072,11 @@ class ExcelController extends BaseController
                 $no = 1;
                 foreach ($data['dipindah'] as $item) {
                     $newSheet->setCellValue('A' . $row, $no++);
-                    $newSheet->setCellValue('B' . $row, $item['no_model_old'] ?: '-');
-                    $newSheet->setCellValue('C' . $row, $delivery[0]['delivery'] ?: '-');
-                    $newSheet->setCellValue('D' . $row, $item['item_type'] ?: '-');
-                    $newSheet->setCellValue('E' . $row, $item['kode_warna'] ?: '-');
-                    $newSheet->setCellValue('F' . $row, $item['warna'] ?: '-');
+                    $newSheet->setCellValue('B' . $row, $item['no_model_old'] ?? '-');
+                    $newSheet->setCellValue('C' . $row, $delivery[0]['delivery'] ?? '-');
+                    $newSheet->setCellValue('D' . $row, $item['item_type'] ?? '-');
+                    $newSheet->setCellValue('E' . $row, $item['kode_warna'] ?? '-');
+                    $newSheet->setCellValue('F' . $row, $item['warna'] ?? '-');
                     $newSheet->setCellValue('G' . $row, $item['kgs']);
                     $newSheet->setCellValue('H' . $row, $item['cns']);
                     $newSheet->setCellValue('I' . $row, $item['lot']);
@@ -10201,7 +10141,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterSisaPakai?bulan=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna) . '&jenis=' . urlencode($jenis);
+        $apiUrl = api_url('material') . 'filterSisaPakai?bulan=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna) . '&jenis=' . urlencode($jenis);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -10369,11 +10309,16 @@ class ExcelController extends BaseController
     }
     public function exportHistoryPindahOrder()
     {
-        $noModel   = $this->request->getGet('model')     ?? '';
+        $noModelOld   = $this->request->getGet('model_old') ?? '';
+        $noModelNew   = $this->request->getGet('model_new') ?? '';
         $kodeWarna = $this->request->getGet('kode_warna') ?? '';
 
         // 1) Ambil data
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/historyPindahOrder?model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = api_url('material') . 'historyPindahOrder'
+            . '?no_model_old=' . urlencode($noModelOld)
+            . '&no_model_new=' . urlencode($noModelNew)
+            . '&kode_warna='   . urlencode($kodeWarna);
+
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -10478,13 +10423,13 @@ class ExcelController extends BaseController
             $sheet->setCellValue('C' . $row, $data['delivery_awal']);
             $sheet->setCellValue('D' . $row, $data['delivery_akhir']);
             $sheet->setCellValue('E' . $row, $data['item_type']);
-            $sheet->setCellValue('F' . $row, $data['kode_warna']);
-            $sheet->setCellValue('G' . $row, $data['warna']);
+            $sheet->setCellValue('F' . $row, $data['kode_warna_old']);
+            $sheet->setCellValue('G' . $row, $data['warna_old']);
             $sheet->setCellValue('H' . $row, $data['kgs']);
             $sheet->setCellValue('I' . $row, $data['cns']);
             $sheet->setCellValue('J' . $row, $data['lot']);
             $sheet->setCellValue('K' . $row, $data['cluster_old']);
-            $sheet->setCellValue('L' . $row, $data['created_at'] . ' ' . $data['keterangan'] . ' KE ' . $data['no_model_new'] . ' KODE ' . $data['kode_warna']);
+            $sheet->setCellValue('L' . $row, $data['created_at'] . ' ' . $data['keterangan'] . ' KE ' . $data['no_model_new'] . ' KODE ' . $data['kode_warna_new']);
 
             // style body
             $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
@@ -10527,7 +10472,7 @@ class ExcelController extends BaseController
             $tglAwal   = date('Y-m-01', $timestamp);
             $tglAkhir  = date('Y-m-t', $timestamp);
         }
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/filterBenangMingguan?tanggal_awal=' . urlencode($tglAwal) . '&tanggal_akhir=' . urlencode($tglAkhir);
+        $apiUrl = api_url('material') . 'filterBenangMingguan?tanggal_awal=' . urlencode($tglAwal) . '&tanggal_akhir=' . urlencode($tglAkhir);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -10898,7 +10843,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangBenang?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = api_url('material') . 'reportSisaDatangBenang?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -11089,7 +11034,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangNylon?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = api_url('material') . 'reportSisaDatangNylon?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -11280,7 +11225,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangSpandex?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = api_url('material') . 'reportSisaDatangSpandex?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -11471,7 +11416,7 @@ class ExcelController extends BaseController
             'Desember' => 12
         ];
         $bulan = $bulanMap[$delivery] ?? null;
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/reportSisaDatangKaret?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = api_url('material') . 'reportSisaDatangKaret?delivery=' . urlencode($bulan) . '&no_model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -11715,7 +11660,7 @@ class ExcelController extends BaseController
         $sheet->getStyle('A1:M1')->applyFromArray($styleTitle);
         // Tulis header
         $sheet->setCellValue('A3', 'TGL BOOKING');
-        $sheet->setCellValue('B3', 'NO Booking');
+        $sheet->setCellValue('B3', 'NO BOOKING');
         $sheet->setCellValue('C3', 'PRODUCT');
         $sheet->setCellValue('D3', 'TYPE');
         $sheet->setCellValue('E3', 'NO ORDER');
@@ -11729,7 +11674,8 @@ class ExcelController extends BaseController
         $sheet->setCellValue('M3', 'QTY');
         $sheet->setCellValue('N3', 'SISA');
         $sheet->setCellValue('O3', 'DESCRIPTION');
-        $sheet->setCellValue('P3', 'KETERANGAN');
+        $sheet->setCellValue('P3', 'PROSES ROUTE');
+        $sheet->setCellValue('Q3', 'KETERANGAN');
         $sheet->getStyle('A3')->applyFromArray($styleHeader);
         $sheet->getStyle('B3')->applyFromArray($styleHeader);
         $sheet->getStyle('C3')->applyFromArray($styleHeader);
@@ -11746,6 +11692,7 @@ class ExcelController extends BaseController
         $sheet->getStyle('N3')->applyFromArray($styleHeader);
         $sheet->getStyle('O3')->applyFromArray($styleHeader);
         $sheet->getStyle('P3')->applyFromArray($styleHeader);
+        $sheet->getStyle('Q3')->applyFromArray($styleHeader);
 
 
         // Tulis data mulai dari baris 2
@@ -11776,7 +11723,8 @@ class ExcelController extends BaseController
             $sheet->setCellValue('M' . $row, number_format($item['qty_booking'] / 24, 2, '.', ''));
             $sheet->setCellValue('N' . $row, number_format($item['sisa_booking'] / 24, 2, '.', ''));
             $sheet->setCellValue('O' . $row, $item['desc']);
-            $sheet->setCellValue('P' . $row, $item['keterangan']);
+            $sheet->setCellValue('P' . $row, $item['proses_route']);
+            $sheet->setCellValue('Q' . $row, $item['keterangan']);
             // 
             $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
@@ -11794,12 +11742,13 @@ class ExcelController extends BaseController
             $sheet->getStyle('N' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('O' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('P' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('Q' . $row)->applyFromArray($styleBody);
 
             $row++;
         }
 
         // Set lebar kolom agar menyesuaikan isi
-        foreach (range('A', 'P') as $col) {
+        foreach (range('A', 'Q') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
@@ -12190,7 +12139,7 @@ class ExcelController extends BaseController
     //     unset($info);
 
     //     // ============= HITUNG TOTAL ALL ===============
-    //     $ttlMcArray = $this->areaMachineModel->getTotalMc($area);
+    //     $ttlMcArray = $this->areaMcModel->getTotalMc($area);
     //     $ttlMc = isset($ttlMcArray['total_mc']) ? intval($ttlMcArray['total_mc']) : 0;
 
     //     // Inisialisasi total keseluruhan
@@ -12899,7 +12848,7 @@ class ExcelController extends BaseController
         unset($info);
 
         // ============= HITUNG TOTAL ALL ===============
-        $ttlMcArray = $this->areaMachineModel->getTotalMc($area);
+        $ttlMcArray = $this->areaMcModel->getTotalMc($area);
         $ttlMc = isset($ttlMcArray['total_mc']) ? intval($ttlMcArray['total_mc']) : 0;
 
         // Inisialisasi total keseluruhan
@@ -13088,7 +13037,8 @@ class ExcelController extends BaseController
                 $sheet->setCellValue('D' . $rowNow, number_format($item['shift_a'] / 24, 2));
                 $sheet->setCellValue('E' . $rowNow, number_format($item['shift_b'] / 24, 2));
                 $sheet->setCellValue('F' . $rowNow, number_format($item['shift_c'] / 24, 2));
-                $sheet->setCellValue('G' . $rowNow, number_format($item['qty_produksi'], 2));
+                $sheet->setCellValue('G' . $rowNow, number_format($item['qty_produksi'] / 24, 2));
+                $sheet->setCellValue('G' . $rowNow, number_format($item['qty_produksi'] / 24, 2));
                 $sheet->getRowDimension($rowNow)->setRowHeight(29);
                 $sheet->getStyle('A' . $rowNow . ':G' . $rowNow)->applyFromArray([
                     'alignment' => ['horizontal' => 'center', 'vertical' => 'center'],
@@ -13453,8 +13403,7 @@ class ExcelController extends BaseController
 
         foreach ($getPdk as $pdk) {
             $modelData = $this->orderModel->getModelData($pdk);
-            $ppsData   = $this->ApsPerstyleModel->getPpsData($pdk);
-
+            $ppsData   = $this->ApsPerstyleModel->getPpsData($pdk['model'], $pdk['area']);
             foreach ($ppsData as $pps) {
                 $sheet->setCellValue("A{$row}", $no++);
                 $sheet->setCellValue("B{$row}", $modelData['no_model'] ?? '');
@@ -13514,7 +13463,7 @@ class ExcelController extends BaseController
         $noModel = $this->request->getGet('no_model');
         $warna = $this->request->getGet('warna');
 
-        $apiUrl = "http://172.23.44.14/MaterialSystem/public/api/searchStock"
+        $apiUrl = api_url('material') . "searchStock"
             . "?no_model=" . urlencode($noModel)
             . "&warna=" . urlencode($warna);
 
@@ -13638,7 +13587,7 @@ class ExcelController extends BaseController
             'search' => $search ?? ''
         ];
 
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/statusbahanbaku/?' . http_build_query($params);
+        $apiUrl = api_url('material') . 'statusbahanbaku/?' . http_build_query($params);
         $json   = @file_get_contents($apiUrl);
 
         if ($json === false) {

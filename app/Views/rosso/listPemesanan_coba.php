@@ -532,7 +532,7 @@
 
             // Kirim data ke server untuk pencarian
             $.ajax({
-                url: 'http://172.23.44.14/MaterialSystem/public/api/getUpdateListPemesanan', // Ganti dengan URL endpoint
+                url: MaterialUrl + 'getUpdateListPemesanan', // Ganti dengan URL endpoint
                 method: 'POST',
                 data: {
                     area: area,
@@ -722,7 +722,6 @@
 
             const form = event.target;
             const formData = new FormData(form);
-            const BASE_URL = "http://172.23.44.14/CapacityApps/public/";
 
             // Konversi FormData ke JSON tanpa "[]"
             const payload = {};
@@ -733,7 +732,7 @@
             });
             console.log(payload);
 
-            fetch('http://172.23.44.14/MaterialSystem/public/api/updateListPemesanan', {
+            fetch(MaterialUrl + 'updateListPemesanan', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -848,7 +847,7 @@
                 };
 
                 // Kirim data ke server menggunakan AJAX
-                fetch("http://172.23.44.14/MaterialSystem/public/api/kirimPemesanan", {
+                fetch(MaterialUrl + "kirimPemesanan", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",

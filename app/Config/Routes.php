@@ -14,6 +14,7 @@ $routes->post('authverify', 'AuthController::login');
 // chart
 $routes->get('chart/getProductionData', 'ProduksiController::getProductionData');
 $routes->get('chart/getBsData', 'ProduksiController::getBsData');
+$routes->get('chart/getPerbaikan', 'DeffectController::getPerbaikan');
 $routes->get('chart/getBsMesin', 'DeffectController::getBsMesin');
 $routes->get('chart/dashboardData', 'GodController::dashboardData');
 $routes->get('chart/getDailyProd', 'GodController::getDailyProd');
@@ -43,7 +44,7 @@ $routes->group(
         $routes->get('exportPlanningJlMc/(:any)', 'PlanningJalanMcController::excelPlanningJlMc/$1');
         $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
         $routes->get('retur/(:any)', 'ReturController::index/$1');
-        $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
+        // $routes->get('filterRetur/(:any)', 'ReturController::dataRetur/$1');
         $routes->post('pengajuanRetur/(:any)', 'ReturController::pengajuanRetur/$1');
         $routes->get('getKategoriRetur', 'ReturController::getKategoriRetur');
         $routes->get('getKodeWarnaWarnaByItemType', 'ReturController::getKodeWarnaWarnaByItemType');
@@ -70,6 +71,8 @@ $routes->group(
         $routes->get('getNotif/(:any)', 'ApiController::getNotifAduan/$1');
         $routes->get('ExportPengaduan/(:num)', 'ApiController::ExportPengaduan/$1');
 
+        // update supermarket area
+        $routes->post('repeatSupermarket', 'ApiController::repeatSupermarket');
 
         $routes->get('getQtyOrderBulk', 'ApiController::getQtyOrderBulk');
 
@@ -84,7 +87,15 @@ $routes->group(
         // proftype
         $routes->get('getProductType', 'ApiController::getProductType');
 
+        // jatah bahan baku
         $routes->get('getQtyOrderPerArea', 'ApiController::getQtyOrderPerArea');
+
+
+        // APLIKASI WMS
+        $routes->post('getAllDataOrder', 'ApiController::getAllDataOrder');
+        $routes->get('getDetailOrder', 'ApiController::getDetailOrder');
+        $routes->get('getOrderStatus', 'ApiController::getOrderStatus');
+        $routes->get('getDataOrderFetch', 'ApiController::getDataOrderFetch');
     }
 );
 
@@ -322,6 +333,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->get('warehouse/reportKebutuhanBahanBaku', 'MaterialController::reportKebutuhanBahanBaku');
     $routes->get('exportMaterialPDK', 'ExcelController::exportMaterialPDK');
 
+    $routes->get('exportBsMesinPerbulan/(:any)/(:any)', 'SummaryController::summaryBsMesinPerbulan/$1/$2');
 
     //pph
     $routes->get('pph/(:any)', 'MaterialController::pph/$1');
@@ -422,11 +434,11 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('mesinPerJarum/(:any)', 'MesinController::mesinPerJarumPlan/$1');
     $routes->get('mesinperarea/(:any)', 'MesinController::mesinperareaPlan/$1');
     $routes->get('stockcylinder', 'MesinController::stockcylinderPlan');
-    $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarumPlan/$1/$2');
+    $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarum/$1/$2');
     $routes->get('datamesinperarea/(:any)', 'MesinController::DetailMesinPerAreaPlan/$1');
     $routes->post('capacityperarea/(:any)', 'MesinController::capacityperarea/$1');
     $routes->post('deletemesinareal/(:any)', 'MesinController::deletemesinarealPlan/$1');
-    $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarumPlan/$1');
+    $routes->post('updatemesinperjarum/(:any)', 'MesinController::updatemesinperjarum/$1');
     $routes->post('tambahmesinperarea', 'MesinController::inputmesinperareaPlan');
     $routes->post('tambahmesinperjarum', 'MesinController::inputmesinperjarumPlan');
     $routes->post('addcylinder', 'MesinController::inputcylinderPlan');
@@ -478,7 +490,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('pps', 'ApsController::pps');
     $routes->get('ppsDetail/(:any)', 'ApsController::ppsDetail/$1');
     $routes->post('updatePps', 'ApsController::updatePps');
-    $routes->get('exportPps/(:any)', 'excelController::exportPps/$1');
+    $routes->get('exportPps/(:any)', 'ExcelController::exportPps/$1');
 
     // produksi
     $routes->get('dataproduksi', 'ProduksiController::viewProduksi');
@@ -494,6 +506,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     //summary
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
     $routes->post('exportSummaryPerTod', 'SummaryController::excelSummaryPerTod');
+    $routes->get('exportBsMesinPerbulan/(:any)/(:any)', 'SummaryController::summaryBsMesinPerbulan/$1/$2');
 
     //summary produksi
     $routes->post('summaryProdPerTanggal', 'ProduksiController::summaryProdPerTanggal');
@@ -511,6 +524,16 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('datadeffect', 'DeffectController::datadeffect');
     $routes->post('inputKode', 'DeffectController::inputKode');
     $routes->post('viewDataBs', 'DeffectController::viewDataBs');
+
+    // bs mesin
+    $routes->get('bsmesin', 'UserController::bsmesin');
+    $routes->get('bsMesinPerbulan/(:any)/(:any)', 'UserController::bsMesinPerbulan/$1/$2');
+
+    // perbaikan
+    $routes->get('perbaikanArea', 'DeffectController::perbaikanArea');
+    $routes->post('viewPerbaikan', 'DeffectController::viewPerbaikan');
+    $routes->post('exportExcelPerbaikan', 'ExcelController::exportExcelPerbaikan');
+    $routes->post('summaryGlobalPbArea', 'ExcelController::summaryGlobalPbArea');
 
 
     //bahanbakyu
@@ -643,7 +666,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('mesinPerJarum/(:any)', 'MesinController::mesinPerJarumPlan/$1');
     $routes->get('mesinperarea', 'MesinController::mesinperareaAps');
     $routes->get('stockcylinder', 'MesinController::stockcylinderPlan');
-    $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarumPlan/$1/$2');
+    $routes->get('datamesinperjarum/(:any)/(:any)', 'MesinController::DetailMesinPerJarum/$1/$2');
     $routes->get('datamesinperarea/(:any)', 'MesinController::DetailMesinPerAreaPlan/$1');
     $routes->post('deletemesinareal/(:any)', 'MesinController::deletemesinarealPlan/$1');
     $routes->post('deletemesinpernomor/(:any)', 'MesinController::deletemesinpernomor/$1');
@@ -728,13 +751,23 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('pps', 'ApsController::pps');
     $routes->get('ppsDetail/(:any)', 'ApsController::ppsDetail/$1');
     $routes->post('updatePps', 'ApsController::updatePps');
-    $routes->get('exportPps/(:any)', 'excelController::exportPps/$1');
+    $routes->get('exportPps/(:any)', 'ExcelController::exportPps/$1');
 
 
     // deffect
     $routes->get('datadeffect', 'DeffectController::datadeffect');
     $routes->post('inputKode', 'DeffectController::inputKode');
     $routes->post('viewDataBs', 'DeffectController::viewDataBs');
+
+    // bs mesin
+    $routes->get('bsmesin', 'UserController::bsmesin');
+    $routes->get('bsMesinPerbulan/(:any)/(:any)', 'UserController::bsMesinPerbulan/$1/$2');
+
+    // perbaikan
+    $routes->get('perbaikanArea', 'DeffectController::perbaikanArea');
+    $routes->post('viewPerbaikan', 'DeffectController::viewPerbaikan');
+    $routes->post('exportExcelPerbaikan', 'ExcelController::exportExcelPerbaikan');
+    $routes->post('summaryGlobalPbArea', 'ExcelController::summaryGlobalPbArea');
 
     //bahanbakyu
     $routes->get('stockbb', 'MaterialController::stockbb');
@@ -948,6 +981,10 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('stockareaInStock/(:any)', 'MaterialController::inStock/$1');
     $routes->post('stockarea/outStock', 'MaterialController::outStock');
     $routes->post('stockarea/saveStock', 'MaterialController::saveStock');
+    $routes->get('stockareaFromMc/(:any)', 'MaterialController::stockareaFromMc/$1');
+    $routes->get('getNoModelList', 'MaterialController::getNoModelList');
+    $routes->get('getLotByList', 'MaterialController::getLotByList');
+    $routes->post('saveStockareaFromMc', 'MaterialController::saveStockareaFromMc');
 
 
     //pph

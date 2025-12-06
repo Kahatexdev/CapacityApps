@@ -11,7 +11,6 @@ use App\Models\ProductTypeModel;
 use App\Models\ApsPerstyleModel;
 use App\Models\ProduksiModel;
 use App\Models\BsMesinModel;
-use App\Models\PenggunaanJarum;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpParser\Node\Stmt\Return_;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -22,28 +21,10 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class UserController extends BaseController
 {
-    protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $liburModel;
-    protected $BsMesinModel;
-    protected $PenggunaanJarumModel;
+
     public function __construct()
     {
 
-
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->BsMesinModel = new BsMesinModel();
-        $this->PenggunaanJarumModel = new PenggunaanJarum();
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -70,6 +51,7 @@ class UserController extends BaseController
         $dataBuyer = $this->orderModel->getBuyer();
         $dataArea = $this->jarumModel->getArea();
         $dataJarum = $this->jarumModel->getJarum();
+
         $data = [
             'role' => session()->get('role'),
             'title' => 'Dashboard',
@@ -166,7 +148,7 @@ class UserController extends BaseController
             $month[] = date('F-Y', strtotime("first day of $i month"));
         }
 
-        $apiUrl = 'http://172.23.44.14/HumanResourceSystem/public/api/area/' . $area;
+        $apiUrl = api_url('hris') . '/area/' . $area;
 
         try {
             // Attempt to fetch the API response
@@ -195,6 +177,10 @@ class UserController extends BaseController
             log_message('error', 'Error fetching API data: ' . $e->getMessage());
         }
 
+        $listArea = $this->jarumModel->getArea();
+
+        $listArea = $this->jarumModel->getArea();
+
         // Prepare data for the view
         $data = [
             'role' => session()->get('role'),
@@ -215,6 +201,8 @@ class UserController extends BaseController
             'buyer' => $dataBuyer,
             'area' => $dataArea,
             'jarum' => $dataJarum,
+            'listArea' => $listArea,
+            'listArea' => $listArea,
         ];
         return view(session()->get('role') . '/bsmesin', $data);
     }
@@ -301,7 +289,7 @@ class UserController extends BaseController
         }
 
         // Batch insert data ke database
-        if ($this->BsMesinModel->insertBatch($details)) {
+        if ($this->bsMesinModel->insertBatch($details)) {
             return $this->response->setJSON([
                 'success' => true,
                 'message' => 'Data berhasil disimpan.',
@@ -321,7 +309,7 @@ class UserController extends BaseController
             $month[] = date('F-Y', strtotime("first day of $i month"));
         }
 
-        $apiUrl = 'http://172.23.44.14/HumanResourceSystem/public/api/area/' . $area;
+        $apiUrl = api_url('hris') . '/area/' . $area;
 
         try {
             // Attempt to fetch the API response
@@ -410,11 +398,11 @@ class UserController extends BaseController
     public function bsMesinPerbulan($area, $bulan)
     {
         $buyer = $this->request->getGet('buyer') ?? '';
-        // $bsPerbulan = $this->BsMesinModel->bsMesinPerbulan($area, $bulan);
-        $bsPerbulan = $this->BsMesinModel->bsMesinPerbulan2($area, $bulan, $buyer);
-        $totalBsGram = $this->BsMesinModel->totalGramPerbulan($area, $bulan, $buyer);
-        $totalBsPcs = $this->BsMesinModel->totalPcsPerbulan($area, $bulan, $buyer);
-        $chartData = $this->BsMesinModel->ChartPdk($area, $bulan, $buyer);
+        // $bsPerbulan = $this->bsMesinModel->bsMesinPerbulan($area, $bulan);
+        $bsPerbulan = $this->bsMesinModel->bsMesinPerbulan2($area, $bulan, $buyer);
+        $totalBsGram = $this->bsMesinModel->totalGramPerbulan($area, $bulan, $buyer);
+        $totalBsPcs = $this->bsMesinModel->totalPcsPerbulan($area, $bulan, $buyer);
+        $chartData = $this->bsMesinModel->ChartPdk($area, $bulan, $buyer);
         $buyerList = $this->orderModel->getBuyer();
 
 
@@ -431,7 +419,7 @@ class UserController extends BaseController
         $dataOrder = array_values($dataOrder);
 
         // get data gw aktual / gw MU
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/getAllGw';
+        $apiUrl = api_url('material') . 'getAllGw';
         // Kirim data ke API pakai CodeIgniter HTTP client
         $dataGw = service('curlrequest')->post($apiUrl, [
             'json' => $dataOrder
@@ -461,19 +449,17 @@ class UserController extends BaseController
                 }
             }
             if ($gwValue == 0) {
-                log_message('warning', "⚠️ GW tidak ditemukan untuk {$noModel} / {$size}");
+                log_message('warning', "âš ï¸ GW tidak ditemukan untuk {$noModel} / {$size}");
+            } else {
+                $bsGram = $bs['qty_gram'] > 0 ? round($bs['qty_gram'] / $gwValue) : 0;
+                $bsPcs  = $bs['qty_pcs'] + $bsGram;
+                // $totalBsDz = round($bsPcs / 24);
             }
-
-            $bsGram = $bs['qty_gram'] > 0 ? round($bs['qty_gram'] / $gwValue) : 0;
-            $bsPcs = $bs['qty_pcs'] + $bsGram;
-            $totalBsDz = round($bsPcs / 24);
-
-            // tambahkan gw ke data bs
             $bs['totalBsMc'] = $bsPcs;
         }
         unset($bs); // good practice
 
-        // --- 🔽 Sekarang group berdasarkan nama_karyawan ---
+        // --- ðŸ”½ Sekarang group berdasarkan nama_karyawan ---
         $groupedByKaryawan = [];
 
         foreach ($bsPerbulan as $row) {
@@ -736,7 +722,7 @@ class UserController extends BaseController
         $awal = $this->request->getPost('awal');
         $akhir = $this->request->getPost('akhir');
 
-        $delete = $this->BsMesinModel->deleteBsRange($area, $awal, $akhir);
+        $delete = $this->bsMesinModel->deleteBsRange($area, $awal, $akhir);
 
         if ($delete) {
             return redirect()->back()->with('success', 'Data berhasil dihapus.');

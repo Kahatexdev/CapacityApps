@@ -6,24 +6,6 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use Datetime;
 
-use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
-use App\Models\LiburModel;
-use App\Models\KebutuhanMesinModel;
-use App\Models\KebutuhanAreaModel;
-use App\Models\MesinPlanningModel;
-use App\Models\DetailPlanningModel;
-use App\Models\TanggalPlanningModel;
-use App\Models\EstimatedPlanningModel;
-use App\Models\MesinPerStyle;
-use App\Models\MesinPernomor;
-use App\Models\MachinesModel;
-use App\Models\AksesModel;/*  */
-use App\Models\PpsModel;/*  */
 use App\Services\orderServices;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
@@ -31,52 +13,11 @@ use CodeIgniter\HTTP\RequestInterface;
 
 class ApsController extends BaseController
 {
-    protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $liburModel;
-    protected $KebutuhanMesinModel;
-    protected $KebutuhanAreaModel;
-    protected $MesinPlanningModel;
-    protected $aksesModel;
-    protected $DetailPlanningModel;
-    protected $TanggalPlanningModel;
-    protected $EstimatedPlanningModel;
-    protected $orderServices;
-    protected $MesinPerStyle;
-    protected $MesinPernomor;
-    protected $machinesModel;
-    protected $ppsModel;
+
 
     public function __construct()
     {
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->liburModel = new LiburModel();
-        $this->KebutuhanMesinModel = new KebutuhanMesinModel();
-        $this->KebutuhanAreaModel = new KebutuhanAreaModel();
-        $this->MesinPlanningModel = new MesinPlanningModel();
-        $this->aksesModel = new AksesModel();
-        $this->DetailPlanningModel = new DetailPlanningModel();
-        $this->TanggalPlanningModel = new TanggalPlanningModel();
-        $this->EstimatedPlanningModel = new EstimatedPlanningModel();
-        $this->MesinPerStyle = new MesinPerStyle();
-        $this->MesinPernomor = new MesinPernomor();
-        $this->machinesModel = new MachinesModel();
-        $this->ppsModel = new PpsModel();
         $this->orderServices = new orderServices();
-        if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
-            return redirect()->to(base_url('/login'));
-        }
-        $this->isLogedin();
     }
     protected function isLogedin()
     {
@@ -419,8 +360,7 @@ class ApsController extends BaseController
     }
     public function detailmodeljarum($noModel, $delivery, $jarum)
     {
-        $apsPerstyleModel = new ApsPerstyleModel(); // Create an instance of the model
-        $dataApsPerstyle = $apsPerstyleModel->detailModelJarum($noModel, $delivery, $jarum); // Call the model method
+        $dataApsPerstyle = $this->ApsPerstyleModel->detailModelJarum($noModel, $delivery, $jarum); // Call the model method
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Order',
@@ -1579,7 +1519,10 @@ class ApsController extends BaseController
 
     public function ppsDetail($pdk, $area = null)
     {
-        $modelData = $this->orderModel->getModelData($pdk);
+        $model = [
+            'model' => $pdk
+        ];
+        $modelData = $this->orderModel->getModelData($model);
         $ppsData = $this->ApsPerstyleModel->getPpsData($pdk, $area);
 
         $data = [

@@ -6,20 +6,13 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\API\ResponseTrait;
-use App\Models\PengaduanReply;
-use App\Models\PengaduanModel;
+
 
 class PengaduanController extends BaseController
 {
-    protected $replyModel;
-    protected $pengaduanModel;
 
-    public function __construct()
-    {
-        $this->pengaduanModel = new PengaduanModel();
 
-        $this->replyModel = new PengaduanReply();
-    }
+    public function __construct() {}
 
     public function index()
     {

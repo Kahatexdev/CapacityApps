@@ -1,68 +1,135 @@
-# CodeIgniter 4 Application Starter
+📦 CapacityApps — Production Capacity Management System
 
-## What is CodeIgniter?
+CapacityApps adalah aplikasi internal yang digunakan untuk mengelola kapasitas produksi, melakukan forecasting, serta membantu proses perencanaan order di pabrik (knitting, linking, dan proses lainnya). Sistem ini terintegrasi dengan beberapa service seperti Material System, HRIS, TLS, dan Warehouse Management (soon).
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+🚀 Features
+Productivity
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+Kontrol produktivitas harian, mingguan, dan bulanan.
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+Menganalisis waste dan BS untuk membantu monitoring dan pengendalian proses produksi.
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+Capacity Forecasting
 
-## Installation & updates
+Menghitung dan menampilkan kapasitas harian, mingguan, atau bulanan.
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+Perhitungan berbasis status order dan data productivity.
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+Order Planning
 
-## Setup
+Menentukan area produksi terbaik berdasarkan remaining capacity.
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+Menyusun planning mesin dan order harian.
 
-## Important Change with index.php
+Material Integration
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+Integrasi dengan Material System untuk cek ketersediaan material.
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+Mendukung proses pemesanan material otomatis.
 
-**Please** read the user guide for a better explanation of how CI4 works!
+Multi-Area Support
 
-## Repository Management
+Mendukung berbagai unit produksi dengan konfigurasi yang fleksibel.
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+API-First Architecture
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+Menggunakan CodeIgniter 4 dengan struktur modular.
 
-## Server Requirements
+Menyediakan helper untuk pemanggilan service eksternal.
 
-PHP version 7.4 or higher is required, with the following extensions installed:
+🏗️ Tech Stack
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+Backend: CodeIgniter 4
 
-> [!WARNING]
-> The end of life date for PHP 7.4 was November 28, 2022.
-> The end of life date for PHP 8.0 was November 26, 2023.
-> If you are still using PHP 7.4 or 8.0, you should upgrade immediately.
-> The end of life date for PHP 8.1 will be November 25, 2024.
+Language: PHP 8+
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+Database: MySQL/MariaDB
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+Frontend: Bootstrap / AdminLTE / Soft UI
+
+Integration: Material API, HRIS, TLS
+
+📁 Project Structure
+app/
+ ├── Config/
+ │    ├── App.php
+ │    ├── Routes.php
+ ├── Controllers/
+ ├── Models/
+ ├── Views/
+ ├── Helpers/
+ │    └── api_helper.php
+ └── Libraries/
+public/
+writable/
+
+🔧 Installation
+1. Clone Repository
+git clone <repo-url>
+cd capacityApps
+
+2. Install Dependencies
+composer install
+
+3. Setup Environment
+
+Copy file environment:
+
+cp env.example .env
+
+
+Konfigurasi minimal:
+
+app.baseURL = 'http://localhost:8080/'
+CI_ENVIRONMENT = development
+
+materialApiUrl = 'http://172.23.44.14/MaterialSystem/public/api'
+hrisApiUrl     = 'http://172.23.44.14/HumanResourceSystem/public/api'
+tlsApiUrl      = 'http://172.23.44.14/KHTEXT/public/api'
+
+4. Database Migration & Seeder
+(rahasia WLE)
+
+5. Run Development Server
+php spark serve
+
+🧩 API Helper Example
+/**
+ * Resolve API endpoint by key
+ */
+function api_url(string $key): string
+{
+    $app = config('App');
+
+    return match ($key) {
+        'material' => $app->materialApiUrl,
+        'hris'     => $app->hrisApiUrl,
+        'tls'      => $app->tlsApiUrl,
+        default    => throw new InvalidArgumentException("Unknown API key: {$key}"),
+    };
+}
+
+📝 Coding Standards
+
+Mengikuti PSR-12
+
+Query di Model dibuat minimalis
+
+Business logic diletakkan di Service / Library
+
+Setiap endpoint divalidasi melalui Request Filters
+
+🛠️ Development Workflow
+
+Buat branch baru dari dev
+
+Lakukan commit kecil dan terstruktur
+
+Buat Pull Request → review → merge ke dev
+
+Branch main hanya digunakan untuk production deploy
+
+📄 License
+
+Internal — PT. Kahatex
+Tidak untuk penggunaan publik.

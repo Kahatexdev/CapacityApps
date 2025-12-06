@@ -817,6 +817,7 @@ class ApsPerstyleModel extends Model
             $builder->where('apsperstyle.factory', $ar);
         }
         $builder->where('apsperstyle.production_unit !=', 'MJ')
+            ->where('apsperstyle.qty > 0')
             // ->where('apsperstyle.mastermodel', 'DA2549')
             ->where('MONTH(apsperstyle.delivery)', date('m', strtotime($bulan))) // Filter bulan
             ->where('YEAR(apsperstyle.delivery)', date('Y', strtotime($bulan))) // Filter tahun
@@ -1130,7 +1131,8 @@ class ApsPerstyleModel extends Model
     public function monthlyTarget($filters)
     {
         $builder = $this->select('SUM(qty) as qty, SUM(sisa) as sisa')
-            ->where('production_unit !=', 'MJ');
+            ->where('production_unit !=', 'MJ')
+            ->where('qty >', 0);
 
         if (!empty($filters['bulan'])) {
             $builder->where('MONTH(delivery)', $filters['bulan']);
@@ -1553,5 +1555,52 @@ class ApsPerstyleModel extends Model
             ->where('production_unit !=', 'mj')
             ->groupBy('mastermodel,factory,delivery')
             ->findAll();
+    }
+    public function getAllDataOrder($noModel)
+    {
+        return $this->select('data_model.kd_buyer_order, data_model.seam, data_model.description, apsperstyle.no_order, data_model.no_model, apsperstyle.factory, MIN(apsperstyle.delivery) AS delivery_awal, GROUP_CONCAT(DISTINCT apsperstyle.factory) AS list_factory, SUM(apsperstyle.qty) AS qty')
+            ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
+            ->whereIn('apsperstyle.mastermodel', $noModel)
+            ->where('apsperstyle.qty <>', 0)
+            ->groupBy('apsperstyle.mastermodel')
+            ->orderBy('data_model.kd_buyer_order, data_model.no_model', 'ASC')
+            // ->limit(100)
+            ->get()
+            ->getResultArray();
+    }
+    public function getDetailOrder($noModel)
+    {
+        return $this->select('apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.inisial, apsperstyle.size, apsperstyle.color, apsperstyle.delivery, apsperstyle.factory, SUM(apsperstyle.qty) AS qty, SUM(apsperstyle.sisa) AS sisa, SUM(apsperstyle.po_plus) AS po_plus')
+            ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
+            ->where('apsperstyle.mastermodel', $noModel)
+            ->where('apsperstyle.qty <>', 0)
+            ->groupBy('apsperstyle.mastermodel')
+            ->groupBy('apsperstyle.factory')
+            ->groupBy('apsperstyle.machinetypeid')
+            ->groupBy('apsperstyle.size')
+            ->groupBy('apsperstyle.delivery')
+            ->orderBy(' apsperstyle.delivery, apsperstyle.machinetypeid, apsperstyle.inisial, apsperstyle.factory', 'ASC')
+            // ->limit(100)
+            ->get()
+            ->getResultArray();
+    }
+    public function getStatusOrder($noModel)
+    {
+        return $this->select('apsperstyle.idapsperstyle, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.inisial, apsperstyle.size, apsperstyle.color, apsperstyle.country, apsperstyle.delivery, apsperstyle.factory, apsperstyle.qty, apsperstyle.sisa, apsperstyle.po_plus')
+            ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
+            ->where('apsperstyle.mastermodel', $noModel)
+            ->where('apsperstyle.qty <>', 0)
+            ->groupBy('apsperstyle.idapsperstyle')   // PENTING!
+            ->orderBy('apsperstyle.delivery, apsperstyle.machinetypeid, apsperstyle.inisial, apsperstyle.factory', 'ASC')
+            ->get()
+            ->getResultArray();
+    }
+    public function getDataOrderFetch($listNoModel)
+    {
+        return $this->db->table('apsperstyle')
+            ->select('idapsperstyle, inisial, size, mastermodel')
+            ->whereIn('mastermodel', $listNoModel)
+            ->get()
+            ->getResultArray();
     }
 }

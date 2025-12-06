@@ -5,14 +5,7 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\LiburModel;
-use App\Models\KebutuhanMesinModel;
-use App\Models\ProduksiModel;
+
 use CodeIgniter\Format\JSONFormatter;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpParser\Node\Expr\Cast\String_;
@@ -21,31 +14,8 @@ use function PHPUnit\Framework\returnSelf;
 
 class CalendarController extends BaseController
 {
-    protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $liburModel;
-    protected $kebMc;
 
-    public function __construct()
-    {
-        $this->kebMc = new KebutuhanMesinModel();
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->liburModel = new LiburModel();
-        if ($this->filters   = ['role' => ['capacity', 'planning', 'aps', 'god']] != session()->get('role')) {
-            return redirect()->to(base_url('/login'));
-        }
-        $this->isLogedin();
-    }
+    public function __construct() {}
     protected function isLogedin()
     {
         if (!session()->get('id_user')) {
@@ -112,7 +82,7 @@ class CalendarController extends BaseController
         $jumlahHari = ($tgl_akhir - $tgl_awal) / (60 * 60 * 24);
 
         $startDate = new \DateTime($awal);
-        $LiburModel = new LiburModel();
+        $LiburModel = $this->liburModel;
         $holidays = $LiburModel->findAll();
         $currentMonth = $startDate->format('F');
         $weekCount = 1; // Initialize week count for the first week of the month
@@ -259,8 +229,8 @@ class CalendarController extends BaseController
         $jumlahHari = ($tgl_akhir - $tgl_awal) / (60 * 60 * 24);
 
         $startDate = new \DateTime($awal);
-        $LiburModel = new LiburModel();
-        $holidays = $LiburModel->findAll();
+
+        $holidays = $this->liburModel->findAll();
         $currentMonth = $startDate->format('F');
         $weekCount = 1; // Initialize week count for the first week of the month
         $monthlyData = [];

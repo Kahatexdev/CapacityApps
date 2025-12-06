@@ -154,4 +154,35 @@ class PerbaikanAreaModel extends Model
             ->orderBy('qty', 'DESC')
             ->findAll();
     }
+    public function chartDataByMonth($bulan, $year, $area = null)
+    {
+        $builder = $this->select('master_deffect.Keterangan, sum(perbaikan_area.qty) as qty, ')
+            ->join('apsperstyle', 'apsperstyle.idapsperstyle = perbaikan_area.idapsperstyle')
+            ->join('master_deffect', 'master_deffect.kode_deffect = perbaikan_area.kode_deffect')
+            ->join('data_model', 'data_model.no_model = apsperstyle.mastermodel')
+            ->where('MONTH(tgl_perbaikan)', $bulan)
+            ->where('YEAR(tgl_perbaikan)', $year);
+
+        if (!empty($area)) {
+            $builder->where('area', $area); // pastiin kolom `area` memang ada di tabel ini
+        }
+
+        return $this->groupBy('Keterangan')
+            ->orderBy('qty', 'DESC')
+            ->findAll();
+    }
+    public function getAllPB($idAps)
+    {
+        if (empty($idAps)) return [];
+        $result = $this->select('idapsperstyle, SUM(qty) as qty')
+            ->whereIn('idapsperstyle', $idAps)
+            ->groupBy('idapsperstyle')
+            ->findAll();
+
+        $index = [];
+        foreach ($result as $r) {
+            $index[$r['idapsperstyle']] = $r['qty'];
+        }
+        return $index;
+    }
 }

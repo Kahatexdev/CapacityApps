@@ -5,64 +5,16 @@ namespace App\Controllers;
 use DateTime;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
-use App\Models\LiburModel;
-use App\Models\KebutuhanMesinModel;
-use App\Models\MesinPlanningModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\RequestInterface;
-use App\Models\DetailPlanningModel;
 use App\Services\orderServices;
-use App\Models\MonthlyMcModel;
-use App\Models\EstimatedPlanningModel;
-use App\Models\MachinesModel;
-use App\Models\BsMesinModel;
-
-
-
 
 class PlanningController extends BaseController
 {
-    protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $liburModel;
-    protected $KebutuhanMesinModel;
-    protected $MesinPlanningModel;
-    protected $orderServices;
-    protected $DetailPlanningModel;
-    protected $EstimatedPlanningModel;
-    protected $globalModel;
-    protected $machinesModel;
-    protected $bsMesinModel;
-
-
 
     public function __construct()
     {
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->liburModel = new LiburModel();
-        $this->KebutuhanMesinModel = new KebutuhanMesinModel();
-        $this->MesinPlanningModel = new MesinPlanningModel();
-        $this->DetailPlanningModel = new DetailPlanningModel();
-        $this->globalModel = new MonthlyMcModel();
-        $this->EstimatedPlanningModel = new EstimatedPlanningModel();
-        $this->machinesModel = new MachinesModel();
-        $this->bsMesinModel = new BsMesinModel();
+
 
         $this->orderServices = new orderServices();
         if ($this->filters   = ['role' => ['planning']] != session()->get('role')) {
@@ -181,7 +133,7 @@ class PlanningController extends BaseController
         $assign = $this->ApsPerstyleModel->asignarealall($data);
         $getDeliv = $this->ApsPerstyleModel->getDeliveryAwalAkhir($model);
         // Kirim ke API MaterialSystem dengan cURL
-        $apiUrl = 'http://172.23.44.14/MaterialSystem/public/api/assignArea';
+        $apiUrl = api_url('material') . 'assignArea';
         $postData = [
             'model' => $model,
             'area' => $area,
@@ -502,8 +454,7 @@ class PlanningController extends BaseController
 
         $monthlyData = [];
         $weekCount = 1; // Inisialisasi minggu
-        $LiburModel = new LiburModel();
-        $holidays = $LiburModel->findAll(); // Ambil data libur
+        $holidays = $this->liburModel->findAll(); // Ambil data libur
 
         while ($startDate <= $endDate) {
             // Tentukan akhir minggu (hari Minggu)
@@ -968,6 +919,9 @@ class PlanningController extends BaseController
                     break;
                 case 'KK9D':
                     $html = view($role . '/Planning/partials/denah_rows9D', $data);
+                    break;
+                case 'KK11M':
+                    $html = view($role . '/Planning/partials/denah_rows11M', $data);
                     break;
                 default:
                     $html = view($role . '/Planning/partials/denah_rows', $data);

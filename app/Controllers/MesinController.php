@@ -7,42 +7,15 @@ use App\Controllers\BaseController;
 use App\Database\Migrations\Machineplan;
 use App\Models\AksesModel;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
-use App\Models\CylinderModel;
-use App\Models\MachinesModel;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 
 class MesinController extends BaseController
 {
-    protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $cylinderModel;
-    protected $aksesModel;
-    protected $machinesModel;
 
     public function __construct()
     {
-        $this->aksesModel = new AksesModel();
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->cylinderModel = new cylinderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->machinesModel = new MachinesModel();
         if ($this->filters   = ['role' => ['capacity'], 'god', 'sudo'] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -499,9 +472,9 @@ class MesinController extends BaseController
         $update = $this->jarumModel->update($id, $data);
         $area = $this->request->getPost("area");
         if ($update) {
-            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('success', 'Data Berhasil Di Update');
+            return redirect()->back()->withInput()->with('success', 'Data Berhasil Di Update');
         } else {
-            return redirect()->to(base_url(session()->get('role') . '/datamesinperarea/' . $area))->withInput()->with('error', 'Gagal Update Data');
+            return redirect()->back()->withInput()->with('error', 'Gagal Update Data');
         }
     }
     public function mesinPernomor($jarum, $area)
@@ -815,6 +788,8 @@ class MesinController extends BaseController
             $mc['kapasitas'] = $mc['mesin_jalan'] * $mc['target'];
         }
         $getPU = $this->jarumModel->getpu($area);
+        $detailMc = $this->machinesModel->getDataMcArea($area);
+
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Mesin',
@@ -826,6 +801,7 @@ class MesinController extends BaseController
             'active6' => '',
             'active7' => '',
             'listjarum' => $listjarum,
+            'mesinDetail' => $detailMc,
             'area' => $area,
             'jarum' => $jarum,
             'max' => $maxCapacityPerWeek,

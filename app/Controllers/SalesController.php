@@ -5,14 +5,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Database\Migrations\TargetExport;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
-use App\Models\LiburModel;
-use App\Models\CylinderModel;
+
 use App\Models\TargetExportModel;
 // 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -25,27 +18,12 @@ use PhpParser\Node\Stmt\Echo_;
 
 class SalesController extends BaseController
 {
-    protected $filters;
-    protected $jarumModel;
-    protected $cylinderModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $liburModel;
+
     protected $targetExportModel;
 
     public function __construct()
     {
-        $this->jarumModel = new DataMesinModel();
-        $this->cylinderModel = new cylinderModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->liburModel = new LiburModel();
+
         $this->targetExportModel = new TargetExportModel();
 
         if ($this->filters   = ['role' => ['capacity']] != session()->get('role')) {

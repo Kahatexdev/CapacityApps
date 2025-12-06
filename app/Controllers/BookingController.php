@@ -5,37 +5,16 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Database\Seeds\ProductType;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\DataMesinModel;
-use App\Models\OrderModel;
-use App\Models\BookingModel;
-use App\Models\ProductTypeModel;
-use App\Models\ApsPerstyleModel;
-use App\Models\ProduksiModel;
-use App\Models\CancelModel;
-use App\Models\TransferModel;
+
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class BookingController extends BaseController
 {
-    protected $filters;
-    protected $jarumModel;
-    protected $productModel;
-    protected $produksiModel;
-    protected $bookingModel;
-    protected $orderModel;
-    protected $ApsPerstyleModel;
-    protected $cancelModel;
-    protected $liburModel;
+
+
     public function __construct()
     {
 
-        $this->jarumModel = new DataMesinModel();
-        $this->bookingModel = new BookingModel();
-        $this->productModel = new ProductTypeModel();
-        $this->produksiModel = new ProduksiModel();
-        $this->orderModel = new OrderModel();
-        $this->ApsPerstyleModel = new ApsPerstyleModel();
-        $this->cancelModel = new cancelModel();
         if ($this->filters   = ['role' => ['capacity', session()->get('role') . '', 'god', 'sudo']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }
@@ -223,8 +202,7 @@ class BookingController extends BaseController
         $totalMesin = $this->jarumModel->getTotalMesinByJarum();
         $childOrder = $this->orderModel->getChild($idBooking);
         $childBooking = $this->bookingModel->getChild($idBooking);
-        $transferModel = new TransferModel();
-        $transferData = $transferModel->getTransferData($idBooking);
+        $transferData = $this->transferModel->getTransferData($idBooking);
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Booking',
@@ -890,8 +868,8 @@ class BookingController extends BaseController
                 'qty_transfer' => $qtyTransfer,
                 'to_id' => $tujuan['id_booking']
             ];
-            $tfModel = new \App\Models\TransferModel();
-            $insert = $tfModel->insert($data);
+
+            $insert = $this->transferModel->insert($data);
 
             if ($insert) {
                 $cekKeterangan = $this->bookingModel->select('keterangan')->where('id_booking', $id_booking)->first();

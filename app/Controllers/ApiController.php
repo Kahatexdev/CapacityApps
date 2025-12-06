@@ -15,12 +15,14 @@ use App\Models\ProduksiModel;
 use App\Models\BsMesinModel;
 use App\Models\DetailPlanningModel;
 use App\Models\AreaModel;
+use App\Models\MonthlyMcModel;
 use App\Models\LiburModel;
 use App\Models\BsModel;
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use App\Models\MonthlyMcModel;
 use App\Models\PengaduanModel;
 use App\Models\MesinPerStyle;
+use App\Models\StockAreaModel;
+use App\Models\PerbaikanAreaModel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ApiController extends ResourceController
 {
@@ -32,7 +34,7 @@ class ApiController extends ResourceController
     protected $orderModel;
     protected $ApsPerstyleModel;
     protected $liburModel;
-    protected $BsMesinModel;
+    protected $bsMesinModel;
     protected $DetailPlanningModel;
     protected $areaModel;
     protected $bsModel;
@@ -40,6 +42,8 @@ class ApiController extends ResourceController
     protected $pengaduanModel;
     protected $productType;
     protected $mesinPerStyle;
+    protected $stockArea;
+    protected $perbaikanAreaModel;
 
     protected $validation;
     protected $format = 'json';
@@ -52,13 +56,15 @@ class ApiController extends ResourceController
         $this->orderModel = new OrderModel();
         $this->ApsPerstyleModel = new ApsPerstyleModel();
         $this->DetailPlanningModel = new DetailPlanningModel();
-        $this->BsMesinModel = new BsMesinModel();
+        $this->bsMesinModel = new BsMesinModel();
         $this->areaModel = new AreaModel();
         $this->bsModel = new BsModel();
         $this->globalModel = new MonthlyMcModel();
         $this->pengaduanModel = new PengaduanModel();
         $this->liburModel = new LiburModel();
         $this->mesinPerStyle = new MesinPerStyle();
+        $this->stockArea = new StockAreaModel();
+        $this->perbaikanAreaModel = new PerbaikanAreaModel();
         $this->validation = \Config\Services::validation();
     }
     public function index()
@@ -67,17 +73,17 @@ class ApiController extends ResourceController
     }
     public function bsKaryawan($id)
     {
-        $bsData = $this->BsMesinModel->bsDataKaryawan($id);
+        $bsData = $this->bsMesinModel->bsDataKaryawan($id);
         return $this->respond($bsData, 200);
     }
     public function bsPeriode($start, $stop)
     {
-        $bsData = $this->BsMesinModel->bsPeriode($start, $stop);
+        $bsData = $this->bsMesinModel->bsPeriode($start, $stop);
         return $this->respond($bsData, 200);
     }
     public function bsDaily($start, $stop)
     {
-        $bsData = $this->BsMesinModel->bsDaily($start, $stop);
+        $bsData = $this->bsMesinModel->bsDaily($start, $stop);
         return $this->respond($bsData, 200);
     }
 
@@ -120,23 +126,25 @@ class ApiController extends ResourceController
             ])->setStatusCode(400);
         }
         $prod = $this->orderModel->getDataPph($area, $model, $size);
+        $prod = $prod ?? [];
         $idaps = $this->ApsPerstyleModel->getIdApsForPph($area, $model, $size);
         $idapsList = array_column($idaps, 'idapsperstyle');
         $bsSettingData = $this->bsModel->getBsPph($idapsList);
-        $bsMesinData = $this->BsMesinModel->getBsMesinPph($area, $model, $size);
+        $bsMesinData = $this->bsMesinModel->getBsMesinPph($area, $model, $size);
         $bsMesin = $bsMesinData['bs_gram'] ?? 0;
+
         $result = [
-            "machinetypeid" => $prod["machinetypeid"],
-            "area" => $prod['factory'],
-            "no_model" => $model,
-            "size" => $size,
-            "inisial" =>  $prod["inisial"] ?? null,
-            "qty" => $prod["qty"],
-            "sisa" =>    $prod["sisa"],
-            "po_plus" => $prod["po_plus"],
-            "bruto" => $prod["bruto"],
-            "bs_setting" => $bsSettingData['bs_setting'],
-            "bs_mesin" => $bsMesin,
+            "machinetypeid" => $prod["machinetypeid"] ?? null,
+            "area"          => $prod["factory"]       ?? null,
+            "no_model"      => $model,
+            "size"          => $size,
+            "inisial"       => $prod["inisial"]       ?? null,
+            "qty"           => $prod["qty"]           ?? 0,
+            "sisa"          => $prod["sisa"]          ?? 0,
+            "po_plus"       => $prod["po_plus"]       ?? 0,
+            "bruto"         => $prod["bruto"]         ?? 0,
+            "bs_setting"    => $bsSettingData['bs_setting'] ?? 0,
+            "bs_mesin"      => $bsMesin,
         ];
         return $this->response->setJSON($result);
     }
@@ -164,7 +172,7 @@ class ApiController extends ResourceController
             $sizes = array_column($produksi, 'size');
 
             // Fetch all bs_mesin data in one query
-            $bsMesinData = $this->BsMesinModel->getBsMesinHarian($mastermodels, $sizes, $tanggal, $area);
+            $bsMesinData = $this->bsMesinModel->getBsMesinHarian($mastermodels, $sizes, $tanggal, $area);
 
             // Create a lookup table for fast matching
             $bsMesinMap = [];
@@ -194,7 +202,7 @@ class ApiController extends ResourceController
     }
     public function prodBsDaily($area, $tanggal)
     {
-        $bsdata = $this->BsMesinModel->bsKary($area, $tanggal);
+        $bsdata = $this->bsMesinModel->bsKary($area, $tanggal);
         return $this->response->setJSON($bsdata);
     }
 
@@ -541,7 +549,7 @@ class ApiController extends ResourceController
 
         $bsList = [];
         foreach ($styles as $style) {
-            $bs = $this->BsMesinModel->getBsMesin($area, $noModel, [$style]);
+            $bs = $this->bsMesinModel->getBsMesin($area, $noModel, [$style]);
             $bsList[$style] = is_array($bs) && isset($bs['bs_gram']) ? (float)$bs['bs_gram'] : 0;
         }
 
@@ -621,12 +629,213 @@ class ApiController extends ResourceController
         $data = [];
         $qtyPerArea = $this->ApsPerstyleModel->getQtyArea($noModel) ?: [];
         $totalPo = $this->ApsPerstyleModel->totalPo($noModel)['totalPo'] ?? 0;
+        $qtyPdk = $this->ApsPerstyleModel->getPembagianModel($noModel) ?: [];
 
         $data = [
             'qtyPerArea' => $qtyPerArea,
             'totalPo' => $totalPo,
+            'qtyPdk' => $qtyPdk,
         ];
 
         return $this->response->setJSON($data);
+    }
+    public function getAllDataOrder()
+    {
+        $json = $this->request->getJSON(true); // array
+        $noModel = $json['no_model'] ?? [];
+
+        $order = $this->ApsPerstyleModel->getAllDataOrder($noModel);
+
+        return $this->response->setJSON($order);
+    }
+
+    public function getDetailOrder()
+    {
+        $noModel = $this->request->getGet('no_model');
+        $detailOrder = $this->ApsPerstyleModel->getDetailOrder($noModel);
+
+        return $this->response->setJSON($detailOrder);
+    }
+
+    public function repeatSupermarket()
+    {
+        $json = $this->request->getJSON(true);
+        log_message('error', 'DEBUG_POST_REPEAT: ' . json_encode($json));
+
+        $db = \Config\Database::connect();
+        $db->transBegin(); // mulai transaksi
+
+        try {
+            $retur  = $json['retur']  ?? [];
+            $repeat = $json['repeat'] ?? [];
+            // VALIDASI
+            if (empty($repeat) || !is_array($repeat)) {
+                throw new \Exception("Data repeat tidak valid / tidak dikirim");
+            }
+
+            foreach ($repeat as $data => $r) {
+                $kg_cns = ($r['cns'] > 0) ? ($r['kgs'] / $r['cns']) : 0;
+                // insert data repeat
+                $dataRepeat = [
+                    'id_pengeluaran'    => $r['id_pengeluaran'],
+                    'no_karung'         => $r['no_karung'],
+                    'area'              => $r['area'],
+                    'no_model'          => $r['no_model'],
+                    'item_type'         => $r['item_type'],
+                    'kode_warna'        => $r['kode_warna'],
+                    'warna'             => $r['warna'],
+                    'lot'               => $r['lot'],
+                    'kgs_in_out'        => $r['kgs'],
+                    'cns_in_out'        => $r['cns'],
+                    'kg_cns'            => $kg_cns,
+                    'created_at'        => date('Y-m-d H:i:s'), // Waktu pemindahan
+                ];
+                if (!$this->stockArea->insert($dataRepeat)) {
+                    throw new \Exception("Gagal insert repeat area");
+                }
+            }
+
+            // UPDATE STOCK SUPERMARKET (SET 0)
+            $updateSupermarket = [
+                'kgs_in_out'    => 0,
+                'cns_in_out'    => 0,
+                'updated_at'    => date('Y-m-d H:i:s'), // Waktu pemindahan
+            ];
+            $updated = $this->stockArea
+                ->where('no_model', $retur['no_model'])
+                ->where('item_type', $retur['item_type'])
+                ->where('kode_warna', $retur['kode_warna'])
+                ->where('warna', $retur['warna'])
+                ->where('lot', $retur['lot'])
+                ->set($updateSupermarket)
+                ->update();
+
+
+            // jika query benar-benar gagal (error DB)
+            if ($updated === false) {
+                throw new \Exception("Gagal melakukan update database supermarket");
+            }
+
+            if ($this->stockArea->db()->affectedRows() < 1) {
+                // optional: log atau abaikan
+                log_message('info', 'Stock supermarket tidak ditemukan untuk update');
+            }
+
+            // Semua sukses → commit transaksi
+            $db->transCommit();
+
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => 'Repeat dan update supermarket berhasil'
+            ]);
+        } catch (\Throwable $e) {
+            // WAJIB rollback
+            if ($db->transStatus() === FALSE) {
+                $db->transRollback();
+            } else {
+                $db->transRollback();
+            }
+
+            log_message('error', 'RepeatSupermarket error: ' . $e->getMessage());
+
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ])->setStatusCode(500);
+        }
+    }
+
+    public function getOrderStatus()
+    {
+        $noModel = $this->request->getGet('no_model');
+
+        $dataOrder = $this->ApsPerstyleModel->getStatusOrder($noModel);
+
+        $idAps = array_column($dataOrder, 'idapsperstyle'); // ambil dr dataOrder
+
+        $produksi      = $this->produksiModel->getAllProd($idAps);
+        $bsStocklot = $this->bsModel->getAllTotalBsSet($idAps);
+        $perbaikan      = $this->perbaikanAreaModel->getAllPB($idAps);
+
+        $grouped = [];
+
+        foreach ($dataOrder as $row) {
+            $id = $row['idapsperstyle'];
+            $key = $row['factory'] . '-' . $row['delivery'] . '-' . $row['size'];
+
+            if (!isset($grouped[$key])) {
+                $grouped[$key] = [
+                    'factory'   => $row['factory'],
+                    'delivery'  => $row['delivery'],
+                    'inisial'      => $row['inisial'],
+                    'size'      => $row['size'],
+                    'color'      => $row['color'],
+                    'countries'      => [], // jika ada lebih dari 1 country pakai koma aja, tampilin semua
+                    'qty_order' => 0,
+                    'sisa_order' => 0,
+                    'produksi'  => 0,
+                    'bs_stocklot' => 0,
+                    'perbaikan' => 0,
+                    'po_plus' => 0,
+                ];
+            }
+
+            // ==== COUNTRY (unique, multiple allowed) ====
+            $country = trim($row['country']);
+            if (!in_array($country, $grouped[$key]['countries'])) {
+                $grouped[$key]['countries'][] = $country;
+            }
+
+            // ==== SUM DATA ====
+            $grouped[$key]['qty_order']   += $row['qty'];
+            $grouped[$key]['sisa_order']  += $row['sisa'];
+            $grouped[$key]['po_plus']  += $row['po_plus'];
+            $grouped[$key]['produksi']    += $produksi[$id] ?? 0;
+            $grouped[$key]['bs_stocklot'] += $bsStocklot[$id] ?? 0;
+            $grouped[$key]['perbaikan']   += $perbaikan[$id] ?? 0;
+        }
+
+        // === Convert country array → string ===
+        foreach ($grouped as &$g) {
+            $g['country'] = implode(', ', $g['countries']);
+            unset($g['countries']);
+        }
+        unset($g);
+
+        return $this->response->setJSON([
+            'orderStatus' => $grouped
+        ]);
+    }
+
+    public function getDataOrderFetch()
+    {
+        $startDate = date('Y-m-d', strtotime('90 days ago')); // Menggunakan format tanggal yang benar
+
+        // 1️⃣ Ambil semua no_model berdasarkan tanggal
+        $dataModel = $this->orderModel->getNoModel($startDate);
+
+        // kalau kosong
+        if (empty($dataModel)) {
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => 'No model ditemukan',
+                'data'    => []
+            ]);
+        }
+
+        // ambil daftar no_model dalam bentuk array
+        $listNoModel = array_column($dataModel, 'no_model');
+
+        // 2️⃣ Ambil detail APS berdasarkan list no_model
+        $detailModel = $this->ApsPerstyleModel->getDataOrderFetch($listNoModel);
+
+        // 3️⃣ Return JSON
+        return $this->response->setJSON([
+            'status' => 'success',
+            'data' => [
+                'models' => $dataModel,
+                'aps'    => $detailModel
+            ]
+        ]);
     }
 }
