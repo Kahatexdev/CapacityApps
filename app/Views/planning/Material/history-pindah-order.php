@@ -94,7 +94,7 @@
         <div class="loader-wrap">
             <div class="loading-card">
                 <div class="loader" role="status" aria-hidden="true"></div>
-                <div class="loader-text">Memuat data...</div>
+                <div class="loader-text">Memuat dataaa...</div>
 
                 <!-- Progress bar -->
                 <div class="progress mt-3" style="height: 6px; border-radius: 6px;">
