@@ -680,6 +680,7 @@ class OrderModel extends Model
             ->join('apsperstyle', 'apsperstyle.mastermodel=data_model.no_model', 'left')
             ->join('produksi', 'apsperstyle.idapsperstyle=produksi.idapsperstyle', 'left')
             ->where('apsperstyle.factory', $area)
+            ->where('produksi.area', $area)
             ->where('data_model.no_model', $nomodel)
             ->where('apsperstyle.size', $size)
             ->groupBy('apsperstyle.size')
