@@ -32,131 +32,6 @@
         </script>
     <?php endif; ?>
 
-
-    <!-- <div class="row">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card pb-0">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5>Input BS Mesin</h5>
-                        <div class="d-flex gap-2 ms-auto">
-                            <a href="http://172.23.44.14/CapacityApps/public/templateExcel/Template Form Input BS MC.xlsx" target="_blank" class="btn btn-success"><i class="fa fa-download"></i> Download Template</a>
-                            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#importBs">Import</button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <form id="bsMesinForm">
-                            <div class="row">
-                                <div class="col-lg-3 col-sm-12">
-                                    <div class="form-group">
-                                        <label for="nama" class="form-control-label">Nama</label>
-                                        <select name="nama" id="nama" class="form-control" onchange="getInfo()">
-                                            <option value="" selected>Pilih Nama</option>
-                                            <?php if (!empty($karyawan) && is_array($karyawan)): ?>
-                                                <?php foreach ($karyawan as $kar): ?>
-                                                    <option value="<?= htmlspecialchars($kar['id_karyawan']); ?>">
-                                                        <?= htmlspecialchars($kar['nama_karyawan']); ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            <?php else: ?>
-                                                <option value="">No employees found</option>
-                                            <?php endif; ?>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 col-sm-12">
-                                    <div class="form-group">
-                                        <label for="kode_kartu" class="form-control-label">Kode Kartu</label>
-                                        <input type="hidden" class="form-control" id="nama_kar" name="namakar" value="">
-                                        <input type="text" class="form-control" id="kode_kartu" name="kode_kartu" placeholder="Masukkan Kode Kartu">
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-3 col-sm-12">
-                                    <div class="form-group">
-                                        <label for="shift" class="form-control-label">Shift</label>
-                                        <input class="form-control" type="text" id="shift" name="shift">
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 col-sm-12">
-                                    <div class="form-group">
-                                        <label for="tgl_prod" class="form-control-label">Tanggal Produksi</label>
-                                        <input class="form-control" type="date" id="tgl_prod" name="tgl_prod" required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="dynamicRowContainer">
-                                <div class="row" id="row_0">
-                                    <div class="col-lg-1 col-sm-12">
-                                        <div class="form-group">
-                                            <label for="no_mesin_0" class="form-control-label">No MC</label>
-                                            <input class="form-control" type="text" id="no_mesin_0" name="no_mesin[]" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2 col-sm-12">
-                                        <div class="form-group">
-                                            <label for="no_model_0" class="form-control-label">PDK</label> -->
-    <!--<input class="form-control" type="text" id="no_model_0" name="no_model[]" required> -->
-    <!--<select name="no_model[]" id="no_model_0" class="select2 form-select" onchange="getIn(0)" required>
-                                                <option value="" selected>Pilih No Model</option>
-                                                <?php if (!empty($pdk) && is_array($pdk)): ?>
-                                                    <?php foreach ($pdk as $pd): ?>
-                                                        <option value="<?= htmlspecialchars($pd['mastermodel']); ?>">
-                                                            <?= htmlspecialchars($pd['mastermodel']); ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                <?php else: ?>
-                                                    <option value="">No employees found</option>
-                                                <?php endif; ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2 col-sm-12">
-                                        <div class="form-group">
-                                            <label for="inisial_0" class="form-control-label">Inisial</label>
-                                            <select class="select2 form-select" id="inisial_0" name="inisial[]" onchange="getSize(0)" required>
-                                                <option value="" selected>Pilih inisial</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2 col-sm-12">
-                                        <div class="form-group">
-                                            <label for="size_0" class="form-control-label">Size</label>
-                                            <input class="form-control" type="text" id="size_0" name="size[]" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2 col-sm-12">
-                                        <div class="form-group">
-                                            <label for="gram_0" class="form-control-label">Qty (Gram)</label>
-                                            <input class="form-control" type="number" id="gram_0" name="gram[]" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2 col-sm-12">
-                                        <div class="form-group">
-                                            <label for="pcs_0" class="form-control-label">Qty (pcs)</label>
-                                            <input class="form-control" type="number" id="pcs_0" name="pcs[]" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-1 col-sm-12">
-                                        <div class="form-group">
-                                            <label for="" class="form-control-label"></label>
-                                            <button type="button" class="btn btn-info" onclick="addRow()">+</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row mt-3">
-                                <button type="button" class="btn btn-info" id="submitForm">Simpan</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
     <div class="row mt-3">
         <div class="col-lg-12">
             <div class="card">
@@ -168,10 +43,6 @@
 
                         </h4>
                         <div>
-
-                            <button type="button" class="btn btn-sm btn-danger bg-gradient-danger shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#deleteBs">
-                                <i class="fas fa-trash text-lg opacity-10" aria-hidden="true"></i> Delete BS MC
-                            </button>
                             <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#summaryBS">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary BS MC
                             </button>
@@ -199,6 +70,77 @@
                 </button>
             </div>
         <?php endforeach ?>
+    </div>
+</div>
+<div class="modal fade" id="summaryBS" tabindex="-1" role="dialog" aria-labelledby="summaryBS" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Summary BS MC</h5>
+                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form action="<?= base_url($role . '/exportSummaryBs'); ?>" method="POST">
+                <div class="modal-body align-items-center">
+                    <div class="form-group">
+                        <label for="buyer" class="col-form-label">Buyer</label>
+                        <select class="form-control" id="buyer" name="buyer">
+                            <option></option>
+                            <?php foreach ($buyer as $buy) : ?>
+                                <option><?= $buy['kd_buyer_order'] ?></option>
+                            <?php endforeach ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="area" class="col-form-label">Area</label>
+                        <select class="form-control" id="area" name="area">
+                            <option></option>
+                            <?php foreach ($area as $ar) : ?>
+                                <option><?= $ar ?></option>
+                            <?php endforeach ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="jarum" class="col-form-label">Jarum</label>
+                        <select class="form-control" id="jarum" name="jarum">
+                            <option></option>
+                            <option value="13">13</option>
+                            <option value="84">84</option>
+                            <option value="92">92</option>
+                            <option value="96">96</option>
+                            <option value="106">106</option>
+                            <option value="108">108</option>
+                            <option value="116">116</option>
+                            <option value="120">120</option>
+                            <option value="124">124</option>
+                            <option value="126">126</option>
+                            <option value="144">144</option>
+                            <option value="168">168</option>
+                            <option value="200">200</option>
+                            <option value="240">240</option>
+                            <option value="POM-POM">POM-POM</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pdk" class="col-form-label">No Model</label>
+                        <input type="text" class="form-control" name="pdk">
+                    </div>
+                    <div class="form-group">
+                        <label for="awal" class="col-form-label">Dari</label>
+                        <input type="date" class="form-control" name="awal">
+                    </div>
+                    <div class="form-group">
+                        <label for="akhir" class="col-form-label">Sampai</label>
+                        <input type="date" class="form-control" name="akhir">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-gradient-info">Generate</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
