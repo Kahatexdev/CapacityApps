@@ -42,6 +42,7 @@ class TransferModel extends Model
         $result = $this->select('transfers.from_id, transfers.qty_transfer, transfers.created_at, data_booking.kd_buyer_booking,data_booking.no_booking, data_booking.desc, data_booking.no_order, data_booking.delivery')
             ->join('data_booking', 'transfers.to_id = data_booking.id_booking')
             ->where('from_id', $idBooking)
+            ->where('data_booking.keterangan !=', 'Manual Cancel Booking')
             ->findAll();
         return $result;
     }
