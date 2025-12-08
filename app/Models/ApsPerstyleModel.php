@@ -1044,6 +1044,7 @@ class ApsPerstyleModel extends Model
     {
         return $this->select('size,inisial')
             ->where('mastermodel', $noModel)
+            ->where('qty > 0')
             ->groupBy('size')
             ->orderBy('size', 'ASC')
             ->findAll();
