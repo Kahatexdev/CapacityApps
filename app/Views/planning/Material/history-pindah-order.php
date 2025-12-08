@@ -116,8 +116,12 @@
             </div>
             <div class="row mt-2">
                 <div class="col-md-2">
-                    <label for="">No Model</label>
-                    <input type="text" class="form-control" name="no_model" id="no_model">
+                    <label for="">No Model (Yang Di Pindah)</label>
+                    <input type="text" class="form-control" name="no_model_old" id="no_model_old">
+                </div>
+                <div class="col-md-2">
+                    <label for="">No Model (Yang Menerima)</label>
+                    <input type="text" class="form-control" name="no_model_new" id="no_model_new">
                 </div>
                 <div class="col-md-3">
                     <label for="">Kode Warna</label>
@@ -144,7 +148,8 @@
                     <thead>
                         <tr>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Model</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Model Lama</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Model Baru</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Delivery Awal</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Delivery Akhir</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Item Type</th>
@@ -214,10 +219,12 @@
         });
 
         $('#btnExport').click(function() {
-            const m = $('#no_model').val().trim();
+            const model_old = $('#no_model_old').val().trim();
+            const model_new = $('#no_model_new').val().trim();
             const k = $('#kode_warna').val().trim();
             window.location.href = "<?= base_url("$role/warehouse/exportHistoryPindahOrder") ?>" +
-                "?model=" + encodeURIComponent(m) +
+                "?model_old=" + encodeURIComponent(model_old) +
+                "&model_new=" + encodeURIComponent(model_new) +
                 "&kode_warna=" + encodeURIComponent(k);
         });
 
@@ -233,10 +240,11 @@
         });
 
         function loadData() {
-            let no_model = $('#no_model').val().trim();
-            let kode_warna = $('#kode_warna').val().trim();
+            let no_model_old = $('input[name="no_model_old"]').val().trim();
+            let no_model_new = $('input[name="no_model_new"]').val().trim();
+            let kode_warna = $('input[name="kode_warna"]').val().trim();
 
-            if (no_model === '' && kode_warna === '') {
+            if (no_model_old === '' && no_model_new === '' && kode_warna === '') {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Oops...',
@@ -249,7 +257,8 @@
                 url: "<?= base_url($role . '/warehouse/historyPindahOrder') ?>",
                 type: "GET",
                 data: {
-                    model: no_model,
+                    no_model_old: no_model_old,
+                    no_model_new: no_model_new,
                     kode_warna: kode_warna
                 },
                 dataType: "json",
@@ -272,39 +281,28 @@
                 },
                 success: function(response) {
                     dataTable.clear().draw();
-                    if (response.length > 0) {
-                        $.each(response, function(index, item) {
-                            dataTable.row.add([
-                                index + 1,
-                                item.no_model_old || '-',
-                                item.delivery_awal,
-                                item.delivery_akhir,
-                                item.item_type || '-',
-                                item.kode_warna || '-',
-                                item.warna || '-',
-                                item.kgs,
-                                item.cns,
-                                item.lot,
-                                item.cluster_old,
-                                item.created_at + ' ' + item.keterangan + ' ke ' + item.no_model_new + ' kode ' + item.kode_warna
-                            ]).draw(false);
-                        });
 
-                        // Atur tombol export
-                        $('#btnExportAll').addClass('d-none'); // Hilangkan tombol export all
-                        $('#btnExport').removeClass('d-none');
-                    } else {
-                        let colCount = $('#dataTable thead th').length;
-                        $('#dataTable tbody').html(`
-                            <tr>
-                                <td colspan="${colCount}" class="text-center text-danger font-weight-bold">
-                                    ⚠ Tidak ada data ditemukan
-                                </td>
-                            </tr>
-                        `);
-                        $('#btnExportAll').addClass('d-none'); // Hilangkan tombol export all
-                        $('#btnExport').removeClass('d-none');
-                    }
+                    $.each(response, function(index, item) {
+                        dataTable.row.add([
+                            index + 1,
+                            item.no_model_old || '-',
+                            item.no_model_new || '-',
+                            item.delivery_awal,
+                            item.delivery_akhir,
+                            item.item_type || '-',
+                            item.kode_warna_old || '-',
+                            item.warna_old || '-',
+                            item.kgs,
+                            item.cns,
+                            item.lot,
+                            item.cluster_old,
+                            item.created_at + ' ' + item.keterangan + ' ke ' + item.no_model_new + ' kode ' + item.kode_warna_new
+                        ]).draw(false);
+                    });
+
+                    // Atur tombol export
+                    $('#btnExportAll').addClass('d-none'); // Hilangkan tombol export all
+                    $('#btnExport').removeClass('d-none');
                 },
                 error: function(xhr, status, error) {
                     console.error("Error:", error);
@@ -328,16 +326,17 @@
                         dataTable.row.add([
                             index + 1,
                             item.no_model_old || '-',
+                            item.no_model_new || '-',
                             item.delivery_awal,
                             item.delivery_akhir,
                             item.item_type || '-',
-                            item.kode_warna || '-',
-                            item.warna || '-',
+                            item.kode_warna_old || '-',
+                            item.warna_old || '-',
                             item.kgs,
                             item.cns,
                             item.lot,
                             item.cluster_old,
-                            item.created_at + ' ' + item.keterangan + ' ke ' + item.no_model_new + ' kode ' + item.kode_warna
+                            item.created_at + ' ' + item.keterangan + ' ke ' + item.no_model_new + ' kode ' + item.kode_warna_new
                         ]).draw(false);
                     });
                 },

@@ -839,7 +839,17 @@ class MaterialController extends BaseController
         $apiUrl = api_url('material') . 'pph?model=' . urlencode($noModel);
 
         // Mengambil data dari API eksternal
-        $response = file_get_contents($apiUrl);
+        // $response = file_get_contents($apiUrl);
+        $context = stream_context_create([
+            "ssl" => [
+                "verify_peer" => false,
+                "verify_peer_name" => false,
+                "allow_self_signed" => true
+            ]
+        ]);
+
+        $response = file_get_contents($apiUrl, false, $context);
+
         if ($response === FALSE) {
             log_message('error', "API tidak bisa diakses: $apiUrl");
             return $this->response->setJSON(["error" => "Gagal mengambil data dari API"]);
@@ -849,12 +859,31 @@ class MaterialController extends BaseController
             $pphInisial = [];
             foreach ($models as $items) {
                 $styleSize = $items['style_size'];
-                $gw = $items['gw'];
-                $comp = $items['composition'];
-                $loss = $items['loss'];
-                $gwpcs = ($gw * $comp) / 100;
+                // $gwpcs = ($gw * $comp) / 100;
                 $prod = $this->orderModel->getDataPph($area, $noModel, $styleSize);
                 $prod = is_array($prod) ? $prod : [];
+
+                // --- TAMBAHKAN INI ---
+                $qty    = $prod['qty']    ?? 0;
+                $bruto  = $prod['bruto']  ?? 0;
+                $sisa   = $prod['sisa']   ?? 0;
+                $poPlus = $prod['po_plus'] ?? 0;
+                $inisial = $prod['inisial'] ?? null;
+                $size = $prod['size'] ?? null;
+                $jarum   = $prod['machinetypeid'] ?? null;
+                // -----------------------
+
+                // Cocokkan size
+                $matchSize = ($size === $styleSize);
+
+                // Jika size cocok → ambil data dari API item
+                $itemType  = $matchSize ? ($items['item_type'] ?? null) : null;
+                $kodeWarna = $matchSize ? ($items['kode_warna'] ?? null) : null;
+                $color     = $matchSize ? ($items['color'] ?? null) : null;
+                $gw        = $matchSize ? ($items['gw'] ?? 0) : 0;
+                $loss      = $matchSize ? ($items['loss'] ?? 0) : 0;
+                $comp      = $matchSize ? ($items['composition'] ?? 0) : 0;
+
                 $idaps = $this->ApsPerstyleModel->getIdApsForPph($area, $noModel, $styleSize);
                 $idapsList = array_column($idaps, 'idapsperstyle');
                 if (!empty($idapsList)) {
@@ -864,7 +893,7 @@ class MaterialController extends BaseController
                 }
                 $bsMesinData = $this->bsMesinModel->getBsMesinPph($area, $noModel, $styleSize);
                 $bsMesin = $bsMesinData['bs_gram'] ?? 0;
-                $bruto = $prod['bruto'] ?? 0;
+
                 if ($gw == 0) {
                     $pph = 0;
                 } else {
@@ -872,23 +901,23 @@ class MaterialController extends BaseController
                     $pph = ((($bruto * $comp * $gw) / 100) / 1000) + ($bsMesin / 1000 * $comp / 100);
                 }
 
-                $ttl_kebutuhan = ($prod['qty'] * $comp * $gw / 100 / 1000) + ($loss / 100 * ($prod['qty'] * $comp * $gw / 100 / 1000));
+                $ttl_kebutuhan = ($qty * $comp * $gw / 100 / 1000) + ($loss / 100 * ($qty * $comp * $gw / 100 / 1000));
 
                 $pphInisial[] = [
-                    'area'  => $items['area'],
-                    'style_size'  => $items['style_size'],
-                    'inisial'  => $prod['inisial'],
-                    'item_type'  => $items['item_type'],
-                    'kode_warna'      => $items['kode_warna'],
-                    'color'      => $items['color'],
-                    'gw'         => $items['gw'],
-                    'composition' => $items['composition'],
+                    'area'  => $prod['factory'] ?? null,
+                    'style_size'  => $size,
+                    'inisial'  => $inisial,
+                    'item_type'  => $itemType,
+                    'kode_warna'      => $kodeWarna,
+                    'color'      => $color,
+                    'gw'         => $gw,
+                    'composition' => $comp,
                     'kgs'  => $ttl_kebutuhan,
-                    'jarum'      => $prod['machinetypeid'] ?? null,
+                    'jarum'      => $jarum,
                     'bruto'      => $bruto,
-                    'qty'        => $prod['qty'] ?? 0,
-                    'sisa'       => $prod['sisa'] ?? 0,
-                    'po_plus'    => $prod['po_plus'] ?? 0,
+                    'qty'        => $qty,
+                    'sisa'       => $sisa,
+                    'po_plus'    => $poPlus,
                     'bs_setting' => $bsSettingData['bs_setting'] ?? 0,
                     'bs_mesin'   => $bsMesin,
                     'pph'        => $pph
@@ -912,11 +941,11 @@ class MaterialController extends BaseController
             // Jika style_size sudah ada, jangan tambahkan lagi
             if (!isset($processedStyleSizes[$styleSizeKey])) {
                 $temporaryData[] = [
-                    'qty' => $item['qty'],
-                    'sisa' => $item['sisa'],
-                    'bruto' => $item['bruto'],
-                    'bs_setting' => $item['bs_setting'],
-                    'bs_mesin' => $item['bs_mesin']
+                    'qty' => $item['qty'] ?? 0,
+                    'sisa' => $item['sisa'] ?? 0,
+                    'bruto' => $item['bruto'] ?? 0,
+                    'bs_setting' => $item['bs_setting'] ?? 0,
+                    'bs_mesin' => $item['bs_mesin'] ?? 0
                 ];
                 $processedStyleSizes[$styleSizeKey] = true;
             }
@@ -995,7 +1024,17 @@ class MaterialController extends BaseController
         $apiUrl = api_url('material') . 'pph?model=' . urlencode($noModel);
 
         // Mengambil data dari API eksternal
-        $response = file_get_contents($apiUrl);
+        // $response = file_get_contents($apiUrl);
+        $context = stream_context_create([
+            "ssl" => [
+                "verify_peer" => false,
+                "verify_peer_name" => false,
+                "allow_self_signed" => true
+            ]
+        ]);
+
+        $response = file_get_contents($apiUrl, false, $context);
+
         if ($response === FALSE) {
             log_message('error', "API tidak bisa diakses: $apiUrl");
             return $this->response->setJSON(["error" => "Gagal mengambil data dari API"]);
@@ -1005,12 +1044,10 @@ class MaterialController extends BaseController
             $pphInisial = [];
             foreach ($models as $items) {
                 $styleSize = $items['style_size'];
-                $gw = $items['gw'];
-                $comp = $items['composition'];
-                $loss = $items['loss'];
-                $gwpcs = ($gw * $comp) / 100;
+                // $gwpcs = ($gw * $comp) / 100;
                 $prod = $this->orderModel->getDataPph($area, $noModel, $styleSize);
                 $prod = is_array($prod) ? $prod : [];
+
                 $idaps = $this->ApsPerstyleModel->getIdApsForPph($area, $noModel, $styleSize);
                 $idapsList = array_column($idaps, 'idapsperstyle');
                 if (!empty($idapsList)) {
@@ -1019,38 +1056,94 @@ class MaterialController extends BaseController
                     $bsSettingData = ['bs_setting' => 0]; // default kalau data kosong
                 }
                 $bsMesinData = $this->bsMesinModel->getBsMesinPph($area, $noModel, $styleSize);
-                $bsMesin = $bsMesinData['bs_gram'] ?? 0;
-                $bruto = $prod['bruto'] ?? 0;
-                if ($gw == 0) {
-                    $pph = 0;
-                } else {
-                    // $pph = ((($bruto + ($bsMesin / $gw)) * $comp * $gw) / 100) / 1000;
-                    $pph = ((($bruto * $comp * $gw) / 100) / 1000) + ($bsMesin / 1000 * $comp / 100);
-                }
-                $ttl_kebutuhan = ($prod['qty'] * $comp * $gw / 100 / 1000) + ($loss / 100 * ($prod['qty'] * $comp * $gw / 100 / 1000));
 
-                $pphInisial[] = [
-                    'area'  => $items['area'],
-                    'style_size'  => $items['style_size'],
-                    'inisial'  => $prod['inisial'],
-                    'item_type'  => $items['item_type'],
-                    'kode_warna'      => $items['kode_warna'],
-                    'color'      => $items['color'],
-                    'gw'         => $items['gw'],
-                    'loss'         => $items['loss'],
-                    'composition' => $items['composition'],
-                    'kgs'  => $ttl_kebutuhan,
-                    'jarum'      => $prod['machinetypeid'] ?? null,
+                // --- TAMBAHKAN INI ---
+                $qty    = $prod['qty']    ?? 0;
+                $bruto  = $prod['bruto']  ?? 0;
+                $sisa   = $prod['sisa']   ?? 0;
+                $poPlus = $prod['po_plus'] ?? 0;
+                $inisial = $prod['inisial'] ?? null;
+                $size = $prod['size'] ?? null;
+                $jarum   = $prod['machinetypeid'] ?? null;
+                $bsMesin = $bsMesinData['bs_gram'] ?? 0;
+                // -----------------------
+
+                // Cocokkan size
+                $matchSize = ($size === $styleSize);
+
+                if ($matchSize) {
+
+                    // ambil item dari API
+                    $itemType  = $items['item_type'] ?? null;
+                    $kodeWarna = $items['kode_warna'] ?? null;
+                    $color     = $items['color'] ?? null;
+                    $gw        = $items['gw'] ?? 0;
+                    $loss      = $items['loss'] ?? 0;
+                    $comp      = $items['composition'] ?? 0;
+
+                    // perhitungan PPH
+                    if ($gw > 0) {
+                        $pph = ((($bruto * $comp * $gw) / 100) / 1000) + ($bsMesin / 1000 * $comp / 100);
+                    } else {
+                        $pph = 0;
+                    }
+
+                    // perhitungan total kebutuhan
+                    $ttl_kebutuhan = ($qty * $comp * $gw / 100 / 1000)
+                        + ($loss / 100 * ($qty * $comp * $gw / 100 / 1000));
+                } else {
+
+                    // tidak match = jadikan semuanya nol/null
+                    $itemType = null;
+                    $kodeWarna = null;
+                    $color = null;
+
+                    $gw = 0;
+                    $loss = 0;
+                    $comp = 0;
+
+                    $pph = 0;
+                    $ttl_kebutuhan = 0;
+                }
+
+                // Cek apakah semua field penting kosong atau 0
+                $row = [
+                    'area'  => $prod['factory'] ?? null,
+                    'style_size'  => $size,
+                    'inisial'  => $inisial,
+                    'item_type'  => $itemType,
+                    'kode_warna'      => $kodeWarna,
+                    'color'      => $color,
+                    'gw'         => $gw,
+                    'loss'         => $loss,
+                    'composition' => $comp,
+                    'kgs'  => $ttl_kebutuhan ?? 0,
+                    'jarum'      => $jarum,
                     'bruto'      => $bruto,
-                    'netto'      => $bruto - $bsSettingData['bs_setting'] ?? 0,
-                    'qty'        => $prod['qty'] ?? 0,
-                    'sisa'       => $prod['sisa'] ?? 0,
-                    'po_plus'    => $prod['po_plus'] ?? 0,
+                    'netto'      => ($bruto - ($bsSettingData['bs_setting'] ?? 0)),
+                    'qty'        => $qty,
+                    'sisa'       => $sisa,
+                    'po_plus'    => $poPlus,
                     'bs_setting' => $bsSettingData['bs_setting'] ?? 0,
                     'bs_mesin'   => $bsMesin,
                     'pph'        => $pph,
                     'pph_persen' => ($ttl_kebutuhan != 0) ? ($pph / $ttl_kebutuhan) * 100 : 0,
                 ];
+
+                // FILTER: cek apakah semua nilai row kosong/0/null
+                $allEmpty = true;
+                foreach ($row as $val) {
+                    if (!empty($val)) {
+                        $allEmpty = false;
+                        break;
+                    }
+                }
+
+                if ($allEmpty) {
+                    continue;
+                }
+
+                $pphInisial[] = $row;
             }
         }
 
@@ -1104,7 +1197,7 @@ class MaterialController extends BaseController
 
             // Fetch all bs_mesin data in one query
             $bsMesinData = $this->bsMesinModel->getBsMesinHarian($mastermodels, $sizes, $tanggal, $area);
-            log_message('debug', 'Hasil bsMesinData: ' . print_r($bsMesinData, true));
+            // log_message('debug', 'Hasil bsMesinData: ' . print_r($bsMesinData, true));
 
             // Create a lookup table for fast matching
             $bsMesinMap = [];
@@ -1112,13 +1205,13 @@ class MaterialController extends BaseController
                 $key = $bs['no_model'] . '_' . $bs['size'];
                 $bsMesinMap[$key] = $bs['bs_mesin'];
             }
-            log_message('debug', 'Mapping bsMesinMap: ' . print_r($bsMesinMap, true));
+            // log_message('debug', 'Mapping bsMesinMap: ' . print_r($bsMesinMap, true));
 
             // Assign bs_mesin to production data
             foreach ($data as &$prod) {
                 $key = $prod['mastermodel'] . '_' . $prod['size'];
                 $prod['bs_mesin'] = $bsMesinMap[$key] ?? 0; // Default to null if not found
-                log_message('debug', 'Assign bs_mesin untuk ' . $key . ': ' . $prod['bs_mesin']);
+                // log_message('debug', 'Assign bs_mesin untuk ' . $key . ': ' . $prod['bs_mesin']);
             }
         }
 
@@ -1131,14 +1224,24 @@ class MaterialController extends BaseController
             $apiUrl = api_url('material') . 'pphperhari?model=' . urlencode($prod['mastermodel']) . '&size=' . urlencode($prod['size']);
 
             // Mengambil data dari API eksternal
-            $response = @file_get_contents($apiUrl);
-            log_message('debug', 'Response dari API: ' . $response);
+            // $response = @file_get_contents($apiUrl);
+            $context = stream_context_create([
+                "ssl" => [
+                    "verify_peer" => false,
+                    "verify_peer_name" => false,
+                    "allow_self_signed" => true
+                ]
+            ]);
+
+            $response = file_get_contents($apiUrl, false, $context);
+
+            // log_message('debug', 'Response dari API: ' . $response);
             if ($response === FALSE) {
                 log_message('error', "API tidak bisa diakses: $apiUrl");
                 log_message('debug', 'URL yang dikirim ke API: ' . $apiUrl);
                 return $this->response->setJSON(["error" => "Gagal mengambil data dari API"]);
             } else {
-                log_message('debug', 'Response dari API: ' . $response);
+                // log_message('debug', 'Response dari API: ' . $response);
                 $material = json_decode($response, true);
             }
             // $material = $this->materialModel->getMU($prod['mastermodel'], $prod['size']);
@@ -2375,11 +2478,16 @@ class MaterialController extends BaseController
 
     public function historyPindahOrder()
     {
-        $noModel   = $this->request->getGet('model')     ?? '';
+        $noModelOld   = $this->request->getGet('no_model_old') ?? '';
+        $noModelNew   = $this->request->getGet('no_model_new') ?? '';
         $kodeWarna = $this->request->getGet('kode_warna') ?? '';
 
         // 1) Ambil data
-        $apiUrl = api_url('material') . 'historyPindahOrder?model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = api_url('material') . 'historyPindahOrder'
+            . '?no_model_old=' . urlencode($noModelOld)
+            . '&no_model_new=' . urlencode($noModelNew)
+            . '&kode_warna='   . urlencode($kodeWarna);
+
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {

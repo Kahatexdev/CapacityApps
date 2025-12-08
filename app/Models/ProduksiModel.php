@@ -350,18 +350,39 @@ class ProduksiModel extends Model
         // Pastikan group by hanya model & size untuk aggr per style
         return $builder->groupBy(['produksi.idapsperstyle', 'apsperstyle.mastermodel', 'apsperstyle.size'])->get()->getResultArray();
     }
+    public function dailyProd($filters)
+    {
+        $days = $this->select('tgl_produksi')
+            ->where('area', $filters['area'])
+            ->where('MONTH(tgl_produksi)', $filters['bulan'])
+            ->orderBy('tgl_produksi', 'DESC')
+            ->first();
+
+        $builder = $this->db->table('produksi');
+        $builder->select('produksi.idapsperstyle, apsperstyle.mastermodel, apsperstyle.size, SUM(produksi.qty_produksi) as prod, tgl_produksi');
+        $builder->join('apsperstyle', 'apsperstyle.idapsperstyle = produksi.idapsperstyle', 'left')
+            ->where('tgl_produksi', $days['tgl_produksi'])
+            ->where('area', $filters['area']);
+        // Pastikan group by hanya model & size untuk aggr per style
+        return $builder->groupBy(['produksi.idapsperstyle', 'apsperstyle.mastermodel', 'apsperstyle.size'])->get()->getResultArray();
+    }
 
     public function directMonthly($filters)
     {
         $builder = $this->select('area, COUNT(DISTINCT no_mesin) as jumlah_mesin');
 
-        if (!empty($filters['bulan'])) {
-            $builder->where('MONTH(tgl_produksi)', $filters['bulan']);
+        // if (!empty($filters['bulan'])) {
+        //     $builder->where('MONTH(tgl_produksi)', $filters['bulan']);
+        // }
+
+        // if (!empty($filters['tahun'])) {
+        //     $builder->where('YEAR(tgl_produksi)', $filters['tahun']);
+        // }
+
+        if (!empty($filters['tgl_produksi'])) {
+            $builder->where('tgl_produksi', $filters['tgl_produksi']);
         }
 
-        if (!empty($filters['tahun'])) {
-            $builder->where('YEAR(tgl_produksi)', $filters['tahun']);
-        }
         if (!empty($filters['area'])) {
             $builder->where('area', $filters['area']);
         }
@@ -834,6 +855,7 @@ class ProduksiModel extends Model
     {
         $days = $this->select('tgl_produksi')
             ->where('area', $filters['area'])
+            ->where('MONTH(tgl_produksi)', $filters['bulan'])
             ->orderBy('tgl_produksi', 'DESC')
             ->first();
 

@@ -8652,8 +8652,10 @@ class ExcelController extends BaseController
         $key = $this->request->getGet('key');
         $tanggalAwal = $this->request->getGet('tanggal_awal');
         $tanggalAkhir = $this->request->getGet('tanggal_akhir');
+        $poPlus = $this->request->getGet('po_plus');
 
-        $apiUrl = api_url('material') . 'filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir;
+        $apiUrl = api_url('material') . 'filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir . '&po_plus=' . $poPlus;
+
         $material = @file_get_contents($apiUrl);
 
         // $models = [];
@@ -8667,22 +8669,28 @@ class ExcelController extends BaseController
 
         // Judul
         $sheet->setCellValue('A1', 'Datang Benang');
-        $sheet->mergeCells('A1:U1'); // Menggabungkan sel untuk judul
+        $sheet->mergeCells('A1:V1'); // Menggabungkan sel untuk judul
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         // Header
-        $header = ["No", "Foll Up", "No Model", "No Order", "Buyer", "Delivery Awal", "Delivery Akhir", "Order Type", "Item Type", "Kode Warna", "Warna", "KG Pesan", "Tanggal Datang", "Kgs Datang", "Cones Datang", "LOT Datang", "No Surat Jalan", "LMD", "GW", "Harga", "Nama Cluster"];
+        $header = ["No", "Foll Up", "No Model", "No Order", "Buyer", "Delivery Awal", "Delivery Akhir", "Order Type", "Item Type", "Kode Warna", "Warna", "KG Pesan", "Tanggal Datang", "Kgs Datang", "Cones Datang", "LOT Datang", "No Surat Jalan", "LMD", "GW", "Harga", "Nama Cluster", "Po Tambahan"];
         $sheet->fromArray([$header], NULL, 'A3');
 
         // Styling Header
-        $sheet->getStyle('A3:U3')->getFont()->setBold(true);
-        $sheet->getStyle('A3:U3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A3:U3')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A3:V3')->getFont()->setBold(true);
+        $sheet->getStyle('A3:V3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A3:V3')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
         // Data
         $row = 4;
         foreach ($data as $index => $item) {
+            $getPoPlus = $item['po_plus'];
+            if ($getPoPlus == 1) {
+                $poPlus = 'YA';
+            } else {
+                $poPlus = '';
+            }
             $sheet->fromArray([
                 [
                     $index + 1,
@@ -8697,7 +8705,7 @@ class ExcelController extends BaseController
                     $item['kode_warna'],
                     $item['warna'],
                     number_format($item['kgs_material'], 2),
-                    $item['tgl_masuk'],
+                    $item['tgl_datang'],
                     number_format($item['kgs_kirim'], 2),
                     $item['cones_kirim'],
                     $item['lot_kirim'],
@@ -8705,7 +8713,8 @@ class ExcelController extends BaseController
                     $item['l_m_d'],
                     number_format($item['gw_kirim'], 2),
                     number_format($item['harga'], 2),
-                    $item['nama_cluster']
+                    $item['nama_cluster'],
+                    $poPlus,
                 ]
             ], NULL, 'A' . $row);
             $row++;
@@ -8720,16 +8729,16 @@ class ExcelController extends BaseController
                 ],
             ],
         ];
-        $sheet->getStyle('A3:U' . ($row - 1))->applyFromArray($styleArray);
+        $sheet->getStyle('A3:V' . ($row - 1))->applyFromArray($styleArray);
 
         // Set auto width untuk setiap kolom
-        foreach (range('A', 'U') as $column) {
+        foreach (range('A', 'V') as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
 
         // Set isi tabel agar rata tengah
-        $sheet->getStyle('A4:U' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A4:U' . ($row - 1))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A4:V' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A4:V' . ($row - 1))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
         $writer = new Xlsx($spreadsheet);
         $fileName = 'Report_Datang_Benang_' . date('Y-m-d') . '.xlsx';
@@ -9558,7 +9567,7 @@ class ExcelController extends BaseController
 
                 $footerRow = $lastRow + 2;
                 $newSheet->mergeCells("A{$footerRow}:P{$footerRow}");
-                $newSheet->setCellValue("A{$footerRow}", 'REPORT (+)DATANG SOLID');
+                $newSheet->setCellValue("A{$footerRow}", 'REPORT (+) DATANG LUREX');
                 $newSheet->getStyle("A{$footerRow}")->getFont()->setBold(true)->setSize(10);
                 $newSheet->getStyle("A{$footerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             }
@@ -9593,21 +9602,22 @@ class ExcelController extends BaseController
                 $row = 4;
                 $no = 1;
                 foreach ($data['returGbn'] as $item) {
+                    // dd($data['returGbn']);
                     $newSheet->setCellValue('A' . $row, $no++);
-                    $newSheet->setCellValue('B' . $row, $item['no_model'] ?: '-');
-                    $newSheet->setCellValue('C' . $row, $item['item_type'] ?: '-');
-                    $newSheet->setCellValue('D' . $row, $item['kode_warna'] ?: '-');
-                    $newSheet->setCellValue('E' . $row, $item['warna'] ?: '-');
-                    $newSheet->setCellValue('F' . $row, $item['area_retur']);
-                    $newSheet->setCellValue('G' . $row, $item['tgl_retur'] ?: '-');
-                    $newSheet->setCellValue('H' . $row, $item['nama_cluster']);
-                    $newSheet->setCellValue('I' . $row, isset($item['kgs_retur']) ? number_format($item['kgs_retur'], 2, '.', '') : 0);
-                    $newSheet->setCellValue('J' . $row, $item['cns_retur'] ?: 0);
-                    $newSheet->setCellValue('K' . $row, $item['krg_retur'] ?: 0);
-                    $newSheet->setCellValue('L' . $row, $item['lot_retur'] ?: '-');
-                    $newSheet->setCellValue('M' . $row, $item['kategori'] ?: '-');
-                    $newSheet->setCellValue('N' . $row, $item['keterangan_area'] ?: '-');
-                    $newSheet->setCellValue('O' . $row, $item['keterangan_gbn'] ?: '-');
+                    $newSheet->setCellValue('B' . $row, $item['no_model'] ?? '-');
+                    $newSheet->setCellValue('C' . $row, $item['item_type'] ?? '-');
+                    $newSheet->setCellValue('D' . $row, $item['kode_warna'] ?? '-');
+                    $newSheet->setCellValue('E' . $row, $item['warna'] ?? '-');
+                    $newSheet->setCellValue('F' . $row, 'GUDANG BENANG');
+                    $newSheet->setCellValue('G' . $row, $item['tgl_retur'] ?? '-');
+                    $newSheet->setCellValue('H' . $row, $item['cluster_old']);
+                    $newSheet->setCellValue('I' . $row, isset($item['kgs']) ? number_format($item['kgs'], 2, '.', '') : 0);
+                    $newSheet->setCellValue('J' . $row, $item['cns'] ?? 0);
+                    $newSheet->setCellValue('K' . $row, $item['krg'] ?? 0);
+                    $newSheet->setCellValue('L' . $row, $item['lot'] ?? '-');
+                    $newSheet->setCellValue('M' . $row, $item['nama_kategori'] ?? '-');
+                    $newSheet->setCellValue('N' . $row, $item['keterangan_area'] ?? '-');
+                    $newSheet->setCellValue('O' . $row, $item['keterangan_gbn'] ?? '-');
                     $row++;
                 }
 
@@ -10062,11 +10072,11 @@ class ExcelController extends BaseController
                 $no = 1;
                 foreach ($data['dipindah'] as $item) {
                     $newSheet->setCellValue('A' . $row, $no++);
-                    $newSheet->setCellValue('B' . $row, $item['no_model_old'] ?: '-');
-                    $newSheet->setCellValue('C' . $row, $delivery[0]['delivery'] ?: '-');
-                    $newSheet->setCellValue('D' . $row, $item['item_type'] ?: '-');
-                    $newSheet->setCellValue('E' . $row, $item['kode_warna'] ?: '-');
-                    $newSheet->setCellValue('F' . $row, $item['warna'] ?: '-');
+                    $newSheet->setCellValue('B' . $row, $item['no_model_old'] ?? '-');
+                    $newSheet->setCellValue('C' . $row, $delivery[0]['delivery'] ?? '-');
+                    $newSheet->setCellValue('D' . $row, $item['item_type'] ?? '-');
+                    $newSheet->setCellValue('E' . $row, $item['kode_warna'] ?? '-');
+                    $newSheet->setCellValue('F' . $row, $item['warna'] ?? '-');
                     $newSheet->setCellValue('G' . $row, $item['kgs']);
                     $newSheet->setCellValue('H' . $row, $item['cns']);
                     $newSheet->setCellValue('I' . $row, $item['lot']);
@@ -10299,11 +10309,16 @@ class ExcelController extends BaseController
     }
     public function exportHistoryPindahOrder()
     {
-        $noModel   = $this->request->getGet('model')     ?? '';
+        $noModelOld   = $this->request->getGet('model_old') ?? '';
+        $noModelNew   = $this->request->getGet('model_new') ?? '';
         $kodeWarna = $this->request->getGet('kode_warna') ?? '';
 
         // 1) Ambil data
-        $apiUrl = api_url('material') . 'historyPindahOrder?model=' . urlencode($noModel) . '&kode_warna=' . urlencode($kodeWarna);
+        $apiUrl = api_url('material') . 'historyPindahOrder'
+            . '?no_model_old=' . urlencode($noModelOld)
+            . '&no_model_new=' . urlencode($noModelNew)
+            . '&kode_warna='   . urlencode($kodeWarna);
+
         $material = @file_get_contents($apiUrl);
 
         if ($material !== FALSE) {
@@ -10408,13 +10423,13 @@ class ExcelController extends BaseController
             $sheet->setCellValue('C' . $row, $data['delivery_awal']);
             $sheet->setCellValue('D' . $row, $data['delivery_akhir']);
             $sheet->setCellValue('E' . $row, $data['item_type']);
-            $sheet->setCellValue('F' . $row, $data['kode_warna']);
-            $sheet->setCellValue('G' . $row, $data['warna']);
+            $sheet->setCellValue('F' . $row, $data['kode_warna_old']);
+            $sheet->setCellValue('G' . $row, $data['warna_old']);
             $sheet->setCellValue('H' . $row, $data['kgs']);
             $sheet->setCellValue('I' . $row, $data['cns']);
             $sheet->setCellValue('J' . $row, $data['lot']);
             $sheet->setCellValue('K' . $row, $data['cluster_old']);
-            $sheet->setCellValue('L' . $row, $data['created_at'] . ' ' . $data['keterangan'] . ' KE ' . $data['no_model_new'] . ' KODE ' . $data['kode_warna']);
+            $sheet->setCellValue('L' . $row, $data['created_at'] . ' ' . $data['keterangan'] . ' KE ' . $data['no_model_new'] . ' KODE ' . $data['kode_warna_new']);
 
             // style body
             $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
@@ -11645,7 +11660,7 @@ class ExcelController extends BaseController
         $sheet->getStyle('A1:M1')->applyFromArray($styleTitle);
         // Tulis header
         $sheet->setCellValue('A3', 'TGL BOOKING');
-        $sheet->setCellValue('B3', 'NO Booking');
+        $sheet->setCellValue('B3', 'NO BOOKING');
         $sheet->setCellValue('C3', 'PRODUCT');
         $sheet->setCellValue('D3', 'TYPE');
         $sheet->setCellValue('E3', 'NO ORDER');
@@ -11659,7 +11674,8 @@ class ExcelController extends BaseController
         $sheet->setCellValue('M3', 'QTY');
         $sheet->setCellValue('N3', 'SISA');
         $sheet->setCellValue('O3', 'DESCRIPTION');
-        $sheet->setCellValue('P3', 'KETERANGAN');
+        $sheet->setCellValue('P3', 'PROSES ROUTE');
+        $sheet->setCellValue('Q3', 'KETERANGAN');
         $sheet->getStyle('A3')->applyFromArray($styleHeader);
         $sheet->getStyle('B3')->applyFromArray($styleHeader);
         $sheet->getStyle('C3')->applyFromArray($styleHeader);
@@ -11676,6 +11692,7 @@ class ExcelController extends BaseController
         $sheet->getStyle('N3')->applyFromArray($styleHeader);
         $sheet->getStyle('O3')->applyFromArray($styleHeader);
         $sheet->getStyle('P3')->applyFromArray($styleHeader);
+        $sheet->getStyle('Q3')->applyFromArray($styleHeader);
 
 
         // Tulis data mulai dari baris 2
@@ -11706,7 +11723,8 @@ class ExcelController extends BaseController
             $sheet->setCellValue('M' . $row, number_format($item['qty_booking'] / 24, 2, '.', ''));
             $sheet->setCellValue('N' . $row, number_format($item['sisa_booking'] / 24, 2, '.', ''));
             $sheet->setCellValue('O' . $row, $item['desc']);
-            $sheet->setCellValue('P' . $row, $item['keterangan']);
+            $sheet->setCellValue('P' . $row, $item['proses_route']);
+            $sheet->setCellValue('Q' . $row, $item['keterangan']);
             // 
             $sheet->getStyle('A' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('B' . $row)->applyFromArray($styleBody);
@@ -11724,12 +11742,13 @@ class ExcelController extends BaseController
             $sheet->getStyle('N' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('O' . $row)->applyFromArray($styleBody);
             $sheet->getStyle('P' . $row)->applyFromArray($styleBody);
+            $sheet->getStyle('Q' . $row)->applyFromArray($styleBody);
 
             $row++;
         }
 
         // Set lebar kolom agar menyesuaikan isi
-        foreach (range('A', 'P') as $col) {
+        foreach (range('A', 'Q') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 

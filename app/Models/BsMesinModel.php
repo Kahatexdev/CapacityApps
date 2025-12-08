@@ -225,10 +225,13 @@ class BsMesinModel extends Model
     }
     public function getTotalKgMonth($filters)
     {
-        $builder = $this->select(" SUM(qty_gram) as qty_gram")
-            ->where('MONTH(tanggal_produksi)',  $filters['bulan'])
-            ->where('YEAR(tanggal_produksi)',  $filters['tahun']);
+        $builder = $this->select(" SUM(qty_gram) as qty_gram");
+        // ->where('MONTH(tanggal_produksi)',  $filters['bulan'])
+        // ->where('YEAR(tanggal_produksi)',  $filters['tahun']);
 
+        if (!empty($filters['tgl_produksi'])) {
+            $builder->where('tanggal_produksi',  $filters['tgl_produksi']);
+        }
         if (!empty($filters['area'])) {
             $builder->where('area',  $filters['area']);
         }

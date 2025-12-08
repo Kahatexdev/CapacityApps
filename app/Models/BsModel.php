@@ -195,6 +195,18 @@ class BsModel extends Model
         }
         return $builder->first();
     }
+    public function bsDaily($filters)
+    {
+        $builder = $this->select('SUM(data_bs.qty) as bs');
+
+        if (!empty($filters['tgl_produksi'])) {
+            $builder->where('tgl_instocklot', $filters['tgl_produksi']);
+        }
+        if (!empty($filters['area'])) {
+            $builder->where('area', $filters['area']);
+        }
+        return $builder->first();
+    }
     public function getBsPerhari($bulan, $year, $area = null)
     {
         $builder = $this->select('master_deffect.Keterangan, SUM(data_bs.qty) as qty')

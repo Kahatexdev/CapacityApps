@@ -680,6 +680,7 @@ class OrderModel extends Model
             ->join('apsperstyle', 'apsperstyle.mastermodel=data_model.no_model', 'left')
             ->join('produksi', 'apsperstyle.idapsperstyle=produksi.idapsperstyle', 'left')
             ->where('apsperstyle.factory', $area)
+            ->where('produksi.area', $area)
             ->where('data_model.no_model', $nomodel)
             ->where('apsperstyle.size', $size)
             ->groupBy('apsperstyle.size')
@@ -797,5 +798,16 @@ class OrderModel extends Model
             ->join('master_product_type', 'master_product_type.id_product_type = data_model.id_product_type', 'left')
             ->where('data_model.no_model', $pdk['model'])
             ->first();
+    }
+    public function getNoModel($startDate)
+    {
+        return $this->select('no_model, kd_buyer_order')
+            ->join('apsperstyle', 'apsperstyle.mastermodel=data_model.no_model', 'left')
+            ->where('created_at >=', $startDate)
+            ->where('apsperstyle.qty <>', 0)
+            ->groupBy('no_model')
+            ->orderBy('created_at', 'DESC')
+            ->get()
+            ->getResultArray();
     }
 }
