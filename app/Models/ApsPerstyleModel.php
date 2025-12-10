@@ -1604,4 +1604,13 @@ class ApsPerstyleModel extends Model
             ->get()
             ->getResultArray();
     }
+    public function geQtyByModel($noModel)
+    {
+        return $this->select('mastermodel, factory, machinetypeid, inisial, size, SUM(qty/24) as qty')
+            ->where('mastermodel', $noModel)
+            ->where('qty > 0')
+            ->groupBy('factory, machinetypeid, size')
+            ->orderBy('factory, machinetypeid, size')
+            ->findAll();
+    }
 }
