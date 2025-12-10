@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Models\MachinesModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -1005,16 +1006,23 @@ class GodController extends BaseController
             $targetMonth = 0;
             $targetMonth = $this->MonthlyMcModel->getTargetArea($judul, $area); // area spesifik
 
-            $prodYesterday = $this->produksiModel->monthlyProd($filters);
+            // $prodYesterday = $this->produksiModel->monthlyProd($filters);
+            $prodYesterday = $this->produksiModel->dailyProd($filters);
+            if (!empty($prodYesterday)) {
+                $filters['tgl_produksi'] = $prodYesterday[0]['tgl_produksi'];
+            } else {
+                $filters['tgl_produksi'] = null; // fallback jika data kosong
+            }
             // $totalProd = $this->produksiModel->totalProdBulan($filters);
             // return $this->response->setJSON($totalProd);
 
-            $bs = $this->bsModel->bsMonthly($filters);
+            // $bs = $this->bsModel->bsMonthly($filters);
+            $bs = $this->bsModel->bsDaily($filters);
+
             $bsMesin = $this->bsMesinModel->getTotalKgMonth($filters) ?? 0;
             $direct = $this->produksiModel->directMonthly($filters);
             $target = $this->ApsPerstyleModel->monthlyTarget($filters);
             $hari = $this->produksiModel->hariProduksi($filters);
-            $jlMc = $this->produksiModel->getLatestMc($filters);
             $jlMc = $this->produksiModel->getLatestMc($filters);
             $jumhari = $hari['hari'];
             $prodTotal = 0;
@@ -1079,8 +1087,7 @@ class GodController extends BaseController
                 $quality = ($good / $prodTotal) * 100;
                 $prod = $target['qty'] - $target['sisa'];
                 $percentage =  ($prod / $target['qty']) * 100;
-                $productivity = (($jlMc['prodYes']  / 24) / ($targetMonth['targetMc'] * $jlMc['mc'])) * 100;
-                $productivity = (($jlMc['prodYes']  / 24) / ($targetMonth['targetMc'] * $jlMc['mc'])) * 100;
+                $productivity = (($prodTotal  / 24) / ($targetMonth['targetMc'] * $jlMc['mc'])) * 100;
             }
 
             $data = [
@@ -1094,18 +1101,15 @@ class GodController extends BaseController
                 'percentage' => $percentage,
                 'productivity' =>   round($productivity),
                 'prodtotal' => ($prodTotal / 24),
-                'targetday' => $targetMonth['total_output'],
+                // 'targetday' => $targetMonth['total_output'],
+                'targetday' => $targetMonth['targetMc'] * $jlMc['mc'],
                 'targetOutput' => $targetMonth['total_output'] * (int)$jumhari,
                 'hari' => $jumhari,
                 'planmc' => $targetMonth['mesin'],
                 'actMc' => $jlMc['mc'] ?? 0,
-                'prodKemaren' => $jlMc['prodYes'] / 24 ?? 0,
                 'mesinDetail' => $detailMc,
-                'targetPermesin' => $targetMonth['targetMc']
-                'actMc' => $jlMc['mc'] ?? 0,
-                'prodKemaren' => $jlMc['prodYes'] / 24 ?? 0,
-                'mesinDetail' => $detailMc,
-                'targetPermesin' => $targetMonth['targetMc']
+                'targetPermesin' => $targetMonth['targetMc'],
+                'tglProd' => $filters['tgl_produksi'],
             ];
 
             return $this->response->setJSON($data);
