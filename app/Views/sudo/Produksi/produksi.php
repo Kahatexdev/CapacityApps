@@ -26,6 +26,7 @@
                                         <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#summaryTOD">Produksi Global</a></li>
                                         <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#summaryBS">Bs Mesin</a></li>
                                         <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#timter">Timter</a></li>
+                                        <li><a class="dropdown-item" href="<?= base_url($role . '/reportGlobalProduksi') ?>">Report Global Produksi</a></li>
                                     </ul>
                                 </li>
                                 <li class="nav-item dropdown">

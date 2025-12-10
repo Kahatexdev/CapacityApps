@@ -1837,4 +1837,134 @@ class ProduksiController extends BaseController
         }
         $db->transComplete();
     }
+    public function reportGlobalProduksi()
+    {
+        $no_model = $this->request->getGet('no_model') ?? '';
+
+        // Siapkan default grouped kosong
+        $grouped = [];
+
+        // Jika no_model kosong → skip proses tapi tetap kirim view
+        if (!empty($no_model)) {
+
+            // data utama
+            $allData = $this->ApsPerstyleModel->geQtyByModel($no_model);
+
+            // Jika data utama ada → proses
+            if (!empty($allData)) {
+
+                // Siapkan array mapping
+                $prodMap = $bsMcMap = $pbMap = $bsStocklotMap = [];
+
+                $allProd = $this->produksiModel
+                    ->select('SUM(produksi.qty_produksi) AS qtyProd, produksi.area, apsperstyle.size')
+                    ->join('apsperstyle', 'apsperstyle.idapsperstyle=produksi.idapsperstyle')
+                    ->where('apsperstyle.mastermodel', $no_model)
+                    ->groupBy('produksi.area, apsperstyle.size')
+                    ->findAll();
+
+                foreach ($allProd as $row) {
+                    $prodMap[$row['area']][$row['size']] = $row['qtyProd'];
+                }
+
+                // ===========================
+                // 3. BS MESIN (1 QUERY)
+                // ===========================
+                $allBsMc = $this->bsMesinModel
+                    ->select('area, size, sum(qty_gram) AS bs_gram, sum(qty_pcs) AS qty_pcs')
+                    ->where('no_model', $no_model)
+                    ->groupBy('area, size')
+                    ->findAll();
+
+                foreach ($allBsMc as $row) {
+                    $bsMcMap[$row['area']][$row['size']] = [
+                        'qty_pcs' => $row['qty_pcs'],
+                        'bs_gram' => $row['bs_gram'],
+                    ];
+                }
+
+                // ===========================
+                // 4. PERBAIKAN AREA (1 QUERY)
+                // ===========================
+                $allPb = $this->perbaikanAreaModel
+                    ->select('perbaikan_area.area, apsperstyle.size, SUM(perbaikan_area.qty) AS qtyPb')
+                    ->join('apsperstyle', 'apsperstyle.idapsperstyle = perbaikan_area.idapsperstyle')
+                    ->where('apsperstyle.mastermodel', $no_model)
+                    ->where('apsperstyle.qty > 0')
+                    ->groupBy('apsperstyle.factory, apsperstyle.size')
+                    ->findAll();
+
+                foreach ($allPb as $row) {
+                    $pbMap[$row['area']][$row['size']] = $row['qtyPb'];
+                }
+
+                // ===========================
+                // 5. BS STOCKLOT (1 QUERY)
+                // ===========================
+                $allBsStocklot = $this->bsModel
+                    ->select('data_bs.area, apsperstyle.size, SUM(data_bs.qty) AS qtyBs')
+                    ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle')
+                    ->where('apsperstyle.mastermodel', $no_model)
+                    ->groupBy('data_bs.area, apsperstyle.size')
+                    ->findAll();
+
+                foreach ($allBsStocklot as $row) {
+                    $bsStocklotMap[$row['area']][$row['size']] = $row['qtyBs'];
+                }
+
+                // ========================================
+                // 6. LOOP UTAMA (TANPA QUERY LAGI)
+                // ========================================
+                foreach ($allData as $key => $id) {
+
+                    $area = $id['factory'];   // field dari geQtyByModel
+                    $size = $id['size'];
+
+                    // PRODUKSI
+                    $allData[$key]['prodPcs'] = $prodMap[$area][$size] ?? 0;
+                    $allData[$key]['prodDz'] = round($prodMap[$area][$size] / 24) ?? 0;
+
+                    // BS MESIN
+                    $allData[$key]['bsMcPcs']  = $bsMcMap[$area][$size]['qty_pcs'] ?? 0;
+                    $allData[$key]['bsMcGram'] = $bsMcMap[$area][$size]['bs_gram'] ?? 0;
+                    $bsMcPercen = $bsMcMap[$area][$size]['qty_pcs'] / ($prodMap[$area][$size] + $bsMcMap[$area][$size]['qty_pcs']) * 100;
+                    $allData[$key]['bsMcPercen'] = round($bsMcPercen) ?? 0;
+
+                    // PERBAIKAN
+                    $allData[$key]['pbAreaPcs'] = $pbMap[$area][$size] ?? 0;
+                    $allData[$key]['pbAreaDz'] = round($pbMap[$area][$size] / 24) ?? 0;
+                    $pbAreaPercen = $pbMap[$area][$size] / $prodMap[$area][$size] * 100;
+                    $allData[$key]['pbAreaPercen'] = round($pbAreaPercen) ?? 0;
+
+                    // BS STOCKLOT
+                    $allData[$key]['bsStocklotPcs'] = $bsStocklotMap[$area][$size] ?? 0;
+                    $allData[$key]['bsStocklotDz'] = round($bsStocklotMap[$area][$size] / 24) ?? 0;
+                    $bsStocklotPercen = $pbMap[$area][$size] / $prodMap[$area][$size] * 100;
+                    $allData[$key]['bsStocklotPercen'] = round($bsStocklotPercen) ?? 0;
+                }
+            }
+
+            foreach ($allData as $row) {
+                $area = $row['factory'];
+                $grouped[$area][] = $row;
+            }
+        }
+
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Data Produksi',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'noModel' => $no_model,
+            'data' => $grouped,
+        ];
+        // dd($data);
+
+        return view(session()->get('role') . '/Produksi/reportGlobal', $data);
+    }
 }
