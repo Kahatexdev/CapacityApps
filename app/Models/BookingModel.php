@@ -53,7 +53,10 @@ class BookingModel extends Model
     public function getAllData()
     {
         return $this->select('data_booking.*, master_product_type.product_type')
+            ->groupStart()
             ->where('data_booking.keterangan !=', 'Manual Cancel Booking')
+            ->orWhere('data_booking.keterangan', null)
+            ->groupEnd()
             ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
             ->findAll();
     }
@@ -72,8 +75,12 @@ class BookingModel extends Model
     {
         return $this->select('data_booking.*, master_product_type.product_type')
             ->where('needle', $jarum)
+            ->groupStart()
             ->where('data_booking.keterangan !=', 'Manual Cancel Booking')
+            ->orWhere('data_booking.keterangan', null)
+            ->groupEnd()
             ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('id_booking')
             ->findAll();
     }
     public function getDataPerjarumbulan($bulan, $tahun, $jarum)
@@ -82,8 +89,12 @@ class BookingModel extends Model
             ->where('needle', $jarum)
             ->where('monthname(delivery)', $bulan)
             ->where('year(delivery)', $tahun)
+            ->groupStart()
             ->where('data_booking.keterangan !=', 'Manual Cancel Booking')
+            ->orWhere('data_booking.keterangan', null)
+            ->groupEnd()
             ->join('master_product_type', 'master_product_type.id_product_type = data_booking.id_product_type')
+            ->groupBy('id_booking')
             ->findAll();
     }
     public function getNeedle($idBooking)
@@ -98,7 +109,10 @@ class BookingModel extends Model
     }
     public function getOrderJalan()
     {
-        return $this->where('status', 'Aktif')->where('data_booking.keterangan !=', 'Manual Cancel Booking')->countAllResults();
+        return $this->where('status', 'Aktif')->groupStart()
+            ->where('data_booking.keterangan !=', 'Manual Cancel Booking')
+            ->orWhere('data_booking.keterangan', null)
+            ->groupEnd()->countAllResults();
     }
     public function getBookingMasuk()
     {
@@ -106,7 +120,10 @@ class BookingModel extends Model
         $year = date('Y');
         return $this->where("MONTH(tgl_terima_booking) =", $bulan)
             ->where("YEAR(tgl_terima_booking) =", $year)
+            ->groupStart()
             ->where('data_booking.keterangan !=', 'Manual Cancel Booking')
+            ->orWhere('data_booking.keterangan', null)
+            ->groupEnd()
             ->countAllResults();
     }
     public function getBulan($jarum)
@@ -130,7 +147,10 @@ class BookingModel extends Model
             ->where('data_booking.delivery >=', $cek['start'])
             ->where('data_booking.delivery <=', $cek['end'])
             ->where('master_product_type.product_type', $productType)
+            ->groupStart()
             ->where('data_booking.keterangan !=', 'Manual Cancel Booking')
+            ->orWhere('data_booking.keterangan', null)
+            ->groupEnd()
             ->get()
             ->getResultArray();
 
@@ -199,7 +219,10 @@ class BookingModel extends Model
         $allResults = $this
             ->select('*')
             ->where('status', 'Aktif')
+            ->groupStart()
             ->where('data_booking.keterangan !=', 'Manual Cancel Booking')
+            ->orWhere('data_booking.keterangan', null)
+            ->groupEnd()
             ->orderBy('updated_at', 'ASC')
             ->findAll();
 
@@ -235,7 +258,10 @@ class BookingModel extends Model
             ->where("data_booking.delivery > DATE_ADD(CURDATE(), INTERVAL 7 DAY)")
             ->where('data_booking.delivery >=', $get['start'])
             ->where('data_booking.delivery <=', $get['end'])
+            ->groupStart()
             ->where('data_booking.keterangan !=', 'Manual Cancel Booking')
+            ->orWhere('data_booking.keterangan', null)
+            ->groupEnd()
             ->get()->getResultArray();
 
 
@@ -249,7 +275,10 @@ class BookingModel extends Model
             ->where('no_booking', $data['no_booking'])
             ->where('no_order', $data['no_order'])
             ->where('delivery', $data['delivery'])
+            ->groupStart()
             ->where('data_booking.keterangan !=', 'Manual Cancel Booking')
+            ->orWhere('data_booking.keterangan', null)
+            ->groupEnd()
             ->first();
         return $result;
     }
@@ -262,7 +291,10 @@ class BookingModel extends Model
             ->where('needle', $cek['jarum'])
             ->where('delivery >=', $cek['start'])
             ->where('delivery <=', $cek['end'])
+            ->groupStart()
             ->where('data_booking.keterangan !=', 'Manual Cancel Booking')
+            ->orWhere('data_booking.keterangan', null)
+            ->groupEnd()
             ->get()
             ->getResultArray();
 
@@ -287,7 +319,10 @@ class BookingModel extends Model
             ->where('data_booking.needle', $cek['jarum'])
             ->where('data_booking.delivery >=', $cek['start'])
             ->where('data_booking.delivery <=', $cek['end'])
+            ->groupStart()
             ->where('data_booking.keterangan !=', 'Manual Cancel Booking')
+            ->orWhere('data_booking.keterangan', null)
+            ->groupEnd()
             ->groupBy('product_group')
             ->get()
             ->getResultArray();
@@ -297,7 +332,10 @@ class BookingModel extends Model
     {
         return $this->where('sisa_booking', 0)
             ->where('status !=', 'cancel booking')
+            ->groupStart()
             ->where('data_booking.keterangan !=', 'Manual Cancel Booking')
+            ->orWhere('data_booking.keterangan', null)
+            ->groupEnd()
             ->set('status', 'Habis')
             ->update();
     }
@@ -307,7 +345,10 @@ class BookingModel extends Model
             ->join('master_product_type', 'master_product_type.id_product_type=data_booking.id_product_type', 'left')
             ->join('data_model', 'data_model.id_booking=data_booking.id_booking', 'left')
             ->where('status !=', 'cancel booking')
-            ->where('data_booking.keterangan !=', 'Manual Cancel Booking');
+            ->groupStart()
+            ->where('data_booking.keterangan !=', 'Manual Cancel Booking')
+            ->orWhere('data_booking.keterangan', null)
+            ->groupEnd();
 
         if (!empty($validate['buyer'])) {
             $builder->like('data_booking.kd_buyer_booking', $validate['buyer']);
@@ -342,7 +383,10 @@ class BookingModel extends Model
         return $this->select('ROUND(SUM(sisa_booking/24)) AS sisa_booking')
             ->where("DATE_FORMAT(delivery, '%Y-%m')", $month)
             ->where('status !=', 'cancel booking')
+            ->groupStart()
             ->where('data_booking.keterangan !=', 'Manual Cancel Booking')
+            ->orWhere('data_booking.keterangan', null)
+            ->groupEnd()
             ->first() ?? ['sisa_booking' => 0];
     }
 }
