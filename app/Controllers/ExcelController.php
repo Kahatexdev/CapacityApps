@@ -14031,7 +14031,7 @@ class ExcelController extends BaseController
 
             $layoutDonut = new Layout();
             $layoutDonut->setShowVal(true);
-            $layoutDonut->setShowPercent(true);
+            $layoutDonut->setShowPercent(false);
 
             $plotAreaDonut = new PlotArea($layoutDonut, [$seriesDonut]);
             $legendDonut = new Legend(Legend::POSITION_RIGHT, null, false);
