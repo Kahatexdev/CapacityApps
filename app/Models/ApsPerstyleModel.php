@@ -1604,4 +1604,19 @@ class ApsPerstyleModel extends Model
             ->get()
             ->getResultArray();
     }
+    public function getArea($model)
+    {
+        $result = $this->select('factory')
+            ->where('mastermodel', $model)
+            ->groupBy('factory')
+            ->orderBy('factory', 'ASC')
+            ->get()
+            ->getResultArray();
+
+        // Ambil hanya nilai factory dari setiap row
+        $areas = array_column($result, 'factory');
+
+        // Gabung dengan koma
+        return !empty($areas) ? implode(', ', $areas) : '';
+    }
 }
