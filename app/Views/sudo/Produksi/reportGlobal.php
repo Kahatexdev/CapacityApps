@@ -130,8 +130,8 @@ $this->extend($role . '/layout'); ?>
                                                         <td class="text-sm" style="text-align: center;"><?= round($id['qty'], 2) ?></td>
                                                         <td class="text-sm" style="text-align: center;"><?= $id['prodDz'] ?></td>
                                                         <td class="text-sm" style="text-align: center;"><?= $id['prodPcs'] ?></td>
-                                                        <td class="text-sm" style="text-align: center;"><?= $id['bsMcPcs'] ?></td>
                                                         <td class="text-sm" style="text-align: center;"><?= $id['bsMcGram'] ?></td>
+                                                        <td class="text-sm" style="text-align: center;"><?= $id['bsMcPcs'] ?></td>
                                                         <td class="text-sm" style="text-align: center;"><?= $id['bsMcPercen'] ?>%</td>
                                                         <td class="text-sm" style="text-align: center;"><?= $id['pbAreaDz'] ?></td>
                                                         <td class="text-sm" style="text-align: center;"><?= $id['pbAreaPcs'] ?></td>
