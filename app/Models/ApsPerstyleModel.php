@@ -1619,4 +1619,13 @@ class ApsPerstyleModel extends Model
         // Gabung dengan koma
         return !empty($areas) ? implode(', ', $areas) : '';
     }
+    public function geQtyByModel($noModel)
+    {
+        return $this->select('mastermodel, factory, machinetypeid, inisial, size, SUM(qty/24) as qty')
+            ->where('mastermodel', $noModel)
+            ->where('qty > 0')
+            ->groupBy('factory, machinetypeid, size')
+            ->orderBy('factory, machinetypeid, size')
+            ->findAll();
+    }
 }
