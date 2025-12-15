@@ -240,6 +240,7 @@ class ApsPerstyleModel extends Model
             ->where('sisa >', 0)
             ->where('qty >', 0)
             ->where('size', $validate['style'])
+            ->orderBy('delivery', 'asc')
             ->first();
     }
 
