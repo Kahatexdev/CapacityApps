@@ -7,7 +7,7 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',
-                    text: '<?= session()->getFlashdata('success') ?>',
+                    html: '<?= session()->getFlashdata('success') ?>',
                 });
             });
         </script>
@@ -19,173 +19,156 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: '<?= session()->getFlashdata('error') ?>',
+                    html: `<?= session()->getFlashdata('error') ?> <br>
+                <?php if (session()->getFlashdata('error_list')): ?>
+                    <ul style="text-align: left; padding-left: 20px;">
+                        <?php foreach (session()->getFlashdata('error_list') as $item): ?>
+                            <li><?= esc($item) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>`
                 });
             });
         </script>
     <?php endif; ?>
+
     <div class="row mt-3">
         <div class="col-lg-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-0 pb-0 d-flex justify-content-between align-items-center">
-                    <h5 class="text-dark fw-bold mb-0">
-                        <i class="ni ni-filter-alt text-info me-2"></i> Filter Data BS Mesin
-                    </h5>
-                </div>
-
-                <div class="card-body pt-3">
-                    <form action="<?= base_url($role . '/bsMesinPerbulan/' . $ar . '/' . $bulan) ?>" method="get" class="row g-3 align-items-end">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label for="buyer" class="form-label fw-semibold small mb-1">Buyer</label>
-                                <select class="form-select text-dark" id="buyer" name="buyer">
-                                    <option value="">Pilih Buyer</option>
-                                    <?php foreach ($buyerList as $b) : ?>
-                                        <option value="<?= $b['kd_buyer_order']; ?>"
-                                            <?= isset($buyerFilter) && $buyerFilter == $b['kd_buyer_order'] ? 'selected' : '' ?>>
-                                            <?= $b['kd_buyer_order']; ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold small mb-1"> </label>
-                                <button type="submit" class="btn btn-info w-100">
-                                    <i class="fas fa-search me-1"></i> Tampilkan
-                                </button>
-                            </div>
-                        </div>
-
-                    </form>
-                </div>
-
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <div class="card mt-2">
-                <div class="card-header">
-                    <h5>
-                        <h5>
-                            Data BS Mesin <?= $area ?> Bulan <?= $month ?>
-                        </h5>
-                        Total in BS Mesin : <?= $totalbsgram ?> gr (<?= $totalbspcs ?> pcs)
-                    </h5>
-                </div>
+            <div class="card">
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-lg-8 col-md-8">
+                    <div class=" d-flex justify-content-between">
 
-                            <div class="chart">
-                                <canvas id="bs-chart" class="chart-canvas" height="500"></canvas>
-                            </div>
+                        <h4>
+                            BS Mesin Perbulan <?= $areas ?>
 
-                        </div>
-                        <div class="col-lg-4 col-md-4">
-                            <table class="table-responsive">
-                                <thead>
-                                    <tr>
-                                        <th>Keterangan</th>
-                                        <th>Jumlah</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                    // Array warna yang akan digunakan
-                                    $chartColors = ['#845ec2', '#d65db1', '#ff6f91', '#ff9671', '#ffc75f', '#f9f871', '#008f7a', '#b39cd0', '#c34a36', '#4b4453', '#4ffbdf', '#936c00', '#c493ff', '#296073'];
-
-                                    foreach ($chart as $index => $ch) :
-                                        // Ulangi warna jika index lebih besar dari jumlah warna yang tersedia
-                                        $color = $chartColors[$index % count($chartColors)];
-                                    ?>
-                                        <tr>
-                                            <td> <i class="ni ni-button-play" style="color: <?= $color ?>;"></i><?= $ch['no_model'] ?></td>
-                                            <td><?= $ch['totalGram'] ?> gr</td>
-                                        </tr>
-                                    <?php endforeach ?>
-                                </tbody>
-                            </table>
+                        </h4>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#summaryBS">
+                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary BS MC
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="row mt-4">
-        <div class="col-lg-12">
-            <div class="card pb-0">
-                <div class="card-header d-flex justify-content-between">
-                    <h5>Total <?= $month ?></h5>
-                    <!-- <a href="<?= base_url($role . '/exportBsMesinPerbulan/' . $area . '/' . $month) ?>" class="btn btn-success">Export</a> -->
-                    <p class="text-danger">Rumus persentase (%) = (Bs Mesin + Perbaikan) / Produksi</p>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table id="dataTable1" class="display  striped" style="width:100%">
-                            <thead>
-                                <tr class="text-center">
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal Produksi</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Produksi (Pcs)</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Bs Mesin (Pcs)</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Perbaikan (Pcs)</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Persentase (%)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($dataTotal as $bs) : ?>
-                                    <tr>
-                                        <td class="text-sm"><?= $bs['tanggal']; ?></td>
-                                        <td class="text-sm"><?= $bs['qty_prod']; ?></td>
-                                        <td class="text-sm"><?= $bs['totalBsMc']; ?></td>
-                                        <td class="text-sm"><?= $bs['qty_perbaikan']; ?></td>
-                                        <td class="text-sm"><?= round($bs['persentase'], 2); ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row mt-4">
-        <div class="col-lg-12">
-            <div class="card shadow-sm">
-                <div class="card pb-0">
-                    <div class="card-header d-flex justify-content-between">
-                        <h5>BS Mesin bulan <?= $month ?></h5>
-                        <a href="<?= base_url($role . '/exportBsMesinPerbulan/' . $area . '/' . $month) ?>" class="btn btn-success">Export</a>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table id="dataTable0" class="display  striped" style="width:100%">
-                                <thead>
-                                    <tr class="text-center">
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Nama</th>
-                                        <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Total Bs (Dz)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($dataBs as $bs) : ?>
-                                        <tr>
-                                            <td class="text-sm"><?= $bs['nama_karyawan']; ?></td>
-                                            <td class="text-sm"><?= $bs['totalBsMc']; ?></td>
-
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
+    <div class="row mt-1">
+        <?php foreach ($month as $bln): ?>
+            <div class="col-lg-3 mt-2">
+                <button type="button"
+                    class="btn w-100 p-0 border-0 bg-transparent openAreaModal"
+                    data-bulan="<?= $bln ?>"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalAreaSelect">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-calendar-alt text-lg opacity-10"></i> <b><?= $bln ?></b>
+                            </h5>
                         </div>
                     </div>
+                </button>
+            </div>
+        <?php endforeach ?>
+    </div>
+</div>
+
+<div class="modal fade" id="summaryBS" tabindex="-1" role="dialog" aria-labelledby="summaryBS" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Summary BS MC</h5>
+                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form action="<?= base_url($role . '/exportSummaryBs'); ?>" method="POST">
+                <div class="modal-body align-items-center">
+                    <div class="form-group">
+                        <label for="buyer" class="col-form-label">Buyer</label>
+                        <select class="form-control" id="buyer" name="buyer">
+                            <option></option>
+                            <?php foreach ($buyer as $buy) : ?>
+                                <option><?= $buy['kd_buyer_order'] ?></option>
+                            <?php endforeach ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="area" class="col-form-label">Area</label>
+                        <select class="form-control" id="area" name="area">
+                            <option></option>
+                            <?php foreach ($area as $ar) : ?>
+                                <option><?= $ar ?></option>
+                            <?php endforeach ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="jarum" class="col-form-label">Jarum</label>
+                        <select class="form-control" id="jarum" name="jarum">
+                            <option></option>
+                            <option value="13">13</option>
+                            <option value="84">84</option>
+                            <option value="92">92</option>
+                            <option value="96">96</option>
+                            <option value="106">106</option>
+                            <option value="108">108</option>
+                            <option value="116">116</option>
+                            <option value="120">120</option>
+                            <option value="124">124</option>
+                            <option value="126">126</option>
+                            <option value="144">144</option>
+                            <option value="168">168</option>
+                            <option value="200">200</option>
+                            <option value="240">240</option>
+                            <option value="POM-POM">POM-POM</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pdk" class="col-form-label">No Model</label>
+                        <input type="text" class="form-control" name="pdk">
+                    </div>
+                    <div class="form-group">
+                        <label for="awal" class="col-form-label">Dari</label>
+                        <input type="date" class="form-control" name="awal">
+                    </div>
+                    <div class="form-group">
+                        <label for="akhir" class="col-form-label">Sampai</label>
+                        <input type="date" class="form-control" name="akhir">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-gradient-info">Generate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- modal bs mc perbulan -->
+<div class="modal fade" id="modalAreaSelect" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Pilih Area</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="areaSelect">Area</label>
+                    <select id="areaSelect" class="form-select">
+                        <option value="">-- Pilih Area --</option>
+                        <?php foreach ($listArea as $ar): ?>
+                            <option value="<?= $ar; ?>"><?= $ar; ?></option>
+                        <?php endforeach ?>
+                    </select>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                 <button type="button" id="submitArea" class="btn btn-success">Lanjut</button>
             </div>
 
@@ -195,89 +178,32 @@
 
 
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
-<script type="text/javascript">
-    // AJAX form submission
-    $(document).ready(function() {
-        $('#dataTable0').DataTable({
-            "order": []
-        });
-        $('#dataTable').DataTable({});
+<!-- jQuery (Diperlukan oleh Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-        $('#dataTable1').DataTable({
-            "order": []
-        });
-        $('#dataTable').DataTable({});
+<!-- Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
-
-    });
-</script>
 <script>
-    let data = <?php echo json_encode($chart); ?>;
+    let selectedBulan = "";
 
-    let labels = data.map(item => item.no_model);
-    let value = data.map(item => item.totalGram);
+    // Saat kartu diklik → simpan bulan
+    $(".openAreaModal").on("click", function() {
+        selectedBulan = $(this).data("bulan");
+    });
 
-    // Warna yang diulang jika jumlah data lebih banyak dari warna yang tersedia
-    let chartColors = <?php echo json_encode($chartColors); ?>;
-    let colors = data.map((_, index) => chartColors[index % chartColors.length]);
+    // Saat user klik "Lanjut"
+    $("#submitArea").on("click", function() {
+        const area = $("#areaSelect").val();
 
-    var ctx4 = document.getElementById("bs-chart").getContext("2d");
+        if (!area) {
+            Swal.fire("Error", "Pilih area terlebih dahulu", "error");
+            return;
+        }
 
-    new Chart(ctx4, {
-        type: "pie",
-        data: {
-            labels: labels,
-            datasets: [{
-                label: "Projects",
-                weight: 9,
-                cutout: 0,
-                tension: 0.9,
-                pointRadius: 2,
-                borderWidth: 2,
-                backgroundColor: colors,
-                data: value,
-                fill: false
-            }],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false,
-                }
-            },
-            interaction: {
-                intersect: false,
-                mode: 'index',
-            },
-            scales: {
-                y: {
-                    grid: {
-                        drawBorder: false,
-                        display: false,
-                        drawOnChartArea: false,
-                        drawTicks: false,
-                    },
-                    ticks: {
-                        display: false
-                    }
-                },
-                x: {
-                    grid: {
-                        drawBorder: false,
-                        display: false,
-                        drawOnChartArea: false,
-                        drawTicks: false,
-                    },
-                    ticks: {
-                        display: false,
-                    }
-                },
-            },
-        },
+        // Redirect ke route sesuai pilihan
+        window.location.href = "<?= base_url($role . '/bsMesinPerbulan') ?>/" + area + "/" + selectedBulan;
     });
 </script>
-
 
 <?php $this->endSection(); ?>

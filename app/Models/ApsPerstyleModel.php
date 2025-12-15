@@ -240,6 +240,7 @@ class ApsPerstyleModel extends Model
             ->where('sisa >', 0)
             ->where('qty >', 0)
             ->where('size', $validate['style'])
+            ->orderBy('delivery', 'asc')
             ->first();
     }
 
@@ -1044,6 +1045,7 @@ class ApsPerstyleModel extends Model
     {
         return $this->select('size,inisial')
             ->where('mastermodel', $noModel)
+            ->where('qty > 0')
             ->groupBy('size')
             ->orderBy('size', 'ASC')
             ->findAll();
@@ -1602,5 +1604,29 @@ class ApsPerstyleModel extends Model
             ->whereIn('mastermodel', $listNoModel)
             ->get()
             ->getResultArray();
+    }
+    public function getArea($model)
+    {
+        $result = $this->select('factory')
+            ->where('mastermodel', $model)
+            ->groupBy('factory')
+            ->orderBy('factory', 'ASC')
+            ->get()
+            ->getResultArray();
+
+        // Ambil hanya nilai factory dari setiap row
+        $areas = array_column($result, 'factory');
+
+        // Gabung dengan koma
+        return !empty($areas) ? implode(', ', $areas) : '';
+    }
+    public function geQtyByModel($noModel)
+    {
+        return $this->select('mastermodel, factory, machinetypeid, inisial, size, SUM(qty/24) as qty')
+            ->where('mastermodel', $noModel)
+            ->where('qty > 0')
+            ->groupBy('factory, machinetypeid, size')
+            ->orderBy('factory, machinetypeid, size')
+            ->findAll();
     }
 }

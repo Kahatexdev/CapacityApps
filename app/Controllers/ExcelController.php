@@ -14031,7 +14031,7 @@ class ExcelController extends BaseController
 
             $layoutDonut = new Layout();
             $layoutDonut->setShowVal(true);
-            $layoutDonut->setShowPercent(true);
+            $layoutDonut->setShowPercent(false);
 
             $plotAreaDonut = new PlotArea($layoutDonut, [$seriesDonut]);
             $legendDonut = new Legend(Legend::POSITION_RIGHT, null, false);
@@ -15615,6 +15615,298 @@ class ExcelController extends BaseController
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
+        $writer->save('php://output');
+        exit;
+    }
+    public function excelGlobalProduksi($no_model)
+    {
+        // Siapkan default grouped kosong
+        $grouped = [];
+
+        // Jika no_model kosong → skip proses tapi tetap kirim view
+        if (!empty($no_model)) {
+
+            // data utama
+            $allData = $this->ApsPerstyleModel->geQtyByModel($no_model);
+
+            // Jika data utama ada → proses
+            if (!empty($allData)) {
+
+                // Siapkan array mapping
+                $prodMap = $bsMcMap = $pbMap = $bsStocklotMap = [];
+
+                $allProd = $this->produksiModel
+                    ->select('SUM(produksi.qty_produksi) AS qtyProd, produksi.area, apsperstyle.size, MAX(tgl_produksi) AS tglProd')
+                    ->join('apsperstyle', 'apsperstyle.idapsperstyle=produksi.idapsperstyle')
+                    ->where('apsperstyle.mastermodel', $no_model)
+                    ->groupBy('produksi.area, apsperstyle.size')
+                    ->findAll();
+
+                foreach ($allProd as $row) {
+                    $prodMap[$row['area']][$row['size']] = [
+                        'prod' => $row['qtyProd'],
+                        'tglProd' => $row['tglProd'],
+                    ];
+                }
+
+                // ===========================
+                // 3. BS MESIN (1 QUERY)
+                // ===========================
+                $allBsMc = $this->bsMesinModel
+                    ->select('area, size, SUM(qty_gram) AS bs_gram, SUM(qty_pcs) AS qty_pcs, MAX(tanggal_produksi) AS tglBsMc')
+                    ->where('no_model', $no_model)
+                    ->groupBy('area, size')
+                    ->findAll();
+
+                foreach ($allBsMc as $row) {
+                    $bsMcMap[$row['area']][$row['size']] = [
+                        'qty_pcs' => $row['qty_pcs'],
+                        'bs_gram' => $row['bs_gram'],
+                        'tglBsMc' => $row['tglBsMc'],
+                    ];
+                }
+
+                // ===========================
+                // 4. PERBAIKAN AREA (1 QUERY)
+                // ===========================
+                $allPb = $this->perbaikanAreaModel
+                    ->select('perbaikan_area.area, apsperstyle.size, SUM(perbaikan_area.qty) AS qtyPb, MAX(tgl_perbaikan) AS tglPbArea')
+                    ->join('apsperstyle', 'apsperstyle.idapsperstyle = perbaikan_area.idapsperstyle')
+                    ->where('apsperstyle.mastermodel', $no_model)
+                    ->where('apsperstyle.qty > 0')
+                    ->groupBy('perbaikan_area.area, apsperstyle.size')
+                    ->findAll();
+
+                foreach ($allPb as $row) {
+                    $pbMap[$row['area']][$row['size']] = [
+                        'qtyPb' => $row['qtyPb'],
+                        'tglPbArea' => $row['tglPbArea'],
+                    ];
+                }
+
+                // ===========================
+                // 5. BS STOCKLOT (1 QUERY)
+                // ===========================
+                $allBsStocklot = $this->bsModel
+                    ->select('data_bs.area, apsperstyle.size, SUM(data_bs.qty) AS qtyBs, MAX(data_bs.tgl_instocklot) AS tglBs')
+                    ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle')
+                    ->where('apsperstyle.mastermodel', $no_model)
+                    ->groupBy('data_bs.area, apsperstyle.size')
+                    ->findAll();
+
+                foreach ($allBsStocklot as $row) {
+                    $bsStocklotMap[$row['area']][$row['size']] = [
+                        'qtyBs' => $row['qtyBs'],
+                        'tglBs' => $row['tglBs']
+                    ];
+                }
+                // ========================================
+                // 6. LOOP UTAMA (TANPA QUERY LAGI)
+                // ========================================
+                foreach ($allData as $key => $id) {
+
+                    $area = $id['factory'];   // field dari geQtyByModel
+                    $size = $id['size'];
+
+                    // PRODUKSI
+                    $allData[$key]['prodPcs'] = $prodMap[$area][$size]['prod'] ?? 0;
+                    $allData[$key]['prodDz'] = round($prodMap[$area][$size]['prod'] / 24) ?? 0;
+                    $allData[$key]['tglProd'] = $prodMap[$area][$size]['tglProd'] ?? '';
+
+                    // BS MESIN
+                    $allData[$key]['bsMcPcs']  = $bsMcMap[$area][$size]['qty_pcs'] ?? 0;
+                    $allData[$key]['bsMcGram'] = $bsMcMap[$area][$size]['bs_gram'] ?? 0;
+                    $bsMcPercen = $bsMcMap[$area][$size]['qty_pcs'] / ($prodMap[$area][$size]['prod'] + $bsMcMap[$area][$size]['qty_pcs']) * 100;
+                    $allData[$key]['bsMcPercen'] = round($bsMcPercen) ?? 0;
+                    $allData[$key]['tglBsMc']  = $bsMcMap[$area][$size]['tglBsMc'] ?? '';
+
+                    // PERBAIKAN
+                    $allData[$key]['pbAreaPcs'] = $pbMap[$area][$size]['qtyPb'] ?? 0;
+                    $allData[$key]['pbAreaDz'] = round($pbMap[$area][$size]['qtyPb'] / 24) ?? 0;
+                    $pbAreaPercen = $pbMap[$area][$size]['qtyPb'] / $prodMap[$area][$size]['prod'] * 100;
+                    $allData[$key]['pbAreaPercen'] = round($pbAreaPercen) ?? 0;
+                    $allData[$key]['tglPbArea'] = $pbMap[$area][$size]['tglPbArea'] ?? '';
+
+                    // BS STOCKLOT
+                    $allData[$key]['bsStocklotPcs'] = $bsStocklotMap[$area][$size]['qtyBs'] ?? 0;
+                    $allData[$key]['bsStocklotDz'] = round($bsStocklotMap[$area][$size]['qtyBs'] / 24) ?? 0;
+                    $bsStocklotPercen = $bsStocklotMap[$area][$size]['qtyBs'] / $prodMap[$area][$size]['prod'] * 100;
+                    $allData[$key]['bsStocklotPercen'] = round($bsStocklotPercen) ?? 0;
+                    $allData[$key]['tglBs'] = $bsStocklotMap[$area][$size]['tglBs'] ?? '';
+                }
+            }
+
+            foreach ($allData as $row) {
+                $area = $row['factory'];
+                $grouped[$area][] = $row;
+            }
+        }
+
+        $maxDates = [];
+
+        foreach ($grouped as $area => $rows) {
+            $maxDates[$area] = [
+                'tglProd'   => date('d-m-Y', strtotime(max(array_column($rows, 'tglProd')))),
+                'tglBsMc'   => date('d-m-Y', strtotime(max(array_column($rows, 'tglBsMc')))),
+                'tglPbArea' => date('d-m-Y', strtotime(max(array_column($rows, 'tglPbArea')))),
+                'tglBs'     => date('d-m-Y', strtotime(max(array_column($rows, 'tglBs')))),
+            ];
+        }
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Title
+        $sheet->setCellValue('A2', "Data Produksi, BS Mesin, Perbaikan & Stocklot $no_model");
+        $sheet->mergeCells('A2:Q2');
+        $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(14);
+
+        $row = 4;
+
+        foreach ($grouped as $area => $rows) {
+            $start = $row;
+            $rHeader = $row + 1;
+            $rHeader2 = $row + 2;
+            $sheet->setCellValue("A{$start}", "Area");
+            $sheet->mergeCells("A{$start}:A{$rHeader2}");
+
+            $sheet->setCellValue("B{$start}", "Needle");
+            $sheet->mergeCells("B{$start}:B{$rHeader2}");
+
+            $sheet->setCellValue("C{$start}", "No Model");
+            $sheet->mergeCells("C{$start}:C{$rHeader2}");
+
+            $sheet->setCellValue("D{$start}", "Inisial");
+            $sheet->mergeCells("D{$start}:D{$rHeader2}");
+
+            $sheet->setCellValue("E{$start}", "Style Size");
+            $sheet->mergeCells("E{$start}:E{$rHeader2}");
+
+            $sheet->setCellValue("F{$start}", "TOTAL GLOBAL");
+            $sheet->mergeCells("F{$start}:Q{$start}");
+
+            $sheet->setCellValue("F{$rHeader}", "Qty Po (Dz)");
+            $sheet->mergeCells("F{$rHeader}:F{$rHeader2}");
+
+            $sheet->setCellValue("G{$rHeader}", "Produksi");
+            $sheet->mergeCells("G{$rHeader}:H{$rHeader}");
+            $sheet->setCellValue("G{$rHeader2}", "Dz");
+            $sheet->setCellValue("H{$rHeader2}", "Pcs");
+
+            $sheet->setCellValue("I{$rHeader}", "BS MC");
+            $sheet->mergeCells("I{$rHeader}:K{$rHeader}");
+            $sheet->setCellValue("I{$rHeader2}", "Gram");
+            $sheet->setCellValue("J{$rHeader2}", "Pcs");
+            $sheet->setCellValue("K{$rHeader2}", "%");
+
+            $sheet->setCellValue("L{$rHeader}", "IN PB");
+            $sheet->mergeCells("L{$rHeader}:N{$rHeader}");
+            $sheet->setCellValue("L{$rHeader2}", "Dz");
+            $sheet->setCellValue("M{$rHeader2}", "Pcs");
+            $sheet->setCellValue("N{$rHeader2}", "%");
+
+            $sheet->setCellValue("O{$rHeader}", "IN STOCKLOT");
+            $sheet->mergeCells("O{$rHeader}:Q{$rHeader}");
+            $sheet->setCellValue("O{$rHeader2}", "Dz");
+            $sheet->setCellValue("P{$rHeader2}", "Pcs");
+            $sheet->setCellValue("Q{$rHeader2}", "%");
+
+            $sheet->getStyle("A{$start}:Q{$rHeader2}")->getFont()->setBold(true);
+            $sheet->getStyle("A{$start}:Q{$rHeader2}")->applyFromArray([
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000']
+                    ]
+                ],
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    'vertical'   => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                    'wrapText'   => true,
+                ],
+                'font' => [
+                    'bold' => true
+                ]
+            ]);
+            $row = $rHeader2;
+            $row++;
+
+            // ==== Data Rows ====
+            foreach ($rows as $id) {
+                $sheet->fromArray([
+                    $area,
+                    $id['machinetypeid'],
+                    $id['mastermodel'],
+                    $id['inisial'],
+                    $id['size'],
+                    round($id['qty'], 2),
+                    $id['prodDz'],
+                    $id['prodPcs'],
+                    $id['bsMcGram'],
+                    $id['bsMcPcs'],
+                    $id['bsMcPercen'] . '%',
+                    $id['pbAreaDz'],
+                    $id['pbAreaPcs'],
+                    $id['pbAreaPercen'] . '%',
+                    $id['bsStocklotDz'],
+                    $id['bsStocklotPcs'],
+                    $id['bsStocklotPercen'] . '%',
+                ], null, "A{$row}");
+                $sheet->getStyle("A{$row}:Q{$row}")->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['rgb' => '000000']
+                        ]
+                    ],
+                    'alignment' => [
+                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                        'vertical'   => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                    ]
+
+                ]);
+                $row++;
+            }
+
+            $row = $row + 2; // spacing antar area
+        }
+
+        // DATA NOTE
+        $sheet->setCellValue("A{$row}", "Note :");
+
+        foreach ($maxDates as $area => $tgl) {
+            $sheet->setCellValue("B{$row}", "Produksi {$area} sampai tanggal {$tgl['tglProd']}");
+            $sheet->mergeCells("B{$row}:E{$row}");
+            $row++;
+
+            $sheet->setCellValue("B{$row}", "BS Mc {$area} sampai tanggal {$tgl['tglBsMc']}");
+            $sheet->mergeCells("B{$row}:E{$row}");
+            $row++;
+
+            $sheet->setCellValue("B{$row}", "In Perbaikan {$area} sampai tanggal {$tgl['tglPbArea']}");
+            $sheet->mergeCells("B{$row}:E{$row}");
+            $row++;
+
+            $sheet->setCellValue("B{$row}", "In Stocklot {$area} sampai tanggal {$tgl['tglBs']}");
+            $sheet->mergeCells("B{$row}:E{$row}");
+            $row++;
+        }
+
+
+
+        // ==== Auto-size columns ====
+        foreach (range('A', 'Q') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // ==== Output ====
+        $filename = "Produlsi Global {$no_model}.xlsx";
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment;filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
     }

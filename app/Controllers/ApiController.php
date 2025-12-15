@@ -466,14 +466,25 @@ class ApiController extends ResourceController
 
         // Fetch data from the model
         $startMc = $this->orderModel->getStartMc($model);
+        $areaMc = $this->ApsPerstyleModel->getArea($model);
 
         // Check if data is found
         if (empty($startMc)) {
-            return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
+            return $this->respond([
+                'message' => 'Data tidak ditemukan',
+                'model'   => $model
+            ], ResponseInterface::HTTP_NOT_FOUND);
         }
 
+        $response = [
+            'startMc' => $startMc,
+            'areaMc'  => $areaMc
+        ];
+
+        log_message('info', 'SERVER getStartMc RETURN: ' . json_encode($response));
+
         // Return the data with a 200 status
-        return $this->respond($startMc, ResponseInterface::HTTP_OK);
+        return $this->respond($response, 200);
     }
     public function getNotifAduan($role)
     {

@@ -6,7 +6,7 @@
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
-                        <div class="col-4">
+                        <div class="col-3">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                                 <h5 class="font-weight-bolder mb-0">
@@ -14,7 +14,7 @@
                                 </h5>
                             </div>
                         </div>
-                        <div class="col-8 text-end">
+                        <div class="col-9 text-end">
                             <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#summaryPertgl">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Summary Produksi Pertanggal
                             </button>
@@ -30,6 +30,7 @@
                             <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#dataProduksi">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Produksi Harian
                             </button>
+                            <a class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" href="<?= base_url($role . '/reportGlobalProduksi') ?>"><i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i>Report Global Produksi</a>
                         </div>
                     </div>
                 </div>
