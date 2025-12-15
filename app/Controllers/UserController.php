@@ -73,6 +73,11 @@ class UserController extends BaseController
     }
     public function produksi()
     {
+        $dataPdk = $this->ApsPerstyleModel->getPdkProduksi();
+        $produksi = $this->produksiModel->getProduksiHarianArea();
+        $dataBuyer = $this->orderModel->getBuyer();
+        $dataArea = $this->jarumModel->getArea();
+        $dataJarum = $this->jarumModel->getJarum();
         $model = $this->ApsPerstyleModel->getPdkProduksi();
         $data = [
             'role' => session()->get('role'),
@@ -80,6 +85,15 @@ class UserController extends BaseController
             'active1' => '',
             'active3' => '',
             'active2' => 'active',
+            'targetProd' => 0,
+            'produksiBulan' => 0,
+            'produksiHari' => 0,
+            'pdk' => $dataPdk,
+            'produksi' => $produksi,
+            'buyer' => $dataBuyer,
+            'area' => $dataArea,
+            'jarum' => $dataJarum,
+            'models' => $model,
         ];
         return view(session()->get('role') . '/produksi', $data);
     }
