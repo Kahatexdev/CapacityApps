@@ -71,6 +71,8 @@ $routes->group(
         $routes->get('getNotif/(:any)', 'ApiController::getNotifAduan/$1');
         $routes->get('ExportPengaduan/(:num)', 'ApiController::ExportPengaduan/$1');
 
+        $routes->get('pengaduan/fetchNew', 'PengaduanController::fetchNew');
+
         // update supermarket area
         $routes->post('repeatSupermarket', 'ApiController::repeatSupermarket');
 
