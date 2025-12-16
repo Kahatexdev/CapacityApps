@@ -1452,6 +1452,19 @@ class ApsPerstyleModel extends Model
             ->where("DATE_FORMAT(delivery, '%Y-%m')", $month)
             ->first() ?? ['qty' => 0, 'sisa' => 0];
     }
+    public function getTotalOrderMonthByBuyer($month)
+    {
+        return $this->select('
+            SUM(apsperstyle.qty/24) AS qty, 
+            SUM(CASE WHEN apsperstyle.sisa > 0 THEN apsperstyle.sisa/24 ELSE 0 END) AS sisa,
+            data_model.kd_buyer_order
+        ')
+            ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
+            ->where('apsperstyle.production_unit !=', 'MJ')
+            ->where("DATE_FORMAT(apsperstyle.delivery, '%Y-%m')", $month)
+            ->groupBy('data_model.kd_buyer_order')
+            ->findAll();
+    }
     public function getFilterArea($model)
     {
         return $this->select('factory AS area')
