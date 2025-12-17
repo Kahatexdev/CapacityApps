@@ -133,4 +133,73 @@ class PengaduanController extends BaseController
         // $this->replyModel->deleteReplyLama($week);
         return $this->response->setJSON($data);
     }
+
+    public function fetchNew()
+    {
+        $lastId      = (int) ($this->request->getGet('last_id') ?? 0);
+        $lastReplyId = (int) ($this->request->getGet('last_reply_id') ?? 0);
+
+        // role dari query atau session
+        $role = $this->request->getGet('role') ?? session()->get('role') ?? 'user';
+        $role = trim((string) $role);
+
+        // username opsional (buat role user biasanya)
+        $username = $this->request->getGet('username') ?? '';
+        $username = trim((string) $username);
+
+        if ($role === 'user' && $username === '') {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'username is required for role=user'
+            ])->setStatusCode(400);
+        }
+
+        // allowlist role biar aman
+        $allowed = ['user', 'planning', 'aps', 'sudo', 'monitoring', 'capacity', 'rosso', 'gbn', 'celup', 'covering'];
+        if (!in_array($role, $allowed, true)) {
+            $role = 'user';
+        }
+
+        // ===== 1) Ambil pengaduan baru =====
+        // - kalau role != user : filter target_role = role
+        // - kalau role == user : ambil pengaduan yg dibuat si username (opsional, sesuai sistem kamu)
+        $newPengaduan = $this->pengaduanModel->getNewPengaduan([
+            'role'    => $role,
+            'username'=> $username,
+            'last_id' => $lastId,
+            'limit'   => 50,
+        ]);
+
+        // ===== 2) Ambil reply baru =====
+        // reply diambil dengan filter pengaduan yang relevan untuk role tsb,
+        // lalu reply id_reply > last_reply_id
+        $newReplies = $this->replyModel->getNewRepliesByRole([
+            'role'          => $role,
+            'username'      => $username,
+            'last_reply_id' => $lastReplyId,
+            'limit'         => 100,
+        ]);
+
+        // ===== 3) Cursor max terbaru =====
+        // max_id harus dihitung berdasarkan filter yang sama biar "maxId gak loncat"
+        $maxId      = (int) ($this->pengaduanModel->getMaxIdByRole($role, $username) ?? 0);
+        $maxReplyId = (int) ($this->replyModel->getMaxReplyIdByRole($role, $username) ?? 0);
+
+        // ===== 4) Normalize payload buat front-end =====
+        // tambahin field helper biar front-end gampang render
+        foreach ($newPengaduan as &$p) {
+            $p['date_iso']       = date('Y-m-d', strtotime($p['created_at']));
+            $p['formatted_time'] = date('d M Y (H:i)', strtotime($p['created_at']));
+            $p['pdf_url']        = base_url('api/pengaduan/exportPdf/' . $p['id_pengaduan']);
+        }
+        unset($p);
+
+        return $this->response->setJSON([
+            'success'       => true,
+            'data'          => $newPengaduan,
+            'replies'       => $newReplies,
+            'max_id'        => $maxId,
+            'max_reply_id'  => $maxReplyId,
+        ]);
+    }
 }
