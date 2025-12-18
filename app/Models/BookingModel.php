@@ -389,4 +389,16 @@ class BookingModel extends Model
             ->groupEnd()
             ->first() ?? ['sisa_booking' => 0];
     }
+    public function getSisaBookingMonthByBuyer($month)
+    {
+        return $this->select('ROUND(SUM(sisa_booking/24)) AS sisa_booking, kd_buyer_booking')
+            ->where("DATE_FORMAT(delivery, '%Y-%m')", $month)
+            ->where('status !=', 'cancel booking')
+            ->groupStart()
+            ->where('data_booking.keterangan !=', 'Manual Cancel Booking')
+            ->orWhere('data_booking.keterangan', null)
+            ->groupEnd()
+            ->groupBy('kd_buyer_booking')
+            ->findAll();
+    }
 }

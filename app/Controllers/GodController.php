@@ -29,16 +29,7 @@ class GodController extends BaseController
     }
     public function index()
     {
-        $orderJalan = $this->bookingModel->getOrderJalan();
-        $terimaBooking = $this->bookingModel->getBookingMasuk();
-        $mcJalan = $this->jarumModel->mcJalan();
-        $totalMc = $this->jarumModel->totalMc();
         $area = $this->jarumModel->getArea();
-        $bulan = date('m');
-        $buyer = $this->orderModel->getBuyer();
-        $yesterday = date('Y-m-d', strtotime('14 days ago'));
-        $month = date('F');
-        $year = date('Y');
 
         $data = [
             'role' => session()->get('role'),
@@ -50,11 +41,7 @@ class GodController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-            'jalan' => $orderJalan,
-            'TerimaBooking' => $terimaBooking,
-            'mcJalan' => $mcJalan,
             'area' => $area,
-            'buyer' => $buyer
 
 
 

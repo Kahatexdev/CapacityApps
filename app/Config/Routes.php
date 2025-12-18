@@ -267,6 +267,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     // $routes->get('exportsales', 'ExcelController::export');
     $routes->post('exportsales', 'SalesController::exportExcelByJarum');
     $routes->get('generatesales', 'SalesController::generateExcel');
+    $routes->get('generateSalesByBuyer', 'SalesController::generateSalesByBuyer');
 
     //target
     $routes->get('datatarget', 'BookingController::target');
@@ -1211,6 +1212,9 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
 
 
     $routes->post('importMesin', 'GodController::importMesin');
+
+    // OEE
+    $routes->get('oee', 'OEEController::index');
 });
 
 // ie
