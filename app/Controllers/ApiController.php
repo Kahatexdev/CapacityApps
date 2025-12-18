@@ -849,4 +849,17 @@ class ApiController extends ResourceController
             ]
         ]);
     }
+
+    public function getQtyOrderByNoModel()
+    {
+        $models = $this->request->getJSON(true)['models'] ?? [];
+
+        if (empty($models)) {
+            return $this->response->setJSON([])->setStatusCode(400);
+        }
+
+        $orderQty = $this->ApsPerstyleModel->getQtyOrderByNoModel($models);
+
+        return $this->response->setJSON($orderQty);
+    }
 }

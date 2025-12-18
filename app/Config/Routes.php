@@ -58,6 +58,7 @@ $routes->group(
         $routes->get('getDeliv/(:any)', 'ApiController::getDeliv/$1');
 
         $routes->get('getQtyOrder', 'ApiController::getQtyOrder');
+        $routes->post('getQtyOrderByNoModel', 'ApiController::getQtyOrderByNoModel');
         $routes->get('getDataBuyer', 'ApiController::getDataBuyer');
         $routes->get('getDeliveryAwalAkhir', 'ApiController::getDeliveryAwalAkhir');
         $routes->get('searchApsPerStyleByMastermodel', 'ApiController::searchApsPerStyleByMastermodel');

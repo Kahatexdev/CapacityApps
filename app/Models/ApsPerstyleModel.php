@@ -1629,4 +1629,19 @@ class ApsPerstyleModel extends Model
             ->orderBy('factory, machinetypeid, size')
             ->findAll();
     }
+    public function getQtyOrderByNoModelAndStyle($noModel, $styleSize)
+    {
+        return $this->select('size, SUM(qty) AS qty')
+            ->where('mastermodel', $noModel)
+            ->where('size', $styleSize)
+            ->where('qty >', 0)
+            ->first();
+    }
+    public function getQtyOrderByNoModel($noModel)
+    {
+        return $this->select('mastermodel, size, qty')
+            ->whereIn('mastermodel', $noModel)
+            ->where('qty >', 0)
+            ->findAll();
+    }
 }
