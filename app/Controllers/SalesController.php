@@ -2468,6 +2468,15 @@ class SalesController extends BaseController
     }
     public function generateSalesByBuyer()
     {
+        $dataBuyer = [
+            'H&M',
+            'C&A',
+            'Lidl',
+            'Okamoto',
+            'Royce too',
+            'Adidas',
+            'Others',
+        ];
         // List 6 bulan dari bulan sekarang
         $today = date('d-M-y');
         $months = [];
@@ -2479,34 +2488,36 @@ class SalesController extends BaseController
 
         foreach ($months as $month) {
             // Ambil data dari DB
-            $Orders  = $this->ApsPerstyleModel->getTotalOrderMonthByBuyer($month);
+            $orders  = $this->ApsPerstyleModel->getTotalOrderMonthByBuyer($month);
             $booking = $this->bookingModel->getSisaBookingMonthByBuyer($month);
 
             $bookingByBuyer = [];
             foreach ($booking as $b) {
-                $buyer = strtoupper(trim($b['kd_buyer_booking']));
-                $bookingByBuyer[$buyer] = (float) $b['sisa_booking'];
+                $rawBuyer = strtoupper(trim($b['kd_buyer_booking']));
+                $groupBuyer = mapBuyerGroup($rawBuyer, $dataBuyer);
+
+                if (!isset($bookingByBuyer[$groupBuyer])) {
+                    $bookingByBuyer[$groupBuyer] = 0;
+                }
+
+                $bookingByBuyer[$groupBuyer] += (float) $b['sisa_booking'];
             }
             $result[$month] = [];
 
-            foreach ($Orders as $o) {
-                $buyer = strtoupper(trim($o['kd_buyer_order']));
+            foreach ($orders as $o) {
+                $rawBuyer   = strtoupper(trim($o['kd_buyer_order']));
+                $groupBuyer = mapBuyerGroup($rawBuyer, $dataBuyer);
 
-                $result[$month][$buyer] = [
-                    'confirm_order' => (float) $o['qty'],
-                    'sisa_order'    => (float) $o['sisa'],
-                    'sisa_booking'  => $bookingByBuyer[$buyer] ?? 0,
-                ];
-            }
-
-            foreach ($bookingByBuyer as $buyer => $sisaBooking) {
-                if (!isset($result[$month][$buyer])) {
-                    $result[$month][$buyer] = [
+                if (!isset($result[$month][$groupBuyer])) {
+                    $result[$month][$groupBuyer] = [
                         'confirm_order' => 0,
                         'sisa_order'    => 0,
-                        'sisa_booking'  => $sisaBooking,
+                        'sisa_booking'  => 0,
                     ];
                 }
+
+                $result[$month][$groupBuyer]['confirm_order'] += (float) $o['qty'];
+                $result[$month][$groupBuyer]['sisa_order']    += (float) $o['sisa'];
             }
         }
 
@@ -2542,7 +2553,7 @@ class SalesController extends BaseController
         sort($buyers, SORT_STRING);
 
 
-        // dd($today, $result, $totalAllMonths);
+        dd($today, $result, $totalAllMonths);
 
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -2710,5 +2721,22 @@ class SalesController extends BaseController
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
+    }
+    function mapBuyerGroup(string $buyer, array $dataBuyer): string
+    {
+        $buyerUpper = strtoupper($buyer);
+
+        foreach ($dataBuyer as $group) {
+            if ($group === 'Others') {
+                continue;
+            }
+
+            // LIKE / contains (case-insensitive)
+            if (stripos($buyerUpper, strtoupper($group)) !== false) {
+                return strtoupper($group);
+            }
+        }
+
+        return 'OTHERS';
     }
 }
