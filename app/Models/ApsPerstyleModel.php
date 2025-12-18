@@ -1336,6 +1336,37 @@ class ApsPerstyleModel extends Model
             ->first();
     }
 
+    public function getDeliveryAwalAkhirBulk(array $models): array
+    {
+        $rows = $this->select('
+                mastermodel,
+                MIN(delivery) AS delivery_awal,
+                MAX(delivery) AS delivery_akhir,
+                production_unit AS unit
+            ')
+            ->whereIn('mastermodel', $models)
+            ->groupBy('mastermodel')
+            ->findAll();
+
+        $result = [];
+
+        foreach ($rows as $r) {
+            $unit = match ($r['unit']) {
+                'CJ' => 'CIJERAH',
+                'MJ' => 'MAJALAYA',
+                default => 'Belum di Assign',
+            };
+
+            $result[$r['mastermodel']] = [
+                'delivery_awal'  => $r['delivery_awal'],
+                'delivery_akhir' => $r['delivery_akhir'],
+                'unit'           => $unit,
+            ];
+        }
+
+        return $result;
+    }
+
     public function searchApsPerStyleByMastermodel($mastermodel)
     {
         return $this->select('idapsperstyle, mastermodel, size, inisial, delivery, factory')
