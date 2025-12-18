@@ -2466,4 +2466,50 @@ class SalesController extends BaseController
             return redirect()->to(base_url(session()->get('role') . '/sales'))->with('error', 'Data gagal disimpan!');
         }
     }
+    public function generateSalesByBuyer()
+    {
+        // List 6 bulan dari bulan sekarang
+        $months = [];
+        for ($i = 0; $i < 6; $i++) {
+            $months[] = date('Y-m', strtotime("+$i month"));
+        }
+
+        $result = [];
+
+        foreach ($months as $month) {
+            // Ambil data dari DB
+            $Orders  = $this->ApsPerstyleModel->getTotalOrderMonthByBuyer($month);
+            $booking = $this->bookingModel->getSisaBookingMonthByBuyer($month);
+
+            $bookingByBuyer = [];
+            foreach ($booking as $b) {
+                $buyer = strtoupper(trim($b['kd_buyer_booking']));
+                $bookingByBuyer[$buyer] = (float) $b['sisa_booking'];
+            }
+            $result[$month] = [];
+
+            foreach ($Orders as $o) {
+                $buyer = strtoupper(trim($o['kd_buyer_order']));
+
+                $result[$month][$buyer] = [
+                    'confirm_order' => (float) $o['qty'],
+                    'sisa_order'    => (float) $o['sisa'],
+                    'sisa_booking'  => $bookingByBuyer[$buyer] ?? 0,
+                ];
+            }
+
+            foreach ($bookingByBuyer as $buyer => $sisaBooking) {
+                if (!isset($result[$month][$buyer])) {
+                    $result[$month][$buyer] = [
+                        'confirm_order' => 0,
+                        'sisa_order'    => 0,
+                        'sisa_booking'  => $sisaBooking,
+                    ];
+                }
+            }
+        }
+
+
+        dd($result);
+    }
 }
