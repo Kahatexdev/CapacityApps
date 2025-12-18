@@ -1209,6 +1209,9 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
 
 
     $routes->post('importMesin', 'GodController::importMesin');
+
+    // OEE
+    $routes->get('oee', 'OEEController::index');
 });
 
 // ie

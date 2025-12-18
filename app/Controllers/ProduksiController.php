@@ -354,14 +354,9 @@ class ProduksiController extends BaseController
         $bulan = date('m');
         $month = date('F');
         $year = date('Y');
-        $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan, $year);
         $totalMesin = $this->jarumModel->getArea();
         $model = $this->ApsPerstyleModel->getPdkProduksi();
 
-        $produksiPerArea = [];
-        foreach ($totalMesin as $area) {
-            $produksiPerArea[$area] = $this->produksiModel->getProduksiPerArea($area, $bulan, $year);
-        }
         $dataBuyer = $this->orderModel->getBuyer();
         $dataArea = $this->jarumModel->getArea();
         $dataJarum = $this->jarumModel->getJarum();
@@ -376,9 +371,7 @@ class ProduksiController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-            'produksiArea' => $produksiPerArea,
             'Area' => $totalMesin,
-            'Produksi' => $dataProduksi,
             'bulan' => $month,
             'buyer' => $dataBuyer,
             'area' => $dataArea,
@@ -1090,7 +1083,7 @@ class ProduksiController extends BaseController
                     $tgl = $data[1];
                     $date = new DateTime($tgl);
                     $tglprod = $date->format('Y-m-d');
-                    $kodeDeffect =  substr($data[29] ?? '16A', 0, 3);
+                    $kodeDeffect =  substr($data[29] ?? '20A', 0, 3);
 
                     // $strReplace = str_replace('.', '-', $tglprod);
                     // $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
