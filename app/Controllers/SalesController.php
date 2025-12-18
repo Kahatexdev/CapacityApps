@@ -2469,6 +2469,7 @@ class SalesController extends BaseController
     public function generateSalesByBuyer()
     {
         // List 6 bulan dari bulan sekarang
+        $today = date('d-M-y');
         $months = [];
         for ($i = 0; $i < 6; $i++) {
             $months[] = date('Y-m', strtotime("+$i month"));
@@ -2509,7 +2510,205 @@ class SalesController extends BaseController
             }
         }
 
+        $totalAllMonths = [];
 
-        dd($result);
+        foreach ($result as $month => $buyers) {
+            foreach ($buyers as $buyer => $val) {
+
+                if (!isset($totalAllMonths[$buyer])) {
+                    $totalAllMonths[$buyer] = [
+                        'confirm_order' => 0,
+                        'sisa_order'    => 0,
+                        'sisa_booking'  => 0,
+                    ];
+                }
+
+                $totalAllMonths[$buyer]['confirm_order'] += $val['confirm_order'];
+                $totalAllMonths[$buyer]['sisa_order']    += $val['sisa_order'];
+                $totalAllMonths[$buyer]['sisa_booking']  += $val['sisa_booking'];
+            }
+        }
+        ksort($totalAllMonths, SORT_STRING);
+
+        $buyerMaster = [];
+
+        foreach ($result as $month => $buyers) {
+            foreach ($buyers as $buyer => $val) {
+                $buyerMaster[$buyer] = true; // pakai key biar unik
+            }
+        }
+
+        $buyers = array_keys($buyerMaster);
+        sort($buyers, SORT_STRING);
+
+
+        // dd($today, $result, $totalAllMonths);
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $headerStyle = [
+            'font' => [
+                'bold' => true,
+                'size' => 10,
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+                'wrapText'   => true,
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => [
+                    'rgb' => 'D9D9D9', // abu-abu header
+                ],
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                ],
+            ],
+        ];
+
+        $dataStyle = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_RIGHT,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                ],
+            ],
+        ];
+
+        $totalStyle = [
+            'font' => [
+                'bold' => true,
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => [
+                    'rgb' => 'F2F2F2',
+                ],
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                ],
+            ],
+        ];
+
+        // ===== HEADER ATAS =====
+        $sheet->setCellValue("A2", "Dated :");
+        $sheet->setCellValue("B2", $today);
+
+        // Bulan
+        $sheet->setCellValue("A3", "Bulan");
+        $sheet->mergeCells("A3:A4");
+        $sheet->getStyle("A3")->getAlignment()->setVertical('center');
+        // ===== HEADER BUYER =====
+        $startCol = 2; // kolom B
+        foreach ($buyers as $buyer) {
+
+            $colStart = Coordinate::stringFromColumnIndex($startCol);
+            $colEnd   = Coordinate::stringFromColumnIndex($startCol + 2);
+
+            // Nama Buyer (merge 3 kolom)
+            $sheet->setCellValue($colStart . "3", $buyer);
+            $sheet->mergeCells("{$colStart}3:{$colEnd}3");
+            $sheet->getStyle("{$colStart}3")->getAlignment()->setHorizontal('center');
+
+            // Sub header
+            $sheet->setCellValue($colStart . "4", "Sisa Order");
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($startCol + 1) . "4", "Sisa order belum jalan MC");
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($startCol + 2) . "4", "Sisa Booking");
+
+            $startCol += 3;
+        }
+
+        $lastCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($startCol - 1);
+
+        $sheet->getStyle("A3:{$lastCol}4")->applyFromArray($headerStyle);
+
+        $row = 5;
+
+        // data start
+        foreach ($result as $month => $buyersData) {
+
+            $sheet->setCellValue("A{$row}", date('F', strtotime($month)));
+
+            $col = 2;
+            foreach ($buyers as $buyer) {
+
+                $data = $buyersData[$buyer] ?? [
+                    'sisa_order'    => 0,
+                    'confirm_order' => 0,
+                    'sisa_booking'  => 0,
+                ];
+
+                $sheet->setCellValue(
+                    Coordinate::stringFromColumnIndex($col) . $row,
+                    $data['sisa_order']
+                );
+                $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray($dataStyle);
+
+                $sheet->setCellValue(
+                    Coordinate::stringFromColumnIndex($col + 1) . $row,
+                    $data['confirm_order']
+                );
+                $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray($dataStyle);
+
+                $sheet->setCellValue(
+                    Coordinate::stringFromColumnIndex($col + 2) . $row,
+                    $data['sisa_booking']
+                );
+                $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray($dataStyle);
+
+                $col += 3;
+            }
+
+            $row++;
+        }
+
+        $sheet->setCellValue("A{$row}", "Total");
+
+        $col = 2;
+        foreach ($buyers as $buyer) {
+
+            $sheet->setCellValue(
+                Coordinate::stringFromColumnIndex($col) . $row,
+                $totalAllMonths[$buyer]['sisa_order'] ?? 0
+            );
+
+
+            $sheet->setCellValue(
+                Coordinate::stringFromColumnIndex($col + 1) . $row,
+                $totalAllMonths[$buyer]['confirm_order'] ?? 0
+            );
+
+            $sheet->setCellValue(
+                Coordinate::stringFromColumnIndex($col + 2) . $row,
+                $totalAllMonths[$buyer]['sisa_booking'] ?? 0
+            );
+
+            $col += 3;
+        }
+        $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray($totalStyle);
+
+
+
+
+
+        // ==== Output ====
+        $filename = "Sales Position By Buyer.xlsx";
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment;filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 }
