@@ -113,6 +113,28 @@ class ApiController extends ResourceController
         return $this->respond($startMc, 200);
     }
 
+    public function reqstartmcBulk()
+    {
+        $models = $this->request->getJSON(true);
+
+        if (empty($models) || !is_array($models)) {
+            return $this->respond([
+                'message' => 'Invalid payload'
+            ], 400);
+        }
+
+        // sanitasi & unique
+        $models = array_values(array_unique(array_filter($models)));
+
+        if (empty($models)) {
+            return $this->respond([]);
+        }
+
+        $result = $this->mesinPerStyle->reqstartmcBulk($models);
+
+        return $this->respond($result, 200);
+    }
+
     public function getDataPerinisial($area, $model, $size)
     {
         if (!$model || !$size) {
@@ -426,6 +448,26 @@ class ApiController extends ResourceController
         // Return the data with a 200 status
         return $this->respond($delivery, ResponseInterface::HTTP_OK);
     }
+
+    public function getDeliveryAwalAkhirBulk()
+    {
+        $models = $this->request->getJSON(true);
+
+        if (empty($models) || !is_array($models)) {
+            return $this->respond(['message' => 'Invalid payload'], 400);
+        }
+
+        $models = array_values(array_unique(array_filter($models)));
+
+        if (empty($models)) {
+            return $this->respond([]);
+        }
+
+        $data = $this->ApsPerstyleModel->getDeliveryAwalAkhirBulk($models);
+
+        return $this->respond($data, 200);
+    }
+
 
     public function searchApsPerStyleByMastermodel()
     {

@@ -30,13 +30,16 @@
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
-                        <div class="col-10">
+                        <div class="col-8">
                             <div class="numbers">
                                 <h4 class="font-weight-bolder mb-0">Sales Position</h4>
                             </div>
                         </div>
-                        <div class="col-2">
+                        <div class="col-2 d-flex justify-content-end">
                             <a href="<?= base_url($role . '/generatesales') ?>" class="btn btn-sm bg-gradient-success shadow text-center border-radius-md">Generate Excel</a>
+                        </div>
+                        <div class="col-2">
+                            <a href="<?= base_url($role . '/generateSalesByBuyer') ?>" class="btn btn-sm bg-gradient-success shadow text-center border-radius-md">Generate Excel By Buyer</a>
                         </div>
                     </div>
                 </div>

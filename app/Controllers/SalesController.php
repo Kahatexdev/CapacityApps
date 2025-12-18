@@ -2466,4 +2466,322 @@ class SalesController extends BaseController
             return redirect()->to(base_url(session()->get('role') . '/sales'))->with('error', 'Data gagal disimpan!');
         }
     }
+    public function generateSalesByBuyer()
+    {
+        $dataBuyer = [
+            'H&M',
+            'C&A',
+            'LIDL',
+            'OKAMOTO',
+            'ROYCE TOO',
+            'ADIDAS',
+            'OTHERS',
+        ];
+        // List 6 bulan dari bulan sekarang
+        $today = date('d-M-y');
+        $months = [];
+        for ($i = 0; $i < 6; $i++) {
+            $months[] = date('Y-m', strtotime("+$i month"));
+        }
+
+        $result = [];
+
+        foreach ($months as $month) {
+            // Ambil data dari DB
+            $orders  = $this->ApsPerstyleModel->getTotalOrderMonthByBuyer($month);
+            $booking = $this->bookingModel->getSisaBookingMonthByBuyer($month);
+
+            $result[$month] = [];
+
+            // ===== BOOKING =====
+            foreach ($booking as $b) {
+                $rawBuyer   = strtoupper(trim($b['kd_buyer_booking']));
+                $groupBuyer = $this->mapBuyerGroup($rawBuyer, $dataBuyer);
+
+                if (!isset($result[$month][$groupBuyer])) {
+                    $result[$month][$groupBuyer] = [
+                        'sisa_blm_jln' => 0,
+                        'sisa_order'    => 0,
+                        'sisa_booking'  => 0,
+                    ];
+                }
+
+                $qtyBooking = (float) ($b['sisa_booking'] ?? 0);
+                $result[$month][$groupBuyer]['sisa_booking'] += $qtyBooking;
+            }
+
+            foreach ($orders as $o) {
+                $rawBuyer   = strtoupper(trim($o['kd_buyer_order']));
+                $groupBuyer = $this->mapBuyerGroup($rawBuyer, $dataBuyer);
+
+                if (!isset($result[$month][$groupBuyer])) {
+                    $result[$month][$groupBuyer] = [
+                        'sisa_blm_jln' => 0,
+                        'sisa_order'    => 0,
+                        'sisa_booking'  => 0,
+                    ];
+                }
+
+                $result[$month][$groupBuyer]['sisa_blm_jln'] += (float) $o['sisa_blm_jln'];
+                $result[$month][$groupBuyer]['sisa_order']    += (float) $o['sisa'];
+                ksort($result[$month], SORT_STRING);
+            }
+        }
+
+        $totalPerBuyer = [];
+        // total perbuyer
+        foreach ($result as $month => $buyers) {
+            foreach ($buyers as $buyer => $val) {
+
+                if (!isset($totalPerBuyer[$buyer])) {
+                    $totalPerBuyer[$buyer] = [
+                        'sisa_blm_jln' => 0,
+                        'sisa_order'    => 0,
+                        'sisa_booking'  => 0,
+                    ];
+                }
+
+                $totalPerBuyer[$buyer]['sisa_blm_jln'] += $val['sisa_blm_jln'];
+                $totalPerBuyer[$buyer]['sisa_order']    += $val['sisa_order'];
+                $totalPerBuyer[$buyer]['sisa_booking']  += $val['sisa_booking'];
+            }
+        }
+        ksort($totalPerBuyer, SORT_STRING);
+
+        // total perbulan
+        $totalPerMonth = [];
+        foreach ($result as $month => $buyers) {
+
+            $totalPerMonth[$month] = [
+                'sisa_blm_jln' => 0,
+                'sisa_order'    => 0,
+                'sisa_booking'  => 0,
+            ];
+
+            foreach ($buyers as $buyer => $val) {
+                $totalPerMonth[$month]['sisa_blm_jln'] += $val['sisa_blm_jln'];
+                $totalPerMonth[$month]['sisa_order']    += $val['sisa_order'];
+                $totalPerMonth[$month]['sisa_booking']  += $val['sisa_booking'];
+            }
+        }
+
+        // total keseluruhan
+        $totalAll = [
+            'sisa_blm_jln' => 0,
+            'sisa_order'   => 0,
+            'sisa_booking' => 0,
+        ];
+
+        foreach ($totalPerMonth as $month => $val) {
+            $totalAll['sisa_blm_jln'] += $val['sisa_blm_jln'];
+            $totalAll['sisa_order']   += $val['sisa_order'];
+            $totalAll['sisa_booking'] += $val['sisa_booking'];
+        }
+        // dd($today, $result, $totalPerBuyer, $totalPerMonth);
+
+        // excel start
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $headerStyle = [
+            'font' => [
+                'bold' => true,
+                'size' => 10,
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+                'wrapText'   => true,
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => [
+                    'rgb' => 'D9D9D9', // abu-abu header
+                ],
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                ],
+            ],
+        ];
+
+        $dataStyle = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_RIGHT,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                ],
+            ],
+        ];
+
+        $totalStyle = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_RIGHT,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
+            'font' => [
+                'bold' => true,
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => [
+                    'rgb' => 'F2F2F2',
+                ],
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                ],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => [
+                    'rgb' => 'D9D9D9', // abu-abu header
+                ],
+            ],
+        ];
+
+        // ===== HEADER ATAS =====
+        $sheet->setCellValue("A2", "Dated :");
+        $sheet->setCellValue("B2", $today);
+
+        // Bulan
+        $sheet->setCellValue("A3", "Bulan");
+        $sheet->mergeCells("A3:A4");
+        $sheet->getStyle("A3")->getAlignment()->setVertical('center');
+        // ===== HEADER BUYER =====
+        $startCol = 2; // kolom B
+        foreach ($dataBuyer as $byr) {
+
+            $colStart = Coordinate::stringFromColumnIndex($startCol);
+            $colEnd   = Coordinate::stringFromColumnIndex($startCol + 2);
+
+            // Nama Buyer (merge 3 kolom)
+            $sheet->setCellValue($colStart . "3", $byr);
+            $sheet->mergeCells("{$colStart}3:{$colEnd}3");
+            $sheet->getStyle("{$colStart}3")->getAlignment()->setHorizontal('center');
+
+            // Sub header
+            $sheet->setCellValue($colStart . "4", "Sisa Order");
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($startCol + 1) . "4", "Sisa order belum jalan MC");
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($startCol + 2) . "4", "Sisa Booking");
+
+            $startCol += 3;
+        }
+
+        // ===== HEADER TOTAL =====
+        $colStart = Coordinate::stringFromColumnIndex($startCol);
+        $colEnd   = Coordinate::stringFromColumnIndex($startCol + 2);
+
+        $sheet->setCellValue($colStart . "3", "TOTAL");
+        $sheet->mergeCells("{$colStart}3:{$colEnd}3");
+        $sheet->getStyle("{$colStart}3")->getAlignment()->setHorizontal('center');
+
+        // Sub header Total
+        $sheet->setCellValue($colStart . "4", "Sisa Order");
+        $sheet->setCellValue(
+            Coordinate::stringFromColumnIndex($startCol + 1) . "4",
+            "Sisa order belum jalan MC"
+        );
+        $sheet->setCellValue(
+            Coordinate::stringFromColumnIndex($startCol + 2) . "4",
+            "Sisa Booking"
+        );
+
+        $startCol += 3;
+
+        // last column
+        $lastCol = Coordinate::stringFromColumnIndex($startCol - 1);
+
+        // Apply style
+        $sheet->getStyle("A3:{$lastCol}4")->applyFromArray($headerStyle);
+
+        $row = 5;
+
+        // data start
+        foreach ($result as $month => $buyersData) {
+
+            $sheet->setCellValue("A{$row}", date('F', strtotime($month)));
+
+            $col = 2;
+            foreach ($dataBuyer as $byr2) {
+
+                $data = $buyersData[$byr2] ?? [
+                    'sisa_order'    => 0,
+                    'sisa_blm_jln' => 0,
+                    'sisa_booking'  => 0,
+                ];
+
+                $sheet->setCellValue(Coordinate::stringFromColumnIndex($col) . $row, round($data['sisa_order']));
+
+                $sheet->setCellValue(Coordinate::stringFromColumnIndex($col + 1) . $row, round($data['sisa_blm_jln']));
+
+                $sheet->setCellValue(Coordinate::stringFromColumnIndex($col + 2) . $row, round($data['sisa_booking']));
+
+                $col += 3;
+            }
+
+            // total perbulan
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($col) . $row, round($totalPerMonth[$month]['sisa_order']));
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($col + 1) . $row, round($totalPerMonth[$month]['sisa_blm_jln']));
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($col + 2) . $row, round($totalPerMonth[$month]['sisa_booking']));
+
+            $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray($dataStyle);
+            $row++;
+        }
+        $sheet->setCellValue("A{$row}", "TOTAL");
+
+        // total perbuyer
+        $col = 2;
+        foreach ($dataBuyer as $byr3) {
+
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($col) . $row, round($totalPerBuyer[$byr3]['sisa_order']) ?? 0);
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($col + 1) . $row, round($totalPerBuyer[$byr3]['sisa_blm_jln']) ?? 0);
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($col + 2) . $row, round($totalPerBuyer[$byr3]['sisa_booking']) ?? 0);
+
+            $col += 3;
+        }
+
+        // total ALL
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($col) . $row, round($totalAll['sisa_order']));
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($col + 1) . $row, round($totalAll['sisa_blm_jln']));
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($col + 2) . $row, round($totalAll['sisa_booking']));
+
+        $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray($totalStyle);
+
+        // ==== Auto width kolom A ====
+        $sheet->getColumnDimension('A')->setAutoSize(true);
+
+        // ==== Output ====
+        $filename = "Sales Position By Buyer.xlsx";
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment;filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+    private function mapBuyerGroup(string $buyer, array $dataBuyer): string
+    {
+        $buyerUpper = strtoupper($buyer);
+
+        foreach ($dataBuyer as $group) {
+            if ($group === 'OTHERS') {
+                continue;
+            }
+
+            // LIKE / contains (case-insensitive)
+            if (stripos($buyerUpper, strtoupper($group)) !== false) {
+                return strtoupper($group);
+            }
+        }
+
+        return 'OTHERS';
+    }
 }

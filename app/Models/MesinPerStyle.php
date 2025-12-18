@@ -73,7 +73,7 @@ class MesinPerStyle extends Model
     {
         $dm = $this->select('MIN(start_pps_plan) AS start_mc')
             ->join('apsperstyle', 'apsperstyle.idapsperstyle=mesin_perinisial.idapsperstyle')
-            ->where('mastermodel', $model)
+            ->where('apsperstyle.mastermodel', $model)
             ->first();
         if (empty($dm['start_mc'])) {
             return $this->db->table('data_model')
@@ -85,4 +85,54 @@ class MesinPerStyle extends Model
             ];
         }
     }
+
+    public function reqstartmcBulk(array $models): array
+    {
+        if (empty($models)) {
+            return [];
+        }
+
+        /*
+        * 1. Ambil dari mesin_perinisial + apsperstyle
+        */
+        $rows = $this->select('apsperstyle.mastermodel, MIN(start_pps_plan) AS start_mc')
+            ->join(
+                'apsperstyle',
+                'apsperstyle.idapsperstyle = mesin_perinisial.idapsperstyle'
+            )
+            ->whereIn('apsperstyle.mastermodel', $models)
+            ->groupBy('apsperstyle.mastermodel')
+            ->findAll();
+
+        $result = [];
+
+        foreach ($rows as $row) {
+            if (!empty($row['start_mc'])) {
+                $result[$row['mastermodel']] =
+                    date('Y-m-d', strtotime($row['start_mc']));
+            }
+        }
+
+        /*
+        * 2. Fallback ke data_model kalau belum ketemu
+        */
+        $missingModels = array_diff($models, array_keys($result));
+
+        if (!empty($missingModels)) {
+            $fallback = $this->db->table('data_model')
+                ->select('no_model, start_mc')
+                ->whereIn('no_model', $missingModels)
+                ->get()
+                ->getResultArray();
+
+            foreach ($fallback as $fb) {
+                if (!empty($fb['start_mc'])) {
+                    $result[$fb['no_model']] = $fb['start_mc'];
+                }
+            }
+        }
+
+        return $result;
+    }
+
 }
