@@ -1455,8 +1455,8 @@ class ApsPerstyleModel extends Model
     public function getTotalOrderMonthByBuyer($month)
     {
         return $this->select('
-            SUM(apsperstyle.qty/24) AS qty, 
             SUM(CASE WHEN apsperstyle.sisa > 0 THEN apsperstyle.sisa/24 ELSE 0 END) AS sisa,
+            SUM(CASE WHEN apsperstyle.sisa = apsperstyle.qty THEN apsperstyle.sisa / 24 ELSE 0 END) AS sisa_blm_jln,
             data_model.kd_buyer_order
         ')
             ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')

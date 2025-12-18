@@ -2471,11 +2471,11 @@ class SalesController extends BaseController
         $dataBuyer = [
             'H&M',
             'C&A',
-            'Lidl',
-            'Okamoto',
-            'Royce too',
-            'Adidas',
-            'Others',
+            'LIDL',
+            'OKAMOTO',
+            'ROYCE TOO',
+            'ADIDAS',
+            'OTHERS',
         ];
         // List 6 bulan dari bulan sekarang
         $today = date('d-M-y');
@@ -2491,70 +2491,95 @@ class SalesController extends BaseController
             $orders  = $this->ApsPerstyleModel->getTotalOrderMonthByBuyer($month);
             $booking = $this->bookingModel->getSisaBookingMonthByBuyer($month);
 
-            $bookingByBuyer = [];
-            foreach ($booking as $b) {
-                $rawBuyer = strtoupper(trim($b['kd_buyer_booking']));
-                $groupBuyer = mapBuyerGroup($rawBuyer, $dataBuyer);
-
-                if (!isset($bookingByBuyer[$groupBuyer])) {
-                    $bookingByBuyer[$groupBuyer] = 0;
-                }
-
-                $bookingByBuyer[$groupBuyer] += (float) $b['sisa_booking'];
-            }
             $result[$month] = [];
 
-            foreach ($orders as $o) {
-                $rawBuyer   = strtoupper(trim($o['kd_buyer_order']));
-                $groupBuyer = mapBuyerGroup($rawBuyer, $dataBuyer);
+            // ===== BOOKING =====
+            foreach ($booking as $b) {
+                $rawBuyer   = strtoupper(trim($b['kd_buyer_booking']));
+                $groupBuyer = $this->mapBuyerGroup($rawBuyer, $dataBuyer);
 
                 if (!isset($result[$month][$groupBuyer])) {
                     $result[$month][$groupBuyer] = [
-                        'confirm_order' => 0,
+                        'sisa_blm_jln' => 0,
                         'sisa_order'    => 0,
                         'sisa_booking'  => 0,
                     ];
                 }
 
-                $result[$month][$groupBuyer]['confirm_order'] += (float) $o['qty'];
+                $qtyBooking = (float) ($b['sisa_booking'] ?? 0);
+                $result[$month][$groupBuyer]['sisa_booking'] += $qtyBooking;
+            }
+
+            foreach ($orders as $o) {
+                $rawBuyer   = strtoupper(trim($o['kd_buyer_order']));
+                $groupBuyer = $this->mapBuyerGroup($rawBuyer, $dataBuyer);
+
+                if (!isset($result[$month][$groupBuyer])) {
+                    $result[$month][$groupBuyer] = [
+                        'sisa_blm_jln' => 0,
+                        'sisa_order'    => 0,
+                        'sisa_booking'  => 0,
+                    ];
+                }
+
+                $result[$month][$groupBuyer]['sisa_blm_jln'] += (float) $o['sisa_blm_jln'];
                 $result[$month][$groupBuyer]['sisa_order']    += (float) $o['sisa'];
+                ksort($result[$month], SORT_STRING);
             }
         }
 
-        $totalAllMonths = [];
-
+        $totalPerBuyer = [];
+        // total perbuyer
         foreach ($result as $month => $buyers) {
             foreach ($buyers as $buyer => $val) {
 
-                if (!isset($totalAllMonths[$buyer])) {
-                    $totalAllMonths[$buyer] = [
-                        'confirm_order' => 0,
+                if (!isset($totalPerBuyer[$buyer])) {
+                    $totalPerBuyer[$buyer] = [
+                        'sisa_blm_jln' => 0,
                         'sisa_order'    => 0,
                         'sisa_booking'  => 0,
                     ];
                 }
 
-                $totalAllMonths[$buyer]['confirm_order'] += $val['confirm_order'];
-                $totalAllMonths[$buyer]['sisa_order']    += $val['sisa_order'];
-                $totalAllMonths[$buyer]['sisa_booking']  += $val['sisa_booking'];
+                $totalPerBuyer[$buyer]['sisa_blm_jln'] += $val['sisa_blm_jln'];
+                $totalPerBuyer[$buyer]['sisa_order']    += $val['sisa_order'];
+                $totalPerBuyer[$buyer]['sisa_booking']  += $val['sisa_booking'];
             }
         }
-        ksort($totalAllMonths, SORT_STRING);
+        ksort($totalPerBuyer, SORT_STRING);
 
-        $buyerMaster = [];
-
+        // total perbulan
+        $totalPerMonth = [];
         foreach ($result as $month => $buyers) {
+
+            $totalPerMonth[$month] = [
+                'sisa_blm_jln' => 0,
+                'sisa_order'    => 0,
+                'sisa_booking'  => 0,
+            ];
+
             foreach ($buyers as $buyer => $val) {
-                $buyerMaster[$buyer] = true; // pakai key biar unik
+                $totalPerMonth[$month]['sisa_blm_jln'] += $val['sisa_blm_jln'];
+                $totalPerMonth[$month]['sisa_order']    += $val['sisa_order'];
+                $totalPerMonth[$month]['sisa_booking']  += $val['sisa_booking'];
             }
         }
 
-        $buyers = array_keys($buyerMaster);
-        sort($buyers, SORT_STRING);
+        // total keseluruhan
+        $totalAll = [
+            'sisa_blm_jln' => 0,
+            'sisa_order'   => 0,
+            'sisa_booking' => 0,
+        ];
 
+        foreach ($totalPerMonth as $month => $val) {
+            $totalAll['sisa_blm_jln'] += $val['sisa_blm_jln'];
+            $totalAll['sisa_order']   += $val['sisa_order'];
+            $totalAll['sisa_booking'] += $val['sisa_booking'];
+        }
+        // dd($today, $result, $totalPerBuyer, $totalPerMonth);
 
-        dd($today, $result, $totalAllMonths);
-
+        // excel start
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -2594,6 +2619,10 @@ class SalesController extends BaseController
         ];
 
         $totalStyle = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_RIGHT,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
             'font' => [
                 'bold' => true,
             ],
@@ -2608,6 +2637,12 @@ class SalesController extends BaseController
                     'borderStyle' => Border::BORDER_THIN,
                 ],
             ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => [
+                    'rgb' => 'D9D9D9', // abu-abu header
+                ],
+            ],
         ];
 
         // ===== HEADER ATAS =====
@@ -2620,13 +2655,13 @@ class SalesController extends BaseController
         $sheet->getStyle("A3")->getAlignment()->setVertical('center');
         // ===== HEADER BUYER =====
         $startCol = 2; // kolom B
-        foreach ($buyers as $buyer) {
+        foreach ($dataBuyer as $byr) {
 
             $colStart = Coordinate::stringFromColumnIndex($startCol);
             $colEnd   = Coordinate::stringFromColumnIndex($startCol + 2);
 
             // Nama Buyer (merge 3 kolom)
-            $sheet->setCellValue($colStart . "3", $buyer);
+            $sheet->setCellValue($colStart . "3", $byr);
             $sheet->mergeCells("{$colStart}3:{$colEnd}3");
             $sheet->getStyle("{$colStart}3")->getAlignment()->setHorizontal('center');
 
@@ -2638,8 +2673,31 @@ class SalesController extends BaseController
             $startCol += 3;
         }
 
-        $lastCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($startCol - 1);
+        // ===== HEADER TOTAL =====
+        $colStart = Coordinate::stringFromColumnIndex($startCol);
+        $colEnd   = Coordinate::stringFromColumnIndex($startCol + 2);
 
+        $sheet->setCellValue($colStart . "3", "TOTAL");
+        $sheet->mergeCells("{$colStart}3:{$colEnd}3");
+        $sheet->getStyle("{$colStart}3")->getAlignment()->setHorizontal('center');
+
+        // Sub header Total
+        $sheet->setCellValue($colStart . "4", "Sisa Order");
+        $sheet->setCellValue(
+            Coordinate::stringFromColumnIndex($startCol + 1) . "4",
+            "Sisa order belum jalan MC"
+        );
+        $sheet->setCellValue(
+            Coordinate::stringFromColumnIndex($startCol + 2) . "4",
+            "Sisa Booking"
+        );
+
+        $startCol += 3;
+
+        // last column
+        $lastCol = Coordinate::stringFromColumnIndex($startCol - 1);
+
+        // Apply style
         $sheet->getStyle("A3:{$lastCol}4")->applyFromArray($headerStyle);
 
         $row = 5;
@@ -2650,66 +2708,53 @@ class SalesController extends BaseController
             $sheet->setCellValue("A{$row}", date('F', strtotime($month)));
 
             $col = 2;
-            foreach ($buyers as $buyer) {
+            foreach ($dataBuyer as $byr2) {
 
-                $data = $buyersData[$buyer] ?? [
+                $data = $buyersData[$byr2] ?? [
                     'sisa_order'    => 0,
-                    'confirm_order' => 0,
+                    'sisa_blm_jln' => 0,
                     'sisa_booking'  => 0,
                 ];
 
-                $sheet->setCellValue(
-                    Coordinate::stringFromColumnIndex($col) . $row,
-                    $data['sisa_order']
-                );
-                $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray($dataStyle);
+                $sheet->setCellValue(Coordinate::stringFromColumnIndex($col) . $row, round($data['sisa_order']));
 
-                $sheet->setCellValue(
-                    Coordinate::stringFromColumnIndex($col + 1) . $row,
-                    $data['confirm_order']
-                );
-                $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray($dataStyle);
+                $sheet->setCellValue(Coordinate::stringFromColumnIndex($col + 1) . $row, round($data['sisa_blm_jln']));
 
-                $sheet->setCellValue(
-                    Coordinate::stringFromColumnIndex($col + 2) . $row,
-                    $data['sisa_booking']
-                );
-                $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray($dataStyle);
+                $sheet->setCellValue(Coordinate::stringFromColumnIndex($col + 2) . $row, round($data['sisa_booking']));
 
                 $col += 3;
             }
 
+            // total perbulan
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($col) . $row, round($totalPerMonth[$month]['sisa_order']));
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($col + 1) . $row, round($totalPerMonth[$month]['sisa_blm_jln']));
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($col + 2) . $row, round($totalPerMonth[$month]['sisa_booking']));
+
+            $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray($dataStyle);
             $row++;
         }
+        $sheet->setCellValue("A{$row}", "TOTAL");
 
-        $sheet->setCellValue("A{$row}", "Total");
-
+        // total perbuyer
         $col = 2;
-        foreach ($buyers as $buyer) {
+        foreach ($dataBuyer as $byr3) {
 
-            $sheet->setCellValue(
-                Coordinate::stringFromColumnIndex($col) . $row,
-                $totalAllMonths[$buyer]['sisa_order'] ?? 0
-            );
-
-
-            $sheet->setCellValue(
-                Coordinate::stringFromColumnIndex($col + 1) . $row,
-                $totalAllMonths[$buyer]['confirm_order'] ?? 0
-            );
-
-            $sheet->setCellValue(
-                Coordinate::stringFromColumnIndex($col + 2) . $row,
-                $totalAllMonths[$buyer]['sisa_booking'] ?? 0
-            );
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($col) . $row, round($totalPerBuyer[$byr3]['sisa_order']) ?? 0);
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($col + 1) . $row, round($totalPerBuyer[$byr3]['sisa_blm_jln']) ?? 0);
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($col + 2) . $row, round($totalPerBuyer[$byr3]['sisa_booking']) ?? 0);
 
             $col += 3;
         }
+
+        // total ALL
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($col) . $row, round($totalAll['sisa_order']));
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($col + 1) . $row, round($totalAll['sisa_blm_jln']));
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($col + 2) . $row, round($totalAll['sisa_booking']));
+
         $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray($totalStyle);
 
-
-
-
+        // ==== Auto width kolom A ====
+        $sheet->getColumnDimension('A')->setAutoSize(true);
 
         // ==== Output ====
         $filename = "Sales Position By Buyer.xlsx";
@@ -2722,12 +2767,12 @@ class SalesController extends BaseController
         $writer->save('php://output');
         exit;
     }
-    function mapBuyerGroup(string $buyer, array $dataBuyer): string
+    private function mapBuyerGroup(string $buyer, array $dataBuyer): string
     {
         $buyerUpper = strtoupper($buyer);
 
         foreach ($dataBuyer as $group) {
-            if ($group === 'Others') {
+            if ($group === 'OTHERS') {
                 continue;
             }
 
