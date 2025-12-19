@@ -701,18 +701,19 @@ class OrderModel extends Model
             ->where('data_model.no_model', $model)
             ->first();
 
-        if (empty($data['start_mc'])) {
-            $dp = $this->db->table('detail_planning')
-                ->select('MIN(tanggal_planning.start_mesin) AS start_mc')
-                ->join('estimated_planning', 'estimated_planning.id_detail_pln = detail_planning.id_detail_pln', 'left')
-                ->join('tanggal_planning', 'tanggal_planning.id_est_qty = estimated_planning.id_est_qty', 'left')
-                ->where('detail_planning.model', $model)
-                ->get()
-                ->getRowArray();
+        //Sudah acc bapak novan, data start mc ambil dari data_model saja
+        // if (empty($data['start_mc'])) {
+        //     $dp = $this->db->table('detail_planning')
+        //         ->select('MIN(tanggal_planinng.start_mesin) AS start_mc')
+        //         ->join('estimated_planning', 'estimated_planning.id_detail_pln = detail_planning.id_detail_pln', 'left')
+        //         ->join('tanggal_planning', 'tanggal_planning.id_est_qty = estimated_planning.id_est_qty', 'left')
+        //         ->where('detail_planning.model', $model)
+        //         ->get()
+        //         ->getRowArray();
 
 
-            $data['start_mc'] = $dp['start_mc'] ?? null;
-        }
+        //     $data['start_mc'] = $dp['start_mc'] ?? null;
+        // }
 
         return $data;
     }
