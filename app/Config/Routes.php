@@ -1213,6 +1213,8 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
 
     // OEE
     $routes->get('oee', 'OEEController::index');
+    $routes->get('oee/download-template', 'OEEController::downloadTemplate');
+    $routes->post('oee/importdowntime', 'OEEController::import');
 });
 
 // ie

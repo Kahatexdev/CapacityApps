@@ -22,7 +22,7 @@ class Downtime extends Migration
             'tanggal' => [
                 'type' => 'DATE',
             ],
-            'needle' => [
+            'jarum' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 20,
                 'null'       => true,
@@ -31,19 +31,7 @@ class Downtime extends Migration
                 'type'       => 'VARCHAR',
                 'constraint' => 20,
             ],
-            'available_wh' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'default'    => 0,
-                'comment'    => 'Available working hours in minutes',
-            ],
-            'downtime' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'default'    => 0,
-                'comment'    => 'Downtime in minutes',
-            ],
-            'changeover_time' => [
+            'total_time' => [
                 'type'       => 'INT',
                 'constraint' => 11,
                 'default'    => 0,
@@ -53,13 +41,21 @@ class Downtime extends Migration
                 'type'       => 'INT',
                 'constraint' => 11,
                 'default'    => 0,
-                'comment'    => 'Loading time in minutes',
+                'comment'    => 'Changeover time in minutes',
             ],
             'operating_time' => [
                 'type'       => 'INT',
                 'constraint' => 11,
                 'default'    => 0,
-                'comment'    => 'Operating time in minutes',
+                'comment'    => 'Changeover time in minutes',
+            ],
+            'breakdown' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 100,
+            ],
+            'keterangan' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 100,
             ],
             'created_at' => [
                 'type' => 'DATETIME',

@@ -6,18 +6,28 @@ use CodeIgniter\Model;
 
 class DowntimeModel extends Model
 {
-    protected $table            = 'downtimes';
+    protected $table            = 'downtime';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = [
+        'area',
+        'tanggal',
+        'jarum',
+        'no_mc',
+        'total_time',
+        'loading_time',
+        'operating_time',
+        'breakdown',
+        'keterangan'
+    ];
 
     protected bool $allowEmptyInserts = false;
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';

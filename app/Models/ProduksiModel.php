@@ -153,7 +153,7 @@ class ProduksiModel extends Model
     public function getDataForReset($area, $tanggal, $akhir)
     {
         return $this->select('id_produksi,idapsperstyle,qty_produksi')
-            ->where('admin', $area)
+            ->where('area', $area)
             ->where('tgl_produksi >=', $tanggal)
             ->where('tgl_produksi <=', $akhir)
             ->findAll();
