@@ -119,6 +119,7 @@ abstract class BaseController extends Controller
     protected $urlMaterial;
     protected $urlHris;
     protected $urlTls;
+    protected $db;
 
     public function __construct() {}
     /**
@@ -155,7 +156,7 @@ abstract class BaseController extends Controller
         service('renderer')->setVar('materialApiUrl', api_url('material'));
         service('renderer')->setVar('hrisApiUrl', api_url('hris'));
         service('renderer')->setVar('tlsApiUrl', api_url('tls'));
-
+        $this->db = \Config\Database::connect();
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
