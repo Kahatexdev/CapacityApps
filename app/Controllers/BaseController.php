@@ -52,6 +52,7 @@ use App\Models\DataCancelOrderModel;
 use App\Models\HistoryRevisiModel;
 use App\Models\PenggunaanJarum;
 use App\Models\DetailAreaMachineModel;
+use App\Models\DowntimeModel;
 
 /**
  * Class BaseController
@@ -113,10 +114,12 @@ abstract class BaseController extends Controller
     protected $stokPdk;
     protected $PenggunaanJarumModel;
     protected $MesinPerStyleModel;
+    protected $downtimeModel;
     protected $detailAreaMc;
     protected $urlMaterial;
     protected $urlHris;
     protected $urlTls;
+    protected $db;
 
     public function __construct() {}
     /**
@@ -153,7 +156,7 @@ abstract class BaseController extends Controller
         service('renderer')->setVar('materialApiUrl', api_url('material'));
         service('renderer')->setVar('hrisApiUrl', api_url('hris'));
         service('renderer')->setVar('tlsApiUrl', api_url('tls'));
-
+        $this->db = \Config\Database::connect();
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
@@ -199,6 +202,7 @@ abstract class BaseController extends Controller
         $this->pengaduanModel = new PengaduanModel();
         $this->replyModel = new PengaduanReply();
         $this->detailAreaMc = new DetailAreaMachineModel();
+        $this->downtimeModel = new DowntimeModel();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }

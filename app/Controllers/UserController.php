@@ -43,9 +43,7 @@ class UserController extends BaseController
         $bulan = date('m');
         $month = date('F');
         $year = date('Y');
-        $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan, $year);
         $totalMesin = $this->jarumModel->getArea();
-        $model = $this->ApsPerstyleModel->getPdkProduksi();
 
 
         $dataBuyer = $this->orderModel->getBuyer();
@@ -66,7 +64,6 @@ class UserController extends BaseController
             'buyer' => $dataBuyer,
             'area' => $dataArea,
             'jarum' => $dataJarum,
-            'models' => $model,
 
         ];
         return view(session()->get('role') . '/index', $data);

@@ -109,7 +109,7 @@ class ProduksiModel extends Model
     }
     public function getProduksiPerArea($area, $bulan, $year)
     {
-        $result = $this->select('DATE(tgl_produksi) as tgl_produksi, SUM(qty_produksi) as qty_produksi')
+        $result = $this->select('area,DATE(tgl_produksi) as tgl_produksi, SUM(qty_produksi) as qty_produksi')
             ->where('MONTH(tgl_produksi)', $bulan)
             ->where('YEAR(tgl_produksi)', $year)
             ->where('area', $area)
@@ -153,7 +153,7 @@ class ProduksiModel extends Model
     public function getDataForReset($area, $tanggal, $akhir)
     {
         return $this->select('id_produksi,idapsperstyle,qty_produksi')
-            ->where('admin', $area)
+            ->where('area', $area)
             ->where('tgl_produksi >=', $tanggal)
             ->where('tgl_produksi <=', $akhir)
             ->findAll();

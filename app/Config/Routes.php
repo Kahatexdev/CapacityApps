@@ -34,6 +34,7 @@ $routes->group(
         // material
         $routes->get('orderMaterial/(:any)/(:any)', 'ApiController::orderMaterial/$1/$2');
         $routes->get('reqstartmc/(:any)', 'ApiController::reqstartmc/$1');
+        $routes->post('reqstartmc-bulk', 'ApiController::reqstartmcBulk');
         $routes->get('getDataForPPH/(:any)/(:any)', 'ApiController::getDataForPPH/$1/$2');
         $routes->get('getDataPerinisial/(:any)/(:any)/(:any)', 'ApiController::getDataPerinisial/$1/$2/$3');
         $routes->get('getDataArea', 'ApiController::getArea');
@@ -58,8 +59,10 @@ $routes->group(
         $routes->get('getDeliv/(:any)', 'ApiController::getDeliv/$1');
 
         $routes->get('getQtyOrder', 'ApiController::getQtyOrder');
+        $routes->post('getQtyOrderByNoModel', 'ApiController::getQtyOrderByNoModel');
         $routes->get('getDataBuyer', 'ApiController::getDataBuyer');
         $routes->get('getDeliveryAwalAkhir', 'ApiController::getDeliveryAwalAkhir');
+        $routes->post('getDeliveryAwalAkhir-bulk', 'ApiController::getDeliveryAwalAkhirBulk');
         $routes->get('searchApsPerStyleByMastermodel', 'ApiController::searchApsPerStyleByMastermodel');
         $routes->get('getStartMc/(:any)', 'ApiController::getStartMc/$1');
         $routes->get('getPlanStyle', 'ApsController::getPlanStyle/$1');
@@ -1210,6 +1213,11 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
 
 
     $routes->post('importMesin', 'GodController::importMesin');
+
+    // OEE
+    $routes->get('oee', 'OEEController::index');
+    $routes->get('oee/download-template', 'OEEController::downloadTemplate');
+    $routes->post('oee/importdowntime', 'OEEController::import');
 });
 
 // ie

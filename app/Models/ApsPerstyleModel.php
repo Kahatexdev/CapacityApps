@@ -1336,6 +1336,37 @@ class ApsPerstyleModel extends Model
             ->first();
     }
 
+    public function getDeliveryAwalAkhirBulk(array $models): array
+    {
+        $rows = $this->select('
+                mastermodel,
+                MIN(delivery) AS delivery_awal,
+                MAX(delivery) AS delivery_akhir,
+                production_unit AS unit
+            ')
+            ->whereIn('mastermodel', $models)
+            ->groupBy('mastermodel')
+            ->findAll();
+
+        $result = [];
+
+        foreach ($rows as $r) {
+            $unit = match ($r['unit']) {
+                'CJ' => 'CIJERAH',
+                'MJ' => 'MAJALAYA',
+                default => 'Belum di Assign',
+            };
+
+            $result[$r['mastermodel']] = [
+                'delivery_awal'  => $r['delivery_awal'],
+                'delivery_akhir' => $r['delivery_akhir'],
+                'unit'           => $unit,
+            ];
+        }
+
+        return $result;
+    }
+
     public function searchApsPerStyleByMastermodel($mastermodel)
     {
         return $this->select('idapsperstyle, mastermodel, size, inisial, delivery, factory')
@@ -1455,8 +1486,8 @@ class ApsPerstyleModel extends Model
     public function getTotalOrderMonthByBuyer($month)
     {
         return $this->select('
-            SUM(apsperstyle.qty/24) AS qty, 
             SUM(CASE WHEN apsperstyle.sisa > 0 THEN apsperstyle.sisa/24 ELSE 0 END) AS sisa,
+            SUM(CASE WHEN apsperstyle.sisa = apsperstyle.qty THEN apsperstyle.sisa / 24 ELSE 0 END) AS sisa_blm_jln,
             data_model.kd_buyer_order
         ')
             ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
@@ -1640,6 +1671,21 @@ class ApsPerstyleModel extends Model
             ->where('qty > 0')
             ->groupBy('factory, machinetypeid, size')
             ->orderBy('factory, machinetypeid, size')
+            ->findAll();
+    }
+    public function getQtyOrderByNoModelAndStyle($noModel, $styleSize)
+    {
+        return $this->select('size, SUM(qty) AS qty')
+            ->where('mastermodel', $noModel)
+            ->where('size', $styleSize)
+            ->where('qty >', 0)
+            ->first();
+    }
+    public function getQtyOrderByNoModel($noModel)
+    {
+        return $this->select('mastermodel, size, qty')
+            ->whereIn('mastermodel', $noModel)
+            ->where('qty >', 0)
             ->findAll();
     }
 }

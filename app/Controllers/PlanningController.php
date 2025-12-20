@@ -31,12 +31,9 @@ class PlanningController extends BaseController
     public function index()
     {
 
-        $orderJalan = $this->bookingModel->getOrderJalan();
-        $terimaBooking = $this->bookingModel->getBookingMasuk();
         $mcJalan = $this->jarumModel->getJalanMesinPerArea();
         $totalMc = $this->jarumModel->totalMc();
         $bulan = date('m');
-        $totalMesin = $this->jarumModel->getJalanMesinPerArea();
         $jarum = $this->jarumModel->jarumPerArea();
         $area = $this->jarumModel->getArea();
 
@@ -50,11 +47,8 @@ class PlanningController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-            'jalan' => $orderJalan,
-            'TerimaBooking' => $terimaBooking,
             'mcJalan' => $mcJalan,
             'totalMc' => $totalMc,
-            'Area' => $totalMesin,
             'order' => $this->ApsPerstyleModel->getTurunOrder($bulan),
             'jarum' => $jarum,
             'area' => $area,
