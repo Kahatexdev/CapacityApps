@@ -1613,7 +1613,7 @@ class ApsPerstyleModel extends Model
     public function getDataOrderFetch($listNoModel)
     {
         return $this->db->table('apsperstyle')
-            ->select('idapsperstyle, inisial, size, mastermodel, delivery, qty')
+            ->select('idapsperstyle, inisial, size, mastermodel, delivery, qty, factory')
             ->whereIn('mastermodel', $listNoModel)
             ->get()
             ->getResultArray();
