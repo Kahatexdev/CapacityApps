@@ -120,6 +120,7 @@ abstract class BaseController extends Controller
     protected $urlHris;
     protected $urlTls;
 
+
     /**
      * @var BaseConnection
      */
@@ -161,7 +162,7 @@ abstract class BaseController extends Controller
         service('renderer')->setVar('hrisApiUrl', api_url('hris'));
         service('renderer')->setVar('tlsApiUrl', api_url('tls'));
 
-        $this->db = \Config\Database::connect();
+
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
