@@ -42,10 +42,6 @@ class ProduksiController extends BaseController
         $bulan = date('m');
         $month = date('F');
         $year = date('Y');
-        $totalMesin = $this->jarumModel->getArea();
-        $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan, $year);
-        $dataPdk = $this->ApsPerstyleModel->getPdkProduksi();
-        $produksi = $this->produksiModel->getProduksiHarianArea();
         $data = [
             'role' => session()->get('role'),
             'title' => 'Data Produksi',
@@ -56,11 +52,6 @@ class ProduksiController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-            'pdk' => $dataPdk,
-            'Area' => $totalMesin,
-            'Produksi' => $dataProduksi,
-            'bulan' => $month,
-            'produksi' => $produksi
         ];
         return view(session()->get('role') . '/produksi', $data);
     }
@@ -491,111 +482,144 @@ class ProduksiController extends BaseController
 
         $db->transStart();
         foreach ($batchData as $batchItem) {
-            $rowIndex = $batchItem['rowIndex'];
-            $data = $batchItem['data'];
-            try {
-                log_message('debug', 'Processing row: ' . $rowIndex);
 
+            $rowIndex = $batchItem['rowIndex'];
+            $data     = $batchItem['data'];
+
+            try {
 
                 $no_model = $data[2];
-                $style = $data[3];
-                $size = $data[3];
+                $style    = $data[3];
+                $area     = $area;
 
+                $totalProduksi = abs((int) $data[14]);
+                if ($totalProduksi <= 0) {
+                    continue;
+                }
 
                 $validate = [
                     'no_model' => $no_model,
-                    'style' => $style,
-                    'area' => $area
+                    'style'    => $style,
+                    'area'     => $area
                 ];
 
-                // Fetch data based on model, style, and size
-                $dataMaster = $this->ApsPerstyleModel->getAllForModelStyleAndSize($validate);
-                $remainingQty = str_replace('-', '', $data[14]); // Production quantity
-                $lastId = null;
-                $delivery = null;
+                $dataMaster = $this->ApsPerstyleModel
+                    ->getAllForModelStyleAndSize($validate);
 
-                if ($dataMaster && count($dataMaster) > 0) {
-                    log_message('debug', 'Data Master found: ' . json_encode($dataMaster));
-                    log_message('debug', 'Original remainingQty: ' . $remainingQty);
-
-                    // Sort delivery ascending if not sorted from query
-                    usort($dataMaster, fn($a, $b) => strtotime($a['delivery']) <=> strtotime($b['delivery']));
-                    log_message('debug', 'Sorted Data: ' . json_encode($dataMaster));
-
-                    $remaining = $remainingQty;
-                    $lastDeliveryRow = end($dataMaster);
-                    reset($dataMaster);
-
-                    foreach ($dataMaster as $item) {
-                        if ($remaining <= 0) break;
-
-                        $id       = $item['idapsperstyle'];
-                        $sisa     = (float) $item['sisa'];
-                        $delivery = $item['delivery'];
-
-                        log_message('debug', "Processing ID: $id | Delivery: $delivery | Sisa: $sisa | Remaining: $remaining");
-
-                        if ($sisa >= $remaining) {
-                            $newSisa  = $sisa - $remaining;
-                            $remaining = 0;
-                        } else {
-                            $remaining -= $sisa;
-                            $newSisa = 0;
-                        }
-
-                        $this->ApsPerstyleModel->update($id, ['sisa' => $newSisa]);
-                        log_message('debug', "Updated ID: $id | New Sisa: $newSisa");
-                    }
-
-                    // Overproduction → simpan ke delivery terakhir
-                    if ($remaining > 0 && $lastDeliveryRow) {
-                        $lastId = $lastDeliveryRow['idapsperstyle'];
-                        $this->ApsPerstyleModel->update($lastId, ['sisa' => -1 * $remaining]);
-                        log_message('debug', "Overproduction: updated ID $lastId with negative sisa: -" . $remaining);
-                    }
-
-
-                    // Setup tanggal produksi = tgl input - 1 hari
-                    $tglInputProduksi = $data[0];
-                    $tglProduksi = (new DateTime($tglInputProduksi))->modify('-1 day')->format('Y-m-d');
-
-                    // Siapkan data insert produksi
-                    $dataInsert = [
-                        'tgl_produksi'   => $tglProduksi,
-                        'idapsperstyle'  => $lastDeliveryRow['idapsperstyle'],
-                        'bagian'         => "-",
-                        'storage_awal'   => "-",
-                        'storage_akhir'  => "-",
-                        'qty_produksi'   => abs((int) $data[14]),
-                        'bs_prod'        => 0,
-                        'kategori_bs'    => "-",
-                        'no_box'         => $data[12] ?? 0,
-                        'no_label'       => $data[13],
-                        'admin'          => session()->get('username'),
-                        'shift'          => "-",
-                        'shift_a'        => $data[9] ?? 0,
-                        'shift_b'        => $data[10] ?? 0,
-                        'shift_c'        => $data[11] ?? 0,
-                        'no_mesin'       => $data[8] ?? 0,
-                        'delivery'       => $lastDeliveryRow['delivery'],
-                        'area'           => $area,
-                        'size'           => $style,
-                    ];
-
-                    // Cek duplikat sebelum insert
-                    if (!$this->produksiModel->existingData($dataInsert)) {
-                        $this->produksiModel->insert($dataInsert);
-                        log_message('debug', "Inserted production data for row: $rowIndex");
-                    } else {
-                        $failedRows[] = "$rowIndex duplikat";
-                    }
-                } else {
-                    $failedRows[] = "Style tidak ditemukan $rowIndex";
-                    log_message('debug', "Style not found for row: $rowIndex");
+                if (!$dataMaster || count($dataMaster) === 0) {
+                    $failedRows[] = "Style tidak ditemukan row $rowIndex";
+                    continue;
                 }
-            } catch (\Exception $e) {
-                log_message('error', 'Error in row ' . $rowIndex . ': ' . $e->getMessage());
-                $failedRows[] = 'Error on row ' . $rowIndex . ': ' . $e->getMessage();
+
+                // =====================================================
+                // SORT SHIPMENT BERURUT (PALING PENTING)
+                // =====================================================
+                usort(
+                    $dataMaster,
+                    fn($a, $b) =>
+                    strtotime($a['delivery']) <=> strtotime($b['delivery'])
+                );
+
+                $tglProduksi = (new DateTime($data[0]))
+                    ->modify('-1 day')
+                    ->format('Y-m-d');
+
+                $remaining = $totalProduksi;
+                $lastAPS   = null;
+
+                // =====================================================
+                // LOOP SHIPMENT SATU-SATU (HABISKAN DULU)
+                // =====================================================
+                foreach ($dataMaster as $item) {
+
+                    if ($remaining <= 0) {
+                        break;
+                    }
+
+                    $id       = $item['idapsperstyle'];
+                    $sisa     = (int) $item['sisa'];
+                    $delivery = $item['delivery'];
+
+                    $lastAPS = $item; // selalu update → ujungnya shipment terakhir
+
+                    // shipment ini sudah habis → skip
+                    if ($sisa <= 0) {
+                        continue;
+                    }
+
+                    // tentukan berapa yang dipakai dari shipment ini
+                    if ($sisa >= $remaining) {
+                        $pakai     = $remaining;
+                        $newSisa   = $sisa - $remaining;
+                        $remaining = 0;
+                    } else {
+                        $pakai     = $sisa;
+                        $newSisa   = 0;
+                        $remaining -= $sisa;
+                    }
+
+                    // UPDATE SISA SHIPMENT INI
+                    $this->ApsPerstyleModel->update($id, [
+                        'sisa' => $newSisa
+                    ]);
+
+                    // INSERT PRODUKSI UNTUK SHIPMENT INI
+                    $this->produksiModel->insert([
+                        'tgl_produksi'  => $tglProduksi,
+                        'idapsperstyle' => $id,
+                        'qty_produksi'  => $pakai,
+                        'bs_prod'       => 0,
+                        'kategori_bs'   => '-',
+                        'no_box'        => $data[12] ?? 0,
+                        'no_label'      => $data[13],
+                        'admin'         => session()->get('username'),
+                        'shift'         => '-',
+                        'shift_a'       => $data[9] ?? 0,
+                        'shift_b'       => $data[10] ?? 0,
+                        'shift_c'       => $data[11] ?? 0,
+                        'no_mesin'      => $data[8] ?? 0,
+                        'delivery'      => $delivery,
+                        'area'          => $area,
+                        'size'          => $style,
+                    ]);
+                }
+
+                // =====================================================
+                // OVERPRODUCTION → MASUK KE SHIPMENT TERAKHIR SAJA
+                // =====================================================
+                if ($remaining > 0 && $lastAPS) {
+
+                    $lastId   = $lastAPS['idapsperstyle'];
+                    $sisaLast = (int) $lastAPS['sisa'];
+
+                    // sisa akhir = sisa awal shipment terakhir - sisa produksi
+                    $this->ApsPerstyleModel->update($lastId, [
+                        'sisa' => $sisaLast - $remaining
+                    ]);
+
+                    // insert produksi sisa ke shipment terakhir
+                    $this->produksiModel->insert([
+                        'tgl_produksi'  => $tglProduksi,
+                        'idapsperstyle' => $lastId,
+                        'qty_produksi'  => $remaining,
+                        'bs_prod'       => 0,
+                        'kategori_bs'   => '-',
+                        'no_box'        => $data[12] ?? 0,
+                        'no_label'      => $data[13],
+                        'admin'         => session()->get('username'),
+                        'shift'         => '-',
+                        'shift_a'       => $data[9] ?? 0,
+                        'shift_b'       => $data[10] ?? 0,
+                        'shift_c'       => $data[11] ?? 0,
+                        'no_mesin'      => $data[8] ?? 0,
+                        'delivery'      => $lastAPS['delivery'],
+                        'area'          => $area,
+                        'size'          => $style,
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                log_message('error', "Row $rowIndex error: " . $e->getMessage());
+                $failedRows[] = "Error row $rowIndex";
             }
         }
 
@@ -615,57 +639,69 @@ class ProduksiController extends BaseController
     }
     public function resetproduksiarea()
     {
-        $area = $this->request->getPost('area');
-        $awal = $this->request->getPost('awal');
+        $area  = $this->request->getPost('area');
+        $awal  = $this->request->getPost('awal');
         $akhir = $this->request->getPost('akhir');
 
-        $produksi = $this->produksiModel->getDataForReset($area, $awal, $akhir);
-        $errorMessages = [];
-        $totalProcessed = 0;
-        $totalErrors = 0;
+        $db = \Config\Database::connect();
+        $db->transBegin();
 
-        // Set batch size
-        $batchSize = 100;
-        $batchCounter = 0;
+        try {
 
-        foreach ($produksi as $pr) {
-            try {
-                $idProduksi = $pr['id_produksi'];
-                $qtyproduksi = $pr['qty_produksi'];
-                $idaps = $pr['idapsperstyle'];
-                $sisaOrder = $this->ApsPerstyleModel->getSisaOrder($idaps);
-                $setSisa = $qtyproduksi + $sisaOrder;
+            /**
+             * 1. Ambil total produksi per APS
+             */
+            $rows = $db->table('produksi p')
+                ->select('p.idapsperstyle, SUM(p.qty_produksi) AS total_qty')
+                ->where('p.area', $area)
+                ->where('p.tgl_produksi >=', $awal)
+                ->where('p.tgl_produksi <=', $akhir)
+                ->groupBy('p.idapsperstyle')
+                ->get()
+                ->getResultArray();
 
-                // Update 'sisa' di tabel ApsPerstyle
-                $this->ApsPerstyleModel->update($idaps, ['sisa' => $setSisa]);
-
-                // Hapus data produksi
-                $this->produksiModel->delete($idProduksi);
-
-                $totalProcessed++;
-            } catch (\Exception $e) {
-                // Simpan pesan error jika terjadi
-                $errorMessages[] = "Error processing ID: $idProduksi - " . $e->getMessage();
-                $totalErrors++;
+            if (empty($rows)) {
+                $db->transRollback();
+                return redirect()
+                    ->back()
+                    ->with('warning', 'Tidak ada data produksi untuk di-reset');
             }
 
-            $batchCounter++;
-
-            // Kalau sudah mencapai batch size, simpan checkpoint dan lanjut ke batch berikutnya
-            if ($batchCounter >= $batchSize) {
-                // Reset batch counter
-                $batchCounter = 0;
-                // Di sini lo bisa simpan ke log atau lakukan tindakan lain kalau perlu
+            /**
+             * 2. Update sisa APS (bulk, loop kecil)
+             */
+            foreach ($rows as $row) {
+                $db->table('apsperstyle')
+                    ->set('sisa', 'sisa + ' . (int)$row['total_qty'], false)
+                    ->where('idapsperstyle', $row['idapsperstyle'])
+                    ->update();
             }
-        }
 
-        // Redirect dengan pesan sukses atau error
-        if ($totalErrors > 0) {
-            return redirect()->to(base_url(session()->get('role') . '/dataproduksi'))->withInput()->with('error', "Data berhasil di reset sebagian. $totalErrors data tidak terproses.");
-        } else {
-            return redirect()->to(base_url(session()->get('role') . '/dataproduksi'))->withInput()->with('success', 'Semua data berhasil di reset');
+            /**
+             * 3. Delete produksi langsung (sekali query)
+             */
+            $db->table('produksi')
+                ->where('area', $area)
+                ->where('tgl_produksi >=', $awal)
+                ->where('tgl_produksi <=', $akhir)
+                ->delete();
+
+            $db->transCommit();
+
+            return redirect()
+                ->to(base_url(session()->get('role') . '/dataproduksi'))
+                ->with('success', 'Reset produksi berhasil dan konsisten');
+        } catch (\Throwable $e) {
+            $db->transRollback();
+
+            log_message('error', 'Reset produksi gagal: ' . $e->getMessage());
+
+            return redirect()
+                ->back()
+                ->with('error', 'Reset produksi gagal. Silakan cek log.');
         }
     }
+
     public function summaryProdPerTanggal()
     {
         $role = session()->get('role');
