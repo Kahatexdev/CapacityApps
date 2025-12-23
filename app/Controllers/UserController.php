@@ -43,9 +43,7 @@ class UserController extends BaseController
         $bulan = date('m');
         $month = date('F');
         $year = date('Y');
-        $dataProduksi = $this->produksiModel->getProduksiPerhari($bulan, $year);
         $totalMesin = $this->jarumModel->getArea();
-        $model = $this->ApsPerstyleModel->getPdkProduksi();
 
 
         $dataBuyer = $this->orderModel->getBuyer();
@@ -66,18 +64,12 @@ class UserController extends BaseController
             'buyer' => $dataBuyer,
             'area' => $dataArea,
             'jarum' => $dataJarum,
-            'models' => $model,
 
         ];
         return view(session()->get('role') . '/index', $data);
     }
     public function produksi()
     {
-        $dataPdk = $this->ApsPerstyleModel->getPdkProduksi();
-        $produksi = $this->produksiModel->getProduksiHarianArea();
-        $dataBuyer = $this->orderModel->getBuyer();
-        $dataArea = $this->jarumModel->getArea();
-        $dataJarum = $this->jarumModel->getJarum();
         $model = $this->ApsPerstyleModel->getPdkProduksi();
         $data = [
             'role' => session()->get('role'),
@@ -85,15 +77,6 @@ class UserController extends BaseController
             'active1' => '',
             'active3' => '',
             'active2' => 'active',
-            'targetProd' => 0,
-            'produksiBulan' => 0,
-            'produksiHari' => 0,
-            'pdk' => $dataPdk,
-            'produksi' => $produksi,
-            'buyer' => $dataBuyer,
-            'area' => $dataArea,
-            'jarum' => $dataJarum,
-            'models' => $model,
         ];
         return view(session()->get('role') . '/produksi', $data);
     }

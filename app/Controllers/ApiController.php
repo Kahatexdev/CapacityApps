@@ -113,6 +113,28 @@ class ApiController extends ResourceController
         return $this->respond($startMc, 200);
     }
 
+    public function reqstartmcBulk()
+    {
+        $models = $this->request->getJSON(true);
+
+        if (empty($models) || !is_array($models)) {
+            return $this->respond([
+                'message' => 'Invalid payload'
+            ], 400);
+        }
+
+        // sanitasi & unique
+        $models = array_values(array_unique(array_filter($models)));
+
+        if (empty($models)) {
+            return $this->respond([]);
+        }
+
+        $result = $this->mesinPerStyle->reqstartmcBulk($models);
+
+        return $this->respond($result, 200);
+    }
+
     public function getDataPerinisial($area, $model, $size)
     {
         if (!$model || !$size) {
@@ -427,6 +449,26 @@ class ApiController extends ResourceController
         return $this->respond($delivery, ResponseInterface::HTTP_OK);
     }
 
+    public function getDeliveryAwalAkhirBulk()
+    {
+        $models = $this->request->getJSON(true);
+
+        if (empty($models) || !is_array($models)) {
+            return $this->respond(['message' => 'Invalid payload'], 400);
+        }
+
+        $models = array_values(array_unique(array_filter($models)));
+
+        if (empty($models)) {
+            return $this->respond([]);
+        }
+
+        $data = $this->ApsPerstyleModel->getDeliveryAwalAkhirBulk($models);
+
+        return $this->respond($data, 200);
+    }
+
+
     public function searchApsPerStyleByMastermodel()
     {
         $mastermodel = $this->request->getGet('mastermodel');
@@ -466,14 +508,25 @@ class ApiController extends ResourceController
 
         // Fetch data from the model
         $startMc = $this->orderModel->getStartMc($model);
+        $areaMc = $this->ApsPerstyleModel->getArea($model);
 
         // Check if data is found
         if (empty($startMc)) {
-            return $this->respond(['message' => 'Data tidak ditemukan'], ResponseInterface::HTTP_NOT_FOUND);
+            return $this->respond([
+                'message' => 'Data tidak ditemukan',
+                'model'   => $model
+            ], ResponseInterface::HTTP_NOT_FOUND);
         }
 
+        $response = [
+            'startMc' => $startMc,
+            'areaMc'  => $areaMc
+        ];
+
+        log_message('info', 'SERVER getStartMc RETURN: ' . json_encode($response));
+
         // Return the data with a 200 status
-        return $this->respond($startMc, ResponseInterface::HTTP_OK);
+        return $this->respond($response, 200);
     }
     public function getNotifAduan($role)
     {
@@ -809,7 +862,7 @@ class ApiController extends ResourceController
 
     public function getDataOrderFetch()
     {
-        $startDate = date('Y-m-d', strtotime('90 days ago')); // Menggunakan format tanggal yang benar
+        $startDate = date('Y-m-d', strtotime('150 days ago')); // Menggunakan format tanggal yang benar
 
         // 1️⃣ Ambil semua no_model berdasarkan tanggal
         $dataModel = $this->orderModel->getNoModel($startDate);
@@ -837,5 +890,18 @@ class ApiController extends ResourceController
                 'aps'    => $detailModel
             ]
         ]);
+    }
+
+    public function getQtyOrderByNoModel()
+    {
+        $models = $this->request->getJSON(true)['models'] ?? [];
+
+        if (empty($models)) {
+            return $this->response->setJSON([])->setStatusCode(400);
+        }
+
+        $orderQty = $this->ApsPerstyleModel->getQtyOrderByNoModel($models);
+
+        return $this->response->setJSON($orderQty);
     }
 }

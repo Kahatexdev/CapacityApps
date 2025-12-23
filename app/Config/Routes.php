@@ -34,6 +34,7 @@ $routes->group(
         // material
         $routes->get('orderMaterial/(:any)/(:any)', 'ApiController::orderMaterial/$1/$2');
         $routes->get('reqstartmc/(:any)', 'ApiController::reqstartmc/$1');
+        $routes->post('reqstartmc-bulk', 'ApiController::reqstartmcBulk');
         $routes->get('getDataForPPH/(:any)/(:any)', 'ApiController::getDataForPPH/$1/$2');
         $routes->get('getDataPerinisial/(:any)/(:any)/(:any)', 'ApiController::getDataPerinisial/$1/$2/$3');
         $routes->get('getDataArea', 'ApiController::getArea');
@@ -58,8 +59,10 @@ $routes->group(
         $routes->get('getDeliv/(:any)', 'ApiController::getDeliv/$1');
 
         $routes->get('getQtyOrder', 'ApiController::getQtyOrder');
+        $routes->post('getQtyOrderByNoModel', 'ApiController::getQtyOrderByNoModel');
         $routes->get('getDataBuyer', 'ApiController::getDataBuyer');
         $routes->get('getDeliveryAwalAkhir', 'ApiController::getDeliveryAwalAkhir');
+        $routes->post('getDeliveryAwalAkhir-bulk', 'ApiController::getDeliveryAwalAkhirBulk');
         $routes->get('searchApsPerStyleByMastermodel', 'ApiController::searchApsPerStyleByMastermodel');
         $routes->get('getStartMc/(:any)', 'ApiController::getStartMc/$1');
         $routes->get('getPlanStyle', 'ApsController::getPlanStyle/$1');
@@ -70,6 +73,8 @@ $routes->group(
         $routes->post('pengaduan/reply/(:num)', 'PengaduanController::Apireply/$1');
         $routes->get('getNotif/(:any)', 'ApiController::getNotifAduan/$1');
         $routes->get('ExportPengaduan/(:num)', 'ApiController::ExportPengaduan/$1');
+
+        $routes->get('pengaduan/fetchNew', 'PengaduanController::fetchNew');
 
         // update supermarket area
         $routes->post('repeatSupermarket', 'ApiController::repeatSupermarket');
@@ -263,6 +268,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     // $routes->get('exportsales', 'ExcelController::export');
     $routes->post('exportsales', 'SalesController::exportExcelByJarum');
     $routes->get('generatesales', 'SalesController::generateExcel');
+    $routes->get('generateSalesByBuyer', 'SalesController::generateSalesByBuyer');
 
     //target
     $routes->get('datatarget', 'BookingController::target');
@@ -501,6 +507,8 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('produksi', 'ProduksiController::produksi');
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->get('generateDataProduksi', 'ExcelController::dataProduksi');
+    $routes->get('reportGlobalProduksi', 'ProduksiController::reportGlobalProduksi');
+    $routes->get('excelGlobalProduksi/(:any)', 'ExcelController::excelGlobalProduksi/$1');
 
 
     //summary
@@ -1115,6 +1123,8 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('updatebs', 'ProduksiController::updatebs');
     $routes->get('hapus-produksi/(:any)', 'ProduksiController::deleteProduksi/$1');
     $routes->get('detailproduksi_export/(:any)', 'ExcelController::exportDetailProduksi/$1');
+    $routes->get('reportGlobalProduksi', 'ProduksiController::reportGlobalProduksi');
+    $routes->get('excelGlobalProduksi/(:any)', 'ExcelController::excelGlobalProduksi/$1');
 
     $routes->post('summaryproduksi', 'ProduksiController::summaryProduksi');
     $routes->get('bssetting', 'UserController::bssetting');
@@ -1203,6 +1213,11 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
 
 
     $routes->post('importMesin', 'GodController::importMesin');
+
+    // OEE
+    $routes->get('oee', 'OEEController::index');
+    $routes->get('oee/download-template', 'OEEController::downloadTemplate');
+    $routes->post('oee/importdowntime', 'OEEController::import');
 });
 
 // ie

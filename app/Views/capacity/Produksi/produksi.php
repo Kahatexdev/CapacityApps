@@ -334,9 +334,22 @@
 <div class="row my-3">
     <div class="col-lg-12">
         <div class="card z-index-2">
-            <div class="card-header pb-0">
-                <h6 class="card-title">Data Produksi Harian bulan <?= $bulan ?></h6>
-
+            <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                <h6 class="card-title">Data Produksi Harian</h6>
+                <div>
+                    <select id="filter-bulan" class="form-control d-inline w-auto">
+                        <option value="">Semua Bulan</option>
+                        <?php for ($i = 1; $i <= 12; $i++): ?>
+                            <option value="<?= str_pad($i, 2, '0', STR_PAD_LEFT) ?>"><?= date("F", mktime(0, 0, 0, $i, 1)) ?></option>
+                        <?php endfor; ?>
+                    </select>
+                    <select id="filter-tahun" class="form-control d-inline w-auto">
+                        <option value="">Semua Tahun</option>
+                        <?php for ($i = date("Y") - 5; $i <= date("Y"); $i++): ?>
+                            <option value="<?= $i ?>"><?= $i ?></option>
+                        <?php endfor; ?>
+                    </select>
+                </div>
             </div>
             <div class="card-body p-3">
                 <div class="row">
@@ -345,20 +358,15 @@
                             <canvas id="mixed-chart" class="chart-canvas" height="300"></canvas>
                         </div>
                     </div>
-
                 </div>
-
             </div>
         </div>
     </div>
 </div>
 
-
 <div class="row">
     <?php foreach ($Area as $ar) : ?>
-
         <div class="col-xl-6 col-sm-3 mb-xl-0 mb-4 mt-2">
-
             <div class="card">
                 <div class="card-header">
                     <div class="row">
@@ -369,38 +377,36 @@
                                 <?php else : ?>
                                     <p class="text-sm mb-0 text-capitalize font-weight-bold"><?= $ar ?></p>
                                 <?php endif; ?>
-                                <h5 class="font-weight-bolder mb-0">
-                                </h5>
+                                <h5 class="font-weight-bolder mb-0"></h5>
                             </div>
                         </div>
                         <div class="col-4 text-end">
                             <?php if (stripos($ar, 'KK8J') !== false || stripos($ar, '13G') !== false) : ?>
-
-                                <a href="<?= base_url($role . '/detailproduksi/' . $ar) ?>" class="btn btn-info btn-sm"> <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i> Details</a>
-
+                                <a href="<?= base_url($role . '/detailproduksi/' . $ar) ?>" class="btn btn-info btn-sm">
+                                    <i class="fas fa-mitten text-lg opacity-10" aria-hidden="true"></i> Details
+                                </a>
                             <?php else : ?>
-                                <a href="<?= base_url($role . '/detailproduksi/' . $ar) ?>" class="btn btn-info btn-sm"> <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i> Details</a>
+                                <a href="<?= base_url($role . '/detailproduksi/' . $ar) ?>" class="btn btn-info btn-sm">
+                                    <i class="fas fa-socks text-lg opacity-10" aria-hidden="true"></i> Details
+                                </a>
                             <?php endif; ?>
                         </div>
-
                     </div>
                 </div>
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="col-lg-12 col-md-12">
-
                             <div class="chart">
                                 <canvas id="<?= $ar ?>-chart" class="chart-canvas" height="300"></canvas>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
-
         </div>
-    <?php endforeach ?>
+    <?php endforeach; ?>
 </div>
+
 
 </div>
 <!-- Skrip JavaScript -->
@@ -408,100 +414,115 @@
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 
 <script>
-    let productionData = <?php echo json_encode($Produksi); ?>;
-    let labels = productionData.map(item => item.tgl_produksi);
-    let values = productionData.map(item => (item.qty_produksi / 24).toFixed(0));
-    var ctx2 = document.getElementById("mixed-chart").getContext("2d");
+    let chartInstance = null;
 
-    var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
-    gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
-    gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-    gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)');
+    function fetchData(bulan, tahun) {
+        $.ajax({
+            url: "<?= base_url('chart/getProductionData') ?>",
+            type: "GET",
+            data: {
+                bulan: bulan,
+                tahun: tahun
+            },
+            dataType: "json",
+            success: function(response) {
+                updateChart(response);
+            }
+        });
+    }
 
-    var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
-    gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
-    gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-    gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)');
+    function updateChart(data) {
+        let labels = data.map(item => item.tgl_produksi);
+        let values = data.map(item => (item.qty_produksi / 24).toFixed(0));
 
-    new Chart(ctx2, {
-        data: {
-            labels: labels,
-            datasets: [{
-                type: "bar",
-                label: "Jumlah Produksi",
-                borderWidth: 0,
-                pointRadius: 30,
-                backgroundColor: "#3A416F",
-                fill: true,
-                data: values,
-                maxBarThickness: 20
-            }, ],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false,
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+
+        var ctx2 = document.getElementById("mixed-chart").getContext("2d");
+        chartInstance = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Jumlah Produksi",
+                    backgroundColor: "#3A416F",
+                    data: values,
+                    maxBarThickness: 20
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            padding: 10
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            padding: 10
+                        }
+                    }
                 }
-            },
-            interaction: {
-                intersect: false,
-                mode: 'index',
-            },
-            scales: {
-                y: {
-                    grid: {
-                        drawBorder: false,
-                        display: true,
-                        drawOnChartArea: true,
-                        drawTicks: false,
-                        borderDash: [5, 5]
-                    },
-                    ticks: {
-                        display: true,
-                        padding: 10,
-                        color: '#b2b9bf',
-                        font: {
-                            size: 11,
-                            family: "Open Sans",
-                            style: 'normal',
-                            lineHeight: 2
-                        },
-                    }
-                },
-                x: {
-                    grid: {
-                        drawBorder: false,
-                        display: false,
-                        drawOnChartArea: false,
-                        drawTicks: false,
-                        borderDash: [5, 5]
-                    },
-                    ticks: {
-                        display: true,
-                        color: '#b2b9bf',
-                        padding: 20,
-                        font: {
-                            size: 11,
-                            family: "Open Sans",
-                            style: 'normal',
-                            lineHeight: 2
-                        },
-                    }
-                },
-            },
-        },
+            }
+        });
+    }
+
+    // Event listener filter bulan & tahun
+    document.getElementById("filter-bulan").addEventListener("change", function() {
+        let bulan = this.value.padStart(2, "0"); // Pastikan selalu dua digit
+        let tahun = document.getElementById("filter-tahun").value;
+        fetchData(bulan, tahun);
     });
+
+    document.getElementById("filter-tahun").addEventListener("change", function() {
+        let bulan = document.getElementById("filter-bulan").value.padStart(2, "0");
+        let tahun = this.value;
+        fetchData(bulan, tahun);
+    });
+
+    // Load awal dengan bulan & tahun sekarang
+    let currentDate = new Date();
+    let defaultBulan = String(currentDate.getMonth() + 1).padStart(2, "0");
+    let defaultTahun = currentDate.getFullYear();
+
+    document.getElementById("filter-bulan").value = defaultBulan;
+    document.getElementById("filter-tahun").value = defaultTahun;
+
+    fetchData(defaultBulan, defaultTahun);
 </script>
 <script>
     $(document).ready(function() {
+        let charts = {}; // Menyimpan referensi chart agar bisa di-destroy
+
         function fetchData() {
+            // Ambil nilai filter bulan & tahun dari dropdown
+            var selectedBulan = $('#filter-bulan').val();
+            var selectedTahun = $('#filter-tahun').val();
+
             $.ajax({
                 url: '<?= base_url($role . '/produksiareachart') ?>',
                 type: 'GET',
+                dataType: "json",
+                data: {
+                    bulan: selectedBulan,
+                    tahun: selectedTahun
+                },
                 success: function(response) {
-                    updatechart(response)
+                    updateChart(response);
                 },
                 error: function(xhr, status, error) {
                     console.error(xhr.responseText);
@@ -509,18 +530,24 @@
             });
         }
 
-        function updatechart(response) {
-            var produksi = JSON.parse(response);
+        function updateChart(produksi) {
             for (const key in produksi) {
                 const value = produksi[key];
                 var canvasId = key + '-chart';
                 var canvasElement = document.getElementById(canvasId);
-                if (canvasElement.chart) {
-                    canvasElement.chart.destroy();
+
+                if (!canvasElement) {
+                    console.warn(`Canvas dengan ID "${canvasId}" tidak ditemukan.`);
+                    continue;
                 }
+
                 var ctx2 = canvasElement.getContext("2d");
 
-                // Check if value is an array or a single object
+                // Hapus chart lama jika ada
+                if (charts[canvasId]) {
+                    charts[canvasId].destroy();
+                }
+
                 if (Array.isArray(value)) {
                     var tanggal = value.map(item => item.tgl_produksi);
                     var values = value.map(item => (item.qty_produksi / 24).toFixed(0));
@@ -530,95 +557,77 @@
                     gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
                     gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)');
 
-                    var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
-                    gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
-                    gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-                    gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)');
-
-                    new Chart(ctx2, {
+                    charts[canvasId] = new Chart(ctx2, {
+                        type: "bar",
                         data: {
                             labels: tanggal,
                             datasets: [{
-                                type: "bar",
                                 label: "Jumlah Produksi",
-                                borderWidth: 0,
-                                pointRadius: 30,
                                 backgroundColor: "#3A416F",
-                                fill: true,
+                                borderWidth: 0,
                                 data: values,
                                 maxBarThickness: 20
-                            }, ],
+                            }]
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: {
                                 legend: {
-                                    display: false,
+                                    display: false
                                 }
                             },
                             interaction: {
                                 intersect: false,
-                                mode: 'index',
+                                mode: 'index'
                             },
                             scales: {
                                 y: {
                                     grid: {
                                         drawBorder: false,
                                         display: true,
-                                        drawOnChartArea: true,
                                         drawTicks: false,
                                         borderDash: [5, 5]
                                     },
                                     ticks: {
                                         display: true,
                                         padding: 10,
-                                        color: '#b2b9bf',
+                                        color: '#000000ff',
                                         font: {
                                             size: 11,
-                                            family: "Open Sans",
-                                            style: 'normal',
-                                            lineHeight: 2
-                                        },
+                                            family: "Open Sans"
+                                        }
                                     }
                                 },
                                 x: {
                                     grid: {
                                         drawBorder: false,
-                                        display: false,
-                                        drawOnChartArea: false,
-                                        drawTicks: false,
-                                        borderDash: [5, 5]
+                                        display: false
                                     },
                                     ticks: {
                                         display: true,
-                                        color: '#b2b9bf',
+                                        color: '#000000ff',
                                         padding: 20,
                                         font: {
                                             size: 11,
-                                            family: "Open Sans",
-                                            style: 'normal',
-                                            lineHeight: 2
-                                        },
+                                            family: "Open Sans"
+                                        }
                                     }
-                                },
-                            },
-
-                        },
+                                }
+                            }
+                        }
                     });
-
-
                 }
-
-
             }
-
-
         }
-        setInterval(fetchData, 5000);
-        fetchData();
 
+        // Trigger fetchData saat filter dropdown berubah
+        $('#filter-bulan, #filter-tahun').on('change', fetchData);
+
+        // Initial fetch saat halaman dimuat
+        fetchData();
     });
+</script>
 </script>
 
 </div>
