@@ -1631,25 +1631,50 @@ class MaterialController extends BaseController
         $qtyOrderList = [];
 
         foreach ($dataPoTambahan as $item) {
-            $style = $item['style_size'];
-            $noModel = $item['no_model'];  // ambil langsung dari API
-            $area = $item['admin'];        // atau sesuai kolom factory di DB
+            $style   = $item['style_size'];
+            $noModel = $item['no_model'];
+            $area    = $item['admin'];
 
-            // Ambil qty dari DB lokal
-            $qty = $this->ApsPerstyleModel->getSisaPerSize($area, $noModel, [$style]);
-            $qtyOrderList[$style] = is_array($qty) ? ($qty['qty'] ?? 0) : ($qty->qty ?? 0);
+            $result = $this->ApsPerstyleModel->getSisaPerSize(
+                $area,
+                $noModel,
+                [$style]
+            );
+
+            // Ambil qty dengan aman
+            $qty = (!empty($result) && isset($result[0]['qty']))
+                ? (float)$result[0]['qty']
+                : 0;
+
+            // Simpan per model + size
+            $qtyOrderList[$noModel][$style] = $qty;
+
+            // Optional: log per baris
+            // log_message(
+            //     'debug',
+            //     "QtyOrder | Area={$area} | Model={$noModel} | Size={$style} | Qty={$qty}"
+            // );
         }
+
+        // Log keseluruhan
+        // log_message('debug', 'qtyOrderList: ' . json_encode($qtyOrderList));
 
         // Gabungkan ke response
         foreach ($dataPoTambahan as $i => $row) {
-            $style = $row['style_size'];
-            $qty_order = isset($qtyOrderList[$style]) ? (float)$qtyOrderList[$style] : 0;
-            $composition = (float)$row['composition'] ?? 0;
-            $gw = (float)$row['gw'] ?? 0;
-            $loss = (float)$row['loss'] ?? 0;
+            $noModel = $row['no_model'];
+            $style   = $row['style_size'];
+
+            // Ambil qty sesuai struktur array
+            $qty_order = $qtyOrderList[$noModel][$style] ?? 0;
+
+            $composition = (float) ($row['composition'] ?? 0);
+            $gw          = (float) ($row['gw'] ?? 0);
+            $loss        = (float) ($row['loss'] ?? 0);
 
             $dataPoTambahan[$i]['qty_order'] = $qty_order;
-            $dataPoTambahan[$i]['kg_po'] = ($qty_order * $composition * $gw / 100 / 1000) * (1 + ($loss / 100));
+            $dataPoTambahan[$i]['kg_po'] =
+                ($qty_order * $composition * $gw / 100 / 1000)
+                * (1 + ($loss / 100));
         }
 
         return $this->response->setStatusCode($httpCode)->setJSON($dataPoTambahan);

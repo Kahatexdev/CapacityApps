@@ -1211,7 +1211,10 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $nomodel)
             ->whereIn('size', $size)
             ->where('qty >', 0)
-            ->first(); // Ambil satu hasil
+            ->groupBy('mastermodel')
+            ->groupBy('size')
+            ->get()
+            ->getResultArray(); // Ambil satu hasil
     }
 
     public function getApsPerStyle($nomodel, $size, $area)
