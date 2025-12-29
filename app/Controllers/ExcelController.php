@@ -4179,35 +4179,57 @@ class ExcelController extends BaseController
         $qtyOrderList = [];
 
         foreach ($dataPoTambahan as $item) {
-            $style = $item['style_size'];
-            $noModel = $item['no_model'];  // ambil langsung dari API
-            $area = $item['admin'];        // atau sesuai kolom factory di DB
+            $style   = $item['style_size'];
+            $noModel = $item['no_model'];
+            $area    = $item['admin'];
 
-            // Ambil qty dari DB lokal
-            $qty = $this->ApsPerstyleModel->getSisaPerSize($area, $noModel, [$style]);
-            $qtyOrderList[$style] = is_array($qty) ? ($qty['qty'] ?? 0) : ($qty->qty ?? 0);
+            $result = $this->ApsPerstyleModel->getSisaPerSize(
+                $area,
+                $noModel,
+                [$style]
+            );
+
+            // Ambil qty dengan aman
+            $qty = (!empty($result) && isset($result[0]['qty']))
+                ? (float)$result[0]['qty']
+                : 0;
+
+            // Simpan per model + size
+            $qtyOrderList[$noModel][$style] = $qty;
+
+            // Optional: log per baris
+            // log_message(
+            //     'debug',
+            //     "QtyOrder | Area={$area} | Model={$noModel} | Size={$style} | Qty={$qty}"
+            // );
         }
 
         // Gabungkan ke response
         foreach ($dataPoTambahan as $i => $row) {
-            $style = $row['style_size'];
-            $qty_order = isset($qtyOrderList[$style]) ? (float)$qtyOrderList[$style] : 0;
-            $composition = (float)$row['composition'] ?? 0;
-            $gw = (float)$row['gw'] ?? 0;
-            $loss = (float)$row['loss'] ?? 0;
+            $noModel = $row['no_model'];
+            $style   = $row['style_size'];
+
+            // 🔑 ambil qty berdasarkan model + size
+            $qty_order = $qtyOrderList[$noModel][$style] ?? 0;
+
+            $composition = (float) ($row['composition'] ?? 0);
+            $gw          = (float) ($row['gw'] ?? 0);
+            $loss        = (float) ($row['loss'] ?? 0);
 
             $dataPoTambahan[$i]['qty_order'] = $qty_order;
-            $dataPoTambahan[$i]['kg_po'] = ($qty_order * $composition * $gw / 100 / 1000) * (1 + ($loss / 100));
+            $dataPoTambahan[$i]['kg_po'] =
+                ($qty_order * $composition * $gw / 100 / 1000)
+                * (1 + ($loss / 100));
 
-            // --- Cari dan masukkan data retur berdasarkan 4 key ---
+            // ====== RETUR (tetap seperti punyamu, SUDAH BENAR) ======
             $key = $row['no_model'] . '|' . $row['item_type'] . '|' . $row['kode_warna'] . '|' . $row['color'];
+
             if (isset($returIndex[$key])) {
                 $dataPoTambahan[$i]['kgs_retur'] = $returIndex[$key]['kgs_retur'];
                 $dataPoTambahan[$i]['cns_retur'] = $returIndex[$key]['cns_retur'];
                 $dataPoTambahan[$i]['krg_retur'] = $returIndex[$key]['krg_retur'];
                 $dataPoTambahan[$i]['lot_retur'] = $returIndex[$key]['lot_retur'];
             } else {
-                // Default 0 / kosong kalau tidak ada retur
                 $dataPoTambahan[$i]['kgs_retur'] = 0;
                 $dataPoTambahan[$i]['cns_retur'] = 0;
                 $dataPoTambahan[$i]['krg_retur'] = 0;

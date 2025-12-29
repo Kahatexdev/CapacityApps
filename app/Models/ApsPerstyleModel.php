@@ -1058,8 +1058,8 @@ class ApsPerstyleModel extends Model
             SELECT 
                 DATE_FORMAT(delivery, '%M') AS month_name, 
                 YEAR(delivery) AS year,
-                round(SUM(qty/24)) AS total_qty, 
-                round(SUM(sisa/24)) AS total_sisa
+                ROUND(SUM(qty/24)) AS total_qty, 
+                ROUND(SUM(CASE WHEN sisa > 0 THEN sisa / 24 ELSE 0 END)) AS total_sisa
             FROM apsperstyle
             WHERE YEAR(delivery) = YEAR(CURDATE()) 
             AND production_unit !='MJ'
@@ -1211,7 +1211,10 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $nomodel)
             ->whereIn('size', $size)
             ->where('qty >', 0)
-            ->first(); // Ambil satu hasil
+            ->groupBy('mastermodel')
+            ->groupBy('size')
+            ->get()
+            ->getResultArray(); // Ambil satu hasil
     }
 
     public function getApsPerStyle($nomodel, $size, $area)

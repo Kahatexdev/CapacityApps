@@ -818,6 +818,7 @@ class ApiController extends ResourceController
 
             if (!isset($grouped[$key])) {
                 $grouped[$key] = [
+                    'idapsperstyle' => $id,
                     'factory'   => $row['factory'],
                     'delivery'  => $row['delivery'],
                     'inisial'      => $row['inisial'],
