@@ -18,6 +18,7 @@ $routes->get('chart/getPerbaikan', 'DeffectController::getPerbaikan');
 $routes->get('chart/getBsMesin', 'DeffectController::getBsMesin');
 $routes->get('chart/dashboardData', 'GodController::dashboardData');
 $routes->get('chart/getDailyProd', 'GodController::getDailyProd');
+$routes->get('oee/fetchData', 'OEEController::fetchData');
 $routes->get('exportProd', 'ExcelController::exportProd');
 
 
