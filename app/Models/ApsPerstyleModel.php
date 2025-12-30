@@ -1041,11 +1041,18 @@ class ApsPerstyleModel extends Model
             ->whereIn('idapsperstyle', (array) $idaps)
             ->findAll();
     }
-    public function getStyleSize($noModel)
+    public function getStyleSize($noModel, $area = NULL)
     {
-        return $this->select('size,inisial')
+        $builder = $this->select('size, inisial')
             ->where('mastermodel', $noModel)
-            ->where('qty > 0')
+            ->where('qty >', 0);
+
+        // tambahkan where area kalau ada
+        if (!empty($area)) {
+            $builder->where('area', $area);
+        }
+
+        return $builder
             ->groupBy('size')
             ->orderBy('size', 'ASC')
             ->findAll();
