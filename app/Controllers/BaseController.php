@@ -53,6 +53,7 @@ use App\Models\HistoryRevisiModel;
 use App\Models\PenggunaanJarum;
 use App\Models\DetailAreaMachineModel;
 use App\Models\DowntimeModel;
+use App\Models\DailyOeeModel;
 
 /**
  * Class BaseController
@@ -125,6 +126,7 @@ abstract class BaseController extends Controller
      * @var BaseConnection
      */
     protected $db;
+    protected $dailyOee;
 
     public function __construct() {}
     /**
@@ -209,6 +211,7 @@ abstract class BaseController extends Controller
         $this->replyModel = new PengaduanReply();
         $this->detailAreaMc = new DetailAreaMachineModel();
         $this->downtimeModel = new DowntimeModel();
+        $this->dailyOee = new DailyOeeModel();
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }

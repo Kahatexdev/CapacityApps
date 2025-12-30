@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Month;
 
 class DowntimeModel extends Model
 {
@@ -20,6 +21,10 @@ class DowntimeModel extends Model
         'total_time',
         'loading_time',
         'operating_time',
+        'performance',
+        'availability',
+        'quality',
+        'oee',
         'breakdown',
         'keterangan'
     ];
@@ -49,4 +54,45 @@ class DowntimeModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getOeeSummary($tanggal, $area)
+    {
+        return $this->select([
+            'AVG(oee) AS oee',
+            'AVG(quality) AS quality',
+            'AVG(performance) AS performance',
+            'AVG(availability) AS availability',
+        ])
+            ->where('tanggal', $tanggal)
+            ->where('area', $area)
+            ->get()
+            ->getRowArray();
+    }
+
+    public function getOeeDetail($tanggal, $area)
+    {
+        return $this->where('tanggal', $tanggal)
+            ->where('area', $area)
+            ->findAll();
+    }
+    public function getLatestData()
+    {
+        return $this->select('tanggal')
+            ->orderBy('tanggal', 'DESC')
+            ->first();
+    }
+    public function averageMonth(string $tanggal, string $area): array
+    {
+        return $this->select([
+            'AVG(oee) AS oee',
+            'AVG(quality) AS quality',
+            'AVG(performance) AS performance',
+            'AVG(availability) AS availability',
+        ])
+            ->where('MONTH(tanggal)', date('m', strtotime($tanggal)))
+            ->where('YEAR(tanggal)', date('Y', strtotime($tanggal)))
+            ->where('area', $area)
+            ->get()
+            ->getRowArray();
+    }
 }

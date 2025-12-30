@@ -1897,7 +1897,7 @@ class ProduksiController extends BaseController
                 $prodMap = $bsMcMap = $pbMap = $bsStocklotMap = [];
 
                 $allProd = $this->produksiModel
-                    ->select('SUM(produksi.qty_produksi) AS qtyProd, produksi.area, apsperstyle.size')
+                    ->select('SUM(produksi.qty_produksi) AS qtyProd, UPPER(produksi.area) AS area, apsperstyle.size')
                     ->join('apsperstyle', 'apsperstyle.idapsperstyle=produksi.idapsperstyle')
                     ->where('apsperstyle.mastermodel', $no_model)
                     ->groupBy('produksi.area, apsperstyle.size')
@@ -1911,7 +1911,7 @@ class ProduksiController extends BaseController
                 // 3. BS MESIN (1 QUERY)
                 // ===========================
                 $allBsMc = $this->bsMesinModel
-                    ->select('area, size, sum(qty_gram) AS bs_gram, sum(qty_pcs) AS qty_pcs')
+                    ->select('UPPER(area) AS area, size, sum(qty_gram) AS bs_gram, sum(qty_pcs) AS qty_pcs')
                     ->where('no_model', $no_model)
                     ->groupBy('area, size')
                     ->findAll();
@@ -1927,7 +1927,7 @@ class ProduksiController extends BaseController
                 // 4. PERBAIKAN AREA (1 QUERY)
                 // ===========================
                 $allPb = $this->perbaikanAreaModel
-                    ->select('perbaikan_area.area, apsperstyle.size, SUM(perbaikan_area.qty) AS qtyPb')
+                    ->select('UPPER(perbaikan_area.area) AS area, apsperstyle.size, SUM(perbaikan_area.qty) AS qtyPb')
                     ->join('apsperstyle', 'apsperstyle.idapsperstyle = perbaikan_area.idapsperstyle')
                     ->where('apsperstyle.mastermodel', $no_model)
                     ->where('apsperstyle.qty > 0')
@@ -1942,7 +1942,7 @@ class ProduksiController extends BaseController
                 // 5. BS STOCKLOT (1 QUERY)
                 // ===========================
                 $allBsStocklot = $this->bsModel
-                    ->select('data_bs.area, apsperstyle.size, SUM(data_bs.qty) AS qtyBs')
+                    ->select('UPPER(data_bs.area) AS area, apsperstyle.size, SUM(data_bs.qty) AS qtyBs')
                     ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle')
                     ->where('apsperstyle.mastermodel', $no_model)
                     ->groupBy('data_bs.area, apsperstyle.size')
@@ -1955,31 +1955,39 @@ class ProduksiController extends BaseController
                 // ========================================
                 // 6. LOOP UTAMA (TANPA QUERY LAGI)
                 // ========================================
+                // dd($allData);
                 foreach ($allData as $key => $id) {
 
                     $area = $id['factory'];   // field dari geQtyByModel
                     $size = $id['size'];
 
                     // PRODUKSI
-                    $allData[$key]['prodPcs'] = $prodMap[$area][$size] ?? 0;
-                    $allData[$key]['prodDz'] = round($prodMap[$area][$size] / 24) ?? 0;
+                    $allData[$key]['prodPcs'] = $prodQty = $prodMap[$area][$size] ?? 0;
+                    $allData[$key]['prodDz'] = round($prodQty / 24) ?? 0;
 
                     // BS MESIN
-                    $allData[$key]['bsMcPcs']  = $bsMcMap[$area][$size]['qty_pcs'] ?? 0;
-                    $allData[$key]['bsMcGram'] = $bsMcMap[$area][$size]['bs_gram'] ?? 0;
-                    $bsMcPercen = $bsMcMap[$area][$size]['qty_pcs'] / ($prodMap[$area][$size] + $bsMcMap[$area][$size]['qty_pcs']) * 100;
+                    $allData[$key]['bsMcPcs']  = $bsMcQty = $bsMcMap[$area][$size]['qty_pcs'] ?? 0;
+                    $allData[$key]['bsMcGram'] = $bsMcGram = $bsMcMap[$area][$size]['bs_gram'] ?? 0;
+                    $bsMcPercen = $bsMcQty > 0
+                        ? $bsMcQty / ($prodQty + $bsMcQty) * 100
+                        : 0;
                     $allData[$key]['bsMcPercen'] = round($bsMcPercen) ?? 0;
 
                     // PERBAIKAN
-                    $allData[$key]['pbAreaPcs'] = $pbMap[$area][$size] ?? 0;
-                    $allData[$key]['pbAreaDz'] = round($pbMap[$area][$size] / 24) ?? 0;
-                    $pbAreaPercen = $pbMap[$area][$size] / $prodMap[$area][$size] * 100;
+                    $allData[$key]['pbAreaPcs'] = $pbQty = $pbMap[$area][$size] ?? 0;
+                    $allData[$key]['pbAreaDz'] = round($pbQty / 24) ?? 0;
+                    $pbAreaPercen = $pbQty > 0
+                        ? ($pbQty / $prodQty) * 100
+                        : 0;
+
                     $allData[$key]['pbAreaPercen'] = round($pbAreaPercen) ?? 0;
 
                     // BS STOCKLOT
-                    $allData[$key]['bsStocklotPcs'] = $bsStocklotMap[$area][$size] ?? 0;
-                    $allData[$key]['bsStocklotDz'] = round($bsStocklotMap[$area][$size] / 24) ?? 0;
-                    $bsStocklotPercen = $pbMap[$area][$size] / $prodMap[$area][$size] * 100;
+                    $allData[$key]['bsStocklotPcs'] = $bsStk = $bsStocklotMap[$area][$size] ?? 0;
+                    $allData[$key]['bsStocklotDz'] = round($bsStk / 24) ?? 0;
+                    $bsStocklotPercen = $bsStk > 0
+                        ? ($bsStk / $prodQty) * 100
+                        : 0;
                     $allData[$key]['bsStocklotPercen'] = round($bsStocklotPercen) ?? 0;
                 }
             }

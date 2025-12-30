@@ -867,4 +867,60 @@ class ProduksiModel extends Model
 
         return $mc;
     }
+    public function getProduksiDanBsBulk($area, $tanggal)
+    {
+        // ================= PRODUKSI =================
+        $produksiRows = $this->db->table('produksi p')
+            ->select('
+            p.area,
+            p.no_mesin,
+            aps.machinetypeid as jarum,
+            SUM(p.qty_produksi) as prod,
+            aps.smv
+        ')
+            ->join('apsperstyle aps', 'aps.idapsperstyle = p.idapsperstyle', 'left')
+            ->where('p.tgl_produksi', $tanggal)
+            ->where('p.area', $area)
+            ->groupBy('p.area, p.no_mesin, aps.machinetypeid, aps.smv')
+            ->get()
+            ->getResultArray();
+
+        // ================= BS =================
+        $bsRows = $this->db->table('bs_mesin')
+            ->select('area, no_mesin, SUM(qty_pcs) as bs')
+            ->where('tanggal_produksi', $tanggal)
+            ->where('area', $area)
+            ->groupBy('area, no_mesin')
+            ->get()
+            ->getResultArray();
+
+        // ================= INDEXING =================
+        $indexed = [];
+        foreach ($produksiRows as $p) {
+            $key = implode('|', [
+                strtoupper($p['area']),
+                $tanggal,
+                $p['no_mesin'],
+                substr($p['jarum'], 2)
+            ]);
+
+            $indexed[$key] = [
+                'prod' => (int) $p['prod'],
+                'smv'  => (float) $p['smv'],
+                'bs'   => 0
+            ];
+        }
+
+        foreach ($bsRows as $b) {
+            foreach ($indexed as $key => &$val) {
+                if (
+                    str_contains($key, "{$b['area']}|{$tanggal}|{$b['no_mesin']}")
+                ) {
+                    $val['bs'] = (int) $b['bs'];
+                }
+            }
+        }
+
+        return $indexed;
+    }
 }
