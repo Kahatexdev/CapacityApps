@@ -98,62 +98,62 @@
     </div>
 </div>
 
-    <!-- ================= KPI ================= -->
-    <div class="row g-3 mb-4">
+<!-- ================= KPI ================= -->
+<div class="row g-3 mb-4">
 
-        <?php
-        $kpis = [
-            ['OEE', 'oeeText'],
-            ['Quality', 'qualityText'],
-            ['Performance', 'performanceText'],
-            ['Availability', 'availabilityText'],
-        ];
-        ?>
+    <?php
+    $kpis = [
+        ['OEE', 'oeeText'],
+        ['Quality', 'qualityText'],
+        ['Performance', 'performanceText'],
+        ['Availability', 'availabilityText'],
+    ];
+    ?>
 
-        <?php foreach ($kpis as [$label, $id]): ?>
-            <div class="col-xl-3 col-sm-6">
-                <div class="card shadow-sm kpi-card">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="mb-1 text-uppercase small"><?= $label ?></p>
-                            <h4 class="mb-0" id="<?= $id ?>">-</h4>
-                        </div>
-                        <i class="fas fa-percent fa-2x opacity-50"></i>
+    <?php foreach ($kpis as [$label, $id]): ?>
+        <div class="col-xl-3 col-sm-6">
+            <div class="card shadow-sm kpi-card">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="mb-1 text-uppercase small"><?= $label ?></p>
+                        <h4 class="mb-0" id="<?= $id ?>">-</h4>
                     </div>
+                    <i class="fas fa-percent fa-2x opacity-50"></i>
                 </div>
             </div>
-        <?php endforeach; ?>
-
-    </div>
-
-    <!-- ================= TABLE ================= -->
-    <div class="card shadow-sm">
-        <div class="card-body table-responsive">
-            <table id="example" class="table table-sm table-bordered text-center align-middle">
-                <thead class="bg-light">
-                    <tr>
-                        <th rowspan="2">Jarum</th>
-                        <th rowspan="2">Mesin</th>
-                        <th colspan="3">Time (Menit)</th>
-                        <th colspan="4">Performance Indicator (%)</th>
-                        <th colspan="2">Downtime</th>
-                    </tr>
-                    <tr>
-                        <th>Loading</th>
-                        <th>Operating</th>
-                        <th>Total DT</th>
-                        <th>Quality</th>
-                        <th>Performance</th>
-                        <th>Availability</th>
-                        <th class="text-primary">OEE</th>
-                        <th>Breakdown</th>
-                        <th>Others</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
         </div>
+    <?php endforeach; ?>
+
+</div>
+
+<!-- ================= TABLE ================= -->
+<div class="card shadow-sm">
+    <div class="card-body table-responsive">
+        <table id="example" class="table table-sm table-bordered text-center align-middle">
+            <thead class="bg-light">
+                <tr>
+                    <th rowspan="2">Jarum</th>
+                    <th rowspan="2">Mesin</th>
+                    <th colspan="3">Time (Menit)</th>
+                    <th colspan="4">Performance Indicator (%)</th>
+                    <th colspan="2">Downtime</th>
+                </tr>
+                <tr>
+                    <th>Loading</th>
+                    <th>Operating</th>
+                    <th>Total DT</th>
+                    <th>Quality</th>
+                    <th>Performance</th>
+                    <th>Availability</th>
+                    <th class="text-primary">OEE</th>
+                    <th>Breakdown</th>
+                    <th>Others</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
+</div>
 
 </div>
 <div class="modal fade" id="modalImport" tabindex="-1">
@@ -238,8 +238,11 @@
     }
 
     function normalizeKeterangan(text) {
-        return text === 'TIDAK ADA(0)' ? '' : text;
+        return (text === 'TIDAK ADA(0)' || text === 'TIDAK ADA(0),') ?
+            '' :
+            text;
     }
+
 
     function handleFilterChange() {
         fetchOee($('#filterTanggal').val(), $('#filterArea').val());
