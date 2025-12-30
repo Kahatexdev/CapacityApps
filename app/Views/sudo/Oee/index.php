@@ -67,9 +67,7 @@
                         </div>
 
                         <div class="col-md-6 d-flex justify-content-md-end gap-2 mt-3 mt-md-0">
-                            <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#modalImport">
-                                <i class="fas fa-file-import me-1"></i> Import Downtime
-                            </button>
+                            <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#modalImport"> <i class="fas fa-file-import me-1"></i> Import Downtime </button>
                             <a href="<?= base_url($role . '/oee/download-template') ?>" class="btn btn-success">
                                 <i class="fas fa-download me-1"></i> Download Template
                             </a>
@@ -157,7 +155,26 @@
     </div>
 
 </div>
-
+<div class="modal fade" id="modalImport" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Upload File Excel</h5> <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formImportOrder" enctype="multipart/form-data" action="<?= base_url($role . '/oee/importdowntime') ?>" method="post">
+                <div class="modal-body">
+                    <div class="mb-3"> <label for="excelFile" class="form-label fw-semibold"> <i class="fas fa-file-excel me-1 text-success"></i> Pilih File Excel </label> <!-- Dropzone Style -->
+                        <div class="p-4 border border-2 rounded-3 text-center upload-area bg-light" style="cursor: pointer;" onclick="document.getElementById('excelFile').click()"> <i class="fas fa-cloud-upload-alt fa-2x mb-2 text-dark"></i>
+                            <p class="mb-1 fw-semibold">Klik untuk memilih file</p>
+                            <p class="text-muted small mb-0">Format yang didukung: .xlsx, .xls, .csv</p>
+                        </div> <!-- Hidden File Input --> <input type="file" class="form-control" id="excelFile" name="file" accept=".xlsx, .xls, .csv" required>
+                    </div>
+                </div>
+                <div class="modal-footer"> <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> <i class="fas fa-times me-1"></i> Batal </button> <button type="submit" class="btn btn-dark" id="btnImport"> <i class="fas fa-upload me-1"></i> Upload </button> </div>
+            </form>
+        </div>
+    </div>
+</div>
 <!-- ================= SCRIPT ================= -->
 <script>
     $('#btnFilter').on('click', handleFilterChange);
