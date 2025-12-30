@@ -1041,11 +1041,18 @@ class ApsPerstyleModel extends Model
             ->whereIn('idapsperstyle', (array) $idaps)
             ->findAll();
     }
-    public function getStyleSize($noModel)
+    public function getStyleSize($noModel, $area = NULL)
     {
-        return $this->select('size,inisial')
+        $builder = $this->select('size, inisial')
             ->where('mastermodel', $noModel)
-            ->where('qty > 0')
+            ->where('qty >', 0);
+
+        // tambahkan where area kalau ada
+        if (!empty($area)) {
+            $builder->where('area', $area);
+        }
+
+        return $builder
             ->groupBy('size')
             ->orderBy('size', 'ASC')
             ->findAll();
@@ -1059,7 +1066,7 @@ class ApsPerstyleModel extends Model
                 DATE_FORMAT(delivery, '%M') AS month_name, 
                 YEAR(delivery) AS year,
                 ROUND(SUM(qty/24)) AS total_qty, 
-                ROUND(SUM(CASE WHEN sisa > 0 THEN sisa / 24 ELSE 0 END)) AS total_sisa
+                ROUND(SUM(sisa/24)) AS total_sisa
             FROM apsperstyle
             WHERE YEAR(delivery) = YEAR(CURDATE()) 
             AND production_unit !='MJ'
