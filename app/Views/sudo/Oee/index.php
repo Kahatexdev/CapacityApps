@@ -96,6 +96,7 @@
             </div>
         </div>
     </div>
+</div>
 
     <!-- ================= KPI ================= -->
     <div class="row g-3 mb-4">
@@ -228,12 +229,16 @@
                     <td>${r.performance}%</td>
                     <td>${r.availability}%</td>
                     <td class="${oeeClass(r.oee)}">${r.oee}%</td>
-                    <td>${r.breakdown}</td>
-                    <td>${r.keterangan}</td>
+                   <td>${normalizeKeterangan(r.breakdown)}</td>
+                   <td>${normalizeKeterangan(r.keterangan)}</td>
                 </tr>`;
         });
 
         $('#example tbody').html(rows);
+    }
+
+    function normalizeKeterangan(text) {
+        return text === 'TIDAK ADA(0)' ? '' : text;
     }
 
     function handleFilterChange() {
