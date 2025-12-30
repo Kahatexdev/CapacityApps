@@ -1510,6 +1510,7 @@ class MaterialController extends BaseController
         }
 
         log_message('debug', 'PPH: ' . print_r($brutoList, true));
+        log_message('debug', 'QTY ORDER LIST: ' . print_r($qtyOrderList, true));
 
         return $this->response->setJSON([
             'item_types' => $itemTypes,
@@ -1635,7 +1636,7 @@ class MaterialController extends BaseController
             $noModel = $item['no_model'];
             $area    = $item['admin'];
 
-            $result = $this->ApsPerstyleModel->getSisaPerSize(
+            $result = $this->ApsPerstyleModel->getPerSize(
                 $area,
                 $noModel,
                 [$style]
@@ -1875,7 +1876,7 @@ class MaterialController extends BaseController
                 return $this->response->setJSON(['error' => $e->getMessage()])->setStatusCode(500);
             }
         } else {
-            $data = $this->ApsPerstyleModel->getStyleSize($noModel); // Sesuaikan dengan model Anda
+            $data = $this->ApsPerstyleModel->getStyleSize($noModel, $area); // Sesuaikan dengan model Anda
         }
 
         // Kembalikan data dalam format JSON
