@@ -57,6 +57,28 @@ class Downtime extends Migration
                 'type'       => 'VARCHAR',
                 'constraint' => 100,
             ],
+            'oee' => [
+                'type'       => 'int',
+                'constraint' => 11,
+                'default'    => 0,
+                'comment'    => 'OEE',
+            ],
+            'quality' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'default'    => 0,
+            ],
+            'performance' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'default'    => 0,
+            ],
+            'availability' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'default'    => 0,
+
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,
@@ -68,7 +90,6 @@ class Downtime extends Migration
         ]);
 
         $this->forge->addKey('id', true);
-        $this->forge->addKey(['area', 'tanggal']);
         $this->forge->createTable('downtime', true);
     }
 
