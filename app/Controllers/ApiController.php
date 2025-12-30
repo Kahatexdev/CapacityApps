@@ -824,6 +824,7 @@ class ApiController extends ResourceController
                     'inisial'      => $row['inisial'],
                     'size'      => $row['size'],
                     'color'      => $row['color'],
+                    'smv'      => $row['smv'],
                     'countries'      => [], // jika ada lebih dari 1 country pakai koma aja, tampilin semua
                     'qty_order' => 0,
                     'sisa_order' => 0,

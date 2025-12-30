@@ -1218,6 +1218,16 @@ class ApsPerstyleModel extends Model
             ->where('mastermodel', $nomodel)
             ->whereIn('size', $size)
             ->where('qty >', 0)
+            ->first(); // Ambil satu hasil
+    }
+
+    public function getPerSize($area, $nomodel, $size)
+    {
+        return $this->select('sum(qty) as qty, sum(sisa) as sisa, sum(po_plus) as po_plus')
+            ->where('factory', $area)
+            ->where('mastermodel', $nomodel)
+            ->whereIn('size', $size)
+            ->where('qty >', 0)
             ->groupBy('mastermodel')
             ->groupBy('size')
             ->get()
@@ -1642,7 +1652,7 @@ class ApsPerstyleModel extends Model
     }
     public function getStatusOrder($noModel)
     {
-        return $this->select('apsperstyle.idapsperstyle, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.inisial, apsperstyle.size, apsperstyle.color, apsperstyle.country, apsperstyle.delivery, apsperstyle.factory, apsperstyle.qty, apsperstyle.sisa, apsperstyle.po_plus')
+        return $this->select('apsperstyle.idapsperstyle, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.inisial, apsperstyle.size, apsperstyle.color, apsperstyle.country, apsperstyle.delivery, apsperstyle.factory, apsperstyle.qty, apsperstyle.sisa, apsperstyle.po_plus, apsperstyle.smv')
             ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
             ->where('apsperstyle.mastermodel', $noModel)
             ->where('apsperstyle.qty <>', 0)
