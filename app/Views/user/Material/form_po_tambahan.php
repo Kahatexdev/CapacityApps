@@ -517,7 +517,9 @@
                 const poKgTanpaLoss = gw > 0 ?
                     qtyOrderVal * composition * gw / 100 / 1000 :
                     0;
-
+                console.log("QTY PO KG:", qtyPoKg);
+                console.log("QTY ORDER:", qtyOrderVal);
+                console.log("COMPOCITION:", composition);
                 $template.find('.po-kg-perstyle').val(qtyPoKg.toFixed(2));
                 $template.find('.po-kg-perstyle-tanpa-loss').val(poKgTanpaLoss.toFixed(2));
 
