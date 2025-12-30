@@ -4183,7 +4183,7 @@ class ExcelController extends BaseController
             $noModel = $item['no_model'];
             $area    = $item['admin'];
 
-            $result = $this->ApsPerstyleModel->getSisaPerSize(
+            $result = $this->ApsPerstyleModel->getPerSize(
                 $area,
                 $noModel,
                 [$style]
@@ -8034,11 +8034,15 @@ class ExcelController extends BaseController
                     $fmt($sisa_order_pcs, 0), // P
                     $fmt($poplus_mc_kg, 2), // Q
                     '', // R
-                    $fmt($poplus_mc_kg / $kg_po * 100, 2) . '%', // S
+                    ($kg_po > 0 && $poplus_mc_kg > 0)
+                        ? number_format(($poplus_mc_kg / $kg_po) * 100, 2) . '%'
+                        : '', // S
                     $fmt($plus_pck_pcs, 0), // T
                     $fmt($plus_pck_kg, 2), // U
                     '', // V
-                    $fmt($plus_pck_kg / $kg_po * 100, 2) . '%', // W
+                    ($kg_po > 0 && $plus_pck_kg > 0)
+                        ? number_format(($plus_pck_kg / $kg_po) * 100, 2) . '%'
+                        : '', // W
                     '', // X
                     '', // Y
                     '', // Z
