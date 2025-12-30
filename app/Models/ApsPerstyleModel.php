@@ -1049,7 +1049,7 @@ class ApsPerstyleModel extends Model
 
         // tambahkan where area kalau ada
         if (!empty($area)) {
-            $builder->where('area', $area);
+            $builder->where('factory', $area);
         }
 
         return $builder

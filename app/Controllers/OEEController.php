@@ -84,7 +84,7 @@ class OEEController extends BaseController
                 $ket   = strtoupper(trim($worksheet->getCell("G{$row}")->getValue()));
 
                 // skip row kosong / aneh
-                if (!$noMc || $menit <= 0) {
+                if (!$noMc || $menit < 0) {
                     continue;
                 }
 
