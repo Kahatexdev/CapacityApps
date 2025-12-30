@@ -1875,7 +1875,7 @@ class MaterialController extends BaseController
                 return $this->response->setJSON(['error' => $e->getMessage()])->setStatusCode(500);
             }
         } else {
-            $data = $this->ApsPerstyleModel->getStyleSize($noModel); // Sesuaikan dengan model Anda
+            $data = $this->ApsPerstyleModel->getStyleSize($noModel, $area); // Sesuaikan dengan model Anda
         }
 
         // Kembalikan data dalam format JSON
