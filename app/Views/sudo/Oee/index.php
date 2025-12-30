@@ -238,10 +238,14 @@
     }
 
     function normalizeKeterangan(text) {
-        return (text === 'TIDAK ADA(0)' || text === 'TIDAK ADA(0),') ?
-            '' :
-            text;
+        if (!text) return '';
+
+        return text
+            .replace(/,\s*TIDAK ADA\(\d+\)/gi, '') // hapus ", TIDAK ADA(x)"
+            .replace(/TIDAK ADA\(\d+\)/gi, '') // jaga-jaga kalau sendirian
+            .trim();
     }
+
 
 
     function handleFilterChange() {
