@@ -17,9 +17,13 @@
                         </div>
                         <div>
 
-                            <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md d-inline-flex align-items-center">
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModalMessage" class="btn btn-success bg-gradient-info shadow text-center border-radius-md d-inline-flex align-items-center me-2">
                                 <i class="fas fa-plus-circle me-2 text-lg opacity-10" style="margin-right: 0.5rem;"></i> <span class="ms-1">Tambah User</span>
                             </button>
+
+                            <a class="btn btn-success bg-gradient-info shadow text-center border-radius-md d-inline-flex align-items-center" href="<?= base_url($role . '/locked-users') ?>">
+                                 <i class="fa fa-unlock me-sm-1"></i></i> <span class="ms-1">Unlock User</span>
+                            </a>
 
                         </div>
                     </div>
