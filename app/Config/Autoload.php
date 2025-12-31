@@ -100,6 +100,9 @@ class Autoload extends AutoloadConfig
     public $helpers = [
         'url',
         'calendar',
-        'api'
+        'api',
+        'audit',
+        'audit_detector_helper',
+        'auditauto'
     ];
 }

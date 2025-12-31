@@ -8,11 +8,45 @@
     }
 </style>
 <style>
+    /* ================= TABLE WRAPPER ================= */
+    .oee-table-wrapper {
+        max-height: 500px;
+        overflow-y: auto;
+        position: relative;
+    }
+
     /* ================= TABLE ================= */
+    #example {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    /* ================= HEADER BASE ================= */
     #example thead th {
         font-size: 11px;
         text-transform: uppercase;
         white-space: nowrap;
+        background-color: #f8f9fa;
+    }
+
+    /* header row 1 */
+    #example thead tr:first-child th {
+        position: sticky;
+        top: 0;
+        z-index: 3;
+    }
+
+    /* header row 2 */
+    #example thead tr:nth-child(2) th {
+        position: sticky;
+        top: 34px;
+        /* tinggi row pertama */
+        z-index: 2;
+    }
+
+    /* ================= BODY ================= */
+    #example tbody td {
+        background-color: #fff;
     }
 
     /* ================= OEE CELL ================= */
@@ -55,7 +89,7 @@
 <div class="container-fluid py-4">
 
     <!-- ================= HEADER ================= -->
-    <div class="row mb-3">
+    <div class="row mb-1">
         <div class="col-12">
             <div class="card shadow-sm">
                 <div class="card-body px-4 py-3">
@@ -76,8 +110,13 @@
 
                     <div class="row align-items-center border-top pt-3">
                         <div class="col-md-6">
-                            <span class="fw-bold">Average OEE This Month:</span>
-                            <span class="fw-bold text-primary ms-1" id="averageMonth">-</span>
+                            <span class="fw-bold">Area: <strong class="area"> - </strong> </span><br>
+                            <span class="fw-bold">Average OEE <strong class="monthName"> - </strong>:</span>
+                            <span class="fw-bold text-primary ms-1" id="averageMonth">-</span><br>
+                            <span class="fw-bold">Average Quality <strong class="monthName"> - </strong></span>
+                            <span class="fw-bold text-primary ms-1" id="averageQuality">-</span><br>
+                            <span class="fw-bold">Average Performance <strong class="monthName"> - </strong></span>
+                            <span class="fw-bold text-primary ms-1" id="averagePerformance">-</span>
                         </div>
 
                         <div class="col-md-6 d-flex justify-content-md-end gap-2 mt-2 mt-md-0">
@@ -99,7 +138,17 @@
 </div>
 
 <!-- ================= KPI ================= -->
-<div class="row g-3 mb-4">
+<div class="row g-3  mx-4">
+    <div class="card">
+
+        <div class="card-header">
+            <h5>
+                OEE
+                <strong id="tanggal">area</strong>
+            </h5>
+        </div>
+    </div>
+
 
     <?php
     $kpis = [
@@ -128,20 +177,19 @@
 
 <!-- ================= TABLE ================= -->
 <div class="card shadow-sm">
-    <div class="card-body table-responsive">
+    <div class="card-body oee-table-wrapper">
         <table id="example" class="table table-sm table-bordered text-center align-middle">
-            <thead class="bg-light">
+            <thead>
                 <tr>
                     <th rowspan="2">Jarum</th>
-                    <th rowspan="2">Mesin</th>
-                    <th colspan="3">Time (Menit)</th>
+                    <th rowspan="2">No Mesin</th>
+                    <th colspan="2">Time (Menit)</th>
                     <th colspan="4">Performance Indicator (%)</th>
                     <th colspan="2">Downtime</th>
                 </tr>
                 <tr>
-                    <th>Loading</th>
-                    <th>Operating</th>
                     <th>Total DT</th>
+                    <th>Operating</th>
                     <th>Quality</th>
                     <th>Performance</th>
                     <th>Availability</th>
@@ -150,10 +198,13 @@
                     <th>Others</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+                <!-- data -->
+            </tbody>
         </table>
     </div>
 </div>
+
 
 </div>
 <div class="modal fade" id="modalImport" tabindex="-1">
@@ -200,16 +251,31 @@
     }
 
     function fetchOee(tanggal, area) {
-        $.getJSON("<?= base_url('oee/fetchData') ?>", {
-            tanggal,
-            area
-        }, dashboard);
+        $.getJSON(
+            "<?= base_url('oee/fetchData') ?>", {
+                tanggal,
+                area
+            },
+            function(response) {
+                dashboard(response, area, tanggal);
+            }
+        );
     }
 
-    function dashboard(data) {
+    function dashboard(data, area, tanggal) {
         if (!data.status) return alert(data.message);
 
+        const dateObj = new Date(tanggal);
+        const monthName = new Intl.DateTimeFormat('en-US', {
+                month: 'long'
+            })
+            .format(dateObj);
+        $('.monthName').text(monthName);
+        $('.area').text(area);
+        $('#tanggal').text(tanggal);
         $('#averageMonth').text(formatPercent(data.average.oee));
+        $('#averageQuality').text(formatPercent(data.average.quality));
+        $('#averagePerformance').text(formatPercent(data.average.performance));
 
         applyKpi('oeeText', data.summary.oee);
         applyKpi('qualityText', data.summary.quality);
@@ -223,7 +289,6 @@
                     <td>${r.jarum}</td>
                     <td>${r.no_mc}</td>
                     <td>${r.total_time}</td>
-                    <td>${r.loading_time}</td>
                     <td>${r.operating_time}</td>
                     <td>${r.quality}%</td>
                     <td>${r.performance}%</td>
