@@ -1708,4 +1708,26 @@ class ApsPerstyleModel extends Model
             ->where('qty >', 0)
             ->findAll();
     }
+    public function getWarnaSmv(array $models)
+    {
+        return $this->select('mastermodel, size, color, smv')
+            ->whereIn('mastermodel', $models)
+            ->groupBy('mastermodel')
+            ->groupBy('size')
+            ->get()
+            ->getResultArray();
+    }
+    public function getNoModelJalan($area)
+    {
+        return $this->select('apsperstyle.mastermodel')
+            ->distinct()
+            ->join(
+                'produksi',
+                'produksi.idapsperstyle = apsperstyle.idapsperstyle',
+                'inner'
+            )
+            ->where('apsperstyle.factory', $area)
+            ->orderBy('apsperstyle.mastermodel', 'ASC')
+            ->findAll();
+    }
 }
