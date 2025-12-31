@@ -65,6 +65,7 @@ class DowntimeModel extends Model
         ])
             ->where('tanggal', $tanggal)
             ->where('area', $area)
+            ->where('OEE >', 0)
             ->get()
             ->getRowArray();
     }
@@ -73,6 +74,7 @@ class DowntimeModel extends Model
     {
         return $this->where('tanggal', $tanggal)
             ->where('area', $area)
+            ->where('OEE >', 0)
             ->findAll();
     }
     public function getLatestData()
@@ -92,6 +94,7 @@ class DowntimeModel extends Model
             ->where('MONTH(tanggal)', date('m', strtotime($tanggal)))
             ->where('YEAR(tanggal)', date('Y', strtotime($tanggal)))
             ->where('area', $area)
+            ->where('OEE >', 0)
             ->get()
             ->getRowArray();
     }

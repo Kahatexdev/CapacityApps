@@ -29,4 +29,24 @@ class Services extends BaseService
      *     return new \CodeIgniter\Example();
      * }
      */
+
+    public static function AuditLoggerService($getShared = true)
+    {
+        if ($getShared) {
+            return static::getSharedInstance('AuditLoggerService');
+        }
+
+        return new \App\Services\AuditLoggerService();
+    }
+
+    public static function auditRegistry($getShared = true)
+    {
+        if ($getShared) {
+            return static::getSharedInstance('auditRegistry');
+        }
+
+        return new \App\Services\AuditRegistry();
+    }
+
+
 }
