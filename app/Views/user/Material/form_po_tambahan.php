@@ -83,7 +83,7 @@
                                     <select class="form-control select-no-model" name="no_model[0][no_model]" required>
                                         <option value="">Pilih No Model</option>
                                         <?php foreach ($noModel as $m) : ?>
-                                            <option value="<?= $m ?>" data-no-model="<?= $m ?>"><?= $m ?></option>
+                                            <option value="<?= $m['mastermodel'] ?>" data-no-model="<?= $m['mastermodel'] ?>"><?= $m['mastermodel'] ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>

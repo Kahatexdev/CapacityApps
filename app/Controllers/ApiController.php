@@ -574,7 +574,8 @@ class ApiController extends ResourceController
     public function getNoModel()
     {
         $area    = $this->request->getGet('area');
-        $model = $this->ApsPerstyleModel->getModelArea($area);
+        // $model = $this->ApsPerstyleModel->getModelArea($area);
+        $model = $this->ApsPerstyleModel->getNoModelJalan($area);
         return $this->response->setJSON($model);
     }
     public function getSisaPerSize($area, $noModel)
@@ -905,5 +906,22 @@ class ApiController extends ResourceController
         $orderQty = $this->ApsPerstyleModel->getQtyOrderByNoModel($models);
 
         return $this->response->setJSON($orderQty);
+    }
+
+    public function getWarnaSmv()
+    {
+        $models = $this->request->getGet('no_model');
+
+        if (empty($models)) {
+            return $this->response->setStatusCode(400)->setJSON([]);
+        }
+
+        $models = is_array($models)
+            ? $models
+            : explode(',', $models);
+
+        $data = $this->ApsPerstyleModel->getWarnaSmv($models);
+
+        return $this->response->setJSON($data);
     }
 }
