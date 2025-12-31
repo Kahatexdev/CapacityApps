@@ -1378,8 +1378,8 @@ class MaterialController extends BaseController
     }
     public function formPoTambahan($area)
     {
-        $model = $this->ApsPerstyleModel->getPerArea($area);
-        $noModel = array_unique(array_column($model, 'mastermodel'));
+        $models = $this->ApsPerstyleModel->getNoModelJalan($area);
+
         $data = [
             'active1' => '',
             'active2' => '',
@@ -1387,7 +1387,7 @@ class MaterialController extends BaseController
             'active4' => '',
             'active5' => '',
             'active6' => '',
-            'noModel' => $noModel,
+            'noModel' => $models,
             'title' => 'Po Tambahan',
             'area' => $area,
             'role' => session()->get('role'),
