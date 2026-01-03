@@ -63,9 +63,14 @@ class ReturController extends BaseController
         }
         $listRetur = api_url('material') . 'listRetur/' . $area;
         $res = file_get_contents($listRetur);
-        $list = json_decode($res, true);
+        if ($res === false) {
+            log_message('error', 'API listRetur gagal: ' . $listRetur);
+            $list = [];
+        } else {
+            $list = json_decode($res, true);
+        }
         $listRetur = $list['listRetur'] ?? [];
-        $data = [
+        $viewData = [
             'role' => session()->get('role'),
             'title' => 'Retur Bahan Baku',
             'active1' => '',
